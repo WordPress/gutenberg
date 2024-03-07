@@ -13,23 +13,13 @@ import useNavigationEntities from '../../use-navigation-entities';
 
 jest.mock( '../../use-navigation-menu', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn(
-		() =>
-			new Promise( ( resolve ) => {
-				resolve();
-			} )
-	);
+	const mock = jest.fn();
 	return mock;
 } );
 
 jest.mock( '../../use-navigation-entities', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn(
-		() =>
-			new Promise( ( resolve ) => {
-				resolve();
-			} )
-	);
+	const mock = jest.fn();
 	return mock;
 } );
 
@@ -600,12 +590,14 @@ describe( 'NavigationMenuSelector', () => {
 						} )
 				);
 
-				useNavigationMenu.mockReturnValue( {
-					canUserCreateNavigationMenu: true,
-				} );
-
 				useNavigationEntities.mockReturnValue( {
 					menus: classicMenusFixture,
+				} );
+
+				useNavigationMenu.mockReturnValue( {
+					canUserCreateNavigationMenu: true,
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
 				} );
 
 				const { rerender } = render(
@@ -624,6 +616,16 @@ describe( 'NavigationMenuSelector', () => {
 
 				expect( handler ).toHaveBeenCalled();
 
+				useNavigationMenu.mockReturnValue( {
+					canUserCreateNavigationMenu: true,
+					isResolvingNavigationMenus: true,
+					hasResolvedNavigationMenus: false,
+				} );
+
+				rerender(
+					<NavigationMenuSelector onSelectClassicMenu={ handler } />
+				);
+
 				// Check the dropdown has been closed.
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
@@ -641,6 +643,11 @@ describe( 'NavigationMenuSelector', () => {
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
 					// // Check all menu items are present but disabled.
 					expect( item ).toBeDisabled();
+				} );
+
+				useNavigationMenu.mockReturnValue( {
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
 				} );
 
 				// Simulate the menu being created and component being re-rendered.

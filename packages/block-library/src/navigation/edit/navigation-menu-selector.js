@@ -99,7 +99,7 @@ function NavigationMenuSelector( {
 
 	let selectorLabel = '';
 
-	if ( isUpdatingMenuRef || isResolvingNavigationMenus ) {
+	if ( isResolvingNavigationMenus ) {
 		selectorLabel = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
@@ -149,7 +149,10 @@ function NavigationMenuSelector( {
 									);
 								} }
 								choices={ menuChoices }
-								disabled={ isUpdatingMenuRef }
+								disabled={
+									isUpdatingMenuRef ||
+									! hasResolvedNavigationMenus
+								}
 							/>
 						</MenuGroup>
 					) }
@@ -175,7 +178,10 @@ function NavigationMenuSelector( {
 											createActionLabel,
 											label
 										) }
-										disabled={ isUpdatingMenuRef }
+										disabled={
+											isUpdatingMenuRef ||
+											! hasResolvedNavigationMenus
+										}
 									>
 										{ label }
 									</MenuItem>
@@ -187,7 +193,10 @@ function NavigationMenuSelector( {
 					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
-								disabled={ isUpdatingMenuRef }
+								disabled={
+									isUpdatingMenuRef ||
+									! hasResolvedNavigationMenus
+								}
 								onClick={ () => {
 									setIsUpdatingMenuRef( true );
 									onCreateNew().then( () => {
