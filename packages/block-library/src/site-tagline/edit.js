@@ -12,17 +12,19 @@ import {
 	AlignmentControl,
 	useBlockProps,
 	BlockControls,
+	InspectorControls,
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { SelectControl } from '@wordpress/components';
 
 export default function SiteTaglineEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, tagName: TagName } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -58,7 +60,7 @@ export default function SiteTaglineEdit( {
 			onChange={ setTagline }
 			aria-label={ __( 'Site tagline text' ) }
 			placeholder={ __( 'Write site tagline…' ) }
-			tagName="p"
+			tagName={ TagName }
 			value={ tagline }
 			disableLineBreaks
 			__unstableOnSplitAtEnd={ () =>
@@ -67,10 +69,30 @@ export default function SiteTaglineEdit( {
 			{ ...blockProps }
 		/>
 	) : (
-		<p { ...blockProps }>{ tagline || __( 'Site Tagline placeholder' ) }</p>
+		<TagName { ...blockProps }>
+			{ tagline || __( 'Site Tagline placeholder' ) }
+		</TagName>
 	);
 	return (
 		<>
+			<InspectorControls group="advanced">
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<p>)' ), value: 'p' },
+						{ label: '<h1>', value: 'h1' },
+						{ label: '<h2>', value: 'h2' },
+						{ label: '<h3>', value: 'h3' },
+						{ label: '<h4>', value: 'h4' },
+						{ label: '<h5>', value: 'h5' },
+						{ label: '<h6>', value: 'h6' },
+					] }
+					value={ TagName }
+					onChange={ ( newTagName ) =>
+						setAttributes( { tagName: newTagName } )
+					}
+				/>
+			</InspectorControls>
 			<BlockControls group="block">
 				<AlignmentControl
 					onChange={ ( newAlign ) =>
