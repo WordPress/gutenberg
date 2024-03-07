@@ -85,30 +85,21 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<VStack spacing={ 10 }>
+			<VStack
+				spacing={ 10 }
+				className="edit-site-global-styles-variation-container"
+			>
 				<StyleVariationsContainer />
-				<div className="edit-site-global-styles-style-variations-container">
-					<h2
-						style={ {
-							textTransform: 'uppercase',
-							color: 'white',
-							fontWeight: '400',
-						} }
-					>
+				<div>
+					<h3 className="edit-site-global-styles-variation-title">
 						{ __( 'Colors' ) }
-					</h2>
+					</h3>
 					<ColorVariations />
 				</div>
-				<div className="edit-site-global-styles-style-variations-container">
-					<h2
-						style={ {
-							textTransform: 'uppercase',
-							color: 'white',
-							fontWeight: '400',
-						} }
-					>
+				<div>
+					<h3 className="edit-site-global-styles-variation-title">
 						{ __( 'Typography' ) }
-					</h2>
+					</h3>
 					<TypographyVariations />
 				</div>
 			</VStack>
