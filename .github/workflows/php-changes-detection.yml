@@ -21,8 +21,8 @@ jobs:
               with:
                   files: |
                       *.{php}
-                      lib/**
-                      phpunit/**
+                      lib/**/*.php
+                      phpunit/**/*.php
 
             - name: List all changed files
               if: steps.changed-files-php.outputs.any_changed == 'true'
