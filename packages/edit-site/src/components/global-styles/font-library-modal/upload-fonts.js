@@ -52,7 +52,7 @@ function UploadFonts() {
 		const selectedFiles = [ ...files ];
 		let hasInvalidFiles = false;
 
-		// Use map to create a promise for each file check, then filter with Promise.all
+		// Use map to create a promise for each file check, then filter with Promise.all.
 		const checkFilesPromises = selectedFiles.map( async ( file ) => {
 			const isFont = await isFontFile( file );
 			if ( ! isFont ) {
