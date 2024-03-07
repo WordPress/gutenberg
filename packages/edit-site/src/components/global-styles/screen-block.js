@@ -20,7 +20,10 @@ import ScreenHeader from './header';
 import BlockPreviewPanel from './block-preview-panel';
 import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
-import { useBlockVariations, VariationsPanel } from './variations-panel';
+import {
+	useBlockVariations,
+	VariationsPanel,
+} from './variations/variations-panel';
 
 function applyFallbackStyle( border ) {
 	if ( ! border ) {
@@ -64,7 +67,6 @@ const {
 	useGlobalSetting,
 	useSettingsForBlockElement,
 	useHasColorPanel,
-	useHasEffectsPanel,
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useGlobalStyle,
@@ -72,7 +74,6 @@ const {
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
-	EffectsPanel: StylesEffectsPanel,
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
@@ -124,7 +125,6 @@ function ScreenBlock( { name, variation } ) {
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
-	const hasEffectsPanel = useHasEffectsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
@@ -277,15 +277,6 @@ function ScreenBlock( { name, variation } ) {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-				/>
-			) }
-			{ hasEffectsPanel && (
-				<StylesEffectsPanel
-					inheritedValue={ inheritedStyleWithLayout }
-					value={ styleWithLayout }
-					onChange={ setStyle }
-					settings={ settings }
-					includeLayoutControls
 				/>
 			) }
 			{ hasFiltersPanel && (

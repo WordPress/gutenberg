@@ -47,11 +47,6 @@ const restrictedImports = [
 		message: 'Please use native functionality instead.',
 	},
 	{
-		name: 'reakit',
-		message:
-			'Please use Reakit API through `@wordpress/components` instead.',
-	},
-	{
 		name: '@ariakit/react',
 		message:
 			'Please use Ariakit API through `@wordpress/components` instead.',
@@ -102,6 +97,7 @@ module.exports = {
 	},
 	rules: {
 		'jest/expect-expect': 'off',
+		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
@@ -359,6 +355,31 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
+			rules: {
+				'no-restricted-syntax': [
+					'error',
+					{
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
+						message:
+							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+					{
+						selector:
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
+						message:
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
@@ -384,6 +405,12 @@ module.exports = {
 						],
 					},
 				],
+			},
+		},
+		{
+			files: [ 'packages/interactivity*/src/**' ],
+			rules: {
+				'react/react-in-jsx-scope': 'error',
 			},
 		},
 	],

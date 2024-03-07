@@ -362,7 +362,7 @@ export const viewPostAction = {
 	},
 	callback( posts ) {
 		const post = posts[ 0 ];
-		document.location.href = post.link;
+		window.open( post.link, '_blank' );
 	},
 };
 

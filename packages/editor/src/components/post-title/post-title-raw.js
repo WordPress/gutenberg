@@ -70,7 +70,7 @@ function PostTitleRaw( _, forwardedRef ) {
 			label={ placeholder }
 			className={ className }
 			placeholder={ decodedPlaceholder }
-			hideLabelFromVision={ true }
+			hideLabelFromVision
 			autoComplete="off"
 			dir="auto"
 			rows={ 1 }

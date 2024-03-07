@@ -64,7 +64,6 @@ const linkOptions = [
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const allowedBlocks = [ 'core/image' ];
 
 const PLACEHOLDER_TEXT = Platform.isNative
 	? __( 'Add media' )
@@ -74,6 +73,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
@@ -103,7 +103,6 @@ function GalleryEdit( props ) {
 	const {
 		getBlock,
 		getSettings,
-		preferredStyle,
 		innerBlockImages,
 		blockWasJustInserted,
 		multiGallerySelection,
@@ -116,15 +115,11 @@ function GalleryEdit( props ) {
 				getBlock: _getBlock,
 				wasBlockJustInserted,
 			} = select( blockEditorStore );
-			const preferredStyleVariations =
-				_getSettings().__experimentalPreferredStyleVariations;
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
 				getBlock: _getBlock,
 				getSettings: _getSettings,
-				preferredStyle:
-					preferredStyleVariations?.value?.[ 'core/image' ],
 				innerBlockImages:
 					_getBlock( clientId )?.innerBlocks ?? EMPTY_ARRAY,
 				blockWasJustInserted: wasBlockJustInserted(
@@ -196,10 +191,6 @@ function GalleryEdit( props ) {
 		let newClassName;
 		if ( imageAttributes.className && imageAttributes.className !== '' ) {
 			newClassName = imageAttributes.className;
-		} else {
-			newClassName = preferredStyle
-				? `is-style-${ preferredStyle }`
-				: undefined;
 		}
 
 		let newLinkTarget;
@@ -383,12 +374,6 @@ function GalleryEdit( props ) {
 		setAttributes( { imageCrop: ! imageCrop } );
 	}
 
-	function getImageCropHelp( checked ) {
-		return checked
-			? __( 'Thumbnails are cropped to align.' )
-			: __( 'Thumbnails are not cropped.' );
-	}
-
 	function toggleRandomOrder() {
 		setAttributes( { randomOrder: ! randomOrder } );
 	}
@@ -512,7 +497,8 @@ function GalleryEdit( props ) {
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		...nativeInnerBlockProps,
@@ -550,36 +536,6 @@ function GalleryEdit( props ) {
 							__next40pxDefaultSize
 						/>
 					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Crop images' ) }
-						checked={ !! imageCrop }
-						onChange={ toggleImageCrop }
-						help={ getImageCropHelp }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Random order' ) }
-						checked={ !! randomOrder }
-						onChange={ toggleRandomOrder }
-					/>
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ __( 'Link to' ) }
-						value={ linkTo }
-						onChange={ setLinkTo }
-						options={ linkOptions }
-						hideCancelButton={ true }
-						size="__unstable-large"
-					/>
-					{ hasLinkTo && (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Open in new tab' ) }
-							checked={ linkTarget === '_blank' }
-							onChange={ toggleOpenInNewTab }
-						/>
-					) }
 					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							__nextHasNoMarginBottom
@@ -590,8 +546,37 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							hideCancelButton
 							size="__unstable-large"
+						/>
+					) }
+					<SelectControl
+						__nextHasNoMarginBottom
+						label={ __( 'Link to' ) }
+						value={ linkTo }
+						onChange={ setLinkTo }
+						options={ linkOptions }
+						hideCancelButton
+						size="__unstable-large"
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Crop images to fit' ) }
+						checked={ !! imageCrop }
+						onChange={ toggleImageCrop }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Randomize order' ) }
+						checked={ !! randomOrder }
+						onChange={ toggleRandomOrder }
+					/>
+					{ hasLinkTo && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Open images in new tab' ) }
+							checked={ linkTarget === '_blank' }
+							onChange={ toggleOpenInNewTab }
 						/>
 					) }
 					{ Platform.isWeb && ! imageSizeOptions && hasImageIds && (
@@ -617,7 +602,7 @@ function GalleryEdit( props ) {
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }
-								multiple={ true }
+								multiple
 								mediaIds={ images
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }

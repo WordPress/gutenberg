@@ -8,7 +8,6 @@
 	"description": "Prompt visitors to take action with a button-style link.",
 	"keywords": [ "link" ],
 	"textdomain": "default",
-	"usesContext": [ "pattern/overrides" ],
 	"attributes": {
 		"tagName": {
 			"type": "string",
@@ -98,7 +97,9 @@
 			}
 		},
 		"reusable": false,
-		"shadow": true,
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"spacing": {
 			"__experimentalSkipSerialization": true,
 			"padding": [ "horizontal", "vertical" ],
@@ -119,7 +120,10 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-button .wp-block-button__link"
+		"__experimentalSelector": ".wp-block-button .wp-block-button__link",
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"styles": [
 		{ "name": "fill", "label": "Fill", "isDefault": true },

@@ -1247,6 +1247,27 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning dragging state. It is possible for a user to be dragging
+ * data from outside of the editor, so this state is separate from `draggedBlocks`.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isDragging( state = false, action ) {
+	switch ( action.type ) {
+		case 'START_DRAGGING':
+			return true;
+
+		case 'STOP_DRAGGING':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning dragged block client id.
  *
  * @param {string[]} state  Current state.
@@ -1500,11 +1521,11 @@ export function isSelectionEnabled( state = true, action ) {
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
-			const { clientIds, selectPrevious, blockNamesForPrompt } = action;
+			const { clientIds, selectPrevious, message } = action;
 			return {
 				clientIds,
 				selectPrevious,
-				blockNamesForPrompt,
+				message,
 			};
 		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
 			return false;
@@ -2023,31 +2044,9 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
-function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				useSource: action.useSource,
-				lockAttributesEditing: action.lockAttributesEditing,
-			},
-		};
-	}
-	return state;
-}
-
-function blockPatterns( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_BLOCK_PATTERNS':
-			return action.patterns;
-	}
-
-	return state;
-}
-
 const combinedReducers = combineReducers( {
 	blocks,
+	isDragging,
 	isTyping,
 	isBlockInterfaceHidden,
 	draggedBlocks,
@@ -2076,8 +2075,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	blockBindingsSources,
-	blockPatterns,
 } );
 
 function withAutomaticChangeReset( reducer ) {

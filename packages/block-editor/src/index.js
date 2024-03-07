@@ -12,7 +12,6 @@ export {
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
-	useShadowProps as __experimentalUseShadowProps,
 	useCachedTruthy,
 } from './hooks';
 export * from './components';

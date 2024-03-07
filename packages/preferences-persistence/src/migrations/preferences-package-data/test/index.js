@@ -20,9 +20,6 @@ const input = {
 		fullscreenMode: false,
 		hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 		editorMode: 'visual',
-		preferredStyleVariations: {
-			'core/quote': 'large',
-		},
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		pinnedItems: {
@@ -62,9 +59,6 @@ describe( 'convertPreferencesPackageData', () => {
 		    "fullscreenMode": false,
 		    "pinnedItems": {
 		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": {
-		      "core/quote": "large",
 		    },
 		    "welcomeGuide": false,
 		  },

@@ -373,6 +373,12 @@ export const getAutosaveAttribute = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const currentUserId = select( coreStore ).getCurrentUser()?.id;
 		const autosave = select( coreStore ).getAutosave(
@@ -592,6 +598,12 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		}
 
 		const postType = getCurrentPostType( state );
+
+		// Currently template autosaving is not supported.
+		if ( postType === 'wp_template' ) {
+			return false;
+		}
+
 		const postId = getCurrentPostId( state );
 		const hasFetchedAutosave = select( coreStore ).hasFetchedAutosaves(
 			postType,
@@ -1300,6 +1312,18 @@ export function isListViewOpened( state ) {
 export function isInserterOpened( state ) {
 	return !! state.blockInserterPanel;
 }
+
+/**
+ * Returns the current editing mode.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Editing mode.
+ */
+export const getEditorMode = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
 
 /*
  * Backward compatibility

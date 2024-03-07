@@ -19,12 +19,17 @@ import useMovingAnimation from '../../use-moving-animation';
 import { PrivateBlockContext } from '../private-block-context';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
-import { useBlockEditContext } from '../../block-edit/context';
+import {
+	blockBindingsKey,
+	useBlockEditContext,
+} from '../../block-edit/context';
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
+import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -95,8 +100,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
+		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
+		templateLock,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -113,9 +120,19 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
+		useFlashEditableBlocks( {
+			clientId,
+			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
+		} ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
+	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
+	const bindingsStyle =
+		hasBlockBindings && canBindBlock( name )
+			? { '--wp-admin-theme-color': 'var(--wp-bound-block-color)' }
+			: {};
+
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
 		warning(
@@ -152,6 +169,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-block-moving-mode': isBlockMovingMode,
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
+				'has-editable-outline': hasEditableOutline,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},
@@ -160,7 +178,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			wrapperProps.className,
 			defaultClassName
 		),
-		style: { ...wrapperProps.style, ...props.style },
+		style: { ...wrapperProps.style, ...props.style, ...bindingsStyle },
 	};
 }
 

@@ -18,39 +18,50 @@ test.describe( 'data-wp-on-document', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'callbacks should run whenever the specified event is dispatched', async ( {
+	test( 'the event listener is attached when the element is added', async ( {
 		page,
 	} ) => {
 		const counter = page.getByTestId( 'counter' );
-		await expect( counter ).toHaveText( '0' );
-		await page.keyboard.press( 'ArrowDown' );
-		await expect( counter ).toHaveText( '1' );
-	} );
-	test( 'the event listener is removed when the element is removed', async ( {
-		page,
-	} ) => {
-		const counter = page.getByTestId( 'counter' );
-		const isEventAttached = page.getByTestId( 'isEventAttached' );
 		const visibilityButton = page.getByTestId( 'visibility' );
 
+		// Initial value.
 		await expect( counter ).toHaveText( '0' );
-		await expect( isEventAttached ).toHaveText( 'yes' );
+
+		// Make sure the event listener is attached.
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'yes' } )
+			.waitFor();
+
+		// This keyboard press should increase the counter.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '1' );
 
 		// Remove the element.
 		await visibilityButton.click();
+
+		// Make sure the event listener is not attached.
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'no' } )
+			.waitFor();
+
 		// This keyboard press should not increase the counter.
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Add the element back.
 		await visibilityButton.click();
+
+		// The counter should have the same value as before.
 		await expect( counter ).toHaveText( '1' );
 
-		// Wait until the effects run again.
-		await expect( isEventAttached ).toHaveText( 'yes' );
+		// Make sure the event listener is re-attached.
+		await page
+			.getByTestId( 'isEventAttached' )
+			.filter( { hasText: 'yes' } )
+			.waitFor();
 
-		// Check that the event listener is attached again.
+		// This keyboard press should increase the counter.
 		await page.keyboard.press( 'ArrowDown' );
 		await expect( counter ).toHaveText( '2' );
 	} );

@@ -56,7 +56,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						value={ availableView.type }
 						name="view-actions-available-view"
 						checked={ availableView.type === view.type }
-						hideOnClick={ true }
+						hideOnClick
 						onChange={ ( e ) => {
 							onChangeView( {
 								...view,
@@ -83,8 +83,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
 				>
 					<DropdownMenuItemLabel>
-						{ /* TODO: probably label per view type. */ }
-						{ __( 'Rows per page' ) }
+						{ __( 'Items per page' ) }
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}

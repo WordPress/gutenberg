@@ -6,6 +6,8 @@ import {
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -19,36 +21,46 @@ import { unlock } from '../../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const DEFAULT_TABS = [
-	{
-		id: 'installed-fonts',
-		title: __( 'Library' ),
-	},
-	{
-		id: 'upload-fonts',
-		title: __( 'Upload' ),
-	},
-];
+const DEFAULT_TAB = {
+	id: 'installed-fonts',
+	title: __( 'Library' ),
+};
+
+const UPLOAD_TAB = {
+	id: 'upload-fonts',
+	title: __( 'Upload' ),
+};
 
 const tabsFromCollections = ( collections ) =>
 	collections.map( ( { slug, name } ) => ( {
 		id: slug,
 		title:
-			collections.length === 1 && slug === 'default-font-collection'
+			collections.length === 1 && slug === 'google-fonts'
 				? __( 'Install Fonts' )
 				: name,
 	} ) );
 
 function FontLibraryModal( {
 	onRequestClose,
-	initialTabId = 'installed-fonts',
+	defaultTabId = 'installed-fonts',
 } ) {
-	const { collections } = useContext( FontLibraryContext );
+	const { collections, setNotice } = useContext( FontLibraryContext );
+	const canUserCreate = useSelect( ( select ) => {
+		const { canUser } = select( coreStore );
+		return canUser( 'create', 'font-families' );
+	}, [] );
 
-	const tabs = [
-		...DEFAULT_TABS,
-		...tabsFromCollections( collections || [] ),
-	];
+	const tabs = [ DEFAULT_TAB ];
+
+	if ( canUserCreate ) {
+		tabs.push( UPLOAD_TAB );
+		tabs.push( ...tabsFromCollections( collections || [] ) );
+	}
+
+	// Reset notice when new tab is selected.
+	const onSelect = () => {
+		setNotice( null );
+	};
 
 	return (
 		<Modal
@@ -58,7 +70,7 @@ function FontLibraryModal( {
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
-				<Tabs initialTabId={ initialTabId }>
+				<Tabs defaultTabId={ defaultTabId } onSelect={ onSelect }>
 					<Tabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
 							<Tabs.Tab key={ id } tabId={ id }>

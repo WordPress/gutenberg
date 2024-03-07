@@ -276,7 +276,7 @@ function requestToExternalModule( request ) {
 		return 'myModule';
 	}
 
-    // If the script module ID in source is the same as the external script module, `true` can be returned.
+	// If the script module ID in source is the same as the external script module, `true` can be returned.
 	return request === 'external-module-id-no-change-required';
 }
 

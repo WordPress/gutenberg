@@ -14,7 +14,7 @@ global.navigator = global.navigator ?? {};
 require( '../../packages/react-native-editor/src/globals' );
 
 // Set up Reanimated library for testing
-require( 'react-native-reanimated/lib/reanimated2/jestUtils' ).setUpTests();
+require( 'react-native-reanimated' ).setUpTests();
 global.__reanimatedWorkletInit = jest.fn();
 global.ReanimatedDataMock = {
 	now: () => 0,
@@ -282,6 +282,14 @@ jest.mock( '@wordpress/compose', () => {
 
 jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
+);
+
+jest.spyOn( Image, 'prefetch' ).mockImplementation(
+	( url, callback = () => {} ) => {
+		const mockRequestId = `mockRequestId-${ url }`;
+		callback( mockRequestId );
+		return Promise.resolve( true );
+	}
 );
 
 jest.mock( 'react-native/Libraries/Utilities/BackHandler', () => {

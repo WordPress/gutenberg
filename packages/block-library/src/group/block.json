@@ -55,7 +55,6 @@
 			}
 		},
 		"dimensions": {
-			"aspectRatio": true,
 			"minHeight": true
 		},
 		"__experimentalBorder": {
@@ -88,6 +87,9 @@
 		},
 		"layout": {
 			"allowSizingOnChildren": true
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-group-editor",

@@ -23,11 +23,27 @@ import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
+import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
+import useCommands from '../commands';
+import BlockRemovalWarnings from '../block-removal-warnings';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 
 const noop = () => {};
+
+/**
+ * These are global entities that are only there to split blocks into logical units
+ * They don't provide a "context" for the current post/page being rendered.
+ * So we should not use their ids as post context. This is important to allow post blocks
+ * (post content, post title) to be used within them without issues.
+ */
+const NON_CONTEXTUAL_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
 
 /**
  * Depending on the post, template and template mode,
@@ -113,8 +129,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const rootLevelPost = shouldRenderTemplate ? template : post;
 		const defaultBlockContext = useMemo( () => {
 			const postContext =
-				rootLevelPost.type !== 'wp_template' ||
-				( shouldRenderTemplate && mode !== 'template-only' )
+				! NON_CONTEXTUAL_POST_TYPES.includes( rootLevelPost.type ) ||
+				shouldRenderTemplate
 					? { postId: post.id, postType: post.type }
 					: {};
 
@@ -126,12 +142,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						: undefined,
 			};
 		}, [
-			mode,
+			shouldRenderTemplate,
 			post.id,
 			post.type,
 			rootLevelPost.type,
-			rootLevelPost?.slug,
-			shouldRenderTemplate,
+			rootLevelPost.slug,
 		] );
 		const { editorSettings, selection, isReady } = useSelect(
 			( select ) => {
@@ -200,7 +215,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
-		}, [ post.type, post.id ] );
+		}, [ post.type, post.id, setEditedPost ] );
 
 		// Synchronize the editor settings as they change.
 		useEffect( () => {
@@ -216,6 +231,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		useEffect( () => {
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
+
+		useHideBlocksFromInserter( post.type );
+
+		// Register the editor commands.
+		useCommands();
 
 		if ( ! isReady ) {
 			return null;
@@ -245,6 +265,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ type === 'wp_navigation' && (
 								<NavigationBlockEditingMode />
 							) }
+							<BlockRemovalWarnings />
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

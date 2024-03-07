@@ -31,13 +31,14 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- shadow: defaultPresets
 
 
 ---
@@ -72,7 +73,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
+| defaultPresets | boolean | false |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -107,6 +108,7 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -177,7 +179,6 @@ Settings related to typography.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
@@ -190,7 +191,7 @@ Settings related to typography.
 | textTransform | boolean | true |  |
 | dropCap | boolean | true |  |
 | fontSizes | array |  | fluid, name, size, slug |
-| fontFamilies | array |  | fontFace, fontFamily, name, preview, slug |
+| fontFamilies | array |  | fontFace, fontFamily, name, slug |
 
 ---
 

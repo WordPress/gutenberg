@@ -373,8 +373,8 @@ Save the file, and you can now move on to the Editor.
 
 Open the `edit.js` file. You will need to accomplish two tasks.
 
-Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes
-Update the block to display the correct content depending on the defined attributes
+- Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes.
+- Update the block to display the correct content depending on the defined attributes.
 
 #### Adding the user interface
 
@@ -715,7 +715,7 @@ Compare this to a statically rendered block like the Paragraph block.
 
 The HTML of the paragraph is stored in post content and saved in the database.
 
-You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
+You can learn more about dynamic and static rendering in the [Fundamentals documentation](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). While most blocks are either dynamically or statically rendered, you can build a block that utilizes both methods.
 
 ### Why add static rendering?
 

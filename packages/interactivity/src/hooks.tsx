@@ -1,7 +1,14 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
+import {
+	h as createElement,
+	options,
+	createContext,
+	cloneElement,
+} from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
 
@@ -59,7 +66,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	attributes: h.JSX.HTMLAttributes;
+	attributes: createElement.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -125,7 +132,7 @@ const namespaceStack: string[] = [];
  * @return The context content.
  */
 export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
+	getScope()?.context[ namespace || getNamespace() ];
 
 /**
  * Retrieves a representation of the element where a function from the store
@@ -191,7 +198,7 @@ const directivePriorities: Record< string, number > = {};
  * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "messages" }'>
+ * <div data-wp-interactive="messages">
  *   <button data-wp-alert="state.alert">Click me!</button>
  * </div>
  * ```
@@ -201,7 +208,7 @@ const directivePriorities: Record< string, number > = {};
  * attribute, followed by the suffix, like in the following HTML snippet:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "myblock" }'>
+ * <div data-wp-interactive="myblock">
  *   <button
  *     data-wp-color--text="state.text"
  *     data-wp-color--background="state.background"
@@ -372,7 +379,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type as any, props ),
+				element: createElement( vnode.type as any, props ),
 				top: true,
 			};
 			vnode.type = Directives;

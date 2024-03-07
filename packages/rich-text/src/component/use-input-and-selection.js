@@ -241,7 +241,7 @@ export function useInputAndSelection( props ) {
 					activeFormats: EMPTY_ACTIVE_FORMATS,
 				};
 			} else {
-				applyRecord( record.current );
+				applyRecord( record.current, { domOnly: true } );
 			}
 
 			onSelectionChange( record.current.start, record.current.end );

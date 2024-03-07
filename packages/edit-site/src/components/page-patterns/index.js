@@ -210,6 +210,26 @@ function Title( { item, categoryId } ) {
 	}
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
+			<Flex
+				as="div"
+				gap={ 0 }
+				justify="left"
+				className="edit-site-patterns__pattern-title"
+			>
+				{ item.type === PATTERN_TYPES.theme ? (
+					item.title
+				) : (
+					<Button
+						variant="link"
+						onClick={ onClick }
+						// Required for the grid's roving tab index system.
+						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
+						tabIndex="-1"
+					>
+						{ item.title || item.name }
+					</Button>
+				) }
+			</Flex>
 			{ itemIcon && ! isNonUserPattern && (
 				<Tooltip
 					placement="top"
@@ -235,26 +255,6 @@ function Title( { item, categoryId } ) {
 					/>
 				</Tooltip>
 			) }
-			<Flex
-				as="div"
-				gap={ 0 }
-				justify="left"
-				className="edit-site-patterns__pattern-title"
-			>
-				{ item.type === PATTERN_TYPES.theme ? (
-					item.title
-				) : (
-					<Button
-						variant="link"
-						onClick={ onClick }
-						// Required for the grid's roving tab index system.
-						// See https://github.com/WordPress/gutenberg/pull/51898#discussion_r1243399243.
-						tabIndex="-1"
-					>
-						{ item.title || item.name }
-					</Button>
-				) }
-			</Flex>
 		</HStack>
 	);
 }
@@ -324,6 +324,7 @@ export default function DataviewsPatterns() {
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IN ],
+					isPrimary: true,
 				},
 				enableSorting: false,
 			} );
@@ -390,7 +391,6 @@ export default function DataviewsPatterns() {
 	// Wrap everything in a block editor provider.
 	// This ensures 'styles' that are needed for the previews are synced
 	// from the site editor store to the block editor store.
-	// TODO: check if I add the provider in every preview like in templates...
 	return (
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<Page
@@ -413,7 +413,7 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering={ true }
+					deferredRendering
 					supportedLayouts={ [ LAYOUT_GRID ] }
 				/>
 			</Page>

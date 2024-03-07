@@ -191,7 +191,7 @@
 			"text": true
 		},
 		"shadow": {
-			"defaultPresets": true,
+			"defaultPresets": false,
 			"presets": [
 				{
 					"name": "Natural",
@@ -236,7 +236,6 @@
 		},
 		"typography": {
 			"customFontSize": true,
-			"defaultFontSizes": true,
 			"dropCap": true,
 			"fontSizes": [
 				{

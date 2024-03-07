@@ -61,5 +61,7 @@ export default function useIndentListItem( clientId ) {
 				clonedBlocks[ clonedBlocks.length - 1 ].clientId
 			);
 		}
+
+		return true;
 	}, [ clientId ] );
 }

@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import removeAccents from 'remove-accents';
 
 /**
@@ -34,7 +35,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-import { useAddedBy, AvatarImage } from '../list/added-by';
+import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -124,14 +125,30 @@ function Title( { item, viewType } ) {
 }
 
 function AuthorField( { item, viewType } ) {
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && <AvatarImage imageUrl={ imageUrl } /> }
+			{ withIcon && imageUrl && (
+				<div
+					className={ classnames(
+						'page-templates-author-field__avatar',
+						{
+							'is-loaded': isImageLoaded,
+						}
+					) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) }
 			{ withIcon && ! imageUrl && (
-				<div className="edit-site-list-added-by__icon">
+				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
@@ -151,6 +168,7 @@ function Preview( { item, viewType } ) {
 		postType: item.type,
 		canvas: 'edit',
 	} );
+
 	const isEmpty = ! blocks?.length;
 	// Wrap everything in a block editor provider to ensure 'styles' that are needed
 	// for the previews are synced between the site editor store and the block editor store.
@@ -165,18 +183,23 @@ function Preview( { item, viewType } ) {
 				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
 				style={ { backgroundColor } }
 			>
-				<button
-					className="page-templates-preview-field__button"
-					type="button"
-					onClick={ onClick }
-					aria-label={ item.title?.rendered || item.title }
-				>
-					{ isEmpty &&
-						( item.type === TEMPLATE_POST_TYPE
-							? __( 'Empty template' )
-							: __( 'Empty template part' ) ) }
-					{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
-				</button>
+				{ viewType === LAYOUT_LIST && ! isEmpty && (
+					<BlockPreview blocks={ blocks } />
+				) }
+				{ viewType !== LAYOUT_LIST && (
+					<button
+						className="page-templates-preview-field__button"
+						type="button"
+						onClick={ onClick }
+						aria-label={ item.title?.rendered || item.title }
+					>
+						{ isEmpty &&
+							( item.type === TEMPLATE_POST_TYPE
+								? __( 'Empty template' )
+								: __( 'Empty template part' ) ) }
+						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+					</button>
+				) }
 			</div>
 		</ExperimentalBlockEditorProvider>
 	);
@@ -186,11 +209,13 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
+		const usedType = window?.__experimentalAdminViews
+			? layout ?? DEFAULT_VIEW.type
+			: DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
-			type: window?.__experimentalAdminViews
-				? layout ?? DEFAULT_VIEW.type
-				: DEFAULT_VIEW.type,
+			type: usedType,
+			layout: defaultConfigPerViewType[ usedType ],
 			filters:
 				activeView !== 'all'
 					? [
@@ -317,7 +342,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			render: ( { item } ) => {
 				return <AuthorField viewType={ view.type } item={ item } />;
 			},
-			enableHiding: false,
 			type: ENUMERATION_TYPE,
 			elements: authors,
 			width: '1%',
@@ -422,6 +446,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	return (
 		<Page
+			className="edit-site-page-template-template-parts-dataviews"
 			title={
 				postType === TEMPLATE_POST_TYPE
 					? __( 'Templates' )

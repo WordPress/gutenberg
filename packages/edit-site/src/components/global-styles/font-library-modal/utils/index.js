@@ -9,7 +9,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { FONT_WEIGHTS, FONT_STYLES } from './constants';
 import { unlock } from '../../../../lock-unlock';
 import { fetchInstallFontFace } from '../resolvers';
-import { formatFontFamily } from './preview-styles';
+import { formatFontFaceName } from './preview-styles';
 
 /**
  * Browser dependencies
@@ -99,7 +99,7 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 
 	const newFont = new window.FontFace(
-		formatFontFamily( fontFace.fontFamily ),
+		formatFontFaceName( fontFace.fontFamily ),
 		dataSource,
 		{
 			style: fontFace.fontStyle,
@@ -121,7 +121,47 @@ export async function loadFontFaceInBrowser( fontFace, source, addTo = 'all' ) {
 	}
 }
 
-export function getDisplaySrcFromFontFace( input, urlPrefix ) {
+/*
+ * Unloads the font face and remove it from the browser.
+ * It also removes it from the iframe document.
+ *
+ * Note that Font faces that were added to the set using the CSS @font-face rule
+ * remain connected to the corresponding CSS, and cannot be deleted.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/FontFaceSet/delete.
+ */
+export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
+	const unloadFontFace = ( fonts ) => {
+		fonts.forEach( ( f ) => {
+			if (
+				f.family === formatFontFaceName( fontFace.fontFamily ) &&
+				f.weight === fontFace.fontWeight &&
+				f.style === fontFace.fontStyle
+			) {
+				fonts.delete( f );
+			}
+		} );
+	};
+
+	if ( removeFrom === 'document' || removeFrom === 'all' ) {
+		unloadFontFace( document.fonts );
+	}
+
+	if ( removeFrom === 'iframe' || removeFrom === 'all' ) {
+		const iframeDocument = document.querySelector(
+			'iframe[name="editor-canvas"]'
+		).contentDocument;
+		unloadFontFace( iframeDocument.fonts );
+	}
+}
+
+/**
+ * Retrieves the display source from a font face src.
+ *
+ * @param {string|string[]} input - The font face src.
+ * @return {string|undefined} The display source or undefined if the input is invalid.
+ */
+export function getDisplaySrcFromFontFace( input ) {
 	if ( ! input ) {
 		return;
 	}
@@ -132,9 +172,9 @@ export function getDisplaySrcFromFontFace( input, urlPrefix ) {
 	} else {
 		src = input;
 	}
-	// If it is a theme font, we need to make the url absolute
-	if ( src.startsWith( 'file:.' ) && urlPrefix ) {
-		src = src.replace( 'file:.', urlPrefix );
+	// It's expected theme fonts will already be loaded in the browser.
+	if ( src.startsWith( 'file:.' ) ) {
+		return;
 	}
 	if ( ! isUrlEncoded( src ) ) {
 		src = encodeURI( src );
@@ -161,23 +201,28 @@ export function makeFontFamilyFormData( fontFamily ) {
 
 export function makeFontFacesFormData( font ) {
 	if ( font?.fontFace ) {
-		const fontFacesFormData = font.fontFace.map( ( face, faceIndex ) => {
+		const fontFacesFormData = font.fontFace.map( ( item, faceIndex ) => {
+			const face = { ...item };
 			const formData = new FormData();
 			if ( face.file ) {
-				// Slugified file name because the it might contain spaces or characters treated differently on the server.
-				const fileId = `file-${ faceIndex }`;
-				// Add the files to the formData
-				formData.append( fileId, face.file, face.file.name );
-				// remove the file object from the face object the file is referenced in src
-				const { file, ...faceWithoutFileProperty } = face;
-				const fontFaceSettings = {
-					...faceWithoutFileProperty,
-					src: fileId,
-				};
-				formData.append(
-					'font_face_settings',
-					JSON.stringify( fontFaceSettings )
-				);
+				// Normalize to an array, since face.file may be a single file or an array of files.
+				const files = Array.isArray( face.file )
+					? face.file
+					: [ face.file ];
+				const src = [];
+
+				files.forEach( ( file, key ) => {
+					// Slugified file name because the it might contain spaces or characters treated differently on the server.
+					const fileId = `file-${ faceIndex }-${ key }`;
+					// Add the files to the formData
+					formData.append( fileId, file, file.name );
+					src.push( fileId );
+				} );
+
+				face.src = src.length === 1 ? src[ 0 ] : src;
+				delete face.file;
+
+				formData.append( 'font_face_settings', JSON.stringify( face ) );
 			} else {
 				formData.append( 'font_face_settings', JSON.stringify( face ) );
 			}
@@ -225,31 +270,33 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 /*
  * Downloads a font face asset from a URL to the client and returns a File object.
  */
-export async function downloadFontFaceAsset( url ) {
-	return fetch( new Request( url ) )
-		.then( ( response ) => {
-			if ( ! response.ok ) {
-				throw new Error(
-					`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
-				);
-			}
-			return response.blob();
+export async function downloadFontFaceAssets( src ) {
+	// Normalize to an array, since `src` could be a string or array.
+	src = Array.isArray( src ) ? src : [ src ];
+
+	const files = await Promise.all(
+		src.map( async ( url ) => {
+			return fetch( new Request( url ) )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						throw new Error(
+							`Error downloading font face asset from ${ url }. Server responded with status: ${ response.status }`
+						);
+					}
+					return response.blob();
+				} )
+				.then( ( blob ) => {
+					const filename = url.split( '/' ).pop();
+					const file = new File( [ blob ], filename, {
+						type: blob.type,
+					} );
+					return file;
+				} );
 		} )
-		.then( ( blob ) => {
-			const filename = url.split( '/' ).pop();
-			const file = new File( [ blob ], filename, {
-				type: blob.type,
-			} );
-			return file;
-		} )
-		.catch( ( error ) => {
-			// eslint-disable-next-line no-console
-			console.error(
-				`Error downloading font face asset from ${ url }:`,
-				error
-			);
-			throw error;
-		} );
+	);
+
+	// If we only have one file return it (not the array).  Otherwise return all of them in the array.
+	return files.length === 1 ? files[ 0 ] : files;
 }
 
 /*
