@@ -224,7 +224,7 @@ test.describe( 'Block Renaming', () => {
 
 			// Trigger actions menu for the Heading (not the selected block).
 			const headingItem = listView.getByRole( 'gridcell', {
-				name: 'Heading',
+				name: 'Untitled',
 			} );
 
 			// The actions menu button is a sibling of the menu item gridcell.
