@@ -256,6 +256,7 @@ function InlineLinkUI( {
 			offset={ 10 }
 			shift
 			focusOnMount={ focusOnMount }
+			constrainTabbing
 		>
 			<LinkControl
 				value={ linkValue }
