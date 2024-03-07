@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- The filters that use `in` and `notIn` operators (the values by default) support now multi-selection. Use `is` and `isNot` for single-selection filters.
+
 ## 0.7.0 (2024-03-06)
 
 ## 0.6.0 (2024-02-21)
