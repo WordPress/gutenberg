@@ -10,6 +10,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
+ * Internal dependencies
+ */
+import { TEMPLATE_POST_TYPE } from '../utils/constants';
+
+/**
  * Action that switches the canvas mode.
  *
  * @param {?string} mode Canvas mode.
@@ -17,6 +22,8 @@ import { decodeEntities } from '@wordpress/html-entities';
 export const setCanvasMode =
 	( mode ) =>
 	( { registry, dispatch } ) => {
+		const isMediumOrBigger =
+			window.matchMedia( '(min-width: 782px)' ).matches;
 		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
@@ -24,7 +31,9 @@ export const setCanvasMode =
 		} );
 		// Check if the block list view should be open by default.
 		// If `distractionFree` mode is enabled, the block list view should not be open.
+		// This behavior is disabled for small viewports.
 		if (
+			isMediumOrBigger &&
 			mode === 'edit' &&
 			registry
 				.select( preferencesStore )
@@ -57,19 +66,20 @@ export const setEditorCanvasContainerView =
 /**
  * Action that removes an array of templates.
  *
- * @param {Array} templates An array of template objects to remove.
+ * @param {Array} items An array of template or template part objects to remove.
  */
 export const removeTemplates =
-	( templates ) =>
+	( items ) =>
 	async ( { registry } ) => {
+		const isTemplate = items[ 0 ].type === TEMPLATE_POST_TYPE;
 		const promiseResult = await Promise.allSettled(
-			templates.map( ( template ) => {
+			items.map( ( item ) => {
 				return registry
 					.dispatch( coreStore )
 					.deleteEntityRecord(
 						'postType',
-						template.type,
-						template.id,
+						item.type,
+						item.id,
 						{ force: true },
 						{ throwOnError: true }
 					);
@@ -80,20 +90,22 @@ export const removeTemplates =
 		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 			let successMessage;
 
-			if ( templates.length === 1 ) {
+			if ( items.length === 1 ) {
 				// Depending on how the entity was retrieved its title might be
 				// an object or simple string.
-				const templateTitle =
-					typeof templates[ 0 ].title === 'string'
-						? templates[ 0 ].title
-						: templates[ 0 ].title?.rendered;
+				const title =
+					typeof items[ 0 ].title === 'string'
+						? items[ 0 ].title
+						: items[ 0 ].title?.rendered;
 				successMessage = sprintf(
 					/* translators: The template/part's name. */
 					__( '"%s" deleted.' ),
-					decodeEntities( templateTitle )
+					decodeEntities( title )
 				);
 			} else {
-				successMessage = __( 'Templates deleted.' );
+				successMessage = isTemplate
+					? __( 'Templates deleted.' )
+					: __( 'Template parts deleted.' );
 			}
 
 			registry
@@ -110,9 +122,11 @@ export const removeTemplates =
 				if ( promiseResult[ 0 ].reason?.message ) {
 					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					errorMessage = __(
-						'An error occurred while deleting the template.'
-					);
+					errorMessage = isTemplate
+						? __( 'An error occurred while deleting the template.' )
+						: __(
+								'An error occurred while deleting the template part.'
+						  );
 				}
 				// If we were trying to delete a multiple templates
 			} else {
@@ -126,25 +140,45 @@ export const removeTemplates =
 					}
 				}
 				if ( errorMessages.size === 0 ) {
-					errorMessage = __(
-						'An error occurred while deleting the templates.'
-					);
+					errorMessage = isTemplate
+						? __(
+								'An error occurred while deleting the templates.'
+						  )
+						: __(
+								'An error occurred while deleting the template parts.'
+						  );
 				} else if ( errorMessages.size === 1 ) {
-					errorMessage = sprintf(
-						/* translators: %s: an error message */
-						__(
-							'An error occurred while deleting the templates: %s'
-						),
-						[ ...errorMessages ][ 0 ]
-					);
+					errorMessage = isTemplate
+						? sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while deleting the templates: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+						  )
+						: sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while deleting the template parts: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+						  );
 				} else {
-					errorMessage = sprintf(
-						/* translators: %s: a list of comma separated error messages */
-						__(
-							'Some errors occurred while deleting the templates: %s'
-						),
-						[ ...errorMessages ].join( ',' )
-					);
+					errorMessage = isTemplate
+						? sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while deleting the templates: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+						  )
+						: sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while deleting the template parts: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+						  );
 				}
 			}
 			registry

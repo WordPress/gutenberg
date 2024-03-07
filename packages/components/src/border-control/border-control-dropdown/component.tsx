@@ -142,6 +142,7 @@ const BorderControlDropdown = (
 		enableStyle,
 		indicatorClassName,
 		indicatorWrapperClassName,
+		isStyleSettable,
 		onReset,
 		onColorChange,
 		onStyleChange,
@@ -178,7 +179,7 @@ const BorderControlDropdown = (
 			aria-label={ toggleAriaLabel }
 			tooltipPosition={ dropdownPosition }
 			label={ __( 'Border color and style picker' ) }
-			showTooltip={ true }
+			showTooltip
 			__next40pxDefaultSize={ size === '__unstable-large' ? true : false }
 		>
 			<span className={ indicatorWrapperClassName }>
@@ -218,7 +219,7 @@ const BorderControlDropdown = (
 						clearable={ false }
 						enableAlpha={ enableAlpha }
 					/>
-					{ enableStyle && (
+					{ enableStyle && isStyleSettable && (
 						<BorderControlStylePicker
 							label={ __( 'Style' ) }
 							value={ style }

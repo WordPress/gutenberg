@@ -6,22 +6,21 @@
  */
 
 /**
- * Update the block content with elements class names.
+ * Determines whether an elements class name should be added to the block.
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param  array $block   Block object.
+ * @param  array $options Per element type options e.g. whether to skip serialization.
+ *
+ * @return boolean        Whether the block needs an elements class name.
  */
-function gutenberg_render_elements_support( $block_content, $block ) {
-	if ( ! $block_content || ! isset( $block['attrs']['style']['elements'] ) ) {
-		return $block_content;
+function gutenberg_should_add_elements_class_name( $block, $options ) {
+	if ( ! isset( $block['attrs']['style']['elements'] ) ) {
+		return false;
 	}
-
-	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 
 	$element_color_properties = array(
 		'button'  => array(
-			'skip'  => wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' ),
+			'skip'  => $options['button']['skip'] ?? false,
 			'paths' => array(
 				array( 'button', 'color', 'text' ),
 				array( 'button', 'color', 'background' ),
@@ -29,14 +28,14 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 			),
 		),
 		'link'    => array(
-			'skip'  => wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' ),
+			'skip'  => $options['link']['skip'] ?? false,
 			'paths' => array(
 				array( 'link', 'color', 'text' ),
 				array( 'link', ':hover', 'color', 'text' ),
 			),
 		),
 		'heading' => array(
-			'skip'  => wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' ),
+			'skip'  => $options['heading']['skip'] ?? false,
 			'paths' => array(
 				array( 'heading', 'color', 'text' ),
 				array( 'heading', 'color', 'background' ),
@@ -63,14 +62,6 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 		),
 	);
 
-	$skip_all_element_color_serialization = $element_color_properties['button']['skip'] &&
-		$element_color_properties['link']['skip'] &&
-		$element_color_properties['heading']['skip'];
-
-	if ( $skip_all_element_color_serialization ) {
-		return $block_content;
-	}
-
 	$elements_style_attributes = $block['attrs']['style']['elements'];
 
 	foreach ( $element_color_properties as $element_config ) {
@@ -80,47 +71,31 @@ function gutenberg_render_elements_support( $block_content, $block ) {
 
 		foreach ( $element_config['paths'] as $path ) {
 			if ( null !== _wp_array_get( $elements_style_attributes, $path, null ) ) {
-				/*
-				 * It only takes a single custom attribute to require that the custom
-				 * class name be added to the block, so once one is found there's no
-				 * need to continue looking for others.
-				 *
-				 * As is done with the layout hook, this code assumes that the block
-				 * contains a single wrapper and that it's the first element in the
-				 * rendered output. That first element, if it exists, gets the class.
-				 */
-				$tags = new WP_HTML_Tag_Processor( $block_content );
-				if ( $tags->next_tag() ) {
-					$tags->add_class( wp_get_elements_class_name( $block ) );
-				}
-
-				return $tags->get_updated_html();
+				return true;
 			}
 		}
 	}
 
-	// If no custom attributes were found then there's nothing to modify.
-	return $block_content;
+	return false;
 }
 
 /**
- * Render the elements stylesheet.
+ * Render the elements stylesheet and adds elements class name to block as required.
  *
  * In the case of nested blocks we want the parent element styles to be rendered before their descendants.
  * This solves the issue of an element (e.g.: link color) being styled in both the parent and a descendant:
  * we want the descendant style to take priority, and this is done by loading it after, in DOM order.
  *
- * @param string|null $pre_render   The pre-rendered content. Default null.
- * @param array       $block The block being rendered.
+ * @param array $parsed_block The parsed block.
  *
- * @return null
+ * @return array The same parsed block with elements classname added if appropriate.
  */
-function gutenberg_render_elements_support_styles( $pre_render, $block ) {
-	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$element_block_styles = isset( $block['attrs']['style']['elements'] ) ? $block['attrs']['style']['elements'] : null;
+function gutenberg_render_elements_support_styles( $parsed_block ) {
+	$block_type           = WP_Block_Type_Registry::get_instance()->get_registered( $parsed_block['blockName'] );
+	$element_block_styles = $parsed_block['attrs']['style']['elements'] ?? null;
 
 	if ( ! $element_block_styles ) {
-		return null;
+		return $parsed_block;
 	}
 
 	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
@@ -131,19 +106,34 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		$skip_button_color_serialization;
 
 	if ( $skips_all_element_color_serialization ) {
-		return null;
+		return $parsed_block;
 	}
 
-	$class_name = wp_get_elements_class_name( $block );
+	$options = array(
+		'button'  => array( 'skip' => $skip_button_color_serialization ),
+		'link'    => array( 'skip' => $skip_link_color_serialization ),
+		'heading' => array( 'skip' => $skip_heading_color_serialization ),
+	);
 
+	if ( ! gutenberg_should_add_elements_class_name( $parsed_block, $options ) ) {
+		return $parsed_block;
+	}
+
+	$class_name         = wp_get_elements_class_name( $parsed_block );
+	$updated_class_name = isset( $parsed_block['attrs']['className'] ) ? $parsed_block['attrs']['className'] . " $class_name" : $class_name;
+
+	_wp_array_set( $parsed_block, array( 'attrs', 'className' ), $updated_class_name );
+
+	// Generate element styles based on selector and store in style engine for enqueuing.
 	$element_types = array(
 		'button'  => array(
 			'selector' => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
 			'skip'     => $skip_button_color_serialization,
 		),
 		'link'    => array(
-			'selector'       => ".$class_name a",
-			'hover_selector' => ".$class_name a:hover",
+			// :where(:not) matches theme.json selector.
+			'selector'       => ".$class_name a:where(:not(.wp-element-button))",
+			'hover_selector' => ".$class_name a:where(:not(.wp-element-button)):hover",
 			'skip'           => $skip_link_color_serialization,
 		),
 		'heading' => array(
@@ -199,11 +189,43 @@ function gutenberg_render_elements_support_styles( $pre_render, $block ) {
 		}
 	}
 
-	return null;
+	return $parsed_block;
+}
+
+/**
+ * Ensure the elements block support class name generated and added to
+ * block attributes in the `render_block_data` filter gets applied to the
+ * block's markup.
+ *
+ * @see gutenberg_render_elements_support_styles
+ *
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ *
+ * @return string                Filtered block content.
+ */
+function gutenberg_render_elements_class_name( $block_content, $block ) {
+	$class_string = $block['attrs']['className'] ?? '';
+	preg_match( '/\bwp-elements-\S+\b/', $class_string, $matches );
+
+	if ( empty( $matches ) ) {
+		return $block_content;
+	}
+
+	$tags = new WP_HTML_Tag_Processor( $block_content );
+
+	if ( $tags->next_tag() ) {
+		// Ensure the elements class name set in render_block_data filter is applied in markup.
+		// See `gutenberg_render_elements_support_styles`.
+		$tags->add_class( $matches[0] );
+	}
+
+	return $tags->get_updated_html();
 }
 
 // Remove WordPress core filters to avoid rendering duplicate elements stylesheet & attaching classes twice.
 remove_filter( 'render_block', 'wp_render_elements_support', 10, 2 );
 remove_filter( 'pre_render_block', 'wp_render_elements_support_styles', 10, 2 );
-add_filter( 'render_block', 'gutenberg_render_elements_support', 10, 2 );
-add_filter( 'pre_render_block', 'gutenberg_render_elements_support_styles', 10, 2 );
+remove_filter( 'render_block', 'wp_render_elements_class_name', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_elements_class_name', 10, 2 );
+add_filter( 'render_block_data', 'gutenberg_render_elements_support_styles', 10, 2 );

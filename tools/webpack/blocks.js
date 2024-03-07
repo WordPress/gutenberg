@@ -35,6 +35,8 @@ const prefixFunctions = [
 	'wp_get_global_settings',
 ];
 
+const classesToSuffix = [ 'WP_Navigation_Block_Renderer' ];
+
 /**
  * Escapes the RegExp special characters.
  *
@@ -139,9 +141,10 @@ module.exports = [
 							},
 							transform: ( content ) => {
 								const prefix = 'gutenberg_';
+								const classSuffix = 'Gutenberg';
 								content = content.toString();
 
-								// Within content, search and prefix any function calls from
+								// Within content, search and prefix any function calls from the
 								// `prefixFunctions` list. This is needed because some functions
 								// are called inside block files, but have been declared elsewhere.
 								// So with the rename we can call Gutenberg override functions, but the
@@ -156,6 +159,19 @@ module.exports = [
 											/^wp_/,
 											''
 										) }`
+								);
+
+								// Within content, search and prefix any classes calls from the
+								// `classesToSuffix` list. This is needed because some classes
+								// are called inside block files, but also exist in core.
+								// With the rename we can use the Gutenberg class in the plugin,
+								// without having to worry about duplicate class names with core.
+								content = content.replace(
+									new RegExp(
+										classesToSuffix.join( '|' ),
+										'g'
+									),
+									( match ) => `${ match }_${ classSuffix }`
 								);
 
 								// Within content, search for any function definitions. For

@@ -15,14 +15,10 @@ import {
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export function getPostLinkProps(
-	history,
-	params = {},
-	state,
-	shouldReplace = false
-) {
+export function useLink( params, state, shouldReplace = false ) {
+	const history = useHistory();
 	function onClick( event ) {
-		event.preventDefault();
+		event?.preventDefault();
 
 		if ( shouldReplace ) {
 			history.replace( params, state );
@@ -50,11 +46,6 @@ export function getPostLinkProps(
 		href: newUrl,
 		onClick,
 	};
-}
-
-export function useLink( params, state, shouldReplace ) {
-	const history = useHistory();
-	return getPostLinkProps( history, params, state, shouldReplace );
 }
 
 export default function Link( {

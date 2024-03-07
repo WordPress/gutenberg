@@ -27,7 +27,7 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
-function useResolveEditedEntityAndContext( { postId, postType } ) {
+function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 	const { hasLoadedAllDependencies, homepageId, url, frontPageTemplateId } =
 		useSelect( ( select ) => {
 			const { getSite, getUnstableBase, getEntityRecords } =
@@ -159,6 +159,11 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				return resolveTemplateForPostTypeAndId( postType, postId );
 			}
 
+			// Some URLs in list views are different
+			if ( path === '/pages' && postId ) {
+				return resolveTemplateForPostTypeAndId( 'page', postId );
+			}
+
 			// If we're rendering the home page, and we have a static home page, resolve its template.
 			if ( homepageId ) {
 				return resolveTemplateForPostTypeAndId( 'page', homepageId );
@@ -176,6 +181,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			url,
 			postId,
 			postType,
+			path,
 			frontPageTemplateId,
 		]
 	);
@@ -189,12 +195,25 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			return { postType, postId };
 		}
 
+		// Some URLs in list views are different
+		if ( path === '/pages' && postId ) {
+			return { postType: 'page', postId };
+		}
+
 		if ( homepageId ) {
 			return { postType: 'page', postId: homepageId };
 		}
 
 		return {};
-	}, [ homepageId, postType, postId ] );
+	}, [ homepageId, postType, postId, path ] );
+
+	if ( path === '/wp_template/all' && postId ) {
+		return { isReady: true, postType: 'wp_template', postId, context };
+	}
+
+	if ( path === '/wp_template_part/all' && postId ) {
+		return { isReady: true, postType: 'wp_template_part', postId, context };
+	}
 
 	if ( postTypesWithoutParentTemplate.includes( postType ) ) {
 		return { isReady: true, postType, postId, context };
@@ -212,7 +231,8 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 	return { isReady: false };
 }
 
-export function useInitEditedEntity( params ) {
+export default function useInitEditedEntityFromURL() {
+	const { params = {} } = useLocation();
 	const { postType, postId, context, isReady } =
 		useResolveEditedEntityAndContext( params );
 
@@ -223,9 +243,4 @@ export function useInitEditedEntity( params ) {
 			setEditedEntity( postType, postId, context );
 		}
 	}, [ isReady, postType, postId, context, setEditedEntity ] );
-}
-
-export default function useInitEditedEntityFromURL() {
-	const { params = {} } = useLocation();
-	return useInitEditedEntity( params );
 }

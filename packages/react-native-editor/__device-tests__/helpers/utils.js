@@ -418,13 +418,20 @@ const selectTextFromElement = async ( driver, element ) => {
 	}
 };
 
-// Starts from the middle of the screen or the element(if specified)
-// and swipes upwards.
+/**
+ * Starts from the middle of the screen or the element(if specified)
+ * and swipes upwards.
+ *
+ * @param {Object} driver                  WebdriverIO driver
+ * @param {Object} element                 Element to swipe from
+ * @param {Object} options                 Options
+ * @param {number} options.delay           Delay between the swipe and the next action
+ * @param {number} options.endYCoefficient Multiplier for the end Y coordinate
+ */
 const swipeUp = async (
 	driver,
 	element = undefined,
-	delay = 3000,
-	endYCoefficient = 0.5
+	{ delay = 3000, endYCoefficient = 0.5 } = {}
 ) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
@@ -465,15 +472,25 @@ const swipeFromTo = async (
 		.pause( delay )
 		.perform();
 
-// Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver, delay = 3000 ) => {
+/**
+ * Starts from the middle of the screen and swipes downwards
+ *
+ * @param {Object} driver                  WebdriverIO driver
+ * @param {Object} options                 Options
+ * @param {number} options.delay           Delay between the swipe and the next action
+ * @param {number} options.endYCoefficient Multiplier for the end Y coordinate
+ */
+const swipeDown = async (
+	driver,
+	{ delay = 3000, endYCoefficient = 0.5 } = {}
+) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
 	const startX = size.width / 2;
 	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY - startY * -1 * 0.5;
+	const endY = startY - startY * -1 * endYCoefficient;
 
 	await swipeFromTo(
 		driver,

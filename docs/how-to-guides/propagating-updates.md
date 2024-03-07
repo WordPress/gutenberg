@@ -36,9 +36,9 @@ If needed, one potential workaround for patterns with custom styles is to add a 
 
 It is not fool-proof because users can modify the class via the editor UI.  However, because this setting is under the "Advanced" panel it is likely to stay intact in most instances. This gives theme authors some CSS control for some pattern types, allowing them to update existing uses. However, it does not prevent users from making massive alterations that cannot be updated.
 
-### Reusable blocks
+### Synced Patterns
 
-As the name suggests, these blocks are inherently synced across your site. Keep in mind that there are currently limitations with relying on reusable blocks to handle certain updates since content, HTML structure, and styles will all stay in sync when updates happen. If you require more nuance than that, this is a key element to factor in and a dynamic block might be a better approach.
+As the name suggests, these patterns are inherently synced across your site. Keep in mind that there are currently limitations with relying on synced patterns to handle certain updates since content, HTML structure, and styles will all stay in sync when updates happen. If you require more nuance than that, this is a key element to factor in and a dynamic block might be a better approach.
 
 ### Template parts and templates
 

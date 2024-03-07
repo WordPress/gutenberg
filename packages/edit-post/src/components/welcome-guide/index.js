@@ -12,17 +12,18 @@ import WelcomeGuideTemplate from './template';
 import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuide() {
-	const { isActive, isTemplateMode } = useSelect( ( select ) => {
+	const { isActive, isEditingTemplate } = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
-		const { getRenderingMode } = select( editorStore );
-		const _isTemplateMode = getRenderingMode() === 'template-only';
-		const feature = _isTemplateMode
+		const { getCurrentPostType } = select( editorStore );
+		const _isEditingTemplate = getCurrentPostType() === 'wp_template';
+
+		const feature = _isEditingTemplate
 			? 'welcomeGuideTemplate'
 			: 'welcomeGuide';
 
 		return {
 			isActive: isFeatureActive( feature ),
-			isTemplateMode: _isTemplateMode,
+			isEditingTemplate: _isEditingTemplate,
 		};
 	}, [] );
 
@@ -30,5 +31,9 @@ export default function WelcomeGuide() {
 		return null;
 	}
 
-	return isTemplateMode ? <WelcomeGuideTemplate /> : <WelcomeGuideDefault />;
+	return isEditingTemplate ? (
+		<WelcomeGuideTemplate />
+	) : (
+		<WelcomeGuideDefault />
+	);
 }

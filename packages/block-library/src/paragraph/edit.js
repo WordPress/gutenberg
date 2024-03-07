@@ -51,9 +51,9 @@ function hasDropCapDisabled( align ) {
 }
 
 function DropCapControl( { clientId, attributes, setAttributes } ) {
-	// Please do no add a useSelect call to the paragraph block unconditionaly.
-	// Every useSelect added to a (frequestly used) block will degrade the load
-	// and type bit. By moving it within InspectorControls, the subscription is
+	// Please do not add a useSelect call to the paragraph block unconditionally.
+	// Every useSelect added to a (frequently used) block will degrade load
+	// and type performance. By moving it within InspectorControls, the subscription is
 	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
 

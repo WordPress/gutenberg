@@ -17,7 +17,7 @@ jobs:
 
             - name: Get changed PHP files
               id: changed-files-php
-              uses: tj-actions/changed-files@716b1e13042866565e00e85fd4ec490e186c4a2f # v41.0.1
+              uses: tj-actions/changed-files@800a2825992141ddde1a8bca8ad394cec34d3188 # v42.0.5
               with:
                   files: |
                       *.{php}
@@ -38,7 +38,7 @@ jobs:
                   echo "formatted_change_list=$formatted_change_list" >> $GITHUB_OUTPUT
 
             - name: Find Comment
-              uses: peter-evans/find-comment@v2
+              uses: peter-evans/find-comment@v3
               id: find-comment
               with:
                   issue-number: ${{ github.event.pull_request.number }}
@@ -47,7 +47,7 @@ jobs:
 
             - name: Create comment
               if: steps.find-comment.outputs.comment-id == '' && steps.changed-files-php.outputs.any_changed == 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   issue-number: ${{ github.event.pull_request.number }}
                   body: |
@@ -67,7 +67,7 @@ jobs:
 
             - name: Update comment
               if: steps.find-comment.outputs.comment-id != '' && steps.changed-files-php.outputs.any_changed == 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}
@@ -89,7 +89,7 @@ jobs:
 
             - name: Update comment
               if: steps.find-comment.outputs.comment-id != '' && steps.changed-files-php.outputs.any_changed != 'true'
-              uses: peter-evans/create-or-update-comment@v3
+              uses: peter-evans/create-or-update-comment@v4
               with:
                   comment-id: ${{ steps.find-comment.outputs.comment-id }}
                   issue-number: ${{ github.event.pull_request.number }}

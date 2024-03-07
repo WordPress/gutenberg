@@ -172,7 +172,7 @@ describe( 'Text color', () => {
 			<SlotFillProvider>
 				<BlockEdit name="core/test-block" isSelected mayDisplayControls>
 					<TextColorEdit
-						isActive={ true }
+						isActive
 						activeAttributes={ {} }
 						value={ textValue }
 						onChange={ jest.fn() }

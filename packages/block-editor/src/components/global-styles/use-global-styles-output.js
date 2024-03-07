@@ -21,12 +21,10 @@ import {
 	ROOT_BLOCK_SELECTOR,
 	scopeSelector,
 	appendToSelector,
+	getBlockStyleVariationSelector,
 } from './utils';
 import { getBlockCSSSelector } from './get-block-css-selector';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { getDuotoneFilter } from '../duotone/utils';
@@ -430,8 +428,14 @@ export function getStylesDeclarations(
 			 */
 			ruleValue = getTypographyFontSizeValue(
 				{ size: ruleValue },
-				getFluidTypographyOptionsFromSettings( tree?.settings )
+				tree?.settings
 			);
+		}
+
+		// For aspect ratio to work, other dimensions rules (and Cover block defaults) must be unset.
+		// This ensures that a fixed height does not override the aspect ratio.
+		if ( cssProperty === 'aspect-ratio' ) {
+			output.push( 'min-height: unset' );
 		}
 
 		output.push( `${ cssProperty }: ${ ruleValue }` );
@@ -593,6 +597,7 @@ const STYLE_KEYS = [
 	'filter',
 	'outline',
 	'shadow',
+	'background',
 ];
 
 function pickStyleKeys( treeToPickFrom ) {
@@ -1071,7 +1076,10 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 		const styleVariationSelectors = {};
 		if ( blockStyleVariations?.length ) {
 			blockStyleVariations.forEach( ( variation ) => {
-				const styleVariationSelector = `.is-style-${ variation.name }${ selector }`;
+				const styleVariationSelector = getBlockStyleVariationSelector(
+					variation.name,
+					selector
+				);
 				styleVariationSelectors[ variation.name ] =
 					styleVariationSelector;
 			} );
@@ -1184,15 +1192,13 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 
 	const isTemplate = blockContext?.templateSlug !== undefined;
 
-	const getBlockStyles = useSelect( ( select ) => {
-		return select( blocksStore ).getBlockStyles;
-	}, [] );
+	const { getBlockStyles } = useSelect( blocksStore );
 
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
-		mergedConfig = updateConfigWithSeparator( mergedConfig );
+		const updatedConfig = updateConfigWithSeparator( mergedConfig );
 
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
@@ -1200,18 +1206,18 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		);
 
 		const customProperties = toCustomProperties(
-			mergedConfig,
+			updatedConfig,
 			blockSelectors
 		);
 		const globalStyles = toStyles(
-			mergedConfig,
+			updatedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
 			isTemplate
 		);
-		const svgs = toSvgFilters( mergedConfig, blockSelectors );
+		const svgs = toSvgFilters( updatedConfig, blockSelectors );
 
 		const styles = [
 			{
@@ -1224,7 +1230,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			},
 			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
 			{
-				css: mergedConfig.styles.css ?? '',
+				css: updatedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
 			{
@@ -1238,11 +1244,11 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
 		getBlockTypes().forEach( ( blockType ) => {
-			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
+			if ( updatedConfig.styles.blocks[ blockType.name ]?.css ) {
 				const selector = blockSelectors[ blockType.name ].selector;
 				styles.push( {
 					css: processCSSNesting(
-						mergedConfig.styles.blocks[ blockType.name ]?.css,
+						updatedConfig.styles.blocks[ blockType.name ]?.css,
 						selector
 					),
 					isGlobalStyles: true,
@@ -1250,12 +1256,14 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			}
 		} );
 
-		return [ styles, mergedConfig.settings ];
+		return [ styles, updatedConfig.settings ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
+		isTemplate,
+		getBlockStyles,
 	] );
 }
 

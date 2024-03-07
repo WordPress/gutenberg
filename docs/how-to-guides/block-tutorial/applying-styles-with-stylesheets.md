@@ -6,7 +6,7 @@ A block typically inserts markup (HTML) into post content that you want to style
 
 ## Before you start
 
-You will need a basic block and WordPress development environment to implement the examples shown in this guide. See the [create a basic block](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md) or [block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) to get setup.
+You will need a basic block and WordPress development environment to implement the examples shown in this guide. See the [Quick Start Guide](/docs/getting-started/quick-start-guide.md) or [block tutorial](/docs/getting-started/tutorial.md) to get set up.
 
 ## Methods to add style
 
@@ -95,11 +95,9 @@ npm run build
 
 Like scripts, you can enqueue your block's styles using the `block.json` file.
 
-Use the `editorStyle` property to a CSS file you want to load in the editor view, and use the `style` property for a CSS file you want to load on the frontend when the block is used.
+Use the `editorStyle` property to a CSS file you want to load in the editor view only, use the `style` property for a CSS file you want to load both in the editor view and on the frontend when the block is used, and use the `viewStyle` property for a CSS file you want to load only on the frontend when the block is used.
 
-It is worth noting that, if the editor content is iframed, both of these will
-load in the iframe. `editorStyle` will also load outside the iframe, so it can
-be used for editor content as well as UI.
+It is worth noting that, if the editor content is iframed, both the `style` and `editorStyle` will load in the iframe. `editorStyle` will also load outside the iframe, so it can be used for editor content as well as UI.
 
 For example:
 

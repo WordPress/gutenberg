@@ -431,7 +431,8 @@ function CoverEdit( {
 			toggleSelection( true );
 			setAttributes( { minHeight: newMinHeight } );
 		},
-		showHandle: true,
+		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
+		showHandle: ! attributes.style?.dimensions?.aspectRatio ? true : false,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -463,7 +464,7 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
+								disableCustomColors
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
@@ -524,7 +525,7 @@ function CoverEdit( {
 				{ ! url && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-cover__image--placeholder-image"
-						withIllustration={ true }
+						withIllustration
 					/>
 				) }
 

@@ -707,6 +707,23 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### RecursionProvider
+
+A React context provider for use with the `useHasRecursion` hook to prevent recursive renders.
+
+Wrap block content with this provider and provide the same `uniqueId` prop as used with `useHasRecursion`.
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _props.blockName_ `string`: Optional block name.
+-   _props.children_ `JSX.Element`: React children.
+
+_Returns_
+
+-   `JSX.Element`: A React element.
+
 ### ReusableBlocksRenameHint
 
 Undocumented declaration.
@@ -940,6 +957,21 @@ _Parameters_
 _Returns_
 
 -   `any`: value
+
+### useHasRecursion
+
+A React hook for keeping track of blocks previously rendered up in the block tree. Blocks susceptible to recursion can use this hook in their `Edit` function to prevent said recursion.
+
+Use this with the `RecursionProvider` component, using the same `uniqueId` value for both the hook and the provider.
+
+_Parameters_
+
+-   _uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _blockName_ `string`: Optional block name.
+
+_Returns_
+
+-   `boolean`: A boolean describing whether the provided id has already been rendered.
 
 ### useInnerBlocksProps
 

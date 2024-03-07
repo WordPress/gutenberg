@@ -42,6 +42,14 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-global-styles-screen-typography__font-variants-count {
+	color: $gray-700;
+}
+
+.edit-site-global-styles-font-families__add-fonts {
+	justify-content: center;
+}
+
 .edit-site-global-styles-screen-colors {
 	margin: $grid-unit-20;
 
@@ -81,40 +89,6 @@
 	padding: $grid-unit-20;
 	padding-bottom: 0;
 	margin: 0;
-}
-
-.edit-site-global-styles-variations_item {
-	box-sizing: border-box;
-	// To round the outline in Windows 10 high contrast mode.
-	border-radius: $radius-block-ui;
-
-	.edit-site-global-styles-variations_item-preview {
-		padding: $border-width * 2;
-		border-radius: $radius-block-ui;
-		box-shadow: 0 0 0 $border-width $gray-200;
-		// Shown in Windows 10 high contrast mode.
-		outline: 1px solid transparent;
-	}
-
-	&.is-active .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width $gray-900;
-		// Shown in Windows 10 high contrast mode.
-		outline-width: 3px;
-	}
-
-	&:hover .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-	}
-
-	&:focus .edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-	}
-
-	&:focus-visible {
-		// Shown in Windows 10 high contrast mode.
-		outline: 3px solid transparent;
-		outline-offset: 0;
-	}
 }
 
 .edit-site-global-styles-icon-with-current-color {
@@ -165,7 +139,7 @@
 }
 
 .edit-site-global-styles-screen-css-help-link {
-	display: block;
+	display: inline-block;
 	margin-top: $grid-unit-10;
 }
 .edit-site-global-styles-screen-variations {

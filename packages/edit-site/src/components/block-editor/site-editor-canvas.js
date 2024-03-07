@@ -11,7 +11,6 @@ import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
@@ -20,24 +19,32 @@ import { store as editSiteStore } from '../../store';
 import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
+	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export default function SiteEditorCanvas() {
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+	const location = useLocation();
+	const { templateType, isFocusableEntity, isViewMode } = useSelect(
+		( select ) => {
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
 
-		const _templateType = getEditedPostType();
+			const _templateType = getEditedPostType();
 
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isViewMode: getCanvasMode() === 'view',
-		};
-	}, [] );
-
+			return {
+				templateType: _templateType,
+				isFocusableEntity: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isViewMode: getCanvasMode() === 'view',
+			};
+		},
+		[]
+	);
+	const isFocusMode = location.params.focusMode || isFocusableEntity;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const settings = useSiteEditorSettings();
@@ -47,7 +54,9 @@ export default function SiteEditorCanvas() {
 		isFocusMode &&
 		! isViewMode &&
 		// Disable resizing in mobile viewport.
-		! isMobileViewport;
+		! isMobileViewport &&
+		// Disable resizing when editing a template in focus mode.
+		templateType !== TEMPLATE_POST_TYPE;
 
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
@@ -67,7 +76,6 @@ export default function SiteEditorCanvas() {
 							'is-view-mode': isViewMode,
 						} ) }
 					>
-						<BackButton />
 						<ResizableEditor
 							enableResizing={ enableResizing }
 							height={

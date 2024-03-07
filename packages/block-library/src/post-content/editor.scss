@@ -1,0 +1,4 @@
+// Disable text selection in the post content placeholder.
+.wp-block-post-content.wp-block-post-content {
+	user-select: none;
+}

@@ -11,6 +11,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
+	Spinner,
 } from '@wordpress/components';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { info } from '@wordpress/icons';
@@ -60,7 +61,7 @@ export default function ViewList( {
 				} ) }
 			>
 				{ ! hasData && (
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				) }
 			</div>
 		);
@@ -85,7 +86,11 @@ export default function ViewList( {
 								className="dataviews-view-list__item"
 								onClick={ () => onSelectionChange( [ item ] ) }
 							>
-								<HStack spacing={ 3 } justify="start">
+								<HStack
+									spacing={ 3 }
+									justify="start"
+									alignment="flex-start"
+								>
 									<div className="dataviews-view-list__media-wrapper">
 										{ mediaField?.render( { item } ) || (
 											<div className="dataviews-view-list__media-placeholder"></div>

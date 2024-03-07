@@ -2,9 +2,13 @@
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
@@ -215,8 +219,17 @@ export function EntitiesSavedStatesExtensible( {
 				{ additionalPrompt }
 				<p>
 					{ isDirty
-						? __(
-								'The following changes have been made to your site, templates, and content.'
+						? createInterpolateElement(
+								sprintf(
+									/* translators: %d: number of site changes waiting to be saved. */
+									_n(
+										'There is <strong>%d site change</strong> waiting to be saved.',
+										'There are <strong>%d site changes</strong> waiting to be saved.',
+										sortedPartitionedSavables.length
+									),
+									sortedPartitionedSavables.length
+								),
+								{ strong: <strong /> }
 						  )
 						: __( 'Select the items you want to save.' ) }
 				</p>

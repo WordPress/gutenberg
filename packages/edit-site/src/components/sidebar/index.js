@@ -12,6 +12,8 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewportMatch } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,7 +33,8 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
-import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -50,6 +53,7 @@ function SidebarScreenWrapper( { className, ...props } ) {
 
 function SidebarScreens() {
 	useSyncPathWithURL();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
@@ -66,25 +70,26 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenPagesDataViews />
-				) : (
-					<SidebarNavigationScreenPages />
-				) }
+				<SidebarNavigationScreenPages />
+			</SidebarScreenWrapper>
+			<SidebarScreenWrapper path="/pages">
+				<SidebarNavigationScreen
+					title={ __( 'Manage pages' ) }
+					content={ <DataViewsSidebarContent /> }
+					backPath="/page"
+				/>
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				{ window?.__experimentalAdminViews ? (
-					<SidebarNavigationScreenTemplatesBrowse />
-				) : (
-					<SidebarNavigationScreenTemplates />
-				) }
+				<SidebarNavigationScreenTemplates />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</SidebarScreenWrapper>
+			{ ! isMobileViewport && (
+				<SidebarScreenWrapper path="/patterns">
+					<SidebarNavigationScreenPatterns />
+				</SidebarScreenWrapper>
+			) }
 			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
