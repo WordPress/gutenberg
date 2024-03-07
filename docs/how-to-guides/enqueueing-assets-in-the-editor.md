@@ -55,7 +55,7 @@ function example_enqueue_editor_content_assets() {
     if ( is_admin() ) {
         wp_enqueue_script(
             'example-editor-content-scripts',
-            plugins_url( 'constent-scripts.css', __FILE__ )
+            plugins_url( 'constent-scripts.js', __FILE__ )
         );
         wp_enqueue_style(
             'example-editor-content-styles',
