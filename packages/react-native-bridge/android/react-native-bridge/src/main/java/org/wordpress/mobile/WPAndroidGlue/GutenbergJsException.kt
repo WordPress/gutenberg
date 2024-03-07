@@ -3,9 +3,9 @@ package org.wordpress.mobile.WPAndroidGlue
 import com.facebook.react.bridge.ReadableMap
 
 data class JsExceptionStackTraceElement (
-    val fileName: String,
-    val lineNumber: Int,
-    val colNumber: Int,
+    val fileName: String?,
+    val lineNumber: Int?,
+    val colNumber: Int?,
     val function: String,
 )
 class GutenbergJsException (
@@ -17,22 +17,28 @@ class GutenbergJsException (
     val isHandled: Boolean,
     val handledBy: String
 ) {
-    
+
     companion object {
         @JvmStatic
         fun fromReadableMap(rawException: ReadableMap): GutenbergJsException {
             val type: String = rawException.getString("type") ?: ""
             val message: String = rawException.getString("message") ?: ""
 
-
-            val stackTrace: List<JsExceptionStackTraceElement> = rawException.getArray("stackTrace")?.toArrayList()?.map {
-                val stackTraceElement = it as ReadableMap
-                JsExceptionStackTraceElement(
-                    stackTraceElement.getString("filename") ?: "",
-                    stackTraceElement.getInt("lineno"),
-                    stackTraceElement.getInt("colno"),
-                    stackTraceElement.getString("function") ?: ""
-                )
+            val stackTrace: List<JsExceptionStackTraceElement> = rawException.getArray("stacktrace")?.let {
+                (0 until it.size()).mapNotNull { index ->
+                    val stackTraceElement = it.getMap(index)
+                    stackTraceElement?.let {
+                        val stackTraceFunction = stackTraceElement.getString("function")
+                        stackTraceFunction?.let {
+                            JsExceptionStackTraceElement(
+                                stackTraceElement.getString("filename"),
+                                if (stackTraceElement.hasKey("lineno")) stackTraceElement.getInt("lineno") else null,
+                                if (stackTraceElement.hasKey("colno")) stackTraceElement.getInt("colno") else null,
+                                stackTraceFunction
+                            )
+                        }
+                    }
+                }
             } ?: emptyList()
 
             val context: Map<String, Any> = rawException.getMap("context")?.toHashMap() ?: emptyMap()
