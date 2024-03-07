@@ -7,7 +7,7 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 
 /**
  * This sniff ensures that PHP functions have docblocks defined
- * and that the `@since` tag in the docblock is present.
+ * and that the `@since` tag is present in the docblock.
  */
 class FunctionCommentSniff implements Sniff {
 	/**
@@ -80,9 +80,9 @@ class FunctionCommentSniff implements Sniff {
 		}
 
 		$phpcsFile->addError(
-			'Invalid @since tag value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
+			'Invalid @since version value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
 			$version_token,
-			'InvalidSinceTagValue',
+			'InvalidSinceVersionValue',
 			array(
 				$function_name,
 				$version_value
