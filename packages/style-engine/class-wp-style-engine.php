@@ -297,12 +297,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'writingMode' ),
 				),
-        'textOrientation' => array(
-				  'property_keys' => array(
-					  'default' => 'text-orientation',
-				  ),
-				  'path'          => array( 'typography', 'textOrientation' ),
-			  ),
+				'textOrientation' => array(
+					'property_keys' => array(
+						'default' => 'text-orientation',
+					),
+					'path'          => array( 'typography', 'textOrientation' ),
+				),
 			),
 		);
 
