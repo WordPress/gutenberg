@@ -389,7 +389,7 @@ export function blockBindingsSources( state = {}, action ) {
 			...state,
 			[ action.sourceName ]: {
 				label: action.sourceLabel,
-				get: action.get,
+				connect: action.connect,
 				lockAttributesEditing: action.lockAttributesEditing ?? true,
 			},
 		};
