@@ -353,6 +353,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GutenbergDemo-GutenbergDemoTests/Pods-GutenbergDemo-GutenbergDemoTests-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/WordPress-Aztec-iOS-framework/WordPress-Aztec-iOS.bundle",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/content-functions.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/editor-behavior-overrides.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/editor-style-overrides.css",
@@ -363,10 +364,10 @@
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/prevent-autosaves.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/wp-bar-override.css",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/WordPress-Aztec-iOS/WordPress-Aztec-iOS.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/WordPress-Aztec-iOS.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/content-functions.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/editor-behavior-overrides.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/editor-style-overrides.css",
@@ -377,7 +378,6 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/prevent-autosaves.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wp-bar-override.css",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/WordPress-Aztec-iOS.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -453,6 +453,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-GutenbergDemo/Pods-GutenbergDemo-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/WordPress-Aztec-iOS-framework/WordPress-Aztec-iOS.bundle",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/content-functions.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/editor-behavior-overrides.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/editor-style-overrides.css",
@@ -463,10 +464,10 @@
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/prevent-autosaves.js",
 				"${PODS_ROOT}/../../../react-native-bridge/common/gutenberg-web-single-block/wp-bar-override.css",
 				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/RCTI18nStrings.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/WordPress-Aztec-iOS/WordPress-Aztec-iOS.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/WordPress-Aztec-iOS.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/content-functions.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/editor-behavior-overrides.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/editor-style-overrides.css",
@@ -477,7 +478,6 @@
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/prevent-autosaves.js",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/wp-bar-override.css",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/RCTI18nStrings.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/WordPress-Aztec-iOS.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
