@@ -2,7 +2,9 @@
 	{
 		"name": "core/site-tagline",
 		"isValid": true,
-		"attributes": {},
+		"attributes": {
+			"tagName": "p"
+		},
 		"innerBlocks": []
 	}
 ]
