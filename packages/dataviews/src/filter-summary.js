@@ -14,7 +14,6 @@ import {
 	SelectControl,
 	Tooltip,
 	Icon,
-	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
@@ -40,13 +39,7 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 
 	const filterTextWrappers = {
 		Name: <span className="dataviews-filter-summary__filter-text-name" />,
-		Value: (
-			<Truncate
-				limit={ 10 }
-				ellipsizeMode="tail"
-				className="dataviews-filter-summary__filter-text-value"
-			/>
-		),
+		Value: <span className="dataviews-filter-summary__filter-text-value" />,
 	};
 
 	if ( filterInView?.operator === OPERATOR_IN ) {
