@@ -77,6 +77,7 @@ export default function TypographyVariations() {
 									>
 										{ ( { ratio, key } ) => (
 											<HStack
+												key={ key }
 												spacing={ 10 * ratio }
 												justify="center"
 												style={ {
@@ -85,7 +86,6 @@ export default function TypographyVariations() {
 												} }
 											>
 												<TypographyExample
-													key={ key }
 													variation={ variation }
 													fontSize={ 85 * ratio }
 												/>
