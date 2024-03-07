@@ -45,7 +45,7 @@ function Edit( {
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 	const openedBy = useRef( null );
-	const clickTimeout = useRef( false );
+	const clickCount = useRef( 0 );
 
 	/**
 	 * Runs when addingLink is set to false by the onFocusOutside handler via a click
@@ -55,23 +55,19 @@ function Edit( {
 			return;
 		}
 
-		resetClickTimeout();
+		resetClickCount();
 
-		// This timeout will be cleared and a new openedBy set if a new link is clicked
-		clickTimeout.current = setTimeout( () => {
-			openedBy.current = null;
-			clickTimeout.current = undefined;
-		}, 100 );
+		// The clickCount is used to determine if the link control is being closed by the onFocusOutside event.
+		clickCount.current = 1;
 
 		return () => {
-			resetClickTimeout();
+			resetClickCount();
 		};
 	}, [ addingLink ] );
 
-	function resetClickTimeout() {
-		if ( clickTimeout.current ) {
-			clearTimeout( clickTimeout.current );
-			clickTimeout.current = undefined;
+	function resetClickCount() {
+		if ( clickCount.current ) {
+			clickCount.current = 0;
 		}
 	}
 
@@ -93,7 +89,7 @@ function Edit( {
 			}
 
 			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
-			if ( clickTimeout.current && event.target === openedBy.current ) {
+			if ( clickCount.current && event.target === openedBy.current ) {
 				openedBy.current = null;
 			} else {
 				setAddingLink( true );
@@ -101,7 +97,7 @@ function Edit( {
 			}
 
 			// Always reset at this point, as we no longer need the timeout since we've processed another click
-			resetClickTimeout();
+			resetClickCount();
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -188,10 +184,10 @@ function Edit( {
 				name="link"
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
-				onClick={ ( event ) => {
-					// If we have a clickTimeout, then the link control is being
+				onMouseDown={ ( event ) => {
+					// If we have a clickCount, then the link control is being
 					// closed by the onFocusOutside event, so we don't want to re-open it
-					if ( ! clickTimeout.current ) {
+					if ( ! clickCount.current ) {
 						addLink( event.currentTarget );
 					}
 				} }
