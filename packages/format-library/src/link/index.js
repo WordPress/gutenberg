@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -59,6 +59,16 @@ function Edit( {
 		}
 		setAddingNewLink( _val );
 	}
+
+	useEffect( () => {
+		// When the link becomes inactive (i.e. isActive is false), reset the addingLink state
+		// and the isAddingNewLink state. This means that if the Link UI is displayed and the link
+		// becomes inactive (e.g. used arrow keys to move cursor outside of link bounds), the UI will close.
+		if ( ! isActive ) {
+			setAddingLink( false );
+			setAddingNewLink( false );
+		}
+	}, [ isActive ] );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
