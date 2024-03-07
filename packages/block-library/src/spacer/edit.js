@@ -67,7 +67,7 @@ const ResizableSpacer = ( {
 				onResizeStop( `${ nextVal }px` );
 				setIsResizing( false );
 			} }
-			__experimentalShowTooltip={ true }
+			__experimentalShowTooltip
 			__experimentalTooltipProps={ {
 				axis: orientation === 'horizontal' ? 'x' : 'y',
 				position: 'corner',

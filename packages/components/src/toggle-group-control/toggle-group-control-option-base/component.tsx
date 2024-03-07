@@ -160,16 +160,18 @@ function ToggleGroupControlOptionBase(
 			</WithToolTip>
 			{ /* Animated backdrop using framer motion's shared layout animation */ }
 			{ isPressed ? (
-				<motion.div
-					className={ backdropClasses }
-					transition={
-						shouldReduceMotion
-							? REDUCED_MOTION_TRANSITION_CONFIG
-							: undefined
-					}
-					role="presentation"
-					layoutId={ LAYOUT_ID }
-				/>
+				<motion.div layout layoutRoot>
+					<motion.div
+						className={ backdropClasses }
+						transition={
+							shouldReduceMotion
+								? REDUCED_MOTION_TRANSITION_CONFIG
+								: undefined
+						}
+						role="presentation"
+						layoutId={ LAYOUT_ID }
+					/>
+				</motion.div>
 			) : null }
 		</LabelView>
 	);

@@ -1857,6 +1857,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Passing $settings to the callbacks defined in static::PRESETS_METADATA.
 	 *
 	 * @param array $settings        Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
@@ -1883,7 +1884,7 @@ class WP_Theme_JSON_Gutenberg {
 					is_callable( $preset_metadata['value_func'] )
 				) {
 					$value_func = $preset_metadata['value_func'];
-					$value      = call_user_func( $value_func, $preset );
+					$value      = call_user_func( $value_func, $preset, $settings );
 				} else {
 					// If we don't have a value, then don't add it to the result.
 					continue;
@@ -2082,6 +2083,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
+	 * @since 6.5.0 Passing current theme JSON settings to wp_get_typography_font_size_value().
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2151,8 +2153,9 @@ class WP_Theme_JSON_Gutenberg {
 				 * whether the incoming value can be converted to a fluid value.
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
+				 * Pass the current theme_json settings to override any global settings.
 				 */
-				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ), $settings );
 			}
 
 			if ( 'aspect-ratio' === $css_property ) {

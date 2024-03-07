@@ -226,7 +226,7 @@ export default function SpacingInputControl( {
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
 						label={ ariaLabel }
-						hideLabelFromVision={ true }
+						hideLabelFromVision
 						className="spacing-sizes-control__custom-value-input"
 						size={ '__unstable-large' }
 					/>
@@ -272,8 +272,8 @@ export default function SpacingInputControl( {
 					max={ spacingSizes.length - 1 }
 					marks={ marks }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
-					__nextHasNoMarginBottom={ true }
+					hideLabelFromVision
+					__nextHasNoMarginBottom
 					onFocus={ onMouseOver }
 					onBlur={ onMouseOut }
 				/>
@@ -296,7 +296,7 @@ export default function SpacingInputControl( {
 					} }
 					options={ options }
 					label={ ariaLabel }
-					hideLabelFromVision={ true }
+					hideLabelFromVision
 					size={ '__unstable-large' }
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }

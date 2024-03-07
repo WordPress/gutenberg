@@ -198,7 +198,7 @@ function InstalledFonts() {
 					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
-							isSmall
+							size="small"
 							onClick={ () => {
 								handleSetLibraryFontSelected( null );
 							} }

@@ -53,7 +53,7 @@ const Caption = ( {
 			__unstableOnSplitAtEnd={ () =>
 				insertBlocksAfter( createBlock( 'core/paragraph' ) )
 			}
-			deleteEnter={ true }
+			deleteEnter
 		/>
 	</View>
 );
