@@ -25,6 +25,7 @@ import { setContent } from './set-content';
 import { setPreferences } from './set-preferences';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
+import { switchBlockInspectorTab } from './switch-block-inspector-tab';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
 import { switchToLegacyCanvas } from './switch-to-legacy-canvas';
 import { transformBlockTo } from './transform-block-to';
@@ -81,6 +82,9 @@ export class Editor {
 	setPreferences: typeof setPreferences = setPreferences.bind( this );
 	/** @borrows showBlockToolbar as this.showBlockToolbar */
 	showBlockToolbar: typeof showBlockToolbar = showBlockToolbar.bind( this );
+	/** @borrows switchBlockInspectorTab as this.switchBlockInspectorTab */
+	switchBlockInspectorTab: typeof switchBlockInspectorTab =
+		switchBlockInspectorTab.bind( this );
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */
 	setIsFixedToolbar: typeof setIsFixedToolbar =
 		setIsFixedToolbar.bind( this );
