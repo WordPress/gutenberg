@@ -125,6 +125,8 @@ function getAnchor( editableContentElement, tagName, className ) {
 	return createVirtualAnchorElement( range, editableContentElement );
 }
 
+const STABLE_OBJECT = {};
+
 /**
  * This hook, to be used in a format type's Edit component, returns the active
  * element that is formatted, or a virtual element for the selection range if
@@ -138,7 +140,12 @@ function getAnchor( editableContentElement, tagName, className ) {
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
-	const { tagName, className, isActive } = settings;
+	const {
+		tagName,
+		className,
+		isActive,
+		activeAttributes = STABLE_OBJECT,
+	} = settings;
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
 	);
@@ -162,7 +169,19 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 				getAnchor( editableContentElement, tagName, className )
 			);
 		}
-	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
+	}, [
+		editableContentElement,
+		tagName,
+		className,
+		isActive,
+		wasActive,
+		// Active attributes is defaulted to a stable object to avoid re-rendering,
+		// but in specific circumstances it can be used to provide additional information
+		// about the currently active format to disambiguate the anchor from other anchors
+		// within the same editable content element. This is useful for `core/link` when you
+		// want to disambiguate between different links when clicking between them.
+		activeAttributes,
+	] );
 
 	return anchor;
 }

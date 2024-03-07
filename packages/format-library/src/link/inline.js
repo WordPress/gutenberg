@@ -218,7 +218,7 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings: { ...settings, isActive },
+		settings: { ...settings, isActive, activeAttributes },
 	} );
 
 	async function handleCreate( pageTitle ) {
