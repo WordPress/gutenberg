@@ -17,8 +17,7 @@ let rootFragment;
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map();
-const stylesheets = new Map();
-const scripts = new Map();
+const headElements = new Map();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -70,21 +69,6 @@ const loadAsset = ( a ) => {
 	return p;
 };
 
-const activateScript = ( n ) => {
-	if (
-		n.nodeName !== 'SCRIPT' &&
-		n.nodeName !== 'STYLE' &&
-		n.nodeName !== 'LINK'
-	)
-		return n;
-	const s = document.createElement( n.nodeName );
-	s.innerText = n.innerText;
-	for ( const attr of n.attributes ) {
-		s.setAttribute( attr.name, attr.value );
-	}
-	return s;
-};
-
 const updateHead = async ( newHead ) => {
 	// Map incoming head tags by their content.
 	const newHeadMap = new Map();
@@ -116,69 +100,55 @@ const updateHead = async ( newHead ) => {
 	// Apply the changes.
 	toRemove.forEach( ( n ) => n.remove() );
 	loaders.forEach( ( l ) => l && l.remove() );
-	document.head.append( ...toAppend.map( activateScript ) );
+	document.head.append( ...toAppend );
 };
 
 const nextTick = ( fn ) =>
 	new Promise( ( resolve ) => setTimeout( () => resolve( fn() ) ) );
 
-const fetchStyle = async ( document ) => {
-	const fetchedItems = await Promise.all(
-		[].map.call(
-			document.querySelectorAll( 'link[rel=stylesheet]' ),
-			( el ) => {
-				const attributeValue = el.getAttribute( 'href' );
-				if ( ! stylesheets.has( attributeValue ) )
-					stylesheets.set(
-						attributeValue,
-						fetch( attributeValue ).then( ( r ) => r.text() )
-					);
-				return stylesheets.get( attributeValue );
-			}
-		)
-	);
-
-	return fetchedItems.map( ( item ) => {
-		const element = document.createElement( 'style' );
-		element.textContent = item;
-		return element;
-	} );
-};
-
-const fetchScript = async ( document ) => {
-	const fetchedItems = await Promise.all(
-		[].map.call( document.querySelectorAll( 'script[src]' ), ( el ) => {
-			const attributeValue = el.getAttribute( 'src' );
-			if ( ! scripts.has( attributeValue ) )
-				scripts.set( attributeValue, {
-					el,
-					text: fetch( attributeValue ).then( ( r ) => r.text() ),
-				} );
-			return scripts.get( attributeValue );
-		} )
-	);
-
-	return fetchedItems.map( ( item ) => {
-		const element = document.createElement( 'script' );
-		element.innerText = item.el.innerText;
-		for ( const attr of item.el.attributes ) {
-			element.setAttribute( attr.name, attr.value );
-		}
-
-		return element;
-	} );
-};
-
-// Fetch styles of a new page.
+// Fetch head assets of a new page.
 const fetchAssets = async ( document ) => {
-	const stylesFromSheets = await fetchStyle( document );
-	const scriptTags = await fetchScript( document );
+	const headTags = [];
+	const assets = [
+		{
+			tagName: 'style',
+			selector: 'link[rel=stylesheet]',
+			attribute: 'href',
+		},
+		{ tagName: 'script', selector: 'script[src]', attribute: 'src' },
+	];
+	for ( const asset of assets ) {
+		const { tagName, selector, attribute } = asset;
+		const tags = document.querySelectorAll( selector );
+
+		// Use Promise.all to wait for fetch to complete
+		await Promise.all(
+			Array.from( tags ).map( async ( tag ) => {
+				const attributeValue = tag.getAttribute( attribute );
+				if ( ! headElements.has( attributeValue ) ) {
+					const response = await fetch( attributeValue );
+					const text = await response.text();
+					headElements.set( attributeValue, {
+						tag,
+						text,
+					} );
+				}
+
+				const headElement = headElements.get( attributeValue );
+				const element = document.createElement( tagName );
+				element.innerText = headElement.text;
+				for ( const attr of headElement.tag.attributes ) {
+					element.setAttribute( attr.name, attr.value );
+				}
+				headTags.push( element );
+			} )
+		);
+	}
 
 	return [
-		...scriptTags,
 		document.querySelector( 'title' ),
 		...document.querySelectorAll( 'style' ),
-		...stylesFromSheets,
+		...headTags,
 	];
 };
 
@@ -261,15 +231,12 @@ if ( canDoClientSideNavigation() ) {
 		document.body
 	);
 	// Cache the scripts. Has to be called before fetching the assets.
-	[].map.call(
-		document.querySelectorAll( 'script[type=module]' ),
-		( script ) => {
-			scripts.set( script.getAttribute( 'src' ), {
-				el: script,
-				text: script.textContent,
-			} );
-		}
-	);
+	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
+		headElements.set( script.getAttribute( 'src' ), {
+			tag: script,
+			text: script.textContent,
+		} );
+	} );
 	const head = await fetchAssets( document );
 	pages.set(
 		cleanUrl( window.location ),
