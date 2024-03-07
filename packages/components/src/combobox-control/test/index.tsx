@@ -212,6 +212,48 @@ describe.each( [
 		expect( input ).toHaveValue( targetOption.label );
 	} );
 
+	it( 'should not filter the list of options if shouldFilter is false', async () => {
+		const user = await userEvent.setup();
+		const targetOption = timezones[ 0 ];
+		const japanTargetOption = timezones[ 12 ];
+		const onChangeSpy = jest.fn();
+		render(
+			<Component
+				options={ timezones }
+				label={ defaultLabelText }
+				onChange={ onChangeSpy }
+				shouldFilter={ false }
+			/>
+		);
+		const input = getInput( defaultLabelText );
+
+		// Pressing tab selects the input and shows the options
+		await user.tab();
+
+		// Type enough characters to ensure a predictable search result
+		await user.keyboard( 'Japan' );
+
+		// Select first item (which should be Japan because the items are ordered)
+		await user.keyboard( '{ArrowDown}' );
+
+		// Pressing Enter/Return selects the currently focused option
+		await user.keyboard( '{Enter}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( japanTargetOption.value );
+		expect( input ).toHaveValue( japanTargetOption.label );
+
+		// Select first item (which should be Japan because the items are ordered)
+		await user.keyboard( '{ArrowDown}' );
+
+		// Pressing Enter/Return selects the currently focused option
+		await user.keyboard( '{Enter}' );
+
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( targetOption.value );
+		expect( input ).toHaveValue( targetOption.label );
+	} );
+
 	it( 'should render aria-live announcement upon selection', async () => {
 		const user = await userEvent.setup();
 		const targetOption = timezones[ 9 ];
