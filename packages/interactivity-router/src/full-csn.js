@@ -19,7 +19,6 @@ let rootFragment;
 const pages = new Map();
 const stylesheets = new Map();
 const scripts = new Map();
-const modules = new Map();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -46,66 +45,137 @@ const canDoClientSideNavigation = () =>
  *                                           item. Can be 'style' or 'script'.
  * @return {Promise<Array<HTMLElement>>} - Array of elements to add to the document.
  */
-const fetchScriptOrStyle = async (
-	document,
-	selector,
-	attribute,
-	cache,
-	elementToCreate
-) => {
+
+const getTagId = ( tag ) => tag.id || tag.outerHTML;
+
+const canBePreloaded = ( e ) => e.src || ( e.href && e.rel !== 'preload' );
+
+const loadAsset = ( a ) => {
+	const loader = document.createElement( 'link' );
+	loader.rel = 'preload';
+	if ( a.nodeName === 'SCRIPT' ) {
+		loader.as = 'script';
+		loader.href = a.getAttribute( 'src' );
+	} else if ( a.nodeName === 'LINK' ) {
+		loader.as = 'style';
+		loader.href = a.getAttribute( 'href' );
+	}
+
+	const p = new Promise( ( resolve, reject ) => {
+		loader.onload = () => resolve( loader );
+		loader.onerror = () => reject( loader );
+	} );
+
+	document.head.appendChild( loader );
+	return p;
+};
+
+const activateScript = ( n ) => {
+	if (
+		n.nodeName !== 'SCRIPT' &&
+		n.nodeName !== 'STYLE' &&
+		n.nodeName !== 'LINK'
+	)
+		return n;
+	const s = document.createElement( n.nodeName );
+	s.innerText = n.innerText;
+	for ( const attr of n.attributes ) {
+		s.setAttribute( attr.name, attr.value );
+	}
+	return s;
+};
+
+const updateHead = async ( newHead ) => {
+	// Map incoming head tags by their content.
+	const newHeadMap = new Map();
+	for ( const child of newHead ) {
+		newHeadMap.set( getTagId( child ), child );
+	}
+
+	const toRemove = [];
+
+	// Detect nodes that should be added or removed.
+	for ( const child of document.head.children ) {
+		const id = getTagId( child );
+		// Always remove styles and links as they might change.
+		if ( child.nodeName === 'LINK' || child.nodeName === 'STYLE' )
+			toRemove.push( child );
+		else if ( newHeadMap.has( id ) ) newHeadMap.delete( id );
+		else if ( child.nodeName !== 'SCRIPT' && child.nodeName !== 'META' )
+			toRemove.push( child );
+	}
+
+	// Prepare new assets.
+	const toAppend = [ ...newHeadMap.values() ];
+
+	// Wait for all new assets to be loaded.
+	const loaders = await Promise.all(
+		toAppend.filter( canBePreloaded ).map( loadAsset )
+	);
+
+	// Apply the changes.
+	toRemove.forEach( ( n ) => n.remove() );
+	loaders.forEach( ( l ) => l && l.remove() );
+	document.head.append( ...toAppend.map( activateScript ) );
+};
+
+const nextTick = ( fn ) =>
+	new Promise( ( resolve ) => setTimeout( () => resolve( fn() ) ) );
+
+const fetchStyle = async ( document ) => {
 	const fetchedItems = await Promise.all(
-		[].map.call( document.querySelectorAll( selector ), ( el ) => {
-			const attributeValue = el.getAttribute( attribute );
-			if ( ! cache.has( attributeValue ) )
-				cache.set(
-					attributeValue,
-					fetch( attributeValue ).then( ( r ) => r.text() )
-				);
-			return cache.get( attributeValue );
+		[].map.call(
+			document.querySelectorAll( 'link[rel=stylesheet]' ),
+			( el ) => {
+				const attributeValue = el.getAttribute( 'href' );
+				if ( ! stylesheets.has( attributeValue ) )
+					stylesheets.set(
+						attributeValue,
+						fetch( attributeValue ).then( ( r ) => r.text() )
+					);
+				return stylesheets.get( attributeValue );
+			}
+		)
+	);
+
+	return fetchedItems.map( ( item ) => {
+		const element = document.createElement( 'style' );
+		element.textContent = item;
+		return element;
+	} );
+};
+
+const fetchScript = async ( document ) => {
+	const fetchedItems = await Promise.all(
+		[].map.call( document.querySelectorAll( 'script[src]' ), ( el ) => {
+			const attributeValue = el.getAttribute( 'src' );
+			if ( ! scripts.has( attributeValue ) )
+				scripts.set( attributeValue, {
+					el,
+					text: fetch( attributeValue ).then( ( r ) => r.text() ),
+				} );
+			return scripts.get( attributeValue );
 		} )
 	);
 
 	return fetchedItems.map( ( item ) => {
-		const element = document.createElement( elementToCreate );
-		element.textContent = item;
+		const element = document.createElement( 'script' );
+		element.innerText = item.el.innerText;
+		for ( const attr of item.el.attributes ) {
+			element.setAttribute( attr.name, attr.value );
+		}
+
 		return element;
 	} );
 };
 
 // Fetch styles of a new page.
 const fetchAssets = async ( document ) => {
-	const stylesFromSheets = await fetchScriptOrStyle(
-		document,
-		'link[rel=stylesheet]',
-		'href',
-		stylesheets,
-		'style'
-	);
-	const scriptTags = await fetchScriptOrStyle(
-		document,
-		'script:not([type="module"])[src]',
-		'src',
-		scripts,
-		'script'
-	);
-	const moduleScripts = await Promise.all(
-		[].map.call(
-			document.querySelectorAll( 'script[type=module]' ),
-			( el ) => {
-				const attributeValue = el.getAttribute( 'src' );
-				if ( ! modules.has( attributeValue ) )
-					fetch( attributeValue ).then( ( r ) =>
-						r.text( modules.set( attributeValue, el ) )
-					);
-
-				return modules.get( attributeValue );
-			}
-		)
-	);
+	const stylesFromSheets = await fetchStyle( document );
+	const scriptTags = await fetchScript( document );
 
 	return [
 		...scriptTags,
-		...moduleScripts,
 		document.querySelector( 'title' ),
 		...document.querySelectorAll( 'style' ),
 		...stylesFromSheets,
@@ -149,8 +219,8 @@ const { actions } = store( 'core/router', {
 				const page = yield pages.get( newUrl );
 
 				if ( page ) {
-					document.head.replaceChildren( ...page.head );
-					render( page.body, rootFragment );
+					yield updateHead( page.head );
+					yield nextTick( () => render( page.body, rootFragment ) );
 					window.history.pushState( {}, '', href );
 				} else {
 					window.location.assign( href );
@@ -194,7 +264,10 @@ if ( canDoClientSideNavigation() ) {
 	[].map.call(
 		document.querySelectorAll( 'script[type=module]' ),
 		( script ) => {
-			scripts.set( script.getAttribute( 'src' ), script );
+			scripts.set( script.getAttribute( 'src' ), {
+				el: script,
+				text: script.textContent,
+			} );
 		}
 	);
 	const head = await fetchAssets( document );
