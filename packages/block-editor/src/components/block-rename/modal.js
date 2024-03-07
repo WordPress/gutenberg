@@ -91,7 +91,7 @@ export default function BlockRenameModal( {
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
-						hideLabelFromVision={ true }
+						hideLabelFromVision
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }

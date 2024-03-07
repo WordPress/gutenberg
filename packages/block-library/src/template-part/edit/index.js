@@ -320,7 +320,7 @@ export default function TemplatePartEdit( {
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
-					isFullScreen={ true }
+					isFullScreen
 				>
 					<TemplatePartSelectionModal
 						templatePartId={ templatePartId }

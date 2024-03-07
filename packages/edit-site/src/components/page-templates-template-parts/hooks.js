@@ -1,28 +1,19 @@
-// @ts-check
-/**
- * External dependencies
- */
-import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
-import { Icon, __experimentalHStack as HStack } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import {
 	commentAuthorAvatar as authorIcon,
 	layout as themeIcon,
 	plugins as pluginIcon,
 	globe as globeIcon,
 } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPE, TEMPLATE_ORIGINS } from '../../utils/constants';
+import { TEMPLATE_ORIGINS } from '../../utils/constants';
 
 /** @typedef {'wp_template'|'wp_template_part'} TemplateType */
 
@@ -105,61 +96,5 @@ export function useAddedBy( postType, postId ) {
 			}
 		},
 		[ postType, postId ]
-	);
-}
-
-/**
- * @param {Object} props
- * @param {string} props.imageUrl
- */
-export function AvatarImage( { imageUrl } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-
-	return (
-		<div
-			className={ classnames( 'edit-site-list-added-by__avatar', {
-				'is-loaded': isImageLoaded,
-			} ) }
-		>
-			<img
-				onLoad={ () => setIsImageLoaded( true ) }
-				alt=""
-				src={ imageUrl }
-			/>
-		</div>
-	);
-}
-
-/**
- * @param {Object}       props
- * @param {TemplateType} props.postType The template post type.
- * @param {number}       props.postId   The template post id.
- */
-export default function AddedBy( { postType, postId } ) {
-	const { text, icon, imageUrl, isCustomized } = useAddedBy(
-		postType,
-		postId
-	);
-
-	return (
-		<HStack alignment="left">
-			{ imageUrl ? (
-				<AvatarImage imageUrl={ imageUrl } />
-			) : (
-				<div className="edit-site-list-added-by__icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span>
-				{ text }
-				{ isCustomized && (
-					<span className="edit-site-list-added-by__customized-info">
-						{ postType === TEMPLATE_POST_TYPE
-							? _x( 'Customized', 'template' )
-							: _x( 'Customized', 'template part' ) }
-					</span>
-				) }
-			</span>
-		</HStack>
 	);
 }

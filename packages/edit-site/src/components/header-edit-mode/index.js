@@ -154,6 +154,7 @@ export default function HeaderEditMode() {
 										? __( 'Show block tools' )
 										: __( 'Hide block tools' )
 								}
+								size="compact"
 							/>
 						</>
 					) }
