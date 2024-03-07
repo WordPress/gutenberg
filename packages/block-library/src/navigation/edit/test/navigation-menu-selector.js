@@ -13,13 +13,23 @@ import useNavigationEntities from '../../use-navigation-entities';
 
 jest.mock( '../../use-navigation-menu', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
+	const mock = jest.fn(
+		() =>
+			new Promise( ( resolve ) => {
+				resolve();
+			} )
+	);
 	return mock;
 } );
 
 jest.mock( '../../use-navigation-entities', () => {
 	// This allows us to tweak the returned value on each test.
-	const mock = jest.fn();
+	const mock = jest.fn(
+		() =>
+			new Promise( ( resolve ) => {
+				resolve();
+			} )
+	);
 	return mock;
 } );
 
@@ -221,7 +231,12 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should call handler callback and close popover when create menu button is clicked', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = jest.fn(
+					() =>
+						new Promise( ( resolve ) => {
+							resolve();
+						} )
+				);
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
@@ -248,7 +263,12 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should handle disabled state of the create menu button during the creation process', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = jest.fn(
+					() =>
+						new Promise( ( resolve ) => {
+							resolve();
+						} )
+				);
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
@@ -425,7 +445,12 @@ describe( 'NavigationMenuSelector', () => {
 			it( 'should call the handler when the navigation menu is selected and disable all options during the import/creation process', async () => {
 				const user = userEvent.setup();
 
-				const handler = jest.fn();
+				const handler = jest.fn(
+					() =>
+						new Promise( ( resolve ) => {
+							resolve();
+						} )
+				);
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
@@ -568,7 +593,12 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should call the handler when the classic menu item is selected and disable all options during the import/creation process', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = jest.fn(
+					() =>
+						new Promise( ( resolve ) => {
+							resolve();
+						} )
+				);
 
 				useNavigationMenu.mockReturnValue( {
 					canUserCreateNavigationMenu: true,
