@@ -7,7 +7,13 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { ALL_OPERATORS, OPERATOR_IN, OPERATOR_NOT_IN } from './constants';
+import {
+	ALL_OPERATORS,
+	OPERATOR_EQUAL,
+	OPERATOR_IN,
+	OPERATOR_NOT_EQUAL,
+	OPERATOR_NOT_IN,
+} from './constants';
 import { unlock } from './lock-unlock';
 
 const { DropdownMenuSeparatorV2: DropdownMenuSeparator } = unlock(
@@ -80,12 +86,13 @@ export const sanitizeOperators = ( field ) => {
 	);
 
 	// Do not allow mixing single & multiselection operators.
+	// Remove multiselction operators if any of the single selection ones is present.
 	if (
-		operators.includes( OPERATOR_IN ) ||
-		operators.includes( OPERATOR_NOT_IN )
+		operators.includes( OPERATOR_EQUAL ) ||
+		operators.includes( OPERATOR_NOT_EQUAL )
 	) {
 		operators = operators.filter( ( operator ) =>
-			[ OPERATOR_IN, OPERATOR_NOT_IN ].includes( operator )
+			[ OPERATOR_EQUAL, OPERATOR_NOT_EQUAL ].includes( operator )
 		);
 	}
 
