@@ -178,7 +178,7 @@ export function updateBlockAttributes(
 }
 
 export function resetBlocksWithBoundAttributes( blocks ) {
-	return ( { dispatch, registry } ) => {
+	return ( { select, dispatch, registry } ) => {
 		/*
 		 * Filter blocks with bound attributes.
 		 */
@@ -210,32 +210,54 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 			registry.select( blocksStore )
 		).getAllBlockBindingsSources();
 
-		blocksWithBoundAttributes.forEach( ( block ) => {
-			const bindings = block.attributes.metadata.bindings;
-			if ( ! Object.keys( bindings ).length ) {
-				return;
-			}
+		/*
+		 * Batch the updates to avoid multiple re-renders.
+		 */
+		registry.batch( () => {
+			blocksWithBoundAttributes.forEach( ( block ) => {
+				const bindings = block.attributes.metadata.bindings;
+				if ( ! Object.keys( bindings ).length ) {
+					return;
+				}
 
-			/*
-			 * boundAttributes object
-			 * Collect and pull the bound attributes
-			 * to update the block attributes.
-			 */
-			const boundAttributes = Object.fromEntries(
-				Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
-					const { connect } = blockBindingsSources[ settings.source ];
+				/*
+				 * boundAttributes object
+				 * Collect and pull the bound attributes
+				 * to update the block attributes.
+				 */
+				const boundAttributes = Object.fromEntries(
+					Object.entries( bindings ).map(
+						( [ attrName, settings ] ) => {
+							const { connect } =
+								blockBindingsSources[ settings.source ];
 
-					const { value } = connect( block, settings.args );
-					return [ attrName, value ];
-				} )
-			);
+							const { value } = connect(
+								block,
+								settings.args,
+								( newValue ) => {
+									dispatch.updateBlockAttributes(
+										block.clientId,
+										{
+											[ attrName ]: newValue,
+										}
+									);
+								}
+							);
 
-			// First sync the attribute value with the external source.
-			dispatch.updateBlockAttributes( block.clientId, boundAttributes );
+							return [ attrName, value ];
+						}
+					)
+				);
+
+				// First sync the attribute value with the external source.
+				dispatch.updateBlockAttributes(
+					block.clientId,
+					boundAttributes
+				);
+			} );
 		} );
 	};
 }
-
 
 /**
  * Action that updates the block with the specified client ID.
