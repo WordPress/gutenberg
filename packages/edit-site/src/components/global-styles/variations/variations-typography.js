@@ -35,7 +35,7 @@ export default function TypographyVariations() {
 
 	const { base } = useContext( GlobalStylesContext );
 
-	if ( ! typographyVariations.length ) {
+	if ( ! typographyVariations?.length ) {
 		return null;
 	}
 

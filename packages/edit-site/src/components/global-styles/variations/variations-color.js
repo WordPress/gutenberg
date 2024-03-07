@@ -23,7 +23,7 @@ export default function ColorVariations() {
 			Object.keys( variation?.settings?.color ).length,
 	} );
 
-	if ( ! colorVariations.length ) {
+	if ( ! colorVariations?.length ) {
 		return null;
 	}
 
