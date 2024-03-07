@@ -12,6 +12,11 @@
 
 -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
 
+### Bug Fix
+-   `PaletteEdit`: Fix order numbers for color palette ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
+
+
+
 ## 27.1.0 (2024-03-06)
 
 ### Bug Fix

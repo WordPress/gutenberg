@@ -26,9 +26,10 @@ describe( 'getNameAndSlugForPosition', () => {
 		const slugPrefix = 'test-';
 		const elements: PaletteElement[] = [];
 
-		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 1',
+			slug: 'test-color-1',
+		} );
 	} );
 
 	test( 'should return a new color name with an incremented slug id', () => {
@@ -41,9 +42,10 @@ describe( 'getNameAndSlugForPosition', () => {
 			},
 		];
 
-		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 2'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 2',
+			slug: 'test-color-2',
+		} );
 	} );
 
 	test( 'should ignore user-defined color names', () => {
@@ -56,9 +58,10 @@ describe( 'getNameAndSlugForPosition', () => {
 			},
 		];
 
-		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 1',
+			slug: 'test-color-1',
+		} );
 	} );
 
 	test( 'should return a new color name with an incremented slug id one higher than the current highest', () => {
@@ -86,9 +89,10 @@ describe( 'getNameAndSlugForPosition', () => {
 			},
 		];
 
-		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 151'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 151',
+			slug: 'test-color-151',
+		} );
 	} );
 } );
 
