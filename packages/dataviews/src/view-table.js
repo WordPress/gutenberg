@@ -247,6 +247,9 @@ function TableRow( {
 				if ( event.ctrlKey || event.metaKey ) {
 					event.stopPropagation();
 					event.preventDefault();
+					if ( ! hasPossibleBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
