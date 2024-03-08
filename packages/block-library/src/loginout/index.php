@@ -41,6 +41,8 @@ function render_block_core_loginout( $attributes ) {
 
 /**
  * Registers the `core/loginout` block on server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_loginout() {
 	register_block_type_from_metadata(
