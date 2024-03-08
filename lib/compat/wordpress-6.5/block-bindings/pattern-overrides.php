@@ -15,11 +15,30 @@
  * @return mixed The value computed for the source.
  */
 function gutenberg_block_bindings_pattern_overrides_callback( $source_attrs, $block_instance, $attribute_name ) {
-	if ( empty( $block_instance->attributes['metadata']['id'] ) ) {
+	if ( ! isset( $block_instance->context['pattern/overrides'] ) ) {
 		return null;
 	}
-	$block_id = $block_instance->attributes['metadata']['id'];
-	return _wp_array_get( $block_instance->context, array( 'pattern/overrides', $block_id, 'values', $attribute_name ), null );
+
+	$override_content = $block_instance->context['pattern/overrides'];
+
+	// Back compat. Pattern overrides previously used a metadata `id` instead of `name`.
+	// We check first for the name, and if it exists, use that value.
+	if ( isset( $block_instance->attributes['metadata']['name'] ) ) {
+		$metadata_name = $block_instance->attributes['metadata']['name'];
+		if ( array_key_exists( $metadata_name, $override_content ) ) {
+			return _wp_array_get( $override_content, array( $metadata_name, $attribute_name ), null );
+		}
+	}
+
+	// Next check for the `id`.
+	if ( isset( $block_instance->attributes['metadata']['id'] ) ) {
+		$metadata_id = $block_instance->attributes['metadata']['id'];
+		if ( array_key_exists( $metadata_id, $override_content ) ) {
+			return _wp_array_get( $override_content, array( $metadata_id, $attribute_name ), null );
+		}
+	}
+
+	return null;
 }
 
 /**
@@ -35,6 +54,7 @@ function gutenberg_register_block_bindings_pattern_overrides_source() {
 		array(
 			'label'              => _x( 'Pattern Overrides', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_pattern_overrides_callback',
+			'uses_context'       => array( 'pattern/overrides' ),
 		)
 	);
 }

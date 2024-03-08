@@ -353,6 +353,18 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorMode
+
+Returns the current editing mode.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: Editing mode.
+
 ### getEditorSelection
 
 Returns the current selection.
@@ -1467,6 +1479,14 @@ _Related_
 
 -   stopTyping in core/block-editor store.
 
+### switchEditorMode
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
+
 ### synchronizeTemplate
 
 _Related_
@@ -1478,6 +1498,10 @@ _Related_
 _Related_
 
 -   toggleBlockMode in core/block-editor store.
+
+### toggleDistractionFree
+
+Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 
 ### toggleEditorPanelEnabled
 

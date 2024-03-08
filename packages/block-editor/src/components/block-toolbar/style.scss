@@ -207,17 +207,18 @@
 		}
 	}
 
-	.block-editor-block-mover .block-editor-block-mover__move-button-container {
-		width: auto;
-
-		@include break-small() {
+	.block-editor-block-mover {
+		.block-editor-block-mover__move-button-container {
+			width: auto;
 			position: relative;
+		}
 
-			&::before {
+		&:not(.is-horizontal) .block-editor-block-mover__move-button-container::before {
+			@include break-small() {
 				content: "";
 				height: $border-width;
 				width: 100%;
-				background: $gray-900;
+				background: $gray-200;
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -225,6 +226,10 @@
 				// X axis allows to make the separator always centered regardless of its width.
 				transform: translate(-50%, 0);
 				margin-top: -$border-width * 0.5;
+			}
+
+			@include break-medium {
+				background: $gray-900;
 			}
 		}
 	}

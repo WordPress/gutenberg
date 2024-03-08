@@ -77,7 +77,7 @@ export default function save( { attributes } ) {
 							typographyProps.className
 						) }
 						style={ typographyProps.style }
-						download={ true }
+						download
 						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />

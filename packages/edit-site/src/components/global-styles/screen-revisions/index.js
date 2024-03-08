@@ -73,7 +73,11 @@ function ScreenRevisions() {
 
 	const onCloseRevisions = () => {
 		goTo( '/' ); // Return to global styles main panel.
-		setEditorCanvasContainerView( undefined );
+		const canvasContainerView =
+			editorCanvasContainerView === 'global-styles-revisions:style-book'
+				? 'style-book'
+				: undefined;
+		setEditorCanvasContainerView( canvasContainerView );
 	};
 
 	const restoreRevision = ( revision ) => {
@@ -99,7 +103,6 @@ function ScreenRevisions() {
 			! editorCanvasContainerView.startsWith( 'global-styles-revisions' )
 		) {
 			goTo( '/' ); // Return to global styles main panel.
-			setEditorCanvasContainerView( editorCanvasContainerView );
 		}
 	}, [ editorCanvasContainerView ] );
 

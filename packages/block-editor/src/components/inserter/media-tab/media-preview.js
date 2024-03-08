@@ -195,7 +195,12 @@ export function MediaPreview( { media, onClick, category } ) {
 			createSuccessNotice,
 		]
 	);
-	const title = media.title?.rendered || media.title;
+
+	const title =
+		typeof media.title === 'string'
+			? media.title
+			: media.title?.rendered || __( 'no title' );
+
 	let truncatedTitle;
 	if ( title.length > MAXIMUM_TITLE_LENGTH ) {
 		const omission = '...';
@@ -206,7 +211,7 @@ export function MediaPreview( { media, onClick, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
 						className={ classnames(

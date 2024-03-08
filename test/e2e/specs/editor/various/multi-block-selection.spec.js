@@ -10,7 +10,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * Some tests in this file use the character `|` to represent the caret's position
  * in a more readable format.
  */
-test.describe( 'Multi-block selection', () => {
+test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 	test.use( {
 		multiBlockSelectionUtils: async ( { page, editor }, use ) => {
 			await use( new MultiBlockSelectionUtils( { page, editor } ) );
@@ -48,7 +48,7 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
-	test( 'should only trigger multi-selection when at the end', async ( {
+	test( 'should only trigger multi-selection when at the end (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -286,7 +286,7 @@ test.describe( 'Multi-block selection', () => {
 	} );
 
 	// @see https://github.com/WordPress/gutenberg/issues/34118
-	test( 'should properly select a single block even if `shift` was held for the selection', async ( {
+	test( 'should properly select a single block even if `shift` was held for the selection (-firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -318,7 +318,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should properly select multiple blocks if selected nested blocks belong to different parent', async ( {
+	test( 'should properly select multiple blocks if selected nested blocks belong to different parent (-webkit)', async ( {
 		editor,
 		multiBlockSelectionUtils,
 	} ) => {
@@ -352,7 +352,7 @@ test.describe( 'Multi-block selection', () => {
 			.toEqual( [ 1, 4 ] );
 	} );
 
-	test( 'should properly select part of nested rich text block while holding shift', async ( {
+	test( 'should properly select part of nested rich text block while holding shift (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -614,7 +614,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should keep correct selection when dragging outside block', async ( {
+	test( 'should keep correct selection when dragging outside block (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -730,7 +730,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should clear selection when clicking next to blocks', async ( {
+	test( 'should clear selection when clicking next to blocks (-firefox)', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -1113,7 +1113,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should write over selection', async ( {
+	test( 'should write over selection (-firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -1134,6 +1134,34 @@ test.describe( 'Multi-block selection', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: '1|2' },
+			},
+		] );
+	} );
+
+	test( 'should write over selection (-chromium, -webkit, @firefox)', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( '1[' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( ']2' );
+		await page.keyboard.press( 'ArrowLeft' );
+		// Select everything between [].
+		await pageUtils.pressKeys( 'Shift+ArrowLeft', { times: 3 } );
+
+		// Ensure selection is in the correct place.
+		await page.keyboard.type( '|' );
+		// For some reason, this works completely fine when testing manually in
+		// Firefox, but with Playwright it only merges the blocks but doesn't
+		// insert the character.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: '12' },
 			},
 		] );
 	} );
@@ -1213,7 +1241,7 @@ test.describe( 'Multi-block selection', () => {
 		] );
 	} );
 
-	test( 'should partially select with shift + click (@webkit)', async ( {
+	test( 'should partially select with shift + click', async ( {
 		page,
 		editor,
 	} ) => {

@@ -35,7 +35,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		<>
 			{ 'hidden' !== type && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Input settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ 'checkbox' !== type && (
 							<CheckboxControl
 								label={ __( 'Inline label' ) }

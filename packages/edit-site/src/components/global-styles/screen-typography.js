@@ -9,7 +9,8 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import TypographyElements from './typogrphy-elements';
+import TypographyElements from './typography-elements';
+import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
@@ -30,7 +31,12 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
-					{ fontLibraryEnabled && <FontFamilies /> }
+					<TypographyVariations />
+					{ ! window.__experimentalDisableFontLibrary && (
+						<VStack spacing={ 3 }>
+							{ fontLibraryEnabled && <FontFamilies /> }
+						</VStack>
+					) }
 					<TypographyElements />
 				</VStack>
 			</div>

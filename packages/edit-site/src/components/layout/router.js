@@ -23,13 +23,21 @@ const { useLocation } = unlock( routerPrivateApis );
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom } = params ?? {};
+	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
+
+	// Note: Since "sidebar" is not yet supported here,
+	// returning undefined from "mobile" means show the sidebar.
+
 	// Regular page
 	if ( path === '/page' ) {
 		return {
 			areas: {
 				content: undefined,
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				mobile:
+					canvas === 'edit' ? (
+						<Editor isLoading={ isSiteEditorLoading } />
+					) : undefined,
 			},
 			widths: {
 				content: undefined,
@@ -63,6 +71,10 @@ export default function useLayoutAreas() {
 		return {
 			areas: {
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				mobile:
+					canvas === 'edit' ? (
+						<Editor isLoading={ isSiteEditorLoading } />
+					) : undefined,
 			},
 		};
 	}
@@ -78,6 +90,11 @@ export default function useLayoutAreas() {
 				),
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
+				),
+				mobile: (
+					<PageTemplatesTemplateParts
+						postType={ TEMPLATE_POST_TYPE }
+					/>
 				),
 			},
 			widths: {
@@ -98,6 +115,11 @@ export default function useLayoutAreas() {
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
+				mobile: (
+					<PageTemplatesTemplateParts
+						postType={ TEMPLATE_PART_POST_TYPE }
+					/>
+				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -110,12 +132,19 @@ export default function useLayoutAreas() {
 		return {
 			areas: {
 				content: <PagePatterns />,
+				mobile: <PagePatterns />,
 			},
 		};
 	}
 
 	// Fallback shows the home page preview
 	return {
-		areas: { preview: <Editor isLoading={ isSiteEditorLoading } /> },
+		areas: {
+			preview: <Editor isLoading={ isSiteEditorLoading } />,
+			mobile:
+				canvas === 'edit' ? (
+					<Editor isLoading={ isSiteEditorLoading } />
+				) : undefined,
+		},
 	};
 }
