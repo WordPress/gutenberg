@@ -120,6 +120,7 @@ function TextColorEdit( {
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
+					isActive={ isActive }
 				/>
 			) }
 		</>

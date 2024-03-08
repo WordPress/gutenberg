@@ -40,6 +40,3 @@ const CustomGradientPickerWithState: StoryFn<
 };
 
 export const Default = CustomGradientPickerWithState.bind( {} );
-Default.args = {
-	__nextHasNoMargin: true,
-};

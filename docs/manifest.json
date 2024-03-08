@@ -1680,6 +1680,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "API Reference",
+		"slug": "packages-interactivity-api-reference",
+		"markdown_source": "../packages/interactivity/docs/api-reference.md",
+		"parent": "packages-interactivity"
+	},
+	{
 		"title": "@wordpress/interface",
 		"slug": "packages-interface",
 		"markdown_source": "../packages/interface/README.md",
@@ -2082,7 +2088,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Entities and Undo/Redo.",
+		"title": "Entities and Undo/Redo",
 		"slug": "entities",
 		"markdown_source": "../docs/explanations/architecture/entities.md",
 		"parent": "architecture"

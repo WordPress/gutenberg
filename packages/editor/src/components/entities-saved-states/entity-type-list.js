@@ -30,7 +30,7 @@ function getEntityDescription( entity, count ) {
 			);
 		case 'page':
 		case 'post':
-			return __( 'The following content has been modified.' );
+			return __( 'The following has been modified.' );
 	}
 }
 
@@ -55,18 +55,17 @@ function GlobalStylesDescription( { record } ) {
 		}
 	);
 	return globalStylesChanges.length ? (
-		<>
-			<h3 className="entities-saved-states__description-heading">
-				{ __( 'Changes made to:' ) }
-			</h3>
-			<PanelRow>{ globalStylesChanges.join( ', ' ) }</PanelRow>
-		</>
+		<ul className="entities-saved-states__changes">
+			{ globalStylesChanges.map( ( change ) => (
+				<li key={ change }>{ change }</li>
+			) ) }
+		</ul>
 	) : null;
 }
 
 function EntityDescription( { record, count } ) {
 	if ( 'globalStyles' === record?.name ) {
-		return <GlobalStylesDescription record={ record } />;
+		return null;
 	}
 	const description = getEntityDescription( record?.name, count );
 	return description ? <PanelRow>{ description }</PanelRow> : null;
@@ -95,7 +94,7 @@ export default function EntityTypeList( {
 	}
 
 	return (
-		<PanelBody title={ entityLabel } initialOpen={ true }>
+		<PanelBody title={ entityLabel } initialOpen>
 			<EntityDescription record={ firstRecord } count={ count } />
 			{ list.map( ( record ) => {
 				return (
@@ -117,6 +116,9 @@ export default function EntityTypeList( {
 					/>
 				);
 			} ) }
+			{ 'globalStyles' === firstRecord?.name && (
+				<GlobalStylesDescription record={ firstRecord } />
+			) }
 		</PanelBody>
 	);
 }

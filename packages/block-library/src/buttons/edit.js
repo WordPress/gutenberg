@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
@@ -36,16 +32,12 @@ function ButtonsEdit( { attributes, className } ) {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const { preferredStyle, hasButtonVariations } = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
+	const { hasButtonVariations } = useSelect( ( select ) => {
 		const buttonVariations = select( blocksStore ).getBlockVariations(
 			'core/button',
 			'inserter'
 		);
 		return {
-			preferredStyle: preferredStyleVariations?.value?.[ 'core/button' ],
 			hasButtonVariations: buttonVariations.length > 0,
 		};
 	}, [] );
@@ -54,12 +46,7 @@ function ButtonsEdit( { attributes, className } ) {
 		defaultBlock: DEFAULT_BLOCK,
 		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
 		directInsert: ! hasButtonVariations,
-		template: [
-			[
-				'core/button',
-				{ className: preferredStyle && `is-style-${ preferredStyle }` },
-			],
-		],
+		template: [ [ 'core/button' ] ],
 		templateInsertUpdatesSelection: true,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );

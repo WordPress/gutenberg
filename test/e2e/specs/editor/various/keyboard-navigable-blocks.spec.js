@@ -12,8 +12,9 @@ test.use( {
 } );
 
 test.describe( 'Order of block keyboard navigation', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test( 'permits tabbing through paragraph blocks in the expected order', async ( {

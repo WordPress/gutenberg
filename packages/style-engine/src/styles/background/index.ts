@@ -16,7 +16,23 @@ const backgroundImage = {
 			return styleRules;
 		}
 
-		if ( _backgroundImage?.source === 'file' && _backgroundImage?.url ) {
+		/*
+		 * If the background image is a string, it could already contain a url() function,
+		 * or have a linear-gradient value.
+		 */
+		if ( typeof _backgroundImage === 'string' ) {
+			styleRules.push( {
+				selector: options.selector,
+				key: 'backgroundImage',
+				value: _backgroundImage,
+			} );
+		}
+
+		if (
+			typeof _backgroundImage === 'object' &&
+			_backgroundImage?.source === 'file' &&
+			_backgroundImage?.url
+		) {
 			styleRules.push( {
 				selector: options.selector,
 				key: 'backgroundImage',
@@ -37,6 +53,18 @@ const backgroundImage = {
 		}
 
 		return styleRules;
+	},
+};
+
+const backgroundPosition = {
+	name: 'backgroundRepeat',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'background', 'backgroundPosition' ],
+			'backgroundPosition'
+		);
 	},
 };
 
@@ -89,4 +117,9 @@ const backgroundSize = {
 	},
 };
 
-export default [ backgroundImage, backgroundRepeat, backgroundSize ];
+export default [
+	backgroundImage,
+	backgroundPosition,
+	backgroundRepeat,
+	backgroundSize,
+];

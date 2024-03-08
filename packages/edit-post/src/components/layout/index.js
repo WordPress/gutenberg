@@ -14,13 +14,11 @@ import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
 	EditorSnackbars,
-	PostSyncStatusModal,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	useBlockCommands,
 	BlockBreadcrumb,
 	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
@@ -51,6 +49,7 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
+import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -131,10 +130,9 @@ function useEditorStyles() {
 	] );
 }
 
-function Layout() {
+function Layout( { initialPost } ) {
 	useCommands();
 	useCommonCommands();
-	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
@@ -180,7 +178,7 @@ function Layout() {
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
-			mode: select( editPostStore ).getEditorMode(),
+			mode: select( editorStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
@@ -196,7 +194,7 @@ function Layout() {
 			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
-			hasHistory: !! getEditorSettings().goBack,
+			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 
@@ -304,12 +302,14 @@ function Layout() {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						initialPost={ initialPost }
 					/>
 				}
 				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
-					( ! isMobileViewport || sidebarIsOpened ) && (
+					( ( isMobileViewport && sidebarIsOpened ) ||
+						( ! isMobileViewport && ! isDistractionFree ) ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
 								<div className="edit-post-layout__toggle-sidebar-panel">
@@ -381,10 +381,10 @@ function Layout() {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
-			<PostSyncStatusModal />
+			<InitPatternModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
-			<SettingsSidebar />
+			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>
 	);
 }

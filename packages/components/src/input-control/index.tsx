@@ -55,11 +55,7 @@ export function UnforwardedInputControl(
 		suffix,
 		value,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< InputControlProps >(
-		props,
-		'wp.components.InputControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
 	const [ isFocused, setIsFocused ] = useState( false );
 

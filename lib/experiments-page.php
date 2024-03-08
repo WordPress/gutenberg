@@ -90,6 +90,7 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-color-randomizer',
 		)
 	);
+
 	add_settings_field(
 		'gutenberg-form-blocks',
 		__( 'Form and input blocks ', 'gutenberg' ),
@@ -103,14 +104,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-group-grid-variation',
-		__( 'Grid variation for Group block ', 'gutenberg' ),
+		'gutenberg-grid-interactivity',
+		__( 'Grid interactivty ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
-			'id'    => 'gutenberg-group-grid-variation',
+			'label' => __( 'Test enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
+			'id'    => 'gutenberg-grid-interactivity',
 		)
 	);
 

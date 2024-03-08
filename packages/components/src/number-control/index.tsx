@@ -54,11 +54,7 @@ function UnforwardedNumberControl(
 		suffix,
 		onChange = noop,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >(
-		props,
-		'wp.components.NumberControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp< NumberControlProps >( props );
 
 	if ( hideHTMLArrows ) {
 		deprecated( 'wp.components.NumberControl hideHTMLArrows prop ', {

@@ -167,7 +167,7 @@ export default function CoverInspectorControls( {
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ isImageBackground && (
 							<>
 								<ToggleControl
@@ -304,11 +304,15 @@ export default function CoverInspectorControls( {
 						minHeight: undefined,
 						minHeightUnit: undefined,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
 							setAttributes( {

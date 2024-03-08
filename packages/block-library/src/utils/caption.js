@@ -10,13 +10,20 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
-	RichText,
 	BlockControls,
 	__experimentalGetElementClassName,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { ToolbarButton } from '@wordpress/components';
 import { caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
 
 export function Caption( {
 	key = 'caption',
@@ -28,6 +35,7 @@ export function Caption( {
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
 	className,
+	disableEditing,
 } ) {
 	const caption = attributes[ key ];
 	const prevCaption = usePrevious( caption );
@@ -101,6 +109,7 @@ export function Caption( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
+						disableEditing={ disableEditing }
 					/>
 				) }
 		</>

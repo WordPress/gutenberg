@@ -6,7 +6,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Platform, useCallback, useContext } from '@wordpress/element';
+import {
+	Platform,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -50,17 +56,45 @@ const SidebarContent = ( {
 	keyboardShortcut,
 	isEditingTemplate,
 } ) => {
+	const tabListRef = useRef( null );
 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+
+	// This effect addresses a race condition caused by tabbing from the last
+	// block in the editor into the settings sidebar. Without this effect, the
+	// selected tab and browser focus can become separated in an unexpected way
+	// (e.g the "block" tab is focused, but the "post" tab is selected).
+	useEffect( () => {
+		const tabsElements = Array.from(
+			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
+		);
+		const selectedTabElement = tabsElements.find(
+			// We are purposefully using a custom `data-tab-id` attribute here
+			// because we don't want rely on any assumptions about `Tabs`
+			// component internals.
+			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
+		);
+		const activeElement = selectedTabElement?.ownerDocument.activeElement;
+		const tabsHasFocus = tabsElements.some( ( element ) => {
+			return activeElement && activeElement.id === element.id;
+		} );
+		if (
+			tabsHasFocus &&
+			selectedTabElement &&
+			selectedTabElement.id !== activeElement?.id
+		) {
+			selectedTabElement?.focus();
+		}
+	}, [ sidebarName ] );
 
 	return (
 		<PluginSidebarEditPost
 			identifier={ sidebarName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SettingsHeader />
+					<SettingsHeader ref={ tabListRef } />
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -157,6 +191,7 @@ const SettingsSidebar = () => {
 			// the selected tab to `null` avoids that.
 			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
 			onSelect={ onTabSelect }
+			selectOnMove={ false }
 		>
 			<SidebarContent
 				sidebarName={ sidebarName }

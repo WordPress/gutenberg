@@ -353,7 +353,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       >
         <button
           aria-disabled="true"
-          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary is-compact"
           type="button"
         >
           Submit for Review
@@ -476,7 +476,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       >
         <button
           aria-disabled="true"
-          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary is-compact"
           type="button"
         >
           Submit for Review
@@ -643,7 +643,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       >
         <button
           aria-disabled="true"
-          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary"
+          class="components-button editor-post-publish-button editor-post-publish-button__button is-primary is-compact"
           type="button"
         >
           Submit for Review

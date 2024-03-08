@@ -228,7 +228,9 @@ test.describe( 'Links', () => {
 		await LinkUtils.createLink();
 
 		// Click on the Edit button.
-		await page.getByRole( 'button', { name: 'Edit', exact: true } ).click();
+		await page
+			.getByRole( 'button', { name: 'Edit link', exact: true } )
+			.click();
 
 		// Change the URL.
 		// getByPlaceholder required in order to handle Link Control component
@@ -255,7 +257,9 @@ test.describe( 'Links', () => {
 
 		const linkPopover = LinkUtils.getLinkPopover();
 
-		await linkPopover.getByRole( 'button', { name: 'Unlink' } ).click();
+		await linkPopover
+			.getByRole( 'button', { name: 'Remove link' } )
+			.click();
 
 		// The link should have been removed.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -874,6 +878,48 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	// Fix for https://github.com/WordPress/gutenberg/issues/58322
+	test( 'can click links within the same paragraph to open the correct link preview (@firefox)', async ( {
+		editor,
+		LinkUtils,
+	} ) => {
+		// Create a paragraph with two links
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: `<a href="https://wordpressfoundation.org/donate/">Donate to the WordPress Foundation</a> to support <a href="https://wordpress.org/gutenberg">Gutenberg</a>`,
+			},
+		} );
+
+		// Click on "Gutenberg" link in the canvas
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'Gutenberg',
+			} )
+			.click();
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeVisible();
+
+		// Click the other link in the same paragraph. We need a short delay between mousdown and mouseup to get the popover to show
+		await editor.canvas
+			.getByRole( 'link', {
+				name: 'WordPress',
+			} )
+			.click( { delay: 100 } );
+
+		await expect( linkPopover ).toBeVisible();
+		await expect(
+			linkPopover.getByText( 'wordpress.org/gutenberg' )
+		).toBeHidden();
+		await expect(
+			linkPopover.getByText( 'wordpressfoundation.org/donate/' )
+		).toBeVisible();
+	} );
+
 	test.describe( 'Editing link text', () => {
 		test( 'should allow for modification of link text via the Link UI', async ( {
 			page,
@@ -980,8 +1026,8 @@ test.describe( 'Links', () => {
 			pageUtils,
 			editor,
 		} ) => {
-			const textToSelect = `\u2003\u2003 spaces\u2003 `;
-			const textWithWhitespace = `Text with leading and trailing       spaces    `;
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
 
 			// Create a block with some text.
 			await editor.insertBlock( {

@@ -137,6 +137,9 @@
 			"default": {
 				"type": "flex"
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-gallery-editor",

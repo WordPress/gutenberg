@@ -181,7 +181,7 @@ export default function ListItemEdit( {
 						onReplace={ onReplaceList }
 						onEnter={ onEnter }
 						style={ styleWithPlaceholderOpacity }
-						deleteEnter={ true }
+						deleteEnter
 						containerWidth={ contentWidth }
 					/>
 				</View>

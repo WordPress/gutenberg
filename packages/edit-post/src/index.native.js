@@ -27,7 +27,6 @@ export function initializeEditor( id, postType, postId ) {
 		inactivePanels: [],
 		isPublishSidebarEnabled: true,
 		openPanels: [ 'post-status' ],
-		preferredStyleVariations: {},
 		welcomeGuide: true,
 	} );
 	dispatch( preferencesStore ).setDefaults( 'core', {

@@ -322,3 +322,7 @@
 		z-index: 35;
 	}
 }
+
+.components-popover.more-menu-dropdown__content {
+	z-index: z-index(".components-popover.more-menu__content");
+}
