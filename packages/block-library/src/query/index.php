@@ -17,13 +17,17 @@
  * @return string Returns the modified output of the query block.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	$is_interactive = isset( $attributes['enhancedPagination'] )
+	$is_interactive           = isset( $attributes['enhancedPagination'] )
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
+	$is_full_site_csn_enabled = false;
+	if ( ! empty( wp_interactivity_config( 'core/router' ) ) ) {
+		$is_full_site_csn_enabled = wp_interactivity_config( 'core/router' )['fullClientSideNavigation'];
+	}
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
-	if ( $is_interactive ) {
+	if ( $is_interactive || $is_full_site_csn_enabled ) {
 		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$module_url = gutenberg_url( '/build/interactivity/query.min.js' );

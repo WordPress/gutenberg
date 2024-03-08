@@ -7,16 +7,26 @@
 wp_interactivity_config( 'core/router', array( 'fullClientSideNavigation' => true ) );
 
 // Add directives to all links.
-function gutenberg_add_client_side_navigation_directives( $content ) {
+// This should probably be done per site, not by default when this option is enabled.
+function gutenberg_add_client_side_navigation_directives( $content, $block ) {
+	// Don't add directives to query blocks and pagination blocks.
+	if (
+		'core/query' === $block['blockName'] ||
+		'core/query-pagination-next' === $block['blockName'] ||
+		'core/query-pagination-previous' === $block['blockName'] ||
+		'core/query-pagination-numbers' === $block['blockName']
+		) {
+		return $content;
+	}
 	$p = new WP_HTML_Tag_Processor( $content );
 	while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
 		$p->set_attribute( 'data-wp-on--click', 'core/router::actions.navigate' );
-		$p->set_attribute( 'data-wp-on--mouseover', 'core/router::actions.prefetch' );
+		$p->set_attribute( 'data-wp-on--mouseenter', 'core/router::actions.prefetch' );
 	}
 	return (string) $p;
 }
 
-add_filter( 'render_block', 'gutenberg_add_client_side_navigation_directives', 10, 1 );
+add_filter( 'render_block', 'gutenberg_add_client_side_navigation_directives', 10, 2 );
 
 // Add `data-wp-interactive` to the top level tag.
 function gutenberg_interactivity_add_directives_csn( array $parsed_block ): array {
