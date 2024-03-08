@@ -13,6 +13,8 @@
  * we add a custom `data-id` attribute before rendering the gallery
  * so that the Image Block can pick it up in its render_callback.
  *
+ * @since 5.9.0
+ *
  * @param array $parsed_block The block being rendered.
  * @return array The migrated block object.
  */
@@ -34,6 +36,8 @@ add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' 
 
 /**
  * Renders the `core/gallery` block on the server.
+ *
+ * @since 6.0.0
  *
  * @param array  $attributes Attributes of the block being rendered.
  * @param string $content Content of the block being rendered.
@@ -164,6 +168,8 @@ function block_core_gallery_render( $attributes, $content ) {
 }
 /**
  * Registers the `core/gallery` block on server.
+ *
+ * @since 5.9.0
  */
 function register_block_core_gallery() {
 	register_block_type_from_metadata(
