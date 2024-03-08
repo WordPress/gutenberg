@@ -175,7 +175,7 @@ class PostTitle extends Component {
 					fontSize={ 24 }
 					lineHeight={ 1 }
 					fontWeight={ 'bold' }
-					deleteEnter={ true }
+					deleteEnter
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
@@ -184,7 +184,7 @@ class PostTitle extends Component {
 					value={ title }
 					onSelectionChange={ () => {} }
 					onEnter={ this.props.onEnterPress }
-					disableEditingMenu={ true }
+					disableEditingMenu
 					__unstableIsSelected={ this.props.isSelected }
 					__unstableOnCreateUndoLevel={ () => {} }
 				/>

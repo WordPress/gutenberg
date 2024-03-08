@@ -19,24 +19,19 @@ import {
 /**
  * This listener hook monitors for block selection and triggers the appropriate
  * sidebar state.
- *
- * @param {number} postId The current post id.
  */
-export const useBlockSelectionListener = ( postId ) => {
+export const useBlockSelectionListener = () => {
 	const { hasBlockSelection, isEditorSidebarOpened, isDistractionFree } =
-		useSelect(
-			( select ) => {
-				const { get } = select( preferencesStore );
-				return {
-					hasBlockSelection:
-						!! select( blockEditorStore ).getBlockSelectionStart(),
-					isEditorSidebarOpened:
-						select( STORE_NAME ).isEditorSidebarOpened(),
-					isDistractionFree: get( 'core', 'distractionFree' ),
-				};
-			},
-			[ postId ]
-		);
+		useSelect( ( select ) => {
+			const { get } = select( preferencesStore );
+			return {
+				hasBlockSelection:
+					!! select( blockEditorStore ).getBlockSelectionStart(),
+				isEditorSidebarOpened:
+					select( STORE_NAME ).isEditorSidebarOpened(),
+				isDistractionFree: get( 'core', 'distractionFree' ),
+			};
+		}, [] );
 
 	const { openGeneralSidebar } = useDispatch( STORE_NAME );
 
@@ -49,21 +44,24 @@ export const useBlockSelectionListener = ( postId ) => {
 		} else {
 			openGeneralSidebar( 'edit-post/document' );
 		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	}, [
+		hasBlockSelection,
+		isDistractionFree,
+		isEditorSidebarOpened,
+		openGeneralSidebar,
+	] );
 };
 
 /**
  * This listener hook monitors any change in permalink and updates the view
  * post link in the admin bar.
- *
- * @param {number} postId
  */
-export const useUpdatePostLinkListener = ( postId ) => {
+export const useUpdatePostLinkListener = () => {
 	const { newPermalink } = useSelect(
 		( select ) => ( {
 			newPermalink: select( editorStore ).getCurrentPost().link,
 		} ),
-		[ postId ]
+		[]
 	);
 	const nodeToUpdate = useRef();
 
@@ -71,7 +69,7 @@ export const useUpdatePostLinkListener = ( postId ) => {
 		nodeToUpdate.current =
 			document.querySelector( VIEW_AS_PREVIEW_LINK_SELECTOR ) ||
 			document.querySelector( VIEW_AS_LINK_SELECTOR );
-	}, [ postId ] );
+	}, [] );
 
 	useEffect( () => {
 		if ( ! newPermalink || ! nodeToUpdate.current ) {

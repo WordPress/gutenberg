@@ -137,7 +137,7 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 				clientId={ clientId }
 				isAppender={ false }
 				prioritizePatterns={ false }
-				selectBlockOnInsert={ true }
+				selectBlockOnInsert
 				hasSearch={ false }
 				onSelect={ onSelectBlock }
 			/>
@@ -247,7 +247,7 @@ export function LinkUI( props ) {
 							hasTextControl
 							hasRichPreviews
 							value={ link }
-							showInitialSuggestions={ true }
+							showInitialSuggestions
 							withCreateSuggestion={ userCanCreate }
 							createSuggestion={ handleCreate }
 							createSuggestionButtonText={ ( searchTerm ) => {
