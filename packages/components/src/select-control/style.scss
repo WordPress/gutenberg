@@ -4,7 +4,11 @@
 }
 
 @media (max-width: #{ ($break-medium) }) {
-	.components-base-control .components-base-control__field .components-select-control__input {
-		font-size: 16px;
+	.components-base-control .components-base-control__field {
+		.components-select-control__input,
+		.components-input-control__prefix,
+		.components-input-control__suffix {
+			font-size: 16px;
+		}
 	}
 }
