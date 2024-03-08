@@ -84,8 +84,7 @@ function Edit( {
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			if (
-				( event.target.tagName !== 'A' &&
-					event.target.parentElement.tagName !== 'A' ) || // other formats (e.g. bold) may be nested within the link.
+				! event.target.closest( '[contenteditable] a' ) || // other formats (e.g. bold) may be nested within the link.
 				! isActive
 			) {
 				setIsEditingLink( false );
