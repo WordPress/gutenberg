@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.114.1
+-   [**] Fix a crash produced when the content of a synced pattern is updated [#59632]
+
 ## 1.114.0
 -   [*] Prevent crash when autoscrolling to blocks [#59110]
 -   [*] Remove opacity change when images are being uploaded [#59264]
