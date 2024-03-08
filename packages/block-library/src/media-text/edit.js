@@ -237,7 +237,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaUrl && (
 				<ToolsPanelItem
 					label={ __( 'Media width' ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					hasValue={ () => !! mediaWidth }
 					onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 				>
@@ -253,7 +253,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			) }
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				hasValue={ () => !! isStackedOnMobile }
 				onDeselect={ () =>
 					setAttributes( { isStackedOnMobile: false } )
@@ -273,7 +273,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaType === 'image' && (
 				<ToolsPanelItem
 					label={ __( 'Crop image to fill' ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					hasValue={ () => !! imageFill }
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
@@ -292,7 +292,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ imageFill && mediaUrl && mediaType === 'image' && (
 				<ToolsPanelItem
 					label={ __( 'Focal point' ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					hasValue={ () => !! focalPoint }
 					onDeselect={ () =>
 						setAttributes( { focalPoint: undefined } )
@@ -315,7 +315,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			{ mediaType === 'image' && (
 				<ToolsPanelItem
 					label={ __( 'Alternative text' ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					hasValue={ () => !! mediaAlt }
 					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
 				>
