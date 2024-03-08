@@ -208,7 +208,7 @@ function MediaContainer( props, ref ) {
 				{ ! featuredImageURL && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-media-text--placeholder-image"
-						withIllustration={ true }
+						withIllustration
 					/>
 				) }
 			</ResizableBoxContainer>
