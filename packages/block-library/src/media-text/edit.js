@@ -46,6 +46,7 @@ import {
 	TEMPLATE,
 } from './constants';
 import { unlock } from '../lock-unlock';
+import { TOOLSPANEL_DROPDOWNMENU_PROPS } from '../utils/constants';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -233,7 +234,11 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	};
 
 	const mediaTextGeneralSettings = (
-		<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ resetAll }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+		>
 			{ mediaUrl && (
 				<ToolsPanelItem
 					label={ __( 'Media width' ) }
