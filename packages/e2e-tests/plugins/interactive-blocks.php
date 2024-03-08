@@ -15,26 +15,8 @@ add_action(
 			$block_json_files = glob( __DIR__ . '/interactive-blocks/**/block.json' );
 
 			// Auto register all blocks that were found.
-			foreach ( $block_json_files as $filename ) {
-				$block_folder = dirname( $filename );
-				$name         = basename( $block_folder );
-
-				$view_file = plugin_dir_url( $block_folder ) . $name . '/' . 'view.js';
-
-				wp_register_script_module(
-					$name . '-view',
-					$view_file,
-					array(
-						'@wordpress/interactivity',
-						array(
-							'id'     => '@wordpress/interactivity-router',
-							'import' => 'dynamic',
-						),
-					),
-					filemtime( $view_file )
-				);
-
-				register_block_type_from_metadata( $block_folder );
+			foreach ( $block_json_files as $block_json_file ) {
+				register_block_type( $block_json_file );
 			}
 		}
 
