@@ -34,10 +34,17 @@ function identity( values ) {
 	return values;
 }
 
-export default function EntitiesSavedStates( { close } ) {
+export default function EntitiesSavedStates( {
+	close,
+	renderDialog = undefined,
+} ) {
 	const isDirtyProps = useIsDirty();
 	return (
-		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
+		<EntitiesSavedStatesExtensible
+			close={ close }
+			renderDialog={ renderDialog }
+			{ ...isDirtyProps }
+		/>
 	);
 }
 
@@ -47,6 +54,7 @@ export function EntitiesSavedStatesExtensible( {
 	onSave = identity,
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
+	renderDialog = undefined,
 
 	dirtyEntityRecords,
 	isDirty,
@@ -197,9 +205,9 @@ export function EntitiesSavedStatesExtensible( {
 			ref={ saveDialogRef }
 			{ ...saveDialogProps }
 			className="entities-saved-states__panel"
-			role="dialog"
-			aria-labelledby={ dialogLabel }
-			aria-describedby={ dialogDescription }
+			role={ renderDialog ? 'dialog' : undefined }
+			aria-labelledby={ renderDialog ? dialogLabel : undefined }
+			aria-describedby={ renderDialog ? dialogDescription : undefined }
 		>
 			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
 				<FlexItem
@@ -208,6 +216,7 @@ export function EntitiesSavedStatesExtensible( {
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={ ! saveEnabled }
+					__experimentalIsFocusable
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
@@ -226,14 +235,14 @@ export function EntitiesSavedStatesExtensible( {
 			<div className="entities-saved-states__text-prompt">
 				<div
 					className="entities-saved-states__text-prompt--header-wrapper"
-					id={ dialogLabel }
+					id={ renderDialog ? dialogLabel : undefined }
 				>
 					<strong className="entities-saved-states__text-prompt--header">
 						{ __( 'Are you ready to save?' ) }
 					</strong>
 					{ additionalPrompt }
 				</div>
-				<p id={ dialogDescription }>
+				<p id={ renderDialog ? dialogDescription : undefined }>
 					{ isDirty
 						? createInterpolateElement(
 								sprintf(

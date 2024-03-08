@@ -81,7 +81,7 @@ const _EntitiesSavedStates = ( { onClose } ) => {
 	if ( isPreviewingTheme() ) {
 		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
 	}
-	return <EntitiesSavedStates close={ onClose } />;
+	return <EntitiesSavedStates close={ onClose } renderDialog />;
 };
 
 export default function SavePanel() {
