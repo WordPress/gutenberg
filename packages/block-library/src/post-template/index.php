@@ -45,9 +45,13 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  * @return string Returns the output of the query, structured using the layout defined by the block's inner blocks.
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
-	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
-	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$page_key                        = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination             = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
+	if ( ! empty( $interactivity_api_router_config ) && ! empty( $interactivity_api_router_config['fullClientSideNavigation'] ) ) {
+		$enhanced_pagination = true;
+	}
+	$page = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	// Use global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );

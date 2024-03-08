@@ -20,15 +20,14 @@ function render_block_core_query( $attributes, $content, $block ) {
 	$is_interactive                  = isset( $attributes['enhancedPagination'] )
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
-	$is_full_site_csn_enabled        = false;
 	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
 	if ( ! empty( $interactivity_api_router_config ) && ! empty( $interactivity_api_router_config['fullClientSideNavigation'] ) && isset( $attributes['queryId'] ) ) {
-		$is_full_site_csn_enabled = true;
+		$is_interactive = true;
 	}
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
-	if ( $is_interactive || $is_full_site_csn_enabled ) {
+	if ( $is_interactive ) {
 		$suffix = wp_scripts_get_suffix();
 		if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 			$module_url = gutenberg_url( '/build/interactivity/query.min.js' );
