@@ -172,4 +172,7 @@
 			</property>
 		</properties>
 	</rule>
+	<rule ref="Gutenberg.Commenting.FunctionComment">
+		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+	</rule>
 </ruleset>

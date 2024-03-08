@@ -110,13 +110,16 @@ class FunctionCommentSniff implements Sniff {
 	 */
 	private static function is_experimental_package( File $phpcsFile ) {
 		$block_json_filepath = dirname( $phpcsFile->getFilename() ) . DIRECTORY_SEPARATOR . 'block.json';
+
 		if ( isset( static::$cache[ $block_json_filepath ] ) ) {
 			return static::$cache[ $block_json_filepath ];
 		}
+
 		if ( ! is_file( $block_json_filepath ) || ! is_readable( $block_json_filepath ) ) {
 			static::$cache[ $block_json_filepath ] = false;
 			return static::$cache[ $block_json_filepath ];
 		}
+
 		$block_metadata = file_get_contents( $block_json_filepath );
 		if ( false === $block_metadata ) {
 			static::$cache[ $block_json_filepath ] = false;
@@ -129,8 +132,8 @@ class FunctionCommentSniff implements Sniff {
 			return static::$cache[ $block_json_filepath ];
 		}
 
-		$experimental_property                 = '__experimental';
-		static::$cache[ $block_json_filepath ] = array_key_exists( $experimental_property, $block_metadata ) && ( false !== $block_metadata[ $experimental_property ] );
+		$experimental_flag                     = '__experimental';
+		static::$cache[ $block_json_filepath ] = array_key_exists( $experimental_flag, $block_metadata ) && ( false !== $block_metadata[ $experimental_flag ] );
 		return static::$cache[ $block_json_filepath ];
 	}
 }
