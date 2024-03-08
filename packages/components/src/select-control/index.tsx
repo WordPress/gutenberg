@@ -14,6 +14,7 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
@@ -106,7 +107,11 @@ function UnforwardedSelectControl(
 				suffix={
 					suffix || ( ! multiple && <SelectControlChevronDown /> )
 				}
-				prefix={ prefix }
+				prefix={
+					<InputControlPrefixWrapper>
+						{ prefix }
+					</InputControlPrefixWrapper>
+				}
 				labelPosition={ labelPosition }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
