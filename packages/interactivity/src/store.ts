@@ -117,8 +117,16 @@ const handlers = {
 					setScope( scope );
 					try {
 						it = gen.next( value );
+					} finally {
+						resetScope();
+						resetNamespace();
+					}
+
+					try {
 						value = await it.value;
 					} catch ( e ) {
+						setNamespace( ns );
+						setScope( scope );
 						gen.throw( e );
 					} finally {
 						resetScope();
