@@ -153,7 +153,7 @@ export default function PostFeaturedImageEdit( {
 					'block-editor-media-placeholder',
 					borderProps.className
 				) }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					height: !! aspectRatio && '100%',
 					width: !! aspectRatio && '100%',

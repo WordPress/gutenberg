@@ -924,10 +924,8 @@ export const __unstableExpandSelection =
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
 	( { registry, select, dispatch } ) => {
-		const blocks = [ firstBlockClientId, secondBlockClientId ];
-		dispatch( { type: 'MERGE_BLOCKS', blocks } );
-
-		const [ clientIdA, clientIdB ] = blocks;
+		const clientIdA = firstBlockClientId;
+		const clientIdB = secondBlockClientId;
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 

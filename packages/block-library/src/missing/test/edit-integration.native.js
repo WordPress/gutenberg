@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	act,
 	fireEvent,
 	getBlock,
 	initializeEditor,
@@ -117,7 +118,7 @@ describe( 'Unsupported block', () => {
 				screen.getByTestId( 'bottom-sheet' ),
 				MODAL_DISMISS_EVENT
 			);
-			jest.runOnlyPendingTimers();
+			act( () => jest.runOnlyPendingTimers() );
 		} );
 		expect( requestUnsupportedBlockFallback ).toHaveBeenCalled();
 	} );

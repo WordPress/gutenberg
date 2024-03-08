@@ -140,6 +140,7 @@ $z-layers: (
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
 	".components-popover.interface-more-menu__content": 99998,
+	".components-popover.more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
 
@@ -203,6 +204,9 @@ $z-layers: (
 
 	// Ensure modal footer actions appear above modal contents
 	".edit-site-start-template-options__modal__actions": 1,
+
+	// Ensure checkbox + actions don't overlap table header
+	".dataviews-view-table thead": 1,
 );
 
 @function z-index( $key ) {

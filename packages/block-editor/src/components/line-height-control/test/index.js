@@ -23,7 +23,7 @@ const ControlledLineHeightControl = () => {
 		<LineHeightControl
 			value={ value }
 			onChange={ setValue }
-			__nextHasNoMarginBottom={ true }
+			__nextHasNoMarginBottom
 		/>
 	);
 };

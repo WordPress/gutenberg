@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useAddedBy } from '../list/added-by';
+import { useAddedBy } from '../page-templates-template-parts/hooks';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import useNavigationMenuContent from './use-navigation-menu-content';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
