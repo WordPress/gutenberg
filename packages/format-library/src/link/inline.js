@@ -89,8 +89,6 @@ function InlineLinkUI( {
 		]
 	);
 
-	const hasLink = linkValue?.url;
-
 	function removeLink() {
 		const newValue = removeFormat( value, 'core/link' );
 		onChange( newValue );
@@ -99,6 +97,7 @@ function InlineLinkUI( {
 	}
 
 	function onChangeLink( nextValue ) {
+		const hasLink = linkValue?.url;
 		const isNewLink = ! hasLink;
 
 		// Merge the next value with the current link value.
