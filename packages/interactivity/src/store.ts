@@ -109,7 +109,7 @@ const handlers = {
 				const scope = getScope();
 				const gen: Generator< any > = result( ...args );
 
-				let value: any;
+				let value: unknown;
 				let it: IteratorResult< any >;
 
 				while ( true ) {
@@ -117,15 +117,12 @@ const handlers = {
 					setScope( scope );
 					try {
 						it = gen.next( value );
-					} finally {
-						resetScope();
-						resetNamespace();
-					}
-
-					try {
 						value = await it.value;
 					} catch ( e ) {
 						gen.throw( e );
+					} finally {
+						resetScope();
+						resetNamespace();
 					}
 
 					if ( it.done ) break;
