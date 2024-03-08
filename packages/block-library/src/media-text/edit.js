@@ -234,6 +234,23 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 
 	const mediaTextGeneralSettings = (
 		<ToolsPanel label={ __( 'Settings' ) } resetAll={ resetAll }>
+			{ mediaUrl && (
+				<ToolsPanelItem
+					label={ __( 'Media width' ) }
+					isShownByDefault={ true }
+					hasValue={ () => !! mediaWidth }
+					onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+				>
+					<RangeControl
+						__nextHasNoMarginBottom
+						label={ __( 'Media width' ) }
+						value={ temporaryMediaWidth || mediaWidth }
+						onChange={ commitWidthChange }
+						min={ WIDTH_CONSTRAINT_PERCENTAGE }
+						max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+					/>
+				</ToolsPanelItem>
+			) }
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
 				isShownByDefault={ true }
@@ -255,14 +272,14 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 			</ToolsPanelItem>
 			{ mediaType === 'image' && (
 				<ToolsPanelItem
-					label={ __( 'Crop image to fill entire column' ) }
+					label={ __( 'Crop image to fill' ) }
 					isShownByDefault={ true }
 					hasValue={ () => !! imageFill }
 					onDeselect={ () => setAttributes( { imageFill: false } ) }
 				>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Crop image to fill entire column' ) }
+						label={ __( 'Crop image to fill' ) }
 						checked={ !! imageFill }
 						onChange={ () =>
 							setAttributes( {
@@ -327,23 +344,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					imageSizeOptions={ imageSizeOptions }
 					onChange={ updateImage }
 				/>
-			) }
-			{ mediaUrl && (
-				<ToolsPanelItem
-					label={ __( 'Media width' ) }
-					isShownByDefault={ true }
-					hasValue={ () => !! mediaWidth }
-					onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
-				>
-					<RangeControl
-						__nextHasNoMarginBottom
-						label={ __( 'Media width' ) }
-						value={ temporaryMediaWidth || mediaWidth }
-						onChange={ commitWidthChange }
-						min={ WIDTH_CONSTRAINT_PERCENTAGE }
-						max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
-					/>
-				</ToolsPanelItem>
 			) }
 		</ToolsPanel>
 	);
