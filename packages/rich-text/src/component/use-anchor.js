@@ -177,7 +177,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		wasActive,
 		// Active attributes is defaulted to a stable object to avoid re-rendering,
 		// but in specific circumstances it can be used to provide additional information
-		// about the currently active format to disambiguate the anchor from other anchors
+		// about the currently active format to disambiguate the format from other instances of the same format
 		// within the same editable content element. This is useful for `core/link` when you
 		// want to disambiguate between different links when clicking between them.
 		activeAttributes,
