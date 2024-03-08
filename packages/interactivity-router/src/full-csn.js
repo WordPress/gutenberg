@@ -30,45 +30,10 @@ const cleanUrl = ( url ) => {
 const canDoClientSideNavigation = () =>
 	getConfig( 'core/router' ).fullClientSideNavigation;
 
-/**
- * Finds the elements in the document that match the selector and fetch them.
- * For each element found, fetch the content and store it in the cache.
- * Returns an array of elements to add to the document.
- *
- * @param {Document}         document
- * @param {string}           selector        - CSS selector used to find the elements.
- * @param {'href'|'src'}     attribute       - Attribute that determines where to fetch
- *                                           the styles or scripts from. Also used as the key for the cache.
- * @param {Map}              cache           - Cache to use for the elements. Can be `stylesheets` or `scripts`.
- * @param {'style'|'script'} elementToCreate - Element to create for each fetched
- *                                           item. Can be 'style' or 'script'.
- * @return {Promise<Array<HTMLElement>>} - Array of elements to add to the document.
- */
-
+// Helper to get the tag id store in the cache.
 const getTagId = ( tag ) => tag.id || tag.outerHTML;
 
-const canBePreloaded = ( e ) => e.src || ( e.href && e.rel !== 'preload' );
-
-const loadAsset = ( a ) => {
-	const loader = document.createElement( 'link' );
-	loader.rel = 'preload';
-	if ( a.nodeName === 'SCRIPT' ) {
-		loader.as = 'script';
-		loader.href = a.getAttribute( 'src' );
-	} else if ( a.nodeName === 'LINK' ) {
-		loader.as = 'style';
-		loader.href = a.getAttribute( 'href' );
-	}
-
-	const p = new Promise( ( resolve, reject ) => {
-		loader.onload = () => resolve( loader );
-		loader.onerror = () => reject( loader );
-	} );
-
-	document.head.appendChild( loader );
-	return p;
-};
-
+// Function to update only the necessary tags in the head.
 const updateHead = async ( newHead ) => {
 	// Map incoming head tags by their content.
 	const newHeadMap = new Map();
@@ -92,14 +57,8 @@ const updateHead = async ( newHead ) => {
 	// Prepare new assets.
 	const toAppend = [ ...newHeadMap.values() ];
 
-	// Wait for all new assets to be loaded.
-	const loaders = await Promise.all(
-		toAppend.filter( canBePreloaded ).map( loadAsset )
-	);
-
 	// Apply the changes.
 	toRemove.forEach( ( n ) => n.remove() );
-	loaders.forEach( ( l ) => l && l.remove() );
 	document.head.append( ...toAppend );
 };
 
@@ -161,6 +120,7 @@ const fetchPage = async ( url ) => {
 	return { head, body: toVdom( dom.body ) };
 };
 
+// Check if the link is valid for client-side navigation.
 const isValidLink = ( ref ) =>
 	ref &&
 	ref instanceof window.HTMLAnchorElement &&
@@ -168,6 +128,7 @@ const isValidLink = ( ref ) =>
 	( ! ref.target || ref.target === '_self' ) &&
 	ref.origin === window.location.origin;
 
+// Check if the event is valid for client-side navigation.
 const isValidEvent = ( event ) =>
 	event.button === 0 && // Left clicks only.
 	! event.metaKey && // Open in new tab (Mac).
@@ -224,7 +185,6 @@ window.addEventListener( 'popstate', async () => {
 } );
 
 // Initialize the router with the initial DOM.
-
 if ( canDoClientSideNavigation() ) {
 	rootFragment = createRootFragment(
 		document.documentElement,
