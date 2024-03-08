@@ -122,7 +122,6 @@ export default function SavePanel() {
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
-			{ isSaveViewOpen && <_EntitiesSavedStates onClose={ onClose } /> }
 			<div className="edit-site-editor__toggle-save-panel">
 				<Button
 					variant="secondary"
@@ -132,10 +131,13 @@ export default function SavePanel() {
 					) }
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup={ 'dialog' }
+					disabled={ isSaveViewOpen }
+					__experimentalIsFocusable
 				>
 					{ __( 'Open save panel' ) }
 				</Button>
 			</div>
+			{ isSaveViewOpen && <_EntitiesSavedStates onClose={ onClose } /> }
 		</NavigableRegion>
 	);
 }
