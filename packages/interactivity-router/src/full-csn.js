@@ -8,12 +8,9 @@ import {
 	getElement,
 } from '@wordpress/interactivity';
 
-const { createRootFragment, render, toVdom } = privateApis(
+const { getRegionRootFragment, render, initialVdom, toVdom } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
-
-// The root to render the vdom (document.body).
-let rootFragment;
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map();
@@ -151,7 +148,8 @@ const { actions } = store( 'core/router', {
 
 				if ( page ) {
 					yield updateHead( page.head );
-					yield nextTick( () => render( page.body, rootFragment ) );
+					const fragment = getRegionRootFragment( document.body );
+					yield nextTick( () => render( page.body, fragment ) );
 					window.history.pushState( {}, '', href );
 				} else {
 					window.location.assign( href );
@@ -161,7 +159,7 @@ const { actions } = store( 'core/router', {
 		prefetch( event, url ) {
 			if ( ! canDoClientSideNavigation() ) return;
 			const { ref } = getElement();
-			const href = url ? url : ref.href;
+			const href = url ? url : ref?.href;
 
 			const newUrl = cleanUrl( href );
 			if ( ! pages.has( newUrl ) ) {
@@ -177,8 +175,9 @@ window.addEventListener( 'popstate', async () => {
 	const url = cleanUrl( window.location ); // Remove hash.
 	const page = pages.has( url ) && ( await pages.get( url ) );
 	if ( page ) {
-		document.head.replaceChildren( ...page.head );
-		render( page.body, rootFragment );
+		await updateHead( ...page.head );
+		const fragment = getRegionRootFragment( document.body );
+		render( page.body, fragment );
 	} else {
 		window.location.reload();
 	}
@@ -186,10 +185,6 @@ window.addEventListener( 'popstate', async () => {
 
 // Initialize the router with the initial DOM.
 if ( canDoClientSideNavigation() ) {
-	rootFragment = createRootFragment(
-		document.documentElement,
-		document.body
-	);
 	// Cache the scripts. Has to be called before fetching the assets.
 	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
 		headElements.set( script.getAttribute( 'src' ), {
@@ -200,6 +195,6 @@ if ( canDoClientSideNavigation() ) {
 	const head = await fetchAssets( document );
 	pages.set(
 		cleanUrl( window.location ),
-		Promise.resolve( { head, body: toVdom( document.body ) } )
+		Promise.resolve( { head, body: initialVdom.get( document.body ) } )
 	);
 }
