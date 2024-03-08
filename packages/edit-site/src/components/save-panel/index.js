@@ -144,12 +144,15 @@ export default function SavePanel() {
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
-			<div className="edit-site-editor__toggle-save-panel">
+			<div
+				className={ classnames( 'edit-site-editor__toggle-save-panel', {
+					'screen-reader-text': isSaveViewOpen,
+				} ) }
+			>
 				<Button
 					variant="secondary"
 					className={ classnames(
-						'edit-site-editor__toggle-save-panel-button',
-						{ 'screen-reader-text': isSaveViewOpen }
+						'edit-site-editor__toggle-save-panel-button'
 					) }
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup={ 'dialog' }
