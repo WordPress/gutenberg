@@ -2,12 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	useState,
-	useLayoutEffect,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -45,35 +40,7 @@ function Edit( {
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 	const openedBy = useRef( null );
-	const clickTimeout = useRef( false );
-
-	/**
-	 * Runs when addingLink is set to false by the onFocusOutside handler via a click
-	 */
-	useEffect( () => {
-		if ( addingLink ) {
-			return;
-		}
-
-		resetClickTimeout();
-
-		// This timeout will be cleared and a new openedBy set if a new link is clicked
-		clickTimeout.current = setTimeout( () => {
-			openedBy.current = null;
-			clickTimeout.current = undefined;
-		}, 100 );
-
-		return () => {
-			resetClickTimeout();
-		};
-	}, [ addingLink ] );
-
-	function resetClickTimeout() {
-		if ( clickTimeout.current ) {
-			clearTimeout( clickTimeout.current );
-			clickTimeout.current = undefined;
-		}
-	}
+	const toolbarButton = useRef( null );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -93,15 +60,13 @@ function Edit( {
 			}
 
 			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
-			if ( clickTimeout.current && event.target === openedBy.current ) {
+			if ( addingLink ) {
+				setAddingLink( false );
 				openedBy.current = null;
 			} else {
 				setAddingLink( true );
 				openedBy.current = event.target;
 			}
-
-			// Always reset at this point, as we no longer need the timeout since we've processed another click
-			resetClickTimeout();
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -109,7 +74,7 @@ function Edit( {
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
 		};
-	}, [ contentRef, isActive ] );
+	}, [ contentRef, isActive, addingLink ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
@@ -167,8 +132,12 @@ function Edit( {
 	// 3. Focus should be in the dropdown of the Options button
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
-	function onFocusOutside() {
-		setAddingLink( false );
+	function onFocusOutside( event ) {
+		// Check for the element that was clicked. Was it our toolbar button or the current linked text? If so, skip this.
+		// Note: event.target.tagName !== 'A' is not the correct way of doing this. We'll need something that allows us to know if it's the correct link. We may be able to use a data attribute.
+		if ( event.target !== toolbarButton && event.target.tagName !== 'A' ) {
+			setAddingLink( false );
+		}
 	}
 
 	function onRemoveFormat() {
@@ -185,13 +154,14 @@ function Edit( {
 				onUse={ onRemoveFormat }
 			/>
 			<RichTextToolbarButton
+				ref={ toolbarButton }
 				name="link"
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					// If we have a clickTimeout, then the link control is being
-					// closed by the onFocusOutside event, so we don't want to re-open it
-					if ( ! clickTimeout.current ) {
+					if ( addingLink ) {
+						setAddingLink( false );
+					} else {
 						addLink( event.currentTarget );
 					}
 				} }
