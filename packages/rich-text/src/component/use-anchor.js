@@ -7,6 +7,8 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
 
+const STABLE_OBJECT = {};
+
 /**
  * Given a range and a format tag name and class name, returns the closest
  * format element.
@@ -124,8 +126,6 @@ function getAnchor( editableContentElement, tagName, className ) {
 
 	return createVirtualAnchorElement( range, editableContentElement );
 }
-
-const STABLE_OBJECT = {};
 
 /**
  * This hook, to be used in a format type's Edit component, returns the active
