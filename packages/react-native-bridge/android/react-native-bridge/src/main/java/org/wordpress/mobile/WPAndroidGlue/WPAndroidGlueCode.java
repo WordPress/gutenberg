@@ -633,7 +633,7 @@ public class WPAndroidGlueCode {
                                     .setApplication(application)
                                     .setJSMainModulePath("index")
                                     .addPackages(getPackages())
-                                    .setUseDeveloperSupport(isDebug)
+                                    .setUseDeveloperSupport(false)
                                     .setJavaScriptExecutorFactory(new HermesExecutorFactory())
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (BuildConfig.SHOULD_ATTACH_JS_BUNDLE) {
