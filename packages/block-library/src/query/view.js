@@ -47,7 +47,10 @@ store(
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {
 					yield import( '@wordpress/interactivity-router' );
-					store( 'core/router' ).actions.prefetch( event, ref.href );
+					yield store( 'core/router' ).actions.prefetch(
+						event,
+						ref.href
+					);
 				}
 			},
 		},
@@ -57,7 +60,10 @@ store(
 				const { ref } = getElement();
 				if ( url && isValidLink( ref ) ) {
 					yield import( '@wordpress/interactivity-router' );
-					store( 'core/router' ).actions.prefetch( event, ref.href );
+					yield store( 'core/router' ).actions.prefetch(
+						event,
+						ref.href
+					);
 				}
 			},
 		},
