@@ -49,6 +49,7 @@ export { default as MediaUploadProgress } from './media-upload-progress';
 export {
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
+	MEDIA_UPLOAD_STATE_PAUSED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
 } from './media-upload-progress/constants';

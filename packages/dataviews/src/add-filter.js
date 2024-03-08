@@ -5,7 +5,6 @@ import {
 	privateApis as componentsPrivateApis,
 	Button,
 } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 
@@ -31,7 +30,6 @@ function AddFilter( { filters, view, onChangeView, setOpenedFilter }, ref ) {
 				<Button
 					__experimentalIsFocusable
 					size="compact"
-					icon={ plus }
 					className="dataviews-filters-button"
 					variant="tertiary"
 					disabled={ ! inactiveFilters.length }

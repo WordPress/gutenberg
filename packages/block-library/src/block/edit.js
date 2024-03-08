@@ -42,6 +42,25 @@ const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
+function getLegacyIdMap( blocks, content, nameCount = {} ) {
+	let idToClientIdMap = {};
+	for ( const block of blocks ) {
+		if ( block?.innerBlocks?.length ) {
+			idToClientIdMap = {
+				...idToClientIdMap,
+				...getLegacyIdMap( block.innerBlocks, content, nameCount ),
+			};
+		}
+
+		const id = block.attributes.metadata?.id;
+		const clientId = block.clientId;
+		if ( id && content?.[ id ] ) {
+			idToClientIdMap[ clientId ] = id;
+		}
+	}
+	return idToClientIdMap;
+}
+
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
 
@@ -101,25 +120,31 @@ function getOverridableAttributes( block ) {
 function applyInitialContentValuesToInnerBlocks(
 	blocks,
 	content = {},
-	defaultValues
+	defaultValues,
+	legacyIdMap
 ) {
 	return blocks.map( ( block ) => {
 		const innerBlocks = applyInitialContentValuesToInnerBlocks(
 			block.innerBlocks,
 			content,
-			defaultValues
+			defaultValues,
+			legacyIdMap
 		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! hasOverridableAttributes( block ) || ! blockId )
+		const metadataName =
+			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
+
+		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
 			return { ...block, innerBlocks };
+		}
+
 		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= {};
-			defaultValues[ blockId ][ attributeKey ] =
+			defaultValues[ metadataName ] ??= {};
+			defaultValues[ metadataName ][ attributeKey ] =
 				block.attributes[ attributeKey ];
 
-			const contentValues = content[ blockId ]?.values;
+			const contentValues = content[ metadataName ];
 			if ( contentValues?.[ attributeKey ] !== undefined ) {
 				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
@@ -142,29 +167,40 @@ function isAttributeEqual( attribute1, attribute2 ) {
 	return attribute1 === attribute2;
 }
 
-function getContentValuesFromInnerBlocks( blocks, defaultValues ) {
+function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
 		if ( block.name === patternBlockName ) continue;
-		Object.assign(
-			content,
-			getContentValuesFromInnerBlocks( block.innerBlocks, defaultValues )
-		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! hasOverridableAttributes( block ) || ! blockId ) continue;
+		if ( block.innerBlocks.length ) {
+			Object.assign(
+				content,
+				getContentValuesFromInnerBlocks(
+					block.innerBlocks,
+					defaultValues,
+					legacyIdMap
+				)
+			);
+		}
+		const metadataName =
+			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
+		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
+			continue;
+		}
+
 		const attributes = getOverridableAttributes( block );
+
 		for ( const attributeKey of attributes ) {
 			if (
 				! isAttributeEqual(
 					block.attributes[ attributeKey ],
-					defaultValues[ blockId ][ attributeKey ]
+					defaultValues?.[ metadataName ]?.[ attributeKey ]
 				)
 			) {
-				content[ blockId ] ??= { values: {}, blockName: block.name };
+				content[ metadataName ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				content[ blockId ].values[ attributeKey ] =
+				content[ metadataName ][ attributeKey ] =
 					block.attributes[ attributeKey ] === undefined
 						? // TODO: We use an empty string to represent undefined for now until
 						  // we support a richer format for overrides and the block binding API.
@@ -278,8 +314,15 @@ export default function ReusableBlockEdit( {
 		[ editedRecord.blocks, editedRecord.content ]
 	);
 
+	const legacyIdMap = useRef( {} );
+
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
+		// Build a map of clientIds to the old nano id system to provide back compat.
+		legacyIdMap.current = getLegacyIdMap(
+			initialBlocks,
+			initialContent.current
+		);
 		defaultContent.current = {};
 		const originalEditingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
@@ -291,7 +334,8 @@ export default function ReusableBlockEdit( {
 					applyInitialContentValuesToInnerBlocks(
 						initialBlocks,
 						initialContent.current,
-						defaultContent.current
+						defaultContent.current,
+						legacyIdMap.current
 					)
 				);
 			} );
@@ -343,7 +387,8 @@ export default function ReusableBlockEdit( {
 					setAttributes( {
 						content: getContentValuesFromInnerBlocks(
 							blocks,
-							defaultContent.current
+							defaultContent.current,
+							legacyIdMap.current
 						),
 					} );
 				} );

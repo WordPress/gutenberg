@@ -131,7 +131,7 @@ function NavigationMenuSelector( {
 		<DropdownMenu
 			label={ selectorLabel }
 			icon={ moreVertical }
-			toggleProps={ { isSmall: true } }
+			toggleProps={ { size: 'small' } }
 		>
 			{ ( { onClose } ) => (
 				<>

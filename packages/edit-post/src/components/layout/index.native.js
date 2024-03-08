@@ -36,7 +36,6 @@ import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
-import { store as editPostStore } from '../../store';
 
 class Layout extends Component {
 	constructor() {
@@ -192,9 +191,8 @@ class Layout extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { __unstableIsEditorReady: isEditorReady } =
+		const { __unstableIsEditorReady: isEditorReady, getEditorMode } =
 			select( editorStore );
-		const { getEditorMode } = select( editPostStore );
 		const { getSettings } = select( blockEditorStore );
 		const globalStyles =
 			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;

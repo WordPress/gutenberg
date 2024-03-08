@@ -42,6 +42,7 @@ createBlockEditFilter(
 		contentLockUI,
 		blockHooks,
 		blockRenaming,
+		childLayout,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [

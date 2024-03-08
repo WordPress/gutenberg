@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
@@ -19,6 +16,16 @@ import BulkActions from './bulk-actions';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
+
+function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
 
 export default function DataViews( {
 	view,
@@ -75,13 +82,22 @@ export default function DataViews( {
 			render: field.render || field.getValue,
 		} ) );
 	}, [ fields ] );
+
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 3 } justify="flex-start">
+			<HStack
+				alignment="top"
+				justify="start"
+				className="dataviews-filters__view-actions"
+			>
 				<HStack
-					alignment="flex-start"
 					justify="start"
-					className="dataviews-filters__view-actions"
+					className="dataviews-filters__container"
+					wrap
 				>
 					{ search && (
 						<Search
@@ -90,27 +106,6 @@ export default function DataViews( {
 							onChangeView={ onChangeView }
 						/>
 					) }
-					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) && (
-						<BulkActions
-							actions={ actions }
-							data={ data }
-							onSelectionChange={ onSetSelection }
-							selection={ selection }
-							getItemId={ getItemId }
-						/>
-					) }
-					<ViewActions
-						fields={ _fields }
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
-				</HStack>
-				<HStack
-					justify="start"
-					className="dataviews-filters__container"
-					wrap
-				>
 					<Filters
 						fields={ _fields }
 						view={ view }
@@ -119,26 +114,42 @@ export default function DataViews( {
 						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
-				<ViewComponent
+				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+					hasPossibleBulkAction && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
+				<ViewActions
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					actions={ actions }
-					data={ data }
-					getItemId={ getItemId }
-					isLoading={ isLoading }
-					onSelectionChange={ onSetSelection }
-					onDetailsChange={ onDetailsChange }
-					selection={ selection }
-					deferredRendering={ deferredRendering }
-					setOpenedFilter={ setOpenedFilter }
+					supportedLayouts={ supportedLayouts }
 				/>
-				<Pagination
-					view={ view }
-					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
-				/>
-			</VStack>
+			</HStack>
+			<ViewComponent
+				fields={ _fields }
+				view={ view }
+				onChangeView={ onChangeView }
+				actions={ actions }
+				data={ data }
+				getItemId={ getItemId }
+				isLoading={ isLoading }
+				onSelectionChange={ onSetSelection }
+				onDetailsChange={ onDetailsChange }
+				selection={ selection }
+				deferredRendering={ deferredRendering }
+				setOpenedFilter={ setOpenedFilter }
+			/>
+			<Pagination
+				view={ view }
+				onChangeView={ onChangeView }
+				paginationInfo={ paginationInfo }
+			/>
 		</div>
 	);
 }

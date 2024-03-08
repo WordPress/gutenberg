@@ -111,6 +111,7 @@ const selectTemplatePartsAsPatterns = createSelector(
 const selectThemePatterns = createSelector(
 	( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
+		const { getIsResolving } = select( coreStore );
 		const settings = getSettings();
 		const blockPatterns =
 			settings.__experimentalAdditionalBlockPatterns ??
@@ -136,19 +137,23 @@ const selectThemePatterns = createSelector(
 					__unstableSkipMigrationLogs: true,
 				} ),
 			} ) );
-
-		return { patterns, isResolving: false };
+		return { patterns, isResolving: getIsResolving( 'getBlockPatterns' ) };
 	},
 	( select ) => [
 		select( coreStore ).getBlockPatterns(),
+		select( coreStore ).getIsResolving( 'getBlockPatterns' ),
 		unlock( select( editSiteStore ) ).getSettings(),
 	]
 );
 
 const selectPatterns = createSelector(
 	( select, categoryId, syncStatus, search = '' ) => {
-		const { patterns: themePatterns } = selectThemePatterns( select );
-		const { patterns: userPatterns } = selectUserPatterns( select );
+		const {
+			patterns: themePatterns,
+			isResolving: isResolvingThemePatterns,
+		} = selectThemePatterns( select );
+		const { patterns: userPatterns, isResolving: isResolvingUserPatterns } =
+			selectUserPatterns( select );
 
 		let patterns = [
 			...( themePatterns || [] ),
@@ -176,7 +181,10 @@ const selectPatterns = createSelector(
 				hasCategory: ( item ) => ! item.hasOwnProperty( 'categories' ),
 			} );
 		}
-		return { patterns, isResolving: false };
+		return {
+			patterns,
+			isResolving: isResolvingThemePatterns || isResolvingUserPatterns,
+		};
 	},
 	( select ) => [
 		selectThemePatterns( select ),

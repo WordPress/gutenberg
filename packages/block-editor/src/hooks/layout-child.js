@@ -9,14 +9,17 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
+import { useLayout } from '../components/block-list/layout';
+import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
 		return ! select( blockEditorStore ).getSettings().disableLayoutStyles;
 	} );
 	const layout = style?.layout ?? {};
-	const { selfStretch, flexSize, columnSpan, rowSpan, parentColumnWidth } =
-		layout;
+	const { selfStretch, flexSize, columnSpan, rowSpan } = layout;
+	const parentLayout = useLayout() || {};
+	const { columnCount, minimumColumnWidth } = parentLayout;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
@@ -37,13 +40,14 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			}`;
 		}
 		/**
-		 * If parentColumnWidth is set, the grid is responsive
-		 * so a container query is needed for the span to resize.
+		 * If minimumColumnWidth is set on the parent, or if no
+		 * columnCount is set, the grid is responsive so a
+		 * container query is needed for the span to resize.
 		 */
-		if ( columnSpan && parentColumnWidth ) {
+		if ( columnSpan && ( minimumColumnWidth || ! columnCount ) ) {
 			// Calculate the container query value.
 			const columnSpanNumber = parseInt( columnSpan );
-			let parentColumnValue = parseFloat( parentColumnWidth );
+			let parentColumnValue = parseFloat( minimumColumnWidth );
 			/**
 			 * 12rem is the default minimumColumnWidth value.
 			 * If parentColumnValue is not a number, default to 12.
@@ -52,7 +56,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 				parentColumnValue = 12;
 			}
 
-			let parentColumnUnit = parentColumnWidth?.replace(
+			let parentColumnUnit = minimumColumnWidth?.replace(
 				parentColumnValue,
 				''
 			);
@@ -93,8 +97,45 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
+function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
+	const parentLayout = useLayout() || {};
+	const rootClientId = useSelect(
+		( select ) => {
+			return select( blockEditorStore ).getBlockRootClientId( clientId );
+		},
+		[ clientId ]
+	);
+	if ( parentLayout.type !== 'grid' ) {
+		return null;
+	}
+	if ( ! window.__experimentalEnableGridInteractivity ) {
+		return null;
+	}
+	return (
+		<>
+			<GridVisualizer clientId={ rootClientId } />
+			<GridItemResizer
+				clientId={ clientId }
+				onChange={ ( { columnSpan, rowSpan } ) => {
+					setAttributes( {
+						style: {
+							...style,
+							layout: {
+								...style?.layout,
+								columnSpan,
+								rowSpan,
+							},
+						},
+					} );
+				} }
+			/>
+		</>
+	);
+}
+
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
+	edit: ChildLayoutControlsPure,
 	attributeKeys: [ 'style' ],
 	hasSupport() {
 		return true;

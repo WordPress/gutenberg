@@ -31,7 +31,18 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		: '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
-		$author_id   = isset( $attributes['userId'] ) ? $attributes['userId'] : get_post_field( 'post_author', $block->context['postId'] );
+		if ( isset( $attributes['userId'] ) ) {
+			$author_id = $attributes['userId'];
+		} elseif ( isset( $block->context['postId'] ) ) {
+			$author_id = get_post_field( 'post_author', $block->context['postId'] );
+		} else {
+			$author_id = get_query_var( 'author' );
+		}
+
+		if ( empty( $author_id ) ) {
+			return '';
+		}
+
 		$author_name = get_the_author_meta( 'display_name', $author_id );
 		// translators: %s is the Author name.
 		$alt          = sprintf( __( '%s Avatar' ), $author_name );

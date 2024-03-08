@@ -9,72 +9,38 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import {
-	Children,
-	cloneElement,
-	useCallback,
-	useRef,
-} from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { Children, cloneElement, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
 } from '@wordpress/keyboard-shortcuts';
-import { pipe, useCopyToClipboard, useViewportMatch } from '@wordpress/compose';
+import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import BlockIcon from '../block-icon';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
+import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+function CopyMenuItem( { clientIds, onCopy, label } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const ref = useCopyToClipboard(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		onCopy
+	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
-}
-
-function ParentSelectorMenuItem( { parentClientId, parentBlockType } ) {
-	const isSmallViewport = useViewportMatch( 'medium', '<' );
-	const { selectBlock } = useDispatch( blockEditorStore );
-
-	// Allows highlighting the parent block outline when focusing or hovering
-	// the parent block selector within the child.
-	const menuItemRef = useRef();
-	const gesturesProps = useShowHoveredOrFocusedGestures( {
-		ref: menuItemRef,
-		highlightParent: true,
-	} );
-
-	if ( ! isSmallViewport ) {
-		return null;
-	}
-
-	return (
-		<MenuItem
-			{ ...gesturesProps }
-			ref={ menuItemRef }
-			icon={ <BlockIcon icon={ parentBlockType.icon } /> }
-			onClick={ () => selectBlock( parentClientId ) }
-		>
-			{ sprintf(
-				/* translators: %s: Name of the block's parent. */
-				__( 'Select parent block (%s)' ),
-				parentBlockType.title
-			) }
-		</MenuItem>
-	);
 }
 
 export function BlockSettingsDropdown( {
@@ -98,6 +64,7 @@ export function BlockSettingsDropdown( {
 		parentBlockType,
 		previousBlockClientId,
 		selectedBlockClientIds,
+		openedBlockSettingsMenu,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -107,7 +74,8 @@ export function BlockSettingsDropdown( {
 				getPreviousBlockClientId,
 				getSelectedBlockClientIds,
 				getBlockAttributes,
-			} = select( blockEditorStore );
+				getOpenedBlockSettingsMenu,
+			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
 
@@ -129,18 +97,13 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
+				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
 			};
 		},
 		[ firstBlockClientId ]
 	);
 	const { getBlockOrder, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
-
-	const openedBlockSettingsMenu = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getOpenedBlockSettingsMenu(),
-		[]
-	);
 
 	const { setOpenedBlockSettingsMenu } = unlock(
 		useDispatch( blockEditorStore )
@@ -239,7 +202,7 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canCopyStyles,
 				canDuplicate,
-				canInsertDefaultBlock,
+				canInsertBlock,
 				canMove,
 				canRemove,
 				onDuplicate,
@@ -249,7 +212,6 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 				onMoveTo,
-				blocks,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
@@ -286,7 +248,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-after',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -296,7 +258,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-before',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -314,7 +276,7 @@ export function BlockSettingsDropdown( {
 								/>
 								{ ! parentBlockIsSelected &&
 									!! firstParentClientId && (
-										<ParentSelectorMenuItem
+										<BlockParentSelectorMenuItem
 											parentClientId={
 												firstParentClientId
 											}
@@ -327,7 +289,7 @@ export function BlockSettingsDropdown( {
 									/>
 								) }
 								<CopyMenuItem
-									blocks={ blocks }
+									clientIds={ clientIds }
 									onCopy={ onCopy }
 								/>
 								{ canDuplicate && (
@@ -342,7 +304,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertBlock && (
 									<>
 										<MenuItem
 											onClick={ pipe(
@@ -368,7 +330,7 @@ export function BlockSettingsDropdown( {
 							{ canCopyStyles && (
 								<MenuGroup>
 									<CopyMenuItem
-										blocks={ blocks }
+										clientIds={ clientIds }
 										onCopy={ onCopy }
 										label={ __( 'Copy styles' ) }
 									/>

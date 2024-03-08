@@ -12,6 +12,8 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	svg {
 		min-width: $grid-unit-30;
 		min-height: $grid-unit-30;
+		width: 1.25em;
+		height: 1.25em;
 		fill: currentColor;
 		vertical-align: text-bottom;
 	}
