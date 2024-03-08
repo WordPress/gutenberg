@@ -22,7 +22,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 		&& isset( $attributes['queryId'] );
 	$is_full_site_csn_enabled = false;
 	if ( ! empty( wp_interactivity_config( 'core/router' ) ) ) {
-		$is_full_site_csn_enabled = wp_interactivity_config( 'core/router' )['fullClientSideNavigation'];
+		$is_full_site_csn_enabled = wp_interactivity_config( 'core/router' )['fullClientSideNavigation'] && isset( $attributes['queryId'] );
 	}
 
 	// Enqueue the script module and add the necessary directives if the block is
