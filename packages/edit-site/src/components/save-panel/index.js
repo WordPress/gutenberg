@@ -77,11 +77,13 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 	);
 };
 
-const _EntitiesSavedStates = ( { onClose } ) => {
+const _EntitiesSavedStates = ( { onClose, renderDialog = undefined } ) => {
 	if ( isPreviewingTheme() ) {
 		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
 	}
-	return <EntitiesSavedStates close={ onClose } renderDialog />;
+	return (
+		<EntitiesSavedStates close={ onClose } renderDialog={ renderDialog } />
+	);
 };
 
 export default function SavePanel() {
@@ -157,7 +159,9 @@ export default function SavePanel() {
 					{ __( 'Open save panel' ) }
 				</Button>
 			</div>
-			{ isSaveViewOpen && <_EntitiesSavedStates onClose={ onClose } /> }
+			{ isSaveViewOpen && (
+				<_EntitiesSavedStates onClose={ onClose } renderDialog />
+			) }
 		</NavigableRegion>
 	);
 }
