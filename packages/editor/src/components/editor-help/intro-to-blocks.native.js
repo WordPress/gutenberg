@@ -51,7 +51,7 @@ const IntroToBlocks = () => {
 					) }
 				/>
 				<HelpDetailImage
-					accessible={ true }
+					accessible
 					accessibilityLabel={ __(
 						'Text formatting controls are located within the toolbar positioned above the keyboard while editing a text block'
 					) }

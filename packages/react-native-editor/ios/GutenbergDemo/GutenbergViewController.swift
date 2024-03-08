@@ -288,14 +288,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("ma.tt"))
     }
 
-    func gutenbergDidRequestMediaSaveSync() {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
-        print(#function)
-    }
-
     func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
         return false;
     }
@@ -421,6 +413,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .tiledGalleryBlock: true,
             .videoPressBlock: true,
+            .videoPressV5Support: true,
             .isAudioBlockMediaUploadEnabled: true,
             .reusableBlock: false,
             .facebookEmbed: true,

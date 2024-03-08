@@ -88,14 +88,14 @@ describe( 'listener hook tests', () => {
 	} );
 	describe( 'useBlockSelectionListener', () => {
 		const registry = createRegistry( mockStores );
-		const TestComponent = ( { postId } ) => {
-			useBlockSelectionListener( postId );
+		const TestComponent = () => {
+			useBlockSelectionListener();
 			return null;
 		};
 		const TestedOutput = () => {
 			return (
 				<RegistryProvider value={ registry }>
-					<TestComponent postId={ 10 } />
+					<TestComponent />
 				</RegistryProvider>
 			);
 		};
@@ -177,14 +177,14 @@ describe( 'listener hook tests', () => {
 
 	describe( 'useUpdatePostLinkListener', () => {
 		const registry = createRegistry( mockStores );
-		const TestComponent = ( { postId } ) => {
-			useUpdatePostLinkListener( postId );
+		const TestComponent = () => {
+			useUpdatePostLinkListener();
 			return null;
 		};
-		const TestedOutput = ( { postId = 10 } ) => {
+		const TestedOutput = () => {
 			return (
 				<RegistryProvider value={ registry }>
-					<TestComponent postId={ postId } />
+					<TestComponent />
 				</RegistryProvider>
 			);
 		};
@@ -222,7 +222,7 @@ describe( 'listener hook tests', () => {
 			} );
 			const { rerender } = render( <TestedOutput /> );
 
-			rerender( <TestedOutput id={ 20 } /> );
+			rerender( <TestedOutput /> );
 
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 			act( () => {

@@ -192,7 +192,7 @@ export default function SearchEdit( {
 						} );
 					} }
 					options={ BUTTON_OPTIONS }
-					hideCancelButton={ true }
+					hideCancelButton
 				/>
 				{ buttonPosition !== 'no-button' && (
 					<ToggleControl
@@ -294,7 +294,7 @@ export default function SearchEdit( {
 		return (
 			<View
 				style={ styles.searchInputContainer }
-				accessible={ true }
+				accessible
 				accessibilityRole="none"
 				accessibilityHint={
 					isScreenReaderEnabled
@@ -383,7 +383,7 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<View
-						accessible={ true }
+						accessible
 						accessibilityRole="none"
 						accessibilityHint={
 							isScreenReaderEnabled
@@ -438,7 +438,7 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<View
-					accessible={ true }
+					accessible
 					accessibilityRole="none"
 					accessibilityHint={
 						isScreenReaderEnabled

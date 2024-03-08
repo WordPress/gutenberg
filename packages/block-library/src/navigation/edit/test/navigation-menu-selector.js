@@ -288,7 +288,7 @@ describe( 'NavigationMenuSelector', () => {
 				rerender(
 					<NavigationMenuSelector
 						onCreateNew={ handler }
-						createNavigationMenuIsSuccess={ true }
+						createNavigationMenuIsSuccess
 					/>
 				);
 
@@ -475,7 +475,7 @@ describe( 'NavigationMenuSelector', () => {
 				// // Simulate the menu being created and component being re-rendered.
 				rerender(
 					<NavigationMenuSelector
-						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
+						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
 					/>
 				);
 
@@ -616,7 +616,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Simulate the menu being created and component being re-rendered.
 				rerender(
 					<NavigationMenuSelector
-						createNavigationMenuIsSuccess={ true } // classic menu import creates a Navigation menu.
+						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
 					/>
 				);
 

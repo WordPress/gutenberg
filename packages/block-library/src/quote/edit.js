@@ -74,19 +74,25 @@ export default function QuoteEdit( {
 	className,
 	style,
 } ) {
-	const { align, citation } = attributes;
+	const { textAlign, citation } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const hasSelection = useSelect( ( select ) => {
-		const { isBlockSelected, hasSelectedInnerBlock } =
-			select( blockEditorStore );
-		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
-	}, [] );
+	const hasSelection = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				hasSelectedInnerBlock( clientId, true ) ||
+				isBlockSelected( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: classNames( className, {
-			[ `has-text-align-${ align }` ]: align,
+			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 		...( ! isWebPlatform && { style } ),
 	} );
@@ -100,9 +106,9 @@ export default function QuoteEdit( {
 		<>
 			<BlockControls group="block">
 				<AlignmentControl
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
@@ -132,7 +138,7 @@ export default function QuoteEdit( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
-						{ ...( ! isWebPlatform ? { textAlign: align } : {} ) }
+						{ ...( ! isWebPlatform ? { textAlign } : {} ) }
 					/>
 				) }
 			</BlockQuotation>
