@@ -142,22 +142,20 @@ export default function SavePanel() {
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
-			{ isSaveViewOpen ? (
-				<_EntitiesSavedStates onClose={ onClose } />
-			) : (
-				<div className="edit-site-editor__toggle-save-panel">
-					<Button
-						variant="secondary"
-						className="edit-site-editor__toggle-save-panel-button"
-						onClick={ () => setIsSaveViewOpened( true ) }
-						aria-expanded={ false }
-						disabled={ disabled }
-						__experimentalIsFocusable
-					>
-						{ __( 'Open save panel' ) }
-					</Button>
-				</div>
-			) }
+			<div className="edit-site-editor__toggle-save-panel">
+				<Button
+					variant="secondary"
+					className="edit-site-editor__toggle-save-panel-button"
+					onClick={ () => setIsSaveViewOpened( true ) }
+					aria-expanded={ false }
+					disabled={ disabled }
+					aria-haspopup={ 'dialog' }
+					__experimentalIsFocusable
+				>
+					{ __( 'Open save panel' ) }
+				</Button>
+			</div>
+			{ isSaveViewOpen && <_EntitiesSavedStates onClose={ onClose } /> }
 		</NavigableRegion>
 	);
 }

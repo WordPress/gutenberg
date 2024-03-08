@@ -20,6 +20,12 @@
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
+
+	.is-entity-save-view-open & {
+		position: absolute;
+		right: -9999999em;
+		height: 0;
+	}
 }
 
 // Adjust the position of the notices
