@@ -26,6 +26,14 @@
 		"showEmpty": {
 			"type": "boolean",
 			"default": false
+		},
+		"label": {
+			"type": "string",
+			"__experimentalRole": "content"
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
