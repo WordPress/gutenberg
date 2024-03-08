@@ -1,6 +1,6 @@
 <?php
 /**
- * HTML for testing the directive `data-wp-bind`.
+ * HTML for testing scope restoration with generators.
  *
  * @package gutenberg-test-interactive-blocks
  */
