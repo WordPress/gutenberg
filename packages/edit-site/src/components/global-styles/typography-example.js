@@ -37,7 +37,6 @@ export default function PreviewTypography( { fontSize, variation } ) {
 
 	return (
 		<motion.div
-			className="edit-site-global-styles_preview-typography"
 			animate={ {
 				scale: 1,
 				opacity: 1,
@@ -49,6 +48,11 @@ export default function PreviewTypography( { fontSize, variation } ) {
 			transition={ {
 				delay: 0.3,
 				type: 'tween',
+			} }
+			style={ {
+				fontSize: '22px',
+				lineHeight: '44px',
+				textAlign: 'center',
 			} }
 		>
 			<span style={ headingPreviewStyle }>
