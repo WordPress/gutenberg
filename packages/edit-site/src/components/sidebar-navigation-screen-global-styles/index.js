@@ -10,6 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -115,13 +116,15 @@ export default function SidebarNavigationScreenGlobalStyles() {
 		},
 		[]
 	);
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const openGlobalStyles = useCallback( async () => {
 		return Promise.all( [
+			setPreference( 'core', 'distractionFree', false ),
 			setCanvasMode( 'edit' ),
 			openGeneralSidebar( 'edit-site/global-styles' ),
 		] );
-	}, [ setCanvasMode, openGeneralSidebar ] );
+	}, [ setCanvasMode, openGeneralSidebar, setPreference ] );
 
 	const openStyleBook = useCallback( async () => {
 		await openGlobalStyles();

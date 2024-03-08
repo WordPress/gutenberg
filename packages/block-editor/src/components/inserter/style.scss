@@ -767,3 +767,13 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 }
+
+.is-zoom-out {
+	.block-editor-inserter__menu {
+		display: flex;
+	}
+
+	.block-editor-inserter__patterns-category-dialog {
+		position: static;
+	}
+}

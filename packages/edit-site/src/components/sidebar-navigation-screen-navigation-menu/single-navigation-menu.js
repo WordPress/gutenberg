@@ -10,7 +10,6 @@ import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-nav
 import ScreenNavigationMoreMenu from './more-menu';
 import NavigationMenuEditor from './navigation-menu-editor';
 import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
-import EditButton from './edit-button';
 
 export default function SingleNavigationMenu( {
 	navigationMenu,
@@ -30,7 +29,6 @@ export default function SingleNavigationMenu( {
 						onSave={ handleSave }
 						onDuplicate={ handleDuplicate }
 					/>
-					<EditButton postId={ navigationMenu?.id } />
 				</>
 			}
 			title={ buildNavigationLabel(

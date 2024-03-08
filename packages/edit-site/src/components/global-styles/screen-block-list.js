@@ -26,7 +26,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useBlockVariations } from './variations-panel';
+import { useBlockVariations } from './variations/variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../lock-unlock';

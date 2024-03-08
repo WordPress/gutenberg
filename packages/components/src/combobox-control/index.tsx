@@ -33,6 +33,7 @@ import { normalizeTextString } from '../utils/strings';
 import type { ComboboxControlOption, ComboboxControlProps } from './types';
 import type { TokenInputProps } from '../form-token-field/types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -186,51 +187,42 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		setIsExpanded( true );
 	};
 
-	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > = (
-		event
-	) => {
-		let preventDefault = false;
+	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+		withIgnoreIMEEvents( ( event ) => {
+			let preventDefault = false;
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			return;
-		}
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
-		switch ( event.code ) {
-			case 'Enter':
-				if ( selectedSuggestion ) {
-					onSuggestionSelected( selectedSuggestion );
+			switch ( event.code ) {
+				case 'Enter':
+					if ( selectedSuggestion ) {
+						onSuggestionSelected( selectedSuggestion );
+						preventDefault = true;
+					}
+					break;
+				case 'ArrowUp':
+					handleArrowNavigation( -1 );
 					preventDefault = true;
-				}
-				break;
-			case 'ArrowUp':
-				handleArrowNavigation( -1 );
-				preventDefault = true;
-				break;
-			case 'ArrowDown':
-				handleArrowNavigation( 1 );
-				preventDefault = true;
-				break;
-			case 'Escape':
-				setIsExpanded( false );
-				setSelectedSuggestion( null );
-				preventDefault = true;
-				break;
-			default:
-				break;
-		}
+					break;
+				case 'ArrowDown':
+					handleArrowNavigation( 1 );
+					preventDefault = true;
+					break;
+				case 'Escape':
+					setIsExpanded( false );
+					setSelectedSuggestion( null );
+					preventDefault = true;
+					break;
+				default:
+					break;
+			}
 
-		if ( preventDefault ) {
-			event.preventDefault();
-		}
-	};
+			if ( preventDefault ) {
+				event.preventDefault();
+			}
+		} );
 
 	const onBlur = () => {
 		setInputHasFocus( false );

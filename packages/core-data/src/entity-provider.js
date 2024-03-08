@@ -183,7 +183,7 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return editedBlocks;
 		}
 
-		if ( ! content || typeof content === 'function' ) {
+		if ( ! content || typeof content !== 'string' ) {
 			return EMPTY_ARRAY;
 		}
 

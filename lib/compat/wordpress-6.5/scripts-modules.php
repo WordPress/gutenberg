@@ -207,3 +207,16 @@ if ( ! function_exists( 'wp_dequeue_script_module' ) ) {
 		wp_script_modules()->dequeue( $id );
 	}
 }
+
+if ( ! function_exists( 'wp_deregister_script_module' ) ) {
+	/**
+	 * Deregisters the script module.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $id The identifier of the script module.
+	 */
+	function wp_deregister_script_module( string $id ) {
+		wp_script_modules()->deregister( $id );
+	}
+}

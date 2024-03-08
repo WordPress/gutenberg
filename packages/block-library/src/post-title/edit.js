@@ -115,53 +115,59 @@ export default function PostTitleEdit( {
 	return (
 		<>
 			{ blockEditingMode === 'default' && (
-				<BlockControls group="block">
-					<HeadingLevelDropdown
-						value={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-					<AlignmentControl
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Make title a link' ) }
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
-					{ isLink && (
-						<>
+				<>
+					<BlockControls group="block">
+						<HeadingLevelDropdown
+							value={ level }
+							onChange={ ( newLevel ) =>
+								setAttributes( { level: newLevel } )
+							}
+						/>
+						<AlignmentControl
+							value={ textAlign }
+							onChange={ ( nextAlign ) => {
+								setAttributes( { textAlign: nextAlign } );
+							} }
+						/>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Settings' ) }>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
-									} )
+								label={ __( 'Make title a link' ) }
+								onChange={ () =>
+									setAttributes( { isLink: ! isLink } )
 								}
-								checked={ linkTarget === '_blank' }
+								checked={ isLink }
 							/>
-							<TextControl
-								__nextHasNoMarginBottom
-								label={ __( 'Link rel' ) }
-								value={ rel }
-								onChange={ ( newRel ) =>
-									setAttributes( { rel: newRel } )
-								}
-							/>
-						</>
-					) }
-				</PanelBody>
-			</InspectorControls>
+							{ isLink && (
+								<>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Open in new tab' ) }
+										onChange={ ( value ) =>
+											setAttributes( {
+												linkTarget: value
+													? '_blank'
+													: '_self',
+											} )
+										}
+										checked={ linkTarget === '_blank' }
+									/>
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Link rel' ) }
+										value={ rel }
+										onChange={ ( newRel ) =>
+											setAttributes( { rel: newRel } )
+										}
+									/>
+								</>
+							) }
+						</PanelBody>
+					</InspectorControls>
+				</>
+			) }
 			{ titleElement }
 		</>
 	);

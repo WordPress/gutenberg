@@ -73,6 +73,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.isNative
 	? { type: 'stepper' }
 	: {};
 
+const DEFAULT_BLOCK = { name: 'core/image' };
 const EMPTY_ARRAY = [];
 
 function GalleryEdit( props ) {
@@ -496,6 +497,8 @@ function GalleryEdit( props ) {
 	};
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
 		orientation: 'horizontal',
 		renderAppender: false,
 		...nativeInnerBlockProps,
@@ -543,7 +546,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							hideCancelButton
 							size="__unstable-large"
 						/>
 					) }
@@ -553,7 +556,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
-						hideCancelButton={ true }
+						hideCancelButton
 						size="__unstable-large"
 					/>
 					<ToggleControl
@@ -599,7 +602,7 @@ function GalleryEdit( props ) {
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }
-								multiple={ true }
+								multiple
 								mediaIds={ images
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }
