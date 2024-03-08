@@ -82,6 +82,7 @@ const BlockMoverButton = forwardRef(
 					getBlockOrder,
 					getBlock,
 					getBlockListSettings,
+					canMoveBlocks,
 				} = select( blockEditorStore );
 				const firstClientId = normalizedClientIds[ 0 ];
 				const blockRootClientId = getBlockRootClientId( firstClientId );
@@ -91,17 +92,20 @@ const BlockMoverButton = forwardRef(
 				);
 				const blockOrder = getBlockOrder( blockRootClientId );
 				const block = getBlock( firstClientId );
-				const isFirstBlock = firstBlockIndex === 0;
+				const blocksBefore = blockOrder.slice( 0, firstBlockIndex );
+				const isFirstUnlockedBlock =
+					firstBlockIndex === 0 || ! canMoveBlocks( blocksBefore );
 				const isLastBlock = lastBlockIndex === blockOrder.length - 1;
 				const { orientation: blockListOrientation } =
 					getBlockListSettings( blockRootClientId ) || {};
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
+					isDisabled:
+						direction === 'up' ? isFirstUnlockedBlock : isLastBlock,
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
-					isFirst: isFirstBlock,
+					isFirst: isFirstUnlockedBlock,
 					isLast: isLastBlock,
 					orientation: moverOrientation || blockListOrientation,
 				};
