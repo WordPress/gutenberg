@@ -199,7 +199,7 @@ function UploadFonts() {
 				<Spacer margin={ 2 } />
 				<Text className="font-library-modal__upload-area__text">
 					{ __(
-						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .tff, .otf, .woff, and .woff2.'
+						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }
 				</Text>
 			</VStack>

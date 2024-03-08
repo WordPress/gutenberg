@@ -1192,15 +1192,13 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 
 	const isTemplate = blockContext?.templateSlug !== undefined;
 
-	const getBlockStyles = useSelect( ( select ) => {
-		return select( blocksStore ).getBlockStyles;
-	}, [] );
+	const { getBlockStyles } = useSelect( blocksStore );
 
 	return useMemo( () => {
 		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
-		mergedConfig = updateConfigWithSeparator( mergedConfig );
+		const updatedConfig = updateConfigWithSeparator( mergedConfig );
 
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
@@ -1208,18 +1206,18 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		);
 
 		const customProperties = toCustomProperties(
-			mergedConfig,
+			updatedConfig,
 			blockSelectors
 		);
 		const globalStyles = toStyles(
-			mergedConfig,
+			updatedConfig,
 			blockSelectors,
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
 			isTemplate
 		);
-		const svgs = toSvgFilters( mergedConfig, blockSelectors );
+		const svgs = toSvgFilters( updatedConfig, blockSelectors );
 
 		const styles = [
 			{
@@ -1232,7 +1230,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			},
 			// Load custom CSS in own stylesheet so that any invalid CSS entered in the input won't break all the global styles in the editor.
 			{
-				css: mergedConfig.styles.css ?? '',
+				css: updatedConfig.styles.css ?? '',
 				isGlobalStyles: true,
 			},
 			{
@@ -1246,11 +1244,11 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		// If there are, get the block selector and push the selector together with
 		// the CSS value to the 'stylesheets' array.
 		getBlockTypes().forEach( ( blockType ) => {
-			if ( mergedConfig.styles.blocks[ blockType.name ]?.css ) {
+			if ( updatedConfig.styles.blocks[ blockType.name ]?.css ) {
 				const selector = blockSelectors[ blockType.name ].selector;
 				styles.push( {
 					css: processCSSNesting(
-						mergedConfig.styles.blocks[ blockType.name ]?.css,
+						updatedConfig.styles.blocks[ blockType.name ]?.css,
 						selector
 					),
 					isGlobalStyles: true,
@@ -1258,12 +1256,14 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			}
 		} );
 
-		return [ styles, mergedConfig.settings ];
+		return [ styles, updatedConfig.settings ];
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
+		isTemplate,
+		getBlockStyles,
 	] );
 }
 

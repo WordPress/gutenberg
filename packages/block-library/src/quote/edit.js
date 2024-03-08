@@ -78,11 +78,17 @@ export default function QuoteEdit( {
 
 	useMigrateOnLoad( attributes, clientId );
 
-	const hasSelection = useSelect( ( select ) => {
-		const { isBlockSelected, hasSelectedInnerBlock } =
-			select( blockEditorStore );
-		return hasSelectedInnerBlock( clientId ) || isBlockSelected( clientId );
-	}, [] );
+	const hasSelection = useSelect(
+		( select ) => {
+			const { isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
+			return (
+				hasSelectedInnerBlock( clientId, true ) ||
+				isBlockSelected( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: classNames( className, {

@@ -46,9 +46,12 @@ function GridItem( {
 				'is-selected': hasBulkAction && isSelected,
 			} ) }
 			onClickCapture={ ( event ) => {
-				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
+				if ( event.ctrlKey || event.metaKey ) {
 					event.stopPropagation();
 					event.preventDefault();
+					if ( ! hasBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
