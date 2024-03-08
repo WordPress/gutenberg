@@ -36,6 +36,8 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 /**
  * Renders the `core/latest-comments` block on server.
  *
+ * @since 5.1.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest comments added.
