@@ -77,7 +77,7 @@
 	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
 	<rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
-<exclude-pattern>*\.asset\.php$</exclude-pattern>
+		<exclude-pattern>*\.asset\.php$</exclude-pattern>
 	</rule>
 	<rule ref="PEAR.NamingConventions.ValidClassName.Invalid">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
