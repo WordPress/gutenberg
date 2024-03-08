@@ -37,11 +37,11 @@ function useShallowMemo( value ) {
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
  * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
  *
  * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
  *
- * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ * @param {?boolean}             __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
  *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
@@ -136,6 +136,16 @@ export default function useNestedSettingsUpdate(
 
 		if ( directInsert !== undefined ) {
 			newSettings.directInsert = directInsert;
+		}
+
+		if (
+			newSettings.directInsert !== undefined &&
+			typeof newSettings.directInsert !== 'boolean'
+		) {
+			deprecated( 'Using `Function` as a `directInsert` argument', {
+				alternative: '`boolean` values',
+				since: '6.5',
+			} );
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders

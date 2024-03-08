@@ -55,18 +55,26 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 			const canvasDoc =
 				// @ts-ignore
 				document.activeElement?.contentDocument ?? document;
-			const clipboardDataTransfer = new DataTransfer();
+			const event = new ClipboardEvent( _type, {
+				bubbles: true,
+				cancelable: true,
+				clipboardData: new DataTransfer(),
+			} );
+
+			if ( ! event.clipboardData ) {
+				throw new Error( 'ClipboardEvent.clipboardData is null' );
+			}
 
 			if ( _type === 'paste' ) {
-				clipboardDataTransfer.setData(
+				event.clipboardData.setData(
 					'text/plain',
 					_clipboardData[ 'text/plain' ]
 				);
-				clipboardDataTransfer.setData(
+				event.clipboardData.setData(
 					'text/html',
 					_clipboardData[ 'text/html' ]
 				);
-				clipboardDataTransfer.setData(
+				event.clipboardData.setData(
 					'rich-text',
 					_clipboardData[ 'rich-text' ]
 				);
@@ -85,22 +93,16 @@ async function emulateClipboard( page: Page, type: 'copy' | 'cut' | 'paste' ) {
 						)
 						.join( '' );
 				}
-				clipboardDataTransfer.setData( 'text/plain', plainText );
-				clipboardDataTransfer.setData( 'text/html', html );
+				event.clipboardData.setData( 'text/plain', plainText );
+				event.clipboardData.setData( 'text/html', html );
 			}
 
-			canvasDoc.activeElement?.dispatchEvent(
-				new ClipboardEvent( _type, {
-					bubbles: true,
-					cancelable: true,
-					clipboardData: clipboardDataTransfer,
-				} )
-			);
+			canvasDoc.activeElement.dispatchEvent( event );
 
 			return {
-				'text/plain': clipboardDataTransfer.getData( 'text/plain' ),
-				'text/html': clipboardDataTransfer.getData( 'text/html' ),
-				'rich-text': clipboardDataTransfer.getData( 'rich-text' ),
+				'text/plain': event.clipboardData.getData( 'text/plain' ),
+				'text/html': event.clipboardData.getData( 'text/html' ),
+				'rich-text': event.clipboardData.getData( 'rich-text' ),
 			};
 		},
 		[ type, clipboardDataHolder ] as const

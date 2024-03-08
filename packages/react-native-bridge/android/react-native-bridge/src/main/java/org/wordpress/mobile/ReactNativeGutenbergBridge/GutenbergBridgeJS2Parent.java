@@ -123,8 +123,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback);
 
-    void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback);
-
     void requestImageFailedRetryDialog(int mediaId);
 
     void requestImageUploadCancelDialog(int mediaId);
@@ -158,16 +156,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void onShowUserSuggestions(Consumer<String> onResult);
 
     void onShowXpostSuggestions(Consumer<String> onResult);
-
-    void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId);
-
-    void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles);
-
-    void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles);
-
-    void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId);
 
     void setFocalPointPickerTooltipShown(boolean tooltipShown);
 

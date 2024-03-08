@@ -29,7 +29,7 @@ import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
 
-const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
+const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -76,7 +76,7 @@ function DocumentTools( {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
+	const { showFixedToolbar } = useShowBlockTools();
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -117,7 +117,7 @@ function DocumentTools( {
 				className
 			) }
 			aria-label={ toolbarAriaLabel }
-			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			shouldUseKeyboardFocusShortcut={ ! showFixedToolbar }
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">

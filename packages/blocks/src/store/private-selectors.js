@@ -186,3 +186,26 @@ export function getBootstrappedBlockType( state, name ) {
 export function getUnprocessedBlockTypes( state ) {
 	return state.unprocessedBlockTypes;
 }
+
+/**
+ * Returns all the block bindings sources registered.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} All the registered sources and their properties.
+ */
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+/**
+ * Returns a specific block bindings source.
+ *
+ * @param {Object} state      Data state.
+ * @param {string} sourceName Name of the source to get.
+ *
+ * @return {Object} The specific block binding source and its properties.
+ */
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}

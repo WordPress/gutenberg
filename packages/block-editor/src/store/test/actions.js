@@ -832,10 +832,6 @@ describe( 'actions', () => {
 				blockB.clientId
 			)( { select, dispatch } );
 
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'MERGE_BLOCKS',
-				blocks: [ blockA.clientId, blockB.clientId ],
-			} );
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
 
