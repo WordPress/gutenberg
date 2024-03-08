@@ -16,6 +16,8 @@ import {
 	Spinner,
 	ToggleControl,
 	ToolbarGroup,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
@@ -23,9 +25,9 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockControls,
-	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
@@ -42,6 +44,7 @@ import {
 	MAX_EXCERPT_LENGTH,
 	MAX_POSTS_COLUMNS,
 } from './constants';
+import { unlock } from '../lock-unlock';
 
 /**
  * Module Constants
@@ -55,6 +58,8 @@ const USERS_LIST_QUERY = {
 	has_published_posts: [ 'post' ],
 	context: 'view',
 };
+
+const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
 function getFeaturedImageDetails( post, size ) {
 	const image = post._embedded?.[ 'wp:featuredmedia' ]?.[ '0' ];
@@ -89,14 +94,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		featuredImageSizeHeight,
 		addLinkToFeaturedImage,
 	} = attributes;
-	const {
-		imageSizes,
-		latestPosts,
-		defaultImageWidth,
-		defaultImageHeight,
-		categoriesList,
-		authorList,
-	} = useSelect(
+	const { imageSizes, latestPosts, categoriesList, authorList } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getUsers } = select( coreStore );
 			const settings = select( blockEditorStore ).getSettings();
@@ -116,12 +114,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			);
 
 			return {
-				defaultImageWidth:
-					settings.imageDimensions?.[ featuredImageSizeSlug ]
-						?.width ?? 0,
-				defaultImageHeight:
-					settings.imageDimensions?.[ featuredImageSizeSlug ]
-						?.height ?? 0,
 				imageSizes: settings.imageSizes,
 				latestPosts: getEntityRecords(
 					'postType',
@@ -136,14 +128,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				authorList: getUsers( USERS_LIST_QUERY ),
 			};
 		},
-		[
-			featuredImageSizeSlug,
-			postsToShow,
-			order,
-			orderBy,
-			categories,
-			selectedAuthor,
-		]
+		[ postsToShow, order, orderBy, categories, selectedAuthor ]
 	);
 
 	// If a user clicks to a link prevent redirection and show a warning.
@@ -166,6 +151,16 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 			value: slug,
 			label: name,
 		} ) );
+	const resetFeaturedImage = () => {
+		setAttributes( {
+			displayFeaturedImage: false,
+			featuredImageAlign: undefined,
+			featuredImageSizeSlug: 'thumbnail',
+			featuredImageSizeWidth: null,
+			featuredImageSizeHeight: null,
+			addLinkToFeaturedImage: false,
+		} );
+	};
 	const categorySuggestions =
 		categoriesList?.reduce(
 			( accumulator, category ) => ( {
@@ -261,76 +256,85 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				/>
 			</PanelBody>
 
-			<PanelBody title={ __( 'Featured image' ) }>
-				<ToggleControl
-					__nextHasNoMarginBottom
+			<ToolsPanel
+				label={ __( 'Featured image' ) }
+				resetAll={ resetFeaturedImage }
+			>
+				<ToolsPanelItem
 					label={ __( 'Display featured image' ) }
-					checked={ displayFeaturedImage }
-					onChange={ ( value ) =>
-						setAttributes( { displayFeaturedImage: value } )
+					isShownByDefault={ true }
+					hasValue={ () => !! displayFeaturedImage }
+					onDeselect={ () =>
+						setAttributes( { displayFeaturedImage: false } )
 					}
-				/>
+				>
+					<ToggleControl
+						label={ __( 'Display featured image' ) }
+						checked={ displayFeaturedImage }
+						onChange={ ( value ) =>
+							setAttributes( { displayFeaturedImage: value } )
+						}
+					/>
+				</ToolsPanelItem>
 				{ displayFeaturedImage && (
 					<>
-						<ImageSizeControl
+						<ResolutionTool
+							value={ featuredImageSizeSlug }
 							onChange={ ( value ) => {
-								const newAttrs = {};
-								if ( value.hasOwnProperty( 'width' ) ) {
-									newAttrs.featuredImageSizeWidth =
-										value.width;
-								}
-								if ( value.hasOwnProperty( 'height' ) ) {
-									newAttrs.featuredImageSizeHeight =
-										value.height;
-								}
-								setAttributes( newAttrs );
-							} }
-							slug={ featuredImageSizeSlug }
-							width={ featuredImageSizeWidth }
-							height={ featuredImageSizeHeight }
-							imageWidth={ defaultImageWidth }
-							imageHeight={ defaultImageHeight }
-							imageSizeOptions={ imageSizeOptions }
-							imageSizeHelp={ __(
-								'Select the size of the source image.'
-							) }
-							onChangeImage={ ( value ) =>
 								setAttributes( {
 									featuredImageSizeSlug: value,
-									featuredImageSizeWidth: undefined,
-									featuredImageSizeHeight: undefined,
+								} );
+							} }
+							options={ imageSizeOptions }
+						/>
+						<ToolsPanelItem
+							label={ __( 'Image alignment' ) }
+							isShownByDefault={ true }
+							hasValue={ () => !! featuredImageAlign }
+							onDeselect={ () =>
+								setAttributes( { featuredImageAlign: false } )
+							}
+						>
+							<BaseControl className="editor-latest-posts-image-alignment-control">
+								<BaseControl.VisualLabel>
+									{ __( 'Image alignment' ) }
+								</BaseControl.VisualLabel>
+								<BlockAlignmentToolbar
+									value={ featuredImageAlign }
+									onChange={ ( value ) =>
+										setAttributes( {
+											featuredImageAlign: value,
+										} )
+									}
+									controls={ [ 'left', 'center', 'right' ] }
+									isCollapsed={ false }
+								/>
+							</BaseControl>
+						</ToolsPanelItem>
+						<ToolsPanelItem
+							label={ __( 'Add link to featured image' ) }
+							isShownByDefault={ true }
+							hasValue={ () => !! addLinkToFeaturedImage }
+							onDeselect={ () =>
+								setAttributes( {
+									addLinkToFeaturedImage: false,
 								} )
 							}
-						/>
-						<BaseControl className="editor-latest-posts-image-alignment-control">
-							<BaseControl.VisualLabel>
-								{ __( 'Image alignment' ) }
-							</BaseControl.VisualLabel>
-							<BlockAlignmentToolbar
-								value={ featuredImageAlign }
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
 								onChange={ ( value ) =>
 									setAttributes( {
-										featuredImageAlign: value,
+										addLinkToFeaturedImage: value,
 									} )
 								}
-								controls={ [ 'left', 'center', 'right' ] }
-								isCollapsed={ false }
 							/>
-						</BaseControl>
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Add link to featured image' ) }
-							checked={ addLinkToFeaturedImage }
-							onChange={ ( value ) =>
-								setAttributes( {
-									addLinkToFeaturedImage: value,
-								} )
-							}
-						/>
+						</ToolsPanelItem>
 					</>
 				) }
-			</PanelBody>
-
+			</ToolsPanel>
 			<PanelBody title={ __( 'Sorting and filtering' ) }>
 				<QueryControls
 					{ ...{ order, orderBy } }
