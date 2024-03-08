@@ -147,6 +147,8 @@ function render_block_core_latest_comments( $attributes = array() ) {
 
 /**
  * Registers the `core/latest-comments` block.
+ *
+ * @since 5.3.0
  */
 function register_block_core_latest_comments() {
 	register_block_type_from_metadata(
