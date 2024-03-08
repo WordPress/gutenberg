@@ -33,7 +33,6 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
-		useFeaturedImage,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
@@ -43,7 +42,7 @@ export default function save( { attributes } ) {
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
 
-	let image = ! useFeaturedImage ? (
+	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
