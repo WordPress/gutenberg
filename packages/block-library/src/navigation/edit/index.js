@@ -153,11 +153,8 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const createUntitledEmptyNavigationMenu = () => {
-		return new Promise( async ( resolve ) => {
-			await createNavigationMenu( '' );
-			resolve();
-		} );
+	const createUntitledEmptyNavigationMenu = async () => {
+		await createNavigationMenu( '' );
 	};
 
 	const {
@@ -345,27 +342,21 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		return new Promise( async ( resolve ) => {
-			const navMenu = await convertClassicMenu(
-				classicMenu.id,
-				classicMenu.name,
-				'draft'
-			);
-			if ( navMenu ) {
-				handleUpdateMenu( navMenu.id, {
-					focusNavigationBlock: true,
-				} );
-			}
-			resolve();
-		} );
+		const navMenu = await convertClassicMenu(
+			classicMenu.id,
+			classicMenu.name,
+			'draft'
+		);
+		if ( navMenu ) {
+			handleUpdateMenu( navMenu.id, {
+				focusNavigationBlock: true,
+			} );
+		}
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
-		return new Promise( ( resolve ) => {
-			handleUpdateMenu( menuId, {
-				focusNavigationBlock: true,
-			} );
-			resolve();
+		handleUpdateMenu( menuId, {
+			focusNavigationBlock: true,
 		} );
 	};
 

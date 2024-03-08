@@ -141,12 +141,9 @@ function NavigationMenuSelector( {
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
 									setIsUpdatingMenuRef( true );
-									onSelectNavigationMenu( menuId ).then(
-										() => {
-											setIsUpdatingMenuRef( false );
-											onClose();
-										}
-									);
+									onSelectNavigationMenu( menuId );
+									setIsUpdatingMenuRef( false );
+									onClose();
 								} }
 								choices={ menuChoices }
 								disabled={
@@ -162,16 +159,11 @@ function NavigationMenuSelector( {
 								const label = decodeEntities( menu.name );
 								return (
 									<MenuItem
-										onClick={ () => {
+										onClick={ async () => {
 											setIsUpdatingMenuRef( true );
-											onSelectClassicMenu( menu ).then(
-												() => {
-													setIsUpdatingMenuRef(
-														false
-													);
-													onClose();
-												}
-											);
+											await onSelectClassicMenu( menu );
+											setIsUpdatingMenuRef( false );
+											onClose();
 										} }
 										key={ menu.id }
 										aria-label={ sprintf(
@@ -197,12 +189,11 @@ function NavigationMenuSelector( {
 									isUpdatingMenuRef ||
 									! hasResolvedNavigationMenus
 								}
-								onClick={ () => {
+								onClick={ async () => {
 									setIsUpdatingMenuRef( true );
-									onCreateNew().then( () => {
-										setIsUpdatingMenuRef( false );
-										onClose();
-									} );
+									await onCreateNew();
+									setIsUpdatingMenuRef( false );
+									onClose();
 								} }
 							>
 								{ __( 'Create new menu' ) }
