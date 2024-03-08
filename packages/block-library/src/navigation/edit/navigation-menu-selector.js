@@ -140,16 +140,11 @@ function NavigationMenuSelector( {
 							<MenuItemsChoice
 								value={ currentMenuId }
 								onSelect={ ( menuId ) => {
-									setIsUpdatingMenuRef( true );
 									onSelectNavigationMenu( menuId );
-									setIsUpdatingMenuRef( false );
 									onClose();
 								} }
 								choices={ menuChoices }
-								disabled={
-									isUpdatingMenuRef ||
-									! hasResolvedNavigationMenus
-								}
+								disabled={ ! hasResolvedNavigationMenus }
 							/>
 						</MenuGroup>
 					) }
