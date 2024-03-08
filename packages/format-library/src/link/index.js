@@ -63,7 +63,7 @@ function Edit( {
 
 	useEffect( () => {
 		// When the link becomes inactive (i.e. isActive is false), reset the editingLink state
-		// and the isAddingNewLink state. This means that if the Link UI is displayed and the link
+		// and the creatingLink state. This means that if the Link UI is displayed and the link
 		// becomes inactive (e.g. used arrow keys to move cursor outside of link bounds), the UI will close.
 		if ( ! isActive ) {
 			setEditingLink( false );
