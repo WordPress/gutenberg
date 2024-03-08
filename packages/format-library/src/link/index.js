@@ -44,20 +44,21 @@ function Edit( {
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
-	const [ autoFocus, setAutoFocus ] = useState( true );
+	// Manages whether the Link UI popover should autofocus when shown.
+	const [ shouldAutoFocus, setShouldAutoFocus ] = useState( true );
 
-	function setIsEditingLink( _val, { shouldAutoFocus = true } = {} ) {
-		setEditingLink( _val );
-		setAutoFocus( shouldAutoFocus );
+	function setIsEditingLink( isEditing, { autoFocus = true } = {} ) {
+		setEditingLink( isEditing );
+		setShouldAutoFocus( autoFocus );
 	}
 
-	function setIsCreatingLink( _val ) {
+	function setIsCreatingLink( isCreating ) {
 		// Don't add a new link if there is already an active link.
 		// The two states are mutually exclusive.
-		if ( _val === true && isActive ) {
+		if ( isCreating === true && isActive ) {
 			return;
 		}
-		setCreatingLink( _val );
+		setCreatingLink( isCreating );
 	}
 
 	useEffect( () => {
@@ -91,7 +92,7 @@ function Edit( {
 				return;
 			}
 
-			setIsEditingLink( true, { shouldAutoFocus: false } );
+			setIsEditingLink( true, { autoFocus: false } );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -102,7 +103,7 @@ function Edit( {
 	}, [ contentRef, isActive ] );
 
 	function addLink( target ) {
-		setAutoFocus( true );
+		setShouldAutoFocus( true );
 		const text = getTextContent( slice( value ) );
 
 		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
@@ -208,7 +209,7 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
-					focusOnMount={ autoFocus ? 'firstElement' : false }
+					focusOnMount={ shouldAutoFocus ? 'firstElement' : false }
 				/>
 			) }
 		</>
