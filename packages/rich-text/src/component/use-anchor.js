@@ -144,7 +144,7 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 		tagName,
 		className,
 		isActive,
-		activeAttributes = STABLE_OBJECT,
+		__unstableActiveAttributes: activeAttributes = STABLE_OBJECT,
 	} = settings;
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
