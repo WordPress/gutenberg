@@ -237,12 +237,28 @@ function TableRow( {
 	data,
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
+
 	const isSelected = selection.includes( id );
+
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
+
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
-				'is-selected': hasPossibleBulkAction && isSelected,
+				'is-selected':
+					hasPossibleBulkAction && selection.includes( id ),
+				'is-hovered': isHovered,
 			} ) }
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
 			onClickCapture={ ( event ) => {
 				if ( event.ctrlKey || event.metaKey ) {
 					event.stopPropagation();

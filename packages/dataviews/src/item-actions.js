@@ -21,6 +21,7 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
@@ -136,6 +137,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		<HStack
 			spacing={ 1 }
 			justify="flex-end"
+			className="dataviews-view-table__actions"
 			style={ {
 				flexShrink: '0',
 				width: 'auto',
@@ -168,10 +170,16 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						icon={ moreVertical }
 						label={ __( 'Actions' ) }
 						disabled={ ! secondaryActions.length }
+						className="dataviews-view-table__all-actions-button"
 					/>
 				}
 				placement="bottom-end"
 			>
+				<ActionsDropdownMenuGroup
+					actions={ primaryActions }
+					item={ item }
+				/>
+				<DropdownMenuSeparator />
 				<ActionsDropdownMenuGroup
 					actions={ secondaryActions }
 					item={ item }
