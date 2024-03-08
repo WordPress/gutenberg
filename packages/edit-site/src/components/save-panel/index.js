@@ -15,7 +15,6 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { NavigableRegion } from '@wordpress/interface';
-import { useEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -101,14 +100,6 @@ export default function SavePanel() {
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const onClose = () => setIsSaveViewOpened( false );
 
-	const saveBtnRef = useRef();
-	useEffect( () => {
-		if ( isSaveViewOpen ) {
-			return;
-		}
-		saveBtnRef?.current?.focus();
-	}, [ isSaveViewOpen ] );
-
 	if ( canvasMode === 'view' ) {
 		return isSaveViewOpen ? (
 			<Modal
@@ -131,21 +122,20 @@ export default function SavePanel() {
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
-			{ isSaveViewOpen ? (
-				<_EntitiesSavedStates onClose={ onClose } />
-			) : (
-				<div className="edit-site-editor__toggle-save-panel">
-					<Button
-						variant="secondary"
-						className="edit-site-editor__toggle-save-panel-button"
-						onClick={ () => setIsSaveViewOpened( true ) }
-						aria-haspopup={ 'dialog' }
-						ref={ saveBtnRef }
-					>
-						{ __( 'Open save panel' ) }
-					</Button>
-				</div>
-			) }
+			{ isSaveViewOpen && <_EntitiesSavedStates onClose={ onClose } /> }
+			<div className="edit-site-editor__toggle-save-panel">
+				<Button
+					variant="secondary"
+					className={ classnames(
+						'edit-site-editor__toggle-save-panel-button',
+						{ 'screen-reader-text': isSaveViewOpen }
+					) }
+					onClick={ () => setIsSaveViewOpened( true ) }
+					aria-haspopup={ 'dialog' }
+				>
+					{ __( 'Open save panel' ) }
+				</Button>
+			</div>
 		</NavigableRegion>
 	);
 }
