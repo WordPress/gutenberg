@@ -17,7 +17,7 @@ if ( ! function_exists( 'wp_script_modules' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @global WP_Script_Modules $wp_script_modules.
+	 * @global WP_Script_Modules $wp_script_modules
 	 *
 	 * @return WP_Script_Modules The main WP_Script_Modules instance.
 	 */

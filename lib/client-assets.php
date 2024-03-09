@@ -245,7 +245,7 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  *
  * @since 6.7.0
  *
- * @global array $editor_styles.
+ * @global array $editor_styles
  *
  * @param WP_Styles $styles WP_Styles instance.
  */
