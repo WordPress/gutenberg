@@ -16,7 +16,6 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
-	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -41,7 +40,6 @@ import {
 	tableRowDelete,
 	table,
 } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -57,6 +55,7 @@ import {
 	toggleSection,
 	isEmptyTableSection,
 } from './state';
+import { Caption } from '../utils/caption';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -98,7 +97,7 @@ function TableEdit( {
 	insertBlocksAfter,
 	isSelected,
 } ) {
-	const { hasFixedLayout, caption, head, foot } = attributes;
+	const { hasFixedLayout, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
@@ -523,27 +522,7 @@ function TableEdit( {
 					{ renderedSections }
 				</table>
 			) }
-			{ ! isEmpty && (
-				<RichText
-					identifier="caption"
-					tagName="figcaption"
-					className={ __experimentalGetElementClassName( 'caption' ) }
-					aria-label={ __( 'Table caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					// Deselect the selected table cell when the caption is focused.
-					onFocus={ () => setSelectedCell() }
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter(
-							createBlock( getDefaultBlockName() )
-						)
-					}
-				/>
-			) }
-			{ isEmpty && (
+			{ isEmpty ? (
 				<Placeholder
 					label={ __( 'Table' ) }
 					icon={ <BlockIcon icon={ icon } showColors /> }
@@ -582,6 +561,14 @@ function TableEdit( {
 						</Button>
 					</form>
 				</Placeholder>
+			) : (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Table caption text' ) }
+				/>
 			) }
 		</figure>
 	);
