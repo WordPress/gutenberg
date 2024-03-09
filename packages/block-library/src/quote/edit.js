@@ -78,6 +78,32 @@ export default function QuoteEdit( {
 
 	useMigrateOnLoad( attributes, clientId );
 
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlock } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { replaceInnerBlocks, selectBlock } = useDispatch( blockEditorStore );
+
+	useEffect( () => {
+		if ( ! hasInnerBlocks ) {
+			const blocksToInsert = TEMPLATE.map( ( [ name, attr ] ) =>
+				createBlock( name, attr )
+			);
+			replaceInnerBlocks( clientId, blocksToInsert, false );
+
+			if ( blocksToInsert.length > 0 ) {
+				selectBlock( blocksToInsert[ 0 ].clientId );
+			}
+		}
+	}, [ hasInnerBlocks, clientId, replaceInnerBlocks, selectBlock ] );
+
 	const hasSelection = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } =
