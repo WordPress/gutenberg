@@ -52,11 +52,11 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
 
-		// Check focus returns to Open save panel button.
+		// Check focus returns to Saved button.
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Save panel' } )
-				.getByRole( 'button', { name: 'Open save panel' } )
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Saved' } )
 		).toBeFocused();
 	} );
 
