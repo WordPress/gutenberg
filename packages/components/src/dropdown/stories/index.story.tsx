@@ -8,6 +8,8 @@ import type { Meta, StoryFn } from '@storybook/react';
  */
 import Dropdown from '..';
 import Button from '../../button';
+import MenuGroup from '../../menu-group';
+import MenuItem from '../../menu-item';
 import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
@@ -80,6 +82,28 @@ WithNoPadding.args = {
 	renderContent: () => (
 		<DropdownContentWrapper paddingSize="none">
 			Content wrapped with <code>{ `paddingSize="none"` }</code>.
+		</DropdownContentWrapper>
+	),
+};
+
+/**
+ * The `<DropdownContentWrapper>` convenience wrapper can also be used to remove padding entirely,
+ * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
+ * paddings, for example when child components already have padding on their own.
+ */
+export const WithMenuItems = Template.bind( {} );
+WithMenuItems.args = {
+	...Default.args,
+	renderContent: () => (
+		<DropdownContentWrapper>
+			<MenuGroup label="Group 1">
+				<MenuItem>Item 1</MenuItem>
+				<MenuItem>Item 2</MenuItem>
+			</MenuGroup>
+			<MenuGroup label="Group 2">
+				<MenuItem>Item 1</MenuItem>
+				<MenuItem>Item 2</MenuItem>
+			</MenuGroup>
 		</DropdownContentWrapper>
 	),
 };
