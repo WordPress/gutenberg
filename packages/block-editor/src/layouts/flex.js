@@ -87,6 +87,10 @@ export default {
 					</FlexItem>
 				</Flex>
 				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				<FlexDirectionOrderControl
+					layout={ layout }
+					onChange={ onChange }
+				/>
 			</>
 		);
 	},
@@ -141,6 +145,7 @@ export default {
 			verticalAlignmentMap[ layout.verticalAlignment ];
 		const alignItems =
 			alignItemsMap[ layout.justifyContent ] || alignItemsMap.left;
+		const flexDirectionReversed = layout?.flexDirectionOrder === 'reverse';
 
 		let output = '';
 		const rules = [];
@@ -156,11 +161,18 @@ export default {
 			if ( justifyContent ) {
 				rules.push( `justify-content: ${ justifyContent }` );
 			}
+			if ( flexDirectionReversed ) {
+				rules.push( 'flex-direction: row-reverse' );
+			}
 		} else {
 			if ( verticalAlignment ) {
 				rules.push( `justify-content: ${ verticalAlignment }` );
 			}
-			rules.push( 'flex-direction: column' );
+			if ( flexDirectionReversed ) {
+				rules.push( 'flex-direction: column-reverse' );
+			} else {
+				rules.push( 'flex-direction: column' );
+			}
 			rules.push( `align-items: ${ alignItems }` );
 		}
 
@@ -358,6 +370,23 @@ function FlexWrapControl( { layout, onChange } ) {
 				} );
 			} }
 			checked={ flexWrap === 'wrap' }
+		/>
+	);
+}
+
+function FlexDirectionOrderControl( { layout, onChange } ) {
+	const { flexDirectionOrder = 'normal' } = layout;
+	return (
+		<ToggleControl
+			__nextHasNoMarginBottom
+			label={ __( 'Reverse the order of elements' ) }
+			onChange={ ( value ) => {
+				onChange( {
+					...layout,
+					flexDirectionOrder: value ? 'reverse' : 'normal',
+				} );
+			} }
+			checked={ flexDirectionOrder === 'reverse' }
 		/>
 	);
 }
