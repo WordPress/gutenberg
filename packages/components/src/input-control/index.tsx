@@ -8,7 +8,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from 'react';
+import { useState, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
