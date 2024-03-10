@@ -43,7 +43,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with is-secondary and is-small class', () => {
-			render( <Button variant="secondary" isSmall /> );
+			render( <Button variant="secondary" size="small" /> );
 			const button = screen.getByRole( 'button' );
 
 			expect( button ).toHaveClass( 'is-secondary' );
@@ -588,9 +588,11 @@ describe( 'Button', () => {
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'should not break when the legacy isSmall prop is passed', () => {
+		it( 'should warn when the isSmall prop is passed', () => {
+			// @ts-expect-error
 			render( <Button isSmall /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should have the is-small class when small class prop is passed', () => {
@@ -599,6 +601,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should prioritize the `size` prop over `isSmall`', () => {
+			// @ts-expect-error
 			render( <Button size="compact" isSmall /> );
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 				'is-small'
