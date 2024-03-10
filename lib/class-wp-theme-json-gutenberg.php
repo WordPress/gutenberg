@@ -1343,6 +1343,22 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+		// Add the global styles elements CSS.
+		if ( isset( $this->theme_json['styles']['elements'] ) ) {
+			foreach ( $this->theme_json['styles']['elements'] as $element => $node ) {
+				$custom_element_css = isset( $this->theme_json['styles']['elements'][ $element ]['css'] )
+					? $this->theme_json['styles']['elements'][ $element ]['css']
+					: null;
+				if ( $custom_element_css ) {
+					$block_nodes[] = array(
+						'name'     => $element,
+						'selector' => static::ELEMENTS[ $element ],
+						'css'      => $custom_element_css,
+					);
+				}
+			}
+		}
+
 		return $block_nodes;
 	}
 
