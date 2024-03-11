@@ -910,8 +910,8 @@ class WP_Duotone_Gutenberg {
 			return $block_content;
 		}
 
-		$tags = new WP_HTML_Tag_Processor( $block_content );
-		$wrapper_query=  array(
+		$tags          = new WP_HTML_Tag_Processor( $block_content );
+		$wrapper_query = array(
 			'tag_name'   => 'div',
 			'class_name' => 'wp-block-image'
 		);
