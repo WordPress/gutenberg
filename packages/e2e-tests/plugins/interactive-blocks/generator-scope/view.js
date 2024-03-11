@@ -8,16 +8,16 @@ store( 'test/generator-scope', {
 		*resolve() {
 			try {
 				getContext().result = yield Promise.resolve( 'ok' );
-			} catch (err) {
-				getContext().result = err.toString()
+			} catch ( err ) {
+				getContext().result = err.toString();
 			}
 		},
 		*reject() {
 			try {
-				getContext().result = yield Promise.reject( new Error( '😘' ) )
-			} catch (err) {
-				getContext().result = err.toString()
+				getContext().result = yield Promise.reject( new Error( '😘' ) );
+			} catch ( err ) {
+				getContext().result = err.toString();
 			}
-		}
-	}
+		},
+	},
 } );
