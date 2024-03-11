@@ -125,6 +125,9 @@ require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 
+// WordPress 6.6 compat.
+require __DIR__ . '/compat/wordpress-6.6/kses.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';

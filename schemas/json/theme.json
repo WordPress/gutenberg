@@ -561,6 +561,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textOrientation": {
+							"description": "Allow users to set the textOrientation.",
+							"type": "boolean",
+							"default": false
+						},
 						"textTransform": {
 							"description": "Allow users to set custom text transforms.",
 							"type": "boolean",

@@ -51,6 +51,7 @@
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalWritingMode": true,
+			"__experimentalTextOrientation": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
