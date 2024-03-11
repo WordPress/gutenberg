@@ -28,11 +28,9 @@ if ( function_exists( 'wp_render_duotone_support' ) ) {
 }
 if ( class_exists( 'WP_Duotone' ) ) {
 	remove_filter( 'render_block', array( 'WP_Duotone', 'render_duotone_support' ) );
-}
-add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
-if ( class_exists( 'WP_Duotone' ) ) {
 	remove_filter( 'render_block_core/image', array( 'WP_Duotone', 'restore_image_outer_container' ) );
 }
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
 add_filter( 'render_block_core/image', array( 'WP_Duotone_Gutenberg', 'restore_image_outer_container' ), 10, 1 );
 
 // Enqueue styles.
