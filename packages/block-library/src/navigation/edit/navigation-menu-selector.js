@@ -82,10 +82,20 @@ function NavigationMenuSelector( {
 					value: id,
 					label,
 					ariaLabel: sprintf( actionLabel, label ),
+					disabled:
+						isUpdatingMenuRef ||
+						isResolvingNavigationMenus ||
+						! hasResolvedNavigationMenus,
 				};
 			} ) || []
 		);
-	}, [ navigationMenus, actionLabel ] );
+	}, [
+		navigationMenus,
+		actionLabel,
+		isResolvingNavigationMenus,
+		hasResolvedNavigationMenus,
+		isUpdatingMenuRef,
+	] );
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
@@ -144,10 +154,6 @@ function NavigationMenuSelector( {
 									onClose();
 								} }
 								choices={ menuChoices }
-								disabled={
-									isUpdatingMenuRef ||
-									! hasResolvedNavigationMenus
-								}
 							/>
 						</MenuGroup>
 					) }
@@ -170,6 +176,7 @@ function NavigationMenuSelector( {
 										) }
 										disabled={
 											isUpdatingMenuRef ||
+											isResolvingNavigationMenus ||
 											! hasResolvedNavigationMenus
 										}
 									>
@@ -183,16 +190,17 @@ function NavigationMenuSelector( {
 					{ canUserCreateNavigationMenu && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
-								disabled={
-									isUpdatingMenuRef ||
-									! hasResolvedNavigationMenus
-								}
 								onClick={ async () => {
 									setIsUpdatingMenuRef( true );
 									await onCreateNew();
 									setIsUpdatingMenuRef( false );
 									onClose();
 								} }
+								disabled={
+									isUpdatingMenuRef ||
+									isResolvingNavigationMenus ||
+									! hasResolvedNavigationMenus
+								}
 							>
 								{ __( 'Create new menu' ) }
 							</MenuItem>
