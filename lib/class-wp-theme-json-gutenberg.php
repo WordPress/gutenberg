@@ -203,6 +203,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
+	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 *
 	 * @var array
 	 */
@@ -210,6 +211,10 @@ class WP_Theme_JSON_Gutenberg {
 		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
+		'background-image'                  => array( 'background', 'backgroundImage' ),
+		'background-position'               => array( 'background', 'backgroundPosition' ),
+		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
+		'background-size'                   => array( 'background', 'backgroundSize' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -461,10 +466,17 @@ class WP_Theme_JSON_Gutenberg {
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
+	 * @since 6.6.0 Added `background` sub properties to top-level only.
 	 *
 	 * @var array
 	 */
 	const VALID_STYLES = array(
+		'background' => array(
+			'backgroundImage'    => 'top',
+			'backgroundPosition' => 'top',
+			'backgroundRepeat'   => 'top',
+			'backgroundSize'     => 'top',
+		),
 		'border'     => array(
 			'color'  => null,
 			'radius' => null,
@@ -1845,6 +1857,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Passing $settings to the callbacks defined in static::PRESETS_METADATA.
 	 *
 	 * @param array $settings        Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
@@ -1871,7 +1884,7 @@ class WP_Theme_JSON_Gutenberg {
 					is_callable( $preset_metadata['value_func'] )
 				) {
 					$value_func = $preset_metadata['value_func'];
-					$value      = call_user_func( $value_func, $preset );
+					$value      = call_user_func( $value_func, $preset, $settings );
 				} else {
 					// If we don't have a value, then don't add it to the result.
 					continue;
@@ -2070,6 +2083,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
+	 * @since 6.5.0 Passing current theme JSON settings to wp_get_typography_font_size_value().
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2119,6 +2133,12 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// Processes background styles.
+			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
+				$background_styles = gutenberg_get_background_support_styles( $styles['background'] );
+				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
@@ -2133,8 +2153,9 @@ class WP_Theme_JSON_Gutenberg {
 				 * whether the incoming value can be converted to a fluid value.
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
+				 * Pass the current theme_json settings to override any global settings.
 				 */
-				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ), $settings );
 			}
 
 			if ( 'aspect-ratio' === $css_property ) {

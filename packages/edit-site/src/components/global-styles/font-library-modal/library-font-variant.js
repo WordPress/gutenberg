@@ -50,7 +50,7 @@ function LibraryFontVariant( { face, font } ) {
 				<CheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom={ true }
+					__nextHasNoMarginBottom
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>

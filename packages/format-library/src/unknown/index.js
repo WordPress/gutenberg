@@ -35,7 +35,7 @@ export const unknown = {
 				icon={ help }
 				title={ title }
 				onClick={ onClick }
-				isActive={ true }
+				isActive
 			/>
 		);
 	},

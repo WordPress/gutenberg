@@ -426,7 +426,7 @@ export function RichTextWrapper(
 					anchorRef,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
-				suppressContentEditableWarning={ true }
+				suppressContentEditableWarning
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,

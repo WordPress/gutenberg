@@ -33,11 +33,12 @@ Setting that enables the following UI tools:
 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- shadow: defaultPresets
 
 
 ---

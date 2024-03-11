@@ -108,7 +108,7 @@ function DropdownMenu( {
 			renderContent={ ( { isOpen, onClose, ...props } ) => {
 				return (
 					<BottomSheet
-						hideHeader={ true }
+						hideHeader
 						isVisible={ isOpen }
 						onClose={ onClose }
 					>
@@ -135,7 +135,7 @@ function DropdownMenu( {
 												} }
 												editable={ false }
 												icon={ control.icon }
-												leftAlign={ true }
+												leftAlign
 												isSelected={ control.isActive }
 												separatorType={
 													Platform.OS === 'android'

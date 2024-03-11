@@ -116,7 +116,7 @@ jobs:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
-            - uses: actions/download-artifact@v4.1.2
+            - uses: actions/download-artifact@v4.1.4
               id: download_artifact
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true

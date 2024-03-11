@@ -93,7 +93,6 @@ function BlockWrapper( {
 	draggingEnabled,
 	hasInnerBlocks,
 	isDescendentBlockSelected,
-	isRootList,
 	isSelected,
 	isTouchable,
 	marginHorizontal,
@@ -137,7 +136,6 @@ function BlockWrapper( {
 			<BlockOutline
 				blockCategory={ blockCategory }
 				hasInnerBlocks={ hasInnerBlocks }
-				isRootList={ isRootList }
 				isSelected={ isSelected }
 				name={ name }
 			/>
@@ -361,7 +359,6 @@ function BlockListBlock( {
 			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
 			isFocused={ isFocused }
-			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }

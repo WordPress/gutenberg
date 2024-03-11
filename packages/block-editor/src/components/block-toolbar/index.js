@@ -35,7 +35,9 @@ import { store as blockEditorStore } from '../../store';
 import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import Shuffle from './shuffle';
+import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
+import { canBindBlock } from '../../hooks/use-bindings-attributes';
 /**
  * Renders the block toolbar.
  *
@@ -60,8 +62,11 @@ export function PrivateBlockToolbar( {
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
+		blockName,
+		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
+		isUsingBindings,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -71,6 +76,7 @@ export function PrivateBlockToolbar( {
 			isBlockValid,
 			getBlockRootClientId,
 			getBlockEditingMode,
+			getBlockAttributes,
 		} = select( blockEditorStore );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
@@ -81,22 +87,24 @@ export function PrivateBlockToolbar( {
 		const parentBlockType = getBlockType( parentBlockName );
 		const _isDefaultEditingMode =
 			getBlockEditingMode( selectedBlockClientId ) === 'default';
+		const _blockName = getBlockName( selectedBlockClientId );
 		const isValid = selectedBlockClientIds.every( ( id ) =>
 			isBlockValid( id )
 		);
 		const isVisual = selectedBlockClientIds.every(
 			( id ) => getBlockMode( id ) === 'visual'
 		);
+		const _isUsingBindings = !! getBlockAttributes( selectedBlockClientId )
+			?.metadata?.bindings;
 		return {
 			blockClientId: selectedBlockClientId,
 			blockClientIds: selectedBlockClientIds,
 			isDefaultEditingMode: _isDefaultEditingMode,
-			blockType:
-				selectedBlockClientId &&
-				getBlockType( getBlockName( selectedBlockClientId ) ),
-
+			blockName: _blockName,
+			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
+			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
 				parentBlockType &&
 				getBlockEditingMode( firstParentClientId ) === 'default' &&
@@ -107,6 +115,7 @@ export function PrivateBlockToolbar( {
 				) &&
 				selectedBlockClientIds.length === 1 &&
 				_isDefaultEditingMode,
+			isUsingBindings: _isUsingBindings,
 		};
 	}, [] );
 
@@ -152,12 +161,15 @@ export function PrivateBlockToolbar( {
 			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-			key={ blockClientId }
+			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
 					isLargeViewport &&
 					isDefaultEditingMode && <BlockParentSelector /> }
+				{ isUsingBindings && canBindBlock( blockName ) && (
+					<BlockBindingsIndicator />
+				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
 					isDefaultEditingMode && (
 						<div

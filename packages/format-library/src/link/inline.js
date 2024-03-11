@@ -264,7 +264,7 @@ function InlineLinkUI( {
 				createSuggestionButtonText={ createButtonText }
 				hasTextControl
 				settings={ LINK_SETTINGS }
-				showInitialSuggestions={ true }
+				showInitialSuggestions
 				suggestionsQuery={ {
 					// always show Pages as initial suggestions
 					initialSuggestionsSearchOptions: {
