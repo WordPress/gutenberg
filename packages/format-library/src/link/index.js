@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -38,9 +38,38 @@ function Edit( {
 	onFocus,
 	contentRef,
 } ) {
-	const [ addingLink, setAddingLink ] = useState( false );
+	const [ editingLink, setEditingLink ] = useState( false );
+	const [ creatingLink, setCreatingLink ] = useState( false );
+
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
+
+	// Manages whether the Link UI popover should autofocus when shown.
+	const [ shouldAutoFocus, setShouldAutoFocus ] = useState( true );
+
+	function setIsEditingLink( isEditing, { autoFocus = true } = {} ) {
+		setEditingLink( isEditing );
+		setShouldAutoFocus( autoFocus );
+	}
+
+	function setIsCreatingLink( isCreating ) {
+		// Don't add a new link if there is already an active link.
+		// The two states are mutually exclusive.
+		if ( isCreating === true && isActive ) {
+			return;
+		}
+		setCreatingLink( isCreating );
+	}
+
+	useEffect( () => {
+		// When the link becomes inactive (i.e. isActive is false), reset the editingLink state
+		// and the creatingLink state. This means that if the Link UI is displayed and the link
+		// becomes inactive (e.g. used arrow keys to move cursor outside of link bounds), the UI will close.
+		if ( ! isActive ) {
+			setEditingLink( false );
+			setCreatingLink( false );
+		}
+	}, [ isActive ] );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -52,14 +81,18 @@ function Edit( {
 			// There is a situation whereby there is an existing link in the rich text
 			// and the user clicks on the leftmost edge of that link and fails to activate
 			// the link format, but the click event still fires on the `<a>` element.
-			// This causes the `addingLink` state to be set to `true` and the link UI
+			// This causes the `editingLink` state to be set to `true` and the link UI
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
-			if ( event.target.tagName !== 'A' || ! isActive ) {
+			if (
+				! event.target.closest( '[contenteditable] a' ) || // other formats (e.g. bold) may be nested within the link.
+				! isActive
+			) {
+				setIsEditingLink( false );
 				return;
 			}
 
-			setAddingLink( true );
+			setIsEditingLink( true, { autoFocus: false } );
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -70,6 +103,7 @@ function Edit( {
 	}, [ contentRef, isActive ] );
 
 	function addLink( target ) {
+		setShouldAutoFocus( true );
 		const text = getTextContent( slice( value ) );
 
 		if ( ! isActive && text && isURL( text ) && isValidHref( text ) ) {
@@ -90,7 +124,11 @@ function Edit( {
 			if ( target ) {
 				setOpenedBy( target );
 			}
-			setAddingLink( true );
+			if ( ! isActive ) {
+				setIsCreatingLink( true );
+			} else {
+				setIsEditingLink( true );
+			}
 		}
 	}
 
@@ -109,7 +147,9 @@ function Edit( {
 		// Otherwise, we rely on the passed in onFocus to return focus to the rich text field.
 
 		// Close the popover
-		setAddingLink( false );
+		setIsEditingLink( false );
+		setIsCreatingLink( false );
+
 		// Return focus to the toolbar button or the rich text field
 		if ( openedBy?.tagName === 'BUTTON' ) {
 			openedBy.focus();
@@ -127,7 +167,8 @@ function Edit( {
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
 	function onFocusOutside() {
-		setAddingLink( false );
+		setIsEditingLink( false );
+		setIsCreatingLink( false );
 		setOpenedBy( null );
 	}
 
@@ -135,6 +176,8 @@ function Edit( {
 		onChange( removeFormat( value, name ) );
 		speak( __( 'Link removed.' ), 'assertive' );
 	}
+
+	const isEditingActiveLink = editingLink && isActive;
 
 	return (
 		<>
@@ -151,13 +194,13 @@ function Edit( {
 				onClick={ ( event ) => {
 					addLink( event.currentTarget );
 				} }
-				isActive={ isActive || addingLink }
+				isActive={ isActive || editingLink }
 				shortcutType="primary"
 				shortcutCharacter="k"
 				aria-haspopup="true"
-				aria-expanded={ addingLink }
+				aria-expanded={ editingLink }
 			/>
-			{ addingLink && (
+			{ ( isEditingActiveLink || creatingLink ) && (
 				<InlineLinkUI
 					stopAddingLink={ stopAddingLink }
 					onFocusOutside={ onFocusOutside }
@@ -166,6 +209,7 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					contentRef={ contentRef }
+					focusOnMount={ shouldAutoFocus ? 'firstElement' : false }
 				/>
 			) }
 		</>
