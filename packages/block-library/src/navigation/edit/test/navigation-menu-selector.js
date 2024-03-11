@@ -72,7 +72,7 @@ const classicMenusFixture = [
 
 describe( 'NavigationMenuSelector', () => {
 	describe( 'Toggle', () => {
-		it( 'should show dropdown toggle with loading message when menus have not resolved', async () => {
+		it( 'should show paragraph with loading message when menus have not resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
@@ -82,14 +82,10 @@ describe( 'NavigationMenuSelector', () => {
 
 			render( <NavigationMenuSelector /> );
 
-			expect(
-				screen.getByRole( 'button', {
-					name: /Loading/,
-				} )
-			).toBeInTheDocument();
+			expect( screen.getByText( /Loading/ ) ).toBeVisible();
 		} );
 
-		it( 'should show correct dropdown toggle prompt to choose a menu when navigation menus have resolved', async () => {
+		it( 'should show correct paragraph message to choose a menu when navigation menus have resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				hasResolvedNavigationMenus: true,
@@ -98,12 +94,9 @@ describe( 'NavigationMenuSelector', () => {
 			} );
 
 			render( <NavigationMenuSelector /> );
-
 			expect(
-				screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
-				} )
-			).toBeInTheDocument();
+				screen.getByText( 'Choose or create a Navigation menu' )
+			).toBeVisible();
 		} );
 	} );
 
@@ -126,12 +119,14 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect(
 				screen.getByRole( 'menu', {
-					name: /Loading/,
+					name: 'Actions',
 				} )
 			).toBeInTheDocument();
 
 			// Check that all the option groups are *not* present.
-			const menusGroup = screen.queryByRole( 'group', { name: 'Menus' } );
+			const menusGroup = screen.queryByRole( 'group', {
+				name: 'Available Menus',
+			} );
 			expect( menusGroup ).not.toBeInTheDocument();
 
 			const classicMenusGroup = screen.queryByRole( 'group', {
@@ -159,23 +154,22 @@ describe( 'NavigationMenuSelector', () => {
 				render( <NavigationMenuSelector /> );
 
 				const toggleButton = screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
+					name: 'Actions',
 				} );
+
+				expect(
+					screen.getByText( 'Choose or create a Navigation menu' )
+				).toBeVisible();
 
 				await user.click( toggleButton );
 
-				const menuPopover = screen.getByRole( 'menu' );
-
-				expect( menuPopover ).toHaveAttribute(
-					'aria-label',
-					expect.stringContaining(
-						'Choose or create a Navigation menu'
-					)
-				);
+				expect(
+					screen.getByText( 'Choose or create a Navigation menu' )
+				).toBeVisible();
 
 				// Check that all the option groups are *not* present.
 				const menusGroup = screen.queryByRole( 'group', {
-					name: 'Menus',
+					name: 'Available Menus',
 				} );
 				expect( menusGroup ).not.toBeInTheDocument();
 
@@ -318,7 +312,7 @@ describe( 'NavigationMenuSelector', () => {
 				await user.click( toggleButton );
 
 				const menusGroup = screen.queryByRole( 'group', {
-					name: 'Menus',
+					name: 'Available Menus',
 				} );
 				expect( menusGroup ).not.toBeInTheDocument();
 			} );
@@ -339,7 +333,7 @@ describe( 'NavigationMenuSelector', () => {
 				await user.click( toggleButton );
 
 				const menusGroup = screen.queryByRole( 'group', {
-					name: 'Menus',
+					name: 'Available Menus',
 				} );
 				expect( menusGroup ).toBeInTheDocument();
 
@@ -378,7 +372,7 @@ describe( 'NavigationMenuSelector', () => {
 				await user.click( toggleButton );
 
 				const menusGroup = screen.queryByRole( 'group', {
-					name: 'Menus',
+					name: 'Available Menus',
 				} );
 				expect( menusGroup ).toBeInTheDocument();
 
@@ -462,7 +456,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the dropdown is again open and is in the "loading" state.
 				expect(
 					screen.getByRole( 'menu', {
-						name: /Loading/,
+						name: 'Actions',
 					} )
 				).toBeInTheDocument();
 
@@ -478,13 +472,6 @@ describe( 'NavigationMenuSelector', () => {
 						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
 					/>
 				);
-
-				// Todo: fix bug where aria label is not updated.
-				// expect(
-				// 	screen.getByRole( 'menu', {
-				// 		name: `You are currently editing ${ navigationMenusFixture[ 0 ].title.rendered }`,
-				// 	} )
-				// ).toBeInTheDocument();
 
 				// Check all menu items are re-enabled.
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
@@ -603,7 +590,7 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the dropdown is open and is in the "loading" state.
 				expect(
 					screen.getByRole( 'menu', {
-						name: /Loading/,
+						name: 'Actions',
 					} )
 				).toBeInTheDocument();
 
@@ -619,13 +606,6 @@ describe( 'NavigationMenuSelector', () => {
 						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
 					/>
 				);
-
-				// Todo: fix bug where aria label is not updated.
-				// expect(
-				// 	screen.getByRole( 'menu', {
-				// 		name: `You are currently editing ${ classicMenusFixture[ 0 ].name }`,
-				// 	} )
-				// ).toBeInTheDocument();
 
 				// Check all menu items are re-enabled.
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {

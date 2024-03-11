@@ -6,6 +6,7 @@ import {
 	MenuItem,
 	MenuItemsChoice,
 	DropdownMenu,
+	FlexItem,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -97,16 +98,18 @@ function NavigationMenuSelector( {
 	const menuUnavailable =
 		hasResolvedNavigationMenus && currentMenuId === null;
 
-	let selectorLabel = '';
+	let currentMenuTitleOrMenuState = '';
 
-	if ( isCreatingMenu || isResolvingNavigationMenus ) {
-		selectorLabel = __( 'Loading…' );
+	if ( isResolvingNavigationMenus || ! hasResolvedNavigationMenus ) {
+		currentMenuTitleOrMenuState = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
-		selectorLabel = __( 'Choose or create a Navigation menu' );
+		currentMenuTitleOrMenuState = __(
+			'Choose or create a Navigation menu'
+		);
 	} else {
 		// Current Menu's title.
-		selectorLabel = currentTitle;
+		currentMenuTitleOrMenuState = currentTitle;
 	}
 
 	useEffect( () => {
@@ -128,69 +131,78 @@ function NavigationMenuSelector( {
 	] );
 
 	const NavigationMenuSelectorDropdown = (
-		<DropdownMenu
-			label={ selectorLabel }
-			icon={ moreVertical }
-			toggleProps={ { size: 'small' } }
-		>
-			{ ( { onClose } ) => (
-				<>
-					{ showNavigationMenus && hasNavigationMenus && (
-						<MenuGroup label={ __( 'Menus' ) }>
-							<MenuItemsChoice
-								value={ currentMenuId }
-								onSelect={ ( menuId ) => {
-									setIsCreatingMenu( true );
-									onSelectNavigationMenu( menuId );
-									onClose();
-								} }
-								choices={ menuChoices }
-								disabled={ isCreatingMenu }
-							/>
-						</MenuGroup>
-					) }
-					{ showClassicMenus && hasClassicMenus && (
-						<MenuGroup label={ __( 'Import Classic Menus' ) }>
-							{ classicMenus?.map( ( menu ) => {
-								const label = decodeEntities( menu.name );
-								return (
-									<MenuItem
-										onClick={ () => {
-											setIsCreatingMenu( true );
-											onSelectClassicMenu( menu );
-											onClose();
-										} }
-										key={ menu.id }
-										aria-label={ sprintf(
-											createActionLabel,
-											label
-										) }
-										disabled={ isCreatingMenu }
-									>
-										{ label }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-
-					{ canUserCreateNavigationMenu && (
-						<MenuGroup label={ __( 'Tools' ) }>
-							<MenuItem
-								disabled={ isCreatingMenu }
-								onClick={ () => {
-									onClose();
-									onCreateNew();
-									setIsCreatingMenu( true );
-								} }
-							>
-								{ __( 'Create new menu' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</>
-			) }
-		</DropdownMenu>
+		<>
+			<DropdownMenu
+				label={ __( 'Actions' ) }
+				icon={ moreVertical }
+				toggleProps={ { size: 'small' } }
+			>
+				{ ( { onClose } ) => (
+					<>
+						{ showNavigationMenus && hasNavigationMenus && (
+							<MenuGroup label={ __( 'Available Menus' ) }>
+								<MenuItemsChoice
+									value={ currentMenuId }
+									onSelect={ ( menuId ) => {
+										setIsCreatingMenu( true );
+										onSelectNavigationMenu( menuId );
+										onClose();
+									} }
+									choices={ menuChoices }
+									disabled={ isCreatingMenu }
+								/>
+							</MenuGroup>
+						) }
+						{ showClassicMenus && hasClassicMenus && (
+							<MenuGroup label={ __( 'Import Classic Menus' ) }>
+								{ classicMenus?.map( ( menu ) => {
+									const label = decodeEntities( menu.name );
+									return (
+										<MenuItem
+											onClick={ () => {
+												setIsCreatingMenu( true );
+												onSelectClassicMenu( menu );
+												onClose();
+											} }
+											key={ menu.id }
+											aria-label={ sprintf(
+												createActionLabel,
+												label
+											) }
+											disabled={ isCreatingMenu }
+										>
+											{ label }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+						{ canUserCreateNavigationMenu && (
+							<MenuGroup label={ __( 'Tools' ) }>
+								<MenuItem
+									disabled={ isCreatingMenu }
+									onClick={ () => {
+										onClose();
+										onCreateNew();
+										setIsCreatingMenu( true );
+									} }
+								>
+									{ __( 'Create new menu' ) }
+								</MenuItem>
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
+			<FlexItem
+				style={ {
+					minWidth: '100%',
+				} }
+				as="p"
+			>
+				{ currentMenuTitleOrMenuState }
+			</FlexItem>
+		</>
 	);
 
 	return NavigationMenuSelectorDropdown;
