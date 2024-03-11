@@ -903,16 +903,19 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.5.0
 	 *
 	 * @param  string $block_content Rendered block content.
-	 * @param  array  $block         Block object.
 	 * @return string                Filtered block content.
 	 */
-	public static function restore_image_outer_container( $block_content, $block ) {
+	public static function restore_image_outer_container( $block_content ) {
 		if ( wp_theme_has_theme_json() ) {
 			return $block_content;
 		}
 
 		$tags = new WP_HTML_Tag_Processor( $block_content );
-		if ( ! $tags->next_tag( array( 'tag_name' => 'div', 'class_name' => 'wp-block-image' ) ) ) {
+		$wrapper_query=  array(
+			'tag_name'   => 'div',
+			'class_name' => 'wp-block-image'
+		);
+		if ( ! $tags->next_tag( $wrapper_query ) ) {
 			return $block_content;
 		}
 
