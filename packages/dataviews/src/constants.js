@@ -20,32 +20,32 @@ import ViewList from './view-list';
 export const ENUMERATION_TYPE = 'enumeration';
 
 // Filter operators.
-export const OPERATOR_IN = 'in';
-export const OPERATOR_NOT_IN = 'notIn';
-export const OPERATOR_EQUAL = 'equal';
-export const OPERATOR_NOT_EQUAL = 'notEqual';
+export const OPERATOR_IS = 'is';
+export const OPERATOR_IS_NOT = 'isNot';
+export const OPERATOR_IS_ANY = 'isAny';
+export const OPERATOR_IS_NONE = 'isNone';
 export const ALL_OPERATORS = [
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-	OPERATOR_EQUAL,
-	OPERATOR_NOT_EQUAL,
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 ];
 export const OPERATORS = {
-	[ OPERATOR_IN ]: {
-		key: 'in-filter',
-		label: __( 'In' ),
-	},
-	[ OPERATOR_NOT_IN ]: {
-		key: 'not-in-filter',
-		label: __( 'Not in' ),
-	},
-	[ OPERATOR_EQUAL ]: {
-		key: 'equal-filter',
+	[ OPERATOR_IS ]: {
+		key: 'is-filter',
 		label: __( 'Is' ),
 	},
-	[ OPERATOR_NOT_EQUAL ]: {
-		key: 'not-equal-filter',
+	[ OPERATOR_IS_NOT ]: {
+		key: 'is-not-filter',
 		label: __( 'Is not' ),
+	},
+	[ OPERATOR_IS_ANY ]: {
+		key: 'is-any-filter',
+		label: __( 'Is any' ),
+	},
+	[ OPERATOR_IS_NONE ]: {
+		key: 'is-none-filter',
+		label: __( 'Is none' ),
 	},
 };
 

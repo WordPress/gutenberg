@@ -26,10 +26,10 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
 import SearchWidget from './search-widget';
 import {
 	OPERATORS,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
-	OPERATOR_EQUAL,
-	OPERATOR_NOT_EQUAL,
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 } from './constants';
 
 const FilterText = ( { activeElements, filterInView, filter } ) => {
@@ -42,11 +42,11 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		Value: <span className="dataviews-filter-summary__filter-text-value" />,
 	};
 
-	if ( filterInView?.operator === OPERATOR_IN ) {
+	if ( filterInView?.operator === OPERATOR_IS_ANY ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author in Admin, Editor". */
-				__( '<Name>%1$s in </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is any: Admin, Editor". */
+				__( '<Name>%1$s is any: </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -54,11 +54,11 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		);
 	}
 
-	if ( filterInView?.operator === OPERATOR_NOT_IN ) {
+	if ( filterInView?.operator === OPERATOR_IS_NONE ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author not in Admin, Editor". */
-				__( '<Name>%1$s not in </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is none: Admin, Editor". */
+				__( '<Name>%1$s is none: </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -66,11 +66,11 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		);
 	}
 
-	if ( filterInView?.operator === OPERATOR_EQUAL ) {
+	if ( filterInView?.operator === OPERATOR_IS ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is Admin". */
-				__( '<Name>%1$s is </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is: Admin". */
+				__( '<Name>%1$s is: </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements[ 0 ].label
 			),
@@ -78,11 +78,11 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 		);
 	}
 
-	if ( filterInView?.operator === OPERATOR_NOT_EQUAL ) {
+	if ( filterInView?.operator === OPERATOR_IS_NOT ) {
 		return createInterpolateElement(
 			sprintf(
-				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not Admin". */
-				__( '<Name>%1$s is not </Name><Value>%2$s</Value>' ),
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not: Admin". */
+				__( '<Name>%1$s is not: </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements[ 0 ].label
 			),

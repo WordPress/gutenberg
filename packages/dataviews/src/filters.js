@@ -13,8 +13,8 @@ import { sanitizeOperators } from './utils';
 import {
 	ENUMERATION_TYPE,
 	ALL_OPERATORS,
-	OPERATOR_EQUAL,
-	OPERATOR_NOT_EQUAL,
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
 } from './constants';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 
@@ -49,7 +49,7 @@ const Filters = memo( function Filters( {
 					name: field.header,
 					elements: field.elements,
 					singleSelection: operators.some( ( op ) =>
-						[ OPERATOR_EQUAL, OPERATOR_NOT_EQUAL ].includes( op )
+						[ OPERATOR_IS, OPERATOR_IS_NOT ].includes( op )
 					),
 					operators,
 					isVisible:
