@@ -154,6 +154,7 @@ function UploadFonts() {
 			setNotice( {
 				type: 'error',
 				message: error.message,
+				errors: error?.installationErrors,
 			} );
 		}
 
@@ -171,6 +172,13 @@ function UploadFonts() {
 						onRemove={ () => setNotice( null ) }
 					>
 						{ notice.message }
+						{ notice.errors && (
+							<ul>
+								{ notice.errors.map( ( error, index ) => (
+									<li key={ index }>{ error }</li>
+								) ) }
+							</ul>
+						) }
 					</Notice>
 				) }
 				{ isUploading && (

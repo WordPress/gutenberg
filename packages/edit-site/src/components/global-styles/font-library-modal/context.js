@@ -9,7 +9,7 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -306,29 +306,14 @@ function FontLibraryProvider( { children } ) {
 				refreshLibrary();
 			}
 
-			if ( installationErrors.length === 1 ) {
-				throw new Error(
-					sprintf(
-						/* translators: %s: Specific error message returned from server. */
-						__( 'There was an error installing fonts. %s' ),
-						installationErrors[ 0 ]
-					)
+			if ( installationErrors.length > 0 ) {
+				const installError = new Error(
+					__( 'There was an error installing fonts.' )
 				);
-			} else if ( installationErrors.length > 1 ) {
-				throw new Error(
-					sprintf(
-						/* translators: %s: Specific error messages returned from server. */
-						__( 'There were some errors installing fonts. %s' ),
-						'<ul>' +
-							installationErrors.reduce(
-								( errorMessageCollection, errorMessage ) => {
-									return `${ errorMessageCollection }<li>${ errorMessage }</li>`;
-								},
-								''
-							) +
-							'</ul>'
-					)
-				);
+
+				installError.installationErrors = installationErrors;
+
+				throw installError;
 			}
 		} finally {
 			setIsInstalling( false );
