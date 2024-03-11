@@ -907,23 +907,29 @@ class WP_Duotone_Gutenberg {
 	 * @return string                Filtered block content.
 	 */
 	public static function restore_image_outer_container( $block_content, $block ) {
-		$tags = new WP_HTML_Tag_Processor( $block_content );
-		if ( $tags->next_tag( array( 'tag_name' => 'div', 'class_name' => 'wp-block-image' ) ) ) {
-			$tags->set_bookmark( 'wrapper-div' );
-			$tags->next_tag();
-			$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
-			foreach ( $inner_classnames as $classname ) {
-				if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
-					$tags->remove_class( $classname );
-					$tags->seek( 'wrapper-div' );
-					$tags->add_class( $classname );
-					break;
-				}
-			}
-			return $tags->get_updated_html();
+		if ( wp_theme_has_theme_json() ) {
+			return $block_content;
 		}
 
-		return $block_content;
+		$tags = new WP_HTML_Tag_Processor( $block_content );
+		if ( ! $tags->next_tag( array( 'tag_name' => 'div', 'class_name' => 'wp-block-image' ) ) ) {
+			return $block_content;
+		}
+
+		$tags->set_bookmark( 'wrapper-div' );
+		$tags->next_tag();
+
+		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
+		foreach ( $inner_classnames as $classname ) {
+			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+				$tags->remove_class( $classname );
+				$tags->seek( 'wrapper-div' );
+				$tags->add_class( $classname );
+				break;
+			}
+		}
+
+		return $tags->get_updated_html();
 	}
 
 	/**
