@@ -81,9 +81,7 @@ function UploadFonts() {
 			loadFiles( allowedFiles );
 		} else {
 			const message = hasInvalidFiles
-				? __(
-						'Sorry, you are not allowed to upload this file type.'
-				  )
+				? __( 'Sorry, you are not allowed to upload this file type.' )
 				: __( 'No fonts found to install.' );
 
 			setNotice( {
