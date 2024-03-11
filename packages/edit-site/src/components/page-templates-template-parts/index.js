@@ -40,8 +40,8 @@ import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -378,7 +378,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			view.filters.forEach( ( filter ) => {
 				if (
 					filter.field === 'author' &&
-					filter.operator === OPERATOR_IN &&
+					filter.operator === OPERATOR_IS_ANY &&
 					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
@@ -386,7 +386,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					} );
 				} else if (
 					filter.field === 'author' &&
-					filter.operator === OPERATOR_NOT_IN &&
+					filter.operator === OPERATOR_IS_NONE &&
 					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
