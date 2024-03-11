@@ -108,7 +108,7 @@ function Edit( {
 			if ( target ) {
 				setOpenedBy( {
 					el: target,
-					action: null,
+					action: null, // We don't need to distinguish between click or keyboard here
 				} );
 			}
 			setAddingLink( true );
