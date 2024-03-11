@@ -12,19 +12,20 @@ import {
 	AlignmentControl,
 	useBlockProps,
 	BlockControls,
-	InspectorControls,
+	HeadingLevelDropdown,
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { SelectControl } from '@wordpress/components';
+
+const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
 
 export default function SiteTaglineEdit( {
 	attributes,
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { textAlign, tagName: TagName } = attributes;
+	const { textAlign, level } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
@@ -40,6 +41,7 @@ export default function SiteTaglineEdit( {
 		};
 	}, [] );
 
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	function setTagline( newTagline ) {
@@ -75,25 +77,14 @@ export default function SiteTaglineEdit( {
 	);
 	return (
 		<>
-			<InspectorControls group="advanced">
-				<SelectControl
-					label={ __( 'HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<p>)' ), value: 'p' },
-						{ label: '<h1>', value: 'h1' },
-						{ label: '<h2>', value: 'h2' },
-						{ label: '<h3>', value: 'h3' },
-						{ label: '<h4>', value: 'h4' },
-						{ label: '<h5>', value: 'h5' },
-						{ label: '<h6>', value: 'h6' },
-					] }
-					value={ TagName }
-					onChange={ ( newTagName ) =>
-						setAttributes( { tagName: newTagName } )
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					options={ HEADING_LEVELS }
+					value={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
 					}
 				/>
-			</InspectorControls>
-			<BlockControls group="block">
 				<AlignmentControl
 					onChange={ ( newAlign ) =>
 						setAttributes( { textAlign: newAlign } )

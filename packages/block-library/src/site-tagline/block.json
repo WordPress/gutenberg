@@ -11,9 +11,9 @@
 		"textAlign": {
 			"type": "string"
 		},
-		"tagName": {
-			"type": "string",
-			"default": "p"
+		"level": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"example": {},

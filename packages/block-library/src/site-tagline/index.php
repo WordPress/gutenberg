@@ -17,9 +17,14 @@ function render_block_core_site_tagline( $attributes ) {
 	if ( ! $site_tagline ) {
 		return;
 	}
-	$tag_name           = empty( $attributes['tagName'] ) ? 'p' : $attributes['tagName'];
+
+	$tag_name           = 'p';
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
+	if ( isset( $attributes['level'] ) ) {
+		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
+	}
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
