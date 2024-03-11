@@ -122,8 +122,12 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 }
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
+
+// Not to be included in WordPress 6.5.
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
+}
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

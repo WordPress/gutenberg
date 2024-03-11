@@ -2,12 +2,16 @@
  * WordPress dependencies
  */
 import { usePrevious } from '@wordpress/compose';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
+
+import { unlock } from '../lock-unlock';
 
 function removeBindings( bindings, syncedAttributes ) {
 	let updatedBindings = {};
@@ -42,6 +46,13 @@ export default function useSetPatternBindings(
 	{ name, attributes, setAttributes },
 	currentPostType
 ) {
+	const hasPatternOverridesSource = useSelect( ( select ) => {
+		const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+
+		// For editing link to the site editor if the theme and user permissions support it.
+		return !! getBlockBindingsSource( 'core/pattern-overrides' );
+	}, [] );
+
 	const metadataName = attributes?.metadata?.name ?? '';
 	const prevMetadataName = usePrevious( metadataName ) ?? '';
 	const bindings = attributes?.metadata?.bindings;
@@ -49,7 +60,9 @@ export default function useSetPatternBindings(
 	useEffect( () => {
 		// Bindings should only be created when editing a wp_block post type,
 		// and also when there's a change to the user-given name for the block.
+		// Also check that the pattern overrides source is registered.
 		if (
+			! hasPatternOverridesSource ||
 			currentPostType !== 'wp_block' ||
 			metadataName === prevMetadataName
 		) {
@@ -95,6 +108,7 @@ export default function useSetPatternBindings(
 			} );
 		}
 	}, [
+		hasPatternOverridesSource,
 		bindings,
 		prevMetadataName,
 		metadataName,
