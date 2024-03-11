@@ -220,7 +220,6 @@ function InlineLinkUI( {
 		settings: {
 			...settings,
 			isActive,
-			__unstableActiveAttributes: activeAttributes,
 		},
 	} );
 

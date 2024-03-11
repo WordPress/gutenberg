@@ -7,8 +7,6 @@ import { useState, useLayoutEffect } from '@wordpress/element';
 /** @typedef {import('../register-format-type').WPFormat} WPFormat */
 /** @typedef {import('../types').RichTextValue} RichTextValue */
 
-const STABLE_OBJECT = {};
-
 /**
  * Given a range and a format tag name and class name, returns the closest
  * format element.
@@ -140,12 +138,7 @@ function getAnchor( editableContentElement, tagName, className ) {
  * @return {Element|VirtualAnchorElement|undefined|null} The active element or selection range.
  */
 export function useAnchor( { editableContentElement, settings = {} } ) {
-	const {
-		tagName,
-		className,
-		isActive,
-		__unstableActiveAttributes: activeAttributes = STABLE_OBJECT,
-	} = settings;
+	const { tagName, className, isActive } = settings;
 	const [ anchor, setAnchor ] = useState( () =>
 		getAnchor( editableContentElement, tagName, className )
 	);
@@ -153,6 +146,20 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 
 	useLayoutEffect( () => {
 		if ( ! editableContentElement ) return;
+
+		function callback() {
+			setAnchor(
+				getAnchor( editableContentElement, tagName, className )
+			);
+		}
+
+		function attach() {
+			ownerDocument.addEventListener( 'selectionchange', callback );
+		}
+
+		function detach() {
+			ownerDocument.removeEventListener( 'selectionchange', callback );
+		}
 
 		const { ownerDocument } = editableContentElement;
 
@@ -168,20 +175,19 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			setAnchor(
 				getAnchor( editableContentElement, tagName, className )
 			);
+			attach();
 		}
-	}, [
-		editableContentElement,
-		tagName,
-		className,
-		isActive,
-		wasActive,
-		// Active attributes is defaulted to a stable object to avoid re-rendering,
-		// but in specific circumstances it can be used to provide additional information
-		// about the currently active format to disambiguate the format from other instances of the same format
-		// within the same editable content element. This is useful for `core/link` when you
-		// want to disambiguate between different links when clicking between them.
-		activeAttributes,
-	] );
+
+		editableContentElement.addEventListener( 'focusin', attach );
+		editableContentElement.addEventListener( 'focusout', detach );
+
+		return () => {
+			detach();
+
+			editableContentElement.removeEventListener( 'focusin', attach );
+			editableContentElement.removeEventListener( 'focusout', detach );
+		};
+	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
 
 	return anchor;
 }
