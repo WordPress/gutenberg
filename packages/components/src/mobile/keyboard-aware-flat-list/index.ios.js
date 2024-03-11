@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { ScrollView, FlatList } from 'react-native';
+import { FlatList } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 /**
@@ -24,7 +24,12 @@ import useTextInputOffset from './use-text-input-offset';
 import useTextInputCaretPosition from './use-text-input-caret-position';
 
 const DEFAULT_FONT_SIZE = 16;
-const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
+const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
+const OPTIMIZATION_PROPS = {
+	removeClippedSubviews: true,
+	windowSize: 11,
+};
+const OPTIMIZATION_ITEMS_THRESHOLD = 30;
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /**
@@ -105,7 +110,14 @@ export const KeyboardAwareFlatList = (
 	// extra padding at the bottom.
 	const contentInset = { bottom: keyboardOffset };
 
-	const style = [ { flex: 1 }, scrollViewStyle ];
+	const style = [ { flexGrow: 1 }, scrollViewStyle ];
+
+	const getFlatListRef = useCallback(
+		( flatListRef ) => {
+			scrollViewRef.current = flatListRef?.getNativeScrollRef();
+		},
+		[ scrollViewRef ]
+	);
 
 	useImperativeHandle( ref, () => {
 		return {
@@ -116,20 +128,24 @@ export const KeyboardAwareFlatList = (
 		};
 	} );
 
+	const optimizationProps =
+		props.data?.length > OPTIMIZATION_ITEMS_THRESHOLD
+			? OPTIMIZATION_PROPS
+			: {};
+
 	return (
-		<AnimatedScrollView
+		<AnimatedFlatList
+			ref={ getFlatListRef }
 			automaticallyAdjustContentInsets={ false }
 			contentInset={ contentInset }
 			keyboardShouldPersistTaps="handled"
 			onContentSizeChange={ onContentSizeChange }
 			onScroll={ scrollHandler }
-			ref={ scrollViewRef }
-			scrollEnabled={ scrollEnabled }
 			scrollEventThrottle={ 16 }
 			style={ style }
-		>
-			<FlatList { ...props } scrollEnabled={ false } />
-		</AnimatedScrollView>
+			{ ...optimizationProps }
+			{ ...props }
+		/>
 	);
 };
 

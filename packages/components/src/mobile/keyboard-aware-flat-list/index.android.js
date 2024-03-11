@@ -41,8 +41,6 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 
 	const getFlatListRef = useCallback(
 		( flatListRef ) => {
-			// On Android, we get the ref of the associated scroll
-			// view to the FlatList.
 			scrollViewRef.current = flatListRef?.getNativeScrollRef();
 		},
 		[ scrollViewRef ]
