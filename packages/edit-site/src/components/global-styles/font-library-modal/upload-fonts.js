@@ -82,9 +82,9 @@ function UploadFonts() {
 		} else {
 			const message = hasInvalidFiles
 				? __(
-						'One or more of the selected files are not valid fonts. Please try again.'
+						'Sorry, you are not allowed to upload this file type.'
 				  )
-				: __( 'No valid fonts found to install.' );
+				: __( 'No fonts found to install.' );
 
 			setNotice( {
 				type: 'error',
