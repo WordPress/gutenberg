@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'store-view' );
 ?>
 
 <div data-wp-interactive="test/store">
