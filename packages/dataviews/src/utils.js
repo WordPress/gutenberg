@@ -1,7 +1,18 @@
 /**
+ * WordPress dependencies
+ */
+import { Children, Fragment } from '@wordpress/element';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { OPERATORS } from './constants';
+import { unlock } from './lock-unlock';
+
+const { DropdownMenuSeparatorV2: DropdownMenuSeparator } = unlock(
+	componentsPrivateApis
+);
 
 /**
  * Helper util to sort data by text fields, when sorting is done client side.
@@ -64,3 +75,14 @@ export const sanitizeOperators = ( field ) => {
 		Object.keys( OPERATORS ).includes( operator )
 	);
 };
+
+export function WithDropDownMenuSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
