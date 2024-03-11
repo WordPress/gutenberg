@@ -1,16 +1,12 @@
 # Interactivity API
 
-> **Note**
-> This package enables the API shared at [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project), participation is encouraged in testing this API providing feedback at the [discussions in GitHub](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api).
+The Interactivity API, [introduced in WordPress 6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), provides a standard way for developers to add interactions to the front end of their blocks. The API is also used in many Core WordPress blocks, including Search, Query, Navigation, and File. 
 
-The Interactivity API is available at WordPress Core from version 6.5: [Merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/)
+This standard makes it easier for developers to create rich, interactive user experiences, from simple counters or pop-ups to more complex features like instant page navigation, instant search, shopping carts, or checkouts.
 
-These Core blocks are already powered by the API:
+Blocks can share data, actions, and callbacks between them. This makes communication between blocks simpler and less error-prone. For example, clicking on an “add to cart” block can seamlessly update a separate “cart” block.
 
-- Search
-- Query
-- Navigation
-- File
+For more information about the genesis of the Interactivity API, check out the original proposal. You can also review the [merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), the [status update post](https://make.wordpress.org/core/2023/08/15/status-update-on-the-interactivity-api/), and the official [Trac ticket](https://core.trac.wordpress.org/ticket/60356).
 
 ## Installation
 
@@ -29,23 +25,9 @@ npm install @wordpress/interactivity --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for such language features and APIs, you should include [the polyfill shipped in `@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default#polyfill) in your code._
 
-## Quick Start Guide
+## Quick start guide
 
-### Table of Contents
-
-- [Quick Start Guide](#quick-start-guide)
-    - [1. Scaffold an interactive block](#1-scaffold-an-interactive-block)
-    - [2. Generate the build](#2-generate-the-build)
-    - [3. Use it in your WordPress installation ](#3-use-it-in-your-wordpress-installation)
-- [Requirements of the Interactivity API](#requirements-of-the-interactivity-aPI)
-    - [A local WordPress installation](#a-local-wordpress-installation)
-    - [Latest vesion of Gutenberg](#latest-vesion-of-gutenberg)
-    - [Node.js](#nodejs)
-    - [Code requirements](#code-requirements)
-        - [Add `interactivity` support to `block.json`](#add-interactivity-support-to-blockjson)
-        - [Add `wp-interactive` directive to a DOM element](#add-wp-interactive-directive-to-a-dom-element)
-
-#### 1. Scaffold an interactive block
+### Scaffold an interactive block
 
 A WordPress plugin that registers an interactive block (using the Interactivity API) by using a [template](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) can be scaffolded with the `@wordpress/create-block` command.
 
@@ -53,7 +35,7 @@ A WordPress plugin that registers an interactive block (using the Interactivity 
 npx @wordpress/create-block@latest my-first-interactive-block --template @wordpress/create-block-interactive-template
 ```
 
-#### 2. Generate the build
+### Generate the build
 
 When the plugin folder is generated, the build process needs to be launched to get a working version of the interactive block that can be used in WordPress.
 
@@ -61,7 +43,7 @@ When the plugin folder is generated, the build process needs to be launched to g
 cd my-first-interactive-block && npm start
 ```
 
-#### 3. Use it in your WordPress installation
+### Use it in your WordPress installation
 
 If you have a local WordPress installation already running, you can launch the commands above inside the `plugins` folder of that installation. If not, you can use [`wp-now`](https://github.com/WordPress/playground-tools/tree/trunk/packages/wp-now) to launch a WordPress site with the plugin installed by executing from the generated folder (and from a different terminal window or tab) the following command
 
@@ -71,11 +53,11 @@ npx @wp-now/wp-now start
 
 At this point you should be able to insert the "My First Interactive Block" block into any post, and see how it behaves in the frontend when published.
 
-### Requirements of the Interactivity API
+## Requirements of the Interactivity API
 
 To start working with the Interactivity API you'll need to have a [proper WordPress development environment for blocks](https://developer.wordpress.org/block-editor/getting-started/devenv/) and some specific code in your block, which should include:
 
-#### A local 6.5 WordPress installation
+### A local 6.5 WordPress installation
 
 You can use [the tools to set your local WordPress environment](https://developer.wordpress.org/block-editor/getting-started/devenv/#wordpress-development-site) you feel more comfortable with.
 
@@ -83,13 +65,13 @@ To get quickly started, [`wp-now`](https://www.npmjs.com/package/@wp-now/wp-now)
 
 Interactivity API is included in Core in WordPress 6.5, for versions below, you'll need to have Gutenberg 17.5 or higher version installed and activated in your WordPress installation.
 
-#### Node.js
+### Node.js
 
 Block development requires [Node](https://nodejs.org/en), so you'll need to have Node installed and running on your machine. Any version modern should work, but please check the minimum version requirements if you run into any issues with any of the Node.js tools used in WordPress development.
 
-#### Code requirements
+### Code requirements
 
-##### Add `interactivity` support to `block.json`
+#### Add `interactivity` support to `block.json`
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json`
 
@@ -99,7 +81,7 @@ To indicate that the block [supports](https://developer.wordpress.org/block-edit
 },
 ```
 
-##### Add `wp-interactive` directive to a DOM element
+#### Add `wp-interactive` directive to a DOM element
 
 To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive` directive](./docs/api-reference.md#wp-interactive) to it from `render.php` or `save.js`
 
@@ -118,7 +100,7 @@ To take a deep dive in how the API works internally, the list of Directives, and
 
 Here you have some more resources to learn/read more about the Interactivity API:
 
-- **[Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882)**
+- [Interactivity API Discussions](https://github.com/WordPress/gutenberg/discussions/52882)
 - [Merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/)
 - [Proposal: The Interactivity API – A better developer experience in building interactive blocks](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/)
 - Developer Hours sessions ([Americas](https://www.youtube.com/watch?v=RXNoyP2ZiS8&t=664s) & [APAC/EMEA](https://www.youtube.com/watch?v=6ghbrhyAcvA))
@@ -127,9 +109,9 @@ Here you have some more resources to learn/read more about the Interactivity API
 There's a Tracking Issue opened to ease the coordination of the work related to the Interactivity API Docs: **[Documentation for the Interactivity API - Tracking Issue #53296](https://github.com/WordPress/gutenberg/issues/53296)**
 
 
-## Get Involved
+## Get involved
 
-As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) participation is encouraged in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best place to engage.
+As part of an [Open Source project](https://developer.wordpress.org/block-editor/getting-started/faq/#the-gutenberg-project) participation is encouraged in helping shape this API and its Docs. The [discussions](https://github.com/WordPress/gutenberg/discussions/categories/interactivity-api) and [issues](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Interactivity%20API) in GitHub are the best places to engage.
 
 If you are willing to help with the documentation, please add a comment to [#51928](https://github.com/WordPress/gutenberg/discussions/51928) to coordinate everyone's efforts.
 
