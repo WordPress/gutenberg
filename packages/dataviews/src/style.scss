@@ -137,14 +137,14 @@
 			}
 		}
 
-		.dataviews-view-table__actions .components-button:not(.dataviews-view-table__all-actions-button) {
+		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 			opacity: 0;
 		}
 
 		&:focus-within,
 		&.is-hovered {
 			.components-checkbox-control__input,
-			.dataviews-view-table__actions .components-button:not(.dataviews-view-table__all-actions-button) {
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
 		}

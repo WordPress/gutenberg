@@ -15,13 +15,13 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import { WithDropDownMenuSeparators } from './utils';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
@@ -137,7 +137,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		<HStack
 			spacing={ 1 }
 			justify="flex-end"
-			className="dataviews-view-table__actions"
+			className="dataviews-item-actions"
 			style={ {
 				flexShrink: '0',
 				width: 'auto',
@@ -163,28 +163,11 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						/>
 					);
 				} ) }
-			<DropdownMenu
-				trigger={
-					<Button
-						size="compact"
-						icon={ moreVertical }
-						label={ __( 'Actions' ) }
-						disabled={ ! secondaryActions.length }
-						className="dataviews-view-table__all-actions-button"
-					/>
-				}
-				placement="bottom-end"
-			>
-				<ActionsDropdownMenuGroup
-					actions={ primaryActions }
-					item={ item }
-				/>
-				<DropdownMenuSeparator />
-				<ActionsDropdownMenuGroup
-					actions={ secondaryActions }
-					item={ item }
-				/>
-			</DropdownMenu>
+			<CompactItemActions
+				item={ item }
+				primaryActions={ primaryActions }
+				secondaryActions={ secondaryActions }
+			/>
 		</HStack>
 	);
 }
@@ -200,22 +183,25 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					disabled={
 						! primaryActions.length && ! secondaryActions.length
 					}
+					className="dataviews-all-actions-button"
 				/>
 			}
 			placement="bottom-end"
 		>
-			{ !! primaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ primaryActions }
-					item={ item }
-				/>
-			) }
-			{ !! secondaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ secondaryActions }
-					item={ item }
-				/>
-			) }
+			<WithDropDownMenuSeparators>
+				{ !! primaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ primaryActions }
+						item={ item }
+					/>
+				) }
+				{ !! secondaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ secondaryActions }
+						item={ item }
+					/>
+				) }
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 }
