@@ -7,6 +7,7 @@ import { ActivityIndicator, View } from 'react-native';
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon } from '@wordpress/components';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
@@ -137,6 +138,16 @@ const MediaUploadProgress = ( props ) => {
 		isUploadInProgress && ! isUploadPaused && ! isUploadFailed;
 	const { renderContent = () => null } = props;
 
+	const indicatorContainerStyle = usePreferredColorSchemeStyle(
+		styles.indicator__container,
+		styles[ 'indicator__container--dark' ]
+	);
+
+	const indicatorIconStyle = usePreferredColorSchemeStyle(
+		styles.indicator__icon,
+		styles[ 'indicator__icon--dark' ]
+	);
+
 	return (
 		<View
 			style={ [ styles.mediaUploadProgress, props.containerStyle ] }
@@ -144,19 +155,19 @@ const MediaUploadProgress = ( props ) => {
 			testID="progress-container"
 		>
 			{ isUploadPaused && (
-				<View style={ styles.indicatorContainer }>
+				<View style={ indicatorContainerStyle }>
 					<Icon
 						fill="#111"
 						size="20"
 						icon={ offlineIcon }
-						style={ styles.indicator }
+						style={ indicatorIconStyle }
 					/>
 				</View>
 			) }
 			{ showSpinner && (
-				<View style={ styles.indicatorContainer }>
+				<View style={ indicatorContainerStyle }>
 					<ActivityIndicator
-						style={ styles.indicator }
+						style={ indicatorIconStyle }
 						size={ 20 }
 						color="#111"
 					/>
