@@ -153,8 +153,8 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const createUntitledEmptyNavigationMenu = () => {
-		createNavigationMenu( '' );
+	const createUntitledEmptyNavigationMenu = async () => {
+		await createNavigationMenu( '' );
 	};
 
 	const {
