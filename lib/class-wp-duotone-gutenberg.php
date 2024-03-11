@@ -913,7 +913,7 @@ class WP_Duotone_Gutenberg {
 		$tags          = new WP_HTML_Tag_Processor( $block_content );
 		$wrapper_query = array(
 			'tag_name'   => 'div',
-			'class_name' => 'wp-block-image'
+			'class_name' => 'wp-block-image',
 		);
 		if ( ! $tags->next_tag( $wrapper_query ) ) {
 			return $block_content;
