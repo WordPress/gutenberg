@@ -202,7 +202,7 @@ function InstalledFonts() {
 							onClick={ () => {
 								handleSetLibraryFontSelected( null );
 							} }
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Heading
 							level={ 2 }
