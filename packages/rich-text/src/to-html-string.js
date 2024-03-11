@@ -21,7 +21,7 @@ import { toTree } from './to-tree';
  *
  * @param {Object}        $1                      Named argements.
  * @param {RichTextValue} $1.value                Rich text value.
- * @param {boolean}      [$1.preserveWhiteSpace] Preserves newlines if true.
+ * @param {boolean}       [$1.preserveWhiteSpace] Preserves newlines if true.
  *
  * @return {string} HTML string.
  */
