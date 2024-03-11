@@ -9,7 +9,7 @@
 ## 27.1.0 (2024-03-06)
 
 ### Bug Fix
-
+-   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
 -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
