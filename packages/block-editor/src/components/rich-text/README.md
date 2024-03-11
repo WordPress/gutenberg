@@ -74,6 +74,9 @@ _Optional._ A list of autocompleters to use instead of the default.
 _Optional._ Whether or not to preserve white space characters in the `value`. Normally tab, newline and space characters are collapsed to a single space or
 trimmed.
 
+*** `disableEditing`: Boolean`
+_Optional._ Whether or not the RichText instance should be disabled. If `true`, it will be read-only Default: `false`
+
 ## RichText.Content
 
 `RichText.Content` should be used in the `save` function of your block to correctly save rich text content.
