@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useLayoutEffect, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useLayoutEffect,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -43,6 +48,8 @@ function Edit( {
 	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
 	const [ openedBy, setOpenedBy ] = useState( null );
 
+	const clickTimeout = useRef( false );
+
 	useEffect( () => {
 		// When the link becomes inactive (i.e. isActive is false), reset the editingLink state
 		// and the creatingLink state. This means that if the Link UI is displayed and the link
@@ -51,6 +58,34 @@ function Edit( {
 			setAddingLink( false );
 		}
 	}, [ isActive ] );
+
+	/**
+	 * Runs when addingLink is set to false by the onFocusOutside handler via a click
+	 */
+	useEffect( () => {
+		if ( addingLink ) {
+			return;
+		}
+
+		resetClickTimeout();
+
+		// This timeout will be cleared and a new openedBy set if a new link is clicked
+		clickTimeout.current = setTimeout( () => {
+			setOpenedBy( null );
+			clickTimeout.current = undefined;
+		}, 100 );
+
+		return () => {
+			resetClickTimeout();
+		};
+	}, [ addingLink ] );
+
+	function resetClickTimeout() {
+		if ( clickTimeout.current ) {
+			clearTimeout( clickTimeout.current );
+			clickTimeout.current = undefined;
+		}
+	}
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -73,11 +108,19 @@ function Edit( {
 				return;
 			}
 
-			setAddingLink( true );
-			setOpenedBy( {
-				el: link,
-				action: 'click',
-			} );
+			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
+			if ( clickTimeout.current && event.target === openedBy?.el ) {
+				setOpenedBy( null );
+			} else {
+				setAddingLink( true );
+				setOpenedBy( {
+					el: link,
+					action: 'click',
+				} );
+			}
+
+			// Always reset at this point, as we no longer need the timeout since we've processed another click
+			resetClickTimeout();
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -176,7 +219,11 @@ function Edit( {
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					addLink( event.currentTarget );
+					// If we have a clickTimeout, then the link control is being
+					// closed by the onFocusOutside event, so we don't want to re-open it
+					if ( ! clickTimeout.current ) {
+						addLink( event.currentTarget );
+					}
 				} }
 				isActive={ isActive || addingLink }
 				shortcutType="primary"
