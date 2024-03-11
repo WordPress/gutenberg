@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import {
 	getTextContent,
 	applyFormat,
@@ -39,8 +39,8 @@ function Edit( {
 	contentRef,
 } ) {
 	const [ addingLink, setAddingLink ] = useState( false );
-	// We only need to store the button element that opened the popover. We can ignore the other states, as they will be handled by the onFocus prop to return to the rich text field.
-	const [ openedBy, setOpenedBy ] = useState( null );
+	const openedBy = useRef( null );
+	const toolbarButton = useRef( null );
 
 	useLayoutEffect( () => {
 		const editableContentElement = contentRef.current;
@@ -59,7 +59,14 @@ function Edit( {
 				return;
 			}
 
-			setAddingLink( true );
+			// If we have a current timeout running AND we've clicked the same link, we want to close the UI.
+			if ( addingLink ) {
+				setAddingLink( false );
+				openedBy.current = null;
+			} else {
+				setAddingLink( true );
+				openedBy.current = event.target;
+			}
 		}
 
 		editableContentElement.addEventListener( 'click', handleClick );
@@ -67,7 +74,7 @@ function Edit( {
 		return () => {
 			editableContentElement.removeEventListener( 'click', handleClick );
 		};
-	}, [ contentRef, isActive ] );
+	}, [ contentRef, isActive, addingLink ] );
 
 	function addLink( target ) {
 		const text = getTextContent( slice( value ) );
@@ -88,7 +95,7 @@ function Edit( {
 			);
 		} else {
 			if ( target ) {
-				setOpenedBy( target );
+				openedBy.current = target;
 			}
 			setAddingLink( true );
 		}
@@ -111,13 +118,12 @@ function Edit( {
 		// Close the popover
 		setAddingLink( false );
 		// Return focus to the toolbar button or the rich text field
-		if ( openedBy?.tagName === 'BUTTON' ) {
-			openedBy.focus();
+		if ( openedBy.current?.tagName === 'BUTTON' ) {
+			openedBy.current.focus();
 		} else {
 			onFocus();
 		}
-		// Remove the openedBy state
-		setOpenedBy( null );
+		openedBy.current = null;
 	}
 
 	// Test for this:
@@ -126,9 +132,12 @@ function Edit( {
 	// 3. Focus should be in the dropdown of the Options button
 	// 4. Press Escape
 	// 5. Focus should be on the Options button
-	function onFocusOutside() {
-		setAddingLink( false );
-		setOpenedBy( null );
+	function onFocusOutside( event ) {
+		// Check for the element that was clicked. Was it our toolbar button or the current linked text? If so, skip this.
+		// Note: event.target.tagName !== 'A' is not the correct way of doing this. We'll need something that allows us to know if it's the correct link. We may be able to use a data attribute.
+		if ( event.target !== toolbarButton && event.target.tagName !== 'A' ) {
+			setAddingLink( false );
+		}
 	}
 
 	function onRemoveFormat() {
@@ -145,11 +154,16 @@ function Edit( {
 				onUse={ onRemoveFormat }
 			/>
 			<RichTextToolbarButton
+				ref={ toolbarButton }
 				name="link"
 				icon={ linkIcon }
 				title={ isActive ? __( 'Link' ) : title }
 				onClick={ ( event ) => {
-					addLink( event.currentTarget );
+					if ( addingLink ) {
+						setAddingLink( false );
+					} else {
+						addLink( event.currentTarget );
+					}
 				} }
 				isActive={ isActive || addingLink }
 				shortcutType="primary"
