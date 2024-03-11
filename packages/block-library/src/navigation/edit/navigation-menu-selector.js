@@ -144,7 +144,10 @@ function NavigationMenuSelector( {
 									onClose();
 								} }
 								choices={ menuChoices }
-								disabled={ ! hasResolvedNavigationMenus }
+								disabled={
+									isUpdatingMenuRef ||
+									! hasResolvedNavigationMenus
+								}
 							/>
 						</MenuGroup>
 					) }

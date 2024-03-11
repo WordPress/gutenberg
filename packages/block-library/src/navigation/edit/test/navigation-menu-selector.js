@@ -250,6 +250,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 				const handler = jest.fn();
 
+				// at the start we have the menus and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
@@ -271,6 +272,8 @@ describe( 'NavigationMenuSelector', () => {
 					} )
 				);
 
+				// creating a menu is a network activity
+				// so we have to wait on it
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: false,
@@ -294,6 +297,8 @@ describe( 'NavigationMenuSelector', () => {
 					} )
 				).toBeDisabled();
 
+				// once the menu is created
+				// no more network activity to wait on
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
@@ -552,6 +557,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 				const handler = jest.fn( async () => {} );
 
+				// initially we have the menus, and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,
@@ -583,6 +589,8 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the dropdown has been closed.
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
+				// since we're importing we are doing network activity
+				// so we have to wait on it
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: true,
@@ -614,6 +622,8 @@ describe( 'NavigationMenuSelector', () => {
 					expect( item ).toBeDisabled();
 				} );
 
+				// once the menu is imported
+				// no more network activity to wait on
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,

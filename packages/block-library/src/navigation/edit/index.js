@@ -355,9 +355,7 @@ function Navigation( {
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
-		handleUpdateMenu( menuId, {
-			focusNavigationBlock: true,
-		} );
+		handleUpdateMenu( menuId );
 	};
 
 	useEffect( () => {
