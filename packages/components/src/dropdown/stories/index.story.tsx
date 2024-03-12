@@ -95,7 +95,7 @@ export const WithMenuItems = Template.bind( {} );
 WithMenuItems.args = {
 	...Default.args,
 	renderContent: () => (
-		<DropdownContentWrapper>
+		<>
 			<MenuGroup label="Group 1">
 				<MenuItem>Item 1</MenuItem>
 				<MenuItem>Item 2</MenuItem>
