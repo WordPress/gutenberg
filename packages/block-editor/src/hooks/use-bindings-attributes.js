@@ -4,7 +4,7 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -56,183 +56,107 @@ export function canBindAttribute( blockName, attributeName ) {
 	);
 }
 
-/**
- * This component is responsible for detecting and
- * propagating data changes from the source to the block.
- *
- * @param {Object}   props                   - The component props.
- * @param {string}   props.attrName          - The attribute name.
- * @param {Object}   props.blockProps        - The block props with bound attribute.
- * @param {Object}   props.source            - Source handler.
- * @param {Object}   props.args              - The arguments to pass to the source.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @return {null}                              Data-handling component. Render nothing.
- */
-const BindingConnector = ( {
-	args,
-	attrName,
-	blockProps,
-	source,
-	onPropValueChange,
-} ) => {
-	const { placeholder, value: propValue } = source.useSource(
-		blockProps,
-		args
-	);
-
-	const { name: blockName } = blockProps;
-	const attrValue = blockProps.attributes[ attrName ];
-
-	const updateBoundAttibute = useCallback(
-		( newAttrValue, prevAttrValue ) => {
-			/*
-			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, core/button, etc.)
-			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
-			 */
-			if ( prevAttrValue instanceof RichTextData ) {
-				// Bail early if the Rich Text value is the same.
-				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
-					return;
-				}
-
-				/*
-				 * To preserve the value type,
-				 * convert the new value to a RichTextData instance.
-				 */
-				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
-			}
-
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
-
-			onPropValueChange( { [ attrName ]: newAttrValue } );
-		},
-		[ attrName, onPropValueChange ]
-	);
-
-	useLayoutEffect( () => {
-		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue, attrValue );
-		} else if ( placeholder ) {
-			/*
-			 * Placeholder fallback.
-			 * If the attribute is `src` or `href`,
-			 * a placeholder can't be used because it is not a valid url.
-			 * Adding this workaround until
-			 * attributes and metadata fields types are improved and include `url`.
-			 */
-			const htmlAttribute =
-				getBlockType( blockName ).attributes[ attrName ].attribute;
-
-			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
-				return;
-			}
-
-			updateBoundAttibute( placeholder );
-		}
-	}, [
-		updateBoundAttibute,
-		propValue,
-		attrValue,
-		placeholder,
-		blockName,
-		attrName,
-	] );
-
-	return null;
-};
-
-/**
- * BlockBindingBridge acts like a component wrapper
- * that connects the bound attributes of a block
- * to the source handlers.
- * For this, it creates a BindingConnector for each bound attribute.
- *
- * @param {Object}   props                   - The component props.
- * @param {Object}   props.blockProps        - The BlockEdit props object.
- * @param {Object}   props.bindings          - The block bindings settings.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @return {null}                              Data-handling component. Render nothing.
- */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
-	const blockBindingsSources = unlock(
-		useSelect( blocksStore )
-	).getAllBlockBindingsSources();
-
-	return (
-		<>
-			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ] ) => {
-					// Bail early if the block doesn't have a valid source handler.
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return null;
-					}
-
-					return (
-						<BindingConnector
-							key={ attrName }
-							attrName={ attrName }
-							source={ source }
-							blockProps={ blockProps }
-							args={ boundAttribute.args }
-							onPropValueChange={ onPropValueChange }
-						/>
-					);
-				}
-			) }
-		</>
-	);
-}
-
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		/*
-		 * Collect and update the bound attributes
-		 * in a separate state.
-		 */
-		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
-				setBoundAttributes( ( prev ) => ( {
-					...prev,
-					...newAttributes,
-				} ) ),
-			[]
-		);
+		const blockBindingsSources = unlock(
+			useSelect( blocksStore )
+		).getAllBlockBindingsSources();
 
 		/*
-		 * Create binding object filtering
-		 * only the attributes that can be bound.
+		 * Binding object:
+		 * - filter out the bindings that are not allowed for the current block.
+		 * - Map the bindings to the source handler.
+		 *
+		 * Object shape:
+		 * {
+		 *  [attrName]: {
+		 *    args: Object,
+		 *    source: string,
+		 *    value: any,
+		 *    placeholder: any,
+		 *    useSource: Function,
+		 * },
 		 */
-		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
-				( [ attrName ] ) => canBindAttribute( props.name, attrName )
-			)
+		const bindings = useMemo( () => {
+			return Object.fromEntries(
+				Object.entries( props.attributes.metadata?.bindings || {} )
+					.filter(
+						( [ attrName, binding ] ) =>
+							canBindAttribute( props.name, attrName ) &&
+							!! blockBindingsSources[ binding.source ]?.init
+					)
+					.map( ( [ attrName, binding ] ) => {
+						const settings = blockBindingsSources[
+							binding.source
+						].init( props, binding.args );
+
+						let value = settings.value;
+
+						/*
+						 * If the original attribute value is a RichTextData,
+						 * the bound value should be a RichTextData as well.
+						 * To do: Probably we should have a better way to handle this.
+						 */
+						const originalAttrValue = props.attributes[ attrName ];
+
+						if ( typeof value !== 'undefined' ) {
+							value =
+								originalAttrValue instanceof RichTextData
+									? RichTextData.fromHTMLString(
+											settings.value
+									  )
+									: settings.value;
+						} else if ( settings.placeholder ) {
+							/*
+							 * Placeholder fallback.
+							 * If the attribute is `src` or `href`,
+							 * a placeholder can't be used because it is not a valid url.
+							 * ToDo: Adding this workaround until
+							 * attributes and metadata fields types are improved and include `url`.
+							 */
+							const htmlAttribute = getBlockType( props.name )
+								.attributes[ attrName ].attribute;
+
+							if (
+								htmlAttribute === 'src' ||
+								htmlAttribute === 'href'
+							) {
+								value = null;
+							} else {
+								value = settings.placeholder;
+							}
+						}
+
+						return [
+							attrName,
+							{
+								source: binding.source,
+								args: binding.args,
+								...settings,
+								value,
+							},
+						];
+					} )
+			);
+		}, [ blockBindingsSources, props ] );
+
+		// Pick bound attributes from the (memoized) bindings object.
+		const boundAttributes = Object.fromEntries(
+			Object.entries( bindings ).map( ( [ attrName, settings ] ) => {
+				const { value } = settings;
+				return [ attrName, value ];
+			} )
 		);
+
+		if ( Object.keys( bindings ).length <= 0 ) {
+			return <BlockEdit { ...props } />;
+		}
 
 		return (
-			<>
-				{ Object.keys( bindings ).length > 0 && (
-					<BlockBindingBridge
-						blockProps={ props }
-						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
-					/>
-				) }
-
-				<BlockEdit
-					{ ...props }
-					attributes={ { ...props.attributes, ...boundAttributes } }
-				/>
-			</>
+			<BlockEdit
+				{ ...props }
+				attributes={ { ...props.attributes, ...boundAttributes } }
+			/>
 		);
 	},
 	'withBlockBindingSupport'
