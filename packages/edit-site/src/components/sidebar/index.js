@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
@@ -83,14 +82,14 @@ function SidebarScreens() {
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplates />
+				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			{ ! isMobileViewport && (
 				<SidebarScreenWrapper path="/patterns">
 					<SidebarNavigationScreenPatterns />
 				</SidebarScreenWrapper>
 			) }
-			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
+			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
