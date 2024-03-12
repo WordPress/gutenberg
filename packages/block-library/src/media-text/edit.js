@@ -295,9 +295,9 @@ function MediaTextEdit( {
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
 				isShownByDefault
-				hasValue={ () => !! isStackedOnMobile }
+				hasValue={ () => ! isStackedOnMobile }
 				onDeselect={ () =>
-					setAttributes( { isStackedOnMobile: false } )
+					setAttributes( { isStackedOnMobile: true } )
 				}
 			>
 				<ToggleControl
@@ -409,7 +409,7 @@ function MediaTextEdit( {
 
 	function resetAll() {
 		setAttributes( {
-			isStackedOnMobile: false,
+			isStackedOnMobile: true,
 			imageFill: false,
 			mediaAlt: undefined,
 			focalPoint: undefined,
