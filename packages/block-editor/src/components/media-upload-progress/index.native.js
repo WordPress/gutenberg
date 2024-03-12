@@ -134,7 +134,7 @@ const MediaUploadProgress = ( props ) => {
 	const retryMessage = getRetryMessage();
 	const isUploadPaused =
 		uploadState === MEDIA_UPLOAD_STATE_PAUSED && props.enablePausedUploads;
-	const showSpinner =
+	const showProgress =
 		isUploadInProgress && ! isUploadPaused && ! isUploadFailed;
 	const { renderContent = () => null } = props;
 
@@ -164,14 +164,29 @@ const MediaUploadProgress = ( props ) => {
 					/>
 				</View>
 			) }
-			{ showSpinner && (
-				<View style={ indicatorContainerStyle }>
-					<ActivityIndicator
-						style={ indicatorIconStyle }
-						size={ 20 }
-						color="#111"
-					/>
-				</View>
+			{ showProgress && (
+				<>
+					{ props.progressType &&
+					props.progressType === 'determinate' &&
+					progress !== 100 ? (
+						<View style={ styles.progress }>
+							<View
+								style={ [
+									styles.progress__bar,
+									{ width: `${ progress }%` },
+								] }
+							/>
+						</View>
+					) : (
+						<View style={ indicatorContainerStyle }>
+							<ActivityIndicator
+								style={ indicatorIconStyle }
+								size={ 20 }
+								color="#111"
+							/>
+						</View>
+					) }
+				</>
 			) }
 			{ renderContent( {
 				isUploadPaused,
