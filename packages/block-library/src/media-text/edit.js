@@ -346,16 +346,6 @@ function MediaTextEdit( {
 					) }
 				/>
 			) }
-			{ ( mediaUrl || featuredImageURL ) && (
-				<RangeControl
-					__nextHasNoMarginBottom
-					label={ __( 'Media width' ) }
-					value={ temporaryMediaWidth || mediaWidth }
-					onChange={ commitWidthChange }
-					min={ WIDTH_CONSTRAINT_PERCENTAGE }
-					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
-				/>
-			) }
 		</PanelBody>
 	);
 
