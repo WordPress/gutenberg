@@ -284,9 +284,7 @@ function TableRow( {
 						width: 20,
 						minWidth: 20,
 					} }
-					onClickCapture={ ( event ) => {
-						event.stopPropagation();
-						event.preventDefault();
+					onClickCapture={ () => {
 						if ( ! hasPossibleBulkAction ) {
 							return;
 						}
