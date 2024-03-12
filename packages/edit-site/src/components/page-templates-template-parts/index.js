@@ -221,8 +221,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: 'isAny',
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -237,8 +237,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: OPERATOR_IS_ANY,
+								value: [ activeView ],
 							},
 					  ]
 					: [],
