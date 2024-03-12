@@ -267,15 +267,11 @@
 	margin: 0 $grid-unit-40 $grid-unit-30;
 	position: relative;
 
-	.dataviews-view-grid__rows {
+	.dataviews-view-grid__cells {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(17em, 1fr));
 		grid-template-rows: max-content;
 		gap: 1em;
-	}
-
-	.dataviews-view-grid__row {
-		display: contents;
 	}
 
 	.dataviews-view-grid__card {

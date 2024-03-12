@@ -19,6 +19,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import {
+	Children,
 	createContext,
 	useContext,
 	useEffect,
@@ -97,33 +98,47 @@ function GridRows( { baseId, gridRef, children } ) {
 			Array.from(
 				{ length: Math.ceil( children?.length / columnCount ) },
 				( _, index ) =>
-					children.slice(
-						index * columnCount,
-						( index + 1 ) * columnCount
-					)
+					Children.toArray( children )
+						.slice(
+							index * columnCount,
+							( index + 1 ) * columnCount
+						)
+						.map( ( { key } ) => `${ baseId }-item-${ key }` )
+						.join( ' ' )
 			),
-		[ children, columnCount ]
+		[ baseId, children, columnCount ]
 	);
 
 	return useMemo(
 		() => (
 			<>
 				{ resizeListener }
+				<div className="dataviews-view-grid__cells">
+					{ Children.map( children, ( child, index ) => (
+						<CompositeRow
+							render={ <></> }
+							id={ `${ baseId }-row-${ Math.floor(
+								index / columnCount
+							) }` }
+						>
+							{ child }
+						</CompositeRow>
+					) ) }
+				</div>
 				<div className="dataviews-view-grid__rows">
 					{ rows.map( ( row, index ) => (
-						<CompositeRow
+						<div
 							className="dataviews-view-grid__row"
 							role="row"
 							id={ `${ baseId }-row-${ index }` }
 							key={ `${ baseId }-row-${ index }` }
-						>
-							{ row }
-						</CompositeRow>
+							aria-owns={ row }
+						/>
 					) ) }
 				</div>
 			</>
 		),
-		[ baseId, resizeListener, rows ]
+		[ baseId, children, columnCount, resizeListener, rows ]
 	);
 }
 
