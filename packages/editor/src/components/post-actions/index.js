@@ -1,28 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useState, Children, Fragment, useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
-	MenuGroup,
-	MenuItem,
-	__experimentalConfirmDialog as ConfirmDialog,
 	privateApis as componentsPrivateApis,
+	Modal,
+	Button,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import isTemplateRemovable from '../../utils/is-template-removable';
-import isTemplateRevertable from '../../utils/is-template-revertable';
-import RenameMenuItem from './rename-menu-item';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import {
 	trashPostAction,
@@ -36,8 +28,20 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
+
+function DropdownMenuItemTrigger( { action, onClick } ) {
+	return (
+		<DropdownMenuItem
+			onClick={ onClick }
+			hideOnClick={ ! action.RenderModal }
+		>
+			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+		</DropdownMenuItem>
+	);
+}
 
 function ActionWithModal( { action, item, ActionTrigger } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -107,7 +111,14 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
-export default function PostActions( { className, postType, postId } ) {
+export default function PostActions( { postType, postId } ) {
+	const item = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
+			return getEditedEntityRecord( 'postType', postType, postId );
+		},
+		[ postType, postId ]
+	);
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 
@@ -120,6 +131,9 @@ export default function PostActions( { className, postType, postId } ) {
 		];
 		return actions.reduce(
 			( accumulator, action ) => {
+				if ( action.isEligible && ! action.isEligible( item ) ) {
+					return accumulator;
+				}
 				if ( action.isPrimary ) {
 					accumulator.primaryActions.push( action );
 				} else {
@@ -129,13 +143,21 @@ export default function PostActions( { className, postType, postId } ) {
 			},
 			{ primaryActions: [], secondaryActions: [] }
 		);
-	}, [ permanentlyDeletePostAction, restorePostAction ] );
+	}, [ permanentlyDeletePostAction, restorePostAction, item ] );
 	return (
 		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
-			className={ className }
-			toggleProps={ { size: 'small' } }
+			trigger={
+				<Button
+					size="compact"
+					icon={ moreVertical }
+					label={ __( 'Actions' ) }
+					disabled={
+						! primaryActions.length && ! secondaryActions.length
+					}
+					className="dataviews-all-actions-button"
+				/>
+			}
+			placement="bottom-end"
 		>
 			<WithDropDownMenuSeparators>
 				{ !! primaryActions.length && (

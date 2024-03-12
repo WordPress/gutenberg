@@ -68,7 +68,8 @@ export default function PagePanels() {
 			renderingMode: getRenderingMode(),
 		};
 	}, [] );
-
+	const postType = type;
+	const postId = id;
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -79,6 +80,9 @@ export default function PagePanels() {
 				<SidebarCard
 					title={ decodeEntities( title ) }
 					icon={ pageIcon }
+					actions={
+						<PostActions postType={ postType } postId={ postId } />
+					}
 					description={
 						<VStack>
 							<Text>
@@ -91,7 +95,6 @@ export default function PagePanels() {
 						</VStack>
 					}
 				/>
-				<PostActions />
 			</PanelBody>
 			<PanelBody title={ __( 'Summary' ) }>
 				<PageSummary

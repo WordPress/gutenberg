@@ -19,10 +19,18 @@ import {
 
 /**
  * Internal dependencies
+ * @param item
  */
 //import { unlock } from '../../lock-unlock';
 
 //const { useHistory } = unlock( routerPrivateApis );
+
+function getItemTitle( item ) {
+	if ( typeof item.title === 'string' ) {
+		return decodeEntities( item.title );
+	}
+	return decodeEntities( item.title?.rendered || '' );
+}
 
 export const trashPostAction = {
 	id: 'move-to-trash',
@@ -46,7 +54,7 @@ export const trashPostAction = {
 						? sprintf(
 								// translators: %s: The page's title.
 								__( 'Are you sure you want to delete "%s"?' ),
-								decodeEntities( posts[ 0 ].title.rendered )
+								getItemTitle( posts[ 0 ] )
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
@@ -85,9 +93,7 @@ export const trashPostAction = {
 									successMessage = sprintf(
 										/* translators: The posts's title. */
 										__( '"%s" moved to the Trash.' ),
-										decodeEntities(
-											posts[ 0 ].title.rendered
-										)
+										getItemTitle( posts[ 0 ] )
 									);
 								} else {
 									successMessage = __(
@@ -203,7 +209,7 @@ export function usePermanentlyDeletePostAction() {
 						successMessage = sprintf(
 							/* translators: The posts's title. */
 							__( '"%s" permanently deleted.' ),
-							decodeEntities( posts[ 0 ].title.rendered )
+							getItemTitle( posts[ 0 ] )
 						);
 					} else {
 						successMessage = __(
@@ -317,7 +323,7 @@ export function useRestorePostAction() {
 							: sprintf(
 									/* translators: The number of posts. */
 									__( '"%s" has been restored.' ),
-									decodeEntities( posts[ 0 ].title.rendered )
+									getItemTitle( posts[ 0 ] )
 							  ),
 						{
 							type: 'snackbar',
