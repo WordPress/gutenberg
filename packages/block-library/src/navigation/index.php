@@ -1466,8 +1466,8 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	/*
 	 * We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
 	 * all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
-	 * $blocks = parse_blocks( $post->post_content );
 	 */
+	$blocks = parse_blocks( $post->post_content );
 
 	/*
 	 * Block Hooks logic requires a `WP_Post` object (rather than the `stdClass` with the updates that
