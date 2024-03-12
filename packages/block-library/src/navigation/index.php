@@ -543,7 +543,7 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the nav element directives.
 	 *
-	 * @param bool  $is_interactive Whether the block is interactive.
+	 * @param bool $is_interactive Whether the block is interactive.
 	 * @return string the directives for the navigation element.
 	 */
 	private static function get_nav_element_directives( $is_interactive ) {
@@ -1499,11 +1499,13 @@ if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'r
 	add_filter( 'rest_pre_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta', 10 );
 }
 
-// Previous versions of Gutenberg and WordPress 6.5 Betas were attaching the block_core_navigation_update_ignore_hooked_blocks_meta
-// function to the `rest_insert_wp_navigation` _action_ (rather than the `rest_pre_insert_wp_navigation` _filter_).
-// To avoid collisions, we need to remove the filter from that action if it's present.
+/*
+ * Previous versions of Gutenberg were attaching the block_core_navigation_update_ignore_hooked_blocks_meta
+ * function to the `rest_insert_wp_navigation` _action_ (rather than the `rest_pre_insert_wp_navigation` _filter_).
+ * To avoid collisions, we need to remove the filter from that action if it's present.
+ */
 if ( has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
-	remove_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback, 10 );
+	remove_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_callback );
 }
 
 /**
