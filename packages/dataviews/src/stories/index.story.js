@@ -11,7 +11,7 @@ import { DEFAULT_VIEW, actions, data } from './fixtures';
 import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
 
 const meta = {
-	title: 'DataViews (Experimental)/DataViews',
+	title: 'DataViews/DataViews',
 	component: DataViews,
 };
 export default meta;
@@ -48,6 +48,20 @@ const fields = [
 		getValue: ( { item } ) => item.title,
 		maxWidth: 400,
 		enableHiding: false,
+	},
+	{
+		header: 'Type',
+		id: 'type',
+		getValue: ( { item } ) => item.type,
+		maxWidth: 400,
+		enableHiding: false,
+		type: 'enumeration',
+		elements: [
+			{ value: 'Not a planet', label: 'Not a planet' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+			{ value: 'Terrestrial', label: 'Terrestrial' },
+			{ value: 'Gas giant', label: 'Gas giant' },
+		],
 	},
 	{
 		header: 'Description',
