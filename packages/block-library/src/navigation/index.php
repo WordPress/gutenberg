@@ -1463,14 +1463,18 @@ function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks
  * @return stdClass
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
-	// We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
-	// all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
-	$blocks = parse_blocks( $post->post_content );
+	/*
+	 * We run the Block Hooks mechanism to inject the `metadata.ignoredHookedBlocks` attribute into
+	 * all anchor blocks. For the root level, we create a mock Navigation and extract them from there.
+	 * $blocks = parse_blocks( $post->post_content );
+	 */
 
-	// Block Hooks logic requires a `WP_Post` object (rather than the `stdClass` with the updates that
-	// we're getting from the `rest_pre_insert_wp_navigation` filter) as its second argument (to be
-	// used as context for hooked blocks insertion).
-	// We thus have to look it up from the DB,based on `$post->ID`.
+	/*
+	 * Block Hooks logic requires a `WP_Post` object (rather than the `stdClass` with the updates that
+	 * we're getting from the `rest_pre_insert_wp_navigation` filter) as its second argument (to be
+	 * used as context for hooked blocks insertion).
+	 * We thus have to look it up from the DB,based on `$post->ID`.
+	 */
 	$markup = block_core_navigation_set_ignored_hooked_blocks_metadata( $blocks, get_post( $post->ID ) );
 
 	$root_nav_block        = parse_blocks( $markup )[0];
@@ -1491,13 +1495,17 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	return $post;
 }
 
-// Before adding our filter, we verify if it's already added in Core.
-// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
-// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+/*
+ * Before adding our filter, we verify if it's already added in Core.
+ * However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+ * Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+ */
 $rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta';
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
-// that are not present in Gutenberg's WP 6.5 compatibility layer.
+/*
+ * Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+ * that are not present in Gutenberg's WP 6.5 compatibility layer.
+ */
 if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_pre_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_pre_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta' );
 }
@@ -1516,7 +1524,6 @@ if ( has_filter( 'rest_insert_wp_navigation', $rest_insert_wp_navigation_core_ca
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Post          $post     Post object.
- * @param WP_REST_Request  $request  Request object.
  * @return WP_REST_Response The response object.
  */
 function block_core_navigation_insert_hooked_blocks_into_rest_response( $response, $post ) {
@@ -1535,13 +1542,17 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	return $response;
 }
 
-// Before adding our filter, we verify if it's already added in Core.
-// However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
-// Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+/*
+ *  Before adding our filter, we verify if it's already added in Core.
+ * However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
+ * Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
+ */
 $rest_prepare_wp_navigation_core_callback = 'block_core_navigation_' . 'insert_hooked_blocks_into_rest_response';
 
-// Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
-// that are not present in Gutenberg's WP 6.5 compatibility layer.
+/*
+ * Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
+ * that are not present in Gutenberg's WP 6.5 compatibility layer.
+ */
 if ( function_exists( 'set_ignored_hooked_blocks_metadata' ) && ! has_filter( 'rest_prepare_wp_navigation', $rest_prepare_wp_navigation_core_callback ) ) {
 	add_filter( 'rest_prepare_wp_navigation', 'block_core_navigation_insert_hooked_blocks_into_rest_response', 10, 3 );
 }
