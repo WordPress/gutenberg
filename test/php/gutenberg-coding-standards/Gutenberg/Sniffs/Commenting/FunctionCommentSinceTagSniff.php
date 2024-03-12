@@ -1,4 +1,11 @@
 <?php
+/**
+ * Gutenberg Coding Standards.
+ *
+ * @package gutenberg/gutenberg-coding-standards
+ * @link    https://github.com/WordPress/gutenberg
+ * @license https://opensource.org/licenses/MIT MIT
+ */
 
 namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 
@@ -60,7 +67,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$missing_since_tag_error_message = sprintf( '@since tag is missing for the \'%s()\' function.', $function_name );
 
 		// All these tokens could be present before the docblock.
-		$tokens_before_the_docblock = [
+		$tokens_before_the_docblock = array(
 			T_PUBLIC,
 			T_PROTECTED,
 			T_PRIVATE,
@@ -68,7 +75,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			T_FINAL,
 			T_ABSTRACT,
 			T_WHITESPACE,
-		];
+		);
 
 		$doc_block_end_token = $phpcsFile->findPrevious( $tokens_before_the_docblock, ( $stackPtr - 1 ), null, true, null, true );
 		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
@@ -112,7 +119,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			'InvalidSinceTagVersionValue',
 			array(
 				$function_name,
-				$version_value
+				$version_value,
 			)
 		);
 	}
@@ -120,8 +127,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	/**
 	 * Checks if the current package is experimental.
 	 *
-	 * @param File $phpcsFile
-	 * @return bool
+	 * @param File $phpcsFile The file being scanned.
+	 * @return bool Returns true if the current package is experimental.
 	 */
 	private static function is_experimental_package( File $phpcsFile ) {
 		$block_json_filepath = dirname( $phpcsFile->getFilename() ) . DIRECTORY_SEPARATOR . 'block.json';
@@ -135,6 +142,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return static::$cache[ $block_json_filepath ];
 		}
 
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- this package doesn't depend on WordPress.
 		$block_metadata = file_get_contents( $block_json_filepath );
 		if ( false === $block_metadata ) {
 			static::$cache[ $block_json_filepath ] = false;

@@ -25,7 +25,7 @@ final class FunctionCommentSinceTagUnitTest extends AbstractSniffUnitTest {
 	public function getErrorList() {
 		return array(
 			9  => 1,
-			19  => 1,
+			19 => 1,
 			24 => 1,
 		);
 	}
