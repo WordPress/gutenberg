@@ -99,6 +99,6 @@ WithMenuItems.args = {
 				<MenuItem>Item 1</MenuItem>
 				<MenuItem>Item 2</MenuItem>
 			</MenuGroup>
-		</DropdownContentWrapper>
+		</>
 	),
 };
