@@ -4,6 +4,7 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * This sniff ensures that PHP functions have docblocks defined
@@ -58,16 +59,19 @@ class FunctionCommentSniff implements Sniff {
 			}
 		}
 
- 		$missing_since_tag_error_message = sprintf( '@since tag is missing for the `%s()` function.', $function_name );
+ 		$missing_since_tag_error_message = sprintf( '@since tag is missing for the %s() function.', $function_name );
 
-		$doc_block_end_token = $phpcsFile->findPrevious( T_DOC_COMMENT_CLOSE_TAG, $stackPtr, null, false, null, true );
-		if ( false === $doc_block_end_token ) {
+		$doc_block_end_token = $phpcsFile->findPrevious( T_WHITESPACE, ( $stackPtr - 1 ), null, true, null, true );
+		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
 			return;
 		}
 
-		$doc_block_start_token = $phpcsFile->findPrevious( T_DOC_COMMENT_OPEN_TAG, $doc_block_end_token, null, false, null, true );
-		if ( false === $doc_block_start_token ) {
+		$all_comment_tags_but_open_comment_tag = Tokens::$commentTokens;
+		unset( $all_comment_tags_but_open_comment_tag[ T_DOC_COMMENT_OPEN_TAG ] );
+
+		$doc_block_start_token = $phpcsFile->findPrevious( $all_comment_tags_but_open_comment_tag, ( $stackPtr - 1 ), null, true, null, true );
+		if ( ( false === $doc_block_start_token ) || ( T_DOC_COMMENT_OPEN_TAG !== $tokens[ $doc_block_start_token ]['code'] ) ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
 			return;
 		}
@@ -127,7 +131,7 @@ class FunctionCommentSniff implements Sniff {
 		}
 
 		$block_metadata = json_decode( $block_metadata, true );
-		if ( null === $block_metadata ) {
+		if ( ! is_array( $block_metadata ) ) {
 			static::$cache[ $block_json_filepath ] = false;
 			return static::$cache[ $block_json_filepath ];
 		}
