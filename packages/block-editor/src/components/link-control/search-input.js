@@ -130,7 +130,7 @@ const LinkControlSearchInput = forwardRef(
 						showSuggestions ? handleRenderSuggestions : null
 					}
 					__experimentalFetchLinkSuggestions={ searchHandler }
-					__experimentalHandleURLSuggestions={ true }
+					__experimentalHandleURLSuggestions
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}

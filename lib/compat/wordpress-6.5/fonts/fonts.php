@@ -87,17 +87,24 @@ function gutenberg_create_initial_post_types() {
 /**
  * Initializes REST routes.
  *
- * @since 6.5
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_create_initial_rest_routes() {
-	$font_collections_controller = new WP_REST_Font_Collections_Controller();
-	$font_collections_controller->register_routes();
+	global $wp_version;
+
+	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
+	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
+		$font_collections_controller = new WP_REST_Font_Collections_Controller();
+		$font_collections_controller->register_routes();
+	}
 }
+
+add_action( 'rest_api_init', 'gutenberg_create_initial_rest_routes' );
 
 /**
  * Initializes REST routes and post types.
  *
- * @since 6.5
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_init_font_library() {
 	global $wp_version;
@@ -105,37 +112,38 @@ function gutenberg_init_font_library() {
 	// Runs only if the Font Library is not available in core ( i.e. in core < 6.5-alpha ).
 	if ( version_compare( $wp_version, '6.5-alpha', '<' ) ) {
 		gutenberg_create_initial_post_types();
-		gutenberg_create_initial_rest_routes();
 	}
 }
 
-add_action( 'rest_api_init', 'gutenberg_init_font_library' );
+add_action( 'init', 'gutenberg_init_font_library' );
 
 
 if ( ! function_exists( 'wp_register_font_collection' ) ) {
 	/**
-	 * Registers a new Font Collection in the Font Library.
+	 * Registers a new font collection in the font library.
+	 *
+	 * See {@link https://schemas.wp.org/trunk/font-collection.json} for the schema
+	 * the font collection data must adhere to.
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param string       $slug Font collection slug. May only contain alphanumeric characters, dashes,
+	 * @param string $slug Font collection slug. May only contain alphanumeric characters, dashes,
 	 *                     and underscores. See sanitize_title().
-	 * @param array|string $data_or_file {
-	 *     Font collection data array or a path/URL to a JSON file containing the font collection.
+	 * @param array  $args {
+	 *     Font collection data.
 	 *
-	 *     @link https://schemas.wp.org/trunk/font-collection.json
-	 *
-	 *     @type string $name           Required. Name of the font collection shown in the Font Library.
-	 *     @type string $description    Optional. A short descriptive summary of the font collection. Default empty.
-	 *     @type array  $font_families  Required. Array of font family definitions that are in the collection.
-	 *     @type array  $categories     Optional. Array of categories, each with a name and slug, that are used by the
-	 *                                  fonts in the collection. Default empty.
+	 *     @type string       $name          Required. Name of the font collection shown in the Font Library.
+	 *     @type string       $description   Optional. A short descriptive summary of the font collection. Default empty.
+	 *     @type array|string $font_families Required. Array of font family definitions that are in the collection,
+	 *                                       or a string containing the path or URL to a JSON file containing the font collection.
+	 *     @type array        $categories    Optional. Array of categories, each with a name and slug, that are used by the
+	 *                                       fonts in the collection. Default empty.
 	 * }
 	 * @return WP_Font_Collection|WP_Error A font collection if it was registered
 	 *                                     successfully, or WP_Error object on failure.
 	 */
-	function wp_register_font_collection( $slug, $data_or_file ) {
-		return WP_Font_Library::get_instance()->register_font_collection( $slug, $data_or_file );
+	function wp_register_font_collection( string $slug, array $args ) {
+		return WP_Font_Library::get_instance()->register_font_collection( $slug, $args );
 	}
 }
 
@@ -148,7 +156,7 @@ if ( ! function_exists( 'wp_unregister_font_collection' ) ) {
 	 * @param string $slug Font collection slug.
 	 * @return bool True if the font collection was unregistered successfully, else false.
 	 */
-	function wp_unregister_font_collection( $slug ) {
+	function wp_unregister_font_collection( string $slug ) {
 		return WP_Font_Library::get_instance()->unregister_font_collection( $slug );
 	}
 }
@@ -157,7 +165,36 @@ function gutenberg_register_font_collections() {
 	if ( null !== WP_Font_Library::get_instance()->get_font_collection( 'google-fonts' ) ) {
 		return;
 	}
-	wp_register_font_collection( 'google-fonts', 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json' );
+	wp_register_font_collection(
+		'google-fonts',
+		array(
+			'name'          => _x( 'Google Fonts', 'font collection name', 'gutenberg' ),
+			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
+			'font_families' => 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json',
+			'categories'    => array(
+				array(
+					'name' => _x( 'Sans Serif', 'font category', 'gutenberg' ),
+					'slug' => 'sans-serif',
+				),
+				array(
+					'name' => _x( 'Display', 'font category', 'gutenberg' ),
+					'slug' => 'display',
+				),
+				array(
+					'name' => _x( 'Serif', 'font category', 'gutenberg' ),
+					'slug' => 'serif',
+				),
+				array(
+					'name' => _x( 'Handwriting', 'font category', 'gutenberg' ),
+					'slug' => 'handwriting',
+				),
+				array(
+					'name' => _x( 'Monospace', 'font category', 'gutenberg' ),
+					'slug' => 'monospace',
+				),
+			),
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_font_collections', 11 );
 
@@ -168,16 +205,6 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param array $defaults {
-	 *     Array of information about the upload directory.
-	 *
-	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
-	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
-	 *     @type string       $subdir  Subdirectory
-	 *     @type string       $basedir Path without subdir.
-	 *     @type string       $baseurl URL path without subdir.
-	 *     @type string|false $error   False or error message.
-	 * }
 	 * @return array $defaults {
 	 *     Array of information about the upload directory.
 	 *
@@ -189,19 +216,20 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *     @type string|false $error   False or error message.
 	 * }
 	 */
-	function wp_get_font_dir( $defaults = array() ) {
+	function wp_get_font_dir() {
 		$site_path = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$site_path = '/sites/' . get_current_blog_id();
 		}
 
-		// Sets the defaults.
-		$defaults['path']    = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
-		$defaults['url']     = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
-		$defaults['subdir']  = '';
-		$defaults['basedir'] = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
-		$defaults['baseurl'] = untrailingslashit( content_url( 'fonts' ) ) . $site_path;
-		$defaults['error']   = false;
+		$defaults = array(
+			'path'    => path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path,
+			'url'     => untrailingslashit( content_url( 'fonts' ) ) . $site_path,
+			'subdir'  => '',
+			'basedir' => path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path,
+			'baseurl' => untrailingslashit( content_url( 'fonts' ) ) . $site_path,
+			'error'   => false,
+		);
 
 		/**
 		 * Filters the fonts directory data.

@@ -19,8 +19,7 @@ import {
 	DimensionsPanel as StylesDimensionsPanel,
 	useHasDimensionsPanel,
 } from '../components/global-styles';
-import { MarginVisualizer } from './margin';
-import { PaddingVisualizer } from './padding';
+import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';

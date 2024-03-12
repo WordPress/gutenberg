@@ -9,7 +9,7 @@ import {
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
-import { Children, cloneElement, useCallback } from '@wordpress/element';
+import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	store as keyboardShortcutsStore,
@@ -33,8 +33,12 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { blocks, onCopy, label } ) {
-	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+function CopyMenuItem( { clientIds, onCopy, label } ) {
+	const { getBlocksByClientId } = useSelect( blockEditorStore );
+	const ref = useCopyToClipboard(
+		() => serialize( getBlocksByClientId( clientIds ) ),
+		onCopy
+	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
 	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
 }
@@ -123,41 +127,35 @@ export function BlockSettingsDropdown( {
 	const isMatch = __unstableUseShortcutEventMatch();
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
-	const updateSelectionAfterDuplicate = useCallback(
-		async ( clientIdsPromise ) => {
-			if ( __experimentalSelectBlock ) {
-				const ids = await clientIdsPromise;
-				if ( ids && ids[ 0 ] ) {
-					__experimentalSelectBlock( ids[ 0 ], false );
-				}
-			}
-		},
-		[ __experimentalSelectBlock ]
-	);
-
-	const updateSelectionAfterRemove = useCallback( () => {
-		if ( __experimentalSelectBlock ) {
-			let blockToFocus = previousBlockClientId || firstParentClientId;
-
-			// Focus the first block if there's no previous block nor parent block.
-			if ( ! blockToFocus ) {
-				blockToFocus = getBlockOrder()[ 0 ];
-			}
-
-			// Only update the selection if the original selection is removed.
-			const shouldUpdateSelection =
-				hasSelectedBlocks && getSelectedBlockClientIds().length === 0;
-
-			__experimentalSelectBlock( blockToFocus, shouldUpdateSelection );
+	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
+		if ( ! __experimentalSelectBlock ) {
+			return;
 		}
-	}, [
-		__experimentalSelectBlock,
-		previousBlockClientId,
-		firstParentClientId,
-		getBlockOrder,
-		hasSelectedBlocks,
-		getSelectedBlockClientIds,
-	] );
+
+		const ids = await clientIdsPromise;
+		if ( ids && ids[ 0 ] ) {
+			__experimentalSelectBlock( ids[ 0 ], false );
+		}
+	}
+
+	function updateSelectionAfterRemove() {
+		if ( ! __experimentalSelectBlock ) {
+			return;
+		}
+
+		let blockToFocus = previousBlockClientId || firstParentClientId;
+
+		// Focus the first block if there's no previous block nor parent block.
+		if ( ! blockToFocus ) {
+			blockToFocus = getBlockOrder()[ 0 ];
+		}
+
+		// Only update the selection if the original selection is removed.
+		const shouldUpdateSelection =
+			hasSelectedBlocks && getSelectedBlockClientIds().length === 0;
+
+		__experimentalSelectBlock( blockToFocus, shouldUpdateSelection );
+	}
 
 	// This can occur when the selected block (the parent)
 	// displays child blocks within a List View.
@@ -175,20 +173,17 @@ export function BlockSettingsDropdown( {
 		? undefined
 		: openedBlockSettingsMenu === currentClientId || false;
 
-	const onToggle = useCallback(
-		( localOpen ) => {
-			if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
-				setOpenedBlockSettingsMenu( currentClientId );
-			} else if (
-				! localOpen &&
-				openedBlockSettingsMenu &&
-				openedBlockSettingsMenu === currentClientId
-			) {
-				setOpenedBlockSettingsMenu( undefined );
-			}
-		},
-		[ currentClientId, openedBlockSettingsMenu, setOpenedBlockSettingsMenu ]
-	);
+	function onToggle( localOpen ) {
+		if ( localOpen && openedBlockSettingsMenu !== currentClientId ) {
+			setOpenedBlockSettingsMenu( currentClientId );
+		} else if (
+			! localOpen &&
+			openedBlockSettingsMenu &&
+			openedBlockSettingsMenu === currentClientId
+		) {
+			setOpenedBlockSettingsMenu( undefined );
+		}
+	}
 
 	return (
 		<BlockActions
@@ -198,7 +193,7 @@ export function BlockSettingsDropdown( {
 			{ ( {
 				canCopyStyles,
 				canDuplicate,
-				canInsertDefaultBlock,
+				canInsertBlock,
 				canMove,
 				canRemove,
 				onDuplicate,
@@ -208,7 +203,6 @@ export function BlockSettingsDropdown( {
 				onCopy,
 				onPasteStyles,
 				onMoveTo,
-				blocks,
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
@@ -230,7 +224,8 @@ export function BlockSettingsDropdown( {
 								canRemove
 							) {
 								event.preventDefault();
-								updateSelectionAfterRemove( onRemove() );
+								onRemove();
+								updateSelectionAfterRemove();
 							} else if (
 								isMatch(
 									'core/block-editor/duplicate',
@@ -245,7 +240,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-after',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -255,7 +250,7 @@ export function BlockSettingsDropdown( {
 									'core/block-editor/insert-before',
 									event
 								) &&
-								canInsertDefaultBlock
+								canInsertBlock
 							) {
 								event.preventDefault();
 								setOpenedBlockSettingsMenu( undefined );
@@ -286,7 +281,7 @@ export function BlockSettingsDropdown( {
 									/>
 								) }
 								<CopyMenuItem
-									blocks={ blocks }
+									clientIds={ clientIds }
 									onCopy={ onCopy }
 								/>
 								{ canDuplicate && (
@@ -301,7 +296,7 @@ export function BlockSettingsDropdown( {
 										{ __( 'Duplicate' ) }
 									</MenuItem>
 								) }
-								{ canInsertDefaultBlock && (
+								{ canInsertBlock && (
 									<>
 										<MenuItem
 											onClick={ pipe(
@@ -327,7 +322,7 @@ export function BlockSettingsDropdown( {
 							{ canCopyStyles && (
 								<MenuGroup>
 									<CopyMenuItem
-										blocks={ blocks }
+										clientIds={ clientIds }
 										onCopy={ onCopy }
 										label={ __( 'Copy styles' ) }
 									/>

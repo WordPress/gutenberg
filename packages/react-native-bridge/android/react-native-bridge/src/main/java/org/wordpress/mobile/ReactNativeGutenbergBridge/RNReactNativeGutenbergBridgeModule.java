@@ -28,11 +28,13 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ConnectionStatusCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.LogExceptionCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.BlockTypeImpressionsCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.io.Serializable;
@@ -274,11 +276,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void mediaSaveSync() {
-        mGutenbergBridgeJS2Parent.mediaSaveSync(getNewMediaSelectedCallback(true,null));
-    }
-
-    @ReactMethod
     public void requestImageFailedRetryDialog(final int mediaId) {
         mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }
@@ -306,31 +303,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestMediaEditor(String mediaUrl, final Callback onUploadMediaSelected) {
         mGutenbergBridgeJS2Parent.requestMediaEditor(getNewMediaSelectedCallback(false, onUploadMediaSelected), mediaUrl);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad(mediaFiles, blockId);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesFailedRetryDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesUploadCancelDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
-        mGutenbergBridgeJS2Parent.requestMediaFilesSaveCancelDialog(mediaFiles);
-    }
-
-    @ReactMethod
-    public void mediaFilesBlockReplaceSync(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.mediaFilesBlockReplaceSync(mediaFiles, blockId);
     }
 
     @ReactMethod
@@ -623,4 +595,19 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             }
         }
     }
+
+    @ReactMethod
+    public void logException(final ReadableMap rawException, final Callback jsCallback) {
+        GutenbergJsException exception = GutenbergJsException.fromReadableMap(rawException);
+        LogExceptionCallback logExceptionCallback = onLogExceptionCallback(jsCallback);
+        mGutenbergBridgeJS2Parent.logException(exception, logExceptionCallback);
+    }
+
+   private LogExceptionCallback onLogExceptionCallback(final Callback jsCallback) {
+       return new GutenbergBridgeJS2Parent.LogExceptionCallback() {
+           @Override public void onLogException(boolean success) {
+               jsCallback.invoke(success);
+           }
+       };
+   }
 }

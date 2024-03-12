@@ -11,6 +11,7 @@ import {
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 	Tooltip,
+	Spinner,
 } from '@wordpress/components';
 import {
 	useAsyncList,
@@ -34,6 +35,8 @@ import { isAppleOS } from '@wordpress/keycodes';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
+
+import { useHasAPossibleBulkAction } from './bulk-actions';
 
 const {
 	useCompositeStoreV2: useCompositeStore,
@@ -135,7 +138,7 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 } ) {
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const itemRef = useRef( null );
 	const { baseId, move, next, previous, up, down } =
 		useContext( GridContext );
@@ -164,14 +167,14 @@ function GridItem( {
 			role="gridcell"
 			aria-label={ primaryField?.getValue( { item } ) }
 			className={ classnames( 'dataviews-view-grid__card', {
-				'is-selected': isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
+				'is-selected': hasBulkAction && isSelected,
 			} ) }
-			onMouseDown={ ( event ) => {
-				if ( event.defaultPrevented ) return;
+			onClickCapture={ ( event ) => {
+				if ( event.defaultPrevented || ! hasBulkAction ) return;
 
 				if ( isAppleOS() ? event.ctrlKey : event.metaKey ) {
-					setHasNoPointerEvents( true );
+					event.stopPropagation();
+					event.preventDefault();
 					const setAsSelected = ! isSelected;
 					const selectedData = data.filter( ( _item ) => {
 						const _itemId = getItemId?.( _item );
@@ -196,11 +199,6 @@ function GridItem( {
 					}
 				}
 			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
-				}
-			} }
 		>
 			<div className="dataviews-view-grid__media">
 				{ mediaField?.render( { item } ) }
@@ -217,6 +215,7 @@ function GridItem( {
 					getItemId={ getItemId }
 					data={ data }
 					primaryField={ primaryField }
+					disabled={ ! hasBulkAction }
 				/>
 				<HStack className="dataviews-view-grid__primary-field">
 					{ primaryField?.render( { item } ) }
@@ -306,7 +305,7 @@ export default function ViewGrid( {
 						'dataviews-no-results': ! isLoading,
 					} ) }
 				>
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				</div>
 			) }
 		</>

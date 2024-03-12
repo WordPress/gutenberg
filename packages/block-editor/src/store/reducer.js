@@ -329,16 +329,13 @@ const withBlockTree =
 				// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				updateParentInnerBlocksInTree(
@@ -351,16 +348,13 @@ const withBlockTree =
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				newState.tree = new Map( newState.tree );
@@ -1521,17 +1515,11 @@ export function isSelectionEnabled( state = true, action ) {
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
-			const {
-				clientIds,
-				selectPrevious,
-				blockNamesForPrompt,
-				messageType,
-			} = action;
+			const { clientIds, selectPrevious, message } = action;
 			return {
 				clientIds,
 				selectPrevious,
-				blockNamesForPrompt,
-				messageType,
+				message,
 			};
 		case 'CLEAR_BLOCK_REMOVAL_PROMPT':
 			return false;
@@ -1709,36 +1697,42 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return action.blocks.reduce( ( prevState, block ) => {
-				const { attributes, name: blockName } = block;
-				let id = blockName;
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				const match = select( blocksStore ).getActiveBlockVariation(
-					blockName,
-					attributes
-				);
-				if ( match?.name ) {
-					id += '/' + match.name;
-				}
-				if ( blockName === 'core/block' ) {
-					id += '/' + attributes.ref;
-				}
+		case 'REPLACE_BLOCKS': {
+			const nextInsertUsage = action.blocks.reduce(
+				( prevUsage, block ) => {
+					const { attributes, name: blockName } = block;
+					let id = blockName;
+					// If a block variation match is found change the name to be the same with the
+					// one that is used for block variations in the Inserter (`getItemFromVariation`).
+					const match = select( blocksStore ).getActiveBlockVariation(
+						blockName,
+						attributes
+					);
+					if ( match?.name ) {
+						id += '/' + match.name;
+					}
+					if ( blockName === 'core/block' ) {
+						id += '/' + attributes.ref;
+					}
 
-				return {
-					...prevState,
-					insertUsage: {
-						...prevState.insertUsage,
+					return {
+						...prevUsage,
 						[ id ]: {
 							time: action.time,
-							count: prevState.insertUsage[ id ]
-								? prevState.insertUsage[ id ].count + 1
+							count: prevUsage[ id ]
+								? prevUsage[ id ].count + 1
 								: 1,
 						},
-					},
-				};
-			}, state );
+					};
+				},
+				state.insertUsage
+			);
+
+			return {
+				...state,
+				insertUsage: nextInsertUsage,
+			};
+		}
 	}
 
 	return state;
@@ -2050,20 +2044,6 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
-function blockBindingsSources( state = {}, action ) {
-	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
-		return {
-			...state,
-			[ action.sourceName ]: {
-				label: action.sourceLabel,
-				useSource: action.useSource,
-				lockAttributesEditing: action.lockAttributesEditing ?? true,
-			},
-		};
-	}
-	return state;
-}
-
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2095,7 +2075,6 @@ const combinedReducers = combineReducers( {
 	blockRemovalRules,
 	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
-	blockBindingsSources,
 } );
 
 function withAutomaticChangeReset( reducer ) {

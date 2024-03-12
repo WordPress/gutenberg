@@ -526,7 +526,7 @@ function BackgroundSizePanelItem( {
 				label={ __( 'Size' ) }
 				value={ currentValueForToggle }
 				onChange={ updateBackgroundSize }
-				isBlock={ true }
+				isBlock
 				help={ backgroundSizeHelpText( sizeValue ) }
 			>
 				<ToggleGroupControlOption
