@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 17.9.0-rc.3 =
+
+
+## Changelog
+
+### Various
+
+#### Font Library
+- Backport r57804 from wp-dev. ([59767](https://github.com/WordPress/gutenberg/pull/59767))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@peterwilsoncc
+
+
 = 17.9.0-rc.2 =
 
 
