@@ -205,8 +205,9 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @return array $defaults {
-	 *     Array of information about the upload directory.
+	 * @param array $upload_dir Unfiltered upload directory data. See return value of wp_upload_dir().
+	 * @return array {
+	 *     Array of information about the font directory.
 	 *
 	 *     @type string       $path    Base directory and subdirectory or full path to the fonts upload directory.
 	 *     @type string       $url     Base URL and subdirectory or absolute URL to the fonts upload directory.
@@ -216,7 +217,34 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 	 *     @type string|false $error   False or error message.
 	 * }
 	 */
-	function wp_get_font_dir() {
+	function wp_get_font_dir( $upload_dir = array() ) {
+		if ( doing_filter( 'font_dir' ) ) {
+			/*
+			 * The font_dir filter is being run, avoid an infinite loop.
+			 *
+			 * This indicates that a plugin is calling wp_upload_dir() while filtering
+			 * the font directory and avoids an infinite loop.
+			 */
+			return $upload_dir;
+		}
+		return apply_filters( 'font_dir', $upload_dir );
+	}
+}
+
+if ( ! function_exists( 'wp_filter_font_dir' ) ) {
+	/**
+	 * Filters the fonts directory data.
+	 *
+	 * Modifies the default fonts directory data, runs on @see 'font_dir' filter.
+	 *
+	 * @since 6.5.0
+	 * @access private
+	 * @see wp_get_font_dir()
+	 *
+	 * @param array $defaults The original fonts directory data.
+	 * @return array $defaults The filtered fonts directory data.
+	 */
+	function wp_filter_font_dir( $defaults ) {
 		$site_path = '';
 		if ( is_multisite() && ! ( is_main_network() && is_main_site() ) ) {
 			$site_path = '/sites/' . get_current_blog_id();
@@ -231,17 +259,9 @@ if ( ! function_exists( 'wp_get_font_dir' ) ) {
 			'error'   => false,
 		);
 
-		/**
-		 * Filters the fonts directory data.
-		 *
-		 * This filter allows developers to modify the fonts directory data.
-		 *
-		 * @since 6.5.0
-		 *
-		 * @param array $defaults The original fonts directory data.
-		 */
-		return apply_filters( 'font_dir', $defaults );
+		return $defaults;
 	}
+	add_filter( 'font_dir', 'wp_filter_font_dir' );
 }
 
 // @core-merge: Filters should go in `src/wp-includes/default-filters.php`,
