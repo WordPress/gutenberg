@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+-	`Drowdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
 
 ### Enhancements
 
@@ -15,7 +16,6 @@
 -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
 -   `Button`: Place `children` before the icon when `iconPosition` is `right` ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
 -   `ToggleGroupControl`: Fix unwanted backdrop vertical animation ([#59642](https://github.com/WordPress/gutenberg/pull/59642)).
--	`Drowdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
 
 ### Internal
 
