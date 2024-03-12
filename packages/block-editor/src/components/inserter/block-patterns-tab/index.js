@@ -20,6 +20,7 @@ import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
+import { useZoomOut } from '../../../hooks/use-zoom-out';
 
 function BlockPatternsTab( {
 	onSelectCategory,
@@ -33,6 +34,11 @@ function BlockPatternsTab( {
 
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
+
+	// Move to zoom out mode when this component is mounted
+	// and back to the previous mode when unmounted.
+	useZoomOut();
+
 	return (
 		<>
 			{ ! isMobile && (

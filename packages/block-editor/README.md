@@ -1028,6 +1028,10 @@ _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
 
+### useZoomOut
+
+Undocumented declaration.
+
 ### Warning
 
 _Related_
