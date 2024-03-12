@@ -224,6 +224,7 @@ function PostFeaturedImage( {
 							</div>
 						) }
 						value={ featuredImageId }
+						postId={ currentPostId }
 					/>
 				</MediaUploadCheck>
 			</div>
