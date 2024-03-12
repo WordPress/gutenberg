@@ -815,6 +815,7 @@ export class ImageEdit extends Component {
 							enablePausedUploads
 							coverUrl={ url }
 							mediaId={ id }
+							progressType="determinate"
 							onUpdateMediaProgress={ this.updateMediaProgress }
 							onFinishMediaUploadWithSuccess={
 								this.finishMediaUploadWithSuccess

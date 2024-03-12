@@ -172,7 +172,7 @@ const MediaUploadProgress = ( props ) => {
 						<View style={ styles.progress }>
 							<View
 								style={ [
-									styles.progress__bar,
+									styles.progressBar,
 									{ width: `${ progress }%` },
 								] }
 							/>
