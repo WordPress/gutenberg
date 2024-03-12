@@ -11,12 +11,13 @@ function foo() {
 function bar() {
 }
 
-/**
- * @since 0.0.0
- */
-function baz() {
-}
+$result = array_map( function ( $value ) {
+	return $value * 2; // Doubling each value
+}, array( 1, 2, 3, 4, 5 ) );
 
+/**
+ * @since 0.0
+ */
 function qux() {
 }
 
@@ -28,11 +29,11 @@ class Foo {
 	}
 }
 
-interface Baz {
+interface Bar {
 	public function bar();
 }
 
-trait Spam {
+trait Baz {
 	public function bar() {
 	}
 }

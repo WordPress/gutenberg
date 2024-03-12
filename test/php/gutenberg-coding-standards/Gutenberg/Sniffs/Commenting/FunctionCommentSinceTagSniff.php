@@ -7,10 +7,10 @@ use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
 
 /**
- * This sniff ensures that PHP functions have docblocks defined
- * and that the `@since` tag is present in the docblock.
+ * This sniff ensures that PHP functions have a valid `@since` tag in the docblock.
+ * The sniff skips checking files in __experimental block-library packages.
  */
-class FunctionCommentSniff implements Sniff {
+class FunctionCommentSinceTagSniff implements Sniff {
 
 	/**
 	 * This property is used to store results returned
@@ -41,10 +41,8 @@ class FunctionCommentSniff implements Sniff {
 			return;
 		}
 
-		$tokens = $phpcsFile->getTokens();
-
-		$function_token = $phpcsFile->findNext( T_STRING, $stackPtr );
-		$function_name  = $tokens[ $function_token ]['content'];
+		$tokens        = $phpcsFile->getTokens();
+		$function_name = $phpcsFile->getDeclarationName( $stackPtr );
 
 		$wrapping_tokens_to_check = array(
 			T_CLASS,
@@ -53,38 +51,51 @@ class FunctionCommentSniff implements Sniff {
 		);
 
 		foreach ( $wrapping_tokens_to_check as $wrapping_token_to_check ) {
-			if ( false !== $phpcsFile->getCondition( $function_token, $wrapping_token_to_check, false ) ) {
+			if ( false !== $phpcsFile->getCondition( $stackPtr, $wrapping_token_to_check, false ) ) {
 				// This sniff only processes functions, not class methods.
 				return;
 			}
 		}
 
- 		$missing_since_tag_error_message = sprintf( '@since tag is missing for the %s() function.', $function_name );
+		$missing_since_tag_error_message = sprintf( '@since tag is missing for the \'%s()\' function.', $function_name );
 
-		$doc_block_end_token = $phpcsFile->findPrevious( T_WHITESPACE, ( $stackPtr - 1 ), null, true, null, true );
+		// All these tokens could be present before the docblock.
+		$tokens_before_the_docblock = [
+			T_PUBLIC,
+			T_PROTECTED,
+			T_PRIVATE,
+			T_STATIC,
+			T_FINAL,
+			T_ABSTRACT,
+			T_WHITESPACE,
+		];
+
+		$doc_block_end_token = $phpcsFile->findPrevious( $tokens_before_the_docblock, ( $stackPtr - 1 ), null, true, null, true );
 		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
 			return;
 		}
 
-		$all_comment_tags_but_open_comment_tag = Tokens::$commentTokens;
-		unset( $all_comment_tags_but_open_comment_tag[ T_DOC_COMMENT_OPEN_TAG ] );
-
-		$doc_block_start_token = $phpcsFile->findPrevious( $all_comment_tags_but_open_comment_tag, ( $doc_block_end_token - 1 ), null, true, null, true );
-		if ( ( false === $doc_block_start_token ) || ( T_DOC_COMMENT_OPEN_TAG !== $tokens[ $doc_block_start_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+		// The sniff intentionally doesn't check if the docblock has a valid start tag.
+		// Its only job is to make sure that the @since tag is present and has a valid version value.
+		$doc_block_start_token = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $doc_block_end_token - 1 ), null, true, null, true );
+		if ( false === $doc_block_start_token ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
 			return;
 		}
 
-		$since_tag = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
-		if ( false === $since_tag ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+		// This is the first non-docblock token, so the next token should be used.
+		++$doc_block_start_token;
+
+		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
+		if ( false === $since_tag_token ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
 			return;
 		}
 
-		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag + 1, null, true, null, true );
+		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag_token + 1, null, true, null, true );
 		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $since_tag_token, 'MissingSinceTag' );
 			return;
 		}
 
@@ -98,7 +109,7 @@ class FunctionCommentSniff implements Sniff {
 		$phpcsFile->addError(
 			'Invalid @since version value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
 			$version_token,
-			'InvalidSinceVersionValue',
+			'InvalidSinceTagVersionValue',
 			array(
 				$function_name,
 				$version_value

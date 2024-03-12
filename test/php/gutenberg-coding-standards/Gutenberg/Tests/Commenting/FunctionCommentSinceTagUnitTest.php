@@ -13,16 +13,9 @@ use PHP_CodeSniffer\Tests\Standards\AbstractSniffUnitTest;
 use PHP_CodeSniffer\Ruleset;
 
 /**
- * Unit test class for the FunctionCommentSniff sniff.
+ * Unit test class for the FunctionCommentSinceTagSniff sniff.
  */
-final class FunctionCommentUnitTest extends AbstractSniffUnitTest {
-
-	/**
-	 * Holds the original Ruleset instance.
-	 *
-	 * @var Ruleset
-	 */
-	private static $original_ruleset;
+final class FunctionCommentSinceTagUnitTest extends AbstractSniffUnitTest {
 
 	/**
 	 * Returns the lines where errors should occur.
@@ -32,7 +25,8 @@ final class FunctionCommentUnitTest extends AbstractSniffUnitTest {
 	public function getErrorList() {
 		return array(
 			9  => 1,
-			15  => 1,
+			19  => 1,
+			24 => 1,
 		);
 	}
 
