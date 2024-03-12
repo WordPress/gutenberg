@@ -365,7 +365,7 @@ function Navigation( {
 			speak( __( `Creating Navigation Menu.` ) );
 		}
 
-		if ( createNavigationMenuIsSuccess && ! isLoading ) {
+		if ( createNavigationMenuIsSuccess ) {
 			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
@@ -867,50 +867,52 @@ function Navigation( {
 					</InspectorControls>
 				) }
 
-				{ isLoading && (
-					<TagName { ...blockProps }>
+				<TagName
+					{ ...blockProps }
+					aria-describedby={
+						! isPlaceholder && ! isLoading
+							? accessibleDescriptionId
+							: undefined
+					}
+				>
+					{ isLoading && (
 						<div className="wp-block-navigation__loading-indicator-container">
 							<Spinner className="wp-block-navigation__loading-indicator" />
 						</div>
-					</TagName>
-				) }
+					) }
 
-				{ ! isLoading && (
-					<TagName
-						{ ...blockProps }
-						aria-describedby={
-							! isPlaceholder
-								? accessibleDescriptionId
-								: undefined
-						}
-					>
-						<AccessibleMenuDescription
-							id={ accessibleDescriptionId }
-						/>
-						<ResponsiveWrapper
-							id={ clientId }
-							onToggle={ setResponsiveMenuVisibility }
-							hasIcon={ hasIcon }
-							icon={ icon }
-							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ isResponsive }
-							isHiddenByDefault={ 'always' === overlayMenu }
-							overlayBackgroundColor={ overlayBackgroundColor }
-							overlayTextColor={ overlayTextColor }
-						>
-							{ isEntityAvailable && (
-								<NavigationInnerBlocks
-									clientId={ clientId }
-									hasCustomPlaceholder={
-										!! CustomPlaceholder
-									}
-									templateLock={ templateLock }
-									orientation={ orientation }
-								/>
-							) }
-						</ResponsiveWrapper>
-					</TagName>
-				) }
+					{ ! isLoading && (
+						<>
+							<AccessibleMenuDescription
+								id={ accessibleDescriptionId }
+							/>
+							<ResponsiveWrapper
+								id={ clientId }
+								onToggle={ setResponsiveMenuVisibility }
+								hasIcon={ hasIcon }
+								icon={ icon }
+								isOpen={ isResponsiveMenuOpen }
+								isResponsive={ isResponsive }
+								isHiddenByDefault={ 'always' === overlayMenu }
+								overlayBackgroundColor={
+									overlayBackgroundColor
+								}
+								overlayTextColor={ overlayTextColor }
+							>
+								{ isEntityAvailable && (
+									<NavigationInnerBlocks
+										clientId={ clientId }
+										hasCustomPlaceholder={
+											!! CustomPlaceholder
+										}
+										templateLock={ templateLock }
+										orientation={ orientation }
+									/>
+								) }
+							</ResponsiveWrapper>
+						</>
+					) }
+				</TagName>
 			</RecursionProvider>
 		</EntityProvider>
 	);
