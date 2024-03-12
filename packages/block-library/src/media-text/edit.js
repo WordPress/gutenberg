@@ -277,23 +277,21 @@ function MediaTextEdit( {
 			resetAll={ resetAll }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
-			{ mediaUrl && (
-				<ToolsPanelItem
+			<ToolsPanelItem
+				label={ __( 'Media width' ) }
+				isShownByDefault
+				hasValue={ () => !! mediaWidth }
+				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
+			>
+				<RangeControl
+					__nextHasNoMarginBottom
 					label={ __( 'Media width' ) }
-					isShownByDefault
-					hasValue={ () => !! mediaWidth }
-					onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
-				>
-					<RangeControl
-						__nextHasNoMarginBottom
-						label={ __( 'Media width' ) }
-						value={ temporaryMediaWidth || mediaWidth }
-						onChange={ commitWidthChange }
-						min={ WIDTH_CONSTRAINT_PERCENTAGE }
-						max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
-					/>
-				</ToolsPanelItem>
-			) }
+					value={ temporaryMediaWidth || mediaWidth }
+					onChange={ commitWidthChange }
+					min={ WIDTH_CONSTRAINT_PERCENTAGE }
+					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
+				/>
+			</ToolsPanelItem>
 			<ToolsPanelItem
 				label={ __( 'Stack on mobile' ) }
 				isShownByDefault
