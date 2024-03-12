@@ -242,6 +242,7 @@ function TableRow( {
 				'is-selected':
 					hasPossibleBulkAction && selection.includes( id ),
 				'is-hovered': isHovered,
+				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
@@ -282,6 +283,34 @@ function TableRow( {
 					style={ {
 						width: 20,
 						minWidth: 20,
+					} }
+					onClickCapture={ ( event ) => {
+						event.stopPropagation();
+						event.preventDefault();
+						if ( ! hasPossibleBulkAction ) {
+							return;
+						}
+						if ( ! isSelected ) {
+							onSelectionChange(
+								data.filter( ( _item ) => {
+									const itemId = getItemId?.( _item );
+									return (
+										itemId === id ||
+										selection.includes( itemId )
+									);
+								} )
+							);
+						} else {
+							onSelectionChange(
+								data.filter( ( _item ) => {
+									const itemId = getItemId?.( _item );
+									return (
+										itemId !== id &&
+										selection.includes( itemId )
+									);
+								} )
+							);
+						}
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">

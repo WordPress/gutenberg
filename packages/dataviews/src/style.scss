@@ -127,6 +127,12 @@
 			background-color: #f8f8f8;
 		}
 
+		&.has-bulk-actions {
+			.dataviews-view-table__checkbox-column {
+				cursor: pointer;
+			}
+		}
+
 		.components-checkbox-control__input.components-checkbox-control__input {
 			opacity: 0;
 
