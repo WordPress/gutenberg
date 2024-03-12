@@ -76,14 +76,14 @@ export const data = [
 		title: 'Jupiter',
 		description: 'Jupiter description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
-		type: 'Gaz giant',
+		type: 'Gas giant',
 	},
 	{
 		id: 10,
 		title: 'Saturn',
 		description: 'Saturn description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
-		type: 'Gaz giant',
+		type: 'Gas giant',
 	},
 	{
 		id: 11,
