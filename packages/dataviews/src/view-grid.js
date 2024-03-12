@@ -144,6 +144,8 @@ function GridItem( {
 		useContext( GridContext );
 	const itemId = getItemId( item );
 	const id = `${ baseId }-item-${ itemId }`;
+	const labelId = `${ id }--label`;
+	const descriptionId = `${ id }--description`;
 	const isSelected = selection.includes( itemId );
 	const rtl = isRTL();
 	const movementMap = useMemo(
@@ -164,8 +166,9 @@ function GridItem( {
 			spacing={ 0 }
 			key={ itemId }
 			id={ id }
+			aria-labelledby={ labelId }
+			aria-describedby={ descriptionId }
 			role="gridcell"
-			aria-label={ primaryField?.getValue( { item } ) }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
 			} ) }
@@ -217,12 +220,19 @@ function GridItem( {
 					primaryField={ primaryField }
 					disabled={ ! hasBulkAction }
 				/>
-				<HStack className="dataviews-view-grid__primary-field">
+				<HStack
+					id={ labelId }
+					className="dataviews-view-grid__primary-field"
+				>
 					{ primaryField?.render( { item } ) }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
-			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+			<VStack
+				id={ descriptionId }
+				className="dataviews-view-grid__fields"
+				spacing={ 3 }
+			>
 				{ visibleFields.map( ( field ) => {
 					const renderedValue = field.render( {
 						item,
