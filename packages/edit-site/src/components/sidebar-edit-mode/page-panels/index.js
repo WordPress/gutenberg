@@ -20,6 +20,7 @@ import {
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
@@ -29,6 +30,9 @@ import { store as editSiteStore } from '../../../store';
 import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
+import { unlock } from '../../../lock-unlock';
+
+const { PostActions } = unlock( editorPrivateApis );
 
 export default function PagePanels() {
 	const {
@@ -87,6 +91,7 @@ export default function PagePanels() {
 						</VStack>
 					}
 				/>
+				<PostActions />
 			</PanelBody>
 			<PanelBody title={ __( 'Summary' ) }>
 				<PageSummary
