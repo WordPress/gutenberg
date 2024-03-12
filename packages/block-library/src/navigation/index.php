@@ -1457,10 +1457,11 @@ function block_core_navigation_set_ignored_hooked_blocks_metadata( $inner_blocks
 /**
  * Updates the post meta with the list of ignored hooked blocks when the navigation is created or updated via the REST API.
  *
- * @since 6.5.0
  * @access private
+ * @since 6.5.0
+ *
  * @param stdClass $post Post object.
- * @return stdClass
+ * @return stdClass The updated post object.
  */
 function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	/*
