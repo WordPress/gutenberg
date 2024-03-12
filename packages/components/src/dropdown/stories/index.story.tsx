@@ -86,11 +86,6 @@ WithNoPadding.args = {
 	),
 };
 
-/**
- * The `<DropdownContentWrapper>` convenience wrapper can also be used to remove padding entirely,
- * with a `paddingSize` of `"none"`. This can also serve as a clean foundation to add arbitrary
- * paddings, for example when child components already have padding on their own.
- */
 export const WithMenuItems = Template.bind( {} );
 WithMenuItems.args = {
 	...Default.args,
