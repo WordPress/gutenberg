@@ -335,32 +335,32 @@ function MediaTextEdit( {
 			{ imageFill &&
 				( mediaUrl || featuredImageURL ) &&
 				mediaType === 'image' && (
-				<ToolsPanelItem
-					label={ __( 'Focal point' ) }
-					isShownByDefault
-					hasValue={ () => !! focalPoint }
-					onDeselect={ () =>
-						setAttributes( { focalPoint: undefined } )
-					}
-				>
-					<FocalPointPicker
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
+					<ToolsPanelItem
 						label={ __( 'Focal point' ) }
-						url={
-							useFeaturedImage && featuredImageURL
-								? featuredImageURL
-								: mediaUrl
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( { focalPoint: undefined } )
 						}
-						value={ focalPoint }
-						onChange={ ( value ) =>
-							setAttributes( { focalPoint: value } )
-						}
-						onDragStart={ imperativeFocalPointPreview }
-						onDrag={ imperativeFocalPointPreview }
-					/>
-				</ToolsPanelItem>
-			) }
+					>
+						<FocalPointPicker
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Focal point' ) }
+							url={
+								useFeaturedImage && featuredImageURL
+									? featuredImageURL
+									: mediaUrl
+							}
+							value={ focalPoint }
+							onChange={ ( value ) =>
+								setAttributes( { focalPoint: value } )
+							}
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+						/>
+					</ToolsPanelItem>
+				) }
 			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
 				<ToolsPanelItem
 					label={ __( 'Alternative text' ) }
