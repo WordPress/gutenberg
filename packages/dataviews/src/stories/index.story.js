@@ -8,10 +8,15 @@ import { useState, useMemo, useCallback } from '@wordpress/element';
  */
 import { DataViews } from '../index';
 import { DEFAULT_VIEW, actions, data } from './fixtures';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
+import {
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_ANY,
+} from '../constants';
 
 const meta = {
-	title: 'DataViews (Experimental)/DataViews',
+	title: 'DataViews/DataViews',
 	component: DataViews,
 };
 export default meta;
@@ -50,6 +55,20 @@ const fields = [
 		enableHiding: false,
 	},
 	{
+		header: 'Type',
+		id: 'type',
+		getValue: ( { item } ) => item.type,
+		maxWidth: 400,
+		enableHiding: false,
+		type: 'enumeration',
+		elements: [
+			{ value: 'Not a planet', label: 'Not a planet' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+			{ value: 'Terrestrial', label: 'Terrestrial' },
+			{ value: 'Gas giant', label: 'Gas giant' },
+		],
+	},
+	{
 		header: 'Description',
 		id: 'description',
 		getValue: ( { item } ) => item.description,
@@ -72,6 +91,29 @@ export const Default = ( props ) => {
 				].some( ( field ) => field.includes( normalizedSearch ) );
 			} );
 		}
+
+		if ( view.filters.length > 0 ) {
+			view.filters.forEach( ( filter ) => {
+				if (
+					filter.field === 'type' &&
+					filter.operator === OPERATOR_IS_ANY &&
+					filter?.value?.length > 0
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return filter.value.includes( item.type );
+					} );
+				} else if (
+					filter.field === 'type' &&
+					filter.operator === OPERATOR_IS_NONE &&
+					filter?.value?.length > 0
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return ! filter.value.includes( item.type );
+					} );
+				}
+			} );
+		}
+
 		// Handle sorting.
 		if ( view.sort ) {
 			const stringSortingFields = [ 'title' ];

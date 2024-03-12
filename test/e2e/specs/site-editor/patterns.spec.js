@@ -84,7 +84,7 @@ test.describe( 'Patterns', () => {
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Save panel' } )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )

@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-text-view' );
 ?>
 
 <div data-wp-interactive="directive-context">

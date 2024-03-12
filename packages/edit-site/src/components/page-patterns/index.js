@@ -46,7 +46,7 @@ import {
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
+	OPERATOR_IS,
 } from '../../utils/constants';
 import {
 	exportJSONaction,
@@ -323,7 +323,7 @@ export default function DataviewsPatterns() {
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
-					operators: [ OPERATOR_IN ],
+					operators: [ OPERATOR_IS ],
 					isPrimary: true,
 				},
 				enableSorting: false,
