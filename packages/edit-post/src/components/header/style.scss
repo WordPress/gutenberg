@@ -27,7 +27,7 @@
 	align-items: center;
 	// Allow focus ring to be fully visible on furthest right button.
 	@include break-medium() {
-		padding-right: 2px;
+		padding-right: var(--wp-admin-border-width-focus);
 	}
 
 	.table-of-contents {
