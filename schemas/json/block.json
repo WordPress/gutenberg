@@ -477,6 +477,11 @@
 									"type": "boolean",
 									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
 									"default": true
+								},
+								"allowCustomContentAndWideSize": {
+									"type": "boolean",
+									"description": "For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.",
+									"default": true
 								}
 							}
 						}

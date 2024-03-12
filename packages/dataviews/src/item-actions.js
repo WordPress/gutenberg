@@ -15,6 +15,7 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import { WithDropDownMenuSeparators } from './utils';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -136,6 +137,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		<HStack
 			spacing={ 1 }
 			justify="flex-end"
+			className="dataviews-item-actions"
 			style={ {
 				flexShrink: '0',
 				width: 'auto',
@@ -161,22 +163,11 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						/>
 					);
 				} ) }
-			<DropdownMenu
-				trigger={
-					<Button
-						size="compact"
-						icon={ moreVertical }
-						label={ __( 'Actions' ) }
-						disabled={ ! secondaryActions.length }
-					/>
-				}
-				placement="bottom-end"
-			>
-				<ActionsDropdownMenuGroup
-					actions={ secondaryActions }
-					item={ item }
-				/>
-			</DropdownMenu>
+			<CompactItemActions
+				item={ item }
+				primaryActions={ primaryActions }
+				secondaryActions={ secondaryActions }
+			/>
 		</HStack>
 	);
 }
@@ -192,22 +183,25 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					disabled={
 						! primaryActions.length && ! secondaryActions.length
 					}
+					className="dataviews-all-actions-button"
 				/>
 			}
 			placement="bottom-end"
 		>
-			{ !! primaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ primaryActions }
-					item={ item }
-				/>
-			) }
-			{ !! secondaryActions.length && (
-				<ActionsDropdownMenuGroup
-					actions={ secondaryActions }
-					item={ item }
-				/>
-			) }
+			<WithDropDownMenuSeparators>
+				{ !! primaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ primaryActions }
+						item={ item }
+					/>
+				) }
+				{ !! secondaryActions.length && (
+					<ActionsDropdownMenuGroup
+						actions={ secondaryActions }
+						item={ item }
+					/>
+				) }
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 }

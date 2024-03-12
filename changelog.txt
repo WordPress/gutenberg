@@ -1,5 +1,53 @@
 == Changelog ==
 
+= 17.9.0-rc.3 =
+
+
+## Changelog
+
+### Various
+
+#### Font Library
+- Backport r57804 from wp-dev. ([59767](https://github.com/WordPress/gutenberg/pull/59767))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@peterwilsoncc
+
+
+= 17.9.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Revert "Zoomed-Out Mode: Don't show blocks in zoomed out view". ([59750](https://github.com/WordPress/gutenberg/pull/59750))
+
+#### Global Styles
+- Remove the extra unneeded color variations panel. ([59718](https://github.com/WordPress/gutenberg/pull/59718))
+
+#### Block Editor
+- Fix: Re-render toolbar when parent block changes. ([59234](https://github.com/WordPress/gutenberg/pull/59234))
+
+#### Site Editor
+- Fix site editor crashing when not fully loaded. ([59658](https://github.com/WordPress/gutenberg/pull/59658))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@scruffian @torounit @jeryj 
+
+
 = 17.9.0-rc.1 =
 
 
