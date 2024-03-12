@@ -300,12 +300,7 @@ class MediaUpload extends Component {
 	 */
 	buildAndSetFeatureImageFrame() {
 		const { wp } = window;
-		const {
-			value: featuredImageId,
-			postId,
-			multiple,
-			allowedTypes,
-		} = this.props;
+		const { value: featuredImageId, multiple, allowedTypes } = this.props;
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( featuredImageId );
 		const selection = new wp.media.model.Selection( attachments.models, {
@@ -325,7 +320,6 @@ class MediaUpload extends Component {
 		// not for site editor.
 		wp.media.view.settings.post = {
 			...wp.media.view.settings.post,
-			id: postId,
 			featuredImageId: featuredImageId || -1,
 		};
 	}
