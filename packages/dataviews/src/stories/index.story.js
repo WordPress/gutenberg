@@ -8,7 +8,12 @@ import { useState, useMemo, useCallback } from '@wordpress/element';
  */
 import { DataViews } from '../index';
 import { DEFAULT_VIEW, actions, data } from './fixtures';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../constants';
+import {
+	LAYOUT_GRID,
+	LAYOUT_TABLE,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_ANY,
+} from '../constants';
 
 const meta = {
 	title: 'DataViews/DataViews',
@@ -86,6 +91,29 @@ export const Default = ( props ) => {
 				].some( ( field ) => field.includes( normalizedSearch ) );
 			} );
 		}
+
+		if ( view.filters.length > 0 ) {
+			view.filters.forEach( ( filter ) => {
+				if (
+					filter.field === 'type' &&
+					filter.operator === OPERATOR_IS_ANY &&
+					filter?.value?.length > 0
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return filter.value.includes( item.type );
+					} );
+				} else if (
+					filter.field === 'type' &&
+					filter.operator === OPERATOR_IS_NONE &&
+					filter?.value?.length > 0
+				) {
+					filteredData = filteredData.filter( ( item ) => {
+						return ! filter.value.includes( item.type );
+					} );
+				}
+			} );
+		}
+
 		// Handle sorting.
 		if ( view.sort ) {
 			const stringSortingFields = [ 'title' ];
