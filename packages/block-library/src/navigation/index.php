@@ -1501,7 +1501,7 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
  * However, during the build process, Gutenberg automatically prefixes our functions with "gutenberg_".
  * Therefore, we concatenate the Core's function name to circumvent this prefix for our check.
  */
-$rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta'; // phpcs:ignore
+$rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ignore_hooked_blocks_meta'; // phpcs:ignore Generic.Strings.UnnecessaryStringConcat.Found
 
 /*
  * Injection of hooked blocks into the Navigation block relies on some functions present in WP >= 6.5
