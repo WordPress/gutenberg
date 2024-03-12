@@ -49,6 +49,8 @@ import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
+import BlockCrashBoundary from './block-crash-boundary';
+import BlockCrashWarning from './block-crash-warning';
 
 const EMPTY_ARRAY = [];
 
@@ -139,14 +141,19 @@ function BlockWrapper( {
 				isSelected={ isSelected }
 				name={ name }
 			/>
-			<BlockDraggable
-				clientId={ clientId }
-				draggingClientId={ draggingClientId }
-				enabled={ draggingEnabled }
-				testID="draggable-trigger-content"
+			<BlockCrashBoundary
+				blockName={ name }
+				fallback={ <BlockCrashWarning /> }
 			>
-				{ children }
-			</BlockDraggable>
+				<BlockDraggable
+					clientId={ clientId }
+					draggingClientId={ draggingClientId }
+					enabled={ draggingEnabled }
+					testID="draggable-trigger-content"
+				>
+					{ children }
+				</BlockDraggable>
+			</BlockCrashBoundary>
 		</Pressable>
 	);
 }

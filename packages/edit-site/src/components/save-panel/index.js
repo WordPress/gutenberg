@@ -77,11 +77,13 @@ const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 	);
 };
 
-const _EntitiesSavedStates = ( { onClose } ) => {
+const _EntitiesSavedStates = ( { onClose, renderDialog = undefined } ) => {
 	if ( isPreviewingTheme() ) {
 		return <EntitiesSavedStatesForPreview onClose={ onClose } />;
 	}
-	return <EntitiesSavedStates close={ onClose } />;
+	return (
+		<EntitiesSavedStates close={ onClose } renderDialog={ renderDialog } />
+	);
 };
 
 export default function SavePanel() {
@@ -142,21 +144,26 @@ export default function SavePanel() {
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
-			{ isSaveViewOpen ? (
-				<_EntitiesSavedStates onClose={ onClose } />
-			) : (
-				<div className="edit-site-editor__toggle-save-panel">
-					<Button
-						variant="secondary"
-						className="edit-site-editor__toggle-save-panel-button"
-						onClick={ () => setIsSaveViewOpened( true ) }
-						aria-expanded={ false }
-						disabled={ disabled }
-						__experimentalIsFocusable
-					>
-						{ __( 'Open save panel' ) }
-					</Button>
-				</div>
+			<div
+				className={ classnames( 'edit-site-editor__toggle-save-panel', {
+					'screen-reader-text': isSaveViewOpen,
+				} ) }
+			>
+				<Button
+					variant="secondary"
+					className={ classnames(
+						'edit-site-editor__toggle-save-panel-button'
+					) }
+					onClick={ () => setIsSaveViewOpened( true ) }
+					aria-haspopup={ 'dialog' }
+					disabled={ disabled }
+					__experimentalIsFocusable
+				>
+					{ __( 'Open save panel' ) }
+				</Button>
+			</div>
+			{ isSaveViewOpen && (
+				<_EntitiesSavedStates onClose={ onClose } renderDialog />
 			) }
 		</NavigableRegion>
 	);

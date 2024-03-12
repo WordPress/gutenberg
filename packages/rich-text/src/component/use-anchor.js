@@ -147,6 +147,20 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 	useLayoutEffect( () => {
 		if ( ! editableContentElement ) return;
 
+		function callback() {
+			setAnchor(
+				getAnchor( editableContentElement, tagName, className )
+			);
+		}
+
+		function attach() {
+			ownerDocument.addEventListener( 'selectionchange', callback );
+		}
+
+		function detach() {
+			ownerDocument.removeEventListener( 'selectionchange', callback );
+		}
+
 		const { ownerDocument } = editableContentElement;
 
 		if (
@@ -161,7 +175,18 @@ export function useAnchor( { editableContentElement, settings = {} } ) {
 			setAnchor(
 				getAnchor( editableContentElement, tagName, className )
 			);
+			attach();
 		}
+
+		editableContentElement.addEventListener( 'focusin', attach );
+		editableContentElement.addEventListener( 'focusout', detach );
+
+		return () => {
+			detach();
+
+			editableContentElement.removeEventListener( 'focusin', attach );
+			editableContentElement.removeEventListener( 'focusout', detach );
+		};
 	}, [ editableContentElement, tagName, className, isActive, wasActive ] );
 
 	return anchor;

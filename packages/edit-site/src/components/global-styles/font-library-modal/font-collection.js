@@ -441,13 +441,13 @@ function FontCollection( { slug } ) {
 							sprintf(
 								// translators: %s: Total number of pages.
 								_x(
-									'Page <CurrenPageControl /> of %s',
+									'Page <CurrentPageControl /> of %s',
 									'paging'
 								),
 								totalPages
 							),
 							{
-								CurrenPageControl: (
+								CurrentPageControl: (
 									<SelectControl
 										aria-label={ __( 'Current page' ) }
 										value={ page }
