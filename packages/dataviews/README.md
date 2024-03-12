@@ -59,6 +59,14 @@ The fields describe the visible items for each record in the dataset.
 Example:
 
 ```js
+const STATUSES = [
+	{ value: 'draft', label: __( 'Draft' ) },
+	{ value: 'future', label: __( 'Scheduled' ) },
+	{ value: 'pending', label: __( 'Pending Review' ) },
+	{ value: 'private', label: __( 'Private' ) },
+	{ value: 'publish', label: __( 'Published' ) },
+	{ value: 'trash', label: __( 'Trash' ) },
+];
 const fields = [
 	{
 		id: 'title',
@@ -89,9 +97,25 @@ const fields = [
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
-		]
+		],
+		filterBy: {
+			operators: [ 'is', 'isNot' ]
+		},
 		enableSorting: false
-	}
+	},
+	{
+		header: __( 'Status' ),
+		id: 'status',
+		getValue: ( { item } ) =>
+			STATUSES.find( ( { value } ) => value === item.status )
+				?.label ?? item.status,
+		type: 'enumeration',
+		elements: STATUSES,
+		filterBy: {
+			operators: [ 'isAny' ],
+		},
+		enableSorting: false,
+	},
 ]
 ```
 
@@ -120,8 +144,8 @@ const view = {
 	type: 'table',
 	search: '',
 	filters: [
-		{ field: 'author', operator: 'in', value: 2 },
-		{ field: 'status', operator: 'in', value: 'publish,draft' }
+		{ field: 'author', operator: 'is', value: 2 },
+		{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft'] }
 	],
 	page: 1,
 	perPage: 5,
@@ -140,7 +164,7 @@ Properties:
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
-    -   `operator`: which type of filter it is. One of `in`, `notIn`. See "Operator types".
+    -   `operator`: which type of filter it is. See "Operator types".
     -   `value`: the actual value selected by the user.
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
@@ -172,8 +196,8 @@ function MyCustomPageTable() {
 		},
 		search: '',
 		filters: [
-			{ field: 'author', operator: 'in', value: 2 },
-			{ field: 'status', operator: 'in', value: 'publish,draft' }
+			{ field: 'author', operator: 'is', value: 2 },
+			{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] }
 		],
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
@@ -182,10 +206,10 @@ function MyCustomPageTable() {
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
-			if ( filter.field === 'status' && filter.operator === 'in' ) {
+			if ( filter.field === 'status' && filter.operator === 'isAny' ) {
 				filters.status = filter.value;
 			}
-			if ( filter.field === 'author' && filter.operator === 'in' ) {
+			if ( filter.field === 'author' && filter.operator === 'is' ) {
 				filters.author = filter.value;
 			}
 		} );
@@ -282,8 +306,16 @@ Callback that signals the user triggered the details for one of more items, and 
 
 ### Operators
 
-- `in`: operator to be used in filters for fields of type `enumeration`.
-- `notIn`: operator to be used in filters for fields of type `enumeration`.
+Allowed operators for fields of type `enumeration`:
+
+- `is`: whether the item is equal to a single value.
+- `isNot`: whether the item is not equal to a single value.
+- `isAny`: whether the item is present in a list of values.
+- `isNone`: whether the item is not present in a list of values.
+
+`is` and `isNot` are single-selection operators, while `isAny` and `isNone` are multi-selection. By default, a filter with no operators declared will support multi-selection. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
+
+> The legacy operators `in` and `notIn` have been deprecated and will be removed soon. In the meantime, they work as `is` and `isNot` operators, respectively.
 
 ## Contributing to this package
 

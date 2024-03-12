@@ -45,29 +45,48 @@ function UploadFonts() {
 	 * @param {Array} files The files to be filtered
 	 * @return {void}
 	 */
-	const handleFilesUpload = ( files ) => {
+	const handleFilesUpload = async ( files ) => {
 		setNotice( null );
 		setIsUploading( true );
 		const uniqueFilenames = new Set();
 		const selectedFiles = [ ...files ];
-		const allowedFiles = selectedFiles.filter( ( file ) => {
-			if ( uniqueFilenames.has( file.name ) ) {
-				return false; // Discard duplicates
+		let hasInvalidFiles = false;
+
+		// Use map to create a promise for each file check, then filter with Promise.all.
+		const checkFilesPromises = selectedFiles.map( async ( file ) => {
+			const isFont = await isFontFile( file );
+			if ( ! isFont ) {
+				hasInvalidFiles = true;
+				return null; // Return null for invalid files.
 			}
-			// Eliminates files that are not allowed
+			// Check for duplicates
+			if ( uniqueFilenames.has( file.name ) ) {
+				return null; // Return null for duplicates.
+			}
+			// Check if the file extension is allowed.
 			const fileExtension = file.name.split( '.' ).pop().toLowerCase();
 			if ( ALLOWED_FILE_EXTENSIONS.includes( fileExtension ) ) {
 				uniqueFilenames.add( file.name );
-				return true; // Keep file if the extension is allowed
+				return file; // Return the file if it passes all checks.
 			}
-			return false; // Discard file extension not allowed
+			return null; // Return null for disallowed file extensions.
 		} );
+
+		// Filter out the nulls after all promises have resolved.
+		const allowedFiles = ( await Promise.all( checkFilesPromises ) ).filter(
+			( file ) => null !== file
+		);
+
 		if ( allowedFiles.length > 0 ) {
 			loadFiles( allowedFiles );
 		} else {
+			const message = hasInvalidFiles
+				? __( 'Sorry, you are not allowed to upload this file type.' )
+				: __( 'No fonts found to install.' );
+
 			setNotice( {
 				type: 'error',
-				message: __( 'No fonts found to install.' ),
+				message,
 			} );
 			setIsUploading( false );
 		}
@@ -93,6 +112,23 @@ function UploadFonts() {
 		);
 		handleInstall( fontFacesLoaded );
 	};
+
+	/**
+	 * Checks if a file is a valid Font file.
+	 *
+	 * @param {File} file The file to be checked.
+	 * @return {boolean} Whether the file is a valid font file.
+	 */
+	async function isFontFile( file ) {
+		const font = new Font( 'Uploaded Font' );
+		try {
+			const buffer = await readFileAsArrayBuffer( file );
+			await font.fromDataBuffer( buffer, 'font' );
+			return true;
+		} catch ( error ) {
+			return false;
+		}
+	}
 
 	// Create a function to read the file as array buffer
 	async function readFileAsArrayBuffer( file ) {
@@ -154,6 +190,7 @@ function UploadFonts() {
 			setNotice( {
 				type: 'error',
 				message: error.message,
+				errors: error?.installationErrors,
 			} );
 		}
 
@@ -167,9 +204,17 @@ function UploadFonts() {
 				{ notice && (
 					<Notice
 						status={ notice.type }
+						__unstableHTML
 						onRemove={ () => setNotice( null ) }
 					>
 						{ notice.message }
+						{ notice.errors && (
+							<ul>
+								{ notice.errors.map( ( error, index ) => (
+									<li key={ index }>{ error }</li>
+								) ) }
+							</ul>
+						) }
 					</Notice>
 				) }
 				{ isUploading && (

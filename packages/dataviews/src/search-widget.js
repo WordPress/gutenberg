@@ -15,7 +15,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { search } from '@wordpress/icons';
+import { search, check } from '@wordpress/icons';
 import { SVG, Circle } from '@wordpress/primitives';
 
 /**
@@ -39,6 +39,36 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
+const getCurrentValue = ( filterDefinition, currentFilter ) => {
+	if ( filterDefinition.singleSelection ) {
+		return currentFilter?.value;
+	}
+
+	if ( Array.isArray( currentFilter?.value ) ) {
+		return currentFilter.value;
+	}
+
+	if ( ! Array.isArray( currentFilter?.value ) && !! currentFilter?.value ) {
+		return [ currentFilter.value ];
+	}
+
+	return [];
+};
+
+const getNewValue = ( filterDefinition, currentFilter, value ) => {
+	if ( filterDefinition.singleSelection ) {
+		return value;
+	}
+
+	if ( Array.isArray( currentFilter?.value ) ) {
+		return currentFilter.value.includes( value )
+			? currentFilter.value.filter( ( v ) => v !== value )
+			: [ ...currentFilter.value, value ];
+	}
+
+	return [ value ];
+};
+
 function ListBox( { view, filter, onChangeView } ) {
 	const compositeStore = useCompositeStore( {
 		virtualFocus: true,
@@ -48,10 +78,10 @@ function ListBox( { view, filter, onChangeView } ) {
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
 	} );
-	const selectedFilter = view.filters.find(
-		( _filter ) => _filter.field === filter.field
+	const currentFilter = view.filters.find(
+		( f ) => f.field === filter.field
 	);
-	const selectedValues = selectedFilter?.value;
+	const currentValue = getCurrentValue( filter, currentFilter );
 	return (
 		<Composite
 			store={ compositeStore }
@@ -83,10 +113,6 @@ function ListBox( { view, filter, onChangeView } ) {
 								/>
 							}
 							onClick={ () => {
-								const currentFilter = view.filters.find(
-									( _filter ) =>
-										_filter.field === filter.field
-								);
 								const newFilters = currentFilter
 									? [
 											...view.filters.map(
@@ -101,7 +127,11 @@ function ListBox( { view, filter, onChangeView } ) {
 																currentFilter.operator ||
 																filter
 																	.operators[ 0 ],
-															value: element.value,
+															value: getNewValue(
+																filter,
+																currentFilter,
+																element.value
+															),
 														};
 													}
 													return _filter;
@@ -113,7 +143,11 @@ function ListBox( { view, filter, onChangeView } ) {
 											{
 												field: filter.field,
 												operator: filter.operators[ 0 ],
-												value: element.value,
+												value: getNewValue(
+													filter,
+													currentFilter,
+													element.value
+												),
 											},
 									  ];
 								onChangeView( {
@@ -126,9 +160,14 @@ function ListBox( { view, filter, onChangeView } ) {
 					}
 				>
 					<span className="dataviews-search-widget-listitem-check">
-						{ selectedValues === element.value && (
-							<Icon icon={ radioCheck } />
-						) }
+						{ filter.singleSelection &&
+							currentValue === element.value && (
+								<Icon icon={ radioCheck } />
+							) }
+						{ ! filter.singleSelection &&
+							currentValue.includes( element.value ) && (
+								<Icon icon={ check } />
+							) }
 					</span>
 					<span>
 						{ element.label }
@@ -147,10 +186,10 @@ function ListBox( { view, filter, onChangeView } ) {
 function ComboboxList( { view, filter, onChangeView } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const deferredSearchValue = useDeferredValue( searchValue );
-	const selectedFilter = view.filters.find(
+	const currentFilter = view.filters.find(
 		( _filter ) => _filter.field === filter.field
 	);
-	const selectedValues = selectedFilter?.value;
+	const currentValue = getCurrentValue( filter, currentFilter );
 	const matches = useMemo( () => {
 		const normalizedSearch = normalizeSearchInput( deferredSearchValue );
 		return filter.elements.filter( ( item ) =>
@@ -160,10 +199,8 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	return (
 		<Ariakit.ComboboxProvider
 			value={ searchValue }
+			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
-				const currentFilter = view.filters.find(
-					( _filter ) => _filter.field === filter.field
-				);
 				const newFilters = currentFilter
 					? [
 							...view.filters.map( ( _filter ) => {
@@ -223,9 +260,14 @@ function ComboboxList( { view, filter, onChangeView } ) {
 							focusOnHover
 						>
 							<span className="dataviews-search-widget-listitem-check">
-								{ selectedValues === element.value && (
-									<Icon icon={ radioCheck } />
-								) }
+								{ filter.singleSelection &&
+									currentValue === element.value && (
+										<Icon icon={ radioCheck } />
+									) }
+								{ ! filter.singleSelection &&
+									currentValue.includes( element.value ) && (
+										<Icon icon={ check } />
+									) }
 							</span>
 							<span>
 								<Ariakit.ComboboxItemValue

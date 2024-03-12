@@ -142,6 +142,56 @@ extension RCTLogLevel {
     }
 }
 
+// Definition of JavaScript exception, which will be used to
+// log exception to the Crash Logging service.
+public struct GutenbergJSException {
+    public let type: String
+    public let message: String
+    public let stacktrace: [StacktraceLine]
+    public let context: [String: Any]
+    public let tags: [String: String]
+    public let isHandled: Bool
+    public let handledBy: String
+
+    public struct StacktraceLine {
+        public let filename: String?
+        public let function: String
+        public let lineno: NSNumber?
+        public let colno: NSNumber?
+        
+        init?(from dict: [AnyHashable: Any]) {
+            guard let function = dict["function"] as? String else {
+                return nil
+            }
+            self.filename = dict["filename"] as? String
+            self.function = function
+            self.lineno = dict["lineno"] as? NSNumber
+            self.colno = dict["colno"] as? NSNumber
+        }
+    }
+    
+    init?(from dict: [AnyHashable: Any]) {
+        guard let type = dict["type"] as? String,
+              let message = dict["message"] as? String,
+              let rawStacktrace = dict["stacktrace"] as? [[AnyHashable: Any]],
+              let context = dict["context"] as? [String: Any],
+              let tags = dict["tags"] as? [String: String],
+              let isHandled = dict["isHandled"] as? Bool,
+              let handledBy = dict["handledBy"] as? String
+        else {
+            return nil
+        }
+        
+        self.type = type
+        self.message = message
+        self.stacktrace = rawStacktrace.compactMap { StacktraceLine(from: $0) }
+        self.context = context
+        self.tags = tags
+        self.isHandled = isHandled
+        self.handledBy = handledBy
+    }
+}
+
 public protocol GutenbergBridgeDelegate: AnyObject {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
@@ -271,6 +321,8 @@ public protocol GutenbergBridgeDelegate: AnyObject {
     func gutenbergDidRequestToggleRedoButton(_ isDisabled: Bool)
 
     func gutenbergDidRequestConnectionStatus() -> Bool
+    
+    func gutenbergDidRequestLogException(_ exception: GutenbergJSException, with callback: @escaping () -> Void)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

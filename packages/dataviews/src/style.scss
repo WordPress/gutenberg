@@ -123,7 +123,7 @@
 			border-bottom: 0;
 		}
 
-		&:hover {
+		&.is-hovered {
 			background-color: #f8f8f8;
 		}
 
@@ -137,9 +137,14 @@
 			}
 		}
 
+		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			opacity: 0;
+		}
+
 		&:focus-within,
-		&:hover {
-			.components-checkbox-control__input {
+		&.is-hovered {
+			.components-checkbox-control__input,
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
 		}

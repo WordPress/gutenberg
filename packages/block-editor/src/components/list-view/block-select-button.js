@@ -14,12 +14,7 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	connection,
-	lockSmall as lock,
-	pinSmall,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -37,12 +32,11 @@ import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
 import { useListViewContext } from './context';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId, name: blockName },
+		block: { clientId },
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -72,7 +66,6 @@ function ListViewBlockSelectButton(
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlocksByClientId,
-		getBlockAttributes,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
 	const { duplicateBlocks, multiSelect, removeBlocks } =
@@ -81,8 +74,6 @@ function ListViewBlockSelectButton(
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 	const { rootClientId } = useListViewContext();
-
-	const isConnected = getBlockAttributes( clientId )?.metadata?.bindings;
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -285,11 +276,6 @@ function ListViewBlockSelectButton(
 							>
 								{ blockInformation.anchor }
 							</Truncate>
-						</span>
-					) }
-					{ isConnected && canBindBlock( blockName ) && (
-						<span className="block-editor-list-view-block-select-button__bindings">
-							<Icon icon={ connection } />
 						</span>
 					) }
 					{ positionLabel && isSticky && (

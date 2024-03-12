@@ -31,7 +31,7 @@ import {
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -127,7 +127,12 @@ function attributesFromMedia( {
 	};
 }
 
-function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
+function MediaTextEdit( {
+	attributes,
+	isSelected,
+	setAttributes,
+	context: { postId, postType },
+} ) {
 	const {
 		focalPoint,
 		href,
@@ -145,8 +150,41 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		rel,
 		verticalAlignment,
 		allowedBlocks,
+		useFeaturedImage,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
+	const [ featuredImage ] = useEntityProp(
+		'postType',
+		postType,
+		'featured_media',
+		postId
+	);
+
+	const featuredImageMedia = useSelect(
+		( select ) =>
+			featuredImage &&
+			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
+		[ featuredImage ]
+	);
+
+	const featuredImageURL = useFeaturedImage
+		? featuredImageMedia?.source_url
+		: '';
+	const featuredImageAlt = useFeaturedImage
+		? featuredImageMedia?.alt_text
+		: '';
+
+	const toggleUseFeaturedImage = () => {
+		setAttributes( {
+			imageFill: false,
+			mediaType: 'image',
+			mediaId: undefined,
+			mediaUrl: undefined,
+			mediaAlt: undefined,
+			useFeaturedImage: ! useFeaturedImage,
+		} );
+	};
 
 	const { imageSizes, image } = useSelect(
 		( select ) => {
@@ -261,25 +299,30 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
-			{ imageFill && mediaUrl && mediaType === 'image' && (
-				<FocalPointPicker
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					label={ __( 'Focal point' ) }
-					url={ mediaUrl }
-					value={ focalPoint }
-					onChange={ ( value ) =>
-						setAttributes( { focalPoint: value } )
-					}
-					onDragStart={ imperativeFocalPointPreview }
-					onDrag={ imperativeFocalPointPreview }
-				/>
-			) }
-			{ mediaType === 'image' && (
+			{ imageFill &&
+				( mediaUrl || featuredImageURL ) &&
+				mediaType === 'image' && (
+					<FocalPointPicker
+						__nextHasNoMarginBottom
+						label={ __( 'Focal point' ) }
+						url={
+							useFeaturedImage && featuredImageURL
+								? featuredImageURL
+								: mediaUrl
+						}
+						value={ focalPoint }
+						onChange={ ( value ) =>
+							setAttributes( { focalPoint: value } )
+						}
+						onDragStart={ imperativeFocalPointPreview }
+						onDrag={ imperativeFocalPointPreview }
+					/>
+				) }
+			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
 				<TextareaControl
 					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt }
+					value={ mediaAlt || featuredImageAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
@@ -301,6 +344,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					imageSizeHelp={ __(
 						'Select the size of the source image.'
 					) }
+				/>
+			) }
+			{ ( mediaUrl || featuredImageURL ) && (
+				<RangeControl
+					__nextHasNoMarginBottom
+					label={ __( 'Media width' ) }
+					value={ temporaryMediaWidth || mediaWidth }
+					onChange={ commitWidthChange }
+					min={ WIDTH_CONSTRAINT_PERCENTAGE }
+					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
 				/>
 			) }
 		</PanelBody>
@@ -353,7 +406,11 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						onChangeUrl={ onSetHref }
 						linkDestination={ linkDestination }
 						mediaType={ mediaType }
-						mediaUrl={ image && image.source_url }
+						mediaUrl={
+							useFeaturedImage && featuredImageURL
+								? featuredImageURL
+								: image && image.source_url
+						}
 						mediaLink={ image && image.link }
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
@@ -370,6 +427,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					commitWidthChange={ commitWidthChange }
 					ref={ refMediaContainer }
 					enableResize={ blockEditingMode === 'default' }
+					toggleUseFeaturedImage={ toggleUseFeaturedImage }
 					{ ...{
 						focalPoint,
 						imageFill,
@@ -381,6 +439,9 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaType,
 						mediaUrl,
 						mediaWidth,
+						useFeaturedImage,
+						featuredImageURL,
+						featuredImageAlt,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }

@@ -46,6 +46,7 @@ function InlineLinkUI( {
 	onFocusOutside,
 	stopAddingLink,
 	contentRef,
+	focusOnMount,
 } ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
 
@@ -216,7 +217,10 @@ function InlineLinkUI( {
 
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,
-		settings: { ...settings, isActive },
+		settings: {
+			...settings,
+			isActive,
+		},
 	} );
 
 	async function handleCreate( pageTitle ) {
@@ -253,6 +257,8 @@ function InlineLinkUI( {
 			placement="bottom"
 			offset={ 10 }
 			shift
+			focusOnMount={ focusOnMount }
+			constrainTabbing
 		>
 			<LinkControl
 				value={ linkValue }
