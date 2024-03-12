@@ -83,7 +83,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		// The sniff intentionally doesn't check if the docblock has a valid start tag.
+		// The sniff intentionally doesn't check if the docblock has a valid open tag.
 		// Its only job is to make sure that the @since tag is present and has a valid version value.
 		$doc_block_start_token = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $doc_block_end_token - 1 ), null, true, null, true );
 		if ( false === $doc_block_start_token ) {
