@@ -280,7 +280,7 @@ function MediaTextEdit( {
 			<ToolsPanelItem
 				label={ __( 'Media width' ) }
 				isShownByDefault
-				hasValue={ () => !! mediaWidth }
+				hasValue={ () => mediaWidth !== 50 }
 				onDeselect={ () => setAttributes( { mediaWidth: 50 } ) }
 			>
 				<RangeControl
@@ -413,7 +413,7 @@ function MediaTextEdit( {
 			imageFill: false,
 			mediaAlt: undefined,
 			focalPoint: undefined,
-			mediaWidth: undefined,
+			mediaWidth: 50,
 			mediaSizeSlug: undefined,
 		} );
 	}
