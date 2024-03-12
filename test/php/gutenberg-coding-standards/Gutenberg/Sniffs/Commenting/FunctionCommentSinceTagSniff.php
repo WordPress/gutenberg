@@ -64,7 +64,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			}
 		}
 
-		$missing_since_tag_error_message = sprintf( '@since tag is missing for the \'%s()\' function.', $function_name );
+		$missing_since_tag_error_message = sprintf( '@since tag is missing for the "%s()" function.', $function_name );
 
 		// All these tokens could be present before the docblock.
 		$tokens_before_the_docblock = array(
@@ -114,7 +114,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 
 		$phpcsFile->addError(
-			'Invalid @since version value for the `%s()` function: `%s`. Version value must be greater than or equal to 0.0.1.',
+			'Invalid @since version value for the "%s()" function: "%s". Version value must be greater than or equal to 0.0.1.',
 			$version_token,
 			'InvalidSinceTagVersionValue',
 			array(
