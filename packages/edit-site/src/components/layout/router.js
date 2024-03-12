@@ -45,12 +45,7 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// List layout is still experimental.
-	// Extracted it here out of the conditionals so it doesn't unintentionally becomes stable.
-	const isListLayout =
-		isCustom !== 'true' &&
-		layout === 'list' &&
-		window?.__experimentalAdminViews;
+	const isListLayout = isCustom !== 'true' && layout === 'list';
 
 	if ( path === '/pages' ) {
 		return {
