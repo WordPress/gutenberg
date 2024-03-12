@@ -16,6 +16,7 @@ import PostPanelRow from './components/post-panel-row';
 import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
+import PostFeaturedImageWithPanelCheck from './components/post-featured-image/with-panel-check';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -32,6 +33,7 @@ lock( privateApis, {
 	PostViewLink,
 	PreviewDropdown,
 	PreferencesModal,
+	PostFeaturedImageWithPanelCheck,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,

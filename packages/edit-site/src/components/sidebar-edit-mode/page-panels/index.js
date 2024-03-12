@@ -16,19 +16,22 @@ import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../../lock-unlock';
 import { store as editSiteStore } from '../../../store';
 import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
+
+const { PostFeaturedImageWithPanelCheck } = unlock( editorPrivateApis );
 
 export default function PagePanels() {
 	const {
@@ -86,7 +89,9 @@ export default function PagePanels() {
 							</Text>
 						</VStack>
 					}
-				/>
+				>
+					<PostFeaturedImageWithPanelCheck />
+				</SidebarCard>
 			</PanelBody>
 			<PanelBody title={ __( 'Summary' ) }>
 				<PageSummary
@@ -104,7 +109,6 @@ export default function PagePanels() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostFeaturedImagePanel />
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
