@@ -237,7 +237,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'isAny',
+								operator: OPERATOR_IS_ANY,
 								value: [ activeView ],
 							},
 					  ]
