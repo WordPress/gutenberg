@@ -365,7 +365,7 @@ function Navigation( {
 			speak( __( `Creating Navigation Menu.` ) );
 		}
 
-		if ( createNavigationMenuIsSuccess ) {
+		if ( createNavigationMenuIsSuccess && ! isLoading ) {
 			handleUpdateMenu( createNavigationMenuPost?.id, {
 				focusNavigationBlock: true,
 			} );
@@ -390,6 +390,7 @@ function Navigation( {
 		handleUpdateMenu,
 		hideNavigationMenuStatusNotice,
 		showNavigationMenuStatusNotice,
+		isLoading,
 	] );
 
 	useEffect( () => {
