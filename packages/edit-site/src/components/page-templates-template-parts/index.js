@@ -63,10 +63,6 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
-	? [ LAYOUT_TABLE, LAYOUT_GRID, LAYOUT_LIST ]
-	: [ LAYOUT_TABLE, LAYOUT_GRID ];
-
 const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {
 		primaryField: 'title',
@@ -473,7 +469,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
 				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
-				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);
