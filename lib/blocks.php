@@ -81,6 +81,7 @@ function gutenberg_reregister_core_block_types() {
 				'navigation.php'                   => 'core/navigation',
 				'navigation-link.php'              => 'core/navigation-link',
 				'navigation-submenu.php'           => 'core/navigation-submenu',
+				'navigation-overlay-close.php'     => 'core/navigation-overlay-close',
 				'page-list.php'                    => 'core/page-list',
 				'page-list-item.php'               => 'core/page-list-item',
 				'pattern.php'                      => 'core/pattern',

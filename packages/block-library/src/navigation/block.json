@@ -22,7 +22,7 @@
 	"textdomain": "default",
 	"attributes": {
 		"ref": {
-			"type": "number"
+			"type": [ "number", "string" ]
 		},
 		"textColor": {
 			"type": "string"
@@ -84,6 +84,9 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
+		},
+		"overlayId": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

@@ -23,6 +23,7 @@ import {
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import useIsNavigationOverlay from './use-is-navigation-overlay';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -45,6 +46,8 @@ export default function SiteEditorCanvas() {
 		[]
 	);
 	const isFocusMode = location.params.focusMode || isFocusableEntity;
+	const isNavigationOverlayTemplate = useIsNavigationOverlay();
+
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const settings = useSiteEditorSettings();
@@ -60,7 +63,9 @@ export default function SiteEditorCanvas() {
 
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
-	const forceFullHeight = isNavigationFocusMode;
+
+	const forceFullHeight =
+		isNavigationFocusMode || isNavigationOverlayTemplate;
 
 	return (
 		<EditorCanvasContainer.Slot>

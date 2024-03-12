@@ -69,6 +69,7 @@ import * as more from './more';
 import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as nextpage from './nextpage';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
@@ -186,6 +187,7 @@ const getAllBlocks = () => {
 		navigation,
 		navigationLink,
 		navigationSubmenu,
+		navigationOverlayClose,
 		siteLogo,
 		siteTitle,
 		siteTagline,

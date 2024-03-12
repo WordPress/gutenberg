@@ -77,3 +77,68 @@ if ( ! function_exists( 'wp_enqueue_block_view_script' ) ) {
 		add_filter( 'render_block', $callback, 10, 2 );
 	}
 }
+
+function add_navigation_overlay_area( $areas ) {
+	$areas[] = array(
+		'area'        => 'navigation-overlay',
+		'label'       => _x( 'Navigation Overlay', 'template part area' ),
+		'description' => __(
+			'An area for navigation overlay content.'
+		),
+		'area_tag'    => 'section',
+		'icon'        => 'handle',
+	);
+	return $areas;
+}
+add_filter( 'default_wp_template_part_areas', 'add_navigation_overlay_area', 10, 1 );
+
+function add_default_navigation_overlay_template_part( $block_template, $id, $template_type ) {
+
+	// if the template type is not template part, return the block template
+	if ( 'wp_template_part' !== $template_type ) {
+		return $block_template;
+	}
+
+	// If its not the "Core" Navigation Overlay, return the block template.
+	if ( $id !== 'core//navigation-overlay' ) {
+		return $block_template;
+	}
+
+	// If the block template is not empty, return the "found" block template.
+	// Failure to do this will override any "found" overlay template part from the Theme.
+	if ( ! empty( $block_template ) ) {
+		return $block_template;
+	}
+
+	// Return a default template part for the Navigation Overlay.
+	// This is essentially a "Core" fallback in case the Theme does not provide one.
+	$template = new WP_Block_Template();
+
+	// TODO: should we provide "$theme" here at all as this is a "Core" template.
+	$template->id             = 'core' . '//' . 'navigation-overlay';
+	$template->theme          = 'core';
+	$template->slug           = 'navigation-overlay';
+	$template->source         = 'custom';
+	$template->type           = 'wp_template_part';
+	$template->title          = 'Navigation Overlay';
+	$template->status         = 'publish';
+	$template->has_theme_file = null;
+	$template->is_custom      = false;
+	$template->modified       = null;
+	$template->origin         = null;
+	$template->author         = null;
+
+	// Set the area to match the Navigation Overlay area.
+	$template->area = 'navigation-overlay';
+
+	// The content is the default Navigation Overlay template part. This will only be used
+	// if the Theme does not provide a template part for the Navigation Overlay.
+	// PHP is used here to allow for translation of the default template part.
+	ob_start();
+	include __DIR__ . '/navigation-overlay.php';
+	$template->content = ob_get_clean();
+
+	return $template;
+}
+
+add_filter( 'get_block_file_template', 'add_default_navigation_overlay_template_part', 10, 3 );

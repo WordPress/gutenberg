@@ -7,6 +7,8 @@ export const PRIORITIZED_INSERTER_BLOCKS = [
 	'core/navigation-link',
 ];
 
+export const NAVIGATION_OVERLAY_TEMPLATE_PART_AREA = 'navigation-overlay';
+
 // These parameters must be kept aligned with those in
 // lib/compat/wordpress-6.3/navigation-block-preloading.php
 // and
