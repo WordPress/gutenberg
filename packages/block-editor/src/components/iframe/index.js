@@ -30,7 +30,7 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { store as blockEditorStore } from '../../store';
-import calculateScale from '../../utils/calculate-scale';
+
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
 
@@ -104,25 +104,21 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	shouldZoom = false,
+	scale = 1,
+	frameSize = 0,
 	readonly,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
 } ) {
-	const { resolvedAssets, isPreviewMode, isZoomOutMode } = useSelect(
-		( select ) => {
-			const { getSettings, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const settings = getSettings();
-			return {
-				resolvedAssets: settings.__unstableResolvedAssets,
-				isPreviewMode: settings.__unstableIsPreviewMode,
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-			};
-		},
-		[]
-	);
+	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
+		return {
+			resolvedAssets: settings.__unstableResolvedAssets,
+			isPreviewMode: settings.__unstableIsPreviewMode,
+		};
+	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -132,24 +128,6 @@ function Iframe( {
 		contentResizeListener,
 		{ height: contentHeight, width: contentWidth },
 	] = useResizeObserver();
-
-	// When zoom-out mode is enabled, the iframe is scaled down to fit the
-	// content within the viewport.
-	// At 1000px wide, the iframe is scaled to 45%.
-	// At 400px wide, the iframe is scaled to 90%.
-	const scale =
-		isZoomOutMode && shouldZoom
-			? calculateScale(
-					{
-						maxWidth: 1000,
-						minWidth: 400,
-						maxScale: 0.45,
-						minScale: 0.9,
-					},
-					contentWidth
-			  )
-			: 1;
-	const frameSize = isZoomOutMode ? 100 : 0;
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -276,25 +254,32 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
-	// We need to counter the margin created by scaling the iframe. If the scale
-	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
-	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
-	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
-
 	useEffect( () => {
-		if ( iframeDocument && scale !== 1 ) {
-			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
+		if ( ! iframeDocument ) {
+			return;
+		}
+
+		const _scale =
+			typeof scale === 'function'
+				? scale( contentWidth, contentHeight )
+				: scale;
+
+		if ( _scale !== 1 ) {
+			// Hack to get proper margins when scaling the iframe document.
+			const bottomFrameSize = frameSize - contentHeight * ( 1 - _scale );
+
+			iframeDocument.documentElement.style.transform = `scale( ${ _scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
-			iframeDocument.documentElement.style.marginBottom = `${
-				-marginFromScaling * 2 + frameSize
-			}px`;
+			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
+			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
+
 			return () => {
 				iframeDocument.documentElement.style.transform = '';
 				iframeDocument.documentElement.style.marginTop = '';
 				iframeDocument.documentElement.style.marginBottom = '';
 			};
 		}
-	}, [ scale, frameSize, marginFromScaling, iframeDocument ] );
+	}, [ scale, frameSize, contentHeight, contentWidth, iframeDocument ] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
