@@ -70,7 +70,7 @@ class FunctionCommentSniff implements Sniff {
 		$all_comment_tags_but_open_comment_tag = Tokens::$commentTokens;
 		unset( $all_comment_tags_but_open_comment_tag[ T_DOC_COMMENT_OPEN_TAG ] );
 
-		$doc_block_start_token = $phpcsFile->findPrevious( $all_comment_tags_but_open_comment_tag, ( $stackPtr - 1 ), null, true, null, true );
+		$doc_block_start_token = $phpcsFile->findPrevious( $all_comment_tags_but_open_comment_tag, ( $doc_block_end_token - 1 ), null, true, null, true );
 		if ( ( false === $doc_block_start_token ) || ( T_DOC_COMMENT_OPEN_TAG !== $tokens[ $doc_block_start_token ]['code'] ) ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $function_token, 'MissingSinceTag' );
 			return;
