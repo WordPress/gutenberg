@@ -165,7 +165,7 @@ export default function ChildLayoutControl( {
 					>
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Column start' ) }
+							label={ __( 'Column' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
@@ -182,7 +182,7 @@ export default function ChildLayoutControl( {
 
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Row start' ) }
+							label={ __( 'Row' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
