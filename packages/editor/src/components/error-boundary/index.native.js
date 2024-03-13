@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 /**
  * WordPress dependencies
@@ -10,9 +11,13 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
 import { logException } from '@wordpress/react-native-bridge';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import {
+	usePreferredColorSchemeStyle,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
+import { warning } from '@wordpress/icons';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,21 +37,38 @@ function getContent() {
 	} catch ( error ) {}
 }
 
-function CopyButton( { text, label, accessibilityLabel, accessibilityHint } ) {
+function CopyButton( {
+	text,
+	label,
+	accessibilityLabel,
+	accessibilityHint,
+	secondary = false,
+} ) {
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles[ 'copy-button__container' ],
 		styles[ 'copy-button__container--dark' ]
 	);
+
+	const containerSecondaryStyle = usePreferredColorSchemeStyle(
+		styles[ 'copy-button__container--secondary' ],
+		styles[ 'copy-button__container--secondary-dark' ]
+	);
+
 	const textStyle = usePreferredColorSchemeStyle(
 		styles[ 'copy-button__text' ],
 		styles[ 'copy-button__text--dark' ]
+	);
+
+	const textSecondaryStyle = usePreferredColorSchemeStyle(
+		styles[ 'copy-button__text--secondary' ],
+		styles[ 'copy-button__text--secondary-dark' ]
 	);
 
 	return (
 		<TouchableOpacity
 			activeOpacity={ 0.5 }
 			accessibilityLabel={ accessibilityLabel }
-			style={ containerStyle }
+			style={ [ containerStyle, secondary && containerSecondaryStyle ] }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ accessibilityHint }
 			onPress={ () => {
@@ -55,7 +77,9 @@ function CopyButton( { text, label, accessibilityLabel, accessibilityHint } ) {
 				);
 			} }
 		>
-			<Text style={ textStyle }>{ label }</Text>
+			<Text style={ [ textStyle, secondary && textSecondaryStyle ] }>
+				{ label }
+			</Text>
 		</TouchableOpacity>
 	);
 }
@@ -89,34 +113,80 @@ class ErrorBoundary extends Component {
 			return this.props.children;
 		}
 
-		const actions = (
-			<View style={ styles[ 'error-boundary__actions-container' ] }>
-				<CopyButton
-					label={ __( 'Copy Post Text' ) }
-					accessibilityLabel={ __( 'Button to copy post text' ) }
-					accessibilityHint={ __( 'Tap here to copy post text' ) }
-					text={ getContent }
-				/>
-				<CopyButton
-					label={ __( 'Copy Error' ) }
-					accessibilityLabel={ __( 'Button to copy error' ) }
-					accessibilityHint={ __( 'Tap here to copy error' ) }
-					text={ error.stack }
-				/>
-			</View>
+		const { getStylesFromColorScheme } = this.props;
+
+		const iconContainerStyle = getStylesFromColorScheme(
+			styles[ 'error-boundary__icon-container' ],
+			styles[ 'error-boundary__icon-container--dark' ]
+		);
+
+		const titleStyle = getStylesFromColorScheme(
+			styles[ 'error-boundary__title' ],
+			styles[ 'error-boundary__title--dark' ]
+		);
+
+		const messageStyle = getStylesFromColorScheme(
+			styles[ 'error-boundary__message' ],
+			styles[ 'error-boundary__message--dark' ]
 		);
 
 		return (
-			<Warning
-				actions={ actions }
-				message={ __(
-					'The editor has encountered an unexpected error.'
-				) }
-				containerStyle={ styles[ 'error-boundary__container' ] }
-				messageStyle={ styles[ 'error-boundary__message' ] }
-			/>
+			<SafeAreaView>
+				<ScrollView
+					style={ styles[ 'error-boundary__scroll' ] }
+					contentContainerStyle={
+						styles[ 'error-boundary__scroll-container' ]
+					}
+				>
+					<View style={ styles[ 'error-boundary__container' ] }>
+						<View style={ iconContainerStyle }>
+							<Icon
+								icon={ warning }
+								{ ...styles[ 'error-boundary__icon' ] }
+							/>
+						</View>
+						<Text style={ titleStyle }>
+							{ __(
+								'The editor has encountered an unexpected error.'
+							) }
+						</Text>
+						<Text style={ messageStyle }>
+							{ __(
+								'You can copy your post text in case your content is impacted. Copy error details to debug and share with support.'
+							) }
+						</Text>
+						<View
+							style={
+								styles[ 'error-boundary__actions-container' ]
+							}
+						>
+							<CopyButton
+								label={ __( 'Copy post text' ) }
+								accessibilityLabel={ __(
+									'Button to copy post text'
+								) }
+								accessibilityHint={ __(
+									'Tap here to copy post text'
+								) }
+								text={ getContent }
+							/>
+							<CopyButton
+								label={ __( 'Copy error details' ) }
+								accessibilityLabel={ __(
+									'Button to copy error details'
+								) }
+								accessibilityHint={ __(
+									'Tap here to copy error details'
+								) }
+								text={ error.stack }
+								secondary
+							/>
+						</View>
+					</View>
+				</ScrollView>
+			</SafeAreaView>
 		);
 	}
 }
 
-export default ErrorBoundary;
+export default withPreferredColorScheme( ErrorBoundary );
