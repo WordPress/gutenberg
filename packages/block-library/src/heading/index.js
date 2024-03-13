@@ -31,7 +31,12 @@ export const settings = {
 		const { content, level } = attributes;
 
 		const customName = attributes?.metadata?.name;
-		const contentHTML = toHTMLString( { value: content } );
+		const contentHTML =
+			typeof content === 'string'
+				? content
+				: toHTMLString( {
+						value: content,
+				  } );
 
 		// In the list view, use the block's content as the label.
 		// If the content is empty, fall back to the default label.
