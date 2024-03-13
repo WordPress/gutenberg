@@ -16,7 +16,7 @@ import {
 	Tooltip,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -220,7 +220,7 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 			};
 		},
-		[ clientId ]
+		[ clientId, maxNestingLevel ]
 	);
 
 	/**
@@ -282,7 +282,7 @@ export default function NavigationLinkEdit( {
 				placeCaretAtHorizontalEdge( ref.current, true );
 			}
 		}
-	}, [ url ] );
+	}, [ url, isLinkOpen, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -329,10 +329,7 @@ export default function NavigationLinkEdit( {
 	} = getColors( context, ! isTopLevelLink );
 
 	function onKeyDown( event ) {
-		if (
-			isKeyboardEvent.primary( event, 'k' ) ||
-			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
-		) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
 			// Required to prevent the command center from opening,
 			// as it shares the CMD+K shortcut.
 			// See https://github.com/WordPress/gutenberg/pull/59845.
