@@ -3,8 +3,7 @@
  */
 import {
 	Button,
-	Modal,
-	__experimentalHStack as HStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import {
 	store as coreStore,
@@ -13,10 +12,10 @@ import {
 } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 export default function NavigationMenuDeleteControl( { onDelete } ) {
-	const [ isConfirmModalVisible, setIsConfirmModalVisible ] =
+	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
 		useState( false );
 	const id = useEntityId( 'postType', 'wp_navigation' );
 	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
@@ -29,50 +28,29 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 				variant="secondary"
 				isDestructive
 				onClick={ () => {
-					setIsConfirmModalVisible( true );
+					setIsConfirmDialogVisible( true );
 				} }
 			>
 				{ __( 'Delete menu' ) }
 			</Button>
-			{ isConfirmModalVisible && (
-				<Modal
-					title={ sprintf(
-						/* translators: %s: the name of a menu to delete */
-						__( 'Delete %s' ),
-						title
-					) }
-					onRequestClose={ () => setIsConfirmModalVisible( false ) }
+			{ isConfirmDialogVisible && (
+				<ConfirmDialog
+					isOpen
+					onConfirm={ () => {
+						deleteEntityRecord( 'postType', 'wp_navigation', id, {
+							force: true,
+						} );
+						onDelete( title );
+					} }
+					onCancel={ () => {
+						setIsConfirmDialogVisible( false );
+					} }
+					confirmButtonText={ __( 'Delete' ) }
 				>
-					<p>
-						{ __(
-							'Are you sure you want to delete this navigation menu?'
-						) }
-					</p>
-					<HStack justify="right">
-						<Button
-							variant="tertiary"
-							onClick={ () => {
-								setIsConfirmModalVisible( false );
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							onClick={ () => {
-								deleteEntityRecord(
-									'postType',
-									'wp_navigation',
-									id,
-									{ force: true }
-								);
-								onDelete( title );
-							} }
-						>
-							{ __( 'Confirm' ) }
-						</Button>
-					</HStack>
-				</Modal>
+					{ __(
+						'Are you sure you want to delete this Navigation menu?'
+					) }
+				</ConfirmDialog>
 			) }
 		</>
 	);
