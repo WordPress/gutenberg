@@ -14,6 +14,7 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -35,6 +36,7 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
+ * @property {Object.<string, string|number|null>}  ssl                           The ssl certificate, key, and port numbers.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -50,9 +52,19 @@ const mergeConfigs = require( './merge-configs' );
  * @property {WPSource[]}                pluginSources Plugins to load in the environment.
  * @property {WPSource[]}                themeSources  Themes to load in the environment.
  * @property {number}                    port          The port to use.
+ * @property {WPSSLConfig}               ssl           The ssl certificate, key, and port number.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ */
+
+/**
+ * The SSL configuration options.
+ *
+ * @typedef WPSSLConfig
+ * @property {string} cert The path to the SSL certificate.
+ * @property {string} key  The path to the SSL key.
+ * @property {number} port The port to use for SSL.
  */
 
 /**
@@ -85,6 +97,12 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	ssl: {
+		cert: null,
+		key: null,
+		port: 8883,
+		testsPort: 8884,
+	},
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -281,6 +299,21 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.port = overrides.testsPort;
 	}
 
+	if ( overrides.ssl ) {
+		overrideConfig.ssl = {};
+		overrideConfig.env.development.ssl = {};
+		overrideConfig.env.tests.ssl = {};
+
+		if ( overrides.ssl.port ) {
+			overrideConfig.ssl.port = overrides.ssl.port;
+			overrideConfig.env.development.ssl.port = overrides.ssl.port;
+		}
+		if ( overrides.ssl.testsPort ) {
+			overrideConfig.ssl.testsPort = overrides.ssl.testsPort;
+			overrideConfig.env.tests.ssl.port = overrides.ssl.testsPort;
+		}
+	}
+
 	if ( overrides.coreSource ) {
 		overrideConfig.coreSource = overrides.coreSource;
 		overrideConfig.env.development.coreSource = overrides.coreSource;
@@ -434,6 +467,35 @@ async function parseEnvironmentConfig(
 	if ( config.port !== undefined ) {
 		checkPort( configFile, `${ environmentPrefix }port`, config.port );
 		parsedConfig.port = config.port;
+	}
+
+	if ( config.ssl !== undefined ) {
+		parsedConfig.ssl = config.ssl;
+		if ( config.ssl.port !== undefined ) {
+			checkPort(
+				configFile,
+				`${ environmentPrefix }ssl.port`,
+				config.ssl.port
+			);
+			parsedConfig.ssl.port = config.ssl.port;
+		}
+		if ( config.ssl.key ) {
+			checkString(
+				configFile,
+				`${ environmentPrefix }ssl.key`,
+				config.ssl.key
+			);
+			parsedConfig.ssl.key = config.ssl.key;
+		}
+		parsedConfig.ssl.key = config.ssl.key;
+		if ( config.ssl.cert ) {
+			checkString(
+				configFile,
+				`${ environmentPrefix }ssl.cert`,
+				config.ssl.cert
+			);
+			parsedConfig.ssl.cert = config.ssl.cert;
+		}
 	}
 
 	if ( config.phpVersion !== undefined ) {

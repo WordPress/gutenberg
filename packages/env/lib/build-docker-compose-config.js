@@ -54,6 +54,11 @@ function getMounts(
 			? `user-home:/home/${ hostUsername }`
 			: `tests-user-home:/home/${ hostUsername }`;
 
+	const sslMount = [];
+	if ( config.ssl !== undefined && config.ssl.cert ) {
+		sslMount.push( workDirectoryPath + `/ssl:/home/${ hostUsername }/ssl` );
+	}
+
 	const corePHPUnitMount = `${ path.join(
 		workDirectoryPath,
 		wordpressDefault === 'wordpress'
@@ -72,6 +77,7 @@ function getMounts(
 			coreMount, // Must be first because of some operations later that expect it to be!
 			corePHPUnitMount,
 			userHomeMount,
+			...sslMount,
 			...directoryMounts,
 			...pluginMounts,
 			...themeMounts,
@@ -165,8 +171,32 @@ module.exports = function buildDockerComposeConfig( config ) {
 	}
 
 	// Set the default ports based on the config values.
-	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
+	const developmentPorts = [
+		`\${WP_ENV_PORT:-${ config.env.development.port }}:80`,
+	];
+	const testsPorts = [
+		`\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`,
+	];
+
+	// Set the default SSL ports based on the config values.
+	if (
+		config.env.development.ssl !== undefined &&
+		config.env.development.ssl.cert &&
+		config.env.development.ssl.port
+	) {
+		developmentPorts.push(
+			`\${WP_ENV_PORT:-${ config.env.development.ssl.port }}:443`
+		);
+	}
+	if (
+		config.env.tests.ssl !== undefined &&
+		config.env.tests.ssl.cert &&
+		config.env.tests.ssl.port
+	) {
+		testsPorts.push(
+			`\${WP_ENV_TESTS_PORT:-${ config.env.tests.ssl.port }}:443`
+		);
+	}
 
 	return {
 		version: '3.7',
@@ -200,7 +230,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ developmentPorts ],
+				ports: developmentPorts,
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,
@@ -218,7 +248,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					dockerfile: 'Tests-WordPress.Dockerfile',
 					args: imageBuildArgs,
 				},
-				ports: [ testsPorts ],
+				ports: testsPorts,
 				environment: {
 					APACHE_RUN_USER: '#' + hostUser.uid,
 					APACHE_RUN_GROUP: '#' + hostUser.gid,

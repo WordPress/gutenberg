@@ -64,6 +64,49 @@ function mergeRootToEnvironments( config ) {
 		delete config.lifecycleScripts;
 	}
 
+	// Check if ssl is set and if it is, move it to the environment configs.
+	if ( config.ssl !== undefined && config.ssl.cert && config.ssl.key ) {
+		removedRootOptions.ssl = {};
+
+		// Create ssl objects if they don't exist.
+		if ( config.env.development.ssl === undefined ) {
+			config.env.development.ssl = {};
+		}
+		if ( config.env.tests.ssl === undefined ) {
+			config.env.tests.ssl = {};
+		}
+
+		// Move the ssl options to the environment configs.
+		if ( config.ssl.port !== undefined ) {
+			if (
+				config.env.development.ssl !== undefined
+			) {
+				config.env.development.ssl.cert = config.ssl.cert;
+				config.env.development.ssl.key = config.ssl.key;
+				config.env.development.ssl.port = config.ssl.port;
+				removedRootOptions.ssl.port = config.ssl.port;
+			}
+		}
+		if ( config.ssl.testsPort !== undefined ) {
+			if (
+				config.env.tests.ssl !== undefined
+			) {
+				config.env.tests.ssl.cert = config.ssl.cert;
+				config.env.tests.ssl.key = config.ssl.key;
+				config.env.tests.ssl.port = config.ssl.testsPort;
+				removedRootOptions.ssl.testsPort = config.ssl.testsPort;
+			}
+		}
+		removedRootOptions.ssl.cert = config.ssl.cert;
+		removedRootOptions.ssl.key = config.ssl.key;
+		delete config.ssl;
+	} else if (
+		config.ssl !== undefined && Object.keys( config.ssl ).length === 0
+	) {
+		removedRootOptions.ssl = config.ssl;
+		delete config.ssl;
+	}
+
 	// Merge the root config and the environment configs together so that
 	// we can ignore the root config and have full environment configs.
 	for ( const env in config.env ) {
@@ -110,9 +153,24 @@ function appendPortToWPConfigs( config ) {
 				continue;
 			}
 
+			let port = config.env[ env ].port;
+			if (
+				config.env[ env ].ssl &&
+				config.env[ env ].ssl.cert &&
+				config.env[ env ].ssl.key
+			) {
+				port = config.env[ env ].ssl.port;
+				if (
+					config.env[ env ].config[ option ].startsWith( 'http://' )
+				) {
+					config.env[ env ].config[ option ] =
+						'https://' +
+						config.env[ env ].config[ option ].substring( 7 );
+				}
+			}
 			config.env[ env ].config[ option ] = addOrReplacePort(
 				config.env[ env ].config[ option ],
-				config.env[ env ].port,
+				port,
 				// Don't replace the port if one is already set on WP_HOME.
 				option !== 'WP_HOME'
 			);
@@ -131,6 +189,7 @@ function validatePortUniqueness( config ) {
 	// We're going to build a map of the environments and their port
 	// so we can accomodate root-level config options more easily.
 	const environmentPorts = {};
+	const environmentSSLPorts = {};
 
 	// Add all of the environments to the map. This will
 	// overwrite any root-level options if necessary.
@@ -140,8 +199,27 @@ function validatePortUniqueness( config ) {
 				`The "${ env }" environment has an invalid port.`
 			);
 		}
+		if (
+			config.env[ env ].ssl !== undefined &&
+			config.env[ env ].ssl.cert &&
+			config.env[ env ].ssl.key &&
+			! config.env[ env ].ssl.port
+		) {
+			throw new ValidationError(
+				`The "${ env }" environment has an invalid SSL port.`
+			);
+		}
 
 		environmentPorts[ env ] = config.env[ env ].port;
+
+		if (
+			config.env[ env ].ssl !== undefined &&
+			config.env[ env ].ssl.port &&
+			config.env[ env ].ssl.cert &&
+			config.env[ env ].ssl.key
+		) {
+			environmentSSLPorts[ env ] = config.env[ env ].ssl.port;
+		}
 	}
 
 	// This search isn't very performant, but, we won't ever be
@@ -155,6 +233,20 @@ function validatePortUniqueness( config ) {
 			if ( environmentPorts[ env ] === environmentPorts[ check ] ) {
 				throw new ValidationError(
 					`The "${ env }" and "${ check }" environments may not have the same port.`
+				);
+			}
+		}
+	}
+
+	for ( const env in environmentSSLPorts ) {
+		for ( const check in environmentSSLPorts ) {
+			if ( env === check ) {
+				continue;
+			}
+
+			if ( environmentSSLPorts[ env ] === environmentSSLPorts[ check ] ) {
+				throw new ValidationError(
+					`The "${ env }" and "${ check }" environments may not have the same SSL port.`
 				);
 			}
 		}

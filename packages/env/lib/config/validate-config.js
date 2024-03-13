@@ -15,7 +15,7 @@ class ValidationError extends Error {}
  *
  * @param {string} configFile The configuration file we're validating.
  * @param {string} configKey  The configuration key we're validating.
- * @param {number} value      The value to check.
+ * @param {string} value      The value to check.
  */
 function checkString( configFile, configKey, value ) {
 	if ( typeof value !== 'string' ) {
