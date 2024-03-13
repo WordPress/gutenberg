@@ -22,7 +22,6 @@ export default function FontFamilyControl( {
 		if ( custom !== undefined ) {
 			fontFamilies = [ ...fontFamilies, ...custom ];
 		}
-
 	}
 
 	if ( ! fontFamilies || fontFamilies.length === 0 ) {
