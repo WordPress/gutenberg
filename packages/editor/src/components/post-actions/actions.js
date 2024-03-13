@@ -186,7 +186,7 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( posts ) {
+			async callback( posts, onPerform ) {
 				const promiseResult = await Promise.allSettled(
 					posts.map( ( post ) => {
 						return deleteEntityRecord(
@@ -220,6 +220,9 @@ export function usePermanentlyDeletePostAction() {
 						type: 'snackbar',
 						id: 'edit-site-post-permanently-deleted',
 					} );
+					if ( onPerform ) {
+						onPerform();
+					}
 				} else {
 					// If there was at lease one failure.
 					let errorMessage;

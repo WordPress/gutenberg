@@ -16,12 +16,6 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import {
-	trashPostAction,
-	usePermanentlyDeletePostAction,
-	useRestorePostAction,
-	postRevisionsAction,
-} from './actions';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -111,7 +105,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
-export default function PostActions( { postType, postId } ) {
+export default function PostActions( { actions, postType, postId } ) {
 	const item = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord } = select( coreStore );
@@ -119,16 +113,8 @@ export default function PostActions( { postType, postId } ) {
 		},
 		[ postType, postId ]
 	);
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
 
 	const { primaryActions, secondaryActions } = useMemo( () => {
-		const actions = [
-			trashPostAction,
-			permanentlyDeletePostAction,
-			restorePostAction,
-			postRevisionsAction,
-		];
 		return actions.reduce(
 			( accumulator, action ) => {
 				if ( action.isEligible && ! action.isEligible( item ) ) {
@@ -143,7 +129,7 @@ export default function PostActions( { postType, postId } ) {
 			},
 			{ primaryActions: [], secondaryActions: [] }
 		);
-	}, [ permanentlyDeletePostAction, restorePostAction, item ] );
+	}, [ actions, item ] );
 	return (
 		<DropdownMenu
 			trigger={
@@ -154,7 +140,7 @@ export default function PostActions( { postType, postId } ) {
 					disabled={
 						! primaryActions.length && ! secondaryActions.length
 					}
-					className="dataviews-all-actions-button"
+					className="editor-all-actions-button"
 				/>
 			}
 			placement="bottom-end"
