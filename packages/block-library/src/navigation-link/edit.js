@@ -333,6 +333,7 @@ export default function NavigationLinkEdit( {
 			isKeyboardEvent.primary( event, 'k' ) ||
 			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
 		) {
+			event.preventDefault();
 			setIsLinkOpen( true );
 		}
 	}
