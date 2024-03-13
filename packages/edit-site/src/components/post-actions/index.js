@@ -18,14 +18,17 @@ const {
 	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
+	viewPostAction,
+	useEditPostAction,
 	postRevisionsAction,
 } = postManagementActions;
 
-export default function PostActions( { postType, postId } ) {
+export function usePostActions() {
 	const history = useHistory();
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
+	const editPostAction = useEditPostAction();
 
 	const actions = useMemo( () => {
 		const TrashPostModal = trashPostAction.RenderModal;
@@ -35,12 +38,12 @@ export default function PostActions( { postType, postId } ) {
 				return (
 					<TrashPostModal
 						{ ...props }
-						onPerform={ () => {
+						onPerform={ ( items ) => {
 							if ( props.onPerform ) {
 								props.onPerform();
 							}
 							history.push( {
-								path: '/' + postType,
+								path: '/' + items[ 0 ].type,
 								postId: undefined,
 								postType: undefined,
 								canvas: 'view',
@@ -58,21 +61,46 @@ export default function PostActions( { postType, postId } ) {
 						onPerform();
 					}
 					history.push( {
-						path: '/' + postType,
-						postId: undefined,
-						postType: undefined,
+						path: '/' + posts[ 0 ].type,
+						postId: posts[ 0 ].id,
+						postType: posts[ 0 ].type,
 						canvas: 'view',
 					} );
 				} );
 			},
 		};
+
+		const customizedEditPostAction = {
+			...editPostAction,
+			callback: ( posts ) => {
+				const post = posts[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			},
+		};
+
 		return [
 			customizedTrashPostAction,
 			customizedPermanentlyDeletePostAction,
 			restorePostAction,
+			viewPostAction,
+			customizedEditPostAction,
 			postRevisionsAction,
 		];
-	}, [ permanentlyDeletePostAction, restorePostAction, history, postType ] );
+	}, [
+		permanentlyDeletePostAction,
+		editPostAction,
+		restorePostAction,
+		history,
+	] );
+	return actions;
+}
+
+export default function PostActions( { postType, postId } ) {
+	const actions = usePostActions();
 
 	return (
 		<EditorPostActions

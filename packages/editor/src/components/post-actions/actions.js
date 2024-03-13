@@ -37,7 +37,6 @@ export const trashPostAction = {
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
 	icon: trash,
-	availableWhenOpen: true,
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
@@ -182,7 +181,6 @@ export function usePermanentlyDeletePostAction() {
 			isPrimary: true,
 			icon: trash,
 			supportsBulk: true,
-			availableWhenOpen: true,
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
@@ -293,7 +291,6 @@ export function useRestorePostAction() {
 			isPrimary: true,
 			icon: backup,
 			supportsBulk: true,
-			availableWhenOpen: true,
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
@@ -369,7 +366,6 @@ export const viewPostAction = {
 	label: __( 'View' ),
 	isPrimary: true,
 	icon: external,
-	availableWhenOpen: false,
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
@@ -400,7 +396,6 @@ export const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
 	isPrimary: false,
-	availableWhenOpen: true,
 	isEligible: ( post ) => {
 		if ( post.status === 'trash' ) {
 			return false;
