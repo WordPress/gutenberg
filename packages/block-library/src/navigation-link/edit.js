@@ -570,6 +570,7 @@ export default function NavigationLinkEdit( {
 									// Need to handle refocusing the Nav block or the inserter?
 									onReplace( [] );
 								}
+								setIsLinkOpen( false );
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
