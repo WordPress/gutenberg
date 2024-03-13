@@ -158,7 +158,7 @@ export default function ChildLayoutControl( {
 					<HStack
 						as={ ToolsPanelItem }
 						hasValue={ hasStartValue }
-						label={ __( 'Grid position' ) }
+						label={ __( 'Grid placement' ) }
 						onDeselect={ resetGridStarts }
 						isShownByDefault={ false }
 						panelId={ panelId }
