@@ -160,7 +160,7 @@ export default function ChildLayoutControl( {
 						hasValue={ hasStartValue }
 						label={ __( 'Grid position' ) }
 						onDeselect={ resetGridStarts }
-						isShownByDefault={ isShownByDefault }
+						isShownByDefault={ false }
 						panelId={ panelId }
 					>
 						<InputControl
