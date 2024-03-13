@@ -134,12 +134,10 @@ class WP_Navigation_Block_Renderer {
 		if ( ! empty( $inner_block_content ) ) {
 			if ( static::does_block_need_a_list_item_wrapper( $inner_block ) ) {
 				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
-			} else {
-				$inner_block_content = '';
 			}
-
 			return $inner_block_content;
 		}
+		return '';
 	}
 
 	/**
