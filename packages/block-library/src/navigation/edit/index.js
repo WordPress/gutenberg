@@ -342,16 +342,7 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
-		}
+		await convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
@@ -403,6 +394,9 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
+			handleUpdateMenu( createNavigationMenuPost?.id, {
+				focusNavigationBlock: true,
+			} );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
@@ -415,6 +409,8 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
+		createNavigationMenuPost?.id,
+		handleUpdateMenu,
 	] );
 
 	useEffect( () => {
