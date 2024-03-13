@@ -5,11 +5,7 @@ import {
 	Button,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import {
-	store as coreStore,
-	useEntityId,
-	useEntityProp,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityId } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -18,7 +14,6 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
 		useState( false );
 	const id = useEntityId( 'postType', 'wp_navigation' );
-	const [ title ] = useEntityProp( 'postType', 'wp_navigation', 'title' );
 	const { deleteEntityRecord } = useDispatch( coreStore );
 
 	return (
@@ -40,7 +35,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 						deleteEntityRecord( 'postType', 'wp_navigation', id, {
 							force: true,
 						} );
-						onDelete( title );
+						onDelete();
 					} }
 					onCancel={ () => {
 						setIsConfirmDialogVisible( false );
