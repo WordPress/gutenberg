@@ -298,6 +298,9 @@ test.describe( 'Heading', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/heading' } );
 
+		await editor.publishPost();
+		await page.reload();
+
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
 			.getByRole( 'button', { name: 'Document Overview' } )
