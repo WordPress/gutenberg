@@ -312,15 +312,24 @@ export class RichText extends Component {
 		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
 			return;
 		}
+		const { eventCount, text, selectionStart, selectionEnd } =
+			event.nativeEvent;
 
-		const contentWithoutRootTag = this.removeRootTagsProducedByAztec(
-			event.nativeEvent.text
-		);
+		// On Android backspacing after selection doesn't work as expected in some keyboards
+		// this makes sure to update the current selection the native AztecView has before merging.
+		if ( ! this.isIOS && selectionStart === 0 && selectionEnd === 0 ) {
+			this.selectionStart = selectionStart;
+			this.selectionEnd = selectionEnd;
+			this.props.onSelectionChange( selectionStart, selectionEnd );
+		}
+
+		const contentWithoutRootTag =
+			this.removeRootTagsProducedByAztec( text );
 		// On iOS, onChange can be triggered after selection changes, even though there are no content changes.
 		if ( contentWithoutRootTag === this.value?.toString() ) {
 			return;
 		}
-		this.lastEventCount = event.nativeEvent.eventCount;
+		this.lastEventCount = eventCount;
 		this.comesFromAztec = true;
 		this.firedAfterTextChanged = true; // The onChange event always fires after the fact.
 		this.onTextUpdate( event );
