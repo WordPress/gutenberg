@@ -380,27 +380,20 @@ export const viewPostAction = {
 };
 
 export function useEditPostAction() {
-	//const history = useHistory();
 	return useMemo(
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
-			availableWhenOpen: false,
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			callback() {
-				//const post = posts[ 0 ];
-				//history.push( {
-				//	postId: post.id,
-				//	postType: post.type,
-				//	canvas: 'edit',
-				//} );
+			callback( posts, onPerform ) {
+				if ( onPerform ) {
+					onPerform( posts );
+				}
 			},
 		} ),
-		[
-			/* history */
-		]
+		[]
 	);
 }
 export const postRevisionsAction = {
