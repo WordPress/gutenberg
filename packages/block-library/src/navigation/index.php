@@ -136,8 +136,9 @@ class WP_Navigation_Block_Renderer {
 				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
 			}
 
-			return $inner_block_content;
 		}
+		
+		return $inner_block_content;
 	}
 
 	/**
