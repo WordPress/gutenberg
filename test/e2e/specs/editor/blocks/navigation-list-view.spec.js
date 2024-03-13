@@ -548,7 +548,6 @@ test.describe( 'Navigation block - List view editing', () => {
 		page,
 		editor,
 		requestUtils,
-		linkControl,
 	} ) => {
 		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
 
@@ -578,14 +577,13 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		// Move focus to the appender
 		await page.keyboard.press( 'ArrowDown' );
-		await expect( editor.canvas.getByLabel( 'Add block' ) ).toBeFocused();
-
-		// Make sure it's a nav block appender. If it is, the linkControl search input will be opened on enter.
-		await page.keyboard.press( 'Enter' );
-
-		// Expect to see the Link creation UI be focused.
-		const linkUIInput = linkControl.getSearchInput();
-		await expect( linkUIInput ).toBeFocused();
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Navigation',
+				} )
+				.getByLabel( 'Add block' )
+		).toBeFocused();
 	} );
 } );
 
