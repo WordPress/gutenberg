@@ -381,7 +381,6 @@ function Navigation( {
 		handleUpdateMenu,
 		hideNavigationMenuStatusNotice,
 		showNavigationMenuStatusNotice,
-		isLoading,
 	] );
 
 	useEffect( () => {
