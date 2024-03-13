@@ -173,7 +173,7 @@
 		</properties>
 	</rule>
 	<rule ref="Gutenberg.Commenting.FunctionCommentSinceTag">
-		<!-- The sniff ensures that functions have a valid @since tag but skips checking experimental packages. -->
+		<!-- The sniff ensures that functions have a valid @since tag but skips checking experimental blocks. -->
 		<include-pattern>/packages/block-library/src/.+/*\.php$</include-pattern>
 	</rule>
 </ruleset>
