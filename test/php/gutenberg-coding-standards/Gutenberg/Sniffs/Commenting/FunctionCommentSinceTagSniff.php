@@ -15,13 +15,13 @@ use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * This sniff ensures that PHP functions have a valid `@since` tag in the docblock.
- * The sniff skips checking files in __experimental block-library packages.
+ * The sniff skips checking files in __experimental block-library blocks.
  */
 class FunctionCommentSinceTagSniff implements Sniff {
 
 	/**
 	 * This property is used to store results returned
-	 * by the static::is_experimental_package() method.
+	 * by the static::is_experimental_block() method.
 	 *
 	 * @var array
 	 */
@@ -43,7 +43,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param int  $stackPtr  The position of the current token in the stack passed in $tokens.
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
-		if ( static::is_experimental_package( $phpcsFile ) ) {
+		if ( static::is_experimental_block( $phpcsFile ) ) {
 			// This is an experimental package, so the "@since" tag is not required.
 			return;
 		}
@@ -125,12 +125,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	}
 
 	/**
-	 * Checks if the current package is experimental.
+	 * Checks if the current block is experimental.
 	 *
 	 * @param File $phpcsFile The file being scanned.
-	 * @return bool Returns true if the current package is experimental.
+	 * @return bool Returns true if the current block is experimental.
 	 */
-	private static function is_experimental_package( File $phpcsFile ) {
+	private static function is_experimental_block( File $phpcsFile ) {
 		$block_json_filepath = dirname( $phpcsFile->getFilename() ) . DIRECTORY_SEPARATOR . 'block.json';
 
 		if ( isset( static::$cache[ $block_json_filepath ] ) ) {
@@ -142,7 +142,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return static::$cache[ $block_json_filepath ];
 		}
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- this package doesn't depend on WordPress.
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- this Composer package doesn't depend on WordPress.
 		$block_metadata = file_get_contents( $block_json_filepath );
 		if ( false === $block_metadata ) {
 			static::$cache[ $block_json_filepath ] = false;
