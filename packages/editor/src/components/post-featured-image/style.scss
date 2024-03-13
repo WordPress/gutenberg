@@ -1,20 +1,12 @@
 .editor-post-featured-image {
 	padding: 0;
 
-
 	.components-spinner {
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		margin-top: -9px;
 		margin-left: -9px;
-	}
-
-	.components-responsive-wrapper__content {
-		object-fit: cover;
-		height: 100%;
-		width: 100%;
-		object-position: 50% 50%;
 	}
 }
 
@@ -39,22 +31,31 @@
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
 
+	// Apply a max-height.
 	display: flex;
 	justify-content: center;
-	height: 150px;
+	max-height: 150px;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		border: $border-width solid rgba(0, 0, 0, 0.1);
+		border-radius: $radius-block-ui;
+	}
 }
 
 .editor-post-featured-image__preview {
+	height: auto;
 
-	.components-responsive-wrapper {
+	.editor-post-featured-image__preview-image {
+		object-fit: cover;
 		width: 100%;
-		height: 100%;
-		background: $gray-100;
-
-		> div {
-			width: 100%;
-			height: 100%;
-		}
+		object-position: 50% 50%;
+		aspect-ratio: 2/1;
 	}
 }
 
