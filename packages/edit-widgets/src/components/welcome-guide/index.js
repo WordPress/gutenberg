@@ -173,7 +173,7 @@ export default function WelcomeGuide() {
 							</h1>
 							<p className="edit-widgets-welcome-guide__text">
 								{ __(
-									'New to the block editor? Want to learn more about using it? '
+									'New to the block editor? Want to learn more about using it?'
 								) }
 								<ExternalLink
 									href={ __(

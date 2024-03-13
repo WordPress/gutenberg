@@ -350,7 +350,7 @@ function BackgroundImagePanelItem( {
 								resetBackgroundImage( style, setAttributes );
 							} }
 						>
-							{ __( 'Reset ' ) }
+							{ __( 'Reset' ) }
 						</MenuItem>
 					) }
 				</MediaReplaceFlow>

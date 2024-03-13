@@ -50,7 +50,7 @@ export default function PostNavigationLinkEdit( {
 
 	if ( showTitle ) {
 		/* translators: Label before for next and previous post. There is a space after the colon. */
-		placeholder = isNext ? __( 'Next: ' ) : __( 'Previous: ' );
+		placeholder = isNext ? __( 'Next:' ) : __( 'Previous:' );
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
