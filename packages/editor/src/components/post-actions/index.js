@@ -54,7 +54,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					onRequestClose={ () => {
 						setIsModalOpen( false );
 					} }
-					overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
 						action.id
 					) }` }
 				>

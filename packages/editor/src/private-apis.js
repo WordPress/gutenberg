@@ -17,6 +17,7 @@ import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
 import PostActions from './components/post-actions';
+import PostSidebarCard from './components/post-sidebar-card';
 import * as postManagementActions from './components/post-actions/actions';
 
 export const privateApis = {};
@@ -35,6 +36,7 @@ lock( privateApis, {
 	PreviewDropdown,
 	PreferencesModal,
 	PostActions,
+	PostSidebarCard,
 	postManagementActions,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
