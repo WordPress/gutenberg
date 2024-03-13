@@ -7,6 +7,8 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -28,17 +30,21 @@ function helpText( selfStretch, parentLayout ) {
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props              Props.
- * @param {Object}   props.value        The child layout value.
- * @param {Function} props.onChange     Function to update the child layout value.
- * @param {Object}   props.parentLayout The parent layout value.
+ * @param {Object}   props                  Props.
+ * @param {Object}   props.value            The child layout value.
+ * @param {Function} props.onChange         Function to update the child layout value.
+ * @param {Object}   props.parentLayout     The parent layout value.
  *
+ * @param {boolean}  props.isShownByDefault
+ * @param {string}   props.panelId
  * @return {Element} child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},
 	onChange,
 	parentLayout,
+	isShownByDefault,
+	panelId,
 } ) {
 	const {
 		selfStretch,
@@ -51,8 +57,34 @@ export default function ChildLayoutControl( {
 	const {
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
+		orientation = 'horizontal',
 	} = parentLayout ?? {};
 	const parentLayoutType = parentType || defaultParentType;
+
+	const hasFlexValue = () => !! selfStretch;
+	const flexResetLabel =
+		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
+	const resetFlex = () => {
+		onChange( {
+			selfStretch: undefined,
+			flexSize: undefined,
+		} );
+	};
+
+	const hasStartValue = () => !! columnStart || !! rowStart;
+	const hasSpanValue = () => !! columnSpan || !! rowSpan;
+	const resetGridStarts = () => {
+		onChange( {
+			columnStart: undefined,
+			rowStart: undefined,
+		} );
+	};
+	const resetGridSpans = () => {
+		onChange( {
+			columnSpan: undefined,
+			rowSpan: undefined,
+		} );
+	};
 
 	useEffect( () => {
 		if ( selfStretch === 'fixed' && ! flexSize ) {
@@ -66,7 +98,15 @@ export default function ChildLayoutControl( {
 	return (
 		<>
 			{ parentLayoutType === 'flex' && (
-				<>
+				<VStack
+					as={ ToolsPanelItem }
+					spacing={ 2 }
+					hasValue={ hasFlexValue }
+					label={ flexResetLabel }
+					onDeselect={ resetFlex }
+					isShownByDefault={ isShownByDefault }
+					panelId={ panelId }
+				>
 					<ToggleGroupControl
 						__nextHasNoMarginBottom
 						size={ '__unstable-large' }
@@ -111,11 +151,18 @@ export default function ChildLayoutControl( {
 							value={ flexSize }
 						/>
 					) }
-				</>
+				</VStack>
 			) }
 			{ parentLayoutType === 'grid' && (
 				<>
-					<HStack>
+					<HStack
+						as={ ToolsPanelItem }
+						hasValue={ hasStartValue }
+						label={ __( 'Grid starts' ) }
+						onDeselect={ resetGridStarts }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
 						<InputControl
 							size={ '__unstable-large' }
 							label={ __( 'Column Start' ) }
@@ -132,6 +179,7 @@ export default function ChildLayoutControl( {
 							min={ 1 }
 							max={ parentLayout?.columnCount }
 						/>
+
 						<InputControl
 							size={ '__unstable-large' }
 							label={ __( 'Row Start' ) }
@@ -149,7 +197,14 @@ export default function ChildLayoutControl( {
 							max={ parentLayout?.columnCount }
 						/>
 					</HStack>
-					<HStack>
+					<HStack
+						as={ ToolsPanelItem }
+						hasValue={ hasSpanValue }
+						label={ __( 'Grid spans' ) }
+						onDeselect={ resetGridSpans }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
 						<InputControl
 							size={ '__unstable-large' }
 							label={ __( 'Column Span' ) }
@@ -158,14 +213,14 @@ export default function ChildLayoutControl( {
 								onChange( {
 									columnStart,
 									rowStart,
-									columnSpan: value,
 									rowSpan,
+									columnSpan: value,
 								} );
 							} }
 							value={ columnSpan }
 							min={ 1 }
-							max={ parentLayout?.columnCount }
 						/>
+
 						<InputControl
 							size={ '__unstable-large' }
 							label={ __( 'Row Span' ) }
@@ -180,7 +235,6 @@ export default function ChildLayoutControl( {
 							} }
 							value={ rowSpan }
 							min={ 1 }
-							max={ parentLayout?.columnCount }
 						/>
 					</HStack>
 				</>
