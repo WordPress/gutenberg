@@ -157,7 +157,7 @@ export const trashPostAction = {
 								}
 							}
 							if ( onPerform ) {
-								onPerform();
+								onPerform( posts );
 							}
 							closeModal();
 						} }
@@ -221,7 +221,7 @@ export function usePermanentlyDeletePostAction() {
 						id: 'edit-site-post-permanently-deleted',
 					} );
 					if ( onPerform ) {
-						onPerform();
+						onPerform( posts );
 					}
 				} else {
 					// If there was at lease one failure.
