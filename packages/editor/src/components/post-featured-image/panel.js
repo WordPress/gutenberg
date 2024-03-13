@@ -15,7 +15,7 @@ import PostFeaturedImageCheck from './check';
 
 const PANEL_NAME = 'featured-image';
 
-export function PrivatePostFeaturedImagePanel( { renderPanelBody } ) {
+export default function PostFeaturedImagePanel( { withPanelBody = true } ) {
 	const { postType, isEnabled, isOpened } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
@@ -37,7 +37,7 @@ export function PrivatePostFeaturedImagePanel( { renderPanelBody } ) {
 		return null;
 	}
 
-	if ( ! renderPanelBody ) {
+	if ( ! withPanelBody ) {
 		return (
 			<PostFeaturedImageCheck>
 				<PostFeaturedImage />
@@ -58,8 +58,4 @@ export function PrivatePostFeaturedImagePanel( { renderPanelBody } ) {
 			</PanelBody>
 		</PostFeaturedImageCheck>
 	);
-}
-
-export default function PostFeaturedImagePanel() {
-	return <PrivatePostFeaturedImagePanel renderPanelBody />;
 }

@@ -7,16 +7,13 @@ import {
 	PostURLPanel,
 	PostSchedulePanel,
 	PostTemplatePanel,
-	privateApis as editorPrivateApis,
+	PostFeaturedImagePanel,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PageStatus from './page-status';
-import { unlock } from '../../../lock-unlock';
-
-const { PrivatePostFeaturedImagePanel } = unlock( editorPrivateApis );
 
 export default function PageSummary( {
 	status,
@@ -27,7 +24,7 @@ export default function PageSummary( {
 } ) {
 	return (
 		<VStack spacing={ 0 }>
-			<PrivatePostFeaturedImagePanel renderPanelBody={ false } />
+			<PostFeaturedImagePanel withPanelBody={ false } />
 			<PageStatus
 				status={ status }
 				date={ date }
