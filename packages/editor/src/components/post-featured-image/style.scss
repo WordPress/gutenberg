@@ -34,10 +34,8 @@
 	outline: $border-width solid rgba(0, 0, 0, 0.1);
 	outline-offset: -#{$border-width};
 
-	// Apply a max-height.
 	display: flex;
 	justify-content: center;
-	max-height: 150px;
 }
 
 .editor-post-featured-image__preview {
