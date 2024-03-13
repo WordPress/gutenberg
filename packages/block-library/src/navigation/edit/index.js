@@ -342,7 +342,7 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		await convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
+		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
