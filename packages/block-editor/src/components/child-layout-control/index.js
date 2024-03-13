@@ -155,48 +155,49 @@ export default function ChildLayoutControl( {
 			) }
 			{ parentLayoutType === 'grid' && (
 				<>
-					<HStack
-						as={ ToolsPanelItem }
-						hasValue={ hasStartValue }
-						label={ __( 'Grid placement' ) }
-						onDeselect={ resetGridStarts }
-						isShownByDefault={ false }
-						panelId={ panelId }
-					>
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Column' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									columnStart: value,
-									rowStart,
-									columnSpan,
-									rowSpan,
-								} );
-							} }
-							value={ columnStart }
-							min={ 1 }
-							max={ parentLayout?.columnCount }
-						/>
-
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Row' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									columnStart,
-									rowStart: value,
-									columnSpan,
-									rowSpan,
-								} );
-							} }
-							value={ rowStart }
-							min={ 1 }
-							max={ parentLayout?.columnCount }
-						/>
-					</HStack>
+					{ window.__experimentalEnableGridInteractivity && (
+						<HStack
+							as={ ToolsPanelItem }
+							hasValue={ hasStartValue }
+							label={ __( 'Grid placement' ) }
+							onDeselect={ resetGridStarts }
+							isShownByDefault={ false }
+							panelId={ panelId }
+						>
+							<InputControl
+								size={ '__unstable-large' }
+								label={ __( 'Column' ) }
+								type="number"
+								onChange={ ( value ) => {
+									onChange( {
+										columnStart: value,
+										rowStart,
+										columnSpan,
+										rowSpan,
+									} );
+								} }
+								value={ columnStart }
+								min={ 1 }
+								max={ parentLayout?.columnCount }
+							/>
+							<InputControl
+								size={ '__unstable-large' }
+								label={ __( 'Row' ) }
+								type="number"
+								onChange={ ( value ) => {
+									onChange( {
+										columnStart,
+										rowStart: value,
+										columnSpan,
+										rowSpan,
+									} );
+								} }
+								value={ rowStart }
+								min={ 1 }
+								max={ parentLayout?.columnCount }
+							/>
+						</HStack>
+					) }
 					<HStack
 						as={ ToolsPanelItem }
 						hasValue={ hasSpanValue }
@@ -220,7 +221,6 @@ export default function ChildLayoutControl( {
 							value={ columnSpan }
 							min={ 1 }
 						/>
-
 						<InputControl
 							size={ '__unstable-large' }
 							label={ __( 'Row span' ) }
