@@ -142,7 +142,8 @@
 		}
 
 		&:focus-within,
-		&.is-hovered {
+		&.is-hovered,
+		&:hover {
 			.components-checkbox-control__input,
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
