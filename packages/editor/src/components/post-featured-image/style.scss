@@ -30,22 +30,13 @@
 	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
+	outline: $border-width solid rgba(0, 0, 0, 0.1);
+	outline-offset: -#{$border-width};
 
 	// Apply a max-height.
 	display: flex;
 	justify-content: center;
 	max-height: 150px;
-
-	&::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		border: $border-width solid rgba(0, 0, 0, 0.1);
-		border-radius: $radius-block-ui;
-	}
 }
 
 .editor-post-featured-image__preview {
