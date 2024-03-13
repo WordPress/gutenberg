@@ -29,6 +29,7 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import ColorVariations from '../global-styles/variations/variations-color';
 import TypographyVariations from '../global-styles/variations/variations-typography';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 const noop = () => {};
 
@@ -74,6 +75,15 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+	} );
+
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( {
+			property: 'typography',
+		} );
+
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
 	// the block editor store's `__internalIsInitialized` is true before
@@ -90,18 +100,22 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				className="edit-site-global-styles-variation-container"
 			>
 				<StyleVariationsContainer />
-				<div>
-					<h3 className="edit-site-global-styles-variation-title">
-						{ __( 'Colors' ) }
-					</h3>
-					<ColorVariations />
-				</div>
-				<div>
-					<h3 className="edit-site-global-styles-variation-title">
-						{ __( 'Typography' ) }
-					</h3>
-					<TypographyVariations />
-				</div>
+				{ colorVariations && (
+					<div>
+						<h3 className="edit-site-global-styles-variation-title">
+							{ __( 'Colors' ) }
+						</h3>
+						<ColorVariations />
+					</div>
+				) }
+				{ typographyVariations && (
+					<div>
+						<h3 className="edit-site-global-styles-variation-title">
+							{ __( 'Typography' ) }
+						</h3>
+						<TypographyVariations />
+					</div>
+				) }
 			</VStack>
 		</BlockEditorProvider>
 	);
