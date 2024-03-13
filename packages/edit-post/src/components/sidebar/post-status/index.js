@@ -15,6 +15,7 @@ import {
 	PostURLPanel,
 	PostTemplatePanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
@@ -27,6 +28,9 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import PostPendingStatus from '../post-pending-status';
 import PluginPostStatusInfo from '../plugin-post-status-info';
+import { unlock } from '../../../lock-unlock';
+
+const { PrivatePostFeaturedImagePanel } = unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -60,6 +64,9 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PrivatePostFeaturedImagePanel
+							renderPanelBody={ false }
+						/>
 						<PostVisibility />
 						<PostSchedulePanel />
 						<PostTemplatePanel />

@@ -16,7 +16,7 @@ import {
 import PageStatus from './page-status';
 import { unlock } from '../../../lock-unlock';
 
-const { PostFeaturedImageWithPanelCheck } = unlock( editorPrivateApis );
+const { PrivatePostFeaturedImagePanel } = unlock( editorPrivateApis );
 
 export default function PageSummary( {
 	status,
@@ -27,7 +27,7 @@ export default function PageSummary( {
 } ) {
 	return (
 		<VStack spacing={ 0 }>
-			<PostFeaturedImageWithPanelCheck />
+			<PrivatePostFeaturedImagePanel renderPanelBody={ false } />
 			<PageStatus
 				status={ status }
 				date={ date }
