@@ -17,14 +17,6 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- * @param item
- */
-//import { unlock } from '../../lock-unlock';
-
-//const { useHistory } = unlock( routerPrivateApis );
-
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
 		return decodeEntities( item.title );

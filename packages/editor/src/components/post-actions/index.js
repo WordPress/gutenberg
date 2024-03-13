@@ -3,11 +3,10 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState, Children, Fragment, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
-	Modal,
 	Button,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
@@ -15,95 +14,17 @@ import { moreVertical } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import {
+	WithDropDownMenuSeparators,
+	ActionsDropdownMenuGroup,
+} from './utility-components';
+
+/**
+ * Internal dependencies
+ */
 import { unlock } from '../../lock-unlock';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
-	kebabCase,
-} = unlock( componentsPrivateApis );
-
-function DropdownMenuItemTrigger( { action, onClick } ) {
-	return (
-		<DropdownMenuItem
-			onClick={ onClick }
-			hideOnClick={ ! action.RenderModal }
-		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
-		</DropdownMenuItem>
-	);
-}
-
-function ActionWithModal( { action, item, ActionTrigger } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const actionTriggerProps = {
-		action,
-		onClick: () => setIsModalOpen( true ),
-	};
-	const { RenderModal, hideModalHeader } = action;
-	return (
-		<>
-			<ActionTrigger { ...actionTriggerProps } />
-			{ isModalOpen && (
-				<Modal
-					title={ action.modalHeader || action.label }
-					__experimentalHideHeader={ !! hideModalHeader }
-					onRequestClose={ () => {
-						setIsModalOpen( false );
-					} }
-					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
-						action.id
-					) }` }
-				>
-					<RenderModal
-						items={ [ item ] }
-						closeModal={ () => setIsModalOpen( false ) }
-					/>
-				</Modal>
-			) }
-		</>
-	);
-}
-
-function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
-
-function ActionsDropdownMenuGroup( { actions, item } ) {
-	return (
-		<DropdownMenuGroup>
-			{ actions.map( ( action ) => {
-				if ( !! action.RenderModal ) {
-					return (
-						<ActionWithModal
-							key={ action.id }
-							action={ action }
-							item={ item }
-							ActionTrigger={ DropdownMenuItemTrigger }
-						/>
-					);
-				}
-				return (
-					<DropdownMenuItemTrigger
-						key={ action.id }
-						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
-					/>
-				);
-			} ) }
-		</DropdownMenuGroup>
-	);
-}
+const { DropdownMenuV2: DropdownMenu } = unlock( componentsPrivateApis );
 
 export default function PostActions( { actions, postType, postId } ) {
 	const item = useSelect(
