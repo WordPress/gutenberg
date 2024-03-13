@@ -150,7 +150,7 @@ const MediaUploadProgress = ( props ) => {
 
 	return (
 		<View
-			style={ [ styles.mediaUploadProgress, props.containerStyle ] }
+			style={ styles.mediaUploadProgress }
 			pointerEvents="box-none"
 			testID="progress-container"
 		>
@@ -164,30 +164,30 @@ const MediaUploadProgress = ( props ) => {
 					/>
 				</View>
 			) }
-			{ showProgress && (
-				<>
-					{ props.progressType &&
-					props.progressType === 'determinate' &&
-					progress !== 100 ? (
-						<View style={ styles.progress }>
-							<View
-								style={ [
-									styles.progressBar,
-									{ width: `${ progress }%` },
-								] }
-							/>
-						</View>
-					) : (
-						<View style={ indicatorContainerStyle }>
-							<ActivityIndicator
-								style={ indicatorIconStyle }
-								size={ 20 }
-								color="#111"
-							/>
-						</View>
-					) }
-				</>
-			) }
+			{ showProgress &&
+				props.progressType &&
+				props.progressType === 'determinate' &&
+				progress !== 100 && (
+					<View style={ styles.progress }>
+						<View
+							style={ [
+								styles.progressBar,
+								{ width: `${ progress }%` },
+							] }
+						/>
+					</View>
+				) }
+			{ showProgress &&
+				props.progressType &&
+				props.progressType === 'indeterminate' && (
+					<View style={ indicatorContainerStyle }>
+						<ActivityIndicator
+							style={ indicatorIconStyle }
+							size={ 20 }
+							color="#111"
+						/>
+					</View>
+				) }
 			{ renderContent( {
 				isUploadPaused,
 				isUploadInProgress,
