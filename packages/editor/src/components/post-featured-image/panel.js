@@ -60,6 +60,6 @@ export function PrivatePostFeaturedImagePanel( { renderPanelBody } ) {
 	);
 }
 
-export default function PostFeaturedImagePanel( props ) {
-	return <PrivatePostFeaturedImagePanel { ...props } renderPanelBody />;
+export default function PostFeaturedImagePanel() {
+	return <PrivatePostFeaturedImagePanel renderPanelBody />;
 }
