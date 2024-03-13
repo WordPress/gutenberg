@@ -12,14 +12,14 @@ export function getVariationClassName( variation ) {
 }
 
 function getFontFamilyFromSetting( fontFamilies, setting ) {
-	if ( ! setting ) {
+	if ( ! Array.isArray( fontFamilies ) || ! setting ) {
 		return null;
 	}
 
 	const fontFamilyVariable = setting.replace( 'var(', '' ).replace( ')', '' );
 	const fontFamilySlug = fontFamilyVariable?.split( '--' ).slice( -1 )[ 0 ];
 
-	return fontFamilies?.find(
+	return fontFamilies.find(
 		( fontFamily ) => fontFamily.slug === fontFamilySlug
 	);
 }
