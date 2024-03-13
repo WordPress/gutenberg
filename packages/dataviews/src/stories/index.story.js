@@ -50,14 +50,12 @@ const fields = [
 	{
 		header: 'Title',
 		id: 'title',
-		getValue: ( { item } ) => item.title,
 		maxWidth: 400,
 		enableHiding: false,
 	},
 	{
 		header: 'Type',
 		id: 'type',
-		getValue: ( { item } ) => item.type,
 		maxWidth: 400,
 		enableHiding: false,
 		type: 'enumeration',
@@ -71,7 +69,6 @@ const fields = [
 	{
 		header: 'Description',
 		id: 'description',
-		getValue: ( { item } ) => item.description,
 		maxWidth: 200,
 		enableSorting: false,
 	},

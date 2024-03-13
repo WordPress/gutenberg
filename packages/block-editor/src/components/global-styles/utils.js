@@ -10,25 +10,7 @@ import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
 
 export const PRESET_METADATA = [
 	{

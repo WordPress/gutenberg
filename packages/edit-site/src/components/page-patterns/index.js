@@ -296,7 +296,6 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title,
 				render: ( { item } ) => (
 					<Title item={ item } categoryId={ categoryId } />
 				),

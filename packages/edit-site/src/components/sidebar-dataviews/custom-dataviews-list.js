@@ -110,7 +110,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 				title={ dataview.title }
 				type={ type }
 				isActive={ isActive }
-				isCustom="true"
+				isCustom
 				customViewId={ dataviewId }
 				suffix={
 					<DropdownMenu

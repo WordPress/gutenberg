@@ -337,7 +337,6 @@ export default function PagePages() {
 			{
 				header: __( 'Date' ),
 				id: 'date',
-				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
