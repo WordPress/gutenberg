@@ -71,13 +71,11 @@ const fields = [
 	{
 		id: 'title',
 		header: 'Title',
-		getValue: ({ item }) => item.title,
 		enableHiding: false,
 	},
 	{
 		id: 'date',
 		header: 'Date',
-		getValue: ( { item } ) => item.date,
 		render: ( { item } ) => {
 			return (
 				<time>{ getFormattedDate( item.date ) }</time>
@@ -87,7 +85,6 @@ const fields = [
 	{
 		id: 'author',
 		header: __( 'Author' ),
-		getValue: ( { item } ) => item.author,
 		render: ( { item } ) => {
 			return (
 				<a href="...">{ item.author }</a>
@@ -123,7 +120,7 @@ Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
 -   `header`: the field's name to be shown in the UI.
--   `getValue`: function that returns the value of the field.
+-   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
 -   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
