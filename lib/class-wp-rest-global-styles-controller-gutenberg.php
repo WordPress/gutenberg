@@ -335,6 +335,18 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			} elseif ( isset( $existing_config['settings'] ) ) {
 				$config['settings'] = $existing_config['settings'];
 			}
+
+			// TODO: Figure out where this should actually go.
+			if ( isset( $config['settings']['typography']['defaultFontSizes'] ) ) {
+				unset( $config['settings']['typography']['defaultFontSizes'] );
+				if ( empty( $config['settings']['typography'] ) ) {
+					unset( $config['settings']['typography'] );
+					if ( empty( $config['settings'] ) ) {
+						unset( $config['settings'] );
+					}
+				}
+			}
+
 			$config['isGlobalStylesUserThemeJSON'] = true;
 			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 			$changes->post_content                 = wp_json_encode( $config );
