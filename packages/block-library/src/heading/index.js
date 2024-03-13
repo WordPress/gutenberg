@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { heading as icon } from '@wordpress/icons';
+import { toHTMLString } from '@wordpress/rich-text';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -30,15 +31,16 @@ export const settings = {
 		const { content, level } = attributes;
 
 		const customName = attributes?.metadata?.name;
+		const contentHTML = toHTMLString( { value: content } );
 
 		// In the list view, use the block's content as the label.
 		// If the content is empty, fall back to the default label.
-		if ( context === 'list-view' && ( customName || content ) ) {
-			return attributes?.metadata?.name || content;
+		if ( context === 'list-view' && ( customName || contentHTML ) ) {
+			return customName || contentHTML;
 		}
 
 		if ( context === 'accessibility' ) {
-			return ! content || content.length === 0
+			return ! contentHTML || contentHTML.length === 0
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
@@ -48,7 +50,7 @@ export const settings = {
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
-						content
+						contentHTML
 				  );
 		}
 	},
