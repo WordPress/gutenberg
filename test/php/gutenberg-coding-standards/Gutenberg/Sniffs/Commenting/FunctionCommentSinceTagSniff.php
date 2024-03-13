@@ -44,7 +44,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 */
 	public function process( File $phpcsFile, $stackPtr ) {
 		if ( static::is_experimental_block( $phpcsFile ) ) {
-			// This is an experimental package, so the "@since" tag is not required.
+			// The "@since" tag is not required for experimental blocks since they are not yet included in WordPress Core.
 			return;
 		}
 
