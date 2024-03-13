@@ -246,34 +246,28 @@ function TableRow( {
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
-			onClickCapture={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! hasPossibleBulkAction ) {
-						return;
-					}
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+			onClickCapture={ () => {
+				if ( ! hasPossibleBulkAction ) {
+					return;
+				}
+				if ( ! isSelected ) {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId === id || selection.includes( itemId )
+							);
+						} )
+					);
+				} else {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId !== id && selection.includes( itemId )
+							);
+						} )
+					);
 				}
 			} }
 		>
@@ -283,32 +277,6 @@ function TableRow( {
 					style={ {
 						width: 20,
 						minWidth: 20,
-					} }
-					onClickCapture={ () => {
-						if ( ! hasPossibleBulkAction ) {
-							return;
-						}
-						if ( ! isSelected ) {
-							onSelectionChange(
-								data.filter( ( _item ) => {
-									const itemId = getItemId?.( _item );
-									return (
-										itemId === id ||
-										selection.includes( itemId )
-									);
-								} )
-							);
-						} else {
-							onSelectionChange(
-								data.filter( ( _item ) => {
-									const itemId = getItemId?.( _item );
-									return (
-										itemId !== id &&
-										selection.includes( itemId )
-									);
-								} )
-							);
-						}
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
