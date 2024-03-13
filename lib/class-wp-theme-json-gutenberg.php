@@ -2666,6 +2666,30 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
 		}
 
+		// 7. Generate :root level rules related to background.
+		// Abstract into something like static::update_separator_declarations.
+		// @TODO - how can this be overwritten by theme.json, if at all? styles.dimensions.minHeight?
+		// @TODO - implement the same logic in the editor https://github.com/WordPress/gutenberg/blob/f079bd2f7fe8e4c5694fc3feb276567777f9997b/packages/block-editor/src/components/iframe/index.js#L252-L252
+		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+			$should_set_root_min_height = false;
+			foreach ( $declarations as $declaration ) {
+				// If backgroundSize === cover, set the :root minHeight to 100%
+				// to ensure the background covers the entire viewport.
+				if ( 'background-size' === $declaration['name'] && 'cover' === $declaration['value'] ) {
+					$should_set_root_min_height = true;
+					break;
+				}
+				// If background is set (gradient), set the :root minHeight to 100%
+				// to ensure the background covers the entire viewport.
+				if ( 'background' === $declaration['name'] && ! empty( $declaration['value'] ) ) {
+					$should_set_root_min_height = true;
+				}
+			}
+			if ( $should_set_root_min_height ) {
+				$block_rules .= ':root { min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px)); }';
+			}
+		}
+
 		return $block_rules;
 	}
 
