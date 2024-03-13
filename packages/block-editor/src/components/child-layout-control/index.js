@@ -158,14 +158,14 @@ export default function ChildLayoutControl( {
 					<HStack
 						as={ ToolsPanelItem }
 						hasValue={ hasStartValue }
-						label={ __( 'Grid starts' ) }
+						label={ __( 'Grid position' ) }
 						onDeselect={ resetGridStarts }
 						isShownByDefault={ isShownByDefault }
 						panelId={ panelId }
 					>
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Column Start' ) }
+							label={ __( 'Column start' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
@@ -182,7 +182,7 @@ export default function ChildLayoutControl( {
 
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Row Start' ) }
+							label={ __( 'Row start' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
@@ -200,14 +200,14 @@ export default function ChildLayoutControl( {
 					<HStack
 						as={ ToolsPanelItem }
 						hasValue={ hasSpanValue }
-						label={ __( 'Grid spans' ) }
+						label={ __( 'Grid span' ) }
 						onDeselect={ resetGridSpans }
 						isShownByDefault={ isShownByDefault }
 						panelId={ panelId }
 					>
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Column Span' ) }
+							label={ __( 'Column span' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
@@ -223,7 +223,7 @@ export default function ChildLayoutControl( {
 
 						<InputControl
 							size={ '__unstable-large' }
-							label={ __( 'Row Span' ) }
+							label={ __( 'Row span' ) }
 							type="number"
 							onChange={ ( value ) => {
 								onChange( {
