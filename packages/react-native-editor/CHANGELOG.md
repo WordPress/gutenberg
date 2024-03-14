@@ -15,6 +15,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] [internal] Upgrade React Native to version 0.73.3 [#58475]
 -   [**] Add error boundary components and exception logging [#59221]
 -   [**] Fix crash occurring when the URL associated with a Video block is changed too quickly [#59841]
+-   [**] Enable setting HTML anchor IDs for all supported block types [#59802]
 
 ## 1.114.1
 -   [**] Fix a crash produced when the content of a synced pattern is updated [#59632]
