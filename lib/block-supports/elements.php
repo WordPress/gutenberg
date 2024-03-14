@@ -8,13 +8,13 @@
 /**
  * Update the block content with elements class names.
  *
- * @deprecated 6.5.0 Use WP_Duotone_Gutenberg::register_duotone_support() instead.
+ * @deprecated 6.6.0 Use WP_Duotone_Gutenberg::register_duotone_support() instead.
  *
  * @param  string $block_content Rendered block content.
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content ) {
-	_deprecated_function( __FUNCTION__, '6.5.0', 'gutenberg_render_elements_support' );
+	_deprecated_function( __FUNCTION__, '6.6.0', 'gutenberg_render_elements_support' );
 	return $block_content;
 }
 
@@ -99,7 +99,7 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
  * This solves the issue of an element (e.g.: link color) being styled in both the parent and a descendant:
  * we want the descendant style to take priority, and this is done by loading it after, in DOM order.
  *
- * @since 6.5.0 Element block support class and styles are generated via the `render_block_data` filter instead of `pre_render_block`
+ * @since 6.6.0 Element block support class and styles are generated via the `render_block_data` filter instead of `pre_render_block`
  *
  * @param array $parsed_block The parsed block.
  *
@@ -108,7 +108,7 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
 function gutenberg_render_elements_support_styles( $parsed_block ) {
 	/*
 	 * The generation of element styles and classname were moved to the
-	 * `render_block_data` filter in 6.5.0 to avoid filtered attributes
+	 * `render_block_data` filter in 6.6.0 to avoid filtered attributes
 	 * breaking the application of the elements CSS class.
 	 *
 	 * @see https://github.com/WordPress/gutenberg/pull/59535.
@@ -119,7 +119,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 	if ( is_string( $parsed_block ) ) {
 		_deprecated_argument(
 			__FUNCTION__,
-			'6.5.0',
+			'6.6.0',
 			__( 'Use as a `pre_render_block` filter is deprecated. Use with `render_block_data` instead.', 'gutenberg' )
 		);
 	}
