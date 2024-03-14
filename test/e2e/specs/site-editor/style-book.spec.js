@@ -116,8 +116,8 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
 			page.locator( 'role=button[name="Blocks styles"]' )
@@ -172,7 +172,7 @@ test.describe( 'Style Book', () => {
 			'style book should be visible'
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )

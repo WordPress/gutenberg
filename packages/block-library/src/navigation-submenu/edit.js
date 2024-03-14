@@ -279,6 +279,7 @@ export default function NavigationSubmenuEdit( {
 
 	function onKeyDown( event ) {
 		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			event.preventDefault();
 			setIsLinkOpen( true );
 		}
 	}

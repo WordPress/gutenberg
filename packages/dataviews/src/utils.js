@@ -1,10 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { Children, Fragment } from '@wordpress/element';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
 import {
@@ -14,11 +8,6 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 } from './constants';
-import { unlock } from './lock-unlock';
-
-const { DropdownMenuSeparatorV2: DropdownMenuSeparator } = unlock(
-	componentsPrivateApis
-);
 
 /**
  * Helper util to sort data by text fields, when sorting is done client side.
@@ -109,14 +98,3 @@ export const sanitizeOperators = ( field ) => {
 
 	return operators;
 };
-
-export function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
