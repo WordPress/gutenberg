@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -11,22 +16,84 @@ import {
 	RadioControl,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	useState,
+	useMemo,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { __, sprintf } from '@wordpress/i18n';
+import { dateI18n, getDate, humanTimeDiff } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
-import StatusLabel from '../../sidebar-navigation-screen-page/status-label';
-import { unlock } from '../../../lock-unlock';
+import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
 
-const { PostPanelRow } = unlock( editorPrivateApis );
+export function PostStatusLabel( { status, date, short } ) {
+	const relateToNow = humanTimeDiff( date );
+	let statusLabel = status;
+	switch ( status ) {
+		case 'publish':
+			statusLabel = date
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the relative time when the post was published. */
+							__( 'Published <time>%s</time>' ),
+							relateToNow
+						),
+						{ time: <time dateTime={ date } /> }
+				  )
+				: __( 'Published' );
+			break;
+		case 'future':
+			const formattedDate = dateI18n(
+				short ? 'M j' : 'F j',
+				getDate( date )
+			);
+			statusLabel = date
+				? createInterpolateElement(
+						sprintf(
+							/* translators: %s: is the formatted date and time on which the post is scheduled to be published. */
+							__( 'Scheduled: <time>%s</time>' ),
+							formattedDate
+						),
+						{ time: <time dateTime={ date } /> }
+				  )
+				: __( 'Scheduled' );
+			break;
+		case 'draft':
+			statusLabel = __( 'Draft' );
+			break;
+		case 'pending':
+			statusLabel = __( 'Pending' );
+			break;
+		case 'private':
+			statusLabel = __( 'Private' );
+			break;
+		case 'protected':
+			statusLabel = __( 'Password protected' );
+			break;
+	}
+
+	return (
+		<div
+			className={ classnames(
+				'edit-site-sidebar-navigation-screen-page__status',
+				{
+					[ `has-status has-${ status }-status` ]: !! status,
+				}
+			) }
+		>
+			{ statusLabel }
+		</div>
+	);
+}
 
 const STATUS_OPTIONS = [
 	{
@@ -82,16 +149,29 @@ const STATUS_OPTIONS = [
 	},
 ];
 
-export default function PageStatus( {
-	postType,
-	postId,
-	status,
-	password,
-	date,
-} ) {
+export default function PostStatus() {
+	const { status, date, password, postId, postType } = useSelect(
+		( select ) => {
+			const {
+				getEditedPostAttribute,
+				getCurrentPostId,
+				getCurrentPostType,
+			} = select( editorStore );
+			return {
+				status: getEditedPostAttribute( 'status' ),
+				date: getEditedPostAttribute( 'date' ),
+				password: getEditedPostAttribute( 'password' ),
+				postId: getCurrentPostId(),
+				postType: getCurrentPostType(),
+			};
+		},
+		[]
+	);
 	const [ showPassword, setShowPassword ] = useState( !! password );
-	const instanceId = useInstanceId( PageStatus );
-
+	const passwordInputId = useInstanceId(
+		PostStatus,
+		'editor-change-status__password-input'
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 
@@ -164,17 +244,17 @@ export default function PageStatus( {
 	return (
 		<PostPanelRow label={ __( 'Status' ) }>
 			<Dropdown
-				contentClassName="edit-site-change-status__content"
+				contentClassName="editor-change-status__content"
 				popoverProps={ popoverProps }
 				focusOnMount
 				ref={ setPopoverAnchor }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
-						className="edit-site-summary-field__trigger"
+						className="editor-summary-field__trigger"
 						variant="tertiary"
 						onClick={ onToggle }
 					>
-						<StatusLabel
+						<PostStatusLabel
 							status={ password ? 'protected' : status }
 						/>
 					</Button>
@@ -188,7 +268,7 @@ export default function PageStatus( {
 						<form>
 							<VStack spacing={ 5 }>
 								<RadioControl
-									className="edit-site-change-status__options"
+									className="editor-change-status__options"
 									hideLabelFromVision
 									label={ __( 'Status' ) }
 									options={ STATUS_OPTIONS }
@@ -196,10 +276,10 @@ export default function PageStatus( {
 									selected={ status }
 								/>
 								{ status !== 'private' && (
-									<fieldset className="edit-site-change-status__password-fieldset">
+									<fieldset>
 										<Text
 											as="legend"
-											className="edit-site-change-status__password-legend"
+											className="editor-change-status__password-legend"
 											size="11"
 											lineHeight={ 1.4 }
 											weight={ 500 }
@@ -215,10 +295,10 @@ export default function PageStatus( {
 											onChange={ handleTogglePassword }
 										/>
 										{ showPassword && (
-											<div className="edit-site-change-status__password-input">
+											<div>
 												<VisuallyHidden
 													as="label"
-													htmlFor={ `edit-site-change-status__password-input-${ instanceId }` }
+													htmlFor={ passwordInputId }
 												>
 													{ __( 'Create password' ) }
 												</VisuallyHidden>
@@ -233,7 +313,7 @@ export default function PageStatus( {
 														'Use a secure password'
 													) }
 													type="text"
-													id={ `edit-site-change-status__password-input-${ instanceId }` }
+													id={ passwordInputId }
 												/>
 											</div>
 										) }

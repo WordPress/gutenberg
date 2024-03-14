@@ -8,30 +8,14 @@ import {
 	PostSchedulePanel,
 	PostTemplatePanel,
 	PostFeaturedImagePanel,
+	PostStatus,
 } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import PageStatus from './page-status';
-
-export default function PageSummary( {
-	status,
-	date,
-	password,
-	postId,
-	postType,
-} ) {
+export default function PageSummary() {
 	return (
 		<VStack spacing={ 0 }>
 			<PostFeaturedImagePanel withPanelBody={ false } />
-			<PageStatus
-				status={ status }
-				date={ date }
-				password={ password }
-				postId={ postId }
-				postType={ postType }
-			/>
+			<PostStatus />
 			<PostSchedulePanel />
 			<PostTemplatePanel />
 			<PostURLPanel />

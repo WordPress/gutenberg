@@ -8,11 +8,11 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
 import { safeDecodeURIComponent } from '@wordpress/url';
+import { PostStatusLabel } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import StatusLabel from './status-label';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import {
@@ -35,7 +35,7 @@ function getPageDetails( page ) {
 		{
 			label: __( 'Status' ),
 			value: (
-				<StatusLabel
+				<PostStatusLabel
 					status={ page?.password ? 'protected' : page.status }
 					date={ page?.date }
 					short
