@@ -23,7 +23,7 @@ const {
 	postRevisionsAction,
 } = postManagementActions;
 
-export function usePostActions() {
+export function usePostActions( hasEdit ) {
 	const history = useHistory();
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
@@ -70,37 +70,42 @@ export function usePostActions() {
 			},
 		};
 
-		const customizedEditPostAction = {
-			...editPostAction,
-			callback: ( posts ) => {
-				const post = posts[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			},
-		};
-
-		return [
+		const actionsToReturn = [
 			customizedTrashPostAction,
 			customizedPermanentlyDeletePostAction,
 			restorePostAction,
 			viewPostAction,
-			customizedEditPostAction,
 			postRevisionsAction,
 		];
+
+		if ( hasEdit ) {
+			const customizedEditPostAction = {
+				...editPostAction,
+				callback: ( posts ) => {
+					const post = posts[ 0 ];
+					history.push( {
+						postId: post.id,
+						postType: post.type,
+						canvas: 'edit',
+					} );
+				},
+			};
+			actionsToReturn.push( customizedEditPostAction );
+		}
+
+		return actionsToReturn;
 	}, [
 		permanentlyDeletePostAction,
 		editPostAction,
 		restorePostAction,
 		history,
+		hasEdit,
 	] );
 	return actions;
 }
 
-export default function PostActions( { postType, postId } ) {
-	const actions = usePostActions();
+export default function PostActions( { postType, postId, hasEdit = true } ) {
+	const actions = usePostActions( hasEdit );
 
 	return (
 		<EditorPostActions

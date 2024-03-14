@@ -81,7 +81,11 @@ export default function PagePanels() {
 					title={ decodeEntities( title ) }
 					icon={ pageIcon }
 					actions={
-						<PostActions postType={ postType } postId={ postId } />
+						<PostActions
+							postType={ postType }
+							postId={ postId }
+							hasEdit={ false }
+						/>
 					}
 					description={
 						<VStack>
