@@ -101,10 +101,13 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 
 		$post_type_object = get_post_type_object( 'wp_navigation' );
 		$request          = new WP_REST_Request( 'POST', '/wp/v2/' . $post_type_object->rest_base );
-		$request->set_param( 'title', 'Title ' . $post_type_object->label );
-		$request->set_param( 'content', $post_type_object->label );
-		$request->set_param( '_locale', 'user' );
-
+		$request->set_body_params(
+			array(
+				'title'   => 'Title ' . $post_type_object->label,
+				'content' => $post_type_object->label,
+				'_locale' => 'user',
+			)
+		);
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertNotEmpty( $response->get_status() );
