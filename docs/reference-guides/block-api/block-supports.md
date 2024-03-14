@@ -119,6 +119,62 @@ supports: {
 }
 ```
 
+## background
+
+_**Note:** Since WordPress 6.5._
+
+-   Type: `Object`
+-   Default value: `null`
+-   Subproperties
+    -   `backgroundImage`: type `boolean`, default value `false`
+    -   `backgroundSize`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
+
+`backgroundImage` adds UI controls which allow the user to select a background image.
+`backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
+
+```js
+supports: {
+	background: {
+		backgroundImage: true // Enable background image control.
+		backgroundSize: true // Enable background image + size control.
+	}
+}
+```
+
+When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
+
+When a background image is selected, the image data is stored in the `style.background.backgroundImage`.
+
+When a background images is selected and its position or size are changed, the background-position is stored in the `style.background.backgroundPosition` and its background-size in `style.background.backgroundSize` attribute.
+
+-   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
+    -   `background`: an attribute of `object` type. 
+        - `backgroundImage`: an attribute of `object` type, containing information about the selected image 
+            - `url`: type `string`, URL to the image
+            - `id`: type `int`, media attachment ID
+            - `source`: type `string`, at the moment the only value is `file`
+            - `title`: type `string`, title of the media attachment 
+        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value. 
+        - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
+
+The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        background: {
+            backgroundImage: {
+				"url":"IMAGE_URL"
+			}
+			backgroundPosition:"50% 50%",
+            backgroundSize: "cover"
+        }
+    }
+}
+```
+
 ## className
 
 -   Type: `boolean`
@@ -139,7 +195,10 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
+    -   `button`: type `boolean`, default value `false`
+    -   `enableContrastChecker`: type `boolean`, default value `true`
     -   `gradients`: type `boolean`, default value `false`
+    -   `heading`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
@@ -228,7 +287,65 @@ When the block declares support for `color.background`, the attributes definitio
   }
   ```
 
-### color.__experimentalDuotone
+### color.button
+
+_**Note:** Since WordPress 6.5._
+
+This property adds block controls which allow the user to set button colors (text, background) in a block. Button colors are disabled by default.
+
+To enable button color support, set `color.button` to `true`.
+
+```js
+supports: {
+	color: {
+		button: true
+	}
+}
+```
+
+Button color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+When the block declares support for `color.button`, the attributes definition is extended to include the `style` attribute:
+
+-   `style`: an attribute of `object` type with no default assigned.
+
+    When a button color is selected, the color value is stored in the `style.elements.button.color.text` and `style.elements.button.color.background` attribute.
+
+    The block can apply a default button colors by specifying its own attribute with a default. For example:
+
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                elements: {
+                    button: {
+                        color: {
+                            text: 'var:preset|color|contrast',
+    					    background: '#000000',
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+### color.enableContrastChecker
+
+_**Note:** Since WordPress 6.5._
+
+Determines whether the contrast checker widget displays in the block editor UI.
+
+The contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default. Set to `false` to explicitly disable:
+
+```js
+supports: {
+	color: {
+		enableContrastChecker: false
+	}
+}
+```
 
 _**Note:** Deprecated since WordPress 6.3._
 
@@ -288,24 +405,62 @@ When the block declares support for `color.gradient`, the attributes definition 
   }
   ```
 
-### color.link
+### color.heading
 
-This property adds block controls which allow the user to set link color in a block. Link color is disabled by default.
+_**Note:** Since WordPress 6.5._
 
+This property adds block controls which allow the user to set heading colors in a block. Heading colors are disabled by default.
+
+To enable heading color support, set `color.heading` to `true`.
 
 ```js
 supports: {
-    color: true // Enables only background and text
+	color: {
+		// Enable heading color support.
+		heading: true
+	}
 }
 ```
+
+Heading color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+When the block declares support for `color.heading`, the attributes definition is extended to include the `style` attribute:
+
+-   `style`: an attribute of `object` type with no default assigned.
+
+    When a heading color is selected, the color value is stored in the `style.elements.heading.color.text` and `style.elements.heading.color.background` attribute.
+
+    The block can apply default heading colors by specifying its own attribute with a default. For example:
+
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                elements: {
+                    heading: {
+                        color: {
+                            text: 'var:preset|color|contrast',
+    					    background: '#000000',
+                        }
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+### color.link
+
+This property adds block controls which allow the user to set link colors in a block. Link colors are disabled by default.
 
 To enable link color support, set `color.link` to `true`.
 
 ```js
 supports: {
-    color: {
-        link: true
-    }
+	color: {
+		link: true
+	}
 }
 ```
 
@@ -314,28 +469,33 @@ Link color presets are sourced from the `editor-color-palette` [theme support](/
 
 When the block declares support for `color.link`, the attributes definition is extended to include the `style` attribute:
 
-- `style`: an attribute of `object` type with no default assigned.
+-   `style`: an attribute of `object` type with no default assigned.
 
-  When a link color is selected, the color value is stored in the `style.elements.link.color.text` attribute.
+    When a link color is selected, the color value is stored in the `style.elements.link.color.text` and `style.elements.link.:hover.color.text` attribute.
 
-  The block can apply a default link color by specifying its own attribute with a default. For example:
+    The block can apply default link colors by specifying its own attribute with a default. For example:
 
-  ```js
-  attributes: {
-      style: {
-          type: 'object',
-          default: {
-              elements: {
-                  link: {
-                      color: {
-                          text: '#ff0000',
-                      }
-                  }
-              }
-          }
-      }
-  }
-  ```
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                elements: {
+                    link: {
+                        color: {
+                            text: 'var:preset|color|contrast',
+                        },
+						":hover": { 
+							color: { 
+								text: "#000000" 
+							} 
+						}
+                    }
+                }
+            }
+        }
+    }
+    ```
 
 ### color.text
 
@@ -703,6 +863,57 @@ attributes: {
     }
 }
 ```
+
+## renaming
+
+_**Note:** Since WordPress 6.5._
+
+-   Type: `boolean`
+-   Default value: `true`
+
+By default, a block can be renamed by a user from the block 'Options' dropdown or the 'Advanced' panel. To disable this behavior, set renaming to false.
+
+```js
+supports: {
+	// Don't allow the block to be renamed in the editor.
+	renaming: false,
+}
+```
+## shadow
+
+_**Note:** Since WordPress 6.5._
+
+-   Type: `boolean`
+-   Default value: `false`
+
+This property adds block controls which allow the user to set a box shadow for a block. Shadows are disabled by default.
+
+```js
+supports: {
+	shadow: true // Enable the box-shadow picker.
+}
+```
+
+Shadow presets are sourced from the shadow presets defined in `theme.json`.
+
+When the block declares support for `shadow`, the attributes definition is extended to include the `style` attribute:
+
+-   `style`: an attribute of `object` type with no default assigned.
+
+    When a shadow is selected, the color value is stored in the `style.shadow`.
+
+    The block can apply a default shadow by specifying its own attribute with a default. For example:
+
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+    			shadow: "var:preset|shadow|deep"
+            }
+        }
+    }
+    ```
 
 ## spacing
 
