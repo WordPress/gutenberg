@@ -16,7 +16,7 @@ import color from './color';
 import fontSize from './font-size';
 import './layout';
 
-createBlockEditFilter( [ align, anchor, style ] );
+createBlockEditFilter( [ align, anchor, customClassName, style ] );
 createBlockListBlockFilter( [ align, style, color, fontSize ] );
 createBlockSaveFilter( [
 	align,

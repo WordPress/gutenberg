@@ -7,7 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
+import { TextControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { InspectorControls } from '../components';
+import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
  * Filters registered block settings, extending attributes to include `className`.
@@ -55,6 +63,31 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
+function CustomClassNameControlsPure( { className, setAttributes } ) {
+	const blockEditingMode = useBlockEditingMode();
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls group="advanced">
+			<TextControl
+				autoCapitalize="none"
+				autoComplete="off"
+				autoCorrect={ false }
+				label={ __( 'Additional CSS class(es)' ) }
+				value={ className || '' }
+				onChange={ ( nextValue ) => {
+					setAttributes( {
+						className: nextValue !== '' ? nextValue : undefined,
+					} );
+				} }
+				help={ __( 'Separate multiple classes with spaces.' ) }
+			/>
+		</InspectorControls>
+	);
+}
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/custom-class-name/attribute',
@@ -62,6 +95,7 @@ addFilter(
 );
 
 export default {
+	edit: CustomClassNameControlsPure,
 	addSaveProps,
 	attributeKeys: [ 'className' ],
 	hasSupport( name ) {
