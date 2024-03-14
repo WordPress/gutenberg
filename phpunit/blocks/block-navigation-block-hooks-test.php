@@ -79,7 +79,7 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 */
 	public function test_block_core_navigation_update_ignore_hooked_blocks_meta_preserves_entities() {
 		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
-			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionalit.' );
+			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
 		}
 
 		register_block_type(
@@ -116,25 +116,30 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
-	public function test_block_core_navigation_rest_creation() {
+	public function test_block_core_navigation_dont_modify_no_post_id() {
 		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
-			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionalit.' );
+			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
 		}
 
-		wp_set_current_user( self::$admin_id );
-
-		$post_type_object = get_post_type_object( 'wp_navigation' );
-		$request          = new WP_REST_Request( 'POST', '/wp/v2/' . $post_type_object->rest_base );
-		$request->set_body_params(
+		register_block_type(
+			'tests/my-block',
 			array(
-				'title'   => 'Title ' . $post_type_object->label,
-				'content' => $post_type_object->label,
-				'_locale' => 'user',
+				'block_hooks' => array(
+					'core/navigation' => 'last_child',
+				),
 			)
 		);
-		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertNotEmpty( $response->get_status() );
-		$this->assertSame( 201, $response->get_status() );
+		$original_markup    = '<!-- wp:navigation-link {"label":"News","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
+		$post               = new stdClass();
+		$post->post_content = $original_markup;
+
+		$post = gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
+
+		$this->assertSame(
+			$original_markup,
+			$post->post_content,
+			'Post content did not match the original markup.'
+		);
 	}
 }
