@@ -342,16 +342,7 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
-		}
+		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
@@ -402,6 +393,9 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
+			handleUpdateMenu( createNavigationMenuPost?.id, {
+				focusNavigationBlock: true,
+			} );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
@@ -414,6 +408,8 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
+		createNavigationMenuPost?.id,
+		handleUpdateMenu,
 	] );
 
 	useEffect( () => {
@@ -866,50 +862,52 @@ function Navigation( {
 					</InspectorControls>
 				) }
 
-				{ isLoading && (
-					<TagName { ...blockProps }>
+				<TagName
+					{ ...blockProps }
+					aria-describedby={
+						! isPlaceholder && ! isLoading
+							? accessibleDescriptionId
+							: undefined
+					}
+				>
+					{ isLoading && (
 						<div className="wp-block-navigation__loading-indicator-container">
 							<Spinner className="wp-block-navigation__loading-indicator" />
 						</div>
-					</TagName>
-				) }
+					) }
 
-				{ ! isLoading && (
-					<TagName
-						{ ...blockProps }
-						aria-describedby={
-							! isPlaceholder
-								? accessibleDescriptionId
-								: undefined
-						}
-					>
-						<AccessibleMenuDescription
-							id={ accessibleDescriptionId }
-						/>
-						<ResponsiveWrapper
-							id={ clientId }
-							onToggle={ setResponsiveMenuVisibility }
-							hasIcon={ hasIcon }
-							icon={ icon }
-							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ isResponsive }
-							isHiddenByDefault={ 'always' === overlayMenu }
-							overlayBackgroundColor={ overlayBackgroundColor }
-							overlayTextColor={ overlayTextColor }
-						>
-							{ isEntityAvailable && (
-								<NavigationInnerBlocks
-									clientId={ clientId }
-									hasCustomPlaceholder={
-										!! CustomPlaceholder
-									}
-									templateLock={ templateLock }
-									orientation={ orientation }
-								/>
-							) }
-						</ResponsiveWrapper>
-					</TagName>
-				) }
+					{ ! isLoading && (
+						<>
+							<AccessibleMenuDescription
+								id={ accessibleDescriptionId }
+							/>
+							<ResponsiveWrapper
+								id={ clientId }
+								onToggle={ setResponsiveMenuVisibility }
+								hasIcon={ hasIcon }
+								icon={ icon }
+								isOpen={ isResponsiveMenuOpen }
+								isResponsive={ isResponsive }
+								isHiddenByDefault={ 'always' === overlayMenu }
+								overlayBackgroundColor={
+									overlayBackgroundColor
+								}
+								overlayTextColor={ overlayTextColor }
+							>
+								{ isEntityAvailable && (
+									<NavigationInnerBlocks
+										clientId={ clientId }
+										hasCustomPlaceholder={
+											!! CustomPlaceholder
+										}
+										templateLock={ templateLock }
+										orientation={ orientation }
+									/>
+								) }
+							</ResponsiveWrapper>
+						</>
+					) }
+				</TagName>
 			</RecursionProvider>
 		</EntityProvider>
 	);
