@@ -9,6 +9,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -156,7 +158,10 @@ export default function ChildLayoutControl( {
 			{ parentLayoutType === 'grid' && (
 				<>
 					{ window.__experimentalEnableGridInteractivity && (
-						<HStack
+						// Use Flex with an explicit width on the FlexItem instead of HStack to
+						// work around an issue in webkit where inputs with a max attribute are
+						// sized incorrectly.
+						<Flex
 							as={ ToolsPanelItem }
 							hasValue={ hasStartValue }
 							label={ __( 'Grid placement' ) }
@@ -164,39 +169,43 @@ export default function ChildLayoutControl( {
 							isShownByDefault={ false }
 							panelId={ panelId }
 						>
-							<InputControl
-								size={ '__unstable-large' }
-								label={ __( 'Column' ) }
-								type="number"
-								onChange={ ( value ) => {
-									onChange( {
-										columnStart: value,
-										rowStart,
-										columnSpan,
-										rowSpan,
-									} );
-								} }
-								value={ columnStart }
-								min={ 1 }
-								max={ parentLayout?.columnCount }
-							/>
-							<InputControl
-								size={ '__unstable-large' }
-								label={ __( 'Row' ) }
-								type="number"
-								onChange={ ( value ) => {
-									onChange( {
-										columnStart,
-										rowStart: value,
-										columnSpan,
-										rowSpan,
-									} );
-								} }
-								value={ rowStart }
-								min={ 1 }
-								max={ parentLayout?.columnCount }
-							/>
-						</HStack>
+							<FlexItem style={ { width: '50%' } }>
+								<InputControl
+									size={ '__unstable-large' }
+									label={ __( 'Column' ) }
+									type="number"
+									onChange={ ( value ) => {
+										onChange( {
+											columnStart: value,
+											rowStart,
+											columnSpan,
+											rowSpan,
+										} );
+									} }
+									value={ columnStart }
+									min={ 1 }
+									max={ parentLayout?.columnCount }
+								/>
+							</FlexItem>
+							<FlexItem style={ { width: '50%' } }>
+								<InputControl
+									size={ '__unstable-large' }
+									label={ __( 'Row' ) }
+									type="number"
+									onChange={ ( value ) => {
+										onChange( {
+											columnStart,
+											rowStart: value,
+											columnSpan,
+											rowSpan,
+										} );
+									} }
+									value={ rowStart }
+									min={ 1 }
+									max={ parentLayout?.columnCount }
+								/>
+							</FlexItem>
+						</Flex>
 					) }
 					<HStack
 						as={ ToolsPanelItem }
