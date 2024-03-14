@@ -1,11 +1,12 @@
 .container {
 	margin-top: 2px;
+	padding: $grid-unit-20;
 }
 
 .defaultButton {
 	border-radius: $border-width * 4;
 	padding: $grid-unit-10;
-	margin-top: $grid-unit-20;
+	margin: $grid-unit-20;
 	background-color: $button-fallback-bg;
 }
 
