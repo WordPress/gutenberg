@@ -306,7 +306,6 @@ const ImageComponent = ( {
 								{ networkImageLoaded && networkURL && (
 									<Image
 										style={ imageStyles }
-										fadeDuration={ 0 }
 										source={ { uri: networkURL } }
 										{ ...( ! focalPoint && {
 											resizeMethod: 'scale',
@@ -318,7 +317,6 @@ const ImageComponent = ( {
 								{ ! networkImageLoaded && ! networkURL && (
 									<Image
 										style={ imageStyles }
-										fadeDuration={ 0 }
 										source={ { uri: localURL } }
 										{ ...( ! focalPoint && {
 											resizeMethod: 'scale',

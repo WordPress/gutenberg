@@ -489,14 +489,18 @@ describe( 'Gallery block', () => {
 
 		// Cancel uploads
 		fireEvent.press( galleryItem1 );
-		fireEvent.press( within( galleryItem1 ).getByTestId( 'spinner' ) );
+		fireEvent.press(
+			within( galleryItem1 ).getByTestId( 'progress-container' )
+		);
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
 			media[ 0 ].localId
 		);
 		await notifyResetState( media[ 0 ] );
 
 		fireEvent.press( galleryItem2 );
-		fireEvent.press( within( galleryItem2 ).getByTestId( 'spinner' ) );
+		fireEvent.press(
+			within( galleryItem2 ).getByTestId( 'progress-container' )
+		);
 		expect( requestImageUploadCancelDialog ).toHaveBeenCalledWith(
 			media[ 1 ].localId
 		);

@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Update Image block progress indicator to use ActivityIndicator [#58759]
 -   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
 -   [*] Gallery block items with in-progress, paused, or failed media uploads correctly display an highlight outline when selected [#59423]
 -   [**] [internal] Upgrade React Native to version 0.73.3 [#58475]
