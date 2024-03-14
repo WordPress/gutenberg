@@ -120,7 +120,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		_deprecated_argument(
 			__FUNCTION__,
 			'6.5.0',
-			__( 'Use as a `pre_render_block` filter is deprecated. Use with `render_block_data` instead.' )
+			__( 'Use as a `pre_render_block` filter is deprecated. Use with `render_block_data` instead.', 'gutenberg' )
 		);
 	}
 
