@@ -157,6 +157,45 @@ export default function ChildLayoutControl( {
 			) }
 			{ parentLayoutType === 'grid' && (
 				<>
+					<HStack
+						as={ ToolsPanelItem }
+						hasValue={ hasSpanValue }
+						label={ __( 'Grid span' ) }
+						onDeselect={ resetGridSpans }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Column span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									rowSpan,
+									columnSpan: value,
+								} );
+							} }
+							value={ columnSpan }
+							min={ 1 }
+						/>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Row span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									columnSpan,
+									rowSpan: value,
+								} );
+							} }
+							value={ rowSpan }
+							min={ 1 }
+						/>
+					</HStack>
 					{ window.__experimentalEnableGridInteractivity && (
 						// Use Flex with an explicit width on the FlexItem instead of HStack to
 						// work around an issue in webkit where inputs with a max attribute are
@@ -207,45 +246,6 @@ export default function ChildLayoutControl( {
 							</FlexItem>
 						</Flex>
 					) }
-					<HStack
-						as={ ToolsPanelItem }
-						hasValue={ hasSpanValue }
-						label={ __( 'Grid span' ) }
-						onDeselect={ resetGridSpans }
-						isShownByDefault={ isShownByDefault }
-						panelId={ panelId }
-					>
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Column span' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									columnStart,
-									rowStart,
-									rowSpan,
-									columnSpan: value,
-								} );
-							} }
-							value={ columnSpan }
-							min={ 1 }
-						/>
-						<InputControl
-							size={ '__unstable-large' }
-							label={ __( 'Row span' ) }
-							type="number"
-							onChange={ ( value ) => {
-								onChange( {
-									columnStart,
-									rowStart,
-									columnSpan,
-									rowSpan: value,
-								} );
-							} }
-							value={ rowSpan }
-							min={ 1 }
-						/>
-					</HStack>
 				</>
 			) }
 		</>
