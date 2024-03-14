@@ -1,15 +1,12 @@
 .edit-site-sidebar-card {
-	display: flex;
-	align-items: flex-start;
-
 	&__content {
 		flex-grow: 1;
-		margin-bottom: $grid-unit-05;
 	}
 
 	&__title {
 		font-weight: 500;
 		line-height: $icon-size;
+		flex-grow: 1;
 		&.edit-site-sidebar-card__title {
 			font-size: $default-font-size;
 			line-height: $default-line-height;
@@ -24,7 +21,6 @@
 
 	&__icon {
 		flex: 0 0 $icon-size;
-		margin-right: $grid-unit-15;
 		width: $icon-size;
 		height: $icon-size;
 	}
