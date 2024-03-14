@@ -19,7 +19,7 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 } from '../block-edit/context';
-import { BlockSettingsButton } from '../block-settings';
+import { BlockSettingsButton } from '../block-inspector';
 
 export default function InspectorControlsFill( {
 	children,

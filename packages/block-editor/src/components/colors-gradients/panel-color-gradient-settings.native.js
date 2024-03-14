@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { blockSettingsScreens } from '../block-settings';
+import { blockSettingsScreens } from '../block-inspector';
 
 export default function PanelColorGradientSettings( {
 	settings,

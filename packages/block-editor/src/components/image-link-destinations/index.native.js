@@ -16,7 +16,7 @@ import { BottomSheet, PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import styles from './style.native.scss';
-import { blockSettingsScreens } from '../block-settings';
+import { blockSettingsScreens } from '../block-inspector';
 
 const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';

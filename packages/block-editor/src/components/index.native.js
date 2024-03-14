@@ -76,7 +76,7 @@ export {
 	BottomSheetSettings,
 	BlockSettingsButton,
 	blockSettingsScreens,
-} from './block-settings';
+} from './block-inspector';
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 export {

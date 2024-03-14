@@ -11,7 +11,7 @@ import BlockActionsMenu from './block-toolbar-menu';
 import BlockControls from '../block-controls';
 import BlockMover from '../block-mover';
 import UngroupButton from '../ungroup-button';
-import { BlockSettingsButton } from '../block-settings';
+import { BlockSettingsButton } from '../block-inspector';
 import { store as blockEditorStore } from '../../store';
 
 const REMOVE_EMPY_PARENT_BLOCKS = [
