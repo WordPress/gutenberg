@@ -62,6 +62,9 @@ const units = [
 	{ value: 'em', label: 'em', default: 0 },
 ];
 
+// Default number of columns when in "manual" mode.
+const DEFAULT_NUM_COLUMNS = 4;
+
 export default {
 	name: 'grid',
 	label: __( 'Grid' ),
@@ -286,7 +289,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	 * previous type so we can switch back without loss.
 	 */
 	const [ tempColumnCount, setTempColumnCount ] = useState(
-		columnCount || 3
+		columnCount || DEFAULT_NUM_COLUMNS
 	);
 	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
 		minimumColumnWidth || '12rem'
@@ -298,7 +301,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		if ( value === 'manual' ) {
 			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
 		} else {
-			setTempColumnCount( columnCount || 3 );
+			setTempColumnCount( columnCount || DEFAULT_NUM_COLUMNS );
 		}
 		onChange( {
 			...layout,
