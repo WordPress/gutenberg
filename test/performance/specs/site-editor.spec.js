@@ -193,7 +193,7 @@ test.describe( 'Site Editor Performance', () => {
 				await metrics.startTracing();
 
 				await page
-					.getByRole( 'link', { name: 'Single Posts' } )
+					.getByRole( 'button', { name: 'Single Posts' } )
 					.click();
 
 				// Stop tracing.
