@@ -15,6 +15,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -34,17 +35,19 @@ import {
 	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
-import {
-	trashPostAction,
-	usePermanentlyDeletePostAction,
-	useRestorePostAction,
-	postRevisionsAction,
-	viewPostAction,
-	useEditPostAction,
-} from '../actions';
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+
+const { postManagementActions } = unlock( editorPrivateApis );
+const {
+	trashPostAction,
+	usePermanentlyDeletePostAction,
+	useRestorePostAction,
+	viewPostAction,
+	useEditPostAction,
+	postRevisionsAction,
+} = postManagementActions;
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -352,13 +355,24 @@ export default function PagePages() {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const editPostAction = useEditPostAction();
+	const customizedEditPostAction = {
+		...editPostAction,
+		callback: ( posts ) => {
+			const post = posts[ 0 ];
+			history.push( {
+				postId: post.id,
+				postType: post.type,
+				canvas: 'edit',
+			} );
+		},
+	};
 	const actions = useMemo(
 		() => [
 			viewPostAction,
 			trashPostAction,
 			restorePostAction,
 			permanentlyDeletePostAction,
-			editPostAction,
+			customizedEditPostAction,
 			postRevisionsAction,
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]

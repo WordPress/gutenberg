@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+
 import {
 	Button,
 	__experimentalText as Text,
@@ -17,12 +17,12 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { useHistory } = unlock( routerPrivateApis );
+function getItemTitle( item ) {
+	if ( typeof item.title === 'string' ) {
+		return decodeEntities( item.title );
+	}
+	return decodeEntities( item.title?.rendered || '' );
+}
 
 export const trashPostAction = {
 	id: 'move-to-trash',
@@ -45,7 +45,7 @@ export const trashPostAction = {
 						? sprintf(
 								// translators: %s: The page's title.
 								__( 'Are you sure you want to delete "%s"?' ),
-								decodeEntities( posts[ 0 ].title.rendered )
+								getItemTitle( posts[ 0 ] )
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
@@ -84,9 +84,7 @@ export const trashPostAction = {
 									successMessage = sprintf(
 										/* translators: The posts's title. */
 										__( '"%s" moved to the Trash.' ),
-										decodeEntities(
-											posts[ 0 ].title.rendered
-										)
+										getItemTitle( posts[ 0 ] )
 									);
 								} else {
 									successMessage = __(
@@ -150,7 +148,7 @@ export const trashPostAction = {
 								}
 							}
 							if ( onPerform ) {
-								onPerform();
+								onPerform( posts );
 							}
 							closeModal();
 						} }
@@ -178,7 +176,7 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( posts ) {
+			async callback( posts, onPerform ) {
 				const promiseResult = await Promise.allSettled(
 					posts.map( ( post ) => {
 						return deleteEntityRecord(
@@ -201,7 +199,7 @@ export function usePermanentlyDeletePostAction() {
 						successMessage = sprintf(
 							/* translators: The posts's title. */
 							__( '"%s" permanently deleted.' ),
-							decodeEntities( posts[ 0 ].title.rendered )
+							getItemTitle( posts[ 0 ] )
 						);
 					} else {
 						successMessage = __(
@@ -212,6 +210,9 @@ export function usePermanentlyDeletePostAction() {
 						type: 'snackbar',
 						id: 'edit-site-post-permanently-deleted',
 					} );
+					if ( onPerform ) {
+						onPerform( posts );
+					}
 				} else {
 					// If there was at lease one failure.
 					let errorMessage;
@@ -314,7 +315,7 @@ export function useRestorePostAction() {
 							: sprintf(
 									/* translators: The number of posts. */
 									__( '"%s" has been restored.' ),
-									decodeEntities( posts[ 0 ].title.rendered )
+									getItemTitle( posts[ 0 ] )
 							  ),
 						{
 							type: 'snackbar',
@@ -367,7 +368,6 @@ export const viewPostAction = {
 };
 
 export function useEditPostAction() {
-	const history = useHistory();
 	return useMemo(
 		() => ( {
 			id: 'edit-post',
@@ -375,16 +375,13 @@ export function useEditPostAction() {
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
-			callback( posts ) {
-				const post = posts[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
+			callback( posts, onPerform ) {
+				if ( onPerform ) {
+					onPerform( posts );
+				}
 			},
 		} ),
-		[ history ]
+		[]
 	);
 }
 export const postRevisionsAction = {

@@ -11,6 +11,7 @@ import {
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,10 +28,11 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from '../../template-actions';
 import TemplateAreas from './template-areas';
-import SidebarCard from '../sidebar-card';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
+
+const { PostSidebarCard } = unlock( editorPrivateApis );
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -99,7 +101,7 @@ export default function TemplatePanel() {
 	return (
 		<>
 			<PanelBody>
-				<SidebarCard
+				<PostSidebarCard
 					className="edit-site-template-card"
 					title={ decodeEntities( title ) }
 					icon={ CARD_ICONS[ record?.type ] ?? icon }
@@ -119,7 +121,7 @@ export default function TemplatePanel() {
 					}
 				>
 					<TemplateAreas />
-				</SidebarCard>
+				</PostSidebarCard>
 			</PanelBody>
 			{ availablePatterns?.length > 0 && (
 				<PanelBody

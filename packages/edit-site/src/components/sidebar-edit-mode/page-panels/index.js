@@ -20,15 +20,19 @@ import {
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import SidebarCard from '../sidebar-card';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
+import PostActions from '../../post-actions';
+import { unlock } from '../../../lock-unlock';
+
+const { PostSidebarCard } = unlock( editorPrivateApis );
 
 export default function PagePanels() {
 	const {
@@ -64,7 +68,8 @@ export default function PagePanels() {
 			renderingMode: getRenderingMode(),
 		};
 	}, [] );
-
+	const postType = type;
+	const postId = id;
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -72,9 +77,12 @@ export default function PagePanels() {
 	return (
 		<>
 			<PanelBody>
-				<SidebarCard
+				<PostSidebarCard
 					title={ decodeEntities( title ) }
 					icon={ pageIcon }
+					actions={
+						<PostActions postType={ postType } postId={ postId } />
+					}
 					description={
 						<VStack>
 							<Text>

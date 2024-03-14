@@ -26,7 +26,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
-import PageActions from '../page-actions';
+import PostActions from '../post-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -36,7 +36,6 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 	const history = useHistory();
 	const {
 		params: { postId },
-		goTo,
 	} = useNavigator();
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -94,13 +93,7 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 			) }
 			actions={
 				<>
-					<PageActions
-						postId={ postId }
-						toggleProps={ { as: SidebarButton } }
-						onRemove={ () => {
-							goTo( '/page' );
-						} }
-					/>
+					<PostActions postId={ postId } postType="page" />
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }
 						label={ __( 'Edit' ) }
