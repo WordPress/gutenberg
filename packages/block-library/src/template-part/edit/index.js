@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { serialize } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
@@ -94,6 +95,7 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -196,12 +198,17 @@ export default function TemplatePartEdit( {
 		mapTemplatePartToBlockPattern( templatePart )
 	);
 
-	const onTemplatePartSelect = ( templatePart ) => {
-		setAttributes( {
-			slug: templatePart.slug,
-			theme: templatePart.theme,
-			area: undefined,
-		} );
+	const onTemplatePartSelect = async ( templatePart ) => {
+		await editEntityRecord(
+			'postType',
+			'wp_template_part',
+			templatePartId,
+			{
+				blocks: templatePart.blocks,
+				content: serialize( templatePart.blocks ),
+			}
+		);
+
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -276,9 +283,7 @@ export default function TemplatePartEdit( {
 								<TemplatesList
 									availableTemplates={ partsAsPatterns }
 									onSelect={ ( pattern ) => {
-										onTemplatePartSelect(
-											pattern.templatePart
-										);
+										onTemplatePartSelect( pattern );
 									} }
 								/>
 								<TemplatesList
