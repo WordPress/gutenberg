@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v1.9.0'
+        aztecVersion = 'fix_gutenberg-backspace-styles-d845fbf4989acc4fbfddc877fd67c7671412fbe0'
         wordpressUtilsVersion = '3.3.0'
 
         // main

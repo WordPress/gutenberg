@@ -13,7 +13,9 @@ class AztecReactTextChangedEvent(
     viewId: Int,
     private val mText: String,
     private val mEventCount: Int,
-    private val mMostRecentChar: Char?
+    private val mMostRecentChar: Char?,
+    private val mSelectionStart: Int,
+    private val mSelectionEnd: Int
 ) : Event<AztecReactTextChangedEvent>(viewId) {
 
     override fun getEventName(): String = "topAztecChange"
@@ -30,5 +32,7 @@ class AztecReactTextChangedEvent(
                 if (mMostRecentChar != null) {
                     putInt("keyCode", mMostRecentChar.toInt())
                 }
+                putInt("selectionStart", mSelectionStart)
+                putInt("selectionEnd", mSelectionEnd)
             }
 }
