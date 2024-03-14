@@ -13,6 +13,11 @@
  */
 class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	/**
+	 * @var int
+	 */
+	protected static $admin_id;
+
+	/**
 	 * Original markup.
 	 *
 	 * @var string
@@ -28,8 +33,16 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 
 	/**
 	 * Setup method.
+	 *
+	 * * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
-	public static function wpSetUpBeforeClass() {
+	public static function wpSetUpBeforeClass( $factory ) {
+		self::$admin_id = $factory->user->create(
+			array(
+				'role' => 'administrator',
+			)
+		);
+
 		//self::$original_markup = '<!-- wp:navigation-link {"label":"News & About","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
 
 		self::$navigation_post = self::factory()->post->create_and_get(
@@ -39,6 +52,13 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 				'post_content' => 'Original content',
 			)
 		);
+	}
+
+	/**
+	 *
+	 */
+	public static function wpTearDownAfterClass() {
+		self::delete_user( self::$admin_id );
 	}
 
 	/**
@@ -97,7 +117,7 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_rest_creation() {
-		wp_set_current_user( 1 );
+		wp_set_current_user( self::$admin_id );
 
 		$post_type_object = get_post_type_object( 'wp_navigation' );
 		$request          = new WP_REST_Request( 'POST', '/wp/v2/' . $post_type_object->rest_base );
