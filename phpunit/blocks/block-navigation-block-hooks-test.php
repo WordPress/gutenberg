@@ -92,4 +92,22 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 			'Block was not added to ignored hooked blocks metadata.'
 		);
 	}
+
+	/**
+	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta being called via the REST API.
+	 */
+	public function test_block_core_navigation_rest_creation() {
+		wp_set_current_user( 1 );
+
+		$post_type_object = get_post_type_object( 'wp_navigation' );
+		$request          = new WP_REST_Request( 'POST', '/wp/v2/' . $post_type_object->rest_base );
+		$request->set_param( 'title', 'Title ' . $post_type_object->label );
+		$request->set_param( 'content', $post_type_object->label );
+		$request->set_param( '_locale', 'user' );
+
+		$response = rest_get_server()->dispatch( $request ); // Triggers the error.
+
+		$this->assertNotEmpty( $response->get_status() );
+		$this->assertSame( 201, $response->get_status() );
+	}
 }
