@@ -500,7 +500,9 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ ( ! useFeaturedImage || url ) && (
+				{ ( ( ! url && useFeaturedImage ) ||
+					! useFeaturedImage ||
+					url ) && (
 					<span
 						aria-hidden="true"
 						className={ classnames(
