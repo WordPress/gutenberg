@@ -51,10 +51,6 @@ function gutenberg_apply_shadow_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
-	if ( wp_should_skip_block_supports_serialization( $block_type, 'shadow' ) ) {
-		return array();
-	}
-
 	$shadow_block_styles = array();
 
 	$custom_shadow                 = $block_attributes['style']['shadow'] ?? null;
