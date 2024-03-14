@@ -28,7 +28,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Use desired version of Java
-              uses: actions/setup-java@9704b39bf258b59bc04b50fa2dd55e9ed76b47a8 # v4.1.0
+              uses: actions/setup-java@5896cecc08fd8a1fbdfaf517e29b571164b031f7 # v4.2.0
               with:
                   distribution: 'corretto'
                   java-version: '17'
