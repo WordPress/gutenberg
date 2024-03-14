@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { serialize } from '@wordpress/blocks';
 import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import {
 	SearchControl,
@@ -52,13 +54,19 @@ export default function TemplatePartSelectionModal( {
 	const shownBlockPatterns = useAsyncList( filteredBlockPatterns );
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	const onTemplatePartSelect = ( templatePart ) => {
-		setAttributes( {
-			slug: templatePart.slug,
-			theme: templatePart.theme,
-			area: undefined,
-		} );
+	const onTemplatePartSelect = async ( templatePart ) => {
+		await editEntityRecord(
+			'postType',
+			'wp_template_part',
+			templatePartId,
+			{
+				blocks: templatePart.blocks,
+				content: serialize( templatePart.blocks ),
+			}
+		);
+
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -98,7 +106,7 @@ export default function TemplatePartSelectionModal( {
 						blockPatterns={ filteredTemplateParts }
 						shownPatterns={ shownTemplateParts }
 						onClickPattern={ ( pattern ) => {
-							onTemplatePartSelect( pattern.templatePart );
+							onTemplatePartSelect( pattern );
 						} }
 					/>
 				</div>
