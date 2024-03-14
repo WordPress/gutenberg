@@ -9,6 +9,9 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../store';
 
+/**
+ * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+ */
 export function useZoomOut() {
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { mode } = useSelect( ( select ) => {
