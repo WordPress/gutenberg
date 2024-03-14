@@ -355,11 +355,11 @@ export default function PagePages() {
 	const actions = useMemo(
 		() => [
 			viewPostAction,
-			trashPostAction,
 			restorePostAction,
 			permanentlyDeletePostAction,
 			editPostAction,
 			postRevisionsAction,
+			trashPostAction,
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
