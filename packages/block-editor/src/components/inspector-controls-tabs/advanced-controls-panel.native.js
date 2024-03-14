@@ -21,14 +21,9 @@ export default function AdvancedControls( props ) {
 				if ( ! fills.length ) {
 					return null;
 				}
+
 				return (
-					<PanelBody
-						className="block-editor-block-inspector__advanced"
-						title={ __( 'Advanced' ) }
-						initialOpen={ false }
-					>
-						{ fills }
-					</PanelBody>
+					<PanelBody title={ __( 'Advanced' ) }>{ fills }</PanelBody>
 				);
 			} }
 		</Slot>
