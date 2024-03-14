@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { TextControl } from '@wordpress/components';
+import { BottomSheetTextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
 
@@ -71,18 +71,21 @@ function CustomClassNameControlsPure( { className, setAttributes } ) {
 
 	return (
 		<InspectorControls group="advanced">
-			<TextControl
-				autoCapitalize="none"
-				autoComplete="off"
-				autoCorrect={ false }
-				label={ __( 'Additional CSS class(es)' ) }
-				value={ className || '' }
+			<BottomSheetTextControl
+				initialValue={ className || '' }
 				onChange={ ( nextValue ) => {
 					setAttributes( {
 						className: nextValue !== '' ? nextValue : undefined,
 					} );
 				} }
-				help={ __( 'Separate multiple classes with spaces.' ) }
+				placeholder={ __( 'Add classes' ) }
+				label={ __( 'Additional CSS class(es)' ) }
+				footerNote={ __( 'Separate multiple classes with spaces.' ) }
+				textInputProps={ {
+					autoCapitalize: 'none',
+					autoComplete: 'off',
+					autoCorrect: false,
+				} }
 			/>
 		</InspectorControls>
 	);

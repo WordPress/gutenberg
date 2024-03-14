@@ -30,6 +30,7 @@ const BottomSheetTextControl = ( {
 	footerNote,
 	cellPlaceholder,
 	disabled,
+	textInputProps,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -79,6 +80,7 @@ const BottomSheetTextControl = ( {
 				</BottomSheet.NavBar>
 				<PanelBody style={ horizontalBorderStyle }>
 					<TextInput
+						{ ...textInputProps }
 						label={ label }
 						onChangeText={ ( text ) => onChange( text ) }
 						defaultValue={ initialValue }
