@@ -1516,7 +1516,7 @@ function block_core_navigation_update_ignore_hooked_blocks_meta( $post ) {
 	 * In this scenario the user has likely tried to create a navigation via the REST API.
 	 * In which case we won't have a post ID to work with and store meta against.
 	 */
-	if ( ! isset( $post->ID ) ) {
+	if ( empty( $post->ID ) ) {
 		return $post;
 	}
 
