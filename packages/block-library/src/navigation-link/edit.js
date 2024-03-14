@@ -333,6 +333,7 @@ export default function NavigationLinkEdit( {
 			isKeyboardEvent.primary( event, 'k' ) ||
 			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
 		) {
+			event.preventDefault();
 			setIsLinkOpen( true );
 		}
 	}
@@ -570,6 +571,7 @@ export default function NavigationLinkEdit( {
 									// Need to handle refocusing the Nav block or the inserter?
 									onReplace( [] );
 								}
+								setIsLinkOpen( false );
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }

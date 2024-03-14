@@ -14,6 +14,7 @@ import {
 	Icon,
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
+	Spinner,
 } from '@wordpress/components';
 import {
 	forwardRef,
@@ -21,8 +22,6 @@ import {
 	useId,
 	useRef,
 	useState,
-	Children,
-	Fragment,
 	useMemo,
 } from '@wordpress/element';
 
@@ -32,7 +31,7 @@ import {
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { sanitizeOperators } from './utils';
+import { sanitizeOperators, WithDropDownMenuSeparators } from './utils';
 import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
@@ -45,19 +44,7 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
-
-function WithSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
 
 const sortArrows = { asc: '↑', desc: '↓' };
 
@@ -101,7 +88,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			}
 			style={ { minWidth: '240px' } }
 		>
-			<WithSeparators>
+			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(
@@ -186,7 +173,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-			</WithSeparators>
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 } );
@@ -236,12 +223,58 @@ function TableRow( {
 	data,
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
+
+	const isSelected = selection.includes( id );
+
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
+
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
 				'is-selected':
 					hasPossibleBulkAction && selection.includes( id ),
+				'is-hovered': isHovered,
 			} ) }
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
+			onClickCapture={ ( event ) => {
+				if ( event.ctrlKey || event.metaKey ) {
+					event.stopPropagation();
+					event.preventDefault();
+					if ( ! hasPossibleBulkAction ) {
+						return;
+					}
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
+				}
+			} }
 		>
 			{ hasBulkActions && (
 				<td
@@ -355,7 +388,7 @@ function ViewTable( {
 	);
 
 	return (
-		<div className="dataviews-view-table-wrapper">
+		<>
 			<table
 				className="dataviews-view-table"
 				aria-busy={ isLoading }
@@ -464,10 +497,10 @@ function ViewTable( {
 				id={ tableNoticeId }
 			>
 				{ ! hasData && (
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				) }
 			</div>
-		</div>
+		</>
 	);
 }
 

@@ -1,6 +1,6 @@
 # API Reference
 
-<div class="callout callout-warning">
+<div class="callout callout-alert">
 Interactivity API is only available for WordPress 6.5 and above.
 </div>
 
@@ -125,7 +125,7 @@ Different contexts can be defined at different levels, and deeper levels will me
 
 ### `wp-bind`
 
-This directive allows setting HTML attributes on elements based on a boolean or string value. It follows the syntax `data-wp-bind--attribute`. 
+This directive allows setting HTML attributes on elements based on a boolean or string value. It follows the syntax `data-wp-bind--attribute`.
 
 ```html
 <li data-wp-context='{ "isMenuOpen": false }'>
@@ -225,7 +225,7 @@ The boolean value received by the directive is used to toggle (add when `true` o
 
 ### `wp-style`
 
-This directive adds or removes inline style to an HTML element, depending on its value. It follows the syntax `data-wp-style--css-property`. 
+This directive adds or removes inline style to an HTML element, depending on its value. It follows the syntax `data-wp-style--css-property`.
 
 ```html
 <div data-wp-context='{ "color": "red" }' >
@@ -299,7 +299,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-on`
 
-This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`). 
+This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
 
 ```php
 <button data-wp-on--click="actions.logTime" >
@@ -387,7 +387,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 
 It runs a callback **when the node is created and runs it again when the state or context changes**.
 
-You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`. 
+You can attach several side effects to the same DOM element by using the syntax `data-wp-watch--[unique-id]`.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-watch` directives of that DOM element.
 
@@ -491,7 +491,7 @@ This directive runs the passed callback **during the node's render execution**.
 
 You can use and compose hooks like `useState`, `useWatch`, or `useEffect` inside the passed callback and create your own logic, providing more flexibility than previous directives.
 
-You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`. 
+You can attach several `wp-run` to the same DOM element by using the syntax `data-wp-run--[unique-id]`.
 
 The `unique-id` doesn't need to be unique globally. It just needs to be different from the other unique IDs of the `wp-run` directives of that DOM element.
 
@@ -619,6 +619,8 @@ For that, you must use `data-wp-each-key` in the `<template>` tag and not `data-
   </template>
 </ul>
 ```
+
+### `wp-each-child`
 
 For server-side rendered lists, another directive called `data-wp-each-child` ensures hydration works as expected. This directive is added automatically when the directive is processed on the server.
 
@@ -1009,11 +1011,11 @@ It returns an object with two keys:
 
 ##### ref
 
-`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement)
 
 ##### attributes
 
-`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+`attributes` contains a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
 
 Those attributes will contain the directives of that element. In the button example:
 
@@ -1040,6 +1042,28 @@ The code will log:
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
+```
+
+### withScope()
+
+Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
+
+When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+
+An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
+
+```js
+store('mySliderPlugin', {
+	callbacks: {
+		initSlideShow: () => {
+			setInterval(
+				withScope( () => {
+					actions.nextImage();
+				} ),
+				3_000
+			);
+		},
+})
 ```
 
 ## Server functions
@@ -1091,4 +1115,27 @@ echo $processed_html;
 will output:
 ```html
 <div data-wp-text="create-block::state.greeting">Hello, World!</div>
+```
+
+### wp_interactivity_data_wp_context
+
+`wp_interactivity_data_wp_context` returns a stringified JSON of a context directive.
+This function is the recommended way to print the `data-wp-context` attribute in the server side rendedered markup.
+
+```php
+
+$my_context = array(
+	'counter' => 0,
+	'isOpen'  => true,
+);
+<div
+ echo wp_interactivity_data_wp_context($my_context)
+>
+</div>
+```
+
+will output:
+
+```html
+<div data-wp-context='{"counter":0,"isOpen":true}'>
 ```

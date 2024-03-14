@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import removeAccents from 'remove-accents';
 
 /**
@@ -34,13 +35,13 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-import { useAddedBy, AvatarImage } from '../list/added-by';
+import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -124,14 +125,30 @@ function Title( { item, viewType } ) {
 }
 
 function AuthorField( { item, viewType } ) {
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
 	const withIcon = viewType !== LAYOUT_LIST;
 
 	return (
 		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && <AvatarImage imageUrl={ imageUrl } /> }
+			{ withIcon && imageUrl && (
+				<div
+					className={ classnames(
+						'page-templates-author-field__avatar',
+						{
+							'is-loaded': isImageLoaded,
+						}
+					) }
+				>
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
+				</div>
+			) }
 			{ withIcon && ! imageUrl && (
-				<div className="edit-site-list-added-by__icon">
+				<div className="page-templates-author-field__icon">
 					<Icon icon={ icon } />
 				</div>
 			) }
@@ -204,8 +221,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: 'isAny',
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -220,8 +237,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: OPERATOR_IS_ANY,
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -292,7 +309,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
-				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return item.description ? (
 						<span className="page-templates-description">
@@ -361,19 +377,19 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			view.filters.forEach( ( filter ) => {
 				if (
 					filter.field === 'author' &&
-					filter.operator === OPERATOR_IN &&
-					!! filter.value
+					filter.operator === OPERATOR_IS_ANY &&
+					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text === filter.value;
+						return filter.value.includes( item.author_text );
 					} );
 				} else if (
 					filter.field === 'author' &&
-					filter.operator === OPERATOR_NOT_IN &&
-					!! filter.value
+					filter.operator === OPERATOR_IS_NONE &&
+					filter?.value?.length > 0
 				) {
 					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text !== filter.value;
+						return ! filter.value.includes( item.author_text );
 					} );
 				}
 			} );

@@ -480,7 +480,7 @@ export function PaletteEdit( {
 										: __( 'Color options' )
 								}
 								toggleProps={ {
-									isSmall: true,
+									size: 'small',
 								} }
 							>
 								{ ( { onClose }: { onClose: () => void } ) => (
@@ -592,14 +592,14 @@ export function PaletteEdit( {
 								gradients={ gradients }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
-								disableCustomGradients={ true }
+								disableCustomGradients
 							/>
 						) : (
 							<ColorPalette
 								colors={ colors }
 								onChange={ onSelectPaletteItem }
 								clearable={ false }
-								disableCustomColors={ true }
+								disableCustomColors
 							/>
 						) ) }
 				</>

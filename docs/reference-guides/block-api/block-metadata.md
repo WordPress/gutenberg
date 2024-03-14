@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting in WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
 
 **Example:**
 
@@ -100,7 +100,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
-See the [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
 
 ### Name
 
@@ -214,7 +214,7 @@ The `allowedBlocks` specifies which block types can be the direct children of th
 
 An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/) (slug serving also as a fallback in non-js contexts).
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. This colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
+**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. These colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
 
 ### Description
 
@@ -301,7 +301,7 @@ The [gettext](https://www.gnu.org/software/gettext/) text domain of the plugin/b
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
-See the [the attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
+See [the attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ### Provides Context
 
@@ -311,7 +311,7 @@ See the [the attributes documentation](/docs/reference-guides/block-api/block-at
 -   Property: `providesContext`
 -   Default: `{}`
 
-Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attribute.
+Context provided for available access by descendants of blocks of this type, in the form of an object which maps a context name to one of the block's own attributes.
 
 See [the block context documentation](/docs/reference-guides/block-api/block-context.md) for more details.
 
@@ -356,7 +356,7 @@ Providing custom selectors allows more fine grained control over which styles
 apply to what block elements, e.g. applying typography styles only to an inner
 heading while colors are still applied on the outer block wrapper etc.
 
-See the [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
+See [the selectors documentation](/docs/reference-guides/block-api/block-selectors.md) for more details.
 
 ```json
 {
@@ -381,7 +381,7 @@ See the [the selectors documentation](/docs/reference-guides/block-api/block-sel
 -   Property: `supports`
 -   Default: `{}`
 
-It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
+It contains a set of options to control features used in the editor. See [the supports documentation](/docs/reference-guides/block-api/block-supports.md) for more details.
 
 ### Block Styles
 
@@ -402,7 +402,7 @@ It contains as set of options to control features used in the editor. See the [t
 
 Block styles can be used to provide alternative styles to block. It works by adding a class name to the block's wrapper. Using CSS, a theme developer can target the class name for the block style if it is selected.
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
+Plugins and Themes can also register [custom block styles](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 ### Example
 
@@ -454,7 +454,7 @@ Block Variations is the API that allows a block to have similar versions of it, 
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
-See the [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
+See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
 ### Block Hooks
 
@@ -631,7 +631,7 @@ _Note: This file loads for every instance of the block type when rendering the p
 
 ### `WPDefinedPath`
 
-The `WPDefinedPath` type is a subtype of string, where the value represents a path to a JavaScript, CSS or PHP file relative to where `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
+The `WPDefinedPath` type is a subtype of string, where the value represents a path to a JavaScript, CSS or PHP file relative to where the `block.json` file is located. The path provided must be prefixed with `file:`. This approach is based on how npm handles [local paths](https://docs.npmjs.com/files/package.json#local-paths) for packages.
 
 **Example:**
 
@@ -673,9 +673,9 @@ It's possible to provide an object which takes the following shape:
 
 -   `handle` (`string`) - the name of the script. If omitted, it will be auto-generated.
 -   `dependencies` (`string[]`|`{ id: string, import?: 'dynamic'|'static' }[]`) - an array of registered script handles this script depends on. Script modules may use a simple string for static dependencies or the object form to indicate a dynamic dependency. Dynamic dependencies are dependencies that may or may not be used at runtime and are typically used with the dynamic `import('module-id')` syntax. Default value: `[]`.
--   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to current installed WordPress version. If set to `null`, no version is added. Default value: `false`.
+-   `version` (`string`|`false`|`null`) - string specifying the script version number, if it has one, which is added to the URL as a query string for cache busting purposes. If the version is set to `false`, a version number is automatically added equal to the currently installed WordPress version. If set to `null`, no version is added. Default value: `false`.
 
-The definition is stored inside separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
+The definition is stored inside a separate PHP file which ends with `.asset.php` and is located next to the JS/CSS file listed in `block.json`. WordPress will automatically detect this file through pattern matching. This option is the preferred one as it is expected it will become an option to auto-generate those asset files with `@wordpress/scripts` package.
 
 **Example:**
 
@@ -797,4 +797,4 @@ registerBlockType( 'my-plugin/block-name', {
 } );
 ```
 
-In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should be still possible to register `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) function on the server.
+In the case of [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) supported by WordPress, it should still be possible to register the `render_callback` property using both [`register_block_type`](https://developer.wordpress.org/reference/functions/register_block_type/) functions on the server.

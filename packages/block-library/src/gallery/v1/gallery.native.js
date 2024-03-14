@@ -140,7 +140,7 @@ export const Gallery = ( props ) => {
 			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
-				accessible={ true }
+				accessible
 				accessibilityLabelCreator={ ( caption ) =>
 					RichText.isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */

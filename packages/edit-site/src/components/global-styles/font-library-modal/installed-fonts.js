@@ -198,11 +198,11 @@ function InstalledFonts() {
 					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
-							isSmall
+							size="small"
 							onClick={ () => {
 								handleSetLibraryFontSelected( null );
 							} }
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Heading
 							level={ 2 }

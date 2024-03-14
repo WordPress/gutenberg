@@ -593,6 +593,11 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
 		} );
 
+		it( 'should have the is-small class when small class prop is passed', () => {
+			render( <Button size="small" /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
+		} );
+
 		it( 'should prioritize the `size` prop over `isSmall`', () => {
 			render( <Button size="compact" isSmall /> );
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(

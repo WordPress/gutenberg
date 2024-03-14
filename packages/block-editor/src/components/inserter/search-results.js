@@ -50,7 +50,6 @@ function InserterSearchResults( {
 	shouldFocusBlock = true,
 	prioritizePatterns,
 	selectBlockOnInsert,
-	showBlocks = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -168,7 +167,7 @@ function InserterSearchResults( {
 	const hasItems =
 		filteredBlockTypes.length > 0 || filteredBlockPatterns.length > 0;
 
-	const blocksUI = showBlocks && !! filteredBlockTypes.length && (
+	const blocksUI = !! filteredBlockTypes.length && (
 		<InserterPanel
 			title={ <VisuallyHidden>{ __( 'Blocks' ) }</VisuallyHidden> }
 		>

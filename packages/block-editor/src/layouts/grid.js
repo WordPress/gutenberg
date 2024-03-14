@@ -310,11 +310,11 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom={ true }
+			__nextHasNoMarginBottom
 			label={ __( 'Type' ) }
 			value={ isManual }
 			onChange={ onChangeType }
-			isBlock={ true }
+			isBlock
 		>
 			<ToggleGroupControlOption
 				key={ 'auto' }

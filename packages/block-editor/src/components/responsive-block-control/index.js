@@ -52,7 +52,7 @@ function ResponsiveBlockControl( props ) {
 		toggleLabel ||
 		sprintf(
 			/* translators: %s: Property value for the control (eg: margin, padding, etc.). */
-			__( 'Use the same %s on all screensizes.' ),
+			__( 'Use the same %s on all screen sizes.' ),
 			property
 		);
 
