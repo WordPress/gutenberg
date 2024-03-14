@@ -18,7 +18,7 @@ export default function NavigationPlaceholder( {
 	isSelected,
 	currentMenuId,
 	clientId,
-	canUserCreateNavigationMenu = false,
+	canUserCreateNavigationMenus = false,
 	isResolvingCanUserCreateNavigationMenu,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
@@ -74,7 +74,7 @@ export default function NavigationPlaceholder( {
 
 						<hr />
 
-						{ canUserCreateNavigationMenu && (
+						{ canUserCreateNavigationMenus && (
 							<Button
 								variant="tertiary"
 								onClick={ onCreateEmpty }

@@ -57,7 +57,7 @@ export default function useNavigationMenu( ref ) {
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		canSwitchNavigationMenu,
-		canUserCreateNavigationMenu: canCreateNavigationMenus,
+		canUserCreateNavigationMenus: canCreateNavigationMenus,
 		isResolvingCanUserCreateNavigationMenu: isResolvingPermissions,
 		hasResolvedCanUserCreateNavigationMenu: hasResolvedPermissions,
 		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
