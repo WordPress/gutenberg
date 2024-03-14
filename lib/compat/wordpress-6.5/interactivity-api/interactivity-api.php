@@ -194,7 +194,7 @@ if ( ! function_exists( 'data_wp_context' ) ) {
 	 *                the store namespace if specified.
 	 */
 	function data_wp_context( array $context, string $store_namespace = '' ): string {
-		_deprecated_function( __FUNCTION__, '5.6.0', 'wp_interactivity_data_wp_context()' );
+		_deprecated_function( __FUNCTION__, '6.5', 'wp_interactivity_data_wp_context()' );
 		return wp_interactivity_data_wp_context( $context, $store_namespace );
 	}
 }
