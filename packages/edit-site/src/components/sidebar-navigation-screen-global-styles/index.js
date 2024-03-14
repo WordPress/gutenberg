@@ -77,11 +77,14 @@ function SidebarNavigationScreenGlobalStylesContent() {
 
 	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		property: 'color',
+		filter: ( variation ) => !! variation?.settings?.color,
 	} );
 
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',
+			filter: ( variation ) =>
+				!! variation?.settings?.typography?.fontFamilies,
 		} );
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
@@ -100,7 +103,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				className="edit-site-global-styles-variation-container"
 			>
 				<StyleVariationsContainer />
-				{ colorVariations && (
+				{ colorVariations?.length && (
 					<div>
 						<h3 className="edit-site-global-styles-variation-title">
 							{ __( 'Colors' ) }
@@ -108,7 +111,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 						<ColorVariations />
 					</div>
 				) }
-				{ typographyVariations && (
+				{ typographyVariations?.length && (
 					<div>
 						<h3 className="edit-site-global-styles-variation-title">
 							{ __( 'Typography' ) }
