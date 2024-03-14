@@ -187,6 +187,7 @@ if ( ! function_exists( 'data_wp_context' ) ) {
 	 * @link https://core.trac.wordpress.org/ticket/60575
 	 *
 	 * @since 6.5.0
+	 * @deprecated 6.5.0
 	 *
 	 * @param array  $context         The array of context data to encode.
 	 * @param string $store_namespace Optional. The unique store namespace identifier.
