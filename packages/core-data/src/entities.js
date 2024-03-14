@@ -39,6 +39,7 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		plural: '__unstableBases',
 		syncConfig: {
 			fetch: async () => {
 				return apiFetch( { path: '/' } );
@@ -63,6 +64,7 @@ export const rootEntitiesConfig = [
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
+		plural: 'sites',
 		getTitle: ( record ) => {
 			return record?.title ?? __( 'Site Title' );
 		},
@@ -92,6 +94,7 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		plural: 'postTypes',
 		syncConfig: {
 			fetch: async ( id ) => {
 				return apiFetch( {
@@ -220,6 +223,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
 		baseURLParams: { context: 'edit' },
+		plural: 'themes',
 		key: 'stylesheet',
 	},
 	{
@@ -228,6 +232,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
+		plural: 'plugins',
 		key: 'plugin',
 	},
 	{
@@ -408,32 +413,20 @@ async function loadTaxonomyEntities() {
  * const nameSingular = getMethodName( 'root', 'theme', 'get' );
  * // nameSingular is getRootTheme
  *
- * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * const namePlural = getMethodName( 'root', 'theme', 'set', 'themes' );
  * // namePlural is setRootThemes
  * ```
  *
- * @param {string}  kind      Entity kind.
- * @param {string}  name      Entity name.
- * @param {string}  prefix    Function prefix.
- * @param {boolean} usePlural Whether to use the plural form or not.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {string} prefix Function prefix.
+ * @param {string} plural Plural for of the name.
  *
  * @return {string} Method name
  */
-export const getMethodName = (
-	kind,
-	name,
-	prefix = 'get',
-	usePlural = false
-) => {
-	const entityConfig = rootEntitiesConfig.find(
-		( config ) => config.kind === kind && config.name === name
-	);
+export const getMethodName = ( kind, name, prefix = 'get', plural ) => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
-	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
-	const suffix =
-		usePlural && 'plural' in entityConfig && entityConfig?.plural
-			? pascalCase( entityConfig.plural )
-			: nameSuffix;
+	const suffix = plural ? pascalCase( plural ) : pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 
