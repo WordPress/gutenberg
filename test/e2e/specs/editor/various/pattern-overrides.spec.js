@@ -115,7 +115,7 @@ test.describe( 'Pattern Overrides', () => {
 				.click();
 			await page
 				.getByRole( 'region', { name: 'Save panel' } )
-				.getByRole( 'button', { name: 'Save' } )
+				.getByRole( 'button', { name: 'Save', exact: true } )
 				.click();
 
 			await expect(

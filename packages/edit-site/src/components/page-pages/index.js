@@ -30,8 +30,8 @@ import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
 import {
@@ -222,18 +222,18 @@ export default function PagePages() {
 		view.filters.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
-				filter.operator === OPERATOR_IN
+				filter.operator === OPERATOR_IS_ANY
 			) {
 				filters.status = filter.value;
 			}
 			if (
 				filter.field === 'author' &&
-				filter.operator === OPERATOR_IN
+				filter.operator === OPERATOR_IS_ANY
 			) {
 				filters.author = filter.value;
 			} else if (
 				filter.field === 'author' &&
-				filter.operator === OPERATOR_NOT_IN
+				filter.operator === OPERATOR_IS_NONE
 			) {
 				filters.author_exclude = filter.value;
 			}
@@ -331,7 +331,7 @@ export default function PagePages() {
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {
-					operators: [ OPERATOR_IN ],
+					operators: [ OPERATOR_IS_ANY ],
 				},
 			},
 			{

@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 17.9.0-rc.1 =
+= 17.9.0 =
 
 
 ## Changelog
@@ -32,7 +32,6 @@
 - Template Parts: Add a replace flow to the inspector controls. ([55128](https://github.com/WordPress/gutenberg/pull/55128))
 
 #### Site Editor
-- Zoomed-Out Mode: Don't show blocks in zoomed out view. ([59245](https://github.com/WordPress/gutenberg/pull/59245))
 - Block Theme Previews: Remove "Looking for Template Parts?" hint. ([59092](https://github.com/WordPress/gutenberg/pull/59092))
 - Remove the site editor sidebar navigation edit button. ([59335](https://github.com/WordPress/gutenberg/pull/59335))
 - Scale the zoomed out mode to fit available space. ([59342](https://github.com/WordPress/gutenberg/pull/59342))
@@ -83,6 +82,7 @@
 - Hide UI elements when user lacks permissions. ([59332](https://github.com/WordPress/gutenberg/pull/59332))
 - Load/Unload the font face in browser when toggling the variants. ([59066](https://github.com/WordPress/gutenberg/pull/59066))
 - Use SearchControl component for search input. ([59589](https://github.com/WordPress/gutenberg/pull/59589))
+- REST API: Backport r57804 from wp-dev. ([59767](https://github.com/WordPress/gutenberg/pull/59767))
 
 #### Interactivity API
 - Fix `navigate()` issues related to initial state merges. ([57134](https://github.com/WordPress/gutenberg/pull/57134))
@@ -101,6 +101,7 @@
 
 #### Block Editor
 - Fix Navigation link control overlapping issue. ([59065](https://github.com/WordPress/gutenberg/pull/59065))
+- Fix: Re-render toolbar when parent block changes. ([59234](https://github.com/WordPress/gutenberg/pull/59234))
 - List: Copy wrapper when multi selecting items. ([59460](https://github.com/WordPress/gutenberg/pull/59460))
 - Refactor: UseBlockTools hook. ([58979](https://github.com/WordPress/gutenberg/pull/58979))
 - Rich text: Fix typing into empty flex element. ([59473](https://github.com/WordPress/gutenberg/pull/59473))
@@ -123,12 +124,14 @@
 - Ensure ResizableFrame does not force Cover blocks within the editor to show drag handles. ([59262](https://github.com/WordPress/gutenberg/pull/59262))
 - Iframe: Scale html instead of iframe element for zoomed out mode. ([59334](https://github.com/WordPress/gutenberg/pull/59334))
 - Zoom out mode: Only apply grey background for mode. ([59377](https://github.com/WordPress/gutenberg/pull/59377))
-- Site Editor: Fix Global Styles outdated output. ([59628](https://github.com/WordPress/gutenberg/pull/59628))
+- Fix Global Styles outdated output. ([59628](https://github.com/WordPress/gutenberg/pull/59628))
+- Fix site editor crashing when not fully loaded. ([59658](https://github.com/WordPress/gutenberg/pull/59658))
 
 #### Global Styles
 - Dynamically set border panel label based on the controls available. ([59358](https://github.com/WordPress/gutenberg/pull/59358))
 - Shadow: Fix layout collapse when indicator is selected. ([59309](https://github.com/WordPress/gutenberg/pull/59309))
 - Theme JSON: Check for null values to cater for blockGap. ([59258](https://github.com/WordPress/gutenberg/pull/59258))
+- Remove the extra unneeded color variations panel. ([59718](https://github.com/WordPress/gutenberg/pull/59718))
 
 #### Post Editor
 - Command Palette: Prevent mode switching if only one editor mode is available. ([59299](https://github.com/WordPress/gutenberg/pull/59299))
@@ -239,7 +242,7 @@
 - Editor: Remove MoreDropdownMenuComponent. ([59096](https://github.com/WordPress/gutenberg/pull/59096))
 - Interface: Remove unused MoreMenuFeatureToggle component. ([59095](https://github.com/WordPress/gutenberg/pull/59095))
 - Remove old templates list code. ([59558](https://github.com/WordPress/gutenberg/pull/59558))
-- Replace Navigator isSmall prop WordPress/gutenberg#53560. ([59304](https://github.com/WordPress/gutenberg/pull/59304))
+- Replace Navigator isSmall prop. ([59304](https://github.com/WordPress/gutenberg/pull/59304))
 - Theme JSON Tests: Refactor base styles to a static variable. ([58975](https://github.com/WordPress/gutenberg/pull/58975))
 - Update: Simplify code and use capture events instead of pointer-events hack. ([59565](https://github.com/WordPress/gutenberg/pull/59565))
 - l10n: Unify terminology to `screen size`. ([59456](https://github.com/WordPress/gutenberg/pull/59456))
@@ -320,7 +323,9 @@ The following PRs were merged by first time contributors:
 
 The following contributors merged PRs in this release:
 
-@afercia @ajlende @alanjacobmathew @andrewserong @annezazu @arthur791004 @bacoords @c4rl0sbr4v0 @carolinan @chad1008 @creativecoder @DAreRodz @dcalhoun @desrosj @draganescu @ellatrix @fluiddot @getdave @glendaviesnz @huzaifaalmesbah @inc2734 @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanfra @kevin940726 @madhusudhand @Mamaduka @matiasbenedetto @mattgrshaw @michalczaplinski @mikachan @mirka @ndiego @noisysocks @ntsekouras @oandregal @ockham @pbking @ramonjd @retrofox @samueljseay @SantosGuillamot @scruffian @shail-mehta @SiobhyB @sirreal @sunil25393 @t-hamano @talldan @tellthemachines @TeresaGobble @torounit @tyxla @WunderBart @youknowriad
+@afercia @ajlende @alanjacobmathew @andrewserong @annezazu @arthur791004 @bacoords @c4rl0sbr4v0 @carolinan @chad1008 @creativecoder @DAreRodz @dcalhoun @desrosj @draganescu @ellatrix @fluiddot @getdave @glendaviesnz @huzaifaalmesbah @inc2734 @jameskoster @jasmussen @jeryj @jorgefilipecosta @jsnajdr @juanfra @kevin940726 @madhusudhand @Mamaduka @matiasbenedetto @mattgrshaw @michalczaplinski @mikachan @mirka @ndiego @noisysocks @ntsekouras @oandregal @ockham @pbking @peterwilsoncc @ramonjd @retrofox @samueljseay @SantosGuillamot @scruffian @shail-mehta @SiobhyB @sirreal @sunil25393 @t-hamano @talldan @tellthemachines @TeresaGobble @torounit @tyxla @WunderBart @youknowriad
+
+
 
 
 = 17.8.2 =
