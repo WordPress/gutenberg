@@ -94,7 +94,7 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta being called via the REST API.
+	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_rest_creation() {
 		wp_set_current_user( 1 );
