@@ -32,6 +32,7 @@ import {
  */
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
+import PostInitialSidebar from '../post-initial-panel';
 import MetaBoxes from '../../meta-boxes';
 import PluginSidebarEditPost from '../plugin-sidebar';
 import TemplateSummary from '../template-summary';
@@ -112,6 +113,7 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					{ ! isEditingTemplate && (
 						<>
+							<PostInitialSidebar />
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
