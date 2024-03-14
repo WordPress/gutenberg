@@ -105,7 +105,7 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 		$request->set_param( 'content', $post_type_object->label );
 		$request->set_param( '_locale', 'user' );
 
-		$response = rest_get_server()->dispatch( $request ); // Triggers the error.
+		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertNotEmpty( $response->get_status() );
 		$this->assertSame( 201, $response->get_status() );
