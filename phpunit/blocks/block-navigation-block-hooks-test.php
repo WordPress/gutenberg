@@ -13,11 +13,6 @@
  */
 class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	/**
-	 * @var int
-	 */
-	protected static $admin_id;
-
-	/**
 	 * Original markup.
 	 *
 	 * @var string
@@ -33,16 +28,8 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 
 	/**
 	 * Setup method.
-	 *
-	 * * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
-	public static function wpSetUpBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
-			array(
-				'role' => 'administrator',
-			)
-		);
-
+	public static function wpSetUpBeforeClass() {
 		//self::$original_markup = '<!-- wp:navigation-link {"label":"News & About","type":"page","id":2,"url":"http://localhost:8888/?page_id=2","kind":"post-type"} /-->';
 
 		self::$navigation_post = self::factory()->post->create_and_get(
@@ -52,13 +39,6 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 				'post_content' => 'Original content',
 			)
 		);
-	}
-
-	/**
-	 *
-	 */
-	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$admin_id );
 	}
 
 	/**
