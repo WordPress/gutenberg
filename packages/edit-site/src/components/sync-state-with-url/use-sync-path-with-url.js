@@ -102,7 +102,7 @@ export default function useSyncPathWithURL() {
 					path: navigatorLocation.path,
 				} );
 			} else if (
-				navigatorLocation.path === '/wp_template' &&
+				navigatorLocation.path === '/wp_template/all' &&
 				! window?.__experimentalAdminViews
 			) {
 				// When the experiment is disabled, we only support table layout.
@@ -119,7 +119,7 @@ export default function useSyncPathWithURL() {
 				// The "type" property should be kept as well.
 				( navigatorLocation.path === '/pages' &&
 					window?.__experimentalAdminViews ) ||
-				( navigatorLocation.path === '/wp_template' &&
+				( navigatorLocation.path === '/wp_template/all' &&
 					window?.__experimentalAdminViews ) ||
 				( navigatorLocation.path === '/wp_template_part/all' &&
 					window?.__experimentalAdminViews )
