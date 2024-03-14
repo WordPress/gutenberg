@@ -412,9 +412,8 @@ async function loadSiteEntity() {
 		meta: {},
 	};
 
-	// @todo: Check why this isn't picking up preloaded data.
 	const site = await apiFetch( {
-		path: '/wp/v2/settings',
+		path: entity.baseURL,
 		method: 'OPTIONS',
 	} );
 
