@@ -1011,7 +1011,7 @@ It returns an object with two keys:
 
 ##### ref
 
-`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement)
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
 
 ##### attributes
 
