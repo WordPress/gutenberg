@@ -1,3 +1,11 @@
+.viewContainer {
+	background-color: $light-ultra-dim;
+}
+
+.viewContainerDark {
+	background-color: $dark-ultra-dim;
+}
+
 .container {
 	margin-top: 2px;
 	padding: $grid-unit-20;
