@@ -117,6 +117,10 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
 	 */
 	public function test_block_core_navigation_rest_creation() {
+		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
+			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionalit.' );
+		}
+
 		wp_set_current_user( self::$admin_id );
 
 		$post_type_object = get_post_type_object( 'wp_navigation' );
