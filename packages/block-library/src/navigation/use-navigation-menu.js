@@ -28,8 +28,13 @@ export default function useNavigationMenu( ref ) {
 	);
 
 	const {
+		// Can the user create navigation menus?
 		canCreate: canCreateNavigationMenus,
+
+		// Can the user update the specific navigation menu with the given post ID?
 		canUpdate: canUpdateNavigationMenu,
+
+		// Can the user delete the specific navigation menu with the given post ID?
 		canDelete: canDeleteNavigationMenu,
 		isResolving: isResolvingPermissions,
 		hasResolved: hasResolvedPermissions,
