@@ -6,14 +6,15 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const DRY_RUN = process.argv.includes( '--dry-run' );
+const LABEL =
+	process.argv.filter( ( arg ) => arg !== '--dry-run' )[ 2 ] ||
+	'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com' );
-
-const DRY_RUN = !! process.argv.includes( '--dry-run' );
 
 const autoPropagateResultsToGithub = GITHUB_CLI_AVAILABLE && ! DRY_RUN;
 
