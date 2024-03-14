@@ -16,7 +16,7 @@ async function activateTheme(
 
 	// The `optionalFolder` regex part matches paths with a folder,
 	// so it will return the first match, which might contain a folder.
-	// First try to honor the including theme slug, that is, without a folder.
+	// First try to honor the included theme slug, that is, without a folder.
 	let matchGroup = html.match(
 		`action=activate&amp;stylesheet=${ encodeURIComponent(
 			themeSlug
