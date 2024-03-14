@@ -170,8 +170,6 @@ export function usePermanentlyDeletePostAction() {
 		() => ( {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
-			isPrimary: true,
-			icon: trash,
 			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
