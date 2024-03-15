@@ -14,7 +14,7 @@ import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
 /**
- * Regular expression matching invalid anchor characters for replacement.
+ * Regular expression matching invalid anchor characters for replacement
  *
  * @type {RegExp}
  */
