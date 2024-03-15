@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	DropdownMenu,
@@ -10,7 +10,6 @@ import {
 	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -30,26 +29,14 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<VisuallyHidden as="legend">
-				{ __( 'Transform to variation' ) }
-			</VisuallyHidden>
+			<legend>{ __( 'Transform to variation' ) }</legend>
 			{ variations.map( ( variation ) => (
 				<Button
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
-					label={
-						selectedValue === variation.name
-							? variation.title
-							: sprintf(
-									/* translators: %s: Name of the block variation */
-									__( 'Transform to %s' ),
-									variation.title
-							  )
-					}
+					label={ variation.title }
 					onClick={ () => onSelectVariation( variation.name ) }
-					aria-label={ variation.title }
-					showTooltip
 				/>
 			) ) }
 		</fieldset>
