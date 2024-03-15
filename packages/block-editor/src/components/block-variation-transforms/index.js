@@ -60,7 +60,6 @@ function VariationsDropdown( {
 	return (
 		<DropdownMenu
 			className={ className }
-			label={ __( 'Transform to variation' ) }
 			text={ __( 'Transform to variation' ) }
 			popoverProps={ {
 				position: 'bottom center',
