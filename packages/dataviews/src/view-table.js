@@ -336,7 +336,19 @@ function TableRow( {
 				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 				<td
 					className="dataviews-view-table__actions-column"
-					onClick={ ( e ) => e.stopPropagation() }
+					onClick={
+						// Prevent click events initiated inside ItemActions
+						// from bubbling up to TableRow.
+						( e ) => e.stopPropagation()
+					}
+					onClickCapture={ ( e ) => {
+						// If a selection has already started, prevent click
+						// events initiated in TableRow from reaching the
+						// descendants in ItemActions.
+						if ( selection.length > 0 ) {
+							e.stopPropagation();
+						}
+					} }
 				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
