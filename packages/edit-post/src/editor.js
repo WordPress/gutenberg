@@ -80,6 +80,7 @@ function Editor( {
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
+			// TODO: This key should have a better names
 			__globalStyles: styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
