@@ -40,7 +40,7 @@ function gutenberg_register_background_support( $block_type ) {
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
 	$background_image_source             = isset( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
-	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'cover';
+	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'auto';
 
 	if ( 'file' === $background_image_source && ! empty( $background_styles['backgroundImage']['url'] ) ) {
 		// If the background size is set to `contain` and no position is set, set the position to `center`.
