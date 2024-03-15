@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.30.0 (2024-03-06)
+
 ## Breaking Changes
 
 -   Removed `MoreMenuDropdown` component ([#59095](https://github.com/WordPress/gutenberg/pull/59095)).

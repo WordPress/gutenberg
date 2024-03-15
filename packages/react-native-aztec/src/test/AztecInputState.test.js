@@ -17,20 +17,16 @@ import {
 } from '../AztecInputState';
 
 // Recreate internal state of TextInput
-jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState', () => {
-	let currentInput = null;
-	return {
-		focusTextInput: jest.fn( ( value ) => {
-			currentInput = value;
-		} ),
-		blurTextInput: jest.fn( ( value ) => {
-			if ( currentInput === value ) {
-				currentInput = null;
-			}
-		} ),
-		currentlyFocusedInput: jest.fn( () => currentInput ),
-	};
+let currentInput = null;
+TextInputState.focusTextInput = jest.fn( ( value ) => {
+	currentInput = value;
 } );
+TextInputState.blurTextInput = jest.fn( ( value ) => {
+	if ( currentInput === value ) {
+		currentInput = null;
+	}
+} );
+TextInputState.currentlyFocusedInput = jest.fn( () => currentInput );
 
 const ref = { current: null };
 const anotherRef = { current: null };

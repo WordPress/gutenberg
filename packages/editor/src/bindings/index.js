@@ -11,5 +11,8 @@ import patternOverrides from './pattern-overrides';
 import postMeta from './post-meta';
 
 const { registerBlockBindingsSource } = unlock( dispatch( blocksStore ) );
-registerBlockBindingsSource( patternOverrides );
 registerBlockBindingsSource( postMeta );
+
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	registerBlockBindingsSource( patternOverrides );
+}

@@ -7,8 +7,10 @@
 }
 
 .edit-site-global-styles-preview__iframe {
-	max-width: 100%;
+	border-radius: $radius-block-ui;
 	display: block;
+	max-width: 100%;
+	width: 100%;
 }
 
 .edit-site-typography-preview {
@@ -165,3 +167,4 @@
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
 }
+

@@ -489,6 +489,9 @@ function CoverEdit( {
 		getPositionClassName( contentPosition )
 	);
 
+	const showOverlay =
+		url || ! useFeaturedImage || ( useFeaturedImage && ! url );
+
 	return (
 		<>
 			{ blockControls }
@@ -500,7 +503,7 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ ( ! useFeaturedImage || url ) && (
+				{ showOverlay && (
 					<span
 						aria-hidden="true"
 						className={ classnames(

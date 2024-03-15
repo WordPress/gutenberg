@@ -125,14 +125,13 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
-	const css = fullLayoutType?.getLayoutStyle?.( {
+	return fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
 		layout,
 		style,
 		hasBlockGapSupport,
 	} );
-	return css;
 }
 
 function LayoutPanelPure( {
@@ -144,8 +143,6 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	// Layout comes from block attributes.
-	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -180,11 +177,9 @@ function LayoutPanelPure( {
 	}
 
 	// Only show the inherit toggle if it's supported,
-	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
-		!! defaultThemeLayout &&
 		( ! layout?.type ||
 			layout?.type === 'default' ||
 			layout?.type === 'constrained' ||

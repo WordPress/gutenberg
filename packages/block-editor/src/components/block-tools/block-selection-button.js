@@ -39,6 +39,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockMover from '../block-mover';
+import Shuffle from '../block-toolbar/shuffle';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -271,6 +272,9 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						</BlockDraggable>
 					) }
 				</FlexItem>
+				{ editorMode === 'zoom-out' && (
+					<Shuffle clientId={ clientId } as={ Button } />
+				) }
 				<FlexItem>
 					<Button
 						ref={ ref }

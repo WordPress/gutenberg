@@ -93,11 +93,6 @@ $block-editor-link-control-number-of-actions: 1;
 	position: absolute;
 	right: 19px; // specific to place the button properly.
 	top: 3px;
-
-	svg {
-		position: relative;
-		top: -2px; // the icon itself is not centered within the bounds; this centers it.
-	}
 }
 
 .block-editor-link-control__search-actions {

@@ -18,7 +18,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { useAddedBy } from '../list/added-by';
+import { useAddedBy } from '../page-templates-template-parts/hooks';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
@@ -93,6 +93,11 @@ function useTemplateDetails( postType, postId ) {
 	return { title, description, content, footer };
 }
 
+const POST_TYPE_PATH = {
+	wp_template: '/wp_template',
+	wp_template_part: '/wp_template_part/all',
+};
+
 export default function SidebarNavigationScreenTemplate() {
 	const navigator = useNavigator();
 	const {
@@ -114,7 +119,7 @@ export default function SidebarNavigationScreenTemplate() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( `/${ postType }/all` );
+							navigator.goTo( POST_TYPE_PATH[ postType ] );
 						} }
 					/>
 					<SidebarButton

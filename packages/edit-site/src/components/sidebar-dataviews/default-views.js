@@ -11,7 +11,7 @@ import {
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 	LAYOUT_GRID,
-	OPERATOR_IN,
+	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 
 export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
@@ -61,7 +61,11 @@ export const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'draft' },
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'draft',
+					},
 				],
 			},
 		},
@@ -72,7 +76,11 @@ export const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'trash' },
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'trash',
+					},
 				],
 			},
 		},

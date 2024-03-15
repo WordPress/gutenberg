@@ -1394,6 +1394,65 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_get_stylesheet_generates_fluid_typography_values() {
+		register_block_type(
+			'test/clamp-me',
+			array(
+				'api_version' => 3,
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'typography' => array(
+						'fluid'     => true,
+						'fontSizes' => array(
+							array(
+								'size' => '16px',
+								'slug' => 'pickles',
+								'name' => 'Pickles',
+							),
+							array(
+								'size' => '22px',
+								'slug' => 'toast',
+								'name' => 'Toast',
+							),
+						),
+					),
+				),
+				'styles'   => array(
+					'typography' => array(
+						'fontSize' => '1em',
+					),
+					'elements'   => array(
+						'h1' => array(
+							'typography' => array(
+								'fontSize' => '100px',
+							),
+						),
+					),
+					'blocks'     => array(
+						'test/clamp-me' => array(
+							'typography' => array(
+								'fontSize' => '48px',
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		unregister_block_type( 'test/clamp-me' );
+
+		// Results also include root site blocks styles.
+		$this->assertSame(
+			'body{--wp--preset--font-size--pickles: clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.156), 16px);--wp--preset--font-size--toast: clamp(14.642px, 0.915rem + ((1vw - 3.2px) * 0.575), 22px);}body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}body{font-size: clamp(0.875em, 0.875rem + ((1vw - 0.2em) * 0.156), 1em);}h1{font-size: clamp(50.171px, 3.136rem + ((1vw - 3.2px) * 3.893), 100px);}.wp-block-test-clamp-me{font-size: clamp(27.894px, 1.743rem + ((1vw - 3.2px) * 1.571), 48px);}.has-pickles-font-size{font-size: var(--wp--preset--font-size--pickles) !important;}.has-toast-font-size{font-size: var(--wp--preset--font-size--toast) !important;}',
+			$theme_json->get_stylesheet()
+		);
+	}
+
 	public function test_allow_indirect_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
