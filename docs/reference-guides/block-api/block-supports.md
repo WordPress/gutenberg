@@ -62,7 +62,7 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow to change block's alignment.
+This property adds block controls, which enable changes to a block's alignment.
 
 ```js
 supports: {
@@ -114,7 +114,7 @@ ARIA-labels let you define an accessible label for elements. This property allow
 
 ```js
 supports: {
-	// Add the support for aria label.
+	// Add support for an aria label.
 	ariaLabel: true
 }
 ```
@@ -243,7 +243,7 @@ supports: {
     color: {
         gradients: true,
 
-        // Default values must be disabled if you don't want to use them with gradient.
+        // Default values must be disabled if you don't want to use them with gradients.
         background: false,
         text: false
     }
@@ -300,7 +300,7 @@ supports: {
 }
 ```
 
-To enable link color support, set to `true`.
+To enable link color support, set the link value to `true`.
 
 ```js
 supports: {
