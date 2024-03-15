@@ -99,6 +99,25 @@ export function useSupportedStyles( name, element ) {
 	return supportedPanels;
 }
 
+export function useUniqueColorVariations() {
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+	} );
+	/*
+	 * Filter out variations with no settings or styles.
+	 */
+	return colorVariations?.length
+		? colorVariations.filter( ( variation ) => {
+				const { settings, styles, title } = variation;
+				return (
+					title === 'Default' ||
+					Object.keys( settings ).length > 0 ||
+					Object.keys( styles ).length > 0
+				);
+		  } )
+		: [];
+}
+
 export function useUniqueTypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
@@ -107,7 +126,8 @@ export function useUniqueTypographyVariations() {
 
 	const { base } = useContext( GlobalStylesContext );
 	/*
-	 * Filter duplicate variations based on the font families used in the variation.
+	 * Filter duplicate variations based on whether the variaitons
+	 * have different heading and body font families.
 	 */
 	return typographyVariations?.length
 		? Object.values(
@@ -116,7 +136,13 @@ export function useUniqueTypographyVariations() {
 						getFontFamilies(
 							mergeBaseAndUserConfigs( base, variation )
 						);
-					if (
+
+					// Always preseve the default variation.
+					if ( variation?.title === 'Default' ) {
+						acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						] = variation;
+					} else if (
 						headingFontFamily?.name &&
 						bodyFontFamily?.name &&
 						! acc[
@@ -127,7 +153,6 @@ export function useUniqueTypographyVariations() {
 							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
 						] = variation;
 					}
-
 					return acc;
 				}, {} )
 		  )

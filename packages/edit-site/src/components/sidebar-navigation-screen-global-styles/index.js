@@ -29,8 +29,10 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import ColorVariations from '../global-styles/variations/variations-color';
 import TypographyVariations from '../global-styles/variations/variations-typography';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import { useUniqueTypographyVariations } from '../global-styles/hooks';
+import {
+	useUniqueColorVariations,
+	useUniqueTypographyVariations,
+} from '../global-styles/hooks';
 
 const noop = () => {};
 
@@ -76,10 +78,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
-	} );
-
+	const colorVariations = useUniqueColorVariations();
 	const typographyVariations = useUniqueTypographyVariations();
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
