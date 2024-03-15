@@ -4,20 +4,22 @@ export function getComputedCSS( element, property ) {
 		.getPropertyValue( property );
 }
 
-export function getGridLines( template, gap ) {
-	const lines = [ 0 ];
+export function getGridTracks( template, gap ) {
+	const tracks = [];
 	for ( const size of template.split( ' ' ) ) {
-		const line = parseFloat( size );
-		lines.push( lines[ lines.length - 1 ] + line + gap );
+		const previousTrack = tracks[ tracks.length - 1 ];
+		const start = previousTrack ? previousTrack.end + gap : 0;
+		const end = start + parseFloat( size );
+		tracks.push( { start, end } );
 	}
-	return lines;
+	return tracks;
 }
 
-export function getClosestLine( lines, position ) {
-	return lines.reduce(
-		( closest, line, index ) =>
-			Math.abs( line - position ) <
-			Math.abs( lines[ closest ] - position )
+export function getClosestTrack( tracks, position, edge = 'start' ) {
+	return tracks.reduce(
+		( closest, track, index ) =>
+			Math.abs( track[ edge ] - position ) <
+			Math.abs( tracks[ closest ][ edge ] - position )
 				? index
 				: closest,
 		0

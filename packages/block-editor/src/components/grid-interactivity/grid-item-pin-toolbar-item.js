@@ -10,7 +10,7 @@ import { pin as pinIcon } from '@wordpress/icons';
  */
 import BlockControls from '../block-controls';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { getComputedCSS, getGridLines, getClosestLine } from './utils';
+import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
 export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -33,18 +33,18 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 			getComputedCSS( gridElement, 'column-gap' )
 		);
 		const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
-		const gridColumnLines = getGridLines(
+		const gridColumnTracks = getGridTracks(
 			getComputedCSS( gridElement, 'grid-template-columns' ),
 			columnGap
 		);
-		const gridRowLines = getGridLines(
+		const gridRowTracks = getGridTracks(
 			getComputedCSS( gridElement, 'grid-template-rows' ),
 			rowGap
 		);
 		const columnStart =
-			getClosestLine( gridColumnLines, blockElement.offsetLeft ) + 1;
+			getClosestTrack( gridColumnTracks, blockElement.offsetLeft ) + 1;
 		const rowStart =
-			getClosestLine( gridRowLines, blockElement.offsetTop ) + 1;
+			getClosestTrack( gridRowTracks, blockElement.offsetTop ) + 1;
 		onChange( {
 			columnStart,
 			rowStart,

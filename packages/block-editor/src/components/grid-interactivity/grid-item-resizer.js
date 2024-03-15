@@ -8,7 +8,7 @@ import { ResizableBox } from '@wordpress/components';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, getGridLines, getClosestLine } from './utils';
+import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -45,33 +45,35 @@ export function GridItemResizer( { clientId, onChange } ) {
 					const rowGap = parseFloat(
 						getComputedCSS( gridElement, 'row-gap' )
 					);
-					const gridColumnLines = getGridLines(
+					const gridColumnTracks = getGridTracks(
 						getComputedCSS( gridElement, 'grid-template-columns' ),
 						columnGap
 					);
-					const gridRowLines = getGridLines(
+					const gridRowTracks = getGridTracks(
 						getComputedCSS( gridElement, 'grid-template-rows' ),
 						rowGap
 					);
-					const columnStart = getClosestLine(
-						gridColumnLines,
+					const columnStart = getClosestTrack(
+						gridColumnTracks,
 						blockElement.offsetLeft
 					);
-					const rowStart = getClosestLine(
-						gridRowLines,
+					const rowStart = getClosestTrack(
+						gridRowTracks,
 						blockElement.offsetTop
 					);
-					const columnEnd = getClosestLine(
-						gridColumnLines,
-						blockElement.offsetLeft + boxElement.offsetWidth
+					const columnEnd = getClosestTrack(
+						gridColumnTracks,
+						blockElement.offsetLeft + boxElement.offsetWidth,
+						'end'
 					);
-					const rowEnd = getClosestLine(
-						gridRowLines,
-						blockElement.offsetTop + boxElement.offsetHeight
+					const rowEnd = getClosestTrack(
+						gridRowTracks,
+						blockElement.offsetTop + boxElement.offsetHeight,
+						'end'
 					);
 					onChange( {
-						columnSpan: Math.max( columnEnd - columnStart, 1 ),
-						rowSpan: Math.max( rowEnd - rowStart, 1 ),
+						columnSpan: columnEnd - columnStart + 1,
+						rowSpan: rowEnd - rowStart + 1,
 					} );
 				} }
 			/>
