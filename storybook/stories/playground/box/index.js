@@ -12,7 +12,7 @@ import {
 /**
  * Internal dependencies
  */
-import editorStyles from '../editor-styles';
+import { editorStyles } from '../editor-styles';
 import './style.css';
 
 export default function EditorBox() {
