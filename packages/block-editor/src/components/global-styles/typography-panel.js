@@ -339,7 +339,7 @@ export default function TypographyPanel( {
 			case 'upright':
 				return {
 					newTextOrientation: 'upright',
-					newWritingMode: isRTL() ? 'vertical-lr' : 'vertical-rl',
+					newWritingMode: isRTL() ? 'vertical-rl' : 'vertical-lr',
 				};
 
 			case 'horizontal':
