@@ -237,7 +237,6 @@ function TableRow( {
 	data,
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
-
 	const isSelected = selection.includes( id );
 
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -253,35 +252,40 @@ function TableRow( {
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
-				'is-selected':
-					hasPossibleBulkAction && selection.includes( id ),
+				'is-selected': hasPossibleBulkAction && isSelected,
 				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
-			onClickCapture={ () => {
-				if ( ! hasPossibleBulkAction ) {
-					return;
-				}
-				if ( ! isSelected ) {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId === id || selection.includes( itemId )
-							);
-						} )
-					);
-				} else {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId !== id && selection.includes( itemId )
-							);
-						} )
-					);
+			onClickCapture={ ( event ) => {
+				if ( event.ctrlKey || event.metaKey || selection.length > 0 ) {
+					event.stopPropagation();
+					event.preventDefault();
+					// if ( ! hasPossibleBulkAction ) {
+					// 	return;
+					// }
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
 				}
 			} }
 		>
