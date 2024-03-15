@@ -108,7 +108,7 @@
 
 ## 3.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/dom` and `@wordpress/keycodes` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -116,7 +116,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -155,7 +155,7 @@
 
 ## 1.2.3 (2018-11-20)
 
-### Bug fixes
+### Bug Fixes
 
 -   Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
 -   Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.

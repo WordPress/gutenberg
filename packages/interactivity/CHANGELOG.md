@@ -74,13 +74,13 @@
 -   Remove unused `state` and rename `props` to `attributes` in `getElement()`. ([#57974](https://github.com/WordPress/gutenberg/pull/57974))
 -   Convert `navigate` and `prefetch` function to actions of the new `core/router` store, available when importing the `@wordpress/interactivity-router` module. ([#57924](https://github.com/WordPress/gutenberg/pull/57924))
 
-### Bug Fix
+### Bug Fixes
 
 -   Prevent `wp-data-on=""` from creating `onDefault` handlers. ([#57925](https://github.com/WordPress/gutenberg/pull/57925))
 
 ## 3.2.0 (2024-01-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix namespaces when there are nested interactive regions. ([#57029](https://github.com/WordPress/gutenberg/pull/57029))
 
@@ -88,7 +88,7 @@
 
 ## 3.0.0 (2023-11-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Implement the new `store()` API as specified in the [proposal](https://github.com/WordPress/gutenberg/discussions/53586). ([#55459](https://github.com/WordPress/gutenberg/pull/55459))
 
@@ -96,7 +96,7 @@
 
 ## 2.6.0 (2023-11-02)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update the title when using enhanced pagination. ([#55446](https://github.com/WordPress/gutenberg/pull/55446))
 
@@ -110,7 +110,7 @@
 
 -   Improve `navigate()` to render only the result of the last call when multiple happen simultaneously. ([#54201](https://github.com/WordPress/gutenberg/pull/54201))
 
-### Bug Fix
+### Bug Fixes
 
 -   Remove `role` attribute when set to `null` in `data-wp-bind`. ([#54608](https://github.com/WordPress/gutenberg/pull/54608))
 -   Add `timeout` option to `navigate()`, with a default value of `10000` milliseconds. ([#54474](https://github.com/WordPress/gutenberg/pull/54474))
@@ -134,7 +134,7 @@
 
 -   Allow passing optional `afterLoad` callbacks to `store` calls. ([#53363](https://github.com/WordPress/gutenberg/pull/53363))
 
-### Bug Fix
+### Bug Fixes
 
 -   Add support for underscores and leading dashes in the suffix part of the directive. ([#53337](https://github.com/WordPress/gutenberg/pull/53337))
 -   Add an asynchronous short circuit to `useSignalEffect` to avoid infinite loops. ([#53358](https://github.com/WordPress/gutenberg/pull/53358))
@@ -145,7 +145,7 @@
 
 ## 2.0.0 (2023-08-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove the `wp-show` directive until we figure out its final implementation. ([#53240](https://github.com/WordPress/gutenberg/pull/53240))
 

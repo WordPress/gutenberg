@@ -76,7 +76,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -125,20 +125,20 @@
 
 ## 2.1.0 (2018-02-15)
 
-### New Feature
+### New Features
 
 -   Updated Browserslist to v3.1.0 ([#81](https://github.com/WordPress/packages/pull/81))
 
 ## 2.0.0
 
-### Breaking Change
+### Breaking Changes
 
 -   Transfer to @wordpress npm organization.
 -   Published as @wordpress/browserslist-config.
 
 ## 1.1.0
 
-### New Feature
+### New Features
 
 -   Add browserslist tests.
 -   Refactor per coding standards.
@@ -151,6 +151,6 @@
 
 ## 1.0.0
 
-### New Feature
+### New Features
 
 -   Initial release.

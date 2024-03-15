@@ -40,7 +40,7 @@
 
 ## 4.3.0 (2023-06-07)
 
-### New Feature
+### New Features
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 -   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
@@ -51,7 +51,7 @@
 
 ## 4.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
 
@@ -128,13 +128,13 @@
 
 ## 2.12.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the notices namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.0.0 (2020-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/notice).
 
@@ -150,7 +150,7 @@
 
 ## 1.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 

@@ -87,7 +87,7 @@
 
 ## 11.15.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -137,7 +137,7 @@
 
 ## 11.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -170,25 +170,25 @@
 
 ## 8.0.0 (2021-03-17)
 
-### Breaking Change
+### Breaking Changes
 
 -   Reverted `cloneBlock` back to its original logic that doesn't sanitize block's attributes. [#28379](https://github.com/WordPress/gutenberg/pull/29111)
 
 ## 7.0.0 (2021-02-01)
 
-### Breaking Change
+### Breaking Changes
 
 -   `cloneBlock` now sanitizes the attributes to match the same logic `createBlock` has. [#28379](https://github.com/WordPress/gutenberg/pull/28379)
 
 ## 6.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the blocks namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 6.13.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
 
@@ -204,14 +204,14 @@
 
 ## 6.3.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
 -   Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Blocks' `transforms` will receive `innerBlocks` as the second argument (or an array of each block's respective `innerBlocks` for a multi-transform).
 
@@ -235,7 +235,7 @@
 
 -   `isValidBlock` has been removed. Please use `isValidBlockContent` instead but keep in mind that the order of params has changed.
 
-### Bug Fix
+### Bug Fixes
 
 -   The block validator is more lenient toward equivalent encoding forms.
 
@@ -243,7 +243,7 @@
 
 ## 5.3.0 (2018-11-09)
 
-### New feature
+### New Features
 
 -   `getBlockAttributes`, `getBlockTransforms`, `getSaveContent`, `getSaveElement` and `isValidBlockContent` methods can now take also block's name as the first param ([#11490](https://github.com/WordPress/gutenberg/pull/11490)). Passing a block's type object continues to work as before.
 -   `registerBlockStyles` and `unregisterBlockStyles` can be triggered at any moment (before or after block registration).
@@ -260,11 +260,11 @@
 
 ## 5.1.0 (2018-10-30)
 
-### New features
+### New Features
 
 -   `isValidBlockContent` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
 
-### Deprecation
+### Deprecations
 
 -   `isValidBlock` function has been deprecated ([#10891](https://github.com/WordPress/gutenberg/pull/10891)). Use `isValidBlockContent` instead.
 
@@ -276,7 +276,7 @@
 -   `setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 -   `getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
 
-### New Feature
+### New Features
 
 -   Added a `unregisterBlockStyle()` function to remove a block style variation.
 

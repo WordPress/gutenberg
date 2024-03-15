@@ -26,7 +26,7 @@
 
 ## 10.13.0 (2023-09-20)
 
-### Enhancement
+### Enhancements
 
 -    Update promise order in `loginUser` to avoid any flakiness in the tests.
 -    Update `activateTheme` to redirect to `themes.php` after theme activation, if theme redirects to some other page.
@@ -74,7 +74,7 @@
 
 ## 9.0.0 (2022-12-14)
 
-### Breaking changes
+### Breaking Changes
 
 -   Remove all the site editor navigation panel related utils: getSiteEditorMenuItem, isSiteEditorRoot, navigateSiteEditorBack, navigateSiteEditorBackToRoot, openSiteEditorNavigationPanel, siteEditorNavigateSequence, clickSiteEditorMenuItem, closeSiteEditorNavigationPanel.
 
@@ -94,13 +94,13 @@
 
 ## 8.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
 ## 7.2.0 (2022-04-08)
 
-### Enhancement
+### Enhancements
 
 -   Changed `setOption` to use `options.php`, to allow setting any option (and to be more consistent with `getOption`). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
 -   Changed `setOption` to return the changed setting's previous value (to make restoring it easier). [#39502](https://github.com/WordPress/gutenberg/pull/39502)
@@ -112,7 +112,7 @@
 
 -   Updated `clickMenuItem` method to use exact label matching instead of partial [#39274](https://github.com/WordPress/gutenberg/pull/39274).
 
-### Enhancement
+### Enhancements
 
 -   The `toggleMoreMenu` and `clickMoreMenuItem` utilities no longer require a second 'context' parameter.
 
