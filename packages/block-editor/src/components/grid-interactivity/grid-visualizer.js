@@ -65,7 +65,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( blockElement )
 	);
-	const [ hasCellPointerEvents, setHasCellPointerEvents ] = useState( false );
+	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 
 	useEffect( () => {
 		const observers = [];
@@ -85,10 +85,10 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 
 	useEffect( () => {
 		function onGlobalDrag() {
-			setHasCellPointerEvents( true );
+			setIsDroppingAllowed( true );
 		}
 		function onGlobalDragEnd() {
-			setHasCellPointerEvents( false );
+			setIsDroppingAllowed( false );
 		}
 		document.addEventListener( 'drag', onGlobalDrag );
 		document.addEventListener( 'dragend', onGlobalDragEnd );
@@ -101,7 +101,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	return (
 		<BlockPopoverCover
 			className={ classnames( 'block-editor-grid-visualizer', {
-				'has-cell-pointer-events': hasCellPointerEvents,
+				'is-dropping-allowed': isDroppingAllowed,
 			} ) }
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
@@ -159,11 +159,16 @@ function GridVisualizerCell( { column, row } ) {
 	} );
 
 	return (
-		<div
-			ref={ ref }
-			className={ classnames( 'block-editor-grid-visualizer__cell', {
-				'is-dragging-over': isDraggingOver,
-			} ) }
-		/>
+		<div className="block-editor-grid-visualizer__cell">
+			<div
+				ref={ ref }
+				className={ classnames(
+					'block-editor-grid-visualizer__drop-zone',
+					{
+						'is-dragging-over': isDraggingOver,
+					}
+				) }
+			/>
+		</div>
 	);
 }
