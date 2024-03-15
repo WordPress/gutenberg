@@ -87,7 +87,7 @@ function useDeprecatedProps( {
 }
 
 export function UnforwardedButton(
-	props: ButtonProps,
+	props: ButtonProps & DeprecatedButtonProps,
 	ref: ForwardedRef< any >
 ) {
 	const {
