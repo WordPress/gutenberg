@@ -212,7 +212,11 @@
 
 	// By painting the borders here, we enable them to be replaced by the Border control.
 	@include placeholder-style();
-	overflow: auto;
+
+	overflow: hidden;
+	.is-selected & {
+		overflow: auto;
+	}
 }
 
 // Position the spinner.

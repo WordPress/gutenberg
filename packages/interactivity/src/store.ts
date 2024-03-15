@@ -202,7 +202,7 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
-const universalUnlock =
+export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
 /**

@@ -182,3 +182,24 @@ if ( ! function_exists( 'wp_interactivity_data_wp_context' ) ) {
 		'\'';
 	}
 }
+
+if ( ! function_exists( 'data_wp_context' ) ) {
+	/**
+	 * `data_wp_context()` was renamed to follow WordPress Core naming schemes.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/pull/59465/
+	 * @link https://core.trac.wordpress.org/ticket/60575
+	 *
+	 * @since 6.5.0
+	 * @deprecated 6.5.0
+	 *
+	 * @param array  $context         The array of context data to encode.
+	 * @param string $store_namespace Optional. The unique store namespace identifier.
+	 * @return string A complete `data-wp-context` directive with a JSON encoded value representing the context array and
+	 *                the store namespace if specified.
+	 */
+	function data_wp_context( array $context, string $store_namespace = '' ): string {
+		_deprecated_function( __FUNCTION__, '6.5', 'wp_interactivity_data_wp_context()' );
+		return wp_interactivity_data_wp_context( $context, $store_namespace );
+	}
+}

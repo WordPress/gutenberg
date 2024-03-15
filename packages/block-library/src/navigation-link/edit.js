@@ -333,6 +333,9 @@ export default function NavigationLinkEdit( {
 			isKeyboardEvent.primary( event, 'k' ) ||
 			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
 		) {
+			// Required to prevent the command center from opening,
+			// as it shares the CMD+K shortcut.
+			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
 			setIsLinkOpen( true );
 		}

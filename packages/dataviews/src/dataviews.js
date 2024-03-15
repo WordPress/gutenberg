@@ -33,7 +33,7 @@ export default function DataViews( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions,
+	actions = [],
 	data,
 	getItemId = defaultGetItemId,
 	isLoading = false,

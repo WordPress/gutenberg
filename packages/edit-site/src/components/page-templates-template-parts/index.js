@@ -415,9 +415,9 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const actions = useMemo(
 		() => [
 			resetTemplateAction,
-			deleteTemplateAction,
 			renameTemplateAction,
 			postRevisionsAction,
+			deleteTemplateAction,
 		],
 		[ resetTemplateAction ]
 	);
