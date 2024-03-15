@@ -7,6 +7,7 @@
 ?>
 
 <div data-wp-interactive="test/store">
+	<div data-wp-text="state.0" data-testid="state-0"></div>
 	<div
 		data-testid="non-plain object"
 		data-wp-text="state.isNotProxified"

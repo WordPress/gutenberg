@@ -22,4 +22,11 @@ test.describe( 'store', () => {
 		const el = page.getByTestId( 'non-plain object' );
 		await expect( el ).toHaveText( 'true' );
 	} );
+
+	test( 'Ensures that state cannot be set to a non-object', async ( {
+		page,
+	} ) => {
+		const resultInput = page.getByTestId( 'result-0' );
+		await expect( resultInput ).toHaveText( 'right' );
+	} );
 } );
