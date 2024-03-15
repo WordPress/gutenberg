@@ -1,11 +1,15 @@
 .block-editor-block-variation-transforms {
-	padding: 0 $grid-unit-20 $grid-unit-20 52px;
-	width: 100%;
+	padding: $grid-unit-20;
+	border-top: $border-width solid $gray-200;
 
 	legend {
 		padding: 0;
 		// Makes the inline label be the correct height, equivalent to setting line-height: 0
 		display: flex;
+	}
+
+	.components-dropdown-menu {
+		width: 100%;
 	}
 
 	.components-dropdown-menu__toggle {

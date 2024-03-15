@@ -29,22 +29,26 @@ function VariationsButtons( {
 	variations,
 } ) {
 	return (
-		<fieldset className={ className }>
-			<legend>
-				<BaseControl.VisualLabel>
-					{ __( 'Transform to variation' ) }
-				</BaseControl.VisualLabel>
-			</legend>
-			{ variations.map( ( variation ) => (
-				<Button
-					key={ variation.name }
-					icon={ <BlockIcon icon={ variation.icon } showColors /> }
-					isPressed={ selectedValue === variation.name }
-					label={ variation.title }
-					onClick={ () => onSelectVariation( variation.name ) }
-				/>
-			) ) }
-		</fieldset>
+		<div className={ className }>
+			<fieldset>
+				<legend>
+					<BaseControl.VisualLabel>
+						{ __( 'Transform to variation' ) }
+					</BaseControl.VisualLabel>
+				</legend>
+				{ variations.map( ( variation ) => (
+					<Button
+						key={ variation.name }
+						icon={
+							<BlockIcon icon={ variation.icon } showColors />
+						}
+						isPressed={ selectedValue === variation.name }
+						label={ variation.title }
+						onClick={ () => onSelectVariation( variation.name ) }
+					/>
+				) ) }
+			</fieldset>
+		</div>
 	);
 }
 
@@ -63,28 +67,29 @@ function VariationsDropdown( {
 	);
 
 	return (
-		<DropdownMenu
-			className={ className }
-			text={ __( 'Transform to variation' ) }
-			popoverProps={ {
-				position: 'bottom center',
-				className: `${ className }__popover`,
-			} }
-			icon={ chevronDown }
-			toggleProps={ { iconPosition: 'right' } }
-		>
-			{ () => (
-				<div className={ `${ className }__container` }>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ selectOptions }
-							value={ selectedValue }
-							onSelect={ onSelectVariation }
-						/>
-					</MenuGroup>
-				</div>
-			) }
-		</DropdownMenu>
+		<div className={ className }>
+			<DropdownMenu
+				text={ __( 'Transform to variation' ) }
+				popoverProps={ {
+					position: 'bottom center',
+					className: `${ className }__popover`,
+				} }
+				icon={ chevronDown }
+				toggleProps={ { iconPosition: 'right' } }
+			>
+				{ () => (
+					<div className={ `${ className }__container` }>
+						<MenuGroup>
+							<MenuItemsChoice
+								choices={ selectOptions }
+								value={ selectedValue }
+								onSelect={ onSelectVariation }
+							/>
+						</MenuGroup>
+					</div>
+				) }
+			</DropdownMenu>
+		</div>
 	);
 }
 
@@ -168,8 +173,8 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 
 	const baseClass = 'block-editor-block-variation-transforms';
 
-	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
-	const showButtons = variations.length > 5;
+	// Show buttons if there are more than 6 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 6;
 
 	const ButtonComponent = showButtons
 		? VariationsButtons
