@@ -274,10 +274,7 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		const rawStore = {
-			state: deepSignal( isObject( state ) ? state : {} ),
-			...block,
-		};
+		const rawStore = { state: deepSignal( state ), ...block };
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
