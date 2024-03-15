@@ -25,10 +25,6 @@ export default function TypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',
-			filter: ( variation ) =>
-				variation?.settings?.typography?.fontFamilies &&
-				Object.keys( variation?.settings?.typography?.fontFamilies )
-					.length,
 		} );
 
 	const { base } = useContext( GlobalStylesContext );
