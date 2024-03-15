@@ -9,14 +9,20 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
+import { mergeBaseAndUserConfigs } from './global-styles-provider';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { getFontFamilies } from './utils';
 import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
-const { useGlobalSetting, useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { useGlobalSetting, useGlobalStyle, GlobalStylesContext } = unlock(
+	blockEditorPrivateApis
+);
 
 // Enable colord's a11y plugin.
 extend( [ a11yPlugin ] );
@@ -91,4 +97,39 @@ export function useSupportedStyles( name, element ) {
 	);
 
 	return supportedPanels;
+}
+
+export function useUniqueTypographyVariations() {
+	const typographyVariations =
+		useCurrentMergeThemeStyleVariationsWithUserConfig( {
+			property: 'typography',
+		} );
+
+	const { base } = useContext( GlobalStylesContext );
+	/*
+	 * Filter duplicate variations based on the font families used in the variation.
+	 */
+	return typographyVariations?.length
+		? Object.values(
+				typographyVariations.reduce( ( acc, variation ) => {
+					const [ bodyFontFamily, headingFontFamily ] =
+						getFontFamilies(
+							mergeBaseAndUserConfigs( base, variation )
+						);
+					if (
+						headingFontFamily?.name &&
+						bodyFontFamily?.name &&
+						! acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						]
+					) {
+						acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						] = variation;
+					}
+
+					return acc;
+				}, {} )
+		  )
+		: [];
 }
