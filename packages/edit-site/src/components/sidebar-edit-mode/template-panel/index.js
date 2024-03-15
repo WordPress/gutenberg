@@ -9,8 +9,8 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
-	store as editorStore,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -31,7 +31,7 @@ import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 const { PostCardPanel } = unlock( editorPrivateApis );
-
+const { PatternSchemaPanel } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function TemplatesList( { availableTemplates, onSelect } ) {
@@ -141,6 +141,7 @@ export default function TemplatePanel() {
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
+			<PatternSchemaPanel />
 		</>
 	);
 }

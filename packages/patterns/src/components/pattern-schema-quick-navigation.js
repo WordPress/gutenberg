@@ -25,7 +25,7 @@ export default function PatternSchemaQuickNavigation() {
 	const { getBlock } = useSelect( blockEditorStore );
 	const clientIdsWithOverrides = useMemo(
 		() =>
-			allClientIds.filter( ( { clientId } ) => {
+			allClientIds.filter( ( clientId ) => {
 				const block = getBlock( clientId );
 				return isOverridableBlock( block );
 			} ),
