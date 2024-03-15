@@ -28,35 +28,35 @@ export default function TypographyVariations() {
 				columns={ 3 }
 				className="edit-site-global-styles-style-variations-container"
 			>
-				{ typographyVariations &&
-					typographyVariations.length &&
-					typographyVariations.map( ( variation, index ) => (
-						<Variation key={ index } variation={ variation }>
-							{ ( isFocused ) => (
-								<PreviewIframe
-									label={ variation?.title }
-									isFocused={ isFocused }
-								>
-									{ ( { ratio, key } ) => (
-										<HStack
-											key={ key }
-											spacing={ 10 * ratio }
-											justify="center"
-											style={ {
-												height: '100%',
-												overflow: 'hidden',
-											} }
-										>
-											<TypographyExample
-												variation={ variation }
-												fontSize={ 85 * ratio }
-											/>
-										</HStack>
-									) }
-								</PreviewIframe>
-							) }
-						</Variation>
-					) ) }
+				{ typographyVariations && typographyVariations.length
+					? typographyVariations.map( ( variation, index ) => (
+							<Variation key={ index } variation={ variation }>
+								{ ( isFocused ) => (
+									<PreviewIframe
+										label={ variation?.title }
+										isFocused={ isFocused }
+									>
+										{ ( { ratio, key } ) => (
+											<HStack
+												key={ key }
+												spacing={ 10 * ratio }
+												justify="center"
+												style={ {
+													height: '100%',
+													overflow: 'hidden',
+												} }
+											>
+												<TypographyExample
+													variation={ variation }
+													fontSize={ 85 * ratio }
+												/>
+											</HStack>
+										) }
+									</PreviewIframe>
+								) }
+							</Variation>
+					  ) )
+					: null }
 			</Grid>
 		</VStack>
 	);
