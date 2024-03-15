@@ -75,7 +75,7 @@ export default function useLayoutAreas() {
 	}
 
 	// Templates
-	if ( path === '/wp_template/all' ) {
+	if ( path === '/wp_template' ) {
 		return {
 			areas: {
 				content: (

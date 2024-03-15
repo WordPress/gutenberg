@@ -105,7 +105,7 @@ export default function useSyncPathWithURL() {
 				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
 				// The "type" property should be kept as well.
 				navigatorLocation.path === '/pages' ||
-				navigatorLocation.path === '/wp_template/all' ||
+				navigatorLocation.path === '/wp_template' ||
 				navigatorLocation.path === '/wp_template_part/all'
 			) {
 				updateUrlParams( {
