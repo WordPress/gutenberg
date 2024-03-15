@@ -1,10 +1,6 @@
-.editor-sidebar-card {
-	display: flex;
-	align-items: flex-start;
-
+.editor-post-card-panel {
 	&__content {
 		flex-grow: 1;
-		margin-bottom: $grid-unit-05;
 	}
 
 	&__title {
@@ -17,7 +13,8 @@
 =======
 		font-weight: 500;
 		line-height: $icon-size;
-		&.editor-sidebar-card__title {
+		flex-grow: 1;
+		&.editor-post-card-panel__title {
 			font-size: $default-font-size;
 			line-height: $default-line-height;
 >>>>>>> 20435777c9 (add/post-sidebarcard-component):packages/editor/src/components/post-sidebar-card/style.scss
@@ -27,12 +24,15 @@
 
 	&__description {
 		font-size: $default-font-size;
+<<<<<<< HEAD:packages/editor/src/components/post-sidebar-card/style.scss
 		color: $gray-700;
+=======
+		padding-left: $grid-unit-05;
+>>>>>>> 5af3f16bcf (update end to end tests):packages/editor/src/components/post-card-panel/style.scss
 	}
 
 	&__icon {
 		flex: 0 0 $icon-size;
-		margin-right: $grid-unit-15;
 		width: $icon-size;
 		height: $icon-size;
 	}
