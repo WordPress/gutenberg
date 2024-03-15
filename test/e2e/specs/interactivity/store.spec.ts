@@ -26,7 +26,7 @@ test.describe( 'store', () => {
 	test( 'Ensures that state cannot be set to a non-object', async ( {
 		page,
 	} ) => {
-		const resultInput = page.getByTestId( 'result-0' );
-		await expect( resultInput ).toHaveText( 'right' );
+		const element = page.getByTestId( 'state-0' );
+		await expect( element ).toHaveText( 'right' );
 	} );
 } );
