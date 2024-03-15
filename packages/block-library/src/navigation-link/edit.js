@@ -29,10 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import {
-	placeCaretAtHorizontalEdge,
-	__unstableStripHTML as stripHTML,
-} from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -93,7 +90,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
-	}, [] );
+	}, [ elementRef ] );
 
 	return isDraggingWithin;
 };
@@ -171,9 +168,14 @@ export default function NavigationLinkEdit( {
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
 
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+		selectPreviousBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
+	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -226,7 +228,7 @@ export default function NavigationLinkEdit( {
 	/**
 	 * Transform to submenu block.
 	 */
-	function transformToSubmenu() {
+	const transformToSubmenu = () => {
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,
@@ -235,7 +237,7 @@ export default function NavigationLinkEdit( {
 				: [ createBlock( 'core/navigation-link' ) ]
 		);
 		replaceBlock( clientId, newSubmenu );
-	}
+	};
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -277,10 +279,11 @@ export default function NavigationLinkEdit( {
 			) {
 				// Focus and select the label text.
 				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
 			}
+		}
+		// Reset openedBy to null if the linkUI is closed
+		else if ( ! isLinkOpen ) {
+			setOpenedBy( null );
 		}
 	}, [ url, isLinkOpen, label ] );
 
@@ -335,6 +338,7 @@ export default function NavigationLinkEdit( {
 			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
 			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
 		}
 	}
 
@@ -373,6 +377,7 @@ export default function NavigationLinkEdit( {
 	if ( ! url || isInvalid || isDraft ) {
 		blockProps.onClick = () => {
 			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
 		};
 	}
 
@@ -399,7 +404,10 @@ export default function NavigationLinkEdit( {
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
+						onClick={ ( event ) => {
+							setIsLinkOpen( true );
+							setOpenedBy( event.currentTarget );
+						} }
 					/>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
@@ -565,10 +573,17 @@ export default function NavigationLinkEdit( {
 								// If there is no link then remove the auto-inserted block.
 								// This avoids empty blocks which can provided a poor UX.
 								if ( ! url ) {
-									// Need to handle refocusing the Nav block or the inserter?
+									// Select the previous block to keep focus nearby
+									selectPreviousBlock( clientId, true );
+									// Remove the link.
 									onReplace( [] );
+									return;
 								}
+
 								setIsLinkOpen( false );
+								if ( openedBy ) {
+									openedBy.focus();
+								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
