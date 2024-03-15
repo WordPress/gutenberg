@@ -50,8 +50,6 @@ export default function PreviewTypography( { fontSize, variation } ) {
 				type: 'tween',
 			} }
 			style={ {
-				fontSize: '22px',
-				lineHeight: '44px',
 				textAlign: 'center',
 			} }
 		>
