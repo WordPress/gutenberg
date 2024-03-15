@@ -1,0 +1,109 @@
+name: Publish npm packages
+
+on:
+    workflow_dispatch:
+        inputs:
+            release_type:
+                description: 'Release type'
+                required: true
+                type: choice
+                default: 'development'
+                options:
+                    - development
+                    - bugfix
+                    - wp
+            wp_version:
+                description: 'WordPress major version (`wp` only)'
+                type: string
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    release:
+        name: Release - ${{ github.event.inputs.release_type }}
+        runs-on: ubuntu-latest
+        environment: WordPress packages
+        steps:
+            - name: Checkout (for CLI)
+              if: ${{ github.event.inputs.release_type != 'wp' }}
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  path: cli
+                  ref: trunk
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Checkout (for publishing)
+              if: ${{ github.event.inputs.release_type != 'wp' }}
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  path: publish
+                  # Later, we switch this branch in the script that publishes packages.
+                  ref: trunk
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Checkout (for publishing WP major version)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  path: publish
+                  ref: wp/${{ github.event.inputs.wp_version }}
+                  # We need to ensure that Lerna can read the commit created during the previous npm publishing.
+                  # Lerna assumes that all packages need publishing if it can't access the necessary information.
+                  fetch-depth: 999
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Configure git user name and email (for publishing)
+              run: |
+                  cd publish
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Setup Node.js
+              if: ${{ github.event.inputs.release_type != 'wp' }}
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+              with:
+                  node-version-file: 'cli/.nvmrc'
+                  registry-url: 'https://registry.npmjs.org'
+                  check-latest: true
+
+            - name: Setup Node.js (for WP major version)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+              with:
+                  node-version-file: 'publish/.nvmrc'
+                  registry-url: 'https://registry.npmjs.org'
+                  check-latest: true
+
+            - name: Publish development packages to npm ("next" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'development' }}
+              run: |
+                  cd cli
+                  npm ci
+                  ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish packages to npm with bug fixes ("latest" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'bugfix' }}
+              run: |
+                  cd cli
+                  npm ci
+                  ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Publish packages to npm for WP major version ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
+              if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
+              run: |
+                  cd publish
+                  npm ci
+                  npx lerna publish patch --dist-tag wp-${{ github.event.inputs.wp_version }} --no-private --yes --no-verify-access
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

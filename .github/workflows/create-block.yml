@@ -1,0 +1,38 @@
+name: Create Block
+
+on:
+    pull_request:
+    push:
+        branches: [trunk, wp/latest]
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+jobs:
+    checks:
+        name: Checks w/Node.js ${{ matrix.node }} on ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['20', '21']
+                os: ['macos-latest', 'ubuntu-latest', 'windows-latest']
+
+        steps:
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Create block
+              shell: bash
+              run: bash ./bin/test-create-block.sh

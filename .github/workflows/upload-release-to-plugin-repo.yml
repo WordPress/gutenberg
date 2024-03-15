@@ -1,0 +1,259 @@
+name: Update Changelog and upload Gutenberg plugin to WordPress.org plugin repo
+
+on:
+    release:
+        types: [published]
+
+jobs:
+    compute-should-update-trunk:
+        name: Decide if trunk or tag
+        runs-on: ubuntu-latest
+        # Skip this job if the release is a release candidate. This will in turn skip
+        # the upload jobs, which are only relevant for non-RC releases.
+        # We first check if the release is a prerelease, and then if the ref contains
+        # the string "rc". The latter is fallback in case the deployer accidentally
+        # unchecks the "This is a pre-release" checkbox in the release UI.
+        if: |
+            !github.event.release.prerelease && !contains(github.ref, 'rc')
+
+        outputs:
+            should_update_trunk: ${{ steps.compute_should_update_trunk.outputs.should_update_trunk }}
+
+        steps:
+            - name: Fetch latest version in the WP core repo
+              id: compute_latest_version_in_core_repo
+              run: |
+                  latest_version_in_core_repo=$(curl -s 'https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request\[slug\]=gutenberg' | jq -r '.version')
+                  echo "Latest Core Repo version: $latest_version_in_core_repo"
+                  echo "version=$latest_version_in_core_repo" >> $GITHUB_OUTPUT
+
+            - name: Decide if it is a trunk or tag update
+              id: compute_should_update_trunk
+              env:
+                  GITHUB_REF: ${{ github.ref }}
+              run: |
+                  latestPublishedVersion=$(echo "$GITHUB_REF" | sed -E 's/refs\/tags\/(v?)([0-9.]+)/\2/')
+                  latestVersionInCoreRepo="${{ steps.compute_latest_version_in_core_repo.outputs.version }}"
+
+                  # Determines if the first version string is greater than the second version string.
+                  #
+                  # Params:
+                  #   $1 - The first version string to compare, which may have an optional leading "v".
+                  #   $2 - The second version string to compare, which may have an optional leading "v".
+                  #
+                  # Return values:
+                  #   0 - The first version string is greater than the second version string.
+                  #   1 - The first version string is less than or equal to the second version string.
+                  is_first_version_greater_than_second() {
+                    v1=${1#v}
+                    v2=${2#v}
+                    dpkg --compare-versions "$v1" gt "$v2"
+                    return $?
+                  }
+
+                  # Only update trunk *if* the published release's version in Github is GREATER
+                  # than the version currently published in the WP plugins repo. If not, then it
+                  # will upload it as a new tag.
+                  shouldUpdateTrunk=false
+                  if is_first_version_greater_than_second "$latestPublishedVersion" "$latestVersionInCoreRepo"; then
+                     shouldUpdateTrunk=true
+                  fi
+
+                  echo "Should update trunk: $shouldUpdateTrunk"
+                  echo "should_update_trunk=$shouldUpdateTrunk" >> $GITHUB_OUTPUT
+
+    get-release-branch:
+        name: Get release branch name
+        runs-on: ubuntu-latest
+        outputs:
+            release_branch: ${{ steps.get_release_branch.outputs.release_branch }}
+
+        steps:
+            - name: Compute release branch name
+              id: get_release_branch
+              env:
+                  TAG: ${{ github.event.release.tag_name }}
+              run: |
+                  IFS='.' read -r -a VERSION_ARRAY <<< "${TAG#v}"
+                  RELEASE_BRANCH="release/${VERSION_ARRAY[0]}.${VERSION_ARRAY[1]}"
+                  echo "release_branch=${RELEASE_BRANCH}" >> $GITHUB_OUTPUT
+
+    update-changelog:
+        name: Update Changelog on ${{ matrix.branch }} branch
+        runs-on: ubuntu-latest
+        if: |
+            github.event.release.assets[0]
+        needs: get-release-branch
+        env:
+            TAG: ${{ github.event.release.tag_name }}
+        strategy:
+            matrix:
+                include:
+                    - branch: trunk
+                      label: trunk
+                    - branch: ${{ needs.get-release-branch.outputs.release_branch }}
+                      label: release
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  ref: ${{ matrix.branch }}
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Update the Changelog to include the release notes
+              run: |
+                  # First, determine where to insert the new Changelog entry.
+                  SERIES="${RELEASE_BRANCH#release/}"
+                  SERIES_REGEX="=\s${SERIES}\.[0-9]+\s="
+                  CUT_MARKS=$( grep -nP -m 1 "${SERIES_REGEX}" changelog.txt | cut -d: -f1 )
+                  if [[ -z "${CUT_MARKS}" ]]; then
+                    CHANGELOG_REGEX="=\s[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?\s="
+                    RC_REGEX="=\s${TAG#v}(-rc\.[0-9]+)?\s="
+                    CUT_MARKS=$( awk "/${RC_REGEX}/ {print NR; next}; /${CHANGELOG_REGEX}/ {print NR; exit}" changelog.txt )
+                  fi
+                  BEFORE=$( echo "$CUT_MARKS" | head -n 1 )
+                  AFTER=$( echo "$CUT_MARKS" | tail -n 1 )
+                  # Okay, we have all we need to build the new Changelog.
+                  head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
+                  printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
+                  # Need to use a heredoc in order to preserve special characters.
+                  cat <<- "EOF" > release_notes.txt
+                  ${{ github.event.release.body }}
+                  EOF
+                  # Normalize empty lines: Trim them from beginning and end of file...
+                  awk 'NF {p=1} p' <<< "$(< release_notes.txt)" >> new_changelog.txt
+                  # ...then add two empty lines at the end.
+                  printf '\n\n' >> new_changelog.txt
+                  tail -n +"${AFTER}" changelog.txt >> new_changelog.txt
+                  mv new_changelog.txt changelog.txt
+
+            - name: Configure git user name and email
+              run: |
+                  git config user.name "Gutenberg Repository Automation"
+                  git config user.email gutenberg@wordpress.org
+
+            - name: Commit the Changelog update
+              run: |
+                  git add changelog.txt
+                  # Remove files that are not meant to be committed
+                  # ie. release_notes.txt created on the previous step.
+                  git clean -fd
+                  # Only attempt to commit changelog if it has been modified.
+                  if ! git diff-index --quiet HEAD --; then
+                    git commit -m "Update Changelog for ${TAG#v}"
+                    git push --set-upstream origin "${{ matrix.branch }}"
+                  fi
+
+            - name: Upload Changelog artifact
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              with:
+                  name: changelog ${{ matrix.label }}
+                  path: ./changelog.txt
+
+    upload:
+        name: Publish as trunk (and tag)
+        runs-on: ubuntu-latest
+        environment: wp.org plugin
+        needs: [compute-should-update-trunk, update-changelog]
+        if: |
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'true' && github.event.release.assets[0]
+        env:
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+            STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+            SVN_USERNAME: ${{ secrets.svn_username }}
+            SVN_PASSWORD: ${{ secrets.svn_password }}
+            VERSION: ${{ github.event.release.name }}
+
+        steps:
+            - name: Check out Gutenberg trunk from WP.org plugin repo
+              run: svn checkout "$PLUGIN_REPO_URL/trunk" --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+            - name: Delete everything
+              working-directory: ./trunk
+              run: find . -maxdepth 1 -not -name ".svn" -not -name "." -not -name ".." -exec rm -rf {} +
+
+            - name: Download and unzip Gutenberg plugin asset into trunk folder
+              env:
+                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+              run: |
+                  curl -L -o gutenberg.zip $PLUGIN_URL
+                  unzip gutenberg.zip -d trunk
+                  rm gutenberg.zip
+
+            - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
+              env:
+                  STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
+              run: |
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
+
+            - name: Download Changelog Artifact
+              uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
+              with:
+                  name: changelog trunk
+                  path: trunk
+
+            - name: Commit the content changes
+              working-directory: ./trunk
+              run: |
+                  svn st | grep '^?' | awk '{print $2}' | xargs -r svn add
+                  svn st | grep '^!' | awk '{print $2}' | xargs -r svn rm
+                  svn commit -m "Committing version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                   --config-option=servers:global:http-timeout=300
+
+            - name: Create the SVN tag
+              working-directory: ./trunk
+              run: |
+                  svn copy "$PLUGIN_REPO_URL/trunk" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Tagging version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+            - name: Update the plugin's stable version
+              working-directory: ./trunk
+              run: |
+                  sed -i "s/Stable tag: ${STABLE_VERSION_REGEX}/Stable tag: ${VERSION}/g" ./readme.txt
+                  svn commit -m "Releasing version $VERSION" \
+                   --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD"
+
+    upload-tag:
+        name: Publish as tag
+        runs-on: ubuntu-latest
+        environment: wp.org plugin
+        needs: [compute-should-update-trunk, update-changelog]
+        if: |
+            needs.compute-should-update-trunk.outputs.should_update_trunk == 'false' && github.event.release.assets[0]
+        env:
+            PLUGIN_REPO_URL: 'https://plugins.svn.wordpress.org/gutenberg'
+            STABLE_VERSION_REGEX: '[0-9]\+\.[0-9]\+\.[0-9]\+\s*'
+            SVN_USERNAME: ${{ secrets.svn_username }}
+            SVN_PASSWORD: ${{ secrets.svn_password }}
+            VERSION: ${{ github.event.release.name }}
+
+        steps:
+            - name: Download and unzip Gutenberg plugin asset into tags folder
+              env:
+                  PLUGIN_URL: ${{ github.event.release.assets[0].browser_download_url }}
+              run: |
+                  # do the magic here
+                  curl -L -o gutenberg.zip $PLUGIN_URL
+                  unzip gutenberg.zip -d "$VERSION"
+                  rm gutenberg.zip
+
+            - name: Replace the stable tag placeholder with the existing stable tag on the SVN repository
+              env:
+                  STABLE_TAG_PLACEHOLDER: 'Stable tag: V\.V\.V'
+              run: |
+                  sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
+
+            - name: Download Changelog Artifact
+              uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
+              with:
+                  name: changelog trunk
+                  path: ${{ github.event.release.name }}
+
+            - name: Add the new version directory and commit changes to the SVN repository
+              run: |
+                  svn import "$VERSION" "$PLUGIN_REPO_URL/tags/$VERSION" -m "Committing version $VERSION" \
+                  --no-auth-cache --non-interactive  --username "$SVN_USERNAME" --password "$SVN_PASSWORD" \
+                  --config-option=servers:global:http-timeout=300
