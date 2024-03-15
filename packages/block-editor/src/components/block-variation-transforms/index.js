@@ -10,6 +10,7 @@ import {
 	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	BaseControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -29,7 +30,11 @@ function VariationsButtons( {
 } ) {
 	return (
 		<fieldset className={ className }>
-			<legend>{ __( 'Transform to variation' ) }</legend>
+			<legend>
+				<BaseControl.VisualLabel>
+					{ __( 'Transform to variation' ) }
+				</BaseControl.VisualLabel>
+			</legend>
 			{ variations.map( ( variation ) => (
 				<Button
 					key={ variation.name }

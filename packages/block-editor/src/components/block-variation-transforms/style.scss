@@ -2,6 +2,12 @@
 	padding: 0 $grid-unit-20 $grid-unit-20 52px;
 	width: 100%;
 
+	legend {
+		padding: 0;
+		// Makes the inline label be the correct height, equivalent to setting line-height: 0
+		display: flex;
+	}
+
 	.components-dropdown-menu__toggle {
 		border: 1px solid $gray-700;
 		border-radius: $radius-block-ui;
