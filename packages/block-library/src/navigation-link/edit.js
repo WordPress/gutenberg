@@ -281,10 +281,6 @@ export default function NavigationLinkEdit( {
 				selectLabelText();
 			}
 		}
-		// Reset openedBy to null if the linkUI is closed
-		else if ( ! isLinkOpen ) {
-			setOpenedBy( null );
-		}
 	}, [ url, isLinkOpen, label ] );
 
 	/**
@@ -583,6 +579,7 @@ export default function NavigationLinkEdit( {
 								setIsLinkOpen( false );
 								if ( openedBy ) {
 									openedBy.focus();
+									setOpenedBy( null );
 								}
 							} }
 							anchor={ popoverAnchor }
