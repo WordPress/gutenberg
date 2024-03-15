@@ -65,7 +65,7 @@ function useDeprecatedProps( {
 	}
 
 	if ( isDefault ) {
-		deprecated( 'Button isDefault prop', {
+		deprecated( 'wp.components.Button `isDefault` prop', {
 			since: '5.4',
 			alternative: 'variant="secondary"',
 		} );
