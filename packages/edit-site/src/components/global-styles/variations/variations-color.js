@@ -11,10 +11,10 @@ import {
  */
 import Variation from './variation';
 import StylesPreviewColors from '../preview-colors';
-import { useUniqueColorVariations } from '../hooks';
+import { useColorVariations } from '../hooks';
 
 export default function ColorVariations() {
-	const colorVariations = useUniqueColorVariations();
+	const colorVariations = useColorVariations();
 
 	if ( ! colorVariations?.length ) {
 		return null;

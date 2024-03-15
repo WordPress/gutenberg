@@ -99,7 +99,7 @@ export function useSupportedStyles( name, element ) {
 	return supportedPanels;
 }
 
-export function useUniqueColorVariations() {
+export function useColorVariations() {
 	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		property: 'color',
 	} );
@@ -118,7 +118,7 @@ export function useUniqueColorVariations() {
 		: [];
 }
 
-export function useUniqueTypographyVariations() {
+export function useTypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',

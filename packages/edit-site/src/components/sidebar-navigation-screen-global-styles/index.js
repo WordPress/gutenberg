@@ -30,8 +30,8 @@ import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-d
 import ColorVariations from '../global-styles/variations/variations-color';
 import TypographyVariations from '../global-styles/variations/variations-typography';
 import {
-	useUniqueColorVariations,
-	useUniqueTypographyVariations,
+	useColorVariations,
+	useTypographyVariations,
 } from '../global-styles/hooks';
 
 const noop = () => {};
@@ -78,8 +78,8 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
-	const colorVariations = useUniqueColorVariations();
-	const typographyVariations = useUniqueTypographyVariations();
+	const colorVariations = useColorVariations();
+	const typographyVariations = useTypographyVariations();
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until

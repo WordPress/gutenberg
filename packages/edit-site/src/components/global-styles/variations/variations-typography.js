@@ -10,13 +10,13 @@ import {
 /**
  * Internal dependencies
  */
-import { useUniqueTypographyVariations } from '../hooks';
+import { useTypographyVariations } from '../hooks';
 import TypographyExample from '../typography-example';
 import PreviewIframe from '../preview-iframe';
 import Variation from './variation';
 
 export default function TypographyVariations() {
-	const typographyVariations = useUniqueTypographyVariations();
+	const typographyVariations = useTypographyVariations();
 
 	if ( ! typographyVariations?.length ) {
 		return null;
