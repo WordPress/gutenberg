@@ -141,20 +141,36 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function print_client_interactivity_data() {
-			$store      = array();
-			$has_state  = ! empty( $this->state_data );
-			$has_config = ! empty( $this->config_data );
+			if ( empty( $this->state_data ) && empty( $this->config_data ) ) {
+				return;
+			}
 
-			if ( $has_state || $has_config ) {
-				if ( $has_config ) {
-					$store['config'] = $this->config_data;
+			$interactivity_data = array();
+
+			$config = array();
+			foreach ( $this->config_data as $key => $value ) {
+				if ( ! empty( $value ) ) {
+					$config[ $key ] = $value;
 				}
-				if ( $has_state ) {
-					$store['state'] = $this->state_data;
+			}
+			if ( ! empty( $config ) ) {
+				$interactivity_data['config'] = $config;
+			}
+
+			$state = array();
+			foreach ( $this->state_data as $key => $value ) {
+				if ( ! empty( $value ) ) {
+					$state[ $key ] = $value;
 				}
+			}
+			if ( ! empty( $state ) ) {
+				$interactivity_data['state'] = $state;
+			}
+
+			if ( ! empty( $interactivity_data ) ) {
 				wp_print_inline_script_tag(
 					wp_json_encode(
-						$store,
+						$interactivity_data,
 						JSON_HEX_TAG | JSON_HEX_AMP
 					),
 					array(
@@ -586,8 +602,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
 					if ( null !== $result && (
-						false !== $result ||
-						( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+					false !== $result ||
+					( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
 					) ) {
 						/*
 						 * If the result of the evaluation is a boolean and the attribute is
@@ -597,8 +613,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						 * https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 						 */
 						if (
-							is_bool( $result ) &&
-							( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+						is_bool( $result ) &&
+						( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
 						) {
 							$result = $result ? 'true' : 'false';
 						}
