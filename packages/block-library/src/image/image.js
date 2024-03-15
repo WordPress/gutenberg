@@ -347,8 +347,7 @@ export default function Image( {
 
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
-	const showLightboxSetting =
-		!! lightbox || lightboxSetting?.allowEditing === true;
+	const showLightboxSetting = lightboxSetting?.allowEditing === true;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );

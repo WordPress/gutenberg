@@ -241,7 +241,10 @@ const ImageURLInputUI = ( {
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
-	const showLinkEditor = ( ! linkEditorValue && ! lightboxEnabled ) === true;
+	const showLinkEditor =
+		( ! linkEditorValue &&
+			( ! lightboxEnabled ||
+				( lightboxEnabled && ! showLightboxSetting ) ) ) === true;
 
 	const urlLabel = (
 		getLinkDestinations().find(
@@ -258,7 +261,9 @@ const ImageURLInputUI = ( {
 				aria-expanded={ isOpen }
 				onClick={ openLinkUI }
 				ref={ setPopoverAnchor }
-				isActive={ !! url || lightboxEnabled }
+				isActive={
+					!! url || ( lightboxEnabled && showLightboxSetting )
+				}
 			/>
 			{ isOpen && (
 				<URLPopover
@@ -267,7 +272,10 @@ const ImageURLInputUI = ( {
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={
-						! lightboxEnabled ? () => advancedOptions : null
+						! lightboxEnabled ||
+						( lightboxEnabled && ! showLightboxSetting )
+							? () => advancedOptions
+							: null
 					}
 					additionalControls={
 						showLinkEditor && (
@@ -314,54 +322,62 @@ const ImageURLInputUI = ( {
 					}
 					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) && ! lightboxEnabled && (
-						<>
-							<URLPopover.LinkEditor
-								className="block-editor-format-toolbar__link-container-content"
-								value={ linkEditorValue }
-								onChangeInputValue={ setUrlInput }
-								onSubmit={ onSubmitLinkChange() }
-								autocompleteRef={ autocompleteRef }
-							/>
-						</>
-					) }
-					{ url && ! isEditingLink && ! lightboxEnabled && (
-						<>
-							<URLPopover.LinkViewer
-								className="block-editor-format-toolbar__link-container-content"
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<Button
-								icon={ linkOff }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-								size="compact"
-							/>
-						</>
-					) }
-					{ ! url && ! isEditingLink && lightboxEnabled && (
-						<div className="block-editor-url-popover__expand-on-click">
-							<Icon icon={ fullscreen } />
-							<div className="text">
-								<p>{ __( 'Expand on click' ) }</p>
-								<p className="description">
-									{ __(
-										'Scales the image with a lightbox effect'
-									) }
-								</p>
+					{ ( ! url || isEditingLink ) &&
+						( ! lightboxEnabled ||
+							( lightboxEnabled && ! showLightboxSetting ) ) && (
+							<>
+								<URLPopover.LinkEditor
+									className="block-editor-format-toolbar__link-container-content"
+									value={ linkEditorValue }
+									onChangeInputValue={ setUrlInput }
+									onSubmit={ onSubmitLinkChange() }
+									autocompleteRef={ autocompleteRef }
+								/>
+							</>
+						) }
+					{ url &&
+						! isEditingLink &&
+						( ! lightboxEnabled ||
+							( lightboxEnabled && ! showLightboxSetting ) ) && (
+							<>
+								<URLPopover.LinkViewer
+									className="block-editor-format-toolbar__link-container-content"
+									url={ url }
+									onEditLinkClick={ startEditLink }
+									urlLabel={ urlLabel }
+								/>
+								<Button
+									icon={ linkOff }
+									label={ __( 'Remove link' ) }
+									onClick={ onLinkRemove }
+									size="compact"
+								/>
+							</>
+						) }
+					{ ! url &&
+						! isEditingLink &&
+						lightboxEnabled &&
+						showLightboxSetting && (
+							<div className="block-editor-url-popover__expand-on-click">
+								<Icon icon={ fullscreen } />
+								<div className="text">
+									<p>{ __( 'Expand on click' ) }</p>
+									<p className="description">
+										{ __(
+											'Scales the image with a lightbox effect'
+										) }
+									</p>
+								</div>
+								<Button
+									icon={ linkOff }
+									label={ __( 'Disable expand on click' ) }
+									onClick={ () => {
+										onSetLightbox( false );
+									} }
+									size="compact"
+								/>
 							</div>
-							<Button
-								icon={ linkOff }
-								label={ __( 'Disable expand on click' ) }
-								onClick={ () => {
-									onSetLightbox( false );
-								} }
-								size="compact"
-							/>
-						</div>
-					) }
+						) }
 				</URLPopover>
 			) }
 		</>
