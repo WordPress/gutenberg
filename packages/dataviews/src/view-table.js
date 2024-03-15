@@ -258,34 +258,25 @@ function TableRow( {
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
-			onClickCapture={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey || selection.length > 0 ) {
-					event.stopPropagation();
-					event.preventDefault();
-					// if ( ! hasPossibleBulkAction ) {
-					// 	return;
-					// }
-					if ( ! isSelected ) {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId === id ||
-									selection.includes( itemId )
-								);
-							} )
-						);
-					} else {
-						onSelectionChange(
-							data.filter( ( _item ) => {
-								const itemId = getItemId?.( _item );
-								return (
-									itemId !== id &&
-									selection.includes( itemId )
-								);
-							} )
-						);
-					}
+			onClick={ () => {
+				if ( ! isSelected ) {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId === id || selection.includes( itemId )
+							);
+						} )
+					);
+				} else {
+					onSelectionChange(
+						data.filter( ( _item ) => {
+							const itemId = getItemId?.( _item );
+							return (
+								itemId !== id && selection.includes( itemId )
+							);
+						} )
+					);
 				}
 			} }
 		>
@@ -336,9 +327,20 @@ function TableRow( {
 				</td>
 			) ) }
 			{ !! actions?.length && (
-				<td className="dataviews-view-table__actions-column">
+				// Disable reason: we are not making the element interactive,
+				// but preventing any click events from bubbling up to the
+				// table row. This allows us to add a click handler to the row
+				// itself (to toggle row selection) without erroneously
+				// intercepting click events from ItemActions.
+
+				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+				<td
+					className="dataviews-view-table__actions-column"
+					onClick={ ( e ) => e.stopPropagation() }
+				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
+				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			) }
 		</tr>
 	);
