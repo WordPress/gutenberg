@@ -108,7 +108,6 @@ function VariationsToggleGroupControl( {
 			<ToggleGroupControl
 				label={ __( 'Transform to variation' ) }
 				value={ selectedValue }
-				hideLabelFromVision
 				onChange={ onSelectVariation }
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
@@ -120,15 +119,7 @@ function VariationsToggleGroupControl( {
 							<BlockIcon icon={ variation.icon } showColors />
 						}
 						value={ variation.name }
-						label={
-							selectedValue === variation.name
-								? variation.title
-								: sprintf(
-										/* translators: %s: Name of the block variation */
-										__( 'Transform to %s' ),
-										variation.title
-								  )
-						}
+						label={ variation.title }
 					/>
 				) ) }
 			</ToggleGroupControl>
