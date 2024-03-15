@@ -21,4 +21,4 @@ if [ -z "$TEST_RN_PLATFORM" ] || [ "$TEST_RN_PLATFORM" = "android" ] && [ -z "$G
 fi
 
 # Pass along all arguments to Jest.
-cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --config ./jest_ui.config.js "$@"
+NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --config ./jest_ui.config.js "$@"

@@ -14,11 +14,11 @@ concurrency:
 
 jobs:
     test:
-        runs-on: macos-12
+        runs-on: macos-14
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             matrix:
-                xcode: ['14.2']
+                xcode: ['15.2']
                 device: ['iPhone 14']
                 native-test-name: [gutenberg-editor-rendering]
 
@@ -38,8 +38,13 @@ jobs:
             - name: Launch simulator
               run: (open -a Simulator && xcrun simctl boot '${{ matrix.device }}') &
 
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - run: npm ci
 
             - name: Restore tests setup cache
               uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
@@ -80,6 +85,9 @@ jobs:
 
             - name: Build Web Driver Agent (if needed)
               run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+
+            - name: Start Appium
+              run: (npm run native appium:start) &
 
             - name: Run iOS Device Tests
               run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
