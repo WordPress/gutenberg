@@ -207,6 +207,23 @@ function Iframe( {
 		};
 	}, [] );
 
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const onResize = () => {
+			setIframeWindowInnerHeight(
+				node.ownerDocument.defaultView.innerHeight
+			);
+		};
+		node.ownerDocument.defaultView.addEventListener( 'resize', onResize );
+		return () => {
+			node.ownerDocument.defaultView.removeEventListener(
+				'resize',
+				onResize
+			);
+		};
+	}, [] );
+
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -214,6 +231,7 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -268,18 +286,34 @@ function Iframe( {
 			// Hack to get proper margins when scaling the iframe document.
 			const bottomFrameSize = frameSize - contentHeight * ( 1 - _scale );
 
+			iframeDocument.body.classList.add( 'is-zoomed-out' );
+
 			iframeDocument.documentElement.style.transform = `scale( ${ _scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
 			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
+			if ( iframeWindowInnerHeight > contentHeight * _scale ) {
+				iframeDocument.body.style.minHeight = `${ Math.floor(
+					( iframeWindowInnerHeight - 2 * frameSize ) / _scale
+				) }px`;
+			}
 
 			return () => {
+				iframeDocument.body.classList.remove( 'is-zoomed-out' );
 				iframeDocument.documentElement.style.transform = '';
 				iframeDocument.documentElement.style.marginTop = '';
 				iframeDocument.documentElement.style.marginBottom = '';
+				iframeDocument.body.style.minHeight = '';
 			};
 		}
-	}, [ scale, frameSize, contentHeight, contentWidth, iframeDocument ] );
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		contentHeight,
+		iframeWindowInnerHeight,
+		contentWidth,
+	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
