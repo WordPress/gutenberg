@@ -313,7 +313,6 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					$existing_directives_prefixes = array_intersect(
 						'enter' === $mode ? $directive_processor_prefixes : $directive_processor_prefixes_reversed,
 						$directives_prefixes
-
 					);
 					foreach ( $existing_directives_prefixes as $directive_prefix ) {
 						$func = is_array( self::$directive_processors[ $directive_prefix ] )
