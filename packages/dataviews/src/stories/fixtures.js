@@ -135,3 +135,44 @@ export const actions = [
 		callback() {},
 	},
 ];
+
+export const fields = [
+	{
+		header: 'Image',
+		id: 'image',
+		render: ( { item } ) => {
+			return (
+				<img src={ item.image } alt="" style={ { width: '100%' } } />
+			);
+		},
+		width: 50,
+		enableSorting: false,
+	},
+	{
+		header: 'Title',
+		id: 'title',
+		maxWidth: 400,
+		enableHiding: false,
+		isSearchField: true,
+	},
+	{
+		header: 'Type',
+		id: 'type',
+		maxWidth: 400,
+		enableHiding: false,
+		type: 'enumeration',
+		elements: [
+			{ value: 'Not a planet', label: 'Not a planet' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+			{ value: 'Terrestrial', label: 'Terrestrial' },
+			{ value: 'Gas giant', label: 'Gas giant' },
+		],
+	},
+	{
+		header: 'Description',
+		id: 'description',
+		maxWidth: 200,
+		enableSorting: false,
+		isSearchField: true,
+	},
+];
