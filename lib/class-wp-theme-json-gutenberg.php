@@ -2528,6 +2528,7 @@ class WP_Theme_JSON_Gutenberg {
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
+		$is_root_selector = static::ROOT_BLOCK_SELECTOR === $selector;
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -2613,10 +2614,16 @@ class WP_Theme_JSON_Gutenberg {
 		$block_rules = '';
 
 		/*
-		 * 1. Separate the declarations that use the general selector
+		 * 1. Bespoke declaration modifiers:
+		 * - 'filter': Separate the declarations that use the general selector
 		 * from the ones using the duotone selector.
+		 * - 'background|background-size': set the html minHeight to 100%
+		 * to ensure the background covers the entire viewport.
+		 *
 		 */
-		$declarations_duotone = array();
+		$declarations_duotone       = array();
+		$should_set_root_min_height = false;
+
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				/*
@@ -2633,6 +2640,29 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				unset( $declarations[ $index ] );
 			}
+
+			if ( $is_root_selector && (
+					'background-size' === $declaration['name'] && 'cover' === $declaration['value'] ||
+					'background' === $declaration['name'] && ! empty( $declaration['value'] )
+				) ) {
+				$should_set_root_min_height = true;
+			}
+		}
+
+		/*
+		 * If root styles has backgroundSize === cover, or a background is set (gradient),
+		 * set the body minHeight to 100%.
+		 */
+		if ( $should_set_root_min_height ) {
+			$block_rules .= static::to_ruleset(
+				'html',
+				array(
+					array(
+						'name'  => 'min-height',
+						'value' => 'calc(100% - var(--wp-admin--admin-bar--height, 0px))',
+					),
+				)
+			);
 		}
 
 		// Update declarations if there are separators with only background color defined.
@@ -2650,7 +2680,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 4. Generate Layout block gap styles.
 		if (
-			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! $is_root_selector &&
 			! empty( $block_metadata['name'] )
 		) {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
@@ -2664,30 +2694,6 @@ class WP_Theme_JSON_Gutenberg {
 		// 6. Generate and append the style variation rulesets.
 		foreach ( $style_variation_declarations as $style_variation_selector => $individual_style_variation_declarations ) {
 			$block_rules .= static::to_ruleset( $style_variation_selector, $individual_style_variation_declarations );
-		}
-
-		// 7. Generate :root level rules related to background.
-		// Abstract into something like static::update_separator_declarations.
-		// @TODO - how can this be overwritten by theme.json, if at all? styles.dimensions.minHeight?
-		// @TODO - implement the same logic in the editor https://github.com/WordPress/gutenberg/blob/f079bd2f7fe8e4c5694fc3feb276567777f9997b/packages/block-editor/src/components/iframe/index.js#L252-L252
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
-			$should_set_root_min_height = false;
-			foreach ( $declarations as $declaration ) {
-				// If backgroundSize === cover, set the :root minHeight to 100%
-				// to ensure the background covers the entire viewport.
-				if ( 'background-size' === $declaration['name'] && 'cover' === $declaration['value'] ) {
-					$should_set_root_min_height = true;
-					break;
-				}
-				// If background is set (gradient), set the :root minHeight to 100%
-				// to ensure the background covers the entire viewport.
-				if ( 'background' === $declaration['name'] && ! empty( $declaration['value'] ) ) {
-					$should_set_root_min_height = true;
-				}
-			}
-			if ( $should_set_root_min_height ) {
-				$block_rules .= ':root { min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px)); }';
-			}
 		}
 
 		return $block_rules;
