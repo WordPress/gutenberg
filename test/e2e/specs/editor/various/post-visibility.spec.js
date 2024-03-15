@@ -89,7 +89,12 @@ test.describe( 'Post visibility', () => {
 
 		await page.click( 'role=button[name="View next month"i]' );
 		await page.click( 'role=application[name="Calendar"] >> text=15' );
-
+		await page
+			.locator( '.block-editor-publish-date-time-picker' )
+			.getByRole( 'button', {
+				name: 'Close',
+			} )
+			.click();
 		await page.click( 'role=button[name="Select visibility: Public"i]' );
 
 		await page.click( 'role=radio[name="Private"i]' );

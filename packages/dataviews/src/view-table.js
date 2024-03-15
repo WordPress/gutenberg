@@ -23,6 +23,8 @@ import {
 	useRef,
 	useState,
 	useMemo,
+	Children,
+	Fragment,
 } from '@wordpress/element';
 
 /**
@@ -31,7 +33,7 @@ import {
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
-import { sanitizeOperators, WithDropDownMenuSeparators } from './utils';
+import { sanitizeOperators } from './utils';
 import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
@@ -44,7 +46,19 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuRadioItemV2: DropdownMenuRadioItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
+
+function WithDropDownMenuSeparators( { children } ) {
+	return Children.toArray( children )
+		.filter( Boolean )
+		.map( ( child, i ) => (
+			<Fragment key={ i }>
+				{ i > 0 && <DropdownMenuSeparator /> }
+				{ child }
+			</Fragment>
+		) );
+}
 
 const sortArrows = { asc: '↑', desc: '↓' };
 

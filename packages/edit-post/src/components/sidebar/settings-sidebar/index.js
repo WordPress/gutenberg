@@ -22,7 +22,6 @@ import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 } from '@wordpress/editor';
@@ -117,7 +116,6 @@ const SidebarContent = ( {
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
 							<PostTaxonomiesPanel />
-							<PostFeaturedImagePanel />
 							<PostExcerptPanel />
 							<PostDiscussionPanel />
 							<PageAttributesPanel />

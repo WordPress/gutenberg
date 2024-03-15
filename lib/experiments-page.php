@@ -105,7 +105,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-grid-interactivity',
-		__( 'Grid interactivty ', 'gutenberg' ),
+		__( 'Grid interactivity ', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
