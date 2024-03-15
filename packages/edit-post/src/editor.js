@@ -7,6 +7,7 @@ import {
 	PostLockedModal,
 	store as editorStore,
 	privateApis as editorPrivateApis,
+	useStyles,
 } from '@wordpress/editor';
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
@@ -73,14 +74,23 @@ function Editor( {
 		[ currentPost.postType, currentPost.postId ]
 	);
 
+	// get the styles from the global styles
+	const { styles } = useStyles();
+
 	const editorSettings = useMemo(
 		() => ( {
 			...settings,
+			__globalStyles: styles,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
 			defaultRenderingMode: 'post-only',
 		} ),
-		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+		[
+			settings,
+			styles,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+		]
 	);
 
 	const initialPost = useMemo( () => {
