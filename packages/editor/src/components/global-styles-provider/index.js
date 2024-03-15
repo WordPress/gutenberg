@@ -7,10 +7,10 @@ import { isPlainObject } from 'is-plain-object';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -118,7 +118,7 @@ function useGlobalStylesBaseConfig() {
 	return [ !! baseConfig, baseConfig ];
 }
 
-function useGlobalStylesContext() {
+export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
