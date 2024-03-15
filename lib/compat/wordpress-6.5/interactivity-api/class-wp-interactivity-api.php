@@ -602,8 +602,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 					$result          = $this->evaluate( $attribute_value, end( $namespace_stack ), end( $context_stack ) );
 
 					if ( null !== $result && (
-					false !== $result ||
-					( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+						false !== $result ||
+						( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
 					) ) {
 						/*
 						 * If the result of the evaluation is a boolean and the attribute is
@@ -613,8 +613,8 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 						 * https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L131C24-L136
 						 */
 						if (
-						is_bool( $result ) &&
-						( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
+							is_bool( $result ) &&
+							( strlen( $bound_attribute ) > 5 && '-' === $bound_attribute[4] )
 						) {
 							$result = $result ? 'true' : 'false';
 						}
