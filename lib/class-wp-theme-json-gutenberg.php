@@ -2518,6 +2518,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Setting a min-height of HTML for background gradient or background size.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
@@ -2643,7 +2644,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( $is_root_selector && (
 					'background-size' === $declaration['name'] && 'cover' === $declaration['value'] ||
-					'background' === $declaration['name'] && ! empty( $declaration['value'] )
+					'background' === $declaration['name']
 				) ) {
 				$should_set_root_min_height = true;
 			}
