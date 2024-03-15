@@ -13,6 +13,7 @@ import { useLayout } from '../components/block-list/layout';
 import {
 	GridVisualizer,
 	GridItemResizer,
+	GridItemPinToolbarItem,
 } from '../components/grid-interactivity';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
@@ -168,6 +169,11 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		<>
 			<GridVisualizer clientId={ rootClientId } />
 			<GridItemResizer clientId={ clientId } onChange={ updateLayout } />
+			<GridItemPinToolbarItem
+				clientId={ clientId }
+				layout={ style?.layout }
+				onChange={ updateLayout }
+			/>
 		</>
 	);
 }
