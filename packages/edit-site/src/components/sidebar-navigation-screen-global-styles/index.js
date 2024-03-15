@@ -77,14 +77,11 @@ function SidebarNavigationScreenGlobalStylesContent() {
 
 	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		property: 'color',
-		filter: ( variation ) => !! variation?.settings?.color,
 	} );
 
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',
-			filter: ( variation ) =>
-				!! variation?.settings?.typography?.fontFamilies,
 		} );
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
