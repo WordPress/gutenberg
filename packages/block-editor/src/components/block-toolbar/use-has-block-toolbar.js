@@ -24,6 +24,9 @@ export function useHasBlockToolbar() {
 				getBlockSelectionStart,
 			} = select( blockEditorStore );
 
+			// we only care about the 1st selected block
+			// for the toolbar, so we use getBlockSelectionStart
+			// instead of getSelectedBlockClientIds
 			const selectedBlockClientId = getBlockSelectionStart();
 			const isDefaultEditingMode =
 				getBlockEditingMode( selectedBlockClientId ) === 'default';

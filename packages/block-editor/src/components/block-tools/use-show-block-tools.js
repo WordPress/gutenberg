@@ -42,7 +42,7 @@ export function useShowBlockTools() {
 				clientId &&
 				! isTyping() &&
 				editorMode === 'edit' &&
-				isUnmodifiedDefaultBlock( block );
+				isEmptyDefaultBlock;
 			const maybeShowBreadcrumb =
 				hasSelectedBlock &&
 				! hasMultiSelection() &&
