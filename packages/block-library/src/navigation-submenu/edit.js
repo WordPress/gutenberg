@@ -138,8 +138,11 @@ export default function NavigationSubmenuEdit( {
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlock,
+		selectBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
 	const [ openedBy, setOpenedBy ] = useState( null );
@@ -475,6 +478,7 @@ export default function NavigationSubmenuEdit( {
 							onClick={ () => {
 								if ( ! openSubmenusOnClick && ! url ) {
 									setIsLinkOpen( true );
+									setOpenedBy( ref.current );
 								}
 							} }
 						/>
@@ -488,6 +492,8 @@ export default function NavigationSubmenuEdit( {
 								if ( openedBy ) {
 									openedBy.focus();
 									setOpenedBy( null );
+								} else {
+									selectBlock( clientId );
 								}
 							} }
 							anchor={ popoverAnchor }

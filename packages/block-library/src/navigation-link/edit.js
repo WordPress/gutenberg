@@ -172,6 +172,7 @@ export default function NavigationLinkEdit( {
 		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 		selectPreviousBlock,
+		selectBlock,
 	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
@@ -525,6 +526,12 @@ export default function NavigationLinkEdit( {
 												'core/image',
 												'core/strikethrough',
 											] }
+											onClick={ () => {
+												if ( ! url ) {
+													setIsLinkOpen( true );
+													setOpenedBy( ref.current );
+												}
+											} }
 										/>
 										{ description && (
 											<span className="wp-block-navigation-item__description">
@@ -580,6 +587,9 @@ export default function NavigationLinkEdit( {
 								if ( openedBy ) {
 									openedBy.focus();
 									setOpenedBy( null );
+								} else {
+									// select the block if no ref, such as when adding a new link
+									selectBlock( clientId );
 								}
 							} }
 							anchor={ popoverAnchor }
