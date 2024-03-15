@@ -110,7 +110,7 @@ export function useUniqueColorVariations() {
 		? colorVariations.filter( ( variation ) => {
 				const { settings, styles, title } = variation;
 				return (
-					title === 'Default' ||
+					title === 'Default' || // Always preseve the default variation.
 					Object.keys( settings ).length > 0 ||
 					Object.keys( styles ).length > 0
 				);
