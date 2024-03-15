@@ -1655,6 +1655,17 @@
 								}
 							]
 						},
+						"textOrientation": {
+							"description": "Sets the `text-orientation` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
 						"textTransform": {
 							"description": "Sets the `text-transform` CSS property.",
 							"oneOf": [
