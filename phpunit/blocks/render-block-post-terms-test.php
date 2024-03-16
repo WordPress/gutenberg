@@ -1,6 +1,6 @@
 <?php
 /**
- * File block rendering tests.
+ * Post Terms block rendering tests.
  *
  * @package WordPress
  * @subpackage Blocks
