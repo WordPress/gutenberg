@@ -191,6 +191,7 @@ export function makeFontFamilyFormData( fontFamily ) {
 		...familyWithValidParameters,
 		slug: kebabCase( fontFamily.slug ),
 	};
+	delete fontFamilySettings.preview;
 
 	formData.append(
 		'font_family_settings',
@@ -203,6 +204,7 @@ export function makeFontFacesFormData( font ) {
 	if ( font?.fontFace ) {
 		const fontFacesFormData = font.fontFace.map( ( item, faceIndex ) => {
 			const face = { ...item };
+			delete face.preview;
 			const formData = new FormData();
 			if ( face.file ) {
 				// Normalize to an array, since face.file may be a single file or an array of files.

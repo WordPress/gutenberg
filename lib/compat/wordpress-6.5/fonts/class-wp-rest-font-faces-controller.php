@@ -655,15 +655,6 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 									'sanitize_callback' => 'sanitize_text_field',
 								),
 							),
-							'preview'               => array(
-								'description' => __( 'URL to a preview image of the font face.', 'gutenberg' ),
-								'type'        => 'string',
-								'format'      => 'uri',
-								'default'     => '',
-								'arg_options' => array(
-									'sanitize_callback' => 'sanitize_url',
-								),
-							),
 						),
 						'required'             => array( 'fontFamily', 'src' ),
 						'additionalProperties' => false,
