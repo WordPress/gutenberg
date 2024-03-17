@@ -27,10 +27,8 @@ const entitySelectors = rootEntitiesConfig.reduce( ( result, entity ) => {
 		selectors.getEntityRecord( state, kind, name, key, query );
 
 	if ( plural ) {
-		result[ getMethodName( kind, name, 'get', plural ) ] = (
-			state,
-			query
-		) => selectors.getEntityRecords( state, kind, name, query );
+		result[ getMethodName( kind, plural, 'get' ) ] = ( state, query ) =>
+			selectors.getEntityRecords( state, kind, name, query );
 	}
 	return result;
 }, {} );
@@ -41,7 +39,7 @@ const entityResolvers = rootEntitiesConfig.reduce( ( result, entity ) => {
 		resolvers.getEntityRecord( kind, name, key, query );
 
 	if ( plural ) {
-		const pluralMethodName = getMethodName( kind, name, 'get', plural );
+		const pluralMethodName = getMethodName( kind, plural, 'get' );
 		result[ pluralMethodName ] = ( ...args ) =>
 			resolvers.getEntityRecords( kind, name, ...args );
 		result[ pluralMethodName ].shouldInvalidate = ( action ) =>

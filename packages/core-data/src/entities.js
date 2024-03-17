@@ -413,20 +413,19 @@ async function loadTaxonomyEntities() {
  * const nameSingular = getMethodName( 'root', 'theme', 'get' );
  * // nameSingular is getRootTheme
  *
- * const namePlural = getMethodName( 'root', 'theme', 'set', 'themes' );
+ * const namePlural = getMethodName( 'root', 'themes', 'set' );
  * // namePlural is setRootThemes
  * ```
  *
  * @param {string} kind   Entity kind.
  * @param {string} name   Entity name.
  * @param {string} prefix Function prefix.
- * @param {string} plural Plural for of the name.
  *
  * @return {string} Method name
  */
-export const getMethodName = ( kind, name, prefix = 'get', plural ) => {
+export const getMethodName = ( kind, name, prefix = 'get' ) => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
-	const suffix = plural ? pascalCase( plural ) : pascalCase( name );
+	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 

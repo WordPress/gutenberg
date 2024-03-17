@@ -27,24 +27,8 @@ describe( 'getMethodName', () => {
 		expect( methodName ).toEqual( 'setPostType' );
 	} );
 
-	it( 'should use the plural form', () => {
-		const methodName = getMethodName(
-			'root',
-			'postType',
-			'get',
-			'postTypes'
-		);
-
-		expect( methodName ).toEqual( 'getPostTypes' );
-	} );
-
 	it( 'should use the given plural form', () => {
-		const methodName = getMethodName(
-			'root',
-			'taxonomy',
-			'get',
-			'taxonomies'
-		);
+		const methodName = getMethodName( 'root', 'taxonomies', 'get' );
 
 		expect( methodName ).toEqual( 'getTaxonomies' );
 	} );
