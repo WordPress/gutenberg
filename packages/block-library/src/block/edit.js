@@ -28,7 +28,7 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { parse, cloneBlock } from '@wordpress/blocks';
+import { parse, cloneBlock, store as blocksStore } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
@@ -265,6 +265,7 @@ export default function ReusableBlockEdit( {
 		getBlockEditingMode,
 		onNavigateToEntityRecord,
 		editingMode,
+		hasPatternOverridesSource,
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
@@ -273,6 +274,7 @@ export default function ReusableBlockEdit( {
 				getSettings,
 				getBlockEditingMode: _getBlockEditingMode,
 			} = select( blockEditorStore );
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const blocks = getBlocks( patternClientId );
 			const canEdit = canUser( 'update', 'blocks', ref );
 
@@ -284,6 +286,9 @@ export default function ReusableBlockEdit( {
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 				editingMode: _getBlockEditingMode( patternClientId ),
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
 			};
 		},
 		[ patternClientId, ref ]
@@ -295,13 +300,20 @@ export default function ReusableBlockEdit( {
 			setBlockEditingMode,
 			innerBlocks,
 			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' ? 'disabled' : undefined
+			editingMode === 'disabled' || ! hasPatternOverridesSource
+				? 'disabled'
+				: undefined
 		);
-	}, [ editingMode, innerBlocks, setBlockEditingMode ] );
+	}, [
+		editingMode,
+		innerBlocks,
+		setBlockEditingMode,
+		hasPatternOverridesSource,
+	] );
 
 	const canOverrideBlocks = useMemo(
-		() => hasOverridableBlocks( innerBlocks ),
-		[ innerBlocks ]
+		() => hasPatternOverridesSource && hasOverridableBlocks( innerBlocks ),
+		[ hasPatternOverridesSource, innerBlocks ]
 	);
 
 	const initialBlocks = useMemo(
@@ -329,19 +341,21 @@ export default function ReusableBlockEdit( {
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
-				replaceInnerBlocks(
-					patternClientId,
-					applyInitialContentValuesToInnerBlocks(
-						initialBlocks,
-						initialContent.current,
-						defaultContent.current,
-						legacyIdMap.current
-					)
-				);
+				const blocks = hasPatternOverridesSource
+					? applyInitialContentValuesToInnerBlocks(
+							initialBlocks,
+							initialContent.current,
+							defaultContent.current,
+							legacyIdMap.current
+					  )
+					: initialBlocks;
+
+				replaceInnerBlocks( patternClientId, blocks );
 			} );
 			setBlockEditingMode( patternClientId, originalEditingMode );
 		} );
 	}, [
+		hasPatternOverridesSource,
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
 		initialBlocks,
@@ -377,6 +391,9 @@ export default function ReusableBlockEdit( {
 	// Sync the `content` attribute from the updated blocks to the pattern block.
 	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
+		if ( ! hasPatternOverridesSource ) {
+			return;
+		}
 		const { getBlocks } = registry.select( blockEditorStore );
 		let prevBlocks = getBlocks( patternClientId );
 		return registry.subscribe( () => {
@@ -394,7 +411,13 @@ export default function ReusableBlockEdit( {
 				} );
 			}
 		}, blockEditorStore );
-	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
+	}, [
+		hasPatternOverridesSource,
+		syncDerivedUpdates,
+		patternClientId,
+		registry,
+		setAttributes,
+	] );
 
 	const handleEditOriginal = () => {
 		onNavigateToEntityRecord( {

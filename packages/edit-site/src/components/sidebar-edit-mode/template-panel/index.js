@@ -7,7 +7,6 @@ import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
@@ -55,6 +54,11 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 		/>
 	);
 }
+
+const POST_TYPE_PATH = {
+	wp_template: '/wp_template',
+	wp_template_part: '/wp_template_part/all',
+};
 
 export default function TemplatePanel() {
 	const { title, description, icon, record, postType, postId } = useSelect(
@@ -112,7 +116,7 @@ export default function TemplatePanel() {
 							toggleProps={ { size: 'small' } }
 							onRemove={ () => {
 								history.push( {
-									path: `/${ postType }/all`,
+									path: POST_TYPE_PATH[ postType ],
 								} );
 							} }
 						/>
@@ -142,7 +146,6 @@ export default function TemplatePanel() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostFeaturedImagePanel />
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />

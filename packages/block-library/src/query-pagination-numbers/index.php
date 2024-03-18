@@ -8,6 +8,8 @@
 /**
  * Renders the `core/query-pagination-numbers` block on the server.
  *
+ * @since 5.8.0
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -115,6 +117,8 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 
 /**
  * Registers the `core/query-pagination-numbers` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_query_pagination_numbers() {
 	register_block_type_from_metadata(

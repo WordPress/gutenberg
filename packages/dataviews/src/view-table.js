@@ -22,9 +22,9 @@ import {
 	useId,
 	useRef,
 	useState,
+	useMemo,
 	Children,
 	Fragment,
-	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -49,7 +49,7 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-function WithSeparators( { children } ) {
+function WithDropDownMenuSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
 		.map( ( child, i ) => (
@@ -102,7 +102,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			}
 			style={ { minWidth: '240px' } }
 		>
-			<WithSeparators>
+			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(
@@ -187,7 +187,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-			</WithSeparators>
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 } );
@@ -237,16 +237,35 @@ function TableRow( {
 	data,
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
+
 	const isSelected = selection.includes( id );
+
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
+
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
-				'is-selected': hasPossibleBulkAction && isSelected,
+				'is-selected':
+					hasPossibleBulkAction && selection.includes( id ),
+				'is-hovered': isHovered,
 			} ) }
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
 			onClickCapture={ ( event ) => {
 				if ( event.ctrlKey || event.metaKey ) {
 					event.stopPropagation();
 					event.preventDefault();
+					if ( ! hasPossibleBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {

@@ -1,5 +1,4 @@
 .dataviews-wrapper {
-	width: 100%;
 	height: 100%;
 	overflow: auto;
 	box-sizing: border-box;
@@ -7,6 +6,7 @@
 }
 
 .dataviews-filters__view-actions {
+	box-sizing: border-box;
 	padding: $grid-unit-15 $grid-unit-40 0;
 	margin-bottom: $grid-unit-15;
 	flex-shrink: 0;
@@ -123,7 +123,7 @@
 			border-bottom: 0;
 		}
 
-		&:hover {
+		&.is-hovered {
 			background-color: #f8f8f8;
 		}
 
@@ -137,9 +137,15 @@
 			}
 		}
 
+		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			opacity: 0;
+		}
+
 		&:focus-within,
+		&.is-hovered,
 		&:hover {
-			.components-checkbox-control__input {
+			.components-checkbox-control__input,
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
 		}

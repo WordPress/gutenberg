@@ -134,9 +134,9 @@ export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
 	const unloadFontFace = ( fonts ) => {
 		fonts.forEach( ( f ) => {
 			if (
-				f.family === formatFontFaceName( fontFace.fontFamily ) &&
-				f.weight === fontFace.fontWeight &&
-				f.style === fontFace.fontStyle
+				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.weight === fontFace?.fontWeight &&
+				f.style === fontFace?.fontStyle
 			) {
 				fonts.delete( f );
 			}
@@ -259,7 +259,7 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 			// Handle network errors or other fetch-related errors
 			results.errors.push( {
 				data: fontFacesData[ index ],
-				message: `Fetch error: ${ result.reason.message }`,
+				message: result.reason.message,
 			} );
 		}
 	} );

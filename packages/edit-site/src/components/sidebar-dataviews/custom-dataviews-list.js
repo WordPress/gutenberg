@@ -110,7 +110,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 				title={ dataview.title }
 				type={ type }
 				isActive={ isActive }
-				isCustom="true"
+				isCustom
 				customViewId={ dataviewId }
 				suffix={
 					<DropdownMenu
@@ -216,7 +216,7 @@ export default function CustomDataViewsList( { type, activeView, isCustom } ) {
 							key={ customViewRecord.id }
 							dataviewId={ customViewRecord.id }
 							isActive={
-								isCustom === 'true' &&
+								isCustom &&
 								Number( activeView ) === customViewRecord.id
 							}
 						/>

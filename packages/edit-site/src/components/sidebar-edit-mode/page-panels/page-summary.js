@@ -7,6 +7,7 @@ import {
 	PostURLPanel,
 	PostSchedulePanel,
 	PostTemplatePanel,
+	PostFeaturedImagePanel,
 } from '@wordpress/editor';
 
 /**
@@ -23,6 +24,7 @@ export default function PageSummary( {
 } ) {
 	return (
 		<VStack spacing={ 0 }>
+			<PostFeaturedImagePanel withPanelBody={ false } />
 			<PageStatus
 				status={ status }
 				date={ date }

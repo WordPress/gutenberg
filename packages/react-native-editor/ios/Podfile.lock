@@ -13,7 +13,7 @@ PODS:
     - ReactCommon/turbomodule/core (= 0.73.3)
   - fmt (6.2.1)
   - glog (0.3.5)
-  - Gutenberg (1.114.0):
+  - Gutenberg (1.115.0):
     - React-Core (= 0.73.3)
     - React-CoreModules (= 0.73.3)
     - React-RCTImage (= 0.73.3)
@@ -1109,7 +1109,7 @@ PODS:
     - React-Core
   - RNSVG (14.0.0):
     - React-Core
-  - RNTAztecView (1.114.0):
+  - RNTAztecView (1.115.0):
     - React-Core
     - WordPress-Aztec-iOS (= 1.19.9)
   - SDWebImage (5.11.1):
@@ -1190,7 +1190,6 @@ DEPENDENCIES:
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec`)
-  - WordPress-Aztec-iOS (from `https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git`, commit `a41d881f6a831fecef9e6400e69a64aafe80d9ac`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1201,6 +1200,7 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
+    - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
   boost:
@@ -1332,16 +1332,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec"
-  WordPress-Aztec-iOS:
-    :commit: a41d881f6a831fecef9e6400e69a64aafe80d9ac
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
-
-CHECKOUT OPTIONS:
-  WordPress-Aztec-iOS:
-    :commit: a41d881f6a831fecef9e6400e69a64aafe80d9ac
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
@@ -1351,7 +1343,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 73b3972e2bd20b3235ff2014f06a3d3af675ed29
   fmt: ff9d55029c625d3757ed641535fd4a75fedc7ce9
   glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
-  Gutenberg: 76d20cd7f0489c9e73d94616eb59593560a04941
+  Gutenberg: 063e73c87f712ec62233eb93c12f1ab54adcc880
   hermes-engine: 5420539d016f368cd27e008f65f777abd6098c56
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
@@ -1410,13 +1402,13 @@ SPEC CHECKSUMS:
   RNReanimated: 6936b41d8afb97175e7c0ab40425b53103f71046
   RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   RNSVG: 255767813dac22db1ec2062c8b7e7b856d4e5ae6
-  RNTAztecView: 68c970e04c9f7ae81ba64810667a07a66e6ba0b7
+  RNTAztecView: f9ac93cee7a4cd984d8453a9141058fa22cb9b1a
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   WordPress-Aztec-iOS: fbebd569c61baa252b3f5058c0a2a9a6ada686bb
   Yoga: ff0382b894475dba0b4d2a5fda860bfee5a9afad
 
-PODFILE CHECKSUM: ea6b5fb1749cb8bf26e491208aff7b540d63776e
+PODFILE CHECKSUM: 4684cf41ccdeb5f720da9f11c8904f21ad9fcc7f
 
 COCOAPODS: 1.14.3
