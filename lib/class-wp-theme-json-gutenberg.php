@@ -2705,8 +2705,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		* Reset default browser margin on the root body element.
-		* This is set on the root selector **before** generating the ruleset
+		* Reset default browser margin on the body element.
+		* This is set on the body selector **before** generating the ruleset
 		* from the `theme.json`. This is to ensure that if the `theme.json` declares
 		* `margin` in its `spacing` declaration for the `body` element then these
 		* user-generated values take precedence in the CSS cascade.
@@ -2744,7 +2744,7 @@ class WP_Theme_JSON_Gutenberg {
 			$css            .= ':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-				$css .= static::ROOT_CSS_PROPERTIES_SELECTOR . " { --wp--style--block-gap: $block_gap_value; }";
+			$css .= static::ROOT_CSS_PROPERTIES_SELECTOR . " { --wp--style--block-gap: $block_gap_value; }";
 		}
 		$css .= $this->get_layout_styles( $block_metadata );
 
