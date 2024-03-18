@@ -126,4 +126,4 @@ function register_block_core_post_terms() {
 		)
 	);
 }
-add_action( 'init', 'register_block_core_post_terms' );
+add_action( 'init', 'register_block_core_post_terms', 11 );
