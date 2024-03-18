@@ -56,7 +56,9 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					icon={ pinIcon }
-					label={ __( 'Pin to grid' ) }
+					label={
+						isPinned ? __( 'Pinned to grid' ) : __( 'Pin to grid' )
+					}
 					isPressed={ isPinned }
 					onClick={ isPinned ? unpinBlock : pinBlock }
 				/>
