@@ -82,7 +82,7 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  * @param  elements   An array of color palette items.
  * @param  slugPrefix The slug prefix used to match the element slug.
  *
- * @return {{name:string, slug:string}} A name and slug for the new palette item.
+ * @return A name and slug for the new palette item.
  */
 export function getNameAndSlugForPosition(
 	elements: PaletteElement[],

@@ -32,7 +32,7 @@ describe( 'getNameAndSlugForPosition', () => {
 		} );
 	} );
 
-	test( 'should return a new color name with an incremented slug id', () => {
+	test( 'should return a new color name and slug with an incremented slug id', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
@@ -48,7 +48,7 @@ describe( 'getNameAndSlugForPosition', () => {
 		} );
 	} );
 
-	test( 'should ignore user-defined color names', () => {
+	test( 'should ignore user-defined color name and slug', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
@@ -64,7 +64,7 @@ describe( 'getNameAndSlugForPosition', () => {
 		} );
 	} );
 
-	test( 'should return a new color name with an incremented slug id one higher than the current highest', () => {
+	test( 'should return a new color name and slug with an incremented slug id one higher than the current highest', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
