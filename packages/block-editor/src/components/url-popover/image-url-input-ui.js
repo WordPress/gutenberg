@@ -251,6 +251,62 @@ const ImageURLInputUI = ( {
 		) || {}
 	).title;
 
+	const PopoverChildren = () => {
+		if (
+			lightboxEnabled &&
+			showLightboxSetting &&
+			! url &&
+			! isEditingLink
+		) {
+			return (
+				<div className="block-editor-url-popover__expand-on-click">
+					<Icon icon={ fullscreen } />
+					<div className="text">
+						<p>{ __( 'Expand on click' ) }</p>
+						<p className="description">
+							{ __( 'Scales the image with a lightbox effect' ) }
+						</p>
+					</div>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Disable expand on click' ) }
+						onClick={ () => {
+							onSetLightbox( false );
+						} }
+						size="compact"
+					/>
+				</div>
+			);
+		} else if ( ! url || isEditingLink ) {
+			return (
+				<URLPopover.LinkEditor
+					className="block-editor-format-toolbar__link-container-content"
+					value={ linkEditorValue }
+					onChangeInputValue={ setUrlInput }
+					onSubmit={ onSubmitLinkChange() }
+					autocompleteRef={ autocompleteRef }
+				/>
+			);
+		} else if ( url && ! isEditingLink ) {
+			return (
+				<>
+					<URLPopover.LinkViewer
+						className="block-editor-format-toolbar__link-container-content"
+						url={ url }
+						onEditLinkClick={ startEditLink }
+						urlLabel={ urlLabel }
+					/>
+					<Button
+						icon={ linkOff }
+						label={ __( 'Remove link' ) }
+						onClick={ onLinkRemove }
+						size="compact"
+					/>
+				</>
+			);
+		}
+	};
+
 	return (
 		<>
 			<ToolbarButton
@@ -318,57 +374,7 @@ const ImageURLInputUI = ( {
 					}
 					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) && hideLightboxPanel && (
-						<>
-							<URLPopover.LinkEditor
-								className="block-editor-format-toolbar__link-container-content"
-								value={ linkEditorValue }
-								onChangeInputValue={ setUrlInput }
-								onSubmit={ onSubmitLinkChange() }
-								autocompleteRef={ autocompleteRef }
-							/>
-						</>
-					) }
-					{ url && ! isEditingLink && hideLightboxPanel && (
-						<>
-							<URLPopover.LinkViewer
-								className="block-editor-format-toolbar__link-container-content"
-								url={ url }
-								onEditLinkClick={ startEditLink }
-								urlLabel={ urlLabel }
-							/>
-							<Button
-								icon={ linkOff }
-								label={ __( 'Remove link' ) }
-								onClick={ onLinkRemove }
-								size="compact"
-							/>
-						</>
-					) }
-					{ ! url &&
-						! isEditingLink &&
-						lightboxEnabled &&
-						showLightboxSetting && (
-							<div className="block-editor-url-popover__expand-on-click">
-								<Icon icon={ fullscreen } />
-								<div className="text">
-									<p>{ __( 'Expand on click' ) }</p>
-									<p className="description">
-										{ __(
-											'Scales the image with a lightbox effect'
-										) }
-									</p>
-								</div>
-								<Button
-									icon={ linkOff }
-									label={ __( 'Disable expand on click' ) }
-									onClick={ () => {
-										onSetLightbox( false );
-									} }
-									size="compact"
-								/>
-							</div>
-						) }
+					<PopoverChildren />
 				</URLPopover>
 			) }
 		</>
