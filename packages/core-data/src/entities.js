@@ -469,10 +469,12 @@ function registerSyncConfigs( configs ) {
 }
 
 /**
- * Loads the kind entities into the store.
+ * Loads the entities into the store.
  *
- * @param {string}  kind Kind
- * @param {?string} name Name
+ * Note: The `name` argument is used for `root` entities requiring additional server data.
+ *
+ * @param {string} kind Kind
+ * @param {string} name Name
  * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig =
