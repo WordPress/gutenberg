@@ -351,9 +351,17 @@
 							"default": false
 						},
 						"backgroundSize": {
-							"type": "boolean",
-							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
-							"default": false
+							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls.",
+							"default": false,
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "string",
+									"enum": [ "cover", "contain", "auto" ]
+								}
+							]
 						}
 					}
 				},

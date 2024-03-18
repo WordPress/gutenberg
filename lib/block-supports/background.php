@@ -39,15 +39,7 @@ function gutenberg_register_background_support( $block_type ) {
  * @return array                     Style engine array of CSS string and style declarations.
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
-	$background_image_source             = isset( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
 	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'auto';
-
-	if ( 'file' === $background_image_source && ! empty( $background_styles['backgroundImage']['url'] ) ) {
-		// If the background size is set to `contain` and no position is set, set the position to `center`.
-		if ( 'contain' === $background_styles['backgroundSize'] && ! isset( $background_styles['backgroundPosition'] ) ) {
-			$background_styles['backgroundPosition'] = 'center';
-		}
-	}
 
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 }
@@ -74,7 +66,23 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$styles = gutenberg_get_background_support_styles( $block_attributes['style']['background'] );
+	// Grab any default value from block.json.
+	$background_size_default              = isset( $block_type->supports['background']['backgroundSize'] ) && is_string( $block_type->supports['background']['backgroundSize'] ) ? $block_type->supports['background']['backgroundSize'] : null;
+	$background_styles                    = array();
+	$background_styles['backgroundSize']  = isset( $block_attributes['style']['background']['backgroundSize'] ) ? $block_attributes['style']['background']['backgroundSize'] : $background_size_default;
+	$background_styles['backgroundImage'] = isset( $block_attributes['style']['background']['backgroundImage'] ) ? $block_attributes['style']['background']['backgroundImage'] : array();
+
+	if ( isset( $background_styles['backgroundImage']['source'] ) && 'file' === $background_styles['backgroundImage']['source']  && isset( $background_styles['backgroundImage']['url'] ) ) {
+		$background_styles['backgroundPosition'] = isset( $block_attributes['style']['background']['backgroundPosition'] ) ? $block_attributes['style']['background']['backgroundPosition'] : null;
+		$background_styles['backgroundRepeat']   = isset( $block_attributes['style']['background']['backgroundRepeat'] ) ? $block_attributes['style']['background']['backgroundRepeat'] : null;
+
+		// If the background size is set to `contain` and no position is set, set the position to `center`.
+		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
+			$background_styles['backgroundPosition'] = 'center';
+		}
+	}
+
+	$styles = gutenberg_get_background_support_styles( $background_styles );
 
 	if ( ! empty( $styles['css'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.

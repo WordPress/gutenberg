@@ -166,10 +166,15 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
  * Resets the background size block support attributes. This can be used when disabling
  * the background size controls for a block via a `ToolsPanel`.
  *
- * @param {Object}   style         Style attribute.
- * @param {Function} setAttributes Function to set block's attributes.
+ * @param {Object}   style                      Style attribute.
+ * @param {Function} setAttributes              Function to set block's attributes.
+ * @param {string}   backgroundSizeDefaultValue Reset value for backgroundSize
  */
-function resetBackgroundSize( style = {}, setAttributes ) {
+function resetBackgroundSize(
+	style = {},
+	setAttributes,
+	backgroundSizeDefaultValue
+) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
@@ -177,7 +182,7 @@ function resetBackgroundSize( style = {}, setAttributes ) {
 				...style?.background,
 				backgroundPosition: undefined,
 				backgroundRepeat: undefined,
-				backgroundSize: undefined,
+				backgroundSize: backgroundSizeDefaultValue,
 			},
 		} ),
 	} );
@@ -257,6 +262,7 @@ function BackgroundImagePanelItem( {
 		[ clientId ]
 	);
 	const { id, title, url } = style?.background?.backgroundImage || {};
+	const sizeValue = style?.background?.backgroundSize;
 
 	const replaceContainerRef = useRef();
 
@@ -311,6 +317,7 @@ function BackgroundImagePanelItem( {
 					source: 'file',
 					title: media.title || undefined,
 				},
+				backgroundSize: sizeValue || 'cover',
 			},
 		};
 
@@ -440,6 +447,7 @@ function BackgroundSizePanelItem( {
 	clientId,
 	isShownByDefault,
 	setAttributes,
+	defaultValue = 'auto',
 } ) {
 	const style = useSelect(
 		( select ) =>
@@ -449,8 +457,9 @@ function BackgroundSizePanelItem( {
 
 	const sizeValue = style?.background?.backgroundSize;
 	const repeatValue = style?.background?.backgroundRepeat;
+	const positionValue = style?.background?.backgroundPosition;
 
-	// An `undefined` value is treated as `auto` by the toggle group control.
+	// An `undefined` value is treated as `cover` by the toggle group control.
 	// An empty string is treated as `auto` by the toggle group control. This
 	// allows a user to select "Size" and then enter a custom value, with an
 	// empty value being treated as `auto`.
@@ -460,7 +469,7 @@ function BackgroundSizePanelItem( {
 			sizeValue !== 'contain' ) ||
 		sizeValue === ''
 			? 'auto'
-			: sizeValue || 'auto';
+			: sizeValue || defaultValue;
 
 	// If the current value is `cover` and the repeat value is `undefined`, then
 	// the toggle should be unchecked as the default state. Otherwise, the toggle
@@ -489,9 +498,17 @@ function BackgroundSizePanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+			if ( nextPosition === undefined ) {
+				nextPosition = 'center';
+			}
+		}
+
+		if ( next !== 'contain' && nextPosition === 'center' ) {
+			nextPosition = undefined;
 		}
 
 		if (
@@ -507,6 +524,7 @@ function BackgroundSizePanelItem( {
 				...style,
 				background: {
 					...style?.background,
+					backgroundPosition: nextPosition,
 					backgroundRepeat: nextRepeat,
 					backgroundSize: next,
 				},
@@ -514,7 +532,7 @@ function BackgroundSizePanelItem( {
 		} );
 	};
 
-	const updateBackgroundPosition = ( next ) => {
+	const updateBackgroundPosition = ( next ) =>
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
@@ -524,7 +542,6 @@ function BackgroundSizePanelItem( {
 				},
 			} ),
 		} );
-	};
 
 	const toggleIsRepeated = () => {
 		setAttributes( {
@@ -546,7 +563,9 @@ function BackgroundSizePanelItem( {
 			className="single-column"
 			hasValue={ () => hasValue }
 			label={ __( 'Size' ) }
-			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
+			onDeselect={ () =>
+				resetBackgroundSize( style, setAttributes, defaultValue )
+			}
 			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
@@ -626,6 +645,11 @@ export function BackgroundImagePanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
+	const defaultBackgroundSize = getBlockSupport( props.name, [
+		BACKGROUND_SUPPORT_KEY,
+		'backgroundSize',
+	] );
+
 	return (
 		<InspectorControls group="background">
 			<BackgroundImagePanelItem
@@ -635,6 +659,7 @@ export function BackgroundImagePanel( props ) {
 			{ showBackgroundSize && (
 				<BackgroundSizePanelItem
 					isShownByDefault={ defaultControls?.backgroundSize }
+					defaultValue={ defaultBackgroundSize }
 					{ ...props }
 				/>
 			) }
