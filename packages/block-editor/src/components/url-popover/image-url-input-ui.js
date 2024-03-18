@@ -241,10 +241,9 @@ const ImageURLInputUI = ( {
 	);
 
 	const linkEditorValue = urlInput !== null ? urlInput : url;
-	const showLinkEditor =
-		( ! linkEditorValue &&
-			( ! lightboxEnabled ||
-				( lightboxEnabled && ! showLightboxSetting ) ) ) === true;
+	const hideLightboxPanel =
+		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
+	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
 	const urlLabel = (
 		getLinkDestinations().find(
@@ -272,10 +271,7 @@ const ImageURLInputUI = ( {
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
 					renderSettings={
-						! lightboxEnabled ||
-						( lightboxEnabled && ! showLightboxSetting )
-							? () => advancedOptions
-							: null
+						hideLightboxPanel ? () => advancedOptions : null
 					}
 					additionalControls={
 						showLinkEditor && (
@@ -322,38 +318,33 @@ const ImageURLInputUI = ( {
 					}
 					offset={ 13 }
 				>
-					{ ( ! url || isEditingLink ) &&
-						( ! lightboxEnabled ||
-							( lightboxEnabled && ! showLightboxSetting ) ) && (
-							<>
-								<URLPopover.LinkEditor
-									className="block-editor-format-toolbar__link-container-content"
-									value={ linkEditorValue }
-									onChangeInputValue={ setUrlInput }
-									onSubmit={ onSubmitLinkChange() }
-									autocompleteRef={ autocompleteRef }
-								/>
-							</>
-						) }
-					{ url &&
-						! isEditingLink &&
-						( ! lightboxEnabled ||
-							( lightboxEnabled && ! showLightboxSetting ) ) && (
-							<>
-								<URLPopover.LinkViewer
-									className="block-editor-format-toolbar__link-container-content"
-									url={ url }
-									onEditLinkClick={ startEditLink }
-									urlLabel={ urlLabel }
-								/>
-								<Button
-									icon={ linkOff }
-									label={ __( 'Remove link' ) }
-									onClick={ onLinkRemove }
-									size="compact"
-								/>
-							</>
-						) }
+					{ ( ! url || isEditingLink ) && hideLightboxPanel && (
+						<>
+							<URLPopover.LinkEditor
+								className="block-editor-format-toolbar__link-container-content"
+								value={ linkEditorValue }
+								onChangeInputValue={ setUrlInput }
+								onSubmit={ onSubmitLinkChange() }
+								autocompleteRef={ autocompleteRef }
+							/>
+						</>
+					) }
+					{ url && ! isEditingLink && hideLightboxPanel && (
+						<>
+							<URLPopover.LinkViewer
+								className="block-editor-format-toolbar__link-container-content"
+								url={ url }
+								onEditLinkClick={ startEditLink }
+								urlLabel={ urlLabel }
+							/>
+							<Button
+								icon={ linkOff }
+								label={ __( 'Remove link' ) }
+								onClick={ onLinkRemove }
+								size="compact"
+							/>
+						</>
+					) }
 					{ ! url &&
 						! isEditingLink &&
 						lightboxEnabled &&
