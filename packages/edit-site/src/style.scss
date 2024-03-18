@@ -8,7 +8,6 @@
 @import "./components/global-styles/style.scss";
 @import "./components/global-styles/screen-revisions/style.scss";
 @import "./components/header-edit-mode/style.scss";
-@import "./components/list/style.scss";
 @import "./components/page/style.scss";
 @import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
@@ -34,7 +33,6 @@
 @import "./components/sidebar-navigation-screen-details-footer/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menu/style.scss";
 @import "./components/sidebar-navigation-screen-page/style.scss";
-@import "./components/sidebar-navigation-screen-templates/style.scss";
 @import "components/sidebar-navigation-screen-details-panel/style.scss";
 @import "./components/sidebar-navigation-screen-pattern/style.scss";
 @import "./components/sidebar-navigation-screen-patterns/style.scss";
@@ -49,6 +47,7 @@
 @import "./hooks/push-changes-to-global-styles/style.scss";
 @import "./components/global-styles/font-library-modal/style.scss";
 @import "./components/pagination/style.scss";
+@import "./components/global-styles/variations/style.scss";
 
 body.js #wpadminbar {
 	display: none;

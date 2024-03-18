@@ -22,13 +22,15 @@ import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
+import { computeIFrameScale } from '../../utils/math';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { hasBlocks, isFocusMode, templateType, canvasMode } = useSelect(
-		( select ) => {
-			const { getBlockCount } = select( blockEditorStore );
+	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
+		useSelect( ( select ) => {
+			const { getBlockCount, __unstableGetEditorMode } =
+				select( blockEditorStore );
 			const { getEditedPostType, getCanvasMode } = unlock(
 				select( editSiteStore )
 			);
@@ -37,12 +39,11 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			return {
 				templateType: _templateType,
 				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 				canvasMode: getCanvasMode(),
 				hasBlocks: !! getBlockCount(),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -52,8 +53,11 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	const viewModeProps = {
-		'aria-label': __( 'Editor Canvas' ),
+	// In view mode, make the canvas iframe be perceived and behave as a button
+	// to switch to edit mode, with a meaningful label and no title attribute.
+	const viewModeIframeProps = {
+		'aria-label': __( 'Edit' ),
+		title: null,
 		role: 'button',
 		tabIndex: 0,
 		onFocus: () => setIsFocused( true ),
@@ -99,6 +103,17 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		[ settings.styles, enableResizing, canvasMode ]
 	);
 
+	const frameSize = isZoomOutMode ? 20 : undefined;
+
+	const scale = isZoomOutMode
+		? ( contentWidth ) =>
+				computeIFrameScale(
+					{ width: 1000, scale: 0.45 },
+					{ width: 400, scale: 0.9 },
+					contentWidth
+				)
+		: undefined;
+
 	return (
 		<EditorCanvasRoot
 			className={ classnames( 'edit-site-editor-canvas__block-list', {
@@ -107,7 +122,8 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				shouldZoom: true,
+				scale,
+				frameSize,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{
@@ -115,7 +131,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					}
 				),
 				...props,
-				...( canvasMode === 'view' ? viewModeProps : {} ),
+				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
 		>
 			{ children }

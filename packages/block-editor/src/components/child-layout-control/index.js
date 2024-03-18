@@ -8,6 +8,8 @@ import {
 	__experimentalInputControl as InputControl,
 	__experimentalHStack as HStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
@@ -36,6 +38,8 @@ export default function ChildLayoutControl( {
 	const {
 		selfStretch,
 		flexSize,
+		columnStart,
+		rowStart,
 		columnSpan,
 		rowSpan,
 		selfAlign,
@@ -113,16 +117,22 @@ export default function ChildLayoutControl( {
 			height: undefined,
 		} );
 	};
-	const resetGridSpanValue = () => {
+	const resetGridStarts = () => {
+		onChange( {
+			columnStart: undefined,
+			rowStart: undefined,
+		} );
+	};
+	const resetGridSpans = () => {
 		onChange( {
 			columnSpan: undefined,
 			rowSpan: undefined,
 		} );
 	};
+	const hasStartValue = () => !! columnStart || !! rowStart;
+	const hasSpanValue = () => !! columnSpan || !! rowSpan;
 	const hasWidthValue = () => !! childLayout[ widthProp ];
 	const hasHeightValue = () => !! childLayout[ heightProp ];
-	const hasGridSpanValue = () =>
-		!! ( childLayout.columnSpan || childLayout.rowSpan );
 
 	const widthOptions = [];
 
@@ -469,41 +479,97 @@ export default function ChildLayoutControl( {
 				</>
 			) }
 			{ parentLayoutType === 'grid' && (
-				<HStack
-					as={ ToolsPanelItem }
-					hasValue={ hasGridSpanValue }
-					label={ __( 'Grid spans' ) }
-					onDeselect={ resetGridSpanValue }
-					isShownByDefault={ isShownByDefault }
-					panelId={ panelId }
-				>
-					<InputControl
-						size={ '__unstable-large' }
-						label={ __( 'Column Span' ) }
-						type="number"
-						onChange={ ( value ) => {
-							onChange( {
-								rowSpan,
-								columnSpan: value,
-							} );
-						} }
-						value={ columnSpan }
-						min={ 1 }
-					/>
-					<InputControl
-						size={ '__unstable-large' }
-						label={ __( 'Row Span' ) }
-						type="number"
-						onChange={ ( value ) => {
-							onChange( {
-								columnSpan,
-								rowSpan: value,
-							} );
-						} }
-						value={ rowSpan }
-						min={ 1 }
-					/>
-				</HStack>
+				<>
+					<HStack
+						as={ ToolsPanelItem }
+						hasValue={ hasSpanValue }
+						label={ __( 'Grid span' ) }
+						onDeselect={ resetGridSpans }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Column span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									rowSpan,
+									columnSpan: value,
+								} );
+							} }
+							value={ columnSpan }
+							min={ 1 }
+						/>
+						<InputControl
+							size={ '__unstable-large' }
+							label={ __( 'Row span' ) }
+							type="number"
+							onChange={ ( value ) => {
+								onChange( {
+									columnStart,
+									rowStart,
+									columnSpan,
+									rowSpan: value,
+								} );
+							} }
+							value={ rowSpan }
+							min={ 1 }
+						/>
+					</HStack>
+					{ window.__experimentalEnableGridInteractivity && (
+						// Use Flex with an explicit width on the FlexItem instead of HStack to
+						// work around an issue in webkit where inputs with a max attribute are
+						// sized incorrectly.
+						<Flex
+							as={ ToolsPanelItem }
+							hasValue={ hasStartValue }
+							label={ __( 'Grid placement' ) }
+							onDeselect={ resetGridStarts }
+							isShownByDefault={ false }
+							panelId={ panelId }
+						>
+							<FlexItem style={ { width: '50%' } }>
+								<InputControl
+									size={ '__unstable-large' }
+									label={ __( 'Column' ) }
+									type="number"
+									onChange={ ( value ) => {
+										onChange( {
+											columnStart: value,
+											rowStart,
+											columnSpan,
+											rowSpan,
+										} );
+									} }
+									value={ columnStart }
+									min={ 1 }
+									max={ parentLayout?.columnCount }
+								/>
+							</FlexItem>
+							<FlexItem style={ { width: '50%' } }>
+								<InputControl
+									size={ '__unstable-large' }
+									label={ __( 'Row' ) }
+									type="number"
+									onChange={ ( value ) => {
+										onChange( {
+											columnStart,
+											rowStart: value,
+											columnSpan,
+											rowSpan,
+										} );
+									} }
+									value={ rowStart }
+									min={ 1 }
+									max={ parentLayout?.columnCount }
+								/>
+							</FlexItem>
+						</Flex>
+					) }
+				</>
 			) }
 		</>
 	);

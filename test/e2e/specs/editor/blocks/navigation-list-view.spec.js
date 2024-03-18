@@ -543,6 +543,48 @@ test.describe( 'Navigation block - List view editing', () => {
 		// we have unmounted the list view and then remounted it).
 		await expect( linkControl.getSearchInput() ).toBeHidden();
 	} );
+
+	test( `can create a new menu without losing focus`, async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		await page.getByLabel( 'Test Menu' ).click();
+
+		await page.keyboard.press( 'ArrowUp' );
+
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Create new menu' } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		// Check that the menu was created
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( 'Navigation Menu successfully created.' )
+		).toBeVisible();
+		await expect(
+			page.getByText( 'This navigation menu is empty.' )
+		).toBeVisible();
+
+		// Move focus to the appender
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Navigation',
+				} )
+				.getByLabel( 'Add block' )
+		).toBeFocused();
+	} );
 } );
 
 class LinkControl {

@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -20,14 +19,13 @@ import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
+import { useShowBlockTools } from './use-show-block-tools';
 
 function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
-		getBlock,
 		getSettings,
-		hasMultiSelection,
 		__unstableGetEditorMode,
 		isTyping,
 	} = select( blockEditorStore );
@@ -35,36 +33,13 @@ function selector( select ) {
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	const { name = '', attributes = {} } = getBlock( clientId ) || {};
 	const editorMode = __unstableGetEditorMode();
-	const hasSelectedBlock = clientId && name;
-	const isEmptyDefaultBlock = isUnmodifiedDefaultBlock( {
-		name,
-		attributes,
-	} );
-	const _showEmptyBlockSideInserter =
-		clientId &&
-		! isTyping() &&
-		editorMode === 'edit' &&
-		isUnmodifiedDefaultBlock( { name, attributes } );
-	const maybeShowBreadcrumb =
-		hasSelectedBlock &&
-		! hasMultiSelection() &&
-		( editorMode === 'navigation' || editorMode === 'zoom-out' );
 
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
 		isZoomOutMode: editorMode === 'zoom-out',
-		showEmptyBlockSideInserter: _showEmptyBlockSideInserter,
-		showBreadcrumb: ! _showEmptyBlockSideInserter && maybeShowBreadcrumb,
-		showBlockToolbar:
-			! getSettings().hasFixedToolbar &&
-			! _showEmptyBlockSideInserter &&
-			hasSelectedBlock &&
-			! isEmptyDefaultBlock &&
-			! maybeShowBreadcrumb,
 	};
 }
 
@@ -82,18 +57,20 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const {
-		clientId,
-		hasFixedToolbar,
-		isTyping,
-		isZoomOutMode,
-		showEmptyBlockSideInserter,
-		showBreadcrumb,
-		showBlockToolbar,
-	} = useSelect( selector, [] );
+	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
+		selector,
+		[]
+	);
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
+
+	const {
+		showEmptyBlockSideInserter,
+		showBreadcrumb,
+		showBlockToolbarPopover,
+	} = useShowBlockTools();
+
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -186,7 +163,7 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showBlockToolbar && (
+				{ showBlockToolbarPopover && (
 					<BlockToolbarPopover
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }

@@ -44,7 +44,7 @@ afterAll( () => {
 it( 'displays the message', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
@@ -56,7 +56,7 @@ it( 'displays the message', () => {
 it( 'dismisses when the screen is tapped', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>
@@ -72,7 +72,7 @@ it( 'dismisses when the screen is tapped', () => {
 it( 'dismisses when the keyboard closes', () => {
 	const screen = render(
 		<TooltipSlot>
-			<Tooltip visible={ true } text="A helpful message">
+			<Tooltip visible text="A helpful message">
 				<Text>I need help</Text>
 			</Tooltip>
 		</TooltipSlot>

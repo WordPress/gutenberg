@@ -404,6 +404,8 @@ export default function DimensionsPanel( {
 				selfAlign: undefined,
 				width: undefined,
 				height: undefined,
+				columnStart: undefined,
+				rowStart: undefined,
 				columnSpan: undefined,
 				rowSpan: undefined,
 			} ),

@@ -292,6 +292,56 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'Should have proper label in the list view', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+
+		await editor.publishPost();
+		await page.reload();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect(
+			listView.getByRole( 'link' ),
+			'should show default block name if the content is empty'
+		).toHaveText( 'Heading' );
+
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Heading',
+			} )
+			.fill( 'Heading content' );
+
+		await expect(
+			listView.getByRole( 'link' ),
+			'should show content'
+		).toHaveText( 'Heading content' );
+
+		await editor.openDocumentSettingsSidebar();
+
+		await page.getByRole( 'button', { name: 'Advanced' } ).click();
+
+		await page
+			.getByRole( 'textbox', {
+				name: 'Block name',
+			} )
+			.fill( 'My new name' );
+
+		await expect(
+			listView.getByRole( 'link' ),
+			'should show custom name'
+		).toHaveText( 'My new name' );
+	} );
+
 	test.describe( 'Block transforms', () => {
 		test.describe( 'FROM paragraph', () => {
 			test( 'should preserve the content', async ( { editor } ) => {

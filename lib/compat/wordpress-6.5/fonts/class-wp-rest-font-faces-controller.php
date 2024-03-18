@@ -858,25 +858,37 @@ if ( ! class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		 */
 		protected function handle_font_file_upload( $file ) {
 			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
-			add_filter( 'upload_dir', 'wp_get_font_dir' );
+
+			/*
+			 * Set the upload directory to the fonts directory.
+			 *
+			 * wp_get_font_dir() contains the 'font_dir' hook, whose callbacks are
+			 * likely to call wp_get_upload_dir().
+			 *
+			 * To avoid an infinite loop, don't hook wp_get_font_dir() to 'upload_dir'.
+			 * Instead, just pass its return value to the 'upload_dir' callback.
+			 */
+			$font_dir       = wp_get_font_dir();
+			$set_upload_dir = function () use ( $font_dir ) {
+				return $font_dir;
+			};
+			add_filter( 'upload_dir', $set_upload_dir );
 
 			$overrides = array(
 				'upload_error_handler' => array( $this, 'handle_font_file_upload_error' ),
-				// Arbitrary string to avoid the is_uploaded_file() check applied
-				// when using 'wp_handle_upload'.
-				'action'               => 'wp_handle_font_upload',
 				// Not testing a form submission.
 				'test_form'            => false,
-				// Seems mime type for files that are not images cannot be tested.
-				// See wp_check_filetype_and_ext().
-				'test_type'            => true,
 				// Only allow uploading font files for this request.
 				'mimes'                => WP_Font_Utils::get_allowed_font_mime_types(),
 			);
 
-			$uploaded_file = wp_handle_upload( $file, $overrides );
+			// Bypasses is_uploaded_file() when running unit tests.
+			if ( defined( 'DIR_TESTDATA' ) && DIR_TESTDATA ) {
+				$overrides['action'] = 'wp_handle_mock_upload';
+			}
 
-			remove_filter( 'upload_dir', 'wp_get_font_dir' );
+			$uploaded_file = wp_handle_upload( $file, $overrides );
+			remove_filter( 'upload_dir', $set_upload_dir );
 			remove_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 
 			return $uploaded_file;
