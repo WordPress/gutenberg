@@ -41,6 +41,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'__unstableGalleryWithImageBlocks',
+	'__globalStyles',
 	'alignWide',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
