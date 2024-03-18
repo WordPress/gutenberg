@@ -19,6 +19,7 @@
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 	$type            = isset( $attributes['type'] ) ? $attributes['type'] : 'monthly';
+	$title           = isset( $attributes['label'] ) ? $attributes['label'] : __( 'Archives' );
 
 	$class = 'wp-block-archives-list';
 
@@ -26,8 +27,7 @@ function render_block_core_archives( $attributes ) {
 
 		$class = 'wp-block-archives-dropdown';
 
-		$dropdown_id = wp_unique_id( 'wp-block-archives-' );
-		$title       = __( 'Archives' );
+		$dropdown_id = isset( $attributes['uniqueId'] ) ? $attributes['uniqueId'] : wp_unique_id( 'wp-block-archives-' );
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
 		$dropdown_args = apply_filters(
@@ -65,8 +65,12 @@ function render_block_core_archives( $attributes ) {
 
 		$show_label = empty( $attributes['showLabel'] ) ? ' screen-reader-text' : '';
 
-		$block_content = '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . esc_html( $title ) . '</label>
-		<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
+		$block_content = '';
+
+		if ( empty( $attributes['isEdit'] ) ) {
+			$block_content .= '<label for="' . $dropdown_id . '" class="wp-block-archives__label' . $show_label . '">' . wp_kses_post( $title ) . '</label>';
+		}
+		$block_content .= '<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
 		<option value="">' . esc_html( $label ) . '</option>' . $archives . '</select>';
 
 		return sprintf(
