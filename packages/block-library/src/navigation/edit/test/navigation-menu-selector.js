@@ -250,6 +250,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 				const handler = jest.fn();
 
+				// at the start we have the menus and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
@@ -271,6 +272,18 @@ describe( 'NavigationMenuSelector', () => {
 					} )
 				);
 
+				// creating a menu is a network activity
+				// so we have to wait on it
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					hasResolvedNavigationMenus: false,
+					isResolvingNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
+
+				rerender( <NavigationMenuSelector onCreateNew={ handler } /> );
+
 				// Re-open the dropdown (it's closed when the "Create menu" button is clicked).
 				await user.click( toggleButton );
 
@@ -283,6 +296,16 @@ describe( 'NavigationMenuSelector', () => {
 						name: 'Create new menu',
 					} )
 				).toBeDisabled();
+
+				// once the menu is created
+				// no more network activity to wait on
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					hasResolvedNavigationMenus: true,
+					isResolvingNavigationMenus: false,
+					canUserCreateNavigationMenu: true,
+					canSwitchNavigationMenu: true,
+				} );
 
 				// Simulate the menu being created and component being re-rendered.
 				rerender(
@@ -422,7 +445,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuItem ).toBeChecked();
 			} );
 
-			it( 'should call the handler when the navigation menu is selected and disable all options during the import/creation process', async () => {
+			it( 'should call the handler when the navigation menu is selected', async () => {
 				const user = userEvent.setup();
 
 				const handler = jest.fn();
@@ -434,7 +457,7 @@ describe( 'NavigationMenuSelector', () => {
 					canSwitchNavigationMenu: true,
 				} );
 
-				const { rerender } = render(
+				render(
 					<NavigationMenuSelector
 						onSelectNavigationMenu={ handler }
 					/>
@@ -455,42 +478,6 @@ describe( 'NavigationMenuSelector', () => {
 
 				//  Check the dropdown has been closed.
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-
-				// Re-open the dropdown
-				await user.click( screen.getByRole( 'button' ) );
-
-				// Check the dropdown is again open and is in the "loading" state.
-				expect(
-					screen.getByRole( 'menu', {
-						name: /Loading/,
-					} )
-				).toBeInTheDocument();
-
-				// // Check all menu items are present but disabled.
-				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
-					// // Check all menu items are present but disabled.
-					expect( item ).toBeDisabled();
-				} );
-
-				// // Simulate the menu being created and component being re-rendered.
-				rerender(
-					<NavigationMenuSelector
-						createNavigationMenuIsSuccess // classic menu import creates a Navigation menu.
-					/>
-				);
-
-				// Todo: fix bug where aria label is not updated.
-				// expect(
-				// 	screen.getByRole( 'menu', {
-				// 		name: `You are currently editing ${ navigationMenusFixture[ 0 ].title.rendered }`,
-				// 	} )
-				// ).toBeInTheDocument();
-
-				// Check all menu items are re-enabled.
-				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
-					// // Check all menu items are present but disabled.
-					expect( item ).toBeEnabled();
-				} );
 			} );
 		} );
 
@@ -568,9 +555,14 @@ describe( 'NavigationMenuSelector', () => {
 
 			it( 'should call the handler when the classic menu item is selected and disable all options during the import/creation process', async () => {
 				const user = userEvent.setup();
-				const handler = jest.fn();
+				const handler = jest.fn( async () => {} );
 
+				// initially we have the menus, and we're not waiting on network
 				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canSwitchNavigationMenu: true,
 					canUserCreateNavigationMenu: true,
 				} );
 
@@ -597,6 +589,23 @@ describe( 'NavigationMenuSelector', () => {
 				// Check the dropdown has been closed.
 				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
+				// since we're importing we are doing network activity
+				// so we have to wait on it
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					isResolvingNavigationMenus: true,
+					hasResolvedNavigationMenus: false,
+					canUserCreateNavigationMenu: true,
+				} );
+
+				useNavigationEntities.mockReturnValue( {
+					menus: classicMenusFixture,
+				} );
+
+				rerender(
+					<NavigationMenuSelector onSelectClassicMenu={ handler } />
+				);
+
 				// // Re-open the dropdown (it's closed when the "Create menu" button is clicked).
 				await user.click( screen.getByRole( 'button' ) );
 
@@ -611,6 +620,19 @@ describe( 'NavigationMenuSelector', () => {
 				screen.getAllByRole( 'menuitem' ).forEach( ( item ) => {
 					// // Check all menu items are present but disabled.
 					expect( item ).toBeDisabled();
+				} );
+
+				// once the menu is imported
+				// no more network activity to wait on
+				useNavigationMenu.mockReturnValue( {
+					navigationMenus: [],
+					isResolvingNavigationMenus: false,
+					hasResolvedNavigationMenus: true,
+					canUserCreateNavigationMenu: true,
+				} );
+
+				useNavigationEntities.mockReturnValue( {
+					menus: classicMenusFixture,
 				} );
 
 				// Simulate the menu being created and component being re-rendered.

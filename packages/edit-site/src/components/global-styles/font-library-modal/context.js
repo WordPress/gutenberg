@@ -9,7 +9,7 @@ import {
 	useEntityRecords,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -274,8 +274,22 @@ function FontLibraryProvider( { children } ) {
 						...alreadyInstalledFontFaces,
 					];
 					fontFamiliesToActivate.push( fontFamilyToInstall );
-				} else if ( isANewFontFamily ) {
-					// If the font family is new, delete it to avoid having font families without font faces.
+				}
+
+				// If it's a system font but was installed successfully, activate it.
+				if (
+					installedFontFamily &&
+					! fontFamilyToInstall?.fontFace?.length
+				) {
+					fontFamiliesToActivate.push( installedFontFamily );
+				}
+
+				// If the font family is new and is not a system font, delete it to avoid having font families without font faces.
+				if (
+					isANewFontFamily &&
+					fontFamilyToInstall?.fontFace?.length > 0 &&
+					sucessfullyInstalledFontFaces?.length === 0
+				) {
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
 
@@ -283,6 +297,14 @@ function FontLibraryProvider( { children } ) {
 					unsucessfullyInstalledFontFaces
 				);
 			}
+
+			installationErrors = installationErrors.reduce(
+				( unique, item ) =>
+					unique.includes( item.message )
+						? unique
+						: [ ...unique, item.message ],
+				[]
+			);
 
 			if ( fontFamiliesToActivate.length > 0 ) {
 				// Activate the font family (add the font family to the global styles).
@@ -300,18 +322,13 @@ function FontLibraryProvider( { children } ) {
 			}
 
 			if ( installationErrors.length > 0 ) {
-				throw new Error(
-					sprintf(
-						/* translators: %s: Specific error message returned from server. */
-						__( 'There were some errors installing fonts. %s' ),
-						installationErrors.reduce(
-							( errorMessageCollection, error ) => {
-								return `${ errorMessageCollection } ${ error.message }`;
-							},
-							''
-						)
-					)
+				const installError = new Error(
+					__( 'There was an error installing fonts.' )
 				);
+
+				installError.installationErrors = installationErrors;
+
+				throw installError;
 			}
 		} finally {
 			setIsInstalling( false );
@@ -408,15 +425,15 @@ function FontLibraryProvider( { children } ) {
 
 		const isFaceActivated = isFontActivated(
 			font.slug,
-			face.fontStyle,
-			face.fontWeight,
+			face?.fontStyle,
+			face?.fontWeight,
 			font.source
 		);
 
 		if ( isFaceActivated ) {
 			loadFontFaceInBrowser(
 				face,
-				getDisplaySrcFromFontFace( face.src ),
+				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
 		} else {

@@ -22,9 +22,9 @@ import {
 	useId,
 	useRef,
 	useState,
+	useMemo,
 	Children,
 	Fragment,
-	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -49,7 +49,7 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-function WithSeparators( { children } ) {
+function WithDropDownMenuSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
 		.map( ( child, i ) => (
@@ -102,7 +102,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			}
 			style={ { minWidth: '240px' } }
 		>
-			<WithSeparators>
+			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(
@@ -187,7 +187,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-			</WithSeparators>
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 } );

@@ -140,10 +140,40 @@ type AnchorProps = {
 };
 
 export type DeprecatedButtonProps = {
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isDefault?: boolean;
+	/**
+	 * Gives the button a link style.
+	 *
+	 * @deprecated Use the `'link'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isLink?: boolean;
+	/**
+	 * Gives the button a primary style.
+	 *
+	 * @deprecated Use the `'primary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isPrimary?: boolean;
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isSecondary?: boolean;
+	/**
+	 * Gives the button a text-based style.
+	 *
+	 * @deprecated Use the `'tertiary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isTertiary?: boolean;
 	isSmall?: boolean;
 };

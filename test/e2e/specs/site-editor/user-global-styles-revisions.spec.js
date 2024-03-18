@@ -212,7 +212,7 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

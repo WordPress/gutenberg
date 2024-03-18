@@ -346,24 +346,7 @@ class RCTAztecView: Aztec.TextView {
 
         super.deleteBackward()
         updatePlaceholderVisibility()
-    }
-
-    // MARK: - Dictation
-    
-    func removeUnicodeAndRestoreCursor(from textView: UITextView) {
-        // Capture current cursor position
-        let originalPosition = textView.offset(from: textView.beginningOfDocument, to: textView.selectedTextRange?.start ?? textView.beginningOfDocument)
-                
-        // Replace occurrences of the obj symbol ("\u{FFFC}")
-        textView.text = textView.text?.replacingOccurrences(of: "\u{FFFC}", with: "")
-        
-        // Detect if cursor is off-by-one and correct, if so
-        let newPositionOffset = originalPosition > 0 ? originalPosition - 1 : originalPosition
-        if let newPosition = textView.position(from: textView.beginningOfDocument, offset: newPositionOffset) {
-            // Move the cursor to the correct, new position following dictation
-            textView.selectedTextRange = textView.textRange(from: newPosition, to: newPosition)
-        }
-    }
+    }    
 
     // MARK: - Custom Edit Intercepts
 
@@ -784,13 +767,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        // Workaround for RN dictation bug that adds obj symbol.
-        // Ref: https://github.com/facebook/react-native/issues/36521
-        // TODO: Remove workaround when RN issue is fixed
-        if textView.text?.contains("\u{FFFC}") == true {
-            removeUnicodeAndRestoreCursor(from: textView)
-        }
-
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.
