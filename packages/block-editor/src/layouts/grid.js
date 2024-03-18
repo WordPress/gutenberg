@@ -120,13 +120,11 @@ export default {
 		if ( columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
-				// 'grid-auto-rows: minmax(8px, auto)'
 			);
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
 				'container-type: inline-size'
-				// 'grid-auto-rows: minmax(8px, auto)'
 			);
 		}
 
