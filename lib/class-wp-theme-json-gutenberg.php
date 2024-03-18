@@ -2681,6 +2681,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Outputs the CSS for layout rules on the root.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Use `ROOT_CSS_PROPERTIES_SELECTOR` for CSS custom properties.
 	 *
 	 * @param string $selector The root node selector.
 	 * @param array  $block_metadata The metadata for the root block.
@@ -2712,7 +2713,7 @@ class WP_Theme_JSON_Gutenberg {
 		* user-generated values take precedence in the CSS cascade.
 		* @link https://github.com/WordPress/gutenberg/issues/36147.
 		*/
-		$css .= static::ROOT_BLOCK_SELECTOR . ' { margin: 0; }';
+		$css .= $selector . ' { margin: 0; }';
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
