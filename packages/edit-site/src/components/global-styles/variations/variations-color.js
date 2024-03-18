@@ -16,9 +16,6 @@ import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hook
 export default function ColorVariations() {
 	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
 		property: 'color',
-		filter: ( variation ) =>
-			variation?.settings?.color &&
-			Object.keys( variation?.settings?.color ).length,
 	} );
 
 	if ( ! colorVariations?.length ) {

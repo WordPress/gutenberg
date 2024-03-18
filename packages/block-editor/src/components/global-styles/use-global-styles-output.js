@@ -409,7 +409,9 @@ export function getStylesDeclarations(
 		let ruleValue = rule.value;
 		if ( typeof ruleValue !== 'string' && ruleValue?.ref ) {
 			const refPath = ruleValue.ref.split( '.' );
-			ruleValue = getValueFromObjectPath( tree, refPath );
+			ruleValue = compileStyleValue(
+				getValueFromObjectPath( tree, refPath )
+			);
 			// Presence of another ref indicates a reference to another dynamic value.
 			// Pointing to another dynamic value is not supported.
 			if ( ! ruleValue || ruleValue?.ref ) {

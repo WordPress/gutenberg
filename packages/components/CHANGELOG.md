@@ -1,11 +1,16 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
--	`Drowdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+-	`Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+-	`Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
 
 ### Enhancements
 
 -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+
+### Internal
+
+-   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
 
 ## 27.1.0 (2024-03-06)
 

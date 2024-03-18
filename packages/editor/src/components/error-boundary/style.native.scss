@@ -32,7 +32,7 @@
 }
 
 .error-boundary__icon-container--dark {
-	background-color: $gray-20;
+	background-color: rgba(235, 235, 245, 0.3);
 }
 
 .error-boundary__icon {
@@ -64,7 +64,7 @@
 }
 
 .error-boundary__message--dark {
-	color: $white;
+	color: rgba(235, 235, 245, 0.6);
 }
 
 .error-boundary__actions-container {
@@ -82,7 +82,7 @@
 }
 
 .copy-button__container--dark {
-	background-color: $gray-20;
+	background-color: $white;
 }
 
 .copy-button__container--secondary {
@@ -91,6 +91,7 @@
 }
 
 .copy-button__container--secondary-dark {
+	border-color: rgba(255, 255, 255, 0.3);
 	background-color: $black;
 }
 

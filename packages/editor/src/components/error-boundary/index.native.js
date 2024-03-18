@@ -147,7 +147,7 @@ class ErrorBoundary extends Component {
 						</View>
 						<Text style={ titleStyle }>
 							{ __(
-								'The editor has encountered an unexpected error.'
+								'The editor has encountered an unexpected error'
 							) }
 						</Text>
 						<Text style={ messageStyle }>
