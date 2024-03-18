@@ -28,10 +28,9 @@ export default function useLayoutAreas() {
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
 
-	const isListLayout = isCustom !== 'true' && layout === 'list';
-
 	// Regular page
 	if ( path === '/page' ) {
+		const isListLayout = layout === 'list' || ! layout;
 		return {
 			areas: {
 				content: <PagePages />,
@@ -64,6 +63,7 @@ export default function useLayoutAreas() {
 
 	// Templates
 	if ( path === '/wp_template' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			areas: {
 				content: (
@@ -88,6 +88,7 @@ export default function useLayoutAreas() {
 
 	// Template parts
 	if ( path === '/wp_template_part/all' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			areas: {
 				content: (
