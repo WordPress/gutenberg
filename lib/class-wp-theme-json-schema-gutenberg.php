@@ -95,9 +95,9 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	}
 
 	/**
-	 * Sets settings.typography.defaultFontSizes to false as it drives
-	 * PRESETS_METADATA prevent_override in class-wp-theme-json.php which was
-	 * hardcoded to false in v2 but defaults to true in v3.
+	 * Migrates from v2 to v3.
+	 *
+	 * - Sets settings.typography.defaultFontSizes to false.
 	 *
 	 * @since 6.5.0
 	 *
@@ -109,7 +109,25 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		// Copy everything.
 		$new = $old;
 
-		// Overwrite the things that changed.
+		// Set the new version.
+		$new['version'] = 3;
+
+		/*
+		 * Remaining changes do not need to be applied to the custom origin,
+		 * as they should take on the value of the theme origin.
+		 */
+		if (
+			isset( $new['isGlobalStylesUserThemeJSON'] ) &&
+			true === $new['isGlobalStylesUserThemeJSON']
+		) {
+			return $new;
+		}
+
+		/*
+		 * Even though defaultFontSizes is a new setting, we need to migrate
+		 * it to false as it controls the PRESETS_METADATA prevent_override
+		 * which controls how CSS is generated and was hardcoded to false.
+		 */
 		if ( ! isset( $new['settings'] ) ) {
 			$new['settings'] = array();
 		}
@@ -117,9 +135,6 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			$new['settings']['typography'] = array();
 		}
 		$new['settings']['typography']['defaultFontSizes'] = false;
-
-		// Set the new version.
-		$new['version'] = 3;
 
 		return $new;
 	}
