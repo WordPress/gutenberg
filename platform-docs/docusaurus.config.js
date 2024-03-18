@@ -37,7 +37,7 @@ const config = {
 				docs: {
 					sidebarPath: require.resolve( './sidebars.js' ),
 					editUrl:
-						'https://github.com/WordPress/gutenberg/tree/main/platform-docs/',
+						'https://github.com/WordPress/gutenberg/tree/trunk/platform-docs/',
 				},
 				theme: {
 					customCss: require.resolve( './src/css/custom.css' ),
