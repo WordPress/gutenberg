@@ -52,7 +52,6 @@ export default function ChildLayoutControl( {
 		supported,
 		onChangeAlignment,
 	} = alignments || {};
-
 	/**
 	 * If supported alignments is true, it means that the block supports
 	 * both wide and full alignments. If false, it supports neither.
@@ -76,6 +75,8 @@ export default function ChildLayoutControl( {
 		justifyContent = 'left',
 		verticalAlignment = 'center',
 		alignWidth: parentAlignment = 'none',
+		contentSize,
+		wideSize,
 	} = parentLayout ?? {};
 	const parentLayoutType = parentType || defaultParentType;
 
@@ -137,12 +138,15 @@ export default function ChildLayoutControl( {
 	const widthOptions = [];
 
 	if ( parentLayoutType === 'constrained' ) {
-		widthOptions.push( {
-			key: 'content',
-			value: 'content',
-			name: __( 'Default' ),
-		} );
+		if ( contentSize ) {
+			widthOptions.push( {
+				key: 'content',
+				value: 'content',
+				name: __( 'Default' ),
+			} );
+		}
 		if (
+			wideSize &&
 			supportedAlignments?.includes( 'wide' ) &&
 			( parentAlignment === 'wide' || parentAlignment === 'full' )
 		) {
@@ -152,9 +156,11 @@ export default function ChildLayoutControl( {
 				name: __( 'Wide' ),
 			} );
 		}
+		// If no contentSize is defined, fill should be the default.
 		if (
-			supportedAlignments?.includes( 'full' ) &&
-			parentAlignment === 'full'
+			( supportedAlignments?.includes( 'full' ) &&
+				parentAlignment === 'full' ) ||
+			! contentSize
 		) {
 			widthOptions.push( {
 				key: 'fill',
@@ -274,6 +280,7 @@ export default function ChildLayoutControl( {
 			) {
 				selectedValue = 'fill';
 			} else if (
+				wideSize &&
 				currentAlignment === 'wide' &&
 				parentLayoutType === 'constrained'
 			) {
