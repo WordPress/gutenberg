@@ -2728,10 +2728,8 @@ class WP_Theme_JSON_Gutenberg {
 		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-		$block_gap_value       = $this->theme_json['styles']['spacing']['blockGap'] ?? '0.5em';
-		$has_block_gap_support = isset( $this->theme_json['settings']['spacing']['blockGap'] );
-		if ( $has_block_gap_support ) {
+		// Block gap styles will be output unless explicitly set to `null`. See static::PROTECTED_PROPERTIES.
+		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
 			$css            .= ':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
