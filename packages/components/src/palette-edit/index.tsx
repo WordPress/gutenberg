@@ -79,8 +79,8 @@ function NameInput( { value, onChange, label }: NameInputProps ) {
  * It expects slugs to be in the format: slugPrefix + color- + number.
  * It then sets the id component of the new name based on the incremented id of the highest existing slug id.
  *
- * @param  elements   An array of color palette items.
- * @param  slugPrefix The slug prefix used to match the element slug.
+ * @param elements   An array of color palette items.
+ * @param slugPrefix The slug prefix used to match the element slug.
  *
  * @return A name and slug for the new palette item.
  */
