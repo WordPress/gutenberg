@@ -425,15 +425,15 @@ function FontLibraryProvider( { children } ) {
 
 		const isFaceActivated = isFontActivated(
 			font.slug,
-			face.fontStyle,
-			face.fontWeight,
+			face?.fontStyle,
+			face?.fontWeight,
 			font.source
 		);
 
 		if ( isFaceActivated ) {
 			loadFontFaceInBrowser(
 				face,
-				getDisplaySrcFromFontFace( face.src ),
+				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
 		} else {
