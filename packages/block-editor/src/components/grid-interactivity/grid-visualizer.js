@@ -15,7 +15,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS } from './utils';
+import { getComputedCSS, range, Rect } from './utils';
 import { parseDropEvent } from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 
@@ -57,15 +57,15 @@ function getGridInfo( blockElement ) {
 	};
 }
 
-function range( start, length ) {
-	return Array.from( { length }, ( _, i ) => start + i );
-}
-
 function GridVisualizerGrid( { clientId, blockElement } ) {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( blockElement )
 	);
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
+	const [ highlightedRect, setHighlightedRect ] = useState( null );
+
+	const { getBlockAttributes } = useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const observers = [];
@@ -114,8 +114,73 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 					range( 1, gridInfo.numColumns ).map( ( column ) => (
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
-							column={ column }
-							row={ row }
+							isHighlighted={
+								highlightedRect?.contains(
+									column - 1,
+									row - 1
+								) ?? false
+							}
+							validateDrag={ ( srcClientId ) => {
+								const attributes =
+									getBlockAttributes( srcClientId );
+								const columnSpan =
+									attributes.style?.layout?.columnSpan ?? 1;
+								const rowSpan =
+									attributes.style?.layout?.rowSpan ?? 1;
+								return new Rect( {
+									width: gridInfo.numColumns,
+									height: gridInfo.numRows,
+								} ).containsRect(
+									new Rect( {
+										x: column - 1,
+										y: row - 1,
+										width: columnSpan,
+										height: rowSpan,
+									} )
+								);
+							} }
+							onDragEnter={ ( srcClientId ) => {
+								const attributes =
+									getBlockAttributes( srcClientId );
+								const columnSpan =
+									attributes.style?.layout?.columnSpan ?? 1;
+								const rowSpan =
+									attributes.style?.layout?.rowSpan ?? 1;
+								setHighlightedRect(
+									new Rect( {
+										x: column - 1,
+										y: row - 1,
+										width: columnSpan,
+										height: rowSpan,
+									} )
+								);
+							} }
+							onDragLeave={ () => {
+								// onDragEnter can be called before onDragLeave if the user moves
+								// their mouse quickly, so only clear the highlight if it was set
+								// by this cell.
+								setHighlightedRect( ( prevHighlightedRect ) =>
+									prevHighlightedRect?.x === column - 1 &&
+									prevHighlightedRect?.y === row - 1
+										? null
+										: prevHighlightedRect
+								);
+							} }
+							onDrop={ ( srcClientId ) => {
+								const attributes =
+									getBlockAttributes( srcClientId );
+								updateBlockAttributes( srcClientId, {
+									style: {
+										...attributes.style,
+										layout: {
+											...attributes.style?.layout,
+											columnStart: column,
+											rowStart: row,
+										},
+									},
+								} );
+								setHighlightedRect( null );
+							} }
 						/>
 					) )
 				) }
@@ -124,40 +189,34 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	);
 }
 
-function GridVisualizerCell( { column, row } ) {
-	const [ isDraggingOver, setIsDraggingOver ] = useState( false );
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
+function GridVisualizerCell( {
+	isHighlighted,
+	validateDrag,
+	onDragEnter,
+	onDragLeave,
+	onDrop,
+} ) {
 	const ref = useDropZone( {
-		onDragEnter() {
-			setIsDraggingOver( true );
-		},
-		onDragLeave() {
-			setIsDraggingOver( false );
-		},
-		onDrop( event ) {
-			setIsDraggingOver( false );
+		onDragEnter( event ) {
 			const {
 				srcClientIds: [ srcClientId ],
 			} = parseDropEvent( event );
-			if ( ! srcClientId ) {
-				return;
+			if ( validateDrag( srcClientId ) ) {
+				onDragEnter( srcClientId );
 			}
-			const attributes = getBlockAttributes( srcClientId );
-			updateBlockAttributes( srcClientId, {
-				style: {
-					...attributes.style,
-					layout: {
-						...attributes.style?.layout,
-						columnStart: column,
-						rowStart: row,
-					},
-				},
-			} );
+		},
+		onDragLeave() {
+			onDragLeave();
+		},
+		onDrop( event ) {
+			const {
+				srcClientIds: [ srcClientId ],
+			} = parseDropEvent( event );
+			if ( validateDrag( srcClientId ) ) {
+				onDrop( srcClientId );
+			}
 		},
 	} );
-
 	return (
 		<div className="block-editor-grid-visualizer__cell">
 			<div
@@ -165,7 +224,7 @@ function GridVisualizerCell( { column, row } ) {
 				className={ classnames(
 					'block-editor-grid-visualizer__drop-zone',
 					{
-						'is-dragging-over': isDraggingOver,
+						'is-highlighted': isHighlighted,
 					}
 				) }
 			/>

@@ -34,7 +34,7 @@
 	min-width: $grid-unit-10;
 	min-height: $grid-unit-10;
 
-	&.is-dragging-over {
+	&.is-highlighted {
 		background: var(--wp-admin-theme-color);
 	}
 }
