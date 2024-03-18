@@ -583,7 +583,7 @@ describe( 'Button', () => {
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'should warn when the isSmall prop is passed', () => {
+		it( 'should not break when the legacy isSmall prop is passed', () => {
 			render( <Button isSmall /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
 			expect( console ).toHaveWarned();
