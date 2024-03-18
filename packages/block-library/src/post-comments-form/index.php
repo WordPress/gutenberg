@@ -31,7 +31,13 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
 		$classes[] = 'has-link-color';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class'         => implode( ' ', $classes ),
+			'data-wp-fill'  => 'context.formSlot',
+			'data-wp-watch' => 'callbacks.scrollOnReply',
+		)
+	);
 
 	add_filter( 'comment_form_defaults', 'post_comments_form_block_form_defaults' );
 
@@ -48,9 +54,154 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	// of the 'Reply' link that the user clicked by Core's `comment-reply.js` script.
 	$form = str_replace( 'class="comment-respond"', $wrapper_attributes, $form );
 
-	// Enqueue the comment-reply script.
-	wp_enqueue_script( 'comment-reply' );
+	$enhanced_submission = $block->context['enhancedSubmission'];
+	$enhanced_form       = false;
 
+	if ( $enhanced_submission ) {
+		$p = new WP_HTML_Tag_Processor( $form );
+
+		// Move to the first tag and add a bookmark. This is supposed to be OK considering
+		// that the first element is not the form element.
+		$p->next_tag();
+		$p->set_bookmark( 'first-tag' );
+
+		// Try to find the form element. This is not optional; if it fails, we don't
+		// enhance the submission.
+		if ( $p->next_tag(
+			array(
+				'tag_name' => 'FORM',
+				'id'       => 'commentform',
+			)
+		) ) {
+			// Add the necessary directives.
+			$p->set_attribute( 'data-wp-on--submit', 'actions.submit' );
+
+			while ( $p->next_tag() ) {
+				$tag  = $p->get_tag();
+				$name = $p->get_attribute( 'name' );
+				$type = $p->get_attribute( 'type' );
+
+				// Try to find the different input fields and save their values on the
+				// context so it can be restored when the form is moved around. This is
+				// optional.
+				if ( 'TEXTAREA' === $tag && 'comment' === $name ) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--change', 'actions.updateField' );
+				}
+
+				if (
+					'INPUT' === $tag &&
+					in_array( $name, array( 'author', 'email', 'url' ), true )
+				) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
+					$p->set_attribute( 'data-wp-on--input', 'actions.updateField' );
+				}
+
+				if ( 'INPUT' === $tag && 'comment_parent' === $name ) {
+					$p->set_attribute( 'data-wp-bind--value', 'context.fields.' . $name );
+				}
+
+				// Try to find the submit button and add directives to change its value
+				// on submission. This is optional.
+				if ( 'INPUT' === $tag && 'submit' === $type ) {
+					// Add the necessary directives.
+					$p->set_attribute( 'data-wp-bind--value', 'state.submitButtonText' );
+					$p->set_attribute( 'data-wp-bind--disabled', 'context.isSubmitting' );
+
+					// Add translated strings to the state.
+					$submit_text = $p->get_attribute( 'value' );
+					wp_store(
+						array(
+							'core/comments' => array(
+								'submitText'  => $submit_text,
+								'loadingText' => __( 'Submitting…' ),
+							),
+						)
+					);
+				}
+			}
+
+			// Start again to add directives to the reply title elements.
+			$p->seek( 'first-tag' );
+			if ( $p->next_tag( array( 'class_name' => 'comment-reply-title' ) ) ) {
+				$p->set_attribute( 'data-wp-watch', 'actions.updateReplyTitle' );
+			}
+
+			while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
+				if ( 'cancel-comment-reply-link' === $p->get_attribute( 'id' ) ) {
+					$p->set_attribute( 'data-wp-style--display', 'state.displayCancelReply' );
+					$p->set_attribute( 'data-wp-on--click', 'actions.cancelReply' );
+					break;
+				}
+			}
+
+			// Mark the block as interactive.
+			$block->block_type->supports['interactivity'] = true;
+
+			// Add a div to show error messages below the form and another div to
+			// announce the spoken notices.
+			wp_store(
+				array(
+					'core/comments' => array(
+						'submittedNotice' => __( 'Comment submitted.' ),
+					),
+				)
+			);
+			$enhanced_form     = $p->get_updated_html();
+			$last_div_position = strripos( $enhanced_form, '</form>' );
+			$enhanced_form     = substr_replace(
+				$enhanced_form,
+				'<div
+					class="wp-block-post-comments-form__error"
+					data-wp-style--display="state.showError"
+					data-wp-watch="callbacks.scrollToError"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
+						<path d="M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"></path>
+					</svg>
+					<span
+						data-wp-text="state.error"
+						aria-live="polite"
+					></span>
+				</div>
+				<div
+					style="position:absolute;clip:rect(0,0,0,0);width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;border:0;"
+					aria-live="polite"
+					data-wp-text="context.notice"
+				></div>
+				</form>',
+				$last_div_position,
+				0
+			);
+		}
+	}
+
+	$is_gutenberg_plugin = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$view_asset          = 'wp-block-post-comments-form-view';
+	$script_handles      = $block->block_type->view_script_handles;
+
+	if ( $is_gutenberg_plugin ) {
+		gutenberg_enqueue_module( '@wordpress/block-library/post-comments-form' );
+		// Remove the view script because we are using the module.
+		$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+	} elseif ( ! wp_script_is( $view_asset ) ) {
+		// If the script is not needed, and it is still in the `view_script_handles`, remove it.
+		if ( ! $enhanced_submission && in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_diff( $script_handles, array( $view_asset ) );
+		}
+		// If the script is needed, but it was previously removed, add it again.
+		if ( $enhanced_submission && ! in_array( $view_asset, $script_handles, true ) ) {
+			$block->block_type->view_script_handles = array_merge( $script_handles, array( $view_asset ) );
+		}
+	}
+
+	if ( $enhanced_form ) {
+		return $enhanced_form;
+	}
+
+	// If something failed or there is no enhanced submission, enqueue the regular
+	// comment-reply script and return the HTML without the directives.
+	wp_enqueue_script( 'comment-reply' );
 	return $form;
 }
 
@@ -66,6 +217,15 @@ function register_block_core_post_comments_form() {
 			'render_callback' => 'render_block_core_post_comments_form',
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/post-comments-form',
+			'/wp-content/plugins/gutenberg/build/interactivity/comments.min.js',
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_post_comments_form' );
 

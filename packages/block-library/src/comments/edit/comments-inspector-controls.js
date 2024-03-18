@@ -1,12 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl } from '@wordpress/components';
+import {
+	SelectControl,
+	PanelBody,
+	ToggleControl,
+	Notice,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
+import { useEffect, useRef } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 
 export default function CommentsInspectorControls( {
-	attributes: { tagName },
+	attributes: { tagName, enhancedSubmission },
 	setAttributes,
 } ) {
 	const htmlElementMessages = {
@@ -17,8 +24,21 @@ export default function CommentsInspectorControls( {
 			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
 		),
 	};
+
+	const enhancedSubmissionNotice = __(
+		'Enhanced submission might cause interactive blocks within the Comment Template to stop working. Disable it if you experience any issues.'
+	);
+
+	const isFirstRender = useRef( true ); // Don't speak on first render.
+	useEffect( () => {
+		if ( ! isFirstRender.current && enhancedSubmission ) {
+			speak( enhancedSubmissionNotice );
+		}
+		isFirstRender.current = false;
+	}, [ enhancedSubmission, enhancedSubmissionNotice ] );
+
 	return (
-		<InspectorControls>
+		<>
 			<InspectorControls group="advanced">
 				<SelectControl
 					__nextHasNoMarginBottom
@@ -36,6 +56,36 @@ export default function CommentsInspectorControls( {
 					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorControls>
-		</InspectorControls>
+			<InspectorControls>
+				<PanelBody
+					title={ __( 'User Experience' ) }
+					initialOpen={ false }
+				>
+					<ToggleControl
+						label={ __( 'Enhanced form submission' ) }
+						help={ __(
+							'Submitted comments are added without refreshing the page.'
+						) }
+						checked={ !! enhancedSubmission }
+						onChange={ ( value ) =>
+							setAttributes( {
+								enhancedSubmission: !! value,
+							} )
+						}
+					/>
+					{ enhancedSubmission && (
+						<div>
+							<Notice
+								spokenMessage={ null }
+								status="warning"
+								isDismissible={ false }
+							>
+								{ enhancedSubmissionNotice }
+							</Notice>
+						</div>
+					) }
+				</PanelBody>
+			</InspectorControls>
+		</>
 	);
 }

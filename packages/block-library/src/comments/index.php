@@ -27,6 +27,7 @@
  */
 function render_block_core_comments( $attributes, $content, $block ) {
 	global $post;
+	static $id = 0;
 
 	$post_id = $block->context['postId'];
 	if ( ! isset( $post_id ) ) {
@@ -41,7 +42,31 @@ function render_block_core_comments( $attributes, $content, $block ) {
 	// If this isn't the legacy block, we need to render the static version of this block.
 	$is_legacy = 'core/post-comments' === $block->name || ! empty( $attributes['legacy'] );
 	if ( ! $is_legacy ) {
-		return $block->render( array( 'dynamic' => false ) );
+		$output = $block->render( array( 'dynamic' => false ) );
+		if ( $attributes['enhancedSubmission'] ) {
+			$p = new WP_HTML_Tag_Processor( $output );
+			if ( $p->next_tag( array( 'class_name' => 'wp-block-comments' ) ) ) {
+				// Add the necessary directives.
+				$p->set_attribute( 'data-wp-interactive', '{ "namespace": "core/comments" }' );
+				$p->set_attribute( 'data-wp-navigation-id', 'comments-' . ++$id );
+				$p->set_attribute( 'data-wp-slot-provider', true );
+				$p->set_attribute(
+					'data-wp-context',
+					wp_json_encode(
+						array(
+							'fields' => (object) array(
+								'comment_parent' => 0,
+							),
+						)
+					)
+				);
+				$output = $p->get_updated_html();
+
+				// Mark the block as interactive.
+				$block->block_type->supports['interactivity'] = true;
+			}
+		}
+		return $output;
 	}
 
 	$post_before = $post;
@@ -98,6 +123,15 @@ function register_block_core_comments() {
 			'skip_inner_blocks' => true,
 		)
 	);
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		gutenberg_register_module(
+			'@wordpress/block-library/comments',
+			gutenberg_url( '/build/interactivity/comments.min.js' ),
+			array( '@wordpress/interactivity' ),
+			defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
+		);
+	}
 }
 add_action( 'init', 'register_block_core_comments' );
 
