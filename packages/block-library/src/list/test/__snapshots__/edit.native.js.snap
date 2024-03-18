@@ -2,7 +2,7 @@
 
 exports[`List block adds one item to the list 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>First list item</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
@@ -10,9 +10,9 @@ exports[`List block adds one item to the list 1`] = `
 
 exports[`List block changes the indentation level 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Item 1<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Item 2</li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list --></li>
@@ -22,7 +22,7 @@ exports[`List block changes the indentation level 1`] = `
 
 exports[`List block changes to ordered list 1`] = `
 "<!-- wp:list {"ordered":true} -->
-<ol><!-- wp:list-item -->
+<ol class="wp-block-list"><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
 
@@ -38,7 +38,7 @@ exports[`List block changes to ordered list 1`] = `
 
 exports[`List block changes to reverse ordered list 1`] = `
 "<!-- wp:list {"ordered":true,"reversed":true} -->
-<ol reversed><!-- wp:list-item -->
+<ol reversed class="wp-block-list"><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
 
@@ -54,7 +54,7 @@ exports[`List block changes to reverse ordered list 1`] = `
 
 exports[`List block inserts block 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->"
@@ -62,7 +62,7 @@ exports[`List block inserts block 1`] = `
 
 exports[`List block removes the indentation level 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
 
@@ -74,7 +74,7 @@ exports[`List block removes the indentation level 1`] = `
 
 exports[`List block sets a start value to an ordered list 1`] = `
 "<!-- wp:list {"ordered":true,"start":25} -->
-<ol start="25"><!-- wp:list-item -->
+<ol start="25" class="wp-block-list"><!-- wp:list-item -->
 <li>Item 1</li>
 <!-- /wp:list-item -->
 
@@ -90,19 +90,19 @@ exports[`List block sets a start value to an ordered list 1`] = `
 
 exports[`List block shows different indentation levels 1`] = `
 "<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>List item 1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li>List item 2<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>List item nested 1</li>
 <!-- /wp:list-item -->
 
 <!-- wp:list-item -->
 <li>List item nested 2<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>Extra item 1</li>
 <!-- /wp:list-item -->
 
