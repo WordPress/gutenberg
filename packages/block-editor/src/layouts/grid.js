@@ -68,7 +68,6 @@ export default {
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
-		clientId,
 	} ) {
 		return (
 			<>
@@ -87,14 +86,14 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
-				{ window.__experimentalEnableGridInteractivity && (
-					<GridVisualizer clientId={ clientId } />
-				) }
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls() {
-		return null;
+	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
+		if ( ! window.__experimentalEnableGridInteractivity ) {
+			return null;
+		}
+		return <GridVisualizer clientId={ clientId } />;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
