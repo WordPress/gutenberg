@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -82,6 +82,9 @@ export default function Editor( { isLoading } ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const { __unstableSetEditorMode: setBlockEditorMode } =
+		useDispatch( blockEditorStore );
 
 	const {
 		context,
@@ -179,6 +182,10 @@ export default function Editor( { isLoading } ) {
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
 			( ! postWithTemplate && !! editedPost ) );
+
+	if ( ! shouldShowInserter && blockEditorMode === 'zoom-out' ) {
+		setBlockEditorMode( 'edit' );
+	}
 
 	return (
 		<>
