@@ -110,10 +110,10 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		$new = $old;
 
 		// Overwrite the things that changed.
-		if ( ! isset( $old['settings'] ) ) {
+		if ( ! isset( $new['settings'] ) ) {
 			$new['settings'] = array();
 		}
-		if ( ! isset( $old['settings']['typography'] ) ) {
+		if ( ! isset( $new['settings']['typography'] ) ) {
 			$new['settings']['typography'] = array();
 		}
 		$new['settings']['typography']['defaultFontSizes'] = false;
