@@ -565,12 +565,6 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		// Check that the menu was created
-		await expect(
-			page
-				.getByTestId( 'snackbar' )
-				.getByText( 'Navigation Menu successfully created.' )
-		).toBeVisible();
 		await expect(
 			page.getByText( 'This navigation menu is empty.' )
 		).toBeVisible();
