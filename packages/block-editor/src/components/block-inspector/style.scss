@@ -36,6 +36,25 @@
 	}
 }
 
+.show-icon-labels {
+	.block-editor-block-inspector {
+		.components-button.has-icon,
+		[class*="isIconStyles"] {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+}
+
 .block-editor-block-inspector__no-blocks,
 .block-editor-block-inspector__no-block-tools {
 	display: block;
