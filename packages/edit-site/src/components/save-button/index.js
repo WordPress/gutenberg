@@ -1,6 +1,8 @@
 /**
  * WordPress dependencies
  */
+import { useMemo, useCallback } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -56,6 +58,7 @@ export default function SaveButton( {
 					: undefined,
 			};
 		}, [] );
+
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 
 	const activateSaveEnabled = isPreviewingTheme() || isDirty;
@@ -95,7 +98,27 @@ export default function SaveButton( {
 		}
 		return __( 'Save' );
 	};
-	const label = getLabel();
+
+	/**
+	 * We focus on adding the customization to the SaveButton's `onClick` and `label` for now.
+	 * We will provide the customization to the other entry points (e.g., SavePanel, SaveHub) in the future if needed.
+	 * @see https://github.com/WordPress/gutenberg/pull/56807
+	 */
+	const onClick = useCallback( () => {
+		const callback = applyFilters( 'edit-site.SaveButton.onClick', () =>
+			setIsSaveViewOpened( true )
+		);
+		callback();
+	}, [ setIsSaveViewOpened ] );
+	const label = useMemo( () => {
+		return applyFilters( 'edit-site.SaveButton.label', getLabel(), {
+			isSaving,
+			disabled,
+			isPreviewingTheme,
+			defaultLabel,
+			isDirty,
+		} );
+	}, [ isSaving, disabled, defaultLabel, isDirty, getLabel ] );
 
 	return (
 		<Button
@@ -104,7 +127,7 @@ export default function SaveButton( {
 			aria-disabled={ disabled }
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
-			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
+			onClick={ disabled ? undefined : onClick }
 			label={ label }
 			/*
 			 * We want the tooltip to show the keyboard shortcut only when the
