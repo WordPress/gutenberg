@@ -18,7 +18,7 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 		return null;
 	}
 
-	const isPinned = !! layout?.columnStart && !! layout?.rowStart;
+	const isPinned = !! layout?.columnStart || !! layout?.rowStart;
 
 	function unpinBlock() {
 		onChange( {
