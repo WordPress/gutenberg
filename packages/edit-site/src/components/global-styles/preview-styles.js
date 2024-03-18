@@ -13,7 +13,7 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { useStylesPreviewColors } from './hooks';
-import PreviewTypography from './preview-typography';
+import TypographyExample from './typography-example';
 import HighlightedColors from './highlighted-colors';
 import PreviewIframe from './preview-iframe';
 
@@ -89,7 +89,7 @@ const PreviewStyles = ( { label, isFocused, withHoverView, variation } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<PreviewTypography
+						<TypographyExample
 							fontSize={ 65 * ratio }
 							variation={ variation }
 						/>

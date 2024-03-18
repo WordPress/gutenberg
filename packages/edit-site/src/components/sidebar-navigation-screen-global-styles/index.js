@@ -5,7 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalNavigatorButton as NavigatorButton } from '@wordpress/components';
+import {
+	__experimentalNavigatorButton as NavigatorButton,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
@@ -24,6 +27,10 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import StyleBook from '../style-book';
 import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-global-styles-revisions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import ColorVariations from '../global-styles/variations/variations-color';
+import TypographyVariations from '../global-styles/variations/variations-typography';
+import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { useUniqueTypographyVariations } from '../global-styles/hooks';
 
 const noop = () => {};
 
@@ -69,6 +76,12 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+	} );
+
+	const typographyVariations = useUniqueTypographyVariations();
+
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
 	// the block editor store's `__internalIsInitialized` is true before
@@ -80,7 +93,28 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			onChange={ noop }
 			onInput={ noop }
 		>
-			<StyleVariationsContainer />
+			<VStack
+				spacing={ 10 }
+				className="edit-site-global-styles-variation-container"
+			>
+				<StyleVariationsContainer />
+				{ colorVariations?.length && (
+					<div>
+						<h3 className="edit-site-global-styles-variation-title">
+							{ __( 'Colors' ) }
+						</h3>
+						<ColorVariations />
+					</div>
+				) }
+				{ typographyVariations?.length && (
+					<div>
+						<h3 className="edit-site-global-styles-variation-title">
+							{ __( 'Typography' ) }
+						</h3>
+						<TypographyVariations />
+					</div>
+				) }
+			</VStack>
 		</BlockEditorProvider>
 	);
 }
