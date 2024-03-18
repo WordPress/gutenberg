@@ -284,6 +284,13 @@ if ( ! property_exists( 'WP_Block_Type', 'view_style_handles' ) ) {
 
 	add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_styles', 10, 3 );
 
+
+	/**
+	 * Registers a REST field for block types to provide view styles.
+	 *
+	 * Adds the `view_style_handles` field to block type objects in the REST API, which
+	 * lists the style handles associated with the block's viewStyle key.
+	 */
 	function gutenberg_register_view_style_rest_field() {
 		register_rest_field(
 			'block-type',
@@ -307,12 +314,12 @@ if ( ! property_exists( 'WP_Block_Type', 'view_style_handles' ) ) {
 	 * Required for core versions < 6.5, since a custom version of generate_block_asset_handle has to be used
 	 * that supports the viewStyle property and correctly creates the handle
 	 *
-	* @param array  $metadata   Block metadata.
-	* @param int    $index      Optional. Index of the style to register when multiple items passed.
-	*                           Default 0.
-	* @return string|false Style handle provided directly or created through
-	*                      style's registration, or false on failure.
-	*/
+	 * @param array  $metadata   Block metadata.
+	 * @param int    $index      Optional. Index of the style to register when multiple items passed.
+	 *                           Default 0.
+	 * @return string|false Style handle provided directly or created through
+	 *                      style's registration, or false on failure.
+	 */
 	function gutenberg_register_block_view_style_handle( $metadata, $index = 0 ) {
 		$style_handle = $metadata['viewStyle'];
 		if ( is_array( $style_handle ) ) {
