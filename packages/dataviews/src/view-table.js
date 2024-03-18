@@ -259,24 +259,28 @@ function TableRow( {
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 			onClick={ () => {
-				if ( ! isSelected ) {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId === id || selection.includes( itemId )
-							);
-						} )
-					);
-				} else {
-					onSelectionChange(
-						data.filter( ( _item ) => {
-							const itemId = getItemId?.( _item );
-							return (
-								itemId !== id && selection.includes( itemId )
-							);
-						} )
-					);
+				if ( document.getSelection().type !== 'Range' ) {
+					if ( ! isSelected ) {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId === id ||
+									selection.includes( itemId )
+								);
+							} )
+						);
+					} else {
+						onSelectionChange(
+							data.filter( ( _item ) => {
+								const itemId = getItemId?.( _item );
+								return (
+									itemId !== id &&
+									selection.includes( itemId )
+								);
+							} )
+						);
+					}
 				}
 			} }
 		>
