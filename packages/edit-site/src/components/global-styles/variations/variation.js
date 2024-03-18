@@ -25,6 +25,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 
 const PATHS_TO_AVOID_OVERWRITING = [
 	[ 'settings', 'typography', 'fontFamilies', 'custom' ],
+	[ 'settings', 'color', 'palette', 'custom' ],
 ];
 
 export default function Variation( { variation, children } ) {
