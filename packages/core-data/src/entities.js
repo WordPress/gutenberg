@@ -39,6 +39,8 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
 		plural: '__unstableBases',
 		syncConfig: {
 			fetch: async () => {
@@ -64,6 +66,8 @@ export const rootEntitiesConfig = [
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
 		plural: 'sites',
 		getTitle: ( record ) => {
 			return record?.title ?? __( 'Site Title' );
@@ -406,7 +410,7 @@ async function loadTaxonomyEntities() {
 }
 
 /**
- * Returns the entity's getter method name given its kind and name.
+ * Returns the entity's getter method name given its kind and name or plural name.
  *
  * @example
  * ```js
@@ -418,7 +422,7 @@ async function loadTaxonomyEntities() {
  * ```
  *
  * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
+ * @param {string} name   Entity name or plural name.
  * @param {string} prefix Function prefix.
  *
  * @return {string} Method name
