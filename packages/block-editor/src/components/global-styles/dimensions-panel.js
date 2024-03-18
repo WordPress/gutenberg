@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useCallback, Platform } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
+import { store as blockEditorStore } from '../../store';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -84,10 +86,35 @@ function useHasAspectRatio( settings ) {
 }
 
 function useHasChildLayout( settings ) {
-	const { allowSizingOnChildren = false } = settings?.parentLayout ?? {};
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			themeSupportsLayout: getSettings().supportsLayout,
+		};
+	}, [] );
+
+	const {
+		allowSizingOnChildren = false,
+		type,
+		default: { type: defaultType = 'default' } = {},
+	} = settings?.parentLayout ?? {};
+	const layoutType = type || defaultType;
+	const isFlowOrConstrained =
+		layoutType === 'default' || layoutType === 'constrained';
 
 	const support = allowSizingOnChildren;
-	return !! settings?.layout && support;
+
+	/*
+	 * If the theme supports layout and parent block supports sizing on children,
+	 * the child layout control is always shown.
+	 * If the theme does not support layout, the child layout control is shown
+	 * only if the parent layout is not flow or constrained.
+	 */
+	return (
+		!! settings?.layout &&
+		support &&
+		( themeSupportsLayout || ! isFlowOrConstrained )
+	);
 }
 
 function useHasSpacingPresets( settings ) {
