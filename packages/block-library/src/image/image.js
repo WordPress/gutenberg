@@ -351,7 +351,11 @@ export default function Image( {
 
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
-	const showLightboxSetting = lightboxSetting?.allowEditing === true;
+	const showLightboxSetting =
+		// If a block-level override is set, we should give users the option to
+		// remove that override, even if the lightbox UI is disabled in the settings.
+		( !! lightbox && lightbox?.enabled !== lightboxSetting?.enabled ) ||
+		lightboxSetting?.allowEditing;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
