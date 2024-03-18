@@ -52,7 +52,6 @@ function useDeprecatedProps( {
 		deprecated( 'Button isSmall prop', {
 			since: '6.6',
 			alternative: 'size="small"',
-			version: '6.9',
 		} );
 		computedSize ??= 'small';
 	}
