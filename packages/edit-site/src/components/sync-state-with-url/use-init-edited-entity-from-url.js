@@ -30,9 +30,9 @@ const postTypesWithoutParentTemplate = [
 function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 	const { hasLoadedAllDependencies, homepageId, url, frontPageTemplateId } =
 		useSelect( ( select ) => {
-			const { getEntityRecord, getUnstableBase, getEntityRecords } =
+			const { getSite, getUnstableBase, getEntityRecords } =
 				select( coreDataStore );
-			const siteData = getEntityRecord( 'root', 'site' );
+			const siteData = getSite();
 			const base = getUnstableBase();
 			const templates = getEntityRecords(
 				'postType',

@@ -223,7 +223,12 @@ export const rootEntitiesConfig = [
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
-	{ kind: 'root', loadEntities: loadSiteEntity },
+	{
+		kind: 'root',
+		name: 'site',
+		plural: 'sites',
+		loadEntities: loadSiteEntity,
+	},
 ];
 
 /**

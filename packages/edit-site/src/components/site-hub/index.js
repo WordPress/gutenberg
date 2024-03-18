@@ -41,7 +41,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 			);
 
 			const {
-				getEntityRecord,
+				getSite,
 				getUnstableBase, // Site index.
 			} = select( coreStore );
 
@@ -50,7 +50,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
 				homeUrl: getUnstableBase()?.home,
-				siteTitle: getEntityRecord( 'root', 'site' )?.title,
+				siteTitle: getSite()?.title,
 			};
 		},
 		[]
