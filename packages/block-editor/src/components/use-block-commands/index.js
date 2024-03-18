@@ -40,7 +40,7 @@ export const useTransformCommands = () => {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
-			).filter( Boolean );
+			).filter( Boolean ); // This can have `null`s when something tries to call `selectBlock` with an inexistent clientId. These nulls will cause fatal errors.
 
 			const rootClientId = getBlockRootClientId(
 				selectedBlockClientIds[ 0 ]
