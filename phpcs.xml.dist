@@ -31,9 +31,9 @@
 	</rule>
 
 	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
-		<exclude-pattern>lib/compat/*</exclude-pattern>
-		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
-		<exclude-pattern>build/block-library/*</exclude-pattern>
+		<exclude-pattern>/lib/compat/*</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/*</exclude-pattern>
+		<exclude-pattern>/build/block-library/*</exclude-pattern>
 	</rule>
 
 	<arg value="ps"/>
@@ -50,28 +50,28 @@
 	<file>./post-content.php</file>
 
 	<!-- Exclude generated files -->
-	<exclude-pattern>./packages/block-serialization-spec-parser/parser.php</exclude-pattern>
-	<exclude-pattern>node_modules/*</exclude-pattern>
-	<exclude-pattern>build/*</exclude-pattern>
+	<exclude-pattern>/packages/block-serialization-spec-parser/parser\.php$</exclude-pattern>
+	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>/build/*</exclude-pattern>
 
 	<!-- Exclude third party libraries -->
-	<exclude-pattern>./vendor/*</exclude-pattern>
-	<exclude-pattern>./test/php/gutenberg-coding-standards/*</exclude-pattern>
+	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>/test/php/gutenberg-coding-standards/*</exclude-pattern>
 
 	<!-- Exclude files maintained in WordPress Core and backported to Gutenberg
 	     DO NOT REMOVE these rules; these files are "built" artifacts from Core
 	     and when they are removed it prevents keeping the repos in sync. -->
-	<exclude-pattern>./lib/compat/wordpress-*/html-api/*.php</exclude-pattern>
+	<exclude-pattern>/lib/compat/wordpress-*/html-api/*\.php$</exclude-pattern>
 
 	<!-- Ignore filename error since it requires WP core build process change -->
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
-		<exclude-pattern>packages/block-library/src/navigation/index.php</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/navigation/index\.php$</exclude-pattern>
 	</rule>
 
 	<!-- Ignore empty files in tests/gutenberg-test-themes -->
 	<rule ref="Internal.NoCodeFound">
-		<exclude-pattern>./test/gutenberg-test-themes/*</exclude-pattern>
+		<exclude-pattern>/test/gutenberg-test-themes/*</exclude-pattern>
 	</rule>
 
 	<!-- Exclude PHPUnit tests from file and class name sniffs (for Core parity). -->
@@ -85,9 +85,9 @@
 
 	<!-- Enforce checks against redeclaration for functions and classes. -->
 	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
-		<exclude-pattern>./phpunit/*</exclude-pattern>
-		<exclude-pattern>./packages/*</exclude-pattern>
-		<exclude-pattern>./bin/generate-gutenberg-php</exclude-pattern>
+		<exclude-pattern>/phpunit/*</exclude-pattern>
+		<exclude-pattern>/packages/*</exclude-pattern>
+		<exclude-pattern>/bin/generate-gutenberg-php\.php$</exclude-pattern>
 		<properties>
 			<property name="functionsWhiteList" type="array">
 				<element value="/^_?gutenberg.+/"/>
@@ -100,7 +100,7 @@
 	</rule>
 
 	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName">
-		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<include-pattern>/packages/block-library/src/*/*\.php$</include-pattern>
 		<properties>
 			<property name="prefixes" type="array">
 				<element value="block_core_"/>
@@ -154,15 +154,15 @@
 		</properties>
 	</rule>
 	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses">
-		<include-pattern>./packages/block-library/src/*/*.php</include-pattern>
+		<include-pattern>/packages/block-library/src/.+/*\.php$</include-pattern>
 		<!--
 			Refactoring required: the functions and classes prefixed with 'Gutenberg_' in the files that are being excluded
 			through the 'exclude-pattern' statements below must be guarded, as they are available only in the Gutenberg context,
 			not in Core.
 		-->
-		<exclude-pattern>./packages/block-library/src/form-input/index.php</exclude-pattern>
-		<exclude-pattern>./packages/block-library/src/form-submission-notification/index.php</exclude-pattern>
-		<exclude-pattern>./packages/block-library/src/form/index.php</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/form-input/index\.php$</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/form-submission-notification/index\.php$</exclude-pattern>
+		<exclude-pattern>/packages/block-library/src/form/index\.php$</exclude-pattern>
 		<properties>
 			<property name="forbidden_functions" type="array">
 				<element value="[Gg]utenberg.*"/>
