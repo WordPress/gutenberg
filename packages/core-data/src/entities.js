@@ -39,6 +39,9 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
+		plural: '__unstableBases',
 		syncConfig: {
 			fetch: async () => {
 				return apiFetch( { path: '/' } );
@@ -63,6 +66,9 @@ export const rootEntitiesConfig = [
 		name: 'site',
 		kind: 'root',
 		baseURL: '/wp/v2/settings',
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
+		plural: 'sites',
 		getTitle: ( record ) => {
 			return record?.title ?? __( 'Site Title' );
 		},
@@ -92,6 +98,7 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		plural: 'postTypes',
 		syncConfig: {
 			fetch: async ( id ) => {
 				return apiFetch( {
@@ -220,6 +227,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
 		baseURLParams: { context: 'edit' },
+		plural: 'themes',
 		key: 'stylesheet',
 	},
 	{
@@ -228,6 +236,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
+		plural: 'plugins',
 		key: 'plugin',
 	},
 	{
@@ -401,39 +410,26 @@ async function loadTaxonomyEntities() {
 }
 
 /**
- * Returns the entity's getter method name given its kind and name.
+ * Returns the entity's getter method name given its kind and name or plural name.
  *
  * @example
  * ```js
  * const nameSingular = getMethodName( 'root', 'theme', 'get' );
  * // nameSingular is getRootTheme
  *
- * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * const namePlural = getMethodName( 'root', 'themes', 'set' );
  * // namePlural is setRootThemes
  * ```
  *
- * @param {string}  kind      Entity kind.
- * @param {string}  name      Entity name.
- * @param {string}  prefix    Function prefix.
- * @param {boolean} usePlural Whether to use the plural form or not.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name or plural name.
+ * @param {string} prefix Function prefix.
  *
  * @return {string} Method name
  */
-export const getMethodName = (
-	kind,
-	name,
-	prefix = 'get',
-	usePlural = false
-) => {
-	const entityConfig = rootEntitiesConfig.find(
-		( config ) => config.kind === kind && config.name === name
-	);
+export const getMethodName = ( kind, name, prefix = 'get' ) => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
-	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
-	const suffix =
-		usePlural && 'plural' in entityConfig && entityConfig?.plural
-			? pascalCase( entityConfig.plural )
-			: nameSuffix;
+	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 

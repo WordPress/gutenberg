@@ -102,6 +102,7 @@ function DocumentTools() {
 					'Toggle block inserter',
 					'Generic label for block inserter button'
 				) }
+				size="compact"
 			/>
 			{ isMediumViewport && (
 				<>
@@ -116,6 +117,7 @@ function DocumentTools() {
 						label={ __( 'List View' ) }
 						onClick={ toggleListView }
 						ref={ listViewToggleRef }
+						size="compact"
 					/>
 				</>
 			) }

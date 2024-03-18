@@ -1,6 +1,6 @@
 # API Reference
 
-<div class="callout callout-warning">
+<div class="callout callout-alert">
 Interactivity API is only available for WordPress 6.5 and above.
 </div>
 
@@ -1011,11 +1011,11 @@ It returns an object with two keys:
 
 ##### ref
 
-`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
 
 ##### attributes
 
-`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+`attributes` contains a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
 
 Those attributes will contain the directives of that element. In the button example:
 
@@ -1042,6 +1042,28 @@ The code will log:
 	"children": ['Log'],
 	"onclick": event => { evaluate(entry, event); }
 }
+```
+
+### withScope()
+
+Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
+
+When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+
+An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
+
+```js
+store('mySliderPlugin', {
+	callbacks: {
+		initSlideShow: () => {
+			setInterval(
+				withScope( () => {
+					actions.nextImage();
+				} ),
+				3_000
+			);
+		},
+})
 ```
 
 ## Server functions
