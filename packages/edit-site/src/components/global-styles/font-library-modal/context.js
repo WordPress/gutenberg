@@ -105,16 +105,21 @@ function FontLibraryProvider( { children } ) {
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
-	const baseThemeFonts = baseFontFamilies?.theme
-		? baseFontFamilies.theme
-				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		: [];
-
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+
+	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+
+	const baseThemeFonts = baseFontFamilies?.theme
+		? themeFonts.concat(
+				baseFontFamilies.theme
+					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
+					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		  )
 		: [];
 
 	const customFonts = fontFamilies?.custom
@@ -144,8 +149,7 @@ function FontLibraryProvider( { children } ) {
 			return;
 		}
 
-		const fonts =
-			font.source === 'theme' ? baseThemeFonts : baseCustomFonts;
+		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
 
 		// Tries to find the font in the installed fonts
 		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
