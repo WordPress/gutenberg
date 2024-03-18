@@ -94,11 +94,7 @@ function hasOverridableAttributes( block ) {
 	return (
 		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
 			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
+		) && !! block.attributes.metadata?.name
 	);
 }
 
@@ -110,11 +106,7 @@ function hasOverridableBlocks( blocks ) {
 }
 
 function getOverridableAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
+	return PARTIAL_SYNCING_SUPPORTED_BLOCKS[ block.name ];
 }
 
 function applyInitialContentValuesToInnerBlocks(

@@ -13,7 +13,6 @@ import {
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
-import useSetPatternBindings from './components/use-set-pattern-bindings';
 import ResetOverridesControl from './components/reset-overrides-control';
 import { useAddPatternCategory } from './private-hooks';
 import {
@@ -34,7 +33,6 @@ lock( privateApis, {
 	RenamePatternModal,
 	PatternsMenuItems,
 	RenamePatternCategoryModal,
-	useSetPatternBindings,
 	ResetOverridesControl,
 	useAddPatternCategory,
 	PATTERN_TYPES,
