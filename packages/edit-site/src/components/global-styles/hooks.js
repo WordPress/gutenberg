@@ -10,6 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -110,7 +111,7 @@ export function useColorVariations() {
 		? colorVariations.filter( ( variation ) => {
 				const { settings, styles, title } = variation;
 				return (
-					title === 'Default' || // Always preseve the default variation.
+					title === __( 'Default' ) || // Always preseve the default variation.
 					Object.keys( settings ).length > 0 ||
 					Object.keys( styles ).length > 0
 				);
