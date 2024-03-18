@@ -172,7 +172,6 @@ export default function NavigationLinkEdit( {
 		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 		selectPreviousBlock,
-		selectBlock,
 	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
@@ -587,9 +586,12 @@ export default function NavigationLinkEdit( {
 								if ( openedBy ) {
 									openedBy.focus();
 									setOpenedBy( null );
+								} else if ( ref.current ) {
+									// select the ref when adding a new link
+									ref.current.focus();
 								} else {
-									// select the block if no ref, such as when adding a new link
-									selectBlock( clientId );
+									// Fallback
+									selectPreviousBlock( clientId, true );
 								}
 							} }
 							anchor={ popoverAnchor }
