@@ -268,10 +268,14 @@ export default function Image( {
 				lightbox: { enabled: false },
 			} );
 		} else {
-			setAttributes( {
-				lightbox: undefined,
-			} );
+			resetLightbox();
 		}
+	}
+
+	function resetLightbox() {
+		setAttributes( {
+			lightbox: undefined,
+		} );
 	}
 
 	function onSetTitle( value ) {
@@ -497,6 +501,7 @@ export default function Image( {
 							showLightboxSetting={ showLightboxSetting }
 							lightboxEnabled={ lightboxChecked }
 							onSetLightbox={ onSetLightbox }
+							resetLightbox={ resetLightbox }
 						/>
 					) }
 				{ allowCrop && (

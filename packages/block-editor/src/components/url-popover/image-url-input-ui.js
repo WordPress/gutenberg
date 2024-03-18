@@ -46,6 +46,7 @@ const ImageURLInputUI = ( {
 	showLightboxSetting,
 	lightboxEnabled,
 	onSetLightbox,
+	resetLightbox,
 } ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
@@ -299,7 +300,10 @@ const ImageURLInputUI = ( {
 					<Button
 						icon={ linkOff }
 						label={ __( 'Remove link' ) }
-						onClick={ onLinkRemove }
+						onClick={ () => {
+							onLinkRemove();
+							resetLightbox();
+						} }
 						size="compact"
 					/>
 				</>
