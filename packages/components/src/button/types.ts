@@ -175,6 +175,12 @@ export type DeprecatedButtonProps = {
 	 * @ignore
 	 */
 	isTertiary?: boolean;
+	/**
+	 * Decreases the size of the button.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
+	 * @ignore
+	 */
 	isSmall?: boolean;
 };
 
