@@ -28,32 +28,20 @@ export default function useLayoutAreas() {
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
 
-	// Regular page
-	if ( path === '/page' ) {
-		return {
-			areas: {
-				content: undefined,
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile:
-					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
-			},
-			widths: {
-				content: undefined,
-			},
-		};
-	}
-
 	const isListLayout = isCustom !== 'true' && layout === 'list';
 
-	if ( path === '/pages' ) {
+	// Regular page
+	if ( path === '/page' ) {
 		return {
 			areas: {
 				content: <PagePages />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
+				mobile:
+					canvas === 'edit' ? (
+						<Editor isLoading={ isSiteEditorLoading } />
+					) : undefined,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
