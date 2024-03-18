@@ -48,7 +48,6 @@ export function BlockSettingsDropdown( {
 	clientIds,
 	children,
 	__experimentalSelectBlock,
-	__unstableDisplayLocation,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
@@ -338,9 +337,6 @@ export function BlockSettingsDropdown( {
 									firstBlockClientId,
 								} }
 								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
-								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
