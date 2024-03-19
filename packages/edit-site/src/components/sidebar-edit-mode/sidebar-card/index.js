@@ -22,7 +22,7 @@ export default function SidebarCard( {
 } ) {
 	return (
 		<div className={ classnames( 'edit-site-sidebar-card', className ) }>
-			<HStack spacing={ 3 } className="edit-site-sidebar-card__header">
+			<HStack spacing={ 2 } className="edit-site-sidebar-card__header">
 				<Icon className="edit-site-sidebar-card__icon" icon={ icon } />
 				<h2 className="edit-site-sidebar-card__title">{ title }</h2>
 				{ actions }
