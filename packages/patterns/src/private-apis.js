@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { lock } from './lock-unlock';
+import ContentPanel from './components/content-panel';
 import {
 	default as CreatePatternModal,
 	CreatePatternModalContents,
@@ -13,7 +14,6 @@ import {
 import { isOverridableBlock } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
-import PatternSchemaQuickNavigation from './components/pattern-schema-quick-navigation';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
 import useSetPatternBindings from './components/use-set-pattern-bindings';
 import ResetOverridesControl from './components/reset-overrides-control';
@@ -29,6 +29,7 @@ import {
 
 export const privateApis = {};
 lock( privateApis, {
+	ContentPanel,
 	CreatePatternModal,
 	CreatePatternModalContents,
 	DuplicatePatternModal,
@@ -36,7 +37,6 @@ lock( privateApis, {
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,
-	PatternSchemaQuickNavigation,
 	RenamePatternCategoryModal,
 	useSetPatternBindings,
 	ResetOverridesControl,

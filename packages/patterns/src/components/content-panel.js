@@ -1,22 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import {
-	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { PanelBody } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import { isOverridableBlock } from '../api';
+import { unlock } from '../lock-unlock';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
-export default function PatternSchemaQuickNavigation() {
+export default function ContentPanel() {
 	const allClientIds = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getClientIdsWithDescendants(),
@@ -31,5 +33,14 @@ export default function PatternSchemaQuickNavigation() {
 			} ),
 		[ allClientIds, getBlock ]
 	);
-	return <BlockQuickNavigation clientIds={ clientIdsWithOverrides } />;
+
+	if ( ! clientIdsWithOverrides?.length ) {
+		return null;
+	}
+
+	return (
+		<PanelBody title={ __( 'Content' ) }>
+			<BlockQuickNavigation clientIds={ clientIdsWithOverrides } />
+		</PanelBody>
+	);
 }

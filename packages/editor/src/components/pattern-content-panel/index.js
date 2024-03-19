@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 /**
@@ -12,21 +10,17 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { PatternSchemaQuickNavigation } = unlock( patternsPrivateApis );
+const { ContentPanel } = unlock( patternsPrivateApis );
 
-export default function PatternSchemaPanel() {
-	const supportsPatternSchema = useSelect(
+export default function PatternContentPanel() {
+	const supportsPatternContentPanel = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType() === 'wp_block',
 		[]
 	);
 
-	if ( ! supportsPatternSchema ) {
+	if ( ! supportsPatternContentPanel ) {
 		return null;
 	}
 
-	return (
-		<PanelBody title={ __( 'Content' ) }>
-			<PatternSchemaQuickNavigation />
-		</PanelBody>
-	);
+	return <ContentPanel />;
 }
