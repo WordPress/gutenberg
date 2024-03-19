@@ -738,12 +738,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "CustomSelectControlV2",
-		"slug": "custom-select-control-v2",
-		"markdown_source": "../packages/components/src/custom-select-control-v2/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "CustomSelectControl",
 		"slug": "custom-select-control",
 		"markdown_source": "../packages/components/src/custom-select-control/README.md",
@@ -1197,12 +1191,6 @@
 		"title": "TabPanel",
 		"slug": "tab-panel",
 		"markdown_source": "../packages/components/src/tab-panel/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "Tabs",
-		"slug": "tabs",
-		"markdown_source": "../packages/components/src/tabs/README.md",
 		"parent": "components"
 	},
 	{
