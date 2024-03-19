@@ -40,7 +40,7 @@ jobs:
                   node-version: ${{ matrix.node }}
 
             - name: Get number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@v2
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
               id: cpu-cores
 
             - name: npm build
@@ -298,7 +298,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Get number of CPU cores
-              uses: SimenB/github-actions-cpu-cores@v2
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
               id: cpu-cores
 
             - name: Setup Node.js and install dependencies
