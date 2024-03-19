@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 26.0.2 (2024-04-09)
+
+### Bug Fix
+
+-   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
+
+
 ## 26.0.1 (2024-02-13)
 
 ### Bug Fix
