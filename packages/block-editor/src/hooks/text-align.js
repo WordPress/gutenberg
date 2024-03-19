@@ -20,6 +20,8 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
  */
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { shouldSkipSerialization } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 
@@ -150,9 +152,17 @@ function useBlockProps( { name, textAlign } ) {
 	const validTextAlignments = getValidTextAlignments(
 		getBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY )
 	);
+
 	if ( ! validTextAlignments.length ) {
 		return null;
 	}
+
+	if (
+		shouldSkipSerialization( name, TYPOGRAPHY_SUPPORT_KEY, 'textAlign' )
+	) {
+		return null;
+	}
+
 	const className = classnames( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
@@ -174,7 +184,14 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 	const blockTextAlign = getBlockSupport( blockType, TEXT_ALIGN_SUPPORT_KEY );
 	const isTextAlignValid =
 		getValidTextAlignments( blockTextAlign ).includes( textAlign );
-	if ( isTextAlignValid ) {
+	if (
+		isTextAlignValid &&
+		! shouldSkipSerialization(
+			blockType,
+			TYPOGRAPHY_SUPPORT_KEY,
+			'textAlign'
+		)
+	) {
 		props.className = classnames(
 			`has-text-align-${ textAlign }`,
 			props.className

@@ -241,13 +241,15 @@ function gutenberg_render_typography_support( $block_content, $block ) {
 	$block_type             = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_attributes       = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
 	$has_text_align_support = block_has_support( $block_type, array( 'typography', 'textAlign' ), false );
-	$should_skip_text_align = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
 
-	if ( $has_text_align_support && ! $should_skip_text_align && ! empty( $block_attributes['textAlign'] ) ) {
-		$content = new WP_HTML_Tag_Processor( $block_content );
-		$content->next_tag();
-		$content->add_class( 'has-text-align-' . $block_attributes['textAlign'] );
-		$block_content = $content->get_updated_html();
+	if ( $has_text_align_support && ! empty( $block_attributes['textAlign'] ) ) {
+		$should_skip_text_align = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
+		if ( ! $should_skip_text_align && ! empty( $block_attributes['textAlign'] ) ) {
+			$content = new WP_HTML_Tag_Processor( $block_content );
+			$content->next_tag();
+			$content->add_class( 'has-text-align-' . $block_attributes['textAlign'] );
+			$block_content = $content->get_updated_html();
+		}
 	}
 
 	if ( ! isset( $block['attrs']['style']['typography']['fontSize'] ) ) {
