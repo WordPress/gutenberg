@@ -13,7 +13,6 @@ import {
 	__experimentalText as Text,
 	PanelBody,
 } from '@wordpress/components';
-import { page as pageIcon, navigation, symbol } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -24,11 +23,6 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-
-const CARD_ICONS = {
-	wp_block: symbol,
-	wp_navigation: navigation,
-};
 
 export default function PostCardPanel( { className, actions, children } ) {
 	const { modified, title, templateInfo } = useSelect( ( select ) => {

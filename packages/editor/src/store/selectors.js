@@ -17,7 +17,6 @@ import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
-import { layout } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -33,7 +32,6 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
-import { getPostIcon } from './private-selectors';
 import { unlock } from '../lock-unlock';
 import { store as editorStore } from './index';
 
