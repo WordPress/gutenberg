@@ -35,11 +35,11 @@ function ScreenColors() {
 			<ScreenHeader
 				title={ __( 'Colors' ) }
 				description={ __(
-					'Manage palettes and the default color of different global elements on the site.'
+					'Palette colors and the application of those colors on site elements.'
 				) }
 			/>
 			<div className="edit-site-global-styles-screen-colors">
-				<VStack spacing={ 6 }>
+				<VStack spacing={ 7 }>
 					<ColorVariations />
 					<Palette />
 					<StylesColorPanel
