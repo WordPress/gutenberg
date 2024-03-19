@@ -785,7 +785,7 @@ export const toStyles = (
 	let ruleset = '';
 
 	if ( contentSize || wideSize ) {
-		ruleset += ':root {';
+		ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } {`;
 		ruleset = contentSize
 			? ruleset + ` --wp--style--global--content-size: ${ contentSize };`
 			: ruleset;
