@@ -35,7 +35,7 @@ function gutenberg_register_background_support( $block_type ) {
  *
  * @since 6.6.0
  *
- * @param  array  $background_styles Background style properties.
+ * @param  array $background_styles Background style properties.
  * @return array                     Style engine array of CSS string and style declarations.
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
@@ -72,7 +72,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	$background_styles['backgroundSize']  = isset( $block_attributes['style']['background']['backgroundSize'] ) ? $block_attributes['style']['background']['backgroundSize'] : $background_size_default;
 	$background_styles['backgroundImage'] = isset( $block_attributes['style']['background']['backgroundImage'] ) ? $block_attributes['style']['background']['backgroundImage'] : array();
 
-	if ( isset( $background_styles['backgroundImage']['source'] ) && 'file' === $background_styles['backgroundImage']['source']  && isset( $background_styles['backgroundImage']['url'] ) ) {
+	if ( isset( $background_styles['backgroundImage']['source'] ) && 'file' === $background_styles['backgroundImage']['source'] && isset( $background_styles['backgroundImage']['url'] ) ) {
 		$background_styles['backgroundPosition'] = isset( $block_attributes['style']['background']['backgroundPosition'] ) ? $block_attributes['style']['background']['backgroundPosition'] : null;
 		$background_styles['backgroundRepeat']   = isset( $block_attributes['style']['background']['backgroundRepeat'] ) ? $block_attributes['style']['background']['backgroundRepeat'] : null;
 
