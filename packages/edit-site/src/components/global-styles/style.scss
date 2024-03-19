@@ -7,7 +7,8 @@
 }
 
 .edit-site-global-styles-preview__iframe {
-	border-radius: $radius-block-ui;
+	border-radius: $radius-block-ui + 1px; // Visually resembles the $radius-block-ui.
+	max-width: 100%;
 	display: block;
 	max-width: 100%;
 	width: 100%;
@@ -53,13 +54,27 @@
 }
 
 .edit-site-global-styles-screen-colors {
-	margin: $grid-unit-20;
+	margin: $grid-unit-10 $grid-unit-20 $grid-unit-20;
 
 	.color-block-support-panel {
 		padding-left: 0;
 		padding-right: 0;
+		padding-top: 0;
 		border-top: none;
+		row-gap: calc(#{$grid-unit-05} * 3);
 	}
+}
+
+.edit-site-global-styles-screen-colors__palette-count {
+	color: $gray-700;
+}
+
+.edit-site-global-styles-sidebar__more-menu > .components-button.has-icon {
+	// Make the DropdownMenu the same size as the rest of the buttons, as it does not support "compact" size.
+	height: $grid-unit-40;
+	min-width: $grid-unit-40;
+	padding: 0;
+	width: $grid-unit-40;
 }
 
 .edit-site-global-styles-header__description {
