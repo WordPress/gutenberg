@@ -20,8 +20,7 @@ const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 export default function ContentPanel() {
 	const allClientIds = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getClientIdsWithDescendants(),
+		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
 		[]
 	);
 	const { getBlock } = useSelect( blockEditorStore );
