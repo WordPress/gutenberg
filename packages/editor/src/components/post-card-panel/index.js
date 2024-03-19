@@ -54,14 +54,14 @@ export default function PostCardPanel( { className, actions, children } ) {
 			templateInfo: _templateInfo,
 		};
 	} );
-	const description =
-		type === 'wp_template' || type === 'wp_template_part'
-			? templateInfo?.description
-			: sprintf(
-					// translators: %s: Human-readable time difference, e.g. "2 days ago".
-					__( 'Last edited %s' ),
-					humanTimeDiff( modified )
-			  );
+	const description = templateInfo?.description;
+	const lastEditedText =
+		modified &&
+		sprintf(
+			// translators: %s: Human-readable time difference, e.g. "2 days ago".
+			__( 'Last edited %s' ),
+			humanTimeDiff( modified )
+		);
 	const icon = CARD_ICONS[ type ] || templateInfo?.icon || pageIcon;
 	return (
 		<PanelBody>
@@ -76,20 +76,30 @@ export default function PostCardPanel( { className, actions, children } ) {
 						className="editor-post-card-panel__icon"
 						icon={ icon }
 					/>
-					<h2 className="editor-post-card-panel__title">
-						{ decodeEntities( title ) }
-					</h2>
+					{ !! title && (
+						<h2 className="editor-post-card-panel__title">
+							{ decodeEntities( title ) }
+						</h2>
+					) }
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
-					{ description && (
+					{ ( description || lastEditedText ) && (
 						<div className="editor-post-card-panel__description">
 							<VStack>
-								<Text>{ description }</Text>
+								{ !! description && (
+									<Text>{ description }</Text>
+								) }
+								{ !! lastEditedText && (
+									<Text>{ lastEditedText }</Text>
+								) }
 							</VStack>
 						</div>
 					) }
-					{ children }
+					{
+						// Todo: move TemplateAreas (and the selectors it depends) to the editor package, and use it here removing the children prop.
+						children
+					}
 				</VStack>
 			</div>
 		</PanelBody>
