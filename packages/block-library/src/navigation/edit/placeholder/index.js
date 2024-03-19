@@ -19,7 +19,7 @@ export default function NavigationPlaceholder( {
 	currentMenuId,
 	clientId,
 	canUserCreateNavigationMenus = false,
-	isResolvingCanUserCreateNavigationMenu,
+	isResolvingCanUserCreateNavigationMenus,
 	onSelectNavigationMenu,
 	onSelectClassicMenu,
 	onCreateEmpty,
@@ -41,7 +41,7 @@ export default function NavigationPlaceholder( {
 	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
-		isResolvingMenus && isResolvingCanUserCreateNavigationMenu;
+		isResolvingMenus && isResolvingCanUserCreateNavigationMenus;
 
 	return (
 		<>

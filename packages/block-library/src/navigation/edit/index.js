@@ -188,8 +188,8 @@ function Navigation( {
 		canUserDeleteNavigationMenu,
 		hasResolvedCanUserDeleteNavigationMenu,
 		canUserCreateNavigationMenus,
-		isResolvingCanUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		isResolvingCanUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -467,7 +467,7 @@ function Navigation( {
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigationMenu &&
+				hasResolvedCanUserCreateNavigationMenus &&
 				! canUserCreateNavigationMenus
 			) {
 				showNavigationMenuPermissionsNotice(
@@ -483,7 +483,7 @@ function Navigation( {
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserCreateNavigationMenus,
-		hasResolvedCanUserCreateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenus,
 		ref,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
@@ -804,8 +804,8 @@ function Navigation( {
 					canUserCreateNavigationMenus={
 						canUserCreateNavigationMenus
 					}
-					isResolvingCanUserCreateNavigationMenu={
-						isResolvingCanUserCreateNavigationMenu
+					isResolvingCanUserCreateNavigationMenus={
+						isResolvingCanUserCreateNavigationMenus
 					}
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
