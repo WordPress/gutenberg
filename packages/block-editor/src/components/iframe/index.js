@@ -214,8 +214,9 @@ function Iframe( {
 			);
 		};
 		node.ownerDocument.defaultView.addEventListener( 'resize', onResize );
+
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
+			node.ownerDocument.defaultView?.removeEventListener(
 				'resize',
 				onResize
 			);
