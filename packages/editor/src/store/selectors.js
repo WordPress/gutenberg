@@ -17,6 +17,7 @@ import { addQueryArgs, cleanForSlug } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
+import { layout } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -32,8 +33,6 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
-import { unlock } from '../lock-unlock';
-import { store as editorStore } from './index';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1747,31 +1746,32 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
-export const __experimentalGetTemplateInfo = createRegistrySelector(
-	( select ) => ( state, template ) => {
-		if ( ! template ) {
-			return EMPTY_OBJECT;
-		}
-
-		const { description, slug, title } = template;
-		const { title: defaultTitle, description: defaultDescription } =
-			__experimentalGetDefaultTemplateType( state, slug );
-
-		const templateTitle =
-			typeof title === 'string' ? title : title?.rendered;
-		const templateDescription =
-			typeof description === 'string' ? description : description?.raw;
-
-		return {
-			title:
-				templateTitle && templateTitle !== slug
-					? templateTitle
-					: defaultTitle || slug,
-			description: templateDescription || defaultDescription,
-			icon: unlock( select( editorStore ) ).getPostIcon( template ),
-		};
+export function __experimentalGetTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return EMPTY_OBJECT;
 	}
-);
+
+	const { description, slug, title, area } = template;
+	const { title: defaultTitle, description: defaultDescription } =
+		__experimentalGetDefaultTemplateType( state, slug );
+
+	const templateTitle = typeof title === 'string' ? title : title?.rendered;
+	const templateDescription =
+		typeof description === 'string' ? description : description?.raw;
+	const templateIcon =
+		__experimentalGetDefaultTemplatePartAreas( state ).find(
+			( item ) => area === item.area
+		)?.icon || layout;
+
+	return {
+		title:
+			templateTitle && templateTitle !== slug
+				? templateTitle
+				: defaultTitle || slug,
+		description: templateDescription || defaultDescription,
+		icon: templateIcon,
+	};
+}
 
 /**
  * Returns a post type label depending on the current post.

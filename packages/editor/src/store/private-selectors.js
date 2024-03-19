@@ -75,28 +75,31 @@ export function getListViewToggleRef( state ) {
 const CARD_ICONS = {
 	wp_block: symbol,
 	wp_navigation: navigation,
+	page: pageIcon,
 };
 
 export const getPostIcon = createRegistrySelector(
-	( select ) => ( state, postRecord ) => {
+	( select ) => ( state, postType, area ) => {
 		{
-			const { type } = postRecord;
-			if ( type === 'wp_template_part' || type === 'wp_template' ) {
+			if (
+				postType === 'wp_template_part' ||
+				postType === 'wp_template'
+			) {
 				return (
 					__experimentalGetDefaultTemplatePartAreas( state ).find(
-						( item ) => postRecord.area === item.area
+						( item ) => area === item.area
 					)?.icon || layout
 				);
 			}
-			if ( CARD_ICONS[ type ] ) {
-				return CARD_ICONS[ type ];
+			if ( CARD_ICONS[ postType ] ) {
+				return CARD_ICONS[ postType ];
 			}
-			const postType = select( coreStore ).getPostType( type );
+			const postTypeEntity = select( coreStore ).getPostType( postType );
 			// `icon` is the `menu_icon` property of a post type. We
 			// only handle `dashicons` for now, even if the `menu_icon`
 			// also supports urls and svg as values.
-			if ( postType?.icon?.startsWith( 'dashicons-' ) ) {
-				return postType.icon.slice( 10 );
+			if ( postTypeEntity?.icon?.startsWith( 'dashicons-' ) ) {
+				return postTypeEntity.icon.slice( 10 );
 			}
 			return pageIcon;
 		}

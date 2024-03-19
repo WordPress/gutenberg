@@ -23,9 +23,10 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function PostCardPanel( { className, actions, children } ) {
-	const { modified, title, templateInfo } = useSelect( ( select ) => {
+	const { modified, title, templateInfo, icon } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPostType,
@@ -42,6 +43,10 @@ export default function PostCardPanel( { className, actions, children } ) {
 			modified: getEditedPostAttribute( 'modified' ),
 			id: _id,
 			templateInfo: __experimentalGetTemplateInfo( _record ),
+			icon: unlock( select( editorStore ) ).getPostIcon(
+				_type,
+				_record?.area
+			),
 		};
 	} );
 	const description = templateInfo?.description;
@@ -64,7 +69,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 				>
 					<Icon
 						className="editor-post-card-panel__icon"
-						icon={ templateInfo.icon }
+						icon={ icon }
 					/>
 					{ !! title && (
 						<h2 className="editor-post-card-panel__title">
