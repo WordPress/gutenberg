@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-  [*] [internal] Relocate useNetworkConnectivity hook and withNetworkConnectivity HOC [#59982]
 
 ## 1.115.0
 -   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
