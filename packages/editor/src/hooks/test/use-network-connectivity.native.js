@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import useNetworkConnectivity from '../index';
+import useNetworkConnectivity from '../use-network-connectivity';
 
 describe( 'useNetworkConnectivity', () => {
 	it( 'should optimisitically presume network connectivity', () => {
