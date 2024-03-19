@@ -268,14 +268,25 @@ export default function Image( {
 				lightbox: { enabled: false },
 			} );
 		} else {
-			resetLightbox();
+			setAttributes( {
+				lightbox: undefined,
+			} );
 		}
 	}
 
 	function resetLightbox() {
-		setAttributes( {
-			lightbox: undefined,
-		} );
+		// When deleting a link from an image while lightbox settings
+		// are enabled by default, we should disable the lightbox,
+		// otherwise the resulting UX looks like a mistake.
+		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
 	}
 
 	function onSetTitle( value ) {
