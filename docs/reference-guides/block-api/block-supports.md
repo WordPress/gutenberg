@@ -126,9 +126,9 @@ _**Note:** Since WordPress 6.5._
 -   Default value: `null`
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
-    -   `backgroundSize`: type `boolean|string`, default value `false`
+    -   `backgroundSize`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to background, e.g., background image files and related properties.. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 `backgroundImage` adds UI controls which allow the user to select a background image.
 `backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
@@ -138,17 +138,6 @@ supports: {
 	background: {
 		backgroundImage: true // Enable background image control.
 		backgroundSize: true // Enable background image + size control.
-	}
-}
-```
-
-Note that the `backgroundSize` supports `boolean` and `string` types. When set to `true`, the block editor will show UI controls for the user to set background size, position and repeat values. When set to a `string`, the block editor will show UI controls for the user to set their values and the string will be used as the default value for `backgroundSize`. For example:
-
-```js
-supports: {
-	background: {
-		backgroundImage: true,
-		backgroundSize: 'cover', // Enables the backgroundSize UI control with a default value of 'cover'.
 	}
 }
 ```

@@ -649,10 +649,7 @@ export function BackgroundImagePanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	const defaultBackgroundSize = getBlockSupport( props.name, [
-		BACKGROUND_SUPPORT_KEY,
-		'backgroundSize',
-	] );
+	const defaultBackgroundSize = 'cover';
 
 	return (
 		<InspectorControls group="background">

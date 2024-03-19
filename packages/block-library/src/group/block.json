@@ -30,7 +30,7 @@
 		"html": false,
 		"background": {
 			"backgroundImage": true,
-			"backgroundSize": "cover",
+			"backgroundSize": true,
 			"__experimentalDefaultControls": {
 				"backgroundImage": true
 			}
