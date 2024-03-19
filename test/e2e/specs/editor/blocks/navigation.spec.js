@@ -8,6 +8,22 @@ test.describe( 'Navigation block', () => {
 		await requestUtils.deleteAllMenus();
 	} );
 
+	test.beforeAll( async ( { requestUtils } ) => {
+		// We need pages to be published so the Link Control can return pages
+		await requestUtils.createPage( {
+			title: 'Cat',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Dog',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Walrus',
+			status: 'publish',
+		} );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMenus();
 	} );
@@ -15,6 +31,7 @@ test.describe( 'Navigation block', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPosts(),
+			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllMenus(),
 		] );
 	} );
@@ -288,6 +305,225 @@ test.describe( 'Navigation block', () => {
 			.getByRole( 'document', { name: 'Block: Navigation' } )
 			.getByText( 'Navigation menu has been deleted or is unavailable.' );
 		await expect( warningMessage ).toBeVisible();
+	} );
+
+	test( 'creating navigation menus via keyboard without losing focus', async ( {
+		admin,
+		page,
+		pageUtils,
+		editor,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+
+		await requestUtils.createNavigationMenu( {
+			title: 'Animals',
+			content: '',
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		const navBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+
+		const navBlockInserter = navBlock.getByLabel( 'Add block' );
+		// Wait until the nav block inserter is visible before we move on to using it
+		await expect( navBlockInserter ).toBeVisible();
+
+		/**
+		 * Test: Exiting the appender from the link control returns focus to the navigation block
+		 *
+		 * 1. Use arrow keys to reach Appender
+		 * 2. Enter to open link control
+		 * 3. Escape to exit
+		 * 4. Focus should be within the Navigation Block, ideally on the appender that opened it
+		 */
+
+		await pageUtils.pressKeys( 'ArrowDown' );
+
+		await expect( navBlockInserter ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		const linkControlSearch = page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+
+		/**
+		 * Note: This is not desired behavior. Ideally the
+		 * Appender should be focused again. This check is
+		 * not to enforce this behavior, but to make sure
+		 * focus is kept nearby until we are able to send
+		 * focus to the appender.
+		 */
+		await expect( linkControlSearch ).toBeHidden();
+		await expect( navBlock ).toBeFocused();
+
+		/**
+		 * Test: Creating a link sends focus to the newly created navigation link item
+		 *
+		 * 1. Use arrow keys to reach Appender
+		 * 2. Enter to open link control
+		 * 3. Arrow down to the suggested pages
+		 * 4. Enter
+		 * 5. Focus should be on the newly created navigation item
+		 */
+
+		await pageUtils.pressKeys( 'ArrowDown' );
+
+		await expect( navBlockInserter ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await page.keyboard.type( 'Cat' );
+
+		await pageUtils.pressKeys( 'ArrowDown' );
+
+		await page.keyboard.press( 'Enter' );
+
+		const linkControlCatLink = page.getByRole( 'link', {
+			name: 'Cat (opens in a new tab)',
+			exact: true,
+		} );
+		await expect( linkControlCatLink ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+
+		await expect( linkControlSearch ).toBeHidden();
+
+		const navLinkCat = editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Cat', exact: true } );
+
+		await expect( navLinkCat ).toBeVisible();
+
+		// Testing for selection is tricky, so let's approximate. If we command+k, then we should be back in editing mode for this item.
+
+		/**
+		 * Test: Exiting link control from primary+k returns
+		 *       focus to the navigation block
+		 *
+		 * 1. Primary + k
+		 * 2. Focus is within the link control
+		 * 3. Escape to exit
+		 * 4. Focus should be at the same position it started at
+		 */
+		await pageUtils.pressKeys( 'primary+k' );
+
+		await expect( linkControlCatLink ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+
+		await expect( linkControlCatLink ).toBeHidden();
+
+		/**
+		 * Test: Creating a link from a url-string (https://www.example.com) returns
+		 *       focus to the newly created link with the text selected
+		 *
+		 * 1. Use arrow keys to reach Appender
+		 * 2. Enter to open link control
+		 * 3. Type https://www.example.com
+		 * 4. Enter
+		 * 5. Focus should be on the newly created navigation item with text selected
+		 */
+
+		// Move focus to the Add Block Appender.
+		await pageUtils.pressKeys( 'ArrowDown' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+
+		await expect( navBlockInserter ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+
+		// `https://example.com` should be on the page and highlighted because it is url-like
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.type( 'Blobfish' );
+
+		const navLinkBlobfish = editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Blobfish', exact: true } );
+
+		await expect( navLinkBlobfish ).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+k' );
+
+		// Expect the Link Control to be focused
+		const linkControlBlobfishLink = page.getByRole( 'link', {
+			name: 'Example Domain (opens in a new tab)',
+			exact: true,
+		} );
+
+		await expect( linkControlBlobfishLink ).toBeVisible();
+
+		await page.keyboard.press( 'Escape' );
+
+		// Expect Link Control to be gone
+		await expect( linkControlBlobfishLink ).toBeHidden();
+
+		/**
+		 * Test: Exiting the link control from the toolbar link button returns
+		 *       focus to the toolbar
+		 *
+		 * 1. Go to toolbar link button
+		 * 2. Enter
+		 * 3. Focus is within the link control
+		 * 4. Escape to exit
+		 * 5. Focus should be on the toolbar link button
+		 */
+
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		await pageUtils.pressKeys( 'ArrowRight', { times: 4 } );
+
+		const toolbarLinkButton = page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+
+		await expect( toolbarLinkButton ).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		await expect( linkControlBlobfishLink ).toBeFocused();
+
+		await page.keyboard.press( 'Escape' );
+
+		await expect( toolbarLinkButton ).toBeFocused();
+
+		/**
+		 * Test: Can add submenu item using the keyboard
+		 *
+		 * 1. Go to toolbar add submenu button
+		 * 2. Enter
+		 * 3. Focus is within the link control
+		 * 4. Escape to exit
+		 * 5. Focus should be on the toolbar link button
+		 */
+
+		await pageUtils.pressKeys( 'ArrowRight' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Add submenu', exact: true } )
+		).toBeFocused();
+
+		await page.keyboard.press( 'Enter' );
+
+		// Expect the submenu Add link to be present
+		await expect(
+			editor.canvas.getByRole( 'link', { name: 'Add link', exact: true } )
+		).toBeVisible();
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
