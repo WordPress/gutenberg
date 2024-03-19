@@ -43,6 +43,38 @@ import { store as blockEditorStore } from '../store';
 export const BACKGROUND_SUPPORT_KEY = 'background';
 export const IMAGE_BACKGROUND_TYPE = 'image';
 
+function useBlockProps( { name, style } ) {
+	if ( ! hasBackgroundSupport( name ) ) {
+		return {};
+	}
+
+	const backgroundImage = style?.background?.backgroundImage;
+
+	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
+		// Block background size defaults to cover.
+		const backgroundSize = style?.background?.backgroundSize ?? 'cover';
+		let backgroundPosition = style?.background?.backgroundPosition;
+
+		// If background size is set to contain, but no position is set, default to center.
+		if (
+			backgroundSize === 'contain' &&
+			backgroundPosition === undefined
+		) {
+			backgroundPosition = 'center';
+		}
+
+		return {
+			style: {
+				...style,
+				backgroundSize,
+				backgroundPosition,
+			},
+		};
+	}
+
+	return { style };
+}
+
 /**
  * Checks if there is a current value in the background image block support
  * attributes.
@@ -459,7 +491,7 @@ function BackgroundSizePanelItem( {
 	const repeatValue = style?.background?.backgroundRepeat;
 	const positionValue = style?.background?.backgroundPosition;
 
-	// An `undefined` value is treated as `cover` by the toggle group control.
+	// An `undefined` value is treated as whatever the value of defaultValue by the toggle group control.
 	// An empty string is treated as `auto` by the toggle group control. This
 	// allows a user to select "Size" and then enter a custom value, with an
 	// empty value being treated as `auto`.
