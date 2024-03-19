@@ -361,6 +361,7 @@ function FontCollection( { slug } ) {
 							isSmall
 							onClick={ () => {
 								setSelectedFont( null );
+								setNotice( null );
 							} }
 							aria-label={ __( 'Navigate to the previous view' ) }
 						/>
