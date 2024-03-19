@@ -60,9 +60,9 @@ function Editor() {
   const [blocks, setBlocks] = useState([]);
   return (
 		/*
-			The BlockEditorProvider is the wrapper of the block editor's state.
-			All the UI elements of the block editor need to be rendered within this provider.
-		*/
+				The BlockEditorProvider is the wrapper of the block editor's state.
+				All the UI elements of the block editor need to be rendered within this provider.
+		  */
     <BlockEditorProvider
       value={blocks}
       onChange={setBlocks}
