@@ -37,7 +37,7 @@ export function useStyles() {
 	// Make sure to recompute the styles when hasResolved changes.
 	const config = useMemo( () => {
 		return {
-			styles: styles ?? 'no styless',
+			styles: styles ?? {},
 			isReady,
 		};
 	}, [ isReady, styles ] );
