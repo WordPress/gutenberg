@@ -30,7 +30,7 @@ export const settings = {
 		const { content, level } = attributes;
 
 		const customName = attributes?.metadata?.name;
-		const hasContent = content?.length > 0;
+		const hasContent = content?.trim().length > 0;
 
 		// In the list view, use the block's content as the label.
 		// If the content is empty, fall back to the default label.
