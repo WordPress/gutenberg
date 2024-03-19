@@ -4,6 +4,11 @@
 import classnames from 'classnames';
 
 /**
+ * Internal dependencies
+ */
+import isImageUrl from './is-url-image';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -61,8 +66,22 @@ export default function LinkPreview( {
 
 	let icon;
 
+	const attachmentImg =
+		value.type === 'attachment' && isImageUrl( value?.url )
+			? value.url
+			: null;
+
 	if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
+	} else if ( attachmentImg ) {
+		//TODO we don't have an alt text for this image
+		icon = (
+			<img
+				className="block-editor-link-control__search-item-media-thumbnail"
+				src={ attachmentImg }
+				alt=""
+			/>
+		);
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
 	} else {

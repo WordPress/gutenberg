@@ -28,6 +28,13 @@ const ICONS_MAP = {
 
 function SearchItemIcon( { isURL, suggestion } ) {
 	let icon = null;
+	let imageURL = null;
+	let altText = '';
+
+	if ( suggestion.kind === 'media' ) {
+		imageURL = suggestion.thumbnail ? suggestion.thumbnail : null;
+		altText = suggestion.alt_text;
+	}
 
 	if ( isURL ) {
 		icon = globe;
@@ -43,7 +50,17 @@ function SearchItemIcon( { isURL, suggestion } ) {
 		}
 	}
 
-	if ( icon ) {
+	if ( imageURL ) {
+		return (
+			<span className="block-editor-link-control__search-item-icon">
+				<img
+					className="block-editor-link-control__search-item-media-thumbnail"
+					src={ imageURL }
+					alt={ altText }
+				/>
+			</span>
+		);
+	} else if ( icon ) {
 		return (
 			<Icon
 				className="block-editor-link-control__search-item-icon"
