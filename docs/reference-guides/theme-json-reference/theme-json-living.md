@@ -38,7 +38,6 @@ Setting that enables the following UI tools:
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
-- shadow: defaultPresets
 
 
 ---
