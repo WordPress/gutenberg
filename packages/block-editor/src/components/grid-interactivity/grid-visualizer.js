@@ -16,7 +16,6 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, range, Rect } from './utils';
-import { parseDropEvent } from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 
 export function GridVisualizer( { clientId } ) {
@@ -196,27 +195,26 @@ function GridVisualizerCell( {
 	onDragLeave,
 	onDrop,
 } ) {
+	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
+
 	const ref = useDropZone( {
-		onDragEnter( event ) {
-			const {
-				srcClientIds: [ srcClientId ],
-			} = parseDropEvent( event );
-			if ( validateDrag( srcClientId ) ) {
+		onDragEnter() {
+			const [ srcClientId ] = getDraggedBlockClientIds();
+			if ( srcClientId && validateDrag( srcClientId ) ) {
 				onDragEnter( srcClientId );
 			}
 		},
 		onDragLeave() {
 			onDragLeave();
 		},
-		onDrop( event ) {
-			const {
-				srcClientIds: [ srcClientId ],
-			} = parseDropEvent( event );
-			if ( validateDrag( srcClientId ) ) {
+		onDrop() {
+			const [ srcClientId ] = getDraggedBlockClientIds();
+			if ( srcClientId && validateDrag( srcClientId ) ) {
 				onDrop( srcClientId );
 			}
 		},
 	} );
+
 	return (
 		<div className="block-editor-grid-visualizer__cell">
 			<div
