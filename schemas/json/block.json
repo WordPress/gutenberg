@@ -351,7 +351,7 @@
 							"default": false
 						},
 						"backgroundSize": {
-							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls.",
+							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls. When a string value is provided, it will be used as the default value for the backgroundSize attribute.",
 							"default": false,
 							"oneOf": [
 								{

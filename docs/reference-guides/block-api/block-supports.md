@@ -126,9 +126,9 @@ _**Note:** Since WordPress 6.5._
 -   Default value: `null`
 -   Subproperties
     -   `backgroundImage`: type `boolean`, default value `false`
-    -   `backgroundSize`: type `boolean`, default value `false`
+    -   `backgroundSize`: type `boolean|string`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
+This value signals that a block supports some of the CSS style properties related to background, e.g., background image files and related properties.. When it does, the block editor will show UI controls for the user to set their values if [the theme declares support](/docs/how-to-guides/themes/global-settings-and-styles.md#opt-in-into-ui-controls).
 
 `backgroundImage` adds UI controls which allow the user to select a background image.
 `backgroundSize` adds the FocalPointPicker to pick the position of the background image and allow the user to select the background size (cover, contain, fixed).
@@ -142,6 +142,17 @@ supports: {
 }
 ```
 
+Note that the `backgroundSize` supports `boolean` and `string` types. When set to `true`, the block editor will show UI controls for the user to set background size, position and repeat values. When set to a `string`, the block editor will show UI controls for the user to set their values and the string will be used as the default value for `backgroundSize`. For example:
+
+```js
+supports: {
+	background: {
+		backgroundImage: true,
+		backgroundSize: 'cover', // Enables the backgroundSize UI control with a default value of 'cover'.
+	}
+}
+```
+
 When a block declares support for a specific background property, its attributes definition is extended to include the `style` attribute.
 
 When a background image is selected, the image data is stored in the `style.background.backgroundImage`.
@@ -149,13 +160,13 @@ When a background image is selected, the image data is stored in the `style.back
 When a background images is selected and its position or size are changed, the background-position is stored in the `style.background.backgroundPosition` and its background-size in `style.background.backgroundSize` attribute.
 
 -   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
-    -   `background`: an attribute of `object` type. 
-        - `backgroundImage`: an attribute of `object` type, containing information about the selected image 
+    -   `background`: an attribute of `object` type.
+        - `backgroundImage`: an attribute of `object` type, containing information about the selected image
             - `url`: type `string`, URL to the image
             - `id`: type `int`, media attachment ID
             - `source`: type `string`, at the moment the only value is `file`
-            - `title`: type `string`, title of the media attachment 
-        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value. 
+            - `title`: type `string`, title of the media attachment
+        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
@@ -484,10 +495,10 @@ When the block declares support for `color.link`, the attributes definition is e
                         color: {
                             text: 'var:preset|color|contrast',
                         },
-						":hover": { 
-							color: { 
-								text: "#000000" 
-							} 
+						":hover": {
+							color: {
+								text: "#000000"
+							}
 						}
                     }
                 }
