@@ -87,6 +87,10 @@ export function formatFontFamily( input ) {
  * formatFontFaceName(", 'Open Sans', 'Helvetica Neue', sans-serif") => "Open Sans"
  */
 export function formatFontFaceName( input ) {
+	if ( ! input ) {
+		return '';
+	}
+
 	let output = input.trim();
 	if ( output.includes( ',' ) ) {
 		output = output

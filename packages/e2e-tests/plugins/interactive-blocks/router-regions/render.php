@@ -6,8 +6,6 @@
  *
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
-
-wp_enqueue_script_module( 'router-regions-view' );
 ?>
 
 <section>

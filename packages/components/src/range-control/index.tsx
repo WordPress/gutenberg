@@ -253,7 +253,7 @@ function UnforwardedRangeControl(
 						value={ inputSliderValue ?? undefined }
 					/>
 					<RangeRail
-						aria-hidden={ true }
+						aria-hidden
 						disabled={ disabled }
 						marks={ marks }
 						max={ max }
@@ -263,7 +263,7 @@ function UnforwardedRangeControl(
 						value={ rangeFillValue }
 					/>
 					<Track
-						aria-hidden={ true }
+						aria-hidden
 						className="components-range-control__track"
 						disabled={ disabled }
 						style={ { width: fillValueOffset } }
@@ -275,7 +275,7 @@ function UnforwardedRangeControl(
 						disabled={ disabled }
 					>
 						<Thumb
-							aria-hidden={ true }
+							aria-hidden
 							isFocused={ isThumbFocused }
 							disabled={ disabled }
 						/>
