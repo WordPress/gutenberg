@@ -294,12 +294,12 @@
 						},
 						"heading": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set heading colors in a block, heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"description": "This property adds block controls which allow the user to set heading colors in a block. Heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"button": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set button colors in a block, button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"description": "This property adds block controls which allow the user to set button colors in a block. Button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.button, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"enableContrastChecker": {
@@ -476,6 +476,11 @@
 								"allowOrientation": {
 									"type": "boolean",
 									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
+									"default": true
+								},
+								"allowCustomContentAndWideSize": {
+									"type": "boolean",
+									"description": "For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.",
 									"default": true
 								}
 							}

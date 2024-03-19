@@ -94,7 +94,7 @@ describe( 'Disabled', () => {
 			'This is contentEditable.'
 		);
 
-		rerender( <MaybeDisable isDisabled={ true } /> );
+		rerender( <MaybeDisable isDisabled /> );
 		expect( getInput() ).toHaveValue( 'This is input.' );
 		expect( getContentEditable() ).toHaveTextContent(
 			'This is contentEditable.'

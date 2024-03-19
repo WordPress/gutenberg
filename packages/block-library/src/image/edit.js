@@ -369,7 +369,7 @@ export function ImageEdit( {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
-				withIllustration={ true }
+				withIllustration
 				icon={ lockUrlControls ? pluginsIcon : icon }
 				label={ __( 'Image' ) }
 				instructions={

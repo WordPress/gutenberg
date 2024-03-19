@@ -14,7 +14,6 @@ import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
 	EditorSnackbars,
-	PostSyncStatusModal,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -50,6 +49,7 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
+import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -381,7 +381,7 @@ function Layout( { initialPost } ) {
 			<EditPostPreferencesModal />
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
-			<PostSyncStatusModal />
+			<InitPatternModal />
 			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && <SettingsSidebar /> }

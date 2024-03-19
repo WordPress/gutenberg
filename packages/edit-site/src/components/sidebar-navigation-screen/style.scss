@@ -77,7 +77,7 @@
 	flex-shrink: 0;
 }
 
-.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
+.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variation-container {
 	@include break-medium() {
 		// Safari does not currently support `scrollbar-gutter: stable`, so at
 		// particular viewport sizes it's possible for previews to render prior to a
@@ -90,7 +90,16 @@
 		// See: https://github.com/WordPress/gutenberg/issues/55112
 		max-width: 292px;
 	}
+}
 
+.edit-site-global-styles-variation-title {
+	color: $gray-300;
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+}
+
+.edit-site-sidebar-navigation-screen__content .edit-site-global-styles-style-variations-container {
 	.edit-site-global-styles-variations_item-preview {
 		box-shadow: 0 0 0 $border-width $gray-900;
 	}

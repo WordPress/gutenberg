@@ -1,13 +1,35 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+-	`Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+-	`Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
+
+### Enhancements
+
+-   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+
+### Deprecation
+
+-   `isSmall` prop in `Button` component has been deprecated. Use `size="small"` prop instead ([#59734](https://github.com/WordPress/gutenberg/pull/59734)).
+
+### Internal
+
+-   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
 
 ### Bug Fix
+-   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
 
+
+
+## 27.1.0 (2024-03-06)
+
+### Bug Fix
+-   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
 -   `Button`: Fix focus outline in disabled primary variant ([#59391](https://github.com/WordPress/gutenberg/pull/59391)).
--   `Button`: Place `children` before the icon when `iconPosition` is `right`  ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
+-   `Button`: Place `children` before the icon when `iconPosition` is `right` ([#59489](https://github.com/WordPress/gutenberg/pull/59489)).
+-   `ToggleGroupControl`: Fix unwanted backdrop vertical animation ([#59642](https://github.com/WordPress/gutenberg/pull/59642)).
 
 ### Internal
 
@@ -61,6 +83,7 @@
 -   `AnglePickerControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#58700](https://github.com/WordPress/gutenberg/pull/58700)).
 
 ### Enhancements
+
 -   `Button`: Update secondary variant to show the border even in a disabled state. ([#58606](https://github.com/WordPress/gutenberg/pull/58606)).
 -   `ConfirmDialog`: Add `__next40pxDefaultSize` to buttons ([#58421](https://github.com/WordPress/gutenberg/pull/58421)).
 -   `Snackbar`: Update the warning message ([#58591](https://github.com/WordPress/gutenberg/pull/58591)).
@@ -108,8 +131,8 @@
 -   `Tooltip`: no-op when nested inside other `Tooltip` components ([#57202](https://github.com/WordPress/gutenberg/pull/57202)).
 -   `Tooltip` and `Button`: tidy up unit tests ([#57975](https://github.com/WordPress/gutenberg/pull/57975)).
 -   `BorderControl`, `BorderBoxControl`: Replace style picker with ToggleGroupControl ([#57562](https://github.com/WordPress/gutenberg/pull/57562)).
--	`SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
--	`Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
+-   `SlotFill`: fix typo in use-slot-fills return docs ([#57654](https://github.com/WordPress/gutenberg/pull/57654))
+-   `Popover`: Adding `constrainTabbing` prop to `useDialog` hook ([#57962](https://github.com/WordPress/gutenberg/pull/57962))
 
 ### Bug Fix
 

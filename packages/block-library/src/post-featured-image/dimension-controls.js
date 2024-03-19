@@ -83,7 +83,7 @@ const DimensionControls = ( {
 				resetAllFilter={ () => ( {
 					aspectRatio: undefined,
 				} ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				panelId={ clientId }
 			>
 				<SelectControl
@@ -138,7 +138,7 @@ const DimensionControls = ( {
 				resetAllFilter={ () => ( {
 					height: undefined,
 				} ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				panelId={ clientId }
 			>
 				<UnitControl
@@ -160,7 +160,7 @@ const DimensionControls = ( {
 				resetAllFilter={ () => ( {
 					width: undefined,
 				} ) }
-				isShownByDefault={ true }
+				isShownByDefault
 				panelId={ clientId }
 			>
 				<UnitControl
@@ -186,7 +186,7 @@ const DimensionControls = ( {
 					resetAllFilter={ () => ( {
 						scale: DEFAULT_SCALE,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<ToggleGroupControl

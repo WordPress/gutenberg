@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -36,7 +35,6 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 } ) {
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -46,11 +44,14 @@ function GridItem( {
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
 			} ) }
-			onMouseDown={ ( event ) => {
-				if ( hasBulkAction && ( event.ctrlKey || event.metaKey ) ) {
-					setHasNoPointerEvents( true );
+			onClickCapture={ ( event ) => {
+				if ( event.ctrlKey || event.metaKey ) {
+					event.stopPropagation();
+					event.preventDefault();
+					if ( ! hasBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
@@ -72,11 +73,6 @@ function GridItem( {
 							} )
 						);
 					}
-				}
-			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
 				}
 			} }
 		>

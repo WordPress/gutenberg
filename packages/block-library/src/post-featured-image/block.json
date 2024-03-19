@@ -77,6 +77,9 @@
 				"width": true
 			}
 		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -85,6 +88,9 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
+	},
+	"selectors": {
+		"shadow": ".wp-block-post-featured-image img, .wp-block-post-featured-image .components-placeholder"
 	},
 	"editorStyle": "wp-block-post-featured-image-editor",
 	"style": "wp-block-post-featured-image"
