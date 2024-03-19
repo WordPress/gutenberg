@@ -43,38 +43,6 @@ import { store as blockEditorStore } from '../store';
 export const BACKGROUND_SUPPORT_KEY = 'background';
 export const IMAGE_BACKGROUND_TYPE = 'image';
 
-function useBlockProps( { name, style } ) {
-	if ( ! hasBackgroundSupport( name ) ) {
-		return {};
-	}
-
-	const backgroundImage = style?.background?.backgroundImage;
-
-	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
-		// Block background size defaults to cover.
-		const backgroundSize = style?.background?.backgroundSize ?? 'cover';
-		let backgroundPosition = style?.background?.backgroundPosition;
-
-		// If background size is set to contain, but no position is set, default to center.
-		if (
-			backgroundSize === 'contain' &&
-			backgroundPosition === undefined
-		) {
-			backgroundPosition = 'center';
-		}
-
-		return {
-			style: {
-				...style,
-				backgroundSize,
-				backgroundPosition,
-			},
-		};
-	}
-
-	return { style };
-}
-
 /**
  * Checks if there is a current value in the background image block support
  * attributes.
@@ -198,15 +166,10 @@ export function resetBackgroundImage( style = {}, setAttributes ) {
  * Resets the background size block support attributes. This can be used when disabling
  * the background size controls for a block via a `ToolsPanel`.
  *
- * @param {Object}   style                      Style attribute.
- * @param {Function} setAttributes              Function to set block's attributes.
- * @param {string}   backgroundSizeDefaultValue Reset value for backgroundSize
+ * @param {Object}   style         Style attribute.
+ * @param {Function} setAttributes Function to set block's attributes.
  */
-function resetBackgroundSize(
-	style = {},
-	setAttributes,
-	backgroundSizeDefaultValue
-) {
+function resetBackgroundSize( style = {}, setAttributes ) {
 	setAttributes( {
 		style: cleanEmptyObject( {
 			...style,
@@ -214,7 +177,7 @@ function resetBackgroundSize(
 				...style?.background,
 				backgroundPosition: undefined,
 				backgroundRepeat: undefined,
-				backgroundSize: backgroundSizeDefaultValue,
+				backgroundSize: undefined,
 			},
 		} ),
 	} );
@@ -294,7 +257,6 @@ function BackgroundImagePanelItem( {
 		[ clientId ]
 	);
 	const { id, title, url } = style?.background?.backgroundImage || {};
-	const sizeValue = style?.background?.backgroundSize;
 
 	const replaceContainerRef = useRef();
 
@@ -349,7 +311,6 @@ function BackgroundImagePanelItem( {
 					source: 'file',
 					title: media.title || undefined,
 				},
-				backgroundSize: sizeValue || 'cover',
 			},
 		};
 
@@ -479,7 +440,6 @@ function BackgroundSizePanelItem( {
 	clientId,
 	isShownByDefault,
 	setAttributes,
-	defaultValue = 'auto',
 } ) {
 	const style = useSelect(
 		( select ) =>
@@ -489,9 +449,8 @@ function BackgroundSizePanelItem( {
 
 	const sizeValue = style?.background?.backgroundSize;
 	const repeatValue = style?.background?.backgroundRepeat;
-	const positionValue = style?.background?.backgroundPosition;
 
-	// An `undefined` value is treated as whatever the value of defaultValue by the toggle group control.
+	// An `undefined` value is treated as `cover` by the toggle group control.
 	// An empty string is treated as `auto` by the toggle group control. This
 	// allows a user to select "Size" and then enter a custom value, with an
 	// empty value being treated as `auto`.
@@ -501,7 +460,7 @@ function BackgroundSizePanelItem( {
 			sizeValue !== 'contain' ) ||
 		sizeValue === ''
 			? 'auto'
-			: sizeValue || defaultValue;
+			: sizeValue || 'cover';
 
 	// If the current value is `cover` and the repeat value is `undefined`, then
 	// the toggle should be unchecked as the default state. Otherwise, the toggle
@@ -530,21 +489,9 @@ function BackgroundSizePanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
-		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
-			if ( nextPosition === undefined ) {
-				nextPosition = 'center';
-			}
-		}
-
-		if ( next !== 'contain' && nextPosition === 'center' ) {
-			nextPosition = undefined;
-		}
-
-		if ( next === 'cover' ) {
-			nextRepeat = undefined;
 		}
 
 		if (
@@ -560,7 +507,6 @@ function BackgroundSizePanelItem( {
 				...style,
 				background: {
 					...style?.background,
-					backgroundPosition: nextPosition,
 					backgroundRepeat: nextRepeat,
 					backgroundSize: next,
 				},
@@ -568,7 +514,7 @@ function BackgroundSizePanelItem( {
 		} );
 	};
 
-	const updateBackgroundPosition = ( next ) =>
+	const updateBackgroundPosition = ( next ) => {
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
@@ -578,6 +524,7 @@ function BackgroundSizePanelItem( {
 				},
 			} ),
 		} );
+	};
 
 	const toggleIsRepeated = () => {
 		setAttributes( {
@@ -599,9 +546,7 @@ function BackgroundSizePanelItem( {
 			className="single-column"
 			hasValue={ () => hasValue }
 			label={ __( 'Size' ) }
-			onDeselect={ () =>
-				resetBackgroundSize( style, setAttributes, defaultValue )
-			}
+			onDeselect={ () => resetBackgroundSize( style, setAttributes ) }
 			isShownByDefault={ isShownByDefault }
 			resetAllFilter={ resetAllFilter }
 			panelId={ clientId }
@@ -681,8 +626,6 @@ export function BackgroundImagePanel( props ) {
 		'__experimentalDefaultControls',
 	] );
 
-	const defaultBackgroundSize = 'cover';
-
 	return (
 		<InspectorControls group="background">
 			<BackgroundImagePanelItem
@@ -692,16 +635,9 @@ export function BackgroundImagePanel( props ) {
 			{ showBackgroundSize && (
 				<BackgroundSizePanelItem
 					isShownByDefault={ defaultControls?.backgroundSize }
-					defaultValue={ defaultBackgroundSize }
 					{ ...props }
 				/>
 			) }
 		</InspectorControls>
 	);
 }
-
-export default {
-	useBlockProps,
-	attributeKeys: [ 'style' ],
-	hasSupport: hasBackgroundSupport,
-};
