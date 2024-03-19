@@ -34,6 +34,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
 
+const NOOP = () => {};
 function InserterMenu(
 	{
 		rootClientId,
@@ -45,6 +46,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
+		__experimentalOnPatternCategorySelection = NOOP,
 	},
 	ref
 ) {
@@ -114,8 +116,9 @@ function InserterMenu(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
+			__experimentalOnPatternCategorySelection();
 		},
-		[ setSelectedPatternCategory ]
+		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
 	const blocksTab = useMemo(

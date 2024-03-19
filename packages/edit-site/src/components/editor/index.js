@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -174,6 +174,8 @@ export default function Editor( { isLoading, onClick } ) {
 		'edit-site-editor__loading-progress'
 	);
 
+	const { closeGeneralSidebar } = useDispatch( editSiteStore );
+
 	const settings = useSpecificEditorSettings();
 	const isReady =
 		! isLoading &&
@@ -243,7 +245,12 @@ export default function Editor( { isLoading, onClick } ) {
 						}
 						secondarySidebar={
 							isEditMode &&
-							( ( shouldShowInserter && <InserterSidebar /> ) ||
+							( ( shouldShowInserter && (
+								<InserterSidebar
+									closeGeneralSidebar={ closeGeneralSidebar }
+									isRightSidebarOpen={ isRightSidebarOpen }
+								/>
+							) ) ||
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
