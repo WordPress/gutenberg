@@ -238,6 +238,9 @@ export const getEntityRecords =
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
 					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
