@@ -135,6 +135,7 @@ export default function ListViewSidebar() {
 						icon={ closeSmall }
 						label={ __( 'Close' ) }
 						onClick={ closeListView }
+						size="compact"
 					/>
 					<Tabs.TabList
 						className="editor-list-view-sidebar__tabs-tablist"
