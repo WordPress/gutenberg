@@ -217,6 +217,9 @@ const v4 = {
 			},
 		},
 		__experimentalSelector: '.wp-block-table > table',
+		interactivity: {
+			clientNavigation: true,
+		},
 	},
 	save( { attributes } ) {
 		const { hasFixedLayout, head, body, foot, caption } = attributes;
