@@ -31,7 +31,7 @@ const CARD_ICONS = {
 };
 
 export default function PostCardPanel( { className, actions, children } ) {
-	const { modified, title, type, templateInfo } = useSelect( ( select ) => {
+	const { modified, title, templateInfo } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPostType,
@@ -42,16 +42,12 @@ export default function PostCardPanel( { className, actions, children } ) {
 		const _type = getCurrentPostType();
 		const _id = getCurrentPostId();
 		let _templateInfo;
-		if ( _type === 'wp_template' || _type === 'wp_template_part' ) {
-			const _record = getEditedEntityRecord( 'postType', _type, _id );
-			_templateInfo = __experimentalGetTemplateInfo( _record );
-		}
+		const _record = getEditedEntityRecord( 'postType', _type, _id );
 		return {
 			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
 			modified: getEditedPostAttribute( 'modified' ),
 			id: _id,
-			type: _type,
-			templateInfo: _templateInfo,
+			templateInfo: __experimentalGetTemplateInfo( _record ),
 		};
 	} );
 	const description = templateInfo?.description;
@@ -62,7 +58,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 			__( 'Last edited %s' ),
 			humanTimeDiff( modified )
 		);
-	const icon = CARD_ICONS[ type ] || templateInfo?.icon || pageIcon;
+
 	return (
 		<PanelBody>
 			<div
@@ -74,7 +70,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 				>
 					<Icon
 						className="editor-post-card-panel__icon"
-						icon={ icon }
+						icon={ templateInfo.icon }
 					/>
 					{ !! title && (
 						<h2 className="editor-post-card-panel__title">
