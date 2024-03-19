@@ -136,7 +136,7 @@ const fetchTranslations = ( {
 
 	return Promise.all( fetchPromises ).then( ( results ) => {
 		const fetchedTranslations = results.filter(
-			( result ) => result.response
+			( result ) => result?.response
 		);
 
 		// Abort process if any translation can't be fetched
