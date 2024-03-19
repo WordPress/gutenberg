@@ -45,6 +45,9 @@ import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
+	if ( action.type === 'clear' ) {
+		return {};
+	}
 	if ( Array.isArray( action.clientIds ) ) {
 		return {
 			...state,
@@ -194,7 +197,10 @@ function ListViewComponent(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			const clientIds = Array.isArray( clientId )
+				? clientId
+				: [ clientId ];
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
@@ -207,6 +213,9 @@ function ListViewComponent(
 		},
 		[ setExpandedState ]
 	);
+	const collapseAll = useCallback( () => {
+		setExpandedState( { type: 'clear' } );
+	}, [ setExpandedState ] );
 	const expandRow = useCallback(
 		( row ) => {
 			expand( row?.dataset?.block );
@@ -282,6 +291,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
@@ -299,6 +309,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,

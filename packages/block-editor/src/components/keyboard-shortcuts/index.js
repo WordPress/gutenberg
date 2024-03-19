@@ -132,6 +132,17 @@ function KeyboardShortcutsRegister() {
 				character: 'y',
 			},
 		} );
+
+		// List view shortcuts.
+		registerShortcut( {
+			name: 'core/block-editor/collapse-list-view',
+			category: 'list-view',
+			description: __( 'Collapse all but the focused list view item.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'l',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;
