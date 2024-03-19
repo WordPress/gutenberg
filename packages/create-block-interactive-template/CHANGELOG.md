@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Update the template to use `wp_interactivity_data_wp_context` for the context attribute ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
+
 ## 1.16.0 (2024-03-06)
 
 ## 1.15.0 (2024-02-21)
