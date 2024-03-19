@@ -18,8 +18,7 @@
 
 ### Bug Fix
 -   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
-
-
+-   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
 
 ## 27.1.0 (2024-03-06)
 
