@@ -24,6 +24,7 @@ import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { lock, unlock } from '../../lock-unlock';
+import { useStyles } from '../use-styles';
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -41,7 +42,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
 	'__unstableGalleryWithImageBlocks',
-	'__globalStyles',
 	'alignWide',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
@@ -174,6 +174,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
+	// get the styles from the global styles
+	const { styles } = useStyles();
+
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
 		settings.__experimentalBlockPatterns; // WP 5.9
@@ -260,6 +263,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			// TODO: This key should have a better name
+			__globalStyles: styles,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
