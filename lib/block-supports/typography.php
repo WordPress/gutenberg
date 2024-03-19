@@ -26,6 +26,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
@@ -37,6 +38,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_font_weight_support
 		|| $has_letter_spacing_support
 		|| $has_line_height_support
+		|| $has_text_align_support
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
 		|| $has_text_transform_support
@@ -61,6 +63,12 @@ function gutenberg_register_typography_support( $block_type ) {
 	if ( $has_font_family_support && ! array_key_exists( 'fontFamily', $block_type->attributes ) ) {
 		$block_type->attributes['fontFamily'] = array(
 			'type' => 'string',
+		);
+	}
+
+	if ( $has_text_align_support && ! array_key_exists( 'textAlign', $block_type->attributes ) ) {
+		$block_type->attributes['textAlign'] = array(
+			'type' => 'array',
 		);
 	}
 }
@@ -95,6 +103,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_font_weight_support     = $typography_supports['__experimentalFontWeight'] ?? false;
 	$has_letter_spacing_support  = $typography_supports['__experimentalLetterSpacing'] ?? false;
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
+	$has_text_align_support      = $typography_supports['textAlign'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
@@ -106,6 +115,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_font_style      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontStyle' );
 	$should_skip_font_weight     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'fontWeight' );
 	$should_skip_line_height     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
+	$should_skip_text_align      = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
 	$should_skip_text_columns    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
@@ -227,6 +237,19 @@ function gutenberg_typography_get_preset_inline_style_value( $style_value, $css_
  * @return string                Filtered block content.
  */
 function gutenberg_render_typography_support( $block_content, $block ) {
+	// Inject text align class name to the block wrapper.
+	$block_type             = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$block_attributes       = ( isset( $block['attrs'] ) && is_array( $block['attrs'] ) ) ? $block['attrs'] : array();
+	$has_text_align_support = block_has_support( $block_type, array( 'typography', 'textAlign' ), false );
+	$should_skip_text_align = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textAlign' );
+
+	if ( $has_text_align_support && ! $should_skip_text_align && ! empty( $block_attributes['textAlign'] ) ) {
+		$content = new WP_HTML_Tag_Processor( $block_content );
+		$content->next_tag();
+		$content->add_class( 'has-text-align-' . $block_attributes['textAlign'] );
+		$block_content = $content->get_updated_html();
+	}
+
 	if ( ! isset( $block['attrs']['style']['typography']['fontSize'] ) ) {
 		return $block_content;
 	}
