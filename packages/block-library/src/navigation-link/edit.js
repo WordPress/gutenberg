@@ -333,6 +333,8 @@ export default function NavigationLinkEdit( {
 			// as it shares the CMD+K shortcut.
 			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
+			// If this link is a child of a parent submenu item, the parent submenu item event will also open, closing this popover
+			event.stopPropagation();
 			setIsLinkOpen( true );
 			setOpenedBy( ref.current );
 		}
@@ -525,12 +527,6 @@ export default function NavigationLinkEdit( {
 												'core/image',
 												'core/strikethrough',
 											] }
-											onClick={ () => {
-												if ( ! url ) {
-													setIsLinkOpen( true );
-													setOpenedBy( ref.current );
-												}
-											} }
 										/>
 										{ description && (
 											<span className="wp-block-navigation-item__description">
