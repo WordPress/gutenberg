@@ -54,7 +54,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 		modified &&
 		sprintf(
 			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s' ),
+			__( 'Last edited %s.' ),
 			humanTimeDiff( modified )
 		);
 
