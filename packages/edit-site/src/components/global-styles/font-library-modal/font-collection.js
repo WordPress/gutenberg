@@ -344,6 +344,7 @@ function FontCollection( { slug } ) {
 							size="small"
 							onClick={ () => {
 								setSelectedFont( null );
+								setNotice( null );
 							} }
 							label={ __( 'Back' ) }
 						/>
