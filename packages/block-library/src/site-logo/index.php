@@ -80,6 +80,8 @@ function render_block_core_site_logo( $attributes ) {
  * Generates class names and styles to apply the border support styles for
  * the site logo block.
  *
+ * @since 6.6.0
+ *
  * @param array $attributes The block attributes.
  * @return array The border-related classnames and styles for the block.
  */

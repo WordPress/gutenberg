@@ -73,7 +73,7 @@ const ImageWrapper = ( { isLink, href, title, classes, children } ) => {
 			title={ title }
 			rel="home"
 			onClick={ ( event ) => event.preventDefault() }
-			aria-disabled={ true }
+			aria-disabled
 			style={ {
 				// When the site logo block is linked,
 				// it's wrapped with a disabled <a /> tag.
