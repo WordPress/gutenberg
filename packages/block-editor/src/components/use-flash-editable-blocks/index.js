@@ -24,7 +24,9 @@ export function useFlashEditableBlocks( {
 	rootClientId = '',
 	isEnabled = true,
 } = {} ) {
-	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
+	const { getEnabledClientIdsTree, getBlockName, getBlockOrder } = unlock(
+		useSelect( blockEditorStore )
+	);
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
@@ -54,12 +56,21 @@ export function useFlashEditableBlocks( {
 			const selectClosestEditableBlock = ( x, y ) => {
 				const editableBlockClientIds = getEnabledClientIdsTree(
 					rootClientId
-				).map( ( { clientId } ) => clientId );
+				).flatMap( ( { clientId } ) => {
+					// TODO: We shouldn't be referencing a particular block in @wordpress/block-editor
+					if ( getBlockName( clientId ) === 'core/post-content' ) {
+						const innerBlocks = getBlockOrder( clientId );
+						if ( innerBlocks.length ) {
+							return innerBlocks;
+						}
+					}
+					return [ clientId ];
+				} );
 				let closestDistance = Infinity,
 					closestClientId = null;
-				for ( const id of editableBlockClientIds ) {
+				for ( const clientId of editableBlockClientIds ) {
 					const block = element.querySelector(
-						`[data-block="${ id }"]`
+						`[data-block="${ clientId }"]`
 					);
 					if ( ! block ) {
 						continue;
@@ -68,7 +79,7 @@ export function useFlashEditableBlocks( {
 					const distance = distanceFromRect( x, y, rect );
 					if ( distance < closestDistance ) {
 						closestDistance = distance;
-						closestClientId = id;
+						closestClientId = clientId;
 					}
 				}
 				if ( closestClientId ) {
