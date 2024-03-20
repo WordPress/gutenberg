@@ -316,7 +316,7 @@
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-right: calc(#{$grid-unit-05} * 1.5); // 6px.
+		padding-right: $grid-unit-15 * 0.5; // 6px.
 
 		.components-button.has-icon {
 			height: 24px;
