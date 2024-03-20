@@ -11,6 +11,8 @@ import {
 	OPERATOR_IS_NOT,
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_ANY,
+	OPERATOR_IS_ALL,
+	OPERATOR_IS_NOT_ALL,
 } from './constants';
 import { normalizeFields } from './normalize-fields';
 
@@ -71,6 +73,24 @@ export function filterAndSortDataView( data, view, fields ) {
 					return ! filter.value.includes(
 						field.getValue( { item } )
 					);
+				} );
+			} else if (
+				filter.operator === OPERATOR_IS_ALL &&
+				filter?.value?.length > 0
+			) {
+				filteredData = filteredData.filter( ( item ) => {
+					return filter.value.every( ( value ) => {
+						return field.getValue( { item } ).includes( value );
+					} );
+				} );
+			} else if (
+				filter.operator === OPERATOR_IS_NOT_ALL &&
+				filter?.value?.length > 0
+			) {
+				filteredData = filteredData.filter( ( item ) => {
+					return filter.value.every( ( value ) => {
+						return ! field.getValue( { item } ).includes( value );
+					} );
 				} );
 			} else if ( filter.operator === OPERATOR_IS ) {
 				filteredData = filteredData.filter( ( item ) => {

@@ -53,6 +53,51 @@ describe( 'filters', () => {
 		expect( result[ 0 ].description ).toBe( 'NASA photo' );
 	} );
 
+	it( 'should search using IS filter', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'type',
+						operator: 'is',
+						value: 'Ice giant',
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 2 );
+		expect( result[ 0 ].title ).toBe( 'Neptune' );
+		expect( result[ 1 ].title ).toBe( 'Uranus' );
+	} );
+
+	it( 'should search using IS NOT filter', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'type',
+						operator: 'isNot',
+						value: 'Ice giant',
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 9 );
+		expect( result[ 0 ].title ).toBe( 'Apollo' );
+		expect( result[ 1 ].title ).toBe( 'Space' );
+		expect( result[ 2 ].title ).toBe( 'NASA' );
+		expect( result[ 3 ].title ).toBe( 'Mercury' );
+		expect( result[ 4 ].title ).toBe( 'Venus' );
+		expect( result[ 5 ].title ).toBe( 'Earth' );
+		expect( result[ 6 ].title ).toBe( 'Mars' );
+		expect( result[ 7 ].title ).toBe( 'Jupiter' );
+		expect( result[ 8 ].title ).toBe( 'Saturn' );
+	} );
+
 	it( 'should search using IS ANY filter', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
@@ -72,23 +117,68 @@ describe( 'filters', () => {
 		expect( result[ 1 ].title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS filter', () => {
+	it( 'should search using IS NONE filter', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
 			{
 				filters: [
 					{
 						field: 'type',
-						operator: 'is',
-						value: 'Ice giant',
+						operator: 'isNone',
+						value: [ 'Ice giant', 'Gas giant', 'Terrestrial' ],
 					},
 				],
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 2 );
+		expect( result ).toHaveLength( 3 );
+		expect( result[ 0 ].title ).toBe( 'Apollo' );
+		expect( result[ 1 ].title ).toBe( 'Space' );
+		expect( result[ 2 ].title ).toBe( 'NASA' );
+	} );
+
+	it( 'should search using IS ALL filter', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'categories',
+						operator: 'isAll',
+						value: [ 'Planet', 'Solar system' ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 7 );
 		expect( result[ 0 ].title ).toBe( 'Neptune' );
-		expect( result[ 1 ].title ).toBe( 'Uranus' );
+		expect( result[ 1 ].title ).toBe( 'Mercury' );
+		expect( result[ 2 ].title ).toBe( 'Venus' );
+		expect( result[ 3 ].title ).toBe( 'Earth' );
+		expect( result[ 4 ].title ).toBe( 'Mars' );
+		expect( result[ 5 ].title ).toBe( 'Jupiter' );
+		expect( result[ 6 ].title ).toBe( 'Saturn' );
+	} );
+
+	it( 'should search using IS NOT ALL filter', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'categories',
+						operator: 'isNotAll',
+						value: [ 'Planet', 'Solar system' ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 3 );
+		expect( result[ 0 ].title ).toBe( 'Apollo' );
+		expect( result[ 1 ].title ).toBe( 'Space' );
+		expect( result[ 2 ].title ).toBe( 'NASA' );
 	} );
 } );
 
