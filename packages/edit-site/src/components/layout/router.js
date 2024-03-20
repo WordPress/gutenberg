@@ -12,6 +12,7 @@ import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
+import { default as Link } from '../routes/link';
 
 import {
 	TEMPLATE_POST_TYPE,
@@ -35,7 +36,16 @@ export default function useLayoutAreas() {
 			areas: {
 				content: <PagePages />,
 				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
+					<Link
+						params={ {
+							path,
+							postType: 'page',
+							postId,
+							canvas: 'edit',
+						} }
+					>
+						<Editor isLoading={ isSiteEditorLoading } />
+					</Link>
 				),
 				mobile:
 					canvas === 'edit' ? (
