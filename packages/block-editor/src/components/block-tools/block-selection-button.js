@@ -61,6 +61,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				getBlockListSettings,
 				__unstableGetEditorMode,
 				getNextBlockClientId,
+				getPreviousBlockClientId,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -74,7 +75,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				blockType?.name === 'core/template-part';
 
 			let isNextBlockTemplatePart = false;
-			const nextClientId = getNextBlockClientId( clientId );
+			const nextClientId = getNextBlockClientId();
 			if ( nextClientId ) {
 				const { name: nextName } = getBlock( nextClientId );
 				const nextBlockType = getBlockType( nextName );
@@ -83,7 +84,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			}
 
 			let isPrevBlockTemplatePart = false;
-			const prevClientId = getNextBlockClientId( clientId );
+			const prevClientId = getPreviousBlockClientId();
 			if ( prevClientId ) {
 				const { name: prevName } = getBlock( prevClientId );
 				const prevBlockType = getBlockType( prevName );
