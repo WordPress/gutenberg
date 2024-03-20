@@ -18,10 +18,11 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
+	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
 
@@ -35,7 +36,17 @@ export default function useLayoutAreas() {
 			areas: {
 				content: <PagePages />,
 				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
+					<Editor
+						isLoading={ isSiteEditorLoading }
+						onClick={ () =>
+							history.push( {
+								path,
+								postType: 'page',
+								postId,
+								canvas: 'edit',
+							} )
+						}
+					/>
 				),
 				mobile:
 					canvas === 'edit' ? (
