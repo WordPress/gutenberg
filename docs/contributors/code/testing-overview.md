@@ -499,6 +499,15 @@ To locally run the tests in debug mode, follow these steps:
 5. Click on the "Play" button to resume execution
 6. Enjoy debugging the native mobile unit tests!
 
+### Snapshot testing in native mobile
+
+Snapshot testing in native mobile is very similar to that of the web as described [above](#snapshot-testing), just use `npm run test-unit:native` instead of `npm run test-unit`. Arguments such as `--updateSnapshot` (to update snapshots) and `--testPathPattern` remain the same. 
+For example, if snapshots are broken and you wish to update them, you might run:
+
+```
+npm run test-unit:native -- --updateSnapshot --testPathPattern packages/block-library/src/file/test/edit.native.js
+```
+
 ### Native mobile end-to-end tests
 
 Contributors to Gutenberg will note that PRs include continuous integration E2E tests running the native mobile E2E tests on Android and iOS. For troubleshooting failed tests, check our guide on [native mobile tests in continuous integration](/docs/contributors/code/react-native/integration-test-guide.md). More information on running these tests locally can be found in [here](/packages/react-native-editor/__device-tests__/README.md).
