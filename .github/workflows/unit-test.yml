@@ -28,7 +28,7 @@ jobs:
             fail-fast: false
             matrix:
                 node: ['20', '21']
-                shard: [1, 2, 3, 4]
+                shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
             - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
@@ -50,12 +50,12 @@ jobs:
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the tests ${{ matrix.shard }}/${{ strategy.job-total }}
+            - name: Running the tests ${{ matrix.shard }}
               run: |
                   npm run test:unit -- \
                     --ci \
                     --maxWorkers="${{ steps.cpu-cores.outputs.count }}" \
-                    --shard="${{ matrix.shard }}/${{ strategy.job-total }}" \
+                    --shard="${{ matrix.shard }}" \
                     --cacheDirectory="$HOME/.jest-cache"
 
     unit-js-date:
