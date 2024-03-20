@@ -29,9 +29,8 @@
 	max-width: 100%;
 }
 
-.edit-site-global-styles-screen-typography,
-.edit-site-global-styles-screen-css {
-	margin: $grid-unit-20;
+.edit-site-global-styles-screen-typography {
+	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
 
 .edit-site-global-styles-screen-typography__indicator {
@@ -53,7 +52,7 @@
 }
 
 .edit-site-global-styles-screen-colors {
-	margin: $grid-unit-10 $grid-unit-20 $grid-unit-20;
+	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 
 	.color-block-support-panel {
 		padding-left: 0;
@@ -129,6 +128,7 @@
 	flex: 1 1 auto;
 	display: flex;
 	flex-direction: column;
+	margin: $grid-unit-20;
 
 	.components-v-stack {
 		flex: 1 1 auto;
