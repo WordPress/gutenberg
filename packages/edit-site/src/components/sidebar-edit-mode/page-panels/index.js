@@ -29,26 +29,26 @@ const { PostCardPanel } = unlock( editorPrivateApis );
 export default function PagePanels() {
 	const { id, type, hasResolved, status, date, password, renderingMode } =
 		useSelect( ( select ) => {
-		const { getEditedPostContext } = select( editSiteStore );
-		const { getEditedEntityRecord, hasFinishedResolution } =
-			select( coreStore );
-		const { getRenderingMode } = select( editorStore );
-		const context = getEditedPostContext();
-		const queryArgs = [ 'postType', context.postType, context.postId ];
-		const page = getEditedEntityRecord( ...queryArgs );
-		return {
-			hasResolved: hasFinishedResolution(
-				'getEditedEntityRecord',
-				queryArgs
-			),
-			id: page?.id,
-			type: page?.type,
-			status: page?.status,
-			date: page?.date,
-			password: page?.password,
-			renderingMode: getRenderingMode(),
-		};
-	}, [] );
+			const { getEditedPostContext } = select( editSiteStore );
+			const { getEditedEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const { getRenderingMode } = select( editorStore );
+			const context = getEditedPostContext();
+			const queryArgs = [ 'postType', context.postType, context.postId ];
+			const page = getEditedEntityRecord( ...queryArgs );
+			return {
+				hasResolved: hasFinishedResolution(
+					'getEditedEntityRecord',
+					queryArgs
+				),
+				id: page?.id,
+				type: page?.type,
+				status: page?.status,
+				date: page?.date,
+				password: page?.password,
+				renderingMode: getRenderingMode(),
+			};
+		}, [] );
 
 	if ( ! hasResolved ) {
 		return null;

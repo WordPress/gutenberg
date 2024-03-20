@@ -79,7 +79,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 						weight={ 500 }
 						as="h2"
 					>
-						{ title || __( 'No Title' ) }
+						{ title ? decodeEntities( title ) : __( 'No Title' ) }
 					</Text>
 					{ actions }
 				</HStack>
