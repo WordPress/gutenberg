@@ -113,7 +113,7 @@ const SocialLinkEdit = ( {
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
-	const socialLinkLabel = label ?? socialLinkName;
+	const socialLinkLabel = label ? label : socialLinkName;
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
@@ -140,7 +140,7 @@ const SocialLinkEdit = ( {
 							help={ __(
 								'Briefly describe the link to help screen reader users.'
 							) }
-							value={ label || '' }
+							value={ socialLinkLabel }
 							onChange={ ( value ) =>
 								setAttributes( { label: value || undefined } )
 							}
