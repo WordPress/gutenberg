@@ -61,7 +61,7 @@ function Palette( { name } ) {
 					_n( '%d color', '%d colors', colors.length ),
 					colors.length
 			  )
-			: __( 'Add colors' );
+			: __( 'Add custom colors' );
 
 	return (
 		<VStack spacing={ 3 }>
