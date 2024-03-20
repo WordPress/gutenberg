@@ -73,7 +73,6 @@ export const store = createReduxStore( STORE_NAME, storeConfig() );
 unlock( store ).registerPrivateSelectors( privateSelectors );
 register( store ); // Register store after unlocking private selectors to allow resolvers to use them.
 
-export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
 export * from './entity-types';
 export * from './fetch';
