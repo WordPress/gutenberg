@@ -2133,12 +2133,6 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// Processes background styles.
-			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				$background_styles = gutenberg_get_background_support_styles( $styles['background'] );
-				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
-			}
-
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
