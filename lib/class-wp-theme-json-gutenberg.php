@@ -2642,10 +2642,7 @@ class WP_Theme_JSON_Gutenberg {
 				unset( $declarations[ $index ] );
 			}
 
-			if ( $is_root_selector && (
-					'background-size' === $declaration['name'] && 'cover' === $declaration['value'] ||
-					'background' === $declaration['name']
-				) ) {
+			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
 				$should_set_root_min_height = true;
 			}
 		}
