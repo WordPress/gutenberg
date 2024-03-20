@@ -121,7 +121,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
 		useFlashEditableBlocks( {
-			clientId,
+			rootClientId: clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
 	] );

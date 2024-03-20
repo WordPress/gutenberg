@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,11 +10,22 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+function clamp( value, min, max ) {
+	return Math.min( Math.max( value, min ), max );
+}
+
+function distanceFromRect( x, y, rect ) {
+	const dx = x - clamp( x, rect.left, rect.right );
+	const dy = y - clamp( y, rect.top, rect.bottom );
+	return Math.sqrt( dx * dx + dy * dy );
+}
+
 export function useFlashEditableBlocks( {
-	clientId = '',
+	rootClientId = '',
 	isEnabled = true,
 } = {} ) {
 	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( element ) => {
@@ -23,10 +34,10 @@ export function useFlashEditableBlocks( {
 			}
 
 			const flashEditableBlocks = () => {
-				getEnabledClientIdsTree( clientId ).forEach(
-					( { clientId: id } ) => {
+				getEnabledClientIdsTree( rootClientId ).forEach(
+					( { clientId } ) => {
 						const block = element.querySelector(
-							`[data-block="${ id }"]`
+							`[data-block="${ clientId }"]`
 						);
 						if ( ! block ) {
 							return;
@@ -38,6 +49,31 @@ export function useFlashEditableBlocks( {
 						block.classList.add( 'has-editable-outline' );
 					}
 				);
+			};
+
+			const selectClosestEditableBlock = ( x, y ) => {
+				const editableBlockClientIds = getEnabledClientIdsTree(
+					rootClientId
+				).map( ( { clientId } ) => clientId );
+				let closestDistance = Infinity,
+					closestClientId = null;
+				for ( const id of editableBlockClientIds ) {
+					const block = element.querySelector(
+						`[data-block="${ id }"]`
+					);
+					if ( ! block ) {
+						continue;
+					}
+					const rect = block.getBoundingClientRect();
+					const distance = distanceFromRect( x, y, rect );
+					if ( distance < closestDistance ) {
+						closestDistance = distance;
+						closestClientId = id;
+					}
+				}
+				if ( closestClientId ) {
+					selectBlock( closestClientId );
+				}
 			};
 
 			const handleClick = ( event ) => {
@@ -52,6 +88,7 @@ export function useFlashEditableBlocks( {
 				}
 				event.preventDefault();
 				flashEditableBlocks();
+				selectClosestEditableBlock( event.clientX, event.clientY );
 			};
 
 			element.addEventListener( 'click', handleClick );
