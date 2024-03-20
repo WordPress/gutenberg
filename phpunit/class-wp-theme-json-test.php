@@ -4848,31 +4848,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'backgroundRepeat'   => 'no-repeat',
 						'backgroundPosition' => 'center center',
 					),
-					'blocks'     => array(
-						'core/paragraph' => array(
-							'background' => array(
-								'backgroundImage'    => array(
-									'url'    => 'http://example.org/image.png',
-									'source' => 'file',
-								),
-								'backgroundSize'     => 'cover',
-								'backgroundRepeat'   => 'no-repeat',
-								'backgroundPosition' => 'center center',
-							),
-						),
-					),
-					'elements'   => array(
-						'button' => array(
-							'background' => array(
-								'backgroundImage'    => array(
-									'url' => 'http://example.org/image.png',
-								),
-								'backgroundSize'     => 'cover',
-								'backgroundRepeat'   => 'no-repeat',
-								'backgroundPosition' => 'center center',
-							),
-						),
-					),
 				),
 			)
 		);
