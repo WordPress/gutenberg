@@ -41,6 +41,7 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
 				patternSourceFilter={ patternSourceFilter }
+				rootClientId={ rootClientId }
 			/>
 		</div>
 	);
