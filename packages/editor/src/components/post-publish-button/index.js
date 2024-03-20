@@ -102,7 +102,6 @@ export class PostPublishButton extends Component {
 	render() {
 		const {
 			forceIsDirty,
-			hasPublishAction,
 			isBeingScheduled,
 			isOpen,
 			isPostSavingLocked,
@@ -116,9 +115,9 @@ export class PostPublishButton extends Component {
 			onStatusChange,
 			onSubmit = noop,
 			onToggle,
-			visibility,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
+			status,
 		} = this.props;
 
 		const isButtonDisabled =
@@ -135,23 +134,12 @@ export class PostPublishButton extends Component {
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
-		let publishStatus;
-		if ( ! hasPublishAction ) {
-			publishStatus = 'pending';
-		} else if ( visibility === 'private' ) {
-			publishStatus = 'private';
-		} else if ( isBeingScheduled ) {
-			publishStatus = 'future';
-		} else {
-			publishStatus = 'publish';
-		}
-
 		const onClickButton = () => {
 			if ( isButtonDisabled ) {
 				return;
 			}
 			onSubmit();
-			onStatusChange( publishStatus );
+			onStatusChange( status );
 			onSave();
 		};
 
@@ -218,14 +206,13 @@ export default compose( [
 			isSavingPost,
 			isAutosavingPost,
 			isEditedPostBeingScheduled,
-			getEditedPostVisibility,
 			isCurrentPostPublished,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
 			isPostSavingLocked,
-			getCurrentPost,
 			getCurrentPostType,
 			getCurrentPostId,
+			getEditedPostAttribute,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
 		} = select( editorStore );
@@ -233,17 +220,15 @@ export default compose( [
 			isSaving: isSavingPost(),
 			isAutoSaving: isAutosavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction:
-				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
+			status: getEditedPostAttribute( 'status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
