@@ -4,7 +4,7 @@
 
 -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
 -   `Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
--   `Utils` : Update the line height in the Javascript to match to CSS.
+-   `Text`, `Heading`, `ItemGroup` : Update the line height from 1.2 to 1.4.
 
 ### Enhancements
 
