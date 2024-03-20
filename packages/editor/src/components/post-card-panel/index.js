@@ -85,16 +85,19 @@ export default function PostCardPanel( { className, actions, children } ) {
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
 					{ ( description || lastEditedText ) && (
-						<div className="editor-post-card-panel__description">
-							<VStack>
-								{ !! description && (
-									<Text>{ description }</Text>
-								) }
-								{ !! lastEditedText && (
-									<Text>{ lastEditedText }</Text>
-								) }
-							</VStack>
-						</div>
+						<VStack
+							className="editor-post-card-panel__description"
+							spacing={ 3 }
+						>
+							{ !! description && (
+								<Text variant="muted" lineHeight={ 1.4 }>
+									{ description }
+								</Text>
+							) }
+							{ !! lastEditedText && (
+								<Text variant="muted">{ lastEditedText }</Text>
+							) }
+						</VStack>
 					) }
 					{
 						// Todo: move TemplateAreas (and the selectors it depends) to the editor package, and use it here removing the children prop.
