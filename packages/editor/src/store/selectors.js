@@ -1105,7 +1105,7 @@ export function canUserUseUnfilteredHTML( state ) {
 }
 
 /**
- * Returns whether the pre-publish panel should be shown
+ * Returns whether the panel should be shown
  * or skipped when the user clicks the "publish" button.
  *
  * @return {boolean} Whether the pre-publish panel should be shown or not.
@@ -1115,6 +1115,34 @@ export const isPublishSidebarEnabled = createRegistrySelector(
 		!! select( preferencesStore ).get(
 			'core/edit-post',
 			'isPublishSidebarEnabled'
+		)
+);
+
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or skipped
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export const showPrePublishPanel = createRegistrySelector(
+	( select ) => () =>
+		!! select( preferencesStore ).get(
+			'core/edit-post',
+			'showPrePublishPanel'
+		)
+);
+
+/**
+ * Returns whether the post-publish panel should be shown
+ * or skipped
+ *
+ * @return {boolean} Whether the post-publish panel should be shown or not.
+ */
+export const showPostPublishPanel = createRegistrySelector(
+	( select ) => () =>
+		!! select( preferencesStore ).get(
+			'core/edit-post',
+			'showPostPublishPanel'
 		)
 );
 
