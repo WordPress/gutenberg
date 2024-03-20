@@ -85,7 +85,7 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
 								<VisuallyHidden as="span">

@@ -86,7 +86,7 @@ export const MoreExamplesStory: StoryFn< typeof Navigation > = ( {
 							className="navigation-story__wordpress-icon"
 							href="https://wordpress.org/"
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener"
 						>
 							<Icon icon={ wordpress } />
 							<em>Custom Content</em>

@@ -32,7 +32,6 @@ function UnforwardedExternalLink(
 			[
 				...rel.split( ' ' ),
 				'external',
-				'noreferrer',
 				'noopener',
 			].filter( Boolean )
 		),

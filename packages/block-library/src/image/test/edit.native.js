@@ -262,7 +262,7 @@ describe( 'Image Block', () => {
 		fireEvent.press( linkTargetButton );
 
 		const expectedHtml = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
-<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noreferrer noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<figure class="wp-block-image size-large is-style-default"><a href="https://wordpress.org" target="_blank" rel="noopener"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></a><figcaption class="wp-element-caption">Mountain</figcaption></figure>
 <!-- /wp:image -->`;
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
@@ -271,7 +271,7 @@ describe( 'Image Block', () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"custom","className":"is-style-default"} -->
 		<figure class="wp-block-image size-large is-style-default">
-			<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">
+			<a href="https://wordpress.org" target="_blank" rel="noopener">
 				<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
 			</a>
 			<figcaption class="wp-element-caption">Mountain</figcaption>

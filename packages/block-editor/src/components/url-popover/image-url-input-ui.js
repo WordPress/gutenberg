@@ -31,7 +31,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
-const NEW_TAB_REL = [ 'noreferrer', 'noopener' ];
+const NEW_TAB_REL = [ 'noopener' ];
 
 const ImageURLInputUI = ( {
 	linkDestination,
