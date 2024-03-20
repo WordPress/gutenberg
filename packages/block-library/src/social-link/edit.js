@@ -58,7 +58,9 @@ const SocialLinkURLPopover = ( {
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
 						}
-						placeholder={ __( 'Enter address' ) }
+						placeholder={ __( 'Enter social media link' ) }
+						label={ __( 'Enter social media link' ) }
+						hideLabelFromVision
 						disableSuggestions
 						onKeyDown={ ( event ) => {
 							if (
@@ -128,7 +130,7 @@ const SocialLinkEdit = ( {
 				<PanelBody
 					title={ sprintf(
 						/* translators: %s: name of the social service. */
-						__( '%s label' ),
+						__( '%s link text' ),
 						socialLinkName
 					) }
 					initialOpen={ false }
@@ -136,9 +138,9 @@ const SocialLinkEdit = ( {
 					<PanelRow>
 						<TextControl
 							__nextHasNoMarginBottom
-							label={ __( 'Link label' ) }
+							label={ __( 'Link text' ) }
 							help={ __(
-								'Briefly describe the link to help screen reader users.'
+								'The link text is only visible when Show links text is enabled.'
 							) }
 							value={ socialLinkLabel }
 							onChange={ ( value ) =>
