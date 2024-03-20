@@ -60,6 +60,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				hasBlockMovingClientId,
 				getBlockListSettings,
 				__unstableGetEditorMode,
+				getNextBlockClientId,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -69,6 +70,26 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			const orientation =
 				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
+			const isBlockTemplatePart =
+				blockType?.name === 'core/template-part';
+
+			let isNextBlockTemplatePart = false;
+			const nextClientId = getNextBlockClientId( clientId );
+			if ( nextClientId ) {
+				const { name: nextName } = getBlock( nextClientId );
+				const nextBlockType = getBlockType( nextName );
+				isNextBlockTemplatePart =
+					nextBlockType?.name === 'core/template-part';
+			}
+
+			let isPrevBlockTemplatePart = false;
+			const prevClientId = getNextBlockClientId( clientId );
+			if ( prevClientId ) {
+				const { name: prevName } = getBlock( prevClientId );
+				const prevBlockType = getBlockType( prevName );
+				isPrevBlockTemplatePart =
+					prevBlockType?.name === 'core/template-part';
+			}
 
 			return {
 				blockMovingMode: hasBlockMovingClientId(),
@@ -80,11 +101,22 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					index + 1,
 					orientation
 				),
+				isBlockTemplatePart,
+				isNextBlockTemplatePart,
+				isPrevBlockTemplatePart,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { label, icon, blockMovingMode, editorMode } = selected;
+	const {
+		label,
+		icon,
+		blockMovingMode,
+		editorMode,
+		isBlockTemplatePart,
+		isNextBlockTemplatePart,
+		isPrevBlockTemplatePart,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -252,8 +284,13 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
 				<FlexItem>
-					{ editorMode === 'zoom-out' && (
-						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
+					{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
+						<BlockMover
+							clientIds={ [ clientId ] }
+							hideDragHandle
+							isPrevBlockTemplatePart={ isPrevBlockTemplatePart }
+							isNextBlockTemplatePart={ isNextBlockTemplatePart }
+						/>
 					) }
 					{ editorMode === 'navigation' && (
 						<BlockDraggable clientIds={ [ clientId ] }>
