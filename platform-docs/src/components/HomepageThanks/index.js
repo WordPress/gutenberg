@@ -16,7 +16,7 @@ export default function HomepageThanks() {
 				<h2 className={ styles.title }>Thanks for trying Gutenberg.</h2>
 				<div className={ styles.columns }>
 					<p className={ styles.description }>
-						Gutenberg is project by the WordPress community. New
+						Gutenberg is a project by the WordPress community. New
 						developments and experiments will continue in the{ ' ' }
 						<a href="http://github.com/wordPress/gutenberg/">
 							Gutenberg repository
