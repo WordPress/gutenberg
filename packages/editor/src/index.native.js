@@ -12,6 +12,5 @@ import './hooks';
 
 export { store } from './store';
 export * from './components';
-export * from './hooks';
 export * from './utils';
 export * from './private-apis';
