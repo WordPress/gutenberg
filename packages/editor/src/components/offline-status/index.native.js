@@ -7,6 +7,7 @@ import { AccessibilityInfo, Text, View } from 'react-native';
  * WordPress dependencies
  */
 import { usePreferredColorSchemeStyle, usePrevious } from '@wordpress/compose';
+import { useNetworkConnectivity } from '@wordpress/react-native-editor';
 import { Icon } from '@wordpress/components';
 import { offline as offlineIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -16,7 +17,6 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './style.native.scss';
-import useNetworkConnectivity from '../../hooks/use-network-connectivity';
 
 /**
  * Conditionally announces messages for screen reader users. This Hook provides
