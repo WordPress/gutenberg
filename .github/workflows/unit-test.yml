@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }})
+        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
@@ -50,7 +50,7 @@ jobs:
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the tests ${{ matrix.shard }}
+            - name: Running the tests
               run: |
                   npm run test:unit -- \
                     --ci \
