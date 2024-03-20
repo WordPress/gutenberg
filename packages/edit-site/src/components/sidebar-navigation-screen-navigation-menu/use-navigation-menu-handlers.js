@@ -35,9 +35,12 @@ function useDeleteNavigationMenu() {
 					throwOnError: true,
 				}
 			);
-			createSuccessNotice( __( 'Deleted Navigation menu' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				__( 'Navigation menu successfully deleted.' ),
+				{
+					type: 'snackbar',
+				}
+			);
 			goTo( '/navigation' );
 		} catch ( error ) {
 			createErrorNotice(

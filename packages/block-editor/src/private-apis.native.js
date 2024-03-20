@@ -3,7 +3,7 @@
  */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { kebabCase } from './utils/object';
+import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import { lock } from './lock-unlock';
 
 /**
@@ -12,6 +12,6 @@ import { lock } from './lock-unlock';
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
-	kebabCase,
 	ExperimentalBlockEditorProvider,
+	getRichTextValues,
 } );

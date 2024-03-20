@@ -9,7 +9,7 @@ Let's discover how to use the **Gutenberg Block Editor** to build your own block
 
 ## What you'll need
 
-- [Node.js](https://nodejs.org/en/download/) version 16.14 or above.
+- [Node.js](https://nodejs.org/en/download/) version 20.10 or above.
 - We're going to be using "vite" to setup our single page application (SPA) that contains a block editor. You can use your own setup, and your own application for this.
 
 ## Preparing the SPA powered by Vite.
@@ -59,7 +59,7 @@ registerCoreBlocks();
 function Editor() {
   const [blocks, setBlocks] = useState([]);
   return (
-    {/* 
+    {/*
         The BlockEditorProvider is the wrapper of the block editor's state.
         All the UI elements of the block editor need to be rendered within this provider.
       */}

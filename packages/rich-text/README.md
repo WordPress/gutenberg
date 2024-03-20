@@ -355,6 +355,19 @@ _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
 
+### RichTextData
+
+The RichTextData class is used to instantiate a wrapper around rich text values, with methods that can be used to transform or manipulate the data.
+
+-   Create an empty instance: `new RichTextData()`.
+-   Create one from an HTML string: `RichTextData.fromHTMLString(
+'<em>hello</em>' )`.
+-   Create one from a wrapper HTMLElement: `RichTextData.fromHTMLElement(
+document.querySelector( 'p' ) )`.
+-   Create one from plain text: `RichTextData.fromPlainText( '1\n2' )`.
+-   Create one from a rich text value: `new RichTextData( { text: '...',
+formats: [ ... ] } )`.
+
 ### RichTextValue
 
 An object which represents a formatted string. See main `@wordpress/rich-text` documentation for more information.
@@ -419,6 +432,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 

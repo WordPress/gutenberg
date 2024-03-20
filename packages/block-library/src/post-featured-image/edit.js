@@ -24,7 +24,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
+import { useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -64,13 +67,43 @@ export default function PostFeaturedImageEdit( {
 		sizeSlug,
 		rel,
 		linkTarget,
+		useFirstImageFromPost,
 	} = attributes;
-	const [ featuredImage, setFeaturedImage ] = useEntityProp(
+
+	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
 		'postType',
 		postTypeSlug,
 		'featured_media',
 		postId
 	);
+
+	// Fallback to post content if no featured image is set.
+	// This is needed for the "Use first image from post" option.
+	const [ postContent ] = useEntityProp(
+		'postType',
+		postTypeSlug,
+		'content',
+		postId
+	);
+
+	const featuredImage = useMemo( () => {
+		if ( storedFeaturedImage ) {
+			return storedFeaturedImage;
+		}
+
+		if ( ! useFirstImageFromPost ) {
+			return;
+		}
+
+		const imageOpener =
+			/<!--\s+wp:(?:core\/)?image\s+(?<attrs>{(?:(?:[^}]+|}+(?=})|(?!}\s+\/?-->).)*)?}\s+)?-->/.exec(
+				postContent
+			);
+		const imageId =
+			imageOpener?.groups?.attrs &&
+			JSON.parse( imageOpener.groups.attrs )?.id;
+		return imageId;
+	}, [ storedFeaturedImage, useFirstImageFromPost, postContent ] );
 
 	const { media, postType, postPermalink } = useSelect(
 		( select ) => {
@@ -112,6 +145,8 @@ export default function PostFeaturedImageEdit( {
 		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const blockEditingMode = useBlockEditingMode();
 
 	const placeholder = ( content ) => {
 		return (
@@ -120,11 +155,12 @@ export default function PostFeaturedImageEdit( {
 					'block-editor-media-placeholder',
 					borderProps.className
 				) }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					height: !! aspectRatio && '100%',
 					width: !! aspectRatio && '100%',
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ content }
@@ -143,8 +179,13 @@ export default function PostFeaturedImageEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
-	const controls = (
+	const controls = blockEditingMode === 'default' && (
 		<>
+			<Overlay
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				clientId={ clientId }
+			/>
 			<DimensionControls
 				clientId={ clientId }
 				attributes={ attributes }
@@ -193,6 +234,7 @@ export default function PostFeaturedImageEdit( {
 			</InspectorControls>
 		</>
 	);
+
 	let image;
 
 	/**
@@ -220,11 +262,6 @@ export default function PostFeaturedImageEdit( {
 					) : (
 						placeholder()
 					) }
-					<Overlay
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						clientId={ clientId }
-					/>
 				</div>
 			</>
 		);
@@ -233,6 +270,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
+		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
@@ -329,11 +367,6 @@ export default function PostFeaturedImageEdit( {
 				) : (
 					image
 				) }
-				<Overlay
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
 			</figure>
 		</>
 	);

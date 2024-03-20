@@ -37,7 +37,7 @@ const EmbedPlaceholder = ( {
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 			</form>
-			<div className="components-placeholder__learn-more">
+			<div className="wp-block-embed__learn-more">
 				<ExternalLink
 					href={ __(
 						'https://wordpress.org/documentation/article/embeds/'

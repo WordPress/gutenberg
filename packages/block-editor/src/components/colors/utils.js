@@ -6,9 +6,14 @@ import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 
 /**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
-import { kebabCase } from '../../utils/object';
+import { unlock } from '../../lock-unlock';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -69,6 +74,8 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	if ( ! colorContextName || ! colorSlug ) {
 		return undefined;
 	}
+
+	const { kebabCase } = unlock( componentsPrivateApis );
 
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
 }

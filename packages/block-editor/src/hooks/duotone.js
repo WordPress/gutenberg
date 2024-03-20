@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 
@@ -13,7 +12,7 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
 
@@ -95,8 +94,7 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanel( { attributes, setAttributes, name } ) {
-	const style = attributes?.style;
+function DuotonePanelPure( { style, setAttributes, name } ) {
 	const duotoneStyle = style?.color?.duotone;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
@@ -176,6 +174,16 @@ function DuotonePanel( { attributes, setAttributes, name } ) {
 	);
 }
 
+export default {
+	shareWithChildBlocks: true,
+	edit: DuotonePanelPure,
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, 'filter.duotone' );
+	},
+};
+
 /**
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
@@ -204,38 +212,7 @@ function addDuotoneAttributes( settings ) {
 	return settings;
 }
 
-/**
- * Override the default edit UI to include toolbar controls for duotone if the
- * block supports duotone.
- *
- * @param {Function} BlockEdit Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withDuotoneControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		// Previous `color.__experimentalDuotone` support flag is migrated via
-		// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
-		const hasDuotoneSupport = hasBlockSupport(
-			props.name,
-			'filter.duotone'
-		);
-
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
-				<BlockEdit { ...props } />
-			</>
-		);
-	},
-	'withDuotoneControls'
-);
-
-function DuotoneStyles( {
+function useDuotoneStyles( {
 	clientId,
 	id: filterId,
 	selector: duotoneSelector,
@@ -333,103 +310,69 @@ function DuotoneStyles( {
 			blockElement.style.display = display;
 		}
 	}, [ isValidFilter, blockElement ] );
-
-	return null;
 }
 
-/**
- * Override the default block element to include duotone styles.
- *
- * @param {Function} BlockListBlock Original component.
- *
- * @return {Function} Wrapped component.
- */
-const withDuotoneStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const id = useInstanceId( BlockListBlock );
+function useBlockProps( { name, style } ) {
+	const id = useInstanceId( useBlockProps );
+	const selector = useMemo( () => {
+		const blockType = getBlockType( name );
 
-		const selector = useMemo( () => {
-			const blockType = getBlockType( props.name );
-
-			if ( blockType ) {
-				// Backwards compatibility for `supports.color.__experimentalDuotone`
-				// is provided via the `block_type_metadata_settings` filter. If
-				// `supports.filter.duotone` has not been set and the
-				// experimental property has been, the experimental property
-				// value is copied into `supports.filter.duotone`.
-				const duotoneSupport = getBlockSupport(
-					blockType,
-					'filter.duotone',
-					false
-				);
-				if ( ! duotoneSupport ) {
-					return null;
-				}
-
-				// If the experimental duotone support was set, that value is
-				// to be treated as a selector and requires scoping.
-				const experimentalDuotone = getBlockSupport(
-					blockType,
-					'color.__experimentalDuotone',
-					false
-				);
-				if ( experimentalDuotone ) {
-					const rootSelector = getBlockCSSSelector( blockType );
-					return typeof experimentalDuotone === 'string'
-						? scopeSelector( rootSelector, experimentalDuotone )
-						: rootSelector;
-				}
-
-				// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
-				return getBlockCSSSelector( blockType, 'filter.duotone', {
-					fallback: true,
-				} );
+		if ( blockType ) {
+			// Backwards compatibility for `supports.color.__experimentalDuotone`
+			// is provided via the `block_type_metadata_settings` filter. If
+			// `supports.filter.duotone` has not been set and the
+			// experimental property has been, the experimental property
+			// value is copied into `supports.filter.duotone`.
+			const duotoneSupport = getBlockSupport(
+				blockType,
+				'filter.duotone',
+				false
+			);
+			if ( ! duotoneSupport ) {
+				return null;
 			}
-		}, [ props.name ] );
 
-		const attribute = props?.attributes?.style?.color?.duotone;
+			// If the experimental duotone support was set, that value is
+			// to be treated as a selector and requires scoping.
+			const experimentalDuotone = getBlockSupport(
+				blockType,
+				'color.__experimentalDuotone',
+				false
+			);
+			if ( experimentalDuotone ) {
+				const rootSelector = getBlockCSSSelector( blockType );
+				return typeof experimentalDuotone === 'string'
+					? scopeSelector( rootSelector, experimentalDuotone )
+					: rootSelector;
+			}
 
-		const filterClass = `wp-duotone-${ id }`;
+			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
+			return getBlockCSSSelector( blockType, 'filter.duotone', {
+				fallback: true,
+			} );
+		}
+	}, [ name ] );
 
-		const shouldRender = selector && attribute;
+	const attribute = style?.color?.duotone;
 
-		const className = shouldRender
-			? classnames( props?.className, filterClass )
-			: props?.className;
+	const filterClass = `wp-duotone-${ id }`;
 
-		// CAUTION: code added before this line will be executed
-		// for all blocks, not just those that support duotone. Code added
-		// above this line should be carefully evaluated for its impact on
-		// performance.
-		return (
-			<>
-				{ shouldRender && (
-					<DuotoneStyles
-						clientId={ props.clientId }
-						id={ filterClass }
-						selector={ selector }
-						attribute={ attribute }
-					/>
-				) }
-				<BlockListBlock { ...props } className={ className } />
-			</>
-		);
-	},
-	'withDuotoneStyles'
-);
+	const shouldRender = selector && attribute;
+
+	useDuotoneStyles( {
+		clientId: id,
+		id: filterClass,
+		selector,
+		attribute,
+	} );
+
+	return {
+		className: shouldRender ? filterClass : '',
+	};
+}
 
 addFilter(
 	'blocks.registerBlockType',
 	'core/editor/duotone/add-attributes',
 	addDuotoneAttributes
-);
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/duotone/with-editor-controls',
-	withDuotoneControls
-);
-addFilter(
-	'editor.BlockListBlock',
-	'core/editor/duotone/with-styles',
-	withDuotoneStyles
 );

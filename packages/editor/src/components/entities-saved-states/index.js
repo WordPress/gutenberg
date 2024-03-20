@@ -2,12 +2,19 @@
  * WordPress dependencies
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import {
+	__experimentalUseDialog as useDialog,
+	useInstanceId,
+} from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -27,10 +34,17 @@ function identity( values ) {
 	return values;
 }
 
-export default function EntitiesSavedStates( { close } ) {
+export default function EntitiesSavedStates( {
+	close,
+	renderDialog = undefined,
+} ) {
 	const isDirtyProps = useIsDirty();
 	return (
-		<EntitiesSavedStatesExtensible close={ close } { ...isDirtyProps } />
+		<EntitiesSavedStatesExtensible
+			close={ close }
+			renderDialog={ renderDialog }
+			{ ...isDirtyProps }
+		/>
 	);
 }
 
@@ -40,6 +54,7 @@ export function EntitiesSavedStatesExtensible( {
 	onSave = identity,
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
+	renderDialog = undefined,
 
 	dirtyEntityRecords,
 	isDirty,
@@ -179,12 +194,20 @@ export function EntitiesSavedStatesExtensible( {
 	const [ saveDialogRef, saveDialogProps ] = useDialog( {
 		onClose: () => dismissPanel(),
 	} );
+	const dialogLabel = useInstanceId( EntitiesSavedStatesExtensible, 'label' );
+	const dialogDescription = useInstanceId(
+		EntitiesSavedStatesExtensible,
+		'description'
+	);
 
 	return (
 		<div
 			ref={ saveDialogRef }
 			{ ...saveDialogProps }
 			className="entities-saved-states__panel"
+			role={ renderDialog ? 'dialog' : undefined }
+			aria-labelledby={ renderDialog ? dialogLabel : undefined }
+			aria-describedby={ renderDialog ? dialogDescription : undefined }
 		>
 			<Flex className="entities-saved-states__panel-header" gap={ 2 }>
 				<FlexItem
@@ -193,6 +216,7 @@ export function EntitiesSavedStatesExtensible( {
 					ref={ saveButtonRef }
 					variant="primary"
 					disabled={ ! saveEnabled }
+					__experimentalIsFocusable
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
@@ -209,15 +233,31 @@ export function EntitiesSavedStatesExtensible( {
 			</Flex>
 
 			<div className="entities-saved-states__text-prompt">
-				<strong>{ __( 'Are you ready to save?' ) }</strong>
-				{ additionalPrompt }
-				{ isDirty && (
-					<p>
-						{ __(
-							'The following changes have been made to your site, templates, and content.'
-						) }
-					</p>
-				) }
+				<div
+					className="entities-saved-states__text-prompt--header-wrapper"
+					id={ renderDialog ? dialogLabel : undefined }
+				>
+					<strong className="entities-saved-states__text-prompt--header">
+						{ __( 'Are you ready to save?' ) }
+					</strong>
+					{ additionalPrompt }
+				</div>
+				<p id={ renderDialog ? dialogDescription : undefined }>
+					{ isDirty
+						? createInterpolateElement(
+								sprintf(
+									/* translators: %d: number of site changes waiting to be saved. */
+									_n(
+										'There is <strong>%d site change</strong> waiting to be saved.',
+										'There are <strong>%d site changes</strong> waiting to be saved.',
+										sortedPartitionedSavables.length
+									),
+									sortedPartitionedSavables.length
+								),
+								{ strong: <strong /> }
+						  )
+						: __( 'Select the items you want to save.' ) }
+				</p>
 			</div>
 
 			{ sortedPartitionedSavables.map( ( list ) => {

@@ -38,6 +38,8 @@ function ListViewBlockSelectButton(
 		className,
 		block: { clientId },
 		onClick,
+		onContextMenu,
+		onMouseDown,
 		onToggleExpanded,
 		tabIndex,
 		onFocus,
@@ -45,7 +47,6 @@ function ListViewBlockSelectButton(
 		onDragEnd,
 		draggable,
 		isExpanded,
-		ariaLabel,
 		ariaDescribedBy,
 		updateFocusAndSelection,
 	},
@@ -237,7 +238,9 @@ function ListViewBlockSelectButton(
 					className
 				) }
 				onClick={ onClick }
+				onContextMenu={ onContextMenu }
 				onKeyDown={ onKeyDownHandler }
+				onMouseDown={ onMouseDown }
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
@@ -245,7 +248,6 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-label={ ariaLabel }
 				aria-describedby={ ariaDescribedBy }
 				aria-expanded={ isExpanded }
 			>

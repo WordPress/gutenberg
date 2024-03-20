@@ -52,7 +52,11 @@ function BlockListItemCell( { children, item: clientId, onLayout } ) {
 		[ clientId, rootClientId, updateBlocksLayouts, onLayout ]
 	);
 
-	return <View onLayout={ onCellLayout }>{ children }</View>;
+	return (
+		<View testID="block-list-item-cell" onLayout={ onCellLayout }>
+			{ children }
+		</View>
+	);
 }
 
 export default BlockListItemCell;

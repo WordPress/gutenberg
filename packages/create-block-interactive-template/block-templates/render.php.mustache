@@ -11,13 +11,14 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
+// Generate unique id for aria-controls.
 $unique_id = wp_unique_id( 'p-' );
 ?>
 
 <div
 	<?php echo get_block_wrapper_attributes(); ?>
-	data-wp-interactive='{ "namespace": "{{namespace}}" }'
-	data-wp-context='{ "isOpen": false }'
+	data-wp-interactive="{{namespace}}"
+	<?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
 	data-wp-watch="callbacks.logIsOpen"
 >
 	<button

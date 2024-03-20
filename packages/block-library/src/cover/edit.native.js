@@ -538,6 +538,7 @@ const Cover = ( {
 						<BottomSheetConsumer>
 							{ ( { shouldEnableBottomSheetScroll } ) => (
 								<ColorPalette
+									enableCustomColor
 									customColorIndicatorStyles={
 										styles.paletteColorIndicator
 									}

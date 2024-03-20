@@ -23,19 +23,17 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
-	const { categories, collections, items } = useSelect(
-		( select ) => {
-			const { getInserterItems } = select( blockEditorStore );
-			const { getCategories, getCollections } = select( blocksStore );
-
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				items: getInserterItems( rootClientId ),
-			};
-		},
+	const [ items ] = useSelect(
+		( select ) => [
+			select( blockEditorStore ).getInserterItems( rootClientId ),
+		],
 		[ rootClientId ]
 	);
+
+	const [ categories, collections ] = useSelect( ( select ) => {
+		const { getCategories, getCollections } = select( blocksStore );
+		return [ getCategories(), getCollections() ];
+	}, [] );
 
 	const onSelectItem = useCallback(
 		(

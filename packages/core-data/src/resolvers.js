@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { fetchBlockPatterns } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -58,7 +59,7 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -193,7 +194,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -236,6 +237,9 @@ export const getEntityRecords =
 				meta = {
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
+					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
 					),
 				};
 			} else {
@@ -425,7 +429,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -619,17 +623,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
@@ -688,7 +682,7 @@ export const getNavigationFallbackId =
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -703,7 +697,7 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
 		}
 	};
@@ -732,7 +726,7 @@ export const getDefaultTemplateId =
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -857,7 +851,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);

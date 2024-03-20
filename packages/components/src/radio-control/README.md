@@ -5,12 +5,6 @@ Use radio buttons when you want users to select one option from a set, and you w
 ![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -125,4 +119,4 @@ The value property of the currently selected option.
 
 -   To select one or more items from a set, use the `CheckboxControl` component.
 -   To toggle a single setting on or off, use the `ToggleControl` component.
--   To format as a button group, use the `RadioGroup` component.
+-   To format as a segmented button group, use the `ToggleGroupControl` component.

@@ -4,13 +4,6 @@
 
 ![MenuItemsChoice Example](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice.png)
 
-1. MenuItemsChoice
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-
 ## Design guidelines
 
 A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so that the set of options are distinct from nearby `MenuItems`.

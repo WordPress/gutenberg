@@ -73,7 +73,7 @@ To better understand the specific code example above:
 
 Check out the [_Loading JavaScript_](/docs/how-to-guides/javascript/loading-javascript.md) tutorial for a primer on how to load your custom JavaScript into the block editor.
 
-## Learn More
+## Learn more
 
 The block editor offers a complete API for generating notices. The official documentation is a great place to review what's possible.
 

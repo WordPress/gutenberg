@@ -14,7 +14,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems, getQueriedTotalItems } from './queried-data';
+import {
+	getQueriedItems,
+	getQueriedTotalItems,
+	getQueriedTotalPages,
+} from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
@@ -230,10 +234,11 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: string ): Array< any > {
-	return state.entities.config.filter( ( entity ) => entity.kind === kind );
-}
-
+export const getEntitiesConfig = createSelector(
+	( state: State, kind: string ): Array< any > =>
+		state.entities.config.filter( ( entity ) => entity.kind === kind ),
+	( state: State, kind: string ) => state.entities.config
+);
 /**
  * Returns the entity config given its kind and name.
  *
@@ -622,6 +627,11 @@ export const getEntityRecordsTotalPages = (
 	if ( query.per_page === -1 ) return 1;
 	const totalItems = getQueriedTotalItems( queriedState, query );
 	if ( ! totalItems ) return totalItems;
+	// If `per_page` is not set and the query relies on the defaults of the
+	// REST endpoint, get the info from query's meta.
+	if ( ! query.per_page ) {
+		return getQueriedTotalPages( queriedState, query );
+	}
 	return Math.ceil( totalItems / query.per_page );
 };
 

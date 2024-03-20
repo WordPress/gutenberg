@@ -42,6 +42,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  */
 export function DimensionControl( props: DimensionControlProps ) {
 	const {
+		__next40pxDefaultSize = false,
 		label,
 		value,
 		sizes = sizesTable,
@@ -85,6 +86,7 @@ export function DimensionControl( props: DimensionControlProps ) {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize={ __next40pxDefaultSize }
 			className={ classnames(
 				className,
 				'block-editor-dimension-control'

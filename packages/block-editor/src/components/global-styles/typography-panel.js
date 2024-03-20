@@ -13,7 +13,11 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { mergeOrigins, hasMergedOrigins } from '../use-settings';
+import {
+	mergeOrigins,
+	overrideOrigins,
+	hasOriginValue,
+} from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -21,7 +25,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
-import { getValueFromVariable } from './utils';
+import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
@@ -53,13 +57,13 @@ export function useHasTypographyPanel( settings ) {
 
 function useHasFontSizeControl( settings ) {
 	return (
-		hasMergedOrigins( settings?.typography?.fontSizes ) ||
+		hasOriginValue( settings?.typography?.fontSizes ) ||
 		settings?.typography?.customFontSize
 	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	return hasMergedOrigins( settings?.typography?.fontFamilies );
+	return hasOriginValue( settings?.typography?.fontFamilies );
 }
 
 function useHasLineHeightControl( settings ) {
@@ -101,10 +105,10 @@ function useHasTextColumnsControl( settings ) {
 }
 
 function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes;
-	const mergedFontSizes = fontSizes ? mergeOrigins( fontSizes ) : [];
+	const fontSizes = settings?.typography?.fontSizes ?? {};
+	const overriddenFontSizes = overrideOrigins( fontSizes ) ?? [];
 	const uniqueSizes = [];
-	for ( const currentSize of mergedFontSizes ) {
+	for ( const currentSize of overriddenFontSizes ) {
 		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
 			uniqueSizes.push( currentSize );
 		}
@@ -129,6 +133,7 @@ function TypographyToolsPanel( {
 			label={ __( 'Typography' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			{ children }
 		</ToolsPanel>
@@ -161,7 +166,7 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
+	const fontFamilies = settings?.typography?.fontFamilies ?? {};
 	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
@@ -372,7 +377,6 @@ export default function TypographyPanel( {
 						withReset={ false }
 						withSlider
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }

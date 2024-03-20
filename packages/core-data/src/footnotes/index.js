@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { create, toHTMLString } from '@wordpress/rich-text';
+import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -53,15 +53,18 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			if ( typeof value !== 'string' ) {
+			// To do, remove support for string values?
+			if (
+				typeof value !== 'string' &&
+				! ( value instanceof RichTextData )
+			) {
 				continue;
 			}
 
-			if ( value.indexOf( 'data-fn' ) === -1 ) {
-				continue;
-			}
-
-			const richTextValue = create( { html: value } );
+			const richTextValue =
+				typeof value === 'string'
+					? RichTextData.fromHTMLString( value )
+					: new RichTextData( value );
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
@@ -72,13 +75,24 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 						html: replacement.innerHTML,
 					} );
 					countValue.text = String( index + 1 );
+					countValue.formats = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.formats[ 0 ]
+					);
+					countValue.replacements = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.replacements[ 0 ]
+					);
 					replacement.innerHTML = toHTMLString( {
 						value: countValue,
 					} );
 				}
 			} );
 
-			attributes[ key ] = toHTMLString( { value: richTextValue } );
+			attributes[ key ] =
+				typeof value === 'string'
+					? richTextValue.toHTMLString()
+					: richTextValue;
 		}
 
 		return attributes;

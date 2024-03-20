@@ -10,7 +10,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import RenameModal from './rename-modal';
-import DeleteModal from './delete-modal';
+import DeleteConfirmDialog from './delete-confirm-dialog';
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
@@ -20,14 +20,15 @@ export default function ScreenNavigationMoreMenu( props ) {
 	const { onDelete, onSave, onDuplicate, menuTitle } = props;
 
 	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
-	const [ deleteModalOpen, setDeleteModalOpen ] = useState( false );
+	const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] =
+		useState( false );
 
 	const closeModals = () => {
 		setRenameModalOpen( false );
-		setDeleteModalOpen( false );
+		setDeleteConfirmDialogOpen( false );
 	};
 	const openRenameModal = () => setRenameModalOpen( true );
-	const openDeleteModal = () => setDeleteModalOpen( true );
+	const openDeleteConfirmDialog = () => setDeleteConfirmDialogOpen( true );
 
 	return (
 		<>
@@ -60,7 +61,7 @@ export default function ScreenNavigationMoreMenu( props ) {
 							<MenuItem
 								isDestructive
 								onClick={ () => {
-									openDeleteModal();
+									openDeleteConfirmDialog();
 
 									// Close the dropdown after opening the modal.
 									onClose();
@@ -72,11 +73,12 @@ export default function ScreenNavigationMoreMenu( props ) {
 					</div>
 				) }
 			</DropdownMenu>
-
-			{ deleteModalOpen && (
-				<DeleteModal onClose={ closeModals } onConfirm={ onDelete } />
+			{ deleteConfirmDialogOpen && (
+				<DeleteConfirmDialog
+					onClose={ closeModals }
+					onConfirm={ onDelete }
+				/>
 			) }
-
 			{ renameModalOpen && (
 				<RenameModal
 					onClose={ closeModals }

@@ -14,7 +14,7 @@ export default function getIsListPage(
 	isMobileViewport
 ) {
 	return (
-		[ '/wp_template/all', '/wp_template_part/all', '/pages' ].includes(
+		[ '/wp_template', '/wp_template_part/all', '/pages' ].includes(
 			path
 		) ||
 		( path === '/patterns' &&

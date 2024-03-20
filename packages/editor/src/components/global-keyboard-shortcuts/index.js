@@ -10,8 +10,41 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
 export default function EditorKeyboardShortcuts() {
-	const { redo, undo, savePost } = useDispatch( editorStore );
-	const { isEditedPostDirty, isPostSavingLocked } = useSelect( editorStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } =
+			select( editorStore ).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
+	const {
+		redo,
+		undo,
+		savePost,
+		setIsListViewOpened,
+		switchEditorMode,
+		toggleDistractionFree,
+	} = useDispatch( editorStore );
+	const {
+		isEditedPostDirty,
+		isPostSavingLocked,
+		isListViewOpened,
+		getEditorMode,
+	} = useSelect( editorStore );
+
+	useShortcut(
+		'core/editor/toggle-mode',
+		() => {
+			switchEditorMode(
+				getEditorMode() === 'visual' ? 'text' : 'visual'
+			);
+		},
+		{
+			isDisabled: isModeToggleDisabled,
+		}
+	);
+
+	useShortcut( 'core/editor/toggle-distraction-free', () => {
+		toggleDistractionFree();
+	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
 		undo();
@@ -43,6 +76,14 @@ export default function EditorKeyboardShortcuts() {
 		}
 
 		savePost();
+	} );
+
+	// Only opens the list view. Other functionality for this shortcut happens in the rendered sidebar.
+	useShortcut( 'core/editor/toggle-list-view', ( event ) => {
+		if ( ! isListViewOpened() ) {
+			event.preventDefault();
+			setIsListViewOpened( true );
+		}
 	} );
 
 	return null;

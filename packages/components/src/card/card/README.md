@@ -99,7 +99,7 @@ const Example = () => (
 		<CardMedia>
 			<img src="..." />
 		</CardMedia>
-		<CardHeader>...</CardHeader>
+		<CardFooter>...</CardFooter>
 	</Card>
 );
 ```

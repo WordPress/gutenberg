@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
 	"version": 2,
 	"settings": {
 		"appearanceTools": false,
@@ -190,7 +191,7 @@
 			"text": true
 		},
 		"shadow": {
-			"defaultPresets": true,
+			"defaultPresets": false,
 			"presets": [
 				{
 					"name": "Natural",

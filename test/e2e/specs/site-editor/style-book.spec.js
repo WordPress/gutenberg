@@ -116,8 +116,8 @@ test.describe( 'Style Book', () => {
 			} )
 			.click();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
 			page.locator( 'role=button[name="Blocks styles"]' )
@@ -154,6 +154,35 @@ test.describe( 'Style Book', () => {
 			styleBookRegion,
 			'should close when Escape key is pressed'
 		).toBeHidden();
+	} );
+
+	test( 'should persist when navigating the global styles sidebar', async ( {
+		page,
+	} ) => {
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Browse styles' } )
+			.click();
+
+		const styleBookRegion = page.getByRole( 'region', {
+			name: 'Style Book',
+		} );
+		await expect(
+			styleBookRegion,
+			'style book should be visible'
+		).toBeVisible();
+
+		await page.click( 'role=button[name="Back"]' );
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Typography' } )
+			.click();
+
+		await expect(
+			styleBookRegion,
+			'style book should be visible'
+		).toBeVisible();
 	} );
 } );
 

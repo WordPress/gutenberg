@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __experimentalHStack as HStack } from '@wordpress/components';
+import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useLink } from '../routes/link';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
-import { VIEW_LAYOUTS } from '../dataviews';
 const { useLocation } = unlock( routerPrivateApis );
 
 export default function DataViewItem( {
@@ -29,7 +29,7 @@ export default function DataViewItem( {
 	suffix,
 } ) {
 	const {
-		params: { path },
+		params: { path, layout },
 	} = useLocation();
 
 	const iconToUse =
@@ -37,8 +37,9 @@ export default function DataViewItem( {
 
 	const linkInfo = useLink( {
 		path,
-		activeView: isCustom === 'true' ? customViewId : slug,
-		isCustom,
+		layout,
+		activeView: isCustom ? customViewId : slug,
+		isCustom: isCustom ? 'true' : 'false',
 	} );
 	return (
 		<HStack

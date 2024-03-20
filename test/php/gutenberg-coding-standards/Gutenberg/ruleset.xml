@@ -4,6 +4,7 @@
 	<description>Gutenberg Coding Standards</description>
 
 	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames"/>
+	<rule ref="Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses"/>
 	<rule ref="Gutenberg.NamingConventions.ValidBlockLibraryFunctionName"/>
 
 </ruleset>

@@ -3,6 +3,7 @@
  */
 import {
 	areGlobalStyleConfigsEqual,
+	getBlockStyleVariationSelector,
 	getPresetVariableFromValue,
 	getValueFromVariable,
 } from '../utils';
@@ -255,6 +256,91 @@ describe( 'editor utils', () => {
 			( { original, variation, expected } ) => {
 				expect(
 					areGlobalStyleConfigsEqual( original, variation )
+				).toBe( expected );
+			}
+		);
+	} );
+
+	describe( 'getBlockStyleVariationSelector', () => {
+		test.each( [
+			{ type: 'empty', selector: '', expected: '.is-style-custom' },
+			{
+				type: 'class',
+				selector: '.wp-block',
+				expected: '.wp-block.is-style-custom',
+			},
+			{
+				type: 'id',
+				selector: '#wp-block',
+				expected: '#wp-block.is-style-custom',
+			},
+			{
+				type: 'element tag',
+				selector: 'p',
+				expected: 'p.is-style-custom',
+			},
+			{
+				type: 'attribute',
+				selector: '[style*="color"]',
+				expected: '[style*="color"].is-style-custom',
+			},
+			{
+				type: 'descendant',
+				selector: '.wp-block .inner',
+				expected: '.wp-block.is-style-custom .inner',
+			},
+			{
+				type: 'comma-separated',
+				selector: '.wp-block .inner, .wp-block .alternative',
+				expected:
+					'.wp-block.is-style-custom .inner, .wp-block.is-style-custom .alternative',
+			},
+			{
+				type: 'pseudo',
+				selector: 'div:first-child',
+				expected: 'div.is-style-custom:first-child',
+			},
+			{
+				type: ':is',
+				selector: '.wp-block:is(.outer .inner:first-child)',
+				expected:
+					'.wp-block.is-style-custom:is(.outer .inner:first-child)',
+			},
+			{
+				type: ':not',
+				selector: '.wp-block:not(.outer .inner:first-child)',
+				expected:
+					'.wp-block.is-style-custom:not(.outer .inner:first-child)',
+			},
+			{
+				type: ':has',
+				selector: '.wp-block:has(.outer .inner:first-child)',
+				expected:
+					'.wp-block.is-style-custom:has(.outer .inner:first-child)',
+			},
+			{
+				type: ':where',
+				selector: '.wp-block:where(.outer .inner:first-child)',
+				expected:
+					'.wp-block.is-style-custom:where(.outer .inner:first-child)',
+			},
+			{
+				type: 'wrapping :where',
+				selector: ':where(.outer .inner:first-child)',
+				expected: ':where(.outer.is-style-custom .inner:first-child)',
+			},
+			{
+				type: 'complex',
+				selector:
+					'.wp:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
+				expected:
+					'.wp.is-style-custom:where(.something):is(.test:not(.nothing p)):has(div[style]) .content, .wp.is-style-custom:where(.nothing):not(.test:is(.something div)):has(span[style]) .inner',
+			},
+		] )(
+			'should add variation class to ancestor in $type selector',
+			( { selector, expected } ) => {
+				expect(
+					getBlockStyleVariationSelector( 'custom', selector )
 				).toBe( expected );
 			}
 		);

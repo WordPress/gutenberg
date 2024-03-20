@@ -204,6 +204,7 @@ For example, a button block, deeply nested in several levels of block `X` that u
 ![defaultBlock-api-example](https://github.com/WordPress/gutenberg/assets/180264/fceaf2bb-a412-4a4b-8031-c431dbe8bb36)
 
 
+
 ### `directInsert`
 
 - **Type:** `Boolean`

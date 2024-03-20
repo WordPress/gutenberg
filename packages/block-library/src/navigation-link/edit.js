@@ -16,7 +16,7 @@ import {
 	Tooltip,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -44,6 +44,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
+
+const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -218,7 +220,7 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 			};
 		},
-		[ clientId ]
+		[ clientId, maxNestingLevel ]
 	);
 
 	/**
@@ -280,7 +282,7 @@ export default function NavigationLinkEdit( {
 				placeCaretAtHorizontalEdge( ref.current, true );
 			}
 		}
-	}, [ url ] );
+	}, [ url, isLinkOpen, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -327,10 +329,11 @@ export default function NavigationLinkEdit( {
 	} = getColors( context, ! isTopLevelLink );
 
 	function onKeyDown( event ) {
-		if (
-			isKeyboardEvent.primary( event, 'k' ) ||
-			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
-		) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			// Required to prevent the command center from opening,
+			// as it shares the CMD+K shortcut.
+			// See https://github.com/WordPress/gutenberg/pull/59845.
+			event.preventDefault();
 			setIsLinkOpen( true );
 		}
 	}
@@ -355,22 +358,12 @@ export default function NavigationLinkEdit( {
 		onKeyDown,
 	} );
 
-	const ALLOWED_BLOCKS = [
-		'core/navigation-link',
-		'core/navigation-submenu',
-		'core/page-list',
-	];
-	const DEFAULT_BLOCK = {
-		name: 'core/navigation-link',
-	};
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 			renderAppender: false,
@@ -378,7 +371,9 @@ export default function NavigationLinkEdit( {
 	);
 
 	if ( ! url || isInvalid || isDraft ) {
-		blockProps.onClick = () => setIsLinkOpen( true );
+		blockProps.onClick = () => {
+			setIsLinkOpen( true );
+		};
 	}
 
 	const classes = classnames( 'wp-block-navigation-item__content', {
@@ -526,11 +521,6 @@ export default function NavigationLinkEdit( {
 												'core/image',
 												'core/strikethrough',
 											] }
-											onClick={ () => {
-												if ( ! url ) {
-													setIsLinkOpen( true );
-												}
-											} }
 										/>
 										{ description && (
 											<span className="wp-block-navigation-item__description">
@@ -571,7 +561,15 @@ export default function NavigationLinkEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								// If there is no link then remove the auto-inserted block.
+								// This avoids empty blocks which can provided a poor UX.
+								if ( ! url ) {
+									// Need to handle refocusing the Nav block or the inserter?
+									onReplace( [] );
+								}
+								setIsLinkOpen( false );
+							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {

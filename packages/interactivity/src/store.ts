@@ -11,12 +11,13 @@ import {
 	getScope,
 	setScope,
 	resetScope,
+	getNamespace,
 	setNamespace,
 	resetNamespace,
 } from './hooks';
 
-const isObject = ( item: unknown ): boolean =>
-	!! item && typeof item === 'object' && ! Array.isArray( item );
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	item && typeof item === 'object' && item.constructor === Object;
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -25,34 +26,24 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				if ( ! target[ key ] ) target[ key ] = {};
 				deepMerge( target[ key ], source[ key ] );
 			} else {
-				Object.assign( target, { [ key ]: source[ key ] } );
+				try {
+					target[ key ] = source[ key ];
+				} catch ( e ) {
+					// Assignemnts fail for properties that are only getters.
+					// When that's the case, the assignment is simply ignored.
+				}
 			}
 		}
 	}
 };
 
-const parseInitialState = () => {
-	const storeTag = document.querySelector(
-		`script[type="application/json"]#wp-interactivity-initial-state`
-	);
-	if ( ! storeTag?.textContent ) return {};
-	try {
-		const initialState = JSON.parse( storeTag.textContent );
-		if ( isObject( initialState ) ) return initialState;
-		throw Error( 'Parsed state is not an object' );
-	} catch ( e ) {
-		// eslint-disable-next-line no-console
-		console.log( e );
-	}
-	return {};
-};
-
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
+const storeConfigs = new Map();
 
 const objToProxy = new WeakMap();
 const proxyToNs = new WeakMap();
@@ -100,13 +91,13 @@ const handlers = {
 			}
 		}
 
-		const result = Reflect.get( target, key, receiver );
+		const result = Reflect.get( target, key );
 
 		// Check if the proxy is the store root and no key with that name exist. In
 		// that case, return an empty object for the requested key.
 		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
 			const obj = {};
-			Reflect.set( target, key, obj, receiver );
+			Reflect.set( target, key, obj );
 			return proxify( obj, ns );
 		}
 
@@ -118,7 +109,7 @@ const handlers = {
 				const scope = getScope();
 				const gen: Generator< any > = result( ...args );
 
-				let value: any;
+				let value: unknown;
 				let it: IteratorResult< any >;
 
 				while ( true ) {
@@ -134,7 +125,12 @@ const handlers = {
 					try {
 						value = await it.value;
 					} catch ( e ) {
+						setNamespace( ns );
+						setScope( scope );
 						gen.throw( e );
+					} finally {
+						resetScope();
+						resetNamespace();
 					}
 
 					if ( it.done ) break;
@@ -163,72 +159,103 @@ const handlers = {
 
 		return result;
 	},
+	// Prevents passing the current proxy as the receiver to the deepSignal.
+	set( target: any, key: string, value: any ) {
+		return Reflect.set( target, key, value );
+	},
 };
 
 /**
- * @typedef StoreProps Properties object passed to `store`.
- * @property {Object} state State to be added to the global store. All the
- *                          properties included here become reactive.
- */
-
-/**
- * @typedef StoreOptions Options object.
- */
-
-/**
- * Extends the Interactivity API global store with the passed properties.
+ * Get the defined config for the store with the passed namespace.
  *
- * These props typically consist of `state`, which is reactive, and other
- * properties like `selectors`, `actions`, `effects`, etc. which can store
- * callbacks and derived state. These props can then be referenced by any
- * directive to make the HTML interactive.
+ * @param namespace Store's namespace from which to retrieve the config.
+ * @return Defined config for the given namespace.
+ */
+export const getConfig = ( namespace: string ) =>
+	storeConfigs.get( namespace || getNamespace() ) || {};
+
+interface StoreOptions {
+	/**
+	 * Property to block/unblock private store namespaces.
+	 *
+	 * If the passed value is `true`, it blocks the given namespace, making it
+	 * accessible only trough the returned variables of the `store()` call. In
+	 * the case a lock string is passed, it also blocks the namespace, but can
+	 * be unblocked for other `store()` calls using the same lock string.
+	 *
+	 * @example
+	 * ```
+	 * // The store can only be accessed where the `state` const can.
+	 * const { state } = store( 'myblock/private', { ... }, { lock: true } );
+	 * ```
+	 *
+	 * @example
+	 * ```
+	 * // Other modules knowing `SECRET_LOCK_STRING` can access the namespace.
+	 * const { state } = store(
+	 *   'myblock/private',
+	 *   { ... },
+	 *   { lock: 'SECRET_LOCK_STRING' }
+	 * );
+	 * ```
+	 */
+	lock?: boolean | string;
+}
+
+export const universalUnlock =
+	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
+
+/**
+ * Extends the Interactivity API global store adding the passed properties to
+ * the given namespace. It also returns stable references to the namespace
+ * content.
+ *
+ * These props typically consist of `state`, which is the reactive part of the
+ * store ― which means that any directive referencing a state property will be
+ * re-rendered anytime it changes ― and function properties like `actions` and
+ * `callbacks`, mostly used for event handlers. These props can then be
+ * referenced by any directive to make the HTML interactive.
  *
  * @example
  * ```js
- *  store({
+ *  const { state } = store( 'counter', {
  *    state: {
- *      counter: { value: 0 },
+ *      value: 0,
+ *      get double() { return state.value * 2; },
  *    },
  *    actions: {
- *      counter: {
- *        increment: ({ state }) => {
- *          state.counter.value += 1;
- *        },
+ *      increment() {
+ *        state.value += 1;
  *      },
  *    },
- *  });
+ *  } );
  * ```
  *
  * The code from the example above allows blocks to subscribe and interact with
  * the store by using directives in the HTML, e.g.:
  *
  * ```html
- * <div data-wp-interactive>
+ * <div data-wp-interactive="counter">
  *   <button
- *     data-wp-text="state.counter.value"
- *     data-wp-on--click="actions.counter.increment"
+ *     data-wp-text="state.double"
+ *     data-wp-on--click="actions.increment"
  *   >
  *     0
  *   </button>
  * </div>
  * ```
+ * @param namespace The store namespace to interact with.
+ * @param storePart Properties to add to the store namespace.
+ * @param options   Options for the given namespace.
  *
- * @param {StoreProps}   properties Properties to be added to the global store.
- * @param {StoreOptions} [options]  Options passed to the `store` call.
+ * @return A reference to the namespace content.
  */
-
-interface StoreOptions {
-	lock?: boolean | string;
-}
-
-const universalUnlock =
-	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
-
 export function store< S extends object = {} >(
 	namespace: string,
 	storePart?: S,
 	options?: StoreOptions
 ): S;
+
 export function store< T extends object >(
 	namespace: string,
 	storePart?: T,
@@ -247,7 +274,10 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		const rawStore = { state: deepSignal( state ), ...block };
+		const rawStore = {
+			state: deepSignal( isObject( state ) ? state : {} ),
+			...block,
+		};
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
@@ -283,7 +313,36 @@ export function store(
 	return stores.get( namespace );
 }
 
-// Parse and populate the initial state.
-Object.entries( parseInitialState() ).forEach( ( [ namespace, state ] ) => {
-	store( namespace, { state } );
-} );
+export const parseInitialData = ( dom = document ) => {
+	const storeTag = dom.querySelector(
+		`script[type="application/json"]#wp-interactivity-data`
+	);
+	if ( storeTag?.textContent ) {
+		try {
+			return JSON.parse( storeTag.textContent );
+		} catch ( e ) {
+			// Do nothing.
+		}
+	}
+	return {};
+};
+
+export const populateInitialData = ( data?: {
+	state?: Record< string, unknown >;
+	config?: Record< string, unknown >;
+} ) => {
+	if ( isObject( data?.state ) ) {
+		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+			store( namespace, { state }, { lock: universalUnlock } );
+		} );
+	}
+	if ( isObject( data?.config ) ) {
+		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+			storeConfigs.set( namespace, config );
+		} );
+	}
+};
+
+// Parse and populate the initial state and config.
+const data = parseInitialData();
+populateInitialData( data );

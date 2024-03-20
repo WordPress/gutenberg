@@ -52,11 +52,14 @@ export function useToolsPanelItem(
 		__experimentalLastVisibleItemClass,
 	} = useToolsPanelContext();
 
-	const hasValueCallback = useCallback( hasValue, [ panelId, hasValue ] );
-	const resetAllFilterCallback = useCallback( resetAllFilter, [
-		panelId,
-		resetAllFilter,
-	] );
+	// hasValue is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const hasValueCallback = useCallback( hasValue, [ panelId ] );
+	// resetAllFilter is a new function on every render, so do not add it as a
+	// dependency to the useCallback hook! If needed, we should use a ref.
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 	const previousPanelId = usePrevious( currentPanelId );
 
 	const hasMatchingPanel =
@@ -126,27 +129,13 @@ export function useToolsPanelItem(
 	const newValueSet = isValueSet && ! wasValueSet;
 
 	// Notify the panel when an item's value has been set.
-	//
-	// 1. For default controls, this is so "reset" appears beside its menu item.
-	// 2. For optional controls, when the panel ID is `null`, it allows the
-	// panel to ensure the item is toggled on for display in the menu, given the
-	// value has been set external to the control.
 	useEffect( () => {
 		if ( ! newValueSet ) {
 			return;
 		}
 
-		if ( isShownByDefault || currentPanelId === null ) {
-			flagItemCustomization( label, menuGroup );
-		}
-	}, [
-		currentPanelId,
-		newValueSet,
-		isShownByDefault,
-		menuGroup,
-		label,
-		flagItemCustomization,
-	] );
+		flagItemCustomization( label, menuGroup );
+	}, [ newValueSet, menuGroup, label, flagItemCustomization ] );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.

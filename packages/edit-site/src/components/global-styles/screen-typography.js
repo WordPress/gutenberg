@@ -3,15 +3,24 @@
  */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import TypographyElements from './typogrphy-elements';
+import TypographyElements from './typography-elements';
+import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
 import ScreenHeader from './header';
 
 function ScreenTypography() {
+	const fontLibraryEnabled = useSelect(
+		( select ) =>
+			select( editorStore ).getEditorSettings().fontLibraryEnabled,
+		[]
+	);
+
 	return (
 		<>
 			<ScreenHeader
@@ -22,8 +31,11 @@ function ScreenTypography() {
 			/>
 			<div className="edit-site-global-styles-screen-typography">
 				<VStack spacing={ 6 }>
+					<TypographyVariations />
 					{ ! window.__experimentalDisableFontLibrary && (
-						<FontFamilies />
+						<VStack spacing={ 3 }>
+							{ fontLibraryEnabled && <FontFamilies /> }
+						</VStack>
 					) }
 					<TypographyElements />
 				</VStack>

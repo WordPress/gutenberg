@@ -10,11 +10,6 @@
  */
 
 /**
- * External dependencies
- */
-import { capitalCase } from 'change-case';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -149,6 +144,17 @@ export const ZERO = 48;
 export { isAppleOS };
 
 /**
+ * Capitalise the first character of a string.
+ * @param {string} string String to capitalise.
+ * @return {string} Capitalised string.
+ */
+function capitaliseFirstCharacter( string ) {
+	return string.length < 2
+		? string.toUpperCase()
+		: string.charAt( 0 ).toUpperCase() + string.slice( 1 );
+}
+
+/**
  * Map the values of an object with a specified callback and return the result object.
  *
  * @template {{ [s: string]: any; } | ArrayLike<any>} T
@@ -260,14 +266,7 @@ export const displayShortcutList = mapValues(
 				/** @type {string[]} */ ( [] )
 			);
 
-			// Symbols (~`,.) are removed by the default regular expression,
-			// so override the rule to allow symbols used for shortcuts.
-			// see: https://github.com/blakeembrey/change-case#options
-			const capitalizedCharacter = capitalCase( character, {
-				stripRegexp: /[^A-Z0-9~`,\.\\\-]/gi,
-			} );
-
-			return [ ...modifierKeys, capitalizedCharacter ];
+			return [ ...modifierKeys, capitaliseFirstCharacter( character ) ];
 		};
 	}
 );
@@ -335,7 +334,7 @@ export const shortcutAriaLabel = mapValues(
 
 			return [ ...modifier( _isApple ), character ]
 				.map( ( key ) =>
-					capitalCase( replacementKeyMap[ key ] ?? key )
+					capitaliseFirstCharacter( replacementKeyMap[ key ] ?? key )
 				)
 				.join( isApple ? ' ' : ' + ' );
 		};

@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'directive-style-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-style" }'>
+<div data-wp-interactive="directive-style">
 	<button
 		data-wp-on--click="actions.toggleColor"
 		data-testid="toggle color"

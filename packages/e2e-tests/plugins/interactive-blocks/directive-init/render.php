@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'directive-init-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-init" }'>
+<div data-wp-interactive="directive-init">
 	<div
 		data-testid="single init"
 		data-wp-context='{"isReady":[false],"calls":[0]}'
