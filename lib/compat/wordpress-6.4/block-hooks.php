@@ -80,7 +80,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 
 	$exposed_settings = array_intersect_key( $settings, $fields_to_pick );
 
-	// @todo Make work for blocks registered via direct call to gutenberg_add_hooked_block().
+	// TODO: Make work for blocks registered via direct call to gutenberg_add_hooked_block().
 	wp_add_inline_script(
 		'wp-blocks',
 		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( array( $inserted_block_name => $exposed_settings ) ) . ');'
