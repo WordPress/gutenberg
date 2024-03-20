@@ -241,6 +241,11 @@
 							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"caption": {
+							"description": "Allow users to set caption colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
