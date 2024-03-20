@@ -30,7 +30,8 @@ function gutenberg_process_pattern_overrides_bindings( $block_content, $parsed_b
 	// If the block isn't one of the supported block types or isn't inside a pattern, return.
 	if (
 		! isset( $supported_block_attrs[ $block_instance->name ] ) ||
-		! isset( $block_instance->context['pattern/overrides'] )
+		! isset( $block_instance->context['pattern/overrides'] ) ||
+		empty( $parsed_block['attrs']['metadata']['name'] )
 	) {
 		return $block_content;
 	}
