@@ -1743,10 +1743,6 @@
 						}
 					},
 					"additionalProperties": false
-				},
-				"css": {
-					"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
-					"type": "string"
 				}
 			}
 		},
@@ -1765,8 +1761,7 @@
 						"typography": {},
 						"filter": {},
 						"shadow": {},
-						"outline": {},
-						"css": {}
+						"outline": {}
 					},
 					"additionalProperties": false
 				}
@@ -1790,7 +1785,6 @@
 								"outline": {},
 								"spacing": {},
 								"typography": {},
-								"css": {},
 								":hover": {
 									"$ref": "#/definitions/stylesPropertiesComplete"
 								},
@@ -2200,7 +2194,10 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
-						"css": {},
+						"css": {
+							"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
+							"type": "string"
+						},
 						"elements": {
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
 						},
@@ -2289,7 +2286,10 @@
 						"filter": {},
 						"shadow": {},
 						"outline": {},
-						"css": {},
+						"css": {
+							"description": "Sets custom CSS to apply styling not covered by other theme.json properties.",
+							"type": "string"
+						},
 						"elements": {
 							"description": "Styles defined on a per-element basis using the element's selector.",
 							"$ref": "#/definitions/stylesElementsPropertiesComplete"
