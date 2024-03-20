@@ -37,141 +37,57 @@ const v4 = {
 			source: 'rich-text',
 			selector: 'figcaption',
 		},
-		head: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'thead tr',
-			query: {
-				cells: {
+		...[ 'head', 'body', 'foot' ].reduce(
+			( acc, section ) => ( {
+				...acc,
+				[ section ]: {
 					type: 'array',
 					default: [],
 					source: 'query',
-					selector: 'td,th',
+					selector: `t${ section } tr`,
 					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
+						cells: {
+							type: 'array',
+							default: [],
+							source: 'query',
+							selector: 'td,th',
+							query: {
+								content: {
+									type: 'rich-text',
+									source: 'rich-text',
+								},
+								tag: {
+									type: 'string',
+									default: 'td',
+									source: 'tag',
+								},
+								scope: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'scope',
+								},
+								align: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'data-align',
+								},
+								colspan: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'colspan',
+								},
+								rowspan: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'rowspan',
+								},
+							},
 						},
 					},
 				},
-			},
-		},
-		body: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tbody tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
-						},
-					},
-				},
-			},
-		},
-		foot: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tfoot tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
-						},
-					},
-				},
-			},
-		},
+			} ),
+			{}
+		),
 	},
 	supports: {
 		anchor: true,
@@ -333,111 +249,47 @@ const v3 = {
 			selector: 'figcaption',
 			default: '',
 		},
-		head: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'thead tr',
-			query: {
-				cells: {
+		...[ 'head', 'body', 'foot' ].reduce(
+			( acc, section ) => ( {
+				...acc,
+				[ section ]: {
 					type: 'array',
 					default: [],
 					source: 'query',
-					selector: 'td,th',
+					selector: `t${ section } tr`,
 					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
+						cells: {
+							type: 'array',
+							default: [],
+							source: 'query',
+							selector: 'td,th',
+							query: {
+								content: {
+									type: 'string',
+									source: 'html',
+								},
+								tag: {
+									type: 'string',
+									default: 'td',
+									source: 'tag',
+								},
+								scope: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'scope',
+								},
+								align: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'data-align',
+								},
+							},
 						},
 					},
 				},
-			},
-		},
-		body: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tbody tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
-				},
-			},
-		},
-		foot: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tfoot tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
-				},
-			},
-		},
+			} ),
+			{}
+		),
 	},
 	supports: {
 		anchor: true,
@@ -579,111 +431,47 @@ const v2 = {
 			selector: 'figcaption',
 			default: '',
 		},
-		head: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'thead tr',
-			query: {
-				cells: {
+		...[ 'head', 'body', 'foot' ].reduce(
+			( acc, section ) => ( {
+				...acc,
+				[ section ]: {
 					type: 'array',
 					default: [],
 					source: 'query',
-					selector: 'td,th',
+					selector: `t${ section } tr`,
 					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
+						cells: {
+							type: 'array',
+							default: [],
+							source: 'query',
+							selector: 'td,th',
+							query: {
+								content: {
+									type: 'string',
+									source: 'html',
+								},
+								tag: {
+									type: 'string',
+									default: 'td',
+									source: 'tag',
+								},
+								scope: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'scope',
+								},
+								align: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'data-align',
+								},
+							},
 						},
 					},
 				},
-			},
-		},
-		body: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tbody tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
-				},
-			},
-		},
-		foot: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tfoot tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
-				},
-			},
-		},
+			} ),
+			{}
+		),
 	},
 	supports: {
 		anchor: true,
@@ -800,96 +588,42 @@ const v1 = {
 		backgroundColor: {
 			type: 'string',
 		},
-		head: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'thead tr',
-			query: {
-				cells: {
+		...[ 'head', 'body', 'foot' ].reduce(
+			( acc, section ) => ( {
+				...acc,
+				[ section ]: {
 					type: 'array',
 					default: [],
 					source: 'query',
-					selector: 'td,th',
+					selector: `t${ section } tr`,
 					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
+						cells: {
+							type: 'array',
+							default: [],
+							source: 'query',
+							selector: 'td,th',
+							query: {
+								content: {
+									type: 'string',
+									source: 'html',
+								},
+								tag: {
+									type: 'string',
+									default: 'td',
+									source: 'tag',
+								},
+								scope: {
+									type: 'string',
+									source: 'attribute',
+									attribute: 'scope',
+								},
+							},
 						},
 					},
 				},
-			},
-		},
-		body: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tbody tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-					},
-				},
-			},
-		},
-		foot: {
-			type: 'array',
-			default: [],
-			source: 'query',
-			selector: 'tfoot tr',
-			query: {
-				cells: {
-					type: 'array',
-					default: [],
-					source: 'query',
-					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-					},
-				},
-			},
-		},
+			} ),
+			{}
+		),
 	},
 	supports: {
 		align: true,
