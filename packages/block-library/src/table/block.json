@@ -152,6 +152,22 @@
 			}
 		}
 	},
+	"selectors": {
+		"root": ".wp-block-table table",
+		"color": {
+			"root": ".wp-block-table td"
+		},
+		"border": {
+			"root": ".wp-block-table td"
+		},
+		"spacing": {
+			"padding": ".wp-block-table td",
+			"margin": ".wp-block-table td"
+		},
+		"typography": {
+			"root": ".wp-block-table td"
+		}
+	},
 	"supports": {
 		"anchor": true,
 		"align": true,
