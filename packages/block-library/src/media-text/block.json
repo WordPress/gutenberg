@@ -14,9 +14,6 @@
 		},
 		"mediaAlt": {
 			"type": "string",
-			"source": "attribute",
-			"selector": "figure img",
-			"attribute": "alt",
 			"default": "",
 			"__experimentalRole": "content"
 		},

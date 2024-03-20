@@ -49,6 +49,9 @@ function render_block_core_media_text( $attributes, $content ) {
 	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
 
+	// Ensure that an alt attribute is always present, even if it is empty.
+	$processor->set_attribute( 'alt', isset( $attributes['mediaAlt'] ) ? $attributes['mediaAlt'] : '' );
+
 	$content = $processor->get_updated_html();
 
 	return $content;

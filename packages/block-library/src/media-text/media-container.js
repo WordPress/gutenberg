@@ -132,7 +132,6 @@ function MediaContainer( props, ref ) {
 		toggleUseFeaturedImage,
 		useFeaturedImage,
 		featuredImageURL,
-		featuredImageAlt,
 	} = props;
 
 	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
@@ -163,7 +162,7 @@ function MediaContainer( props, ref ) {
 		const mediaTypeRenderers = {
 			image: () =>
 				useFeaturedImage && featuredImageURL ? (
-					<img src={ featuredImageURL } alt={ featuredImageAlt } />
+					<img src={ featuredImageURL } alt={ mediaAlt } />
 				) : (
 					mediaUrl && <img src={ mediaUrl } alt={ mediaAlt } />
 				),

@@ -171,9 +171,6 @@ function MediaTextEdit( {
 	const featuredImageURL = useFeaturedImage
 		? featuredImageMedia?.source_url
 		: '';
-	const featuredImageAlt = useFeaturedImage
-		? featuredImageMedia?.alt_text
-		: '';
 
 	const toggleUseFeaturedImage = () => {
 		setAttributes( {
@@ -181,7 +178,7 @@ function MediaTextEdit( {
 			mediaType: 'image',
 			mediaId: undefined,
 			mediaUrl: undefined,
-			mediaAlt: undefined,
+			mediaAlt: '',
 			useFeaturedImage: ! useFeaturedImage,
 		} );
 	};
@@ -322,7 +319,7 @@ function MediaTextEdit( {
 				<TextareaControl
 					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt || featuredImageAlt }
+					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
@@ -431,7 +428,6 @@ function MediaTextEdit( {
 						mediaWidth,
 						useFeaturedImage,
 						featuredImageURL,
-						featuredImageAlt,
 					} }
 				/>
 				{ mediaPosition !== 'right' && <div { ...innerBlocksProps } /> }
