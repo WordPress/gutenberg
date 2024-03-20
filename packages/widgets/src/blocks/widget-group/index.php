@@ -8,8 +8,8 @@
 /**
  * Renders the 'core/widget-group' block.
  *
- * @global array $wp_registered_sidebars
- * @global array $_sidebar_being_rendered
+ * @global array      $wp_registered_sidebars
+ * @global int|string $_sidebar_being_rendered
  *
  * @param array    $attributes The block attributes.
  * @param string   $content The block content.
@@ -62,7 +62,7 @@ add_action( 'init', 'register_block_core_widget_group' );
  * it. This lets us get to the current sidebar in
  * render_block_core_widget_group().
  *
- * @global array $_sidebar_being_rendered
+ * @global int|string $_sidebar_being_rendered
  *
  * @param int|string $index       Index, name, or ID of the dynamic sidebar.
  */
