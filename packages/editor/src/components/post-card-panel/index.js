@@ -72,17 +72,15 @@ export default function PostCardPanel( { className, actions, children } ) {
 						className="editor-post-card-panel__icon"
 						icon={ icon }
 					/>
-					{ !! title && (
-						<Text
-							numberOfLines={ 2 }
-							truncate
-							className="editor-post-card-panel__title"
-							weight={ 500 }
-							as="h2"
-						>
-							{ title }
-						</Text>
-					) }
+					<Text
+						numberOfLines={ 2 }
+						truncate
+						className="editor-post-card-panel__title"
+						weight={ 500 }
+						as="h2"
+					>
+						{ title || __( 'No Title' ) }
+					</Text>
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
