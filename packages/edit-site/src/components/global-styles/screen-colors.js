@@ -8,7 +8,6 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import Subtitle from './subtitle';
 import ScreenHeader from './header';
 import Palette from './palette';
 import { unlock } from '../../lock-unlock';
@@ -41,10 +40,7 @@ function ScreenColors() {
 			/>
 			<div className="edit-site-global-styles-screen-colors">
 				<VStack spacing={ 7 }>
-					<VStack spacing={ 3 }>
-						<Subtitle level={ 3 }>{ __( 'Presets' ) }</Subtitle>
-						<ColorVariations />
-					</VStack>
+					<ColorVariations title={ __( 'Presets' ) } />
 					<Palette />
 					<StylesColorPanel
 						inheritedValue={ inheritedStyle }

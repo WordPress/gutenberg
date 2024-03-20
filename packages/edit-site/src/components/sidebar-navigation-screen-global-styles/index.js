@@ -98,20 +98,13 @@ function SidebarNavigationScreenGlobalStylesContent() {
 			>
 				<StyleVariationsContainer />
 				{ colorVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Colors' ) }
-						</h3>
-						<ColorVariations />
-					</div>
+					<ColorVariations title={ __( 'Colors' ) } gap={ 3 } />
 				) }
 				{ typographyVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Typography' ) }
-						</h3>
-						<TypographyVariations />
-					</div>
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ 3 }
+					/>
 				) }
 			</VStack>
 		</BlockEditorProvider>
