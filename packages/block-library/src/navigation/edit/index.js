@@ -39,7 +39,7 @@ import {
 	Spinner,
 	Notice,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -841,15 +841,11 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ ( deletedMenuTitle = '' ) => {
+									onDelete={ () => {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
-											sprintf(
-												// translators: %s: the name of a menu (e.g. Header navigation).
-												__(
-													'Navigation menu %s successfully deleted.'
-												),
-												deletedMenuTitle
+											__(
+												'Navigation menu successfully deleted.'
 											)
 										);
 									} }
