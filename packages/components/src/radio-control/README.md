@@ -20,12 +20,12 @@ If you have a list of available options that can be collapsed, consider using a 
 
 #### Do
 
-![](https://make.wordpress.org/design/files/2018/11/radio-usage-do.png)
+![](https://raw.githubusercontent.com/krokodok/gutenberg/b3bfe9b6ce458de792595f863df1412975d1c714/do.png)
 Use radio buttons when only one item can be selected from a list.
 
 #### Don’t
 
-![](https://make.wordpress.org/design/files/2018/11/radio-usage-dont.png)
+![](https://raw.githubusercontent.com/krokodok/gutenberg/b3bfe9b6ce458de792595f863df1412975d1c714/dont.png)
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
 #### Defaults
