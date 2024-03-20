@@ -49,9 +49,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
-	? [ LAYOUT_GRID, LAYOUT_TABLE, LAYOUT_LIST ]
-	: [ LAYOUT_GRID, LAYOUT_TABLE ];
 
 function useView( postType ) {
 	const { params } = useLocation();
@@ -337,7 +334,6 @@ export default function PagePages() {
 			{
 				header: __( 'Date' ),
 				id: 'date',
-				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
@@ -356,11 +352,11 @@ export default function PagePages() {
 	const actions = useMemo(
 		() => [
 			viewPostAction,
-			trashPostAction,
 			restorePostAction,
 			permanentlyDeletePostAction,
 			editPostAction,
 			postRevisionsAction,
+			trashPostAction,
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
@@ -430,7 +426,6 @@ export default function PagePages() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

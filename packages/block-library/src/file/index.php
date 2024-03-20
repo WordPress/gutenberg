@@ -8,6 +8,8 @@
 /**
  * When the `core/file` block is rendering, check if we need to enqueue the `wp-block-file-view` script.
  *
+ * @since 5.8.0
+ *
  * @param array    $attributes The block attributes.
  * @param string   $content    The block content.
  * @param WP_Block $block      The parsed block.
@@ -65,6 +67,8 @@ function render_block_core_file( $attributes, $content ) {
 
 /**
  * Registers the `core/file` block on server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_file() {
 	register_block_type_from_metadata(

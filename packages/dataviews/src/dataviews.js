@@ -33,7 +33,7 @@ export default function DataViews( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions,
+	actions = [],
 	data,
 	getItemId = defaultGetItemId,
 	isLoading = false,
@@ -77,10 +77,16 @@ export default function DataViews( {
 		( v ) => v.type === view.type
 	).component;
 	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
+		return fields.map( ( field ) => {
+			const getValue =
+				field.getValue || ( ( { item } ) => item[ field.id ] );
+
+			return {
+				...field,
+				getValue,
+				render: field.render || getValue,
+			};
+		} );
 	}, [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(

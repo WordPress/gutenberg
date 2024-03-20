@@ -15,7 +15,6 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { WithDropDownMenuSeparators } from './utils';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -106,32 +105,22 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 }
 
 export default function ItemActions( { item, actions, isCompact } ) {
-	const { primaryActions, secondaryActions } = useMemo( () => {
-		return actions.reduce(
-			( accumulator, action ) => {
-				// If an action is eligible for all items, doesn't need
-				// to provide the `isEligible` function.
-				if ( action.isEligible && ! action.isEligible( item ) ) {
-					return accumulator;
-				}
-				if ( action.isPrimary && !! action.icon ) {
-					accumulator.primaryActions.push( action );
-				} else {
-					accumulator.secondaryActions.push( action );
-				}
-				return accumulator;
-			},
-			{ primaryActions: [], secondaryActions: [] }
+	const { primaryActions, eligibleActions } = useMemo( () => {
+		// If an action is eligible for all items, doesn't need
+		// to provide the `isEligible` function.
+		const _eligibleActions = actions.filter(
+			( action ) => ! action.isEligible || action.isEligible( item )
 		);
+		const _primaryActions = _eligibleActions.filter(
+			( action ) => action.isPrimary && !! action.icon
+		);
+		return {
+			primaryActions: _primaryActions,
+			eligibleActions: _eligibleActions,
+		};
 	}, [ actions, item ] );
 	if ( isCompact ) {
-		return (
-			<CompactItemActions
-				item={ item }
-				primaryActions={ primaryActions }
-				secondaryActions={ secondaryActions }
-			/>
-		);
+		return <CompactItemActions item={ item } actions={ eligibleActions } />;
 	}
 	return (
 		<HStack
@@ -163,16 +152,12 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						/>
 					);
 				} ) }
-			<CompactItemActions
-				item={ item }
-				primaryActions={ primaryActions }
-				secondaryActions={ secondaryActions }
-			/>
+			<CompactItemActions item={ item } actions={ eligibleActions } />
 		</HStack>
 	);
 }
 
-function CompactItemActions( { item, primaryActions, secondaryActions } ) {
+function CompactItemActions( { item, actions } ) {
 	return (
 		<DropdownMenu
 			trigger={
@@ -180,28 +165,13 @@ function CompactItemActions( { item, primaryActions, secondaryActions } ) {
 					size="compact"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					disabled={
-						! primaryActions.length && ! secondaryActions.length
-					}
+					disabled={ ! actions.length }
 					className="dataviews-all-actions-button"
 				/>
 			}
 			placement="bottom-end"
 		>
-			<WithDropDownMenuSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithDropDownMenuSeparators>
+			<ActionsDropdownMenuGroup actions={ actions } item={ item } />
 		</DropdownMenu>
 	);
 }

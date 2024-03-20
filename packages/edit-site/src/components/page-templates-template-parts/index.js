@@ -63,10 +63,6 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
-	? [ LAYOUT_TABLE, LAYOUT_GRID, LAYOUT_LIST ]
-	: [ LAYOUT_TABLE, LAYOUT_GRID ];
-
 const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {
 		primaryField: 'title',
@@ -209,9 +205,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
-		const usedType = window?.__experimentalAdminViews
-			? layout ?? DEFAULT_VIEW.type
-			: DEFAULT_VIEW.type;
+		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
@@ -221,8 +215,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: 'isAny',
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -237,8 +231,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: OPERATOR_IS_ANY,
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -309,7 +303,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
-				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return item.description ? (
 						<span className="page-templates-description">
@@ -416,9 +409,9 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	const actions = useMemo(
 		() => [
 			resetTemplateAction,
-			deleteTemplateAction,
 			renameTemplateAction,
 			postRevisionsAction,
+			deleteTemplateAction,
 		],
 		[ resetTemplateAction ]
 	);
@@ -474,7 +467,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
 				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
-				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

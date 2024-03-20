@@ -14,9 +14,9 @@ import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	PageAttributesPanel,
+	PluginDocumentSettingPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
@@ -97,6 +97,7 @@ export default function PagePanels() {
 					postType={ type }
 				/>
 			</PanelBody>
+			<PluginDocumentSettingPanel.Slot />
 			{ renderingMode !== 'post-only' && (
 				<PanelBody title={ __( 'Content' ) }>
 					<PageContent />
@@ -104,7 +105,6 @@ export default function PagePanels() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostFeaturedImagePanel />
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />

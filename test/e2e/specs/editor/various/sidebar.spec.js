@@ -114,7 +114,6 @@ test.describe( 'Sidebar', () => {
 			'Summary',
 			'Categories',
 			'Tags',
-			'Featured image',
 			'Excerpt',
 			'Discussion',
 		] );

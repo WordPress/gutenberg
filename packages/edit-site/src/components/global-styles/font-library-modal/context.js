@@ -274,8 +274,22 @@ function FontLibraryProvider( { children } ) {
 						...alreadyInstalledFontFaces,
 					];
 					fontFamiliesToActivate.push( fontFamilyToInstall );
-				} else if ( isANewFontFamily ) {
-					// If the font family is new, delete it to avoid having font families without font faces.
+				}
+
+				// If it's a system font but was installed successfully, activate it.
+				if (
+					installedFontFamily &&
+					! fontFamilyToInstall?.fontFace?.length
+				) {
+					fontFamiliesToActivate.push( installedFontFamily );
+				}
+
+				// If the font family is new and is not a system font, delete it to avoid having font families without font faces.
+				if (
+					isANewFontFamily &&
+					fontFamilyToInstall?.fontFace?.length > 0 &&
+					sucessfullyInstalledFontFaces?.length === 0
+				) {
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
 
@@ -411,15 +425,15 @@ function FontLibraryProvider( { children } ) {
 
 		const isFaceActivated = isFontActivated(
 			font.slug,
-			face.fontStyle,
-			face.fontWeight,
+			face?.fontStyle,
+			face?.fontWeight,
 			font.source
 		);
 
 		if ( isFaceActivated ) {
 			loadFontFaceInBrowser(
 				face,
-				getDisplaySrcFromFontFace( face.src ),
+				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
 		} else {

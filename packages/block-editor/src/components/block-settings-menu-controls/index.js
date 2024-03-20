@@ -26,11 +26,7 @@ import { BlockRenameControl, useBlockRename } from '../block-rename';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( {
-	fillProps,
-	clientIds = null,
-	__unstableDisplayLocation,
-} ) => {
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
 			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
@@ -61,7 +57,6 @@ const BlockSettingsMenuControlsSlot = ( {
 		<Slot
 			fillProps={ {
 				...fillProps,
-				__unstableDisplayLocation,
 				selectedBlocks,
 				selectedClientIds,
 			} }

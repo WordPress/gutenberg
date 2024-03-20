@@ -11,15 +11,10 @@ import {
  */
 import Variation from './variation';
 import StylesPreviewColors from '../preview-colors';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { useColorVariations } from '../hooks';
 
 export default function ColorVariations() {
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
-		filter: ( variation ) =>
-			variation?.settings?.color &&
-			Object.keys( variation?.settings?.color ).length,
-	} );
+	const colorVariations = useColorVariations();
 
 	if ( ! colorVariations?.length ) {
 		return null;
