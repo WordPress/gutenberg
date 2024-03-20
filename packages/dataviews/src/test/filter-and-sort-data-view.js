@@ -53,7 +53,7 @@ describe( 'filters', () => {
 		expect( result[ 0 ].description ).toBe( 'NASA photo' );
 	} );
 
-	it( 'should search using enumeration filters', () => {
+	it( 'should search using IS ANY filter', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
 			{
@@ -62,6 +62,25 @@ describe( 'filters', () => {
 						field: 'type',
 						operator: 'isAny',
 						value: [ 'Ice giant' ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 2 );
+		expect( result[ 0 ].title ).toBe( 'Neptune' );
+		expect( result[ 1 ].title ).toBe( 'Uranus' );
+	} );
+
+	it( 'should search using IS filter', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'type',
+						operator: 'is',
+						value: 'Ice giant',
 					},
 				],
 			},

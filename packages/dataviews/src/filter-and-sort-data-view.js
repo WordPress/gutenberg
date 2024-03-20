@@ -6,7 +6,12 @@ import removeAccents from 'remove-accents';
 /**
  * Internal dependencies
  */
-import { OPERATOR_IS_NONE, OPERATOR_IS_ANY } from './constants';
+import {
+	OPERATOR_IS,
+	OPERATOR_IS_NOT,
+	OPERATOR_IS_NONE,
+	OPERATOR_IS_ANY,
+} from './constants';
 import { normalizeFields } from './normalize-fields';
 
 function normalizeSearchInput( input = '' ) {
@@ -66,6 +71,14 @@ export function filterAndSortDataView( data, view, fields ) {
 					return ! filter.value.includes(
 						field.getValue( { item } )
 					);
+				} );
+			} else if ( filter.operator === OPERATOR_IS ) {
+				filteredData = filteredData.filter( ( item ) => {
+					return filter.value === field.getValue( { item } );
+				} );
+			} else if ( filter.operator === OPERATOR_IS_NOT ) {
+				filteredData = filteredData.filter( ( item ) => {
+					return filter.value !== field.getValue( { item } );
 				} );
 			}
 		} );
