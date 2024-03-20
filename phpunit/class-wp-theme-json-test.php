@@ -4799,7 +4799,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'background' => array(
-						'backgroundImage'    => "url('http://example.org/image.png')",
+						'backgroundImage'    => array(
+							'url' => 'http://example.org/image.png',
+						),
 						'backgroundSize'     => 'contain',
 						'backgroundRepeat'   => 'no-repeat',
 						'backgroundPosition' => 'center center',
@@ -4807,7 +4809,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'blocks'     => array(
 						'core/paragraph' => array(
 							'background' => array(
-								'backgroundImage'    => "url('http://example.org/image.png')",
+								'backgroundImage'    => array(
+									'url'    => 'http://example.org/image.png',
+									'source' => 'file',
+								),
 								'backgroundSize'     => 'cover',
 								'backgroundRepeat'   => 'no-repeat',
 								'backgroundPosition' => 'center center',
@@ -4817,7 +4822,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'elements'   => array(
 						'button' => array(
 							'background' => array(
-								'backgroundImage'    => "url('http://example.org/image.png')",
+								'backgroundImage'    => array(
+									'url' => 'http://example.org/image.png',
+								),
 								'backgroundSize'     => 'cover',
 								'backgroundRepeat'   => 'no-repeat',
 								'backgroundPosition' => 'center center',
@@ -4829,7 +4836,49 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$expected_styles = "body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;}";
-		$this->assertSame( $expected_styles, $theme_json->get_stylesheet() );
+		$this->assertSame( $expected_styles, $theme_json->get_stylesheet(), 'Styles returned from "::get_stylesheet()" with top-level background styles type does not match expectations' );
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage'    => "url('http://example.org/image.png')",
+						'backgroundSize'     => 'contain',
+						'backgroundRepeat'   => 'no-repeat',
+						'backgroundPosition' => 'center center',
+					),
+					'blocks'     => array(
+						'core/paragraph' => array(
+							'background' => array(
+								'backgroundImage'    => array(
+									'url'    => 'http://example.org/image.png',
+									'source' => 'file',
+								),
+								'backgroundSize'     => 'cover',
+								'backgroundRepeat'   => 'no-repeat',
+								'backgroundPosition' => 'center center',
+							),
+						),
+					),
+					'elements'   => array(
+						'button' => array(
+							'background' => array(
+								'backgroundImage'    => array(
+									'url' => 'http://example.org/image.png',
+								),
+								'backgroundSize'     => 'cover',
+								'backgroundRepeat'   => 'no-repeat',
+								'backgroundPosition' => 'center center',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected_styles = "body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}body .is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}body .is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width: var(--wp--style--global--content-size);margin-left: auto !important;margin-right: auto !important;}body .is-layout-constrained > .alignwide{max-width: var(--wp--style--global--wide-size);}body .is-layout-flex{display: flex;}body .is-layout-flex{flex-wrap: wrap;align-items: center;}body .is-layout-flex > *{margin: 0;}body .is-layout-grid{display: grid;}body .is-layout-grid > *{margin: 0;}html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: url('http://example.org/image.png');background-position: center center;background-repeat: no-repeat;background-size: contain;}";
+		$this->assertSame( $expected_styles, $theme_json->get_stylesheet(), 'Styles returned from "::get_stylesheet()" with top-level background image as string type does not match expectations' );
 	}
 
 	public function test_get_custom_css_handles_global_custom_css() {
