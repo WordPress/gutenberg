@@ -89,13 +89,9 @@ export default function PostCardPanel( { className, actions, children } ) {
 							className="editor-post-card-panel__description"
 							spacing={ 3 }
 						>
-							{ !! description && (
-								<Text variant="muted" lineHeight={ 1.4 }>
-									{ description }
-								</Text>
-							) }
+							{ !! description && <Text>{ description }</Text> }
 							{ !! lastEditedText && (
-								<Text variant="muted">{ lastEditedText }</Text>
+								<Text>{ lastEditedText }</Text>
 							) }
 						</VStack>
 					) }
