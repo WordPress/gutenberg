@@ -52,6 +52,12 @@ One notable difference between the JS and PHP hooks API is that in the JS versio
 -   `filters`
 -   `defaultHooks`
 
+
+#### Parameters
+
+- `hookName` unique name of the hook. It may contains only alphanumeric characters and dashes `[a-zA-z\-\_]`. Slashes are not permitted.
+- `namespace` namespace used by your application. Needed only when adding or removing an action or a filter.
+
 ### Events on action/filter add or remove
 
 Whenever an action or filter is added or removed, a matching `hookAdded` or `hookRemoved` action is triggered.
