@@ -67,14 +67,6 @@
 	color: $gray-700;
 }
 
-.edit-site-global-styles-sidebar__more-menu > .components-button.has-icon {
-	// Make the DropdownMenu the same size as the rest of the buttons, as it does not support "compact" size.
-	height: $grid-unit-40;
-	min-width: $grid-unit-40;
-	padding: 0;
-	width: $grid-unit-40;
-}
-
 .edit-site-global-styles-header__description {
 	padding: 0 $grid-unit-20;
 }
