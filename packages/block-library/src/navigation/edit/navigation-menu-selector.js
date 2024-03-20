@@ -46,6 +46,8 @@ function NavigationMenuSelector( {
 	createNavigationMenuIsSuccess,
 	createNavigationMenuIsError,
 } ) {
+	console.log( { currentMenuId } );
+
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
 
@@ -71,7 +73,7 @@ function NavigationMenuSelector( {
 
 	const menuChoices = useMemo( () => {
 		return (
-			navigationMenus?.map( ( { id, title, status }, index ) => {
+			navigationMenus?.map( ( { id, title, status, slug }, index ) => {
 				const label = buildMenuLabel(
 					title?.rendered,
 					index + 1,
@@ -79,7 +81,7 @@ function NavigationMenuSelector( {
 				);
 
 				return {
-					value: id,
+					value: slug,
 					label,
 					ariaLabel: sprintf( actionLabel, label ),
 					disabled:

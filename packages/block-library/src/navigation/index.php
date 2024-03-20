@@ -204,7 +204,41 @@ class WP_Navigation_Block_Renderer {
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
 	private static function get_inner_blocks_from_navigation_post( $attributes ) {
-		$navigation_post = get_post( $attributes['ref'] );
+		$base_args = array(
+			'post_type'              => 'wp_navigation',
+			'nopaging'               => true,
+			'posts_per_page'         => '1',
+			'update_post_term_cache' => false,
+			'no_found_rows'          => true,
+		);
+
+		// Prefer query by slug if available, falling
+		// back to Post ID.
+		if ( ! empty( $attributes['slug'] ) ) {
+			$args = array_merge(
+				$base_args,
+				array(
+					'name' => $attributes['slug'], // query by slug
+				)
+			);
+		} else {
+			$args = array_merge(
+				$base_args,
+				array(
+					'p' => $attributes['ref'], // query by post ID
+				)
+			);
+		}
+
+		// Query for the Navigation Post.
+		$navigation_query = new WP_Query( $args );
+
+		if ( ! isset( $navigation_query->posts[0] ) ) {
+			return '';
+		}
+
+		$navigation_post = $navigation_query->posts[0];
+
 		if ( ! isset( $navigation_post ) ) {
 			return new WP_Block_List( array(), $attributes );
 		}
@@ -280,7 +314,7 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Load inner blocks from the navigation post.
-		if ( array_key_exists( 'ref', $attributes ) ) {
+		if ( array_key_exists( 'slug', $attributes ) || array_key_exists( 'ref', $attributes ) ) {
 			$inner_blocks = static::get_inner_blocks_from_navigation_post( $attributes );
 		}
 

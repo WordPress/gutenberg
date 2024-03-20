@@ -108,11 +108,13 @@ function Navigation( {
 		icon = 'handle',
 	} = attributes;
 
-	const ref = attributes.ref;
+	// Older versions of the block used an ID based ref attribute.
+	// Allow for this to continue to be used.
+	const ref = attributes.slug || attributes.ref;
 
 	const setRef = useCallback(
-		( postId ) => {
-			setAttributes( { ref: postId } );
+		( { slug } ) => {
+			setAttributes( { slug } );
 		},
 		[ setAttributes ]
 	);
@@ -190,6 +192,7 @@ function Navigation( {
 		canUserCreateNavigationMenu,
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
+		navigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -205,9 +208,10 @@ function Navigation( {
 		classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_PENDING;
 
 	const handleUpdateMenu = useCallback(
-		( menuId, options = { focusNavigationBlock: false } ) => {
+		( menu, options = { focusNavigationBlock: false } ) => {
+			debugger;
 			const { focusNavigationBlock } = options;
-			setRef( menuId );
+			setRef( menu );
 			if ( focusNavigationBlock ) {
 				selectBlock( clientId );
 			}
@@ -342,7 +346,16 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
+		const navMenu = await convertClassicMenu(
+			classicMenu.id,
+			classicMenu.name,
+			'draft'
+		);
+		if ( navMenu ) {
+			handleUpdateMenu( navMenu, {
+				focusNavigationBlock: true,
+			} );
+		}
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
@@ -357,7 +370,7 @@ function Navigation( {
 		}
 
 		if ( createNavigationMenuIsSuccess ) {
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 
@@ -374,7 +387,7 @@ function Navigation( {
 	}, [
 		createNavigationMenuStatus,
 		createNavigationMenuError,
-		createNavigationMenuPost?.id,
+		createNavigationMenuPost,
 		createNavigationMenuIsError,
 		createNavigationMenuIsSuccess,
 		isCreatingNavigationMenu,
@@ -393,7 +406,7 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 		}
@@ -408,7 +421,7 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
-		createNavigationMenuPost?.id,
+		createNavigationMenuPost,
 		handleUpdateMenu,
 	] );
 
@@ -814,7 +827,11 @@ function Navigation( {
 	}
 
 	return (
-		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
+		<EntityProvider
+			kind="postType"
+			type="wp_navigation"
+			id={ navigationMenu?.id }
+		>
 			<RecursionProvider uniqueId={ recursionId }>
 				<MenuInspectorControls
 					clientId={ clientId }

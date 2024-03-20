@@ -892,3 +892,18 @@ export const getRevision =
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};
+
+export const getNavigationMenu =
+	( id ) =>
+	async ( { resolveSelect } ) => {
+		resolveSelect.getEntityRecord( 'postType', 'wp_navigation', id );
+	};
+
+export const getNavigationMenuBySlug =
+	( slug ) =>
+	async ( { resolveSelect } ) => {
+		resolveSelect.getEntityRecords( 'postType', 'wp_navigation', {
+			slug,
+			per_page: 1,
+		} );
+	};
