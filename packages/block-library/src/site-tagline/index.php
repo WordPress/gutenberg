@@ -22,8 +22,8 @@ function render_block_core_site_tagline( $attributes ) {
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
-	if ( isset( $attributes['level'] ) ) {
-		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . (int) $attributes['level'];
+	if ( isset( $attributes['level'] ) && 0 !== $attributes['level'] ) {
+		$tag_name = 'h' . (int) $attributes['level'];
 	}
 
 	return sprintf(
