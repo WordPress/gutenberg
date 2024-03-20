@@ -13,8 +13,8 @@ import {
 const variations = [
 	{
 		name: 'comment-form',
-		title: __( 'Experimental Comment form' ),
-		description: __( 'A comment form for posts and pages.' ),
+		title: __( 'Experimental Contact Form' ),
+		description: __( 'A contact form for posts and pages.' ),
 		attributes: {
 			submissionMethod: 'custom',
 			action: '{SITE_URL}/wp-comments-post.php',
