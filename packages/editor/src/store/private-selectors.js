@@ -8,7 +8,13 @@ import createSelector from 'rememo';
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistrySelector } from '@wordpress/data';
-import { layout, symbol, navigation, page as pageIcon } from '@wordpress/icons';
+import {
+	layout,
+	symbol,
+	navigation,
+	page as pageIcon,
+	verse,
+} from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -76,6 +82,7 @@ const CARD_ICONS = {
 	wp_block: symbol,
 	wp_navigation: navigation,
 	page: pageIcon,
+	post: verse,
 };
 
 export const getPostIcon = createRegistrySelector(

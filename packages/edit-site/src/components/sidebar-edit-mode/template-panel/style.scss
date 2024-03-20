@@ -26,6 +26,7 @@
 			padding: 0;
 			min-width: auto;
 		}
+		flex-shrink: 0;
 	}
 }
 
@@ -41,8 +42,4 @@ h3.edit-site-template-card__template-areas-title {
 .edit-site-template-panel .block-editor-block-preview__container {
 	border-radius: 2px;
 	box-shadow: none;
-}
-
-.edit-site-template-card__actions {
-	flex-shrink: 0;
 }
