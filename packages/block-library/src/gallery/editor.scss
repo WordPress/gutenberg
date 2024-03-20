@@ -59,6 +59,12 @@
 	}
 }
 
+.wp-block-gallery.is-layout-grid {
+	> .block-editor-media-placeholder {
+		grid-column: 1 / -1;
+	}
+}
+
 /**
  * Gallery inspector controls settings.
  */
