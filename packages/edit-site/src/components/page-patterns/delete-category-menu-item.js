@@ -92,7 +92,7 @@ export default function DeleteCategoryMenuItem( { category, onClose } ) {
 				className="edit-site-patterns__delete-modal"
 				title={ sprintf(
 					// translators: %s: The pattern category's name.
-					__( 'Delete the category "%s"?' ),
+					__( 'Delete "%s"?' ),
 					decodeEntities( category.label )
 				) }
 				size="medium"
