@@ -14,14 +14,14 @@
 		&::after {
 			content: "";
 			position: absolute;
-			top: -1px;
-			left: -1px;
-			bottom: -1px;
-			right: -1px;
+			top: -$border-width;
+			left: -$border-width;
+			bottom: -$border-width;
+			right: -$border-width;
 			border-radius: $radius-block-ui + $border-width; // Visually resembles the $radius-block-ui.
 			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 			// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
-			border: 1px solid transparent;
+			border: $border-width solid transparent;
 			box-sizing: inherit;
 			transition: box-shadow 0.1s linear;
 		}
