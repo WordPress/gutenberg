@@ -64,17 +64,24 @@ export default function PostCardPanel( { className, actions, children } ) {
 				className={ classnames( 'editor-post-card-panel', className ) }
 			>
 				<HStack
-					spacing={ 3 }
+					spacing={ 2 }
 					className="editor-post-card-panel__header"
+					align="flex-start"
 				>
 					<Icon
 						className="editor-post-card-panel__icon"
 						icon={ icon }
 					/>
 					{ !! title && (
-						<h2 className="editor-post-card-panel__title">
-							{ decodeEntities( title ) }
-						</h2>
+						<Text
+							numberOfLines={ 2 }
+							truncate
+							className="editor-post-card-panel__title"
+							weight={ 500 }
+							as="h2"
+						>
+							{ title }
+						</Text>
 					) }
 					{ actions }
 				</HStack>

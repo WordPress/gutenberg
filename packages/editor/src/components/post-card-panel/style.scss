@@ -4,31 +4,18 @@
 	}
 
 	&__title {
-<<<<<<< HEAD:packages/edit-site/src/components/sidebar-edit-mode/sidebar-card/style.scss
 		width: 100%;
 
-		&.edit-site-sidebar-card__title {
+		&.editor-post-card-panel__title {
 			font-size: 16px;
 			line-height: $icon-size;
-=======
-		font-weight: 500;
-		line-height: $icon-size;
-		flex-grow: 1;
-		&.editor-post-card-panel__title {
-			font-size: $default-font-size;
-			line-height: $default-line-height;
->>>>>>> 20435777c9 (add/post-sidebarcard-component):packages/editor/src/components/post-sidebar-card/style.scss
 			margin: 0;
 		}
 	}
 
 	&__description {
 		font-size: $default-font-size;
-<<<<<<< HEAD:packages/editor/src/components/post-sidebar-card/style.scss
 		color: $gray-700;
-=======
-		padding-left: $grid-unit-05;
->>>>>>> 5af3f16bcf (update end to end tests):packages/editor/src/components/post-card-panel/style.scss
 	}
 
 	&__icon {
@@ -41,9 +28,5 @@
 		display: flex;
 		justify-content: space-between;
 		margin: 0 0 $grid-unit-15;
-	}
-
-	.edit-site-template-card__actions {
-		flex-shrink: 0;
 	}
 }
