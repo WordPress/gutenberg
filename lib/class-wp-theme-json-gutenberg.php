@@ -2518,7 +2518,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
-	 * @since 6.6.0 Setting a min-height of HTML for background gradient or background size.
+	 * @since 6.6.0 Setting a min-height of HTML when root styles have a background gradient or image.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
@@ -2618,7 +2618,7 @@ class WP_Theme_JSON_Gutenberg {
 		 * 1. Bespoke declaration modifiers:
 		 * - 'filter': Separate the declarations that use the general selector
 		 * from the ones using the duotone selector.
-		 * - 'background|background-size': set the html minHeight to 100%
+		 * - 'background|background-image': set the html min-height to 100%
 		 * to ensure the background covers the entire viewport.
 		 *
 		 */
@@ -2648,8 +2648,10 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		 * If root styles has backgroundSize === cover, or a background is set (gradient),
-		 * set the body minHeight to 100%.
+		 * If root styles has a background-image or a background (gradient) set,
+		 * set the min-height to '100%'. Minus `--wp-admin--admin-bar--height` for logged-in view.
+		 * Setting the CSS rule on the HTML tag ensures background gradients and images behave similarly,
+		 * and matches the behavior of the site editor.
 		 */
 		if ( $should_set_root_min_height ) {
 			$block_rules .= static::to_ruleset(
