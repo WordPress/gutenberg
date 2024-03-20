@@ -4,12 +4,11 @@
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function RenameModal( { onClose, onConfirm } ) {
+export default function DeleteConfirmDialog( { onClose, onConfirm } ) {
 	return (
 		<ConfirmDialog
 			isOpen
-			onConfirm={ ( e ) => {
-				e.preventDefault();
+			onConfirm={ () => {
 				onConfirm();
 
 				// Immediate close avoids ability to hit delete multiple times.
