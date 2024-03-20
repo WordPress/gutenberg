@@ -7,9 +7,9 @@
 			"showCommentsCount": true,
 			"level": 4,
 			"borderColor": "vivid-red",
+			"fontSize": "large",
 			"backgroundColor": "primary",
 			"textColor": "background",
-			"fontSize": "large",
 			"style": {
 				"spacing": {
 					"padding": {
