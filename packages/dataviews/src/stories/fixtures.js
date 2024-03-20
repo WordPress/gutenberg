@@ -190,6 +190,5 @@ export const fields = [
 		header: 'Categories',
 		id: 'categories',
 		enableSorting: false,
-		type: 'enumeration',
 	},
 ];
