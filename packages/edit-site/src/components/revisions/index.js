@@ -41,7 +41,7 @@ function Revisions( { userConfig, blocks } ) {
 		return {};
 	}, [ baseConfig, userConfig ] );
 
-	const renderedBlocksArray = useMemo(
+	const renderedBlocks = useMemo(
 		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
 		[ blocks ]
 	);
@@ -61,6 +61,9 @@ function Revisions( { userConfig, blocks } ) {
 		! isObjectEmpty( globalStyles ) && ! isObjectEmpty( userConfig )
 			? globalStyles
 			: settings.styles;
+
+	const showCanvas =
+		!! editorStyles && !! originalSettings && !! renderedBlocks.length;
 
 	return (
 		<EditorCanvasContainer
@@ -83,10 +86,12 @@ function Revisions( { userConfig, blocks } ) {
 				</style>
 				<Disabled className="edit-site-revisions__example-preview__content">
 					<ExperimentalBlockEditorProvider
-						value={ renderedBlocksArray }
+						value={ renderedBlocks }
 						settings={ settings }
 					>
-						<BlockList renderAppender={ false } />
+						{ showCanvas ? (
+							<BlockList renderAppender={ false } />
+						) : null }
 					</ExperimentalBlockEditorProvider>
 				</Disabled>
 			</Iframe>

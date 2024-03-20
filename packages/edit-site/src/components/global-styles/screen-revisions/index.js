@@ -32,6 +32,34 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 
 const PAGE_SIZE = 10;
 
+function RevisionsView( {
+	editorCanvasContainerView,
+	userConfig,
+	blocks,
+	onClose,
+} ) {
+	if ( editorCanvasContainerView === 'global-styles-revisions:style-book' ) {
+		return (
+			<StyleBook
+				userConfig={ userConfig }
+				isSelected={ () => {} }
+				onClose={ onClose }
+			/>
+		);
+	}
+
+	if ( editorCanvasContainerView === 'global-styles-revisions' ) {
+		return (
+			<Revisions
+				blocks={ blocks }
+				userConfig={ userConfig }
+				closeButtonLabel={ __( 'Close revisions' ) }
+			/>
+		);
+	}
+	return null;
+}
+
 function ScreenRevisions() {
 	const { goTo } = useNavigator();
 	const { user: currentEditorGlobalStyles, setUserConfig } =
@@ -160,25 +188,14 @@ function ScreenRevisions() {
 			{ ! hasRevisions && (
 				<Spinner className="edit-site-global-styles-screen-revisions__loading" />
 			) }
-			{ hasRevisions &&
-				( editorCanvasContainerView ===
-				'global-styles-revisions:style-book' ? (
-					<StyleBook
-						userConfig={ currentlySelectedRevision }
-						isSelected={ () => {} }
-						onClose={ () => {
-							setEditorCanvasContainerView(
-								'global-styles-revisions'
-							);
-						} }
-					/>
-				) : (
-					<Revisions
-						blocks={ blocks }
-						userConfig={ currentlySelectedRevision }
-						closeButtonLabel={ __( 'Close revisions' ) }
-					/>
-				) ) }
+			{ hasRevisions && (
+				<RevisionsView
+					editorCanvasContainerView={ editorCanvasContainerView }
+					userConfig={ currentlySelectedRevision }
+					blocks={ blocks }
+					onClose={ onCloseRevisions }
+				/>
+			) }
 			<RevisionsButtons
 				onChange={ selectRevision }
 				selectedRevisionId={ currentlySelectedRevisionId }

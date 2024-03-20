@@ -439,6 +439,8 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		[ blocks ]
 	);
 
+	const showCanvas = !! originalSettings && !! renderedBlocks.length;
+
 	return (
 		<div role="row">
 			<div role="gridcell">
@@ -468,7 +470,9 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 								value={ renderedBlocks }
 								settings={ settings }
 							>
-								<BlockList renderAppender={ false } />
+								{ showCanvas ? (
+									<BlockList renderAppender={ false } />
+								) : null }
 							</ExperimentalBlockEditorProvider>
 						</Disabled>
 					</div>
