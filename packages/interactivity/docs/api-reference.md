@@ -1128,8 +1128,9 @@ $my_context = array(
 	'counter' => 0,
 	'isOpen'  => true,
 );
+?>
 <div
- echo wp_interactivity_data_wp_context($my_context)
+ <?php echo wp_interactivity_data_wp_context( $my_context ); ?>
 >
 </div>
 ```
