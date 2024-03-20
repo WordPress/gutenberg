@@ -1107,7 +1107,7 @@ This code
 
 ```php
 wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
-$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
+$html_content = '<div data-wp-text="myPlugin::state.greeting"></div>';
 $processed_html = wp_interactivity_process_directives( $html_content );
 echo $processed_html;
 ```
