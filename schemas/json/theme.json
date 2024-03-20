@@ -299,7 +299,7 @@
 					"type": "object",
 					"properties": {
 						"contentSize": {
-							"description": "Sets the max-width of the content.",
+							"description": "Sets the default `max-width` of the content. You can use `wideSize` to add an extended width option.",
 							"type": "string"
 						},
 						"wideSize": {
@@ -1111,7 +1111,7 @@
 			"type": "object",
 			"properties": {
 				"border": {
-					"description": "Border styles.",
+					"description": "These are global border styles, applied to the `body`.",
 					"type": "object",
 					"properties": {
 						"color": {
@@ -1367,7 +1367,7 @@
 					"additionalProperties": false
 				},
 				"color": {
-					"description": "Color styles.",
+					"description": "These are global color styles, applied to the `body`.",
 					"type": "object",
 					"properties": {
 						"background": {
@@ -1435,7 +1435,7 @@
 					}
 				},
 				"spacing": {
-					"description": "Spacing styles.",
+					"description": "These are global spacing styles, applied to the `body`.",
 					"type": "object",
 					"properties": {
 						"blockGap": {
@@ -1555,7 +1555,7 @@
 					"additionalProperties": false
 				},
 				"typography": {
-					"description": "Typography styles.",
+					"description": "These are global typography styles, applied to the `body`.",
 					"type": "object",
 					"properties": {
 						"fontFamily": {
@@ -1683,7 +1683,7 @@
 					"additionalProperties": false
 				},
 				"shadow": {
-					"description": "Box shadow styles.",
+					"description": "These are global box shadow styles, applied to the `body`..",
 					"oneOf": [
 						{
 							"type": "string"
@@ -1694,7 +1694,7 @@
 					]
 				},
 				"outline": {
-					"description": "Outline styles.",
+					"description": "These are global outline styles, applied to the `body`.",
 					"type": "object",
 					"properties": {
 						"color": {

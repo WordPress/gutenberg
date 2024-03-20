@@ -206,7 +206,7 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 ### border
 
-Border styles.
+These are global border styles, applied to the `body`.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
@@ -223,7 +223,7 @@ Border styles.
 
 ### color
 
-Color styles.
+These are global color styles, applied to the `body`.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
@@ -246,7 +246,7 @@ Dimensions styles
 
 ### spacing
 
-Spacing styles.
+These are global spacing styles, applied to the `body`.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
@@ -258,7 +258,7 @@ Spacing styles.
 
 ### typography
 
-Typography styles.
+These are global typography styles, applied to the `body`.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
@@ -287,14 +287,14 @@ CSS and SVG filter styles.
 
 ### shadow
 
-Box shadow styles.
+These are global box shadow styles, applied to the `body`..
 
 
 ---
 
 ### outline
 
-Outline styles.
+These are global outline styles, applied to the `body`.
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
