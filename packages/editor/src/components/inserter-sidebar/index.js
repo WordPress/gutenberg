@@ -69,7 +69,7 @@ export default function InserterSidebar( {
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					__experimentalOnPatternCategorySelection={
-						isRightSidebarOpen ? closeGeneralSidebar() : undefined
+						isRightSidebarOpen ? closeGeneralSidebar : undefined
 					}
 					ref={ libraryRef }
 				/>
