@@ -383,6 +383,20 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+export function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				useSource: action.useSource,
+				lockAttributesEditing: action.lockAttributesEditing ?? true,
+			},
+		};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
@@ -395,4 +409,5 @@ export default combineReducers( {
 	groupingBlockName,
 	categories,
 	collections,
+	blockBindingsSources,
 } );

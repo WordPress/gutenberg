@@ -95,7 +95,8 @@ const computeOutlineHeadings = ( blocks = [] ) => {
 };
 
 const isEmptyHeading = ( heading ) =>
-	! heading.attributes.content || heading.attributes.content.length === 0;
+	! heading.attributes.content ||
+	heading.attributes.content.trim().length === 0;
 
 export default function DocumentOutline( {
 	onSelect,

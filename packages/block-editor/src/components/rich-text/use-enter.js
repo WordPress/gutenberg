@@ -21,6 +21,10 @@ export function useEnter( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			if ( event.target.contentEditable !== 'true' ) {
+				return;
+			}
+
 			if ( event.defaultPrevented ) {
 				return;
 			}

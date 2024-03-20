@@ -1,20 +1,19 @@
 .dataviews-wrapper {
-	width: 100%;
 	height: 100%;
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
-
-	> div {
-		min-height: 100%;
-	}
 }
 
 .dataviews-filters__view-actions {
+	box-sizing: border-box;
 	padding: $grid-unit-15 $grid-unit-40 0;
-	.components-search-control {
-		flex-grow: 1;
+	margin-bottom: $grid-unit-15;
+	flex-shrink: 0;
+	position: sticky;
+	left: 0;
 
+	.components-search-control {
 		.components-base-control__field {
 			max-width: 240px;
 		}
@@ -22,11 +21,18 @@
 }
 
 .dataviews-filters__container {
-	padding: 0 $grid-unit-40;
-}
+	padding-right: $grid-unit-40;
 
-.dataviews-filters__view-actions.components-h-stack {
-	align-items: center;
+	.dataviews-filters__reset-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			opacity: 0;
+		}
+
+		&:focus {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-filters-button {
@@ -34,22 +40,25 @@
 }
 
 .dataviews-pagination {
-	margin-top: auto;
 	position: sticky;
 	bottom: 0;
-	background-color: rgba($white, 0.8);
-	backdrop-filter: blur(6px);
+	left: 0;
+	background-color: $white;
 	padding: $grid-unit-15 $grid-unit-40;
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
+	flex-shrink: 0;
+}
+
+.dataviews-pagination__page-selection {
+	font-size: 11px;
+	text-transform: uppercase;
+	font-weight: 500;
+	color: $gray-900;
 }
 
 .dataviews-filters-options {
 	margin: $grid-unit-40 0 $grid-unit-20;
-}
-
-.dataviews-view-table-wrapper {
-	overflow-x: auto;
 }
 
 .dataviews-view-table {
@@ -114,11 +123,11 @@
 			border-bottom: 0;
 		}
 
-		&:hover {
+		&.is-hovered {
 			background-color: #f8f8f8;
 		}
 
-		.components-checkbox-control__input {
+		.components-checkbox-control__input.components-checkbox-control__input {
 			opacity: 0;
 
 			&:checked,
@@ -128,9 +137,15 @@
 			}
 		}
 
+		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			opacity: 0;
+		}
+
 		&:focus-within,
+		&.is-hovered,
 		&:hover {
-			.components-checkbox-control__input {
+			.components-checkbox-control__input,
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
 		}
@@ -145,17 +160,18 @@
 		}
 	}
 	thead {
+		position: sticky;
+		inset-block-start: 0;
+		z-index: z-index(".dataviews-view-table thead");
+
 		tr {
 			border: 0;
 		}
 		th {
-			position: sticky;
-			top: -1px;
 			background-color: $white;
 			box-shadow: inset 0 -#{$border-width} 0 $gray-100;
 			padding-top: $grid-unit-10;
 			padding-bottom: $grid-unit-10;
-			z-index: 1;
 			font-size: 11px;
 			text-transform: uppercase;
 			font-weight: 500;
@@ -202,6 +218,12 @@
 	.dataviews-view-table__actions-column {
 		width: 1%;
 	}
+
+	&:has(tr.is-selected) {
+		.components-checkbox-control__input {
+			opacity: 1;
+		}
+	}
 }
 
 .dataviews-view-list__primary-field,
@@ -212,7 +234,6 @@
 	color: $gray-900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	overflow: hidden;
 	display: block;
 	width: 100%;
 
@@ -228,6 +249,7 @@
 		&:hover {
 			color: $gray-900;
 		}
+		@include link-reset();
 	}
 
 	button.components-button.is-link {
@@ -466,6 +488,10 @@
 .dataviews-no-results,
 .dataviews-loading {
 	padding: 0 $grid-unit-40;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 .dataviews-view-table-selection-checkbox label {
@@ -493,9 +519,6 @@
 	margin-left: $grid-unit-10;
 }
 
-.dataviews-view-grid__card.has-no-pointer-events * {
-	pointer-events: none;
-}
 .dataviews-filter-summary__popover {
 	.components-popover__content {
 		width: 230px;
@@ -510,55 +533,61 @@
 	overflow: auto;
 	border-top: 1px solid $gray-200;
 
-	.dataviews-search-widget-filter-combobox-item {
-		display: flex;
-		align-items: center;
-		gap: $grid-unit-10;
-		border-radius: $radius-block-ui;
-		box-sizing: border-box;
-		padding: $grid-unit-10 $grid-unit-15;
-		cursor: default;
-		margin-block-end: 2px;
+	.dataviews-search-widget-filter-combobox-item-value {
+		[data-user-value] {
+			font-weight: 600;
+		}
+	}
+}
 
-		&:last-child {
-			margin-block-end: 0;
+.dataviews-search-widget-listbox {
+	max-height: $grid-unit * 23;
+	padding: $grid-unit-05;
+	overflow: auto;
+}
+
+.dataviews-search-widget-listitem {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	border-radius: $radius-block-ui;
+	box-sizing: border-box;
+	padding: $grid-unit-10 $grid-unit-15;
+	cursor: default;
+	margin-block-end: 2px;
+
+	&:last-child {
+		margin-block-end: 0;
+	}
+
+	&:hover,
+	&[data-active-item],
+	&:focus {
+		background-color: var(--wp-admin-theme-color);
+		color: $white;
+
+		.dataviews-search-widget-listitem-check {
+			fill: $white;
 		}
 
-		&:hover,
-		&[data-active-item],
-		&:focus {
-			background-color: var(--wp-admin-theme-color);
+		.dataviews-search-widget-listitem-description {
 			color: $white;
-
-			.dataviews-search-widget-filter-combobox-item-check {
-				fill: $white;
-			}
-
-			.dataviews-search-widget-filter-combobox-item-description {
-				color: $white;
-			}
 		}
+	}
 
-		.dataviews-search-widget-filter-combobox-item-check {
-			width: 24px;
-			height: 24px;
-			flex-shrink: 0;
-		}
+	.dataviews-search-widget-listitem-check {
+		width: 24px;
+		height: 24px;
+		flex-shrink: 0;
+	}
 
-		.dataviews-search-widget-filter-combobox-item-value {
-			[data-user-value] {
-				font-weight: 600;
-			}
-		}
-
-		.dataviews-search-widget-filter-combobox-item-description {
-			display: block;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			font-size: $helptext-font-size;
-			line-height: 16px;
-			color: $gray-700;
-		}
+	.dataviews-search-widget-listitem-description {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-size: $helptext-font-size;
+		line-height: 16px;
+		color: $gray-700;
 	}
 }
 
@@ -615,8 +644,12 @@
 }
 
 .dataviews-filter-summary__operators-container {
-	padding: $grid-unit-10 $grid-unit-10 $grid-unit-05;
-	padding-bottom: 0;
+	padding: $grid-unit-10 $grid-unit-10 0;
+
+	&:has(+ .dataviews-search-widget-listbox) {
+		border-bottom: 1px solid $gray-200;
+		padding-bottom: $grid-unit-10;
+	}
 
 	&:empty {
 		display: none;
@@ -648,7 +681,8 @@
 		}
 
 		&:hover,
-		&:focus-visible {
+		&:focus-visible,
+		&[aria-expanded="true"] {
 			background: $gray-200;
 			color: $gray-900;
 		}
@@ -657,8 +691,9 @@
 			color: var(--wp-admin-theme-color);
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
-			&:hover {
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			&:hover,
+			&[aria-expanded="true"] {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
 			}
 		}
 

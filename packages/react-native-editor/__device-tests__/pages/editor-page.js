@@ -205,6 +205,36 @@ class EditorPage {
 		return lastElementFound;
 	}
 
+	/**
+	 * Selects a block.
+	 *
+	 * @param {import('webdriverio').ChainablePromiseElement} block                           The block to select.
+	 * @param {Object}                                        options                         Configuration options.
+	 * @param {Object}                                        [options.offset={ x: 0, y: 0 }] The offset for the click position.
+	 * @param {number|Function}                               [options.offset.x=0]            The x-coordinate offset or a function that calculates the offset based on the block's width.
+	 * @param {number|Function}                               [options.offset.y=0]            The y-coordinate offset or a function that calculates the offset based on the block's height.
+	 *
+	 * @return {import('webdriverio').ChainablePromiseElement} The selected block.
+	 */
+	async selectBlock( block, options = {} ) {
+		const { offset = { x: 0, y: 0 } } = options;
+		const size = await block.getSize();
+
+		let offsetX = offset.x;
+		if ( typeof offset.x === 'function' ) {
+			offsetX = offset.x( size.width );
+		}
+
+		let offsetY = offset.y;
+		if ( typeof offset.y === 'function' ) {
+			offsetY = offset.y( size.height );
+		}
+
+		await block.click( { x: offsetX, y: offsetY } );
+
+		return block;
+	}
+
 	async getFirstBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 		return await waitForVisible( this.driver, firstBlockLocator );
@@ -1076,6 +1106,8 @@ const blockNames = {
 	button: 'Button',
 	preformatted: 'Preformatted',
 	unsupported: 'Unsupported',
+	mediaText: 'Media & Text',
+	quote: 'Quote',
 };
 
 module.exports = { setupEditor, blockNames };

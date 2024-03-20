@@ -33,11 +33,12 @@ Setting that enables the following UI tools:
 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
+- shadow: defaultPresets
 
 
 ---
@@ -72,7 +73,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | true |  |
+| defaultPresets | boolean | false |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -97,6 +98,7 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 

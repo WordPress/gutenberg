@@ -336,7 +336,7 @@ function ListViewComponent(
 		description && `block-editor-list-view-description-${ instanceId }`;
 
 	return (
-		<AsyncModeProvider value={ true }>
+		<AsyncModeProvider value>
 			<ListViewDropIndicatorPreview
 				draggedBlockClientId={ firstDraggedBlockClientId }
 				listViewRef={ elementRef }

@@ -31,12 +31,16 @@ describe( 'getIsResolving', () => {
 		registry.registerStore( 'testStore', testStore );
 	} );
 
+	const DEPRECATION_MESSAGE =
+		'wp.data.select( store ).getIsResolving is deprecated since version 6.6 and will be removed in version 6.8. Please use wp.data.select( store ).getResolutionState instead.';
+
 	it( 'should return undefined if no state by reducerKey, selectorName', () => {
 		const result = registry
 			.select( 'testStore' )
 			.getIsResolving( 'getFoo', [] );
 
 		expect( result ).toBe( undefined );
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
 	} );
 
 	it( 'should return undefined if state by reducerKey, selectorName, but not args', () => {
