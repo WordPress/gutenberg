@@ -112,15 +112,11 @@ function Navigation( {
 	// Allow for this to continue to be used.
 	const ref = attributes.slug || attributes.ref;
 
-	// "ref" attribute is the integer-based reference.
-	const [ idRef, setIdRef ] = useState( attributes.ref );
-
 	const setRef = useCallback(
-		( { id, slug } ) => {
+		( { slug } ) => {
 			setAttributes( { slug } );
-			setIdRef( id );
 		},
-		[ setAttributes, setIdRef ]
+		[ setAttributes ]
 	);
 
 	const recursionId = `navigationMenu/${ ref }`;
@@ -196,6 +192,7 @@ function Navigation( {
 		canUserCreateNavigationMenu,
 		isResolvingCanUserCreateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenu,
+		navigationMenu,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -212,6 +209,7 @@ function Navigation( {
 
 	const handleUpdateMenu = useCallback(
 		( menu, options = { focusNavigationBlock: false } ) => {
+			debugger;
 			const { focusNavigationBlock } = options;
 			setRef( menu );
 			if ( focusNavigationBlock ) {
@@ -408,7 +406,7 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
-			handleUpdateMenu( createNavigationMenuPost?.id, {
+			handleUpdateMenu( createNavigationMenuPost, {
 				focusNavigationBlock: true,
 			} );
 		}
@@ -423,7 +421,7 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
-		createNavigationMenuPost?.id,
+		createNavigationMenuPost,
 		handleUpdateMenu,
 	] );
 
@@ -829,7 +827,11 @@ function Navigation( {
 	}
 
 	return (
-		<EntityProvider kind="postType" type="wp_navigation" id={ idRef }>
+		<EntityProvider
+			kind="postType"
+			type="wp_navigation"
+			id={ navigationMenu?.id }
+		>
 			<RecursionProvider uniqueId={ recursionId }>
 				<MenuInspectorControls
 					clientId={ clientId }
