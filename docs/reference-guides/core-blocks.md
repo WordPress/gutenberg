@@ -598,7 +598,7 @@ Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg
 -	**Name:** core/post-comments-form
 -	**Category:** theme
 -	**Supports:** color (background, gradients, heading, link, text), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** commentFormTitle, textAlign
 
 ## Comments Link
 
