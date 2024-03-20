@@ -33,12 +33,6 @@ export default function InserterSidebar( {
 	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
-	function handleOnCategorySelection() {
-		if ( isRightSidebarOpen ) {
-			closeGeneralSidebar();
-		}
-	}
-
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
@@ -75,7 +69,7 @@ export default function InserterSidebar( {
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					__experimentalOnPatternCategorySelection={
-						handleOnCategorySelection
+						isRightSidebarOpen ? closeGeneralSidebar() : undefined
 					}
 					ref={ libraryRef }
 				/>
