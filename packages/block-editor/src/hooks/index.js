@@ -48,6 +48,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	background,
 	style,
 	color,
 	dimensions,

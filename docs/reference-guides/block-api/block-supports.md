@@ -149,13 +149,13 @@ When a background image is selected, the image data is stored in the `style.back
 When a background images is selected and its position or size are changed, the background-position is stored in the `style.background.backgroundPosition` and its background-size in `style.background.backgroundSize` attribute.
 
 -   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
-    -   `background`: an attribute of `object` type.
-        - `backgroundImage`: an attribute of `object` type, containing information about the selected image
+    -   `background`: an attribute of `object` type. 
+        - `backgroundImage`: an attribute of `object` type, containing information about the selected image 
             - `url`: type `string`, URL to the image
             - `id`: type `int`, media attachment ID
             - `source`: type `string`, at the moment the only value is `file`
-            - `title`: type `string`, title of the media attachment
-        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
+            - `title`: type `string`, title of the media attachment 
+        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value. 
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
@@ -484,10 +484,10 @@ When the block declares support for `color.link`, the attributes definition is e
                         color: {
                             text: 'var:preset|color|contrast',
                         },
-						":hover": {
-							color: {
-								text: "#000000"
-							}
+						":hover": { 
+							color: { 
+								text: "#000000" 
+							} 
 						}
                     }
                 }

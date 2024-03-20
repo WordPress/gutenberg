@@ -641,3 +641,9 @@ export function BackgroundImagePanel( props ) {
 		</InspectorControls>
 	);
 }
+
+export default {
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport: hasBackgroundSupport,
+};

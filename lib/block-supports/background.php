@@ -39,8 +39,6 @@ function gutenberg_register_background_support( $block_type ) {
  * @return array                     Style engine array of CSS string and style declarations.
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
-	$background_styles['backgroundSize'] = ! empty( $background_styles['backgroundSize'] ) ? $background_styles['backgroundSize'] : 'auto';
-
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 }
 

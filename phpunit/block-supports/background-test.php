@@ -242,13 +242,13 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 						'source' => 'file',
 					),
 				),
-				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:auto;",
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');",
 			),
 			'css generated where backgroundImage is a string' => array(
 				'background_style' => array(
 					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
-				'expected_css'     => "background-image:url('https://example.com/image.jpg');background-size:auto;",
+				'expected_css'     => "background-image:url('https://example.com/image.jpg');",
 			),
 			'css generated with escaped URL'         => array(
 				'background_style' => array(
