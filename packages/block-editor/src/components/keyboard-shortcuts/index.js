@@ -137,7 +137,7 @@ function KeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/block-editor/collapse-list-view',
 			category: 'list-view',
-			description: __( 'Collapse all but the focused list view item.' ),
+			description: __( 'Collapse all other items.' ),
 			keyCombination: {
 				modifier: 'alt',
 				character: 'l',

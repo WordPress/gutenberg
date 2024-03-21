@@ -37,6 +37,7 @@ import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
+import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
@@ -240,6 +241,11 @@ function ListViewComponent(
 		},
 		[ updateBlockSelection ]
 	);
+
+	useListViewCollapseItems( {
+		collapseAll,
+		expand,
+	} );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 

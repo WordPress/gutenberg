@@ -20,6 +20,7 @@ import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
+import { unlock } from '../../lock-unlock';
 
 function selector( select ) {
 	const {
@@ -79,7 +80,8 @@ export default function BlockTools( {
 		selectBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-	} = useDispatch( blockEditorStore );
+		expandBlock,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
@@ -140,6 +142,8 @@ export default function BlockTools( {
 				// In effect, to the user this feels like deselecting the multi-selection.
 				selectBlock( clientIds[ 0 ] );
 			}
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			expandBlock( clientId );
 		}
 	}
 
