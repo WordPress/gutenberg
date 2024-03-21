@@ -81,7 +81,7 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726 @Mamaduka
+/test/e2e                                       @Mamaduka
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
