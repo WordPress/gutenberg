@@ -265,6 +265,10 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 					return;
 				}
 
+				if ( ! block.attributes.metadata ) {
+					return;
+				}
+
 				Object.entries( block.attributes.metadata.bindings ).forEach(
 					( [ attributeName, settings ] ) => {
 						if ( ! canBindAttribute( block.name, attributeName ) ) {
