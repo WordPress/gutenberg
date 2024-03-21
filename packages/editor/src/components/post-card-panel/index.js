@@ -87,7 +87,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 					{ ( description || lastEditedText ) && (
 						<VStack
 							className="editor-post-card-panel__description"
-							spacing={ 3 }
+							spacing={ 2 }
 						>
 							{ !! description && <Text>{ description }</Text> }
 							{ !! lastEditedText && (
