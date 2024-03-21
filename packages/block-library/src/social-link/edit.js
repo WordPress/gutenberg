@@ -23,7 +23,7 @@ import {
 	PanelRow,
 	TextControl,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 
 /**
@@ -114,8 +114,7 @@ const SocialLinkEdit = ( {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	const IconComponent = getIconBySite( service );
-	const socialLinkName = getNameBySite( service );
-	const socialLinkLabel = label ? label : socialLinkName;
+	const socialLinkLabel = label ? label : getNameBySite( service );
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
@@ -127,13 +126,7 @@ const SocialLinkEdit = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody
-					title={ sprintf(
-						/* translators: %s: name of the social service. */
-						__( '%s link text' ),
-						socialLinkName
-					) }
-				>
+				<PanelBody title={ __( 'Settings' ) }>
 					<PanelRow>
 						<TextControl
 							__nextHasNoMarginBottom
