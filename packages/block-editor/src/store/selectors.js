@@ -2288,7 +2288,9 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 						...( blocks[ 0 ].attributes.metadata || {} ),
 						categories: pattern.categories,
 						patternName: pattern.name,
-						name: pattern.title,
+						name:
+							blocks[ 0 ].attributes.metadata?.name ||
+							pattern.title,
 					},
 				};
 			}
