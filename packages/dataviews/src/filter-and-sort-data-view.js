@@ -78,9 +78,15 @@ export function filterAndSortDataView( data, view, fields ) {
 				filter?.value?.length > 0
 			) {
 				filteredData = filteredData.filter( ( item ) => {
-					return ! filter.value.includes(
-						field.getValue( { item } )
-					);
+					const fieldValue = field.getValue( { item } );
+					if ( Array.isArray( fieldValue ) ) {
+						return ! filter.value.some( ( filterValue ) =>
+							fieldValue.includes( filterValue )
+						);
+					} else if ( typeof fieldValue === 'string' ) {
+						return ! filter.value.includes( fieldValue );
+					}
+					return false;
 				} );
 			} else if (
 				filter.operator === OPERATOR_IS_ALL &&

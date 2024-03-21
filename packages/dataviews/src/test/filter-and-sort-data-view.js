@@ -170,10 +170,8 @@ describe( 'filters', () => {
 			},
 			fields
 		);
-		expect( result ).toHaveLength( 3 );
-		expect( result[ 0 ].title ).toBe( 'Apollo' );
-		expect( result[ 1 ].title ).toBe( 'Space' );
-		expect( result[ 2 ].title ).toBe( 'NASA' );
+		expect( result ).toHaveLength( 1 );
+		expect( result[ 0 ].title ).toBe( 'NASA' );
 	} );
 
 	it( 'should search using IS ALL filter', () => {
