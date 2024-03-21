@@ -92,12 +92,12 @@ const URLPopover = forwardRef(
 							/>
 						) }
 					</div>
-					{ showSettings && (
-						<div className="block-editor-url-popover__row block-editor-url-popover__settings">
-							{ renderSettings() }
-						</div>
-					) }
 				</div>
+				{ showSettings && (
+					<div className="block-editor-url-popover__settings">
+						{ renderSettings() }
+					</div>
+				) }
 				{ additionalControls && ! showSettings && (
 					<div className="block-editor-url-popover__additional-controls">
 						{ additionalControls }

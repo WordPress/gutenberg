@@ -26,6 +26,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useMemo, useEffect, useState } from '@wordpress/element';
@@ -150,6 +151,7 @@ export default function PostFeaturedImageEdit( {
 		} ),
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
 
 	const placeholder = ( content ) => {
@@ -159,11 +161,12 @@ export default function PostFeaturedImageEdit( {
 					'block-editor-media-placeholder',
 					borderProps.className
 				) }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					height: !! aspectRatio && '100%',
 					width: !! aspectRatio && '100%',
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ content }
@@ -285,6 +288,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
+		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,

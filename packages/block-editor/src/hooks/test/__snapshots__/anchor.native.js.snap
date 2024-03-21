@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`anchor should set the ID attribute on the block 1`] = `
+"<!-- wp:paragraph -->
+<p id="my-anchor"></p>
+<!-- /wp:paragraph -->"
+`;

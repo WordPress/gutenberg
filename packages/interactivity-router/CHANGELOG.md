@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.3.0 (2024-03-06)
+
 ### Bug Fixes
 
 -   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))

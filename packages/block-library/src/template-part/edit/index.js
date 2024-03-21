@@ -205,7 +205,7 @@ export default function TemplatePartEdit( {
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
-				__( 'Template Part "%s" replaceed.' ),
+				__( 'Template Part "%s" replaced.' ),
 				templatePart.title?.rendered || templatePart.slug
 			),
 			{
@@ -320,7 +320,7 @@ export default function TemplatePartEdit( {
 					onRequestClose={ () =>
 						setIsTemplatePartSelectionOpen( false )
 					}
-					isFullScreen={ true }
+					isFullScreen
 				>
 					<TemplatePartSelectionModal
 						templatePartId={ templatePartId }

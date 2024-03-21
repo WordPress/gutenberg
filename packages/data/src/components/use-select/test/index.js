@@ -86,7 +86,7 @@ describe( 'useSelect', () => {
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
-				<TestComponent keyName="foo" change={ true } />
+				<TestComponent keyName="foo" change />
 			</RegistryProvider>
 		);
 
@@ -957,7 +957,7 @@ describe( 'useSelect', () => {
 			} );
 
 			render(
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
 					</RegistryProvider>
@@ -1004,7 +1004,7 @@ describe( 'useSelect', () => {
 				</AsyncModeProvider>
 			);
 
-			const { rerender } = render( <App async={ true } /> );
+			const { rerender } = render( <App async /> );
 
 			// Ensure expected state was rendered.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
@@ -1044,7 +1044,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = ( { variant } ) => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent variant={ variant } />
 					</RegistryProvider>
@@ -1089,7 +1089,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = () => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
 					</RegistryProvider>
@@ -1134,7 +1134,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = ( { reg } ) => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ reg }>
 						<TestComponent />
 					</RegistryProvider>

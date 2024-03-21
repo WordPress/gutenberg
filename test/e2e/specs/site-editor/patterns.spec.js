@@ -84,7 +84,7 @@ test.describe( 'Patterns', () => {
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Save panel' } )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -172,7 +172,7 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'Reset filters' } )
+			.getByRole( 'button', { name: 'Reset', exact: true } )
 			.click();
 		await expect( searchBox ).toHaveValue( '' );
 		await expect( patterns.item ).toHaveCount( 3 );

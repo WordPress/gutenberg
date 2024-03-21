@@ -125,13 +125,22 @@ button.font-library-modal__upload-area {
 	align-items: center;
 	margin-top: $grid-unit-80;
 
-	h3 {
-		font-size: 1.4rem;
+	p {
+		line-height: $default-line-height;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: 400;
 	}
 
 	.components-card {
-		width: 50%;
-		min-width: 350px;
-		max-width: 400px;
+		padding: $grid-unit-20;
+		width: 400px;
+	}
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
 	}
 }

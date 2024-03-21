@@ -445,7 +445,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 -	**Name:** core/media-text
 -	**Category:** media
 -	**Supports:** align (full, wide), anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, verticalAlignment
+-	**Attributes:** align, allowedBlocks, focalPoint, href, imageFill, isStackedOnMobile, linkClass, linkDestination, linkTarget, mediaAlt, mediaId, mediaLink, mediaPosition, mediaSizeSlug, mediaType, mediaUrl, mediaWidth, rel, useFeaturedImage, verticalAlignment
 
 ## Unsupported
 
@@ -642,7 +642,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
@@ -784,7 +784,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 -	**Name:** core/quote
 -	**Category:** text
 -	**Supports:** anchor, color (background, gradients, heading, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** align, citation, value
+-	**Attributes:** citation, textAlign, value
 
 ## Read More
 

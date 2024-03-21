@@ -9,7 +9,7 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
  * Internal dependencies
  */
 import DataViewItem from '../sidebar-dataviews/dataview-item';
-import { useAddedBy } from '../list/added-by';
+import { useAddedBy } from '../page-templates-template-parts/hooks';
 import { layout } from '@wordpress/icons';
 
 const EMPTY_ARRAY = [];
@@ -23,7 +23,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 			title={ text }
 			icon={ icon }
 			isActive={ isActive }
-			isCustom="false"
+			isCustom={ false }
 		/>
 	);
 }
@@ -57,7 +57,7 @@ export default function DataviewsTemplatesSidebarContent( {
 				title={ title }
 				icon={ layout }
 				isActive={ activeView === 'all' }
-				isCustom="false"
+				isCustom={ false }
 			/>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (
