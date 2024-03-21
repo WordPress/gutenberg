@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { filterAndSortDataView } from '../filter-and-sort-data-view';
+import { filterSortAndPaginate } from '../filter-and-sort-data-view';
 import { data, fields } from '../stories/fixtures';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {
-		expect( filterAndSortDataView( null, {}, [] ) ).toStrictEqual( {
+		expect( filterSortAndPaginate( null, {}, [] ) ).toStrictEqual( {
 			data: [],
 			paginationInfo: { totalItems: 0, totalPages: 0 },
 		} );
@@ -14,7 +14,7 @@ describe( 'filters', () => {
 
 	it( 'should return the same data if no filters are applied', () => {
 		expect(
-			filterAndSortDataView(
+			filterSortAndPaginate(
 				data,
 				{
 					filters: [],
@@ -28,7 +28,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using searchable fields (title)', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				search: 'Neptu',
@@ -41,7 +41,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using searchable fields (description)', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				search: 'photo',
@@ -54,7 +54,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should perform case-insensitive and accent-insensitive search', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				search: 'nete ven',
@@ -67,7 +67,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS filter', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -86,7 +86,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS NOT filter', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -112,7 +112,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS ANY filter for STRING values', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -131,7 +131,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS NONE filter for STRING values', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -151,7 +151,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS ANY filter for ARRAY values', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -170,7 +170,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS NONE filter for ARRAY values', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -188,7 +188,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS ALL filter', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -212,7 +212,7 @@ describe( 'filters', () => {
 	} );
 
 	it( 'should search using IS NOT ALL filter', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				filters: [
@@ -234,7 +234,7 @@ describe( 'filters', () => {
 
 describe( 'sorting', () => {
 	it( 'should sort', () => {
-		const { data: result } = filterAndSortDataView(
+		const { data: result } = filterSortAndPaginate(
 			data,
 			{
 				sort: { field: 'title', direction: 'desc' },
@@ -256,7 +256,7 @@ describe( 'sorting', () => {
 
 describe( 'pagination', () => {
 	it( 'should paginate', () => {
-		const { data: result, paginationInfo } = filterAndSortDataView(
+		const { data: result, paginationInfo } = filterSortAndPaginate(
 			data,
 			{
 				perPage: 2,

@@ -9,7 +9,7 @@
 
 ### Breaking changes
 
-- Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterAndSortDataView` function.
+- Removed the `getPaginationResults` and `sortByTextFields` utils and replaced them with a unique `filterSortAndPaginate` function.
 
 ## 0.7.0 (2024-03-06)
 

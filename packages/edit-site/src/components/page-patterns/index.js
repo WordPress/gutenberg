@@ -20,7 +20,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews, filterAndSortDataView } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -338,7 +338,7 @@ export default function DataviewsPatterns() {
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
 		viewWithoutFilters.filters = [];
-		return filterAndSortDataView( patterns, viewWithoutFilters, fields );
+		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(

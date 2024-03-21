@@ -21,7 +21,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { DataViews, filterAndSortDataView } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -335,7 +335,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	}, [ postType, authors, view.type ] );
 
 	const { data, paginationInfo } = useMemo( () => {
-		return filterAndSortDataView( records, view, fields );
+		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();

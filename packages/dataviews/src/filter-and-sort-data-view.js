@@ -31,7 +31,7 @@ const EMPTY_ARRAY = [];
  *
  * @return {Object} { data: any[], paginationInfo: { totalItems: number, totalPages: number } }
  */
-export function filterAndSortDataView( data, view, fields ) {
+export function filterSortAndPaginate( data, view, fields ) {
 	if ( ! data ) {
 		return {
 			data: EMPTY_ARRAY,
