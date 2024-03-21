@@ -56,7 +56,7 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
-		( pattern, blocks ) => {
+		( pattern, blocks, category ) => {
 			const patternBlocks =
 				pattern.type === INSERTER_PATTERN_TYPES.user &&
 				pattern.syncStatus !== 'unsynced'
@@ -64,7 +64,8 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 					: blocks;
 			onInsert(
 				( patternBlocks ?? [] ).map( ( block ) => cloneBlock( block ) ),
-				pattern.name
+				pattern.name,
+				category
 			);
 			createSuccessNotice(
 				sprintf(

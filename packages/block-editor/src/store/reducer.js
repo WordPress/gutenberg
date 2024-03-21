@@ -755,6 +755,31 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+function cloneDeep( object ) {
+	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
+}
+
+const addPatternCategoryToMetadata = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'INSERT_BLOCKS' ) {
+		const { blocks, meta } = action;
+		const nextState = reducer( state, action );
+		const firstBlockClientId = blocks[ 0 ].clientId;
+		const firstBlockAttributes = cloneDeep( blocks[ 0 ].attributes );
+		if ( meta?.category && blocks.length === 1 ) {
+			nextState.attributes.set( firstBlockClientId, {
+				...firstBlockAttributes,
+				metadata: {
+					...( firstBlockAttributes.metadata || {} ),
+					categories: [ meta.category.name ],
+				},
+			} );
+		}
+		return nextState;
+	}
+
+	return reducer( state, action );
+};
+
 /**
  * Reducer returning the blocks state.
  *
@@ -772,7 +797,8 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withResetControlledBlocks,
+	addPatternCategoryToMetadata
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
@@ -852,7 +878,9 @@ export const blocks = pipe(
 						newState.set( key, value );
 					}
 				);
-				return newState;
+
+				// Add pattern category to metadata if available.
+				return newState; //addPatternCategoryToMetadata( newState, action );
 			}
 
 			case 'UPDATE_BLOCK': {
