@@ -58,16 +58,18 @@ const SocialLinkURLPopover = ( {
 					<URLInput
 						value={ url }
 						onChange={ ( nextURL ) => {
-							const nextAttributes = { url: nextURL };
+							const nextAttributes = {
+								url: nextURL,
+								service: undefined,
+							};
 
 							if ( isURL( nextURL ) || isEmail( nextURL ) ) {
 								const matchingService = isEmail( nextURL )
 									? 'mail'
 									: getMatchingService( nextURL );
 
-								if ( matchingService ) {
-									nextAttributes.service = matchingService;
-								}
+								nextAttributes.service =
+									matchingService ?? 'chain';
 							}
 
 							setAttributes( nextAttributes );
