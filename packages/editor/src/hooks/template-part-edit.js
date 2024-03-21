@@ -8,54 +8,43 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarButton } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useLink } from '../components/routes/link';
-import { unlock } from '../lock-unlock';
-import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
-
-const { useLocation } = unlock( routerPrivateApis );
+import { store as editorStore } from '../store';
 
 function EditTemplatePartMenuItem( { attributes } ) {
 	const { theme, slug } = attributes;
-	const { params } = useLocation();
-	const templatePart = useSelect(
+	const { templatePart, onNavigateToEntityRecord } = useSelect(
 		( select ) => {
 			const { getCurrentTheme, getEntityRecord } = select( coreStore );
-
-			return getEntityRecord(
-				'postType',
-				TEMPLATE_PART_POST_TYPE,
-				// Ideally this should be an official public API.
-				`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
-			);
+			const { getEditorSettings } = select( editorStore );
+			return {
+				templatePart: getEntityRecord(
+					'postType',
+					'wp_template_part',
+					// Ideally this should be an official public API.
+					`${ theme || getCurrentTheme()?.stylesheet }//${ slug }`
+				),
+				onNavigateToEntityRecord:
+					getEditorSettings().onNavigateToEntityRecord,
+			};
 		},
 		[ theme, slug ]
 	);
 
-	const linkProps = useLink(
-		{
-			postId: templatePart?.id,
-			postType: templatePart?.type,
-			canvas: 'edit',
-		},
-		{
-			fromTemplateId: params.postId || templatePart?.id,
-		}
-	);
-
-	if ( ! templatePart ) {
+	if ( ! templatePart || ! onNavigateToEntityRecord ) {
 		return null;
 	}
 
 	return (
 		<ToolbarButton
-			{ ...linkProps }
-			onClick={ ( event ) => {
-				linkProps.onClick( event );
+			onClick={ () => {
+				onNavigateToEntityRecord( {
+					postId: templatePart.id,
+					postType: templatePart.type,
+				} );
 			} }
 		>
 			{ __( 'Edit' ) }
@@ -84,6 +73,6 @@ export const withEditBlockControls = createHigherOrderComponent(
 
 addFilter(
 	'editor.BlockEdit',
-	'core/edit-site/template-part-edit-button',
+	'core/editor/template-part-edit-button',
 	withEditBlockControls
 );
