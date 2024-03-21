@@ -66,7 +66,7 @@ function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 		deprecated( 'wp.editor.' + name, {
 			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
-			version: '6.2',
+			version: '6.8',
 		} );
 
 		return <Wrapped ref={ ref } { ...props } />;
@@ -87,7 +87,7 @@ function deprecateFunction( name, func ) {
 		deprecated( 'wp.editor.' + name, {
 			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
-			version: '6.2',
+			version: '6.8',
 		} );
 
 		return func( ...args );
