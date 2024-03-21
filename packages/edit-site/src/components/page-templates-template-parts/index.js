@@ -287,7 +287,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				),
 				maxWidth: 400,
 				enableHiding: false,
-				isSearchField: true,
+				enableGlobalSearch: true,
 			},
 		];
 		if ( postType === TEMPLATE_POST_TYPE ) {
@@ -315,7 +315,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				maxWidth: 400,
 				minWidth: 320,
 				enableSorting: false,
-				isSearchField: true,
+				enableGlobalSearch: true,
 			} );
 		}
 		// TODO: The plan is to support fields reordering, which would require an API like `order` or something

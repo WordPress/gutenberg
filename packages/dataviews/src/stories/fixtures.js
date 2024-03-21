@@ -164,7 +164,7 @@ export const fields = [
 		id: 'title',
 		maxWidth: 400,
 		enableHiding: false,
-		isSearchField: true,
+		enableGlobalSearch: true,
 	},
 	{
 		header: 'Type',
@@ -184,7 +184,7 @@ export const fields = [
 		id: 'description',
 		maxWidth: 200,
 		enableSorting: false,
-		isSearchField: true,
+		enableGlobalSearch: true,
 	},
 	{
 		header: 'Categories',

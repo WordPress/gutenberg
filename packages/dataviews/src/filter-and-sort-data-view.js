@@ -45,7 +45,7 @@ export function filterAndSortDataView( data, view, fields ) {
 		const normalizedSearch = normalizeSearchInput( view.search );
 		filteredData = filteredData.filter( ( item ) => {
 			return _fields
-				.filter( ( field ) => field.isSearchField )
+				.filter( ( field ) => field.enableGlobalSearch )
 				.map( ( field ) => {
 					return normalizeSearchInput( field.getValue( { item } ) );
 				} )
