@@ -47,7 +47,7 @@
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
 	@include break-medium() {
-		padding-left: $grid-unit-40;
+		padding-left: $grid-unit-30;
 	}
 
 	&:hover {
@@ -67,14 +67,14 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 50%;
+		max-width: 70%;
 		color: currentColor;
 	}
 }
 
 .editor-document-bar__shortcut {
 	color: $gray-800;
-	min-width: $grid-unit-40;
+	min-width: $grid-unit-30;
 	display: none;
 
 	@include break-medium() {
