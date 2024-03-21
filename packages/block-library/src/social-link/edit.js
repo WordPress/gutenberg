@@ -58,8 +58,8 @@ const SocialLinkURLPopover = ( {
 						onChange={ ( nextURL ) =>
 							setAttributes( { url: nextURL } )
 						}
-						placeholder={ __( 'Enter social media link' ) }
-						label={ __( 'Enter social media link' ) }
+						placeholder={ __( 'Enter social link' ) }
+						label={ __( 'Enter social link' ) }
 						hideLabelFromVision
 						disableSuggestions
 						onKeyDown={ ( event ) => {
