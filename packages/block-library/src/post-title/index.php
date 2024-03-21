@@ -60,6 +60,8 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-title` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_title() {
 	register_block_type_from_metadata(

@@ -30,7 +30,7 @@ export const Track = styled.div`
 	/* Text color at 10% opacity */
 	background-color: color-mix(
 		in srgb,
-		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
+		${ COLORS.theme.foreground },
 		transparent 90%
 	);
 	border-radius: ${ CONFIG.radiusBlockUi };
@@ -52,7 +52,7 @@ export const Indicator = styled.div< {
 	/* Text color at 90% opacity */
 	background-color: color-mix(
 		in srgb,
-		var( --wp-components-color-foreground, ${ COLORS.gray[ 900 ] } ),
+		${ COLORS.theme.foreground },
 		transparent 10%
 	);
 

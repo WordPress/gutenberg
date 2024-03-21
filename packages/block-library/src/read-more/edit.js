@@ -44,7 +44,7 @@ export default function ReadMore( {
 				__unstableOnSplitAtEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
-				withoutInteractiveFormatting={ true }
+				withoutInteractiveFormatting
 				{ ...blockProps }
 			/>
 		</>

@@ -3,10 +3,18 @@
  */
 import { store, privateApis, getConfig } from '@wordpress/interactivity';
 
-const { directivePrefix, getRegionRootFragment, initialVdom, toVdom, render } =
-	privateApis(
-		'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-	);
+const {
+	directivePrefix,
+	getRegionRootFragment,
+	initialVdom,
+	toVdom,
+	render,
+	parseInitialData,
+	populateInitialData,
+	batch,
+} = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // The cache of visited and prefetched pages.
 const pages = new Map();
@@ -45,20 +53,24 @@ const regionsToVdom = ( dom, { vdom } = {} ) => {
 			: toVdom( region );
 	} );
 	const title = dom.querySelector( 'title' )?.innerText;
-	return { regions, title };
+	const initialData = parseInitialData( dom );
+	return { regions, title, initialData };
 };
 
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
-	const attrName = `data-${ directivePrefix }-router-region`;
-	document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-		const id = region.getAttribute( attrName );
-		const fragment = getRegionRootFragment( region );
-		render( page.regions[ id ], fragment );
+	batch( () => {
+		populateInitialData( page.initialData );
+		const attrName = `data-${ directivePrefix }-router-region`;
+		document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
+			const id = region.getAttribute( attrName );
+			const fragment = getRegionRootFragment( region );
+			render( page.regions[ id ], fragment );
+		} );
+		if ( page.title ) {
+			document.title = page.title;
+		}
 	} );
-	if ( page.title ) {
-		document.title = page.title;
-	}
 };
 
 /**
@@ -176,7 +188,11 @@ export const { state, actions } = store( 'core/router', {
 			// out, and let the newer execution to update the HTML.
 			if ( navigatingTo !== href ) return;
 
-			if ( page ) {
+			if (
+				page &&
+				! page.initialData?.config?.[ 'core/router' ]
+					?.clientNavigationDisabled
+			) {
 				renderRegions( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'

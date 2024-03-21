@@ -4,18 +4,23 @@
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { external } from '@wordpress/icons';
-import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import { external, moreVertical } from '@wordpress/icons';
 import {
-	ActionItem,
-	MoreMenuDropdown,
-	store as interfaceStore,
-} from '@wordpress/interface';
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+	DropdownMenu,
+} from '@wordpress/components';
+import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -32,8 +37,9 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
-import ModeSwitcher from '../mode-switcher';
-import { store as editSiteStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
+
+const { ModeSwitcher } = unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -42,7 +48,7 @@ export default function MoreMenu( { showIconLabels } ) {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
-	const { toggleDistractionFree } = useDispatch( editSiteStore );
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
@@ -50,10 +56,18 @@ export default function MoreMenu( { showIconLabels } ) {
 
 	return (
 		<>
-			<MoreMenuDropdown
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				popoverProps={ {
+					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
+				} }
 				toggleProps={ {
 					showTooltip: ! showIconLabels,
 					...( showIconLabels && { variant: 'tertiary' } ),
+					tooltipPosition: 'bottom',
+					size: 'compact',
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -157,7 +171,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
+			</DropdownMenu>
 			<KeyboardShortcutHelpModal />
 			<EditSitePreferencesModal />
 		</>

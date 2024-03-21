@@ -401,7 +401,7 @@ export default function SearchEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<BaseControl
 						label={ __( 'Width' ) }
 						id={ unitControlInputId }

@@ -14,7 +14,6 @@ import {
 	BlockBreadcrumb,
 	BlockToolbar,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 	BlockInspector,
 } from '@wordpress/block-editor';
 import {
@@ -56,7 +55,6 @@ import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 
-const { BlockRemovalWarningModal } = unlock( blockEditorPrivateApis );
 const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
@@ -72,21 +70,6 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
-};
-
-// Prevent accidental removal of certain blocks, asking the user for
-// confirmation.
-const blockRemovalRules = {
-	'core/query': __( 'Query Loop displays a list of posts or pages.' ),
-	'core/post-content': __(
-		'Post Content displays the content of a post or page.'
-	),
-	'core/post-template': __(
-		'Post Template displays each post or page in a Query Loop.'
-	),
-	'bindings/core/pattern-overrides': __(
-		'Blocks from synced patterns that can have overriden content.'
-	),
 };
 
 export default function Editor( { isLoading } ) {
@@ -115,14 +98,18 @@ export default function Editor( { isLoading } ) {
 		postTypeLabel,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditedPostContext, getEditorMode, getCanvasMode } = unlock(
+		const { getEditedPostContext, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 		const { getEntityRecord } = select( coreDataStore );
-		const { isInserterOpened, isListViewOpened, getPostTypeLabel } =
-			select( editorStore );
+		const {
+			isInserterOpened,
+			isListViewOpened,
+			getPostTypeLabel,
+			getEditorMode,
+		} = select( editorStore );
 		const _context = getEditedPostContext();
 
 		// The currently selected entity to display.
@@ -239,9 +226,6 @@ export default function Editor( { isLoading } ) {
 											<BlockToolbar hideDragHandle />
 										) }
 										<SiteEditorCanvas />
-										<BlockRemovalWarningModal
-											rules={ blockRemovalRules }
-										/>
 										<PatternModal />
 									</>
 								) }
@@ -263,11 +247,11 @@ export default function Editor( { isLoading } ) {
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
+							! isDistractionFree &&
 							isEditMode &&
-							isRightSidebarOpen && (
-								<>
-									<ComplementaryArea.Slot scope="core/edit-site" />
-								</>
+							isRightSidebarOpen &&
+							! isDistractionFree && (
+								<ComplementaryArea.Slot scope="core/edit-site" />
 							)
 						}
 						footer={

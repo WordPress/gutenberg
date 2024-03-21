@@ -59,7 +59,7 @@ const SocialLinkURLPopover = ( {
 							setAttributes( { url: nextURL } )
 						}
 						placeholder={ __( 'Enter address' ) }
-						disableSuggestions={ true }
+						disableSuggestions
 						onKeyDown={ ( event ) => {
 							if (
 								!! url ||

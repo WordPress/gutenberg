@@ -15,7 +15,7 @@ import type { VNode, Context, RefObject } from 'preact';
 /**
  * Internal dependencies
  */
-import { stores } from './store';
+import { store, stores, universalUnlock } from './store';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -198,7 +198,7 @@ const directivePriorities: Record< string, number > = {};
  * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "messages" }'>
+ * <div data-wp-interactive="messages">
  *   <button data-wp-alert="state.alert">Click me!</button>
  * </div>
  * ```
@@ -208,7 +208,7 @@ const directivePriorities: Record< string, number > = {};
  * attribute, followed by the suffix, like in the following HTML snippet:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "myblock" }'>
+ * <div data-wp-interactive="myblock">
  *   <button
  *     data-wp-color--text="state.text"
  *     data-wp-color--background="state.background"
@@ -259,8 +259,14 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	let resolvedStore = stores.get( namespace );
+	if ( typeof resolvedStore === 'undefined' ) {
+		resolvedStore = store( namespace, undefined, {
+			lock: universalUnlock,
+		} );
+	}
 	let current = {
-		...stores.get( namespace ),
+		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
 	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );

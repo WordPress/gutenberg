@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelectControl from '..';
+import UncontrolledCustomSelectControl from '..';
 
 const customClass = 'amber-skies';
 
@@ -48,11 +48,12 @@ const props = {
 	],
 };
 
-const ControlledCustomSelectControl = ( { options } ) => {
+const ControlledCustomSelectControl = ( { options, ...restProps } ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<CustomSelectControl
-			{ ...props }
+		<UncontrolledCustomSelectControl
+			{ ...restProps }
+			options={ options }
 			onChange={ ( { selectedItem } ) => setValue( selectedItem ) }
 			value={ options.find( ( option ) => option.key === value.key ) }
 		/>
@@ -60,7 +61,7 @@ const ControlledCustomSelectControl = ( { options } ) => {
 };
 
 describe.each( [
-	[ 'uncontrolled', CustomSelectControl ],
+	[ 'uncontrolled', UncontrolledCustomSelectControl ],
 	[ 'controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl %s', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
@@ -98,7 +99,7 @@ describe.each( [
 	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <Component { ...props } /> );
 
 		const currentSelectedItem = screen.getByRole( 'button', {
 			expanded: false,
@@ -127,7 +128,7 @@ describe.each( [
 	it( 'Should apply class only to options that have a className defined', async () => {
 		const user = userEvent.setup();
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <Component { ...props } /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -165,7 +166,7 @@ describe.each( [
 		const customStyles =
 			'background-color: rgb(127, 255, 212); rotate: 13deg;';
 
-		render( <CustomSelectControl { ...props } /> );
+		render( <Component { ...props } /> );
 
 		await user.click(
 			screen.getByRole( 'button', {
@@ -200,7 +201,7 @@ describe.each( [
 
 	it( 'does not show selected hint by default', () => {
 		render(
-			<CustomSelectControl
+			<Component
 				{ ...props }
 				label="Custom select"
 				options={ [
@@ -219,7 +220,7 @@ describe.each( [
 
 	it( 'shows selected hint when __experimentalShowSelectedHint is set', () => {
 		render(
-			<CustomSelectControl
+			<Component
 				{ ...props }
 				label="Custom select"
 				options={ [
@@ -248,7 +249,7 @@ describe.each( [
 					role="none"
 					onKeyDown={ onKeyDown }
 				>
-					<CustomSelectControl { ...props } />
+					<Component { ...props } />
 				</div>
 			);
 			const currentSelectedItem = screen.getByRole( 'button', {
@@ -267,7 +268,7 @@ describe.each( [
 		it( 'Should be able to change selection using keyboard', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'button', {
 				expanded: false,
@@ -292,7 +293,7 @@ describe.each( [
 		it( 'Should be able to type characters to select matching options', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'button', {
 				expanded: false,
@@ -314,7 +315,7 @@ describe.each( [
 		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'button', {
 				expanded: false,
@@ -340,7 +341,7 @@ describe.each( [
 		it( 'Should have correct aria-selected value for selections', async () => {
 			const user = userEvent.setup();
 
-			render( <CustomSelectControl { ...props } /> );
+			render( <Component { ...props } /> );
 
 			const currentSelectedItem = screen.getByRole( 'button', {
 				expanded: false,
@@ -397,7 +398,7 @@ describe.each( [
 			const onBlurMock = jest.fn();
 
 			render(
-				<CustomSelectControl
+				<Component
 					{ ...props }
 					onFocus={ onFocusMock }
 					onBlur={ onBlurMock }

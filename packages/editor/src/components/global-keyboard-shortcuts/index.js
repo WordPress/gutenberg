@@ -10,10 +10,41 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 
 export default function EditorKeyboardShortcuts() {
-	const { redo, undo, savePost, setIsListViewOpened } =
-		useDispatch( editorStore );
-	const { isEditedPostDirty, isPostSavingLocked, isListViewOpened } =
-		useSelect( editorStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } =
+			select( editorStore ).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
+	const {
+		redo,
+		undo,
+		savePost,
+		setIsListViewOpened,
+		switchEditorMode,
+		toggleDistractionFree,
+	} = useDispatch( editorStore );
+	const {
+		isEditedPostDirty,
+		isPostSavingLocked,
+		isListViewOpened,
+		getEditorMode,
+	} = useSelect( editorStore );
+
+	useShortcut(
+		'core/editor/toggle-mode',
+		() => {
+			switchEditorMode(
+				getEditorMode() === 'visual' ? 'text' : 'visual'
+			);
+		},
+		{
+			isDisabled: isModeToggleDisabled,
+		}
+	);
+
+	useShortcut( 'core/editor/toggle-distraction-free', () => {
+		toggleDistractionFree();
+	} );
 
 	useShortcut( 'core/editor/undo', ( event ) => {
 		undo();
