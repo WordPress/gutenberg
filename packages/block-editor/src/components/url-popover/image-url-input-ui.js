@@ -378,7 +378,7 @@ const ImageURLInputUI = ( {
 					}
 					offset={ 13 }
 				>
-					<PopoverChildren />
+					{ PopoverChildren() }
 				</URLPopover>
 			) }
 		</>
