@@ -129,7 +129,10 @@ export function useRichText( {
 				: newRecord.formats;
 			newRecord = { ...newRecord, formats: newFormats };
 			if ( typeof value === 'string' ) {
-				_value.current = toHTMLString( { value: newRecord } );
+				_value.current = toHTMLString( {
+					value: newRecord,
+					preserveWhiteSpace,
+				} );
 			} else {
 				_value.current = new RichTextData( newRecord );
 			}

@@ -344,8 +344,9 @@ function FontCollection( { slug } ) {
 							size="small"
 							onClick={ () => {
 								setSelectedFont( null );
+								setNotice( null );
 							} }
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Heading
 							level={ 2 }
@@ -441,13 +442,13 @@ function FontCollection( { slug } ) {
 							sprintf(
 								// translators: %s: Total number of pages.
 								_x(
-									'Page <CurrenPageControl /> of %s',
+									'Page <CurrentPageControl /> of %s',
 									'paging'
 								),
 								totalPages
 							),
 							{
-								CurrenPageControl: (
+								CurrentPageControl: (
 									<SelectControl
 										aria-label={ __( 'Current page' ) }
 										value={ page }

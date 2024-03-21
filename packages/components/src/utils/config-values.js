@@ -58,7 +58,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	fontSizeMobile: '15px',
 	fontSizeSmall: 'calc(0.92 * 13px)',
 	fontSizeXSmall: 'calc(0.75 * 13px)',
-	fontLineHeightBase: '1.2',
+	fontLineHeightBase: '1.4',
 	fontWeight: 'normal',
 	fontWeightHeading: '600',
 	gridBase: '4px',

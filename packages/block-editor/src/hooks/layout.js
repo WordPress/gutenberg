@@ -125,14 +125,13 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
-	const css = fullLayoutType?.getLayoutStyle?.( {
+	return fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
 		layout,
 		style,
 		hasBlockGapSupport,
 	} );
-	return css;
 }
 
 function LayoutPanelPure( {
@@ -144,8 +143,6 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	// Layout comes from block attributes.
-	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -179,36 +176,43 @@ function LayoutPanelPure( {
 		return null;
 	}
 
+	/*
+	 * Try to find the layout type from either the
+	 * block's layout settings or any saved layout config.
+	 */
+	const blockSupportAndLayout = {
+		...layoutBlockSupport,
+		...layout,
+	};
+	const { type, default: { type: defaultType = 'default' } = {} } =
+		blockSupportAndLayout;
+	const blockLayoutType = type || defaultType;
+
 	// Only show the inherit toggle if it's supported,
-	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
-		!! defaultThemeLayout &&
-		( ! layout?.type ||
-			layout?.type === 'default' ||
-			layout?.type === 'constrained' ||
-			layout?.inherit )
+		( ! blockLayoutType ||
+			blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ||
+			blockSupportAndLayout.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const {
-		inherit = false,
-		type = 'default',
-		contentSize = null,
-	} = usedLayout;
+	const { inherit = false, contentSize = null } = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
 	if (
-		( type === 'default' || type === 'constrained' ) &&
+		( blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ) &&
 		! themeSupportsLayout
 	) {
 		return null;
 	}
-	const layoutType = getLayoutType( type );
+	const layoutType = getLayoutType( blockLayoutType );
 	const constrainedType = getLayoutType( 'constrained' );
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
@@ -261,7 +265,7 @@ function LayoutPanelPure( {
 
 					{ ! inherit && allowSwitching && (
 						<LayoutTypeSwitcher
-							type={ type }
+							type={ blockLayoutType }
 							onChange={ onChangeType }
 						/>
 					) }

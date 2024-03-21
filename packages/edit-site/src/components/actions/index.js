@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,8 +27,6 @@ const { useHistory } = unlock( routerPrivateApis );
 export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
-	isPrimary: true,
-	icon: trash,
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
@@ -172,8 +170,6 @@ export function usePermanentlyDeletePostAction() {
 		() => ( {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
-			isPrimary: true,
-			icon: trash,
 			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
@@ -372,6 +368,8 @@ export function useEditPostAction() {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
+			isPrimary: true,
+			icon: edit,
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},

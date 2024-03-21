@@ -7,7 +7,6 @@ import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	store as editorStore,
@@ -19,16 +18,20 @@ import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import TemplateActions from './template-actions';
+import TemplateActions from '../../template-actions';
 import TemplateAreas from './template-areas';
 import SidebarCard from '../sidebar-card';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
+import { unlock } from '../../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const CARD_ICONS = {
 	wp_block: symbol,
@@ -51,6 +54,11 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 		/>
 	);
 }
+
+const POST_TYPE_PATH = {
+	wp_template: '/wp_template',
+	wp_template_part: '/wp_template_part/all',
+};
 
 export default function TemplatePanel() {
 	const { title, description, icon, record, postType, postId } = useSelect(
@@ -77,7 +85,7 @@ export default function TemplatePanel() {
 		},
 		[]
 	);
-
+	const history = useHistory();
 	const availablePatterns = useAvailablePatterns( record );
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -100,7 +108,19 @@ export default function TemplatePanel() {
 					title={ decodeEntities( title ) }
 					icon={ CARD_ICONS[ record?.type ] ?? icon }
 					description={ decodeEntities( description ) }
-					actions={ <TemplateActions template={ record } /> }
+					actions={
+						<TemplateActions
+							postType={ postType }
+							postId={ postId }
+							className="edit-site-template-card__actions"
+							toggleProps={ { size: 'small' } }
+							onRemove={ () => {
+								history.push( {
+									path: POST_TYPE_PATH[ postType ],
+								} );
+							} }
+						/>
+					}
 				>
 					<TemplateAreas />
 				</SidebarCard>
@@ -126,7 +146,6 @@ export default function TemplatePanel() {
 			) }
 			<PostLastRevisionPanel />
 			<PostTaxonomiesPanel />
-			<PostFeaturedImagePanel />
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />

@@ -23,7 +23,7 @@ function TemplateDataviewItem( { template, isActive } ) {
 			title={ text }
 			icon={ icon }
 			isActive={ isActive }
-			isCustom="false"
+			isCustom={ false }
 		/>
 	);
 }
@@ -57,7 +57,7 @@ export default function DataviewsTemplatesSidebarContent( {
 				title={ title }
 				icon={ layout }
 				isActive={ activeView === 'all' }
-				isCustom="false"
+				isCustom={ false }
 			/>
 			{ firstItemPerAuthorText.map( ( template ) => {
 				return (

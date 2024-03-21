@@ -74,7 +74,8 @@ export default function DocumentBar() {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, getIsResolving } = select( coreStore );
+		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
+			select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
@@ -86,7 +87,7 @@ export default function DocumentBar() {
 		return {
 			postType: _postType,
 			document: _document,
-			isResolving: getIsResolving(
+			isResolving: isResolvingSelector(
 				'getEditedEntityRecord',
 				'postType',
 				_postType,

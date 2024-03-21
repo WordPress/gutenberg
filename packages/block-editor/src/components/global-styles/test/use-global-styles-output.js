@@ -968,6 +968,37 @@ describe( 'global styles renderer', () => {
 				'font-size: 15px',
 			] );
 		} );
+
+		it( 'should correctly resolve referenced values', () => {
+			const stylesWithRef = {
+				typography: {
+					fontSize: {
+						ref: 'styles.elements.h1.typography.fontSize',
+					},
+					letterSpacing: {
+						ref: 'styles.elements.h1.typography.letterSpacing',
+					},
+				},
+			};
+			const tree = {
+				styles: {
+					elements: {
+						h1: {
+							typography: {
+								fontSize: 'var:preset|font-size|xx-large',
+								letterSpacing: '2px',
+							},
+						},
+					},
+				},
+			};
+			expect(
+				getStylesDeclarations( stylesWithRef, '.wp-block', false, tree )
+			).toEqual( [
+				'font-size: var(--wp--preset--font-size--xx-large)',
+				'letter-spacing: 2px',
+			] );
+		} );
 	} );
 
 	describe( 'processCSSNesting', () => {

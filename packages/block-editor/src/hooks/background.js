@@ -103,6 +103,46 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
+function useBlockProps( { name, style } ) {
+	if (
+		! hasBackgroundSupport( name ) ||
+		! style?.background?.backgroundImage
+	) {
+		return;
+	}
+
+	const backgroundImage = style?.background?.backgroundImage;
+	let props;
+
+	// Set block background defaults.
+	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
+		if ( ! style?.background?.backgroundSize ) {
+			props = {
+				style: {
+					backgroundSize: 'cover',
+				},
+			};
+		}
+
+		if (
+			'contain' === style?.background?.backgroundSize &&
+			! style?.background?.backgroundPosition
+		) {
+			props = {
+				style: {
+					backgroundPosition: 'center',
+				},
+			};
+		}
+	}
+
+	if ( ! props ) {
+		return;
+	}
+
+	return props;
+}
+
 /**
  * Resets the background image block support attributes. This can be used when disabling
  * the background image controls for a block via a `ToolsPanel`.
@@ -425,11 +465,10 @@ function BackgroundSizePanelItem( {
 	// If the current value is `cover` and the repeat value is `undefined`, then
 	// the toggle should be unchecked as the default state. Otherwise, the toggle
 	// should reflect the current repeat value.
-	const repeatCheckedValue =
+	const repeatCheckedValue = ! (
 		repeatValue === 'no-repeat' ||
 		( currentValueForToggle === 'cover' && repeatValue === undefined )
-			? false
-			: true;
+	);
 
 	const hasValue = hasBackgroundSizeValue( style );
 
@@ -602,3 +641,9 @@ export function BackgroundImagePanel( props ) {
 		</InspectorControls>
 	);
 }
+
+export default {
+	useBlockProps,
+	attributeKeys: [ 'style' ],
+	hasSupport: hasBackgroundSupport,
+};
