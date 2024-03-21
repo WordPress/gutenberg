@@ -24,6 +24,7 @@ import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -222,7 +223,7 @@ function InputField(
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }
-			onKeyDown={ handleOnKeyDown }
+			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
 			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			inputSize={ size }
