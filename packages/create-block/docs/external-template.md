@@ -107,7 +107,7 @@ The following configurable variables are used with the template files. Template 
 
 ### `variants`
 
-Variants are used to create variations for a template. Variants can override any `defaultValues` by provided their own.
+Variants are used to create variations for a template. Variants can override any `defaultValues` by providing their own.
 
 ```js
 module.exports = {
