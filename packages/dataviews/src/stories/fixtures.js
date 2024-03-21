@@ -58,7 +58,7 @@ export const data = [
 	{
 		id: 6,
 		title: 'Venus',
-		description: 'Venus description',
+		description: 'La planète Vénus',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
 		categories: [ 'Space', 'Planet', 'Solar system' ],

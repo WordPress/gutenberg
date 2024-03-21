@@ -53,6 +53,19 @@ describe( 'filters', () => {
 		expect( result[ 0 ].description ).toBe( 'NASA photo' );
 	} );
 
+	it( 'should perform case-insensitive and accent-insensitive search', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				search: 'nete ven',
+				filters: [],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 1 );
+		expect( result[ 0 ].description ).toBe( 'La planète Vénus' );
+	} );
+
 	it( 'should search using IS filter', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
