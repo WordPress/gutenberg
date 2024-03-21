@@ -26,7 +26,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SiteEditorCanvas() {
+export default function SiteEditorCanvas( { onClick } ) {
 	const location = useLocation();
 	const { templateType, isFocusableEntity, isViewMode } = useSelect(
 		( select ) => {
@@ -87,6 +87,7 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
+								onClick={ onClick }
 							>
 								{ resizeObserver }
 							</EditorCanvas>

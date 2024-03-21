@@ -29,7 +29,7 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 };
 
 const DEFAULT_PAGE_BASE = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_LIST,
 	search: '',
 	filters: [],
 	page: 1,
