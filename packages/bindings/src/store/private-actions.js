@@ -44,7 +44,7 @@ export function registerExternalPropertyHandler(
 			}
 
 			currentValue = value;
-			updateCallback( value );
+			updateCallback?.( value );
 		}
 
 		const unsubscribe = registry.subscribe( watchValueChanges );
