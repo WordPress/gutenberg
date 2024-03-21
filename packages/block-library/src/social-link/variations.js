@@ -336,7 +336,6 @@ const variations = [
 		attributes: { service: 'twitter' },
 		title: 'Twitter',
 		icon: TwitterIcon,
-		patterns: [ /^https:\/\/twitter\.com(\/.+)?$/i ],
 	},
 	{
 		name: 'vimeo',
@@ -364,7 +363,10 @@ const variations = [
 		keywords: [ 'twitter' ],
 		title: 'X',
 		icon: XIcon,
-		patterns: [ /^https:\/\/x\.com(\/.+)?$/i ],
+		patterns: [
+			/^https:\/\/x\.com(\/.+)?$/i,
+			/^https:\/\/twitter\.com(\/.+)?$/i,
+		],
 	},
 	{
 		name: 'yelp',
