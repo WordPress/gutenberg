@@ -153,11 +153,17 @@ export function BackgroundImagePanel( {
 		},
 	};
 
+	// Initial control values where no block style is set.
+	const defaultControlValues = {
+		backgroundSize: 'cover',
+	};
+
 	return (
 		<StylesBackgroundPanel
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
 			defaultControls={ defaultControls }
+			defaultControlValues={ defaultControlValues }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }

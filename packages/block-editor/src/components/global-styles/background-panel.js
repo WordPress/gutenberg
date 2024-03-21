@@ -335,6 +335,7 @@ function BackgroundSizeToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	defaultControlValues,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -349,26 +350,30 @@ function BackgroundSizeToolsPanelItem( {
 		style?.background?.backgroundPosition ||
 		inheritedValue?.background?.backgroundPosition;
 
-	// An `undefined` value is treated as `cover` by the toggle group control.
-	// An empty string is treated as `auto` by the toggle group control. This
-	// allows a user to select "Size" and then enter a custom value, with an
-	// empty value being treated as `auto`.
+	/*
+	 * An `undefined` value is replaced with any supplied
+	 * default control value for the toggle group control.
+	 * An empty string is treated as `auto` - this allows a user
+	 * to select "Size" and then enter a custom value, with an
+	 * empty value being treated as `auto`.
+	 */
 	const currentValueForToggle =
 		( sizeValue !== undefined &&
 			sizeValue !== 'cover' &&
 			sizeValue !== 'contain' ) ||
 		sizeValue === ''
 			? 'auto'
-			: sizeValue || 'cover';
+			: sizeValue || defaultControlValues?.backgroundSize;
 
-	// If the current value is `cover` and the repeat value is `undefined`, then
-	// the toggle should be unchecked as the default state. Otherwise, the toggle
-	// should reflect the current repeat value.
-	const repeatCheckedValue =
+	/*
+	 * If the current value is `cover` and the repeat value is `undefined`, then
+	 * the toggle should be unchecked as the default state. Otherwise, the toggle
+	 * should reflect the current repeat value.
+	 */
+	const repeatCheckedValue = ! (
 		repeatValue === 'no-repeat' ||
 		( currentValueForToggle === 'cover' && repeatValue === undefined )
-			? false
-			: true;
+	);
 
 	const hasValue = hasBackgroundSizeValue( style );
 
@@ -542,6 +547,7 @@ export default function BackgroundPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	defaultControlValues = {},
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -573,6 +579,7 @@ export default function BackgroundPanel( {
 					isShownByDefault={ defaultControls.backgroundSize }
 					style={ value }
 					inheritedValue={ inheritedValue }
+					defaultControlValues={ defaultControlValues }
 				/>
 			) }
 		</Wrapper>
