@@ -56,7 +56,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 				// Check if the pattern has only one top level block,
 				// otherwise we may shuffle to pattern that will not allow to continue shuffling.
 				pattern.blocks.length === 1 &&
-				pattern.categories.some( ( category ) => {
+				pattern.categories?.some( ( category ) => {
 					return categories.includes( category );
 				} )
 			);
