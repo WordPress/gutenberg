@@ -203,7 +203,7 @@ export function SocialLinksEdit( props ) {
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Show links text' ) }
+						label={ __( 'Show text' ) }
 						checked={ showLabels }
 						onChange={ () =>
 							setAttributes( { showLabels: ! showLabels } )

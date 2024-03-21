@@ -132,7 +132,7 @@ const SocialLinkEdit = ( {
 							__nextHasNoMarginBottom
 							label={ __( 'Link text' ) }
 							help={ __(
-								'The link text is only visible when Show links text is enabled.'
+								'The link text is visible when enabled from the parent Social Icons block.'
 							) }
 							value={ socialLinkLabel }
 							onChange={ ( value ) =>
