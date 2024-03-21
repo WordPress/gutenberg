@@ -126,7 +126,7 @@ module.exports = {
 };
 ```
 
-Variants are accessed using the `--variant` flag i.e`--variant secondary`.
+Variants are accessed using the `--variant` flag, i.e`--variant secondary`.
 
 If no variant is provided, the first variant is used if any are defined.
 
