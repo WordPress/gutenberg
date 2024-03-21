@@ -133,7 +133,6 @@ const SocialLinkEdit = ( {
 						__( '%s link text' ),
 						socialLinkName
 					) }
-					initialOpen={ false }
 				>
 					<PanelRow>
 						<TextControl
