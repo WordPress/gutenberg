@@ -29,7 +29,7 @@ const defaultConfigPerViewType = {
 
 export const Default = ( props ) => {
 	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const { shownData, paginationInfo } = useMemo( () => {
+	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterAndSortDataView( data, view, fields );
 	}, [ view ] );
 	const onChangeView = useCallback(
