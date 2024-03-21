@@ -230,7 +230,8 @@ export const BlockSwitcher = ( { clientIds, disabled } ) => {
 		? blockTitle
 		: __( 'Multiple blocks selected' );
 
-	if ( disabled || ( ! hasBlockStyles && ! canRemove ) ) {
+	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
+	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
