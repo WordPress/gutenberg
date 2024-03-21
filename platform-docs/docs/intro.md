@@ -30,13 +30,39 @@ To build a block editor, you need to install the following dependencies:
 
 We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling, By default vite supports JSX and and outputs the result as a React pragma. The Block editor uses React so there's no need to configure anything here but if you're using a different bundler/build tool, make sure the JSX transpilation is setup properly.
 
+## Side note: `process.env.IS_GUTENBERG_PLUGIN`
+
+The Gutenberg block editor reads from the `process.env.IS_GUTENBERG_PLUGIN` variable. It
+is used to distinguish the code that is part of the Gutenberg block editor
+[plugin](https://wordpress.org/plugins/gutenberg/) and the code that is part of
+WordPress core. 
+
+For our purposes, as we're building a standalone block editor that is completely
+separate from WordPress, we want to set this variable to `false`. 
+
+When using Vite, we can do it by creating a `vite.config.js` file:
+
+```js
+// vite.config.js
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  define: {
+    "process.env.IS_GUTENBERG_PLUGIN": JSON.stringify(false),
+  },
+});
+```
+
+If you are using Webpack, you can use the
+[DefinePlugin](https://webpack.js.org/plugins/define-plugin/) to accomplish the
+same thing.
+
 ## Bootstrap your block editor
 
-It's time to render our first block editor.
+It's time to render our first block editor. Update your `index.jsx` file with the following code:
 
- - Update your `index.jsx` file with the following code:
 ```jsx
-import { createElement, useState } from "react";
+import React, { useState } from "react";
 import { createRoot } from 'react-dom/client';
 import {
   BlockEditorProvider,
