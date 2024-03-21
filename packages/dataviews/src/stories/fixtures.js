@@ -110,7 +110,7 @@ export const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 10,
-	hiddenFields: [ 'image', 'type', 'categories' ],
+	hiddenFields: [ 'image', 'type' ],
 	layout: {},
 	filters: [],
 };
@@ -189,7 +189,23 @@ export const fields = [
 	{
 		header: 'Categories',
 		id: 'categories',
+		type: 'enumeration',
+		elements: [
+			{ value: 'Space', label: 'Space' },
+			{ value: 'NASA', label: 'NASA' },
+			{ value: 'Planet', label: 'Planet' },
+			{ value: 'Solar system', label: 'Solar system' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+		],
+		filterBy: {
+			operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ],
+		},
+		getValue: ( { item } ) => {
+			return item.categories;
+		},
+		render: ( { item } ) => {
+			return item.categories.join( ',' );
+		},
 		enableSorting: false,
-		enableHiding: false,
 	},
 ];
