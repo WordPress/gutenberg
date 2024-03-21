@@ -26,6 +26,38 @@ const oldColors = {
 };
 
 // Fixed width table cells on by default.
+const v4Query = {
+	content: {
+		type: 'rich-text',
+		source: 'rich-text',
+	},
+	tag: {
+		type: 'string',
+		default: 'td',
+		source: 'tag',
+	},
+	scope: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'scope',
+	},
+	align: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'data-align',
+	},
+	colspan: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'colspan',
+	},
+	rowspan: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'rowspan',
+	},
+};
+
 const v4 = {
 	attributes: {
 		hasFixedLayout: {
@@ -48,37 +80,7 @@ const v4 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
-						},
-					},
+					query: v4Query,
 				},
 			},
 		},
@@ -93,37 +95,7 @@ const v4 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
-						},
-					},
+					query: v4Query,
 				},
 			},
 		},
@@ -138,37 +110,7 @@ const v4 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'rich-text',
-							source: 'rich-text',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-						colspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'colspan',
-						},
-						rowspan: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'rowspan',
-						},
-					},
+					query: v4Query,
 				},
 			},
 		},
@@ -321,6 +263,28 @@ const v4 = {
 
 // In #41140 support was added to global styles for caption elements which
 // added a `wp-element-caption` classname to the embed figcaption element.
+const v3Query = {
+	content: {
+		type: 'string',
+		source: 'html',
+	},
+	tag: {
+		type: 'string',
+		default: 'td',
+		source: 'tag',
+	},
+	scope: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'scope',
+	},
+	align: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'data-align',
+	},
+};
+
 const v3 = {
 	attributes: {
 		hasFixedLayout: {
@@ -344,27 +308,7 @@ const v3 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v3Query,
 				},
 			},
 		},
@@ -379,27 +323,7 @@ const v3 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v3Query,
 				},
 			},
 		},
@@ -414,27 +338,7 @@ const v3 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v3Query,
 				},
 			},
 		},
@@ -564,6 +468,28 @@ const v3 = {
 };
 
 // Deprecation migrating table block to use colors block support feature.
+const v2Query = {
+	content: {
+		type: 'string',
+		source: 'html',
+	},
+	tag: {
+		type: 'string',
+		default: 'td',
+		source: 'tag',
+	},
+	scope: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'scope',
+	},
+	align: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'data-align',
+	},
+};
+
 const v2 = {
 	attributes: {
 		hasFixedLayout: {
@@ -590,27 +516,7 @@ const v2 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v2Query,
 				},
 			},
 		},
@@ -625,27 +531,7 @@ const v2 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v2Query,
 				},
 			},
 		},
@@ -660,27 +546,7 @@ const v2 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-						align: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'data-align',
-						},
-					},
+					query: v2Query,
 				},
 			},
 		},
@@ -791,6 +657,23 @@ const v2 = {
 	},
 };
 
+const v1Query = {
+	content: {
+		type: 'string',
+		source: 'html',
+	},
+	tag: {
+		type: 'string',
+		default: 'td',
+		source: 'tag',
+	},
+	scope: {
+		type: 'string',
+		source: 'attribute',
+		attribute: 'scope',
+	},
+};
+
 const v1 = {
 	attributes: {
 		hasFixedLayout: {
@@ -811,22 +694,7 @@ const v1 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-					},
+					query: v1Query,
 				},
 			},
 		},
@@ -841,22 +709,7 @@ const v1 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-					},
+					query: v1Query,
 				},
 			},
 		},
@@ -871,22 +724,7 @@ const v1 = {
 					default: [],
 					source: 'query',
 					selector: 'td,th',
-					query: {
-						content: {
-							type: 'string',
-							source: 'html',
-						},
-						tag: {
-							type: 'string',
-							default: 'td',
-							source: 'tag',
-						},
-						scope: {
-							type: 'string',
-							source: 'attribute',
-							attribute: 'scope',
-						},
-					},
+					query: v1Query,
 				},
 			},
 		},
