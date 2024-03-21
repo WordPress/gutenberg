@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { backup, trash } from '@wordpress/icons';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
@@ -34,8 +33,6 @@ export function useResetTemplateAction() {
 		() => ( {
 			id: 'reset-template',
 			label: __( 'Reset' ),
-			isPrimary: true,
-			icon: backup,
 			isEligible: isTemplateRevertable,
 			supportsBulk: true,
 			async callback( templates ) {
@@ -112,8 +109,6 @@ export function useResetTemplateAction() {
 export const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
-	isPrimary: true,
-	icon: trash,
 	isEligible: isTemplateRemovable,
 	supportsBulk: true,
 	hideModalHeader: true,

@@ -51,7 +51,7 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './actions';
-import { postRevisionsAction } from '../actions';
+import { postRevisionsAction, useEditPostAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
@@ -406,8 +406,10 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	}, [ records, view, fields ] );
 
 	const resetTemplateAction = useResetTemplateAction();
+	const editTemplateAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
+			editTemplateAction,
 			resetTemplateAction,
 			renameTemplateAction,
 			postRevisionsAction,
