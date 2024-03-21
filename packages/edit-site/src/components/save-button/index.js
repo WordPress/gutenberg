@@ -3,9 +3,14 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -15,32 +20,46 @@ import {
 	currentlyPreviewingTheme,
 	isPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
+const { useSaveEntities } = unlock( editorPrivateApis );
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
 	variant = 'primary',
 	showTooltip = true,
-	defaultLabel,
+	showReviewMessage,
 	icon,
 	size,
 	__next40pxDefaultSize = false,
 } ) {
-	const { isDirty, isSaving, isSaveViewOpen, previewingThemeName } =
-		useSelect( ( select ) => {
+	const { params } = useLocation();
+	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const {
+		isSaving,
+		isSaveViewOpen,
+		previewingThemeName,
+		dirtyEntityRecords,
+		isOnlyCurrentEntityDirty,
+	} = useSelect(
+		( select ) => {
 			const {
 				__experimentalGetDirtyEntityRecords,
 				isSavingEntityRecord,
 				isResolving,
 			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const { hasNonPostEntityChanges, isEditedPostDirty } =
+				select( editorStore );
+			const _dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const { isSaveViewOpened } = select( editSiteStore );
 			const isActivatingTheme = isResolving( 'activateTheme' );
 			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
-
 			return {
-				isDirty: dirtyEntityRecords.length > 0,
+				dirtyEntityRecords: _dirtyEntityRecords,
+				hasDirtyEntities: !! _dirtyEntityRecords.length,
 				isSaving:
-					dirtyEntityRecords.some( ( record ) =>
+					_dirtyEntityRecords.some( ( record ) =>
 						isSavingEntityRecord(
 							record.kind,
 							record.name,
@@ -54,12 +73,19 @@ export default function SaveButton( {
 					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
 							?.name?.rendered
 					: undefined,
+				// Check if the current entity is the only entity with changes.
+				// We have some extra logic for `wp_global_styles` for now, that
+				// is used in navigation sidebar.
+				isOnlyCurrentEntityDirty:
+					( isEditedPostDirty() && ! hasNonPostEntityChanges() ) ||
+					params.path?.includes( 'wp_global_styles' ),
 			};
-		}, [] );
-	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
-
-	const activateSaveEnabled = isPreviewingTheme() || isDirty;
-	const disabled = isSaving || ! activateSaveEnabled;
+		},
+		[ params.path ]
+	);
+	const hasDirtyEntities = !! dirtyEntityRecords.length;
+	const disabled =
+		isSaving || ( ! hasDirtyEntities && ! isPreviewingTheme() );
 
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
@@ -71,32 +97,43 @@ export default function SaveButton( {
 				);
 			} else if ( disabled ) {
 				return __( 'Saved' );
-			} else if ( isDirty ) {
+			} else if ( hasDirtyEntities ) {
 				return sprintf(
 					/* translators: %s: The name of theme to be activated. */
 					__( 'Activate %s & Save' ),
 					previewingThemeName
 				);
 			}
-
 			return sprintf(
 				/* translators: %s: The name of theme to be activated. */
 				__( 'Activate %s' ),
 				previewingThemeName
 			);
 		}
-
 		if ( isSaving ) {
 			return __( 'Saving' );
-		} else if ( disabled ) {
+		}
+		if ( disabled ) {
 			return __( 'Saved' );
-		} else if ( defaultLabel ) {
-			return defaultLabel;
+		}
+		if ( ! isOnlyCurrentEntityDirty && showReviewMessage ) {
+			return sprintf(
+				// translators: %d: number of unsaved changes (number).
+				_n(
+					'Review %d change…',
+					'Review %d changes…',
+					dirtyEntityRecords.length
+				),
+				dirtyEntityRecords.length
+			);
 		}
 		return __( 'Save' );
 	};
 	const label = getLabel();
-
+	const saveEntities = useSaveEntities();
+	const onClick = isOnlyCurrentEntityDirty
+		? saveEntities
+		: () => setIsSaveViewOpened( true );
 	return (
 		<Button
 			variant={ variant }
@@ -104,7 +141,7 @@ export default function SaveButton( {
 			aria-disabled={ disabled }
 			aria-expanded={ isSaveViewOpen }
 			isBusy={ isSaving }
-			onClick={ disabled ? undefined : () => setIsSaveViewOpened( true ) }
+			onClick={ disabled ? undefined : onClick }
 			label={ label }
 			/*
 			 * We want the tooltip to show the keyboard shortcut only when the
