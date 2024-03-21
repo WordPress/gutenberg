@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.24.0 (2024-03-21)
+
 -  Deprecate the `getIsResolved` meta-selector ([#59679](https://github.com/WordPress/gutenberg/pull/59679)).
 
 ## 9.23.0 (2024-03-06)
