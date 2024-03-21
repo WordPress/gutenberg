@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0 (2024-03-21)
+
 ### Enhancement
 
 - Two new operators have been added: `isAll` and `isNotAll`. These are meant to represent `AND` operations. For example, `Category is all: Book, Review, Science Fiction` would represent all items that have all three categories selected.
