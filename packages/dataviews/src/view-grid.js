@@ -111,16 +111,18 @@ function GridItem( {
 						<Flex
 							className={ classnames(
 								'dataviews-view-grid__field',
-								field.gridDisplayDirection &&
-									'is-' + field.gridDisplayDirection
+								field.gridDisplayDirection === 'column'
+									? 'is-column'
+									: 'is-row'
 							) }
 							key={ field.id }
 							gap={ 1 }
 							justify="flex-start"
 							expanded
+							style={ { height: 'auto' } }
 							direction={
-								field.gridDisplayDirection
-									? field.gridDisplayDirection
+								field.gridDisplayDirection === 'column'
+									? 'column'
 									: 'row'
 							}
 						>
