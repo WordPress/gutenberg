@@ -1,0 +1,10 @@
+// Add low specificity default padding to headings with backgrounds.
+:where(h1.has-background),
+:where(h2.has-background),
+:where(h3.has-background),
+:where(h4.has-background),
+:where(h5.has-background),
+:where(h6.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}

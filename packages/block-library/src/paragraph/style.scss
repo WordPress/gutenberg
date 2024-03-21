@@ -38,10 +38,6 @@ p.has-drop-cap.has-background {
 	overflow: hidden;
 }
 
-p.has-background {
-	padding: $block-bg-padding--v $block-bg-padding--h;
-}
-
 // Use :where to contain the specificity of this rule
 // so it's easily overrideable by any theme that targets
 // links using the a element.

@@ -1,0 +1,5 @@
+// Add low specificity default padding to columns blocks with backgrounds.
+:where(.wp-block-columns.has-background) {
+	// Matches paragraph block padding.
+	padding: $block-bg-padding--v $block-bg-padding--h;
+}
