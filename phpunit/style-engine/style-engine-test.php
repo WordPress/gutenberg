@@ -324,7 +324,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'valid_classnames_with_value_regex'            => array(
+			'valid_classnames_with_value'            => array(
 				'block_styles'    => array(
 					'typography' => array(
 						'textAlign' => 'left',
@@ -340,18 +340,19 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'no_classnames_with_invalid_value_regex'       => array(
+			'valid_classnames_with_hyphenated_value'       => array(
 				'block_styles'    => array(
 					'typography' => array(
-						'textAlign' => '12px',
+						'textAlign' => 'justify-all',
 					),
 				),
 				'options'         => array(),
 				'expected_output' => array(
-					'css'          => 'text-align:12px;',
+					'css'          => 'text-align:justify-all;',
 					'declarations' => array(
-						'text-align' => '12px',
+						'text-align' => 'justify-all',
 					),
+					'classnames'   => 'has-text-align-justify-all',
 				),
 			),
 
