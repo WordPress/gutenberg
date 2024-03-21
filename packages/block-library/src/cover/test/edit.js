@@ -277,7 +277,7 @@ describe( 'Cover block', () => {
 					'wp-block-cover__background'
 				);
 
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+				expect( overlay[ 0 ] ).toHaveStyle( 'opacity: 1;' );
 
 				await userEvent.click(
 					screen.getByRole( 'tab', {
@@ -297,7 +297,7 @@ describe( 'Cover block', () => {
 					);
 				} );
 
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-40' );
+				expect( overlay[ 0 ] ).toHaveStyle( 'opacity: 0.4;' );
 			} );
 
 			test( 'applies selected opacity to block when slider moved', async () => {
@@ -310,7 +310,7 @@ describe( 'Cover block', () => {
 					'wp-block-cover__background'
 				);
 
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-100' );
+				expect( overlay[ 0 ] ).toHaveStyle( 'opacity: 1;' );
 
 				await userEvent.click(
 					screen.getByRole( 'tab', {
@@ -329,7 +329,7 @@ describe( 'Cover block', () => {
 					);
 				} );
 
-				expect( overlay[ 0 ] ).toHaveClass( 'has-background-dim-30' );
+				expect( overlay[ 0 ] ).toHaveStyle( 'opacity: 0.3;' );
 			} );
 
 			describe( 'when colors are disabled', () => {
