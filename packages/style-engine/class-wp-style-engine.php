@@ -267,6 +267,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'lineHeight' ),
 				),
+				'textAlign'      => array(
+					'property_keys' => array(
+						'default' => 'text-align',
+					),
+					'path'          => array( 'typography', 'textAlign' ),
+					'classnames'    => array(
+						'has-text-align-$slug' => array(
+							'regex' => '#^[a-z-]+$#',
+						),
+					),
+				),
 				'textColumns'    => array(
 					'property_keys' => array(
 						'default' => 'column-count',
@@ -444,9 +455,18 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				foreach ( $style_definition['classnames'] as $classname => $property_key ) {
 					if ( true === $property_key ) {
 						$classnames[] = $classname;
+						continue;
 					}
 
-					$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+					$slug = null;
+
+					if ( is_string( $style_value ) ) {
+						if ( ! empty( $property_key['regex'] ) && preg_match( $property_key['regex'], $style_value, $matches ) ) {
+							$slug = _wp_to_kebab_case( $matches[0] );
+						} else {
+							$slug = static::get_slug_from_preset_value( $style_value, $property_key );
+						}
+					}
 
 					if ( $slug ) {
 						/*

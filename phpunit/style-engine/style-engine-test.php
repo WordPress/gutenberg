@@ -324,6 +324,52 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'valid_classnames_with_value_regex'            => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'textAlign' => 'left',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'text-align:left;',
+					'declarations' => array(
+						'text-align' => 'left',
+					),
+					'classnames'   => 'has-text-align-left',
+				),
+			),
+
+			'no_classnames_with_invalid_value_regex'       => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'textAlign' => '12px',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'text-align:12px;',
+					'declarations' => array(
+						'text-align' => '12px',
+					),
+				),
+			),
+
+			'no_classnames_with_invalid_type_regex'        => array(
+				'block_styles'    => array(
+					'typography' => array(
+						'textAlign' => 10,
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'text-align:10;',
+					'declarations' => array(
+						'text-align' => 10,
+					),
+				),
+			),
+
 			'invalid_classnames_preset_value'              => array(
 				'block_styles'    => array(
 					'color'   => array(
