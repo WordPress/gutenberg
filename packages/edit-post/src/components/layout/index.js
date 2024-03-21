@@ -28,7 +28,7 @@ import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -135,13 +135,11 @@ function Layout( { initialPost } ) {
 	useCommonCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -203,18 +201,6 @@ function Layout( { initialPost } ) {
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	// Inserter and Sidebars are mutually exclusive
-	useEffect( () => {
-		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpened( false );
-		}
-	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
-	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
-			closeGeneralSidebar();
-		}
-	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
