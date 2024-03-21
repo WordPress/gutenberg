@@ -351,10 +351,10 @@ export default function PagePages() {
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
+			editPostAction,
 			viewPostAction,
 			restorePostAction,
 			permanentlyDeletePostAction,
-			editPostAction,
 			postRevisionsAction,
 			trashPostAction,
 		],
