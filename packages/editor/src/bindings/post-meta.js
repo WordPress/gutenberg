@@ -9,42 +9,26 @@ import { _x } from '@wordpress/i18n';
  */
 import { store as editorStore } from '../store';
 
-const { getCurrentPostId } = select( editorStore );
-
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
-	connect( { key } ) {
-		const { getEntityRecord, getEditedEntityRecord } = select( coreStore );
-		const kind = 'postType';
-		const name = 'post';
-		const prop = 'meta';
-		const id = getCurrentPostId();
+	connect( { key, id } ) {
+		const { getEditedEntityRecord } = select( coreStore );
+		const { editEntityRecord } = dispatch( coreStore );
+		const { getCurrentPostId } = select( editorStore );
+
+		id = id || getCurrentPostId();
 
 		return {
-			get: () => {
-				const record = getEntityRecord( kind, name, id );
-				const editedRecord = getEditedEntityRecord( kind, name, id );
+			get: () =>
+				getEditedEntityRecord( 'postType', 'post', id ).meta[ key ],
 
-				const fullData =
-					record && editedRecord
-						? {
-								fullValue: record[ prop ],
-								value: editedRecord[ prop ],
-						  }
-						: {};
-
-				return fullData.value[ key ];
-			},
-
-			update: ( newValue ) => {
-				const newMeta = {
-					...getEditedEntityRecord( kind, name, id )[ prop ],
-					[ key ]: newValue,
-				};
-
-				dispatch( coreStore ).editEntityRecord( kind, name, id, {
-					[ prop ]: newMeta,
+			update: ( value ) => {
+				editEntityRecord( 'postType', 'post', id, {
+					meta: {
+						...getEditedEntityRecord( 'postType', 'post', id ).meta,
+						[ key ]: value,
+					},
 				} );
 			},
 		};
