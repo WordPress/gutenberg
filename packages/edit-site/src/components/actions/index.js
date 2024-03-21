@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, edit, backup } from '@wordpress/icons';
+import { external, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
