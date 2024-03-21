@@ -105,16 +105,29 @@ function FontLibraryProvider( { children } ) {
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
-	const baseThemeFonts = baseFontFamilies?.theme
-		? baseFontFamilies.theme
-				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		: [];
-
+	// Themes Fonts are the fonts defined in the global styles (database persisted theme.json data).
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+
+	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+
+	/*
+	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
+	 *
+	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
+	 * Avoids incosistencies with the fonts listed in the font library modal as base (unactivated).
+	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variation is applied.
+	 */
+	const baseThemeFonts = baseFontFamilies?.theme
+		? themeFonts.concat(
+				baseFontFamilies.theme
+					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
+					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		  )
 		: [];
 
 	const customFonts = fontFamilies?.custom
@@ -144,8 +157,7 @@ function FontLibraryProvider( { children } ) {
 			return;
 		}
 
-		const fonts =
-			font.source === 'theme' ? baseThemeFonts : baseCustomFonts;
+		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
 
 		// Tries to find the font in the installed fonts
 		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
