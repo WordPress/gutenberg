@@ -114,7 +114,7 @@ const SocialLinkEdit = ( {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 
 	const IconComponent = getIconBySite( service );
-	const socialLinkLabel = label ? label : getNameBySite( service );
+	const socialLinkText = label ? label : getNameBySite( service );
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
@@ -134,7 +134,7 @@ const SocialLinkEdit = ( {
 							help={ __(
 								'The link text is visible when enabled from the parent Social Icons block.'
 							) }
-							value={ socialLinkLabel }
+							value={ socialLinkText }
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}
@@ -162,7 +162,7 @@ const SocialLinkEdit = ( {
 							'screen-reader-text': ! showLabels,
 						} ) }
 					>
-						{ socialLinkLabel }
+						{ socialLinkText }
 					</span>
 				</Button>
 				{ isSelected && showURLPopover && (
