@@ -38,7 +38,7 @@ function Editor( {
 		onNavigateToPreviousEntityRecord,
 	} = useNavigateToEntityRecord( initialPostId, initialPostType );
 
-	const { post, template, defaultRenderingMode } = useSelect(
+	const { post, template } = useSelect(
 		( select ) => {
 			const { getEditedPostTemplate } = select( editPostStore );
 			const { getEntityRecord, getPostType, canUser } =
@@ -65,11 +65,6 @@ function Editor( {
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
-				defaultRenderingMode:
-					currentPost.postType === 'wp_template' ||
-					currentPost.postType === 'wp_template_part'
-						? 'all'
-						: 'post-only',
 			};
 		},
 		[ currentPost.postType, currentPost.postId ]
@@ -80,14 +75,9 @@ function Editor( {
 			...settings,
 			onNavigateToEntityRecord,
 			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode,
+			defaultRenderingMode: 'post-only',
 		} ),
-		[
-			settings,
-			onNavigateToEntityRecord,
-			onNavigateToPreviousEntityRecord,
-			defaultRenderingMode,
-		]
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
 
 	if ( ! post ) {
