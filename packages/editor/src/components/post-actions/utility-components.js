@@ -86,7 +86,7 @@ export function ActionsDropdownMenuGroup( { actions, item } ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
-				if ( !! action.RenderModal ) {
+				if ( action.RenderModal ) {
 					return (
 						<ActionWithModal
 							key={ action.id }
