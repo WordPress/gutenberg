@@ -759,7 +759,14 @@ function cloneDeep( object ) {
 	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
 }
 
-const addPatternCategoryToMetadata = ( reducer ) => ( state, action ) => {
+/**
+ * Higher-order reducer which adds the selected pattern category to the outer block.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withPatternCategory = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'INSERT_BLOCKS' ) {
 		const { blocks, meta } = action;
 		const nextState = reducer( state, action );
@@ -798,7 +805,7 @@ export const blocks = pipe(
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 	withResetControlledBlocks,
-	addPatternCategoryToMetadata
+	withPatternCategory
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
@@ -878,9 +885,7 @@ export const blocks = pipe(
 						newState.set( key, value );
 					}
 				);
-
-				// Add pattern category to metadata if available.
-				return newState; //addPatternCategoryToMetadata( newState, action );
+				return newState;
 			}
 
 			case 'UPDATE_BLOCK': {
