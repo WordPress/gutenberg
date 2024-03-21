@@ -36,6 +36,12 @@ test.describe( 'Navigation block', () => {
 		] );
 	} );
 
+	test.use( {
+		navigation: async ( { page, pageUtils, editor }, use ) => {
+			await use( new Navigation( { page, pageUtils, editor } ) );
+		},
+	} );
+
 	test.describe( 'As a user I want the navigation block to fallback to the best possible default', () => {
 		test( 'default to a list of pages if there are no menus', async ( {
 			admin,
@@ -313,6 +319,7 @@ test.describe( 'Navigation block', () => {
 		pageUtils,
 		editor,
 		requestUtils,
+		navigation,
 	} ) => {
 		await admin.createNewPost();
 
@@ -323,11 +330,9 @@ test.describe( 'Navigation block', () => {
 
 		await editor.insertBlock( { name: 'core/navigation' } );
 
-		const navBlock = editor.canvas.getByRole( 'document', {
-			name: 'Block: Navigation',
-		} );
+		const navBlock = navigation.getNavBlock();
 
-		const navBlockInserter = navBlock.getByLabel( 'Add block' );
+		const navBlockInserter = navigation.getNavBlockInserter();
 		// Wait until the nav block inserter is visible before we move on to using it
 		await expect( navBlockInserter ).toBeVisible();
 
@@ -342,17 +347,7 @@ test.describe( 'Navigation block', () => {
 
 		await pageUtils.pressKeys( 'ArrowDown' );
 
-		await expect( navBlockInserter ).toBeFocused();
-
-		await page.keyboard.press( 'Enter' );
-
-		const linkControlSearch = page.getByRole( 'combobox', {
-			name: 'Link',
-		} );
-
-		await expect( linkControlSearch ).toBeFocused();
-
-		await page.keyboard.press( 'Escape' );
+		navigation.addLinkOpenClose();
 
 		/**
 		 * Note: This is not desired behavior. Ideally the
@@ -361,7 +356,7 @@ test.describe( 'Navigation block', () => {
 		 * focus is kept nearby until we are able to send
 		 * focus to the appender.
 		 */
-		await expect( linkControlSearch ).toBeHidden();
+
 		await expect( navBlock ).toBeFocused();
 
 		/**
@@ -380,48 +375,10 @@ test.describe( 'Navigation block', () => {
 
 		await page.keyboard.press( 'Enter' );
 
-		await expect( linkControlSearch ).toBeFocused();
-
-		await page.keyboard.type( 'Cat' );
-
-		await pageUtils.pressKeys( 'ArrowDown' );
-
-		await page.keyboard.press( 'Enter' );
-
-		const linkControlCatLink = page.getByRole( 'link', {
-			name: 'Cat (opens in a new tab)',
-			exact: true,
-		} );
-		await expect( linkControlCatLink ).toBeFocused();
-
-		await page.keyboard.press( 'Escape' );
-
-		await expect( linkControlSearch ).toBeHidden();
-
-		const navLinkCat = editor.canvas
-			.locator( 'a' )
-			.filter( { hasText: 'Cat', exact: true } );
-
-		await expect( navLinkCat ).toBeVisible();
+		await navigation.addPage( 'Cat' );
+		await navigation.previewOpenClose( 'Cat' );
 
 		// Testing for selection is tricky, so let's approximate. If we command+k, then we should be back in editing mode for this item.
-
-		/**
-		 * Test: Exiting link control from primary+k returns
-		 *       focus to the navigation block
-		 *
-		 * 1. Primary + k
-		 * 2. Focus is within the link control
-		 * 3. Escape to exit
-		 * 4. Focus should be at the same position it started at
-		 */
-		await pageUtils.pressKeys( 'primary+k' );
-
-		await expect( linkControlCatLink ).toBeFocused();
-
-		await page.keyboard.press( 'Escape' );
-
-		await expect( linkControlCatLink ).toBeHidden();
 
 		/**
 		 * Test: Creating a link from a url-string (https://www.example.com) returns
@@ -442,14 +399,16 @@ test.describe( 'Navigation block', () => {
 
 		await page.keyboard.press( 'Enter' );
 
+		const linkControlSearch = navigation.getLinkControlSearch();
+
 		await expect( linkControlSearch ).toBeFocused();
 
-		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.type( 'https://example.com', { delay: 50 } );
 		await page.keyboard.press( 'Enter' );
 
 		// `https://example.com` should be on the page and highlighted because it is url-like
 		await page.keyboard.press( 'Delete' );
-		await page.keyboard.type( 'Blobfish' );
+		await page.keyboard.type( 'Blobfish', { delay: 50 } );
 
 		const navLinkBlobfish = editor.canvas
 			.locator( 'a' )
@@ -482,7 +441,6 @@ test.describe( 'Navigation block', () => {
 		 * 4. Escape to exit
 		 * 5. Focus should be on the toolbar link button
 		 */
-
 		await pageUtils.pressKeys( 'alt+F10' );
 
 		await pageUtils.pressKeys( 'ArrowRight', { times: 4 } );
@@ -511,7 +469,6 @@ test.describe( 'Navigation block', () => {
 		 * 4. Escape to exit
 		 * 5. Focus should be on the toolbar link button
 		 */
-
 		await pageUtils.pressKeys( 'ArrowRight' );
 
 		await expect(
@@ -522,8 +479,25 @@ test.describe( 'Navigation block', () => {
 
 		// Expect the submenu Add link to be present
 		await expect(
-			editor.canvas.getByRole( 'link', { name: 'Add link', exact: true } )
+			editor.canvas.locator( 'a' ).filter( { hasText: 'Add link' } )
 		).toBeVisible();
+
+		await pageUtils.pressKeys( 'ArrowDown' );
+		// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
+		// Use Enter after that bug is resolved
+		await pageUtils.pressKeys( 'primary+k' );
+
+		await navigation.addPage( 'Dog' );
+		await navigation.previewOpenClose( 'Dog' );
+
+		// We should be at the first position on the label
+		await page.keyboard.type( 'Big ', { delay: 50 } );
+
+		const navLinkBigDog = editor.canvas
+			.locator( 'a' )
+			.filter( { hasText: 'Big Dog', exact: true } );
+
+		await expect( navLinkBigDog ).toBeVisible();
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -590,3 +564,129 @@ test.describe( 'Navigation block', () => {
 		).toHaveLength( 1 );
 	} );
 } );
+
+class Navigation {
+	constructor( { page, pageUtils, editor } ) {
+		this.page = page;
+		this.pageUtils = pageUtils;
+		this.editor = editor;
+	}
+
+	async addPage( name ) {
+		const linkControlSearch = this.page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await this.page.keyboard.type( name, { delay: 50 } );
+
+		await this.pageUtils.pressKeys( 'ArrowDown' );
+
+		await this.page.keyboard.press( 'Enter' );
+
+		const linkControlLink = await this.getLinkControlLink( name );
+		await expect( linkControlLink ).toBeFocused();
+
+		await this.page.keyboard.press( 'Escape' );
+
+		await expect( linkControlSearch ).toBeHidden();
+
+		const navLink = this.getNavLink( name );
+
+		await expect( navLink ).toBeVisible();
+	}
+
+	getLinkControlLink( name ) {
+		return this.page.getByRole( 'link', {
+			name: `${ name } (opens in a new tab)`,
+			exact: true,
+		} );
+	}
+
+	getNavLink( name ) {
+		return this.editor.canvas.locator( 'a' ).filter( { hasText: name } );
+	}
+
+	getNavBlock() {
+		return this.editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+	}
+
+	getNavBlockInserter() {
+		return this.getNavBlock().getByLabel( 'Add block' );
+	}
+
+	getLinkControlSearch() {
+		return this.page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+	}
+
+	/**
+	 * Usage: Move focus to the nav block inserter. This will open and close it, and check the states.
+	 * Your code will need to:
+	 * 1. Place focus on the nav block appender
+	 * 2. Check that focus is back where you want it.
+	 */
+	async addLinkOpenClose() {
+		const navBlockInserter = this.getNavBlockInserter();
+
+		// Wait until the nav block inserter is visible before we move on to using it
+		await expect( navBlockInserter ).toBeVisible();
+
+		await expect( navBlockInserter ).toBeFocused();
+
+		await this.page.keyboard.press( 'Enter' );
+
+		const linkControlSearch = this.getLinkControlSearch();
+
+		await expect( linkControlSearch ).toBeFocused();
+
+		await this.page.keyboard.press( 'Escape' );
+
+		await expect( linkControlSearch ).toBeHidden();
+	}
+
+	/**
+	 * Test: Exiting link control from primary+k returns
+	 *       focus to the navigation block
+	 *
+	 * 1. Primary + k
+	 * 2. Focus is within the link control
+	 * 3. Escape to exit
+	 * 4. Focus should be at the same position it started at
+	 *
+	 * @param {string} name of the link to check
+	 */
+	async previewOpenClose( name ) {
+		const linkControlLink = this.getLinkControlLink( name );
+		const navLink = this.getNavLink( name );
+		await expect( navLink ).toBeVisible();
+
+		await this.pageUtils.pressKeys( 'primary+k' );
+
+		await expect( linkControlLink ).toBeFocused();
+
+		await this.page.keyboard.press( 'Escape' );
+
+		await expect( linkControlLink ).toBeHidden();
+
+		const testString = 'Test ';
+		// Focus should be on the nav link rich text element. Test this by typing and checking.
+		await this.page.keyboard.type( testString, { delay: 50 } );
+
+		const navLinkTest = this.getNavLink( `${ testString }${ name }` );
+
+		await expect( navLinkTest ).toBeVisible();
+
+		// Delete what we just added
+		for ( let i = 0; i < testString.length; i++ ) {
+			await this.page.keyboard.press( 'Backspace', { delay: 50 } );
+		}
+
+		await expect( navLinkTest ).toBeHidden();
+		await expect( navLink ).toBeVisible();
+	}
+}
