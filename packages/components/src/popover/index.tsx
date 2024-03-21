@@ -53,11 +53,7 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
-import {
-	contextConnect,
-	ContextSystemProvider,
-	useContextSystem,
-} from '../context';
+import { contextConnect, useContextSystem } from '../context';
 import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
@@ -112,8 +108,6 @@ const getPopoverFallbackContainer = () => {
 
 	return container;
 };
-
-const defaultContextValue = {};
 
 const UnforwardedPopover = (
 	props: Omit<
@@ -424,11 +418,7 @@ const UnforwardedPopover = (
 					/>
 				</div>
 			) }
-			<div className="components-popover__content">
-				<ContextSystemProvider value={ defaultContextValue }>
-					{ children }
-				</ContextSystemProvider>
-			</div>
+			<div className="components-popover__content">{ children }</div>
 			{ hasArrow && (
 				<div
 					ref={ arrowCallbackRef }
