@@ -6,16 +6,134 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useAsyncList } from '@wordpress/compose';
+import { useAsyncList, useInstanceId } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 	Button,
 	Spinner,
+	VisuallyHidden,
 } from '@wordpress/components';
-import { ENTER, SPACE } from '@wordpress/keycodes';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { info } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+
+const {
+	useCompositeStoreV2: useCompositeStore,
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	CompositeRowV2: CompositeRow,
+} = unlock( componentsPrivateApis );
+
+function ListItem( {
+	id,
+	item,
+	isSelected,
+	onSelect,
+	onDetailsChange,
+	mediaField,
+	primaryField,
+	visibleFields,
+} ) {
+	const itemRef = useRef( null );
+	const labelId = `${ id }-label`;
+	const descriptionId = `${ id }-description`;
+
+	useEffect( () => {
+		if ( isSelected ) {
+			itemRef.current?.scrollIntoView( {
+				behavior: 'auto',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
+		}
+	}, [ isSelected ] );
+
+	return (
+		<CompositeRow
+			ref={ itemRef }
+			render={ <li /> }
+			role="row"
+			className={ classNames( {
+				'is-selected': isSelected,
+			} ) }
+		>
+			<HStack className="dataviews-view-list__item-wrapper">
+				<div role="gridcell">
+					<CompositeItem
+						render={ <div /> }
+						role="button"
+						id={ id }
+						aria-pressed={ isSelected }
+						aria-labelledby={ labelId }
+						aria-describedby={ descriptionId }
+						className="dataviews-view-list__item"
+						onClick={ () => onSelect( item ) }
+					>
+						<HStack
+							spacing={ 3 }
+							justify="start"
+							alignment="flex-start"
+						>
+							<div className="dataviews-view-list__media-wrapper">
+								{ mediaField?.render( { item } ) || (
+									<div className="dataviews-view-list__media-placeholder"></div>
+								) }
+							</div>
+							<VStack spacing={ 1 }>
+								<span
+									className="dataviews-view-list__primary-field"
+									id={ labelId }
+								>
+									{ primaryField?.render( { item } ) }
+								</span>
+								<div
+									className="dataviews-view-list__fields"
+									id={ descriptionId }
+								>
+									{ visibleFields.map( ( field ) => (
+										<p
+											key={ field.id }
+											className="dataviews-view-list__field"
+										>
+											<VisuallyHidden
+												as="span"
+												className="dataviews-view-list__field-label"
+											>
+												{ field.header }
+											</VisuallyHidden>
+											<span className="dataviews-view-list__field-value">
+												{ field.render( { item } ) }
+											</span>
+										</p>
+									) ) }
+								</div>
+							</VStack>
+						</HStack>
+					</CompositeItem>
+				</div>
+				{ onDetailsChange && (
+					<div role="gridcell">
+						<CompositeItem
+							render={ <Button /> }
+							className="dataviews-view-list__details-button"
+							onClick={ () => onDetailsChange( [ item ] ) }
+							icon={ info }
+							label={ __( 'View details' ) }
+							size="compact"
+						/>
+					</div>
+				) }
+			</HStack>
+		</CompositeRow>
+	);
+}
 
 export default function ViewList( {
 	view,
@@ -27,9 +145,15 @@ export default function ViewList( {
 	onDetailsChange,
 	selection,
 	deferredRendering,
+	id: preferredId,
 } ) {
+	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
 	const shownData = useAsyncList( data, { step: 3 } );
 	const usedData = deferredRendering ? shownData : data;
+	const selectedItem = usedData?.findLast( ( item ) =>
+		selection.includes( item.id )
+	);
+
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -44,12 +168,19 @@ export default function ViewList( {
 			)
 	);
 
-	const onEnter = ( item ) => ( event ) => {
-		const { keyCode } = event;
-		if ( [ ENTER, SPACE ].includes( keyCode ) ) {
-			onSelectionChange( [ item ] );
-		}
-	};
+	const onSelect = useCallback(
+		( item ) => onSelectionChange( [ item ] ),
+		[ onSelectionChange ]
+	);
+
+	const getItemDomId = useCallback(
+		( item ) => ( item ? `${ baseId }-${ getItemId( item ) }` : undefined ),
+		[ baseId, getItemId ]
+	);
+
+	const store = useCompositeStore( {
+		defaultActiveId: getItemDomId( selectedItem ),
+	} );
 
 	const hasData = usedData?.length;
 	if ( ! hasData ) {
@@ -68,70 +199,29 @@ export default function ViewList( {
 	}
 
 	return (
-		<ul className="dataviews-view-list">
+		<Composite
+			id={ baseId }
+			render={ <ul /> }
+			className="dataviews-view-list"
+			role="grid"
+			store={ store }
+		>
 			{ usedData.map( ( item ) => {
+				const id = getItemDomId( item );
 				return (
-					<li
-						key={ getItemId( item ) }
-						className={ classNames( {
-							'is-selected': selection.includes( item.id ),
-						} ) }
-					>
-						<HStack className="dataviews-view-list__item-wrapper">
-							<div
-								role="button"
-								tabIndex={ 0 }
-								aria-pressed={ selection.includes( item.id ) }
-								onKeyDown={ onEnter( item ) }
-								className="dataviews-view-list__item"
-								onClick={ () => onSelectionChange( [ item ] ) }
-							>
-								<HStack
-									spacing={ 3 }
-									justify="start"
-									alignment="flex-start"
-								>
-									<div className="dataviews-view-list__media-wrapper">
-										{ mediaField?.render( { item } ) || (
-											<div className="dataviews-view-list__media-placeholder"></div>
-										) }
-									</div>
-									<VStack spacing={ 1 }>
-										<span className="dataviews-view-list__primary-field">
-											{ primaryField?.render( { item } ) }
-										</span>
-										<div className="dataviews-view-list__fields">
-											{ visibleFields.map( ( field ) => {
-												return (
-													<span
-														key={ field.id }
-														className="dataviews-view-list__field"
-													>
-														{ field.render( {
-															item,
-														} ) }
-													</span>
-												);
-											} ) }
-										</div>
-									</VStack>
-								</HStack>
-							</div>
-							{ onDetailsChange && (
-								<Button
-									className="dataviews-view-list__details-button"
-									onClick={ () =>
-										onDetailsChange( [ item ] )
-									}
-									icon={ info }
-									label={ __( 'View details' ) }
-									size="compact"
-								/>
-							) }
-						</HStack>
-					</li>
+					<ListItem
+						key={ id }
+						id={ id }
+						item={ item }
+						isSelected={ item === selectedItem }
+						onSelect={ onSelect }
+						onDetailsChange={ onDetailsChange }
+						mediaField={ mediaField }
+						primaryField={ primaryField }
+						visibleFields={ visibleFields }
+					/>
 				);
 			} ) }
-		</ul>
+		</Composite>
 	);
 }
