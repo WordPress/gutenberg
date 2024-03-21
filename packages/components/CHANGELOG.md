@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.2.0 (2024-03-21)
+
 -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
 -   `Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
 
