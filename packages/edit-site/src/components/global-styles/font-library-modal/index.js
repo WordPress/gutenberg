@@ -66,7 +66,7 @@ function FontLibraryModal( {
 		<Modal
 			title={ __( 'Fonts' ) }
 			onRequestClose={ onRequestClose }
-			isFullScreen
+			size="large"
 			className="font-library-modal"
 		>
 			<div className="font-library-modal__tabs">
