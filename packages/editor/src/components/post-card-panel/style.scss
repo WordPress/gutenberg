@@ -25,5 +25,8 @@
 
 	&__description {
 		color: $gray-700;
+		& .components-text {
+			color: inherit;
+		}
 	}
 }
