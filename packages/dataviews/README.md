@@ -305,12 +305,16 @@ Callback that signals the user triggered the details for one of more items, and 
 
 Allowed operators for fields of type `enumeration`:
 
-- `is`: whether the item is equal to a single value.
-- `isNot`: whether the item is not equal to a single value.
-- `isAny`: whether the item is present in a list of values.
-- `isNone`: whether the item is not present in a list of values.
+| Operator | Selection | Description | Example |
+| --- | ---  | --- | --- |
+| `is` | Single item | `EQUAL TO`. The item's field is equal to a single value. | Author is Admin |
+| `isNot` | Single item | `NOT EQUAL TO`. The item's field is not equal to a single value. | Author is not Admin |
+| `isAny` | Multiple items | `OR`. The item's field is present in a list of values. | Author is any: Admin, Editor |
+| `isNone` | Multiple items | `NOT OR`. The item's field is not present in a list of values. | Author is none: Admin, Editor |
+| `isAll` | Multiple items | `AND`. The item's field has all of the values in the list. | Category is all: Book, Review, Science Fiction |
+| `isNotAll` | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list. | Category is not all: Book, Review, Science Fiction |
 
-`is` and `isNot` are single-selection operators, while `isAny` and `isNone` are multi-selection. By default, a filter with no operators declared will support multi-selection. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
+`is` and `isNot` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotALl` are multi-selection. By default, a filter with no operators declared will support the `isAny` and `isNone` multi-selection operators. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
 
 > The legacy operators `in` and `notIn` have been deprecated and will be removed soon. In the meantime, they work as `is` and `isNot` operators, respectively.
 

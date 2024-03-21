@@ -218,11 +218,11 @@ const withMyPluginControls = createHigherOrderComponent( ( BlockEdit ) => {
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ props.isSelected && {
+				{ props.isSelected && (
 					<InspectorControls>
 						<PanelBody>My custom control</PanelBody>
 					</InspectorControls>
-				}}
+				) }
 			</>
 		);
 	};

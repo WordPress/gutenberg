@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import {
 	Icon,
+	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -22,9 +23,21 @@ export default function SidebarCard( {
 } ) {
 	return (
 		<div className={ classnames( 'edit-site-sidebar-card', className ) }>
-			<HStack spacing={ 3 } className="edit-site-sidebar-card__header">
+			<HStack
+				spacing={ 2 }
+				className="edit-site-sidebar-card__header"
+				align="flex-start"
+			>
 				<Icon className="edit-site-sidebar-card__icon" icon={ icon } />
-				<h2 className="edit-site-sidebar-card__title">{ title }</h2>
+				<Text
+					numberOfLines={ 2 }
+					truncate
+					className="edit-site-sidebar-card__title"
+					weight={ 500 }
+					as="h2"
+				>
+					{ title }
+				</Text>
 				{ actions }
 			</HStack>
 			<VStack className="edit-site-sidebar-card__content">

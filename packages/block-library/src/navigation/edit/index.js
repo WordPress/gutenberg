@@ -39,7 +39,7 @@ import {
 	Spinner,
 	Notice,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -187,9 +187,9 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
 		hasResolvedCanUserDeleteNavigationMenu,
-		canUserCreateNavigationMenu,
-		isResolvingCanUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -467,8 +467,8 @@ function Navigation( {
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigationMenu &&
-				! canUserCreateNavigationMenu
+				hasResolvedCanUserCreateNavigationMenus &&
+				! canUserCreateNavigationMenus
 			) {
 				showNavigationMenuPermissionsNotice(
 					__(
@@ -482,8 +482,8 @@ function Navigation( {
 		isInnerBlockSelected,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
-		canUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 		ref,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
@@ -491,7 +491,7 @@ function Navigation( {
 	] );
 
 	const hasManagePermissions =
-		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
 	const overlayMenuPreviewClasses = classnames(
 		'wp-block-navigation__overlay-menu-preview',
@@ -801,9 +801,11 @@ function Navigation( {
 					isSelected={ isSelected }
 					currentMenuId={ ref }
 					clientId={ clientId }
-					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
-					isResolvingCanUserCreateNavigationMenu={
-						isResolvingCanUserCreateNavigationMenu
+					canUserCreateNavigationMenus={
+						canUserCreateNavigationMenus
+					}
+					isResolvingCanUserCreateNavigationMenus={
+						isResolvingCanUserCreateNavigationMenus
 					}
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -841,15 +843,11 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ ( deletedMenuTitle = '' ) => {
+									onDelete={ () => {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
-											sprintf(
-												// translators: %s: the name of a menu (e.g. Header navigation).
-												__(
-													'Navigation menu %s successfully deleted.'
-												),
-												deletedMenuTitle
+											__(
+												'Navigation menu successfully deleted.'
 											)
 										);
 									} }

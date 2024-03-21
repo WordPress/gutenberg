@@ -2084,6 +2084,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
 	 * @since 6.5.0 Passing current theme JSON settings to wp_get_typography_font_size_value().
+	 * @since 6.6.0 Using style engine to correctly fetch background CSS values.
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2135,7 +2136,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Processes background styles.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				$background_styles = gutenberg_get_background_support_styles( $styles['background'] );
+				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
 				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
 			}
 
@@ -2518,6 +2519,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Setting a min-height of HTML when root styles have a background gradient or image.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
@@ -2528,6 +2530,7 @@ class WP_Theme_JSON_Gutenberg {
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
+		$is_root_selector = static::ROOT_BLOCK_SELECTOR === $selector;
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -2613,10 +2616,16 @@ class WP_Theme_JSON_Gutenberg {
 		$block_rules = '';
 
 		/*
-		 * 1. Separate the declarations that use the general selector
+		 * 1. Bespoke declaration modifiers:
+		 * - 'filter': Separate the declarations that use the general selector
 		 * from the ones using the duotone selector.
+		 * - 'background|background-image': set the html min-height to 100%
+		 * to ensure the background covers the entire viewport.
+		 *
 		 */
-		$declarations_duotone = array();
+		$declarations_duotone       = array();
+		$should_set_root_min_height = false;
+
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				/*
@@ -2633,6 +2642,28 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				unset( $declarations[ $index ] );
 			}
+
+			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
+				$should_set_root_min_height = true;
+			}
+		}
+
+		/*
+		 * If root styles has a background-image or a background (gradient) set,
+		 * set the min-height to '100%'. Minus `--wp-admin--admin-bar--height` for logged-in view.
+		 * Setting the CSS rule on the HTML tag ensures background gradients and images behave similarly,
+		 * and matches the behavior of the site editor.
+		 */
+		if ( $should_set_root_min_height ) {
+			$block_rules .= static::to_ruleset(
+				'html',
+				array(
+					array(
+						'name'  => 'min-height',
+						'value' => 'calc(100% - var(--wp-admin--admin-bar--height, 0px))',
+					),
+				)
+			);
 		}
 
 		// Update declarations if there are separators with only background color defined.
@@ -2650,7 +2681,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 4. Generate Layout block gap styles.
 		if (
-			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! $is_root_selector &&
 			! empty( $block_metadata['name'] )
 		) {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
@@ -2728,10 +2759,8 @@ class WP_Theme_JSON_Gutenberg {
 		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-		$block_gap_value       = $this->theme_json['styles']['spacing']['blockGap'] ?? '0.5em';
-		$has_block_gap_support = isset( $this->theme_json['settings']['spacing']['blockGap'] );
-		if ( $has_block_gap_support ) {
+		// Block gap styles will be output unless explicitly set to `null`. See static::PROTECTED_PROPERTIES.
+		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
 			$css            .= ':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';

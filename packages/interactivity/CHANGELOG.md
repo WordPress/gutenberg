@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Prevent non-objects from being set in store state. ([#59886](https://github.com/WordPress/gutenberg/pull/59886))
 -   Ensure that stores are available for subscription before hydration. ([#59842](https://github.com/WordPress/gutenberg/pull/59842))
 -   Ensure scope is restored when catching exceptions thrown in async generator actions. ([#59708](https://github.com/WordPress/gutenberg/pull/59708))
 

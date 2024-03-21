@@ -99,64 +99,7 @@ _Returns_
 
 ### PluginDocumentSettingPanel
 
-Renders items below the Status & Availability panel in the Document Sidebar.
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var el = React.createElement;
-var __ = wp.i18n.__;
-var registerPlugin = wp.plugins.registerPlugin;
-var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
-
-function MyDocumentSettingPlugin() {
-	return el(
-		PluginDocumentSettingPanel,
-		{
-			className: 'my-document-setting-plugin',
-			title: 'My Panel',
-			name: 'my-panel',
-		},
-		__( 'My Document Setting Panel' )
-	);
-}
-
-registerPlugin( 'my-document-setting-plugin', {
-	render: MyDocumentSettingPlugin,
-} );
-```
-
-```jsx
-// Using ESNext syntax
-import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-
-const MyDocumentSettingTest = () => (
-	<PluginDocumentSettingPanel
-		className="my-document-setting-plugin"
-		title="My Panel"
-		name="my-panel"
-	>
-		<p>My Document Setting Panel</p>
-	</PluginDocumentSettingPanel>
-);
-
-registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
-```
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.name_ `string`: Required. A machine-friendly name for the panel.
--   _props.className_ `[string]`: An optional class name added to the row.
--   _props.title_ `[string]`: The title of the panel
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+Undocumented declaration.
 
 ### PluginMoreMenuItem
 

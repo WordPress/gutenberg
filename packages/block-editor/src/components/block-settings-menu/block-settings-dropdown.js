@@ -46,18 +46,14 @@ function CopyMenuItem( { clientIds, onCopy, label } ) {
 export function BlockSettingsDropdown( {
 	block,
 	clientIds,
-	__experimentalSelectBlock,
 	children,
-	__unstableDisplayLocation,
+	__experimentalSelectBlock,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
 	const currentClientId = block?.clientId;
-	const blockClientIds = Array.isArray( clientIds )
-		? clientIds
-		: [ clientIds ];
-	const count = blockClientIds.length;
-	const firstBlockClientId = blockClientIds[ 0 ];
+	const count = clientIds.length;
+	const firstBlockClientId = clientIds[ 0 ];
 	const {
 		firstParentClientId,
 		onlyBlock,
@@ -341,9 +337,6 @@ export function BlockSettingsDropdown( {
 									firstBlockClientId,
 								} }
 								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
-								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )

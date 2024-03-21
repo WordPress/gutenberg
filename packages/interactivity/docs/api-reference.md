@@ -33,7 +33,7 @@ Interactivity API directives use the `data-` prefix. Here's an example of direct
     Toggle
   </button>
 
-  <p id="p-1" data-bind--hidden="!context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
@@ -652,10 +652,10 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
-And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-bind--hidden`.
+And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-wp-bind--hidden`.
 
 ```html
-<div data-bind--hidden="!state.isPlaying" ... >
+<div data-wp-bind--hidden="!state.isPlaying" ... >
   <iframe ...></iframe>
 </div>
 ```
@@ -668,7 +668,7 @@ The example below is getting `state.isPlaying` from `otherPlugin` instead of `my
 
 ```html
 <div data-wp-interactive="myPlugin">
-  <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
+  <div data-wp-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
 </div>
@@ -1128,8 +1128,9 @@ $my_context = array(
 	'counter' => 0,
 	'isOpen'  => true,
 );
+?>
 <div
- echo wp_interactivity_data_wp_context($my_context)
+ <?php echo wp_interactivity_data_wp_context( $my_context ); ?>
 >
 </div>
 ```

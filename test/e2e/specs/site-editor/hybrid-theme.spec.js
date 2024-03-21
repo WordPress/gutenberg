@@ -47,6 +47,10 @@ test.describe( 'Hybrid theme', () => {
 				name: 'Block: Site Title',
 			} )
 		).toBeVisible();
+
+		await expect(
+			page.locator( 'role=dialog[name="Welcome to the site editor"i]' )
+		).toBeHidden();
 	} );
 
 	test( 'can not export Site Editor Templates', async ( { admin, page } ) => {
