@@ -32,7 +32,7 @@ export function useResetTemplateAction() {
 	return useMemo(
 		() => ( {
 			id: 'reset-template',
-			label: __( 'Reset' ),
+			label: __( 'Clear customizations' ),
 			isEligible: isTemplateRevertable,
 			supportsBulk: true,
 			async callback( templates ) {
