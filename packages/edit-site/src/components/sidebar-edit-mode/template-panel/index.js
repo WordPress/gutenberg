@@ -9,6 +9,7 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -30,6 +31,8 @@ import SidebarCard from '../sidebar-card';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
+
+const { PatternContentPanel } = unlock( editorPrivateApis );
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -149,6 +152,7 @@ export default function TemplatePanel() {
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
+			<PatternContentPanel />
 		</>
 	);
 }
