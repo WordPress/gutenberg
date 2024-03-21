@@ -98,7 +98,7 @@ describe( 'filters', () => {
 		expect( result[ 8 ].title ).toBe( 'Saturn' );
 	} );
 
-	it( 'should search using IS ANY filter', () => {
+	it( 'should search using IS ANY filter for STRING values', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
 			{
@@ -117,7 +117,7 @@ describe( 'filters', () => {
 		expect( result[ 1 ].title ).toBe( 'Uranus' );
 	} );
 
-	it( 'should search using IS NONE filter', () => {
+	it( 'should search using IS NONE filter for STRING values', () => {
 		const { data: result } = filterAndSortDataView(
 			data,
 			{
@@ -126,6 +126,45 @@ describe( 'filters', () => {
 						field: 'type',
 						operator: 'isNone',
 						value: [ 'Ice giant', 'Gas giant', 'Terrestrial' ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 3 );
+		expect( result[ 0 ].title ).toBe( 'Apollo' );
+		expect( result[ 1 ].title ).toBe( 'Space' );
+		expect( result[ 2 ].title ).toBe( 'NASA' );
+	} );
+
+	it( 'should search using IS ANY filter for ARRAY values', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'categories',
+						operator: 'isAny',
+						value: [ 'NASA' ],
+					},
+				],
+			},
+			fields
+		);
+		expect( result ).toHaveLength( 2 );
+		expect( result[ 0 ].title ).toBe( 'Apollo' );
+		expect( result[ 1 ].title ).toBe( 'NASA' );
+	} );
+
+	it( 'should search using IS NONE filter for ARRAY values', () => {
+		const { data: result } = filterAndSortDataView(
+			data,
+			{
+				filters: [
+					{
+						field: 'categories',
+						operator: 'isNone',
+						value: [ 'Space' ],
 					},
 				],
 			},
