@@ -110,7 +110,7 @@ export const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 10,
-	hiddenFields: [ 'image', 'type' ],
+	hiddenFields: [ 'image', 'type', 'categories' ],
 	layout: {},
 	filters: [],
 };
@@ -190,5 +190,6 @@ export const fields = [
 		header: 'Categories',
 		id: 'categories',
 		enableSorting: false,
+		enableHiding: false,
 	},
 ];
