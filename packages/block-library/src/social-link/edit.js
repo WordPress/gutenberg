@@ -144,7 +144,7 @@ const SocialLinkEdit = ( {
 							) }
 							value={ socialLinkLabel }
 							onChange={ ( value ) =>
-								setAttributes( { label: value || undefined } )
+								setAttributes( { label: value } )
 							}
 						/>
 					</PanelRow>
