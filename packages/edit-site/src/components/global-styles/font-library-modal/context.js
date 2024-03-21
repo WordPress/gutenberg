@@ -117,9 +117,9 @@ function FontLibraryProvider( { children } ) {
 	/*
 	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
 	 *
-	 * Use the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
+	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
 	 * Avoids incosistencies with the fonts listed in the font library modal as base (unactivated).
-	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme variant is applied.
+	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variantion is applied.
 	 */
 	const baseThemeFonts = baseFontFamilies?.theme
 		? themeFonts.concat(
