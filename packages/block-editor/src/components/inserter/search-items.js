@@ -20,7 +20,11 @@ const defaultGetCollection = () => null;
  * @return {Array} Words, extracted from the input string.
  */
 function extractWords( input = '' ) {
-	return noCase( input, {
+	if ( typeof extractWords[ input ] !== 'undefined' ) {
+		return extractWords[ input ];
+	}
+
+	extractWords[ input ] = noCase( input, {
 		splitRegexp: [
 			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
 			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
@@ -29,6 +33,8 @@ function extractWords( input = '' ) {
 	} )
 		.split( ' ' )
 		.filter( Boolean );
+
+	return extractWords[ input ];
 }
 
 /**
@@ -39,6 +45,10 @@ function extractWords( input = '' ) {
  * @return {string} The normalized search input.
  */
 function normalizeSearchInput( input = '' ) {
+	if ( typeof normalizeSearchInput[ input ] !== 'undefined' ) {
+		return normalizeSearchInput[ input ];
+	}
+
 	// Disregard diacritics.
 	//  Input: "média"
 	input = removeAccents( input );
@@ -49,9 +59,9 @@ function normalizeSearchInput( input = '' ) {
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	input = input.toLowerCase();
+	normalizeSearchInput[ input ] = input.toLowerCase();
 
-	return input;
+	return normalizeSearchInput[ input ];
 }
 
 /**
