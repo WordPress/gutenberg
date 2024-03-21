@@ -68,7 +68,8 @@ function gutenberg_register_typography_support( $block_type ) {
 
 	if ( $has_text_align_support && ! array_key_exists( 'textAlign', $block_type->attributes ) ) {
 		$block_type->attributes['textAlign'] = array(
-			'type' => 'array',
+			'type' => 'string',
+			'enum' => array( 'left', 'center', 'right', '' ),
 		);
 	}
 }

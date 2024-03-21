@@ -202,6 +202,6 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/editor/align/addAttribute',
+	'core/editor/text-align/addAttribute',
 	addAttribute
 );
