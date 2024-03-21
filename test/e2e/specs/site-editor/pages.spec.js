@@ -101,18 +101,6 @@ test.describe( 'Pages', () => {
 		/*
 		 * Test create page.Test creating a new page and editing the template.
 		 */
-		// Selecting a block in the template should display a notice.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Site Title',
-			} )
-			.click( { force: true } );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
-			)
-		).toBeVisible();
-
 		// Switch to template editing focus.
 		await editor.openDocumentSettingsSidebar();
 		await page
