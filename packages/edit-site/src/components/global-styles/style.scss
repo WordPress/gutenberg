@@ -29,7 +29,7 @@
 	max-width: 100%;
 }
 
-.edit-site-global-styles-screen-typography {
+.edit-site-global-styles-screen {
 	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
 
@@ -51,16 +51,12 @@
 	justify-content: center;
 }
 
-.edit-site-global-styles-screen-colors {
-	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
-
-	.color-block-support-panel {
-		padding-left: 0;
-		padding-right: 0;
-		padding-top: 0;
-		border-top: none;
-		row-gap: calc(#{$grid-unit-05} * 3);
-	}
+.edit-site-global-styles-screen-colors .color-block-support-panel {
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	border-top: none;
+	row-gap: calc(#{$grid-unit-05} * 3);
 }
 
 .edit-site-global-styles-screen-colors__palette-count {

@@ -29,7 +29,7 @@ function ScreenTypography() {
 					'Typography styles and the application of those styles on site elements.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-typography">
+			<div className="edit-site-global-styles-screen">
 				<VStack spacing={ 7 }>
 					<TypographyVariations title={ __( 'Presets' ) } />
 					{ ! window.__experimentalDisableFontLibrary &&

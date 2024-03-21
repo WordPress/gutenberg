@@ -38,7 +38,7 @@ function ScreenColors() {
 					'Palette colors and the application of those colors on site elements.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-colors">
+			<div className="edit-site-global-styles-screen">
 				<VStack spacing={ 7 }>
 					<ColorVariations title={ __( 'Presets' ) } />
 					<Palette />
