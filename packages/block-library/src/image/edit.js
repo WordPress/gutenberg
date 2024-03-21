@@ -347,10 +347,11 @@ export function ImageEdit( {
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+				// lockUrlControls:
+				// 	!! metadata?.bindings?.url &&
+				// 	( ! blockBindingsSource ||
+				// 		blockBindingsSource?.lockAttributesEditing ),
+				lockUrlControls: false,
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */

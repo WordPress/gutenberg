@@ -157,44 +157,46 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	const disableBoundBlocks = useSelect(
-		( select ) => {
-			// Disable Rich Text editing if block bindings specify that.
-			let _disableBoundBlocks = false;
-			if ( blockBindings && canBindBlock( blockName ) ) {
-				const blockTypeAttributes =
-					getBlockType( blockName ).attributes;
-				const { getBlockBindingsSource } = unlock(
-					select( blocksStore )
-				);
-				for ( const [ attribute, args ] of Object.entries(
-					blockBindings
-				) ) {
-					if (
-						blockTypeAttributes?.[ attribute ]?.source !==
-						'rich-text'
-					) {
-						break;
-					}
+	// const disableBoundBlocks = useSelect(
+	// 	( select ) => {
+	// 		// Disable Rich Text editing if block bindings specify that.
+	// 		let _disableBoundBlocks = false;
+	// 		if ( blockBindings && canBindBlock( blockName ) ) {
+	// 			const blockTypeAttributes =
+	// 				getBlockType( blockName ).attributes;
+	// 			const { getBlockBindingsSource } = unlock(
+	// 				select( blocksStore )
+	// 			);
+	// 			for ( const [ attribute, args ] of Object.entries(
+	// 				blockBindings
+	// 			) ) {
+	// 				if (
+	// 					blockTypeAttributes?.[ attribute ]?.source !==
+	// 					'rich-text'
+	// 				) {
+	// 					break;
+	// 				}
 
-					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-					const blockBindingsSource = getBlockBindingsSource(
-						args.source
-					);
-					if (
-						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing
-					) {
-						_disableBoundBlocks = true;
-						break;
-					}
-				}
-			}
+	// 				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+	// 				const blockBindingsSource = getBlockBindingsSource(
+	// 					args.source
+	// 				);
+	// 				if (
+	// 					! blockBindingsSource ||
+	// 					blockBindingsSource.lockAttributesEditing
+	// 				) {
+	// 					_disableBoundBlocks = true;
+	// 					break;
+	// 				}
+	// 			}
+	// 		}
 
-			return _disableBoundBlocks;
-		},
-		[ blockBindings, blockName ]
-	);
+	// 		return _disableBoundBlocks;
+	// 	},
+	// 	[ blockBindings, blockName ]
+	// );
+
+	const disableBoundBlocks = false;
 
 	const shouldDisableEditing = disableEditing || disableBoundBlocks;
 

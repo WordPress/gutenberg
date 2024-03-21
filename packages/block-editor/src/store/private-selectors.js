@@ -353,3 +353,57 @@ export function getLastFocus( state ) {
 export function isDragging( state ) {
 	return state.isDragging;
 }
+
+/**
+ * Return the property key of the binding
+ * for the block client ID and attribute.
+ *
+ * @param {Object} state     - Data state.
+ * @param {string} clientId  - Block client ID.
+ * @param {string} attribute - Block attribute name.
+ * @return {Object} The binding for the block client ID.
+ */
+export function getBoundAttributePropertyKey( state, clientId, attribute ) {
+	return state.blocks.bindings.get( clientId )?.[ attribute ];
+}
+
+export function getBlocksClientIdsByExternalProperty( state, propertyKey ) {
+	return state.blocks.bindingsByExternalPropery.get( propertyKey );
+}
+
+export function getAttributesByExternalProperty( state, propertyKey, value ) {
+	const clientIds = state.blocks.bindingsByExternalPropery.get( propertyKey );
+	if ( ! clientIds ) {
+		return [];
+	}
+
+	const result = [];
+
+	clientIds.forEach( ( clientId ) => {
+		const binding = state.blocks.bindings.get( clientId );
+		if ( binding ) {
+			const attributes = {};
+			Object.keys( binding ).forEach( ( attrName ) => {
+				if ( binding[ attrName ] === propertyKey ) {
+					attributes[ attrName ] = value;
+				}
+			} );
+
+			const group = result.find(
+				( g ) =>
+					JSON.stringify( g.attributes ) ===
+					JSON.stringify( attributes )
+			);
+			if ( group ) {
+				group.clientIds.push( clientId );
+			} else {
+				result.push( {
+					clientIds: [ clientId ],
+					attributes,
+				} );
+			}
+		}
+	} );
+
+	return result;
+}

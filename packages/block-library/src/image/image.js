@@ -459,22 +459,26 @@ export default function Image( {
 				titleBinding?.source
 			);
 			return {
-				lockUrlControls:
-					!! urlBinding &&
-					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing ),
-				lockHrefControls:
-					// Disable editing the link of the URL if the image is inside a pattern instance.
-					// This is a temporary solution until we support overriding the link on the frontend.
-					hasParentPattern,
-				lockCaption:
-					// Disable editing the caption if the image is inside a pattern instance.
-					// This is a temporary solution until we support overriding the caption on the frontend.
-					hasParentPattern,
-				lockAltControls:
-					!! altBinding &&
-					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing ),
+				// lockUrlControls:
+				// 	!! urlBinding &&
+				// 	( ! urlBindingSource ||
+				// 		urlBindingSource?.lockAttributesEditing ),
+				lockUrlControls: false,
+				// lockHrefControls:
+				// 	// Disable editing the link of the URL if the image is inside a pattern instance.
+				// 	// This is a temporary solution until we support overriding the link on the frontend.
+				// 	hasParentPattern,
+				lockHrefControls: false,
+				// lockCaption:
+				// 	// Disable editing the caption if the image is inside a pattern instance.
+				// 	// This is a temporary solution until we support overriding the caption on the frontend.
+				// 	hasParentPattern,
+				lockCaption: false,
+				// lockAltControls:
+				// 	!! altBinding &&
+				// 	( ! altBindingSource ||
+				// 		altBindingSource?.lockAttributesEditing ),
+				lockAltControls: false,
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -482,10 +486,11 @@ export default function Image( {
 							altBindingSource.label
 					  )
 					: __( 'Connected to dynamic data' ),
-				lockTitleControls:
-					!! titleBinding &&
-					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing ),
+				// lockTitleControls:
+				// 	!! titleBinding &&
+				// 	( ! titleBindingSource ||
+				// 		titleBindingSource?.lockAttributesEditing ),
+				lockTitleControls: false,
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */

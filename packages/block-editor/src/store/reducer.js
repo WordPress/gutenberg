@@ -1200,6 +1200,49 @@ export const blocks = pipe(
 		}
 		return state;
 	},
+
+	bindings( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'REGISTER_BLOCK_BINDING': {
+				const { clientId, attribute, bindingPropertyKey } = action;
+				const newState = new Map( state );
+
+				newState.set( clientId, {
+					...newState.get( clientId ),
+					[ attribute ]: bindingPropertyKey,
+				} );
+
+				// console.log( '[core/block-edtor] bindings: ', newState );
+
+				return newState;
+			}
+		}
+
+		return state;
+	},
+
+	bindingsByExternalPropery( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'REGISTER_BLOCK_BINDING': {
+				const { clientId, bindingPropertyKey } = action;
+				const newState = new Map( state );
+
+				newState.set( bindingPropertyKey, [
+					...( newState.get( bindingPropertyKey ) || [] ),
+					clientId,
+				] );
+
+				// console.log(
+				// 	'[core/block-edtor] bindingsByExternalPropery: ',
+				// 	newState
+				// );
+
+				return newState;
+			}
+		}
+
+		return state;
+	},
 } );
 
 /**

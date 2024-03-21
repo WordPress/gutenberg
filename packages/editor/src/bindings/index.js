@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { store as bindingsStore } from '@wordpress/bindings';
-
 import { dispatch } from '@wordpress/data';
+
 /**
  * Internal dependencies
  */

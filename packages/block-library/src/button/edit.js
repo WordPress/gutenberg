@@ -233,25 +233,27 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const { lockUrlControls = false } = useSelect(
-		( select ) => {
-			if ( ! isSelected ) {
-				return {};
-			}
+	// const { lockUrlControls = false } = useSelect(
+	// 	( select ) => {
+	// 		if ( ! isSelected ) {
+	// 			return {};
+	// 		}
 
-			const blockBindingsSource = unlock(
-				select( blocksStore )
-			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+	// 		const blockBindingsSource = unlock(
+	// 			select( blocksStore )
+	// 		).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
-			return {
-				lockUrlControls:
-					!! metadata?.bindings?.url &&
-					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
-			};
-		},
-		[ isSelected ]
-	);
+	// 		return {
+	// 			lockUrlControls:
+	// 				!! metadata?.bindings?.url &&
+	// 				( ! blockBindingsSource ||
+	// 					blockBindingsSource?.lockAttributesEditing ),
+	// 		};
+	// 	},
+	// 	[ isSelected ]
+	// );
+
+	const lockUrlControls = false;
 
 	return (
 		<>
