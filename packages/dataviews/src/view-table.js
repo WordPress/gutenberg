@@ -249,6 +249,11 @@ function TableRow( {
 		setIsHovered( false );
 	};
 
+	// Will be set to true if `onTouchStart` fires. This happens before
+	// `onClick` and can be used to exclude touchscreen devices from certain
+	// behaviours.
+	const isTouchDevice = useRef( false );
+
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
@@ -258,8 +263,14 @@ function TableRow( {
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
+			onTouchStart={ () => {
+				isTouchDevice.current = true;
+			} }
 			onClick={ () => {
-				if ( document.getSelection().type !== 'Range' ) {
+				if (
+					! isTouchDevice.current &&
+					document.getSelection().type !== 'Range'
+				) {
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
