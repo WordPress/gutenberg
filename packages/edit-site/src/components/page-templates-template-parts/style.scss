@@ -92,6 +92,10 @@
 	}
 }
 
+.dataviews-view-grid-field__template-description {
+	flex-direction: column;
+}
+
 .page-templates-author-field__icon {
 	display: flex;
 	flex-shrink: 0;
@@ -101,6 +105,11 @@
 	svg {
 		fill: currentColor;
 	}
+}
+
+.page-templates-author-field__name {
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .edit-site-list__rename-modal {

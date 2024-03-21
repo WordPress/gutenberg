@@ -10,8 +10,9 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Tooltip,
 	Spinner,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
@@ -107,17 +108,32 @@ function GridItem( {
 						return null;
 					}
 					return (
-						<VStack
-							className="dataviews-view-grid__field"
+						<Flex
+							className={ classnames(
+								'dataviews-view-grid__field',
+								field.gridDisplayDirection &&
+									'is-' + field.gridDisplayDirection
+							) }
 							key={ field.id }
-							spacing={ 1 }
+							gap={ 1 }
+							justify="flex-start"
+							expanded
+							direction={
+								field.gridDisplayDirection
+									? field.gridDisplayDirection
+									: 'row'
+							}
 						>
-							<Tooltip text={ field.header } placement="left">
-								<div className="dataviews-view-grid__field-value">
-									{ renderedValue }
-								</div>
-							</Tooltip>
-						</VStack>
+							<FlexItem className="dataviews-view-grid__field-name">
+								{ field.header }
+							</FlexItem>
+							<FlexItem
+								className="dataviews-view-grid__field-value"
+								style={ { maxHeight: 'none' } }
+							>
+								{ renderedValue }
+							</FlexItem>
+						</Flex>
 					);
 				} ) }
 			</VStack>

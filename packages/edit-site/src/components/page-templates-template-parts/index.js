@@ -148,7 +148,7 @@ function AuthorField( { item, viewType } ) {
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span>{ text }</span>
+			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
 }
@@ -303,6 +303,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
+				gridDisplayDirection: 'column',
 				render: ( { item } ) => {
 					return item.description ? (
 						<span className="page-templates-description">
