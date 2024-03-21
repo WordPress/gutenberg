@@ -4,19 +4,18 @@
 	}
 
 	&__title {
-		font-weight: 500;
-		line-height: $icon-size;
-		flex-grow: 1;
+		width: 100%;
+
 		&.edit-site-sidebar-card__title {
-			font-size: $default-font-size;
-			line-height: $default-line-height;
+			font-size: 16px;
+			line-height: $icon-size;
 			margin: 0;
-			padding: 3px 0; // This makes the title as high as the icon.
 		}
 	}
 
 	&__description {
 		font-size: $default-font-size;
+		color: $gray-700;
 	}
 
 	&__icon {
@@ -28,6 +27,10 @@
 	&__header {
 		display: flex;
 		justify-content: space-between;
-		margin: 0 0 $grid-unit-05;
+		margin: 0 0 $grid-unit-15;
+	}
+
+	.edit-site-template-card__actions {
+		flex-shrink: 0;
 	}
 }

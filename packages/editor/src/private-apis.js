@@ -4,7 +4,6 @@
 import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
-import EnablePluginDocumentSettingPanelOption from './components/preferences-modal/enable-plugin-document-setting-panel';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
 import DocumentTools from './components/document-tools';
@@ -22,7 +21,6 @@ lock( privateApis, {
 	DocumentTools,
 	EditorCanvas,
 	ExperimentalEditorProvider,
-	EnablePluginDocumentSettingPanelOption,
 	EntitiesSavedStatesExtensible,
 	InserterSidebar,
 	ListViewSidebar,

@@ -15,6 +15,7 @@ import {
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import {
+	PluginDocumentSettingPanel,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -161,7 +162,7 @@ export function reinitializeEditor() {
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
-export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
+export { PluginDocumentSettingPanel };
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';

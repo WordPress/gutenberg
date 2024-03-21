@@ -271,14 +271,32 @@ test.describe( 'List View', () => {
 		// Navigate the right column to image block options button via Home key.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Home' );
+
+		const imageItem = listView.getByRole( 'gridcell', {
+			name: 'Image',
+		} );
+
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Image' } )
+			imageItem
+				.locator( '..' ) // parent selector.
+				.getByRole( 'button', {
+					name: 'Actions',
+				} )
 		).toBeFocused();
 
 		// Navigate the right column to group block options button.
 		await page.keyboard.press( 'End' );
+
+		const groupItem = listView.getByRole( 'gridcell', {
+			name: 'Group',
+		} );
+
 		await expect(
-			listView.getByRole( 'button', { name: 'Options for Group' } )
+			groupItem
+				.locator( '..' ) // parent selector.
+				.getByRole( 'button', {
+					name: 'Actions',
+				} )
 		).toBeFocused();
 	} );
 
@@ -918,11 +936,12 @@ test.describe( 'List View', () => {
 		const listView = await listViewUtils.openListView();
 
 		await listView
-			.getByRole( 'button', { name: 'Options for Heading' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.first()
 			.click();
 
 		await page
-			.getByRole( 'menu', { name: 'Options for Heading' } )
+			.getByRole( 'menu', { name: 'Actions' } )
 			.getByRole( 'menuitem', { name: 'Duplicate' } )
 			.click();
 		await expect
@@ -938,11 +957,11 @@ test.describe( 'List View', () => {
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
 		await listView
-			.getByRole( 'button', { name: 'Options for Heading' } )
+			.getByRole( 'button', { name: 'Actions' } )
 			.first()
 			.click();
 		await page
-			.getByRole( 'menu', { name: 'Options for Heading' } )
+			.getByRole( 'menu', { name: 'Actions' } )
 			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
@@ -960,9 +979,9 @@ test.describe( 'List View', () => {
 			.filter( {
 				has: page.getByRole( 'gridcell', { name: 'File' } ),
 			} )
-			.getByRole( 'button', { name: 'Options for File' } );
+			.getByRole( 'button', { name: 'Actions' } );
 		const optionsForFileMenu = page.getByRole( 'menu', {
-			name: 'Options for File',
+			name: 'Actions',
 		} );
 		await expect(
 			optionsForFileToggle,

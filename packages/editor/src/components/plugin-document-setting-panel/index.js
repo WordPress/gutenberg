@@ -5,18 +5,14 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { usePluginContext } from '@wordpress/plugins';
 import { useDispatch, useSelect } from '@wordpress/data';
 import warning from '@wordpress/warning';
-import {
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import EnablePluginDocumentSettingPanelOption from '../preferences-modal/enable-plugin-document-setting-panel';
+import { store as editorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
-const { EnablePluginDocumentSettingPanelOption } = unlock( editorPrivateApis );
 
 /**
  * Renders items below the Status & Availability panel in the Document Sidebar.
@@ -34,7 +30,7 @@ const { EnablePluginDocumentSettingPanelOption } = unlock( editorPrivateApis );
  * var el = React.createElement;
  * var __ = wp.i18n.__;
  * var registerPlugin = wp.plugins.registerPlugin;
- * var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
+ * var PluginDocumentSettingPanel = wp.editor.PluginDocumentSettingPanel;
  *
  * function MyDocumentSettingPlugin() {
  * 	return el(
@@ -57,7 +53,7 @@ const { EnablePluginDocumentSettingPanelOption } = unlock( editorPrivateApis );
  * ```jsx
  * // Using ESNext syntax
  * import { registerPlugin } from '@wordpress/plugins';
- * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+ * import { PluginDocumentSettingPanel } from '@wordpress/editor';
  *
  * const MyDocumentSettingTest = () => (
  * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel" name="my-panel">
