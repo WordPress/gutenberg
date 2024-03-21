@@ -10,8 +10,8 @@ import { Component, cloneElement, registerComponent } from '@wordpress/element';
 import './globals';
 import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
-import useNetworkConnectivity from './use-network-connectivity';
-import withNetworkConnectivity from './with-network-connectivity';
+import useNetworkConnectivity from './hooks/use-network-connectivity';
+import withNetworkConnectivity from './hooks/with-network-connectivity';
 import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
 
 /**
