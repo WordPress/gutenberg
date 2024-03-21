@@ -76,7 +76,7 @@ add_action( 'dynamic_sidebar_before', 'note_sidebar_being_rendered' );
  * Clear whatever we set in note_sidebar_being_rendered() after WordPress
  * finishes rendering a sidebar.
  *
- * @global array $_sidebar_being_rendered
+ * @global int|string $_sidebar_being_rendered
  */
 function discard_sidebar_being_rendered() {
 	global $_sidebar_being_rendered;
