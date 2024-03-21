@@ -12,8 +12,9 @@ import {
 import Variation from './variation';
 import StylesPreviewColors from '../preview-colors';
 import { useColorVariations } from '../hooks';
+import Subtitle from '../subtitle';
 
-export default function ColorVariations() {
+export default function ColorVariations( { title, gap = 2 } ) {
 	const colorVariations = useColorVariations();
 
 	if ( ! colorVariations?.length ) {
@@ -22,7 +23,8 @@ export default function ColorVariations() {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Grid columns={ 3 }>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
+			<Grid columns={ 3 } gap={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
 					<Variation key={ index } variation={ variation }>
 						{ () => <StylesPreviewColors /> }
