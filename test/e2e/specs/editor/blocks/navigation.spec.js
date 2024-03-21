@@ -346,8 +346,8 @@ test.describe( 'Navigation block', () => {
 		 */
 
 		await pageUtils.pressKeys( 'ArrowDown' );
-
-		navigation.addLinkOpenClose();
+		await navigation.useBlockInserter();
+		await navigation.addLinkClose();
 
 		/**
 		 * Note: This is not desired behavior. Ideally the
@@ -376,7 +376,14 @@ test.describe( 'Navigation block', () => {
 		await page.keyboard.press( 'Enter' );
 
 		await navigation.addPage( 'Cat' );
-		await navigation.previewOpenClose( 'Cat' );
+		await navigation.previewOpenClose( {
+			label: 'Cat',
+			activator: 'shortcut',
+		} );
+		await navigation.previewOpenClose( {
+			label: 'Cat',
+			activator: 'toolbar',
+		} );
 
 		// Testing for selection is tricky, so let's approximate. If we command+k, then we should be back in editing mode for this item.
 
@@ -392,6 +399,7 @@ test.describe( 'Navigation block', () => {
 		 */
 
 		// Move focus to the Add Block Appender.
+		await page.keyboard.press( 'Escape' );
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
@@ -416,21 +424,6 @@ test.describe( 'Navigation block', () => {
 
 		await expect( navLinkBlobfish ).toBeVisible();
 
-		await pageUtils.pressKeys( 'primary+k' );
-
-		// Expect the Link Control to be focused
-		const linkControlBlobfishLink = page.getByRole( 'link', {
-			name: 'Example Domain (opens in a new tab)',
-			exact: true,
-		} );
-
-		await expect( linkControlBlobfishLink ).toBeVisible();
-
-		await page.keyboard.press( 'Escape' );
-
-		// Expect Link Control to be gone
-		await expect( linkControlBlobfishLink ).toBeHidden();
-
 		/**
 		 * Test: Exiting the link control from the toolbar link button returns
 		 *       focus to the toolbar
@@ -441,24 +434,18 @@ test.describe( 'Navigation block', () => {
 		 * 4. Escape to exit
 		 * 5. Focus should be on the toolbar link button
 		 */
-		await pageUtils.pressKeys( 'alt+F10' );
-
-		await pageUtils.pressKeys( 'ArrowRight', { times: 4 } );
-
-		const toolbarLinkButton = page.getByRole( 'button', {
-			name: 'Link',
-			exact: true,
+		// Move caret to beginning of nav item label
+		await page.keyboard.press( 'Home' );
+		await navigation.previewOpenClose( {
+			label: 'Blobfish',
+			linkName: 'Example Domain',
+			activator: 'shortcut',
 		} );
-
-		await expect( toolbarLinkButton ).toBeFocused();
-
-		await page.keyboard.press( 'Enter' );
-
-		await expect( linkControlBlobfishLink ).toBeFocused();
-
-		await page.keyboard.press( 'Escape' );
-
-		await expect( toolbarLinkButton ).toBeFocused();
+		await navigation.previewOpenClose( {
+			label: 'Blobfish',
+			linkName: 'Example Domain',
+			activator: 'toolbar',
+		} );
 
 		/**
 		 * Test: Can add submenu item using the keyboard
@@ -469,13 +456,7 @@ test.describe( 'Navigation block', () => {
 		 * 4. Escape to exit
 		 * 5. Focus should be on the toolbar link button
 		 */
-		await pageUtils.pressKeys( 'ArrowRight' );
-
-		await expect(
-			page.getByRole( 'button', { name: 'Add submenu', exact: true } )
-		).toBeFocused();
-
-		await page.keyboard.press( 'Enter' );
+		navigation.useToolbarButton( 'Add submenu' );
 
 		// Expect the submenu Add link to be present
 		await expect(
@@ -485,10 +466,19 @@ test.describe( 'Navigation block', () => {
 		await pageUtils.pressKeys( 'ArrowDown' );
 		// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
 		// Use Enter after that bug is resolved
-		await pageUtils.pressKeys( 'primary+k' );
+		await navigation.useLinkShortcut();
 
 		await navigation.addPage( 'Dog' );
-		await navigation.previewOpenClose( 'Dog' );
+		await navigation.previewOpenClose( {
+			label: 'Dog',
+			activator: 'shortcut',
+		} );
+		await navigation.previewOpenClose( {
+			label: 'Dog',
+			activator: 'toolbar',
+		} );
+
+		await page.keyboard.press( 'Escape' );
 
 		// We should be at the first position on the label
 		await page.keyboard.type( 'Big ', { delay: 50 } );
@@ -572,40 +562,46 @@ class Navigation {
 		this.editor = editor;
 	}
 
-	async addPage( name ) {
+	/**
+	 * Adds a page via the link control and closes it.
+	 * Usage:
+	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
+	 * @param {string} label Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
+	 */
+	async addPage( label ) {
 		const linkControlSearch = this.page.getByRole( 'combobox', {
 			name: 'Link',
 		} );
 
 		await expect( linkControlSearch ).toBeFocused();
 
-		await this.page.keyboard.type( name, { delay: 50 } );
+		await this.page.keyboard.type( label, { delay: 50 } );
 
 		await this.pageUtils.pressKeys( 'ArrowDown' );
 
 		await this.page.keyboard.press( 'Enter' );
 
-		const linkControlLink = await this.getLinkControlLink( name );
+		const linkControlLink = await this.getLinkControlLink( label );
 		await expect( linkControlLink ).toBeFocused();
 
 		await this.page.keyboard.press( 'Escape' );
 
 		await expect( linkControlSearch ).toBeHidden();
 
-		const navLink = this.getNavLink( name );
+		const navLink = this.getNavLink( label );
 
 		await expect( navLink ).toBeVisible();
 	}
 
-	getLinkControlLink( name ) {
+	getLinkControlLink( linkName ) {
 		return this.page.getByRole( 'link', {
-			name: `${ name } (opens in a new tab)`,
+			name: `${ linkName } (opens in a new tab)`,
 			exact: true,
 		} );
 	}
 
-	getNavLink( name ) {
-		return this.editor.canvas.locator( 'a' ).filter( { hasText: name } );
+	getNavLink( label ) {
+		return this.editor.canvas.locator( 'a' ).filter( { hasText: label } );
 	}
 
 	getNavBlock() {
@@ -624,13 +620,7 @@ class Navigation {
 		} );
 	}
 
-	/**
-	 * Usage: Move focus to the nav block inserter. This will open and close it, and check the states.
-	 * Your code will need to:
-	 * 1. Place focus on the nav block appender
-	 * 2. Check that focus is back where you want it.
-	 */
-	async addLinkOpenClose() {
+	async useBlockInserter() {
 		const navBlockInserter = this.getNavBlockInserter();
 
 		// Wait until the nav block inserter is visible before we move on to using it
@@ -639,7 +629,39 @@ class Navigation {
 		await expect( navBlockInserter ).toBeFocused();
 
 		await this.page.keyboard.press( 'Enter' );
+	}
 
+	async useLinkShortcut() {
+		await this.pageUtils.pressKeys( 'primary+k' );
+	}
+
+	getToolbarLinkButton() {
+		return this.page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+	}
+
+	async useToolbarButton( name ) {
+		await this.pageUtils.pressKeys( 'alt+F10' );
+		await this.arrowToLabel( name );
+		await expect(
+			this.page.getByRole( 'button', {
+				name,
+				exact: true,
+			} )
+		).toBeFocused();
+
+		await this.page.keyboard.press( 'Enter' );
+	}
+
+	/**
+	 * Usage: Move focus to the nav block inserter. This will open and close it, and check the states.
+	 * Your code will need to:
+	 * 1. Place focus on the nav block appender
+	 * 2. Check that focus is back where you want it.
+	 */
+	async addLinkClose() {
 		const linkControlSearch = this.getLinkControlSearch();
 
 		await expect( linkControlSearch ).toBeFocused();
@@ -647,6 +669,31 @@ class Navigation {
 		await this.page.keyboard.press( 'Escape' );
 
 		await expect( linkControlSearch ).toBeHidden();
+	}
+
+	/**
+	 * Checks that focus has returned to a label by:
+	 * - typing 'Test '
+	 * - checking for the text content added
+	 * - Deletes the 'Test ' text
+	 * @param {string} label Nav label text
+	 */
+	async checkLabelFocus( label ) {
+		const testString = 'Test ';
+		// Focus should be on the nav link rich text element. Test this by typing and checking.
+		await this.page.keyboard.type( testString, { delay: 50 } );
+
+		const navLinkTest = this.getNavLink( `${ testString }${ label }` );
+
+		await expect( navLinkTest ).toBeVisible();
+
+		// Delete what we just added
+		for ( let i = 0; i < testString.length; i++ ) {
+			await this.page.keyboard.press( 'Backspace', { delay: 50 } );
+		}
+
+		await expect( navLinkTest ).toBeHidden();
+		await expect( this.getNavLink( label ) ).toBeVisible();
 	}
 
 	/**
@@ -658,14 +705,24 @@ class Navigation {
 	 * 3. Escape to exit
 	 * 4. Focus should be at the same position it started at
 	 *
-	 * @param {string} name of the link to check
+	 * @param {Object} options
 	 */
-	async previewOpenClose( name ) {
-		const linkControlLink = this.getLinkControlLink( name );
-		const navLink = this.getNavLink( name );
-		await expect( navLink ).toBeVisible();
+	async previewOpenClose( options = {} ) {
+		const { label, linkName = '', activator } = options;
+		if ( activator === 'shortcut' ) {
+			await this.useLinkShortcut();
+		} else if ( activator === 'toolbar' ) {
+			await this.useToolbarButton( 'Link' );
+		} else {
+			// This will fail
+			return;
+		}
 
-		await this.pageUtils.pressKeys( 'primary+k' );
+		const linkControlLink = this.getLinkControlLink(
+			linkName !== '' ? linkName : label
+		);
+		const navLink = this.getNavLink( label );
+		await expect( navLink ).toBeVisible();
 
 		await expect( linkControlLink ).toBeFocused();
 
@@ -673,20 +730,25 @@ class Navigation {
 
 		await expect( linkControlLink ).toBeHidden();
 
-		const testString = 'Test ';
-		// Focus should be on the nav link rich text element. Test this by typing and checking.
-		await this.page.keyboard.type( testString, { delay: 50 } );
-
-		const navLinkTest = this.getNavLink( `${ testString }${ name }` );
-
-		await expect( navLinkTest ).toBeVisible();
-
-		// Delete what we just added
-		for ( let i = 0; i < testString.length; i++ ) {
-			await this.page.keyboard.press( 'Backspace', { delay: 50 } );
+		if ( activator === 'shortcut' ) {
+			await this.checkLabelFocus( label );
+		} else if ( activator === 'toolbar' ) {
+			await expect( this.getToolbarLinkButton() ).toBeFocused();
 		}
+	}
 
-		await expect( navLinkTest ).toBeHidden();
-		await expect( navLink ).toBeVisible();
+	async arrowToLabel( label, times = 15 ) {
+		for ( let i = 0; i < times; i++ ) {
+			await this.pageUtils.pressKeys( 'ArrowRight' );
+			const activeLabel = await this.page.evaluate( () => {
+				return (
+					document.activeElement.getAttribute( 'aria-label' ) ||
+					document.activeElement.textContent
+				);
+			} );
+			if ( activeLabel === label ) {
+				return;
+			}
+		}
 	}
 }
