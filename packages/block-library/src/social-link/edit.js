@@ -172,16 +172,16 @@ const SocialLinkEdit = ( {
 					>
 						{ socialLinkLabel }
 					</span>
-					{ isSelected && showURLPopover && (
-						<SocialLinkURLPopover
-							url={ url }
-							setAttributes={ setAttributes }
-							setPopover={ setPopover }
-							popoverAnchor={ popoverAnchor }
-							clientId={ clientId }
-						/>
-					) }
 				</Button>
+				{ isSelected && showURLPopover && (
+					<SocialLinkURLPopover
+						url={ url }
+						setAttributes={ setAttributes }
+						setPopover={ setPopover }
+						popoverAnchor={ popoverAnchor }
+						clientId={ clientId }
+					/>
+				) }
 			</li>
 		</>
 	);
