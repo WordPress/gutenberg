@@ -2,34 +2,27 @@
  * WordPress dependencies
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
-import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import groups from './groups';
 
+/**
+ * We only care about the "other" slot here.
+ * This check is specifically for allowing the Replace
+ * <MediaReplaceFlow /> on featured images and images
+ * within content locked areas.
+ * https://github.com/WordPress/gutenberg/pull/53410
+ *
+ * TODO: Remove this hook, as having a toolbar with only a Replace button is a
+ * misuse of the toolbar.
+ */
 export function useHasAnyBlockControls() {
-	let hasAnyBlockControls = false;
-	for ( const group in groups ) {
-		// It is safe to violate the rules of hooks here as the `groups` object
-		// is static and will not change length between renders. Do not return
-		// early as that will cause the hook to be called a different number of
-		// times between renders.
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		if ( useHasBlockControls( group ) ) {
-			hasAnyBlockControls = true;
-		}
-	}
-	return hasAnyBlockControls;
-}
-
-export function useHasBlockControls( group = 'default' ) {
-	const Slot = groups[ group ]?.Slot;
+	const Slot = groups.other?.Slot;
 	const fills = useSlotFills( Slot?.__unstableName );
 	if ( ! Slot ) {
-		warning( `Unknown BlockControls group "${ group }" provided.` );
-		return null;
+		return false;
 	}
 	return !! fills?.length;
 }
