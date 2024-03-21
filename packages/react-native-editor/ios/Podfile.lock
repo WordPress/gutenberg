@@ -1111,7 +1111,7 @@ PODS:
     - React-Core
   - RNTAztecView (1.115.0):
     - React-Core
-    - WordPress-Aztec-iOS (= 1.19.9)
+    - WordPress-Aztec-iOS (= 1.19.11)
   - SDWebImage (5.11.1):
     - SDWebImage/Core (= 5.11.1)
   - SDWebImage/Core (5.11.1)
@@ -1119,7 +1119,7 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
   - SocketRocket (0.6.1)
-  - WordPress-Aztec-iOS (1.19.9)
+  - WordPress-Aztec-iOS (1.19.11)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -1190,7 +1190,6 @@ DEPENDENCIES:
   - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec`)
-  - WordPress-Aztec-iOS (from `https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git`, commit `a41d881f6a831fecef9e6400e69a64aafe80d9ac`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -1201,6 +1200,7 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
+    - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
   boost:
@@ -1332,16 +1332,8 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec"
-  WordPress-Aztec-iOS:
-    :commit: a41d881f6a831fecef9e6400e69a64aafe80d9ac
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
   Yoga:
     :path: "../../../node_modules/react-native/ReactCommon/yoga"
-
-CHECKOUT OPTIONS:
-  WordPress-Aztec-iOS:
-    :commit: a41d881f6a831fecef9e6400e69a64aafe80d9ac
-    :git: https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git
 
 SPEC CHECKSUMS:
   boost: d3f49c53809116a5d38da093a8aa78bf551aed09
@@ -1410,13 +1402,13 @@ SPEC CHECKSUMS:
   RNReanimated: 6936b41d8afb97175e7c0ab40425b53103f71046
   RNScreens: 2b73f5eb2ac5d94fbd61fa4be0bfebd345716825
   RNSVG: 255767813dac22db1ec2062c8b7e7b856d4e5ae6
-  RNTAztecView: f9ac93cee7a4cd984d8453a9141058fa22cb9b1a
+  RNTAztecView: a7f3ef74bdd75250ae479b8027021576047aed0f
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  WordPress-Aztec-iOS: fbebd569c61baa252b3f5058c0a2a9a6ada686bb
+  WordPress-Aztec-iOS: 47311b8a342f2b12babb5b8a705ab20b281a83ae
   Yoga: ff0382b894475dba0b4d2a5fda860bfee5a9afad
 
-PODFILE CHECKSUM: ea6b5fb1749cb8bf26e491208aff7b540d63776e
+PODFILE CHECKSUM: 4684cf41ccdeb5f720da9f11c8904f21ad9fcc7f
 
 COCOAPODS: 1.14.3

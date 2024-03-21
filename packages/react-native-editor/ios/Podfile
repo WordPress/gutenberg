@@ -7,8 +7,6 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-pod 'WordPress-Aztec-iOS', :git => 'https://github.com/wordpress-mobile/WordPress-Aztec-iOS.git', :commit => 'a41d881f6a831fecef9e6400e69a64aafe80d9ac'
-
 # Uncomment the next line to define a global platform for your project
 app_ios_deployment_target = Gem::Version.new('13.4')
 platform :ios, app_ios_deployment_target.version
