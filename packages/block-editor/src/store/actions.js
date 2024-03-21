@@ -15,10 +15,7 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import {
-	store as bindingsStore,
-	registerExternalPropertyObserver,
-} from '@wordpress/bindings';
+import { store as bindingsStore } from '@wordpress/bindings';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
@@ -244,36 +241,6 @@ export function updateBlockAttributes(
 
 export function resetBlocksWithBoundAttributes( blocks ) {
 	return ( { dispatch, registry } ) => {
-		/*
-		 * Filter blocks with bound attributes.
-		 */
-		const blocksWithBoundAttributes = blocks.filter( ( block ) => {
-			const { name, attributes } = block;
-
-			// Check whether the block can be bound.
-			if ( ! canBindBlock( name ) ) {
-				return false;
-			}
-
-			return Object.keys( attributes ).some( ( attrName ) => {
-				// Check whether the attribute can be bound.
-				if ( ! canBindAttribute( name, attrName ) ) {
-					return false;
-				}
-
-				// Check if the attribute has bindings.
-				if ( ! attributes?.metadata?.bindings ) {
-					return false;
-				}
-
-				return true;
-			} );
-		} );
-
-		if ( ! blocksWithBoundAttributes.length ) {
-			return;
-		}
-
 		const { registerExternalPropertyHandler } = unlock(
 			registry.dispatch( bindingsStore )
 		);
@@ -283,9 +250,27 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 		);
 
 		registry.batch( () => {
-			blocksWithBoundAttributes.forEach( ( block ) => {
+			blocks.forEach( ( block ) => {
+				/*
+				 * Check inner blocks for bound attributes,
+				 * recursively.
+				 */
+				if ( block.innerBlocks ) {
+					dispatch.resetBlocksWithBoundAttributes(
+						block.innerBlocks
+					);
+				}
+
+				if ( ! canBindBlock( block.name ) ) {
+					return;
+				}
+
 				Object.entries( block.attributes.metadata.bindings ).forEach(
 					( [ attributeName, settings ] ) => {
+						if ( ! canBindAttribute( block.name, attributeName ) ) {
+							return;
+						}
+
 						dispatch.syncDerivedUpdates( () => {
 							/*
 							 * Register the external property handler,
