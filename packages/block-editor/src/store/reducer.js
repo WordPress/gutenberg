@@ -755,10 +755,6 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
-}
-
 /**
  * Higher-order reducer which adds the selected pattern category to the outer block.
  *
@@ -769,19 +765,18 @@ function cloneDeep( object ) {
 const withPatternCategory = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'INSERT_BLOCKS' ) {
 		const { blocks, meta } = action;
-		const nextState = reducer( state, action );
-		const firstBlockClientId = blocks[ 0 ].clientId;
-		const firstBlockAttributes = cloneDeep( blocks[ 0 ].attributes );
 		if ( meta?.category && blocks.length === 1 ) {
-			nextState.attributes.set( firstBlockClientId, {
-				...firstBlockAttributes,
+			const newState = { ...state };
+			newState.attributes = new Map( state.attributes );
+			newState.attributes.set( blocks[ 0 ].clientId, {
+				...blocks[ 0 ].attributes,
 				metadata: {
-					...( firstBlockAttributes.metadata || {} ),
+					...( blocks[ 0 ].attributes.metadata || {} ),
 					categories: [ meta.category.name ],
 				},
 			} );
+			return reducer( newState, action );
 		}
-		return nextState;
 	}
 
 	return reducer( state, action );
