@@ -8,7 +8,7 @@ const fixtures = [
 	[ 'https://exampleuser.wordpress.com/', 'wordpress' ],
 	[ 'https://www.instagram.com/exampleuser/', 'instagram' ],
 	[ 'https://www.tiktok.com/@exampleuser', 'tiktok' ],
-	[ 'https://twitter.com/exampleuser', 'twitter' ],
+	[ 'https://twitter.com/exampleuser', 'x' ],
 	[ 'https://x.com/exampleuser', 'x' ],
 	[ 'https://www.facebook.com/exampleuser', 'facebook' ],
 	[ 'https://www.linkedin.com/in/exampleuser', 'linkedin' ],
