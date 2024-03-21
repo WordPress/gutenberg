@@ -32,7 +32,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 			} = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
 			const _categories = attributes?.metadata?.categories || EMPTY_ARRAY;
-			const _patternName = attributes?.metadata?.name;
+			const _patternName = attributes?.metadata?.patternName;
 			const rootBlock = getBlockRootClientId( clientId );
 			const _patterns = __experimentalGetAllowedPatterns( rootBlock );
 			return {
