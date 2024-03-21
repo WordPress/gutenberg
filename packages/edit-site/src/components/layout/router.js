@@ -18,10 +18,11 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
+	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
 
@@ -30,30 +31,27 @@ export default function useLayoutAreas() {
 
 	// Regular page
 	if ( path === '/page' ) {
-		return {
-			areas: {
-				content: undefined,
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile:
-					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
-			},
-			widths: {
-				content: undefined,
-			},
-		};
-	}
-
-	const isListLayout = isCustom !== 'true' && layout === 'list';
-
-	if ( path === '/pages' ) {
+		const isListLayout = layout === 'list' || ! layout;
 		return {
 			areas: {
 				content: <PagePages />,
 				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
+					<Editor
+						isLoading={ isSiteEditorLoading }
+						onClick={ () =>
+							history.push( {
+								path,
+								postType: 'page',
+								postId,
+								canvas: 'edit',
+							} )
+						}
+					/>
 				),
+				mobile:
+					canvas === 'edit' ? (
+						<Editor isLoading={ isSiteEditorLoading } />
+					) : undefined,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -76,6 +74,7 @@ export default function useLayoutAreas() {
 
 	// Templates
 	if ( path === '/wp_template' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			areas: {
 				content: (
@@ -100,6 +99,7 @@ export default function useLayoutAreas() {
 
 	// Template parts
 	if ( path === '/wp_template_part/all' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			areas: {
 				content: (

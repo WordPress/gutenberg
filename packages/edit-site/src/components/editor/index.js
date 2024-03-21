@@ -72,7 +72,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor( { isLoading } ) {
+export default function Editor( { isLoading, onClick } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -225,7 +225,7 @@ export default function Editor( { isLoading } ) {
 										{ ! isLargeViewport && (
 											<BlockToolbar hideDragHandle />
 										) }
-										<SiteEditorCanvas />
+										<SiteEditorCanvas onClick={ onClick } />
 										<PatternModal />
 									</>
 								) }
