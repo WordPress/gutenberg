@@ -3,8 +3,8 @@
 		"name": "core/table",
 		"isValid": true,
 		"attributes": {
-			"hasFixedLayout": true,
-			"caption": "",
+			"hasFixedLayout": false,
+			"caption": "A table for testing",
 			"head": [
 				{
 					"cells": [
