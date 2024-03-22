@@ -43,10 +43,9 @@ export default function PostCardPanel( { className, actions, children } ) {
 			modified: getEditedPostAttribute( 'modified' ),
 			id: _id,
 			templateInfo: __experimentalGetTemplateInfo( _record ),
-			icon: unlock( select( editorStore ) ).getPostIcon(
-				_type,
-				_record?.area
-			),
+			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
+				area: _record?.area,
+			} ),
 		};
 	} );
 	const description = templateInfo?.description;

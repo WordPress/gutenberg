@@ -86,7 +86,7 @@ const CARD_ICONS = {
 };
 
 export const getPostIcon = createRegistrySelector(
-	( select ) => ( state, postType, area ) => {
+	( select ) => ( state, postType, options ) => {
 		{
 			if (
 				postType === 'wp_template_part' ||
@@ -94,7 +94,7 @@ export const getPostIcon = createRegistrySelector(
 			) {
 				return (
 					__experimentalGetDefaultTemplatePartAreas( state ).find(
-						( item ) => area === item.area
+						( item ) => options.area === item.area
 					)?.icon || layout
 				);
 			}
