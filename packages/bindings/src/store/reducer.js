@@ -21,12 +21,24 @@ export function sources( state = {}, action ) {
 
 export function sourceProperties( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REGISTER_BINDINGS_SOURCE_PROPERTY':
+		case 'REGISTER_BINDINGS_SOURCE_PROPERTY': {
 			const { key, type, ...rest } = action;
 			return {
 				...state,
 				[ key ]: { ...rest },
 			};
+		}
+
+		case 'UPDATE_BINDINGS_SOURCE_PROPERTY': {
+			const { type, key, ...updates } = action;
+			return {
+				...state,
+				[ key ]: {
+					...state[ key ],
+					...updates,
+				},
+			};
+		}
 	}
 
 	return state;
