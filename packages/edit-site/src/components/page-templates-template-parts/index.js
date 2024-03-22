@@ -51,7 +51,7 @@ import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
 
 const { postManagementActions } = unlock( editorPrivateApis );
-const { useEditPostAction, postRevisionsAction } = postManagementActions;
+const { usePostActions } = postManagementActions;
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -342,16 +342,31 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const editTemplateAction = useEditPostAction();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const postActions = usePostActions( { onActionPerformed } );
 	const actions = useMemo(
 		() => [
-			editTemplateAction,
+			postActions.find( ( action ) => action.id === 'edit-post' ),
 			resetTemplateAction,
 			renameTemplateAction,
-			postRevisionsAction,
+			postActions.find(
+				( action ) => action.id === 'view-post-revisions'
+			),
 			deleteTemplateAction,
 		],
-		[ editTemplateAction ]
+		[ postActions ]
 	);
 
 	const onChangeView = useCallback(
