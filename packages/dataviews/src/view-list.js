@@ -98,7 +98,7 @@ function ListItem( {
 									id={ descriptionId }
 								>
 									{ visibleFields.map( ( field ) => (
-										<p
+										<div
 											key={ field.id }
 											className="dataviews-view-list__field"
 										>
@@ -111,7 +111,7 @@ function ListItem( {
 											<span className="dataviews-view-list__field-value">
 												{ field.render( { item } ) }
 											</span>
-										</p>
+										</div>
 									) ) }
 								</div>
 							</VStack>
