@@ -274,6 +274,22 @@ export default function Image( {
 		}
 	}
 
+	function resetLightbox() {
+		// When deleting a link from an image while lightbox settings
+		// are enabled by default, we should disable the lightbox,
+		// otherwise the resulting UX looks like a mistake.
+		// See https://github.com/WordPress/gutenberg/pull/59890/files#r1532286123.
+		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -348,7 +364,10 @@ export default function Image( {
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxSetting =
-		!! lightbox || lightboxSetting?.allowEditing === true;
+		// If a block-level override is set, we should give users the option to
+		// remove that override, even if the lightbox UI is disabled in the settings.
+		( !! lightbox && lightbox?.enabled !== lightboxSetting?.enabled ) ||
+		lightboxSetting?.allowEditing;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
@@ -498,6 +517,7 @@ export default function Image( {
 							showLightboxSetting={ showLightboxSetting }
 							lightboxEnabled={ lightboxChecked }
 							onSetLightbox={ onSetLightbox }
+							resetLightbox={ resetLightbox }
 						/>
 					) }
 				{ allowCrop && (
