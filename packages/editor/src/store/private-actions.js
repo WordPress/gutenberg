@@ -114,23 +114,20 @@ export const hideBlockTypes =
 /**
  * Save entity records marked as dirty.
  *
- * @param {Object}   options                  Options for the action.
- * @param {Function} [options.onSave]         Callback when saving happens.
- * @param {object[]} [options.entitiesToSkip] Array of entities to skip saving.
- * @param {Function} [options.close]          Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {Object}   options                      Options for the action.
+ * @param {Function} [options.onSave]             Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords] Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]     Array of entities to skip saving.
+ * @param {Function} [options.close]              Callback when the actions is called. It should be consolidated with `onSave`.
  */
 export const saveDirtyEntities =
-	( { onSave, entitiesToSkip = [], close } = {} ) =>
+	( { onSave, dirtyEntityRecords = [], entitiesToSkip = [], close } = {} ) =>
 	( { registry } ) => {
 		const PUBLISH_ON_SAVE_ENTITIES = [
 			{ kind: 'postType', name: 'wp_navigation' },
 		];
 		const saveNoticeId = 'site-editor-save-success';
 		const homeUrl = registry.select( coreStore ).getUnstableBase()?.home;
-		const dirtyEntityRecords = registry
-			.select( coreStore )
-			.__experimentalGetDirtyEntityRecords();
-
 		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {

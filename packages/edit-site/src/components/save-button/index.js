@@ -7,7 +7,10 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -20,6 +23,7 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
+const { useIsDirty } = unlock( editorPrivateApis );
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -33,39 +37,14 @@ export default function SaveButton( {
 	const { params } = useLocation();
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
 	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
-	const {
-		isSaving,
-		isSaveViewOpen,
-		previewingThemeName,
-		dirtyEntitiesCount,
-		isOnlyCurrentEntityDirty,
-	} = useSelect(
+	const { dirtyEntityRecords } = useIsDirty();
+	const { isSaving, isSaveViewOpen, previewingThemeName } = useSelect(
 		( select ) => {
-			const {
-				__experimentalGetDirtyEntityRecords,
-				isSavingEntityRecord,
-				isResolving,
-			} = select( coreStore );
-			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const { isSavingEntityRecord, isResolving } = select( coreStore );
 			const { isSaveViewOpened } = select( editSiteStore );
 			const isActivatingTheme = isResolving( 'activateTheme' );
 			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
-			let _isOnlyCurrentEntityDirty;
-			// Check if the current entity is the only entity with changes.
-			// We have some extra logic for `wp_global_styles` for now, that
-			// is used in navigation sidebar.
-			if ( dirtyEntityRecords.length === 1 ) {
-				if ( params.postId ) {
-					_isOnlyCurrentEntityDirty =
-						`${ dirtyEntityRecords[ 0 ].key }` === params.postId &&
-						dirtyEntityRecords[ 0 ].name === params.postType;
-				} else if ( params.path?.includes( 'wp_global_styles' ) ) {
-					_isOnlyCurrentEntityDirty =
-						dirtyEntityRecords[ 0 ].name === 'globalStyles';
-				}
-			}
 			return {
-				dirtyEntitiesCount: dirtyEntityRecords.length,
 				isSaving:
 					dirtyEntityRecords.some( ( record ) =>
 						isSavingEntityRecord(
@@ -81,12 +60,25 @@ export default function SaveButton( {
 					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
 							?.name?.rendered
 					: undefined,
-				isOnlyCurrentEntityDirty: _isOnlyCurrentEntityDirty,
 			};
 		},
-		[ params.path, params.postId, params.postType ]
+		[ dirtyEntityRecords ]
 	);
-	const hasDirtyEntities = !! dirtyEntitiesCount;
+	const hasDirtyEntities = !! dirtyEntityRecords.length;
+	let isOnlyCurrentEntityDirty;
+	// Check if the current entity is the only entity with changes.
+	// We have some extra logic for `wp_global_styles` for now, that
+	// is used in navigation sidebar.
+	if ( dirtyEntityRecords.length === 1 ) {
+		if ( params.postId ) {
+			isOnlyCurrentEntityDirty =
+				`${ dirtyEntityRecords[ 0 ].key }` === params.postId &&
+				dirtyEntityRecords[ 0 ].name === params.postType;
+		} else if ( params.path?.includes( 'wp_global_styles' ) ) {
+			isOnlyCurrentEntityDirty =
+				dirtyEntityRecords[ 0 ].name === 'globalStyles';
+		}
+	}
 	const disabled =
 		isSaving || ( ! hasDirtyEntities && ! isPreviewingTheme() );
 	const getLabel = () => {
@@ -124,16 +116,16 @@ export default function SaveButton( {
 				_n(
 					'Review %d change…',
 					'Review %d changes…',
-					dirtyEntitiesCount
+					dirtyEntityRecords.length
 				),
-				dirtyEntitiesCount
+				dirtyEntityRecords.length
 			);
 		}
 		return __( 'Save' );
 	};
 	const label = getLabel();
 	const onClick = isOnlyCurrentEntityDirty
-		? () => saveDirtyEntities()
+		? () => saveDirtyEntities( { dirtyEntityRecords } )
 		: () => setIsSaveViewOpened( true );
 	return (
 		<Button

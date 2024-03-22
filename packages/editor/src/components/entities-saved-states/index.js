@@ -112,6 +112,7 @@ export function EntitiesSavedStatesExtensible( {
 					onClick={ () =>
 						saveDirtyEntities( {
 							onSave,
+							dirtyEntityRecords,
 							entitiesToSkip: unselectedEntities,
 							close,
 						} )
