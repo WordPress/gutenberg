@@ -430,14 +430,8 @@ test.describe( 'Navigation block', () => {
 		/**
 		 * Test: We don't lose focus when closing the submenu appender
 		 */
+
 		// Move focus to the submenu navigation appender
-
-		/**
-		 * Test: We can open and close the preview with the keyboard and escape
-		 *       buttons from a submenu parent item using both the shortcut and toolbar
-		 */
-
-		// TODO: Update _how_ we reach the block appender. This is annoying to use.
 		await page.keyboard.press( 'End' );
 		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 		await navigation.useBlockInserter();
@@ -463,7 +457,6 @@ test.describe( 'Navigation block', () => {
 
 		/**
 		 * Test: We can open and close the preview with the keyboard and escape
-		 *       buttons from a top-level nav link with a url-like label using
 		 *       both the shortcut and toolbar
 		 */
 		await pageUtils.pressKeys( 'ArrowLeft' );
@@ -474,8 +467,8 @@ test.describe( 'Navigation block', () => {
 
 		/**
 		 * Test: We can open and close the preview from a submenu navigation block (the top-level parent of a submenu)
+		 * using both the shortcut and toolbar
 		 */
-		// Navigate to our navigation submenu block
 		// Exit the toolbar
 		await page.keyboard.press( 'Escape' );
 		// Move to the submenu item
@@ -484,9 +477,11 @@ test.describe( 'Navigation block', () => {
 
 		// Check we're on our submenu link
 		await navigation.checkLabelFocus( 'example.com' );
+		// Test the shortcut
 		await navigation.useLinkShortcut();
 		await navigation.previewIsOpenAndCloses();
 		await navigation.checkLabelFocus( 'example.com' );
+		// Test the toolbar
 		await navigation.canUseToolbarLink();
 		await page.keyboard.press( 'Escape' );
 		await navigation.checkLabelFocus( 'example.com' );
@@ -606,10 +601,6 @@ class Navigation {
 		} );
 	}
 
-	getNavLink( label ) {
-		return this.editor.canvas.locator( 'a' ).filter( { hasText: label } );
-	}
-
 	getNavBlock() {
 		return this.editor.canvas.getByRole( 'document', {
 			name: 'Block: Navigation',
@@ -648,6 +639,11 @@ class Navigation {
 		await this.pageUtils.pressKeys( 'primary+k' );
 	}
 
+	/**
+	 * Moves focus to the toolbar and arrows to the button and activates it.
+	 *
+	 * @param {string} name the name of the toolbar button
+	 */
 	async useToolbarButton( name ) {
 		await this.pageUtils.pressKeys( 'alt+F10' );
 		await this.arrowToLabel( name );
@@ -665,6 +661,7 @@ class Navigation {
 	 * Adds a page via the link control and closes it.
 	 * Usage:
 	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
+	 *
 	 * @param {string} label Text of page you want added. Must be a part of the pages added in the beforeAll in this test suite.
 	 */
 	async addPage( label ) {
@@ -695,6 +692,7 @@ class Navigation {
 	 * Usage:
 	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
 	 * - Expect focus to return to the canvas with the url label highlighted
+	 *
 	 * @param {string} url URL you want added to the navigation
 	 */
 	async addCustomURL( url ) {
@@ -706,6 +704,7 @@ class Navigation {
 
 	/**
 	 * Checks if the passed string matches the current editor selection
+	 *
 	 * @param {string} text Text you want to see if it's selected
 	 */
 	async expectToHaveTextSelected( text ) {
@@ -717,10 +716,7 @@ class Navigation {
 	}
 
 	/**
-	 * Usage: Move focus to the nav block inserter. This will open and close it, and check the states.
-	 * Your code will need to:
-	 * 1. Place focus on the nav block appender
-	 * 2. Check that focus is back where you want it.
+	 * Closes the new link popover when used from the block appender
 	 */
 	async addLinkClose() {
 		const linkControlSearch = this.getLinkControlSearch();
@@ -733,8 +729,9 @@ class Navigation {
 	}
 
 	/**
-	 * Checks that a label has the correct text selected
-	 * Usage: Caret must be placed at the beginning of the nav label
+	 * Checks that we are focused on a specific navigation item.
+	 * It will return the caret to the beginning of the item.
+	 *
 	 * @param {string} label Nav label text
 	 */
 	async checkLabelFocus( label ) {
@@ -751,6 +748,7 @@ class Navigation {
 	 * - the preview is open
 	 * - has focus within it
 	 * - closes with Escape
+	 * - The popover is now hidden
 	 */
 	async previewIsOpenAndCloses() {
 		const linkPopover = this.getLinkPopover();
