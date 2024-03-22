@@ -12,6 +12,10 @@ const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
 
+// Normalization cache
+const extractedWords = {};
+const normalizedSearch = {};
+
 /**
  * Extracts words from an input string.
  *
@@ -20,11 +24,11 @@ const defaultGetCollection = () => null;
  * @return {Array} Words, extracted from the input string.
  */
 function extractWords( input = '' ) {
-	if ( typeof extractWords[ input ] !== 'undefined' ) {
-		return extractWords[ input ];
+	if ( typeof extractedWords[ input ] !== 'undefined' ) {
+		return extractedWords[ input ];
 	}
 
-	extractWords[ input ] = noCase( input, {
+	extractedWords[ input ] = noCase( input, {
 		splitRegexp: [
 			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
 			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
@@ -34,7 +38,7 @@ function extractWords( input = '' ) {
 		.split( ' ' )
 		.filter( Boolean );
 
-	return extractWords[ input ];
+	return extractedWords[ input ];
 }
 
 /**
@@ -45,8 +49,8 @@ function extractWords( input = '' ) {
  * @return {string} The normalized search input.
  */
 function normalizeSearchInput( input = '' ) {
-	if ( typeof normalizeSearchInput[ input ] !== 'undefined' ) {
-		return normalizeSearchInput[ input ];
+	if ( typeof normalizedSearch[ input ] !== 'undefined' ) {
+		return normalizedSearch[ input ];
 	}
 
 	// Disregard diacritics.
@@ -59,9 +63,9 @@ function normalizeSearchInput( input = '' ) {
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	normalizeSearchInput[ input ] = input.toLowerCase();
+	normalizedSearch[ input ] = input.toLowerCase();
 
-	return normalizeSearchInput[ input ];
+	return normalizedSearch[ input ];
 }
 
 /**
