@@ -109,8 +109,13 @@
 		max-height: 368px; // Specific to not have commands overflow oddly.
 		overflow: auto;
 
+		// Ensures there is always padding bottom on the last group, when there are commands.
+		& [cmdk-list-sizer] > [cmdk-group]:last-child [cmdk-group-items]:not(:empty) {
+			padding-bottom: $grid-unit-10;
+		}
+
 		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
-			padding: 0 $grid-unit $grid-unit;
+			padding: 0 $grid-unit-10;
 		}
 	}
 
