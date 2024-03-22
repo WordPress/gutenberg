@@ -3,12 +3,12 @@
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 420px;
+	max-width: 400px;
 	position: relative;
-	top: calc(15% + #{$header-height});
+	top: calc(5% + #{$header-height});
 
 	@include break-small() {
-		top: 15%;
+		top: calc(10% + #{$header-height});
 	}
 
 	.components-modal__content {
@@ -74,7 +74,6 @@
 		align-items: center;
 		color: $gray-900;
 		font-size: $default-font-size;
-		min-height: $button-size-next-default-40px;
 
 		&[aria-selected="true"],
 		&:active {
@@ -96,7 +95,8 @@
 		}
 
 		> div {
-			padding: $grid-unit;
+			min-height: $button-size;
+			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
 		}
 
