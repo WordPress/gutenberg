@@ -3,6 +3,8 @@
 This slot allows for adding items into the Gutenberg Toolbar.
 Using this slot will add an icon to the bar that, when clicked, will open a sidebar with the content of the items wrapped in the `<PluginSidebar />` component.
 
+Note: In the site editor, import `PluginSidebar` from `@wordpress/edit-site` instead.
+
 ## Example
 
 ```js

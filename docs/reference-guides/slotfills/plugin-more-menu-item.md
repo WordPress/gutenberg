@@ -2,6 +2,8 @@
 
 This slot will add a new item to the More Tools & Options section.
 
+Note: In the site editor, import `PluginMoreMenuItem` from `@wordpress/edit-site` instead.
+
 ## Example
 
 ```js
