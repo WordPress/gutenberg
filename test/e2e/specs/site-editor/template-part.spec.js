@@ -194,7 +194,7 @@ test.describe( 'Template Part', () => {
 				content: paragraphText,
 			},
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 
 		// Visit the index.
 		await admin.visitSiteEditor();
@@ -237,7 +237,7 @@ test.describe( 'Template Part', () => {
 			},
 		} );
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 
 		// Visit the index.
 		await admin.visitSiteEditor();

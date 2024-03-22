@@ -263,7 +263,7 @@ test.describe( 'Pages', () => {
 		await page
 			.locator( '.block-editor-block-patterns-list__list-item' )
 			.click();
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.
@@ -285,7 +285,7 @@ test.describe( 'Pages', () => {
 		await expect( templateItem ).toHaveCount( 1 );
 		await templateItem.click();
 		await expect( templateOptionsButton ).toHaveText( 'demo' );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 
 		// Now reset, and apply the default template back.
 		await templateOptionsButton.click();

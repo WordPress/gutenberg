@@ -7,8 +7,12 @@ import type { Editor } from './index';
  * Save entities in the site editor. Assumes the editor is in a dirty state.
  *
  * @param this
+ * @param isOnlyCurrentEntityDirty If the only dirty entity is the current one, skip trying to open the save panel.
  */
-export async function saveSiteEditorEntities( this: Editor ) {
+export async function saveSiteEditorEntities(
+	this: Editor,
+	isOnlyCurrentEntityDirty: boolean
+) {
 	const editorTopBar = this.page.getByRole( 'region', {
 		name: 'Editor top bar',
 	} );
@@ -19,11 +23,12 @@ export async function saveSiteEditorEntities( this: Editor ) {
 		.getByRole( 'button', { name: 'Save', exact: true } )
 		.click();
 
-	// Second Save button in the entities panel.
-	await savePanel
-		.getByRole( 'button', { name: 'Save', exact: true } )
-		.click();
-
+	if ( ! isOnlyCurrentEntityDirty ) {
+		// Second Save button in the entities panel.
+		await savePanel
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+	}
 	await this.page
 		.getByRole( 'button', { name: 'Dismiss this notice' } )
 		.getByText( 'Site updated.' )

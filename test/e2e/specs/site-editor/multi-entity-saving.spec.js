@@ -45,7 +45,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
@@ -79,7 +79,7 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		// Change font size.
 		await fontSizePicker.getByRole( 'radio', { name: 'Small' } ).click();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( true );
 
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();
