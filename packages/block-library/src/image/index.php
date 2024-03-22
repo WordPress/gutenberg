@@ -204,7 +204,7 @@ function block_core_image_render_lightbox( $block_content, $block ) {
 	$button =
 		$img[0]
 		. '<button
-			class="lightbox-trigger"
+			class="wp-lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
 			aria-label="' . esc_attr( $aria_label ) . '"
