@@ -6,6 +6,15 @@
 // Add the full client-side navigation config option.
 wp_interactivity_config( 'core/router', array( 'fullClientSideNavigation' => true ) );
 
+// Register and enqueue the full client-side navigation script.
+wp_register_script_module(
+	'@wordpress/interactivity-router-full-client-side-navigation',
+	gutenberg_url( '/build/interactivity/full-csn.min.js' ),
+	array( '@wordpress/interactivity' ),
+	false
+);
+wp_enqueue_script_module( '@wordpress/interactivity-router-full-client-side-navigation' );
+
 // Add directives to all links.
 // This should probably be done per site, not by default when this option is enabled.
 function gutenberg_add_client_side_navigation_directives( $content, $block ) {
