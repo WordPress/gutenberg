@@ -333,21 +333,15 @@ test.describe( 'Navigation block', () => {
 		const navBlock = navigation.getNavBlock();
 
 		const navBlockInserter = navigation.getNavBlockInserter();
-		// Wait until the nav block inserter is visible before we move on to using it
+		// Wait until the nav block inserter is visible before we continue. Otherwise the navigation block may not have finished being created.
 		await expect( navBlockInserter ).toBeVisible();
 
 		/**
-		 * Test: Exiting the appender from the link control returns focus to the navigation block
-		 *
-		 * 1. Use arrow keys to reach Appender
-		 * 2. Enter to open link control
-		 * 3. Escape to exit
-		 * 4. Focus should be within the Navigation Block, ideally on the appender that opened it
+		 * Test: We don't lose focus when using the navigation link appender
 		 */
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await navigation.useBlockInserter();
 		await navigation.addLinkClose();
-
 		/**
 		 * TODO: This is not desired behavior. Ideally the
 		 * Appender should be focused again since it opened
@@ -360,18 +354,15 @@ test.describe( 'Navigation block', () => {
 
 		/**
 		 * Test: Creating a link sends focus to the newly created navigation link item
-		 *
-		 * 1. Use arrow keys to reach Appender
-		 * 2. Enter to open link control
-		 * 3. Arrow down to the suggested pages
-		 * 4. Enter
-		 * 5. Focus should be on the newly created navigation item
 		 */
-
 		await pageUtils.pressKeys( 'ArrowDown' );
 
 		await navigation.useBlockInserter();
 		await navigation.addPage( 'Cat' );
+		/**
+		 * Test: We can open and close the preview with the keyboard and escape
+		 *       buttons from a top-level nav item using both the shortcut and toolbar
+		 */
 		await navigation.previewOpenClose( {
 			label: 'Cat',
 			activator: 'shortcut',
@@ -384,14 +375,7 @@ test.describe( 'Navigation block', () => {
 		/**
 		 * Test: Creating a link from a url-string (https://www.example.com) returns
 		 *       focus to the newly created link with the text selected
-		 *
-		 * 1. Use arrow keys to reach Appender
-		 * 2. Enter to open link control
-		 * 3. Type https://www.example.com
-		 * 4. Enter
-		 * 5. Focus should be on the newly created navigation item with text selected
 		 */
-
 		// Move focus to the Add Block Appender.
 		await page.keyboard.press( 'Escape' );
 		await pageUtils.pressKeys( 'ArrowDown' );
@@ -402,36 +386,22 @@ test.describe( 'Navigation block', () => {
 		await navigation.expectToHaveTextSelected( 'example.com' );
 
 		/**
-		 * Test: Exiting the link control from the toolbar link button returns
-		 *       focus to the toolbar
-		 *
-		 * 1. Go to toolbar link button
-		 * 2. Enter
-		 * 3. Focus is within the link control
-		 * 4. Escape to exit
-		 * 5. Focus should be on the toolbar link button
+		 * Test: We can open and close the preview with the keyboard and escape
+		 *       buttons from a top-level nav link with a url-like label using
+		 *       both the shortcut and toolbar
 		 */
-		// Move caret to beginning of nav item label
 		await pageUtils.pressKeys( 'ArrowLeft' );
 		await navigation.previewOpenClose( {
 			label: 'example.com',
-			linkName: 'Example Domain',
 			activator: 'shortcut',
 		} );
 		await navigation.previewOpenClose( {
 			label: 'example.com',
-			linkName: 'Example Domain',
 			activator: 'toolbar',
 		} );
 
 		/**
 		 * Test: Can add submenu item using the keyboard
-		 *
-		 * 1. Go to toolbar add submenu button
-		 * 2. Enter
-		 * 3. Focus is within the link control
-		 * 4. Escape to exit
-		 * 5. Focus should be on the toolbar link button
 		 */
 		navigation.useToolbarButton( 'Add submenu' );
 
@@ -442,10 +412,15 @@ test.describe( 'Navigation block', () => {
 
 		await pageUtils.pressKeys( 'ArrowDown' );
 		// There is a bug that won't allow us to press Enter to add the link: https://github.com/WordPress/gutenberg/issues/60051
-		// Use Enter after that bug is resolved
+		// TODO: Use Enter after that bug is resolved
 		await navigation.useLinkShortcut();
 
 		await navigation.addPage( 'Dog' );
+
+		/**
+		 * Test: We can open and close the preview with the keyboard and escape
+		 *       buttons from a submenu nav item using both the shortcut and toolbar
+		 */
 		await navigation.previewOpenClose( {
 			label: 'Dog',
 			activator: 'shortcut',
@@ -460,6 +435,55 @@ test.describe( 'Navigation block', () => {
 
 		// We should be at the first position on the label
 		await navigation.checkLabelFocus( 'Dog' );
+
+		/**
+		 * Test: We don't lose focus when closing the submenu appender
+		 */
+		// Move focus to the submenu navigation appender
+
+		/**
+		 * Test: We can open and close the preview with the keyboard and escape
+		 *       buttons from a submenu parent item using both the shortcut and toolbar
+		 */
+
+		// TODO: Update _how_ we reach the block appender. This is annoying to use.
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+		await navigation.useBlockInserter();
+		await navigation.addLinkClose();
+		/**
+		 * TODO: This is not desired behavior. Ideally the
+		 * Appender should be focused again since it opened
+		 * the link control.
+		 * IMPORTANT: This check is not to enforce this behavior,
+		 * but to make sure focus is kept nearby until we are able
+		 * to send focus to the appender. It is falling back to the previous sibling.
+		 */
+		await navigation.checkLabelFocus( 'Dog' );
+
+		/**
+		 * Test: Use the submenu nav item appender to add a custom link
+		 */
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+		await navigation.useBlockInserter();
+		await navigation.addCustomURL( 'https://wordpress.org' );
+		await navigation.expectToHaveTextSelected( 'wordpress.org' );
+
+		/**
+		 * Test: We can open and close the preview with the keyboard and escape
+		 *       buttons from a top-level nav link with a url-like label using
+		 *       both the shortcut and toolbar
+		 */
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await navigation.previewOpenClose( {
+			label: 'wordpress.org',
+			activator: 'shortcut',
+		} );
+		await navigation.previewOpenClose( {
+			label: 'wordpress.org',
+			activator: 'toolbar',
+		} );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -694,7 +718,7 @@ class Navigation {
 	 * @param {Object} options
 	 */
 	async previewOpenClose( options = {} ) {
-		const { label, linkName = '', activator } = options;
+		const { label, activator } = options;
 		if ( activator === 'shortcut' ) {
 			await this.useLinkShortcut();
 		} else if ( activator === 'toolbar' ) {
@@ -704,17 +728,22 @@ class Navigation {
 			return;
 		}
 
-		const linkControlLink = this.getLinkControlLink(
-			linkName !== '' ? linkName : label
-		);
-		const navLink = this.getNavLink( label );
-		await expect( navLink ).toBeVisible();
-
-		await expect( linkControlLink ).toBeFocused();
+		const linkPopover = this.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+		// Expect focus to be within the link control. We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
+		expect(
+			await this.page.evaluate( () => {
+				const { activeElement } =
+					document.activeElement?.contentDocument ?? document;
+				return !! activeElement.closest(
+					'.components-popover__content .block-editor-link-control'
+				);
+			} )
+		).toBe( true );
 
 		await this.page.keyboard.press( 'Escape' );
 
-		await expect( linkControlLink ).toBeHidden();
+		await expect( linkPopover ).toBeHidden();
 
 		if ( activator === 'shortcut' ) {
 			await this.checkLabelFocus( label );
@@ -736,5 +765,19 @@ class Navigation {
 				return;
 			}
 		}
+	}
+
+	/**
+	 * This method is used as a temporary workaround for retriveing the
+	 * LinkControl component. This is because it currently does not expose
+	 * any accessible attributes. In general we should avoid using this method
+	 * and instead rely on locating the sub elements of the component directly.
+	 * Remove / update method once the following PR has landed:
+	 * https://github.com/WordPress/gutenberg/pull/54063.
+	 */
+	getLinkPopover() {
+		return this.page.locator(
+			'.components-popover__content .block-editor-link-control'
+		);
 	}
 }
