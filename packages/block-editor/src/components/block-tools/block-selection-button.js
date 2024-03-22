@@ -289,8 +289,12 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						<BlockMover
 							clientIds={ [ clientId ] }
 							hideDragHandle
-							isPrevBlockTemplatePart={ isPrevBlockTemplatePart }
-							isNextBlockTemplatePart={ isNextBlockTemplatePart }
+							isBlockMoverUpButtonDisabled={
+								isPrevBlockTemplatePart
+							}
+							isBlockMoverDownButtonDisabled={
+								isNextBlockTemplatePart
+							}
 						/>
 					) }
 					{ editorMode === 'navigation' && (

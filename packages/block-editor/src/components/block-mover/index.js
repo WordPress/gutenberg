@@ -22,8 +22,8 @@ import { store as blockEditorStore } from '../../store';
 function BlockMover( {
 	clientIds,
 	hideDragHandle,
-	isPrevBlockTemplatePart,
-	isNextBlockTemplatePart,
+	isBlockMoverUpButtonDisabled,
+	isBlockMoverDownButtonDisabled,
 } ) {
 	const { canMove, rootClientId, isFirst, isLast, orientation } = useSelect(
 		( select ) => {
@@ -88,7 +88,7 @@ function BlockMover( {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverUpButton
-							disabled={ isPrevBlockTemplatePart }
+							disabled={ isBlockMoverUpButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>
@@ -97,7 +97,7 @@ function BlockMover( {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverDownButton
-							disabled={ isNextBlockTemplatePart }
+							disabled={ isBlockMoverDownButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>
