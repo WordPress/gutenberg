@@ -290,7 +290,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 				$default_version
 			);
 			wp_style_add_data( "wp-block-{$block_name}-theme", 'path', gutenberg_dir_path() . $theme_style_path );
-			
 		}
 	}
 
@@ -308,8 +307,6 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		wp_register_style( "wp-block-{$block_name}-editor", false );
 	}
 }
-
-// add_filter( 'should_load_separate_core_block_assets', '__return_false', 11 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
