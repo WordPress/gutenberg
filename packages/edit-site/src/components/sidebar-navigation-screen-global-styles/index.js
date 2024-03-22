@@ -29,8 +29,10 @@ import useGlobalStylesRevisions from '../global-styles/screen-revisions/use-glob
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 import ColorVariations from '../global-styles/variations/variations-color';
 import TypographyVariations from '../global-styles/variations/variations-typography';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
-import { useUniqueTypographyVariations } from '../global-styles/hooks';
+import {
+	useColorVariations,
+	useTypographyVariations,
+} from '../global-styles/hooks';
 
 const noop = () => {};
 
@@ -76,11 +78,9 @@ function SidebarNavigationScreenGlobalStylesContent() {
 		};
 	}, [] );
 
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
-	} );
-
-	const typographyVariations = useUniqueTypographyVariations();
+	const colorVariations = useColorVariations();
+	const typographyVariations = useTypographyVariations();
+	const gap = 3;
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
@@ -97,22 +97,15 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				spacing={ 10 }
 				className="edit-site-global-styles-variation-container"
 			>
-				<StyleVariationsContainer />
+				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Colors' ) }
-						</h3>
-						<ColorVariations />
-					</div>
+					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Typography' ) }
-						</h3>
-						<TypographyVariations />
-					</div>
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ gap }
+					/>
 				) }
 			</VStack>
 		</BlockEditorProvider>

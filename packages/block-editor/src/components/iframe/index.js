@@ -208,17 +208,14 @@ function Iframe( {
 	}, [] );
 
 	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
 		const onResize = () => {
-			setIframeWindowInnerHeight(
-				node.ownerDocument.defaultView.innerHeight
-			);
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		};
-		node.ownerDocument.defaultView.addEventListener( 'resize', onResize );
+		nodeWindow.addEventListener( 'resize', onResize );
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
-				'resize',
-				onResize
-			);
+			nodeWindow.removeEventListener( 'resize', onResize );
 		};
 	}, [] );
 

@@ -104,3 +104,41 @@ The following configurable variables are used with the template files. Template 
 -   `style` (default: `'file:./style-index.css'`) – a frontend and editor style definition.
 -   `render` (no default) – a path to the PHP file used when rendering the block type on the server before presenting on the front end.
 -   `customBlockJSON` (no default) - allows definition of additional properties for the generated block.json file.
+
+### `variants`
+
+Variants are used to create variations for a template. Variants can override any `defaultValues` by providing their own.
+
+```js
+module.exports = {
+	defaultValues: {
+		slug: 'my-fantastic-block',
+		title: 'My fantastic block',
+		dashicon: 'palmtree',
+		version: '1.2.3',
+	},
+	variants: {
+		primary: {},
+		secondary: {
+			title: 'My fantastic block - secondary variant',
+		},
+	},
+};
+```
+
+Variants are accessed using the `--variant` flag, i.e`--variant secondary`.
+
+If no variant is provided, the first variant is used if any are defined.
+
+Mustache variables are created for variants that can be used to conditionally output content in files. The format is `{{isVARIANT_NAMEVariant}}`.
+
+```mustache
+{{#isPrimaryVariant}}
+This content is only rendered if `--variant primary` is passed.
+{{/isPrimaryVariant}}
+
+{{#isSecondaryVariant}}
+This content is only rendered if `--variant secondary` is passed.
+{{/isSecondaryVariant}}
+
+```

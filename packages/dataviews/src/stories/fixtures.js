@@ -21,6 +21,7 @@ export const data = [
 		description: 'Apollo description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Not a planet',
+		categories: [ 'Space', 'NASA' ],
 	},
 	{
 		id: 2,
@@ -28,6 +29,7 @@ export const data = [
 		description: 'Space description',
 		image: 'https://live.staticflickr.com/5678/21911065441_92e2d44708_b.jpg',
 		type: 'Not a planet',
+		categories: [ 'Space' ],
 	},
 	{
 		id: 3,
@@ -35,6 +37,7 @@ export const data = [
 		description: 'NASA photo',
 		image: 'https://live.staticflickr.com/742/21712365770_8f70a2c91e_b.jpg',
 		type: 'Not a planet',
+		categories: [ 'NASA' ],
 	},
 	{
 		id: 4,
@@ -42,6 +45,7 @@ export const data = [
 		description: 'Neptune description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Ice giant',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 5,
@@ -49,13 +53,15 @@ export const data = [
 		description: 'Mercury description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 6,
 		title: 'Venus',
-		description: 'Venus description',
+		description: 'La planète Vénus',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 7,
@@ -63,6 +69,7 @@ export const data = [
 		description: 'Earth description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 8,
@@ -70,6 +77,7 @@ export const data = [
 		description: 'Mars description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Terrestrial',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 9,
@@ -77,6 +85,7 @@ export const data = [
 		description: 'Jupiter description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Gas giant',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 10,
@@ -84,6 +93,7 @@ export const data = [
 		description: 'Saturn description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Gas giant',
+		categories: [ 'Space', 'Planet', 'Solar system' ],
 	},
 	{
 		id: 11,
@@ -91,6 +101,7 @@ export const data = [
 		description: 'Uranus description',
 		image: 'https://live.staticflickr.com/5725/21726228300_51333bd62c_b.jpg',
 		type: 'Ice giant',
+		categories: [ 'Space', 'Ice giant', 'Solar system' ],
 	},
 ];
 
@@ -133,5 +144,68 @@ export const actions = [
 		id: 'secondary',
 		label: 'Secondary action',
 		callback() {},
+	},
+];
+
+export const fields = [
+	{
+		header: 'Image',
+		id: 'image',
+		render: ( { item } ) => {
+			return (
+				<img src={ item.image } alt="" style={ { width: '100%' } } />
+			);
+		},
+		width: 50,
+		enableSorting: false,
+	},
+	{
+		header: 'Title',
+		id: 'title',
+		maxWidth: 400,
+		enableHiding: false,
+		enableGlobalSearch: true,
+	},
+	{
+		header: 'Type',
+		id: 'type',
+		maxWidth: 400,
+		enableHiding: false,
+		type: 'enumeration',
+		elements: [
+			{ value: 'Not a planet', label: 'Not a planet' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+			{ value: 'Terrestrial', label: 'Terrestrial' },
+			{ value: 'Gas giant', label: 'Gas giant' },
+		],
+	},
+	{
+		header: 'Description',
+		id: 'description',
+		maxWidth: 200,
+		enableSorting: false,
+		enableGlobalSearch: true,
+	},
+	{
+		header: 'Categories',
+		id: 'categories',
+		type: 'enumeration',
+		elements: [
+			{ value: 'Space', label: 'Space' },
+			{ value: 'NASA', label: 'NASA' },
+			{ value: 'Planet', label: 'Planet' },
+			{ value: 'Solar system', label: 'Solar system' },
+			{ value: 'Ice giant', label: 'Ice giant' },
+		],
+		filterBy: {
+			operators: [ 'isAny', 'isNone', 'isAll', 'isNotAll' ],
+		},
+		getValue: ( { item } ) => {
+			return item.categories;
+		},
+		render: ( { item } ) => {
+			return item.categories.join( ',' );
+		},
+		enableSorting: false,
 	},
 ];

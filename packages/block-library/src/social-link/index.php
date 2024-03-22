@@ -19,10 +19,10 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service     = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url         = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label       = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
-	$rel         = ( isset( $attributes['rel'] ) ) ? $attributes['rel'] : '';
+	$service     = isset( $attributes['service'] ) ? $attributes['service'] : 'Icon';
+	$url         = isset( $attributes['url'] ) ? $attributes['url'] : false;
+	$label       = ! empty( $attributes['label'] ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$rel         = isset( $attributes['rel'] ) ? $attributes['rel'] : '';
 	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
@@ -57,9 +57,8 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link  = '<li ' . $wrapper_attributes . '>';
 	$link .= '<a href="' . esc_url( $url ) . '" class="wp-block-social-link-anchor">';
 	$link .= $icon;
-	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">';
-	$link .= esc_html( $label );
-	$link .= '</span></a></li>';
+	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">' . esc_html( $label ) . '</span>';
+	$link .= '</a></li>';
 
 	$processor = new WP_HTML_Tag_Processor( $link );
 	$processor->next_tag( 'a' );

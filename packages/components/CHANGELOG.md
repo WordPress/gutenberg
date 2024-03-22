@@ -1,20 +1,34 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
--	`Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
--	`Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
+
+## 27.2.0 (2024-03-21)
+
+-   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+-   `Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
 
 ### Enhancements
 
 -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+-   `Text`, `Heading`, `ItemGroup` : Update the line height from 1.2 to 1.4 ([#60041](https://github.com/WordPress/gutenberg/pull/60041)).
+
+### Deprecation
+
+-   `isSmall` prop in `Button` component has been deprecated. Use `size="small"` prop instead ([#59734](https://github.com/WordPress/gutenberg/pull/59734)).
 
 ### Internal
 
 -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
 
+### Bug Fix
+
+-   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
+-   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
+
 ## 27.1.0 (2024-03-06)
 
 ### Bug Fix
+
 -   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).
