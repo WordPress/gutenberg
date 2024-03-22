@@ -97,14 +97,14 @@ test.describe( 'Pages', () => {
 		// Set up
 		await draftNewPage( page );
 		await addPageContent( editor, page );
-
-		/*
-		 * Test create page.Test creating a new page and editing the template.
-		 */
-		// Switch to template editing focus.
 		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+
+		// Switch to template editing focus.
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Page' } ).click();
+		await editorSettings
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
