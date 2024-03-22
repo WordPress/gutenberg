@@ -269,8 +269,10 @@ function gutenberg_register_core_block_assets( $block_name ) {
 		wp_register_style( "wp-block-{$block_name}", false, array() );
 	}
 
-	// If the current theme supports wp-block-styles, dequeue the full stylesheet
-	// and instead attach each block's theme-styles to their block styles stylesheet.
+	/*
+	 * If the current theme supports wp-block-styles, dequeue the core styles
+	 * and enqueue the plugin ones instead.
+	 */
 	if ( current_theme_supports( 'wp-block-styles' ) ) {
 
 		// Get the path to the block's stylesheet.
