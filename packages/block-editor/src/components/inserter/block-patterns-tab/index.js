@@ -33,6 +33,7 @@ function BlockPatternsTab( {
 
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<>
 			{ ! isMobile && (
