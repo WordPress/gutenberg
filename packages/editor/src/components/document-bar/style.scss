@@ -88,7 +88,7 @@
 	position: absolute;
 
 	&:hover {
-		color: var(--wp-block-synced-color);
+		color: $gray-900;
 		background-color: transparent;
 	}
 }
