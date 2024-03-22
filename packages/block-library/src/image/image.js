@@ -692,6 +692,7 @@ export default function Image( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
