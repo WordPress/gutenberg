@@ -11,8 +11,15 @@ import {
 	useHasRecursion,
 	InspectorControls,
 	__experimentalBlockPatternsList as BlockPatternsList,
+	BlockControls,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
+import {
+	PanelBody,
+	Spinner,
+	Modal,
+	MenuItem,
+	ToolbarButton,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -104,11 +111,17 @@ export default function TemplatePartEdit( {
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
-	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
+	const {
+		isResolved,
+		hasInnerBlocks,
+		isMissing,
+		area,
+		onNavigateToEntityRecord,
+	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount } = select( blockEditorStore );
+			const { getBlockCount, getSettings } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -134,6 +147,8 @@ export default function TemplatePartEdit( {
 					( ! entityRecord ||
 						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -217,6 +232,20 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
+				{ isEntityAvailable && onNavigateToEntityRecord && (
+					<BlockControls group="other">
+						<ToolbarButton
+							onClick={ () =>
+								onNavigateToEntityRecord( {
+									postId: templatePartId,
+									postType: 'wp_template_part',
+								} )
+							}
+						>
+							{ __( 'Edit' ) }
+						</ToolbarButton>
+					</BlockControls>
+				) }
 				<InspectorControls group="advanced">
 					<TemplatePartAdvancedControls
 						tagName={ tagName }
