@@ -937,7 +937,9 @@ export const toStyles = (
 				isTemplate
 			);
 			if ( declarations?.length ) {
-				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `:where(${ selector }){${ declarations.join(
+					';'
+				) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
