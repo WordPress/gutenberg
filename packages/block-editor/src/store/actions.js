@@ -172,7 +172,6 @@ export function updateBlockAttributes(
 	ignoreBindings = false
 ) {
 	clientIds = castArray( clientIds );
-
 	return ( { dispatch, select, registry } ) => {
 		const { updateExternalProperty } = unlock(
 			registry.dispatch( bindingsStore )
@@ -240,12 +239,12 @@ export function updateBlockAttributes(
 }
 
 export function resetBlocksWithBoundAttributes( blocks ) {
-	return ( { dispatch, registry } ) => {
+	return ( { dispatch, registry, select } ) => {
 		const { registerExternalPropertyHandler } = unlock(
 			registry.dispatch( bindingsStore )
 		);
 
-		const { getExternalPropertieValue, getExternalPropertyKey } = unlock(
+		const { getExternalPropertyKey } = unlock(
 			registry.select( bindingsStore )
 		);
 
@@ -316,11 +315,15 @@ export function resetBlocksWithBoundAttributes( blocks ) {
 							/*
 							 * [binding-on-sync]: First bound attribute value update.
 							 */
+							const boundValue = select.getBoundAttributeValue(
+								key,
+								block.attributes[ attributeName ]
+							);
+
 							dispatch.updateBlockAttributes(
 								block.clientId,
 								{
-									[ attributeName ]:
-										getExternalPropertieValue( key ),
+									[ attributeName ]: boundValue,
 								},
 								false,
 								true

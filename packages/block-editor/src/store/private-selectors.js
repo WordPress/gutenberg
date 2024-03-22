@@ -7,6 +7,7 @@ import createSelector from 'rememo';
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { store as bindingsStore } from '@wordpress/bindings';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-ta
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import { selectBlockPatternsKey } from './private-keys';
+import { RichTextData } from '@wordpress/rich-text';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -407,3 +409,52 @@ export function getAttributesByExternalProperty( state, propertyKey, value ) {
 
 	return result;
 }
+
+/**
+ * Selects and optionally transforms a value bound to an external property.
+ *
+ * Returns the value directly for strings,
+ * or a new RichTextData instance
+ * based on the external value for RichTextData types.
+ *
+ * @param {Object}              state          - Redux state.
+ * @param {string}              key            - External property key.
+ * @param {string|RichTextData} boundAttribute - Current attribute value.
+ * @return {string|RichTextData} Transformed or original bound attribute.
+ */
+
+export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
+	createSelector( ( state, key, boundAttribute ) => {
+		const { getExternalPropertieValue } = unlock( select( bindingsStore ) );
+
+		const externalValue = getExternalPropertieValue( key );
+
+		// Check type of the bound attribute.
+
+		// Type: string
+		if ( typeof boundAttribute === 'string' ) {
+			return externalValue;
+		}
+
+		// Type: RichTextData
+		if ( boundAttribute instanceof RichTextData ) {
+			/*
+			 * Compare the string (HTML) value of the RichTextData
+			 * with the external value.
+			 *
+			 * If they are the same, return the bound attribute.
+			 */
+			if ( boundAttribute.toHTMLString() === externalValue ) {
+				return boundAttribute;
+			}
+
+			/*
+			 * Otherwise, return a RichTextData instance
+			 * with the value of the external value.
+			 */
+			return RichTextData.fromHTMLString( externalValue );
+		}
+
+		return externalValue;
+	} )
+);
