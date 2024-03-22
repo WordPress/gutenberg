@@ -78,6 +78,7 @@ function ScaledBlockPreview( {
 			} }
 		>
 			<Iframe
+				loading="lazy"
 				contentRef={ useRefEffect( ( bodyElement ) => {
 					const {
 						ownerDocument: { documentElement },
