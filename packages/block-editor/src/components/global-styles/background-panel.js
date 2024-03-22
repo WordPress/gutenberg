@@ -394,9 +394,14 @@ function BackgroundSizeToolsPanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
+		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
+		}
+
+		if ( next !== 'contain' && nextPosition === 'center' ) {
+			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
@@ -414,6 +419,7 @@ function BackgroundSizeToolsPanelItem( {
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
+				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
