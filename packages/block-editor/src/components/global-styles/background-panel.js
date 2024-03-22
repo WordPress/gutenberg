@@ -399,6 +399,10 @@ function BackgroundSizeToolsPanelItem( {
 			nextRepeat = 'no-repeat';
 		}
 
+		if ( next === 'cover' ) {
+			nextRepeat = undefined;
+		}
+
 		if (
 			( currentValueForToggle === 'cover' ||
 				currentValueForToggle === 'contain' ) &&
