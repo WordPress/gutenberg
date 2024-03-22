@@ -39,7 +39,6 @@
 }
 
 .components-placeholder__label {
-	//display: flex;
 	font-weight: 600;
 	margin-bottom: $grid-unit-20;
 	align-items: center;
@@ -91,24 +90,10 @@
 	flex: 1 1 auto;
 }
 
-/*.components-placeholder__instructions {
-	margin-bottom: 1em;
-} */
-
 .components-placeholder__error {
-	//margin-top: 1em;
 	width: 100%;
 }
 
-/*.components-placeholder__fieldset .components-button {
-	margin-right: $grid-unit-15;
-	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
-
-	&:last-child {
-		margin-bottom: 0;
-		margin-right: 0;
-	}
-}*/
 
 // Any `<Button />` component with `variant="link"` prop will need extra spacing if placed
 // immediately after a button which is *not* an `variant="link"` style button. This is because
