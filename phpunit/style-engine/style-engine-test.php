@@ -324,7 +324,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'valid_classnames_with_value'            => array(
+			'valid_classnames_with_value'                  => array(
 				'block_styles'    => array(
 					'typography' => array(
 						'textAlign' => 'left',
