@@ -25,6 +25,7 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
@@ -38,6 +39,8 @@ import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
+
+const { PostCardPanel } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -112,6 +115,7 @@ const SidebarContent = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					{ ! isEditingTemplate && (
 						<>
+							<PostCardPanel />
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />

@@ -8,11 +8,22 @@ import createSelector from 'rememo';
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistrySelector } from '@wordpress/data';
+import {
+	layout,
+	symbol,
+	navigation,
+	page as pageIcon,
+	verse,
+} from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { getRenderingMode } from './selectors';
+import {
+	getRenderingMode,
+	__experimentalGetDefaultTemplatePartAreas,
+} from './selectors';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -67,3 +78,37 @@ export const getInsertionPoint = createRegistrySelector( ( select ) =>
 export function getListViewToggleRef( state ) {
 	return state.listViewToggleRef;
 }
+const CARD_ICONS = {
+	wp_block: symbol,
+	wp_navigation: navigation,
+	page: pageIcon,
+	post: verse,
+};
+
+export const getPostIcon = createRegistrySelector(
+	( select ) => ( state, postType, options ) => {
+		{
+			if (
+				postType === 'wp_template_part' ||
+				postType === 'wp_template'
+			) {
+				return (
+					__experimentalGetDefaultTemplatePartAreas( state ).find(
+						( item ) => options.area === item.area
+					)?.icon || layout
+				);
+			}
+			if ( CARD_ICONS[ postType ] ) {
+				return CARD_ICONS[ postType ];
+			}
+			const postTypeEntity = select( coreStore ).getPostType( postType );
+			// `icon` is the `menu_icon` property of a post type. We
+			// only handle `dashicons` for now, even if the `menu_icon`
+			// also supports urls and svg as values.
+			if ( postTypeEntity?.icon?.startsWith( 'dashicons-' ) ) {
+				return postTypeEntity.icon.slice( 10 );
+			}
+			return pageIcon;
+		}
+	}
+);
