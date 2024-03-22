@@ -25,6 +25,7 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 	if ( mediaType === 'image' ) {
 		attributes.url = mediaSrc;
 		attributes.alt = alt;
+		attributes.sizeSlug = 'full';
 	} else if ( [ 'video', 'audio' ].includes( mediaType ) ) {
 		attributes.src = mediaSrc;
 	}
