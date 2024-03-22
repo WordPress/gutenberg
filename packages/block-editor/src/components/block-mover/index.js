@@ -85,26 +85,24 @@ function BlockMover( {
 				</BlockDraggable>
 			) }
 			<div className="block-editor-block-mover__move-button-container">
-				{ ! isPrevBlockTemplatePart && (
-					<ToolbarItem>
-						{ ( itemProps ) => (
-							<BlockMoverUpButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-				) }
-				{ ! isNextBlockTemplatePart && (
-					<ToolbarItem>
-						{ ( itemProps ) => (
-							<BlockMoverDownButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-				) }
+				<ToolbarItem>
+					{ ( itemProps ) => (
+						<BlockMoverUpButton
+							disabled={ isPrevBlockTemplatePart }
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
+				<ToolbarItem>
+					{ ( itemProps ) => (
+						<BlockMoverDownButton
+							disabled={ isNextBlockTemplatePart }
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
 			</div>
 		</ToolbarGroup>
 	);
