@@ -41,7 +41,7 @@ import {
 	LAYOUT_LIST,
 } from '../../utils/constants';
 import {
-	useResetTemplateAction,
+	resetTemplateAction,
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './actions';
@@ -338,7 +338,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const resetTemplateAction = useResetTemplateAction();
 	const editTemplateAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
@@ -348,7 +347,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			postRevisionsAction,
 			deleteTemplateAction,
 		],
-		[ resetTemplateAction ]
+		[ editTemplateAction ]
 	);
 
 	const onChangeView = useCallback(
