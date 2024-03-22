@@ -191,17 +191,15 @@ window.addEventListener( 'popstate', async () => {
 } );
 
 // Initialize the router with the initial DOM.
-if ( canDoClientSideNavigation() ) {
-	// Cache the scripts. Has to be called before fetching the assets.
-	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-		headElements.set( script.getAttribute( 'src' ), {
-			tag: script,
-			text: script.textContent,
-		} );
+// Cache the scripts. Has to be called before fetching the assets.
+[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
+	headElements.set( script.getAttribute( 'src' ), {
+		tag: script,
+		text: script.textContent,
 	} );
-	const head = await fetchAssets( document );
-	pages.set(
-		cleanUrl( window.location ),
-		Promise.resolve( { head, body: initialVdom.get( document.body ) } )
-	);
-}
+} );
+const head = await fetchAssets( document );
+pages.set(
+	cleanUrl( window.location ),
+	Promise.resolve( { head, body: initialVdom.get( document.body ) } )
+);
