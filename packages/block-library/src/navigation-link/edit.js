@@ -33,7 +33,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -183,6 +183,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
+	const prevUrl = usePrevious( url );
 
 	// Change the label using inspector causes rich text to change focus on firefox.
 	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
@@ -271,17 +272,18 @@ export default function NavigationLinkEdit( {
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
-		if ( isLinkOpen && url ) {
-			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
-				// Focus and select the label text.
-				selectLabelText();
-			}
+		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
+		if (
+			! prevUrl &&
+			url &&
+			isLinkOpen &&
+			isURL( prependHTTP( label ) ) &&
+			/^.+\.[a-z]+/.test( label )
+		) {
+			// Focus and select the label text.
+			selectLabelText();
 		}
-	}, [ url, isLinkOpen, label ] );
+	}, [ prevUrl, url, isLinkOpen, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
