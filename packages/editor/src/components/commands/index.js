@@ -68,7 +68,7 @@ function useEditorCommandLoader() {
 		name: 'core/toggle-distraction-free',
 		label: isDistractionFree
 			? __( 'Exit Distraction Free' )
-			: __( 'Enter Distraction Free ' ),
+			: __( 'Enter Distraction Free' ),
 		callback: ( { close } ) => {
 			toggleDistractionFree();
 			close();
