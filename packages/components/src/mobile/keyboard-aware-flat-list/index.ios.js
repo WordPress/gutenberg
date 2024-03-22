@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-
 import { FlatList } from 'react-native';
 import Animated from 'react-native-reanimated';
 
@@ -22,14 +21,10 @@ import { useThrottle } from '@wordpress/compose';
 import useScroll from './use-scroll';
 import useTextInputOffset from './use-text-input-offset';
 import useTextInputCaretPosition from './use-text-input-caret-position';
+import { OPTIMIZATION_ITEMS_THRESHOLD, OPTIMIZATION_PROPS } from './shared';
 
 const DEFAULT_FONT_SIZE = 16;
 const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
-const OPTIMIZATION_PROPS = {
-	removeClippedSubviews: true,
-	windowSize: 11,
-};
-const OPTIMIZATION_ITEMS_THRESHOLD = 30;
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /**
