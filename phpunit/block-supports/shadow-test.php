@@ -50,119 +50,58 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 		return $registry->get_registered( $this->test_block_name );
 	}
 
-	public function test_shadow_object_with_no_styles() {
+	/**
+	 * Tests the generation of shadow block support styles.
+	 *
+	 * @dataProvider data_generate_shadow_fixtures
+	 *
+	 * @param boolean|array $support Shadow block support configuration.
+	 * @param string        $value   Shadow style value for style attribute object.
+	 * @param array         $expected       Expected shadow block support styles.
+	 */
+	public function test_gutenberg_apply_shadow_support( $support, $value, $expected ) {
 		$block_type  = self::register_shadow_block_with_support(
-			'test/shadow-object-with-no-styles',
-			array(
-				'shadow' => true,
-			)
+			'test/shadow-block',
+			array( 'shadow' => $support )
 		);
-		$block_attrs = array( 'style' => array( 'shadow' => '' ) );
+		$block_attrs = array( 'style' => array( 'shadow' => $value ) );
 		$actual      = gutenberg_apply_shadow_support( $block_type, $block_attrs );
-		$expected    = array();
 
 		$this->assertSame( $expected, $actual );
 	}
 
-	public function test_shadow_without_support() {
-		$block_type = self::register_shadow_block_with_support(
-			'test/shadow-without-support',
-			array(
-				'shadow' => false,
-			)
-		);
-		$block_atts = array(
-			'style' => array(
-				'shadow' => '1px 1px 1px #000',
+	public function data_generate_shadow_fixtures() {
+		return array(
+			'with no styles'               => array(
+				'support'  => true,
+				'value'    => '',
+				'expected' => array(),
+			),
+			'without support'              => array(
+				'support'  => false,
+				'value'    => '1px 1px 1px #000',
+				'expected' => array(),
+			),
+			'with single shadow'           => array(
+				'support'  => true,
+				'value'    => '1px 1px 1px #000',
+				'expected' => array( 'style' => 'box-shadow:1px 1px 1px #000;' ),
+			),
+			'with comma separated shadows' => array(
+				'support'  => true,
+				'value'    => '1px 1px 1px #000, 2px 2px 2px #fff',
+				'expected' => array( 'style' => 'box-shadow:1px 1px 1px #000, 2px 2px 2px #fff;' ),
+			),
+			'with preset shadow'           => array(
+				'support'  => true,
+				'value'    => 'var:preset|shadow|natural',
+				'expected' => array( 'style' => 'box-shadow:var(--wp--preset--shadow--natural);' ),
+			),
+			'with serialization skipped'   => array(
+				'support'  => array( '__experimentalSkipSerialization' => true ),
+				'value'    => '1px 1px 1px #000',
+				'expected' => array(),
 			),
 		);
-
-		$actual   = gutenberg_apply_shadow_support( $block_type, $block_atts );
-		$expected = array();
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	public function test_shadow_with_single_shadow() {
-		$block_type = self::register_shadow_block_with_support(
-			'test/shadow-with-single-shadow',
-			array(
-				'shadow' => true,
-			)
-		);
-		$block_atts = array(
-			'style' => array(
-				'shadow' => '1px 1px 1px #000',
-			),
-		);
-
-		$actual   = gutenberg_apply_shadow_support( $block_type, $block_atts );
-		$expected = array(
-			'style' => 'box-shadow:1px 1px 1px #000;',
-		);
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	public function test_shadow_with_comma_separated_shadows() {
-		$block_type = self::register_shadow_block_with_support(
-			'test/shadow-with-comma-separated-shadows',
-			array(
-				'shadow' => true,
-			)
-		);
-		$block_atts = array(
-			'style' => array(
-				'shadow' => '1px 1px 1px #000, 2px 2px 2px #fff',
-			),
-		);
-
-		$actual   = gutenberg_apply_shadow_support( $block_type, $block_atts );
-		$expected = array(
-			'style' => 'box-shadow:1px 1px 1px #000, 2px 2px 2px #fff;',
-		);
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	public function test_shadow_with_named_shadow() {
-		$block_type  = self::register_shadow_block_with_support(
-			'test/shadow-with-named-shadow',
-			array(
-				'shadow' => true,
-			)
-		);
-		$block_attrs = array(
-			'style' => array(
-				'shadow' => 'var:preset|shadow|natural',
-			),
-		);
-		$actual      = gutenberg_apply_shadow_support( $block_type, $block_attrs );
-		$expected    = array(
-			'style' => 'box-shadow:var(--wp--preset--shadow--natural);',
-		);
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	public function test_shadow_with_skipped_serialization() {
-		$block_type = self::register_shadow_block_with_support(
-			'test/shadow-with-skipped-serialization',
-			array(
-				'shadow' => array(
-					'__experimentalSkipSerialization' => true,
-				),
-			)
-		);
-		$block_atts = array(
-			'style' => array(
-				'shadow' => '1px 1px 1px #000',
-			),
-		);
-
-		$actual   = gutenberg_apply_shadow_support( $block_type, $block_atts );
-		$expected = array();
-
-		$this->assertSame( $expected, $actual );
 	}
 }
