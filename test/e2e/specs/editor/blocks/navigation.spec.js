@@ -381,8 +381,6 @@ test.describe( 'Navigation block', () => {
 			activator: 'toolbar',
 		} );
 
-		// Testing for selection is tricky, so let's approximate. If we command+k, then we should be back in editing mode for this item.
-
 		/**
 		 * Test: Creating a link from a url-string (https://www.example.com) returns
 		 *       focus to the newly created link with the text selected
@@ -401,6 +399,7 @@ test.describe( 'Navigation block', () => {
 
 		await navigation.useBlockInserter();
 		await navigation.addCustomURL( 'https://example.com' );
+		await navigation.expectToHaveTextSelected( 'example.com' );
 
 		/**
 		 * Test: Exiting the link control from the toolbar link button returns
@@ -456,16 +455,11 @@ test.describe( 'Navigation block', () => {
 			activator: 'toolbar',
 		} );
 
+		// Return to nav label from toolbar
 		await page.keyboard.press( 'Escape' );
 
 		// We should be at the first position on the label
-		await page.keyboard.type( 'Big ', { delay: 50 } );
-
-		const navLinkBigDog = editor.canvas
-			.locator( 'a' )
-			.filter( { hasText: 'Big Dog', exact: true } );
-
-		await expect( navLinkBigDog ).toBeVisible();
+		await navigation.checkLabelFocus( 'Dog' );
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -645,12 +639,18 @@ class Navigation {
 
 		await this.page.keyboard.type( url, { delay: 50 } );
 		await this.page.keyboard.press( 'Enter' );
+	}
 
+	/**
+	 * Checks if the passed string matches the current editor selection
+	 * @param {string} text Text you want to see if it's selected
+	 */
+	async expectToHaveTextSelected( text ) {
 		expect(
 			await this.editor.canvas
 				.locator( ':root' )
 				.evaluate( () => window.getSelection().toString() )
-		).toBe( new URL( url ).host );
+		).toBe( text );
 	}
 
 	/**
@@ -670,28 +670,16 @@ class Navigation {
 	}
 
 	/**
-	 * Checks that focus has returned to a label by:
-	 * - typing 'Test '
-	 * - checking for the text content added
-	 * - Deletes the 'Test ' text
+	 * Checks that a label has the correct text selected
+	 * Usage: Caret must be placed at the beginning of the nav label
 	 * @param {string} label Nav label text
 	 */
 	async checkLabelFocus( label ) {
-		const testString = 'Test ';
-		// Focus should be on the nav link rich text element. Test this by typing and checking.
-		await this.page.keyboard.type( testString, { delay: 50 } );
-
-		const navLinkTest = this.getNavLink( `${ testString }${ label }` );
-
-		await expect( navLinkTest ).toBeVisible();
-
-		// Delete what we just added
-		for ( let i = 0; i < testString.length; i++ ) {
-			await this.page.keyboard.press( 'Backspace', { delay: 50 } );
-		}
-
-		await expect( navLinkTest ).toBeHidden();
-		await expect( this.getNavLink( label ) ).toBeVisible();
+		// Select all the text
+		await this.pageUtils.pressKeys( 'Shift+End' );
+		await this.expectToHaveTextSelected( label );
+		// Move caret back to starting position
+		await this.pageUtils.pressKeys( 'ArrowLeft' );
 	}
 
 	/**
