@@ -103,12 +103,7 @@
 	flex-wrap: nowrap;
 	// Ensure actions do not press against .edit-site-header-edit-mode__center.
 	padding-left: $grid-unit-10;
-	padding-right: $grid-unit-05;
-
-	@include break-small () {
-		padding-right: $grid-unit-10;
-	}
-
+	padding-right: $grid-unit-10;
 	gap: $grid-unit-10;
 }
 
