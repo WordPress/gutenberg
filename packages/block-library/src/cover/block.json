@@ -34,7 +34,8 @@
 			"default": 100
 		},
 		"overlayColor": {
-			"type": "string"
+			"type": "string",
+			"default": "black"
 		},
 		"customOverlayColor": {
 			"type": "string"
