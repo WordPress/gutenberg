@@ -349,7 +349,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 
 		const labelInput = blockSettings.getByRole( 'textbox', {
-			name: 'Label',
+			name: 'Text',
 		} );
 
 		await expect( labelInput ).toHaveValue( 'Top Level Item 1' );
