@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getConfig,
+	getContext,
+	getElement,
+} from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -18,6 +23,12 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
+// Helper to load the router depending on if full client-side navigation is enabled or not.
+const loadInteractivityRouter = async () => {
+	if ( getConfig( 'core/router' ).fullClientSideNavigation ) return;
+	await import( '@wordpress/interactivity-router' );
+};
+
 store(
 	'core/query',
 	{
@@ -32,10 +43,8 @@ store(
 				if ( isValidLink( ref ) && isValidEvent( event ) ) {
 					event.preventDefault();
 
-					const { actions } = yield import(
-						'@wordpress/interactivity-router'
-					);
-					yield actions.navigate( ref.href );
+					yield loadInteractivityRouter();
+					yield store( 'core/router' ).actions.navigate( ref.href );
 					ctx.url = ref.href;
 
 					// Focus the first anchor of the Query block.
@@ -46,7 +55,7 @@ store(
 			*prefetch( event ) {
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {
-					yield import( '@wordpress/interactivity-router' );
+					yield loadInteractivityRouter();
 					yield store( 'core/router' ).actions.prefetch(
 						event,
 						ref.href
@@ -59,7 +68,7 @@ store(
 				const { url } = getContext();
 				const { ref } = getElement();
 				if ( url && isValidLink( ref ) ) {
-					yield import( '@wordpress/interactivity-router' );
+					yield loadInteractivityRouter();
 					yield store( 'core/router' ).actions.prefetch(
 						event,
 						ref.href
