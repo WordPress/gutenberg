@@ -7,10 +7,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import {
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,7 +20,6 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
-const { useSaveEntities } = unlock( editorPrivateApis );
 
 export default function SaveButton( {
 	className = 'edit-site-save-button__button',
@@ -36,11 +32,12 @@ export default function SaveButton( {
 } ) {
 	const { params } = useLocation();
 	const { setIsSaveViewOpened } = useDispatch( editSiteStore );
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
 	const {
 		isSaving,
 		isSaveViewOpen,
 		previewingThemeName,
-		dirtyEntityRecords,
+		dirtyEntitiesCount,
 		isOnlyCurrentEntityDirty,
 	} = useSelect(
 		( select ) => {
@@ -51,15 +48,14 @@ export default function SaveButton( {
 			} = select( coreStore );
 			const { hasNonPostEntityChanges, isEditedPostDirty } =
 				select( editorStore );
-			const _dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
+			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			const { isSaveViewOpened } = select( editSiteStore );
 			const isActivatingTheme = isResolving( 'activateTheme' );
 			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
 			return {
-				dirtyEntityRecords: _dirtyEntityRecords,
-				hasDirtyEntities: !! _dirtyEntityRecords.length,
+				dirtyEntitiesCount: dirtyEntityRecords.length,
 				isSaving:
-					_dirtyEntityRecords.some( ( record ) =>
+					dirtyEntityRecords.some( ( record ) =>
 						isSavingEntityRecord(
 							record.kind,
 							record.name,
@@ -83,10 +79,9 @@ export default function SaveButton( {
 		},
 		[ params.path ]
 	);
-	const hasDirtyEntities = !! dirtyEntityRecords.length;
+	const hasDirtyEntities = !! dirtyEntitiesCount;
 	const disabled =
 		isSaving || ( ! hasDirtyEntities && ! isPreviewingTheme() );
-
 	const getLabel = () => {
 		if ( isPreviewingTheme() ) {
 			if ( isSaving ) {
@@ -122,17 +117,16 @@ export default function SaveButton( {
 				_n(
 					'Review %d change…',
 					'Review %d changes…',
-					dirtyEntityRecords.length
+					dirtyEntitiesCount
 				),
-				dirtyEntityRecords.length
+				dirtyEntitiesCount
 			);
 		}
 		return __( 'Save' );
 	};
 	const label = getLabel();
-	const saveEntities = useSaveEntities();
 	const onClick = isOnlyCurrentEntityDirty
-		? saveEntities
+		? () => saveDirtyEntities()
 		: () => setIsSaveViewOpened( true );
 	return (
 		<Button

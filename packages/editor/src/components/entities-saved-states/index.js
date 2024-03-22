@@ -12,13 +12,15 @@ import {
 	__experimentalUseDialog as useDialog,
 	useInstanceId,
 } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
-import useSaveEntities from './hooks/use-save-entities';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function identity( values ) {
 	return values;
@@ -45,14 +47,13 @@ export function EntitiesSavedStatesExtensible( {
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
 	renderDialog = undefined,
-
 	dirtyEntityRecords,
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
 } ) {
 	const saveButtonRef = useRef();
-
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
 	// To group entities by type.
 	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
 		const { name } = record;
@@ -78,12 +79,6 @@ export function EntitiesSavedStatesExtensible( {
 	].filter( Array.isArray );
 
 	const saveEnabled = saveEnabledProp ?? isDirty;
-	const saveCheckedEntities = useSaveEntities( {
-		onSave,
-		entitiesToSkip: unselectedEntities,
-		close,
-	} );
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -114,7 +109,13 @@ export function EntitiesSavedStatesExtensible( {
 					variant="primary"
 					disabled={ ! saveEnabled }
 					__experimentalIsFocusable
-					onClick={ saveCheckedEntities }
+					onClick={ () =>
+						saveDirtyEntities( {
+							onSave,
+							entitiesToSkip: unselectedEntities,
+							close,
+						} )
+					}
 					className="editor-entities-saved-states__save-button"
 				>
 					{ saveLabel }
