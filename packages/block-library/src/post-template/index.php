@@ -48,7 +48,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key                        = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$enhanced_pagination             = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
 	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
-	if ( ! empty( $interactivity_api_router_config ) && ! empty( $interactivity_api_router_config['fullClientSideNavigation'] ) ) {
+	if ( ! empty( $interactivity_api_router_config['fullClientSideNavigation'] ) ) {
 		$enhanced_pagination = true;
 	}
 	$page = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
