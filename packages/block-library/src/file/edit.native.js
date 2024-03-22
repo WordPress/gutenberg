@@ -411,6 +411,11 @@ export class FileEdit extends Component {
 				? ''
 				: __( 'Add text…' );
 
+		const viewContainerStyle = this.props.getStylesFromColorScheme(
+			styles.viewContainer,
+			styles.viewContainerDark
+		);
+
 		return (
 			<MediaUploadProgress
 				mediaId={ id }
@@ -446,6 +451,7 @@ export class FileEdit extends Component {
 							<View
 								onLayout={ this.onLayout }
 								testID="file-edit-container"
+								style={ viewContainerStyle }
 							>
 								{ this.getPlaceholderWidth( placeholderText ) }
 								{ isUploadInProgress ||
