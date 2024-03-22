@@ -112,7 +112,10 @@ function BlockListBlock( {
 		...context
 	} = useContext( PrivateBlockContext );
 	const { removeBlock } = useDispatch( blockEditorStore );
-	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const onRemove = useCallback(
+		() => removeBlock( clientId ),
+		[ clientId, removeBlock ]
+	);
 
 	const parentLayout = useLayout() || {};
 
