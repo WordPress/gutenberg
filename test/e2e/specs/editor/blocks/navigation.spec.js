@@ -344,19 +344,18 @@ test.describe( 'Navigation block', () => {
 		 * 3. Escape to exit
 		 * 4. Focus should be within the Navigation Block, ideally on the appender that opened it
 		 */
-
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await navigation.useBlockInserter();
 		await navigation.addLinkClose();
 
 		/**
-		 * Note: This is not desired behavior. Ideally the
-		 * Appender should be focused again. This check is
-		 * not to enforce this behavior, but to make sure
-		 * focus is kept nearby until we are able to send
-		 * focus to the appender.
+		 * TODO: This is not desired behavior. Ideally the
+		 * Appender should be focused again since it opened
+		 * the link control.
+		 * IMPORTANT: This check is not to enforce this behavior,
+		 * but to make sure focus is kept nearby until we are able
+		 * to send focus to the appender.
 		 */
-
 		await expect( navBlock ).toBeFocused();
 
 		/**
@@ -371,10 +370,7 @@ test.describe( 'Navigation block', () => {
 
 		await pageUtils.pressKeys( 'ArrowDown' );
 
-		await expect( navBlockInserter ).toBeFocused();
-
-		await page.keyboard.press( 'Enter' );
-
+		await navigation.useBlockInserter();
 		await navigation.addPage( 'Cat' );
 		await navigation.previewOpenClose( {
 			label: 'Cat',
@@ -403,26 +399,8 @@ test.describe( 'Navigation block', () => {
 		await pageUtils.pressKeys( 'ArrowDown' );
 		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
-		await expect( navBlockInserter ).toBeFocused();
-
-		await page.keyboard.press( 'Enter' );
-
-		const linkControlSearch = navigation.getLinkControlSearch();
-
-		await expect( linkControlSearch ).toBeFocused();
-
-		await page.keyboard.type( 'https://example.com', { delay: 50 } );
-		await page.keyboard.press( 'Enter' );
-
-		// `https://example.com` should be on the page and highlighted because it is url-like
-		await page.keyboard.press( 'Delete' );
-		await page.keyboard.type( 'Blobfish', { delay: 50 } );
-
-		const navLinkBlobfish = editor.canvas
-			.locator( 'a' )
-			.filter( { hasText: 'Blobfish', exact: true } );
-
-		await expect( navLinkBlobfish ).toBeVisible();
+		await navigation.useBlockInserter();
+		await navigation.addCustomURL( 'https://example.com' );
 
 		/**
 		 * Test: Exiting the link control from the toolbar link button returns
@@ -435,14 +413,14 @@ test.describe( 'Navigation block', () => {
 		 * 5. Focus should be on the toolbar link button
 		 */
 		// Move caret to beginning of nav item label
-		await page.keyboard.press( 'Home' );
+		await pageUtils.pressKeys( 'ArrowLeft' );
 		await navigation.previewOpenClose( {
-			label: 'Blobfish',
+			label: 'example.com',
 			linkName: 'Example Domain',
 			activator: 'shortcut',
 		} );
 		await navigation.previewOpenClose( {
-			label: 'Blobfish',
+			label: 'example.com',
 			linkName: 'Example Domain',
 			activator: 'toolbar',
 		} );
@@ -562,6 +540,68 @@ class Navigation {
 		this.editor = editor;
 	}
 
+	getLinkControlLink( linkName ) {
+		return this.page.getByRole( 'link', {
+			name: `${ linkName } (opens in a new tab)`,
+			exact: true,
+		} );
+	}
+
+	getNavLink( label ) {
+		return this.editor.canvas.locator( 'a' ).filter( { hasText: label } );
+	}
+
+	getNavBlock() {
+		return this.editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+	}
+
+	getNavBlockInserter() {
+		return this.getNavBlock().getByLabel( 'Add block' );
+	}
+
+	getLinkControlSearch() {
+		return this.page.getByRole( 'combobox', {
+			name: 'Link',
+		} );
+	}
+
+	getToolbarLinkButton() {
+		return this.page.getByRole( 'button', {
+			name: 'Link',
+			exact: true,
+		} );
+	}
+
+	async useBlockInserter() {
+		const navBlockInserter = this.getNavBlockInserter();
+
+		// Wait until the nav block inserter is visible before we move on to using it
+		await expect( navBlockInserter ).toBeVisible();
+
+		await expect( navBlockInserter ).toBeFocused();
+
+		await this.page.keyboard.press( 'Enter' );
+	}
+
+	async useLinkShortcut() {
+		await this.pageUtils.pressKeys( 'primary+k' );
+	}
+
+	async useToolbarButton( name ) {
+		await this.pageUtils.pressKeys( 'alt+F10' );
+		await this.arrowToLabel( name );
+		await expect(
+			this.page.getByRole( 'button', {
+				name,
+				exact: true,
+			} )
+		).toBeFocused();
+
+		await this.page.keyboard.press( 'Enter' );
+	}
+
 	/**
 	 * Adds a page via the link control and closes it.
 	 * Usage:
@@ -593,66 +633,24 @@ class Navigation {
 		await expect( navLink ).toBeVisible();
 	}
 
-	getLinkControlLink( linkName ) {
-		return this.page.getByRole( 'link', {
-			name: `${ linkName } (opens in a new tab)`,
-			exact: true,
-		} );
-	}
+	/**
+	 * Adds a custom url via the link control.
+	 * Usage:
+	 * - Open the new link control however you'd like (block appender, command+k on Add link label...)
+	 * - Expect focus to return to the canvas with the url label highlighted
+	 * @param {string} url URL you want added to the navigation
+	 */
+	async addCustomURL( url ) {
+		await expect( this.getLinkControlSearch() ).toBeFocused();
 
-	getNavLink( label ) {
-		return this.editor.canvas.locator( 'a' ).filter( { hasText: label } );
-	}
-
-	getNavBlock() {
-		return this.editor.canvas.getByRole( 'document', {
-			name: 'Block: Navigation',
-		} );
-	}
-
-	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add block' );
-	}
-
-	getLinkControlSearch() {
-		return this.page.getByRole( 'combobox', {
-			name: 'Link',
-		} );
-	}
-
-	async useBlockInserter() {
-		const navBlockInserter = this.getNavBlockInserter();
-
-		// Wait until the nav block inserter is visible before we move on to using it
-		await expect( navBlockInserter ).toBeVisible();
-
-		await expect( navBlockInserter ).toBeFocused();
-
+		await this.page.keyboard.type( url, { delay: 50 } );
 		await this.page.keyboard.press( 'Enter' );
-	}
 
-	async useLinkShortcut() {
-		await this.pageUtils.pressKeys( 'primary+k' );
-	}
-
-	getToolbarLinkButton() {
-		return this.page.getByRole( 'button', {
-			name: 'Link',
-			exact: true,
-		} );
-	}
-
-	async useToolbarButton( name ) {
-		await this.pageUtils.pressKeys( 'alt+F10' );
-		await this.arrowToLabel( name );
-		await expect(
-			this.page.getByRole( 'button', {
-				name,
-				exact: true,
-			} )
-		).toBeFocused();
-
-		await this.page.keyboard.press( 'Enter' );
+		expect(
+			await this.editor.canvas
+				.locator( ':root' )
+				.evaluate( () => window.getSelection().toString() )
+		).toBe( new URL( url ).host );
 	}
 
 	/**
