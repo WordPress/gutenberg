@@ -128,6 +128,7 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
+		 * @param {Object}  event                              The event which takes place on EventTarget (unused).
 		 * @param {string}  href                               The page href.
 		 * @param {Object}  [options]                          Options object.
 		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
@@ -139,7 +140,7 @@ export const { state, actions } = store( 'core/router', {
 		 *
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
-		*navigate( href, options = {} ) {
+		*navigate( event, href, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
@@ -154,7 +155,7 @@ export const { state, actions } = store( 'core/router', {
 			} = options;
 
 			navigatingTo = href;
-			actions.prefetch( pagePath, options );
+			actions.prefetch( null, pagePath, options );
 
 			// Create a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
@@ -229,13 +230,14 @@ export const { state, actions } = store( 'core/router', {
 		 * The function normalizes the URL and stores internally the fetch
 		 * promise, to avoid triggering a second fetch for an ongoing request.
 		 *
+		 * @param {Object}  event           The event which takes place on EventTarget (unused).
 		 * @param {string}  url             The page URL.
 		 * @param {Object}  [options]       Options object.
 		 * @param {boolean} [options.force] Force fetching the URL again.
 		 * @param {string}  [options.html]  HTML string to be used instead of
 		 *                                  fetching the requested URL.
 		 */
-		prefetch( url, options = {} ) {
+		prefetch( event, url, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) return;
 

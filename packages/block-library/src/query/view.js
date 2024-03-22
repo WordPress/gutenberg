@@ -44,7 +44,10 @@ store(
 					event.preventDefault();
 
 					yield loadInteractivityRouter();
-					yield store( 'core/router' ).actions.navigate( ref.href );
+					yield store( 'core/router' ).actions.navigate(
+						event,
+						ref.href
+					);
 					ctx.url = ref.href;
 
 					// Focus the first anchor of the Query block.
