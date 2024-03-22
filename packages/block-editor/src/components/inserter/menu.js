@@ -112,11 +112,15 @@ function InserterMenu(
 		[ onToggleInsertionPoint ]
 	);
 
+	const isZoomedOutViewExperimentEnabled =
+		window?.__experimentalEnableZoomedOutView;
 	const onClickPatternCategory = useCallback(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			__experimentalOnPatternCategorySelection();
+			if ( isZoomedOutViewExperimentEnabled ) {
+				__experimentalOnPatternCategorySelection();
+			}
 		},
 		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
