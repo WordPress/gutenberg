@@ -190,6 +190,12 @@
 			> * {
 				flex-grow: 1;
 			}
+
+			&.dataviews-view-table__primary-field {
+				a {
+					flex-grow: 0;
+				}
+			}
 		}
 	}
 	.dataviews-view-table-header-button {
@@ -236,6 +242,7 @@
 	white-space: nowrap;
 	display: block;
 	width: 100%;
+	overflow: hidden;
 
 	a {
 		text-decoration: none;
@@ -244,10 +251,10 @@
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
-		width: 100%;
+		flex-grow: 0;
 
 		&:hover {
-			color: $gray-900;
+			color: var(--wp-admin-theme-color);
 		}
 		@include link-reset();
 	}
