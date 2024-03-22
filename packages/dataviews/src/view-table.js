@@ -34,7 +34,7 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
-import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
+import { SORTING_DIRECTIONS } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -76,7 +76,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	// 3. If it's not primary. If it is, it should be already visible.
 	const canAddFilter =
 		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
-		field.type === ENUMERATION_TYPE &&
+		!! field.elements?.length &&
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
 	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
