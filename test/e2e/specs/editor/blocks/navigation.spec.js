@@ -471,6 +471,60 @@ test.describe( 'Navigation block', () => {
 		await navigation.previewIsOpenAndCloses();
 		await navigation.checkLabelFocus( 'wordpress.org' );
 		await navigation.canUseToolbarLink();
+
+		/**
+		 * Test: We can open and close the preview from a submenu navigation block (the top-level parent of a submenu)
+		 */
+		// Navigate to our navigation submenu block
+		// Exit the toolbar
+		await page.keyboard.press( 'Escape' );
+		// Move to the submenu item
+		await pageUtils.pressKeys( 'ArrowUp', { times: 4 } );
+		await page.keyboard.press( 'Home' );
+
+		// Check we're on our submenu link
+		await navigation.checkLabelFocus( 'example.com' );
+		await navigation.useLinkShortcut();
+		await navigation.previewIsOpenAndCloses();
+		await navigation.checkLabelFocus( 'example.com' );
+		await navigation.canUseToolbarLink();
+		await page.keyboard.press( 'Escape' );
+		await navigation.checkLabelFocus( 'example.com' );
+
+		/**
+		 * Deleting returns items focus to its sibling
+		 */
+		await pageUtils.pressKeys( 'ArrowDown', { times: 4 } );
+		await navigation.checkLabelFocus( 'wordpress.org' );
+		// Delete the nav link
+		await pageUtils.pressKeys( 'access+z' );
+		// Focus moved to sibling
+		await navigation.checkLabelFocus( 'Dog' );
+		// Add a link back so we can delete the first submenu link and see if focus returns to the parent submenu item
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
+		await navigation.useBlockInserter();
+		await navigation.addCustomURL( 'https://wordpress.org' );
+		await navigation.expectToHaveTextSelected( 'wordpress.org' );
+
+		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
+		await navigation.checkLabelFocus( 'Dog' );
+		// Delete the nav link
+		await pageUtils.pressKeys( 'access+z' );
+		await pageUtils.pressKeys( 'ArrowDown' );
+		// Focus moved to parent submenu item
+		await navigation.checkLabelFocus( 'example.com' );
+		// Deleting this should move focus to the sibling item
+		await pageUtils.pressKeys( 'access+z' );
+		await navigation.checkLabelFocus( 'Cat' );
+		// Deleting with no more siblings should focus the navigation block again
+		await pageUtils.pressKeys( 'access+z' );
+		await expect( navBlock ).toBeFocused();
+		// Wait until the nav block inserter is visible before we continue.
+		await expect( navBlockInserter ).toBeVisible();
+		// Now the appender should be visible and reachable with an arrow down
+		await pageUtils.pressKeys( 'ArrowDown' );
+		await expect( navBlockInserter ).toBeFocused();
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -684,6 +738,7 @@ class Navigation {
 	 * @param {string} label Nav label text
 	 */
 	async checkLabelFocus( label ) {
+		await this.page.keyboard.press( 'Home' );
 		// Select all the text
 		await this.pageUtils.pressKeys( 'Shift+End' );
 		await this.expectToHaveTextSelected( label );
