@@ -4,7 +4,7 @@
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
+import { useCallback, useReducer } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
@@ -89,11 +89,16 @@ const BindingConnector = ( {
 			 * If the attribute is a RichTextData instance,
 			 * (core/paragraph, core/heading, core/button, etc.)
 			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
 			 */
 			if ( prevAttrValue instanceof RichTextData ) {
+				// If the new value is also a RichTextData instance and the value is the same, bail early.
+				if (
+					newAttrValue instanceof RichTextData &&
+					prevAttrValue.toHTMLString() === newAttrValue.toHTMLString()
+				) {
+					return;
+				}
+
 				// Bail early if the Rich Text value is the same.
 				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
 					return;
@@ -106,6 +111,7 @@ const BindingConnector = ( {
 				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
 			}
 
+			// Bail early if the attribute value is the same.
 			if ( prevAttrValue === newAttrValue ) {
 				return;
 			}
@@ -115,35 +121,26 @@ const BindingConnector = ( {
 		[ attrName, onPropValueChange ]
 	);
 
-	useLayoutEffect( () => {
-		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue, attrValue );
-		} else if ( placeholder ) {
-			/*
-			 * Placeholder fallback.
-			 * If the attribute is `src` or `href`,
-			 * a placeholder can't be used because it is not a valid url.
-			 * Adding this workaround until
-			 * attributes and metadata fields types are improved and include `url`.
-			 */
-			const htmlAttribute =
-				getBlockType( blockName ).attributes[ attrName ].attribute;
+	if ( typeof propValue !== 'undefined' ) {
+		updateBoundAttibute( propValue, attrValue );
+	} else if ( placeholder ) {
+		/*
+		 * Placeholder fallback.
+		 * If the attribute is `src` or `href`,
+		 * a placeholder can't be used because it is not a valid url.
+		 * Adding this workaround until
+		 * attributes and metadata fields types are improved and include `url`.
+		 */
+		const htmlAttribute =
+			getBlockType( blockName ).attributes[ attrName ].attribute;
 
-			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
-				return;
-			}
-
-			updateBoundAttibute( placeholder );
+		if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
+			updateBoundAttibute( null, attrValue );
+			return null;
 		}
-	}, [
-		updateBoundAttibute,
-		propValue,
-		attrValue,
-		placeholder,
-		blockName,
-		attrName,
-	] );
+
+		updateBoundAttibute( placeholder, attrValue );
+	}
 
 	return null;
 };
@@ -194,18 +191,17 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		function attributeReducer( state, newAttibutes ) {
+			return { ...state, ...newAttibutes };
+		}
+
 		/*
 		 * Collect and update the bound attributes
 		 * in a separate state.
 		 */
-		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
-				setBoundAttributes( ( prev ) => ( {
-					...prev,
-					...newAttributes,
-				} ) ),
-			[]
+		const [ boundAttributes, updateBoundAttributes ] = useReducer(
+			attributeReducer,
+			props.attributes
 		);
 
 		/*
@@ -222,16 +218,13 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			<>
 				{ Object.keys( bindings ).length > 0 && (
 					<BlockBindingBridge
-						blockProps={ props }
+						blockProps={ { ...props, attributes: boundAttributes } }
 						bindings={ bindings }
 						onPropValueChange={ updateBoundAttributes }
 					/>
 				) }
 
-				<BlockEdit
-					{ ...props }
-					attributes={ { ...props.attributes, ...boundAttributes } }
-				/>
+				<BlockEdit { ...props } attributes={ boundAttributes } />
 			</>
 		);
 	},
