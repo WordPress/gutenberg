@@ -363,14 +363,11 @@ test.describe( 'Navigation block', () => {
 		 * Test: We can open and close the preview with the keyboard and escape
 		 *       buttons from a top-level nav item using both the shortcut and toolbar
 		 */
-		await navigation.previewOpenClose( {
-			label: 'Cat',
-			activator: 'shortcut',
-		} );
-		await navigation.previewOpenClose( {
-			label: 'Cat',
-			activator: 'toolbar',
-		} );
+		await navigation.useLinkShortcut();
+		await navigation.previewIsOpenAndCloses();
+		await navigation.checkLabelFocus( 'Cat' );
+
+		await navigation.canUseToolbarLink();
 
 		/**
 		 * Test: Creating a link from a url-string (https://www.example.com) returns
@@ -391,14 +388,11 @@ test.describe( 'Navigation block', () => {
 		 *       both the shortcut and toolbar
 		 */
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await navigation.previewOpenClose( {
-			label: 'example.com',
-			activator: 'shortcut',
-		} );
-		await navigation.previewOpenClose( {
-			label: 'example.com',
-			activator: 'toolbar',
-		} );
+		await navigation.useLinkShortcut();
+		await navigation.previewIsOpenAndCloses();
+		await navigation.checkLabelFocus( 'example.com' );
+
+		await navigation.canUseToolbarLink();
 
 		/**
 		 * Test: Can add submenu item using the keyboard
@@ -421,14 +415,11 @@ test.describe( 'Navigation block', () => {
 		 * Test: We can open and close the preview with the keyboard and escape
 		 *       buttons from a submenu nav item using both the shortcut and toolbar
 		 */
-		await navigation.previewOpenClose( {
-			label: 'Dog',
-			activator: 'shortcut',
-		} );
-		await navigation.previewOpenClose( {
-			label: 'Dog',
-			activator: 'toolbar',
-		} );
+		await navigation.useLinkShortcut();
+		await navigation.previewIsOpenAndCloses();
+		await navigation.checkLabelFocus( 'Dog' );
+
+		await navigation.canUseToolbarLink();
 
 		// Return to nav label from toolbar
 		await page.keyboard.press( 'Escape' );
@@ -476,14 +467,10 @@ test.describe( 'Navigation block', () => {
 		 *       both the shortcut and toolbar
 		 */
 		await pageUtils.pressKeys( 'ArrowLeft' );
-		await navigation.previewOpenClose( {
-			label: 'wordpress.org',
-			activator: 'shortcut',
-		} );
-		await navigation.previewOpenClose( {
-			label: 'wordpress.org',
-			activator: 'toolbar',
-		} );
+		await navigation.useLinkShortcut();
+		await navigation.previewIsOpenAndCloses();
+		await navigation.checkLabelFocus( 'wordpress.org' );
+		await navigation.canUseToolbarLink();
 	} );
 
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
@@ -646,9 +633,7 @@ class Navigation {
 
 		await expect( linkControlSearch ).toBeHidden();
 
-		const navLink = this.getNavLink( label );
-
-		await expect( navLink ).toBeVisible();
+		await this.checkLabelFocus( label );
 	}
 
 	/**
@@ -707,27 +692,12 @@ class Navigation {
 	}
 
 	/**
-	 * Test: Exiting link control from primary+k returns
-	 *       focus to the navigation block
-	 *
-	 * 1. Primary + k
-	 * 2. Focus is within the link control
-	 * 3. Escape to exit
-	 * 4. Focus should be at the same position it started at
-	 *
-	 * @param {Object} options
+	 * Checks:
+	 * - the preview is open
+	 * - has focus within it
+	 * - closes with Escape
 	 */
-	async previewOpenClose( options = {} ) {
-		const { label, activator } = options;
-		if ( activator === 'shortcut' ) {
-			await this.useLinkShortcut();
-		} else if ( activator === 'toolbar' ) {
-			await this.useToolbarButton( 'Link' );
-		} else {
-			// This will fail
-			return;
-		}
-
+	async previewIsOpenAndCloses() {
 		const linkPopover = this.getLinkPopover();
 		await expect( linkPopover ).toBeVisible();
 		// Expect focus to be within the link control. We could be more exact here, but it would be more brittle that way. We really care if focus is within it or not.
@@ -744,12 +714,18 @@ class Navigation {
 		await this.page.keyboard.press( 'Escape' );
 
 		await expect( linkPopover ).toBeHidden();
+	}
 
-		if ( activator === 'shortcut' ) {
-			await this.checkLabelFocus( label );
-		} else if ( activator === 'toolbar' ) {
-			await expect( this.getToolbarLinkButton() ).toBeFocused();
-		}
+	/**
+	 * When focus is within a navigation link item, we should be able to:
+	 * - use the toolbar link button to open the popover
+	 * - have focus within the popover
+	 * - close it usingn escape to return focus to the toolbar button
+	 */
+	async canUseToolbarLink() {
+		await this.useToolbarButton( 'Link' );
+		await this.previewIsOpenAndCloses();
+		await expect( this.getToolbarLinkButton() ).toBeFocused();
 	}
 
 	async arrowToLabel( label, times = 15 ) {
