@@ -170,26 +170,29 @@ export function PrivateBlockToolbar( {
 				{ isUsingBindings && canBindBlock( blockName ) && (
 					<BlockBindingsIndicator />
 				) }
-				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					isDefaultEditingMode && (
-						<div
-							ref={ nodeRef }
-							{ ...showHoveredOrFocusedGestures }
-						>
-							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
+				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
+					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
+						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
+							<BlockSwitcher
+								clientIds={ blockClientIds }
+								disabled={ ! isDefaultEditingMode }
+							/>
+							{ isDefaultEditingMode && (
+								<>
+									{ ! isMultiToolbar && (
+										<BlockLockToolbar
+											clientId={ blockClientId }
+										/>
+									) }
+									<BlockMover
+										clientIds={ blockClientIds }
+										hideDragHandle={ hideDragHandle }
 									/>
-								) }
-								<BlockMover
-									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
-								/>
-							</ToolbarGroup>
-						</div>
-					) }
+								</>
+							) }
+						</ToolbarGroup>
+					</div>
+				) }
 				<Shuffle clientId={ blockClientId } />
 				{ shouldShowVisualToolbar && isMultiToolbar && (
 					<BlockGroupToolbar />
