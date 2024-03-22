@@ -154,6 +154,13 @@ const { actions } = store( 'core/router', {
 				} else {
 					window.location.assign( href );
 				}
+
+				// Scroll to the anchor if exits in the link.
+				if ( !! event.target?.hash ) {
+					document
+						.querySelector( event.target.hash )
+						?.scrollIntoView();
+				}
 			}
 		},
 		prefetch( event, url ) {
