@@ -40,13 +40,13 @@
 
 .components-placeholder__label {
 	font-weight: 600;
-	margin-bottom: $grid-unit-20;
 	align-items: center;
+	display: inline-flex;
 
 	> svg,
 	.dashicon,
 	.block-editor-block-icon {
-		margin-right: $grid-unit-15;
+		margin-right: $grid-unit-05;
 		fill: currentColor;
 		// Optimizate for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
@@ -59,9 +59,6 @@
 	&:empty {
 		display: none;
 	}
-
-	// @todo
-	display: none;
 }
 
 .components-placeholder__fieldset,
@@ -110,14 +107,6 @@
 
 // Element queries to show different layouts at various sizes.
 .components-placeholder {
-	// Medium and large sizes.
-	&.is-large {
-		.components-placeholder__label {
-			font-size: 18pt;
-			font-weight: normal;
-		}
-	}
-
 	// Medium and small sizes.
 	&.is-medium,
 	&.is-small {
