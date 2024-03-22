@@ -321,6 +321,7 @@ export const BackdropUI = styled.div< BackdropProps >`
 export const Prefix = styled.span`
 	box-sizing: border-box;
 	display: block;
+	${ fontSizeStyles }
 `;
 
 export const Suffix = styled.span`
@@ -328,4 +329,5 @@ export const Suffix = styled.span`
 	align-self: stretch;
 	box-sizing: border-box;
 	display: flex;
+	${ fontSizeStyles }
 `;
