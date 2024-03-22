@@ -278,6 +278,7 @@ export default function Image( {
 		// When deleting a link from an image while lightbox settings
 		// are enabled by default, we should disable the lightbox,
 		// otherwise the resulting UX looks like a mistake.
+		// See https://github.com/WordPress/gutenberg/pull/59890/files#r1532286123.
 		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
 			setAttributes( {
 				lightbox: { enabled: false },
