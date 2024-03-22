@@ -21,22 +21,12 @@ function gutenberg_reregister_interactivity_script_modules() {
 		$default_version
 	);
 
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-client-side-navigation' ) ) {
-		wp_register_script_module(
-			'@wordpress/interactivity-router',
-			gutenberg_url( '/build/interactivity/full-csn.min.js' ),
-			array( '@wordpress/interactivity' ),
-			$default_version
-		);
-		wp_enqueue_script_module( '@wordpress/interactivity-router' );
-	} else {
-		wp_register_script_module(
-			'@wordpress/interactivity-router',
-			gutenberg_url( '/build/interactivity/router.min.js' ),
-			array( '@wordpress/interactivity' ),
-			$default_version
-		);
-	}
+	wp_register_script_module(
+		'@wordpress/interactivity-router',
+		gutenberg_url( '/build/interactivity/router.min.js' ),
+		array( '@wordpress/interactivity' ),
+		$default_version
+	);
 }
 
 add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
