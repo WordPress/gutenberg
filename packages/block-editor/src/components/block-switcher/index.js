@@ -160,7 +160,7 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-export const BlockSwitcher = ( { clientIds } ) => {
+export const BlockSwitcher = ( { clientIds, disabled } ) => {
 	const {
 		canRemove,
 		hasBlockStyles,
@@ -229,8 +229,8 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	const blockSwitcherLabel = isSingleBlock
 		? blockTitle
 		: __( 'Multiple blocks selected' );
-	const hideDropdown = ! hasBlockStyles && ! canRemove;
 
+	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
