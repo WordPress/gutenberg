@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -22,28 +27,41 @@ const EMPTY_INSERTION_POINT = {
  *
  * @return {Object} The root client ID, index to insert at and starting filter value.
  */
-export const getInsertionPoint = createRegistrySelector(
-	( select ) => ( state ) => {
-		if ( typeof state.blockInserterPanel === 'object' ) {
-			return state.blockInserterPanel;
-		}
+export const getInsertionPoint = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			if ( typeof state.blockInserterPanel === 'object' ) {
+				return state.blockInserterPanel;
+			}
 
-		if ( getRenderingMode( state ) === 'template-locked' ) {
+			if ( getRenderingMode( state ) === 'template-locked' ) {
+				const [ postContentClientId ] =
+					select( blockEditorStore ).getBlocksByName(
+						'core/post-content'
+					);
+				if ( postContentClientId ) {
+					return {
+						rootClientId: postContentClientId,
+						insertionIndex: undefined,
+						filterValue: undefined,
+					};
+				}
+			}
+
+			return EMPTY_INSERTION_POINT;
+		},
+		( state ) => {
 			const [ postContentClientId ] =
 				select( blockEditorStore ).getBlocksByName(
 					'core/post-content'
 				);
-			if ( postContentClientId ) {
-				return {
-					rootClientId: postContentClientId,
-					insertionIndex: undefined,
-					filterValue: undefined,
-				};
-			}
+			return [
+				state.blockInserterPanel,
+				getRenderingMode( state ),
+				postContentClientId,
+			];
 		}
-
-		return EMPTY_INSERTION_POINT;
-	}
+	)
 );
 
 export function getListViewToggleRef( state ) {
