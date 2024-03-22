@@ -313,7 +313,7 @@ test.describe( 'Navigation block', () => {
 		await expect( warningMessage ).toBeVisible();
 	} );
 
-	test( 'creating navigation menus via keyboard without losing focus', async ( {
+	test( 'navigation manages focus for creating, editing, and deleting items', async ( {
 		admin,
 		page,
 		pageUtils,
