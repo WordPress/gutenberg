@@ -182,7 +182,7 @@ window.addEventListener( 'popstate', async () => {
 	const url = cleanUrl( window.location ); // Remove hash.
 	const page = pages.has( url ) && ( await pages.get( url ) );
 	if ( page ) {
-		await updateHead( ...page.head );
+		await updateHead( page.head );
 		const fragment = getRegionRootFragment( document.body );
 		render( page.body, fragment );
 	} else {
