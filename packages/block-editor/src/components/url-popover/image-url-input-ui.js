@@ -369,6 +369,7 @@ const ImageURLInputUI = ( {
 											onSetLightbox( true );
 											stopEditLink();
 										} }
+										label={ __( 'Expand on click' ) }
 									>
 										{ __( 'Expand on click' ) }
 									</MenuItem>
