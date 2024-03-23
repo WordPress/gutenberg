@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -74,7 +75,11 @@ export function FlatTermSelector( { slug } ) {
 				: EMPTY_ARRAY;
 
 			const query = {
-				...DEFAULT_QUERY,
+				...applyFilters(
+					'editor.FlatTermSelector.queryArgs',
+					DEFAULT_QUERY,
+					slug
+				),
 				include: _termIds.join( ',' ),
 				per_page: -1,
 			};
@@ -112,7 +117,11 @@ export function FlatTermSelector( { slug } ) {
 			return {
 				searchResults: !! search
 					? getEntityRecords( 'taxonomy', slug, {
-							...DEFAULT_QUERY,
+							...applyFilters(
+								'editor.FlatTermSelector.queryArgs',
+								DEFAULT_QUERY,
+								slug
+							),
 							search,
 					  } )
 					: EMPTY_ARRAY,
