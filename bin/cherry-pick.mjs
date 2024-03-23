@@ -6,14 +6,17 @@ import readline from 'readline';
 
 import { spawnSync } from 'node:child_process';
 
-const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';
+const DRY_RUN = process.argv.includes( '--dry-run' );
+const LABEL =
+	process.argv.filter( ( arg ) => arg !== '--dry-run' )[ 2 ] ||
+	'Backport to WP Beta/RC';
 const BACKPORT_COMPLETED_LABEL = 'Backported to WP Core';
 const BRANCH = getCurrentBranch();
 const GITHUB_CLI_AVAILABLE = spawnSync( 'gh', [ 'auth', 'status' ] )
 	?.stdout?.toString()
 	.includes( '✓ Logged in to github.com' );
 
-const AUTO_PROPAGATE_RESULTS_TO_GITHUB = GITHUB_CLI_AVAILABLE;
+const autoPropagateResultsToGithub = GITHUB_CLI_AVAILABLE && ! DRY_RUN;
 
 /**
  * The main function of this script. It:
@@ -37,14 +40,23 @@ async function main() {
 	console.log(
 		`• Cherry-pick the merged PRs labeled as "${ LABEL }" to this branch`
 	);
-	console.log( `• Ask whether you want to push this branch` );
-	console.log( `• Comment on each PR` );
-	console.log( `• Remove the label from each PR` );
-	console.log(
-		`The last two actions will be performed USING YOUR GITHUB ACCOUNT that`
-	);
-	console.log( `you've linked to your GitHub CLI (gh command)` );
-	console.log( `` );
+
+	if ( autoPropagateResultsToGithub ) {
+		console.log( `• Ask whether you want to push this branch` );
+		console.log( `• Comment on each PR` );
+		console.log( `• Remove the label from each PR` );
+		console.log(
+			`The last two actions will be performed USING YOUR GITHUB ACCOUNT that`
+		);
+		console.log( `you've linked to your GitHub CLI (gh command)` );
+		console.log( `` );
+	} else {
+		console.log( `` );
+		console.log(
+			`Note: you are running in DRY RUN mode. No changes will be pushed to Github.`
+		);
+		console.log( `` );
+	}
 	await promptDoYouWantToProceed();
 
 	console.log( `$ git pull origin ${ BRANCH } --rebase...` );
@@ -61,7 +73,7 @@ async function main() {
 	reportSummaryNextSteps( successes, failures );
 
 	if ( successes.length ) {
-		if ( AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+		if ( autoPropagateResultsToGithub ) {
 			console.log( `About to push to origin/${ BRANCH }` );
 			await promptDoYouWantToProceed();
 			cli( 'git', [ 'push', 'origin', BRANCH ] );
@@ -334,7 +346,7 @@ function reportSummaryNextSteps( successes, failures ) {
 	console.log( '' );
 
 	const nextSteps = [];
-	if ( successes.length && ! AUTO_PROPAGATE_RESULTS_TO_GITHUB ) {
+	if ( successes.length && ! autoPropagateResultsToGithub ) {
 		nextSteps.push( 'Push this branch' );
 		nextSteps.push( 'Go to each of the cherry-picked Pull Requests' );
 		nextSteps.push( `Remove the ${ LABEL } label` );
