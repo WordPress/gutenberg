@@ -97,26 +97,14 @@ test.describe( 'Pages', () => {
 		// Set up
 		await draftNewPage( page );
 		await addPageContent( editor, page );
-
-		/*
-		 * Test create page.Test creating a new page and editing the template.
-		 */
-		// Selecting a block in the template should display a notice.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Site Title',
-			} )
-			.click( { force: true } );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
-			)
-		).toBeVisible();
+		await editor.openDocumentSettingsSidebar();
 
 		// Switch to template editing focus.
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Page' } ).click();
+		await editorSettings
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();

@@ -32,11 +32,14 @@ function Editor( {
 	...props
 } ) {
 	const {
-		initialPost,
 		currentPost,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-	} = useNavigateToEntityRecord( initialPostId, initialPostType );
+	} = useNavigateToEntityRecord(
+		initialPostId,
+		initialPostType,
+		'post-only'
+	);
 
 	const { post, template } = useSelect(
 		( select ) => {
@@ -79,6 +82,13 @@ function Editor( {
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
+
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
+		};
+	}, [ initialPostType, initialPostId ] );
 
 	if ( ! post ) {
 		return null;

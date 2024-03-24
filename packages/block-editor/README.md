@@ -1028,6 +1028,10 @@ _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
 
+### useZoomOut
+
+A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+
 ### Warning
 
 _Related_
