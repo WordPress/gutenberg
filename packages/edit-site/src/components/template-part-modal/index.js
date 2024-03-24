@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import TemplatePartDuplicateModal from './duplicate';
 import TemplatePartRenameModal from './rename';
 
 export const TEMPLATE_PART_MODALS = {
@@ -9,11 +10,10 @@ export const TEMPLATE_PART_MODALS = {
 };
 
 export default function TemplatePartModal() {
-	// Duplication command and modal is in separate follow-up.
 	return (
 		<>
 			<TemplatePartRenameModal />
-			{ /* <PatternDuplicateModal /> */ }
+			<TemplatePartDuplicateModal />
 		</>
 	);
 }

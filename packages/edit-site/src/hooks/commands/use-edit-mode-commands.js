@@ -290,7 +290,7 @@ function usePatternCommands() {
 			commands.push( {
 				name: 'core/rename-template-part',
 				label: __( 'Rename template part' ),
-				icon: symbol,
+				icon: edit,
 				callback: ( { close } ) => {
 					openModal( TEMPLATE_PART_MODALS.rename );
 					close();
@@ -298,7 +298,15 @@ function usePatternCommands() {
 			} );
 		}
 
-		// All template parts will be eligible for duplication in a follow-up.
+		commands.push( {
+			name: 'core/duplicate-template-part',
+			label: __( 'Duplicate template part' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				openModal( TEMPLATE_PART_MODALS.duplicate );
+				close();
+			},
+		} );
 	}
 
 	return { isLoading: false, commands };
