@@ -8,7 +8,7 @@ export function kebabToCamelCase( str: string ): string {
 	return str
 		.replace( /^-+|-+$/g, '' )
 		.toLowerCase()
-		.replace( /-([a-z])/g, function ( group1: string ) {
+		.replace( /-([a-z])/g, function ( _match, group1: string ) {
 			return group1.toUpperCase();
 		} );
 }
