@@ -10,7 +10,7 @@ import { Disabled } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockList from '../block-list';
-import Iframe from '../iframe';
+import ShadowDom from '../iframe/shadow-dom';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
 
@@ -77,20 +77,20 @@ function ScaledBlockPreview( {
 				minHeight,
 			} }
 		>
-			<Iframe
+			<ShadowDom
 				contentRef={ useRefEffect( ( bodyElement ) => {
-					const {
-						ownerDocument: { documentElement },
-					} = bodyElement;
-					documentElement.classList.add(
-						'block-editor-block-preview__content-iframe'
-					);
-					documentElement.style.position = 'absolute';
-					documentElement.style.width = '100%';
+					// const {
+					// 	ownerDocument: { documentElement },
+					// } = bodyElement;
+					// documentElement.classList.add(
+					// 	'block-editor-block-preview__content-iframe'
+					// );
+					// documentElement.style.position = 'absolute';
+					// documentElement.style.width = '100%';
 
 					// Necessary for contentResizeListener to work.
 					bodyElement.style.boxSizing = 'border-box';
-					bodyElement.style.position = 'absolute';
+					bodyElement.style.position = 'relative';
 					bodyElement.style.width = '100%';
 				}, [] ) }
 				aria-hidden
@@ -112,7 +112,7 @@ function ScaledBlockPreview( {
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
 				<MemoizedBlockList renderAppender={ false } />
-			</Iframe>
+			</ShadowDom>
 		</Disabled>
 	);
 }
