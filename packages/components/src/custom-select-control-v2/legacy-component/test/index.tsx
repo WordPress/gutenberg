@@ -390,6 +390,7 @@ describe.each( [
 			expect( currentSelectedItem ).toHaveFocus();
 			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
 
+			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
 			await type( 'a' );
 
 			expect(
