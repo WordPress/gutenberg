@@ -1,0 +1,38 @@
+a.wp-block-link-preview {
+	display: block;
+	border: 1px solid #d3d3d3;
+	border-radius: 2px;
+	font-size: smaller;
+
+	&.has-image {
+		height: 100px;
+	}
+
+	strong {
+		display: block;
+	}
+
+	> div {
+		padding: 1em;
+	}
+
+	.link-preview__icon {
+		height: 1em;
+		width: 1em;
+		margin-right: 0.25em;
+	}
+
+	> img {
+		float: right;
+		max-width: 50%;
+		height: 100%;
+	}
+
+
+}
+
+.wp-block-link-preview {
+	.components-notice {
+		margin: 0 0 1em 0;
+	}
+}

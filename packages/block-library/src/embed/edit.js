@@ -218,6 +218,7 @@ const EmbedEdit = ( props ) => {
 					tryAgain={ () => {
 						invalidateResolution( 'getEmbedPreview', [ url ] );
 					} }
+					onReplace={ onReplace }
 				/>
 			</View>
 		);

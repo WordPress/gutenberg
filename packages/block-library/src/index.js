@@ -60,6 +60,7 @@ import * as html from './html';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as linkPreview from './link-preview';
 import * as list from './list';
 import * as listItem from './list-item';
 import * as logInOut from './loginout';
@@ -135,6 +136,7 @@ const getAllBlocks = () => {
 		image,
 		heading,
 		gallery,
+		linkPreview,
 		list,
 		listItem,
 		quote,
