@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -49,7 +49,7 @@ export const trashPostAction = {
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
-								__(
+								_n(
 									'Are you sure you want to delete %d pages?'
 								),
 								posts.length
