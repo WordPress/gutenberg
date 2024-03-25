@@ -258,7 +258,12 @@ function Layout( { initialPost } ) {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return <InserterSidebar />;
+			return (
+				<InserterSidebar
+					closeGeneralSidebar={ closeGeneralSidebar }
+					isRightSidebarOpen={ sidebarIsOpened }
+				/>
+			);
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;

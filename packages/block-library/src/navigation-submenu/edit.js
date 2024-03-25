@@ -389,20 +389,22 @@ export default function NavigationSubmenuEdit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ label || '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
-						label={ __( 'Label' ) }
+						label={ __( 'Text' ) }
 						autoComplete="off"
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
 						} }
-						label={ __( 'URL' ) }
+						label={ __( 'Link' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
@@ -420,6 +422,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -432,6 +435,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
