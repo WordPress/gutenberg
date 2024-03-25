@@ -445,9 +445,11 @@ export function getBlocksWithBoundAttributeByExternalKey( state, key, value ) {
 
 export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
 	createSelector( ( state, key, attribute ) => {
-		const { getExternalPropertieValue } = unlock( select( bindingsStore ) );
+		const { getBindingsConnectionValue } = unlock(
+			select( bindingsStore )
+		);
 
-		const externalValue = getExternalPropertieValue( key );
+		const externalValue = getBindingsConnectionValue( key );
 
 		// Check type of the bound attribute.
 

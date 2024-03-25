@@ -24,7 +24,7 @@ const STORE_NAME = 'core/bindings';
  * ```js
  * import { store as bindingsStore } from '@wordpress/bindings';
  * import { dispatch } from '@wordpress/data';
- * ...
+ *
  * const { registerBindingsSource } = dispatch( bindingsStore );
  * ```
  */

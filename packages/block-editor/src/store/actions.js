@@ -230,7 +230,7 @@ export function updateBlockAttributes(
 			uniqueByBlock,
 		} );
 
-		const { updateExternalProperty } = unlock(
+		const { updateBindingsConnectionValue } = unlock(
 			registry.dispatch( bindingsStore )
 		);
 
@@ -248,7 +248,7 @@ export function updateBlockAttributes(
 					/*
 					 * Update the external property with the new value.
 					 */
-					updateExternalProperty( key, value );
+					updateBindingsConnectionValue( key, value );
 				}
 			}
 		} );
@@ -273,11 +273,11 @@ export function resetBlockBindingConnections( blocks ) {
 			return;
 		}
 
-		const { registerExternalConnection } = unlock(
+		const { registerBindingsConnection } = unlock(
 			registry.dispatch( bindingsStore )
 		);
 
-		const { getExternalPropertyKey } = unlock(
+		const { getBindingsConnectionKey } = unlock(
 			registry.select( bindingsStore )
 		);
 
@@ -291,7 +291,7 @@ export function resetBlockBindingConnections( blocks ) {
 							 * and pass a callback function
 							 * to update the value of the bound attribute.
 							 */
-							registerExternalConnection(
+							registerBindingsConnection(
 								bindSettings,
 								( newValue ) => {
 									/*
@@ -313,7 +313,7 @@ export function resetBlockBindingConnections( blocks ) {
 
 							// Pick the external property key bound to the attribute.
 							const bindPropertyKey =
-								getExternalPropertyKey( bindSettings );
+								getBindingsConnectionKey( bindSettings );
 
 							dispatch.syncDerivedUpdates( () => {
 								dispatch.resetBindingBlocks(
