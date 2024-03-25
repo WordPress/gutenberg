@@ -70,6 +70,11 @@ class WP_Block_Supports_Shadow_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual );
 	}
 
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
 	public function data_generate_shadow_fixtures() {
 		return array(
 			'with no styles'               => array(
