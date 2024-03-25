@@ -281,6 +281,8 @@ function FontLibraryProvider( { children } ) {
 					sucessfullyInstalledFontFaces?.length > 0 ||
 					alreadyInstalledFontFaces?.length > 0
 				) {
+					// Use font data from REST API not from client to ensure
+					// correct font information is used.
 					installedFontFamily.fontFace = [
 						...sucessfullyInstalledFontFaces,
 					];
