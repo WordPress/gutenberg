@@ -24,7 +24,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from '../../template-actions';
-import TemplateAreas from './template-areas';
 import PluginTemplateSettingPanel from '../../plugin-template-setting-panel';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
@@ -113,9 +112,7 @@ export default function TemplatePanel() {
 						} }
 					/>
 				}
-			>
-				<TemplateAreas />
-			</PostCardPanel>
+			/>
 			<PluginTemplateSettingPanel.Slot />
 			{ availablePatterns?.length > 0 && (
 				<PanelBody

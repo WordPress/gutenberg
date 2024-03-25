@@ -243,18 +243,9 @@ export function isSaveViewOpened( state ) {
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => () => {
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).getBlocksByName( 'core/template-part' );
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
+		return unlock(
+			select( editorStore )
+		).getCurrentTemplateTemplateParts();
 	}
 );
 
