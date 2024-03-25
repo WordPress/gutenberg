@@ -374,10 +374,20 @@ export function getBoundAttributeExternalPropertyKey(
 	clientId,
 	attribute
 ) {
-	return state.bindings.byClientId.get( clientId )?.keys[ attribute ];
+	if ( ! state.bindings ) {
+		return {};
+	}
+
+	return state.bindings?.byClientId.get( clientId )?.connectionKeys[
+		attribute
+	];
 }
 
 export function getBlockWithBoundAttributes( state ) {
+	if ( ! state.bindings ) {
+		return {};
+	}
+
 	const result = {};
 
 	state.bindings.byClientId.forEach( ( block, clientId ) => {
@@ -387,19 +397,11 @@ export function getBlockWithBoundAttributes( state ) {
 
 		// Check if the attribute can be bound.
 		const boundAttributes = Object.fromEntries(
-			Object.entries( block.attributes || {} )
-				.filter( ( [ attribute ] ) => {
+			Object.entries( block.attributes || {} ).filter(
+				( [ attribute ] ) => {
 					return canBindAttribute( block.name, attribute );
-				} )
-				.map( ( [ attribute, bindSettings ] ) => {
-					return [
-						attribute,
-						{
-							...bindSettings,
-							value: block.attributes[ attribute ],
-						},
-					];
-				} )
+				}
+			)
 		);
 
 		if ( Object.keys( boundAttributes ).length === 0 ) {
@@ -442,7 +444,7 @@ export function getBlocksWithBoundAttributeByExternalKey( state, key, value ) {
  */
 
 export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
-	createSelector( ( state, key, boundAttribute ) => {
+	createSelector( ( state, key, attribute ) => {
 		const { getExternalPropertieValue } = unlock( select( bindingsStore ) );
 
 		const externalValue = getExternalPropertieValue( key );
@@ -450,20 +452,20 @@ export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
 		// Check type of the bound attribute.
 
 		// Type: string
-		if ( typeof boundAttribute === 'string' ) {
+		if ( typeof attribute === 'string' ) {
 			return externalValue;
 		}
 
 		// Type: RichTextData
-		if ( boundAttribute instanceof RichTextData ) {
+		if ( attribute instanceof RichTextData ) {
 			/*
 			 * Compare the string (HTML) value of the RichTextData
 			 * with the external value.
 			 *
 			 * If they are the same, return the bound attribute.
 			 */
-			if ( boundAttribute.toHTMLString() === externalValue ) {
-				return boundAttribute;
+			if ( attribute.toHTMLString() === externalValue ) {
+				return attribute;
 			}
 
 			/*

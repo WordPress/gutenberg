@@ -32,10 +32,6 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import {
-	canBindAttribute,
-	canBindBlock,
-} from '../../../editor/src/bindings/utils';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -53,7 +49,7 @@ export const resetBlocks =
 	( blocks ) =>
 	( { dispatch } ) => {
 		dispatch( { type: 'RESET_BLOCKS', blocks } );
-		dispatch( connectBlocksWithBoundAttributes( blocks ) );
+		dispatch( resetBlockBindingConnections( blocks ) );
 		dispatch( validateBlocksToTemplate( blocks ) );
 	};
 
@@ -155,105 +151,129 @@ export function receiveBlocks( blocks ) {
 	};
 }
 
+export function updateBlockBoundAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
+	clientIds = castArray( clientIds );
+
+	return ( { dispatch, select, registry } ) => {
+		for ( const clientId of clientIds ) {
+			for ( const [ attribute, value ] of Object.entries( attributes ) ) {
+				/*
+				 * Get the external property key bound to the attribute,
+				 * based on the block client ID and attribute name.
+				 */
+				const propertyKey = select.getBoundAttributeExternalPropertyKey(
+					clientId,
+					attribute
+				);
+
+				/*
+				 * Get all blocks that have the same attribute
+				 * bound to the same external property.
+				 */
+				const blocksWithBoundAttributes =
+					select.getBlocksWithBoundAttributeByExternalKey(
+						propertyKey,
+						value,
+						clientId
+					);
+
+				if ( ! blocksWithBoundAttributes?.length ) {
+					continue;
+				}
+
+				/*
+				 * Update all blocks that have
+				 * an attribute bound to the same external property.
+				 */
+				blocksWithBoundAttributes.forEach( ( subAction ) => {
+					registry.batch( () => {
+						dispatch.syncDerivedUpdates( () => {
+							dispatch( {
+								type: 'UPDATE_BLOCK_ATTRIBUTES',
+								clientIds: subAction.clientIds,
+								attributes: subAction.attributes,
+								uniqueByBlock,
+							} );
+						} );
+					} );
+				} );
+			}
+		}
+	};
+}
+
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds      Block client IDs.
- * @param {Object}          attributes     Block attributes to be merged. Should be keyed by clientIds if
- *                                         uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock  true if each block in clientIds array has a unique set of attributes
- * @param {boolean}         ignoreBindings true if the bindings should be ignored
+ * @param {string|string[]} clientIds     Block client IDs.
+ * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
+ *                                        uniqueByBlock is true.
+ * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false,
-	ignoreBindings = false
+	uniqueByBlock = false
 ) {
 	clientIds = castArray( clientIds );
+
 	return ( { dispatch, select, registry } ) => {
-		const { updateExternalProperty } = unlock(
-			registry.dispatch( bindingsStore )
-		);
-
-		if ( ! ignoreBindings ) {
-			dispatch.syncDerivedUpdates( () => {
-				registry.batch( () => {
-					for ( const clientId of clientIds ) {
-						for ( const [ attr, value ] of Object.entries(
-							attributes
-						) ) {
-							const key = select.getBoundAttributePropertyKey(
-								clientId,
-								attr
-							);
-
-							/*
-							 * Update the external property with the new value.
-							 */
-							updateExternalProperty( key, value );
-
-							/*
-							 * Collect all block client IDs that
-							 * have an attribute bound to the same external property.
-							 */
-							const attributeActionsCollection =
-								select.getAttributesByExternalProperty(
-									key,
-									value
-								);
-
-							if ( ! attributeActionsCollection ) {
-								continue;
-							}
-
-							/*
-							 * Update all blocks that have
-							 * an attribute bound to the same external property.
-							 */
-							attributeActionsCollection.forEach(
-								( subAction ) => {
-									dispatch.updateBlockAttributes(
-										subAction.clientIds,
-										subAction.attributes,
-										uniqueByBlock,
-										true
-									);
-								}
-							);
-						}
-					}
-				} );
-			} );
-			return; // Bail. it will update the block attributes in the next iteration.
-		}
-
 		dispatch( {
 			type: 'UPDATE_BLOCK_ATTRIBUTES',
 			clientIds,
 			attributes,
 			uniqueByBlock,
 		} );
+
+		const { updateExternalProperty } = unlock(
+			registry.dispatch( bindingsStore )
+		);
+
+		registry.batch( () => {
+			for ( const clientId of clientIds ) {
+				for ( const [ attribute, value ] of Object.entries(
+					attributes
+				) ) {
+					// Pick the external property key bound to the attribute.
+					const key = select.getBoundAttributeExternalPropertyKey(
+						clientId,
+						attribute
+					);
+
+					/*
+					 * Update the external property with the new value.
+					 */
+					updateExternalProperty( key, value );
+				}
+			}
+		} );
 	};
 }
 
 /**
- * Connect blocks with bound attributes to external data sources
- * by updating their attributes based on bound external properties.
- *
- * Iterates through each block and its inner blocks to establish
- * connections between block attributes and external properties.
+ * Connect blocks with bound attributes to external data sources.
  *
  * Attributes specified in block metadata bindings
  * are updated according to the corresponding external values.
  *
- * @param {Array} blocks - blocks to check for bound attributes.
- * @return {Function}      Returns a Redux thunk function that processes blocks and sets up bindings.
+ * @param {Object} blocks - Blocks list.
+ * @return {Function} Returns a Redux thunk function that processes blocks and sets up bindings.
  */
-export function connectBlocksWithBoundAttributes( blocks ) {
+export function resetBlockBindingConnections( blocks ) {
 	return ( { dispatch, registry, select } ) => {
-		const { registerExternalPropertyHandler } = unlock(
+		const clientIdsWithBoundAttributes =
+			select.getBlockWithBoundAttributes( blocks );
+
+		if ( ! clientIdsWithBoundAttributes ) {
+			return;
+		}
+
+		const { registerExternalConnection } = unlock(
 			registry.dispatch( bindingsStore )
 		);
 
@@ -262,88 +282,80 @@ export function connectBlocksWithBoundAttributes( blocks ) {
 		);
 
 		registry.batch( () => {
-			blocks.forEach( ( block ) => {
-				/*
-				 * Check inner blocks for bound attributes,
-				 * recursively.
-				 */
-				if ( block.innerBlocks ) {
-					dispatch.connectBlocksWithBoundAttributes(
-						block.innerBlocks
+			Object.entries( clientIdsWithBoundAttributes ).forEach(
+				( [ clientId, attributes ] ) => {
+					Object.entries( attributes ).forEach(
+						( [ attribute, bindSettings ] ) => {
+							/*
+							 * Register the external property handler,
+							 * and pass a callback function
+							 * to update the value of the bound attribute.
+							 */
+							registerExternalConnection(
+								bindSettings,
+								( newValue ) => {
+									/*
+									 * [binding-on-sync]: Update bound attribute value.
+									 *
+									 * Update the block attribute
+									 * when the external property value changes.
+									 */
+									dispatch.syncDerivedUpdates( () => {
+										dispatch.updateBlockBoundAttributes(
+											clientId,
+											{
+												[ attribute ]: newValue,
+											}
+										);
+									} );
+								}
+							);
+
+							// Pick the external property key bound to the attribute.
+							const bindPropertyKey =
+								getExternalPropertyKey( bindSettings );
+
+							dispatch.syncDerivedUpdates( () => {
+								dispatch.resetBindingBlocks(
+									clientId,
+									attribute,
+									bindPropertyKey
+								);
+							} );
+
+							/*
+							 * [binding-on-sync]: First bound attribute value update.
+							 */
+
+							const currentAttributeValue =
+								select.getBlockAttributes( clientId )?.[
+									attribute
+								];
+
+							const boundValue = select.getBoundAttributeValue(
+								bindPropertyKey,
+								currentAttributeValue
+							);
+
+							/*
+							 * Sync the block attribute with the external property value.
+							 */
+							if ( currentAttributeValue !== boundValue ) {
+								// dispatch.syncDerivedUpdates( () => {
+								// dispatch( {
+								// 	type: 'UPDATE_BLOCK_ATTRIBUTES',
+								// 	clientIds: [ clientId ],
+								// 	attributes: {
+								// 		[ attribute ]: boundValue,
+								// 	},
+								// 	uniqueByBlock: false,
+								// } );
+								// } );
+							}
+						}
 					);
 				}
-
-				// Skip blocks that can't be bound.
-				if ( ! canBindBlock( block.name ) ) {
-					return;
-				}
-
-				// Skip blocks that don't have metadata attribute.
-				if ( ! block.attributes.metadata ) {
-					return;
-				}
-
-				Object.entries( block.attributes.metadata.bindings ).forEach(
-					( [ attributeName, settings ] ) => {
-						// Skip attributes that can't be bound.
-						if ( ! canBindAttribute( block.name, attributeName ) ) {
-							return;
-						}
-
-						/*
-						 * Register the external property handler,
-						 * and pass a callback function
-						 * to update the value of the bound attribute.
-						 */
-						registerExternalPropertyHandler(
-							settings,
-							( newValue ) => {
-								/*
-								 * [binding-on-sync]: Update bounf attribute value.
-								 *
-								 * Update the block attribute
-								 * when the external property value changes.
-								 */
-								dispatch.syncDerivedUpdates( () => {
-									dispatch.updateBlockAttributes(
-										block.clientId,
-										{
-											[ attributeName ]: newValue,
-										}
-									);
-								} );
-							}
-						);
-
-						const key = getExternalPropertyKey( settings );
-
-						/*
-						 * Register the block with bound attribute
-						 * to the external property.
-						 */
-						dispatch.registerBlockBinding(
-							block.clientId,
-							attributeName,
-							key
-						);
-
-						/*
-						 * [binding-on-sync]: First bound attribute value update.
-						 */
-						const boundValue = select.getBoundAttributeValue(
-							key,
-							block.attributes[ attributeName ]
-						);
-
-						dispatch.updateBlockAttributes(
-							block.clientId,
-							{ [ attributeName ]: boundValue },
-							false,
-							true
-						);
-					}
-				);
-			} );
+			);
 		} );
 	};
 }
@@ -357,14 +369,21 @@ export function connectBlocksWithBoundAttributes( blocks ) {
  * @param {string} clientId  - Block client ID.
  * @param {string} attribute - The name of the block attribute to bind.
  * @param {string} key       - The key representing the external property.
- * @return {Object}            Redux 'REGISTER_BLOCK_BINDING' type action.
+ * @return {Object}            Redux 'RESET_BINDING_CONNECTION_BLOCKS' type action.
  */
-export function registerBlockBinding( clientId, attribute, key ) {
+export function resetBindingBlocks( clientId, attribute, key ) {
 	return {
-		type: 'REGISTER_BLOCK_BINDING',
+		type: 'RESET_BINDING_CONNECTION_BLOCKS',
 		clientId,
 		attribute,
-		bindingPropertyKey: key,
+		key,
+	};
+}
+export function unregisterBlockBinding( clientId, attribute ) {
+	return {
+		type: 'UNRESET_BINDING_CONNECTION_BLOCKS',
+		clientId,
+		attribute,
 	};
 }
 
