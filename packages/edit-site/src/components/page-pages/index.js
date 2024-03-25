@@ -35,6 +35,7 @@ import {
 } from '../../utils/constants';
 
 import {
+	renamePostAction,
 	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
@@ -356,6 +357,7 @@ export default function PagePages() {
 			restorePostAction,
 			permanentlyDeletePostAction,
 			postRevisionsAction,
+			renamePostAction,
 			trashPostAction,
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
