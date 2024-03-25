@@ -15,13 +15,9 @@
  * @return string Returns the previous posts link for the query.
  */
 function render_block_core_query_pagination_previous( $attributes, $content, $block ) {
-	$page_key                        = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination             = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
-	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
-	if ( ! empty( $interactivity_api_router_config['fullPageClientSideNavigation'] ) ) {
-		$enhanced_pagination = true;
-	}
-	$page = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
+	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
+	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$show_label         = isset( $block->context['showLabel'] ) ? (bool) $block->context['showLabel'] : true;

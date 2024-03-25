@@ -17,13 +17,9 @@
  * @return string Returns the modified output of the query block.
  */
 function render_block_core_query( $attributes, $content, $block ) {
-	$is_interactive                  = isset( $attributes['enhancedPagination'] )
+	$is_interactive = isset( $attributes['enhancedPagination'] )
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
-	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
-	if ( ! empty( $interactivity_api_router_config['fullPageClientSideNavigation'] ) && isset( $attributes['queryId'] ) ) {
-		$is_interactive = true;
-	}
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
