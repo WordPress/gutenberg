@@ -81,7 +81,7 @@ const URLSelectionUI = ( {
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
-				variant="tertiary"
+				variant="secondary"
 			>
 				{ __( 'Insert from URL' ) }
 			</Button>
@@ -422,7 +422,7 @@ export function MediaPlaceholder( {
 					<Button
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
-						variant="tertiary"
+						variant="secondary"
 					>
 						{ __( 'Use featured image' ) }
 					</Button>
@@ -435,7 +435,7 @@ export function MediaPlaceholder( {
 		const defaultButton = ( { open } ) => {
 			return (
 				<Button
-					variant="tertiary"
+					variant="secondary"
 					onClick={ () => {
 						open();
 					} }
