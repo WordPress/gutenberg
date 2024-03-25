@@ -465,8 +465,6 @@
 		line-height: $grid-unit-20;
 
 		.dataviews-view-list__field {
-			margin: 0;
-
 			&:has(.dataviews-view-list__field-value:empty) {
 				display: none;
 			}
