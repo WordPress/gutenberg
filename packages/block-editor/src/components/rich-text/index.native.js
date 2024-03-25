@@ -176,6 +176,7 @@ export function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -590,6 +591,7 @@ export function RichTextWrapper(
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
+			clearSelectedBlock={ clearSelectedBlock }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
