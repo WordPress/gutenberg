@@ -21,7 +21,7 @@ const stripRegexp = /(\p{C}|\p{P}|\p{S})+/giu; // Anything that's not a punctuat
 
 // Normalization cache
 const extractedWords = new Map();
-const normalizedSearch = new Map();
+const normalizedStrings = new Map();
 
 /**
  * Extracts words from an input string.
@@ -54,9 +54,9 @@ function extractWords( input = '' ) {
  *
  * @return {string} The normalized search input.
  */
-function normalizeSearchInput( input = '' ) {
-	if ( normalizedSearch.has( input ) ) {
-		return normalizedSearch.get( input );
+function normalizeString( input = '' ) {
+	if ( normalizedStrings.has( input ) ) {
+		return normalizedStrings.get( input );
 	}
 
 	// Disregard diacritics.
@@ -71,7 +71,7 @@ function normalizeSearchInput( input = '' ) {
 	//  Input: "MEDIA"
 	result = result.toLowerCase();
 
-	normalizedSearch.set( input, result );
+	normalizedStrings.set( input, result );
 
 	return result;
 }
@@ -84,7 +84,7 @@ function normalizeSearchInput( input = '' ) {
  * @return {string[]} The normalized list of search terms.
  */
 export const getNormalizedSearchTerms = ( input = '' ) => {
-	return extractWords( normalizeSearchInput( input ) );
+	return extractWords( normalizeString( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
@@ -170,8 +170,8 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const category = getCategory( item );
 	const collection = getCollection( item );
 
-	const normalizedSearchInput = normalizeSearchInput( searchTerm );
-	const normalizedTitle = normalizeSearchInput( title );
+	const normalizedSearchInput = normalizeString( searchTerm );
+	const normalizedTitle = normalizeString( title );
 
 	let rank = 0;
 
