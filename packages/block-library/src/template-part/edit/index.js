@@ -301,7 +301,7 @@ export default function TemplatePartEdit( {
 					( partsAsPatterns.length > 0 ||
 						blockPatterns.length > 0 ) && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Replace' ) }>
+							<PanelBody title={ __( 'Design' ) }>
 								<TemplatesList
 									availableTemplates={ partsAsPatterns }
 									onSelect={ ( pattern ) => {
