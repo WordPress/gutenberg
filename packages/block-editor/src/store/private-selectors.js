@@ -25,6 +25,10 @@ import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import { selectBlockPatternsKey } from './private-keys';
 import { RichTextData } from '@wordpress/rich-text';
+import {
+	canBindAttribute,
+	canBindBlock,
+} from '../../../editor/src/bindings/utils';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -365,49 +369,63 @@ export function isDragging( state ) {
  * @param {string} attribute - Block attribute name.
  * @return {Object} The binding for the block client ID.
  */
-export function getBoundAttributePropertyKey( state, clientId, attribute ) {
-	return state.blocks.bindings.get( clientId )?.[ attribute ];
+export function getBoundAttributeExternalPropertyKey(
+	state,
+	clientId,
+	attribute
+) {
+	return state.bindings.byClientId.get( clientId )?.keys[ attribute ];
 }
 
-export function getBlocksClientIdsByExternalProperty( state, propertyKey ) {
-	return state.blocks.bindingsByExternalPropery.get( propertyKey );
-}
+export function getBlockWithBoundAttributes( state ) {
+	const result = {};
 
-export function getAttributesByExternalProperty( state, propertyKey, value ) {
-	const clientIds = state.blocks.bindingsByExternalPropery.get( propertyKey );
-	if ( ! clientIds ) {
-		return [];
-	}
-
-	const result = [];
-
-	clientIds.forEach( ( clientId ) => {
-		const binding = state.blocks.bindings.get( clientId );
-		if ( binding ) {
-			const attributes = {};
-			Object.keys( binding ).forEach( ( attrName ) => {
-				if ( binding[ attrName ] === propertyKey ) {
-					attributes[ attrName ] = value;
-				}
-			} );
-
-			const group = result.find(
-				( g ) =>
-					JSON.stringify( g.attributes ) ===
-					JSON.stringify( attributes )
-			);
-			if ( group ) {
-				group.clientIds.push( clientId );
-			} else {
-				result.push( {
-					clientIds: [ clientId ],
-					attributes,
-				} );
-			}
+	state.bindings.byClientId.forEach( ( block, clientId ) => {
+		if ( ! canBindBlock( block.name ) ) {
+			return;
 		}
+
+		// Check if the attribute can be bound.
+		const boundAttributes = Object.fromEntries(
+			Object.entries( block.attributes || {} )
+				.filter( ( [ attribute ] ) => {
+					return canBindAttribute( block.name, attribute );
+				} )
+				.map( ( [ attribute, bindSettings ] ) => {
+					return [
+						attribute,
+						{
+							...bindSettings,
+							value: block.attributes[ attribute ],
+						},
+					];
+				} )
+		);
+
+		if ( Object.keys( boundAttributes ).length === 0 ) {
+			return;
+		}
+
+		result[ clientId ] = boundAttributes;
 	} );
 
 	return result;
+}
+
+export function getBlocksWithBoundAttributeByExternalKey( state, key, value ) {
+	const bindingsConnection = state.bindings.connections.get( key );
+	if ( ! bindingsConnection ) {
+		return [];
+	}
+
+	return Object.entries( bindingsConnection ).map(
+		( [ attr, clientIds ] ) => {
+			return {
+				attributes: { [ attr ]: value },
+				clientIds,
+			};
+		}
+	);
 }
 
 /**

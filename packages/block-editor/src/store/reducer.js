@@ -132,6 +132,26 @@ function getFlattenedBlockAttributes( blocks ) {
 }
 
 /**
+ * Given an array of blocks, returns an object containing all blocks
+ * that have bindings, recursing into inner blocks.
+ * Keys correspond to the block client ID, the value contains the following properties:
+ * - name: the block name
+ * - attributes: the block attributes that have bindings.
+ *   Keys correspond to the attribute name, the value contains the following properties:
+ *     - source: The binding source handler name,
+ *     - args: The binding arguments.
+ *
+ * @param {Array} blocks - Blocks to flatten.
+ * @return {Array}         Flattened block.
+ */
+function getFlattenedBindingExternalProperties( blocks ) {
+	return flattenBlocks( blocks, ( block ) => ( {
+		name: block.name,
+		attributes: block.attributes?.metadata?.bindings,
+	} ) ).filter( ( [ , bindings ] ) => bindings.attributes !== undefined );
+}
+
+/**
  * Returns true if the two object arguments have the same keys, or false
  * otherwise.
  *
@@ -771,7 +791,6 @@ export const blocks = pipe(
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
 	withBlockReset,
-	// withBlockWithBoundAttributesReset, // Needs to be after withBlockReset.
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
 	withResetControlledBlocks
@@ -1198,49 +1217,6 @@ export const blocks = pipe(
 				[ clientId ]: hasControlledInnerBlocks,
 			};
 		}
-		return state;
-	},
-
-	bindings( state = new Map(), action ) {
-		switch ( action.type ) {
-			case 'REGISTER_BLOCK_BINDING': {
-				const { clientId, attribute, bindingPropertyKey } = action;
-				const newState = new Map( state );
-
-				newState.set( clientId, {
-					...newState.get( clientId ),
-					[ attribute ]: bindingPropertyKey,
-				} );
-
-				// console.log( '[core/block-edtor] bindings: ', newState );
-
-				return newState;
-			}
-		}
-
-		return state;
-	},
-
-	bindingsByExternalPropery( state = new Map(), action ) {
-		switch ( action.type ) {
-			case 'REGISTER_BLOCK_BINDING': {
-				const { clientId, bindingPropertyKey } = action;
-				const newState = new Map( state );
-
-				newState.set( bindingPropertyKey, [
-					...( newState.get( bindingPropertyKey ) || [] ),
-					clientId,
-				] );
-
-				// console.log(
-				// 	'[core/block-edtor] bindingsByExternalPropery: ',
-				// 	newState
-				// );
-
-				return newState;
-			}
-		}
-
 		return state;
 	},
 } );
@@ -2089,7 +2065,92 @@ export function lastFocus( state = false, action ) {
 	return state;
 }
 
+const withBindingBlockReset = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'RESET_BLOCKS' ) {
+		const newState = {
+			...state,
+			byClientId: new Map(
+				getFlattenedBindingExternalProperties( action.blocks )
+			),
+		};
+		return newState;
+	}
+
+	return reducer( state, action );
+};
+
+export const bindings = pipe(
+	combineReducers,
+	withBindingBlockReset
+)( {
+	byClientId( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'RESET_BINDING_CONNECTION_BLOCKS': {
+				const { clientId, attribute, key } = action;
+				const newState = new Map( state );
+
+				/*
+				 * Populate ClientId entry
+				 * with the property key bound to the block attributes.
+				 */
+				const currentBindings = newState.get( clientId ) || {};
+				newState.set( clientId, {
+					...currentBindings,
+					connectionKeys: {
+						...currentBindings.connectionKeys,
+						[ attribute ]: key,
+					},
+				} );
+
+				return newState;
+			}
+		}
+
+		return state;
+	},
+
+	connections( state = new Map(), action ) {
+		switch ( action.type ) {
+			/*
+			 * Collect the blocks with an attribute
+			 * bound to the external property,
+			 * organized by:
+			 * {
+			 *   [connection-key_1]: {
+			 *     [attribute_1]: [ clientId_1, clientId_2, ... ],
+			 *     [attribute_2]: [ clientId_1, clientId_3, ... ],
+			 *     ...
+			 *   },
+			 *  [connection-key_2]: {
+			 *    [attribute_1]: [ clientId_1, clientId_4, ... ],
+			 *    [attribute_3]: [ clientId_2, clientId_8, ... ],
+			 *    ...
+			 *   },
+			 *   ...
+			 * }
+			 */
+			case 'RESET_BINDING_CONNECTION_BLOCKS': {
+				const { clientId, attribute, key } = action;
+				const newState = new Map( state );
+
+				newState.set( key, {
+					...newState.get( key ),
+					[ attribute ]: [
+						...( newState.get( key )?.[ attribute ] || [] ),
+						clientId,
+					],
+				} );
+
+				return newState;
+			}
+		}
+
+		return state;
+	},
+} );
+
 const combinedReducers = combineReducers( {
+	bindings,
 	blocks,
 	isDragging,
 	isTyping,
