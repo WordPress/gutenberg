@@ -32,6 +32,7 @@ function gutenberg_reregister_core_block_types() {
 				'more',
 				'nextpage',
 				'paragraph',
+				'post-navigation',
 				'preformatted',
 				'pullquote',
 				'quote',
