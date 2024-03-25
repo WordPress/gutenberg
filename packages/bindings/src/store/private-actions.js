@@ -40,17 +40,14 @@ export function observeExternalProperty( key, updateCallback ) {
 		}
 
 		dispatch( {
-			type: 'UPDATE_BINDINGS_SOURCE_PROPERTY',
+			type: 'UPDATE_BINDINGS_CONNECTION',
 			key,
 			unsubscribe: registry.subscribe( watchValueChanges ),
 		} );
 	};
 }
 
-export function registerExternalPropertyHandler(
-	{ source, args },
-	updateCallback
-) {
+export function registerExternalConnection( { source, args }, updateCallback ) {
 	return ( { dispatch, select } ) => {
 		const settings = select.getBindingsSource( source );
 		if ( ! settings ) {
@@ -58,7 +55,7 @@ export function registerExternalPropertyHandler(
 		}
 
 		// Do not register if it's already registered.
-		const key = generateSourcePropertyKey( source, args );
+		const key = generateSourcePropertyKey( { source, args } );
 		if ( select.getExternalPropertyHandler( key ) ) {
 			return;
 		}
@@ -67,7 +64,7 @@ export function registerExternalPropertyHandler(
 		const handler = connect( args );
 
 		dispatch( {
-			type: 'REGISTER_BINDINGS_SOURCE_PROPERTY',
+			type: 'REGISTER_BINDINGS_CONNECTION',
 			key,
 			...handler,
 		} );
@@ -77,12 +74,19 @@ export function registerExternalPropertyHandler(
 }
 
 export function updateExternalProperty( key, value ) {
-	return ( { select } ) => {
+	return ( { select, dispatch } ) => {
 		const handler = select.getExternalPropertyHandler( key );
 		if ( ! handler ) {
 			return;
 		}
 
 		handler.update( value );
+
+		// Fake action
+		dispatch( {
+			type: 'UPDATE_BINDINGS_CONNECTION_VALUE',
+			key,
+			value,
+		} );
 	};
 }

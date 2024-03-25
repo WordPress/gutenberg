@@ -19,9 +19,9 @@ export function sources( state = {}, action ) {
 	return state;
 }
 
-export function sourceProperties( state = {}, action ) {
+export function connections( state = {}, action ) {
 	switch ( action.type ) {
-		case 'REGISTER_BINDINGS_SOURCE_PROPERTY': {
+		case 'REGISTER_BINDINGS_CONNECTION': {
 			const { key, type, ...rest } = action;
 			return {
 				...state,
@@ -29,7 +29,7 @@ export function sourceProperties( state = {}, action ) {
 			};
 		}
 
-		case 'UPDATE_BINDINGS_SOURCE_PROPERTY': {
+		case 'UPDATE_BINDINGS_CONNECTION': {
 			const { type, key, ...updates } = action;
 			return {
 				...state,
@@ -46,7 +46,7 @@ export function sourceProperties( state = {}, action ) {
 
 const reducer = combineReducers( {
 	sources,
-	sourceProperties,
+	connections,
 } );
 
 export default reducer;

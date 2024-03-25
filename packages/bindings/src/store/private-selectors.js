@@ -26,12 +26,12 @@ export function getBindingsSource( state, sourceName ) {
 	return state.sources[ sourceName ];
 }
 
-export function getExternalPropertyKey( state, { source, args } ) {
-	return generateSourcePropertyKey( source, args );
+export function getExternalPropertyKey( state, settings ) {
+	return generateSourcePropertyKey( settings );
 }
 
 export function getExternalPropertyHandler( state, key ) {
-	return state.sourceProperties?.[ key ];
+	return state.connections?.[ key ];
 }
 
 export function getExternalPropertieValue( state, key ) {
