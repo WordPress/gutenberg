@@ -66,7 +66,14 @@ const { state, actions } = store(
 					actions.openMenu( 'hover' );
 			},
 			closeMenuOnHover() {
-				actions.closeMenu( 'hover' );
+				const { type, overlayOpenedBy } = getContext();
+				if (
+					type === 'submenu' &&
+					// Only open on hover if the overlay is closed.
+					Object.values( overlayOpenedBy || {} ).filter( Boolean )
+						.length === 0
+				)
+					actions.closeMenu( 'hover' );
 			},
 			openMenuOnClick() {
 				const ctx = getContext();
