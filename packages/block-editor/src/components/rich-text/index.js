@@ -6,6 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { store as bindingsStore } from '@wordpress/bindings';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	useRef,
 	useCallback,
@@ -19,7 +24,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -157,46 +162,43 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	// const disableBoundBlocks = useSelect(
-	// 	( select ) => {
-	// 		// Disable Rich Text editing if block bindings specify that.
-	// 		let _disableBoundBlocks = false;
-	// 		if ( blockBindings && canBindBlock( blockName ) ) {
-	// 			const blockTypeAttributes =
-	// 				getBlockType( blockName ).attributes;
-	// 			const { getBlockBindingsSource } = unlock(
-	// 				select( blocksStore )
-	// 			);
-	// 			for ( const [ attribute, args ] of Object.entries(
-	// 				blockBindings
-	// 			) ) {
-	// 				if (
-	// 					blockTypeAttributes?.[ attribute ]?.source !==
-	// 					'rich-text'
-	// 				) {
-	// 					break;
-	// 				}
+	const disableBoundBlocks = useSelect(
+		( select ) => {
+			// Disable Rich Text editing if block bindings specify that.
+			let _disableBoundBlocks = false;
+			if ( blockBindings && canBindBlock( blockName ) ) {
+				const blockTypeAttributes =
+					getBlockType( blockName ).attributes;
+				const { getBindingsSource } = unlock( select( bindingsStore ) );
+				for ( const [ attribute, args ] of Object.entries(
+					blockBindings
+				) ) {
+					if (
+						blockTypeAttributes?.[ attribute ]?.source !==
+						'rich-text'
+					) {
+						break;
+					}
 
-	// 				// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-	// 				const blockBindingsSource = getBlockBindingsSource(
-	// 					args.source
-	// 				);
-	// 				if (
-	// 					! blockBindingsSource ||
-	// 					blockBindingsSource.lockAttributesEditing
-	// 				) {
-	// 					_disableBoundBlocks = true;
-	// 					break;
-	// 				}
-	// 			}
-	// 		}
+					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
+					const blockBindingsSource = getBindingsSource(
+						args.source
+					);
 
-	// 		return _disableBoundBlocks;
-	// 	},
-	// 	[ blockBindings, blockName ]
-	// );
+					if (
+						! blockBindingsSource ||
+						blockBindingsSource.lockAttributesEditing
+					) {
+						_disableBoundBlocks = true;
+						break;
+					}
+				}
+			}
 
-	const disableBoundBlocks = false;
+			return _disableBoundBlocks;
+		},
+		[ blockBindings, blockName ]
+	);
 
 	const shouldDisableEditing = disableEditing || disableBoundBlocks;
 
