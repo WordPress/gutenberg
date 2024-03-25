@@ -211,7 +211,7 @@ export default function BlockList( {
 		);
 	};
 
-	const { blockToolbar, headerToolbar, floatingToolbar } = styles;
+	const { blockToolbar, floatingToolbar } = styles;
 
 	const containerStyle = {
 		flex: isRootList ? 1 : 0,
@@ -224,7 +224,6 @@ export default function BlockList( {
 	const isMultiBlocks = blockClientIds.length > 1;
 	const { isWider } = alignmentHelpers;
 	const extraScrollHeight =
-		headerToolbar.height +
 		blockToolbar.height +
 		( isFloatingToolbarVisible ? floatingToolbar.height : 0 );
 
@@ -249,7 +248,6 @@ export default function BlockList( {
 								ref={ scrollRef }
 								extraScrollHeight={ extraScrollHeight }
 								keyboardShouldPersistTaps="always"
-								scrollViewStyle={ { flex: 1 } }
 								extraData={ getExtraData() }
 								scrollEnabled={ isRootList }
 								contentContainerStyle={ [
