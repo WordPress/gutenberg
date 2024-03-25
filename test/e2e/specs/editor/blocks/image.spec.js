@@ -856,164 +856,1090 @@ test.describe( 'Image - interactivity', () => {
 	} );
 
 	test.describe( 'test theme.json configuration', () => {
-		test( 'allow editing false, enabled false', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-			imageBlockUtils,
-		} ) => {
-			await requestUtils.activateTheme(
-				'lightbox-allow-editing-false-enabled-false'
-			);
+		test.describe( 'allow editing false, enabled false', () => {
+			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
 
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/image' } );
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
 
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
 
-			await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
 
-			await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
 
-			await expect(
-				page.getByRole( 'menuitem', {
-					name: 'Expand on click',
-				} )
-			).toBeHidden();
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
 
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
 
-			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeHidden();
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+			} );
+
+			test( 'UI - image block link disabled, lightbox enabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link disabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link enabled, lightbox undefined', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link enabled, lightbox enabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page.getByLabel( 'Remove link' ).click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link enabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page.getByLabel( 'Remove link' ).click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
 		} );
 
-		test( 'allow editing true, enabled false', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-			imageBlockUtils,
-		} ) => {
-			await requestUtils.activateTheme(
-				'lightbox-allow-editing-true-enabled-false'
-			);
+		test.describe( 'allow editing true, enabled false', () => {
+			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
 
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/image' } );
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
 
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
 
-			await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
 
-			await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
 
-			await expect(
-				page.getByRole( 'menuitem', {
-					name: 'Expand on click',
-				} )
-			).toBeVisible();
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
 
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
 
-			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeHidden();
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+			} );
+
+			test( 'UI - image block link disabled, lightbox enabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+			} );
+
+			test( 'UI - image block link disabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+			} );
+
+			test( 'UI - image block link enabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page.getByLabel( 'Remove link' ).click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+			} );
 		} );
 
-		test( 'allow editing false, enabled true', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-			imageBlockUtils,
-		} ) => {
-			await requestUtils.activateTheme(
-				'lightbox-allow-editing-false-enabled-true'
-			);
+		test.describe( 'allow editing false, enabled true', () => {
+			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-true'
+				);
 
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/image' } );
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
 
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
 
-			await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
 
-			await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
 
-			await expect(
-				page.getByRole( 'menuitem', {
-					name: 'Expand on click',
-				} )
-			).toBeHidden();
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
 
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
 
-			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeVisible();
-			await lightboxImage.click();
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
 
-			const lightbox = page.locator( '.wp-lightbox-overlay' );
-			await expect( lightbox ).toBeVisible();
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+			} );
+
+			test( 'UI - image block link disabled, lightbox enabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-true'
+				);
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link disabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-true'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeHidden();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link enabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-false-enabled-true'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page.getByLabel( 'Remove link' ).click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
 		} );
 
-		test( 'allow editing true, enabled true', async ( {
-			admin,
-			editor,
-			page,
-			requestUtils,
-			imageBlockUtils,
-		} ) => {
-			await requestUtils.activateTheme(
-				'lightbox-allow-editing-true-enabled-true'
-			);
+		test.describe( 'allow editing true, enabled true', () => {
+			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
 
-			await admin.createNewPost();
-			await editor.insertBlock( { name: 'core/image' } );
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
 
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
 
-			await imageBlockUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' )
-			);
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
 
-			await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
 
-			await expect(
-				page.getByRole( 'button', {
-					name: 'Disable expand on click',
-				} )
-			).toBeVisible();
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
 
-			const postId = await editor.publishPost();
-			await page.goto( `/?p=${ postId }` );
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
 
-			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeVisible();
-			await lightboxImage.click();
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
 
-			const lightbox = page.locator( '.wp-lightbox-overlay' );
-			await expect( lightbox ).toBeVisible();
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+			} );
+
+			test( 'UI - image block link disabled, lightbox enabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+			} );
+
+			test( 'UI - image block link disabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				const postId = await editor.publishPost();
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeHidden();
+			} );
+
+			test( 'UI - image block link enabled, lightbox disabled', async ( {
+				admin,
+				editor,
+				page,
+				requestUtils,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme( 'emptytheme' );
+
+				await admin.createNewPost();
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				const uriInput = page.getByRole( 'combobox', {
+					name: 'URL',
+				} );
+
+				// Enter a link.
+				await uriInput.fill( 'https://example.com' );
+				await page.keyboard.press( 'Enter' );
+
+				const postId = await editor.publishPost();
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page.getByLabel( 'Remove link' ).click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+			} );
 		} );
 	} );
 
