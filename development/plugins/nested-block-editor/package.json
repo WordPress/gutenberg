@@ -1,0 +1,26 @@
+{
+	"name": "nested-block-editor",
+	"version": "0.1.0",
+	"description": "Example of how to use a Block Editor inside a Block",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "27.5.0"
+	},
+	"dependencies": {
+		"react": "^18.2.0",
+		"@wordpress/block-editor": "^12.22.0",
+		"@wordpress/blocks": "^12.31.0",
+		"@wordpress/i18n": "^4.54.0"
+	}
+}

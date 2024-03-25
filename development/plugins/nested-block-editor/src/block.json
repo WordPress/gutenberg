@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "nested-block-editor/nested-block-editor",
+	"version": "0.1.0",
+	"title": "Nested Block Editor",
+	"category": "widgets",
+	"icon": "carrot",
+	"description": "Example of how to use a Block Editor inside a Block",
+	"example": {},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "nested-block-editor",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScript": "file:./view.js"
+}
