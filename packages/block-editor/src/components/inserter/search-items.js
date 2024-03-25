@@ -13,8 +13,8 @@ const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
 
 // Normalization cache
-const extractedWords = {};
-const normalizedSearch = {};
+const extractedWords = new Map();
+const normalizedSearch = new Map();
 
 /**
  * Extracts words from an input string.
@@ -24,11 +24,11 @@ const normalizedSearch = {};
  * @return {Array} Words, extracted from the input string.
  */
 function extractWords( input = '' ) {
-	if ( typeof extractedWords[ input ] !== 'undefined' ) {
-		return extractedWords[ input ];
+	if ( extractedWords.has( input ) ) {
+		return extractedWords.get( input );
 	}
 
-	extractedWords[ input ] = noCase( input, {
+	const result = noCase( input, {
 		splitRegexp: [
 			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
 			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
@@ -38,7 +38,9 @@ function extractWords( input = '' ) {
 		.split( ' ' )
 		.filter( Boolean );
 
-	return extractedWords[ input ];
+	extractedWords.set( input, result );
+
+	return result;
 }
 
 /**
@@ -49,23 +51,25 @@ function extractWords( input = '' ) {
  * @return {string} The normalized search input.
  */
 function normalizeSearchInput( input = '' ) {
-	if ( typeof normalizedSearch[ input ] !== 'undefined' ) {
-		return normalizedSearch[ input ];
+	if ( normalizedSearch.has( input ) ) {
+		return normalizedSearch.get( input );
 	}
 
 	// Disregard diacritics.
 	//  Input: "média"
-	input = removeAccents( input );
+	let result = removeAccents( input );
 
 	// Accommodate leading slash, matching autocomplete expectations.
 	//  Input: "/media"
-	input = input.replace( /^\//, '' );
+	result = result.replace( /^\//, '' );
 
 	// Lowercase.
 	//  Input: "MEDIA"
-	normalizedSearch[ input ] = input.toLowerCase();
+	result = result.toLowerCase();
 
-	return normalizedSearch[ input ];
+	normalizedSearch.set( input, result );
+
+	return result;
 }
 
 /**
