@@ -9,6 +9,7 @@
 ### Internal
 
 -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
+-   `Popover`, `ToggleGroupControl`: Use `useReducedMotion()` ([#60168](https://github.com/WordPress/gutenberg/pull/60168)).
 
 ## 27.2.0 (2024-03-21)
 
