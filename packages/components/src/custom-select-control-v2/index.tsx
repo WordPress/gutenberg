@@ -1,5 +1,9 @@
 /**
  * Internal dependencies
  */
-export { default as CustomSelect } from './default-component';
-export { default as CustomSelectItem } from './custom-select-item';
+import CustomSelect from './default-component';
+import Item from './item';
+
+const CustomSelectControlV2 = Object.assign( CustomSelect, { Item } );
+
+export default CustomSelectControlV2;

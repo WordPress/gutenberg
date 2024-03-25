@@ -10,7 +10,7 @@ import _CustomSelect from '../custom-select';
 import type { CustomSelectProps } from '../types';
 import type { WordPressComponentProps } from '../../context';
 
-function CustomSelect(
+function CustomSelectControlV2(
 	props: WordPressComponentProps< CustomSelectProps, 'button', false >
 ) {
 	const { defaultValue, onChange, value, ...restProps } = props;
@@ -24,4 +24,4 @@ function CustomSelect(
 	return <_CustomSelect { ...restProps } store={ store } />;
 }
 
-export default CustomSelect;
+export default CustomSelectControlV2;

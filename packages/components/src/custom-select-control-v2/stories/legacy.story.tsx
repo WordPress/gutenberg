@@ -11,11 +11,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelect from '../legacy-component';
+import CustomSelectControl from '../legacy-component';
 
-const meta: Meta< typeof CustomSelect > = {
+const meta: Meta< typeof CustomSelectControl > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
-	component: CustomSelect,
+	component: CustomSelectControl,
 	argTypes: {
 		onChange: { control: { type: null } },
 		value: { control: { type: null } },
@@ -42,18 +42,22 @@ const meta: Meta< typeof CustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
+const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 	const [ fontSize, setFontSize ] = useState( props.options[ 0 ] );
 
 	const onChange: React.ComponentProps<
-		typeof CustomSelect
+		typeof CustomSelectControl
 	>[ 'onChange' ] = ( changeObject ) => {
 		setFontSize( changeObject.selectedItem );
 		props.onChange?.( changeObject );
 	};
 
 	return (
-		<CustomSelect { ...props } onChange={ onChange } value={ fontSize } />
+		<CustomSelectControl
+			{ ...props }
+			onChange={ onChange }
+			value={ fontSize }
+		/>
 	);
 };
 
