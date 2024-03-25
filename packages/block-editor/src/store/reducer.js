@@ -1892,12 +1892,12 @@ export function highlightedBlock( state, action ) {
 /**
  * Reducer returning current expanded block in the list view.
  *
- * @param {boolean} state  Current expanded block.
- * @param {Object}  action Dispatched action.
+ * @param {string|null} state  Current expanded block.
+ * @param {Object}      action Dispatched action.
  *
  * @return {string|null} Updated state.
  */
-export function expandedBlock( state, action ) {
+export function expandedBlock( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EXPANDED_IN_LIST_VIEW':
 			return action.clientId;
