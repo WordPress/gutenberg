@@ -11,9 +11,7 @@ import { generateSourcePropertyKey } from './utils';
 export function registerBindingsSource( source ) {
 	return {
 		type: 'REGISTER_BINDINGS_SOURCE',
-		name: source.name,
-		label: source.label,
-		connect: source.connect,
+		...source,
 	};
 }
 

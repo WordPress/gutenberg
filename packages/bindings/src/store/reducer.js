@@ -8,12 +8,13 @@ import { combineReducers } from '@wordpress/data';
 
 export function sources( state = {}, action ) {
 	if ( action.type === 'REGISTER_BINDINGS_SOURCE' ) {
+		const source = { ...action };
+		delete source.type;
+		delete source.name;
+
 		return {
 			...state,
-			[ action.name ]: {
-				label: action.label,
-				connect: action.connect,
-			},
+			[ action.name ]: source,
 		};
 	}
 	return state;
