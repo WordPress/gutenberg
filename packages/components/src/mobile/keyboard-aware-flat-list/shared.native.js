@@ -1,11 +1,7 @@
-/**
- * External dependencies
- */
-import { Platform } from 'react-native';
-
 export const OPTIMIZATION_PROPS = {
-	// Only enabled for iOS
-	removeClippedSubviews: Platform.OS === 'ios',
+	// Disable clipping to fix focus losing.
+	// See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
+	removeClippedSubviews: false,
 	windowSize: 11,
 };
 
