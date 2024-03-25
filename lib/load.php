@@ -192,8 +192,8 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/interactivity-api.php';
-if ( gutenberg_is_experiment_enabled( 'gutenberg-full-client-side-navigation' ) ) {
-	require __DIR__ . '/experimental/full-client-side-navigation.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
+	require __DIR__ . '/experimental/full-page-client-side-navigation.php';
 }
 
 // Copied package PHP files.

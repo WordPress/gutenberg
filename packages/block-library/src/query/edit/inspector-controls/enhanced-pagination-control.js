@@ -15,11 +15,11 @@ export default function EnhancedPaginationControl( {
 	clientId,
 } ) {
 	const { hasUnsupportedBlocks } = useUnsupportedBlocks( clientId );
-	const fullClientSideNavigation =
-		window.__experimentalFullClientSideNavigation;
+	const fullPageClientSideNavigation =
+		window.__experimentalFullPageClientSideNavigation;
 
 	let help = __( 'Browsing between pages requires a full page reload.' );
-	if ( fullClientSideNavigation ) {
+	if ( fullPageClientSideNavigation ) {
 		help = __( 'Full client-side navigation enabled.' );
 	} else if ( enhancedPagination ) {
 		help = __(
@@ -36,8 +36,12 @@ export default function EnhancedPaginationControl( {
 			<ToggleControl
 				label={ __( 'Force page reload' ) }
 				help={ help }
-				checked={ ! enhancedPagination && ! fullClientSideNavigation }
-				disabled={ hasUnsupportedBlocks || fullClientSideNavigation }
+				checked={
+					! enhancedPagination && ! fullPageClientSideNavigation
+				}
+				disabled={
+					hasUnsupportedBlocks || fullPageClientSideNavigation
+				}
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: ! value,

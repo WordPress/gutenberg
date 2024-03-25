@@ -25,7 +25,7 @@ const cleanUrl = ( url ) => {
 
 // Helper to check if a page can do client-side navigation.
 const canDoClientSideNavigation = () =>
-	getConfig( 'core/router' ).fullClientSideNavigation;
+	getConfig( 'core/router' ).fullPageClientSideNavigation;
 
 // Helper to get the tag id store in the cache.
 const getTagId = ( tag ) => tag.id || tag.outerHTML;

@@ -21,7 +21,7 @@ function render_block_core_query( $attributes, $content, $block ) {
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
 	$interactivity_api_router_config = wp_interactivity_config( 'core/router' );
-	if ( ! empty( $interactivity_api_router_config['fullClientSideNavigation'] ) && isset( $attributes['queryId'] ) ) {
+	if ( ! empty( $interactivity_api_router_config['fullPageClientSideNavigation'] ) && isset( $attributes['queryId'] ) ) {
 		$is_interactive = true;
 	}
 

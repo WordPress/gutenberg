@@ -1,19 +1,19 @@
 <?php
 /**
- * Registers full client-side navigation option using the Interactivity API and adds the necessary directives.
+ * Registers full page client-side navigation option using the Interactivity API and adds the necessary directives.
  */
 
 // Add the full client-side navigation config option.
-wp_interactivity_config( 'core/router', array( 'fullClientSideNavigation' => true ) );
+wp_interactivity_config( 'core/router', array( 'fullPageClientSideNavigation' => true ) );
 
 // Register and enqueue the full client-side navigation script.
 wp_register_script_module(
-	'@wordpress/interactivity-router-full-client-side-navigation',
-	gutenberg_url( '/build/interactivity/full-csn.min.js' ),
+	'@wordpress/interactivity-full-page-router',
+	gutenberg_url( '/build/interactivity/full-page-router.min.js' ),
 	array( '@wordpress/interactivity' ),
 	false
 );
-wp_enqueue_script_module( '@wordpress/interactivity-router-full-client-side-navigation' );
+wp_enqueue_script_module( '@wordpress/interactivity-full-page-router' );
 
 // Add directives to all links.
 // This should probably be done per site, not by default when this option is enabled.

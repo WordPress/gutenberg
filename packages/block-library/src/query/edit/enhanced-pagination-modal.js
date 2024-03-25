@@ -30,7 +30,7 @@ export default function EnhancedPaginationModal( {
 		if (
 			enhancedPagination &&
 			hasUnsupportedBlocks &&
-			! window.__experimentalFullClientSideNavigation
+			! window.__experimentalFullPageClientSideNavigation
 		) {
 			setAttributes( { enhancedPagination: false } );
 			setOpen( true );
