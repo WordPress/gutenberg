@@ -15,6 +15,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
+import { store as bindingsStore } from '@wordpress/bindings';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -33,7 +34,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -438,7 +439,7 @@ export default function Image( {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const { getBindingsSource } = unlock( select( bindingsStore ) );
 			const { getBlockParentsByBlockName } = unlock(
 				select( blockEditorStore )
 			);
@@ -449,36 +450,28 @@ export default function Image( {
 			} = metadata?.bindings || {};
 			const hasParentPattern =
 				getBlockParentsByBlockName( clientId, 'core/block' ).length > 0;
-			const urlBindingSource = getBlockBindingsSource(
-				urlBinding?.source
-			);
-			const altBindingSource = getBlockBindingsSource(
-				altBinding?.source
-			);
-			const titleBindingSource = getBlockBindingsSource(
+			const urlBindingSource = getBindingsSource( urlBinding?.source );
+			const altBindingSource = getBindingsSource( altBinding?.source );
+			const titleBindingSource = getBindingsSource(
 				titleBinding?.source
 			);
 			return {
-				// lockUrlControls:
-				// 	!! urlBinding &&
-				// 	( ! urlBindingSource ||
-				// 		urlBindingSource?.lockAttributesEditing ),
-				lockUrlControls: false,
-				// lockHrefControls:
-				// 	// Disable editing the link of the URL if the image is inside a pattern instance.
-				// 	// This is a temporary solution until we support overriding the link on the frontend.
-				// 	hasParentPattern,
-				lockHrefControls: false,
-				// lockCaption:
-				// 	// Disable editing the caption if the image is inside a pattern instance.
-				// 	// This is a temporary solution until we support overriding the caption on the frontend.
-				// 	hasParentPattern,
-				lockCaption: false,
-				// lockAltControls:
-				// 	!! altBinding &&
-				// 	( ! altBindingSource ||
-				// 		altBindingSource?.lockAttributesEditing ),
-				lockAltControls: false,
+				lockUrlControls:
+					!! urlBinding &&
+					( ! urlBindingSource ||
+						urlBindingSource?.lockAttributesEditing ),
+				lockHrefControls:
+					// 	// Disable editing the link of the URL if the image is inside a pattern instance.
+					// 	// This is a temporary solution until we support overriding the link on the frontend.
+					hasParentPattern,
+				lockCaption:
+					// Disable editing the caption if the image is inside a pattern instance.
+					// This is a temporary solution until we support overriding the caption on the frontend.
+					hasParentPattern,
+				lockAltControls:
+					!! altBinding &&
+					( ! altBindingSource ||
+						altBindingSource?.lockAttributesEditing ),
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -486,11 +479,10 @@ export default function Image( {
 							altBindingSource.label
 					  )
 					: __( 'Connected to dynamic data' ),
-				// lockTitleControls:
-				// 	!! titleBinding &&
-				// 	( ! titleBindingSource ||
-				// 		titleBindingSource?.lockAttributesEditing ),
-				lockTitleControls: false,
+				lockTitleControls:
+					!! titleBinding &&
+					( ! titleBindingSource ||
+						titleBindingSource?.lockAttributesEditing ),
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */

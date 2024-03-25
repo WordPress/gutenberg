@@ -341,16 +341,16 @@ export function resetBlockBindingConnections( blocks ) {
 							 * Sync the block attribute with the external property value.
 							 */
 							if ( currentAttributeValue !== boundValue ) {
-								// dispatch.syncDerivedUpdates( () => {
-								// dispatch( {
-								// 	type: 'UPDATE_BLOCK_ATTRIBUTES',
-								// 	clientIds: [ clientId ],
-								// 	attributes: {
-								// 		[ attribute ]: boundValue,
-								// 	},
-								// 	uniqueByBlock: false,
-								// } );
-								// } );
+								dispatch.syncDerivedUpdates( () => {
+									dispatch( {
+										type: 'UPDATE_BLOCK_ATTRIBUTES',
+										clientIds: [ clientId ],
+										attributes: {
+											[ attribute ]: boundValue,
+										},
+										uniqueByBlock: false,
+									} );
+								} );
 							}
 						}
 					);
