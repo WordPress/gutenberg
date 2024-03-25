@@ -844,7 +844,7 @@ export const toStyles = (
 					( [ cssSelector, declarations ] ) => {
 						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset += `${ cssSelector }{${ rules };}`;
+							ruleset += `:where(${ cssSelector }){${ rules };}`;
 						}
 					}
 				);
