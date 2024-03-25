@@ -51,7 +51,7 @@ export const trashPostAction = {
 								// translators: %d: The number of pages (2 or more).
 								_n(
 									'Are you sure you want to delete %d page?',
-									'Are you sure you want to delete %d pages?'
+									'Are you sure you want to delete %d pages?',
 									posts.length
 								),
 								posts.length
