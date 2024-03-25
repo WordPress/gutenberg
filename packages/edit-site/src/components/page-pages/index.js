@@ -377,27 +377,17 @@ export default function PagePages() {
 	);
 
 	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
-	const openModal = useCallback( () => {
-		if ( ! showAddPageModal ) {
-			setShowAddPageModal( true );
-		}
-	}, [ showAddPageModal ] );
-	const closeModal = useCallback( () => {
-		if ( showAddPageModal ) {
-			setShowAddPageModal( false );
-		}
-	}, [ showAddPageModal ] );
-	const handleNewPage = useCallback(
-		( { type, id } ) => {
-			history.push( {
-				postId: id,
-				postType: type,
-				canvas: 'edit',
-			} );
-			closeModal();
-		},
-		[ history ]
-	);
+
+	const openModal = () => setShowAddPageModal( true );
+	const closeModal = () => setShowAddPageModal( false );
+	const handleNewPage = ( { type, id } ) => {
+		history.push( {
+			postId: id,
+			postType: type,
+			canvas: 'edit',
+		} );
+		closeModal();
+	};
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
