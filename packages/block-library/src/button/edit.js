@@ -2,6 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
+/**
+ * WordPress dependencies
+ */
+import { store as bindingsStore } from '@wordpress/bindings';
 
 /**
  * Internal dependencies
@@ -45,7 +49,6 @@ import {
 	createBlock,
 	cloneBlock,
 	getDefaultBlockName,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -233,27 +236,25 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	// const { lockUrlControls = false } = useSelect(
-	// 	( select ) => {
-	// 		if ( ! isSelected ) {
-	// 			return {};
-	// 		}
+	const { lockUrlControls = false } = useSelect(
+		( select ) => {
+			if ( ! isSelected ) {
+				return {};
+			}
 
-	// 		const blockBindingsSource = unlock(
-	// 			select( blocksStore )
-	// 		).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const blockBindingsSource = unlock(
+				select( bindingsStore )
+			).getBindingsSource( metadata?.bindings?.url?.source );
 
-	// 		return {
-	// 			lockUrlControls:
-	// 				!! metadata?.bindings?.url &&
-	// 				( ! blockBindingsSource ||
-	// 					blockBindingsSource?.lockAttributesEditing ),
-	// 		};
-	// 	},
-	// 	[ isSelected ]
-	// );
-
-	const lockUrlControls = false;
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					( ! blockBindingsSource ||
+						blockBindingsSource?.lockAttributesEditing ),
+			};
+		},
+		[ isSelected ]
+	);
 
 	return (
 		<>
