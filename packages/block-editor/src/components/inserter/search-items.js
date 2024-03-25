@@ -12,6 +12,13 @@ const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
 
+// Normalization regexes
+const splitRegexp = [
+	/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+	/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+];
+const stripRegexp = /(\p{C}|\p{P}|\p{S})+/giu; // Anything that's not a punctuation, symbol or control/format character.
+
 // Normalization cache
 const extractedWords = new Map();
 const normalizedSearch = new Map();
@@ -29,11 +36,8 @@ function extractWords( input = '' ) {
 	}
 
 	const result = noCase( input, {
-		splitRegexp: [
-			/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
-			/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
-		],
-		stripRegexp: /(\p{C}|\p{P}|\p{S})+/giu, // Anything that's not a punctuation, symbol or control/format character.
+		splitRegexp,
+		stripRegexp,
 	} )
 		.split( ' ' )
 		.filter( Boolean );
