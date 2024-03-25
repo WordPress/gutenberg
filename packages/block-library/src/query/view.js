@@ -23,7 +23,7 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
-// Helper to load the router depending on if full client-side navigation is enabled or not.
+// Helper to load the router depending on if full page client-side navigation is enabled or not.
 const loadInteractivityRouter = async () => {
 	if ( getConfig( 'core/router' ).fullPageClientSideNavigation ) return;
 	await import( '@wordpress/interactivity-router' );

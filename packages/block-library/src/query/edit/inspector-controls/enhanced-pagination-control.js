@@ -20,7 +20,7 @@ export default function EnhancedPaginationControl( {
 
 	let help = __( 'Browsing between pages requires a full page reload.' );
 	if ( fullPageClientSideNavigation ) {
-		help = __( 'Full client-side navigation enabled.' );
+		help = __( 'Full page client-side navigation enabled.' );
 	} else if ( enhancedPagination ) {
 		help = __(
 			"Browsing between pages won't require a full page reload, unless non-compatible blocks are detected."

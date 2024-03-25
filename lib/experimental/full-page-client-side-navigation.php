@@ -3,10 +3,10 @@
  * Registers full page client-side navigation option using the Interactivity API and adds the necessary directives.
  */
 
-// Add the full client-side navigation config option.
+// Add the full page client-side navigation config option.
 wp_interactivity_config( 'core/router', array( 'fullPageClientSideNavigation' => true ) );
 
-// Register and enqueue the full client-side navigation script.
+// Register and enqueue the full page client-side navigation script.
 wp_register_script_module(
 	'@wordpress/interactivity-full-page-router',
 	gutenberg_url( '/build/interactivity/full-page-router.min.js' ),
