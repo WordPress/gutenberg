@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, edit, backup } from '@wordpress/icons';
+import { external, trash, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,6 +27,8 @@ const { useHistory } = unlock( routerPrivateApis );
 export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
