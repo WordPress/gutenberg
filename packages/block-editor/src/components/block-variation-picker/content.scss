@@ -15,7 +15,11 @@
 		fill: $gray-400 !important;
 	}
 
-	svg:hover {
+	:hover {
+		background: none !important; // !important to simplify the selector.
+	}
+
+	:hover svg {
 		fill: var(--wp-admin-theme-color) !important;
 	}
 
