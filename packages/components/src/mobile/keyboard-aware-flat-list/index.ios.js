@@ -22,7 +22,7 @@ import useScroll from './use-scroll';
 import useTextInputOffset from './use-text-input-offset';
 import useTextInputCaretPosition from './use-text-input-caret-position';
 import { OPTIMIZATION_ITEMS_THRESHOLD, OPTIMIZATION_PROPS } from './shared';
-import styles from './styles';
+import styles from './styles.scss';
 
 const DEFAULT_FONT_SIZE = 16;
 const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
