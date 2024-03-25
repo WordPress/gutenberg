@@ -1,8 +1,7 @@
 .editor-template-areas {
     margin-top: $grid-unit-20;
     &__list {
-		margin-top: $grid-unit-20;
-
+        margin: 0;
 		> li {
 			margin: 0;
 		}
@@ -18,7 +17,7 @@
 	}
 }
 
-h3.editor-template-areas__title {
+h3.components-heading.editor-template-areas__title {
 	font-weight: 500;
 	margin: 0 0 $grid-unit-10;
 }
