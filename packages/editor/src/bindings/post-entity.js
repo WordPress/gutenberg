@@ -8,6 +8,7 @@ import { select, dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
+import { RichTextData } from '@wordpress/rich-text';
 
 export default {
 	name: 'core/post-entity',
@@ -30,6 +31,10 @@ export default {
 			},
 
 			update: ( newValue ) => {
+				if ( newValue instanceof RichTextData ) {
+					newValue = newValue.toString();
+				}
+
 				editEntityRecord( 'postType', 'post', id, {
 					[ prop ]: newValue,
 				} );
