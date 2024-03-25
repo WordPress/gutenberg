@@ -1398,6 +1398,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/bindings",
+		"slug": "packages-bindings",
+		"markdown_source": "../packages/bindings/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/blob",
 		"slug": "packages-blob",
 		"markdown_source": "../packages/blob/README.md",

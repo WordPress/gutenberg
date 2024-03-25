@@ -361,19 +361,15 @@ export function isDragging( state ) {
 }
 
 /**
- * Return the property key of the binding
- * for the block client ID and attribute.
+ * Return the bindings connection key
+ * for a given block client ID and attribute.
  *
- * @param {Object} state     - Data state.
+ * @param {Object} state     - Global application state.
  * @param {string} clientId  - Block client ID.
  * @param {string} attribute - Block attribute name.
- * @return {Object} The binding for the block client ID.
+ * @return {string}            Bingins connection key.
  */
-export function getBoundAttributeExternalPropertyKey(
-	state,
-	clientId,
-	attribute
-) {
+export function getBindingsConnectionKey( state, clientId, attribute ) {
 	if ( ! state.bindings ) {
 		return {};
 	}
@@ -383,8 +379,15 @@ export function getBoundAttributeExternalPropertyKey(
 	];
 }
 
-export function getBlockWithBoundAttributes( state ) {
-	if ( ! state.bindings ) {
+/**
+ * Returns a blocks with bound attributes collection.
+ *
+ * @param {Object} state - Global application state.
+ * @return {Object}        Block with bound attributes collection.
+ */
+export function getBlocksWithBoundAttributes( state ) {
+	// If there are no bindings, return an empty object.
+	if ( ! state.bindings?.byClientId ) {
 		return {};
 	}
 
@@ -414,7 +417,16 @@ export function getBlockWithBoundAttributes( state ) {
 	return result;
 }
 
-export function getBlocksWithBoundAttributeByExternalKey( state, key, value ) {
+/**
+ * Return a list of blocks that are bound
+ * to the same bindings connection key.
+ *
+ * @param {Object} state - Global application state.
+ * @param {string} key   - Bingins connection key.
+ * @param {string} value - Bingins connection value.
+ * @return {Object[]}      List of blocks with the same bindings connection key.
+ */
+export function getBlocksByBindingsConnectionKey( state, key, value ) {
 	const bindingsConnection = state.bindings.connections.get( key );
 	if ( ! bindingsConnection ) {
 		return [];
@@ -431,18 +443,14 @@ export function getBlocksWithBoundAttributeByExternalKey( state, key, value ) {
 }
 
 /**
- * Selects and optionally transforms a value bound to an external property.
+ * Selects and optionally transforms
+ * the value bound to an external property.
  *
- * Returns the value directly for strings,
- * or a new RichTextData instance
- * based on the external value for RichTextData types.
- *
- * @param {Object}              state          - Redux state.
- * @param {string}              key            - External property key.
- * @param {string|RichTextData} boundAttribute - Current attribute value.
- * @return {string|RichTextData} Transformed or original bound attribute.
+ * @param {Object}              state     - Redux state.
+ * @param {string}              key       - External property key.
+ * @param {string|RichTextData} attribute - Current attribute value.
+ * @return {string|RichTextData}            Transformed or original bound attribute.
  */
-
 export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
 	createSelector( ( state, key, attribute ) => {
 		const { getBindingsConnectionValue } = unlock(
@@ -450,8 +458,6 @@ export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
 		);
 
 		const externalValue = getBindingsConnectionValue( key );
-
-		// Check type of the bound attribute.
 
 		// Type: string
 		if ( typeof attribute === 'string' ) {
@@ -464,7 +470,7 @@ export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
 			 * Compare the string (HTML) value of the RichTextData
 			 * with the external value.
 			 *
-			 * If they are the same, return the bound attribute.
+			 * If they are the same, return the same attribute.
 			 */
 			if ( attribute.toHTMLString() === externalValue ) {
 				return attribute;

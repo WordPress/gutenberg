@@ -165,20 +165,19 @@ export function updateBlockBoundAttributes(
 				 * Get the external property key bound to the attribute,
 				 * based on the block client ID and attribute name.
 				 */
-				const propertyKey = select.getBoundAttributeExternalPropertyKey(
+				const propertyKey = select.getBindingsConnectionKey(
 					clientId,
 					attribute
 				);
 
 				/*
-				 * Get all blocks that have the same attribute
+				 * Get all blocks that have an attribute
 				 * bound to the same external property.
 				 */
 				const blocksWithBoundAttributes =
-					select.getBlocksWithBoundAttributeByExternalKey(
+					select.getBlocksByBindingsConnectionKey(
 						propertyKey,
-						value,
-						clientId
+						value
 					);
 
 				if ( ! blocksWithBoundAttributes?.length ) {
@@ -240,7 +239,7 @@ export function updateBlockAttributes(
 					attributes
 				) ) {
 					// Pick the external property key bound to the attribute.
-					const key = select.getBoundAttributeExternalPropertyKey(
+					const key = select.getBindingsConnectionKey(
 						clientId,
 						attribute
 					);
@@ -262,12 +261,12 @@ export function updateBlockAttributes(
  * are updated according to the corresponding external values.
  *
  * @param {Object} blocks - Blocks list.
- * @return {Function} Returns a Redux thunk function that processes blocks and sets up bindings.
+ * @return {Function}       Returns a Redux thunk function that processes blocks and sets up bindings.
  */
 export function resetBlockBindingConnections( blocks ) {
 	return ( { dispatch, registry, select } ) => {
 		const clientIdsWithBoundAttributes =
-			select.getBlockWithBoundAttributes( blocks );
+			select.getBlocksWithBoundAttributes( blocks );
 
 		if ( ! clientIdsWithBoundAttributes ) {
 			return;

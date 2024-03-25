@@ -2079,6 +2079,9 @@ const withBindingBlockReset = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+/**
+ * Reducer returning the block bindings state.
+ */
 export const bindings = pipe(
 	combineReducers,
 	withBindingBlockReset
@@ -2236,59 +2239,4 @@ function withAutomaticChangeReset( reducer ) {
 	};
 }
 
-function withLogging( reducer ) {
-	return ( state, action ) => {
-		const { type, ...rest } = action;
-
-		/*
-		 * Detect sub-reducers that changed.
-		 */
-		let subReducer = null;
-		const oldState = { ...state };
-		const newState = reducer( state, action );
-
-		Object.keys( newState ).forEach( ( key ) => {
-			if ( newState[ key ] !== oldState[ key ] ) {
-				subReducer = key;
-			}
-		} );
-
-		subReducer = subReducer || 'unknown';
-
-		const relevantTypes = [
-			'RESET_BLOCKS',
-			// 'UPDATE_BLOCK_ATTRIBUTES',
-			'RESET_BINDING_CONNECTION_BLOCKS',
-			// 'SET_EXPLICIT_PERSISTENT',
-			// 'UNRESET_BINDING_CONNECTION_BLOCKS',
-		];
-
-		const isRelevant = relevantTypes.includes( type );
-
-		if ( isRelevant ) {
-			console.log(
-				'%c[%s]%c[%s] %s\n\taction: %o\n\tstate : %o',
-				'color: #486',
-				'core/block-editor',
-				'color: #4D8',
-				subReducer,
-				type,
-				rest,
-				newState
-			);
-		} else {
-			console.log(
-				'%c[%s][%s]%c %s',
-				'color: #486',
-				'core/block-editor',
-				subReducer,
-				'color: #486',
-				type
-			);
-		}
-
-		return newState;
-	};
-}
-
-export default withAutomaticChangeReset( withLogging( combinedReducers ) );
+export default withAutomaticChangeReset( combinedReducers );
