@@ -1,12 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	TextareaControl,
-	Notice,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
+import { useState, useEffect, useRef, useId } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -55,6 +51,33 @@ export default function AdvancedPanel( {
 		);
 	}
 
+	const editorRef = useRef();
+	useEffect( () => {
+		( async () => {
+			const { EditorView, basicSetup } = await import( 'codemirror' );
+			const { css } = await import( '@codemirror/lang-css' );
+
+			if ( editorRef.current ) {
+				new EditorView( {
+					doc: customCSS,
+					extensions: [
+						basicSetup,
+						css(),
+						EditorView.updateListener.of( ( editor ) => {
+							if ( editor.docChanged ) {
+								handleOnChange( editor.state.doc.toString() );
+							}
+						} ),
+					],
+					parent: editorRef.current,
+				} );
+			}
+		} )();
+		// We only want to run this once, so we can ignore the dependency array.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
+
+	const cssEditorId = useId();
 	return (
 		<VStack spacing={ 3 }>
 			{ cssError && (
@@ -62,15 +85,12 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<TextareaControl
-				label={ __( 'Additional CSS' ) }
-				__nextHasNoMarginBottom
-				value={ customCSS }
-				onChange={ ( newValue ) => handleOnChange( newValue ) }
+			<label htmlFor={ cssEditorId }>{ __( 'Additional CSS' ) }</label>
+			<div
+				ref={ editorRef }
 				onBlur={ handleOnBlur }
-				className="block-editor-global-styles-advanced-panel__custom-css-input"
-				spellCheck={ false }
-			/>
+				id={ cssEditorId }
+			></div>
 		</VStack>
 	);
 }

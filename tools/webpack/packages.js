@@ -160,6 +160,7 @@ module.exports = {
 			}
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
+		chunkFilename: './build/[name]/[name]-[contenthash].min.js',
 	},
 	performance: {
 		hints: false, // disable warnings about package sizes
