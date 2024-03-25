@@ -33,5 +33,4 @@ export default {
 			},
 		};
 	},
-	lockAttributesEditing: false,
 };

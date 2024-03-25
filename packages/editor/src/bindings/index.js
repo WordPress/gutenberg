@@ -14,6 +14,12 @@ import postEntity from './post-entity';
 
 const { registerBindingsSource } = unlock( dispatch( bindingsStore ) );
 
+// Lock attributes editing as default.
+postMeta.lockAttributesEditing =
+	typeof postMeta.lockAttributesEditing === 'undefined'
+		? true
+		: postMeta.lockAttributesEditing;
+
 registerBindingsSource( postMeta );
 registerBindingsSource( postEntity );
 
