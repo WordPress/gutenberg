@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	privateApis,
-	store,
-	getConfig,
-	getElement,
-} from '@wordpress/interactivity';
+import { privateApis, store, getElement } from '@wordpress/interactivity';
 
 const { getRegionRootFragment, render, initialVdom, toVdom } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
@@ -25,7 +20,13 @@ const cleanUrl = ( url ) => {
 
 // Helper to check if a page can do client-side navigation.
 const canDoClientSideNavigation = () =>
-	getConfig( 'core/router' ).fullPageClientSideNavigation;
+	store(
+		'core/experimental',
+		{},
+		{
+			lock: 'I acknowledge that using a private store means my plugin will inevitably break on the next store release.',
+		}
+	)?.state?.fullPageClientSideNavigation;
 
 // Helper to get the tag id store in the cache.
 const getTagId = ( tag ) => tag.id || tag.outerHTML;
@@ -127,6 +128,7 @@ const isValidLink = ( ref ) =>
 
 // Check if the event is valid for client-side navigation.
 const isValidEvent = ( event ) =>
+	event &&
 	event.button === 0 && // Left clicks only.
 	! event.metaKey && // Open in new tab (Mac).
 	! event.ctrlKey && // Open in new tab (Windows).
@@ -134,16 +136,30 @@ const isValidEvent = ( event ) =>
 	! event.shiftKey &&
 	! event.defaultPrevented;
 
+// Private store to check if the experiment is enabled.
+// In the future, we should probably use the config settings.
+store(
+	'core/experimental',
+	{
+		state: {
+			fullPageClientSideNavigation: true,
+		},
+	},
+	{ lock: true }
+);
+
 const { actions } = store( 'core/router', {
 	actions: {
-		*navigate( event, url ) {
+		*navigate( eventOrUrl ) {
 			const { ref } = getElement();
+			const url = typeof eventOrUrl === 'string' && eventOrUrl;
+			const event = eventOrUrl instanceof Event && eventOrUrl;
 
 			if ( url || ( isValidLink( ref ) && isValidEvent( event ) ) ) {
+				if ( event ) event.preventDefault();
 				const href = url ? url : ref.href;
-				event.preventDefault();
 				const newUrl = cleanUrl( href );
-				yield actions.prefetch( event, newUrl );
+				yield actions.prefetch( newUrl );
 				const page = yield pages.get( newUrl );
 
 				if ( page ) {
@@ -156,15 +172,13 @@ const { actions } = store( 'core/router', {
 				}
 
 				// Scroll to the anchor if exits in the link.
-				if ( !! event.target?.hash ) {
-					document
-						.querySelector( event.target.hash )
-						?.scrollIntoView();
-				}
+				const { hash } = new URL( href, window.location );
+				if ( hash ) document.querySelector( hash )?.scrollIntoView();
 			}
 		},
-		prefetch( event, url ) {
+		prefetch( eventOrUrl ) {
 			if ( ! canDoClientSideNavigation() ) return;
+			const url = typeof eventOrUrl === 'string' && eventOrUrl;
 			const { ref } = getElement();
 			const href = url ? url : ref?.href;
 

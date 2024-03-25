@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	getConfig,
-	getContext,
-	getElement,
-} from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 const isValidLink = ( ref ) =>
 	ref &&
@@ -25,7 +20,16 @@ const isValidEvent = ( event ) =>
 
 // Helper to load the router depending on if full page client-side navigation is enabled or not.
 const loadInteractivityRouter = async () => {
-	if ( getConfig( 'core/router' ).fullPageClientSideNavigation ) return;
+	if (
+		store(
+			'core/experimental',
+			{},
+			{
+				lock: 'I acknowledge that using a private store means my plugin will inevitably break on the next store release.',
+			}
+		)?.state?.fullPageClientSideNavigation
+	)
+		return;
 	await import( '@wordpress/interactivity-router' );
 };
 
@@ -44,10 +48,7 @@ store(
 					event.preventDefault();
 
 					yield loadInteractivityRouter();
-					yield store( 'core/router' ).actions.navigate(
-						event,
-						ref.href
-					);
+					yield store( 'core/router' ).actions.navigate( ref.href );
 					ctx.url = ref.href;
 
 					// Focus the first anchor of the Query block.
@@ -55,27 +56,21 @@ store(
 					queryRef.querySelector( firstAnchor )?.focus();
 				}
 			},
-			*prefetch( event ) {
+			*prefetch() {
 				const { ref } = getElement();
 				if ( isValidLink( ref ) ) {
 					yield loadInteractivityRouter();
-					yield store( 'core/router' ).actions.prefetch(
-						event,
-						ref.href
-					);
+					yield store( 'core/router' ).actions.prefetch( ref.href );
 				}
 			},
 		},
 		callbacks: {
-			*prefetch( event ) {
+			*prefetch() {
 				const { url } = getContext();
 				const { ref } = getElement();
 				if ( url && isValidLink( ref ) ) {
 					yield loadInteractivityRouter();
-					yield store( 'core/router' ).actions.prefetch(
-						event,
-						ref.href
-					);
+					yield store( 'core/router' ).actions.prefetch( ref.href );
 				}
 			},
 		},
