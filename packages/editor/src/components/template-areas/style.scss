@@ -1,13 +1,13 @@
 .editor-template-areas {
-    margin-top: $grid-unit-20;
-    &__list {
-        margin: 0;
+	margin-top: $grid-unit-20;
+	&__list {
+		margin: 0;
 		> li {
 			margin: 0;
 		}
 	}
 
-    &__item {
+	&__item {
 		width: 100%;
 
 		// Override the default padding.
