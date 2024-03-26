@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UncontrolledCustomSelectControl from '..';
+import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
 
 const items = [
@@ -41,14 +41,14 @@ const items = [
 const defaultProps = {
 	label: 'label!',
 	children: items.map( ( { value, key } ) => (
-		<UncontrolledCustomSelectControl.Item value={ value } key={ key } />
+		<UncontrolledCustomSelectControlV2.Item value={ value } key={ key } />
 	) ),
 };
 
 const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<UncontrolledCustomSelectControl
+		<UncontrolledCustomSelectControlV2
 			{ ...props }
 			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
@@ -60,7 +60,7 @@ const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
 };
 
 describe.each( [
-	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControlV2 ],
 	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControlV2 (%s)', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
@@ -257,12 +257,12 @@ describe.each( [
 						'rose blush',
 						'ultraviolet morning light',
 					].map( ( item ) => (
-						<UncontrolledCustomSelectControl.Item
+						<UncontrolledCustomSelectControlV2.Item
 							key={ item }
 							value={ item }
 						>
 							{ item }
-						</UncontrolledCustomSelectControl.Item>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -329,12 +329,12 @@ describe.each( [
 			render(
 				<Component defaultValue={ defaultValues } label="Multi-select">
 					{ defaultValues.map( ( item ) => (
-						<UncontrolledCustomSelectControl.Item
+						<UncontrolledCustomSelectControlV2.Item
 							key={ item }
 							value={ item }
 						>
 							{ item }
-						</UncontrolledCustomSelectControl.Item>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -384,12 +384,12 @@ describe.each( [
 
 		render(
 			<Component label="Rendered" renderSelectedValue={ renderValue }>
-				<UncontrolledCustomSelectControl.Item value="april-29">
+				<UncontrolledCustomSelectControlV2.Item value="april-29">
 					{ renderValue( 'april-29' ) }
-				</UncontrolledCustomSelectControl.Item>
-				<UncontrolledCustomSelectControl.Item value="july-9">
+				</UncontrolledCustomSelectControlV2.Item>
+				<UncontrolledCustomSelectControlV2.Item value="july-9">
 					{ renderValue( 'july-9' ) }
-				</UncontrolledCustomSelectControl.Item>
+				</UncontrolledCustomSelectControlV2.Item>
 			</Component>
 		);
 
