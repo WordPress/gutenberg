@@ -33,3 +33,4 @@ export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { useCachedTruthy } from './use-cached-truthy';
 export { useEditorWrapperStyles } from './use-editor-wrapper-styles';
+export { getTypographyClassesAndStyles } from './use-typography-props';

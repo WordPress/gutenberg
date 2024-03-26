@@ -10,6 +10,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	getTypographyClassesAndStyles as getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -32,6 +33,7 @@ export default function save( { attributes } ) {
 		  fileName.toString();
 
 	const hasFilename = ! RichText.isEmpty( fileName );
+	const typographyProps = getTypographyClassesAndStyles( attributes );
 
 	// Only output an `aria-describedby` when the element it's referring to is
 	// actually rendered.
@@ -71,8 +73,10 @@ export default function save( { attributes } ) {
 						href={ href }
 						className={ classnames(
 							'wp-block-file__button',
-							__experimentalGetElementClassName( 'button' )
+							__experimentalGetElementClassName( 'button' ),
+							typographyProps.className
 						) }
+						style={ typographyProps.style }
 						download
 						aria-describedby={ describedById }
 					>

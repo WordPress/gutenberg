@@ -22,6 +22,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
+	getTypographyClassesAndStyles as useTypographyProps,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
@@ -82,7 +83,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		} ),
 		[ id ]
 	);
-
+	const typographyProps = useTypographyProps( attributes );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
@@ -281,8 +282,10 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'
-									)
+									),
+									typographyProps.className
 								) }
+								style={ typographyProps.style }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
