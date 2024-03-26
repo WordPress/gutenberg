@@ -62,9 +62,7 @@ const regionsToVdom = async ( dom, { vdom } = {} ) => {
 	let head;
 	if ( navigationMode === 'fullPage' ) {
 		head = await fetchHeadAssets( dom, headElements );
-		regions.body = vdom?.has( 'body' )
-			? vdom.get( 'body' )
-			: toVdom( dom.body );
+		regions.body = vdom ? vdom.get( document.body ) : toVdom( dom.body );
 	}
 	if ( navigationMode === 'regionBased' ) {
 		const attrName = `data-${ directivePrefix }-router-region`;
