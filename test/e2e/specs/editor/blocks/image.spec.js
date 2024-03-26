@@ -842,7 +842,7 @@ test.describe( 'Image', () => {
 	} );
 } );
 
-test.describe( 'Image - interactivity', () => {
+test.describe( 'Image - lightbox', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
@@ -855,9 +855,9 @@ test.describe( 'Image - interactivity', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.describe( 'test theme.json configuration', () => {
-		test.describe( 'allow editing false, enabled false', () => {
-			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+	test.describe( 'should respect theme.json settings and block overrides', () => {
+		test.describe( 'Theme.json settings - allow editing FALSE, enabled FALSE', () => {
+			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI and disable lightbox on frontend when block override is undefined', async ( {
 				admin,
 				editor,
 				page,
@@ -900,7 +900,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'UI - image block link disabled, lightbox enabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox ENABLED - should show UI and enable lightbox on frontend while block override is active, but hide UI and disable lightbox on frontend if override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -938,6 +938,18 @@ test.describe( 'Image - interactivity', () => {
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-false-enabled-false'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -964,9 +976,16 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'UI - image block link disabled, lightbox disabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox DISABLED - should hide UI and disable lightbox on frontend while block override is active, as well as when override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1024,9 +1043,16 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await page.goto( `/?p=${ postId }` );
+
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'UI - image block link enabled, lightbox undefined', async ( {
+			test( 'Block settings - link ENABLED, lightbox DISABLED - configured link should be present on frontend and disable lightbox, and lightbox should not inadvertently be enabled on frontend or in UI', async ( {
 				admin,
 				editor,
 				page,
@@ -1056,14 +1082,23 @@ test.describe( 'Image - interactivity', () => {
 					name: 'URL',
 				} );
 
+				const url = 'https://example.com';
+
 				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
+				await uriInput.fill( url );
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-false-enabled-false'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+				const imageLink = await page
+					.locator( '.wp-block-image a' )
+					.getAttribute( 'href' );
+				expect( imageLink ).toContain( url );
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1078,67 +1113,6 @@ test.describe( 'Image - interactivity', () => {
 					.getByLabel( 'Block tools' )
 					.getByLabel( 'Link' )
 					.click();
-
-				await expect(
-					page.getByRole( 'menuitem', {
-						name: 'Expand on click',
-					} )
-				).toBeHidden();
-			} );
-
-			test( 'UI - image block link enabled, lightbox enabled', async ( {
-				admin,
-				editor,
-				page,
-				requestUtils,
-				imageBlockUtils,
-			} ) => {
-				await requestUtils.activateTheme( 'emptytheme' );
-
-				await admin.createNewPost();
-				await editor.insertBlock( { name: 'core/image' } );
-
-				let imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-
-				await page
-					.getByLabel( 'Block tools' )
-					.getByLabel( 'Link' )
-					.click();
-
-				const uriInput = page.getByRole( 'combobox', {
-					name: 'URL',
-				} );
-
-				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
-				await page.keyboard.press( 'Enter' );
-
-				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-false-enabled-false'
-				);
-				await page.goto(
-					`wp-admin/post.php?post=${ postId }&action=edit`
-				);
-
-				imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-
-				await imageBlock.click();
-
-				await page
-					.getByLabel( 'Block tools' )
-					.getByLabel( 'Link' )
-					.click();
-
 				await page.getByLabel( 'Remove link' ).click();
 
 				await expect(
@@ -1146,81 +1120,19 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
-			} );
 
-			test( 'UI - image block link enabled, lightbox disabled', async ( {
-				admin,
-				editor,
-				page,
-				requestUtils,
-				imageBlockUtils,
-			} ) => {
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-true-enabled-true'
-				);
+				await editor.updatePost();
 
-				await admin.createNewPost();
-				await editor.insertBlock( { name: 'core/image' } );
-
-				let imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				await imageBlockUtils.upload(
-					imageBlock.locator( 'data-testid=form-file-upload-input' )
-				);
-
-				await page
-					.getByLabel( 'Block tools' )
-					.getByLabel( 'Link' )
-					.click();
-
-				await page
-					.getByRole( 'button', {
-						name: 'Disable expand on click',
-					} )
-					.click();
-
-				const uriInput = page.getByRole( 'combobox', {
-					name: 'URL',
-				} );
-
-				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
-				await page.keyboard.press( 'Enter' );
-
-				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-false-enabled-false'
-				);
-				await page.goto(
-					`wp-admin/post.php?post=${ postId }&action=edit`
-				);
-
-				imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-
-				await imageBlock.click();
-
-				await page
-					.getByLabel( 'Block tools' )
-					.getByLabel( 'Link' )
-					.click();
-
-				await page.getByLabel( 'Remove link' ).click();
+				await page.goto( `/?p=${ postId }` );
 
 				await expect(
-					page.getByRole( 'menuitem', {
-						name: 'Expand on click',
-					} )
+					page.locator( '.wp-block-image a' )
 				).toBeHidden();
 			} );
 		} );
 
-		test.describe( 'allow editing true, enabled false', () => {
-			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+		test.describe( 'Theme.json settings - allow editing TRUE, enabled FALSE', () => {
+			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should show UI and disable lightbox on frontend when block override is undefined', async ( {
 				admin,
 				editor,
 				page,
@@ -1263,7 +1175,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'UI - image block link disabled, lightbox enabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox ENABLED - should show UI and enable lightbox on frontend while block override is active, and show UI but disable lightbox on frontend if override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1299,6 +1211,17 @@ test.describe( 'Image - interactivity', () => {
 
 				const postId = await editor.publishPost();
 
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1325,9 +1248,16 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeVisible();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'UI - image block link disabled, lightbox disabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox DISABLED - should show UI but disable lightbox on frontend while block override is active, and continue showing UI and disabling lightbox on frontend if override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1365,6 +1295,7 @@ test.describe( 'Image - interactivity', () => {
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-true-enabled-false'
 				);
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1385,9 +1316,75 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeVisible();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+					.click();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await page
+					.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
 			} );
 
-			test( 'UI - image block link enabled, lightbox disabled', async ( {
+			test( 'Block settings - link ENABLED, lightbox DISABLED - configured link should be present on frontend and disable lightbox, and lightbox should be enabled in UI but not inadvertently enabled on frontend', async ( {
 				admin,
 				editor,
 				page,
@@ -1417,14 +1414,23 @@ test.describe( 'Image - interactivity', () => {
 					name: 'URL',
 				} );
 
+				const url = 'https://example.com';
+
 				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
+				await uriInput.fill( url );
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-true-enabled-false'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+				const imageLink = await page
+					.locator( '.wp-block-image a' )
+					.getAttribute( 'href' );
+				expect( imageLink ).toContain( url );
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1439,7 +1445,6 @@ test.describe( 'Image - interactivity', () => {
 					.getByLabel( 'Block tools' )
 					.getByLabel( 'Link' )
 					.click();
-
 				await page.getByLabel( 'Remove link' ).click();
 
 				await expect(
@@ -1447,11 +1452,19 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeVisible();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				await expect(
+					page.locator( '.wp-block-image a' )
+				).toBeHidden();
 			} );
 		} );
 
-		test.describe( 'allow editing false, enabled true', () => {
-			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+		test.describe( 'Theme.json settings - allow editing FALSE, enabled TRUE', () => {
+			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI but enable lightbox on frontend when block override is undefined', async ( {
 				admin,
 				editor,
 				page,
@@ -1498,7 +1511,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link disabled, lightbox enabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox ENABLED - should hide UI but enable lightbox on frontend while block override is active', async ( {
 				admin,
 				editor,
 				page,
@@ -1544,7 +1557,6 @@ test.describe( 'Image - interactivity', () => {
 				imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
-
 				await imageBlock.click();
 
 				await page
@@ -1553,13 +1565,30 @@ test.describe( 'Image - interactivity', () => {
 					.click();
 
 				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeHidden();
+
+				await expect(
 					page.getByRole( 'menuitem', {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await page.goto( `/?p=${ postId }` );
+
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link disabled, lightbox disabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox DISABLED - should show UI and disable lightbox on frontend while block override is active, and hide UI and enable lightbox when block override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1597,6 +1626,14 @@ test.describe( 'Image - interactivity', () => {
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-false-enabled-true'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1629,9 +1666,20 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link enabled, lightbox disabled', async ( {
+			test( 'Block settings - link ENABLED, lightbox DISABLED - configured link should be present on frontend and disable lightbox, and lightbox should not inadvertently be enabled in UI but should be enabled on frontend if link is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1661,14 +1709,23 @@ test.describe( 'Image - interactivity', () => {
 					name: 'URL',
 				} );
 
+				const url = 'https://example.com';
+
 				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
+				await uriInput.fill( url );
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-false-enabled-true'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+				const imageLink = await page
+					.locator( '.wp-block-image a' )
+					.getAttribute( 'href' );
+				expect( imageLink ).toContain( url );
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1691,11 +1748,24 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
 			} );
 		} );
 
-		test.describe( 'allow editing true, enabled true', () => {
-			test( 'UI and frontend - image block link disabled, lightbox undefined', async ( {
+		test.describe( 'Theme.json settings - allow editing TRUE, enabled TRUE', () => {
+			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should show UI and enable lightbox on frontend when block override is undefined', async ( {
 				admin,
 				editor,
 				page,
@@ -1742,7 +1812,7 @@ test.describe( 'Image - interactivity', () => {
 				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link disabled, lightbox enabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox ENABLED - should show UI and enable lightbox on frontend while block override is active, and continue showing UI and enabling lightbox on frontend if override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1796,20 +1866,63 @@ test.describe( 'Image - interactivity', () => {
 					.getByLabel( 'Link' )
 					.click();
 
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				let lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
+				await page.goto(
+					`wp-admin/post.php?post=${ postId }&action=edit`
+				);
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
 				await page
 					.getByRole( 'button', {
 						name: 'Disable expand on click',
 					} )
 					.click();
 
-				await expect(
-					page.getByRole( 'menuitem', {
+				await page
+					.getByRole( 'menuitem', {
 						name: 'Expand on click',
 					} )
-				).toBeVisible();
+					.click();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link disabled, lightbox disabled', async ( {
+			test( 'Block settings - link DISABLED, lightbox DISABLED - should show UI and disable lightbox on frontend while block override is active, and continue showing UI while enabling lightbox on frontend if override is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1844,6 +1957,13 @@ test.describe( 'Image - interactivity', () => {
 					.click();
 
 				const postId = await editor.publishPost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
 
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
@@ -1877,9 +1997,20 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeHidden();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'UI - image block link enabled, lightbox disabled', async ( {
+			test( 'Block settings - link ENABLED, lightbox DISABLED - configured link should be present on frontend and disable lightbox, and lightbox should be enabled in UI but disabled on frontend if link is removed', async ( {
 				admin,
 				editor,
 				page,
@@ -1909,14 +2040,23 @@ test.describe( 'Image - interactivity', () => {
 					name: 'URL',
 				} );
 
+				const url = 'https://example.com';
+
 				// Enter a link.
-				await uriInput.fill( 'https://example.com' );
+				await uriInput.fill( url );
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
 				await requestUtils.activateTheme(
 					'lightbox-allow-editing-true-enabled-true'
 				);
+
+				await page.goto( `/?p=${ postId }` );
+				const imageLink = await page
+					.locator( '.wp-block-image a' )
+					.getAttribute( 'href' );
+				expect( imageLink ).toContain( url );
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1939,6 +2079,15 @@ test.describe( 'Image - interactivity', () => {
 						name: 'Expand on click',
 					} )
 				).toBeVisible();
+
+				await editor.updatePost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				const lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
 			} );
 		} );
 	} );
