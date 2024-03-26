@@ -68,6 +68,9 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 				ref={ getFlatListRef }
 				onScroll={ scrollHandler }
 				onContentSizeChange={ onContentSizeChange }
+				// Disable clipping to fix focus losing.
+				// See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
+				removeClippedSubviews={ false }
 				{ ...optimizationProps }
 				{ ...props }
 			/>
