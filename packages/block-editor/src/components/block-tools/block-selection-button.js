@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { dragHandle } from '@wordpress/icons';
-import { Button, Flex, FlexItem } from '@wordpress/components';
+import { dragHandle, trash } from '@wordpress/icons';
+import { Button, Flex, FlexItem, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
@@ -316,7 +316,16 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					) }
 				</FlexItem>
 				{ editorMode === 'zoom-out' && (
-					<Shuffle clientId={ clientId } as={ Button } />
+					<>
+						<Shuffle clientId={ clientId } as={ Button } />
+						<ToolbarButton
+							icon={ trash }
+							label="Delete"
+							onClick={ () => {
+								removeBlock( clientId );
+							} }
+						/>
+					</>
 				) }
 				<FlexItem>
 					<Button
