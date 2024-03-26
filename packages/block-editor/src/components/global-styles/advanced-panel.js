@@ -52,14 +52,35 @@ export default function AdvancedPanel( {
 	}
 
 	const editorRef = useRef();
+	/**
+	 * Ensure the editor has at least min lines of code,
+	 * as the editor will shrink to fit the content.
+	 * @param {string} content The content to ensure min lines for.
+	 * @return {string} The content with at least min lines.
+	 */
+	function ensureMinLines( content ) {
+		const MIN_LINES = 10;
+		const lines = content.split( '\n' );
+		const lineCount = lines.length;
+		let result = content;
+		for ( let i = lineCount; i < MIN_LINES; i++ ) {
+			result += '\n';
+		}
+		return result;
+	}
 	useEffect( () => {
 		( async () => {
+			/**
+			 * Lazy load CodeMirror by using Webpack's dynamic import.
+			 * This should be replaced with native dynamic import once it's supported.
+			 * @see https://github.com/WordPress/gutenberg/pull/60155
+			 */
 			const { EditorView, basicSetup } = await import( 'codemirror' );
 			const { css } = await import( '@codemirror/lang-css' );
 
 			if ( editorRef.current ) {
 				new EditorView( {
-					doc: customCSS,
+					doc: ensureMinLines( customCSS ),
 					extensions: [
 						basicSetup,
 						css(),
@@ -85,7 +106,12 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<label htmlFor={ cssEditorId }>{ __( 'Additional CSS' ) }</label>
+			<label
+				htmlFor={ cssEditorId }
+				className="block-editor-global-styles-advanced-panel__custom-css-label"
+			>
+				{ __( 'Additional CSS' ) }
+			</label>
 			<div
 				ref={ editorRef }
 				onBlur={ handleOnBlur }

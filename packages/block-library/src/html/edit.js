@@ -40,6 +40,11 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 
 	useEffect( () => {
 		( async () => {
+			/**
+			 * Lazy load CodeMirror by using Webpack's dynamic import.
+			 * This should be replaced with native dynamic import once it's supported.
+			 * @see https://github.com/WordPress/gutenberg/pull/60155
+			 */
 			const { EditorView, basicSetup } = await import( 'codemirror' );
 			const { html } = await import( '@codemirror/lang-html' );
 

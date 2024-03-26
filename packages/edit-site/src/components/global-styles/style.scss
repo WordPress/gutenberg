@@ -119,25 +119,11 @@
 	margin: $grid-unit-20;
 
 	.components-v-stack {
-		flex: 1 1 auto;
-
-		.block-editor-global-styles-advanced-panel__custom-css-input {
-			flex: 1 1 auto;
-			display: flex;
-			flex-direction: column;
-
-			.components-base-control__field {
-				flex: 1 1 auto;
-				display: flex;
-				flex-direction: column;
-
-				.components-textarea-control__input {
-					flex: 1 1 auto;
-					// CSS input is always LTR regardless of language.
-					/*rtl:ignore*/
-					direction: ltr;
-				}
-			}
+		.block-editor-global-styles-advanced-panel__custom-css-label {
+			font-size: 11px;
+			font-weight: 500;
+			line-height: 1.4;
+			text-transform: uppercase;
 		}
 	}
 }
