@@ -879,7 +879,7 @@ export class RichText extends Component {
 		// There are cases when the component is unmounted e.g. scrolling in a
 		// long post due to virtualization, so the block selection needs to be cleared
 		// so it doesn't auto-focus when it's added back.
-		if ( RCTAztecView.InputState.getCurrentFocusedElement() !== null ) {
+		if ( this._editor?.isFocused() ) {
 			clearCurrentSelectionOnUnmount?.();
 		}
 	}
