@@ -211,66 +211,66 @@ class WP_Theme_JSON_Gutenberg {
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
-	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
+	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties. Removed `--wp--style--root--padding-*` properties.
 	 *
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
-		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
-		'background'                        => array( 'color', 'gradient' ),
-		'background-color'                  => array( 'color', 'background' ),
-		'background-image'                  => array( 'background', 'backgroundImage' ),
-		'background-position'               => array( 'background', 'backgroundPosition' ),
-		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
-		'background-size'                   => array( 'background', 'backgroundSize' ),
-		'border-radius'                     => array( 'border', 'radius' ),
-		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
-		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
-		'border-bottom-left-radius'         => array( 'border', 'radius', 'bottomLeft' ),
-		'border-bottom-right-radius'        => array( 'border', 'radius', 'bottomRight' ),
-		'border-color'                      => array( 'border', 'color' ),
-		'border-width'                      => array( 'border', 'width' ),
-		'border-style'                      => array( 'border', 'style' ),
-		'border-top-color'                  => array( 'border', 'top', 'color' ),
-		'border-top-width'                  => array( 'border', 'top', 'width' ),
-		'border-top-style'                  => array( 'border', 'top', 'style' ),
-		'border-right-color'                => array( 'border', 'right', 'color' ),
-		'border-right-width'                => array( 'border', 'right', 'width' ),
-		'border-right-style'                => array( 'border', 'right', 'style' ),
-		'border-bottom-color'               => array( 'border', 'bottom', 'color' ),
-		'border-bottom-width'               => array( 'border', 'bottom', 'width' ),
-		'border-bottom-style'               => array( 'border', 'bottom', 'style' ),
-		'border-left-color'                 => array( 'border', 'left', 'color' ),
-		'border-left-width'                 => array( 'border', 'left', 'width' ),
-		'border-left-style'                 => array( 'border', 'left', 'style' ),
-		'color'                             => array( 'color', 'text' ),
-		'column-count'                      => array( 'typography', 'textColumns' ),
-		'font-family'                       => array( 'typography', 'fontFamily' ),
-		'font-size'                         => array( 'typography', 'fontSize' ),
-		'font-style'                        => array( 'typography', 'fontStyle' ),
-		'font-weight'                       => array( 'typography', 'fontWeight' ),
-		'letter-spacing'                    => array( 'typography', 'letterSpacing' ),
-		'line-height'                       => array( 'typography', 'lineHeight' ),
-		'margin'                            => array( 'spacing', 'margin' ),
-		'margin-top'                        => array( 'spacing', 'margin', 'top' ),
-		'margin-right'                      => array( 'spacing', 'margin', 'right' ),
-		'margin-bottom'                     => array( 'spacing', 'margin', 'bottom' ),
-		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
-		'min-height'                        => array( 'dimensions', 'minHeight' ),
-		'outline-color'                     => array( 'outline', 'color' ),
-		'outline-offset'                    => array( 'outline', 'offset' ),
-		'outline-style'                     => array( 'outline', 'style' ),
-		'outline-width'                     => array( 'outline', 'width' ),
-		'padding'                           => array( 'spacing', 'padding' ),
-		'padding-top'                       => array( 'spacing', 'padding', 'top' ),
-		'padding-right'                     => array( 'spacing', 'padding', 'right' ),
-		'padding-bottom'                    => array( 'spacing', 'padding', 'bottom' ),
-		'padding-left'                      => array( 'spacing', 'padding', 'left' ),
-		'text-decoration'                   => array( 'typography', 'textDecoration' ),
-		'text-transform'                    => array( 'typography', 'textTransform' ),
-		'filter'                            => array( 'filter', 'duotone' ),
-		'box-shadow'                        => array( 'shadow' ),
-		'writing-mode'                      => array( 'typography', 'writingMode' ),
+		'aspect-ratio'               => array( 'dimensions', 'aspectRatio' ),
+		'background'                 => array( 'color', 'gradient' ),
+		'background-color'           => array( 'color', 'background' ),
+		'background-image'           => array( 'background', 'backgroundImage' ),
+		'background-position'        => array( 'background', 'backgroundPosition' ),
+		'background-repeat'          => array( 'background', 'backgroundRepeat' ),
+		'background-size'            => array( 'background', 'backgroundSize' ),
+		'border-radius'              => array( 'border', 'radius' ),
+		'border-top-left-radius'     => array( 'border', 'radius', 'topLeft' ),
+		'border-top-right-radius'    => array( 'border', 'radius', 'topRight' ),
+		'border-bottom-left-radius'  => array( 'border', 'radius', 'bottomLeft' ),
+		'border-bottom-right-radius' => array( 'border', 'radius', 'bottomRight' ),
+		'border-color'               => array( 'border', 'color' ),
+		'border-width'               => array( 'border', 'width' ),
+		'border-style'               => array( 'border', 'style' ),
+		'border-top-color'           => array( 'border', 'top', 'color' ),
+		'border-top-width'           => array( 'border', 'top', 'width' ),
+		'border-top-style'           => array( 'border', 'top', 'style' ),
+		'border-right-color'         => array( 'border', 'right', 'color' ),
+		'border-right-width'         => array( 'border', 'right', 'width' ),
+		'border-right-style'         => array( 'border', 'right', 'style' ),
+		'border-bottom-color'        => array( 'border', 'bottom', 'color' ),
+		'border-bottom-width'        => array( 'border', 'bottom', 'width' ),
+		'border-bottom-style'        => array( 'border', 'bottom', 'style' ),
+		'border-left-color'          => array( 'border', 'left', 'color' ),
+		'border-left-width'          => array( 'border', 'left', 'width' ),
+		'border-left-style'          => array( 'border', 'left', 'style' ),
+		'color'                      => array( 'color', 'text' ),
+		'column-count'               => array( 'typography', 'textColumns' ),
+		'font-family'                => array( 'typography', 'fontFamily' ),
+		'font-size'                  => array( 'typography', 'fontSize' ),
+		'font-style'                 => array( 'typography', 'fontStyle' ),
+		'font-weight'                => array( 'typography', 'fontWeight' ),
+		'letter-spacing'             => array( 'typography', 'letterSpacing' ),
+		'line-height'                => array( 'typography', 'lineHeight' ),
+		'margin'                     => array( 'spacing', 'margin' ),
+		'margin-top'                 => array( 'spacing', 'margin', 'top' ),
+		'margin-right'               => array( 'spacing', 'margin', 'right' ),
+		'margin-bottom'              => array( 'spacing', 'margin', 'bottom' ),
+		'margin-left'                => array( 'spacing', 'margin', 'left' ),
+		'min-height'                 => array( 'dimensions', 'minHeight' ),
+		'outline-color'              => array( 'outline', 'color' ),
+		'outline-offset'             => array( 'outline', 'offset' ),
+		'outline-style'              => array( 'outline', 'style' ),
+		'outline-width'              => array( 'outline', 'width' ),
+		'padding'                    => array( 'spacing', 'padding' ),
+		'padding-top'                => array( 'spacing', 'padding', 'top' ),
+		'padding-right'              => array( 'spacing', 'padding', 'right' ),
+		'padding-bottom'             => array( 'spacing', 'padding', 'bottom' ),
+		'padding-left'               => array( 'spacing', 'padding', 'left' ),
+		'text-decoration'            => array( 'typography', 'textDecoration' ),
+		'text-transform'             => array( 'typography', 'textTransform' ),
+		'filter'                     => array( 'filter', 'duotone' ),
+		'box-shadow'                 => array( 'shadow' ),
+		'writing-mode'               => array( 'typography', 'writingMode' ),
 	);
 
 	/**
@@ -1354,7 +1354,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $css The block css node.
+	 * @param array  $css The block css node.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -2107,23 +2107,8 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		// $root_variable_duplicates = array();
-
 		foreach ( $properties as $css_property => $value_path ) {
 			$value = static::get_property_value( $styles, $value_path, $theme_json );
-
-//			if ( str_starts_with( $css_property, '--wp--style--root--' ) && ( static::ROOT_BLOCK_SELECTOR !== $selector || ! $use_root_padding ) ) {
-//				continue;
-//			}
-			// Root-level padding styles don't currently support strings with CSS shorthand values.
-			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
-//			if ( '--wp--style--root--padding' === $css_property && is_string( $value ) ) {
-//				continue;
-//			}
-
-//			if ( str_starts_with( $css_property, '--wp--style--root--' ) && $use_root_padding ) {
-//				$root_variable_duplicates[] = substr( $css_property, strlen( '--wp--style--root--' ) );
-//			}
 
 			if ( is_array( $value_path ) ) {
 				$path_string = implode( '.', $value_path );
@@ -2181,14 +2166,6 @@ class WP_Theme_JSON_Gutenberg {
 				'value' => $value,
 			);
 		}
-
-		// If a variable value is added to the root, the corresponding property should be removed.
-//		foreach ( $root_variable_duplicates as $duplicate ) {
-//			$discard = array_search( $duplicate, array_column( $declarations, 'name' ), true );
-//			if ( is_numeric( $discard ) ) {
-//				array_splice( $declarations, $discard, 1 );
-//			}
-//		}
 
 		return $declarations;
 	}
@@ -2729,12 +2706,12 @@ class WP_Theme_JSON_Gutenberg {
 		* as custom properties on the body element so all blocks can use them.
 		*/
 		if ( isset( $settings['layout']['contentSize'] ) || isset( $settings['layout']['wideSize'] ) ) {
-			$content_size = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
-			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
-			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
-			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css         .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
-			$css         .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
+			$content_size        = isset( $settings['layout']['contentSize'] ) ? $settings['layout']['contentSize'] : $settings['layout']['wideSize'];
+			$content_size        = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
+			$wide_size           = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
+			$wide_size           = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
+			$css                .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
+			$css                .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
 			$root_declarations[] = array(
 				'name'  => '--wp--style--global--content-size',
 				'value' => $content_size,

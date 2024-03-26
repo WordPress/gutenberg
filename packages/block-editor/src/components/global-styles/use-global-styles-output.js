@@ -345,12 +345,12 @@ export function getStylesDeclarations(
 
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
-			if (
-				key === '--wp--style--root--padding' &&
-				( typeof styleValue === 'string' || ! useRootPaddingAlign )
-			) {
-				return declarations;
-			}
+			// if (
+			// 	key === '--wp--style--root--padding' &&
+			// 	( typeof styleValue === 'string' || ! useRootPaddingAlign )
+			// ) {
+			// 	return declarations;
+			// }
 
 			if ( properties && typeof styleValue !== 'string' ) {
 				Object.entries( properties ).forEach( ( entry ) => {
@@ -455,9 +455,10 @@ export function getStylesDeclarations(
  * @param {Object}  props.layoutDefinitions     Layout definitions, keyed by layout type.
  * @param {Object}  props.style                 A style object containing spacing values.
  * @param {string}  props.selector              Selector used to group together layout styling rules.
- * @param {boolean} props.hasBlockGapSupport    Whether or not the theme opts-in to blockGap support.
- * @param {boolean} props.hasFallbackGapSupport Whether or not the theme allows fallback gap styles.
+ * @param {boolean} props.hasBlockGapSupport    Whether the theme opts-in to blockGap support.
+ * @param {boolean} props.hasFallbackGapSupport Whether the theme allows fallback gap styles.
  * @param {?string} props.fallbackGapValue      An optional fallback gap value if no real gap value is available.
+ * @param {boolean} props.useRootPadding        Whether to use root padding styles.
  * @return {string} Generated CSS rules for the layout styles.
  */
 export function getLayoutStyles( {
@@ -467,8 +468,10 @@ export function getLayoutStyles( {
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
 	fallbackGapValue,
+	useRootPadding,
 } ) {
 	let ruleset = '';
+	let rootStyles = '';
 	let gapValue = hasBlockGapSupport
 		? getGapCSSValue( style?.spacing?.blockGap )
 		: '';
@@ -544,8 +547,18 @@ export function getLayoutStyles( {
 		);
 		// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 		if ( selector === ROOT_BLOCK_SELECTOR && hasBlockGapSupport ) {
-			ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } { --wp--style--block-gap: ${ gapValue }; }`;
+			rootStyles += `--wp--style--block-gap: ${ gapValue };`;
 		}
+	}
+
+	if ( ROOT_BLOCK_SELECTOR === selector && useRootPadding ) {
+		[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
+			if ( style?.spacing?.padding?.[ side ] ) {
+				rootStyles += `--wp--style--root--padding-${ side }: ${ compileStyleValue(
+					style?.spacing?.padding?.[ side ]
+				) };`;
+			}
+		} );
 	}
 
 	// Output base styles
@@ -587,8 +600,10 @@ export function getLayoutStyles( {
 			}
 		);
 	}
-
-	return ruleset;
+	rootStyles = rootStyles
+		? `${ ROOT_CSS_PROPERTIES_SELECTOR } { ${ rootStyles } }`
+		: '';
+	return rootStyles + ruleset;
 }
 
 const STYLE_KEYS = [
@@ -925,6 +940,7 @@ export const toStyles = (
 					hasBlockGapSupport,
 					hasFallbackGapSupport,
 					fallbackGapValue,
+					useRootPadding: useRootPaddingAlign,
 				} );
 			}
 
