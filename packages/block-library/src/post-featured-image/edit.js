@@ -36,6 +36,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
+import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -181,7 +182,7 @@ export default function PostFeaturedImageEdit( {
 
 	const controls = blockEditingMode === 'default' && (
 		<>
-			<Overlay
+			<OverlayControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				clientId={ clientId }
@@ -262,6 +263,11 @@ export default function PostFeaturedImageEdit( {
 					) : (
 						placeholder()
 					) }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
 				</div>
 			</>
 		);
@@ -367,6 +373,11 @@ export default function PostFeaturedImageEdit( {
 				) : (
 					image
 				) }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
 			</figure>
 		</>
 	);
