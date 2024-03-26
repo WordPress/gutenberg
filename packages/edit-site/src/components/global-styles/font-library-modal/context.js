@@ -281,11 +281,13 @@ function FontLibraryProvider( { children } ) {
 					sucessfullyInstalledFontFaces?.length > 0 ||
 					alreadyInstalledFontFaces?.length > 0
 				) {
-					fontFamilyToInstall.fontFace = [
+					// Use font data from REST API not from client to ensure
+					// correct font information is used.
+					installedFontFamily.fontFace = [
 						...sucessfullyInstalledFontFaces,
-						...alreadyInstalledFontFaces,
 					];
-					fontFamiliesToActivate.push( fontFamilyToInstall );
+
+					fontFamiliesToActivate.push( installedFontFamily );
 				}
 
 				// If it's a system font but was installed successfully, activate it.
@@ -402,14 +404,29 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
-		// Merge the existing custom fonts with the new fonts.
+		// Removes the id from the families and faces to avoid saving that to global styles post content.
+		const fontsToActivate = fontsToAdd.map(
+			( { id: _familyDbId, fontFace, ...font } ) => ( {
+				...font,
+				...( fontFace && fontFace.length > 0
+					? {
+							fontFace: fontFace.map(
+								( { id: _faceDbId, ...face } ) => face
+							),
+					  }
+					: {} ),
+			} )
+		);
+
 		// Activate the fonts by set the new custom fonts array.
 		setFontFamilies( {
 			...fontFamilies,
-			custom: mergeFontFamilies( fontFamilies?.custom, fontsToAdd ),
+			// Merge the existing custom fonts with the new fonts.
+			custom: mergeFontFamilies( fontFamilies?.custom, fontsToActivate ),
 		} );
+
 		// Add custom fonts to the browser.
-		fontsToAdd.forEach( ( font ) => {
+		fontsToActivate.forEach( ( font ) => {
 			if ( font.fontFace ) {
 				font.fontFace.forEach( ( face ) => {
 					// Load font faces just in the iframe because they already are in the document.

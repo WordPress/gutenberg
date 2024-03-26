@@ -642,7 +642,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
@@ -847,7 +847,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** level, textAlign
 
 ## Site Title
 

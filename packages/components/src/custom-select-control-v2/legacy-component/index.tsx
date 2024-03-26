@@ -68,9 +68,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				<CustomSelectItem
 					key={ key }
 					value={ name }
-					children={
-						__experimentalShowSelectedHint ? withHint : name
-					}
+					children={ __experimentalHint ? withHint : name }
 					{ ...rest }
 				/>
 			);

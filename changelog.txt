@@ -1,5 +1,44 @@
 == Changelog ==
 
+= 18.0.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Featured Image: Fix overlay rendering in the editor. ([60187](https://github.com/WordPress/gutenberg/pull/60187))
+- Fix self closing navigation overlay. ([60130](https://github.com/WordPress/gutenberg/pull/60130))
+- Navigation: Avoid content loss when only specific entity fields are edited. ([60071](https://github.com/WordPress/gutenberg/pull/60071))
+
+#### Global Styles
+- Featured Image: Fix block support selectors after shadow support addition. ([60184](https://github.com/WordPress/gutenberg/pull/60184))
+- Fix list of base theme fonts when a theme variation is applied.. ([59959](https://github.com/WordPress/gutenberg/pull/59959))
+
+#### Font Library
+- Activate the fonts coming from the backend and not the data from the frontend. ([60093](https://github.com/WordPress/gutenberg/pull/60093))
+- Install fonts in sequence to work around race condition. ([60180](https://github.com/WordPress/gutenberg/pull/60180))
+
+#### Block Editor
+- Fix root ID calculation when check if block can be transformed. ([60167](https://github.com/WordPress/gutenberg/pull/60167))
+
+
+### Code Quality
+
+#### Block Library
+- Fix code formatting in Nav block view file. ([60162](https://github.com/WordPress/gutenberg/pull/60162))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@aaronrobertshaw @creativecoder @draganescu @getdave @jsnajdr @Mamaduka @matiasbenedetto
+
+
 = 18.0.0-rc.1 =
 
 

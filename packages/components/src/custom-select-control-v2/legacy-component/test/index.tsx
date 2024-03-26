@@ -248,7 +248,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint in list of options when added', async () => {
+	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -260,7 +260,6 @@ describe.each( [
 						__experimentalHint: 'Hint',
 					},
 				] }
-				__experimentalShowSelectedHint
 			/>
 		);
 

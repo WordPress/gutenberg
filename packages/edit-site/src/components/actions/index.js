@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { external, edit, backup } from '@wordpress/icons';
+import { external, trash, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -27,6 +27,8 @@ const { useHistory } = unlock( routerPrivateApis );
 export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
+	isPrimary: true,
+	icon: trash,
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
@@ -47,8 +49,10 @@ export const trashPostAction = {
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
-								__(
-									'Are you sure you want to delete %d pages?'
+								_n(
+									'Are you sure you want to delete %d page?',
+									'Are you sure you want to delete %d pages?',
+									posts.length
 								),
 								posts.length
 						  ) }
