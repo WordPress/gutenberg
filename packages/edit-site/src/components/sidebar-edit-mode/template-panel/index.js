@@ -24,7 +24,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from '../../template-actions';
-import TemplateAreas from './template-areas';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
@@ -112,9 +111,7 @@ export default function TemplatePanel() {
 						} }
 					/>
 				}
-			>
-				<TemplateAreas />
-			</PostCardPanel>
+			/>
 			{ availablePatterns?.length > 0 && (
 				<PanelBody
 					title={ __( 'Transform into:' ) }

@@ -24,8 +24,9 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import TemplateAreas from '../template-areas';
 
-export default function PostCardPanel( { className, actions, children } ) {
+export default function PostCardPanel( { className, actions } ) {
 	const { modified, title, templateInfo, icon } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
@@ -94,10 +95,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 							) }
 						</VStack>
 					) }
-					{
-						// Todo: move TemplateAreas (and the selectors it depends) to the editor package, and use it here removing the children prop.
-						children
-					}
+					<TemplateAreas />
 				</VStack>
 			</div>
 		</PanelBody>
