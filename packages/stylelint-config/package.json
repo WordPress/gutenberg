@@ -35,7 +35,7 @@
 		"stylelint-config-recommended-scss": "^5.0.2"
 	},
 	"peerDependencies": {
-		"stylelint": "^14.2"
+		"stylelint": "^15.1"
 	},
 	"npmpackagejsonlint": {
 		"extends": "@wordpress/npm-package-json-lint-config",
