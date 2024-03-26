@@ -119,6 +119,7 @@ export function RichTextWrapper(
 			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
@@ -155,6 +156,7 @@ export function RichTextWrapper(
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
 			undo,
+			getSelectedBlockClientId,
 			...extraProps,
 		};
 	};
@@ -165,6 +167,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		isSelected,
+		getSelectedBlockClientId,
 		didAutomaticChange,
 		disabled,
 		undo,
@@ -210,6 +213,12 @@ export function RichTextWrapper(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
+
+	const clearCurrentSelectionOnUnmount = useCallback( () => {
+		if ( getSelectedBlockClientId() === clientId ) {
+			clearSelectedBlock();
+		}
+	}, [ clearSelectedBlock, clientId, getSelectedBlockClientId ] );
 
 	const onDelete = useCallback(
 		( { value, isReverse } ) => {
@@ -591,7 +600,7 @@ export function RichTextWrapper(
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
-			clearSelectedBlock={ clearSelectedBlock }
+			clearCurrentSelectionOnUnmount={ clearCurrentSelectionOnUnmount }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
