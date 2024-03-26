@@ -9,6 +9,7 @@ import * as Ariakit from '@ariakit/react';
 import _CustomSelect from '../custom-select';
 import type { CustomSelectProps } from '../types';
 import type { WordPressComponentProps } from '../../context';
+import Item from '../item';
 
 function CustomSelectControlV2(
 	props: WordPressComponentProps< CustomSelectProps, 'button', false >
@@ -23,5 +24,7 @@ function CustomSelectControlV2(
 
 	return <_CustomSelect { ...restProps } store={ store } />;
 }
+
+CustomSelectControlV2.Item = Item;
 
 export default CustomSelectControlV2;
