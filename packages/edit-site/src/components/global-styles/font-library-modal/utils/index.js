@@ -237,7 +237,7 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 	const responses = [];
 
 	/*
-	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work 
+	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work
 	 * around a race condition that can cause an error when the fonts directory doesn't exist yet.
 	 */
 	for ( const faceData of fontFacesData ) {
