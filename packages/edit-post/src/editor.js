@@ -58,12 +58,12 @@ function Editor( {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canEditTemplate = canUser( 'create', 'templates' );
+			const canViewTemplate = canUser( 'read', 'templates' );
 			return {
 				template:
 					supportsTemplateMode &&
 					isViewable &&
-					canEditTemplate &&
+					canViewTemplate &&
 					currentPost.postType !== 'wp_template'
 						? getEditedPostTemplate()
 						: null,

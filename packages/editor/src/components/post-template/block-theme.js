@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -48,6 +48,12 @@ export default function BlockThemeControl( { id } ) {
 		'wp_template',
 		id
 	);
+
+	const canCreateTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
+
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
@@ -81,30 +87,33 @@ export default function BlockThemeControl( { id } ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								onNavigateToEntityRecord( {
-									postId: template.id,
-									postType: 'wp_template',
-								} );
-								onClose();
-								createSuccessNotice(
-									__(
-										'Editing template. Changes made here affect all posts and pages that use the template.'
-									),
-									{
-										type: 'snackbar',
-										actions: notificationAction,
-									}
-								);
-							} }
-						>
-							{ __( 'Edit template' ) }
-						</MenuItem>
-
+						{ canCreateTemplate && (
+							<MenuItem
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: template.id,
+										postType: 'wp_template',
+									} );
+									onClose();
+									createSuccessNotice(
+										__(
+											'Editing template. Changes made here affect all posts and pages that use the template.'
+										),
+										{
+											type: 'snackbar',
+											actions: notificationAction,
+										}
+									);
+								} }
+							>
+								{ __( 'Edit template' ) }
+							</MenuItem>
+						) }
 						<SwapTemplateButton onClick={ onClose } />
 						<ResetDefaultTemplate onClick={ onClose } />
-						<CreateNewTemplate onClick={ onClose } />
+						{ canCreateTemplate && (
+							<CreateNewTemplate onClick={ onClose } />
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
