@@ -374,18 +374,18 @@ export const viewPostAction = {
 };
 
 export const editPostAction = {
-			id: 'edit-post',
-			label: __( 'Edit' ),
-			isPrimary: true,
-			icon: edit,
-			isEligible( { status } ) {
-				return status !== 'trash';
-			},
+	id: 'edit-post',
+	label: __( 'Edit' ),
+	isPrimary: true,
+	icon: edit,
+	isEligible( { status } ) {
+		return status !== 'trash';
+	},
 	callback( posts, onActionPerformed ) {
 		if ( onActionPerformed ) {
 			onActionPerformed( posts );
 		}
-			},
+	},
 };
 export const postRevisionsAction = {
 	id: 'view-post-revisions',
