@@ -4,8 +4,15 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"checkJs": false,
-		"strict": false
+
+		"alwaysStrict": false,
+		"strictNullChecks": false,
+		"strictBindCallApply": false,
+		"strictFunctionTypes": false,
+		"strictPropertyInitialization": false,
+		"noImplicitAny": false,
+		"noImplicitThis": false,
+		"useUnknownInCatchVariables": false
 	},
 	"include": [ "src/**/*" ]
 }

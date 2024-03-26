@@ -7,7 +7,7 @@
 		"jsx": "preserve",
 		"target": "esnext",
 		"module": "esnext",
-		"lib": [ "dom", "esnext" ],
+		"lib": [ "DOM", "DOM.Iterable", "ESNext" ],
 		"declaration": true,
 		"declarationMap": true,
 		"composite": true,
