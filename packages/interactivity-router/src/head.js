@@ -1,0 +1,77 @@
+// Function to update only the necessary tags in the head.
+export const updateHead = async ( newHead ) => {
+	// Helper to get the tag id store in the cache.
+	const getTagId = ( tag ) => tag.id || tag.outerHTML;
+
+	// Map incoming head tags by their content.
+	const newHeadMap = new Map();
+	for ( const child of newHead ) {
+		newHeadMap.set( getTagId( child ), child );
+	}
+
+	const toRemove = [];
+
+	// Detect nodes that should be added or removed.
+	for ( const child of document.head.children ) {
+		const id = getTagId( child );
+		// Always remove styles and links as they might change.
+		if ( child.nodeName === 'LINK' || child.nodeName === 'STYLE' )
+			toRemove.push( child );
+		else if ( newHeadMap.has( id ) ) newHeadMap.delete( id );
+		else if ( child.nodeName !== 'SCRIPT' && child.nodeName !== 'META' )
+			toRemove.push( child );
+	}
+
+	// Prepare new assets.
+	const toAppend = [ ...newHeadMap.values() ];
+
+	// Apply the changes.
+	toRemove.forEach( ( n ) => n.remove() );
+	document.head.append( ...toAppend );
+};
+
+// Fetch head assets of a new page.
+export const fetchHeadAssets = async ( document, headElements ) => {
+	const headTags = [];
+	const assets = [
+		{
+			tagName: 'style',
+			selector: 'link[rel=stylesheet]',
+			attribute: 'href',
+		},
+		{ tagName: 'script', selector: 'script[src]', attribute: 'src' },
+	];
+	for ( const asset of assets ) {
+		const { tagName, selector, attribute } = asset;
+		const tags = document.querySelectorAll( selector );
+
+		// Use Promise.all to wait for fetch to complete
+		await Promise.all(
+			Array.from( tags ).map( async ( tag ) => {
+				const attributeValue = tag.getAttribute( attribute );
+				if ( ! headElements.has( attributeValue ) ) {
+					const response = await fetch( attributeValue );
+					const text = await response.text();
+					headElements.set( attributeValue, {
+						tag,
+						text,
+					} );
+				}
+
+				const headElement = headElements.get( attributeValue );
+				const element = document.createElement( tagName );
+				element.innerText = headElement.text;
+				for ( const attr of headElement.tag.attributes ) {
+					element.setAttribute( attr.name, attr.value );
+				}
+				headTags.push( element );
+			} )
+		);
+	}
+
+	return [
+		document.querySelector( 'title' ),
+		...document.querySelectorAll( 'style' ),
+		...headTags,
+	];
+};

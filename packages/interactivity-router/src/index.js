@@ -1,7 +1,16 @@
 /**
+ * Internal dependencies
+ */
+import { fetchHeadAssets, updateHead } from './head';
+/**
  * WordPress dependencies
  */
-import { store, privateApis, getConfig } from '@wordpress/interactivity';
+import {
+	store,
+	privateApis,
+	getConfig,
+	getElement,
+} from '@wordpress/interactivity';
 
 const {
 	directivePrefix,
@@ -16,8 +25,13 @@ const {
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
-// The cache of visited and prefetched pages.
+// Check if the navigation mode is full page or region based.
+const navigationMode =
+	getConfig( 'core/router' ).navigationMode ?? 'regionBased';
+
+// The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map();
+const headElements = new Map();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
@@ -43,30 +57,49 @@ const fetchPage = async ( url, { html } ) => {
 
 // Return an object with VDOM trees of those HTML regions marked with a
 // `router-region` directive.
-const regionsToVdom = ( dom, { vdom } = {} ) => {
+const regionsToVdom = async ( dom, { vdom } = {} ) => {
 	const regions = {};
-	const attrName = `data-${ directivePrefix }-router-region`;
-	dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-		const id = region.getAttribute( attrName );
-		regions[ id ] = vdom?.has( region )
-			? vdom.get( region )
-			: toVdom( region );
-	} );
+	let head;
+	if ( navigationMode === 'fullPage' ) {
+		head = await fetchHeadAssets( dom, headElements );
+		regions.body = vdom?.has( 'body' )
+			? vdom.get( 'body' )
+			: toVdom( dom.body );
+	}
+	if ( navigationMode === 'regionBased' ) {
+		const attrName = `data-${ directivePrefix }-router-region`;
+		dom.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
+			const id = region.getAttribute( attrName );
+			regions[ id ] = vdom?.has( region )
+				? vdom.get( region )
+				: toVdom( region );
+		} );
+	}
 	const title = dom.querySelector( 'title' )?.innerText;
 	const initialData = parseInitialData( dom );
-	return { regions, title, initialData };
+	return { regions, head, title, initialData };
 };
 
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
 	batch( () => {
 		populateInitialData( page.initialData );
-		const attrName = `data-${ directivePrefix }-router-region`;
-		document.querySelectorAll( `[${ attrName }]` ).forEach( ( region ) => {
-			const id = region.getAttribute( attrName );
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
-		} );
+		if ( navigationMode === 'fullPage' ) {
+			// Once this code is tested and more mature, the head should be updated for region based navigation as well.
+			updateHead( page.head );
+			const fragment = getRegionRootFragment( document.body );
+			render( page.regions.body, fragment );
+		}
+		if ( navigationMode === 'regionBased' ) {
+			const attrName = `data-${ directivePrefix }-router-region`;
+			document
+				.querySelectorAll( `[${ attrName }]` )
+				.forEach( ( region ) => {
+					const id = region.getAttribute( attrName );
+					const fragment = getRegionRootFragment( region );
+					render( page.regions[ id ], fragment );
+				} );
+		}
 		if ( page.title ) {
 			document.title = page.title;
 		}
@@ -102,11 +135,43 @@ window.addEventListener( 'popstate', async () => {
 	}
 } );
 
-// Cache the initial page using the intially parsed vDOM.
+// Initialize the router and cache the initial page using the initial vDOM.
+// Once this code is tested and more mature, the head should be updated for region based navigation as well.
+if ( navigationMode === 'fullPage' ) {
+	// Cache the scripts. Has to be called before fetching the assets.
+	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
+		headElements.set( script.getAttribute( 'src' ), {
+			tag: script,
+			text: script.textContent,
+		} );
+	} );
+	await fetchHeadAssets( document, headElements );
+}
 pages.set(
 	getPagePath( window.location ),
 	Promise.resolve( regionsToVdom( document, { vdom: initialVdom } ) )
 );
+
+const nextTick = ( fn ) =>
+	new Promise( ( resolve ) => setTimeout( () => resolve( fn() ) ) );
+
+// Check if the link is valid for client-side navigation.
+const isValidLink = ( ref ) =>
+	ref &&
+	ref instanceof window.HTMLAnchorElement &&
+	ref.href &&
+	( ! ref.target || ref.target === '_self' ) &&
+	ref.origin === window.location.origin;
+
+// Check if the event is valid for client-side navigation.
+const isValidEvent = ( event ) =>
+	event &&
+	event.button === 0 && // Left clicks only.
+	! event.metaKey && // Open in new tab (Mac).
+	! event.ctrlKey && // Open in new tab (Windows).
+	! event.altKey && // Download.
+	! event.shiftKey &&
+	! event.defaultPrevented;
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -128,23 +193,30 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href                               The page href.
-		 * @param {Object}  [options]                          Options object.
-		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
-		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
-		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
-		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
-		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param {string|Object} eventOrUrl                         The page href or the event handler in case it is used directly in a directive.
+		 * @param {Object}        [options]                          Options object.
+		 * @param {boolean}       [options.force]                    If true, it forces re-fetching the URL.
+		 * @param {string}        [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param {boolean}       [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param {number}        [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param {boolean}       [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param {boolean}       [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
-		*navigate( href, options = {} ) {
+		*navigate( eventOrUrl, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
-			if ( clientNavigationDisabled ) {
-				yield forcePageReload( href );
+			const { ref } = getElement();
+			const url = typeof eventOrUrl === 'string' && eventOrUrl;
+			const event = eventOrUrl instanceof Event && eventOrUrl;
+			if (
+				clientNavigationDisabled ||
+				! ( url || ( isValidLink( ref ) && isValidEvent( event ) ) )
+			) {
+				yield forcePageReload( url );
 			}
-
+			if ( event ) event.preventDefault();
+			const href = url ? url : ref.href;
 			const pagePath = getPagePath( href );
 			const { navigation } = state;
 			const {
@@ -193,7 +265,7 @@ export const { state, actions } = store( 'core/router', {
 				! page.initialData?.config?.[ 'core/router' ]
 					?.clientNavigationDisabled
 			) {
-				renderRegions( page );
+				yield nextTick( () => renderRegions( page ) );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
@@ -218,6 +290,10 @@ export const { state, actions } = store( 'core/router', {
 							? '\u00A0'
 							: '' );
 				}
+
+				// Scroll to the anchor if exits in the link.
+				const { hash } = new URL( href, window.location );
+				if ( hash ) document.querySelector( hash )?.scrollIntoView();
 			} else {
 				yield forcePageReload( href );
 			}
@@ -229,15 +305,15 @@ export const { state, actions } = store( 'core/router', {
 		 * The function normalizes the URL and stores internally the fetch
 		 * promise, to avoid triggering a second fetch for an ongoing request.
 		 *
-		 * @param {string}  url             The page URL.
-		 * @param {Object}  [options]       Options object.
-		 * @param {boolean} [options.force] Force fetching the URL again.
-		 * @param {string}  [options.html]  HTML string to be used instead of
-		 *                                  fetching the requested URL.
+		 * @param {string|Object} eventOrUrl      The page href or the event handler in case it is used directly in a directive.
+		 * @param {Object}        [options]       Options object.
+		 * @param {boolean}       [options.force] Force fetching the URL again.
+		 * @param {string}        [options.html]  HTML string to be used instead of fetching the requested URL.
 		 */
-		prefetch( url, options = {} ) {
+		prefetch( eventOrUrl, options = {} ) {
+			const url = typeof eventOrUrl === 'string' && eventOrUrl;
 			const { clientNavigationDisabled } = getConfig();
-			if ( clientNavigationDisabled ) return;
+			if ( clientNavigationDisabled || ! url ) return;
 
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
