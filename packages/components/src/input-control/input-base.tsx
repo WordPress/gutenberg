@@ -78,7 +78,6 @@ export function InputBase(
 		labelPosition,
 		id: idProp,
 		isBorderless = false,
-		isFocused = false,
 		label,
 		prefix,
 		size = 'default',
@@ -139,11 +138,7 @@ export function InputBase(
 						</Suffix>
 					) }
 				</ContextSystemProvider>
-				<Backdrop
-					disabled={ disabled }
-					isBorderless={ isBorderless }
-					isFocused={ isFocused }
-				/>
+				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
 			</Container>
 		</Root>
 	);

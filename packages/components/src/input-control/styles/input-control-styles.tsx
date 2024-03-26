@@ -35,6 +35,51 @@ export const Suffix = styled.span`
 	display: flex;
 `;
 
+type BackdropProps = {
+	disabled?: boolean;
+	isBorderless?: boolean;
+};
+
+const backdropBorderlessStyles = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ) => {
+	if ( isBorderless ) {
+		return css`
+			border-color: transparent;
+		`;
+	}
+
+	if ( disabled ) {
+		return css`
+			border-color: ${ COLORS.ui.borderDisabled };
+		`;
+	}
+
+	return undefined;
+};
+
+export const BackdropUI = styled.div< BackdropProps >`
+	&&& {
+		box-sizing: border-box;
+		border-color: ${ COLORS.ui.border };
+		border-radius: inherit;
+		border-style: solid;
+		border-width: 1px;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		${ backdropBorderlessStyles }
+		${ rtl( { paddingLeft: 2 } ) }
+	}
+`;
+
 export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
@@ -43,6 +88,14 @@ export const Root = styled( Flex )`
 
 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
 		z-index: 1;
+
+		${ BackdropUI } {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
 	}
 `;
 
@@ -263,61 +316,4 @@ export const Label = (
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
-`;
-
-type BackdropProps = {
-	disabled?: boolean;
-	isBorderless?: boolean;
-	isFocused?: boolean;
-};
-
-const backdropFocusedStyles = ( {
-	disabled,
-	isBorderless,
-	isFocused,
-}: BackdropProps ): SerializedStyles => {
-	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
-
-	let boxShadow;
-	let outline;
-	let outlineOffset;
-
-	if ( isFocused ) {
-		borderColor = COLORS.ui.borderFocus;
-		boxShadow = CONFIG.controlBoxShadowFocus;
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline = `2px solid transparent`;
-		outlineOffset = `-2px`;
-	}
-
-	if ( disabled ) {
-		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
-	}
-
-	return css( {
-		boxShadow,
-		borderColor,
-		borderStyle: 'solid',
-		borderWidth: 1,
-		outline,
-		outlineOffset,
-	} );
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
-	&&& {
-		box-sizing: border-box;
-		border-radius: inherit;
-		bottom: 0;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-		top: 0;
-
-		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
-	}
 `;
