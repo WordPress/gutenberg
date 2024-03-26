@@ -1555,6 +1555,36 @@ _Returns_
 
 -   `Object`: Action object.
 
+### resetBindingBlocks
+
+Creates an action to register a block's attribute binding to an external property.
+
+It registers a specific block attribute to be updated based on the value of an external property, identified by a unique key.
+
+_Parameters_
+
+-   _clientId_ `string`: - Block client ID.
+-   _attribute_ `string`: - The name of the block attribute to bind.
+-   _key_ `string`: - The key representing the external property.
+
+_Returns_
+
+-   `Object`: Redux 'RESET_BINDING_CONNECTION_BLOCKS' type action.
+
+### resetBlockBindingConnections
+
+Connect blocks with bound attributes to external data sources.
+
+Attributes specified in block metadata bindings are updated according to the corresponding external values.
+
+_Parameters_
+
+-   _blocks_ `Object`: - Blocks list.
+
+_Returns_
+
+-   `Function`: Returns a Redux thunk function that processes blocks and sets up bindings.
+
 ### resetBlocks
 
 Action that resets blocks state to the specified array of blocks, taking precedence over any other content reflected as an edit in state.
@@ -1796,6 +1826,10 @@ _Returns_
 
 -   `Object`: Action object.
 
+### unregisterBlockBinding
+
+Undocumented declaration.
+
 ### unsetBlockEditingMode
 
 Clears the block editing mode for a given block.
@@ -1838,6 +1872,10 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### updateBlockBoundAttributes
+
+Undocumented declaration.
 
 ### updateBlockListSettings
 

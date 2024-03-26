@@ -2,17 +2,22 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
+import { __ } from '@wordpress/i18n';
 import { select, dispatch } from '@wordpress/data';
-import { _x } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../store';
+import { RichTextData } from '@wordpress/rich-text';
 
 export default {
-	name: 'core/post-meta',
-	label: _x( 'Post Meta', 'block bindings source' ),
-	connect( { key, id } ) {
+	name: 'core/post-entity',
+	label: __( 'Post Entity' ),
+	connect( { prop, id } ) {
+		if ( ! prop ) {
+			throw new Error( 'The "prop" argument is required.' );
+		}
+
 		const { getEditedEntityRecord } = select( coreStore );
 		const { editEntityRecord } = dispatch( coreStore );
 		const { getCurrentPostId } = select( editorStore );
@@ -20,18 +25,22 @@ export default {
 		id = id || getCurrentPostId();
 
 		return {
-			get: () =>
-				getEditedEntityRecord( 'postType', 'post', id ).meta[ key ],
+			get: () => {
+				const record = getEditedEntityRecord( 'postType', 'post', id );
+				return record[ prop ]?.rendered || record[ prop ];
+			},
 
-			update: ( value ) => {
+			update: ( newValue ) => {
+				if ( newValue instanceof RichTextData ) {
+					newValue = newValue.toString();
+				}
+
 				editEntityRecord( 'postType', 'post', id, {
-					meta: {
-						...getEditedEntityRecord( 'postType', 'post', id ).meta,
-						[ key ]: value,
-					},
+					[ prop ]: newValue,
 				} );
 			},
 		};
 	},
+
 	lockAttributesEditing: false,
 };

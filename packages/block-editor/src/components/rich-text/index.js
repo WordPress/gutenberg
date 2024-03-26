@@ -6,6 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { store as bindingsStore } from '@wordpress/bindings';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	useRef,
 	useCallback,
@@ -19,7 +24,7 @@ import {
 	removeFormat,
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -47,7 +52,7 @@ import { getAllowedFormats } from './utils';
 import { Content } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import { canBindBlock } from '../../../../editor/src/bindings/utils';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -164,9 +169,7 @@ export function RichTextWrapper(
 			if ( blockBindings && canBindBlock( blockName ) ) {
 				const blockTypeAttributes =
 					getBlockType( blockName ).attributes;
-				const { getBlockBindingsSource } = unlock(
-					select( blocksStore )
-				);
+				const { getBindingsSource } = unlock( select( bindingsStore ) );
 				for ( const [ attribute, args ] of Object.entries(
 					blockBindings
 				) ) {
@@ -178,9 +181,10 @@ export function RichTextWrapper(
 					}
 
 					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-					const blockBindingsSource = getBlockBindingsSource(
+					const blockBindingsSource = getBindingsSource(
 						args.source
 					);
+
 					if (
 						! blockBindingsSource ||
 						blockBindingsSource.lockAttributesEditing
@@ -329,7 +333,7 @@ export function RichTextWrapper(
 		onChange,
 	} );
 
-	useMarkPersistent( { html: adjustedValue, value } );
+	useMarkPersistent( value );
 
 	const keyboardShortcuts = useRef( new Set() );
 	const inputEvents = useRef( new Set() );

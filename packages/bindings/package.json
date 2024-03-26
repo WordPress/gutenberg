@@ -1,0 +1,39 @@
+{
+	"name": "@wordpress/bindings",
+	"version": "0.23.0",
+	"description": "Connect to external sources by using the Bindings API.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"bindings"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/bindings/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/bindings"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/data": "file:../data",
+		"@wordpress/private-apis": "file:../private-apis"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

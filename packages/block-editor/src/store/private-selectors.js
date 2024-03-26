@@ -7,6 +7,7 @@ import createSelector from 'rememo';
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { store as bindingsStore } from '@wordpress/bindings';
 
 /**
  * Internal dependencies
@@ -23,6 +24,11 @@ import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-ta
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import { selectBlockPatternsKey } from './private-keys';
+import { RichTextData } from '@wordpress/rich-text';
+import {
+	canBindAttribute,
+	canBindBlock,
+} from '../../../editor/src/bindings/utils';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -353,3 +359,130 @@ export function getLastFocus( state ) {
 export function isDragging( state ) {
 	return state.isDragging;
 }
+
+/**
+ * Return the bindings connection key
+ * for a given block client ID and attribute.
+ *
+ * @param {Object} state     - Global application state.
+ * @param {string} clientId  - Block client ID.
+ * @param {string} attribute - Block attribute name.
+ * @return {string}            Bingins connection key.
+ */
+export function getBindingsConnectionKey( state, clientId, attribute ) {
+	if ( ! state.bindings ) {
+		return {};
+	}
+
+	return state.bindings?.byClientId.get( clientId )?.connectionKeys[
+		attribute
+	];
+}
+
+/**
+ * Returns a blocks with bound attributes collection.
+ *
+ * @param {Object} state - Global application state.
+ * @return {Object}        Block with bound attributes collection.
+ */
+export function getBlocksWithBoundAttributes( state ) {
+	// If there are no bindings, return an empty object.
+	if ( ! state.bindings?.byClientId ) {
+		return {};
+	}
+
+	const result = {};
+
+	state.bindings.byClientId.forEach( ( block, clientId ) => {
+		if ( ! canBindBlock( block.name ) ) {
+			return;
+		}
+
+		// Check if the attribute can be bound.
+		const boundAttributes = Object.fromEntries(
+			Object.entries( block.attributes || {} ).filter(
+				( [ attribute ] ) => {
+					return canBindAttribute( block.name, attribute );
+				}
+			)
+		);
+
+		if ( Object.keys( boundAttributes ).length === 0 ) {
+			return;
+		}
+
+		result[ clientId ] = boundAttributes;
+	} );
+
+	return result;
+}
+
+/**
+ * Return a list of blocks that are bound
+ * to the same bindings connection key.
+ *
+ * @param {Object} state - Global application state.
+ * @param {string} key   - Bingins connection key.
+ * @param {string} value - Bingins connection value.
+ * @return {Object[]}      List of blocks with the same bindings connection key.
+ */
+export function getBlocksByBindingsConnectionKey( state, key, value ) {
+	const bindingsConnection = state.bindings.connections.get( key );
+	if ( ! bindingsConnection ) {
+		return [];
+	}
+
+	return Object.entries( bindingsConnection ).map(
+		( [ attr, clientIds ] ) => {
+			return {
+				attributes: { [ attr ]: value },
+				clientIds,
+			};
+		}
+	);
+}
+
+/**
+ * Selects and optionally transforms
+ * the value bound to an external property.
+ *
+ * @param {Object}              state     - Redux state.
+ * @param {string}              key       - External property key.
+ * @param {string|RichTextData} attribute - Current attribute value.
+ * @return {string|RichTextData}            Transformed or original bound attribute.
+ */
+export const getBoundAttributeValue = createRegistrySelector( ( select ) =>
+	createSelector( ( state, key, attribute ) => {
+		const { getBindingsConnectionValue } = unlock(
+			select( bindingsStore )
+		);
+
+		const externalValue = getBindingsConnectionValue( key );
+
+		// Type: string
+		if ( typeof attribute === 'string' ) {
+			return externalValue;
+		}
+
+		// Type: RichTextData
+		if ( attribute instanceof RichTextData ) {
+			/*
+			 * Compare the string (HTML) value of the RichTextData
+			 * with the external value.
+			 *
+			 * If they are the same, return the same attribute.
+			 */
+			if ( attribute.toHTMLString() === externalValue ) {
+				return attribute;
+			}
+
+			/*
+			 * Otherwise, return a RichTextData instance
+			 * with the value of the external value.
+			 */
+			return RichTextData.fromHTMLString( externalValue );
+		}
+
+		return externalValue;
+	} )
+);
