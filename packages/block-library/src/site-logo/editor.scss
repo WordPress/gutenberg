@@ -1,16 +1,12 @@
 .wp-block[data-align="center"] > .wp-block-site-logo,
-.wp-block-site-logo.aligncenter > div {
+.wp-block-site-logo.aligncenter > div,
+.wp-block-site-logo.aligncenter {
 	display: table;
 	margin-left: auto;
 	margin-right: auto;
 }
 
 .wp-block-site-logo {
-	// Make the block selectable.
-	a {
-		pointer-events: none;
-	}
-
 	.custom-logo-link {
 		cursor: inherit;
 
@@ -25,8 +21,10 @@
 
 	img {
 		display: block;
-		height: auto;
-		max-width: 100%;
+	}
+
+	.wp-block-image__crop-area {
+		pointer-events: auto;
 	}
 }
 
@@ -149,5 +147,23 @@
 		padding: 6px 12px;
 		display: flex;
 		height: $grid-unit-50;
+	}
+}
+
+// This is necessary for the editor resize handles to accurately work on a non-floated, non-resized logo.
+.wp-block-site-logo .components-resizable-box__container {
+	// Using "display: table" because:
+	// - it visually hides empty white space in between elements
+	// - it allows the element to be as wide as its contents (instead of 100% width, as it would be with `display: block`)
+	display: table;
+	img {
+		display: block;
+		width: inherit;
+	}
+}
+
+.wp-block-site-logo.has-custom-border {
+	.wp-block-image__crop-area {
+		box-sizing: border-box;
 	}
 }
