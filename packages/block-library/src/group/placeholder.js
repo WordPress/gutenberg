@@ -159,15 +159,18 @@ function GroupPlaceHolder( { name, onSelect } ) {
 					{ variations.map( ( variation ) => (
 						<li key={ variation.name }>
 							<Button
-								variant="tertiary"
+								variant="secondary"
 								icon={ getGroupPlaceholderIcons(
 									variation.name
 								) }
-								iconSize={ 44 }
+								iconSize={ 48 }
 								onClick={ () => onSelect( variation ) }
 								className="wp-block-group-placeholder__variation-button"
 								label={ `${ variation.title }: ${ variation.description }` }
 							/>
+							<span className="wp-block-group-placeholder__variation-label">
+								{ variation.title }
+							</span>
 						</li>
 					) ) }
 				</ul>
