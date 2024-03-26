@@ -22,38 +22,10 @@ import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions'
 import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
 
 /**
- * The raw structure of a block includes its attributes, inner
- * blocks, and inner HTML. It is important to distinguish inner blocks from
- * the HTML content of the block as only the latter is relevant for block
- * validation and edit operations.
- *
- * @typedef WPRawBlock
- *
- * @property {string=}         blockName    Block name
- * @property {Object=}         attrs        Block raw or comment attributes.
- * @property {string}          innerHTML    HTML content of the block.
- * @property {(string|null)[]} innerContent Content without inner blocks.
- * @property {WPRawBlock[]}    innerBlocks  Inner Blocks.
- */
-
-/**
- * Fully parsed block object.
- *
- * @typedef WPBlock
- *
- * @property {string}     name                    Block name
- * @property {Object}     attributes              Block raw or comment attributes.
- * @property {WPBlock[]}  innerBlocks             Inner Blocks.
- * @property {string}     originalContent         Original content of the block before validation fixes.
- * @property {boolean}    isValid                 Whether the block is valid.
- * @property {Object[]}   validationIssues        Validation issues.
- * @property {WPRawBlock} [__unstableBlockSource] Un-processed original copy of block if created through parser.
- */
-
-/**
- * @typedef  {Object}  ParseOptions
- * @property {boolean?} __unstableSkipMigrationLogs If a block is migrated from a deprecated version, skip logging the migration details.
- * @property {boolean?} __unstableSkipAutop         Whether to skip autop when processing freeform content.
+ * @typedef {import('../../types').Block} Block
+ * @typedef {import('../../types').BlockType} BlockType
+ * @typedef {import('../../types').BlockNode} BlockNode
+ * @typedef {import('../types').BlockParseOptions} BlockParseOptions
  */
 
 /**
@@ -61,9 +33,9 @@ import { applyBuiltInValidationFixes } from './apply-built-in-validation-fixes';
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
  *
- * @param {WPRawBlock} rawBlock
+ * @param {BlockNode} rawBlock
  *
- * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
+ * @return {BlockNode} The block's name and attributes, changed accordingly if a match was found
  */
 function convertLegacyBlocks( rawBlock ) {
 	const [ correctName, correctedAttributes ] =
@@ -82,10 +54,10 @@ function convertLegacyBlocks( rawBlock ) {
  * Normalize the raw block by applying the fallback block name if none given,
  * sanitize the parsed HTML...
  *
- * @param {WPRawBlock}    rawBlock The raw block object.
- * @param {ParseOptions?} options  Extra options for handling block parsing.
+ * @param {BlockNode}          rawBlock The raw block object.
+ * @param {BlockParseOptions=} options  Extra options for handling block parsing.
  *
- * @return {WPRawBlock} The normalized block object.
+ * @return {BlockNode} The normalized block object.
  */
 export function normalizeRawBlock( rawBlock, options ) {
 	const fallbackBlockName = getFreeformContentHandlerName();
@@ -119,9 +91,9 @@ export function normalizeRawBlock( rawBlock, options ) {
 /**
  * Uses the "unregistered blockType" to create a block object.
  *
- * @param {WPRawBlock} rawBlock block.
+ * @param {BlockNode} rawBlock block.
  *
- * @return {WPRawBlock} The unregistered block object.
+ * @return {BlockNode} The unregistered block object.
  */
 function createMissingBlockType( rawBlock ) {
 	const unregisteredFallbackBlock =
@@ -158,9 +130,9 @@ function createMissingBlockType( rawBlock ) {
  *
  * The name here is regrettable but `validateBlock` is already taken.
  *
- * @param {WPBlock}                               unvalidatedBlock
- * @param {import('../registration').WPBlockType} blockType
- * @return {WPBlock}                              validated block, with auto-fixes if initially invalid
+ * @param {Block}     unvalidatedBlock
+ * @param {BlockType} blockType
+ * @return {Block} validated block, with auto-fixes if initially invalid
  */
 function applyBlockValidation( unvalidatedBlock, blockType ) {
 	// Attempt to validate the block.
@@ -188,10 +160,10 @@ function applyBlockValidation( unvalidatedBlock, blockType ) {
 /**
  * Given a raw block returned by grammar parsing, returns a fully parsed block.
  *
- * @param {WPRawBlock}   rawBlock The raw block object.
- * @param {ParseOptions} options  Extra options for handling block parsing.
+ * @param {BlockNode}         rawBlock The raw block object.
+ * @param {BlockParseOptions} options  Extra options for handling block parsing.
  *
- * @return {WPBlock | undefined} Fully parsed block.
+ * @return {Block|undefined} Fully parsed block.
  */
 export function parseRawBlock( rawBlock, options ) {
 	let normalizedBlock = normalizeRawBlock( rawBlock, options );
@@ -302,10 +274,10 @@ export function parseRawBlock( rawBlock, options ) {
  * @see
  * https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/
  *
- * @param {string}       content The post content.
- * @param {ParseOptions} options Extra options for handling block parsing.
+ * @param {string}            content The post content.
+ * @param {BlockParseOptions} options Extra options for handling block parsing.
  *
- * @return {Array} Block list.
+ * @return {Block[]} Block list.
  */
 export default function parse( content, options ) {
 	return grammarParse( content ).reduce( ( accumulator, rawBlock ) => {

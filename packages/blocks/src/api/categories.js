@@ -8,7 +8,9 @@ import { dispatch, select } from '@wordpress/data';
  */
 import { store as blocksStore } from '../store';
 
-/** @typedef {import('../store/reducer').WPBlockCategory} WPBlockCategory */
+/**
+ * @typedef {import('../types').BlockCategory} BlockCategory
+ */
 
 /**
  * Returns all the block categories.
@@ -16,7 +18,7 @@ import { store as blocksStore } from '../store';
  *
  * @ignore
  *
- * @return {WPBlockCategory[]} Block categories.
+ * @return {BlockCategory[]} Block categories.
  */
 export function getCategories() {
 	return select( blocksStore ).getCategories();
@@ -25,7 +27,7 @@ export function getCategories() {
 /**
  * Sets the block categories.
  *
- * @param {WPBlockCategory[]} categories Block categories.
+ * @param {BlockCategory[]} categories Block categories.
  *
  * @example
  * ```js
@@ -64,9 +66,9 @@ export function setCategories( categories ) {
 /**
  * Updates a category.
  *
- * @param {string}          slug     Block category slug.
- * @param {WPBlockCategory} category Object containing the category properties
- *                                   that should be updated.
+ * @param {string}        slug     Block category slug.
+ * @param {BlockCategory} category Object containing the category properties
+ *                                 that should be updated.
  *
  * @example
  * ```js

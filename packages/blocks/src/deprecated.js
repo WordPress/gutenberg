@@ -9,6 +9,9 @@ import deprecated from '@wordpress/deprecated';
  *
  * @deprecated
  *
+ * @template T
+ * @typedef {import('react').ComponentType<T>} Component
+ *
  * @param {Component} OriginalComponent The component to enhance.
  * @return {Component} The same component.
  */

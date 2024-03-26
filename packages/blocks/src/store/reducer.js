@@ -15,16 +15,15 @@ import { __ } from '@wordpress/i18n';
 import { omit } from '../api/utils';
 
 /**
- * @typedef {Object} WPBlockCategory
- *
- * @property {string} slug  Unique category slug.
- * @property {string} title Category label, for display in user interface.
+ * @typedef {import('../types').BlockCategory} BlockCategory
+ * @typedef {import('../types').BlockType} BlockType
+ * @typedef {import('./types').BlockStoreState} BlockStoreState
  */
 
 /**
  * Default set of categories.
  *
- * @type {WPBlockCategory[]}
+ * @type {BlockCategory[]}
  */
 export const DEFAULT_CATEGORIES = [
 	{ slug: 'text', title: __( 'Text' ) },
@@ -36,7 +35,13 @@ export const DEFAULT_CATEGORIES = [
 	{ slug: 'reusable', title: __( 'Reusable blocks' ) },
 ];
 
-// Key block types by their name.
+/**
+ * Key block types by their name.
+ *
+ * @param {BlockType[]} types Block types of which to
+ *
+ * @return {Record<string, BlockType>} Block types collected into an object indexed by `name` property.
+ */
 function keyBlockTypesByName( types ) {
 	return types.reduce(
 		( newBlockTypes, block ) => ( {
@@ -47,7 +52,13 @@ function keyBlockTypesByName( types ) {
 	);
 }
 
-// Filter items to ensure they're unique by their name.
+/**
+ * Filter items to ensure they're unique by their name.
+ *
+ * @template {{name: string}} Item
+ * @param {Item[]} items - Items to be filtered by `name` property.
+ * @return {Item[]} Filtered array of items.
+ */
 function getUniqueItemsByName( items ) {
 	return items.reduce( ( acc, currentItem ) => {
 		if ( ! acc.some( ( item ) => item.name === currentItem.name ) ) {
@@ -141,10 +152,10 @@ function bootstrappedBlockTypes( state = {}, action ) {
  * It's for internal use only. It allows recomputing the processed block types on-demand after block type filters
  * get added or removed.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {BlockStoreState} state  Current state.
+ * @param {Object}          action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {BlockStoreState} Updated state.
  */
 export function unprocessedBlockTypes( state = {}, action ) {
 	switch ( action.type ) {
@@ -164,10 +175,10 @@ export function unprocessedBlockTypes( state = {}, action ) {
  * Reducer managing the processed block types with all filters applied.
  * The state is derived from the `unprocessedBlockTypes` reducer.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {BlockStoreState} state  Current state.
+ * @param {Object}          action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {BlockStoreState} Updated state.
  */
 export function blockTypes( state = {}, action ) {
 	switch ( action.type ) {
@@ -186,10 +197,10 @@ export function blockTypes( state = {}, action ) {
 /**
  * Reducer managing the block styles.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {BlockStoreState} state  Current state.
+ * @param {Object}          action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {BlockStoreState} Updated state.
  */
 export function blockStyles( state = {}, action ) {
 	switch ( action.type ) {
@@ -238,10 +249,10 @@ export function blockStyles( state = {}, action ) {
 /**
  * Reducer managing the block variations.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {BlockStoreState} state  Current state.
+ * @param {Object}          action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {BlockStoreState} Updated state.
  */
 export function blockVariations( state = {}, action ) {
 	switch ( action.type ) {
@@ -297,7 +308,7 @@ export function blockVariations( state = {}, action ) {
  *
  * @param {string} setActionType Action type.
  *
- * @return {Function} Reducer.
+ * @return {( state: string | null, action: Object ) => any} Reducer.
  */
 export function createBlockNameSetterReducer( setActionType ) {
 	return ( state = null, action ) => {
@@ -332,10 +343,10 @@ export const groupingBlockName = createBlockNameSetterReducer(
 /**
  * Reducer managing the categories
  *
- * @param {WPBlockCategory[]} state  Current state.
- * @param {Object}            action Dispatched action.
+ * @param {BlockCategory[]} state  Current state.
+ * @param {Object}          action Dispatched action.
  *
- * @return {WPBlockCategory[]} Updated state.
+ * @return {BlockCategory[]} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
@@ -367,6 +378,13 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the collections.
+ *
+ * @param {BlockStoreState} state  The current state.
+ * @param {Object}          action Dispatched action.
+ * @return {BlockStoreState} Updated state.
+ */
 export function collections( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ADD_BLOCK_COLLECTION':

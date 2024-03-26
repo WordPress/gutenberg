@@ -24,6 +24,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"sideEffects": [
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
