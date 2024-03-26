@@ -70,6 +70,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		displayAsColumnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -303,7 +304,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
-				gridDisplayDirection: 'column',
 				render: ( { item } ) => {
 					return item.description ? (
 						<span className="page-templates-description">
