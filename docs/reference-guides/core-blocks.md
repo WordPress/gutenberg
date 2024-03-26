@@ -35,6 +35,15 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 -	**Supports:** align, color (~~background~~, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), ~~alignWide~~, ~~html~~
 -	**Attributes:** isLink, linkTarget, size, userId
 
+## Back to top
+
+A link that takes you back to the top. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/back-to-top))
+
+-	**Name:** core/back-to-top
+-	**Category:** design
+-	**Supports:** ~~html~~
+-	**Attributes:** text
+
 ## Pattern
 
 Reuse this design across your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
