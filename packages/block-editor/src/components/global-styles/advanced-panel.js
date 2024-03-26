@@ -33,17 +33,15 @@ export default function AdvancedPanel( {
 			}
 		}
 	}
-	function handleOnBlur( event ) {
-		if ( ! event?.target?.value ) {
+	function handleOnBlur( newValue ) {
+		if ( ! newValue ) {
 			setCSSError( null );
 			return;
 		}
-
 		const [ transformed ] = transformStyles(
-			[ { css: event.target.value } ],
+			[ { css: newValue } ],
 			'.editor-styles-wrapper'
 		);
-
 		setCSSError(
 			transformed === null
 				? __( 'There is an error with your CSS structure.' )
@@ -89,6 +87,13 @@ export default function AdvancedPanel( {
 								handleOnChange( editor.state.doc.toString() );
 							}
 						} ),
+						EditorView.focusChangeEffect.of(
+							( editorState, focusing ) => {
+								if ( ! focusing ) {
+									handleOnBlur( editorState.doc.toString() );
+								}
+							}
+						),
 					],
 					parent: editorRef.current,
 				} );
@@ -112,11 +117,7 @@ export default function AdvancedPanel( {
 			>
 				{ __( 'Additional CSS' ) }
 			</label>
-			<div
-				ref={ editorRef }
-				onBlur={ handleOnBlur }
-				id={ cssEditorId }
-			></div>
+			<div ref={ editorRef } id={ cssEditorId }></div>
 		</VStack>
 	);
 }
