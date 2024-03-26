@@ -242,7 +242,6 @@
 	white-space: nowrap;
 	display: block;
 	width: 100%;
-	overflow: hidden;
 
 	a {
 		text-decoration: none;
@@ -420,6 +419,7 @@
 		}
 		.dataviews-view-list__primary-field {
 			min-height: $grid-unit-05 * 5;
+			overflow: hidden;
 		}
 	}
 
