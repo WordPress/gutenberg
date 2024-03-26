@@ -934,9 +934,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ /* Hide controls during upload to avoid component remount,
-				which causes duplicated image upload. */ }
-			{ ! temporaryURL && controls }
+			{ controls }
 			{ img }
 
 			<Caption
