@@ -5,11 +5,24 @@
 /**
  * WordPress dependencies
  */
+import { store as editorStore } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
 import { createSlotFill } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginTemplateSettingPanel' );
 
-const PluginTemplateSettingPanel = Fill;
+const PluginTemplateSettingPanel = ( { children } ) => {
+	const isCurrentEntityTemplate = useSelect(
+		( select ) =>
+			select( editorStore ).getCurrentPostType() === 'wp_template',
+		[]
+	);
+	if ( ! isCurrentEntityTemplate ) {
+		return null;
+	}
+	return <Fill>{ children }</Fill>;
+};
+
 PluginTemplateSettingPanel.Slot = Slot;
 
 /**
