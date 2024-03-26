@@ -68,12 +68,12 @@ test.describe( 'Editing Navigation Menus', () => {
 				listView.locator( `id=${ navBlockNodeDescriptionId }` )
 			).toHaveText( /This block is locked./ );
 
-			// The block should have no actions menu.
+			// The block should have no options menu.
 			await expect(
 				navBlockNode
 					.locator( '..' ) // parent selector.
 					.getByRole( 'button', {
-						name: 'Actions',
+						name: 'Options',
 					} )
 			).toBeHidden();
 

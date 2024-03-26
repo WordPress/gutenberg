@@ -280,7 +280,7 @@ test.describe( 'List View', () => {
 			imageItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 
@@ -295,7 +295,7 @@ test.describe( 'List View', () => {
 			groupItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 	} );
@@ -936,12 +936,12 @@ test.describe( 'List View', () => {
 		const listView = await listViewUtils.openListView();
 
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Duplicate' } )
 			.click();
 		await expect
@@ -957,11 +957,11 @@ test.describe( 'List View', () => {
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
@@ -979,9 +979,9 @@ test.describe( 'List View', () => {
 			.filter( {
 				has: page.getByRole( 'gridcell', { name: 'File' } ),
 			} )
-			.getByRole( 'button', { name: 'Actions' } );
+			.getByRole( 'button', { name: 'Options' } );
 		const optionsForFileMenu = page.getByRole( 'menu', {
-			name: 'Actions',
+			name: 'Options',
 		} );
 		await expect(
 			optionsForFileToggle,

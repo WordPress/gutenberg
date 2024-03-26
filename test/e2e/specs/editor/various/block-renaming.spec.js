@@ -179,14 +179,14 @@ test.describe( 'Block Renaming', () => {
 			await pageUtils.pressKeys( 'primary+a' );
 
 			const blockActionsTrigger = listView.getByRole( 'button', {
-				name: 'Actions',
+				name: 'Options',
 			} );
 
 			await blockActionsTrigger.click();
 
 			const renameMenuItem = page
 				.getByRole( 'menu', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Rename',
@@ -227,20 +227,20 @@ test.describe( 'Block Renaming', () => {
 				name: 'Heading',
 			} );
 
-			// The actions menu button is a sibling of the menu item gridcell.
+			// The options menu button is a sibling of the menu item gridcell.
 			const headingItemActions = headingItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} );
 
 			await headingItemActions.click();
 
-			// usage of `page` is required because the actions menu is rendered
+			// usage of `page` is required because the options menu is rendered
 			// into a slot outside of the treegrid.
 			const renameMenuItem = page
 				.getByRole( 'menu', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Rename',

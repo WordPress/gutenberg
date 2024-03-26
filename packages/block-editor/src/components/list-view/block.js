@@ -396,7 +396,7 @@ function ListViewBlock( {
 							clientIds={ dropdownClientIds }
 							block={ block }
 							icon={ moreVertical }
-							label={ __( 'Actions' ) }
+							label={ __( 'Options' ) }
 							popoverProps={ {
 								anchor: settingsPopoverAnchor, // Used to position the settings at the cursor on right-click.
 							} }
