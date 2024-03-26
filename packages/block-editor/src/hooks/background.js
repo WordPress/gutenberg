@@ -19,6 +19,11 @@ import {
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
+// Initial control values where no block style is set.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+};
+
 /**
  * Determine whether there is block support for background.
  *
@@ -45,6 +50,35 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
+export function setBackgroundStyleDefaults( backgroundStyle ) {
+	if ( ! backgroundStyle ) {
+		return;
+	}
+
+	const backgroundImage = backgroundStyle?.backgroundImage;
+	let backgroundStylesWithDefaults;
+
+	// Set block background defaults.
+	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
+		if ( ! backgroundStyle?.backgroundSize ) {
+			backgroundStylesWithDefaults = {
+				backgroundSize: 'cover',
+			};
+		}
+
+		if (
+			'contain' === backgroundStyle?.backgroundSize &&
+			! backgroundStyle?.backgroundPosition
+		) {
+			backgroundStylesWithDefaults = {
+				backgroundPosition: 'center',
+			};
+		}
+	}
+
+	return backgroundStylesWithDefaults;
+}
+
 function useBlockProps( { name, style } ) {
 	if (
 		! hasBackgroundSupport( name ) ||
@@ -53,36 +87,17 @@ function useBlockProps( { name, style } ) {
 		return;
 	}
 
-	const backgroundImage = style?.background?.backgroundImage;
-	let props;
+	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
 
-	// Set block background defaults.
-	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
-		if ( ! style?.background?.backgroundSize ) {
-			props = {
-				style: {
-					backgroundSize: 'cover',
-				},
-			};
-		}
-
-		if (
-			'contain' === style?.background?.backgroundSize &&
-			! style?.background?.backgroundPosition
-		) {
-			props = {
-				style: {
-					backgroundPosition: 'center',
-				},
-			};
-		}
-	}
-
-	if ( ! props ) {
+	if ( ! backgroundStyles ) {
 		return;
 	}
 
-	return props;
+	return {
+		style: {
+			...backgroundStyles,
+		},
+	};
 }
 
 /**
@@ -153,17 +168,12 @@ export function BackgroundImagePanel( {
 		},
 	};
 
-	// Initial control values where no block style is set.
-	const defaultControlValues = {
-		backgroundSize: 'cover',
-	};
-
 	return (
 		<StylesBackgroundPanel
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
 			defaultControls={ defaultControls }
-			defaultControlValues={ defaultControlValues }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }

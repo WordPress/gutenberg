@@ -335,7 +335,7 @@ function BackgroundSizeToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
-	defaultControlValues,
+	defaultValues,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -363,7 +363,7 @@ function BackgroundSizeToolsPanelItem( {
 			sizeValue !== 'contain' ) ||
 		sizeValue === ''
 			? 'auto'
-			: sizeValue || defaultControlValues?.backgroundSize;
+			: sizeValue || defaultValues?.backgroundSize;
 
 	/*
 	 * If the current value is `cover` and the repeat value is `undefined`, then
@@ -394,14 +394,9 @@ function BackgroundSizeToolsPanelItem( {
 	const updateBackgroundSize = ( next ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
-		let nextPosition = positionValue;
 
 		if ( next === 'contain' ) {
 			nextRepeat = 'no-repeat';
-		}
-
-		if ( next !== 'contain' && nextPosition === 'center' ) {
-			nextPosition = undefined;
 		}
 
 		if ( next === 'cover' ) {
@@ -419,7 +414,6 @@ function BackgroundSizeToolsPanelItem( {
 		onChange(
 			setImmutably( style, [ 'background' ], {
 				...style?.background,
-				backgroundPosition: nextPosition,
 				backgroundRepeat: nextRepeat,
 				backgroundSize: next,
 			} )
@@ -557,7 +551,7 @@ export default function BackgroundPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	defaultControlValues = {},
+	defaultValues = {},
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -589,7 +583,7 @@ export default function BackgroundPanel( {
 					isShownByDefault={ defaultControls.backgroundSize }
 					style={ value }
 					inheritedValue={ inheritedValue }
-					defaultControlValues={ defaultControlValues }
+					defaultValues={ defaultValues }
 				/>
 			) }
 		</Wrapper>
