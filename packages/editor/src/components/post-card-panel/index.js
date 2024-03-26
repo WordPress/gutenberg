@@ -36,13 +36,13 @@ export default function PostCardPanel( { className, actions, children } ) {
 		const { getEditedEntityRecord } = select( coreStore );
 		const _type = getCurrentPostType();
 		const _id = getCurrentPostId();
-		let _templateInfo;
 		const _record = getEditedEntityRecord( 'postType', _type, _id );
+		const _templateInfo = __experimentalGetTemplateInfo( _record );
 		return {
 			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
 			modified: getEditedPostAttribute( 'modified' ),
 			id: _id,
-			templateInfo: __experimentalGetTemplateInfo( _record ),
+			templateInfo: _templateInfo,
 			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
 				area: _record?.area,
 			} ),
@@ -88,8 +88,8 @@ export default function PostCardPanel( { className, actions, children } ) {
 							className="editor-post-card-panel__description"
 							spacing={ 2 }
 						>
-							{ !! description && <Text>{ description }</Text> }
-							{ !! lastEditedText && (
+							{ description && <Text>{ description }</Text> }
+							{ lastEditedText && (
 								<Text>{ lastEditedText }</Text>
 							) }
 						</VStack>
