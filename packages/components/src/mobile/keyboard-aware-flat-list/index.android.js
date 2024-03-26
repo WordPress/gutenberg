@@ -18,8 +18,10 @@ import {
  */
 import useScroll from './use-scroll';
 import KeyboardAvoidingView from '../keyboard-avoiding-view';
+import { OPTIMIZATION_ITEMS_THRESHOLD, OPTIMIZATION_PROPS } from './shared';
 
 const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
+const EMPTY_OBJECT = {};
 
 export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 	const { extraScrollHeight, scrollEnabled, shouldPreventAutomaticScroll } =
@@ -41,8 +43,6 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 
 	const getFlatListRef = useCallback(
 		( flatListRef ) => {
-			// On Android, we get the ref of the associated scroll
-			// view to the FlatList.
 			scrollViewRef.current = flatListRef?.getNativeScrollRef();
 		},
 		[ scrollViewRef ]
@@ -57,12 +57,21 @@ export const KeyboardAwareFlatList = ( { onScroll, ...props }, ref ) => {
 		};
 	} );
 
+	const optimizationProps =
+		props.data?.length > OPTIMIZATION_ITEMS_THRESHOLD
+			? OPTIMIZATION_PROPS
+			: EMPTY_OBJECT;
+
 	return (
 		<KeyboardAvoidingView style={ { flex: 1 } }>
 			<AnimatedFlatList
 				ref={ getFlatListRef }
 				onScroll={ scrollHandler }
 				onContentSizeChange={ onContentSizeChange }
+				// Disable clipping to fix focus losing.
+				// See https://github.com/wordpress-mobile/gutenberg-mobile/pull/741#issuecomment-472746541
+				removeClippedSubviews={ false }
+				{ ...optimizationProps }
 				{ ...props }
 			/>
 		</KeyboardAvoidingView>
