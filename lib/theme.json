@@ -4,6 +4,10 @@
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true
+		},
 		"border": {
 			"color": false,
 			"radius": false,
