@@ -19,9 +19,11 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
+	$text = ! empty( $attributes['label'] ) ? trim( $attributes['label'] ) : '';
+
 	$service     = isset( $attributes['service'] ) ? $attributes['service'] : 'Icon';
 	$url         = isset( $attributes['url'] ) ? $attributes['url'] : false;
-	$label       = ! empty( $attributes['label'] ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$text        = $text ? $text : block_core_social_link_get_name( $service );
 	$rel         = isset( $attributes['rel'] ) ? $attributes['rel'] : '';
 	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
@@ -57,7 +59,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link  = '<li ' . $wrapper_attributes . '>';
 	$link .= '<a href="' . esc_url( $url ) . '" class="wp-block-social-link-anchor">';
 	$link .= $icon;
-	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">' . esc_html( $label ) . '</span>';
+	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">' . esc_html( $text ) . '</span>';
 	$link .= '</a></li>';
 
 	$processor = new WP_HTML_Tag_Processor( $link );

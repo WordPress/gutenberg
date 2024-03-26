@@ -860,7 +860,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social media profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
+Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
 
 -	**Name:** core/social-link
 -	**Category:** widgets
@@ -870,7 +870,7 @@ Display an icon linking to a social media profile or site. ([Source](https://git
 
 ## Social Icons
 
-Display icons linking to your social media profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
+Display icons linking to your social profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
 
 -	**Name:** core/social-links
 -	**Category:** widgets
