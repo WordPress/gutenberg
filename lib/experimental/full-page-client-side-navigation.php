@@ -27,7 +27,7 @@ add_filter( 'render_block_data', '_gutenberg_add_enhanced_pagination', 10 );
 
 // Add directives to all links.
 // This should probably be done per site, not by default when this option is enabled.
-function _gutenberg_add_client_side_navigation_directives( $content, $block ) {
+function _gutenberg_add_client_side_navigation_directives( $content ) {
 	$p = new WP_HTML_Tag_Processor( $content );
 	while ( $p->next_tag( array( 'tag_name' => 'a' ) ) ) {
 		if ( empty( $p->get_attribute( 'data-wp-on--click' ) ) ) {
