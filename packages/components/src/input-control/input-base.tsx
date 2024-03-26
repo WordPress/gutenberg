@@ -109,8 +109,6 @@ export function InputBase(
 			{ ...getUIFlexProps( labelPosition ) }
 			className={ className }
 			gap={ 2 }
-			isFocused={ isFocused }
-			labelPosition={ labelPosition }
 			ref={ ref }
 		>
 			<Label

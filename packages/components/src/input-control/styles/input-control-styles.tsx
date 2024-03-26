@@ -23,23 +23,27 @@ type ContainerProps = {
 	labelPosition?: LabelPosition;
 };
 
-type RootProps = {
-	isFocused?: boolean;
-	labelPosition?: LabelPosition;
-};
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
 
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
-	if ( ! isFocused ) return '';
+export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+`;
 
-	return css( { zIndex: 1 } );
-};
-
-export const Root = styled( Flex )< RootProps >`
+export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
-	${ rootFocusedStyles }
+
+	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
+		z-index: 1;
+	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -316,16 +320,4 @@ export const BackdropUI = styled.div< BackdropProps >`
 		${ backdropFocusedStyles }
 		${ rtl( { paddingLeft: 2 } ) }
 	}
-`;
-
-export const Prefix = styled.span`
-	box-sizing: border-box;
-	display: block;
-`;
-
-export const Suffix = styled.span`
-	align-items: center;
-	align-self: stretch;
-	box-sizing: border-box;
-	display: flex;
 `;
