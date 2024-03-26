@@ -12,7 +12,7 @@ Used to render a customizable select control component.
 
 #### Uncontrolled Mode
 
-CustomSelectControlV2 can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
+`CustomSelectControlV2` can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
 
 ```jsx
 const UncontrolledCustomSelectControlV2 = () => (
@@ -33,7 +33,7 @@ const UncontrolledCustomSelectControlV2 = () => (
 
 #### Controlled Mode
 
-CustomSelectControlV2 can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
+`CustomSelectControlV2` can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
 
 ```jsx
 const ControlledCustomSelectControlV2 = () => {
@@ -83,7 +83,7 @@ const MultiSelectCustomSelectControlV2 = () => (
 
 ### Components and Sub-components
 
-CustomSelectControlV2 is comprised of two individual components:
+`CustomSelectControlV2` is comprised of two individual components:
 
 -   `CustomSelectControlV2`: a wrapper component and context provider. It is responsible for managing the state of the `CustomSelectControlV2.Item` children.
 -   `CustomSelectControlV2.Item`: renders a single select item. The first `CustomSelectControlV2.Item` child will be used as the `defaultValue` when `defaultValue` is undefined.
@@ -94,7 +94,7 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The child elements. This should be composed of CustomSelectControlV2.Item components.
+The child elements. This should be composed of `CustomSelectControlV2.Item` components.
 
 -   Required: yes
 
