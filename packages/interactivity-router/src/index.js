@@ -81,7 +81,6 @@ const regionsToVdom = async ( dom, { vdom } = {} ) => {
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
 	batch( () => {
-		populateInitialData( page.initialData );
 		if ( navigationMode === 'fullPage' ) {
 			// Once this code is tested and more mature, the head should be updated for region based navigation as well.
 			updateHead( page.head );
@@ -89,6 +88,7 @@ const renderRegions = ( page ) => {
 			render( page.regions.body, fragment );
 		}
 		if ( navigationMode === 'regionBased' ) {
+			populateInitialData( page.initialData );
 			const attrName = `data-${ directivePrefix }-router-region`;
 			document
 				.querySelectorAll( `[${ attrName }]` )
