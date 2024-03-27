@@ -37,23 +37,6 @@ function BlockPatternsTab( {
 	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	// const patternsContent = useMemo(
-	// 	() => (
-	// 		<BlockPatternsTab
-	// 			rootClientId={ destinationRootClientId }
-	// 			onInsert={ onInsertPattern }
-	// 			onSelectCategory={ onClickPatternCategory }
-	// 			selectedCategory={ selectedPatternCategory }
-	// 		/>
-	// 	),
-	// 	[
-	// 		destinationRootClientId,
-	// 		onInsertPattern,
-	// 		onClickPatternCategory,
-	// 		selectedPatternCategory,
-	// 	]
-	// );
-
 	return (
 		<>
 			{ ! isMobile && (
