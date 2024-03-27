@@ -10,6 +10,9 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as transformStyles } from '../../utils/transform-styles';
 
+const EDITOR_ID =
+	'block-editor-global-styles-advanced-panel__custom-css-editor';
+
 export default function AdvancedPanel( {
 	value,
 	onChange,
@@ -49,7 +52,6 @@ export default function AdvancedPanel( {
 		);
 	}
 
-	const editorRef = useRef();
 	/**
 	 * Ensure the editor has at least min lines of code,
 	 * as the editor will shrink to fit the content.
@@ -58,14 +60,39 @@ export default function AdvancedPanel( {
 	 */
 	function ensureMinLines( content ) {
 		const MIN_LINES = 10;
+		const LINE_HEIGHT = 18.2; // Height of one line in the editor
+		const MARGIN = 53.4;
+		let requiredLines = MIN_LINES;
+
 		const lines = content.split( '\n' );
-		const lineCount = lines.length;
+		const contentLineCount = lines.length;
+
+		const wrapper = document.querySelector(
+			'.edit-site-global-styles-screen-css'
+		);
+		if ( wrapper ) {
+			const wrapperHeight = wrapper.offsetHeight;
+			const editorHeight = wrapperHeight - MARGIN;
+
+			// Calculate the minimum number of lines that should be displayed
+			const calcMinLineCount = Math.ceil( editorHeight / LINE_HEIGHT );
+			requiredLines = Math.max( MIN_LINES, calcMinLineCount );
+
+			// Set the max height of the editor allowing scrolling by `overflow-y: scroll`
+			const editor = document.getElementById( EDITOR_ID );
+			if ( editor ) {
+				editor.style.height = `${ editorHeight }px`;
+			}
+		}
+
 		let result = content;
-		for ( let i = lineCount; i < MIN_LINES; i++ ) {
+		for ( let i = contentLineCount; i < requiredLines; i++ ) {
 			result += '\n';
 		}
+
 		return result;
 	}
+	const editorRef = useRef();
 	useEffect( () => {
 		( async () => {
 			/**
