@@ -150,9 +150,6 @@ pages.set(
 	Promise.resolve( regionsToVdom( document, { vdom: initialVdom } ) )
 );
 
-const nextTick = ( fn ) =>
-	new Promise( ( resolve ) => setTimeout( () => resolve( fn() ) ) );
-
 // Check if the link is valid for client-side navigation.
 const isValidLink = ( ref ) =>
 	ref &&
@@ -263,7 +260,7 @@ export const { state, actions } = store( 'core/router', {
 				! page.initialData?.config?.[ 'core/router' ]
 					?.clientNavigationDisabled
 			) {
-				yield nextTick( () => renderRegions( page ) );
+				yield renderRegions( page );
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
 				]( {}, '', href );
