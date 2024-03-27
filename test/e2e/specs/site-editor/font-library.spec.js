@@ -105,7 +105,7 @@ test.describe( 'Font Library', () => {
 			// Click "Browse styles"
 			await page.getByRole( 'button', { name: 'Browse styles' } ).click();
 
-			// Click the button labeled "Ember"
+			// Activate "Ember" Theme Variation.
 			await page.getByRole( 'button', { name: 'Ember' } ).click();
 
 			// Click "Back" button
@@ -115,7 +115,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'button', { name: 'Typography styles' } )
 				.click();
 
-			// CLick "Jost 2 variants" button
+			// Click "Jost 2 variants" button
 			await page
 				.getByRole( 'button', { name: 'Jost 2 variants' } )
 				.click();
@@ -128,6 +128,40 @@ test.describe( 'Font Library', () => {
 			// Check correct font is displayed in Font Library
 			await expect(
 				page.getByRole( 'heading', { name: 'Jost' } )
+			).toBeVisible();
+
+			// Close the Font Library dialog
+			await page.getByRole( 'button', { name: 'Close' } ).click();
+
+			// Click "Back"
+			await page.getByRole( 'button', { name: 'Back' } ).click();
+
+			// Click "Browse styles"
+			await page.getByRole( 'button', { name: 'Browse styles' } ).click();
+
+			// Activate "Maelstrom" Theme Variation.
+			await page.getByRole( 'button', { name: 'Maelstrom' } ).click();
+
+			// Click "Back" button
+			await page.getByRole( 'button', { name: 'Back' } ).click();
+
+			await page
+				.getByRole( 'button', { name: 'Typography styles' } )
+				.click();
+
+			// Click Cardo font-family.
+			await page
+				.getByRole( 'button', { name: 'Cardo 3 variants' } )
+				.click();
+
+			await expect( page.getByRole( 'dialog' ) ).toBeVisible();
+			await expect(
+				page.getByRole( 'heading', { name: 'Fonts' } )
+			).toBeVisible();
+
+			// Check correct font is displayed in Font Library
+			await expect(
+				page.getByRole( 'heading', { name: 'Cardo' } )
 			).toBeVisible();
 		} );
 	} );
