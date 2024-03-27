@@ -77,12 +77,41 @@ export function SocialLinksEdit( props ) {
 		}
 	}, [ logosOnly ] );
 
+	const placeholderClasses = classNames( 'wp-social-link', {
+		[ `has-${ iconColor.slug }-color` ]: iconColor.slug,
+		[ `has-${ iconBackgroundColor.slug }-background-color` ]:
+			iconBackgroundColor.slug,
+	} );
+
+	const placeholderStyles = {
+		color: iconColor.color,
+		backgroundColor: iconBackgroundColor.color,
+	};
+
 	const SocialPlaceholder = (
 		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-block-social-links__social-placeholder-icons">
-				<div className="wp-social-link wp-social-link-twitter"></div>
-				<div className="wp-social-link wp-social-link-facebook"></div>
-				<div className="wp-social-link wp-social-link-instagram"></div>
+				<div
+					className={ classNames(
+						'wp-social-link-twitter',
+						placeholderClasses
+					) }
+					style={ placeholderStyles }
+				></div>
+				<div
+					className={ classNames(
+						'wp-social-link-facebook',
+						placeholderClasses
+					) }
+					style={ placeholderStyles }
+				></div>
+				<div
+					className={ classNames(
+						'wp-social-link-instagram',
+						placeholderClasses
+					) }
+					style={ placeholderStyles }
+				></div>
 			</div>
 		</li>
 	);

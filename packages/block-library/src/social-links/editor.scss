@@ -35,6 +35,7 @@
 	// Wrap the remaining placeholders in a container so the plus can overlap.
 	> .wp-block-social-links__social-placeholder-icons {
 		display: flex;
+		gap: var(--wp--style--block-gap);
 	}
 
 	.wp-social-link {
@@ -43,6 +44,7 @@
 		.is-style-pill-shape & {
 			padding-left: calc((2/3) * 1em);
 			padding-right: calc((2/3) * 1em);
+			border-radius: 9999px;
 		}
 
 		.is-style-logos-only & {
@@ -59,6 +61,8 @@
 
 		.is-style-logos-only & {
 			background: currentColor;
+			height: 1.25em;
+			width: 1.25em;
 		}
 	}
 }
