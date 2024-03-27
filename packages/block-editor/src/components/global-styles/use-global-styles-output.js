@@ -530,7 +530,7 @@ export function getLayoutStyles( {
 										? `:where(${ selector } .${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -557,7 +557,7 @@ export function getLayoutStyles( {
 					displayMode &&
 					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
+					ruleset += `:where(${ selector } .${ className }) { display:${ displayMode }; }`;
 				}
 
 				if ( baseStyles?.length ) {
@@ -1000,10 +1000,10 @@ export const toStyles = (
 			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+			':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
+			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {
