@@ -48,11 +48,8 @@ test.describe( 'Font Library', () => {
 					name: 'Manage Fonts',
 				} )
 				.click();
-			await expect(
-				page.getByRole( 'tab', { name: 'Upload' } )
-			).toBeVisible();
 
-			// Upload local fonts
+			// Upload local fonts.
 			await page.getByRole( 'tab', { name: 'Upload' } ).click();
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
 			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
