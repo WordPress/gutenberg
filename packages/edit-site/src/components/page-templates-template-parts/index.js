@@ -72,7 +72,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -400,7 +400,10 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
+				deferredRendering={
+					view.type === LAYOUT_GRID ||
+					! view.hiddenFields?.includes( 'preview' )
+				}
 			/>
 		</Page>
 	);
