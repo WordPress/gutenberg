@@ -353,3 +353,14 @@ export function getLastFocus( state ) {
 export function isDragging( state ) {
 	return state.isDragging;
 }
+
+/**
+ * Retrieves the expanded block from the state.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string|null} The client ID of the expanded block, if set.
+ */
+export function getExpandedBlock( state ) {
+	return state.expandedBlock;
+}
