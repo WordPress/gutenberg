@@ -54,3 +54,13 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 		state.blockPatterns,
 	];
 };
+
+export function getInsertBlockTypeDependants( state, rootClientId ) {
+	return [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockEditingModes,
+	];
+}
