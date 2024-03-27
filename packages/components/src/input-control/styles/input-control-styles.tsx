@@ -40,29 +40,25 @@ type BackdropProps = {
 	isBorderless?: boolean;
 };
 
-const backdropBorderlessStyles = ( {
+const backdropBorderColor = ( {
 	disabled,
 	isBorderless,
-}: BackdropProps ) => {
+}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
 	if ( isBorderless ) {
-		return css`
-			border-color: transparent;
-		`;
+		return 'transparent';
 	}
 
 	if ( disabled ) {
-		return css`
-			border-color: ${ COLORS.ui.borderDisabled };
-		`;
+		return COLORS.ui.borderDisabled;
 	}
 
-	return undefined;
+	return COLORS.ui.border;
 };
 
 export const BackdropUI = styled.div< BackdropProps >`
 	&&& {
 		box-sizing: border-box;
-		border-color: ${ COLORS.ui.border };
+		border-color: ${ backdropBorderColor };
 		border-radius: inherit;
 		border-style: solid;
 		border-width: 1px;
@@ -75,7 +71,6 @@ export const BackdropUI = styled.div< BackdropProps >`
 		right: 0;
 		top: 0;
 
-		${ backdropBorderlessStyles }
 		${ rtl( { paddingLeft: 2 } ) }
 	}
 `;
@@ -86,6 +81,7 @@ export const Root = styled( Flex )`
 	border-radius: 2px;
 	padding-top: 0;
 
+	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
 	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
 		z-index: 1;
 
