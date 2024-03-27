@@ -60,8 +60,7 @@ export default function useZoomOutBlockEditingMode() {
 		isZoomOutMode,
 		rootClientId,
 		sectionsContainerClientId,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		...sectionsClientIds,
+		sectionsClientIds,
 		setBlockEditingMode,
 		unsetBlockEditingMode,
 	] );
