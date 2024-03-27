@@ -34,7 +34,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -135,14 +135,11 @@ function Layout( { initialPost } ) {
 	useCommonCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar } =
-		useDispatch( editPostStore );
+	const { openGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -210,18 +207,6 @@ function Layout( { initialPost } ) {
 		openGeneralSidebar(
 			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
 		);
-
-	// Inserter and Sidebars are mutually exclusive
-	useEffect( () => {
-		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpened( false );
-		}
-	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
-	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
-			closeGeneralSidebar();
-		}
-	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
