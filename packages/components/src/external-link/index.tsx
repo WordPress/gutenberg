@@ -9,13 +9,11 @@ import type { ForwardedRef } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
-import { StyledIcon } from './styles/external-link-styles';
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -73,10 +71,7 @@ function UnforwardedExternalLink(
 					__( '(opens in a new tab)' )
 				}
 			</VisuallyHidden>
-			<StyledIcon
-				icon={ external }
-				className="components-external-link__icon"
-			/>
+			&nbsp;&#8599;
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);
