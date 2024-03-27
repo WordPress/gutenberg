@@ -527,7 +527,7 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(${ selector } .${ className })${
+										? `:where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
 										: `:where(${ selector }-${ className })${
@@ -557,7 +557,7 @@ export function getLayoutStyles( {
 					displayMode &&
 					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `:where(${ selector } .${ className }) { display:${ displayMode }; }`;
+					ruleset += `:where(.${ className }) { display:${ displayMode }; }`;
 				}
 
 				if ( baseStyles?.length ) {
@@ -575,7 +575,7 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `${ selector } .${ className }${
+							const combinedSelector = `.${ className }${
 								baseStyle?.selector || ''
 							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(

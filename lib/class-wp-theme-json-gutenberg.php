@@ -1557,7 +1557,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : ':where(%s-%s) %s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s) %3$s' : ':where(%1$s-%2$s) %3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -1592,11 +1592,7 @@ class WP_Theme_JSON_Gutenberg {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$layout_selector = sprintf(
-							'%s .%s',
-							$selector,
-							$class_name
-						);
+						$layout_selector = ".$class_name";
 						$block_rules    .= static::to_ruleset(
 							$layout_selector,
 							array(
@@ -1636,8 +1632,7 @@ class WP_Theme_JSON_Gutenberg {
 							}
 
 							$layout_selector = sprintf(
-								'%s .%s%s',
-								$selector,
+								'.%s%s',
 								$class_name,
 								$base_style_rule['selector']
 							);
