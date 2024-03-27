@@ -175,9 +175,9 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		$tokens_before_the_docblock = array_merge($tokens_before_the_docblock, Tokens::$assignmentTokens);
 
-		$property_name                   = $tokens[ $stackPtr ]['content'];
-		$class_token                     = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
-		$class_name                      = $tokens[ $class_token ]['content'];
+		$property_name = $tokens[ $stackPtr ]['content'];
+		$class_token   = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
+		$class_name    = $phpcsFile->getDeclarationName( $class_token );
 		$missing_since_tag_error_message = sprintf(
 			'@since tag is missing for the "%s::%s" property.',
 			$class_name,
