@@ -27,6 +27,7 @@ function LinkDestination( {
 	children,
 	isSelected,
 	label,
+	subLabel,
 	onPress,
 	value,
 	valueStyle,
@@ -44,6 +45,7 @@ function LinkDestination( {
 				! isSelected && styles.unselectedOptionIcon,
 			] ) }
 			label={ label }
+			subLabel={ subLabel }
 			leftAlign
 			onPress={ onPress }
 			value={ value }
@@ -64,6 +66,8 @@ function ImageLinkDestinationsScreen( props ) {
 		imageUrl,
 		attachmentPageUrl,
 		linkDestination,
+		showLightboxSetting,
+		lightboxEnabled,
 	} = route.params || {};
 
 	function goToLinkPicker() {
@@ -97,6 +101,14 @@ function ImageLinkDestinationsScreen( props ) {
 		} );
 	};
 
+	const onEnableLightbox = () => {
+		navigation.navigate( blockSettingsScreens.settings, {
+			inputValue: '',
+			text: '',
+			lightboxEnabled: true,
+		} );
+	};
+
 	return (
 		<>
 			<BottomSheet.NavBar>
@@ -107,7 +119,10 @@ function ImageLinkDestinationsScreen( props ) {
 			</BottomSheet.NavBar>
 			<PanelBody>
 				<LinkDestination
-					isSelected={ linkDestination === LINK_DESTINATION_NONE }
+					isSelected={
+						linkDestination === LINK_DESTINATION_NONE &&
+						( ! showLightboxSetting || ! lightboxEnabled )
+					}
 					label={ __( 'None' ) }
 					onPress={ setLinkDestination( LINK_DESTINATION_NONE ) }
 				/>
@@ -125,6 +140,16 @@ function ImageLinkDestinationsScreen( props ) {
 						onPress={ setLinkDestination(
 							LINK_DESTINATION_ATTACHMENT
 						) }
+					/>
+				) }
+				{ showLightboxSetting && (
+					<LinkDestination
+						isSelected={ lightboxEnabled }
+						label={ __( 'Expand on click' ) }
+						subLabel={ __(
+							'Scale the image with a lightbox effect'
+						) }
+						onPress={ onEnableLightbox }
 					/>
 				) }
 				<LinkDestination

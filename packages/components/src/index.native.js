@@ -138,8 +138,8 @@ export {
 	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
 export {
+	getDefaultGlobalStyles,
 	getGlobalStyles,
-	getColorsAndGradients,
 	useMobileGlobalStylesColors,
 	useEditorColorScheme,
 } from './mobile/global-styles-context/utils';
