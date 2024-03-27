@@ -9,6 +9,7 @@
 ### Internal
 
 -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
+-   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `UnitControl`), as well as `SelectControl` and `CustomSelectControl` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
 
 ### Experimental
 
