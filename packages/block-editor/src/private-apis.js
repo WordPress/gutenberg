@@ -21,6 +21,7 @@ import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import { BlockRemovalWarningModal } from './components/block-removal-warning-modal';
 import {
+	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
 	__unstableBlockStyleVariationOverridesWithConfig,
@@ -95,4 +96,5 @@ lock( privateApis, {
 	useSpacingSizes,
 	useBlockDisplayTitle,
 	__unstableBlockStyleVariationOverridesWithConfig,
+	setBackgroundStyleDefaults,
 } );
