@@ -316,16 +316,16 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					) }
 				</FlexItem>
 				{ editorMode === 'zoom-out' && (
-					<>
-						<Shuffle clientId={ clientId } as={ Button } />
-						<ToolbarButton
-							icon={ trash }
-							label="Delete"
-							onClick={ () => {
-								removeBlock( clientId );
-							} }
-						/>
-					</>
+					<Shuffle clientId={ clientId } as={ Button } />
+				) }
+				{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
+					<ToolbarButton
+						icon={ trash }
+						label="Delete"
+						onClick={ () => {
+							removeBlock( clientId );
+						} }
+					/>
 				) }
 				<FlexItem>
 					<Button
