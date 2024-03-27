@@ -25,7 +25,7 @@ test.describe( 'Font Library', () => {
 			await expect( manageFontsIcon ).toBeVisible();
 		} );
 
-		test( 'should allow user to upload a local font', async ( {
+		test( 'should allow user to upload multiple local font files', async ( {
 			page,
 			editor,
 		} ) => {
@@ -39,7 +39,7 @@ test.describe( 'Font Library', () => {
 				} )
 				.click();
 
-			// Delete test font family (Exo 2) if it exists
+			// Delete test font family (Exo 2) if it exists.
 			await expect(
 				page.getByRole( 'tab', { name: 'Upload' } )
 			).toBeVisible( { timeout: 80000 } );
@@ -69,7 +69,7 @@ test.describe( 'Font Library', () => {
 				'./test/e2e/assets/Exo2-SemiBoldItalic.woff2',
 			] );
 
-			// Check fonts were installed
+			// Check fonts were installed.
 			await expect(
 				page
 					.getByLabel( 'Upload' )
@@ -81,7 +81,7 @@ test.describe( 'Font Library', () => {
 				page.getByRole( 'button', { name: 'Exo 2' } )
 			).toBeVisible();
 
-			// Check CSS preset was created
+			// Check CSS preset was created.
 			await page.getByRole( 'button', { name: 'Close' } ).click();
 			await page
 				.getByRole( 'button', { name: 'Typography Headings styles' } )
