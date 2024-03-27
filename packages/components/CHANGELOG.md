@@ -6,6 +6,10 @@
 
 -   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
 
+### Experimental
+
+-   `CustomSelectControlV2`: Rename for consistency ([#60178](https://github.com/WordPress/gutenberg/pull/60178)).
+
 ### Internal
 
 -   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
