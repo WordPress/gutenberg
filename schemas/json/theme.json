@@ -1115,6 +1115,74 @@
 		"stylesProperties": {
 			"type": "object",
 			"properties": {
+				"background": {
+					"description": "Background styles.",
+					"type": "object",
+					"properties": {
+						"backgroundImage": {
+							"description": "Sets the `background-image` CSS property.",
+							"oneOf": [
+								{
+									"description": "A valid CSS value for the background-image property.",
+									"type": "string"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"source": {
+											"description": "The origin of the image. 'file' denotes that the 'url' is a path to an image or other file.",
+											"type": "string",
+											"enum": [ "file" ],
+											"default": "file"
+										},
+										"url": {
+											"description": "A URL to an image file.",
+											"type": "string"
+										}
+									},
+									"additionalProperties": false
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundPosition": {
+							"description": "Sets the `background-position` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundRepeat": {
+							"description": "Sets the `background-repeat` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						},
+						"backgroundSize": {
+							"description": "Sets the `background-size` CSS property.",
+							"oneOf": [
+								{
+									"type": "string"
+								},
+								{
+									"$ref": "#/definitions/refComplete"
+								}
+							]
+						}
+					},
+					"additionalProperties": false
+				},
 				"border": {
 					"description": "Border styles.",
 					"type": "object",
@@ -1763,6 +1831,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -1789,6 +1858,7 @@
 						{
 							"properties": {
 								"border": {},
+								"background": {},
 								"color": {},
 								"filter": {},
 								"shadow": {},
@@ -2197,6 +2267,7 @@
 				},
 				{
 					"properties": {
+						"background": {},
 						"border": {},
 						"color": {},
 						"dimensions": {},
@@ -2302,74 +2373,6 @@
 						"blocks": {
 							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
-						},
-						"background": {
-							"description": "Background styles.",
-							"type": "object",
-							"properties": {
-								"backgroundImage": {
-									"description": "Sets the `background-image` CSS property.",
-									"oneOf": [
-										{
-											"description": "A valid CSS value for the background-image property.",
-											"type": "string"
-										},
-										{
-											"type": "object",
-											"properties": {
-												"source": {
-													"description": "The origin of the image. 'file' denotes that the 'url' is a path to an image or other file.",
-													"type": "string",
-													"enum": [ "file" ],
-													"default": "file"
-												},
-												"url": {
-													"description": "A URL to an image file.",
-													"type": "string"
-												}
-											},
-											"additionalProperties": false
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundPosition": {
-									"description": "Sets the `background-position` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundRepeat": {
-									"description": "Sets the `background-repeat` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								},
-								"backgroundSize": {
-									"description": "Sets the `background-size` CSS property.",
-									"oneOf": [
-										{
-											"type": "string"
-										},
-										{
-											"$ref": "#/definitions/refComplete"
-										}
-									]
-								}
-							},
-							"additionalProperties": false
 						}
 					},
 					"additionalProperties": false

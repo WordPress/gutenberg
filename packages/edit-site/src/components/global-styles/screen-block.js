@@ -25,6 +25,11 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 
+// Initial control values where no block style is set.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+};
+
 function applyFallbackStyle( border ) {
 	if ( ! border ) {
 		return border;
@@ -70,6 +75,8 @@ const {
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useGlobalStyle,
+	useHasBackgroundPanel,
+	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
@@ -77,6 +84,7 @@ const {
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
+	setBackgroundStyleDefaults,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -121,6 +129,7 @@ function ScreenBlock( { name, variation } ) {
 	}
 
 	const blockVariations = useBlockVariations( name );
+	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 	const hasTypographyPanel = useHasTypographyPanel( settings );
 	const hasColorPanel = useHasColorPanel( settings );
 	const hasBorderPanel = useHasBorderPanel( settings );
@@ -232,6 +241,19 @@ function ScreenBlock( { name, variation } ) {
 		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
+	const onChangeBackground = ( newStyle ) => {
+		const backgroundStyles = setBackgroundStyleDefaults(
+			newStyle?.background
+		);
+		setStyle( {
+			...newStyle,
+			background: {
+				...newStyle?.background,
+				...backgroundStyles,
+			},
+		} );
+	};
+
 	return (
 		<>
 			<ScreenHeader
@@ -293,6 +315,20 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ onChangeLightbox }
 					value={ userSettings }
 					inheritedValue={ settings }
+				/>
+			) }
+
+			{ hasBackgroundPanel && (
+				<StylesBackgroundPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ onChangeBackground }
+					settings={ settings }
+					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					defaultControls={
+						blockType?.supports?.background
+							?.__experimentalDefaultControls
+					}
 				/>
 			) }
 
