@@ -38,27 +38,31 @@ test.describe( 'Font Library', () => {
 				} )
 				.click();
 
-			// Delete test font (Exo 2) if it exists
+			// Delete test font family (Exo 2) if it exists
+			await expect(
+				page.getByRole( 'tab', { name: 'Upload' } )
+			).toBeVisible( { timeout: 80000 } );
+
 			if (
-				await page
-					.getByRole( 'button', { name: 'Exo 2' } )
-					.isVisible( { timeout: 40000 } )
+				await page.getByRole( 'button', { name: 'Exo 2' } ).isVisible()
 			) {
 				await page.getByRole( 'button', { name: 'Exo 2' } ).click();
 				await page.getByRole( 'button', { name: 'Delete' } ).click();
 				await page.getByRole( 'button', { name: 'Delete' } ).click();
+				await page.getByRole( 'tab', { name: 'Library' } ).click();
 			}
 
-			// Upload a local font
-			await page
-				.getByRole( 'tab', { name: 'Upload' } )
-				.click( { timeout: 40000 } );
+			// Upload local fonts
+			await page.getByRole( 'tab', { name: 'Upload' } ).click();
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
 			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
-			await fileChooser.setFiles( './test/e2e/assets/Exo2-Regular.woff' );
+			await fileChooser.setFiles( [
+				'./test/e2e/assets/Exo2-Regular.woff',
+				'./test/e2e/assets/Exo2-SemiBoldItalic.woff2',
+			] );
 
-			// Check font was installed
+			// Check fonts were installed
 			await expect(
 				page
 					.getByLabel( 'Upload' )
