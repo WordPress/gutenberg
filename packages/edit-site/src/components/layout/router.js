@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,12 +25,6 @@ export default function useLayoutAreas() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
-	const currentPostIsTrashed = useSelect(
-		( select ) =>
-			select( editorStore ).getCurrentPostAttribute( 'status' ) ===
-			'trash',
-		[]
-	);
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -47,16 +39,14 @@ export default function useLayoutAreas() {
 				preview: isListLayout && (
 					<Editor
 						isLoading={ isSiteEditorLoading }
-						onClick={ () => {
-							if ( ! currentPostIsTrashed ) {
-								history.push( {
-									path,
-									postType: 'page',
-									postId,
-									canvas: 'edit',
-								} );
-							}
-						} }
+						onClick={ () =>
+							history.push( {
+								path,
+								postType: 'page',
+								postId,
+								canvas: 'edit',
+							} )
+						}
 					/>
 				),
 				mobile:

@@ -92,6 +92,9 @@ function EditorCanvas( {
 			}
 		},
 		onClick: () => {
+			if ( currentPostIsTrashed ) {
+				return;
+			}
 			if ( !! onClick ) {
 				onClick();
 			} else {
