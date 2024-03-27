@@ -36,6 +36,7 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 	displayAsColumnFields,
+	displayAsBadgeFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -112,6 +113,9 @@ function GridItem( {
 						<Flex
 							className={ classnames(
 								'dataviews-view-grid__field',
+								'dataviews-view-grid__field-' + field.id,
+								displayAsBadgeFields?.includes( field.id ) &&
+									'is-badge',
 								displayAsColumnFields?.includes( field.id )
 									? 'is-column'
 									: 'is-row'
@@ -127,9 +131,12 @@ function GridItem( {
 									: 'row'
 							}
 						>
-							<FlexItem className="dataviews-view-grid__field-name">
-								{ field.header }
-							</FlexItem>
+							{ ! displayAsBadgeFields?.includes( field.id ) && (
+								<FlexItem className="dataviews-view-grid__field-name">
+									{ field.header }
+								</FlexItem>
+							) }
+
 							<FlexItem
 								className="dataviews-view-grid__field-value"
 								style={ { maxHeight: 'none' } }
@@ -196,6 +203,9 @@ export default function ViewGrid( {
 								visibleFields={ visibleFields }
 								displayAsColumnFields={
 									view.layout.displayAsColumnFields
+								}
+								displayAsBadgeFields={
+									view.layout.displayAsBadgeFields
 								}
 							/>
 						);

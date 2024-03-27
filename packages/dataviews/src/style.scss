@@ -353,6 +353,19 @@
 			.dataviews-view-grid__field-name {
 				color: $gray-700;
 			}
+
+			&.is-badge {
+				width: fit-content;
+				
+				.dataviews-view-grid__field-value {
+					background: $gray-100;
+					padding: 0 $grid-unit-10;
+					min-height: $grid-unit-30;
+					border-radius: $radius-block-ui;
+					display: flex;
+					align-items: center;
+				}
+			}
 		}
 	}
 }

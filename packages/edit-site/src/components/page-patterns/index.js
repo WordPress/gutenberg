@@ -68,6 +68,8 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		displayAsBadgeFields: [ 'sync-status' ],
+		displayAsColumnFields: [ 'sync-status' ],
 	},
 };
 const DEFAULT_VIEW = {
@@ -300,7 +302,7 @@ export default function DataviewsPatterns() {
 		];
 		if ( type === PATTERN_TYPES.theme ) {
 			_fields.push( {
-				header: __( 'Sync Status' ),
+				header: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
 					// User patterns can have their sync statuses checked directly.
