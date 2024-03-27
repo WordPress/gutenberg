@@ -1,8 +1,4 @@
 /**
- * Internal dependencies
- */
-import { fetchHeadAssets, updateHead } from './head';
-/**
  * WordPress dependencies
  */
 import {
@@ -11,6 +7,11 @@ import {
 	getConfig,
 	getElement,
 } from '@wordpress/interactivity';
+
+/**
+ * Internal dependencies
+ */
+import { fetchHeadAssets, updateHead } from './head';
 
 const {
 	directivePrefix,
