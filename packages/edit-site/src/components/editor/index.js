@@ -50,6 +50,7 @@ import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 import PatternModal from '../pattern-modal';
+import PageModal from '../page-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
@@ -229,6 +230,7 @@ export default function Editor( { isLoading, onClick } ) {
 										) }
 										<SiteEditorCanvas onClick={ onClick } />
 										<PatternModal />
+										<PageModal />
 									</>
 								) }
 								{ editorMode === 'text' && isEditMode && (

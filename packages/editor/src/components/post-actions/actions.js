@@ -11,11 +11,15 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 import {
 	Button,
-	TextControl,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import RenameModalContent from '../rename-modal-content';
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -419,75 +423,7 @@ export const renamePostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const originalTitle = decodeEntities(
-			typeof item.title === 'string' ? item.title : item.title.rendered
-		);
-		const [ title, setTitle ] = useState( () => originalTitle );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-
-		async function onRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord( 'postType', item.type, item.id, {
-					title,
-				} );
-				// Update state before saving rerenders the list.
-				setTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveEditedEntityRecord( 'postType', item.type, item.id, {
-					throwOnError: true,
-				} );
-				createSuccessNotice( __( 'Name updated' ), {
-					type: 'snackbar',
-				} );
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while updating the name' );
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-
-		return (
-			<form onSubmit={ onRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
+	RenderModal: RenameModalContent,
 };
 
 export function usePostActions( onActionPerformed, actionIds = null ) {
