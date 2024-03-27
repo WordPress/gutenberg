@@ -1,4 +1,11 @@
-// Function to update only the necessary tags in the head.
+/**
+ * Helper to update only the necessary tags in the head.
+ *
+ * @async
+ * @param {Array} newHead The head elements of the new page.
+ *
+ * @return {void}
+ */
 export const updateHead = async ( newHead ) => {
 	// Helper to get the tag id store in the cache.
 	const getTagId = ( tag ) => tag.id || tag.outerHTML;
@@ -30,7 +37,15 @@ export const updateHead = async ( newHead ) => {
 	document.head.append( ...toAppend );
 };
 
-// Fetch head assets of a new page.
+/**
+ * Fetches and processes head assets (stylesheets and scripts) from a specified document.
+ *
+ * @async
+ * @param {Document} document     The document from which to fetch head assets. It should support standard DOM querying methods.
+ * @param {Map}      headElements A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
+ *
+ * @return {void}
+ */
 export const fetchHeadAssets = async ( document, headElements ) => {
 	const headTags = [];
 	const assets = [
