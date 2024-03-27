@@ -201,7 +201,10 @@ export const { state, actions } = store( 'core/router', {
 		 */
 		*navigate( eventOrUrl, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
-			const url = typeof eventOrUrl === 'string' && eventOrUrl;
+			const url =
+				( typeof eventOrUrl === 'string' ||
+					eventOrUrl instanceof URL ) &&
+				eventOrUrl;
 			const event = eventOrUrl instanceof Event && eventOrUrl;
 			let ref;
 			// The getElement() function can only be called when it is an event.
