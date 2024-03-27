@@ -10,7 +10,11 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { useEffect, createInterpolateElement } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,10 +25,14 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 export default function PostLockedModal() {
+	const [ heartbeatTickTriggered, triggerHeartbeatTick ] = useState( false );
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
+	const { __experimentalUpdateCurrentUserSession: updateCurrentUserSession } =
+		useDispatch( coreStore );
 	const {
+		isDraft,
 		isLocked,
 		isTakeover,
 		user,
@@ -33,6 +41,7 @@ export default function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
+		isCurrentUserSessionActive,
 	} = useSelect( ( select ) => {
 		const {
 			isPostLocked,
@@ -44,8 +53,12 @@ export default function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, __experimentalIsCurrentUserSessionActive } =
+			select( coreStore );
 		return {
+			isDraft: [ 'draft', 'auto-draft' ].includes(
+				getEditedPostAttribute( 'status' )
+			),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
@@ -54,8 +67,60 @@ export default function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
+			isCurrentUserSessionActive:
+				__experimentalIsCurrentUserSessionActive(),
 		};
 	}, [] );
+
+	useEffect( () => {
+		const checkUserLoginHookName = `core/editor/check-user-login/post-locked-modal-${ instanceId }`;
+
+		/**
+		 * Binds to the Heartbeat Tick event and checks if the user is logged in or not.
+		 *
+		 * @param {Object} data Data received in the heartbeat request
+		 */
+		function checkUserLogin( data ) {
+			// Bail early, if the heartbeat has neither auth check data attribute nor nonce expiry attribute.
+			if (
+				! [ 'wp-auth-check', 'nonces_expired' ].some( ( attr ) =>
+					Object.prototype.hasOwnProperty.call( data, attr )
+				)
+			) {
+				return;
+			}
+
+			if ( ! data[ 'wp-auth-check' ] && isCurrentUserSessionActive ) {
+				// Update login state to false,
+				// if server does not respond with auth check
+				// and current login state is true.
+				updateCurrentUserSession( { isActive: false } );
+			} else if ( ! isCurrentUserSessionActive && data.nonces_expired ) {
+				// If current login state is false and nonce is renewed,
+				// trigger a heartbeat tick to check for latest post lock.
+				// Because first heartbeat will only renew the nonce.
+				// It will not return any errors if the post is already locked by other user or not.
+				if ( window.wp?.heartbeat?.connectNow ) {
+					triggerHeartbeatTick( true );
+					window.wp.heartbeat.connectNow();
+				}
+			} else if (
+				! isCurrentUserSessionActive &&
+				heartbeatTickTriggered &&
+				data[ 'wp-auth-check' ]
+			) {
+				// If current login state is false and server responds with auth check for previously triggered heartbeat,
+				// update login state to true.
+				updateCurrentUserSession( { isActive: true } );
+			}
+		}
+
+		addAction( 'heartbeat.tick', checkUserLoginHookName, checkUserLogin );
+
+		return () => {
+			removeAction( 'heartbeat.tick', checkUserLoginHookName );
+		};
+	}, [ heartbeatTickTriggered, isCurrentUserSessionActive ] );
 
 	useEffect( () => {
 		/**
@@ -90,7 +155,12 @@ export default function PostLockedModal() {
 			const received = data[ 'wp-refresh-post-lock' ];
 			if ( received.lock_error ) {
 				// Auto save and display the takeover modal.
-				autosave();
+				// Meanwhile, other user may have opened the post and started to make new changes.
+				// Post may have been published or may have been switched back to draft.
+				// In either case, we don't want to accidentally loose the changes made by other user.
+				// If we perform server side autosave, and the post is in draft, previous changes will be overwritten in the database.
+				// Hence, we will only perform local autosave.
+				autosave( { local: true } );
 				updatePostLock( {
 					isLocked: true,
 					isTakeover: true,
@@ -141,7 +211,7 @@ export default function PostLockedModal() {
 			removeAction( 'heartbeat.tick', hookName );
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
-	}, [] );
+	}, [ isDraft, isLocked ] );
 
 	if ( ! isLocked ) {
 		return null;

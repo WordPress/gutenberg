@@ -1421,6 +1421,27 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostSaveable( state ) ).toBe( true );
 		} );
+
+		it( 'should return false if the post is locked', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+				saving: {},
+				postLock: {
+					isLocked: true,
+				},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isEditedPostAutosaveable', () => {
