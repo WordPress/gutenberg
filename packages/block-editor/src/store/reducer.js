@@ -756,6 +756,33 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Higher-order reducer which adds the selected pattern category to the outer block.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withPatternCategory = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'INSERT_BLOCKS' ) {
+		const { blocks, meta } = action;
+		if ( meta?.category && blocks.length === 1 ) {
+			const newState = { ...state };
+			newState.attributes = new Map( state.attributes );
+			newState.attributes.set( blocks[ 0 ].clientId, {
+				...blocks[ 0 ].attributes,
+				metadata: {
+					...( blocks[ 0 ].attributes.metadata || {} ),
+					categories: [ meta.category.name ],
+				},
+			} );
+			return reducer( newState, action );
+		}
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Reducer returning the blocks state.
  *
  * @param {Object} state  Current state.
@@ -772,7 +799,8 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks
+	withResetControlledBlocks,
+	withPatternCategory
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact

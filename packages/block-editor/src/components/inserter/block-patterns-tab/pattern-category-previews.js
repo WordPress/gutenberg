@@ -163,7 +163,9 @@ export function PatternCategoryPreviews( {
 					ref={ scrollContainerRef }
 					shownPatterns={ pagingProps.categoryPatternsAsyncList }
 					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
+					onClickPattern={ ( pattern, blocks ) =>
+						onClickPattern( pattern, blocks, category )
+					}
 					onHover={ onHover }
 					label={ category.label }
 					orientation="vertical"
