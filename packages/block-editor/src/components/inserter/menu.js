@@ -155,23 +155,6 @@ function InserterMenu(
 		]
 	);
 
-	const patternsTab = useMemo(
-		() => (
-			<BlockPatternsTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsertPattern }
-				onSelectCategory={ onClickPatternCategory }
-				selectedCategory={ selectedPatternCategory }
-			/>
-		),
-		[
-			destinationRootClientId,
-			onInsertPattern,
-			onClickPatternCategory,
-			selectedPatternCategory,
-		]
-	);
-
 	const mediaTab = useMemo(
 		() => (
 			<MediaTab
@@ -187,15 +170,6 @@ function InserterMenu(
 			selectedMediaCategory,
 			setSelectedMediaCategory,
 		]
-	);
-
-	const inserterTabsContents = useMemo(
-		() => ( {
-			blocks: blocksTab,
-			patterns: patternsTab,
-			media: mediaTab,
-		} ),
-		[ blocksTab, mediaTab, patternsTab ]
 	);
 
 	const searchRef = useRef();
@@ -222,6 +196,44 @@ function InserterMenu(
 		}
 		setSelectedTab( value );
 	};
+
+	const patternsTab = useMemo(
+		() => (
+			<BlockPatternsTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsertPattern }
+				onSelectCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			>
+				{ showPatternPanel && (
+					<PatternCategoryPreviewPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onHover={ onHoverPattern }
+						category={ selectedPatternCategory }
+						patternFilter={ patternFilter }
+						showTitlesAsTooltip
+					/>
+				) }
+			</BlockPatternsTab>
+		),
+		[
+			destinationRootClientId,
+			onInsertPattern,
+			onClickPatternCategory,
+			selectedPatternCategory,
+			showPatternPanel,
+		]
+	);
+
+	const inserterTabsContents = useMemo(
+		() => ( {
+			blocks: blocksTab,
+			patterns: patternsTab,
+			media: mediaTab,
+		} ),
+		[ blocksTab, mediaTab, patternsTab ]
+	);
 
 	return (
 		<div className="block-editor-inserter__menu">
@@ -291,16 +303,6 @@ function InserterMenu(
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
 				</Popover>
-			) }
-			{ showPatternPanel && (
-				<PatternCategoryPreviewPanel
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsertPattern }
-					onHover={ onHoverPattern }
-					category={ selectedPatternCategory }
-					patternFilter={ patternFilter }
-					showTitlesAsTooltip
-				/>
 			) }
 		</div>
 	);
