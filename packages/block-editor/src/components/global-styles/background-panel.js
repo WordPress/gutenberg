@@ -99,7 +99,7 @@ function backgroundSizeHelpText( value ) {
 }
 
 /**
- * Coverts decimal x and y coords from FocalPointPicker to percentage-based values
+ * Converts decimal x and y coords from FocalPointPicker to percentage-based values
  * to use as backgroundPosition value.
  *
  * @param {{x?:number, y?:number}} value FocalPointPicker coords.
@@ -117,7 +117,7 @@ export const coordsToBackgroundPosition = ( value ) => {
 };
 
 /**
- * Coverts backgroundPosition value to x and y coords for FocalPointPicker.
+ * Converts backgroundPosition value to x and y coords for FocalPointPicker.
  *
  * @param {string} value backgroundPosition value.
  * @return {{x?:number, y?:number}}       FocalPointPicker coords.
