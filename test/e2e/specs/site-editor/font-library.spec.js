@@ -105,7 +105,6 @@ test.describe( 'Font Library', () => {
 			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
 			await page.getByRole( 'button', { name: 'Delete' } ).click();
 			await page.getByRole( 'button', { name: 'Delete' } ).click();
-			await page.getByRole( 'tab', { name: 'Library' } ).click();
 			await expect(
 				page
 					.getByLabel( 'Library' )
