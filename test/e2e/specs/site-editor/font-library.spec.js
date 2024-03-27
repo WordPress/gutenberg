@@ -7,6 +7,16 @@ test.describe( 'Font Library', () => {
 	test.describe( 'When a blank theme is active', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activateTheme( 'emptytheme' );
+			/*
+			 * Delete all installed fonts, font files, the fonts directory, and user font settings
+			 * in global styles for the active theme before starting the tests.
+			 */
+			await requestUtils.activatePlugin(
+				'gutenberg-test-delete-installed-fonts'
+			);
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-delete-installed-fonts'
+			);
 		} );
 
 		test.beforeEach( async ( { admin, editor } ) => {
@@ -38,25 +48,9 @@ test.describe( 'Font Library', () => {
 					name: 'Manage Fonts',
 				} )
 				.click();
-
-			// Delete test font family (Exo 2) if it exists.
 			await expect(
 				page.getByRole( 'tab', { name: 'Upload' } )
 			).toBeVisible( { timeout: 80000 } );
-
-			if (
-				await page.getByRole( 'button', { name: 'Exo 2' } ).isVisible()
-			) {
-				await page.getByRole( 'button', { name: 'Exo 2' } ).click();
-				await page.getByRole( 'button', { name: 'Delete' } ).click();
-				await page.getByRole( 'button', { name: 'Delete' } ).click();
-				await page.getByRole( 'tab', { name: 'Library' } ).click();
-				await expect(
-					page
-						.getByLabel( 'Library' )
-						.getByText( 'Font family uninstalled successfully.' )
-				).toBeVisible( { timeout: 40000 } );
-			}
 
 			// Upload local fonts
 			await page.getByRole( 'tab', { name: 'Upload' } ).click();
@@ -77,8 +71,10 @@ test.describe( 'Font Library', () => {
 			).toBeVisible( { timeout: 40000 } );
 			await page.getByRole( 'tab', { name: 'Library' } ).click();
 			// Provides coverage for https://github.com/WordPress/gutenberg/issues/60040.
+			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
+			await expect( page.getByLabel( 'Exo 2 Normal' ) ).toBeVisible();
 			await expect(
-				page.getByRole( 'button', { name: 'Exo 2' } )
+				page.getByLabel( 'Exo 2 Semi-bold Italic' )
 			).toBeVisible();
 
 			// Check CSS preset was created.
@@ -90,6 +86,31 @@ test.describe( 'Font Library', () => {
 			await expect(
 				editor.canvas.locator( '.is-root-container h1' )
 			).toHaveCSS( 'font-family', '"Exo 2"' );
+		} );
+
+		test( 'should allow user to delete installed fonts', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Typography Styles' } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: 'Manage Fonts',
+				} )
+				.click();
+
+			await page.getByRole( 'button', { name: 'Exo 2' } ).isVisible();
+			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await page.getByRole( 'button', { name: 'Delete' } ).click();
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			await expect(
+				page
+					.getByLabel( 'Library' )
+					.getByText( 'Font family uninstalled successfully.' )
+			).toBeVisible( { timeout: 40000 } );
 		} );
 	} );
 
