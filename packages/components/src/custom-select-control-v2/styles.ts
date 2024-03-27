@@ -10,7 +10,7 @@ import styled from '@emotion/styled';
  */
 import { COLORS, CONFIG } from '../utils';
 import { space } from '../utils/space';
-import type { CustomSelectButtonProps } from './types';
+import type { CustomSelectButtonSize } from './types';
 
 const ITEM_PADDING = space( 2 );
 
@@ -46,7 +46,7 @@ export const Select = styled( Ariakit.Select, {
 	size,
 	hasCustomRenderProp,
 }: {
-	size: NonNullable< CustomSelectButtonProps[ 'size' ] >;
+	size: NonNullable< CustomSelectButtonSize[ 'size' ] >;
 	hasCustomRenderProp: boolean;
 } ) => {
 	const heightProperty = hasCustomRenderProp ? 'minHeight' : 'height';

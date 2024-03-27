@@ -14,6 +14,24 @@ export type CustomSelectStore = {
 
 export type CustomSelectContext = CustomSelectStore | undefined;
 
+export type CustomSelectButtonSize = {
+	/**
+	 * The size of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'compact' | 'default' | 'small';
+};
+
+type CustomSelectSize = {
+	/**
+	 * The size of the control.
+	 *
+	 * @default 'default'
+	 */
+	size?: 'compact' | 'default';
+};
+
 export type CustomSelectButtonProps = {
 	/**
 	 * An optional default value for the control when used in uncontrolled mode.
@@ -31,18 +49,12 @@ export type CustomSelectButtonProps = {
 		selectedValue: string | string[]
 	) => React.ReactNode;
 	/**
-	 * The size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'compact' | 'default' | 'small';
-	/**
 	 * The value of the control when used in uncontrolled mode.
 	 */
 	value?: string | string[];
 };
 
-export type _CustomSelectProps = {
+export type _CustomSelectProps = CustomSelectButtonProps & {
 	/**
 	 * The child elements. This should be composed of `CustomSelectItem` components.
 	 */
@@ -60,14 +72,8 @@ export type _CustomSelectProps = {
 };
 
 export type CustomSelectProps = _CustomSelectProps &
-	Omit< CustomSelectButtonProps, 'size' > & {
-		/**
-		 * The size of the control.
-		 *
-		 * @default 'default'
-		 */
-		size?: Exclude< CustomSelectButtonProps[ 'size' ], 'small' >;
-	};
+	CustomSelectButtonProps &
+	CustomSelectSize;
 
 /**
  * The legacy object structure for the options array.
