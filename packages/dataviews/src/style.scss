@@ -333,7 +333,24 @@
 		}
 
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-value {
+			align-items: flex-start;
+
+			&:not(.is-column) {
+				align-items: center;
+
+				.dataviews-view-grid__field-name {
+					width: 35%;
+				}
+
+				.dataviews-view-grid__field-value {
+					width: 65%;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+
+			.dataviews-view-grid__field-name {
 				color: $gray-700;
 			}
 		}
