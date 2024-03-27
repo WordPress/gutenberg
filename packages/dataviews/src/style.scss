@@ -783,3 +783,20 @@
 		}
 	}
 }
+
+
+.dataviews-bulk-actions-toolbar-wrapper {
+	display: flex;
+	flex-grow: 1;
+	width: 100%;
+}
+
+.dataviews-bulk-actions {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+	width: 100%;
+	bottom: $grid-unit-30;
+}
