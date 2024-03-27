@@ -57,6 +57,7 @@ test.describe( 'Font Library', () => {
 			const fileChooserPromise = page.waitForEvent( 'filechooser' );
 			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
 			const fileChooser = await fileChooserPromise;
+			// Provides coverage for https://github.com/WordPress/gutenberg/issues/59023.
 			await fileChooser.setFiles( [
 				'./test/e2e/assets/Exo2-Regular.woff',
 				'./test/e2e/assets/Exo2-SemiBoldItalic.woff2',
