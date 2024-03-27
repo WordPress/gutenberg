@@ -50,7 +50,7 @@ test.describe( 'Font Library', () => {
 				.click();
 			await expect(
 				page.getByRole( 'tab', { name: 'Upload' } )
-			).toBeVisible( { timeout: 80000 } );
+			).toBeVisible();
 
 			// Upload local fonts
 			await page.getByRole( 'tab', { name: 'Upload' } ).click();
@@ -68,7 +68,7 @@ test.describe( 'Font Library', () => {
 				page
 					.getByLabel( 'Upload' )
 					.getByText( 'Fonts were installed successfully.' )
-			).toBeVisible( { timeout: 40000 } );
+			).toBeVisible();
 			await page.getByRole( 'tab', { name: 'Library' } ).click();
 			// Provides coverage for https://github.com/WordPress/gutenberg/issues/60040.
 			await page.getByRole( 'button', { name: 'Exo 2' } ).click();
@@ -110,7 +110,7 @@ test.describe( 'Font Library', () => {
 				page
 					.getByLabel( 'Library' )
 					.getByText( 'Font family uninstalled successfully.' )
-			).toBeVisible( { timeout: 40000 } );
+			).toBeVisible();
 		} );
 	} );
 
