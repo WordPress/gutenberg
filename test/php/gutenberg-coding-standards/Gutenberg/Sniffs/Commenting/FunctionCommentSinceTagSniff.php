@@ -12,6 +12,7 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
+use PHPCSUtils\Utils\ObjectDeclarations;
 use PHPCSUtils\Utils\Scopes;
 
 
@@ -235,22 +236,10 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 	protected function process_function_token( File $phpcsFile, $stackPtr ) {
 		$tokens                   = $phpcsFile->getTokens();
-		$wrapping_tokens_to_check = array(
-			T_INTERFACE,
-			T_TRAIT,
-		);
 
-		foreach ( $wrapping_tokens_to_check as $wrapping_token_to_check ) {
-			if ( false !== $phpcsFile->getCondition( $stackPtr, $wrapping_token_to_check, false ) ) {
-				// This sniff only processes functions and class methods, not interfaces and traits.
-				return;
-			}
-		}
-
-		$class_token  = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
+		$oo_token = Scopes::validDirectScope( $phpcsFile, $stackPtr, Tokens::$ooScopeTokens );
 		$is_oo_method = Scopes::isOOMethod( $phpcsFile, $stackPtr );
-
-		$function_name = $phpcsFile->getDeclarationName( $stackPtr );
+		$function_name = ObjectDeclarations::getName( $phpcsFile, $stackPtr );
 
 		if ( $is_oo_method ) {
 			$scopeModifier = $phpcsFile->getMethodProperties($stackPtr)['scope'];
@@ -262,7 +251,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				return;
 			}
 
-			$function_name = $phpcsFile->getDeclarationName( $class_token ) . '::' . $function_name;
+			$function_name = ObjectDeclarations::getName( $phpcsFile, $oo_token ) . '::' . $function_name;
 		}
 
 		$missing_since_tag_error_message = sprintf(
