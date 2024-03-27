@@ -58,7 +58,7 @@ function getImageSourceUrlBySizeSlug( image, slug ) {
 }
 
 function attributesFromMedia( {
-	attributes: { linkDestination, href },
+	attributes: { linkDestination, href, mediaSizeSlug },
 	setAttributes,
 } ) {
 	return ( media ) => {
@@ -95,12 +95,12 @@ function attributesFromMedia( {
 			mediaType = media.type;
 		}
 
-		if ( mediaType === 'image' ) {
-			// Try the "large" size URL, falling back to the "full" size URL below.
+		if ( mediaType === 'image' && mediaSizeSlug ) {
+			// Try the "mediaSizeSlug" size URL, falling back to the "full" size URL below.
 			src =
-				media.sizes?.large?.url ||
+				media.sizes?.[ mediaSizeSlug ]?.url ||
 				// eslint-disable-next-line camelcase
-				media.media_details?.sizes?.large?.source_url;
+				media.media_details?.sizes?.[ mediaSizeSlug ]?.source_url;
 		}
 
 		let newHref = href;
@@ -123,6 +123,7 @@ function attributesFromMedia( {
 			mediaLink: media.link || undefined,
 			href: newHref,
 			focalPoint: undefined,
+			mediaSizeSlug: src ? mediaSizeSlug : 'full',
 		} );
 	};
 }
