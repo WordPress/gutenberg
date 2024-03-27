@@ -90,7 +90,6 @@ const fields = [
 				<a href="...">{ item.author }</a>
 			);
 		},
-		type: 'enumeration',
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
@@ -106,7 +105,6 @@ const fields = [
 		getValue: ( { item } ) =>
 			STATUSES.find( ( { value } ) => value === item.status )
 				?.label ?? item.status,
-		type: 'enumeration',
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
@@ -123,7 +121,7 @@ Each field is an object with the following properties:
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
--   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
+-   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
@@ -299,11 +297,11 @@ Callback that signals the user triggered the details for one of more items, and 
 
 ### Fields
 
-- `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
+> The `enumeration` type was removed as it was deemed redundant with the field.elements metadata. New types will be introduced soon.
 
 ### Operators
 
-Allowed operators for fields of type `enumeration`:
+Allowed operators:
 
 | Operator | Selection | Description | Example |
 | --- | ---  | --- | --- |

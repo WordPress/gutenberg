@@ -416,17 +416,19 @@ export default function NavigationLinkEdit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
-						label={ __( 'Label' ) }
+						label={ __( 'Text' ) }
 						autoComplete="off"
 						onFocus={ () => setIsLabelFieldFocused( true ) }
 						onBlur={ () => setIsLabelFieldFocused( false ) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
@@ -435,7 +437,7 @@ export default function NavigationLinkEdit( {
 								attributes
 							);
 						} }
-						label={ __( 'URL' ) }
+						label={ __( 'Link' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
@@ -451,6 +453,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -463,6 +466,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );

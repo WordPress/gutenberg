@@ -80,6 +80,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 
 	const colorVariations = useColorVariations();
 	const typographyVariations = useTypographyVariations();
+	const gap = 3;
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
@@ -96,22 +97,15 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				spacing={ 10 }
 				className="edit-site-global-styles-variation-container"
 			>
-				<StyleVariationsContainer />
+				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Colors' ) }
-						</h3>
-						<ColorVariations />
-					</div>
+					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Typography' ) }
-						</h3>
-						<TypographyVariations />
-					</div>
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ gap }
+					/>
 				) }
 			</VStack>
 		</BlockEditorProvider>

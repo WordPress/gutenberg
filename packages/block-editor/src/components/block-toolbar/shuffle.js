@@ -23,7 +23,7 @@ function Container( props ) {
 }
 
 export default function Shuffle( { clientId, as = Container } ) {
-	const { categories, patterns } = useSelect(
+	const { categories, patterns, patternName } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -32,11 +32,13 @@ export default function Shuffle( { clientId, as = Container } ) {
 			} = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
 			const _categories = attributes?.metadata?.categories || EMPTY_ARRAY;
+			const _patternName = attributes?.metadata?.patternName;
 			const rootBlock = getBlockRootClientId( clientId );
 			const _patterns = __experimentalGetAllowedPatterns( rootBlock );
 			return {
 				categories: _categories,
 				patterns: _patterns,
+				patternName: _patternName,
 			};
 		},
 		[ clientId ]
@@ -56,7 +58,7 @@ export default function Shuffle( { clientId, as = Container } ) {
 				// Check if the pattern has only one top level block,
 				// otherwise we may shuffle to pattern that will not allow to continue shuffling.
 				pattern.blocks.length === 1 &&
-				pattern.categories.some( ( category ) => {
+				pattern.categories?.some( ( category ) => {
 					return categories.includes( category );
 				} )
 			);
@@ -65,28 +67,32 @@ export default function Shuffle( { clientId, as = Container } ) {
 	if ( sameCategoryPatternsWithSingleWrapper.length === 0 ) {
 		return null;
 	}
+
+	function getNextPattern() {
+		const numberOfPatterns = sameCategoryPatternsWithSingleWrapper.length;
+		const patternIndex = sameCategoryPatternsWithSingleWrapper.findIndex(
+			( { name } ) => name === patternName
+		);
+		const nextPatternIndex =
+			patternIndex + 1 < numberOfPatterns ? patternIndex + 1 : 0;
+		return sameCategoryPatternsWithSingleWrapper[ nextPatternIndex ];
+	}
+
 	const ComponentToUse = as;
 	return (
 		<ComponentToUse
 			label={ __( 'Shuffle' ) }
 			icon={ shuffle }
 			onClick={ () => {
-				const randomPattern =
-					sameCategoryPatternsWithSingleWrapper[
-						Math.floor(
-							// eslint-disable-next-line no-restricted-syntax
-							Math.random() *
-								sameCategoryPatternsWithSingleWrapper.length
-						)
-					];
-				randomPattern.blocks[ 0 ].attributes = {
-					...randomPattern.blocks[ 0 ].attributes,
+				const nextPattern = getNextPattern();
+				nextPattern.blocks[ 0 ].attributes = {
+					...nextPattern.blocks[ 0 ].attributes,
 					metadata: {
-						...randomPattern.blocks[ 0 ].attributes.metadata,
+						...nextPattern.blocks[ 0 ].attributes.metadata,
 						categories,
 					},
 				};
-				replaceBlocks( clientId, randomPattern.blocks );
+				replaceBlocks( clientId, nextPattern.blocks );
 			} }
 		/>
 	);

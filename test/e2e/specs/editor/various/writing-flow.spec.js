@@ -923,7 +923,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->` );
 	} );
 

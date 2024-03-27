@@ -26,7 +26,13 @@ import { computeIFrameScale } from '../../utils/math';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
+function EditorCanvas( {
+	enableResizing,
+	settings,
+	children,
+	onClick,
+	...props
+} ) {
 	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
 		useSelect( ( select ) => {
 			const { getBlockCount, __unstableGetEditorMode } =
@@ -69,7 +75,13 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				setCanvasMode( 'edit' );
 			}
 		},
-		onClick: () => setCanvasMode( 'edit' ),
+		onClick: () => {
+			if ( !! onClick ) {
+				onClick();
+			} else {
+				setCanvasMode( 'edit' );
+			}
+		},
 		readonly: true,
 	};
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;

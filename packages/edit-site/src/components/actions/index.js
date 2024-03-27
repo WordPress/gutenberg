@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, trash, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -49,8 +49,10 @@ export const trashPostAction = {
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
-								__(
-									'Are you sure you want to delete %d pages?'
+								_n(
+									'Are you sure you want to delete %d page?',
+									'Are you sure you want to delete %d pages?',
+									posts.length
 								),
 								posts.length
 						  ) }
@@ -172,8 +174,6 @@ export function usePermanentlyDeletePostAction() {
 		() => ( {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
-			isPrimary: true,
-			icon: trash,
 			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
@@ -372,6 +372,8 @@ export function useEditPostAction() {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
+			isPrimary: true,
+			icon: edit,
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},

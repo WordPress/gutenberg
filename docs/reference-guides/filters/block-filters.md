@@ -283,6 +283,24 @@ wp.hooks.addFilter(
 ```
 
 
+### `editor.postContentBlockTypes`
+
+Used to modify the list of blocks that should be enabled even when used inside a locked template. Any block that saves data to a post should be added here. Examples of this are the post featured image block. Which often gets used in templates but should still allow selecting the image even when the template is locked.
+
+_Example:_
+
+```js
+const addExampleBlockToPostContentBlockTypes = ( blockTypes ) => {
+	return [ ...blockTypes, 'namespace/example' ];
+};
+
+wp.hooks.addFilter(
+	'editor.postContentBlockTypes',
+	'my-plugin/post-content-block-types',
+	addExampleBlockToPostContentBlockTypes
+);
+```
+
 ## Removing Blocks
 
 ### Using a deny list

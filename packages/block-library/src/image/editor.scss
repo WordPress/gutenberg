@@ -1,5 +1,5 @@
 // Provide special styling for the placeholder.
-// @todo: this particular minimal style of placeholder could be componentized further.
+// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
 
 	// Show Placeholder style on-select.
@@ -13,7 +13,7 @@
 		// Disable any duotone filter applied in the selected state.
 		filter: none !important;
 
-		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
 		border-radius: $radius-block-ui;
 
 		> svg {

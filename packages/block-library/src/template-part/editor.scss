@@ -25,9 +25,13 @@
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
-	&.is-highlighted,
-	&.is-selected {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+	&.is-highlighted::after,
+	&.is-selected::after {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+	}
+
+	&.is-hovered::after {
+		box-shadow: 0 0 0 $border-width var(--wp-block-synced-color);
 	}
 
 	&.block-editor-block-list__block:not([contenteditable]):focus {
@@ -39,4 +43,8 @@
 			}
 		}
 	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part.has-editable-outline::after {
+	border: none;
 }

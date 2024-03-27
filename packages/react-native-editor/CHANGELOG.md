@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [**] Highlight color formatting style improvements [#57650]
 
 ## 1.115.0
 -   [*] Improve consistency of the block outline indicating the currently selected block [#59415]

@@ -1107,7 +1107,7 @@ This code
 
 ```php
 wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
-$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
+$html_content = '<div data-wp-text="myPlugin::state.greeting"></div>';
 $processed_html = wp_interactivity_process_directives( $html_content );
 echo $processed_html;
 ```
@@ -1128,8 +1128,9 @@ $my_context = array(
 	'counter' => 0,
 	'isOpen'  => true,
 );
+?>
 <div
- echo wp_interactivity_data_wp_context($my_context)
+ <?php echo wp_interactivity_data_wp_context( $my_context ); ?>
 >
 </div>
 ```

@@ -30,6 +30,7 @@ import {
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
+	getInsertBlockTypeDependants,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -1666,13 +1667,8 @@ const canInsertBlockTypeUnmemoized = (
  */
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
-	( state, blockName, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		state.blockEditingModes,
-	]
+	( state, blockName, rootClientId ) =>
+		getInsertBlockTypeDependants( state, rootClientId )
 );
 
 /**
@@ -2057,14 +2053,11 @@ export const getInserterItems = createSelector(
 		return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
+		getBlockTypes(),
+		getReusableBlocks( state ),
 		state.blocks.order,
 		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
+		...getInsertBlockTypeDependants( state, rootClientId ),
 	]
 );
 
@@ -2128,12 +2121,9 @@ export const getBlockTransformItems = createSelector(
 		);
 	},
 	( state, blocks, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
 		getBlockTypes(),
+		state.preferences.insertUsage,
+		...getInsertBlockTypeDependants( state, rootClientId ),
 	]
 );
 
@@ -2160,12 +2150,9 @@ export const hasInserterItems = createSelector(
 		return hasReusableBlock;
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
 		getBlockTypes(),
+		getReusableBlocks( state ),
+		...getInsertBlockTypeDependants( state, rootClientId ),
 	]
 );
 
@@ -2198,12 +2185,9 @@ export const getAllowedBlocks = createSelector(
 		return blockTypes;
 	},
 	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
 		getBlockTypes(),
+		getReusableBlocks( state ),
+		...getInsertBlockTypeDependants( state, rootClientId ),
 	]
 );
 
@@ -2220,9 +2204,8 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		);
 		return getAllowedBlocks( state, rootClientId );
 	},
-	( state, rootClientId ) => [
-		...getAllowedBlocks.getDependants( state, rootClientId ),
-	]
+	( state, rootClientId ) =>
+		getAllowedBlocks.getDependants( state, rootClientId )
 );
 
 /**
@@ -2287,6 +2270,10 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 					metadata: {
 						...( blocks[ 0 ].attributes.metadata || {} ),
 						categories: pattern.categories,
+						patternName: pattern.name,
+						name:
+							blocks[ 0 ].attributes.metadata?.name ||
+							pattern.title,
 					},
 				};
 			}
@@ -2297,15 +2284,10 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 		}, getAllPatternsDependants( select ) )
 );
 
-const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => {
-	return [
-		...getAllPatternsDependants( select )( state ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-	];
-};
+const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
+	...getAllPatternsDependants( select )( state ),
+	...getInsertBlockTypeDependants( state, rootClientId ),
+];
 
 /**
  * Returns the list of allowed patterns for inner blocks children.
