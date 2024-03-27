@@ -247,12 +247,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			}
 		}
 
-		$class_token     = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
-		$is_class_method = false !== $class_token;
+		$class_token  = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
+		$is_oo_method = Scopes::isOOMethod( $phpcsFile, $stackPtr );
 
 		$function_name = $phpcsFile->getDeclarationName( $stackPtr );
 
-		if ( $is_class_method ) {
+		if ( $is_oo_method ) {
 			$scopeModifier = $phpcsFile->getMethodProperties($stackPtr)['scope'];
 			if (($scopeModifier === 'protected'
 			     && $this->minimumVisibility === 'public')
@@ -268,7 +268,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$missing_since_tag_error_message = sprintf(
 			'@since tag is missing for the "%s()" %s.',
 			$function_name,
-			$is_class_method ? 'method' : 'function'
+			$is_oo_method ? 'method' : 'function'
 		);
 
 		// All these tokens could be present before the docblock.
@@ -324,7 +324,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			'InvalidSinceTagVersionValue',
 			array(
 				$function_name,
-				$is_class_method ? 'method' : 'function',
+				$is_oo_method ? 'method' : 'function',
 				$version_value,
 			)
 		);
