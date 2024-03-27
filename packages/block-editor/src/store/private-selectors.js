@@ -18,7 +18,11 @@ import {
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
-import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
+import {
+	checkAllowListRecursive,
+	getAllPatternsDependants,
+	getInsertBlockTypeDependants,
+} from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -282,11 +286,8 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			getAllPatternsDependants( select )( state ),
-			state.settings.allowedBlockTypes,
-			state.settings.templateLock,
-			state.blockListSettings[ rootClientId ],
-			state.blocks.byClientId.get( rootClientId ),
+			...getAllPatternsDependants( select )( state ),
+			...getInsertBlockTypeDependants( state, rootClientId ),
 		]
 	)
 );
