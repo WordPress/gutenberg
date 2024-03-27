@@ -3374,7 +3374,7 @@ describe( 'selectors', () => {
 				},
 				{
 					clientId: 'block4',
-					name: 'core/test-block-b',
+					name: 'core/test-block-a',
 					innerBlocks: [],
 				},
 			] );
@@ -3412,7 +3412,6 @@ describe( 'selectors', () => {
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-a',
 				'core/test-block-b',
-				'core/test-block-c',
 				'core/freeform',
 				'core/test-block-ancestor',
 				'core/test-block-parent',
