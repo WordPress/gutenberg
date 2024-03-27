@@ -98,11 +98,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 		) {
 			return 'default';
 		}
-
 		if ( ! __next40pxDefaultSize && size === 'default' ) {
 			return 'compact';
 		}
-
 		return size;
 	} )();
 

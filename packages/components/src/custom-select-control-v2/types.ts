@@ -14,23 +14,18 @@ export type CustomSelectStore = {
 
 export type CustomSelectContext = CustomSelectStore | undefined;
 
-export type CustomSelectButtonSize = {
+type CustomSelectSize< Size = 'compact' | 'default' > = {
 	/**
 	 * The size of the control.
 	 *
 	 * @default 'default'
 	 */
-	size?: 'compact' | 'default' | 'small';
+	size?: Size;
 };
 
-type CustomSelectSize = {
-	/**
-	 * The size of the control.
-	 *
-	 * @default 'default'
-	 */
-	size?: 'compact' | 'default';
-};
+export type CustomSelectButtonSize = CustomSelectSize<
+	'compact' | 'default' | 'small'
+>;
 
 export type CustomSelectButtonProps = {
 	/**
