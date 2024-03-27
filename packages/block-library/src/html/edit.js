@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useState } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
@@ -22,22 +22,11 @@ import { useInstanceId } from '@wordpress/compose';
 import Preview from './preview';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
-
 	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
-
-	function switchToPreview() {
-		setIsPreview( true );
-	}
-
-	function switchToHTML() {
-		setIsPreview( false );
-	}
-
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
-		'aria-describedby': isPreview ? instanceId : undefined,
+		'aria-describedby': attributes.isPreview ? instanceId : undefined,
 	} );
 
 	return (
@@ -46,21 +35,21 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ ! isPreview }
-						onClick={ switchToHTML }
+						isPressed={ ! attributes.isPreview }
+						onClick={ () => setAttributes( { isPreview: false } ) }
 					>
-						HTML
+						{ __( 'Edit' ) }
 					</ToolbarButton>
 					<ToolbarButton
 						className="components-tab-button"
-						isPressed={ isPreview }
-						onClick={ switchToPreview }
+						isPressed={ attributes.isPreview }
+						onClick={ () => setAttributes( { isPreview: true } ) }
 					>
 						{ __( 'Preview' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isDisabled ? (
+			{ attributes.isPreview || isDisabled ? (
 				<>
 					<Preview
 						content={ attributes.content }
