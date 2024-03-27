@@ -2710,8 +2710,6 @@ class WP_Theme_JSON_Gutenberg {
 			$content_size        = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size           = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size           = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css                .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
-			$css                .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
 			$root_declarations[] = array(
 				'name'  => '--wp--style--global--content-size',
 				'value' => $content_size,
