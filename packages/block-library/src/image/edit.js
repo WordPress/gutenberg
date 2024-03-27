@@ -117,7 +117,9 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState();
+	const [ temporaryURL, setTemporaryURL ] = useState( () => {
+		return isTemporaryImage( id, url ) ? url : undefined;
+	} );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -275,7 +277,6 @@ export function ImageEdit( {
 		onError: onUploadError,
 	} );
 
-	const isTemp = isTemporaryImage( id, url );
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
 	const mediaPreview = !! url && (
@@ -291,7 +292,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = classnames( className, {
-		'is-transient': temporaryURL || isTemp,
+		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -380,7 +381,6 @@ export function ImageEdit( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				isSingleSelected={ isSingleSelected }
-				isTemporaryImage={ isTemp }
 				insertBlocksAfter={ insertBlocksAfter }
 				onReplace={ onReplace }
 				onSelectImage={ onSelectImage }

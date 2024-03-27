@@ -99,7 +99,6 @@ export default function Image( {
 	attributes,
 	setAttributes,
 	isSingleSelected,
-	isTemporaryImage,
 	insertBlocksAfter,
 	onReplace,
 	onSelectImage,
@@ -785,7 +784,7 @@ export default function Image( {
 					...shadowProps.style,
 				} }
 			/>
-			{ ( temporaryURL || isTemporaryImage ) && <Spinner /> }
+			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
