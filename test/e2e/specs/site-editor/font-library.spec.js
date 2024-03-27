@@ -27,6 +27,7 @@ test.describe( 'Font Library', () => {
 
 		test( 'should allow user to upload a local font', async ( {
 			page,
+			editor,
 		} ) => {
 			await page.getByRole( 'button', { name: 'Styles' } ).click();
 			await page
@@ -50,6 +51,11 @@ test.describe( 'Font Library', () => {
 				await page.getByRole( 'button', { name: 'Delete' } ).click();
 				await page.getByRole( 'button', { name: 'Delete' } ).click();
 				await page.getByRole( 'tab', { name: 'Library' } ).click();
+				await expect(
+					page
+						.getByLabel( 'Library' )
+						.getByText( 'Font family uninstalled successfully.' )
+				).toBeVisible( { timeout: 40000 } );
 			}
 
 			// Upload local fonts
@@ -74,6 +80,16 @@ test.describe( 'Font Library', () => {
 			await expect(
 				page.getByRole( 'button', { name: 'Exo 2' } )
 			).toBeVisible();
+
+			// Check CSS preset was created
+			await page.getByRole( 'button', { name: 'Close' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Typography Headings styles' } )
+				.click();
+			await page.getByLabel( 'Font' ).selectOption( 'Exo 2' );
+			await expect(
+				editor.canvas.locator( '.is-root-container h1' )
+			).toHaveCSS( 'font-family', '"Exo 2"' );
 		} );
 	} );
 
