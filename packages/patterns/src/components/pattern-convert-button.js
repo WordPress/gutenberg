@@ -70,16 +70,11 @@ export default function PatternConvertButton( {
 					blocks[ 0 ].attributes.ref
 				);
 
-			const isSingleBlockWithInnerBlocks =
-				blocks.length === 1 && blocks[ 0 ].innerBlocks.length > 0;
-
 			const _canConvert =
 				// Hide when this is already a synced pattern.
 				! isReusable &&
 				// Hide when patterns are disabled.
 				canInsertBlockType( 'core/block', rootId ) &&
-				// hide on single blocks with no inner blocks
-				isSingleBlockWithInnerBlocks &&
 				blocks.every(
 					( block ) =>
 						// Guard against the case where a regular block has *just* been converted.
