@@ -25,10 +25,9 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 
-// Default controls for the background panel for blocks.
+// Initial control values where no block style is set.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
-	backgroundImage: true,
-	backgroundSize: false,
+	backgroundSize: 'cover',
 };
 
 function applyFallbackStyle( border ) {
@@ -326,6 +325,10 @@ function ScreenBlock( { name, variation } ) {
 					onChange={ onChangeBackground }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+					defaultControls={
+						blockType?.supports?.background
+							?.__experimentalDefaultControls
+					}
 				/>
 			) }
 
