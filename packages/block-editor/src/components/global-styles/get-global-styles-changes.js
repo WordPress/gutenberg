@@ -127,7 +127,7 @@ export function getGlobalStylesChangelist( next, previous ) {
 	const changedValueTree = deepCompare(
 		{
 			styles: {
-				background: next?.styles?.spacing,
+				background: next?.styles?.background,
 				color: next?.styles?.color,
 				typography: next?.styles?.typography,
 				spacing: next?.styles?.spacing,
