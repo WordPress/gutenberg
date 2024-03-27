@@ -70,6 +70,7 @@ test.describe( 'Font Library', () => {
 					.getByText( 'Fonts were installed successfully.' )
 			).toBeVisible( { timeout: 40000 } );
 			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			// Provides coverage for https://github.com/WordPress/gutenberg/issues/60040.
 			await expect(
 				page.getByRole( 'button', { name: 'Exo 2' } )
 			).toBeVisible();
