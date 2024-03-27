@@ -281,9 +281,10 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-						view.type
-					) ? (
+					const addLink =
+						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						item.status !== 'trash';
+					return addLink ? (
 						<Link
 							params={ {
 								postId: item.id,
