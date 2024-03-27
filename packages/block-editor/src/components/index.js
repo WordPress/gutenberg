@@ -174,3 +174,5 @@ export { useBlockCommands } from './use-block-commands';
  * The following rename hint component can be removed in 6.4.
  */
 export { default as ReusableBlocksRenameHint } from './inserter/reusable-block-rename-hint';
+
+export { default as useZoomOutBlockEditingMode } from './block-list/use-zoom-out-block-editing-mode';

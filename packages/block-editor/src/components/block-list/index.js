@@ -40,7 +40,7 @@ import {
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
 import { unlock } from '../../lock-unlock';
-import useZoomOutBlockEditingMode from './use-zoom-out-block-editing-mode';
+//import useZoomOutBlockEditingMode from './use-zoom-out-block-editing-mode';
 
 export const IntersectionObserver = createContext();
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
@@ -121,7 +121,7 @@ function Root( { className, ...settings } ) {
 		settings
 	);
 
-	useZoomOutBlockEditingMode();
+	//useZoomOutBlockEditingMode();
 
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>

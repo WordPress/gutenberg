@@ -26,7 +26,7 @@ export default function useZoomOutBlockEditingMode() {
 
 			// TODO: We need a better API as using the post type
 			// in block editor package is not allowed.
-			const postType = select( 'core/editor' ).getCurrentPostType();
+			const postType = select( editorStore ).getCurrentPostType();
 
 			const _sectionsContainerClientId =
 				getSectionsContainerClientId( postType );

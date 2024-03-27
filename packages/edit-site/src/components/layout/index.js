@@ -50,6 +50,7 @@ import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
+import useZoomOutBlockEditingMode from '../../hooks/use-zoom-out-block-editing-mode';
 import useLayoutAreas from './router';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -65,6 +66,7 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
+	useZoomOutBlockEditingMode();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
