@@ -123,10 +123,11 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
-		ref.current.focus();
-
-		speak( label );
-	}, [ label ] );
+		if ( editorMode === 'navigation' ) {
+			ref.current.focus();
+			speak( label );
+		}
+	}, [ label, editorMode ] );
 	const blockElement = useBlockElement( clientId );
 
 	const {

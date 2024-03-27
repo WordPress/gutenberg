@@ -286,25 +286,30 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Indirect properties are not output directly by `compute_style_properties`,
 	 * but are used elsewhere in the processing of global styles. The indirect
-	 * property is used to validate whether or not a style value is allowed.
+	 * property is used to validate whether a style value is allowed.
 	 *
 	 * @since 6.2.0
+	 * @since 6.6.0 Added background-image properties.
 	 *
 	 * @var array
 	 */
 	const INDIRECT_PROPERTIES_METADATA = array(
-		'gap'        => array(
+		'gap'              => array(
 			array( 'spacing', 'blockGap' ),
 		),
-		'column-gap' => array(
+		'column-gap'       => array(
 			array( 'spacing', 'blockGap', 'left' ),
 		),
-		'row-gap'    => array(
+		'row-gap'          => array(
 			array( 'spacing', 'blockGap', 'top' ),
 		),
-		'max-width'  => array(
+		'max-width'        => array(
 			array( 'layout', 'contentSize' ),
 			array( 'layout', 'wideSize' ),
+		),
+		'background-image' => array(
+			array( 'background', 'backgroundImage', 'url' ),
+			array( 'background', 'backgroundImage', 'source' ),
 		),
 	);
 
@@ -1359,7 +1364,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $css The block css node.
+	 * @param array  $css The block css node.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -2680,7 +2685,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2697,7 +2702,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.

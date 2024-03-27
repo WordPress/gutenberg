@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select';
+import CustomSelectItem from '../item';
 import type { LegacyCustomSelectProps } from '../types';
-import { CustomSelectItem } from '..';
 import * as Styled from '../styles';
 import { ContextSystemProvider } from '../../context';
 
-function CustomSelect( props: LegacyCustomSelectProps ) {
+function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
 		__next40pxDefaultSize = false,
@@ -128,4 +128,4 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export default CustomSelect;
+export default CustomSelectControl;
