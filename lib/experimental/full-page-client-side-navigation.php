@@ -3,15 +3,14 @@
  * Registers full page client-side navigation option using the Interactivity API and adds the necessary directives.
  */
 
-// Set the navigation mode to full page client-side navigation.
-wp_interactivity_config( 'core/router', array( 'navigationMode' => 'fullPage' ) );
-
 // Enqueue the interactivity router script.
 function _gutenberg_enqueue_interactivity_router() {
+	// Set the navigation mode to full page client-side navigation.
+	wp_interactivity_config( 'core/router', array( 'navigationMode' => 'fullPage' ) );
 	wp_enqueue_script_module( '@wordpress/interactivity-router' );
 }
 
-add_action( 'init', '_gutenberg_enqueue_interactivity_router', 20 );
+add_action( 'wp_enqueue_scripts', '_gutenberg_enqueue_interactivity_router' );
 
 // Add directives to all links.
 // This should probably be done per site, not by default when this option is enabled.
