@@ -82,12 +82,22 @@ const restrictedImports = [
 			'Please use dynamic import (`import()`) instead since it is a large dependency.',
 	},
 	{
+		name: '@codemirror/commands',
+		message:
+			'Please use dynamic import (`import()`) instead since it is a large dependency.',
+	},
+	{
 		name: '@codemirror/lang-css',
 		message:
 			'Please use dynamic import (`import()`) instead since it is a large dependency.',
 	},
 	{
 		name: '@codemirror/lang-html',
+		message:
+			'Please use dynamic import (`import()`) instead since it is a large dependency.',
+	},
+	{
+		name: '@codemirror/view',
 		message:
 			'Please use dynamic import (`import()`) instead since it is a large dependency.',
 	},

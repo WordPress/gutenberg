@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useEffect, useRef, useId } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -101,6 +101,8 @@ export default function AdvancedPanel( {
 			 * @see https://github.com/WordPress/gutenberg/pull/60155
 			 */
 			const { EditorView, basicSetup } = await import( 'codemirror' );
+			const {indentWithTab} = await import('@codemirror/commands');
+			const {keymap} = await import('@codemirror/view');
 			const { css } = await import( '@codemirror/lang-css' );
 
 			if ( editorRef.current ) {
@@ -109,6 +111,7 @@ export default function AdvancedPanel( {
 					extensions: [
 						basicSetup,
 						css(),
+						keymap.of([indentWithTab]),
 						EditorView.updateListener.of( ( editor ) => {
 							if ( editor.docChanged ) {
 								handleOnChange( editor.state.doc.toString() );
@@ -130,7 +133,6 @@ export default function AdvancedPanel( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	const cssEditorId = useId();
 	return (
 		<VStack spacing={ 3 }>
 			{ cssError && (
@@ -139,7 +141,7 @@ export default function AdvancedPanel( {
 				</Notice>
 			) }
 			<label
-				htmlFor={ cssEditorId }
+				htmlFor={ EDITOR_ID }
 				className="block-editor-global-styles-advanced-panel__custom-css-label"
 			>
 				{ __( 'Additional CSS' ) }

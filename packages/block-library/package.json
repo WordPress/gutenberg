@@ -31,7 +31,9 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
+		"@codemirror/commands": "6.3.3",
 		"@codemirror/lang-html": "6.4.8",
+		"@codemirror/view": "6.26.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
