@@ -13,6 +13,8 @@ import { default as transformStyles } from '../../utils/transform-styles';
 const EDITOR_ID =
 	'block-editor-global-styles-advanced-panel__custom-css-editor';
 
+const EDITOR_INSTRUCTIONS_ID = `${ EDITOR_ID }-instructions`;
+
 export default function AdvancedPanel( {
 	value,
 	onChange,
@@ -101,8 +103,8 @@ export default function AdvancedPanel( {
 			 * @see https://github.com/WordPress/gutenberg/pull/60155
 			 */
 			const { EditorView, basicSetup } = await import( 'codemirror' );
-			const {indentWithTab} = await import('@codemirror/commands');
-			const {keymap} = await import('@codemirror/view');
+			const { indentWithTab } = await import( '@codemirror/commands' );
+			const { keymap } = await import( '@codemirror/view' );
 			const { css } = await import( '@codemirror/lang-css' );
 
 			if ( editorRef.current ) {
@@ -111,7 +113,7 @@ export default function AdvancedPanel( {
 					extensions: [
 						basicSetup,
 						css(),
-						keymap.of([indentWithTab]),
+						keymap.of( [ indentWithTab ] ),
 						EditorView.updateListener.of( ( editor ) => {
 							if ( editor.docChanged ) {
 								handleOnChange( editor.state.doc.toString() );
@@ -146,7 +148,20 @@ export default function AdvancedPanel( {
 			>
 				{ __( 'Additional CSS' ) }
 			</label>
-			<div ref={ editorRef } id={ cssEditorId }></div>
+			<div
+				id={ EDITOR_INSTRUCTIONS_ID }
+				className={ EDITOR_INSTRUCTIONS_ID }
+			>
+				{ __(
+					`This editor allows you to input Additional CSS and customize the site's appearance with your own styles. Press Escape then Tab to move focus out of the editor.`
+				) }
+			</div>
+			<div
+				ref={ editorRef }
+				id={ EDITOR_ID }
+				className={ EDITOR_ID }
+				aria-describedby={ EDITOR_INSTRUCTIONS_ID }
+			></div>
 		</VStack>
 	);
 }
