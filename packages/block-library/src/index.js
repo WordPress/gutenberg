@@ -300,7 +300,7 @@ export const registerCoreBlocks = (
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
-	setGroupingBlockName( group.name );
+	setGroupingBlockName( postContent.name );
 };
 
 /**
