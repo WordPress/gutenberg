@@ -10,6 +10,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { unlock } from '../lock-unlock';
 
+const DISTANCE_THRESHOLD = 500;
+
 function clamp( value, min, max ) {
 	return Math.min( Math.max( value, min ), max );
 }
@@ -62,7 +64,10 @@ export default function useSelectNearestEditableBlock( {
 					}
 					const rect = block.getBoundingClientRect();
 					const distance = distanceFromRect( x, y, rect );
-					if ( distance < nearestDistance ) {
+					if (
+						distance < nearestDistance &&
+						distance < DISTANCE_THRESHOLD
+					) {
 						nearestDistance = distance;
 						nearestClientId = clientId;
 					}
