@@ -46,13 +46,8 @@ export function getTypographyClassesAndStyles( attributes, settings ) {
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
 
-	const textAlignClassName = !! attributes?.textAlign
-		? `has-text-align-${ attributes.textAlign }`
-		: '';
-
 	const className = classnames(
 		fontFamilyClassName,
-		textAlignClassName,
 		getFontSizeClass( attributes?.fontSize )
 	);
 

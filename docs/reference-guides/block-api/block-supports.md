@@ -1096,13 +1096,17 @@ supports: {
 }
 ```
 
-When the block declares support for `textAlign`, the attributes definition is extended to include a text align attribute with a `string` type. By default, no text alignment is assigned. The block can apply a default text alignment by specifying its own `textAlign` attribute with a default e.g.:
+When the block declares support for `textAlign`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default. For example:
 
 ```js
 attributes: {
-    textAlign: {
-        type: 'string',
-        default: 'right'
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textAlign: 'value'
+            }
+        }
     }
 }
 ```

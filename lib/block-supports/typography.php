@@ -154,6 +154,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			$typography_block_styles['lineHeight'] = $block_attributes['style']['typography']['lineHeight'] ?? null;
 	}
 
+	if ( $has_text_align_support && ! $should_skip_text_align ) {
+			$typography_block_styles['textAlign'] = $block_attributes['style']['typography']['textAlign'] ?? null;
+	}
+
 	if ( $has_text_columns_support && ! $should_skip_text_columns && isset( $block_attributes['style']['typography']['textColumns'] ) ) {
 		$typography_block_styles['textColumns'] = $block_attributes['style']['typography']['textColumns'] ?? null;
 	}
@@ -178,22 +182,13 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
-	$classnames = array();
 	$styles     = gutenberg_style_engine_get_styles(
 		array( 'typography' => $typography_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
 	);
 
 	if ( ! empty( $styles['classnames'] ) ) {
-		$classnames[] = $styles['classnames'];
-	}
-
-	if ( $has_text_align_support && ! $should_skip_text_align && isset( $block_attributes['textAlign'] ) ) {
-		$classnames[] = 'has-text-align-' . $block_attributes['textAlign'];
-	}
-
-	if ( ! empty( $classnames ) ) {
-		$attributes['class'] = implode( ' ', $classnames );
+		$attributes['class'] = $styles['classnames'];
 	}
 
 	if ( ! empty( $styles['css'] ) ) {

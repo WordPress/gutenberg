@@ -3,8 +3,8 @@
 		"name": "core/comments-pagination-previous",
 		"isValid": true,
 		"attributes": {
-			"fontSize": "medium",
 			"backgroundColor": "foreground",
+			"fontSize": "medium",
 			"style": {
 				"typography": {
 					"textTransform": "uppercase"
