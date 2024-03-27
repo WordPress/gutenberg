@@ -42,5 +42,11 @@ function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
 			/>
 		);
 	}
+	// Blocks which have no inner blocks and are not template part blocks
+	// should not have the option to convert to template part.
+	if ( blocks.length === 1 && blocks[ 0 ].innerBlocks.length === 0 ) {
+		return;
+	}
+
 	return <ConvertToTemplatePart clientIds={ clientIds } blocks={ blocks } />;
 }
