@@ -326,7 +326,7 @@ export const deleteAction = {
 
 export const resetAction = {
 	id: 'reset-action',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
@@ -338,11 +338,7 @@ export const resetAction = {
 		const { removeTemplate } = useDispatch( editSiteStore );
 		return (
 			<VStack spacing="5">
-				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
-				</Text>
+				<Text>{ __( 'Reset and clear all customizations?' ) }</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
 						{ __( 'Cancel' ) }
@@ -351,7 +347,7 @@ export const resetAction = {
 						variant="primary"
 						onClick={ () => removeTemplate( item ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>
