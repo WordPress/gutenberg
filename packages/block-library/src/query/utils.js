@@ -379,10 +379,19 @@ export const useUnsupportedBlocks = ( clientId ) => {
 			getClientIdsOfDescendants( clientId ).forEach(
 				( descendantClientId ) => {
 					const blockName = getBlockName( descendantClientId );
-					const blockInteractivity = getBlockSupport(
+					/*
+					 * Client side navigation can be true in two states:
+					 *  - supports.interactivity = true;
+					 *  - supports.interactivity.clientNavigation = true;
+					 */
+					const blockInteractivityBool =
+						getBlockSupport( blockName, 'interactivity' ) === true;
+					const blockClientNavigation = getBlockSupport(
 						blockName,
-						'interactivity'
+						'interactivity.clientNavigation'
 					);
+					const blockInteractivity =
+						blockInteractivityBool || blockClientNavigation;
 					if (
 						! blockName.startsWith( 'core/' ) &&
 						! blockInteractivity
