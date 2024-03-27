@@ -6,6 +6,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -15,6 +16,7 @@ import { unlock } from '../lock-unlock';
 
 const {
 	useSetPatternBindings,
+	PatternOverridesControls,
 	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
@@ -60,9 +62,20 @@ function BindingUpdater( props ) {
 // on every block.
 function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
-	const isEditingPattern = useSelect(
-		( select ) =>
-			select( editorStore ).getCurrentPostType() === PATTERN_TYPES.user,
+	const { hasPatternOverridesSource, isEditingPattern } = useSelect(
+		( select ) => {
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+
+			return {
+				// For editing link to the site editor if the theme and user permissions support it.
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
+				isEditingPattern:
+					select( editorStore ).getCurrentPostType() ===
+					PATTERN_TYPES.user,
+			};
+		},
 		[]
 	);
 
@@ -73,14 +86,23 @@ function ControlsWithStoreSubscription( props ) {
 			( binding ) => binding.source === 'core/pattern-overrides'
 		);
 
+	const shouldShowPatternOverridesControls =
+		isEditingPattern && blockEditingMode === 'default';
 	const shouldShowResetOverridesControl =
 		! isEditingPattern &&
 		!! props.attributes.metadata?.name &&
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
+	if ( ! hasPatternOverridesSource ) {
+		return null;
+	}
+
 	return (
 		<>
+			{ shouldShowPatternOverridesControls && (
+				<PatternOverridesControls { ...props } />
+			) }
 			{ shouldShowResetOverridesControl && (
 				<ResetOverridesControl { ...props } />
 			) }

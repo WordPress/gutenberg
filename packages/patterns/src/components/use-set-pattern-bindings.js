@@ -30,7 +30,7 @@ function removeBindings( bindings, syncedAttributes ) {
 	return updatedBindings;
 }
 
-function addBindings( bindings, syncedAttributes ) {
+export function addBindings( bindings, syncedAttributes ) {
 	const updatedBindings = { ...bindings };
 	for ( const attributeName of syncedAttributes ) {
 		if ( ! bindings?.[ attributeName ] ) {
@@ -64,7 +64,9 @@ export default function useSetPatternBindings(
 		if (
 			! hasPatternOverridesSource ||
 			currentPostType !== 'wp_block' ||
-			metadataName === prevMetadataName
+			metadataName === prevMetadataName ||
+			// Don't update the bindings if it's explicitly set to false.
+			bindings === false
 		) {
 			return;
 		}

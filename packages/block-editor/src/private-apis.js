@@ -34,6 +34,7 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import { selectBlockPatternsKey } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { BlockRenameModal } from './components/block-rename';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -70,4 +71,5 @@ lock( privateApis, {
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
+	BlockRenameModal,
 } );
