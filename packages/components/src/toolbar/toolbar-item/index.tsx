@@ -17,6 +17,8 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarItemProps } from './types';
 
+export type { ToolbarItemProps } from './types';
+
 function ToolbarItem(
 	{ children, as: Component, ...props }: ToolbarItemProps,
 	ref: ForwardedRef< any >

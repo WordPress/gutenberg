@@ -1,2 +1,2 @@
-export { default as BorderControl } from './component';
+export { default as BorderControl, type BorderControlProps } from './component';
 export { useBorderControl } from './hook';

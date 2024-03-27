@@ -6,10 +6,16 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import type { FormToggleProps } from './types';
+import type { FormToggleProps as FormToggleBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 export const noop = () => {};
+
+export type FormToggleProps = WordPressComponentProps<
+	FormToggleBaseProps,
+	'input',
+	false
+>;
 
 /**
  * FormToggle switches a single setting on or off.
@@ -30,9 +36,7 @@ export const noop = () => {};
  * };
  * ```
  */
-export function FormToggle(
-	props: WordPressComponentProps< FormToggleProps, 'input', false >
-) {
+export function FormToggle( props: FormToggleProps ) {
 	const {
 		className,
 		checked,

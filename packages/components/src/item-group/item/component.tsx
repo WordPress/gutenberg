@@ -6,14 +6,16 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { ItemProps } from '../types';
+import type { ItemProps as ItemBaseProps } from '../types';
 import { useItem } from './hook';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 
+export type ItemProps = WordPressComponentProps< ItemBaseProps, 'div' >;
+
 function UnconnectedItem(
-	props: WordPressComponentProps< ItemProps, 'div' >,
+	props: ItemProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { role, wrapperClassName, ...otherProps } = useItem( props );

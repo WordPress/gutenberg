@@ -22,8 +22,10 @@ import CONFIG from '../../utils/config-values';
 import { useCx } from '../../utils/hooks/use-cx';
 import type { Props } from '../types';
 
+export type CardProps = WordPressComponentProps< Props, 'div' >;
+
 function UnconnectedCard(
-	props: WordPressComponentProps< Props, 'div' >,
+	props: CardProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

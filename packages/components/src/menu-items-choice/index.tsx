@@ -8,6 +8,7 @@ import { check } from '@wordpress/icons';
  */
 import MenuItem from '../menu-item';
 import type { MenuItemsChoiceProps } from './types';
+export type { MenuItemsChoiceProps } from './types';
 
 const noop = () => {};
 

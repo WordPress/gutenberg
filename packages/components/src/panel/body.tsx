@@ -19,6 +19,7 @@ import Button from '../button';
 import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
+export type { PanelBodyProps } from './types';
 const noop = () => {};
 
 export function UnforwardedPanelBody(

@@ -1,3 +1,2 @@
-export { default as Spacer } from './component';
+export { default as Spacer, type SpacerProps } from './component';
 export { useSpacer } from './hook';
-export type { SpacerProps } from './types';

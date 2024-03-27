@@ -21,6 +21,8 @@ function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
 	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
 }
 
+export type { ToolbarGroupProps } from './types';
+
 /**
  * Renders a collapsible group of controls
  *

@@ -8,7 +8,13 @@ import { useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import type { WordPressComponentProps } from '../context';
-import type { FormFileUploadProps } from './types';
+import type { FormFileUploadProps as FormFileUploadBaseProps } from './types';
+
+export type FormFileUploadProps = WordPressComponentProps<
+	FormFileUploadBaseProps,
+	'button',
+	false
+>;
 
 /**
  * FormFileUpload is a component that allows users to select files from their local device.
@@ -34,7 +40,7 @@ export function FormFileUpload( {
 	onClick,
 	render,
 	...props
-}: WordPressComponentProps< FormFileUploadProps, 'button', false > ) {
+}: FormFileUploadProps ) {
 	const ref = useRef< HTMLInputElement >( null );
 	const openFileDialog = () => {
 		ref.current?.click();

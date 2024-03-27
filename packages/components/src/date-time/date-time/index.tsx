@@ -17,6 +17,7 @@ import { default as TimePicker } from '../time';
 import type { DateTimePickerProps } from '../types';
 import { Wrapper } from './styles';
 
+export type { DateTimePickerProps } from '../types';
 export { DatePicker, TimePicker };
 
 const noop = () => {};

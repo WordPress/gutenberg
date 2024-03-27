@@ -16,10 +16,16 @@ import { FlexBlock } from '../flex';
 import FormToggle from '../form-toggle';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { ToggleControlProps } from './types';
+import type { ToggleControlProps as ToggleControlBaseProps } from './types';
 import { HStack } from '../h-stack';
 import { useCx } from '../utils';
 import { space } from '../utils/space';
+
+export type ToggleControlProps = WordPressComponentProps<
+	ToggleControlBaseProps,
+	'input',
+	false
+>;
 
 /**
  * ToggleControl is used to generate a toggle user interface.
@@ -49,7 +55,7 @@ export function ToggleControl( {
 	className,
 	onChange,
 	disabled,
-}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
+}: ToggleControlProps ) {
 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
 		onChange( event.target.checked );
 	}

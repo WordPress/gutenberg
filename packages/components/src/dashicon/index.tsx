@@ -10,7 +10,13 @@
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import type { DashiconProps } from './types';
+import type { DashiconProps as DashiconBaseProps } from './types';
+
+export type DashiconProps = WordPressComponentProps<
+	DashiconBaseProps,
+	'span',
+	false
+>;
 
 function Dashicon( {
 	icon,
@@ -18,7 +24,7 @@ function Dashicon( {
 	size = 20,
 	style = {},
 	...extraProps
-}: WordPressComponentProps< DashiconProps, 'span', false > ) {
+}: DashiconProps ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',

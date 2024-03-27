@@ -21,7 +21,7 @@ import * as inputControlActionTypes from '../input-control/reducer/actions';
 import { add, subtract, roundClamp } from '../utils/math';
 import { ensureNumber, isValueEmpty } from '../utils/values';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { NumberControlProps } from './types';
+import type { NumberControlProps as NumberControlBaseProps } from './types';
 import { HStack } from '../h-stack';
 import { Spacer } from '../spacer';
 import { useCx } from '../utils';
@@ -29,8 +29,14 @@ import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props'
 
 const noop = () => {};
 
+export type NumberControlProps = WordPressComponentProps<
+	NumberControlBaseProps,
+	'input',
+	false
+>;
+
 function UnforwardedNumberControl(
-	props: WordPressComponentProps< NumberControlProps, 'input', false >,
+	props: NumberControlProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

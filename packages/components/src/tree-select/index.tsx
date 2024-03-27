@@ -25,6 +25,8 @@ function getSelectOptions(
 	] );
 }
 
+export type { TreeSelectProps } from './types';
+
 /**
  * TreeSelect component is used to generate select input fields.
  *

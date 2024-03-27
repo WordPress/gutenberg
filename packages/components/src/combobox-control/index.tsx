@@ -62,6 +62,8 @@ const getIndexOfMatchingSuggestion = (
 		? -1
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
+export type { ComboboxControlProps } from './types';
+
 /**
  * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
  * being able to search for options using a search input.

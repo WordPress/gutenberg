@@ -17,7 +17,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
-import type { SnackbarListProps } from './types';
+import type { SnackbarListProps as SnackbarListBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 const SNACKBAR_VARIANTS = {
@@ -48,6 +48,10 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
+export type SnackbarListProps = WordPressComponentProps<
+	SnackbarListBaseProps,
+	'div'
+>;
 /**
  * Renders a list of notices.
  *
@@ -65,7 +69,7 @@ export function SnackbarList( {
 	className,
 	children,
 	onRemove,
-}: WordPressComponentProps< SnackbarListProps, 'div' > ) {
+}: SnackbarListProps ) {
 	const listRef = useRef< HTMLDivElement | null >( null );
 	const isReducedMotion = useReducedMotion();
 	className = classnames( 'components-snackbar-list', className );

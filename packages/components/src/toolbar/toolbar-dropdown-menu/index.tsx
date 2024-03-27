@@ -14,10 +14,12 @@ import type { ForwardedRef } from 'react';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import DropdownMenu from '../../dropdown-menu';
-import type { DropdownMenuProps } from '../../dropdown-menu/types';
+import type { DropdownMenuProps } from '../../dropdown-menu';
+
+export type ToolbarDropdownMenuProps = DropdownMenuProps;
 
 function ToolbarDropdownMenu(
-	props: DropdownMenuProps,
+	props: ToolbarDropdownMenuProps,
 	ref: ForwardedRef< any >
 ) {
 	const accessibleToolbarState = useContext( ToolbarContext );

@@ -38,6 +38,8 @@ import type {
 	GradientTypePickerProps,
 } from './types';
 
+export type { CustomGradientPickerProps } from './types';
+
 const GradientAnglePicker = ( {
 	gradientAST,
 	hasGradient,

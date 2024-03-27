@@ -26,7 +26,7 @@ import { ColorHeading } from './styles';
 import DropdownContentWrapper from '../dropdown/dropdown-content-wrapper';
 import type {
 	ColorObject,
-	ColorPaletteProps,
+	ColorPaletteProps as ColorPaletteBaseProps,
 	CustomColorPickerDropdownProps,
 	MultiplePalettesProps,
 	PaletteObject,
@@ -177,8 +177,13 @@ export function CustomColorPickerDropdown( {
 	);
 }
 
+export type ColorPaletteProps = WordPressComponentProps<
+	ColorPaletteBaseProps,
+	'div'
+>;
+
 function UnforwardedColorPalette(
-	props: WordPressComponentProps< ColorPaletteProps, 'div' >,
+	props: ColorPaletteProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

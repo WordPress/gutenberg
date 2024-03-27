@@ -22,6 +22,7 @@ import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
 import type { NavigationMenuProps } from '../types';
+export type { NavigationMenuProps } from '../types';
 
 export function NavigationMenu( props: NavigationMenuProps ) {
 	const {

@@ -56,7 +56,7 @@ import {
 import { contextConnect, useContextSystem } from '../context';
 import type { WordPressComponentProps } from '../context';
 import type {
-	PopoverProps,
+	PopoverProps as PopoverBaseProps,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
 } from './types';
@@ -109,14 +109,16 @@ const getPopoverFallbackContainer = () => {
 	return container;
 };
 
+export type PopoverProps = Omit<
+	WordPressComponentProps< PopoverBaseProps, 'div', false >,
+	// To avoid overlaps between the standard HTML attributes and the props
+	// expected by `framer-motion`, omit all framer motion props from popover
+	// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
+	keyof Omit< MotionProps, 'animate' | 'children' >
+>;
+
 const UnforwardedPopover = (
-	props: Omit<
-		WordPressComponentProps< PopoverProps, 'div', false >,
-		// To avoid overlaps between the standard HTML attributes and the props
-		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
-	>,
+	props: PopoverProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

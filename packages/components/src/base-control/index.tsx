@@ -7,7 +7,10 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import { VisuallyHidden } from '../visually-hidden';
-import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
+import type {
+	BaseControlProps as BaseControlBaseProps,
+	BaseControlVisualLabelProps,
+} from './types';
 import {
 	Wrapper,
 	StyledField,
@@ -19,6 +22,11 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnectWithoutRef, useContextSystem } from '../context';
 
 export { useBaseControlProps } from './hooks';
+
+// This prop is exported differently than others because creating a type and
+// then using that type in the component below causes TS union error in other
+// files. `Expression produces a union type that is too complex to represent.`
+export type BaseControlProps = Parameters< typeof UnconnectedBaseControl >[ 0 ];
 
 /**
  * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
@@ -44,7 +52,7 @@ export { useBaseControlProps } from './hooks';
  * ```
  */
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressComponentProps< BaseControlBaseProps, null >
 ) => {
 	const {
 		__nextHasNoMarginBottom = false,

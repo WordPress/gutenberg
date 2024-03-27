@@ -27,10 +27,16 @@ import { useCx } from '../../utils/hooks/use-cx';
 import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
-import type { NavigatorScreenProps } from '../types';
+import type { NavigatorScreenProps as NavigatorScreenBaseProps } from '../types';
+
+export type NavigatorScreenProps = WordPressComponentProps<
+	NavigatorScreenBaseProps,
+	'div',
+	false
+>;
 
 function UnconnectedNavigatorScreen(
-	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
+	props: NavigatorScreenProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const screenId = useId();

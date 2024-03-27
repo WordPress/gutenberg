@@ -22,6 +22,7 @@ import type {
 	NavigationProps,
 	NavigationContext as NavigationContextType,
 } from './types';
+export type { NavigationProps } from './types';
 
 const noop = () => {};
 

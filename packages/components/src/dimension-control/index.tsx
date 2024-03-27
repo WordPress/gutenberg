@@ -17,6 +17,7 @@ import sizesTable, { findSizeBySlug } from './sizes';
 import type { DimensionControlProps, Size } from './types';
 import type { SelectControlSingleSelectionProps } from '../select-control/types';
 
+export type { DimensionControlProps } from './types';
 /**
  * `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
  *

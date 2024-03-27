@@ -16,8 +16,14 @@ import { Icon, check, reset } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import type { CheckboxControlProps } from './types';
+import type { CheckboxControlProps as CheckboxControlBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
+
+export type CheckboxControlProps = WordPressComponentProps<
+	CheckboxControlBaseProps,
+	'input',
+	false
+>;
 
 /**
  * Checkboxes allow the user to select one or more items from a set.
@@ -39,9 +45,7 @@ import type { WordPressComponentProps } from '../context';
  * };
  * ```
  */
-export function CheckboxControl(
-	props: WordPressComponentProps< CheckboxControlProps, 'input', false >
-) {
+export function CheckboxControl( props: CheckboxControlProps ) {
 	const {
 		__nextHasNoMarginBottom,
 		label,

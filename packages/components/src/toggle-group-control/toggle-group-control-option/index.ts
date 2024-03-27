@@ -1,1 +1,4 @@
-export { default as ToggleGroupControlOption } from './component';
+export {
+	default as ToggleGroupControlOption,
+	type ToggleGroupControlOptionProps,
+} from './component';

@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import NavigableContainer from './container';
 import type { NavigableMenuProps } from './types';
+export type { NavigableMenuProps } from './types';
 
 export function UnforwardedNavigableMenu(
 	{ role = 'menu', orientation = 'vertical', ...rest }: NavigableMenuProps,

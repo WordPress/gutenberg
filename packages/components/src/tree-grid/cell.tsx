@@ -8,14 +8,16 @@ import { forwardRef } from '@wordpress/element';
  */
 import TreeGridItem from './item';
 import type { WordPressComponentProps } from '../context';
-import type { TreeGridCellProps } from './types';
+import type { TreeGridCellProps as TreeGridCellBaseProps } from './types';
+
+export type TreeGridCellProps = WordPressComponentProps<
+	TreeGridCellBaseProps,
+	'td',
+	false
+>;
 
 function UnforwardedTreeGridCell(
-	{
-		children,
-		withoutGridItem = false,
-		...props
-	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
+	{ children, withoutGridItem = false, ...props }: TreeGridCellProps,
 	ref: React.ForwardedRef< any >
 ) {
 	return (

@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useVStack } from './hook';
-import type { VStackProps } from './types';
+import type { VStackProps as VStackBaseProps } from './types';
+
+export type VStackProps = WordPressComponentProps< VStackBaseProps, 'div' >;
 
 function UnconnectedVStack(
-	props: WordPressComponentProps< VStackProps, 'div' >,
+	props: VStackProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const vStackProps = useVStack( props );

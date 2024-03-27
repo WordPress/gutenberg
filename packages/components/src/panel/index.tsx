@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import PanelHeader from './header';
 import type { PanelProps } from './types';
+export type { PanelProps } from './types';
 
 function UnforwardedPanel(
 	{ header, className, children }: PanelProps,

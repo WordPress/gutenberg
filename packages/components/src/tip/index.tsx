@@ -8,6 +8,8 @@ import { Icon, tip } from '@wordpress/icons';
  */
 import type { TipProps } from './types';
 
+export type { TipProps } from './types';
+
 export function Tip( props: TipProps ) {
 	const { children } = props;
 

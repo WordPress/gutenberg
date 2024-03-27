@@ -16,14 +16,16 @@ import { external } from '@wordpress/icons';
  */
 import { VisuallyHidden } from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
-import type { ExternalLinkProps } from './types';
+import type { ExternalLinkProps as ExternalLinkBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+export type ExternalLinkProps = Omit<
+	WordPressComponentProps< ExternalLinkBaseProps, 'a', false >,
+	'target'
+>;
+
 function UnforwardedExternalLink(
-	props: Omit<
-		WordPressComponentProps< ExternalLinkProps, 'a', false >,
-		'target'
-	>,
+	props: ExternalLinkProps,
 	ref: ForwardedRef< HTMLAnchorElement >
 ) {
 	const { href, children, className, rel = '', ...additionalProps } = props;

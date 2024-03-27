@@ -16,7 +16,7 @@ import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
 import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
-import type { SelectControlProps } from './types';
+import type { SelectControlProps as SelectControlBaseProps } from './types';
 import SelectControlChevronDown from './chevron-down';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
@@ -29,8 +29,14 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
+export type SelectControlProps = WordPressComponentProps<
+	SelectControlBaseProps,
+	'select',
+	false
+>;
+
 function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+	props: SelectControlProps,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {

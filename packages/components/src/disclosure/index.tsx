@@ -12,19 +12,21 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { DisclosureContentProps } from './types';
+import type { DisclosureContentProps as DisclosureContentBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
+
+export type DisclosureContentProps = WordPressComponentProps<
+	DisclosureContentBaseProps,
+	'div',
+	false
+>;
 
 /**
  * Accessible Disclosure component that controls visibility of a section of
  * content. It follows the WAI-ARIA Disclosure Pattern.
  */
 const UnforwardedDisclosureContent = (
-	{
-		visible,
-		children,
-		...props
-	}: WordPressComponentProps< DisclosureContentProps, 'div', false >,
+	{ visible, children, ...props }: DisclosureContentProps,
 	ref: React.ForwardedRef< any >
 ) => {
 	const disclosure = Ariakit.useDisclosureStore( { open: visible } );

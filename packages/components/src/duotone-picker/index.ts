@@ -1,2 +1,8 @@
-export { default as DuotonePicker } from './duotone-picker';
-export { default as DuotoneSwatch } from './duotone-swatch';
+export {
+	default as DuotonePicker,
+	type DuotonePickerProps,
+} from './duotone-picker';
+export {
+	default as DuotoneSwatch,
+	type DuotoneSwatchProps,
+} from './duotone-swatch';

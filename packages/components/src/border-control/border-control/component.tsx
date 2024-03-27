@@ -17,7 +17,10 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
 
-import type { BorderControlProps, LabelProps } from '../types';
+import type {
+	BorderControlProps as BorderControlBaseProps,
+	LabelProps,
+} from '../types';
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -33,8 +36,14 @@ const BorderLabel = ( props: LabelProps ) => {
 	);
 };
 
+export type BorderControlProps = WordPressComponentProps<
+	BorderControlBaseProps,
+	'div',
+	false
+>;
+
 const UnconnectedBorderControl = (
-	props: WordPressComponentProps< BorderControlProps, 'div', false >,
+	props: BorderControlProps,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

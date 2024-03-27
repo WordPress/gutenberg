@@ -22,7 +22,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
  */
 
 import Button from '../button';
-import type { TabPanelProps } from './types';
+import type { TabPanelProps as TabPanelBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 // Separate the actual tab name from the instance ID. This is
@@ -35,6 +35,12 @@ const extractTabName = ( id: string | undefined | null ) => {
 	}
 	return id.match( /^tab-panel-[0-9]*-(.*)/ )?.[ 1 ];
 };
+
+export type TabPanelProps = WordPressComponentProps<
+	TabPanelBaseProps,
+	'div',
+	false
+>;
 
 /**
  * TabPanel is an ARIA-compliant tabpanel.
@@ -82,7 +88,7 @@ const UnforwardedTabPanel = (
 		orientation = 'horizontal',
 		activeClass = 'is-active',
 		onSelect,
-	}: WordPressComponentProps< TabPanelProps, 'div', false >,
+	}: TabPanelProps,
 	ref: ForwardedRef< any >
 ) => {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );

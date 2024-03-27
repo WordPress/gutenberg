@@ -11,10 +11,15 @@ import { contextConnect } from '../../context';
 import { useItemGroup } from './hook';
 import { ItemGroupContext, useItemGroupContext } from '../context';
 import { View } from '../../view';
-import type { ItemGroupProps } from '../types';
+import type { ItemGroupProps as ItemGroupBaseProps } from '../types';
+
+export type ItemGroupProps = WordPressComponentProps<
+	ItemGroupBaseProps,
+	'div'
+>;
 
 function UnconnectedItemGroup(
-	props: WordPressComponentProps< ItemGroupProps, 'div' >,
+	props: ItemGroupProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

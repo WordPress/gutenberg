@@ -16,6 +16,7 @@ import { GroupTitleUI } from '../styles/navigation-styles';
 import { useNavigationContext } from '../context';
 
 import type { NavigationGroupProps } from '../types';
+export type { NavigationGroupProps } from '../types';
 
 let uniqueId = 0;
 

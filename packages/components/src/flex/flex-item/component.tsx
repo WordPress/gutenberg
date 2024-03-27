@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useFlexItem } from './hook';
-import type { FlexItemProps } from '../types';
+import type { FlexItemProps as FlexItemBaseProps } from '../types';
+
+export type FlexItemProps = WordPressComponentProps< FlexItemBaseProps, 'div' >;
 
 function UnconnectedFlexItem(
-	props: WordPressComponentProps< FlexItemProps, 'div' >,
+	props: FlexItemProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const flexItemProps = useFlexItem( props );

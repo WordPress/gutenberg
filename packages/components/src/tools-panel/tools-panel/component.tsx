@@ -12,10 +12,15 @@ import { useToolsPanel } from './hook';
 import { Grid } from '../../grid';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import type { ToolsPanelProps } from '../types';
+import type { ToolsPanelProps as ToolsPanelBaseProps } from '../types';
+
+export type ToolsPanelProps = WordPressComponentProps<
+	ToolsPanelBaseProps,
+	'div'
+>;
 
 const UnconnectedToolsPanel = (
-	props: WordPressComponentProps< ToolsPanelProps, 'div' >,
+	props: ToolsPanelProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

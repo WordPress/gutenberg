@@ -10,12 +10,17 @@ import { useToolsPanelItem } from './hook';
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
-import type { ToolsPanelItemProps } from '../types';
+import type { ToolsPanelItemProps as ToolsPanelItemBaseProps } from '../types';
+
+export type ToolsPanelItemProps = WordPressComponentProps<
+	ToolsPanelItemBaseProps,
+	'div'
+>;
 
 // This wraps controls to be conditionally displayed within a tools panel. It
 // prevents props being applied to HTML elements that would make them invalid.
 const UnconnectedToolsPanelItem = (
-	props: WordPressComponentProps< ToolsPanelItemProps, 'div' >,
+	props: ToolsPanelItemProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {

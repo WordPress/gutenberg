@@ -1,2 +1,2 @@
-export { default as Item } from './item';
-export { default as ItemGroup } from './item-group';
+export { default as Item, type ItemProps } from './item';
+export { default as ItemGroup, type ItemGroupProps } from './item-group';

@@ -59,6 +59,7 @@ import type {
 	PaletteEditProps,
 	PaletteElement,
 } from './types';
+export type { PaletteEditProps } from './types';
 
 const DEFAULT_COLOR = '#000';
 

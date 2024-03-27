@@ -19,6 +19,7 @@ import type { NoticeAction, NoticeProps } from './types';
 import type { DeprecatedButtonProps } from '../button/types';
 import { VisuallyHidden } from '../visually-hidden';
 
+export type { NoticeProps } from './types';
 const noop = () => {};
 
 /**

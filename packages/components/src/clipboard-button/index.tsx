@@ -14,8 +14,14 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import Button from '../button';
-import type { ClipboardButtonProps } from './types';
+import type { ClipboardButtonProps as ClipboardButtonBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
+
+export type ClipboardButtonProps = WordPressComponentProps<
+	ClipboardButtonBaseProps,
+	'button',
+	false
+>;
 
 const TIMEOUT = 4000;
 
@@ -26,7 +32,7 @@ export default function ClipboardButton( {
 	onFinishCopy,
 	text,
 	...buttonProps
-}: WordPressComponentProps< ClipboardButtonProps, 'button', false > ) {
+}: ClipboardButtonProps ) {
 	deprecated( 'wp.components.ClipboardButton', {
 		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',

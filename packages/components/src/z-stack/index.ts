@@ -1,1 +1,1 @@
-export { default as ZStack } from './component';
+export { default as ZStack, type ZStackProps } from './component';

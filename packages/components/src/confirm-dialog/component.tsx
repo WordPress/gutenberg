@@ -8,7 +8,10 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Modal from '../modal';
-import type { ConfirmDialogProps, DialogInputEvent } from './types';
+import type {
+	ConfirmDialogProps as ConfirmDialogBaseProps,
+	DialogInputEvent,
+} from './types';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem, contextConnect } from '../context';
 import { Flex } from '../flex';
@@ -18,8 +21,14 @@ import { VStack } from '../v-stack';
 import * as styles from './styles';
 import { useCx } from '../utils/hooks/use-cx';
 
+export type ConfirmDialogProps = WordPressComponentProps<
+	ConfirmDialogBaseProps,
+	'div',
+	false
+>;
+
 const UnconnectedConfirmDialog = (
-	props: WordPressComponentProps< ConfirmDialogProps, 'div', false >,
+	props: ConfirmDialogProps,
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {

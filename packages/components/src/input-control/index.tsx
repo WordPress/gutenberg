@@ -30,6 +30,7 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
+export type { InputControlProps } from './types';
 export function UnforwardedInputControl(
 	props: InputControlProps,
 	ref: ForwardedRef< HTMLInputElement >

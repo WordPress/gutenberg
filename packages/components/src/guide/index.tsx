@@ -18,6 +18,8 @@ import Button from '../button';
 import PageControl from './page-control';
 import type { GuideProps } from './types';
 
+export type { GuideProps } from './types';
+
 /**
  * `Guide` is a React component that renders a _user guide_ in a modal. The guide consists of several pages which the user can step through one by one. The guide is finished when the modal is closed or when the user clicks _Finish_ on the last page of the guide.
  *

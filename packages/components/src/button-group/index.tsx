@@ -12,11 +12,17 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { ButtonGroupProps } from './types';
+import type { ButtonGroupProps as ButtonGroupBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+export type ButtonGroupProps = WordPressComponentProps<
+	ButtonGroupBaseProps,
+	'div',
+	false
+>;
+
 function UnforwardedButtonGroup(
-	props: WordPressComponentProps< ButtonGroupProps, 'div', false >,
+	props: ButtonGroupProps,
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { className, ...restProps } = props;

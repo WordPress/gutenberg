@@ -12,15 +12,17 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../context';
-import type { ToggleGroupControlOptionProps } from '../types';
+import type { ToggleGroupControlOptionProps as ToggleGroupControlOptionBaseProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 
+export type ToggleGroupControlOptionProps = WordPressComponentProps<
+	ToggleGroupControlOptionBaseProps,
+	'button',
+	false
+>;
+
 function UnforwardedToggleGroupControlOption(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionProps,
-		'button',
-		false
-	>,
+	props: ToggleGroupControlOptionProps,
 	ref: ForwardedRef< any >
 ) {
 	const { label, ...restProps } = props;

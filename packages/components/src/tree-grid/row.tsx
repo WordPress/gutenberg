@@ -7,7 +7,13 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import type { TreeGridRowProps } from './types';
+import type { TreeGridRowProps as TreeGridRowBaseProps } from './types';
+
+export type TreeGridRowProps = WordPressComponentProps<
+	TreeGridRowBaseProps,
+	'tr',
+	false
+>;
 
 function UnforwardedTreeGridRow(
 	{
@@ -17,7 +23,7 @@ function UnforwardedTreeGridRow(
 		setSize,
 		isExpanded,
 		...props
-	}: WordPressComponentProps< TreeGridRowProps, 'tr', false >,
+	}: TreeGridRowProps,
 	ref: React.ForwardedRef< HTMLTableRowElement >
 ) {
 	return (

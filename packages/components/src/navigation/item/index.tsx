@@ -19,6 +19,7 @@ import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
 import type { NavigationItemProps } from '../types';
+export type { NavigationItemProps } from '../types';
 
 const noop = () => {};
 

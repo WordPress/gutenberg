@@ -9,10 +9,15 @@ import type { ForwardedRef } from 'react';
 import { Spacer } from '../spacer';
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
-import type { InputControlPrefixWrapperProps } from './types';
+import type { InputControlPrefixWrapperProps as InputControlPrefixWrapperBaseProps } from './types';
+
+export type InputControlPrefixWrapperProps = WordPressComponentProps<
+	InputControlPrefixWrapperBaseProps,
+	'div'
+>;
 
 function UnconnectedInputControlPrefixWrapper(
-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
+	props: InputControlPrefixWrapperProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );

@@ -1,1 +1,4 @@
-export { default as NavigatorButton } from './component';
+export {
+	default as NavigatorButton,
+	type NavigatorButtonProps,
+} from './component';

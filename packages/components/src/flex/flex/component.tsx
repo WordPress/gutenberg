@@ -11,10 +11,12 @@ import { contextConnect } from '../../context';
 import { useFlex } from './hook';
 import { FlexContext } from './../context';
 import { View } from '../../view';
-import type { FlexProps } from '../types';
+import type { FlexProps as FlexBaseProps } from '../types';
+
+export type FlexProps = WordPressComponentProps< FlexBaseProps, 'div' >;
 
 function UnconnectedFlex(
-	props: WordPressComponentProps< FlexProps, 'div' >,
+	props: FlexProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { children, isColumn, ...otherProps } = useFlex( props );

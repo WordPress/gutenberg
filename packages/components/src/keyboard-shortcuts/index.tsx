@@ -8,6 +8,7 @@ import { useKeyboardShortcut } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { KeyboardShortcutProps, KeyboardShortcutsProps } from './types';
+export type { KeyboardShortcutsProps } from './types';
 
 function KeyboardShortcut( {
 	target,

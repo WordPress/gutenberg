@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useElevation } from './hook';
-import type { ElevationProps } from './types';
+import type { ElevationProps as ElevationBaseProps } from './types';
+
+export type ElevationProps = WordPressComponentProps<
+	ElevationBaseProps,
+	'div'
+>;
 
 function UnconnectedElevation(
-	props: WordPressComponentProps< ElevationProps, 'div' >,
+	props: ElevationProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const elevationProps = useElevation( props );

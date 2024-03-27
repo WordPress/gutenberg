@@ -11,7 +11,7 @@ import type {
 /**
  * Internal dependencies
  */
-import type { BaseControlProps } from '../base-control/types';
+import type { BaseControlProps } from '../base-control';
 
 export type FocalPoint = Record< FocalPointAxis, number >;
 export type FocalPointAxis = 'x' | 'y';

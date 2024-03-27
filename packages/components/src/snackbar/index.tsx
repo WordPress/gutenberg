@@ -22,7 +22,7 @@ import warning from '@wordpress/warning';
  * Internal dependencies
  */
 import Button from '../button';
-import type { SnackbarProps } from './types';
+import type { SnackbarProps as SnackbarBaseProps } from './types';
 import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
@@ -49,6 +49,8 @@ function useSpokenMessage(
 	}, [ spokenMessage, politeness ] );
 }
 
+export type SnackbarProps = WordPressComponentProps< SnackbarBaseProps, 'div' >;
+
 function UnforwardedSnackbar(
 	{
 		className,
@@ -64,7 +66,7 @@ function UnforwardedSnackbar(
 		// actually the function to call to remove the snackbar from the UI.
 		onDismiss,
 		listRef,
-	}: WordPressComponentProps< SnackbarProps, 'div' >,
+	}: SnackbarProps,
 	ref: ForwardedRef< any >
 ) {
 	function dismissMe( event: KeyboardEvent | MouseEvent ) {
