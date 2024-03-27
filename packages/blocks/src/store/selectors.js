@@ -514,6 +514,10 @@ export function getGroupingBlockName( state ) {
 	return state.groupingBlockName;
 }
 
+export function getSectionRootBlockName( state ) {
+	return state.sectionRootBlockName;
+}
+
 /**
  * Returns an array with the child blocks of a given block.
  *
