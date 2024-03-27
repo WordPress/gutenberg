@@ -24,6 +24,51 @@ test.describe( 'Font Library', () => {
 			} );
 			await expect( manageFontsIcon ).toBeVisible();
 		} );
+
+		test( 'should allow user to upload a local font', async ( {
+			page,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Styles' } ).click();
+			await page
+				.getByRole( 'button', { name: 'Typography Styles' } )
+				.click();
+			await page
+				.getByRole( 'button', {
+					name: 'Manage Fonts',
+				} )
+				.click();
+
+			// Delete test font (Exo 2) if it exists
+			if (
+				await page
+					.getByRole( 'button', { name: 'Exo 2' } )
+					.isVisible( { timeout: 40000 } )
+			) {
+				await page.getByRole( 'button', { name: 'Exo 2' } ).click();
+				await page.getByRole( 'button', { name: 'Delete' } ).click();
+				await page.getByRole( 'button', { name: 'Delete' } ).click();
+			}
+
+			// Upload a local font
+			await page
+				.getByRole( 'tab', { name: 'Upload' } )
+				.click( { timeout: 40000 } );
+			const fileChooserPromise = page.waitForEvent( 'filechooser' );
+			await page.getByRole( 'button', { name: 'Upload Font' } ).click();
+			const fileChooser = await fileChooserPromise;
+			await fileChooser.setFiles( './test/e2e/assets/Exo2-Regular.woff' );
+
+			// Check font was installed
+			await expect(
+				page
+					.getByLabel( 'Upload' )
+					.getByText( 'Fonts were installed successfully.' )
+			).toBeVisible( { timeout: 40000 } );
+			await page.getByRole( 'tab', { name: 'Library' } ).click();
+			await expect(
+				page.getByRole( 'button', { name: 'Exo 2' } )
+			).toBeVisible();
+		} );
 	} );
 
 	test.describe( 'When a theme with bundled fonts is active', () => {
@@ -83,53 +128,6 @@ test.describe( 'Font Library', () => {
 			).toBeVisible();
 			await expect(
 				page.getByRole( 'checkbox', { name: 'System Font Normal' } )
-			).toBeVisible();
-		} );
-
-		test( 'should allow user to upload a local font', async ( {
-			page,
-		} ) => {
-			await page.getByRole( 'button', { name: 'Styles' } ).click();
-			await page
-				.getByRole( 'button', { name: 'Typography Styles' } )
-				.click();
-			await page
-				.getByRole( 'button', {
-					name: 'Manage Fonts',
-				} )
-				.click();
-
-			// Delete test font (Commissioner) if it exists
-			if (
-				await page
-					.getByRole( 'button', { name: /commissioner/i } )
-					.isVisible( { timeout: 40000 } )
-			) {
-				await page
-					.getByRole( 'button', { name: /commissioner/i } )
-					.click();
-				await page.getByRole( 'button', { name: /delete/i } ).click();
-				await page.getByRole( 'button', { name: /delete/i } ).click();
-			}
-
-			// Upload a local font
-			await page.getByRole( 'tab', { name: /upload/i } ).click();
-			const fileChooserPromise = page.waitForEvent( 'filechooser' );
-			await page.getByRole( 'button', { name: /upload font/i } ).click();
-			const fileChooser = await fileChooserPromise;
-			await fileChooser.setFiles(
-				'./test/e2e/assets/Commissioner-Regular.ttf'
-			);
-
-			// Check font was installed
-			await expect(
-				page
-					.getByLabel( 'Upload' )
-					.getByText( 'Fonts were installed successfully.' )
-			).toBeVisible( { timeout: 40000 } );
-			await page.getByRole( 'tab', { name: /library/i } ).click();
-			await expect(
-				page.getByRole( 'button', { name: /commissioner/i } )
 			).toBeVisible();
 		} );
 	} );
