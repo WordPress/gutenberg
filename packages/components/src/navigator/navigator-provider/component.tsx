@@ -29,19 +29,20 @@ import type {
 } from '../types';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
+
 type RouterAction =
 	| { type: 'add' | 'remove'; screen: Screen }
 	| { type: 'goback' }
 	| { type: 'goto'; path: string; options?: NavigateOptions }
 	| { type: 'gotoparent'; options?: NavigateToParentOptions };
 
-const MAX_HISTORY_LENGTH = 50;
-
 type RouterState = {
 	screens: Screen[];
 	locationHistory: NavigatorLocation[];
 	matchedPath: MatchedPath;
 };
+
+const MAX_HISTORY_LENGTH = 50;
 
 function addScreen( { screens }: RouterState, screen: Screen ) {
 	return [ ...screens, screen ];
