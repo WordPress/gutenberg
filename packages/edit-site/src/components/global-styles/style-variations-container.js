@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
  */
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
+import { isVariationOfSingleProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 export default function StyleVariationsContainer( { gap = 2 } ) {
 	const variations = useSelect( ( select ) => {
@@ -20,6 +21,14 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
+	// Filter out variations that are of single property type, i.e. color and typography variations.
+	const filteredVariations = variations?.filter( ( variation ) => {
+		return (
+			! isVariationOfSingleProperty( variation, 'color' ) &&
+			! isVariationOfSingleProperty( variation, 'typography' )
+		);
+	} );
+
 	const withEmptyVariation = useMemo( () => {
 		return [
 			{
@@ -27,13 +36,13 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				settings: {},
 				styles: {},
 			},
-			...( variations ?? [] ).map( ( variation ) => ( {
+			...( filteredVariations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
 			} ) ),
 		];
-	}, [ variations ] );
+	}, [ filteredVariations ] );
 
 	return (
 		<Grid

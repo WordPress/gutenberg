@@ -174,3 +174,25 @@ export default function useThemeStyleVariationsByProperty( {
 		return processedStyleVariations;
 	}, [ variations, property, baseVariation, filter ] );
 }
+
+/**
+ * Compares a style variation to the same variation filtered by a single property.
+ * Returns true if the variation contains only the property specified.
+ *
+ * @param {Object} variation The variation to compare.
+ * @param {string} property  The property to compare.
+ * @return {boolean} Whether the variation contains only a single property.
+ */
+export function isVariationOfSingleProperty( variation, property ) {
+	const variationWithProperty = filterObjectByProperty(
+		cloneDeep( variation ),
+		property
+	);
+
+	return (
+		JSON.stringify( variationWithProperty?.styles ) ===
+			JSON.stringify( variation?.styles ) &&
+		JSON.stringify( variationWithProperty?.settings ) ===
+			JSON.stringify( variation?.settings )
+	);
+}
