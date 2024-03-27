@@ -310,6 +310,7 @@ _Example:_
 This script provides the following custom options:
 
 -   `--dist-tag` – allows specifying a custom dist-tag when updating npm packages. Defaults to `latest`. This is especially useful when using [`@wordpress/dependency-extraction-webpack-plugin`](https://www.npmjs.com/package/@wordpress/dependency-extraction-webpack-plugin). It lets installing the npm dependencies at versions used by the given WordPress major version for local testing, etc. Example: `wp-scripts packages-update --dist-tag=wp-6.0`.
+-   `--packager` – allows specifying a custom packager when updating npm packages. Defaults to `npm`. This is especially useful when you're not using npm.
 
 #### Advanced information
 

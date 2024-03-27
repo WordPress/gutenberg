@@ -50,13 +50,18 @@ function getPackageVersionDiff( initialPackageJSON, finalPackageJSON ) {
 
 function updatePackagesToLatestVersion( packages ) {
 	const distTag = getArgFromCLI( '--dist-tag' ) || 'latest';
+	const packager = getArgFromCLI( '--packager' ) || 'npm';
 
 	const packagesWithLatest = packages.map(
 		( packageName ) => `${ packageName }@${ distTag }`
 	);
-	return spawn.sync( 'npm', [ 'install', ...packagesWithLatest, '--save' ], {
-		stdio: 'inherit',
-	} );
+	return spawn.sync(
+		packager,
+		[ 'install', ...packagesWithLatest, '--save' ],
+		{
+			stdio: 'inherit',
+		}
+	);
 }
 
 function outputPackageDiffReport( packageDiff ) {
