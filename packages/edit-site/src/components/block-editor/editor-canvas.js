@@ -75,6 +75,7 @@ function EditorCanvas( {
 	// to switch to edit mode, with a meaningful label and no title attribute.
 	const viewModeIframeProps = {
 		'aria-label': __( 'Edit' ),
+		'aria-disabled': currentPostIsTrashed,
 		title: null,
 		role: 'button',
 		tabIndex: 0,
@@ -82,7 +83,10 @@ function EditorCanvas( {
 		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
-			if ( keyCode === ENTER || keyCode === SPACE ) {
+			if (
+				( keyCode === ENTER || keyCode === SPACE ) &&
+				! currentPostIsTrashed
+			) {
 				event.preventDefault();
 				setCanvasMode( 'edit' );
 			}
