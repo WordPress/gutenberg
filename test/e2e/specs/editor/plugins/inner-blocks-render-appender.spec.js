@@ -71,41 +71,52 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 			name: 'test/inner-blocks-render-appender-dynamic',
 		} );
 
-		const dynamimcAppender = page.locator( '.my-dynamic-blocks-appender' );
-		const addBlockBtn = dynamimcAppender.getByRole( 'button', {
-			name: 'Add block',
-		} );
+		const addBlockBtn = page
+			.locator( '.my-dynamic-blocks-appender' )
+			.getByRole( 'button', {
+				name: 'Add block',
+			} );
 
 		// Verify if the custom block appender text is the expected one.
-		await expect( dynamimcAppender ).toContainText(
-			'Empty Blocks Appender'
-		);
+		await expect(
+			page.locator( '.my-dynamic-blocks-appender' )
+		).toContainText( 'Empty Blocks Appender' );
 
 		// Open the inserter of our custom block appender.
 		await addBlockBtn.click();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		const blockListBox = page.getByRole( 'listbox', { name: 'Blocks' } );
-		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
-			'Quote',
-			'Video',
-		] );
+		await expect(
+			page
+				.getByRole( 'listbox', { name: 'Blocks' } )
+				.getByRole( 'option' )
+		).toHaveText( [ 'Quote', 'Video' ] );
 
 		// Insert a quote block.
-		await blockListBox.getByRole( 'option', { name: 'Quote' } ).click();
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Quote' } )
+			.click();
 
 		// Verify if the custom block appender text changed as expected.
 		await expect(
-			dynamimcAppender.getByText( 'Single Blocks Appender' )
+			page
+				.locator( '.my-dynamic-blocks-appender' )
+				.getByText( 'Single Blocks Appender' )
 		).toBeVisible();
 
 		// Insert a video block.
 		await addBlockBtn.click();
-		await blockListBox.getByRole( 'option', { name: 'Video' } ).click();
+		await page
+			.getByRole( 'listbox', { name: 'Blocks' } )
+			.getByRole( 'option', { name: 'Video' } )
+			.click();
 
 		// Verify if the custom block appender text changed as expected.
 		await expect(
-			dynamimcAppender.getByText( 'Multiple Blocks Appender' )
+			page
+				.locator( '.my-dynamic-blocks-appender' )
+				.getByText( 'Multiple Blocks Appender' )
 		).toBeVisible();
 
 		// Verify that the custom appender button is now not being rendered.
