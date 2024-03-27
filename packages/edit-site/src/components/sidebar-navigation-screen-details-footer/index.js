@@ -32,13 +32,17 @@ export default function SidebarNavigationScreenDetailsFooter( {
 	 * the following logic.
 	 */
 	const hrefProps = {};
-	if ( record?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ) {
+	const lastRevisionId =
+		record?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id ?? null;
+	const revisionsCount =
+		record?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
+	// Enable the revisions link if there is a last revision and there are more than one revisions.
+	if ( lastRevisionId && revisionsCount > 1 ) {
 		hrefProps.href = addQueryArgs( 'revision.php', {
 			revision: record?._links[ 'predecessor-version' ][ 0 ].id,
 		} );
 		hrefProps.as = 'a';
 	}
-
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-details-footer">
 			<SidebarNavigationItem
