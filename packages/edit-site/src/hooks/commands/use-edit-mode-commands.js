@@ -32,6 +32,7 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
+import { PAGE_MODALS } from '../../components/page-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
@@ -97,6 +98,45 @@ function usePageContentFocusCommands() {
 	}
 
 	return { isLoading: false, commands };
+}
+
+function useManipulateEditedDocumentCommands() {
+	const { isPage, postId, postType } = useSelect( ( select ) => {
+		const { isPage: _isPage } = unlock( select( editSiteStore ) );
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+
+		return {
+			isPage: _isPage(),
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
+		};
+	}, [] );
+
+	const { isLoaded, record } = useEditedEntityRecord( postType, postId );
+	const { openModal } = useDispatch( interfaceStore );
+
+	if ( ! isLoaded ) {
+		return { isLoading: true, commands: [] };
+	}
+
+	const commands = [];
+
+	if ( isPage && !! record ) {
+		commands.push( {
+			name: 'core/rename-page',
+			label: __( 'Rename page' ),
+			icon: edit,
+			callback: ( { close } ) => {
+				openModal( PAGE_MODALS.rename );
+				close();
+			},
+		} );
+	}
+
+	return {
+		isLoading: ! isLoaded,
+		commands,
+	};
 }
 
 function useManipulateDocumentCommands() {
@@ -292,6 +332,12 @@ export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
+	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/manipulate-edited-document',
+		hook: useManipulateEditedDocumentCommands,
+		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {
