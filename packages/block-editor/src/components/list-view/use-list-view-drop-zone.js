@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
 	useThrottle,
@@ -433,6 +433,8 @@ export default function useListViewDropZone( {
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
+
 	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 
 	const rtl = isRTL();
@@ -579,6 +581,7 @@ export default function useListViewDropZone( {
 			// This allows styling rules that are active only when a user is
 			// dragging to be removed.
 			setTarget( undefined );
+			__unstableSetEditorMode( 'edit' );
 		},
 	} );
 
