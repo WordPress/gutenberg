@@ -101,6 +101,36 @@ function GridItem( {
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
+			<HStack
+				className="dataviews-view-grid__badge-fields"
+				spacing={ 2 }
+				wrap
+				align="top"
+				justify="flex-start"
+			>
+				{ visibleFields.map( ( field ) => {
+					const renderedValue = field.render( {
+						item,
+					} );
+					if ( ! renderedValue ) {
+						return null;
+					}
+					return (
+						displayAsBadgeFields?.includes( field.id ) && (
+							<FlexItem
+								className={ classnames(
+									'dataviews-view-grid__field-value',
+									'dataviews-view-grid__field-' + field.id,
+									'is-badge'
+								) }
+							>
+								{ renderedValue }
+							</FlexItem>
+						)
+					);
+				} ) }
+			</HStack>
+
 			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
 				{ visibleFields.map( ( field ) => {
 					const renderedValue = field.render( {
@@ -114,8 +144,6 @@ function GridItem( {
 							className={ classnames(
 								'dataviews-view-grid__field',
 								'dataviews-view-grid__field-' + field.id,
-								displayAsBadgeFields?.includes( field.id ) &&
-									'is-badge',
 								displayAsColumnFields?.includes( field.id )
 									? 'is-column'
 									: 'is-row'
@@ -132,17 +160,18 @@ function GridItem( {
 							}
 						>
 							{ ! displayAsBadgeFields?.includes( field.id ) && (
-								<FlexItem className="dataviews-view-grid__field-name">
-									{ field.header }
-								</FlexItem>
+								<>
+									<FlexItem className="dataviews-view-grid__field-name">
+										{ field.header }
+									</FlexItem>
+									<FlexItem
+										className="dataviews-view-grid__field-value"
+										style={ { maxHeight: 'none' } }
+									>
+										{ renderedValue }
+									</FlexItem>
+								</>
 							) }
-
-							<FlexItem
-								className="dataviews-view-grid__field-value"
-								style={ { maxHeight: 'none' } }
-							>
-								{ renderedValue }
-							</FlexItem>
 						</Flex>
 					);
 				} ) }

@@ -64,7 +64,8 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
-		displayAsColumnFields: [ 'description' ],
+		//displayAsColumnFields: [ 'description' ],
+		displayAsBadgeFields: [ 'author', 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
