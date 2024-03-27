@@ -716,8 +716,8 @@ test.describe( 'insert media from inserter', () => {
 			`role=listbox[name="Media List"i] >> role=option[name="${ uploadedMedia.title.raw }"]`
 		);
 		await expect.poll( editor.getEditedPostContent ).toBe(
-			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
-<figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
+			`<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full"} -->
+<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
 <!-- /wp:image -->`
 		);
 	} );
