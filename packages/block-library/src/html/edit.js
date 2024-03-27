@@ -46,8 +46,8 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			 * @see https://github.com/WordPress/gutenberg/pull/60155
 			 */
 			const { EditorView, basicSetup } = await import( 'codemirror' );
-			const {indentWithTab} = await import('@codemirror/commands');
-			const {keymap} = await import('@codemirror/view');
+			const { indentWithTab } = await import( '@codemirror/commands' );
+			const { keymap } = await import( '@codemirror/view' );
 			const { html } = await import( '@codemirror/lang-html' );
 
 			if ( editorRef.current ) {
@@ -56,7 +56,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					extensions: [
 						basicSetup,
 						html(),
-						keymap.of([indentWithTab]),
+						keymap.of( [ indentWithTab ] ),
 						EditorView.updateListener.of( ( editor ) => {
 							if ( editor.docChanged ) {
 								setAttributes( {
