@@ -12,6 +12,8 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
+use PHPCSUtils\Utils\Scopes;
+
 
 /**
  * This sniff ensures that PHP functions have a valid `@since` tag in the docblock.
@@ -77,8 +79,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 				T_VAR
 			);
 
-			$class_property = $phpcsFile->findPrevious( $class_property_tokens, $stackPtr, null, false, null, true );
-			if ( false !== $class_property ) {
+			if ( Scopes::isOOProperty( $phpcsFile, $stackPtr ) ) {
 				$this->process_class_property_token( $phpcsFile, $stackPtr );
 				return;
 			}
