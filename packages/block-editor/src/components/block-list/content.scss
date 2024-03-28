@@ -260,6 +260,16 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
+// Add fade in/out background for editable blocks in synced patterns.
+@keyframes block-editor-outline__animation {
+	from {
+		outline-color: transparent;
+	}
+	to {
+		outline-color: var(--wp-admin-theme-color);
+	}
+}
+
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
 
 	&.is-hovered:not(.is-selected) {
@@ -277,6 +287,10 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			outline-style: solid;
 			outline-width: var(--wp-admin-border-width-focus);
 			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+			animation-name: block-editor-outline__animation;
+			animation-duration: 0.15s;
+			animation-timing-function: ease-out;
+			@include reduce-motion("animation");
 		}
 	}
 
