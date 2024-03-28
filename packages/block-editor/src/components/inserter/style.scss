@@ -22,7 +22,6 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
-	overflow-y: hidden;
 
 	&.show-as-tabs {
 		gap: 0;
@@ -142,6 +141,8 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__no-tab-container {
 	overflow-y: auto;
 	flex-grow: 1;
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
 }
 
 .block-editor-inserter__panel-header {
