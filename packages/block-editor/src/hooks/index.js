@@ -8,6 +8,7 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
+import textAlign from './text-align';
 import background from './background';
 import './lock';
 import anchor from './anchor';
@@ -34,6 +35,7 @@ import './use-bindings-attributes';
 createBlockEditFilter(
 	[
 		align,
+		textAlign,
 		anchor,
 		customClassName,
 		style,

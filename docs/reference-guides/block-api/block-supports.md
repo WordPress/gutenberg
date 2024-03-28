@@ -149,13 +149,13 @@ When a background image is selected, the image data is stored in the `style.back
 When a background images is selected and its position or size are changed, the background-position is stored in the `style.background.backgroundPosition` and its background-size in `style.background.backgroundSize` attribute.
 
 -   `style`: an attribute of `object` type with no default assigned. This is added when `backgroundImage` or `backgroundSize` support is declared. It stores the custom values set by the user.
-    -   `background`: an attribute of `object` type. 
-        - `backgroundImage`: an attribute of `object` type, containing information about the selected image 
+    -   `background`: an attribute of `object` type.
+        - `backgroundImage`: an attribute of `object` type, containing information about the selected image
             - `url`: type `string`, URL to the image
             - `id`: type `int`, media attachment ID
             - `source`: type `string`, at the moment the only value is `file`
-            - `title`: type `string`, title of the media attachment 
-        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value. 
+            - `title`: type `string`, title of the media attachment
+        - `backgroundPosition`: an attribute of `string` type, defining the background images position, selected by FocalPointPicker and used in CSS as the [`background-position`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-position) value.
         - `backgroundSize`: an attribute of `string` type. defining the CSS [`background-size`](https://developer.mozilla.org/en-US/docs/Web/CSS/background-size) value.
 
 The block can apply a default background image, position and size by specifying its own attribute with a default. For example:
@@ -484,10 +484,10 @@ When the block declares support for `color.link`, the attributes definition is e
                         color: {
                             text: 'var:preset|color|contrast',
                         },
-						":hover": { 
-							color: { 
-								text: "#000000" 
-							} 
+						":hover": {
+							color: {
+								text: "#000000"
+							}
 						}
                     }
                 }
@@ -973,6 +973,7 @@ supports: {
 -   Subproperties:
     -   `fontSize`: type `boolean`, default value `false`
     -   `lineHeight`: type `boolean`, default value `false`
+    -   `textAlign`: type `boolean` or `array`, default value `false`
 
 The presence of this object signals that a block supports some typography related properties. When it does, the block editor will show a typography UI allowing the user to control their values.
 
@@ -983,6 +984,8 @@ supports: {
         fontSize: true,
         // Enable support and UI control for line-height.
         lineHeight: true,
+        // Enable support and UI control for text alignment.
+        textAlign: true,
     },
 }
 ```
@@ -1058,6 +1061,50 @@ attributes: {
         default: {
             typography: {
                 lineHeight: 'value'
+            }
+        }
+    }
+}
+```
+
+### typography.textAlign
+
+_**Note:** Since WordPress 6.6._
+
+-   Type: `boolean` or `array`
+-   Default value: `false`
+
+This property adds block toolbar controls which allow to change block's text alignment.
+
+```js
+supports: {
+    typography: {
+        // Declare support for block's text alignment.
+        // This adds support for all the options:
+        // left, center, right.
+        textAlign: true
+    }
+}
+```
+
+```js
+supports: {
+    typography: {
+        // Declare support for specific text alignment options.
+        textAlign: [ 'left', 'right' ]
+    }
+}
+```
+
+When the block declares support for `textAlign`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default. For example:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                textAlign: 'value'
             }
         }
     }

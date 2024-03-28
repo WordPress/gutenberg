@@ -12,6 +12,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 				typography: {
 					letterSpacing: '22px',
 					fontSize: '2rem',
+					textAlign: 'center',
 					textColumns: 3,
 					textTransform: 'uppercase',
 				},
@@ -23,6 +24,7 @@ describe( 'getTypographyClassesAndStyles', () => {
 				columnCount: 3,
 				letterSpacing: '22px',
 				fontSize: '2rem',
+				textAlign: 'center',
 				textTransform: 'uppercase',
 			},
 		} );
