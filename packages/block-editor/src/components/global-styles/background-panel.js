@@ -135,10 +135,7 @@ export const backgroundPositionToCoords = ( value ) => {
 };
 
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	let imgLabel = label || getFilename( imgUrl );
-	// getFilename returns 'undefined' as a string.
-	imgLabel =
-		!! imgLabel && imgLabel !== 'undefined' ? imgLabel : __( 'Add image' );
+	const imgLabel = label || getFilename( imgUrl ) || __( 'Add image' );
 
 	return (
 		<ItemGroup as="span">
