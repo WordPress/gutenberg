@@ -62,6 +62,37 @@ export function canBindAttribute( blockName, attributeName ) {
 }
 
 /**
+ * Return the attribute value to be used in the binding.
+ * It handles the case when the attribute instance is a RichTextData.
+ *
+ * @param {*} value - Attribute value instance,
+ * @return {string}   String raw value.
+ */
+function getAttributeValue( value ) {
+	if ( value instanceof RichTextData ) {
+		return value.toHTMLString();
+	}
+
+	return value;
+}
+
+/**
+ * Create a new attribute value instance,
+ * based on the original value type.
+ *
+ * @param {string} value    - The attribute value.
+ * @param {*}      original - The original attribute instance.
+ * @return {*}                The new attribute value instance.
+ */
+function castValue( value, original ) {
+	if ( original instanceof RichTextData ) {
+		return RichTextData.fromHTMLString( value );
+	}
+
+	return value;
+}
+
+/**
  * This component is responsible for detecting and
  * propagating data changes from the source to the block.
  *
@@ -90,46 +121,26 @@ const BindingConnector = ( {
 	const attrValue = blockProps.attributes[ attrName ];
 
 	const updateBoundAttibute = useCallback(
-		( newAttrValue, prevAttrValue ) => {
-			/*
-			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, core/button, etc.)
-			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
-			 */
-			if ( prevAttrValue instanceof RichTextData ) {
-				// Bail early if the Rich Text value is the same.
-				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
-					return;
-				}
-
-				/*
-				 * To preserve the value type,
-				 * convert the new value to a RichTextData instance.
-				 */
-				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
-			}
-
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
-
-			onPropValueChange( { [ attrName ]: newAttrValue } );
+		( newAttrValue ) => {
+			onPropValueChange( {
+				[ attrName ]: castValue( newAttrValue, attrValue ),
+			} );
 		},
-		[ attrName, onPropValueChange ]
+		[ attrName, attrValue, onPropValueChange ]
 	);
 
+	// Get the raw attribute value.
+	const rawAttrValue = getAttributeValue( attrValue );
+	const prevAttrValue = useRef( rawAttrValue );
+
 	const prevPropValue = useRef(); // intially undefined for the initial sync.
-	const prevAttrValue = useRef( attrValue );
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			// Sync from external source propery to block attribute.
 			if ( propValue !== prevPropValue.current ) {
 				prevPropValue.current = propValue;
-				return updateBoundAttibute( propValue, attrValue ); // close the loop.
+				return updateBoundAttibute( propValue ); // close the loop.
 			}
 		} else if ( placeholder ) {
 			/*
@@ -151,14 +162,14 @@ const BindingConnector = ( {
 		}
 
 		// Sync from block attribute to external source property.
-		if ( attrValue !== prevAttrValue.current ) {
-			prevAttrValue.current = attrValue;
-			updatePropValue( attrValue );
+		if ( rawAttrValue !== prevAttrValue.current ) {
+			prevAttrValue.current = rawAttrValue;
+			updatePropValue( rawAttrValue );
 		}
 	}, [
 		updateBoundAttibute,
 		propValue,
-		attrValue,
+		rawAttrValue,
 		placeholder,
 		blockName,
 		attrName,
