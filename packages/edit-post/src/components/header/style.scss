@@ -288,7 +288,7 @@
 	.edit-post-header {
 		backdrop-filter: blur(20px) !important;
 		background-color: rgba(255, 255, 255, 0.9);
-		border-bottom: 1px solid #e0e0e0;
+		box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133);
 		position: absolute;
 		width: 100%;
 

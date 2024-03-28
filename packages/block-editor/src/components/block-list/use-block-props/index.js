@@ -130,7 +130,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
 	const bindingsStyle =
 		hasBlockBindings && canBindBlock( name )
-			? { '--wp-admin-theme-color': 'var(--wp-bound-block-color)' }
+			? {
+					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
+					'--wp-admin-theme-color--rgb':
+						'var(--wp-block-synced-color--rgb)',
+			  }
 			: {};
 
 	// Ensures it warns only inside the `edit` implementation for the block.

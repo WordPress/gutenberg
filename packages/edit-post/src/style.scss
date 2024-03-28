@@ -88,7 +88,6 @@ body.js.block-editor-page {
 
 	.is-sidebar-opened & {
 		@include break-medium() {
-			border-left: $border-width solid $gray-200;
 			overflow: hidden scroll;
 		}
 	}

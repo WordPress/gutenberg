@@ -7,7 +7,7 @@
 	box-sizing: border-box;
 	width: 100%;
 	justify-content: space-between;
-	border-bottom: $border-width solid $gray-200;
+	box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133);
 	padding-left: $header-height;
 
 	.edit-site-header-edit-mode__start {
