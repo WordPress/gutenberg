@@ -70,11 +70,19 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 
 export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
+	const { value, align } = useSelect(
+		( select ) => {
+			const blockAttributes =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+
+			return {
+				value: blockAttributes?.style,
+				align: blockAttributes?.align,
+			};
+		},
 		[ clientId ]
 	);
+
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -99,6 +107,14 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		...defaultSpacingControls,
 	};
 
+	/**
+	 * Alignments are needed for the child layout control.
+	 */
+	const supportedAlignments = getBlockSupport( name, 'align' );
+	const onChangeAlignment = ( newAlign ) => {
+		setAttributes( { align: newAlign } );
+	};
+
 	return (
 		<>
 			<StylesDimensionsPanel
@@ -106,6 +122,11 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				panelId={ clientId }
 				settings={ settings }
 				value={ value }
+				alignments={ {
+					current: align,
+					supported: supportedAlignments,
+					onChangeAlignment,
+				} }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
 				onVisualize={ setVisualizedProperty }

@@ -42,11 +42,14 @@ export default function BlockEdit( {
 		attributes = {},
 		__unstableLayoutClassNames,
 	} = props;
-	const { layout = null, metadata = {} } = attributes;
+	const { layout = null, align = null, metadata = {} } = attributes;
 	const { bindings } = metadata;
 	const layoutSupport =
 		hasBlockSupport( name, 'layout', false ) ||
 		hasBlockSupport( name, '__experimentalLayout', false );
+
+	const hasAlignSupport = hasBlockSupport( name, 'align', false );
+
 	return (
 		<BlockEditContextProvider
 			// It is important to return the same object if props haven't
@@ -57,6 +60,7 @@ export default function BlockEdit( {
 					name,
 					isSelected,
 					clientId,
+					align: hasAlignSupport ? align : null,
 					layout: layoutSupport ? layout : null,
 					__unstableLayoutClassNames,
 					// We use symbols in favour of an __unstable prefix to avoid
@@ -70,6 +74,8 @@ export default function BlockEdit( {
 					name,
 					isSelected,
 					clientId,
+					align,
+					hasAlignSupport,
 					layoutSupport,
 					layout,
 					__unstableLayoutClassNames,
