@@ -71,10 +71,7 @@ export default function specialCommentConverter( node, doc ) {
 
 function createBlock( commentNode, doc ) {
 	if ( commentNode.nodeValue === 'nextpage' ) {
-		const node = doc.createElement( 'wp-block' );
-		node.dataset.block = 'core/nextpage';
-
-		return node;
+		return createNextpage( doc );
 	}
 
 	// Grab any custom text in the comment.
@@ -98,6 +95,10 @@ function createBlock( commentNode, doc ) {
 		}
 	}
 
+	return createMore( customText, noTeaser, doc );
+}
+
+function createMore( customText, noTeaser, doc ) {
 	const node = doc.createElement( 'wp-block' );
 	node.dataset.block = 'core/more';
 	if ( customText ) {
@@ -107,5 +108,12 @@ function createBlock( commentNode, doc ) {
 		// "Boolean" data attribute.
 		node.dataset.noTeaser = '';
 	}
+	return node;
+}
+
+function createNextpage( doc ) {
+	const node = doc.createElement( 'wp-block' );
+	node.dataset.block = 'core/nextpage';
+
 	return node;
 }
