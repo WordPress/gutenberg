@@ -7,13 +7,7 @@ import SelectControl from '..';
  * Single type
  */
 // Normal select, no generic or option provided. Any value is allowed here.
-<SelectControl
-	value="string"
-	multiple={ false }
-	onChange={ ( value ) => {
-		return value === 'string';
-	} }
-/>;
+<SelectControl value="string" multiple={ false } />;
 
 // Normal select, no generic provided. Value type is inferred from available options.
 <SelectControl
@@ -29,9 +23,6 @@ import SelectControl from '..';
 			label: 'Other String',
 		},
 	] }
-	onChange={ ( value ) => {
-		return value === 'string';
-	} }
 />;
 
 // Normal select, no generic provided. Value type is inferred from available options.
@@ -51,6 +42,8 @@ import SelectControl from '..';
 		},
 	] }
 	onChange={ ( value ) => {
+		// Typescript can't guarantee the value isn't modified by the
+		// user, so we can't assign a type to value here.
 		return value === 'string';
 	} }
 />;
@@ -70,9 +63,6 @@ import SelectControl from '..';
 		},
 	] }
 	multiple={ false }
-	onChange={ ( value ) => {
-		return value === 'narrow';
-	} }
 />;
 
 // Select with explicit generic provided.
@@ -94,24 +84,13 @@ import SelectControl from '..';
 			label: 'Other String',
 		},
 	] }
-	onChange={ ( value ) => {
-		// Typescript can't guarantee the value isn't modified by the
-		// user, so we can't assign a type to value here.
-		return value === 'string';
-	} }
 />;
 
 /**
  * Multiple type
  */
 // Normal select, no generic or option provided. Any value is allowed here.
-<SelectControl
-	value={ [ 'string' ] }
-	multiple
-	onChange={ ( values ) => {
-		return values.includes( 'string' );
-	} }
-/>;
+<SelectControl value={ [ 'string' ] } multiple />;
 
 // Normal select, no generic provided. Value type is inferred from available options.
 <SelectControl
@@ -127,9 +106,6 @@ import SelectControl from '..';
 			label: 'Other String',
 		},
 	] }
-	onChange={ ( values ) => {
-		return values.includes( 'string' );
-	} }
 />;
 
 // Normal select, no generic provided. Value type is inferred from available options.
@@ -148,9 +124,6 @@ import SelectControl from '..';
 			label: 'Value',
 		},
 	] }
-	onChange={ ( values ) => {
-		return values.includes( 'string' );
-	} }
 />;
 
 // Select with explicit generic provided.
@@ -168,9 +141,6 @@ import SelectControl from '..';
 			label: 'Value',
 		},
 	] }
-	onChange={ ( values ) => {
-		return values.includes( 'narrow' );
-	} }
 />;
 // Select with explicit generic provided.
 // Both value and options.value must match the provided generic.
@@ -188,9 +158,6 @@ import SelectControl from '..';
 			label: 'Value',
 		},
 	] }
-	onChange={ ( values ) => {
-		return values.includes( 'narrow' );
-	} }
 />;
 
 // Select with explicit generic provided.
@@ -212,11 +179,6 @@ import SelectControl from '..';
 			label: 'Other String',
 		},
 	] }
-	onChange={ ( values ) => {
-		// Typescript can't guarantee the value isn't modified by the
-		// user, so we can't assign a type to values here.
-		return values.includes( 'string' );
-	} }
 />;
 
 // Select with explicit generic provided.
@@ -237,9 +199,4 @@ import SelectControl from '..';
 			label: 'String',
 		},
 	] }
-	onChange={ ( values ) => {
-		// Typescript can't guarantee the value isn't modified by the
-		// user, so we can't assign a type to values here.
-		return values.includes( 'string' );
-	} }
 />;
