@@ -6,9 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Notice } from '@wordpress/components';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
@@ -71,6 +73,15 @@ const interfaceLabels = {
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
 };
+
+function getSectionRootBlockName( postType ) {
+	const CONTENT_TYPES = [ 'post', 'page' ];
+
+	if ( CONTENT_TYPES.includes( postType ) ) {
+		return 'core/post-content';
+	}
+	return 'core/group';
+}
 
 export default function Editor( { isLoading, onClick } ) {
 	const {
@@ -137,6 +148,11 @@ export default function Editor( { isLoading, onClick } ) {
 			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
+
+	const { setSectionRootBlockName } = useDispatch( blocksStore );
+	useEffect( () => {
+		setSectionRootBlockName( getSectionRootBlockName( context?.postType ) );
+	}, [ context, setSectionRootBlockName ] );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';

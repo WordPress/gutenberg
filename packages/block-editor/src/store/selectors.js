@@ -2803,7 +2803,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	if (
 		editorMode === 'zoom-out' &&
 		clientId &&
-		! getBlockRootClientId( state, clientId )
+		getBlockRootClientId( state, clientId ) ===
+			getSectionsContainerClientId( state )
 	) {
 		return true;
 	}
@@ -2962,4 +2963,29 @@ export const isGroupable = createRegistrySelector(
 				canRemoveBlocks( state, _clientIds, rootClientId )
 			);
 		}
+);
+
+export const getSectionsContainerClientId = createRegistrySelector(
+	( select ) => ( state ) => {
+		const sectionRootBlockName =
+			select( blocksStore ).getSectionRootBlockName();
+		const { getGroupingBlockName } = select( blocksStore );
+		const groupingBlockName = getGroupingBlockName();
+		if ( sectionRootBlockName === groupingBlockName ) {
+			const groupBlocks = getBlocksByName( state, sectionRootBlockName );
+			return groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( state, clientId )?.tagName === 'main'
+			);
+		}
+
+		const sectionRootBlocks = getBlocksByName(
+			state,
+			sectionRootBlockName
+		);
+
+		if ( sectionRootBlocks?.length > 0 ) {
+			return sectionRootBlocks[ 0 ];
+		}
+	}
 );
