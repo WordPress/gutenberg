@@ -10,7 +10,11 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../store';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
-import { GridVisualizer, GridItemResizer } from '../components/grid-visualizer';
+import {
+	GridVisualizer,
+	GridItemResizer,
+	GridItemPinToolbarItem,
+} from '../components/grid-interactivity';
 
 function useBlockPropsChildLayoutStyles( { style } ) {
 	const shouldRenderChildLayoutStyles = useSelect( ( select ) => {
@@ -141,29 +145,34 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		},
 		[ clientId ]
 	);
+
 	if ( parentLayout.type !== 'grid' ) {
 		return null;
 	}
 	if ( ! window.__experimentalEnableGridInteractivity ) {
 		return null;
 	}
+
+	function updateLayout( layout ) {
+		setAttributes( {
+			style: {
+				...style,
+				layout: {
+					...style?.layout,
+					...layout,
+				},
+			},
+		} );
+	}
+
 	return (
 		<>
 			<GridVisualizer clientId={ rootClientId } />
-			<GridItemResizer
+			<GridItemResizer clientId={ clientId } onChange={ updateLayout } />
+			<GridItemPinToolbarItem
 				clientId={ clientId }
-				onChange={ ( { columnSpan, rowSpan } ) => {
-					setAttributes( {
-						style: {
-							...style,
-							layout: {
-								...style?.layout,
-								columnSpan,
-								rowSpan,
-							},
-						},
-					} );
-				} }
+				layout={ style?.layout }
+				onChange={ updateLayout }
 			/>
 		</>
 	);
