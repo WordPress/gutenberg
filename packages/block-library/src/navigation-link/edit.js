@@ -12,6 +12,7 @@ import {
 	PanelBody,
 	TextControl,
 	TextareaControl,
+	ToggleControl,
 	ToolbarButton,
 	Tooltip,
 	ToolbarGroup,
@@ -166,7 +167,17 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, rel, title, kind } = attributes;
+	const {
+		id,
+		label,
+		type,
+		url,
+		description,
+		rel,
+		title,
+		kind,
+		opensInNewTab,
+	} = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
@@ -476,6 +487,16 @@ export default function NavigationLinkEdit( {
 						help={ __(
 							'The relationship of the linked URL as space-separated link types.'
 						) }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Open in new tab' ) }
+						onChange={ ( value ) =>
+							setAttributes( {
+								opensInNewTab: value,
+							} )
+						}
+						checked={ opensInNewTab }
 					/>
 				</PanelBody>
 			</InspectorControls>
