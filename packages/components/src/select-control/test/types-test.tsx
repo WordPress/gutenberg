@@ -86,6 +86,24 @@ import SelectControl from '..';
 	] }
 />;
 
+// Select with explicit generic provided.
+// Usually this would result in a type error with no generic,
+// but this has been explicitly loosened to bypass errors.
+<SelectControl< string >
+	value="string"
+	multiple={ false }
+	options={ [
+		{
+			value: 'narrow',
+			label: 'Narrow',
+		},
+		{
+			value: 'value',
+			label: 'Value',
+		},
+	] }
+/>;
+
 /**
  * Multiple type
  */
