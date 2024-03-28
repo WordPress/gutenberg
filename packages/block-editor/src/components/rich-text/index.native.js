@@ -655,29 +655,32 @@ export function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = withDeprecations(
+// This export does not actually implement a private API, but was exported
+// under this name for interoperability with the web version of the RichText
+// component.
+export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
 );
 
-ForwardedRichTextContainer.Content = Content;
+PrivateRichText.Content = Content;
 
-ForwardedRichTextContainer.isEmpty = ( value ) => {
+PrivateRichText.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
-ForwardedRichTextContainer.Content.defaultProps = {
+PrivateRichText.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
 
-ForwardedRichTextContainer.Raw = forwardRef( ( props, ref ) => (
+PrivateRichText.Raw = forwardRef( ( props, ref ) => (
 	<RichText { ...props } nativeEditorRef={ ref } />
 ) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default ForwardedRichTextContainer;
+export default PrivateRichText;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';
