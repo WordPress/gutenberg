@@ -220,6 +220,13 @@ export function RichTextWrapper(
 			const selection = {};
 			const unset = start === undefined && end === undefined;
 
+			const baseSelection = {
+				clientId,
+				[ identifier ? 'attributeKey' : instanceIdKey ]: identifier
+					? identifier
+					: instanceId,
+			};
+
 			if ( typeof start === 'number' || unset ) {
 				// If we are only setting the start (or the end below), which
 				// means a partial selection, and we're not updating a selection
@@ -234,9 +241,7 @@ export function RichTextWrapper(
 				}
 
 				selection.start = {
-					clientId,
-					attributeKey: identifier,
-					[ instanceIdKey ]: instanceId,
+					...baseSelection,
 					offset: start,
 				};
 			}
@@ -251,9 +256,7 @@ export function RichTextWrapper(
 				}
 
 				selection.end = {
-					clientId,
-					attributeKey: identifier,
-					[ instanceIdKey ]: instanceId,
+					...baseSelection,
 					offset: end,
 				};
 			}
