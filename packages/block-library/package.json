@@ -31,9 +31,6 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
-		"@codemirror/commands": "6.3.3",
-		"@codemirror/lang-html": "6.4.8",
-		"@codemirror/view": "6.26.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
@@ -68,7 +65,6 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"classnames": "^2.3.1",
-		"codemirror": "6.0.1",
 		"colord": "^2.7.0",
 		"escape-html": "^1.0.3",
 		"fast-average-color": "^9.1.1",

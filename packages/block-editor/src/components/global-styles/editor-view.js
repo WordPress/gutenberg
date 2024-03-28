@@ -1,58 +1,33 @@
 /**
- * External dependencies
- */
-import { EditorView as CmEditorView, basicSetup } from 'codemirror';
-import { indentWithTab } from '@codemirror/commands';
-import { keymap } from '@codemirror/view';
-import { css } from '@codemirror/lang-css';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const EditorView = ({editorId, editorInstructionsId, customCSS, onChange, onBlur}) => {
-	/**
-	 * Ensure the editor has at least min lines of code,
-	 * as the editor will shrink to fit the content.
-	 * @param {string} content The content to ensure min lines for.
-	 * @return {string} The content with at least min lines.
-	 */
-	function ensureMinLines( content ) {
-		const MIN_LINES = 10;
-		const LINE_HEIGHT = 18.2; // Height of one line in the editor
-		const MARGIN = 53.4;
-		let requiredLines = MIN_LINES;
-
-		const lines = content.split( '\n' );
-		const contentLineCount = lines.length;
-
-		const wrapper = document.querySelector(
-			'.edit-site-global-styles-screen-css'
-		);
-		if ( wrapper ) {
-			const wrapperHeight = wrapper.offsetHeight;
-			const editorHeight = wrapperHeight - MARGIN;
-
-			// Calculate the minimum number of lines that should be displayed
-			const calcMinLineCount = Math.ceil( editorHeight / LINE_HEIGHT );
-			requiredLines = Math.max( MIN_LINES, calcMinLineCount );
-
-			// Set the max height of the editor allowing scrolling by `overflow-y: scroll`
-			const editor = document.getElementById( editorId );
-			if ( editor ) {
-				editor.style.height = `${ editorHeight }px`;
-			}
-		}
-
-		let result = content;
-		for ( let i = contentLineCount; i < requiredLines; i++ ) {
-			result += '\n';
-		}
-
-		return result;
+function importLanguageSupport( mode ) {
+	switch ( mode ) {
+		case 'css':
+			return import( '@codemirror/lang-css' );
+		case 'html':
+			return import( '@codemirror/lang-html' );
+		default:
+			return import( '@codemirror/lang-css' );
 	}
+}
+
+/**
+ * EditorView provided by CodeMirror
+ * 
+ * @param {Object} props
+ * @param {string} props.content - Text content of the editor.
+ * @param {string} props.editorId
+ * @param {string} props.editorInstructionsId
+ * @param {string} props.editorInstructionsText - Instructions text for accessibility.
+ * @param {Function} props.onChange - Callback for when the content changes.
+ * @param {Function} [props.onBlur] - Callback for when the editor loses focus.
+ * @param {string} props.mode - Language mode for the editor. Currently supports 'css' and 'html'.
+ */
+const EditorView = ({content, editorId, editorInstructionsId, editorInstructionsText, onChange, onBlur, mode}) => {
 	const editorRef = useRef(null);
 	useEffect( () => {
 		( async () => {
@@ -61,31 +36,35 @@ const EditorView = ({editorId, editorInstructionsId, customCSS, onChange, onBlur
 			 * This should be replaced with native dynamic import once it's supported.
 			 * @see https://github.com/WordPress/gutenberg/pull/60155
 			 */
-			// const { EditorView: CmEditorView, basicSetup } = await import( 'codemirror' );
-			// const { indentWithTab } = await import( '@codemirror/commands' );
-			// const { keymap } = await import( '@codemirror/view' );
-			// const { css } = await import( '@codemirror/lang-css' );
+			const [{ EditorView: CmEditorView, basicSetup }, { indentWithTab }, { keymap }, languageSupport] = 
+				await Promise.all([
+					import( 'codemirror' ), 
+					import( '@codemirror/commands' ), 
+					import( '@codemirror/view' ),
+					importLanguageSupport( mode )
+				])
 
 			if ( editorRef.current ) {
 				new CmEditorView( {
-					doc: ensureMinLines( customCSS ),
+					doc: content,
 					extensions: [
 						basicSetup,
-						css(),
+						languageSupport[mode](),
 						keymap.of( [ indentWithTab ] ),
 						CmEditorView.updateListener.of( ( editor ) => {
 							if ( editor.docChanged ) {
 								onChange( editor.state.doc.toString() );
 							}
 						} ),
-						CmEditorView.focusChangeEffect.of(
+						...(onBlur ?
+						[CmEditorView.focusChangeEffect.of(
 							( editorState, focusing ) => {
 								if ( ! focusing ) {
 									onBlur( editorState.doc.toString() );
 								}
 								return null;
 							}
-						),
+						)] : []),
 					],
 					parent: editorRef.current,
 				} );
@@ -96,20 +75,22 @@ const EditorView = ({editorId, editorInstructionsId, customCSS, onChange, onBlur
 	}, [] );
 	return (
 		<>
-		<div
-			id={ editorInstructionsId }
-			className={ editorInstructionsId }
-		>
-			{ __(
-				`This editor allows you to input Additional CSS and customize the site's appearance with your own styles. Press Escape then Tab to move focus out of the editor.`
-			) }
-		</div>
-		<div
-			ref={ editorRef }
-			id={ editorId }
-			className={ editorId }
-			aria-describedby={ editorInstructionsId }
-		></div>
+			<div
+				id={ editorInstructionsId }
+				className={ editorInstructionsId }
+				style={ { display: 'none' } }
+			>
+				{ editorInstructionsText }
+				{ __(
+					`Press Escape then Tab to move focus out of the editor.`
+				) }
+			</div>
+			<div
+				ref={ editorRef }
+				id={ editorId }
+				className={ editorId }
+				aria-describedby={ editorInstructionsId }
+			></div>
 		</>
 	);
 };
