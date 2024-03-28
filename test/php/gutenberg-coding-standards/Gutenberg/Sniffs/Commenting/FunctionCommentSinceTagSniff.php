@@ -249,7 +249,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 	/**
 	 * Finds the docblock preceding a specified position (stack pointer) in a given PHP file.
-	 * Implementation has been copied from FunctionCommentSniff::process().
+	 * The implementation was copied from FunctionCommentSniff::process().
 	 *
 	 * @param File $phpcs_file   The file being scanned.
 	 * @param int $stack_pointer The position (stack pointer) in the token stack from which to start searching backwards.
@@ -261,12 +261,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$ignore[ T_WHITESPACE ] = T_WHITESPACE;
 
 		for ( $comment_end = ( $stack_pointer - 1 ); $comment_end >= 0; $comment_end -- ) {
-			if ( isset( $ignore[ $tokens[ $comment_end ]['code'] ] ) === true ) {
+			if ( isset( $ignore[ $tokens[ $comment_end ]['code'] ] ) ) {
 				continue;
 			}
 
-			if ( $tokens[ $comment_end ]['code'] === T_ATTRIBUTE_END
-			     && isset( $tokens[ $comment_end ]['attribute_opener'] ) === true
+			if ( T_ATTRIBUTE_END === $tokens[ $comment_end ]['code']
+			     && isset( $tokens[ $comment_end ]['attribute_opener'] )
 			) {
 				$comment_end = $tokens[ $comment_end ]['attribute_opener'];
 				continue;
@@ -280,9 +280,9 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			// control structures or functions instead of function comments
 			// using the wrong comment type. If there is other code on the line,
 			// assume they relate to that code.
-			$prev = $phpcs_file->findPrevious( $ignore, ( $comment_end - 1 ), null, true );
-			if ( $prev !== false && $tokens[ $prev ]['line'] === $tokens[ $comment_end ]['line'] ) {
-				$comment_end = $prev;
+			$previous = $phpcs_file->findPrevious( $ignore, ( $comment_end - 1 ), null, true );
+			if ( false !== $previous && $tokens[ $previous ]['line'] === $tokens[ $comment_end ]['line'] ) {
+				$comment_end = $previous;
 			}
 		}
 
