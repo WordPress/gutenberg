@@ -64,9 +64,9 @@ function RootMenu() {
 					<NavigationButtonAsItem
 						icon={ image }
 						path="/background"
-						aria-label={ __( 'Background styles' ) }
+						aria-label={ __( 'Background image styles' ) }
 					>
-						{ __( 'Background' ) }
+						{ __( 'Background image' ) }
 					</NavigationButtonAsItem>
 				) }
 			</ItemGroup>
