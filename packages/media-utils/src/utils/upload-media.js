@@ -117,6 +117,18 @@ export async function uploadMedia( {
 			continue;
 		}
 
+		// Special handling for the `.heic` file format, which most modern browsers cannot display.
+		if ( mediaFile.type && mediaFile.type === 'image/heic' ) {
+			onError( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message: __(
+					'This image cannot be displayed in a web browser. For best results convert it to JPEG before uploading.'
+				),
+				file: mediaFile,
+			} );
+			continue;
+		}
+
 		// Check if the block supports this mime type.
 		// Defer to the server when type not detected.
 		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
