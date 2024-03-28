@@ -23,8 +23,6 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
  */
 import { unlock } from '../lock-unlock';
 
-const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
-
 export function Caption( {
 	attributeKey = 'caption',
 	attributes,
@@ -44,6 +42,7 @@ export function Caption( {
 } ) {
 	const caption = attributes[ attributeKey ];
 	const prevCaption = usePrevious( caption );
+	const { PrivateRichText: RichText } = unlock( blockEditorPrivateApis );
 	const isCaptionEmpty = RichText.isEmpty( caption );
 	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
