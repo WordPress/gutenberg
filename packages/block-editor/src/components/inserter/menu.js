@@ -68,6 +68,7 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
+
 	const { showPatterns } = useSelect(
 		( select ) => {
 			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
@@ -303,6 +304,9 @@ function InserterMenu(
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
 				</Popover>
+			) }
+			{ showPatternPanel && (
+				<div className="block-editor-inserter__pattern-panel-placeholder" />
 			) }
 		</div>
 	);

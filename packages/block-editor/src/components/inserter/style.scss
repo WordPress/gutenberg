@@ -772,13 +772,20 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
+
 .is-zoom-out {
 	.block-editor-inserter__menu {
 		display: flex;
 	}
 
-	.block-editor-inserter__patterns-category-panel {
-		position: static;
+	.block-editor-inserter__pattern-panel-placeholder {
+		display: block;
+		width: 300px;
+		height: 100%;
 	}
 
 	.block-editor-inserter__media-dialog {
