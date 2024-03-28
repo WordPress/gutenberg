@@ -38,7 +38,6 @@ Setting that enables the following UI tools:
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
-- shadow: defaultPresets
 
 
 ---
@@ -73,7 +72,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | false |  |
+| defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
 ---
