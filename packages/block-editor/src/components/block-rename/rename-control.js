@@ -32,6 +32,7 @@ export default function BlockRenameControl( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const customName = metadata?.name;
+	const hasOverrides = !! customName && !! metadata?.bindings;
 
 	function onChange( newName ) {
 		updateBlockAttributes( [ clientId ], {
@@ -60,6 +61,7 @@ export default function BlockRenameControl( { clientId } ) {
 					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
 					onClose={ () => setRenamingBlock( false ) }
+					hasOverridesWarning={ hasOverrides }
 					onSave={ ( newName ) => {
 						// If the new value is the block's original name (e.g. `Group`)
 						// or it is an empty string then assume the intent is to reset

@@ -1,12 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import {
-	InspectorControls,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import { ToggleControl } from '@wordpress/components';
+import { useState, useId } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
+import { ToggleControl, BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,12 +11,12 @@ import { __ } from '@wordpress/i18n';
  */
 import { addBindings } from './use-set-pattern-bindings';
 import { PARTIAL_SYNCING_SUPPORTED_BLOCKS } from '../constants';
-import { unlock } from '../lock-unlock';
-
-const { BlockRenameModal } = unlock( blockEditorPrivateApis );
+import AllowOverridesModal from './allow-overrides-modal';
 
 function PatternOverridesControls( { attributes, name, setAttributes } ) {
-	const [ showBlockNameModal, setShowBlockNameModal ] = useState( false );
+	const controlId = useId();
+	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
+		useState( false );
 
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
 	const attributeSources = syncedAttributes.map(
@@ -32,7 +29,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 
 	function updateBindings( isChecked, customName ) {
 		if ( isChecked && ! attributes.metadata?.name && ! customName ) {
-			setShowBlockNameModal( true );
+			setShowAllowOverridesModal( true );
 			return;
 		}
 
@@ -59,28 +56,45 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	// Avoid overwriting other (e.g. meta) bindings.
 	if ( isConnectedToOtherSources ) return null;
 
+	const hasName = attributes.metadata?.name;
+
 	return (
 		<>
 			<InspectorControls group="advanced">
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Allow pattern overrides' ) }
-					checked={ attributeSources.some(
-						( source ) => source === 'core/pattern-overrides'
-					) }
+				<BaseControl
+					id={ controlId }
+					label={ __( 'Overrides' ) }
 					help={ __(
 						'Allow attributes within this block to be overridden by pattern instances.'
 					) }
-					onChange={ ( isChecked ) => {
-						updateBindings( isChecked );
-					} }
-				/>
+				>
+					{ hasName ? (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Allow overrides' ) }
+							checked={ attributeSources.some(
+								( source ) =>
+									source === 'core/pattern-overrides'
+							) }
+							onChange={ ( isChecked ) => {
+								updateBindings( isChecked );
+							} }
+						/>
+					) : (
+						<Button
+							className="pattern-overrides-control__allow-overrides-button"
+							variant="secondary"
+							onClick={ () => updateBindings( true ) }
+						>
+							{ __( 'Allow overrides' ) }
+						</Button>
+					) }
+				</BaseControl>
 			</InspectorControls>
 
-			{ showBlockNameModal && (
-				<BlockRenameModal
-					blockName={ attributes.metadata?.name || '' }
-					onClose={ () => setShowBlockNameModal( false ) }
+			{ showAllowOverridesModal && (
+				<AllowOverridesModal
+					onClose={ () => setShowAllowOverridesModal( false ) }
 					onSave={ ( newName ) => {
 						updateBindings( true, newName );
 					} }

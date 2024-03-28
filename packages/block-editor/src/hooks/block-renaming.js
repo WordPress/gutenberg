@@ -1,15 +1,19 @@
 /**
  * WordPress dependencies
  */
+import { useId, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { TextControl } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Button, BaseControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { InspectorControls } from '../components';
+import { BlockRenameModal } from '../components/block-rename';
+import isEmptyString from '../components/block-rename/is-empty-string';
+import { useBlockDisplayInformation } from '../';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
@@ -45,21 +49,70 @@ export function addLabelCallback( settings ) {
 	return settings;
 }
 
-function BlockRenameControlPure( { metadata, setAttributes } ) {
+function BlockRenameControlPure( { clientId, metadata, setAttributes } ) {
+	const id = useId();
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
+	const blockName = metadata?.name;
+	const blockInformation = useBlockDisplayInformation( clientId );
+	const hasOverrides = !! blockName && !! metadata?.bindings;
+
 	return (
-		<InspectorControls group="advanced">
-			<TextControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'Block name' ) }
-				value={ metadata?.name || '' }
-				onChange={ ( newName ) => {
-					setAttributes( {
-						metadata: { ...metadata, name: newName },
-					} );
-				} }
-			/>
-		</InspectorControls>
+		<>
+			<InspectorControls group="advanced">
+				<BaseControl
+					id={ id }
+					label={ __( 'Block name' ) }
+					help={
+						blockName
+							? __(
+									'Naming a block will help people understand its purpose. This block can be overridden in instances that might rely on this name. Renaming this block may break their connections.'
+							  )
+							: __(
+									'Naming a block will help people understand its purpose.'
+							  )
+					}
+				>
+					<Button
+						className="block-editor-hooks__block-renaming-button"
+						variant="secondary"
+						isDestructive={ hasOverrides }
+						onClick={ () => setIsRenameModalOpen( true ) }
+					>
+						{ blockName
+							? sprintf(
+									// translators: %s: block name
+									__( '%s (rename)' ),
+									blockName
+							  )
+							: __( 'Rename' ) }
+					</Button>
+				</BaseControl>
+			</InspectorControls>
+
+			{ isRenameModalOpen && (
+				<BlockRenameModal
+					blockName={ blockName || '' }
+					originalBlockName={ blockInformation?.title }
+					onClose={ () => setIsRenameModalOpen( false ) }
+					hasOverridesWarning={ hasOverrides }
+					onSave={ ( newName ) => {
+						// If the new value is the block's original name (e.g. `Group`)
+						// or it is an empty string then assume the intent is to reset
+						// the value. Therefore reset the metadata.
+						if (
+							newName === blockInformation?.title ||
+							isEmptyString( newName )
+						) {
+							newName = undefined;
+						}
+
+						setAttributes( {
+							metadata: { ...metadata, name: newName },
+						} );
+					} }
+				/>
+			) }
+		</>
 	);
 }
 

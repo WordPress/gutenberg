@@ -7,6 +7,7 @@ import {
 	Button,
 	TextControl,
 	Modal,
+	CheckboxControl,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -23,14 +24,18 @@ export default function BlockRenameModal( {
 	originalBlockName,
 	onClose,
 	onSave,
+	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
+	const [ checkedWaring, setCheckedWarning ] = useState( false );
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
 	const nameIsEmpty = isEmptyString( editedBlockName );
 
 	const isNameValid = nameHasChanged || nameIsOriginal;
+	const isSaveDisabled =
+		! isNameValid || ( hasOverridesWarning && ! checkedWaring );
 
 	const autoSelectInputText = ( event ) => event.target.select();
 
@@ -70,6 +75,7 @@ export default function BlockRenameModal( {
 				describedby: dialogDescription,
 			} }
 			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<p id={ dialogDescription }>
 				{ __( 'Enter a custom name for this block.' ) }
@@ -78,7 +84,7 @@ export default function BlockRenameModal( {
 				onSubmit={ ( e ) => {
 					e.preventDefault();
 
-					if ( ! isNameValid ) {
+					if ( isSaveDisabled ) {
 						return;
 					}
 
@@ -96,6 +102,18 @@ export default function BlockRenameModal( {
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }
 					/>
+					{ hasOverridesWarning ? (
+						<CheckboxControl
+							label={ __(
+								'I understand renaming a block with overrides enabled could potentially break existing connections.'
+							) }
+							checked={ checkedWaring }
+							onChange={ ( checked ) =>
+								setCheckedWarning( checked )
+							}
+							required
+						/>
+					) : null }
 					<HStack justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -107,7 +125,7 @@ export default function BlockRenameModal( {
 
 						<Button
 							__next40pxDefaultSize
-							aria-disabled={ ! isNameValid }
+							aria-disabled={ isSaveDisabled }
 							variant="primary"
 							type="submit"
 						>
