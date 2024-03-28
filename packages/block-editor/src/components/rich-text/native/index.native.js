@@ -1222,8 +1222,8 @@ export class RichText extends Component {
 					ref={ ( ref ) => {
 						this._editor = ref;
 
-						if ( this.props.setRef ) {
-							this.props.setRef( ref );
+						if ( this.props.nativeEditorRef ) {
+							this.props.nativeEditorRef( ref );
 						}
 					} }
 					style={ {

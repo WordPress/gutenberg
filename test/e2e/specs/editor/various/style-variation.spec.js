@@ -17,9 +17,6 @@ test.describe( 'adding blocks', () => {
 			attributes: { value: '<p>Quote content</p>' },
 		} );
 
-		// Select the quote block.
-		await page.keyboard.press( 'ArrowDown' );
-
 		await editor.clickBlockToolbarButton( 'Quote' );
 
 		await page.click( 'role=menuitem[name="Plain"i]' );

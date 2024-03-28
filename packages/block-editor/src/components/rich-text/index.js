@@ -77,7 +77,6 @@ function removeNativeProps( props ) {
 		fontStyle,
 		minWidth,
 		maxWidth,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		...restProps
