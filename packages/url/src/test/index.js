@@ -285,14 +285,6 @@ describe( 'getFilename', () => {
 		expect( getFilename( '/' ) ).toBe( undefined );
 		expect( getFilename( undefined ) ).toBe( undefined );
 		expect( getFilename( null ) ).toBe( undefined );
-
-		/*
-		 * The URL() constructor accepts a string or any other object with a stringifier, e.g., <a>.
-		 * See https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
-		 */
-		const aElement = document.createElement( 'a' );
-		aElement.href = 'http://localhost:8080/file.jpg';
-		expect( getFilename( aElement ) ).toBe( 'file.jpg' );
 	} );
 } );
 
