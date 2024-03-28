@@ -102,7 +102,7 @@ const MainContent = ( {
 	const description = navigationMenu
 		? sprintf(
 				/* translators: %s: The name of a menu. */
-				__( 'Structure for navigation menu: %s' ),
+				__( 'Structure for Navigation Menu: %s' ),
 				navigationMenu?.title || __( 'Untitled menu' )
 		  )
 		: __(
@@ -113,7 +113,7 @@ const MainContent = ( {
 		<div className="wp-block-navigation__menu-inspector-controls">
 			{ ! hasChildren && (
 				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
-					{ __( 'This navigation menu is empty.' ) }
+					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
 			<PrivateListView

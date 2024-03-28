@@ -113,7 +113,7 @@ function NavigationMenuSelector( {
 		selectorLabel = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
-		selectorLabel = __( 'Choose or create a Navigation menu' );
+		selectorLabel = __( 'Choose or create a Navigation Menu' );
 	} else {
 		// Current Menu's title.
 		selectorLabel = currentTitle;
