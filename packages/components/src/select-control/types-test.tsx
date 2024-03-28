@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import SelectControl from '..';
+import SelectControl from '.';
 
 /**
  * Single type
