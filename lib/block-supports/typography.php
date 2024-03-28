@@ -28,6 +28,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_indent_support     = $typography_supports['__experimentalTextIndent'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
@@ -39,6 +40,7 @@ function gutenberg_register_typography_support( $block_type ) {
 		|| $has_line_height_support
 		|| $has_text_columns_support
 		|| $has_text_decoration_support
+		|| $has_text_indent_support
 		|| $has_text_transform_support
 		|| $has_writing_mode_support;
 
@@ -97,6 +99,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_line_height_support     = $typography_supports['lineHeight'] ?? false;
 	$has_text_columns_support    = $typography_supports['textColumns'] ?? false;
 	$has_text_decoration_support = $typography_supports['__experimentalTextDecoration'] ?? false;
+	$has_text_indent_support     = $typography_supports['__experimentalTextIndent'] ?? false;
 	$has_text_transform_support  = $typography_supports['__experimentalTextTransform'] ?? false;
 	$has_writing_mode_support    = $typography_supports['__experimentalWritingMode'] ?? false;
 
@@ -108,6 +111,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$should_skip_line_height     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'lineHeight' );
 	$should_skip_text_columns    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textColumns' );
 	$should_skip_text_decoration = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textDecoration' );
+	$should_skip_text_indent     = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textIndent' );
 	$should_skip_text_transform  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'textTransform' );
 	$should_skip_letter_spacing  = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'letterSpacing' );
 	$should_skip_writing_mode    = wp_should_skip_block_supports_serialization( $block_type, 'typography', 'writingMode' );
@@ -150,6 +154,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( $has_text_decoration_support && ! $should_skip_text_decoration && isset( $block_attributes['style']['typography']['textDecoration'] ) ) {
 		$typography_block_styles['textDecoration'] =
 			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textDecoration'], 'text-decoration' );
+	}
+
+	if ( $has_text_indent_support && ! $should_skip_text_indent && isset( $block_attributes['style']['typography']['textIndent'] ) ) {
+		$typography_block_styles['textIndent'] =
+			gutenberg_typography_get_preset_inline_style_value( $block_attributes['style']['typography']['textIndent'], 'text-indent' );
 	}
 
 	if ( $has_text_transform_support && ! $should_skip_text_transform && isset( $block_attributes['style']['typography']['textTransform'] ) ) {

@@ -265,6 +265,7 @@
 			"lineHeight": false,
 			"textColumns": false,
 			"textDecoration": true,
+			"textIndent": true,
 			"textTransform": true,
 			"writingMode": false
 		},
