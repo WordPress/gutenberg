@@ -63,16 +63,17 @@ function UnforwardedExternalLink(
 			target="_blank"
 			rel={ optimizedRel }
 			ref={ ref }
-			style={ { textDecoration: 'none' } }
 		>
-			<span style={ { textDecoration: 'underline' } }>{ children }</span>
+			<span className="components-external-link__contents">
+				{ children }
+			</span>
 			<VisuallyHidden as="span">
 				{
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )
 				}
 			</VisuallyHidden>
-			&nbsp;&#8599;
+			<span className="components-external-link__icon">&#8599;</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);
