@@ -120,7 +120,6 @@ function GridItem( {
 							<FlexItem
 								className={ classnames(
 									'dataviews-view-grid__field-value',
-									'dataviews-view-grid__field-' + field.id,
 									'is-badge'
 								) }
 							>
@@ -140,26 +139,25 @@ function GridItem( {
 						return null;
 					}
 					return (
-						<Flex
-							className={ classnames(
-								'dataviews-view-grid__field',
-								'dataviews-view-grid__field-' + field.id,
-								displayAsColumnFields?.includes( field.id )
-									? 'is-column'
-									: 'is-row'
-							) }
-							key={ field.id }
-							gap={ 1 }
-							justify="flex-start"
-							expanded
-							style={ { height: 'auto' } }
-							direction={
-								displayAsColumnFields?.includes( field.id )
-									? 'column'
-									: 'row'
-							}
-						>
-							{ ! displayAsBadgeFields?.includes( field.id ) && (
+						! displayAsBadgeFields?.includes( field.id ) && (
+							<Flex
+								className={ classnames(
+									'dataviews-view-grid__field',
+									displayAsColumnFields?.includes( field.id )
+										? 'is-column'
+										: 'is-row'
+								) }
+								key={ field.id }
+								gap={ 1 }
+								justify="flex-start"
+								expanded
+								style={ { height: 'auto' } }
+								direction={
+									displayAsColumnFields?.includes( field.id )
+										? 'column'
+										: 'row'
+								}
+							>
 								<>
 									<FlexItem className="dataviews-view-grid__field-name">
 										{ field.header }
@@ -171,8 +169,8 @@ function GridItem( {
 										{ renderedValue }
 									</FlexItem>
 								</>
-							) }
-						</Flex>
+							</Flex>
+						)
 					);
 				} ) }
 			</VStack>
