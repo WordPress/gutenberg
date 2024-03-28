@@ -13,7 +13,7 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	removeFormat,
@@ -51,6 +51,8 @@ import { canBindBlock } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
+
+const instanceIdKey = Symbol( 'instanceId' );
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -117,6 +119,8 @@ export function RichTextWrapper(
 ) {
 	props = removeNativeProps( props );
 
+	const instanceId = useInstanceId( RichTextWrapper );
+
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
@@ -139,7 +143,8 @@ export function RichTextWrapper(
 			isSelected =
 				selectionStart.clientId === clientId &&
 				selectionEnd.clientId === clientId &&
-				selectionStart.attributeKey === identifier;
+				( selectionStart.attributeKey === identifier ||
+					selectionStart[ instanceIdKey ] === instanceId );
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
@@ -153,6 +158,7 @@ export function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
 		clientId,
 		identifier,
+		instanceId,
 		originalIsSelected,
 		isBlockSelected,
 	] );
@@ -229,6 +235,7 @@ export function RichTextWrapper(
 				selection.start = {
 					clientId,
 					attributeKey: identifier,
+					[ instanceIdKey ]: instanceId,
 					offset: start,
 				};
 			}
@@ -245,13 +252,22 @@ export function RichTextWrapper(
 				selection.end = {
 					clientId,
 					attributeKey: identifier,
+					[ instanceIdKey ]: instanceId,
 					offset: end,
 				};
 			}
 
 			selectionChange( selection );
 		},
-		[ clientId, identifier ]
+		[
+			clientId,
+			getBlockRootClientId,
+			getSelectionEnd,
+			getSelectionStart,
+			identifier,
+			instanceId,
+			selectionChange,
+		]
 	);
 
 	const {
