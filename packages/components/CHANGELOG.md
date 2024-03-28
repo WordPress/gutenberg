@@ -22,6 +22,10 @@
 
 -   `CustomSelectControlV2`: Fix hint behavior in legacy ([#60183](https://github.com/WordPress/gutenberg/pull/60183)).
 
+### Enhancement
+
+-   `SelectControl`: Make component type generic to allow type narrowing ([#60293](https://github.com/WordPress/gutenberg/pull/60293)).
+
 ## 27.2.0 (2024-03-21)
 
 -   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
