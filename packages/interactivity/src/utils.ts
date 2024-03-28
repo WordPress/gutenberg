@@ -20,9 +20,16 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
+import type { Flusher, ParentElement } from './types';
 
-const afterNextFrame = ( callback ) => {
-	return new Promise( ( resolve ) => {
+/**
+ * Executes a callback function after the next frame is rendered.
+ *
+ * @param callback - The callback function to be executed.
+ * @return A promise that resolves after the callback function is executed.
+ */
+const afterNextFrame = ( callback: Function ) => {
+	return new Promise< void >( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
 			window.cancelAnimationFrame( raf );
@@ -36,12 +43,20 @@ const afterNextFrame = ( callback ) => {
 	} );
 };
 
-// Using the mangled properties:
-// this.c: this._callback
-// this.x: this._compute
-// https://github.com/preactjs/signals/blob/main/mangle.json
-function createFlusher( compute, notify ) {
-	let flush;
+/**
+ * Creates a Flusher object that can be used to flush computed values and notify listeners.
+ *
+ * Using the mangled properties:
+ * this.c: this._callback
+ * this.x: this._compute
+ * https://github.com/preactjs/signals/blob/main/mangle.json
+ *
+ * @param compute - The function that computes the value to be flushed.
+ * @param notify  - The function that notifies listeners when the value is flushed.
+ * @return The Flusher object with `flush` and `dispose` properties.
+ */
+function createFlusher( compute: Function, notify: () => void ): Flusher {
+	let flush: () => void;
 	const dispose = effect( function () {
 		flush = this.c.bind( this );
 		this.x = compute;
@@ -51,13 +66,22 @@ function createFlusher( compute, notify ) {
 	return { flush, dispose };
 }
 
-// Version of `useSignalEffect` with a `useEffect`-like execution. This hook
-// implementation comes from this PR, but we added short-cirtuiting to avoid
-// infinite loops: https://github.com/preactjs/signals/pull/290
-export function useSignalEffect( callback ) {
+/**
+ * Custom hook that executes a callback function whenever a signal is triggered.
+ * Version of `useSignalEffect` with a `useEffect`-like execution. This hook
+ * implementation comes from this PR, but we added short-cirtuiting to avoid
+ * infinite loops: https://github.com/preactjs/signals/pull/290
+ *
+ * @param callback - The callback function to be executed.
+ */
+export function useSignalEffect( callback: Function ) {
 	_useEffect( () => {
 		let eff = null;
 		let isExecuting = false;
+
+		/**
+		 * Notifies the callback function to execute after the next frame.
+		 */
 		const notify = async () => {
 			if ( eff && ! isExecuting ) {
 				isExecuting = true;
@@ -65,6 +89,7 @@ export function useSignalEffect( callback ) {
 				isExecuting = false;
 			}
 		};
+
 		eff = createFlusher( callback, notify );
 		return eff.dispose;
 	}, [] );
@@ -75,17 +100,17 @@ export function useSignalEffect( callback ) {
  * accessible whenever the function runs. This is primarily to make the scope
  * available inside hook callbacks.
  *
- * @param {Function} func The passed function.
- * @return {Function} The wrapped function.
+ * @param func The passed function.
+ * @return The wrapped function.
  */
-export const withScope = ( func ) => {
+export const withScope = ( func: Function ): ( () => void ) => {
 	const scope = getScope();
 	const ns = getNamespace();
 	if ( func?.constructor?.name === 'GeneratorFunction' ) {
 		return async ( ...args ) => {
 			const gen = func( ...args );
-			let value;
-			let it;
+			let value: any;
+			let it: any;
 			while ( true ) {
 				setNamespace( ns );
 				setScope( scope );
@@ -125,9 +150,9 @@ export const withScope = ( func ) => {
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
  *
- * @param {Function} callback The hook callback.
+ * @param callback The hook callback.
  */
-export function useWatch( callback ) {
+export function useWatch( callback: Function ) {
 	useSignalEffect( withScope( callback ) );
 }
 
@@ -138,9 +163,9 @@ export function useWatch( callback ) {
  * This hook makes the element's scope available so functions like
  * `getElement()` and `getContext()` can be used inside the passed callback.
  *
- * @param {Function} callback The hook callback.
+ * @param callback The hook callback.
  */
-export function useInit( callback ) {
+export function useInit( callback: Function ) {
 	_useEffect( withScope( callback ), [] );
 }
 
@@ -152,12 +177,12 @@ export function useInit( callback ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useEffect( callback, inputs ) {
+export function useEffect( callback: Function, inputs: any[] ) {
 	_useEffect( withScope( callback ), inputs );
 }
 
@@ -169,12 +194,12 @@ export function useEffect( callback, inputs ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useLayoutEffect( callback, inputs ) {
+export function useLayoutEffect( callback: Function, inputs: any[] ) {
 	_useLayoutEffect( withScope( callback ), inputs );
 }
 
@@ -186,12 +211,12 @@ export function useLayoutEffect( callback, inputs ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
- *                            values in the list change (using `===`).
+ * @param callback Imperative function that can return a cleanup
+ *                 function.
+ * @param inputs   If present, effect will only activate if the
+ *                 values in the list change (using `===`).
  */
-export function useCallback( callback, inputs ) {
+export function useCallback( callback: Function, inputs: any[] ) {
 	_useCallback( withScope( callback ), inputs );
 }
 
@@ -203,21 +228,31 @@ export function useCallback( callback, inputs ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed factory function.
  *
- * @param {Function} factory Imperative function that can return a cleanup
- *                           function.
- * @param {any[]}    inputs  If present, effect will only activate if the
- *                           values in the list change (using `===`).
+ * @param factory Imperative function that can return a cleanup
+ *                function.
+ * @param inputs  If present, effect will only activate if the
+ *                values in the list change (using `===`).
  */
-export function useMemo( factory, inputs ) {
+export function useMemo( factory: Function, inputs: any[] ) {
 	_useMemo( withScope( factory ), inputs );
 }
 
-// For wrapperless hydration.
-// See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
-export const createRootFragment = ( parent, replaceNode ) => {
+/**
+ * Creates a root fragment by replacing a node or an array of nodes in a parent element.
+ * For wrapperless hydration.
+ * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
+ *
+ * @param parent      - The parent element where the nodes will be replaced.
+ * @param replaceNode - The node or array of nodes to replace in the parent element.
+ * @return The created root fragment.
+ */
+export const createRootFragment = (
+	parent: ParentElement,
+	replaceNode: Node | Node[]
+) => {
 	replaceNode = [].concat( replaceNode );
 	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;
-	function insert( c, r ) {
+	function insert( c: any, r: any ) {
 		parent.insertBefore( c, r || s );
 	}
 	return ( parent.__k = {
@@ -227,7 +262,7 @@ export const createRootFragment = ( parent, replaceNode ) => {
 		childNodes: replaceNode,
 		insertBefore: insert,
 		appendChild: insert,
-		removeChild( c ) {
+		removeChild( c: Node ) {
 			parent.removeChild( c );
 		},
 	} );
