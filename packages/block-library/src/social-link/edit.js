@@ -25,39 +25,55 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
+import { isURL, isEmail } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { getIconBySite, getNameBySite } from './social-list';
+import {
+	getIconBySite,
+	getNameBySite,
+	getMatchingService,
+} from './social-list';
 
 const SocialLinkURLPopover = ( {
 	url,
 	setAttributes,
-	setPopover,
+	onClose,
 	popoverAnchor,
 	clientId,
 } ) => {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	return (
-		<URLPopover
-			anchor={ popoverAnchor }
-			onClose={ () => setPopover( false ) }
-		>
+		<URLPopover anchor={ popoverAnchor } onClose={ () => onClose( false ) }>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
-					setPopover( false );
+					onClose( false );
 				} }
 			>
 				<div className="block-editor-url-input">
 					<URLInput
 						__nextHasNoMarginBottom
 						value={ url }
-						onChange={ ( nextURL ) =>
-							setAttributes( { url: nextURL } )
-						}
+						onChange={ ( nextURL ) => {
+							const nextAttributes = {
+								url: nextURL,
+								service: undefined,
+							};
+
+							if ( isURL( nextURL ) || isEmail( nextURL ) ) {
+								const matchingService = isEmail( nextURL )
+									? 'mail'
+									: getMatchingService( nextURL );
+
+								nextAttributes.service =
+									matchingService ?? 'chain';
+							}
+
+							setAttributes( nextAttributes );
+						} }
 						placeholder={ __( 'Enter address' ) }
 						disableSuggestions
 						onKeyDown={ ( event ) => {
@@ -99,14 +115,15 @@ const SocialLinkEdit = ( {
 		iconBackgroundColor,
 		iconBackgroundColorValue,
 	} = context;
-	const [ showURLPopover, setPopover ] = useState( false );
-	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
+	const classes = classNames( 'wp-social-link', {
+		[ `wp-social-link-${ service }` ]: !! service,
 		'wp-social-link__is-incomplete': ! url,
 		[ `has-${ iconColor }-color` ]: iconColor,
 		[ `has-${ iconBackgroundColor }-background-color` ]:
 			iconBackgroundColor,
 	} );
 
+	const [ showPopover, setShowPopover ] = useState( ! url && ! service );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -160,7 +177,7 @@ const SocialLinkEdit = ( {
 				<Button
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
-					onClick={ () => setPopover( true ) }
+					onClick={ () => setShowPopover( true ) }
 				>
 					<IconComponent />
 					<span
@@ -170,11 +187,11 @@ const SocialLinkEdit = ( {
 					>
 						{ socialLinkLabel }
 					</span>
-					{ isSelected && showURLPopover && (
+					{ isSelected && showPopover && (
 						<SocialLinkURLPopover
 							url={ url }
 							setAttributes={ setAttributes }
-							setPopover={ setPopover }
+							onClose={ setShowPopover }
 							popoverAnchor={ popoverAnchor }
 							clientId={ clientId }
 						/>
