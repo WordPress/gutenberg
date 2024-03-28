@@ -77,12 +77,12 @@ function getAttributeValue( value ) {
 }
 
 /**
- * Create a new attribute value instance,
- * based on the original value type.
+ * Create a new attribute instance,
+ * based on the original type.
  *
  * @param {string} value    - The attribute value.
  * @param {*}      original - The original attribute instance.
- * @return {*}                The new attribute value instance.
+ * @return {*}                The new attribute instance.
  */
 function castValue( value, original ) {
 	if ( original instanceof RichTextData ) {
@@ -133,7 +133,7 @@ const BindingConnector = ( {
 	const rawAttrValue = getAttributeValue( attrValue );
 	const prevAttrValue = useRef( rawAttrValue );
 
-	const prevPropValue = useRef(); // intially undefined for the initial sync.
+	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
