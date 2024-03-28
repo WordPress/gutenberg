@@ -71,19 +71,18 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 			name: 'test/inner-blocks-render-appender-dynamic',
 		} );
 
-		const addBlockBtn = page
-			.locator( '.my-dynamic-blocks-appender' )
-			.getByRole( 'button', {
-				name: 'Add block',
-			} );
-
 		// Verify if the custom block appender text is the expected one.
 		await expect(
 			page.locator( '.my-dynamic-blocks-appender' )
 		).toContainText( 'Empty Blocks Appender' );
 
 		// Open the inserter of our custom block appender.
-		await addBlockBtn.click();
+		await page
+			.locator( '.my-dynamic-blocks-appender' )
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
 		await expect(
@@ -106,7 +105,12 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 		).toBeVisible();
 
 		// Insert a video block.
-		await addBlockBtn.click();
+		await page
+			.locator( '.my-dynamic-blocks-appender' )
+			.getByRole( 'button', {
+				name: 'Add block',
+			} )
+			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Blocks' } )
 			.getByRole( 'option', { name: 'Video' } )
@@ -120,7 +124,11 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 		).toBeVisible();
 
 		// Verify that the custom appender button is now not being rendered.
-		await expect( addBlockBtn ).toBeHidden();
+		await expect(
+			page.locator( '.my-dynamic-blocks-appender' ).getByRole( 'button', {
+				name: 'Add block',
+			} )
+		).toBeHidden();
 
 		// Verify if the post content is the expected one.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
