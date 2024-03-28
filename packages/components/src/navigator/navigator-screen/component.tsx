@@ -106,7 +106,7 @@ function UnconnectedNavigatorScreen(
 
 		// When navigating back, if a selector is provided, use it to look for the
 		// target element (assumed to be a node inside the current NavigatorScreen)
-		if ( location.isBack && location?.focusTargetSelector ) {
+		if ( location.isBack && location.focusTargetSelector ) {
 			elementToFocus = wrapperRef.current.querySelector(
 				location.focusTargetSelector
 			);
