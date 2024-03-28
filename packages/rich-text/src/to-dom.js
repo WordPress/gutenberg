@@ -68,7 +68,7 @@ function append( element, child ) {
 	const { type, attributes } = child;
 
 	if ( type ) {
-		child = element.ownerDocument.createElement( type );
+		child = element.ownerDocument.createElementNS( attributes?.xmlns || element.namespaceURI, type );
 
 		for ( const key in attributes ) {
 			child.setAttribute( key, attributes[ key ] );
