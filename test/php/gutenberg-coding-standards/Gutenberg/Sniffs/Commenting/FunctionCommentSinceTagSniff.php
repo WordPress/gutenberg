@@ -260,8 +260,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
 
-		$version_token = static::find_version_tag($phpcsFile, $doc_block_start_token, $doc_block_end_token);
-		if ( false === $version_token) {
+		$version_token = static::find_version_tag_token( $phpcsFile, $doc_block_start_token, $doc_block_end_token );
+		if ( false === $version_token ) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $doc_block_start_token, $violation_code );
 			return;
 		}
@@ -298,51 +298,51 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$ignore                 = Tokens::$methodPrefixes;
 		$ignore[ T_WHITESPACE ] = T_WHITESPACE;
 
-		for ( $commentEnd = ( $stackPtr - 1 ); $commentEnd >= 0; $commentEnd -- ) {
-			if ( isset( $ignore[ $tokens[ $commentEnd ]['code'] ] ) === true ) {
+		for ( $comment_end = ( $stackPtr - 1 ); $comment_end >= 0; $comment_end -- ) {
+			if ( isset( $ignore[ $tokens[ $comment_end ]['code'] ] ) === true ) {
 				continue;
 			}
 
-			if ( $tokens[ $commentEnd ]['code'] === T_ATTRIBUTE_END
-			     && isset( $tokens[ $commentEnd ]['attribute_opener'] ) === true
+			if ( $tokens[ $comment_end ]['code'] === T_ATTRIBUTE_END
+			     && isset( $tokens[ $comment_end ]['attribute_opener'] ) === true
 			) {
-				$commentEnd = $tokens[ $commentEnd ]['attribute_opener'];
+				$comment_end = $tokens[ $comment_end ]['attribute_opener'];
 				continue;
 			}
 
 			break;
 		}
 
-		if ( $tokens[ $commentEnd ]['code'] === T_COMMENT ) {
+		if ( $tokens[ $comment_end ]['code'] === T_COMMENT ) {
 			// Inline comments might just be closing comments for
 			// control structures or functions instead of function comments
 			// using the wrong comment type. If there is other code on the line,
 			// assume they relate to that code.
-			$prev = $phpcsFile->findPrevious( $ignore, ( $commentEnd - 1 ), null, true );
-			if ( $prev !== false && $tokens[ $prev ]['line'] === $tokens[ $commentEnd ]['line'] ) {
-				$commentEnd = $prev;
+			$prev = $phpcsFile->findPrevious( $ignore, ( $comment_end - 1 ), null, true );
+			if ( $prev !== false && $tokens[ $prev ]['line'] === $tokens[ $comment_end ]['line'] ) {
+				$comment_end = $prev;
 			}
 		}
 
-		if ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $commentEnd ]['code'] ) {
+		if ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $comment_end ]['code'] ) {
 			return false;
 		}
 
 		return array(
-			$tokens[ $commentEnd ]['comment_opener'],
-			$commentEnd
+			$tokens[ $comment_end ]['comment_opener'],
+			$comment_end
 		);
 	}
 
 	/**
-	 * Searches for a version tag within a docblock in the specified PHP file.
+	 * Searches for a version tag within a docblock.
 	 *
 	 * @param File $phpcsFile         The file being scanned.
 	 * @param int $docBlockStartToken The token index where the docblock starts.
 	 * @param int $docBlockEndToken   The token index where the docblock ends.
 	 * @return false|int The token index of the version tag within the docblock if found, false otherwise.
 	 */
-	private static function find_version_tag( File $phpcsFile, $doc_block_start_token, $doc_block_end_token ) {
+	private static function find_version_tag_token( File $phpcsFile, $doc_block_start_token, $doc_block_end_token ) {
 		$tokens          = $phpcsFile->getTokens();
 		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
 		if ( false === $since_tag_token ) {
