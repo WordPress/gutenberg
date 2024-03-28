@@ -734,7 +734,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				':where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 0.5em; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 0.5em; }:root { --wp--style--block-gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				':root { --wp--style--block-gap: 0.5em; }:where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 0.5em; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 0.5em; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -751,7 +751,7 @@ describe( 'global styles renderer', () => {
 			} );
 
 			expect( layoutStyles ).toEqual(
-				':where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 12px; }:root { --wp--style--block-gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+				':root { --wp--style--block-gap: 12px; }:where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 
@@ -787,6 +787,104 @@ describe( 'global styles renderer', () => {
 
 			expect( layoutStyles ).toEqual(
 				':where(.wp-block-group.is-layout-flex) { gap: 2em; }'
+			);
+		} );
+
+		it( 'should output padding variables and other properties if selector is "body"', () => {
+			const style = {
+				spacing: {
+					blockGap: '12px',
+					padding: {
+						top: '23px',
+						right: 'var:preset|spacing|20',
+						bottom: '1rem',
+						left: '33px',
+					},
+				},
+			};
+
+			const layoutStyles = getLayoutStyles( {
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
+				style,
+				selector: 'body',
+				useRootPadding: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				':root { --wp--style--root--padding-top: 23px;--wp--style--root--padding-right: var(--wp--preset--spacing--20);--wp--style--root--padding-bottom: 1rem;--wp--style--root--padding-left: 33px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+			);
+		} );
+
+		it( 'should not output padding variables and other properties if selector is not "body"', () => {
+			const style = {
+				spacing: {
+					padding: {
+						top: '23px',
+						right: 'var:preset|spacing|20',
+						bottom: '1rem',
+						left: '33px',
+					},
+				},
+			};
+
+			const layoutStyles = getLayoutStyles( {
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
+				style,
+				selector: '.wp-block-group',
+				useRootPadding: true,
+			} );
+
+			expect( layoutStyles ).toEqual( '' );
+		} );
+
+		it( 'should output padding CSS variables and merge with block-gap if useRootPaddingAwareAlignments is enabled', () => {
+			const style = {
+				spacing: {
+					blockGap: '12px',
+					padding: {
+						top: '23px',
+						right: 'var:preset|spacing|20',
+						bottom: '1rem',
+						left: '33px',
+					},
+				},
+			};
+
+			const layoutStyles = getLayoutStyles( {
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
+				style,
+				selector: 'body',
+				hasBlockGapSupport: true,
+				useRootPadding: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				':root { --wp--style--block-gap: 12px;--wp--style--root--padding-top: 23px;--wp--style--root--padding-right: var(--wp--preset--spacing--20);--wp--style--root--padding-bottom: 1rem;--wp--style--root--padding-left: 33px; }:where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
+			);
+		} );
+
+		it( 'should not output padding variables if padding value is a string', () => {
+			const style = {
+				spacing: {
+					blockGap: '12px',
+					padding: '44px',
+				},
+			};
+
+			const layoutStyles = getLayoutStyles( {
+				layoutDefinitions:
+					layoutDefinitionsTree.settings.layout.definitions,
+				style,
+				selector: 'body',
+				useRootPadding: true,
+				hasBlockGapSupport: true,
+			} );
+
+			expect( layoutStyles ).toEqual(
+				':root { --wp--style--block-gap: 12px; }:where(body .is-layout-flow) > * { margin-block-start: 0; margin-block-end: 0; }:where(body .is-layout-flow) > * + * { margin-block-start: 12px; margin-block-end: 0; }:where(body .is-layout-flex) { gap: 12px; }body .is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }body .is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }body .is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }body .is-layout-flex { display:flex; }body .is-layout-flex { flex-wrap: wrap; align-items: center; }body .is-layout-flex > * { margin: 0; }'
 			);
 		} );
 	} );
@@ -873,14 +971,10 @@ describe( 'global styles renderer', () => {
 			},
 		};
 
-		it( 'should output padding variables and other properties if useRootPaddingAwareAlignments is enabled', () => {
+		it( 'should not output padding properties if useRootPaddingAwareAlignments is enabled', () => {
 			expect(
 				getStylesDeclarations( blockStyles, 'body', true )
 			).toEqual( [
-				'--wp--style--root--padding-top: 33px',
-				'--wp--style--root--padding-right: 33px',
-				'--wp--style--root--padding-bottom: 33px',
-				'--wp--style--root--padding-left: 33px',
 				'background-color: var(--wp--preset--color--light-green-cyan)',
 				'font-family: sans-serif',
 				'font-size: 15px',
@@ -901,7 +995,7 @@ describe( 'global styles renderer', () => {
 			] );
 		} );
 
-		it( 'should not output padding variables if selector is not root', () => {
+		it( 'should output padding properties if selector is not root', () => {
 			expect(
 				getStylesDeclarations(
 					blockStyles,
