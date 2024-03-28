@@ -43,8 +43,6 @@ function BlockPatternsTab( {
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<Tabs
 						selectOnMove={ false }
-						aria-label={ __( 'Block pattern categories' ) }
-						className="block-editor-inserter__block-patterns-tabs"
 						orientation={ 'vertical' }
 						selectedTabId={ initialCategory.name }
 						onSelect={ ( categoryId ) => {
@@ -56,16 +54,12 @@ function BlockPatternsTab( {
 							);
 						} }
 					>
-						<Tabs.TabList>
+						<Tabs.TabList className="block-editor-inserter__block-patterns-tablist">
 							{ categories.map( ( category ) => (
 								<Tabs.Tab
 									key={ category.name }
 									tabId={ category.name }
-									className={
-										category === selectedCategory
-											? 'block-editor-inserter__patterns-category block-editor-inserter__patterns-selected-category'
-											: 'block-editor-inserter__patterns-category'
-									}
+									className="block-editor-inserter__patterns-tab"
 									aria-label={ category.label }
 									aria-current={
 										category === selectedCategory
@@ -93,7 +87,7 @@ function BlockPatternsTab( {
 								key={ category.name }
 								tabId={ category.name }
 								focusable={ false }
-								className="block-editor-inserter__patterns-category-dialog"
+								className="block-editor-inserter__patterns-category-panel"
 							>
 								{ children }
 							</Tabs.TabPanel>
@@ -111,13 +105,15 @@ function BlockPatternsTab( {
 			{ isMobile && (
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
-						<PatternCategoryPreviews
-							key={ category.name }
-							onInsert={ onInsert }
-							rootClientId={ rootClientId }
-							category={ category }
-							showTitlesAsTooltip={ false }
-						/>
+						<div className="block-editor-inserter__patterns-category-panel">
+							<PatternCategoryPreviews
+								key={ category.name }
+								onInsert={ onInsert }
+								rootClientId={ rootClientId }
+								category={ category }
+								showTitlesAsTooltip={ false }
+							/>
+						</div>
 					) }
 				</MobileTabNavigation>
 			) }
