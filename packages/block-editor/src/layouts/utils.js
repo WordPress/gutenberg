@@ -27,9 +27,7 @@ export function appendSelectors( selectors, append = '' ) {
 		.split( ',' )
 		.map(
 			( subselector ) =>
-				`.editor-styles-wrapper ${ subselector }${
-					append ? ` ${ append }` : ''
-				}`
+				`${ subselector }${ append ? ` ${ append }` : '' }`
 		)
 		.join( ',' );
 }
