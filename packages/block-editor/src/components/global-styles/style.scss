@@ -73,6 +73,40 @@
 
 .block-editor-global-styles-background-panel__inspector-media-replace-container {
 	position: relative;
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	display: flex;
+	justify-content: center;
+	align-items: stretch;
+	// Full width. ToolsPanel lays out children in a grid.
+	grid-column: 1 / -1;
+
+	&.is-open {
+		background-color: $gray-100;
+	}
+
+	.block-editor-global-styles-background-panel__inspector-preview-inner {
+		height: 100%;
+	}
+
+	.block-editor-global-styles-background-panel__image-preview,
+	.block-editor-global-styles-background-panel__inspector-media-replace {
+		flex-grow: 1;
+	}
+
+	.block-editor-global-styles-background-panel__image-preview-content,
+	.block-editor-global-styles-background-panel__dropdown-toggle {
+		height: 100%;
+		width: 100%;
+		padding-left: $grid-unit-15;
+	}
+
+	.block-editor-global-styles-background-panel__dropdown-toggle {
+		cursor: pointer;
+		background: transparent;
+		border: none;
+	}
+
 	// Since there is no option to skip rendering the drag'n'drop icon in drop
 	// zone, we hide it for now.
 	.components-drop-zone__content-icon {
@@ -84,7 +118,6 @@
 		box-shadow: inset 0 0 0 $border-width $gray-400;
 		width: 100%;
 		display: block;
-		height: $grid-unit-50;
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
@@ -111,11 +144,8 @@
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
-	display: block;
 	width: 20px;
 	height: 20px;
-	flex: none;
-	background: #fff;
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
@@ -141,3 +171,16 @@
 	box-sizing: inherit;
 }
 
+.block-editor-global-styles-background-panel__dropdown-content-wrapper {
+	min-width: 260px;
+	.components-base-control__help,
+	.components-toggle-control {
+		margin-bottom: 0;
+	}
+}
+
+.block-editor-global-styles-background-panel__hidden-tools-panel-item {
+	height: 0px;
+	position: absolute;
+	width: 0px;
+}
