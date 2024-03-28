@@ -15,7 +15,7 @@ describe( 'specialCommentConverter', () => {
 			deepFilterHTML( '<p><!--nextpage--></p>', [
 				specialCommentConverter,
 			] )
-		).toEqual( '<p></p><wp-block data-block="core/nextpage"></wp-block>' );
+		).toEqual( '<wp-block data-block="core/nextpage"></wp-block>' );
 	} );
 	it( 'should convert two comments into a block', () => {
 		expect(
@@ -124,9 +124,9 @@ describe( 'specialCommentConverter', () => {
 			);
 			expect( output ).toEqual(
 				`<p>First page.</p>
-				<p></p><wp-block data-block=\"core/nextpage\"></wp-block>
+				<wp-block data-block=\"core/nextpage\"></wp-block>
 				<p>Second page</p>
-				<p></p><wp-block data-block=\"core/nextpage\"></wp-block>
+				<wp-block data-block=\"core/nextpage\"></wp-block>
 				<p>Third page</p>`
 			);
 		} );

@@ -23,54 +23,20 @@ export default function specialCommentConverter( node, doc ) {
 		return;
 	}
 
-	if ( node.nodeValue === 'nextpage' ) {
-		replace( node, createNextpage( doc ) );
+	if (
+		node.nodeValue !== 'nextpage' &&
+		node.nodeValue.indexOf( 'more' ) !== 0
+	) {
 		return;
 	}
 
-	if ( node.nodeValue.indexOf( 'more' ) === 0 ) {
-		moreCommentConverter( node, doc );
-	}
-}
-
-/**
- * Convert `<!--more-->` as well as the `<!--more Some text-->` variant
- * and its `<!--noteaser-->` companion into the custom element
- * described in `specialCommentConverter()`.
- *
- * @param {Node}     node The node to be processed.
- * @param {Document} doc  The document of the node.
- * @return {void}
- */
-function moreCommentConverter( node, doc ) {
-	// Grab any custom text in the comment.
-	const customText = node.nodeValue.slice( 4 ).trim();
-
-	/*
-	 * When a `<!--more-->` comment is found, we need to look for any
-	 * `<!--noteaser-->` sibling, but it may not be a direct sibling
-	 * (whitespace typically lies in between)
-	 */
-	let sibling = node;
-	let noTeaser = false;
-	while ( ( sibling = sibling.nextSibling ) ) {
-		if (
-			sibling.nodeType === sibling.COMMENT_NODE &&
-			sibling.nodeValue === 'noteaser'
-		) {
-			noTeaser = true;
-			remove( sibling );
-			break;
-		}
-	}
-
-	const moreBlock = createMore( customText, noTeaser, doc );
+	const block = createBlock( node, doc );
 
 	// If our `<!--more-->` comment is in the middle of a paragraph, we should
 	// split the paragraph in two and insert the more block in between. If not,
 	// the more block will eventually end up being inserted after the paragraph.
 	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
-		replace( node, moreBlock );
+		replace( node, block );
 	} else {
 		const childNodes = Array.from( node.parentNode.childNodes );
 		const nodeIndex = childNodes.indexOf( node );
@@ -89,7 +55,7 @@ function moreCommentConverter( node, doc ) {
 		// Split the original parent node and insert our more block
 		[
 			childNodes.slice( 0, nodeIndex ).reduce( paragraphBuilder, null ),
-			moreBlock,
+			block,
 			childNodes.slice( nodeIndex + 1 ).reduce( paragraphBuilder, null ),
 		].forEach(
 			( element ) =>
@@ -101,7 +67,35 @@ function moreCommentConverter( node, doc ) {
 	}
 }
 
-function createMore( customText, noTeaser, doc ) {
+function createBlock( commentNode, doc ) {
+	if ( commentNode.nodeValue === 'nextpage' ) {
+		const node = doc.createElement( 'wp-block' );
+		node.dataset.block = 'core/nextpage';
+
+		return node;
+	}
+
+	// Grab any custom text in the comment.
+	const customText = commentNode.nodeValue.slice( 4 ).trim();
+
+	/*
+	 * When a `<!--more-->` comment is found, we need to look for any
+	 * `<!--noteaser-->` sibling, but it may not be a direct sibling
+	 * (whitespace typically lies in between)
+	 */
+	let sibling = commentNode;
+	let noTeaser = false;
+	while ( ( sibling = sibling.nextSibling ) ) {
+		if (
+			sibling.nodeType === sibling.COMMENT_NODE &&
+			sibling.nodeValue === 'noteaser'
+		) {
+			noTeaser = true;
+			remove( sibling );
+			break;
+		}
+	}
+
 	const node = doc.createElement( 'wp-block' );
 	node.dataset.block = 'core/more';
 	if ( customText ) {
@@ -111,12 +105,5 @@ function createMore( customText, noTeaser, doc ) {
 		// "Boolean" data attribute.
 		node.dataset.noTeaser = '';
 	}
-	return node;
-}
-
-function createNextpage( doc ) {
-	const node = doc.createElement( 'wp-block' );
-	node.dataset.block = 'core/nextpage';
-
 	return node;
 }
