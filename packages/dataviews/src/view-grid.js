@@ -36,6 +36,7 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 	displayAsColumnFields,
+	displayAsBadgeFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -100,6 +101,36 @@ function GridItem( {
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
+			<HStack
+				className="dataviews-view-grid__badge-fields"
+				spacing={ 2 }
+				wrap
+				align="top"
+				justify="flex-start"
+			>
+				{ visibleFields.map( ( field ) => {
+					const renderedValue = field.render( {
+						item,
+					} );
+					if ( ! renderedValue ) {
+						return null;
+					}
+					return (
+						displayAsBadgeFields?.includes( field.id ) && (
+							<FlexItem
+								className={ classnames(
+									'dataviews-view-grid__field-value',
+									'dataviews-view-grid__field-' + field.id,
+									'is-badge'
+								) }
+							>
+								{ renderedValue }
+							</FlexItem>
+						)
+					);
+				} ) }
+			</HStack>
+
 			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
 				{ visibleFields.map( ( field ) => {
 					const renderedValue = field.render( {
@@ -109,34 +140,38 @@ function GridItem( {
 						return null;
 					}
 					return (
-						<Flex
-							className={ classnames(
-								'dataviews-view-grid__field',
-								displayAsColumnFields?.includes( field.id )
-									? 'is-column'
-									: 'is-row'
-							) }
-							key={ field.id }
-							gap={ 1 }
-							justify="flex-start"
-							expanded
-							style={ { height: 'auto' } }
-							direction={
-								displayAsColumnFields?.includes( field.id )
-									? 'column'
-									: 'row'
-							}
-						>
-							<FlexItem className="dataviews-view-grid__field-name">
-								{ field.header }
-							</FlexItem>
-							<FlexItem
-								className="dataviews-view-grid__field-value"
-								style={ { maxHeight: 'none' } }
+						! displayAsBadgeFields?.includes( field.id ) && (
+							<Flex
+								className={ classnames(
+									'dataviews-view-grid__field',
+									displayAsColumnFields?.includes( field.id )
+										? 'is-column'
+										: 'is-row'
+								) }
+								key={ field.id }
+								gap={ 1 }
+								justify="flex-start"
+								expanded
+								style={ { height: 'auto' } }
+								direction={
+									displayAsColumnFields?.includes( field.id )
+										? 'column'
+										: 'row'
+								}
 							>
-								{ renderedValue }
-							</FlexItem>
-						</Flex>
+								<>
+									<FlexItem className="dataviews-view-grid__field-name">
+										{ field.header }
+									</FlexItem>
+									<FlexItem
+										className="dataviews-view-grid__field-value"
+										style={ { maxHeight: 'none' } }
+									>
+										{ renderedValue }
+									</FlexItem>
+								</>
+							</Flex>
+						)
 					);
 				} ) }
 			</VStack>
@@ -196,6 +231,9 @@ export default function ViewGrid( {
 								visibleFields={ visibleFields }
 								displayAsColumnFields={
 									view.layout.displayAsColumnFields
+								}
+								displayAsBadgeFields={
+									view.layout.displayAsBadgeFields
 								}
 							/>
 						);
