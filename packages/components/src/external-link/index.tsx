@@ -63,8 +63,9 @@ function UnforwardedExternalLink(
 			target="_blank"
 			rel={ optimizedRel }
 			ref={ ref }
+			style={ { textDecoration: 'none' } }
 		>
-			{ children }
+			<span style={ { textDecoration: 'underline' } }>{ children }</span>
 			<VisuallyHidden as="span">
 				{
 					/* translators: accessibility text */
