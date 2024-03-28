@@ -92,12 +92,6 @@ export default function Editor( { isLoading, onClick } ) {
 
 	const { type: editedPostType } = editedPost;
 
-	const { setSectionRootBlockName } = useDispatch( blocksStore );
-	// TODO: find the correct post type here...
-	useEffect( () => {
-		setSectionRootBlockName( getSectionRootBlockName( editedPostType ) );
-	}, [ editedPostType ] );
-
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const {
@@ -154,6 +148,11 @@ export default function Editor( { isLoading, onClick } ) {
 			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
+
+	const { setSectionRootBlockName } = useDispatch( blocksStore );
+	useEffect( () => {
+		setSectionRootBlockName( getSectionRootBlockName( context?.postType ) );
+	}, [ context, setSectionRootBlockName ] );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
