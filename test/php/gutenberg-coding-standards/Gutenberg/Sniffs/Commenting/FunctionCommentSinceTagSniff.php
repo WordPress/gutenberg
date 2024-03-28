@@ -312,6 +312,53 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	}
 
 	/**
+	 * @param File $phpcsFile
+	 * @param $stackPtr
+	 *
+	 * @return array|false
+	 */
+	private static function find_docblock( File $phpcsFile, $stackPtr ) {
+		$tokens                 = $phpcsFile->getTokens();
+		$ignore                 = Tokens::$methodPrefixes;
+		$ignore[ T_WHITESPACE ] = T_WHITESPACE;
+
+		for ( $commentEnd = ( $stackPtr - 1 ); $commentEnd >= 0; $commentEnd -- ) {
+			if ( isset( $ignore[ $tokens[ $commentEnd ]['code'] ] ) === true ) {
+				continue;
+			}
+
+			if ( $tokens[ $commentEnd ]['code'] === T_ATTRIBUTE_END
+			     && isset( $tokens[ $commentEnd ]['attribute_opener'] ) === true
+			) {
+				$commentEnd = $tokens[ $commentEnd ]['attribute_opener'];
+				continue;
+			}
+
+			break;
+		}
+
+		if ( $tokens[ $commentEnd ]['code'] === T_COMMENT ) {
+			// Inline comments might just be closing comments for
+			// control structures or functions instead of function comments
+			// using the wrong comment type. If there is other code on the line,
+			// assume they relate to that code.
+			$prev = $phpcsFile->findPrevious( $ignore, ( $commentEnd - 1 ), null, true );
+			if ( $prev !== false && $tokens[ $prev ]['line'] === $tokens[ $commentEnd ]['line'] ) {
+				$commentEnd = $prev;
+			}
+		}
+
+		if ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $commentEnd ]['code'] ) {
+			return false;
+		}
+
+		return array(
+			$tokens[ $commentEnd ]['comment_opener'],
+			$commentEnd
+		);
+	}
+
+	/**
 	 * Checks if the current block is experimental.
 	 *
 	 * @param File $phpcsFile The file being scanned.
