@@ -310,6 +310,34 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
+// Colorize outlines for template parts and synced patterns (.is-reusable).
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
+	&.is-highlighted::after,
+	&.is-selected::after {
+		outline-color: var(--wp-block-synced-color);
+	}
+
+	&.is-hovered::after {
+		outline-color: var(--wp-block-synced-color);
+	}
+
+	&.block-editor-block-list__block:not([contenteditable]):focus {
+		&::after {
+			outline-color: var(--wp-block-synced-color);
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				outline-color: $dark-theme-focus; //@todo, is this even helpful?
+			}
+		}
+	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part.has-editable-outline::after {
+	border: none;
+}
+
 // Add fade in/out background for editable blocks in synced patterns.
 @keyframes block-editor-is-editable__animation {
 	from {
@@ -376,7 +404,7 @@ body.is-zoomed-out {
 
 	.is-outline-mode .block-editor-block-list__block:not(.remove-outline):not(.rich-text).is-selected::after,
 	.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-hovered:not(.is-selected)::after {
-		outline-width: calc(2 * var(--wp-admin-border-width-focus)); // Adjusted for the zoom scale of 0.5.
+		outline-width: calc(2 * var(--wp-admin-border-width-focus)); // Adjusted for the zoom scale of 0.5; not perfect but its ok.
 	}
 
 	> .is-root-container {
