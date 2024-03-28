@@ -135,7 +135,13 @@ export const backgroundPositionToCoords = ( value ) => {
 };
 
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel = label || getFilename( imgUrl );
+	let imgLabel = label || getFilename( imgUrl );
+	// getFilename returns 'undefined' as a string.
+	imgLabel =
+		!! imgLabel && imgLabel !== 'undefined'
+			? imgLabel
+			: __( 'Select or upload image' );
+
 	return (
 		<ItemGroup as="span">
 			<HStack justify="flex-start" as="span">
@@ -295,7 +301,7 @@ function BackgroundImageToolsPanelItem( {
 					onSelect={ onSelectMedia }
 					name={
 						<InspectorImagePreview
-							label={ __( 'Background image' ) }
+							label={ title }
 							filename={ title || __( 'Untitled' ) }
 							url={ url }
 						/>
@@ -518,6 +524,7 @@ function BackgroundToolsPanel( {
 	value,
 	panelId,
 	children,
+	headerLabel,
 } ) {
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -528,7 +535,7 @@ function BackgroundToolsPanel( {
 		<VStack
 			as={ ToolsPanel }
 			spacing={ 6 }
-			label={ __( 'Background' ) }
+			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
@@ -552,6 +559,7 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
+	headerLabel = __( 'Background image' ),
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -568,6 +576,7 @@ export default function BackgroundPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			headerLabel={ headerLabel }
 		>
 			<BackgroundImageToolsPanelItem
 				onChange={ onChange }
