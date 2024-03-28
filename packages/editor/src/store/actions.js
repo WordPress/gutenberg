@@ -406,7 +406,7 @@ export const enablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+			.set( 'core', 'isPublishSidebarEnabled', true );
 	};
 
 /**
@@ -417,7 +417,7 @@ export const disablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+			.set( 'core', 'isPublishSidebarEnabled', false );
 	};
 
 /**
@@ -818,6 +818,41 @@ export const switchEditorMode =
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
+
+/**
+ * Returns an action object used in signalling that the user opened the publish
+ * sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function openPublishSidebar() {
+	return {
+		type: 'OPEN_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user closed the
+ * publish sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closePublishSidebar() {
+	return {
+		type: 'CLOSE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function togglePublishSidebar() {
+	return {
+		type: 'TOGGLE_PUBLISH_SIDEBAR',
+	};
+}
 
 /**
  * Backward compatibility

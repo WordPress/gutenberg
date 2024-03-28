@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -31,6 +31,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -51,6 +52,7 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import PublishPanel from './publish-panel';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -76,11 +78,16 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		showPublishButton,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
 		);
 		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		const { getCurrentPostAttribute, hasNonPostEntityChanges } =
+			select( editorStore );
+		const currentPostIsDraft =
+			getCurrentPostAttribute( 'status' ) === 'draft';
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
@@ -102,6 +109,8 @@ export default function Layout() {
 				'zoom-out',
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
+			showPublishButton:
+				currentPostIsDraft && ! hasNonPostEntityChanges(),
 		};
 	}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
@@ -115,6 +124,20 @@ export default function Layout() {
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
 	const { areas, widths } = useLayoutAreas();
+
+	// Local state for save panel. Used in `publishPanel`.
+	// Note 'truthy' callback implies an open panel.
+	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
+		useState( false );
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -243,7 +266,11 @@ export default function Layout() {
 									ease: 'easeOut',
 								} }
 							>
-								<Header />
+								<Header
+									setEntitiesSavedStatesCallback={
+										setEntitiesSavedStatesCallback
+									}
+								/>
 							</NavigableRegion>
 						) }
 					</AnimatePresence>
@@ -285,7 +312,21 @@ export default function Layout() {
 						</NavigableRegion>
 					) }
 
-					<SavePanel />
+					{ showPublishButton ? (
+						<PublishPanel
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					) : (
+						<SavePanel />
+					) }
 
 					{ isMobileViewport && areas.mobile && (
 						<div
