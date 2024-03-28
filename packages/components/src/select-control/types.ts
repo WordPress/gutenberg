@@ -9,7 +9,7 @@ import type { ChangeEvent, FocusEvent, ReactNode } from 'react';
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
-type SelectControlBaseProps = Pick<
+type SelectControlBaseProps< OptionType extends string = string > = Pick<
 	InputBaseProps,
 	| '__next36pxDefaultSize'
 	| '__next40pxDefaultSize'
@@ -33,7 +33,7 @@ type SelectControlBaseProps = Pick<
 			 * The internal value used to choose the selected value.
 			 * This is also the value passed to `onChange` when the option is selected.
 			 */
-			value: string;
+			value: OptionType;
 			id?: string;
 			/**
 			 * Whether or not the option should have the disabled attribute.
@@ -55,7 +55,9 @@ type SelectControlBaseProps = Pick<
 		children?: ReactNode;
 	};
 
-export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
+export type SelectControlSingleSelectionProps<
+	OptionType extends string = string,
+> = SelectControlBaseProps< OptionType > & {
 	/**
 	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
 	 *
@@ -64,7 +66,7 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
 	 * @default false
 	 */
 	multiple?: false;
-	value?: string;
+	value?: OptionType & {};
 	/**
 	 * A function that receives the value of the new option that is being selected as input.
 	 *
@@ -77,7 +79,9 @@ export type SelectControlSingleSelectionProps = SelectControlBaseProps & {
 	) => void;
 };
 
-export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
+export type SelectControlMultipleSelectionProps<
+	OptionType extends string = string,
+> = SelectControlBaseProps< OptionType > & {
 	/**
 	 * If this property is added, multiple values can be selected. The `value` passed should be an array.
 	 *
@@ -86,7 +90,7 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
 	 * @default false
 	 */
 	multiple: true;
-	value?: string[];
+	value?: ( OptionType & {} )[];
 	/**
 	 * A function that receives the value of the new option that is being selected as input.
 	 *
@@ -99,6 +103,6 @@ export type SelectControlMultipleSelectionProps = SelectControlBaseProps & {
 	) => void;
 };
 
-export type SelectControlProps =
-	| SelectControlSingleSelectionProps
-	| SelectControlMultipleSelectionProps;
+export type SelectControlProps< OptionType extends string = string > =
+	| SelectControlSingleSelectionProps< OptionType >
+	| SelectControlMultipleSelectionProps< OptionType >;

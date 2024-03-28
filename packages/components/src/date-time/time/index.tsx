@@ -71,6 +71,20 @@ function buildPadInputStateReducer( pad: number ) {
 	};
 }
 
+type MonthValue =
+	| '01'
+	| '02'
+	| '03'
+	| '04'
+	| '05'
+	| '06'
+	| '07'
+	| '08'
+	| '09'
+	| '10'
+	| '11'
+	| '12';
+
 /**
  * TimePicker is a React component that renders a clock for time selection.
  *
@@ -114,7 +128,7 @@ export function TimePicker( {
 	const { day, month, year, minutes, hours, am } = useMemo(
 		() => ( {
 			day: format( date, 'dd' ),
-			month: format( date, 'MM' ),
+			month: format( date, 'MM' ) as MonthValue,
 			year: format( date, 'yyyy' ),
 			minutes: format( date, 'mm' ),
 			hours: format( date, is12Hour ? 'hh' : 'HH' ),
@@ -197,7 +211,7 @@ export function TimePicker( {
 
 	const monthField = (
 		<MonthSelectWrapper>
-			<SelectControl
+			<SelectControl< MonthValue >
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision

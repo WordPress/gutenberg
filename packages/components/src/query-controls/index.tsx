@@ -85,7 +85,11 @@ export function QueryControls( {
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
-						value={ `${ orderBy }/${ order }` }
+						value={
+							orderBy === undefined || order === undefined
+								? undefined
+								: `${ orderBy }/${ order }`
+						}
 						options={ [
 							{
 								label: __( 'Newest to oldest' ),
