@@ -43,6 +43,8 @@ function isFunction( maybeFunc: unknown ): maybeFunc is () => void {
 	return typeof maybeFunc === 'function';
 }
 
+export type { DropdownMenuProps } from './types';
+
 function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 	const {
 		children,

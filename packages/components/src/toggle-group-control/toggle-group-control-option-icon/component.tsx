@@ -12,16 +12,18 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../../context';
-import type { ToggleGroupControlOptionIconProps } from '../types';
+import type { ToggleGroupControlOptionIconProps as ToggleGroupControlOptionIconBaseProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
 import Icon from '../../icon';
 
+export type ToggleGroupControlOptionIconProps = WordPressComponentProps<
+	ToggleGroupControlOptionIconBaseProps,
+	'button',
+	false
+>;
+
 function UnforwardedToggleGroupControlOptionIcon(
-	props: WordPressComponentProps<
-		ToggleGroupControlOptionIconProps,
-		'button',
-		false
-	>,
+	props: ToggleGroupControlOptionIconProps,
 	ref: ForwardedRef< any >
 ) {
 	const { icon, label, ...restProps } = props;

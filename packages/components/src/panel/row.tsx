@@ -13,6 +13,7 @@ import type { ForwardedRef } from 'react';
  * Internal dependencies
  */
 import type { PanelRowProps } from './types';
+export type { PanelRowProps } from './types';
 
 function UnforwardedPanelRow(
 	{ className, children }: PanelRowProps,

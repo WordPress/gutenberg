@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
 import { useNavigatorBackButton } from '../navigator-back-button/hook';
-import type { NavigatorToParentButtonProps } from '../types';
+import type { NavigatorToParentButtonProps as NavigatorToParentButtonBaseProps } from '../types';
+
+export type NavigatorToParentButtonProps = WordPressComponentProps<
+	NavigatorToParentButtonBaseProps,
+	'button'
+>;
 
 function UnconnectedNavigatorToParentButton(
-	props: WordPressComponentProps< NavigatorToParentButtonProps, 'button' >,
+	props: NavigatorToParentButtonProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorToParentButtonProps = useNavigatorBackButton( {

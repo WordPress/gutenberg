@@ -1,3 +1,3 @@
-export { default as Scrollable } from './component';
+export { default as Scrollable, type ScrollableProps } from './component';
 
 export * from './hook';

@@ -7,12 +7,14 @@ import { createContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { disabledStyles } from './styles/disabled-styles';
-import type { DisabledProps } from './types';
+import type { DisabledProps as DisabledBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { useCx } from '../utils';
 
 const Context = createContext< boolean >( false );
 const { Consumer, Provider } = Context;
+
+export type DisabledProps = WordPressComponentProps< DisabledBaseProps, 'div' >;
 
 /**
  * `Disabled` is a component which disables descendant tabbable elements and
@@ -56,7 +58,7 @@ function Disabled( {
 	children,
 	isDisabled = true,
 	...props
-}: WordPressComponentProps< DisabledProps, 'div' > ) {
+}: DisabledProps ) {
 	const cx = useCx();
 
 	return (

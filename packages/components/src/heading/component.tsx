@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useHeading } from './hook';
-import type { HeadingProps } from './types';
+import type { HeadingProps as HeadingBaseProps } from './types';
+
+export type HeadingProps = WordPressComponentProps< HeadingBaseProps, 'h1' >;
 
 function UnconnectedHeading(
-	props: WordPressComponentProps< HeadingProps, 'h1' >,
+	props: HeadingProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useHeading( props );

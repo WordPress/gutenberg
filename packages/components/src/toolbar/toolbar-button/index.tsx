@@ -16,8 +16,14 @@ import Button from '../../button';
 import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
-import type { ToolbarButtonProps } from './types';
+import type { ToolbarButtonProps as ToolbarButtonBaseProps } from './types';
 import type { WordPressComponentProps } from '../../context';
+
+export type ToolbarButtonProps = WordPressComponentProps<
+	ToolbarButtonBaseProps,
+	typeof Button,
+	false
+>;
 
 function UnforwardedToolbarButton(
 	{
@@ -29,7 +35,7 @@ function UnforwardedToolbarButton(
 		isDisabled,
 		title,
 		...props
-	}: WordPressComponentProps< ToolbarButtonProps, typeof Button, false >,
+	}: ToolbarButtonProps,
 	ref: ForwardedRef< any >
 ) {
 	const accessibleToolbarState = useContext( ToolbarContext );

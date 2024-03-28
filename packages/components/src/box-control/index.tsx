@@ -33,6 +33,7 @@ import type {
 	BoxControlProps,
 	BoxControlValue,
 } from './types';
+export type { BoxControlProps } from './types';
 
 const defaultInputProps = {
 	min: 0,

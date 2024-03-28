@@ -8,6 +8,7 @@ import { createInterpolateElement } from '@wordpress/element';
  */
 import { escapeRegExp } from '../utils/strings';
 import type { TextHighlightProps } from './types';
+export type { TextHighlightProps } from './types';
 
 /**
  * Highlights occurrences of a given string within another string of text. Wraps

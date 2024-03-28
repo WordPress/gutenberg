@@ -18,6 +18,7 @@ import type {
 	OriginObject,
 	GradientObject,
 } from './types';
+export type { GradientPickerComponentProps } from './types';
 
 // The Multiple Origin Gradients have a `gradients` property (an array of
 // gradient objects), while Single Origin ones have a `gradient` property.

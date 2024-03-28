@@ -10,6 +10,7 @@ import ColorIndicator from '../color-indicator';
 import Icon from '../icon';
 import { getGradientFromCSSColors } from './utils';
 import type { DuotoneSwatchProps } from './types';
+export type { DuotoneSwatchProps } from './types';
 
 function DuotoneSwatch( { values }: DuotoneSwatchProps ) {
 	return values ? (

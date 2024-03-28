@@ -1,2 +1,2 @@
-export { default as Heading } from './component';
+export { default as Heading, type HeadingProps } from './component';
 export { useHeading } from './hook';

@@ -15,7 +15,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import Icon from '../icon';
-import type { PlaceholderProps } from './types';
+import type { PlaceholderProps as PlaceholderBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 const PlaceholderIllustration = (
@@ -30,6 +30,12 @@ const PlaceholderIllustration = (
 	</SVG>
 );
 
+export type PlaceholderProps = WordPressComponentProps<
+	PlaceholderBaseProps,
+	'div',
+	false
+>;
+
 /**
  * Renders a placeholder. Normally used by blocks to render their empty state.
  *
@@ -40,9 +46,7 @@ const PlaceholderIllustration = (
  * const MyPlaceholder = () => <Placeholder icon={ more } label="Placeholder" />;
  * ```
  */
-export function Placeholder(
-	props: WordPressComponentProps< PlaceholderProps, 'div', false >
-) {
+export function Placeholder( props: PlaceholderProps ) {
 	const {
 		icon,
 		children,

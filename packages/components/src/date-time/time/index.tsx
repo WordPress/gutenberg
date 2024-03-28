@@ -42,6 +42,8 @@ import {
 import { inputToDate } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
+export type { TimePickerProps } from '../types';
+
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
 }

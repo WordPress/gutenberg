@@ -13,6 +13,7 @@ import { forwardRef } from '@wordpress/element';
  */
 import NavigableContainer from './container';
 import type { TabbableContainerProps } from './types';
+export type { TabbableContainerProps } from './types';
 
 export function UnforwardedTabbableContainer(
 	{ eventToOffset, ...props }: TabbableContainerProps,

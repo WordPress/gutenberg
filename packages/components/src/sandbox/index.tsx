@@ -13,6 +13,7 @@ import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { SandBoxProps } from './types';
+export type { SandBoxProps } from './types';
 
 const observeAndResizeJS = function () {
 	const { MutationObserver } = window;

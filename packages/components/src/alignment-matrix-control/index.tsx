@@ -18,7 +18,13 @@ import { Root, Row } from './styles/alignment-matrix-control-styles';
 import AlignmentMatrixControlIcon from './icon';
 import { GRID, getItemId, getItemValue } from './utils';
 import type { WordPressComponentProps } from '../context';
-import type { AlignmentMatrixControlProps } from './types';
+import type { AlignmentMatrixControlProps as AlignmentMatrixControlBaseProps } from './types';
+
+export type AlignmentMatrixControlProps = WordPressComponentProps<
+	AlignmentMatrixControlBaseProps,
+	'div',
+	false
+>;
 
 /**
  *
@@ -49,7 +55,7 @@ export function AlignmentMatrixControl( {
 	onChange,
 	width = 92,
 	...props
-}: WordPressComponentProps< AlignmentMatrixControlProps, 'div', false > ) {
+}: AlignmentMatrixControlProps ) {
 	const baseId = useInstanceId(
 		AlignmentMatrixControl,
 		'alignment-matrix-control',

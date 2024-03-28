@@ -16,7 +16,10 @@ import { forwardRef, useMemo, useRef } from '@wordpress/element';
  */
 import Button from '../button';
 import type { WordPressComponentProps } from '../context/wordpress-component';
-import type { SearchControlProps, SuffixItemProps } from './types';
+import type {
+	SearchControlProps as SearchControlBaseProps,
+	SuffixItemProps,
+} from './types';
 import type { ForwardedRef } from 'react';
 import { ContextSystemProvider } from '../context';
 import { StyledInputControl, SuffixItemWrapper } from './styles';
@@ -46,6 +49,12 @@ function SuffixItem( {
 	);
 }
 
+export type SearchControlProps = Omit<
+	WordPressComponentProps< SearchControlBaseProps, 'input', false >,
+	// TODO: Background styling currently doesn't support a disabled state. Needs design work.
+	'disabled'
+>;
+
 function UnforwardedSearchControl(
 	{
 		__nextHasNoMarginBottom = false,
@@ -58,11 +67,7 @@ function UnforwardedSearchControl(
 		onClose,
 		size = 'default',
 		...restProps
-	}: Omit<
-		WordPressComponentProps< SearchControlProps, 'input', false >,
-		// TODO: Background styling currently doesn't support a disabled state. Needs design work.
-		'disabled'
-	>,
+	}: SearchControlProps,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	// @ts-expect-error The `disabled` prop is not yet supported in the SearchControl component.

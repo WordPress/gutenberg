@@ -18,6 +18,7 @@ import { contextConnect, useContextSystem } from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
+export type { DropdownProps } from './types';
 
 const UnconnectedDropdown = (
 	props: DropdownProps,

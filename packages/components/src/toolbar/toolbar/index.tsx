@@ -15,17 +15,18 @@ import deprecated from '@wordpress/deprecated';
  */
 import ToolbarGroup from '../toolbar-group';
 import ToolbarContainer from './toolbar-container';
-import type { ToolbarProps } from './types';
+import type { ToolbarProps as ToolbarBaseProps } from './types';
 import type { WordPressComponentProps } from '../../context';
 import { ContextSystemProvider } from '../../context';
 
+export type ToolbarProps = WordPressComponentProps<
+	ToolbarBaseProps,
+	'div',
+	false
+>;
+
 function UnforwardedToolbar(
-	{
-		className,
-		label,
-		variant,
-		...props
-	}: WordPressComponentProps< ToolbarProps, 'div', false >,
+	{ className, label, variant, ...props }: ToolbarProps,
 	ref: ForwardedRef< any >
 ) {
 	const isVariantDefined = variant !== undefined;

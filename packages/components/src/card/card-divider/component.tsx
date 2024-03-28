@@ -6,14 +6,13 @@ import type { ForwardedRef } from 'react';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import type { DividerProps } from '../../divider';
 import { Divider } from '../../divider';
 import { useCardDivider } from './hook';
 
 function UnconnectedCardDivider(
-	props: WordPressComponentProps< DividerProps, 'hr', false >,
+	props: DividerProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const dividerProps = useCardDivider( props );

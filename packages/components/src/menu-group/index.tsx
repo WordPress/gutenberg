@@ -13,6 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import type { MenuGroupProps } from './types';
+export type { MenuGroupProps } from './types';
 
 /**
  * `MenuGroup` wraps a series of related `MenuItem` components into a common

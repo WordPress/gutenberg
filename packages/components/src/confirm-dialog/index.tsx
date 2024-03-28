@@ -2,5 +2,6 @@
  * Internal dependencies
  */
 import ConfirmDialog from './component';
+import type { ConfirmDialogProps } from './component';
 
-export { ConfirmDialog };
+export { ConfirmDialog, type ConfirmDialogProps };

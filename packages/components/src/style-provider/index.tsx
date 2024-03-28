@@ -10,6 +10,8 @@ import * as uuid from 'uuid';
  */
 import type { StyleProviderProps } from './types';
 
+export type { StyleProviderProps } from './types';
+
 const uuidCache = new Set();
 // Use a weak map so that when the container is detached it's automatically
 // dereferenced to avoid memory leak.

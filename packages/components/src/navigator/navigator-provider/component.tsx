@@ -20,7 +20,7 @@ import { View } from '../../view';
 import { NavigatorContext } from '../context';
 import * as styles from '../styles';
 import type {
-	NavigatorProviderProps,
+	NavigatorProviderProps as NavigatorProviderBaseProps,
 	NavigatorLocation,
 	NavigatorContext as NavigatorContextType,
 	NavigateOptions,
@@ -197,8 +197,13 @@ function routerReducer(
 	return { screens, locationHistory, matchedPath };
 }
 
+export type NavigatorProviderProps = WordPressComponentProps<
+	NavigatorProviderBaseProps,
+	'div'
+>;
+
 function UnconnectedNavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+	props: NavigatorProviderProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { initialPath, children, className, ...otherProps } =

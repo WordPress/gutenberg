@@ -1,1 +1,4 @@
-export { default as NavigatorProvider } from './component';
+export {
+	default as NavigatorProvider,
+	type NavigatorProviderProps,
+} from './component';

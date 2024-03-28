@@ -12,8 +12,10 @@ import { Flex } from '../../flex';
 import { useCardHeader } from './hook';
 import type { HeaderProps } from '../types';
 
+export type CardHeaderProps = WordPressComponentProps< HeaderProps, 'div' >;
+
 function UnconnectedCardHeader(
-	props: WordPressComponentProps< HeaderProps, 'div' >,
+	props: CardHeaderProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const headerProps = useCardHeader( props );

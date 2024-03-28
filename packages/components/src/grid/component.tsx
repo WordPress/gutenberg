@@ -10,10 +10,12 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useGrid from './hook';
-import type { GridProps } from './types';
+import type { GridProps as GridBaseProps } from './types';
+
+export type GridProps = WordPressComponentProps< GridBaseProps, 'div' >;
 
 function UnconnectedGrid(
-	props: WordPressComponentProps< GridProps, 'div' >,
+	props: GridProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const gridProps = useGrid( props );

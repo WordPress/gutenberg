@@ -9,11 +9,16 @@ import type { ForwardedRef } from 'react';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { View } from '../../view';
-import type { FlexBlockProps } from '../types';
+import type { FlexBlockProps as FlexBlockBaseProps } from '../types';
 import { useFlexBlock } from './hook';
 
+export type FlexBlockProps = WordPressComponentProps<
+	FlexBlockBaseProps,
+	'div'
+>;
+
 function UnconnectedFlexBlock(
-	props: WordPressComponentProps< FlexBlockProps, 'div' >,
+	props: FlexBlockProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const flexBlockProps = useFlexBlock( props );

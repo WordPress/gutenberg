@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
 import { useContextSystem, contextConnect } from '../context';
 import { visuallyHidden } from './styles';
 import { View } from '../view';
-import type { VisuallyHiddenProps } from './types';
+import type { VisuallyHiddenProps as VisuallyHiddenBaseProps } from './types';
+
+export type VisuallyHiddenProps = WordPressComponentProps<
+	VisuallyHiddenBaseProps,
+	'div'
+>;
 
 function UnconnectedVisuallyHidden(
-	props: WordPressComponentProps< VisuallyHiddenProps, 'div' >,
+	props: VisuallyHiddenProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const { style: styleProp, ...contextProps } = useContextSystem(

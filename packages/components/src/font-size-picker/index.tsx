@@ -36,6 +36,8 @@ import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
 import { T_SHIRT_NAMES } from './constants';
 
+export type { FontSizePickerProps } from './types';
+
 const UnforwardedFontSizePicker = (
 	props: FontSizePickerProps,
 	ref: ForwardedRef< any >

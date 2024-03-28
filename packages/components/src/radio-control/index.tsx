@@ -14,8 +14,14 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
-import type { RadioControlProps } from './types';
+import type { RadioControlProps as RadioControlBaseProps } from './types';
 import { VStack } from '../v-stack';
+
+export type RadioControlProps = WordPressComponentProps<
+	RadioControlBaseProps,
+	'input',
+	false
+>;
 
 /**
  * Render a user interface to select the user type using radio inputs.
@@ -42,9 +48,7 @@ import { VStack } from '../v-stack';
  * };
  * ```
  */
-export function RadioControl(
-	props: WordPressComponentProps< RadioControlProps, 'input', false >
-) {
+export function RadioControl( props: RadioControlProps ) {
 	const {
 		label,
 		className,

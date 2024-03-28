@@ -19,6 +19,8 @@ const cloneWrapperClass = 'components-draggable__clone';
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
 
+export type { DraggableProps } from './types';
+
 /**
  * `Draggable` is a Component that provides a way to set up a cross-browser
  * (including IE) customizable drag image and the transfer data for the drag

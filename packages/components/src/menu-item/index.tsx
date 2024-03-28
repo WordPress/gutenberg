@@ -16,10 +16,16 @@ import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
 import type { WordPressComponentProps } from '../context';
-import type { MenuItemProps } from './types';
+import type { MenuItemProps as MenuItemBaseProps } from './types';
+
+export type MenuItemProps = WordPressComponentProps<
+	MenuItemBaseProps,
+	'button',
+	false
+>;
 
 function UnforwardedMenuItem(
-	props: WordPressComponentProps< MenuItemProps, 'button', false >,
+	props: MenuItemProps,
 	ref: ForwardedRef< HTMLButtonElement >
 ) {
 	let {

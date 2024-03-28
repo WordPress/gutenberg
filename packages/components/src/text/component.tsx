@@ -7,6 +7,8 @@ import { View } from '../view';
 import useText from './hook';
 import type { Props } from './types';
 
+export type TextProps = WordPressComponentProps< Props, 'span' >;
+
 /**
  * @param props
  * @param forwardedRef

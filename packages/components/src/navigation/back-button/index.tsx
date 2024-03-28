@@ -16,6 +16,7 @@ import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
 
 import type { NavigationBackButtonProps } from '../types';
+export type { NavigationBackButtonProps } from '../types';
 
 function UnforwardedNavigationBackButton(
 	{

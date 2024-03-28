@@ -87,7 +87,7 @@ const HANDLE_STYLES = {
 	bottomLeft: HANDLE_STYLES_OVERRIDES,
 };
 
-type ResizableBoxProps = ResizableProps & {
+export type ResizableBoxProps = ResizableProps & {
 	children: ReactNode;
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;

@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useScrollable } from './hook';
-import type { ScrollableProps } from './types';
+import type { ScrollableProps as ScrollableBaseProps } from './types';
+
+export type ScrollableProps = WordPressComponentProps<
+	ScrollableBaseProps,
+	'div'
+>;
 
 function UnconnectedScrollable(
-	props: WordPressComponentProps< ScrollableProps, 'div' >,
+	props: ScrollableProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const scrollableProps = useScrollable( props );

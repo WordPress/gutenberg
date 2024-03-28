@@ -20,6 +20,7 @@ import CustomDuotoneBar from './custom-duotone-bar';
 import { getDefaultColors, getGradientFromCSSColors } from './utils';
 import { Spacer } from '../spacer';
 import type { DuotonePickerProps } from './types';
+export type { DuotonePickerProps } from './types';
 
 /**
  * ```jsx

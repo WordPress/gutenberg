@@ -12,6 +12,7 @@ import { cloneElement, Children } from '@wordpress/element';
  * Internal dependencies
  */
 import type { ResponsiveWrapperProps } from './types';
+export type { ResponsiveWrapperProps } from './types';
 
 /**
  * A wrapper component that maintains its aspect ratio when resized.

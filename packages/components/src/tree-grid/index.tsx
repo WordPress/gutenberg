@@ -9,7 +9,7 @@ import { UP, DOWN, LEFT, RIGHT, HOME, END } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import RovingTabIndexContainer from './roving-tab-index';
-import type { TreeGridProps } from './types';
+import type { TreeGridProps as TreeGridBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
 /**
@@ -30,6 +30,12 @@ function getRowFocusables( rowElement: HTMLElement ) {
 	} );
 }
 
+export type TreeGridProps = WordPressComponentProps<
+	TreeGridBaseProps,
+	'table',
+	false
+>;
+
 /**
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
@@ -42,7 +48,7 @@ function UnforwardedTreeGrid(
 		onFocusRow = () => {},
 		applicationAriaLabel,
 		...props
-	}: WordPressComponentProps< TreeGridProps, 'table', false >,
+	}: TreeGridProps,
 	/** A ref to the underlying DOM table element. */
 	ref: React.ForwardedRef< HTMLTableElement >
 ) {
@@ -388,6 +394,6 @@ function UnforwardedTreeGrid(
 export const TreeGrid = forwardRef( UnforwardedTreeGrid );
 
 export default TreeGrid;
-export { default as TreeGridRow } from './row';
-export { default as TreeGridCell } from './cell';
-export { default as TreeGridItem } from './item';
+export { default as TreeGridRow, type TreeGridRowProps } from './row';
+export { default as TreeGridCell, type TreeGridCellProps } from './cell';
+export { default as TreeGridItem, type TreeGridItemProps } from './item';

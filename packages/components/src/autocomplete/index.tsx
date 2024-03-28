@@ -41,6 +41,7 @@ import type {
 	UseAutocompleteProps,
 	WPCompleter,
 } from './types';
+export type { AutocompleteProps } from './types';
 
 const getNodeText = ( node: React.ReactNode ): string => {
 	if ( node === null ) {

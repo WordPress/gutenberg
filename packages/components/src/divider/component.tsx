@@ -11,10 +11,16 @@ import type { ForwardedRef } from 'react';
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
 import { DividerView } from './styles';
-import type { DividerProps } from './types';
+import type { DividerProps as DividerBaseProps } from './types';
+
+export type DividerProps = WordPressComponentProps<
+	DividerBaseProps,
+	'hr',
+	false
+>;
 
 function UnconnectedDivider(
-	props: WordPressComponentProps< DividerProps, 'hr', false >,
+	props: DividerProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const contextProps = useContextSystem( props, 'Divider' );

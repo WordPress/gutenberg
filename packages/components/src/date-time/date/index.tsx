@@ -42,6 +42,7 @@ import { inputToDate } from '../utils';
 import Button from '../../button';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
+export type { DatePickerProps } from '../types';
 /**
  * DatePicker is a React component that renders a calendar for date selection.
  *

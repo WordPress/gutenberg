@@ -14,11 +14,13 @@ import { isValidElement } from '@wordpress/element';
 import { getValidChildren } from '../utils/get-valid-children';
 import { contextConnect, useContextSystem } from '../context';
 import { ZStackView, ZStackChildView } from './styles';
-import type { ZStackProps } from './types';
+import type { ZStackProps as ZStackBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+export type ZStackProps = WordPressComponentProps< ZStackBaseProps, 'div' >;
+
 function UnconnectedZStack(
-	props: WordPressComponentProps< ZStackProps, 'div' >,
+	props: ZStackProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

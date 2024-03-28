@@ -31,11 +31,17 @@ import { useUpdateEffect } from '../utils/hooks';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type {
 	FocalPoint as FocalPointType,
-	FocalPointPickerProps,
+	FocalPointPickerProps as FocalPointPickerBaseProps,
 } from './types';
 import type { KeyboardEventHandler } from 'react';
 
 const GRID_OVERLAY_TIMEOUT = 600;
+
+export type FocalPointPickerProps = WordPressComponentProps<
+	FocalPointPickerBaseProps,
+	'div',
+	false
+>;
 
 /**
  * Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
@@ -100,7 +106,7 @@ export function FocalPointPicker( {
 		y: 0.5,
 	},
 	...restProps
-}: WordPressComponentProps< FocalPointPickerProps, 'div', false > ) {
+}: FocalPointPickerProps ) {
 	const [ point, setPoint ] = useState( valueProp );
 	const [ showGridOverlay, setShowGridOverlay ] = useState( false );
 

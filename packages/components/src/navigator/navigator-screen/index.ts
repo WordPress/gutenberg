@@ -1,1 +1,4 @@
-export { default as NavigatorScreen } from './component';
+export {
+	default as NavigatorScreen,
+	type NavigatorScreenProps,
+} from './component';

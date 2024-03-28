@@ -1,2 +1,2 @@
-export { default as Surface } from './component';
+export { default as Surface, type SurfaceProps } from './component';
 export * from './hook';

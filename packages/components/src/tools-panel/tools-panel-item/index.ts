@@ -1,2 +1,2 @@
-export { default } from './component';
+export { default, type ToolsPanelItemProps } from './component';
 export { useToolsPanelItem } from './hook';

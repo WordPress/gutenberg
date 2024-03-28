@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import type { AnimateProps, GetAnimateOptions } from './types';
+export type { AnimateProps } from './types';
 
 /**
  * @param type The animation type

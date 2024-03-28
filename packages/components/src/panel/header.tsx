@@ -3,6 +3,8 @@
  */
 import type { PanelHeaderProps } from './types';
 
+export type { PanelHeaderProps } from './types';
+
 /**
  * `PanelHeader` renders the header for the `Panel`.
  * This is used by the `Panel` component under the hood,

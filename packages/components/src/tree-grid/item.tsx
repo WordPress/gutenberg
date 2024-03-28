@@ -7,10 +7,11 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import RovingTabIndexItem from './roving-tab-index-item';
-import type { RovingTabIndexItemProps } from './types';
+import type { RovingTabIndexItemProps as TreeGridItemProps } from './types';
+export type { RovingTabIndexItemProps as TreeGridItemProps } from './types';
 
 function UnforwardedTreeGridItem(
-	{ children, ...props }: RovingTabIndexItemProps,
+	{ children, ...props }: TreeGridItemProps,
 	ref: React.ForwardedRef< any >
 ) {
 	return (

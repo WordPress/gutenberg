@@ -1,1 +1,4 @@
-export { default as VisuallyHidden } from './component';
+export {
+	default as VisuallyHidden,
+	type VisuallyHiddenProps,
+} from './component';

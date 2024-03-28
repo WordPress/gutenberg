@@ -22,8 +22,14 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '../animation';
-import type { DropType, DropZoneProps } from './types';
+import type { DropType, DropZoneProps as DropZoneBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
+
+export type DropZoneProps = WordPressComponentProps<
+	DropZoneBaseProps,
+	'div',
+	false
+>;
 
 /**
  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
@@ -55,7 +61,7 @@ export function DropZoneComponent( {
 	onHTMLDrop,
 	onDrop,
 	...restProps
-}: WordPressComponentProps< DropZoneProps, 'div', false > ) {
+}: DropZoneProps ) {
 	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
 		useState< boolean >();
 	const [ isDraggingOverElement, setIsDraggingOverElement ] =

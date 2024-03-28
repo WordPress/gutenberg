@@ -25,15 +25,20 @@ import {
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
-import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
+import type {
+	UnitControlProps as UnitControlBaseProps,
+	UnitControlOnChangeCallback,
+} from './types';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
+export type UnitControlProps = WordPressComponentProps<
+	UnitControlBaseProps,
+	'input',
+	false
+>;
+
 function UnforwardedUnitControl(
-	unitControlProps: WordPressComponentProps<
-		UnitControlProps,
-		'input',
-		false
-	>,
+	unitControlProps: UnitControlProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const {

@@ -35,14 +35,20 @@ import {
 	Wrapper,
 } from './styles/range-control-styles';
 
-import type { RangeControlProps } from './types';
+import type { RangeControlProps as RangeControlBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
 
 const noop = () => {};
 
+export type RangeControlProps = WordPressComponentProps<
+	RangeControlBaseProps,
+	'input',
+	false
+>;
+
 function UnforwardedRangeControl(
-	props: WordPressComponentProps< RangeControlProps, 'input', false >,
+	props: RangeControlProps,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {

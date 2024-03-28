@@ -20,10 +20,15 @@ import AngleCircle from './angle-circle';
 import { UnitText } from './styles/angle-picker-control-styles';
 
 import type { WordPressComponentProps } from '../context';
-import type { AnglePickerControlProps } from './types';
+import type { AnglePickerControlProps as AnglePickerControlBaseProps } from './types';
+
+export type AnglePickerControlProps = WordPressComponentProps<
+	AnglePickerControlBaseProps,
+	'div'
+>;
 
 function UnforwardedAnglePickerControl(
-	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
+	props: AnglePickerControlProps,
 	ref: ForwardedRef< any >
 ) {
 	const {

@@ -8,9 +8,15 @@ import classnames from 'classnames';
  */
 import Notice from '.';
 import type { WordPressComponentProps } from '../context';
-import type { NoticeListProps } from './types';
+import type { NoticeListProps as NoticeListBaseProps } from './types';
 
 const noop = () => {};
+
+export type NoticeListProps = WordPressComponentProps<
+	NoticeListBaseProps,
+	'div',
+	false
+>;
 
 /**
  * `NoticeList` is a component used to render a collection of notices.
@@ -43,7 +49,7 @@ function NoticeList( {
 	onRemove = noop,
 	className,
 	children,
-}: WordPressComponentProps< NoticeListProps, 'div', false > ) {
+}: NoticeListProps ) {
 	const removeNotice =
 		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
 			onRemove( id );

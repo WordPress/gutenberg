@@ -18,6 +18,8 @@ import type {
 	QueryControlsWithSingleCategorySelectionProps,
 } from './types';
 
+export type { QueryControlsProps } from './types';
+
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 const MAX_CATEGORIES_SUGGESTIONS = 20;

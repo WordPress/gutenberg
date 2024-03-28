@@ -10,10 +10,15 @@ import type { WordPressComponentProps } from '../context';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import useTruncate from './hook';
-import type { TruncateProps } from './types';
+import type { TruncateProps as TruncateBaseProps } from './types';
+
+export type TruncateProps = WordPressComponentProps<
+	TruncateBaseProps,
+	'span'
+>;
 
 function UnconnectedTruncate(
-	props: WordPressComponentProps< TruncateProps, 'span' >,
+	props: TruncateProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const truncateProps = useTruncate( props );

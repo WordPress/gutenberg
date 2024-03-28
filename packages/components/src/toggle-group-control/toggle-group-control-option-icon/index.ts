@@ -1,1 +1,4 @@
-export { default as ToggleGroupControlOptionIcon } from './component';
+export {
+	default as ToggleGroupControlOptionIcon,
+	type ToggleGroupControlOptionIconProps,
+} from './component';

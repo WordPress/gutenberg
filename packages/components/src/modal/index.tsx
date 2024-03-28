@@ -43,6 +43,8 @@ import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
+export type { ModalProps } from './types';
+
 // Used to track and dismiss the prior modal when another opens unless nested.
 const ModalContext = createContext<
 	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]

@@ -1,5 +1,8 @@
 /**
  * Internal Dependencies
  */
-export { default as NavigableMenu } from './menu';
-export { default as TabbableContainer } from './tabbable';
+export { default as NavigableMenu, type NavigableMenuProps } from './menu';
+export {
+	default as TabbableContainer,
+	type TabbableContainerProps,
+} from './tabbable';

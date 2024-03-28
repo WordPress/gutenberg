@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import type { FocusableIframeProps } from './types';
+export type { FocusableIframeProps } from './types';
 
 export default function FocusableIframe( {
 	iframeRef,

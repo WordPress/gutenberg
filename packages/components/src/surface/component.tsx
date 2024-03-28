@@ -9,11 +9,13 @@ import type { ForwardedRef } from 'react';
 import { contextConnect } from '../context';
 import { View } from '../view';
 import { useSurface } from './hook';
-import type { SurfaceProps } from './types';
+import type { SurfaceProps as SurfaceBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+export type SurfaceProps = WordPressComponentProps< SurfaceBaseProps, 'div' >;
+
 function UnconnectedSurface(
-	props: WordPressComponentProps< SurfaceProps, 'div' >,
+	props: SurfaceProps,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const surfaceProps = useSurface( props );

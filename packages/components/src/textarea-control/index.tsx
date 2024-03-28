@@ -9,11 +9,17 @@ import { forwardRef } from '@wordpress/element';
  */
 import BaseControl from '../base-control';
 import { StyledTextarea } from './styles/textarea-control-styles';
-import type { TextareaControlProps } from './types';
+import type { TextareaControlProps as TextareaControlBaseProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+export type TextareaControlProps = WordPressComponentProps<
+	TextareaControlBaseProps,
+	'textarea',
+	false
+>;
+
 function UnforwardedTextareaControl(
-	props: WordPressComponentProps< TextareaControlProps, 'textarea', false >,
+	props: TextareaControlProps,
 	ref: React.ForwardedRef< HTMLTextAreaElement >
 ) {
 	const {
