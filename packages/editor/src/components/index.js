@@ -27,6 +27,8 @@ export { default as PageAttributesPanel } from './page-attributes/panel';
 export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template/classic-theme';
 export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
+export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
+export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
 export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
 export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
 export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';

@@ -36,14 +36,17 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { DocumentTools, PostViewLink, PreviewDropdown } =
-	unlock( editorPrivateApis );
+const {
+	DocumentTools,
+	PostViewLink,
+	PreviewDropdown,
+	PostPublishButtonOrToggle,
+} = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },

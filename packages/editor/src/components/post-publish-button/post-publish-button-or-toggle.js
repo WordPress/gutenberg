@@ -1,24 +1,52 @@
 /**
  * WordPress dependencies
  */
-import { useViewportMatch, compose } from '@wordpress/compose';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { PostPublishButton, store as editorStore } from '@wordpress/editor';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
 
-export function PostPublishButtonOrToggle( {
+/**
+ * Internal dependencies
+ */
+import PostPublishButton from './index';
+import { store as editorStore } from '../../store';
+
+const IS_TOGGLE = 'toggle';
+const IS_BUTTON = 'button';
+
+export default function PostPublishButtonOrToggle( {
 	forceIsDirty,
-	hasPublishAction,
-	isBeingScheduled,
-	isPending,
-	isPublished,
-	isPublishSidebarEnabled,
-	isPublishSidebarOpened,
-	isScheduled,
-	togglePublishSidebar,
 	setEntitiesSavedStatesCallback,
 } ) {
-	const IS_TOGGLE = 'toggle';
-	const IS_BUTTON = 'button';
+	const { togglePublishSidebar } = useDispatch( editorStore );
+	const {
+		hasPublishAction,
+		isBeingScheduled,
+		isPending,
+		isPublished,
+		isScheduled,
+		isPublishSidebarEnabled,
+		isPublishSidebarOpened,
+	} = useSelect( ( select ) => {
+		const {
+			getCurrentPost,
+			isEditedPostBeingScheduled,
+			isCurrentPostPublished,
+			isCurrentPostPending,
+			isCurrentPostScheduled,
+		} = select( editorStore );
+		return {
+			hasPublishAction:
+				getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			isPending: isCurrentPostPending(),
+			isPublished: isCurrentPostPublished(),
+			isScheduled: isCurrentPostScheduled(),
+			isPublishSidebarEnabled:
+				select( editorStore ).isPublishSidebarEnabled(),
+			isPublishSidebarOpened:
+				select( editorStore ).isPublishSidebarOpened(),
+		};
+	}, [] );
 	const isSmallerThanMediumViewport = useViewportMatch( 'medium', '<' );
 	let component;
 
@@ -68,25 +96,3 @@ export function PostPublishButtonOrToggle( {
 		/>
 	);
 }
-
-export default compose(
-	withSelect( ( select ) => ( {
-		hasPublishAction:
-			select( editorStore ).getCurrentPost()?._links?.[
-				'wp:action-publish'
-			] ?? false,
-		isBeingScheduled: select( editorStore ).isEditedPostBeingScheduled(),
-		isPending: select( editorStore ).isCurrentPostPending(),
-		isPublished: select( editorStore ).isCurrentPostPublished(),
-		isPublishSidebarEnabled:
-			select( editorStore ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened: select( editorStore ).isPublishSidebarOpened(),
-		isScheduled: select( editorStore ).isCurrentPostScheduled(),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( editorStore );
-		return {
-			togglePublishSidebar,
-		};
-	} )
-)( PostPublishButtonOrToggle );
