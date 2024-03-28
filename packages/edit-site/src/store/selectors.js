@@ -8,6 +8,7 @@ import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -329,3 +330,36 @@ export function hasPageContentFocus() {
 
 	return false;
 }
+
+export const getSectionsContainerClientId = createRegistrySelector(
+	( select ) =>
+		( state, postType = 'page' ) => {
+			const CONTENT_TYPES = [ 'post', 'page' ];
+
+			const { getBlockAttributes, getBlocksByName } =
+				select( blockEditorStore );
+
+			if ( CONTENT_TYPES.includes( postType ) ) {
+				const postContentBlocks = getBlocksByName(
+					state,
+					'core/post-content'
+				);
+
+				if ( postContentBlocks?.length > 0 ) {
+					return postContentBlocks[ 0 ];
+				}
+			}
+
+			const { getGroupingBlockName } = select( blocksStore );
+
+			const groupBlocks = getBlocksByName(
+				state,
+				getGroupingBlockName()
+			);
+
+			return groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( state, clientId )?.tagName === 'main'
+			);
+		}
+);

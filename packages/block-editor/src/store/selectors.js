@@ -2803,7 +2803,8 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	if (
 		editorMode === 'zoom-out' &&
 		clientId &&
-		! getBlockRootClientId( state, clientId )
+		getBlockRootClientId( state, clientId ) ===
+			getSectionsContainerClientId( state )
 	) {
 		return true;
 	}
@@ -2960,6 +2961,36 @@ export const isGroupable = createRegistrySelector(
 			return (
 				_isGroupable &&
 				canRemoveBlocks( state, _clientIds, rootClientId )
+			);
+		}
+);
+
+export const getSectionsContainerClientId = createRegistrySelector(
+	( select ) =>
+		( state, postType = 'page' ) => {
+			const CONTENT_TYPES = [ 'post', 'page' ];
+
+			if ( CONTENT_TYPES.includes( postType ) ) {
+				const postContentBlocks = getBlocksByName(
+					state,
+					'core/post-content'
+				);
+
+				if ( postContentBlocks?.length > 0 ) {
+					return postContentBlocks[ 0 ];
+				}
+			}
+
+			const { getGroupingBlockName } = select( blocksStore );
+
+			const groupBlocks = getBlocksByName(
+				state,
+				getGroupingBlockName()
+			);
+
+			return groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( state, clientId )?.tagName === 'main'
 			);
 		}
 );
