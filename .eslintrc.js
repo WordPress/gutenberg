@@ -101,6 +101,8 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
