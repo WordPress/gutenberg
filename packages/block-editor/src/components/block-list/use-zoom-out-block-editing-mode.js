@@ -24,12 +24,7 @@ export default function useZoomOutBlockEditingMode() {
 				getClientIdsOfDescendants,
 			} = select( blockEditorStore );
 
-			// TODO: We need a better API as using the post type
-			// in block editor package is not allowed.
-			const postType = select( 'core/editor' ).getCurrentPostType();
-
-			const _sectionsContainerClientId =
-				getSectionsContainerClientId( postType );
+			const _sectionsContainerClientId = getSectionsContainerClientId();
 
 			return {
 				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
