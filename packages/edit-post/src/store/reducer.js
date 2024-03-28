@@ -95,10 +95,19 @@ function metaBoxesInitialized( state = false, action ) {
 	return state;
 }
 
+function showMetaBoxes( state = false, action ) {
+	switch ( action.type ) {
+		case 'TOGGLE_META_BOXES':
+			return ! state;
+	}
+	return state;
+}
+
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
 	initialized: metaBoxesInitialized,
+	showMetaBoxes,
 } );
 
 export default combineReducers( {

@@ -552,6 +552,10 @@ export function areMetaBoxesInitialized( state ) {
 	return state.metaBoxes.initialized;
 }
 
+export function showMetaBoxes( state ) {
+	return state.metaBoxes.showMetaBoxes;
+}
+
 /**
  * Retrieves the template of the currently edited post.
  *

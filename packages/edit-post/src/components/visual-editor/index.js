@@ -48,16 +48,12 @@ export default function VisualEditor( { styles } ) {
 				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
-	const hasMetaBoxes = useSelect(
-		( select ) => select( editPostStore ).hasMetaBoxes(),
-		[]
-	);
 
 	let paddingBottom;
 
 	// Add a constant padding for the typewritter effect. When typing at the
 	// bottom, there needs to be room to scroll up.
-	if ( ! hasMetaBoxes && renderingMode === 'post-only' ) {
+	if ( renderingMode === 'post-only' ) {
 		paddingBottom = '40vh';
 	}
 
@@ -75,8 +71,8 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	const isToBeIframed =
-		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
-			! hasMetaBoxes ) ||
+		hasV3BlocksOnly ||
+		( isGutenbergPlugin && isBlockBasedTheme ) ||
 		isEditingTemplate;
 
 	return (
