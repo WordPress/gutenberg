@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	parse,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
@@ -167,6 +171,15 @@ export function setNavigationMenu( navigationMenuId ) {
 	};
 }
 
+function getSectionRootBlockName( postType ) {
+	const CONTENT_TYPES = [ 'post', 'page' ];
+
+	if ( CONTENT_TYPES.includes( postType ) ) {
+		return 'core/post-content';
+	}
+	return 'core/group';
+}
+
 /**
  * Action that sets an edited entity.
  *
@@ -176,14 +189,21 @@ export function setNavigationMenu( navigationMenuId ) {
  *
  * @return {Object} Action object.
  */
-export function setEditedEntity( postType, postId, context ) {
-	return {
-		type: 'SET_EDITED_POST',
-		postType,
-		id: postId,
-		context,
+export const setEditedEntity =
+	( postType, postId, context ) =>
+	( { registry, dispatch } ) => {
+		registry
+			.dispatch( blocksStore )
+			.setSectionRootBlockName(
+				getSectionRootBlockName( context.postType )
+			);
+		dispatch( {
+			type: 'SET_EDITED_POST',
+			postType,
+			id: postId,
+			context,
+		} );
 	};
-}
 
 /**
  * @deprecated

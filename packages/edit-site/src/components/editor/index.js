@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Notice,
@@ -18,7 +17,6 @@ import {
 	useViewportMatch,
 	useReducedMotion,
 } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
@@ -87,15 +85,6 @@ const interfaceLabels = {
 
 const ANIMATION_DURATION = 0.25;
 
-function getSectionRootBlockName( postType ) {
-	const CONTENT_TYPES = [ 'post', 'page' ];
-
-	if ( CONTENT_TYPES.includes( postType ) ) {
-		return 'core/post-content';
-	}
-	return 'core/group';
-}
-
 export default function Editor( { isLoading, onClick } ) {
 	const {
 		record: editedPost,
@@ -162,11 +151,6 @@ export default function Editor( { isLoading, onClick } ) {
 			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
-
-	const { setSectionRootBlockName } = useDispatch( blocksStore );
-	useEffect( () => {
-		setSectionRootBlockName( getSectionRootBlockName( context?.postType ) );
-	}, [ context, setSectionRootBlockName ] );
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
