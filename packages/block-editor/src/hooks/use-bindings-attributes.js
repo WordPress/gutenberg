@@ -86,6 +86,14 @@ function getAttributeValue( value ) {
  */
 function castValue( value, original ) {
 	if ( original instanceof RichTextData ) {
+		/*
+		 * Before to create a new instance,
+		 * return the original instance if the value is the same.
+		 */
+		if ( value === original.toHTMLString() ) {
+			return original;
+		}
+
 		return RichTextData.fromHTMLString( value );
 	}
 
@@ -120,27 +128,25 @@ const BindingConnector = ( {
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
 
+	// Store previous values for the attribute and external property
+	const prevAttrValue = useRef( attrValue );
+	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
+
 	const updateBoundAttibute = useCallback(
-		( newAttrValue ) => {
+		( newAttrValue, prev ) => {
 			onPropValueChange( {
-				[ attrName ]: castValue( newAttrValue, attrValue ),
+				[ attrName ]: castValue( newAttrValue, prev ),
 			} );
 		},
-		[ attrName, attrValue, onPropValueChange ]
+		[ attrName, onPropValueChange ]
 	);
-
-	// Get the raw attribute value.
-	const rawAttrValue = getAttributeValue( attrValue );
-	const prevAttrValue = useRef( rawAttrValue );
-
-	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
 			// Sync from external source propery to block attribute.
 			if ( propValue !== prevPropValue.current ) {
 				prevPropValue.current = propValue;
-				return updateBoundAttibute( propValue ); // close the loop.
+				return updateBoundAttibute( propValue, attrValue ); // close the loop.
 			}
 		} else if ( placeholder ) {
 			/*
@@ -162,18 +168,20 @@ const BindingConnector = ( {
 		}
 
 		// Sync from block attribute to external source property.
-		if ( rawAttrValue !== prevAttrValue.current ) {
-			prevAttrValue.current = rawAttrValue;
+		const rawAttrValue = getAttributeValue( attrValue );
+
+		if ( rawAttrValue !== getAttributeValue( prevAttrValue.current ) ) {
+			prevAttrValue.current = attrValue;
 			updatePropValue( rawAttrValue );
 		}
 	}, [
 		updateBoundAttibute,
 		propValue,
-		rawAttrValue,
 		placeholder,
 		blockName,
 		attrName,
 		updatePropValue,
+		attrValue,
 	] );
 
 	return null;
