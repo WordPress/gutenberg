@@ -12,6 +12,7 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
+use PHPCSUtils\Utils\FunctionDeclarations;
 use PHPCSUtils\Utils\ObjectDeclarations;
 use PHPCSUtils\Utils\Scopes;
 
@@ -46,9 +47,9 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 */
 	public function register() {
 		return array(
-			//T_FUNCTION,
+			T_FUNCTION,
 			T_VARIABLE,
-			//T_CLASS
+			T_CLASS
 		);
 	}
 
@@ -72,19 +73,8 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		if ( 'T_VARIABLE' === $token['type'] ) {
-			$class_property_tokens = array(
-				T_PUBLIC,
-				T_PROTECTED,
-				T_PRIVATE,
-				T_VAR
-			);
-
-			if ( Scopes::isOOProperty( $phpcsFile, $stackPtr ) ) {
-				$this->process_class_property_token( $phpcsFile, $stackPtr );
-				return;
-			}
-
+		if ( 'T_VARIABLE' === $token['type'] && Scopes::isOOProperty( $phpcsFile, $stackPtr ) ) {
+			$this->process_class_property_token( $phpcsFile, $stackPtr );
 			return;
 		}
 
@@ -235,18 +225,20 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	}
 
 	protected function process_function_token( File $phpcsFile, $stackPtr ) {
-		$tokens                   = $phpcsFile->getTokens();
+		$tokens = $phpcsFile->getTokens();
 
-		$oo_token = Scopes::validDirectScope( $phpcsFile, $stackPtr, Tokens::$ooScopeTokens );
-		$is_oo_method = Scopes::isOOMethod( $phpcsFile, $stackPtr );
+		$oo_token      = Scopes::validDirectScope( $phpcsFile, $stackPtr, Tokens::$ooScopeTokens );
+		$is_oo_method  = Scopes::isOOMethod( $phpcsFile, $stackPtr );
 		$function_name = ObjectDeclarations::getName( $phpcsFile, $stackPtr );
 
+		$violation_code = 'missingSinceTag';
+
 		if ( $is_oo_method ) {
-			$scopeModifier = $phpcsFile->getMethodProperties($stackPtr)['scope'];
-			if (($scopeModifier === 'protected'
-			     && $this->minimumVisibility === 'public')
-			    || ($scopeModifier === 'private'
-			        && ($this->minimumVisibility === 'public' || $this->minimumVisibility === 'protected'))
+			$scope_modifier = FunctionDeclarations::getProperties( $phpcsFile, $stackPtr )['scope'];
+			if ( ( $scope_modifier === 'protected'
+			       && $this->minimumVisibility === 'public' )
+			     || ( $scope_modifier === 'private'
+			          && ( $this->minimumVisibility === 'public' || $this->minimumVisibility === 'protected' ) )
 			) {
 				return;
 			}
@@ -273,7 +265,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		$doc_block_end_token = $phpcsFile->findPrevious( $tokens_before_the_docblock, ( $stackPtr - 1 ), null, true, null, true );
 		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
 			return;
 		}
 
@@ -281,7 +273,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		// Its only job is to make sure that the @since tag is present and has a valid version value.
 		$doc_block_start_token = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $doc_block_end_token - 1 ), null, true, null, true );
 		if ( false === $doc_block_start_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
 			return;
 		}
 
@@ -290,13 +282,13 @@ class FunctionCommentSinceTagSniff implements Sniff {
 
 		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
 		if ( false === $since_tag_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
 			return;
 		}
 
 		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag_token + 1, null, true, null, true );
 		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $since_tag_token, 'MissingSinceTag' );
+			$phpcsFile->addError( $missing_since_tag_error_message, $since_tag_token, $violation_code );
 			return;
 		}
 
@@ -310,7 +302,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		$phpcsFile->addError(
 			'Invalid @since version value for the "%s()" %s: "%s". Version value must be greater than or equal to 0.0.1.',
 			$version_token,
-			'InvalidSinceTagVersionValue',
+			$violation_code,
 			array(
 				$function_name,
 				$is_oo_method ? 'method' : 'function',
