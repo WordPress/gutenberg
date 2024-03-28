@@ -18,13 +18,13 @@ register_activation_hook( __FILE__, 'gutenberg_e2e_set_temp_font_dir' );
 /**
  * Uses the randomly generated font directory for the duration of the font tests.
  */
- function gutenberg_filter_e2e_font_dir( $font_dir ) {
+function gutenberg_filter_e2e_font_dir( $font_dir ) {
 	$subdir = get_option( 'gutenberg_e2e_font_dir' );
 
-	$font_dir['path']     .= $subdir;
-	$font_dir['url']      .= $subdir;
-	$font_dir['basedir']  .= $subdir;
-	$font_dir['baseurl']  .= $subdir;
+	$font_dir['path']    .= $subdir;
+	$font_dir['url']     .= $subdir;
+	$font_dir['basedir'] .= $subdir;
+	$font_dir['baseurl'] .= $subdir;
 
 	return $font_dir;
 }
