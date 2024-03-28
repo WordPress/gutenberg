@@ -318,9 +318,9 @@ export function removeBlockCollection( namespace ) {
 	};
 }
 
-export function setSectionRootBlockName( blockName = 'core/group' ) {
+export function setSectionRootBlockName( name = 'core/group' ) {
 	return {
 		type: 'SET_SECTION_ROOT_BLOCK_NAME',
-		blockName,
+		name,
 	};
 }

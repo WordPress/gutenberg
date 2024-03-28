@@ -2983,11 +2983,10 @@ export const getSectionsContainerClientId = createRegistrySelector(
 	( select ) => ( state ) => {
 		const sectionRootBlockName =
 			select( blocksStore ).getSectionRootBlockName();
-
 		const { getGroupingBlockName } = select( blocksStore );
 		const groupingBlockName = getGroupingBlockName();
 		if ( sectionRootBlockName === groupingBlockName ) {
-			const groupBlocks = getBlocksByName( state, groupingBlockName );
+			const groupBlocks = getBlocksByName( state, sectionRootBlockName );
 			return groupBlocks.find(
 				( clientId ) =>
 					getBlockAttributes( state, clientId )?.tagName === 'main'
