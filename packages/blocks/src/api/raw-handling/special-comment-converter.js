@@ -33,8 +33,10 @@ export default function specialCommentConverter( node, doc ) {
 	const block = createBlock( node, doc );
 
 	// If our `<!--more-->` comment is in the middle of a paragraph, we should
-	// split the paragraph in two and insert the more block in between. If not,
-	// the more block will eventually end up being inserted after the paragraph.
+	// split the paragraph in two and insert the more block in between. If it's
+	// inside an empty paragraph, we should still move it out of the paragraph
+	// and remove the paragraph. If there's no paragraph, fall back to simply
+	// replacing the comment.
 	if ( ! node.parentNode || node.parentNode.nodeName !== 'P' ) {
 		replace( node, block );
 	} else {
