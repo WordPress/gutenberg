@@ -14,6 +14,7 @@
 .components-text-control__input[type="number"] {
 	width: 100%;
 	height: $grid-unit-40;
+	margin: 0;
 	@include input-control;
 
 	&.is-next-40px-default-size {
