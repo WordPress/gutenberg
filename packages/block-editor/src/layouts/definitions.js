@@ -34,13 +34,13 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child:first-child',
+				selector: ' > :first-child',
 				rules: {
 					'margin-block-start': '0',
 				},
 			},
 			{
-				selector: ' > :last-child:last-child',
+				selector: ' > :last-child',
 				rules: {
 					'margin-block-end': '0',
 				},
@@ -100,13 +100,13 @@ export const LAYOUT_DEFINITIONS = {
 		],
 		spacingStyles: [
 			{
-				selector: ' > :first-child:first-child',
+				selector: ' > :first-child',
 				rules: {
 					'margin-block-start': '0',
 				},
 			},
 			{
-				selector: ' > :last-child:last-child',
+				selector: ' > :last-child',
 				rules: {
 					'margin-block-end': '0',
 				},

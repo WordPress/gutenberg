@@ -31,7 +31,7 @@
 	// Such shifts happen when the bottom margin of the Title block has been set to less than the default 1em margin of paragraphs.
 	:where(body .is-layout-constrained) &,
 	:where(.wp-site-blocks) & {
-		> :first-child:first-child {
+		> :first-child {
 			margin-block-start: 0;
 			margin-block-end: 0;
 		}
