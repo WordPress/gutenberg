@@ -101,7 +101,7 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
-	top: 0;
+	top: $border-width;
 	right: 0;
 	bottom: 0;
 	left: 0;
@@ -126,20 +126,20 @@ html.interface-interface-skeleton__html-container {
 	overflow: auto;
 
 	@include break-medium() {
-		border-left: $border-width solid $gray-200;
+		box-shadow: -$border-width 0 0 0 rgba($color: #000, $alpha: 0.133);
 	}
 }
 
 .interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $gray-200;
+		box-shadow: $border-width 0 0 0 rgba($color: #000, $alpha: 0.133);
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $gray-200;
+	box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133);
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
 }
