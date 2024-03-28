@@ -1,28 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function TrashPageMenuItem( { postId, onRemove } ) {
+export default function TrashPageMenuItem( { page, onRemove } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
-	const page = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'postType', 'page', postId ),
-		[ postId ]
+	const title = decodeEntities(
+		typeof page.title === 'string' ? page.title : page.title.rendered
 	);
+
 	async function removePage() {
 		try {
 			await deleteEntityRecord(
 				'postType',
 				'page',
-				postId,
+				page.id,
 				{},
 				{ throwOnError: true }
 			);
@@ -30,7 +29,7 @@ export default function TrashPageMenuItem( { postId, onRemove } ) {
 				sprintf(
 					/* translators: The page's title. */
 					__( '"%s" moved to the Trash.' ),
-					decodeEntities( page.title.rendered )
+					title
 				),
 				{
 					type: 'snackbar',
@@ -50,14 +49,8 @@ export default function TrashPageMenuItem( { postId, onRemove } ) {
 		}
 	}
 	return (
-		<>
-			<MenuItem
-				onClick={ () => removePage() }
-				isDestructive
-				variant="secondary"
-			>
-				{ __( 'Move to Trash' ) }
-			</MenuItem>
-		</>
+		<MenuItem onClick={ () => removePage() } isDestructive>
+			{ __( 'Move to Trash' ) }
+		</MenuItem>
 	);
 }

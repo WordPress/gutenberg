@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import RenameMenuItem from './rename-menu-item';
+import RenameMenuItem from '../rename-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function TemplateActions( {
@@ -56,7 +56,7 @@ export default function TemplateActions( {
 					{ isRemovable && (
 						<>
 							<RenameMenuItem
-								template={ template }
+								item={ template }
 								onClose={ onClose }
 							/>
 							<DeleteMenuItem

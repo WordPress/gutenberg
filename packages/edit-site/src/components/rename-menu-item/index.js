@@ -21,8 +21,10 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-export default function RenameMenuItem( { template, onClose } ) {
-	const title = decodeEntities( template.title.rendered );
+export default function RenameMenuItem( { item, onClose } ) {
+	const title = decodeEntities(
+		typeof item.title === 'string' ? item.title : item.title.rendered
+	);
 	const [ editedTitle, setEditedTitle ] = useState( title );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
@@ -33,15 +35,15 @@ export default function RenameMenuItem( { template, onClose } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	if ( template.type === TEMPLATE_POST_TYPE && ! template.is_custom ) {
+	if ( item.type === TEMPLATE_POST_TYPE && ! item.is_custom ) {
 		return null;
 	}
 
-	async function onTemplateRename( event ) {
+	async function onRename( event ) {
 		event.preventDefault();
 
 		try {
-			await editEntityRecord( 'postType', template.type, template.id, {
+			await editEntityRecord( 'postType', item.type, item.id, {
 				title: editedTitle,
 			} );
 
@@ -53,33 +55,23 @@ export default function RenameMenuItem( { template, onClose } ) {
 			// Persist edited entity.
 			await saveSpecifiedEntityEdits(
 				'postType',
-				template.type,
-				template.id,
+				item.type,
+				item.id,
 				[ 'title' ], // Only save title to avoid persisting other edits.
 				{
 					throwOnError: true,
 				}
 			);
 
-			createSuccessNotice(
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'Template renamed.' )
-					: __( 'Template part renamed.' ),
-				{
-					type: 'snackbar',
-				}
-			);
+			createSuccessNotice( __( 'Name updated.' ), {
+				id: 'template-update',
+				type: 'snackbar',
+			} );
 		} catch ( error ) {
-			const fallbackErrorMessage =
-				template.type === TEMPLATE_POST_TYPE
-					? __( 'An error occurred while renaming the template.' )
-					: __(
-							'An error occurred while renaming the template part.'
-					  );
 			const errorMessage =
 				error.message && error.code !== 'unknown_error'
 					? error.message
-					: fallbackErrorMessage;
+					: __( 'An error occurred while updating the name.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
@@ -103,7 +95,7 @@ export default function RenameMenuItem( { template, onClose } ) {
 					} }
 					overlayClassName="edit-site-list__rename-modal"
 				>
-					<form onSubmit={ onTemplateRename }>
+					<form onSubmit={ onRename }>
 						<VStack spacing="5">
 							<TextControl
 								__nextHasNoMarginBottom
