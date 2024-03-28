@@ -2534,6 +2534,14 @@ export const __experimentalGetReusableBlockTitle = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, ref ) => {
+				deprecated(
+					"wp.data.select( 'core/block-editor' ).__experimentalGetReusableBlockTitle",
+					{
+						since: '6.6',
+						version: '6.8',
+					}
+				);
+
 				const reusableBlock = unlock( select( STORE_NAME ) )
 					.getReusableBlocks()
 					.find( ( block ) => block.id === ref );
