@@ -12,6 +12,7 @@ namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
 use PHP_CodeSniffer\Util\Tokens;
+use PHPCSUtils\Tokens\Collections;
 use PHPCSUtils\Utils\FunctionDeclarations;
 use PHPCSUtils\Utils\ObjectDeclarations;
 use PHPCSUtils\Utils\Scopes;
@@ -38,7 +39,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 *
 	 * @var array
 	 */
-	private static $cache = array();
+	protected static $cache = array();
 
 	/**
 	 * Returns an array of tokens this test wants to listen for.
@@ -83,7 +84,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		}
 	}
 
-	public function process_class_token( File $phpcsFile, $stackPtr ) {
+	protected function process_class_token( File $phpcsFile, $stackPtr ) {
 		$tokens = $phpcsFile->getTokens();
 		// All these tokens could be present before the docblock.
 		$tokens_before_the_docblock = array(
@@ -151,57 +152,31 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		);
 	}
 
-	public function process_class_property_token( File $phpcsFile, $stackPtr ) {
-
+	protected function process_class_property_token( File $phpcsFile, $stackPtr ) {
 		$tokens = $phpcsFile->getTokens();
-		// All these tokens could be present before the docblock.
-		$tokens_before_the_docblock = array(
-			T_FINAL,
-			T_ABSTRACT,
-			T_WHITESPACE,
-			T_ATTRIBUTE,
-			T_ATTRIBUTE_END,
-			T_STRING,
-			T_NS_SEPARATOR
-		);
 
-		$tokens_before_the_docblock = array_merge($tokens_before_the_docblock, Tokens::$assignmentTokens);
-
-		$property_name = $tokens[ $stackPtr ]['content'];
-		$class_token   = $phpcsFile->getCondition( $stackPtr, T_CLASS, false );
-		$class_name    = $phpcsFile->getDeclarationName( $class_token );
+		$property_name                   = $tokens[ $stackPtr ]['content'];
+		$oo_token                        = Scopes::validDirectScope( $phpcsFile, $stackPtr, Collections::ooPropertyScopes() );
+		$class_name                      = ObjectDeclarations::getName( $phpcsFile, $oo_token );
 		$missing_since_tag_error_message = sprintf(
 			'@since tag is missing for the "%s::%s" property.',
 			$class_name,
 			$property_name
 		);
 
-		$doc_block_end_token = $phpcsFile->findPrevious( $tokens_before_the_docblock, ( $stackPtr - 1 ), null, true, null, true );
-		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
+		$violation_code = 'missingSinceTag';
+
+		$docblock = static::find_docblock( $phpcsFile, $stackPtr );
+		if ( false === $docblock ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
 			return;
 		}
 
-		// The sniff intentionally doesn't check if the docblock has a valid open tag.
-		// Its only job is to make sure that the @since tag is present and has a valid version value.
-		$doc_block_start_token = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $doc_block_end_token - 1 ), null, true, null, true );
-		if ( false === $doc_block_start_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
-			return;
-		}
+		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
 
-		// This is the first non-docblock token, so the next token should be used.
-		++ $doc_block_start_token;
-
-		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
-		if ( false === $since_tag_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, 'MissingSinceTag' );
-			return;
-		}
-
-		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag_token + 1, null, true, null, true );
-		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $since_tag_token, 'MissingSinceTag' );
+		$version_token = static::find_version_tag_token( $phpcsFile, $doc_block_start_token, $doc_block_end_token );
+		if ( false === $version_token ) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $doc_block_start_token, $violation_code );
 			return;
 		}
 
@@ -293,7 +268,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param int $stackPtr   The position (stack pointer) in the token stack from which to start searching backwards.
 	 * @return array|false An array with the starting and ending token positions of the found docblock, or false if no docblock is found.
 	 */
-	private static function find_docblock( File $phpcsFile, $stackPtr ) {
+	protected static function find_docblock( File $phpcsFile, $stackPtr ) {
 		$tokens                 = $phpcsFile->getTokens();
 		$ignore                 = Tokens::$methodPrefixes;
 		$ignore[ T_WHITESPACE ] = T_WHITESPACE;
@@ -342,7 +317,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param int $docBlockEndToken   The token index where the docblock ends.
 	 * @return false|int The token index of the version tag within the docblock if found, false otherwise.
 	 */
-	private static function find_version_tag_token( File $phpcsFile, $doc_block_start_token, $doc_block_end_token ) {
+	protected static function find_version_tag_token( File $phpcsFile, $doc_block_start_token, $doc_block_end_token ) {
 		$tokens          = $phpcsFile->getTokens();
 		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
 		if ( false === $since_tag_token ) {
@@ -363,7 +338,7 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	 * @param File $phpcsFile The file being scanned.
 	 * @return bool Returns true if the current block is experimental.
 	 */
-	private static function is_experimental_block( File $phpcsFile ) {
+	protected static function is_experimental_block( File $phpcsFile ) {
 		$block_json_filepath = dirname( $phpcsFile->getFilename() ) . DIRECTORY_SEPARATOR . 'block.json';
 
 		if ( isset( static::$cache[ $block_json_filepath ] ) ) {
