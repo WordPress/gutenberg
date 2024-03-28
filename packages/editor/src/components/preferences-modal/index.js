@@ -148,6 +148,20 @@ export default function EditorPreferencesModal( {
 								/>
 							</PageAttributesCheck>
 						</PreferencesModalSection>
+						{ isLargeViewport && (
+							<PreferencesModalSection
+								title={ __( 'Publishing' ) }
+							>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="isPublishSidebarEnabled"
+									help={ __(
+										'Review settings, such as visibility and tags.'
+									) }
+									label={ __( 'Enable pre-publish checks' ) }
+								/>
+							</PreferencesModalSection>
+						) }
 						{ extraSections?.general }
 					</>
 				),

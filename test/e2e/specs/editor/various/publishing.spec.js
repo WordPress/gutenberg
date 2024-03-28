@@ -70,13 +70,13 @@ test.describe( 'Publishing', () => {
 		test.describe( `a ${ postType } with pre-publish checks disabled`, () => {
 			test.beforeEach( async ( { admin, editor } ) => {
 				await admin.createNewPost( { postType } );
-				await editor.setPreferences( 'core/edit-post', {
+				await editor.setPreferences( 'core', {
 					isPublishSidebarEnabled: false,
 				} );
 			} );
 
 			test.afterEach( async ( { editor } ) => {
-				await editor.setPreferences( 'core/edit-post', {
+				await editor.setPreferences( 'core', {
 					isPublishSidebarEnabled: true,
 				} );
 			} );
@@ -127,14 +127,14 @@ test.describe( 'Publishing', () => {
 		test.describe( `a ${ postType } in small viewports`, () => {
 			test.beforeEach( async ( { admin, editor, pageUtils } ) => {
 				await admin.createNewPost( { postType } );
-				await editor.setPreferences( 'core/edit-post', {
+				await editor.setPreferences( 'core', {
 					isPublishSidebarEnabled: false,
 				} );
 				await pageUtils.setBrowserViewport( 'small' );
 			} );
 
 			test.afterEach( async ( { editor, pageUtils } ) => {
-				await editor.setPreferences( 'core/edit-post', {
+				await editor.setPreferences( 'core', {
 					isPublishSidebarEnabled: true,
 				} );
 				await pageUtils.setBrowserViewport( 'large' );

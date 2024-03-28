@@ -56,7 +56,6 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
-		isPublishSidebarEnabled: true,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -72,6 +71,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
