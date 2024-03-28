@@ -127,7 +127,7 @@
 		}
 		.block-editor-global-styles-advanced-panel__custom-css-editor {
 			overflow-y: scroll;
-			border: 1px solid var($gray-600);
+			border: 1px solid $gray-600;
 			border-radius: $radius-block-ui;
 			&:focus-within {
 				box-shadow: 0 0 0 calc(1.5px - 1px) var(--wp-admin-theme-color);
