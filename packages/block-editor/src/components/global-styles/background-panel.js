@@ -138,9 +138,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 	let imgLabel = label || getFilename( imgUrl );
 	// getFilename returns 'undefined' as a string.
 	imgLabel =
-		!! imgLabel && imgLabel !== 'undefined'
-			? imgLabel
-			: __( 'Select or upload image' );
+		!! imgLabel && imgLabel !== 'undefined' ? imgLabel : __( 'Add image' );
 
 	return (
 		<ItemGroup as="span">
