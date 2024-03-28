@@ -98,7 +98,7 @@ function ResetMenuItem( { template, onClose } ) {
 			createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
-					__( '"%s" reverted.' ),
+					__( '"%s" reset.' ),
 					decodeEntities( template.title.rendered )
 				),
 				{

@@ -448,7 +448,7 @@ export const revertTemplate =
 
 				registry
 					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ), {
+					.createSuccessNotice( __( 'Template reset.' ), {
 						type: 'snackbar',
 						id: noticeId,
 						actions: [

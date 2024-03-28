@@ -52,12 +52,12 @@ export const resetTemplateAction = {
 					items.length > 1
 						? sprintf(
 								/* translators: The number of items. */
-								__( '%s items reverted.' ),
+								__( '%s items reset.' ),
 								items.length
 						  )
 						: sprintf(
 								/* translators: The template/part's name. */
-								__( '"%s" reverted.' ),
+								__( '"%s" reset.' ),
 								decodeEntities( items[ 0 ].title.rendered )
 						  ),
 					{
