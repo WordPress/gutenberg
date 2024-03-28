@@ -34,7 +34,6 @@ function BlockPatternsTab( {
 
 	const categories = usePatternCategories( rootClientId );
 
-	const initialCategory = selectedCategory || categories[ 0 ];
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -44,7 +43,6 @@ function BlockPatternsTab( {
 					<Tabs
 						selectOnMove={ false }
 						orientation={ 'vertical' }
-						selectedTabId={ initialCategory.name }
 						onSelect={ ( categoryId ) => {
 							// Pass the full category object
 							onSelectCategory(
@@ -119,7 +117,7 @@ function BlockPatternsTab( {
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
-					initialCategory={ initialCategory }
+					initialCategory={ selectedCategory || categories[ 0 ] }
 					patternCategories={ categories }
 					onModalClose={ () => setShowPatternsExplorer( false ) }
 					rootClientId={ rootClientId }
