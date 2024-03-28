@@ -40,9 +40,9 @@ export const getNameBySite = ( name ) => {
  * @return {Object} Social service variation.
  */
 export function getMatchingService( url ) {
-	const variataion = variations.find( ( { patterns } ) =>
+	const variation = variations.find( ( { patterns } ) =>
 		patterns?.some( ( pattern ) => pattern.test( url ) )
 	);
 
-	return variataion?.attributes?.service;
+	return variation?.attributes?.service;
 }
