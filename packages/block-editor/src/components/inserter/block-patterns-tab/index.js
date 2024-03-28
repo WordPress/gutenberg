@@ -93,6 +93,7 @@ function BlockPatternsTab( {
 								key={ category.name }
 								tabId={ category.name }
 								focusable={ false }
+								className="block-editor-inserter__patterns-category-dialog"
 							>
 								{ children }
 							</Tabs.TabPanel>
