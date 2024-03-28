@@ -99,17 +99,18 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			position: absolute;
 			z-index: 1;
 			pointer-events: none;
-			top: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-			outline: 2px solid transparent; // This shows up in Windows High Contrast Mode.
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			outline-color: var(--wp-admin-theme-color);
+			outline-style: solid;
+			outline-width: var(--wp-admin-border-width-focus);
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 
-			// Show a light color for dark themes.
+			// Show a light color for dark themes (@todo, is this even helpful?)
 			.is-dark-theme & {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
+				outline-color: $dark-theme-focus;
 			}
 		}
 	}
@@ -122,10 +123,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 			position: absolute;
 			z-index: 0;
 			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
+			transition: outline 0.1s linear;
 			right: 0;
 			left: 0;
 			top: -$default-block-margin * 0.5;
@@ -263,19 +261,22 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 .is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
-	&.is-hovered {
+
+	&.is-hovered:not(.is-selected) {
 		cursor: default;
 
 		&::after {
 			content: "";
 			position: absolute;
 			pointer-events: none;
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			outline-color: var(--wp-admin-theme-color);
+			outline-style: solid;
+			outline-width: var(--wp-admin-border-width-focus);
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}
 
@@ -285,27 +286,36 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		&.rich-text {
 			cursor: unset;
 		}
+	}
+
+	&:not(.rich-text).is-selected {
+
+		&.rich-text::after {
+			outline-offset: 0;
+		}
 
 		&::after {
 			content: "";
 			position: absolute;
 			pointer-events: none;
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			outline-color: var(--wp-admin-theme-color);
+			outline-style: solid;
+			outline-width: var(--wp-admin-border-width-focus);
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}
 }
 
-@keyframes block-editor-has-editable-outline__fade-out-animation {
+@keyframes block-editor-is-editable__animation {
 	from {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 1);
+		background-color: rgba(var(--wp-block-synced-color--rgb), 0.08);
 	}
 	to {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+		background-color: rgba(var(--wp-block-synced-color--rgb), 0);
 	}
 }
 
@@ -318,11 +328,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		left: 0;
 		right: 0;
 		bottom: 0;
-		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
-		border-radius: $radius-block-ui;
-		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
-		animation-delay: 1s;
-		animation-fill-mode: forwards;
+		animation: block-editor-is-editable__animation 0.35s ease-out;
+		animation-delay: 0.5s;
+		animation-fill-mode: backwards;
 		@include reduce-motion("animation");
 	}
 }
@@ -360,9 +368,15 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }
 
+// Increase width when zoomed out to match visually.
 body.is-zoomed-out {
 	display: flex;
 	flex-direction: column;
+
+	.is-outline-mode .block-editor-block-list__block:not(.remove-outline):not(.rich-text).is-selected::after,
+	.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-hovered:not(.is-selected)::after {
+		outline-width: calc(2 * var(--wp-admin-border-width-focus)); // Adjusted for the zoom scale of 0.5.
+	}
 
 	> .is-root-container {
 		flex: 1;
