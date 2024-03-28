@@ -855,6 +855,546 @@ test.describe( 'Image - lightbox', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.describe( 'should respect theme.json settings and global styles overrides', () => {
+		test.describe( 'Theme.json settings - allow editing TRUE, enabled FALSE', () => {
+			test.beforeEach(
+				async ( { requestUtils, admin, page, editor } ) => {
+					await requestUtils.activateTheme(
+						'lightbox-allow-editing-true-enabled-false'
+					);
+
+					await admin.visitSiteEditor( {
+						path: '/wp_global_styles',
+						canvas: 'edit',
+					} );
+
+					await page
+						.getByRole( 'region', { name: 'Editor top bar' } )
+						.getByRole( 'button', { name: 'Styles' } )
+						.click();
+
+					await page
+						.getByRole( 'region', { name: 'Editor settings' } )
+						.getByLabel( 'More' )
+						.click();
+
+					const resetStylesButton = page.getByRole( 'menuitem', {
+						name: 'Reset styles',
+					} );
+
+					if ( await resetStylesButton.isEnabled() ) {
+						await resetStylesButton.click();
+						await editor.saveSiteEditorEntities();
+					}
+				}
+			);
+
+			test.afterEach( async ( { requestUtils, admin, page, editor } ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByLabel( 'More' )
+					.click();
+
+				const resetStylesButton = page.getByRole( 'menuitem', {
+					name: 'Reset styles',
+				} );
+
+				if ( await resetStylesButton.isEnabled() ) {
+					await resetStylesButton.click();
+					await editor.saveSiteEditorEntities();
+				}
+			} );
+
+			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and disable lightbox on frontend when override is removed', async ( {
+				imageBlockUtils,
+				requestUtils,
+				page,
+				editor,
+				admin,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( true );
+
+				await editor.saveSiteEditorEntities();
+
+				await admin.createNewPost();
+
+				await editor.insertBlock( { name: 'core/image' } );
+
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				const postId = await editor.publishPost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'button', { name: 'Settings options' } )
+					.click();
+
+				await page
+					.getByRole( 'menu', { name: 'Settings options' } )
+					.getByRole( 'menuitem', { name: 'Reset all' } )
+					.click();
+
+				await editor.saveSiteEditorEntities();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeHidden();
+			} );
+
+			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and continue disabling lightbox when override is removed', async ( {
+				requestUtils,
+				page,
+				admin,
+				editor,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( true );
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( false );
+
+				await editor.saveSiteEditorEntities();
+
+				await admin.createNewPost();
+
+				await editor.insertBlock( { name: 'core/image' } );
+
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				const postId = await editor.publishPost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'button', { name: 'Settings options' } )
+					.click();
+
+				await page
+					.getByRole( 'menu', { name: 'Settings options' } )
+					.getByRole( 'menuitem', { name: 'Reset all' } )
+					.click();
+
+				await editor.saveSiteEditorEntities();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await expect( lightboxImage ).toBeHidden();
+			} );
+		} );
+
+		test.describe( 'Theme.json settings - allow editing TRUE, enabled TRUE', () => {
+			test.beforeEach(
+				async ( { requestUtils, admin, page, editor } ) => {
+					await requestUtils.activateTheme(
+						'lightbox-allow-editing-true-enabled-true'
+					);
+
+					await admin.visitSiteEditor( {
+						path: '/wp_global_styles',
+						canvas: 'edit',
+					} );
+
+					await page
+						.getByRole( 'region', { name: 'Editor top bar' } )
+						.getByRole( 'button', { name: 'Styles' } )
+						.click();
+
+					await page
+						.getByRole( 'region', { name: 'Editor settings' } )
+						.getByLabel( 'More' )
+						.click();
+
+					const resetStylesButton = page.getByRole( 'menuitem', {
+						name: 'Reset styles',
+					} );
+
+					if ( await resetStylesButton.isEnabled() ) {
+						await resetStylesButton.click();
+						await editor.saveSiteEditorEntities();
+					}
+				}
+			);
+
+			test.afterEach( async ( { requestUtils, admin, page, editor } ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByLabel( 'More' )
+					.click();
+
+				const resetStylesButton = page.getByRole( 'menuitem', {
+					name: 'Reset styles',
+				} );
+
+				if ( await resetStylesButton.isEnabled() ) {
+					await resetStylesButton.click();
+					await editor.saveSiteEditorEntities();
+				}
+			} );
+
+			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and continue enabling lightbox on frontend when override is removed', async ( {
+				requestUtils,
+				admin,
+				page,
+				editor,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( false );
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( true );
+
+				await editor.saveSiteEditorEntities();
+
+				await admin.createNewPost();
+
+				await editor.insertBlock( { name: 'core/image' } );
+
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				const postId = await editor.publishPost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeVisible();
+				await lightboxImage.click();
+
+				let lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'button', { name: 'Settings options' } )
+					.click();
+
+				await page
+					.getByRole( 'menu', { name: 'Settings options' } )
+					.getByRole( 'menuitem', { name: 'Reset all' } )
+					.click();
+
+				await editor.saveSiteEditorEntities();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await lightboxImage.click();
+
+				lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+			} );
+
+			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and enable lightbox when override is removed', async ( {
+				requestUtils,
+				admin,
+				page,
+				editor,
+				imageBlockUtils,
+			} ) => {
+				await requestUtils.activateTheme(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'checkbox', { name: 'Expand on click' } )
+					.setChecked( false );
+
+				await editor.saveSiteEditorEntities();
+
+				await admin.createNewPost();
+
+				await editor.insertBlock( { name: 'core/image' } );
+
+				const imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				const postId = await editor.publishPost();
+
+				await page.goto( `/?p=${ postId }` );
+
+				let lightboxImage = page.locator(
+					'.wp-lightbox-container img'
+				);
+				await expect( lightboxImage ).toBeHidden();
+
+				await admin.visitSiteEditor( {
+					path: '/wp_global_styles',
+					canvas: 'edit',
+				} );
+
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Blocks styles' } )
+					.click();
+
+				await page
+					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'button', { name: 'Image block styles' } )
+					.click();
+
+				await page
+					.getByRole( 'button', { name: 'Settings options' } )
+					.click();
+
+				await page
+					.getByRole( 'menu', { name: 'Settings options' } )
+					.getByRole( 'menuitem', { name: 'Reset all' } )
+					.click();
+
+				await editor.saveSiteEditorEntities();
+
+				await page.goto( `/?p=${ postId }` );
+
+				lightboxImage = page.locator( '.wp-lightbox-container img' );
+				await lightboxImage.click();
+
+				const lightbox = page.locator( '.wp-lightbox-overlay' );
+				await expect( lightbox ).toBeVisible();
+			} );
+		} );
+	} );
+
 	test.describe( 'should respect theme.json settings and block overrides', () => {
 		test.describe( 'Theme.json settings - allow editing FALSE, enabled FALSE', () => {
 			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI and disable lightbox on frontend when block override is undefined', async ( {
