@@ -1965,7 +1965,7 @@ export function setBlockEditingMode( clientId = '', mode ) {
  */
 export function setBlockEditingModes( modes ) {
 	return {
-		type: 'SET_BLOCK_EDITING_MODE',
+		type: 'SET_BLOCK_EDITING_MODES',
 		modes,
 	};
 }
@@ -1997,7 +1997,7 @@ export function unsetBlockEditingMode( clientId = '' ) {
  */
 export function unsetBlockEditingModes( clientIds = [] ) {
 	return {
-		type: 'UNSET_BLOCK_EDITING_MODE',
+		type: 'UNSET_BLOCK_EDITING_MODES',
 		clientIds,
 	};
 }
