@@ -12,6 +12,11 @@ export type TimePickerProps = {
 	is12Hour?: boolean;
 
 	/**
+	 * Whether to show the date picker.
+	 */
+	showDatePicker?: boolean;
+
+	/**
 	 * The function called when a new time has been selected. It is passed the
 	 * time as an argument.
 	 */
