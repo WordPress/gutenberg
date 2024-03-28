@@ -1981,9 +1981,18 @@ export function blockEditingModes( state = new Map(), action ) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EDITING_MODE':
 			return new Map( state ).set( action.clientId, action.mode );
+		case 'SET_BLOCK_EDITING_MODES':
+			return new Map( ...state, ...action.modes );
 		case 'UNSET_BLOCK_EDITING_MODE': {
 			const newState = new Map( state );
 			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'UNSET_BLOCK_EDITING_MODES': {
+			const newState = new Map( state );
+			action.clientIds.forEach( ( clientId ) =>
+				newState.delete( clientId )
+			);
 			return newState;
 		}
 		case 'RESET_BLOCKS': {

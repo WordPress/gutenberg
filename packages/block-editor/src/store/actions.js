@@ -1445,6 +1445,36 @@ export const __unstableSetEditorMode =
 			}
 		}
 
+		// TODO: Cleanup this for better performance/readability.
+		// When switching to zoom-out mode, we need to disable editing mode for all blocks except the sections.
+		const sectionsContainerClientId = select.getSectionsContainerClientId();
+		const sectionsClientIds = select.getClientIdsOfDescendants(
+			sectionsContainerClientId
+		);
+		if ( mode === 'zoom-out' ) {
+			dispatch(
+				setBlockEditingModes( [
+					[ '' /* rootClientId */, 'disabled' ],
+					[ sectionsContainerClientId, 'contentOnly' ],
+					...sectionsClientIds.map( ( clientId ) => [
+						clientId,
+						'default',
+					] ),
+				] )
+			);
+		} else {
+			const prevMode = select.__unstableGetEditorMode();
+			if ( prevMode === 'zoom-out' ) {
+				dispatch(
+					unsetBlockEditingModes( [
+						'' /* rootClientId */,
+						sectionsContainerClientId,
+						...sectionsClientIds,
+					] )
+				);
+			}
+		}
+
 		dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
 		if ( mode === 'navigation' ) {
@@ -1912,6 +1942,35 @@ export function setBlockEditingMode( clientId = '', mode ) {
 }
 
 /**
+ * @typedef {Iterable.<[string, BlockEditingMode]>} BlockEditingModes
+ */
+
+/**
+ * Sets the block editing mode for a multiple blocks.
+ *
+ * @see useBlockEditingMode
+ *
+ * @example
+ * ```js
+ * wp.data.dispatch('core/block-editor').setBlockEditingModes([
+ * 	['block-1', 'disabled'],
+ * 	['block-2', 'contentOnly'],
+ * 	['block-3', 'default'],
+ * ]);
+ * ```
+ *
+ * @param {BlockEditingModes} modes Iterable of client ids and block editing modes.
+ *
+ * @return {Object} Action object.
+ */
+export function setBlockEditingModes( modes ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODE',
+		modes,
+	};
+}
+
+/**
  * Clears the block editing mode for a given block.
  *
  * @see useBlockEditingMode
@@ -1924,5 +1983,21 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {string[]} clientIds The block client ID, or `''` for the root container.
+ *
+ * @return {Object} Action object.
+ */
+export function unsetBlockEditingModes( clientIds = [] ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODE',
+		clientIds,
 	};
 }
