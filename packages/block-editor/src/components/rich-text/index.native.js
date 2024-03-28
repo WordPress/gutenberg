@@ -94,14 +94,13 @@ export function RichTextWrapper(
 		minWidth,
 		maxWidth,
 		onBlur,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
 		onEnter: onCustomEnter,
 		...props
 	},
-	forwardedRef
+	providedRef
 ) {
 	const instanceId = useInstanceId( RichTextWrapper );
 
@@ -529,13 +528,13 @@ export function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
-	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
+	const mergedRef = useMergeRefs( [ providedRef, fallbackRef ] );
 
 	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
-			ref={ mergedRef }
+			nativeEditorRef={ mergedRef }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }
@@ -586,7 +585,6 @@ export function RichTextWrapper(
 			minWidth={ minWidth }
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
-			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
@@ -672,7 +670,9 @@ ForwardedRichTextContainer.Content.defaultProps = {
 	value: '',
 };
 
-ForwardedRichTextContainer.Raw = RichText;
+ForwardedRichTextContainer.Raw = forwardRef( ( props, ref ) => (
+	<RichText { ...props } nativeEditorRef={ ref } />
+) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
