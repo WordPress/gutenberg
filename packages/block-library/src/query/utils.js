@@ -384,18 +384,17 @@ export const useUnsupportedBlocks = ( clientId ) => {
 					 *  - supports.interactivity = true;
 					 *  - supports.interactivity.clientNavigation = true;
 					 */
-					const blockInteractivityBool =
-						getBlockSupport( blockName, 'interactivity' ) === true;
+					const blockInteractivityBool = Object.is(
+						getBlockSupport( blockName, 'interactivity' ),
+						true
+					);
 					const blockClientNavigation = getBlockSupport(
 						blockName,
 						'interactivity.clientNavigation'
 					);
 					const blockInteractivity =
 						blockInteractivityBool || blockClientNavigation;
-					if (
-						! blockName.startsWith( 'core/' ) &&
-						! blockInteractivity
-					) {
+					if ( ! blockInteractivity ) {
 						blocks.hasBlocksFromPlugins = true;
 					} else if ( blockName === 'core/post-content' ) {
 						blocks.hasPostContentBlock = true;
