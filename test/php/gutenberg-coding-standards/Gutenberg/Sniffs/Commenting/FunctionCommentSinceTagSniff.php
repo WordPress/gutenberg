@@ -73,13 +73,13 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			return;
 		}
 
-		if ( 'T_VARIABLE' === $token['type'] && Scopes::isOOProperty( $phpcsFile, $stackPtr ) ) {
-			$this->process_class_property_token( $phpcsFile, $stackPtr );
+		if ( 'T_CLASS' === $token['type'] ) {
+			$this->process_class_token( $phpcsFile, $stackPtr );
 			return;
 		}
 
-		if ( 'T_CLASS' === $token['type'] ) {
-			$this->process_class_token( $phpcsFile, $stackPtr );
+		if ( Scopes::isOOProperty( $phpcsFile, $stackPtr ) ) {
+			$this->process_class_property_token( $phpcsFile, $stackPtr );
 		}
 	}
 
