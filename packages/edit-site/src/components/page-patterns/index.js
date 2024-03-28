@@ -308,13 +308,20 @@ export default function DataviewsPatterns() {
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
-						SYNC_FILTERS.find(
-							( { value } ) => value === item.syncStatus
-						)?.label ||
-						SYNC_FILTERS.find(
-							( { value } ) =>
-								value === PATTERN_SYNC_TYPES.unsynced
-						).label
+						<span
+							className={
+								'edit-site-patterns__field-sync-status-' +
+								item.syncStatus
+							}
+						>
+							{ SYNC_FILTERS.find(
+								( { value } ) => value === item.syncStatus
+							)?.label ||
+								SYNC_FILTERS.find(
+									( { value } ) =>
+										value === PATTERN_SYNC_TYPES.unsynced
+								).label }
+						</span>
 					);
 				},
 				type: ENUMERATION_TYPE,
