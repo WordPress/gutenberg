@@ -252,43 +252,17 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$is_oo_method ? 'method' : 'function'
 		);
 
-		// All these tokens could be present before the docblock.
-		$tokens_before_the_docblock = array(
-			T_PUBLIC,
-			T_PROTECTED,
-			T_PRIVATE,
-			T_STATIC,
-			T_FINAL,
-			T_ABSTRACT,
-			T_WHITESPACE,
-		);
-
-		$doc_block_end_token = $phpcsFile->findPrevious( $tokens_before_the_docblock, ( $stackPtr - 1 ), null, true, null, true );
-		if ( ( false === $doc_block_end_token ) || ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $doc_block_end_token ]['code'] ) ) {
+		$docblock = static::find_docblock($phpcsFile, $stackPtr);
+		if (false === $docblock) {
 			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
 			return;
 		}
 
-		// The sniff intentionally doesn't check if the docblock has a valid open tag.
-		// Its only job is to make sure that the @since tag is present and has a valid version value.
-		$doc_block_start_token = $phpcsFile->findPrevious( Tokens::$commentTokens, ( $doc_block_end_token - 1 ), null, true, null, true );
-		if ( false === $doc_block_start_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
-			return;
-		}
+		list( $doc_block_start_token, $doc_block_end_token ) = $docblock;
 
-		// This is the first non-docblock token, so the next token should be used.
-		++ $doc_block_start_token;
-
-		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
-		if ( false === $since_tag_token ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $stackPtr, $violation_code );
-			return;
-		}
-
-		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag_token + 1, null, true, null, true );
-		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
-			$phpcsFile->addError( $missing_since_tag_error_message, $since_tag_token, $violation_code );
+		$version_token = static::find_version_tag($phpcsFile, $doc_block_start_token, $doc_block_end_token);
+		if ( false === $version_token) {
+			$phpcsFile->addError( $missing_since_tag_error_message, $doc_block_start_token, $violation_code );
 			return;
 		}
 
@@ -312,10 +286,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 	}
 
 	/**
-	 * @param File $phpcsFile
-	 * @param $stackPtr
+	 * Finds the docblock preceding a specified position (stack pointer) in a given PHP file.
+	 * Implementation has been copied from FunctionCommentSniff::process().
 	 *
-	 * @return array|false
+	 * @param File $phpcsFile The file being scanned.
+	 * @param int $stackPtr   The position (stack pointer) in the token stack from which to start searching backwards.
+	 * @return array|false An array with the starting and ending token positions of the found docblock, or false if no docblock is found.
 	 */
 	private static function find_docblock( File $phpcsFile, $stackPtr ) {
 		$tokens                 = $phpcsFile->getTokens();
@@ -356,6 +332,29 @@ class FunctionCommentSinceTagSniff implements Sniff {
 			$tokens[ $commentEnd ]['comment_opener'],
 			$commentEnd
 		);
+	}
+
+	/**
+	 * Searches for a version tag within a docblock in the specified PHP file.
+	 *
+	 * @param File $phpcsFile         The file being scanned.
+	 * @param int $docBlockStartToken The token index where the docblock starts.
+	 * @param int $docBlockEndToken   The token index where the docblock ends.
+	 * @return false|int The token index of the version tag within the docblock if found, false otherwise.
+	 */
+	private static function find_version_tag( File $phpcsFile, $doc_block_start_token, $doc_block_end_token ) {
+		$tokens          = $phpcsFile->getTokens();
+		$since_tag_token = $phpcsFile->findNext( T_DOC_COMMENT_TAG, $doc_block_start_token, $doc_block_end_token, false, '@since', true );
+		if ( false === $since_tag_token ) {
+			return false;
+		}
+
+		$version_token = $phpcsFile->findNext( T_DOC_COMMENT_WHITESPACE, $since_tag_token + 1, null, true, null, true );
+		if ( ( false === $version_token ) || ( T_DOC_COMMENT_STRING !== $tokens[ $version_token ]['code'] ) ) {
+			return false;
+		}
+
+		return $version_token;
 	}
 
 	/**
