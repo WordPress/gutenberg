@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,8 +19,6 @@ import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
-
-const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -41,9 +39,7 @@ function UnforwardedSelectControl(
 		id: idProp,
 		label,
 		multiple = false,
-		onBlur = noop,
 		onChange,
-		onFocus = noop,
 		options = [],
 		size = 'default',
 		value: valueProp,
@@ -55,22 +51,11 @@ function UnforwardedSelectControl(
 		__nextHasNoMarginBottom = false,
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp( props );
-	const [ isFocused, setIsFocused ] = useState( false );
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
 	// Disable reason: A select with an onchange throws a warning.
 	if ( ! options?.length && ! children ) return null;
-
-	const handleOnBlur = ( event: React.FocusEvent< HTMLSelectElement > ) => {
-		onBlur( event );
-		setIsFocused( false );
-	};
-
-	const handleOnFocus = ( event: React.FocusEvent< HTMLSelectElement > ) => {
-		onFocus( event );
-		setIsFocused( true );
-	};
 
 	const handleOnChange = (
 		event: React.ChangeEvent< HTMLSelectElement >
@@ -100,7 +85,6 @@ function UnforwardedSelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFocused={ isFocused }
 				label={ label }
 				size={ size }
 				suffix={
@@ -118,9 +102,7 @@ function UnforwardedSelectControl(
 					disabled={ disabled }
 					id={ id }
 					multiple={ multiple }
-					onBlur={ handleOnBlur }
 					onChange={ handleOnChange }
-					onFocus={ handleOnFocus }
 					ref={ ref }
 					selectSize={ size }
 					value={ valueProp }
