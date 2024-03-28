@@ -3,14 +3,15 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useLayoutEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -154,16 +155,32 @@ const BindingConnector = ( {
  * to the source handlers.
  * For this, it creates a BindingConnector for each bound attribute.
  *
- * @param {Object}   props                   - The component props.
- * @param {Object}   props.blockProps        - The BlockEdit props object.
- * @param {Object}   props.bindings          - The block bindings settings.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @return {null}                              Data-handling component. Render nothing.
+ * @param {Object} props            - The component props.
+ * @param {Object} props.blockProps - The BlockEdit props object.
+ * @param {Object} props.bindings   - The block bindings settings.
+ * @return {null}                     Data-handling component. Render nothing.
  */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
+function BlockBindingBridge( { blockProps, bindings } ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
+
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
+
+	const { setAttributes } = blockProps;
+
+	/**
+	 * Update the bound attributes with the new values,
+	 * marking every change as "non-persistent".
+	 *
+	 * @param {Object} newAttributes - The new attributes to set.
+	 * @return {void}
+	 */
+	const setBoundAttributes = useCallback(
+		( newAttributes ) =>
+			syncDerivedUpdates( () => setAttributes( newAttributes ) ),
+		[ setAttributes, syncDerivedUpdates ]
+	);
 
 	return (
 		<>
@@ -181,9 +198,9 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 							key={ attrName }
 							attrName={ attrName }
 							source={ source }
-							blockProps={ blockProps }
 							args={ boundAttribute.args }
-							onPropValueChange={ onPropValueChange }
+							blockProps={ blockProps }
+							onPropValueChange={ setBoundAttributes }
 						/>
 					);
 				}
@@ -194,20 +211,6 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 
 const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		/*
-		 * Collect and update the bound attributes
-		 * in a separate state.
-		 */
-		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const updateBoundAttributes = useCallback(
-			( newAttributes ) =>
-				setBoundAttributes( ( prev ) => ( {
-					...prev,
-					...newAttributes,
-				} ) ),
-			[]
-		);
-
 		/*
 		 * Create binding object filtering
 		 * only the attributes that can be bound.
@@ -224,14 +227,10 @@ const withBlockBindingSupport = createHigherOrderComponent(
 					<BlockBindingBridge
 						blockProps={ props }
 						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
 					/>
 				) }
 
-				<BlockEdit
-					{ ...props }
-					attributes={ { ...props.attributes, ...boundAttributes } }
-				/>
+				<BlockEdit { ...props } />
 			</>
 		);
 	},
