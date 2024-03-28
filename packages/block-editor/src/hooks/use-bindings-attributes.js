@@ -3,7 +3,7 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useLayoutEffect, useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -11,6 +11,7 @@ import { RichTextData } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
@@ -164,6 +165,23 @@ function BlockBindingBridge( { blockProps, bindings } ) {
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
 
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
+
+	const { setAttributes } = blockProps;
+
+	/**
+	 * Update the bound attributes with the new values,
+	 * marking every change as "non-persistent".
+	 *
+	 * @param {Object} newAttributes - The new attributes to set.
+	 * @return {void}
+	 */
+	const setBoundAttributes = useCallback(
+		( newAttributes ) =>
+			syncDerivedUpdates( () => setAttributes( newAttributes ) ),
+		[ setAttributes, syncDerivedUpdates ]
+	);
+
 	return (
 		<>
 			{ Object.entries( bindings ).map(
@@ -180,9 +198,9 @@ function BlockBindingBridge( { blockProps, bindings } ) {
 							key={ attrName }
 							attrName={ attrName }
 							source={ source }
-							blockProps={ blockProps }
 							args={ boundAttribute.args }
-							onPropValueChange={ blockProps.setAttributes }
+							blockProps={ blockProps }
+							onPropValueChange={ setBoundAttributes }
 						/>
 					);
 				}
