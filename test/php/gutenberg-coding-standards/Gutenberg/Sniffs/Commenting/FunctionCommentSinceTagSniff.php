@@ -127,6 +127,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		);
 	}
 
+	/**
+	 * Processes a token representing an object-oriented property to check for a missing @since tag in its docblock.
+	 *
+	 * @param File $phpcs_file   The file being scanned.
+	 * @param int $stack_pointer The position of the object-oriented property token in the stack.
+	 */
 	protected function process_class_property_token( File $phpcs_file, $stack_pointer ) {
 		$tokens = $phpcs_file->getTokens();
 
@@ -174,6 +180,12 @@ class FunctionCommentSinceTagSniff implements Sniff {
 		);
 	}
 
+	/**
+	 * Processes a T_FUNCTION token to check for a missing @since tag in its docblock.
+	 *
+	 * @param File $phpcs_file   The file being scanned.
+	 * @param int $stack_pointer The position of the T_FUNCTION token in the stack.
+	 */
 	protected function process_function_token( File $phpcs_file, $stack_pointer ) {
 		$tokens = $phpcs_file->getTokens();
 
