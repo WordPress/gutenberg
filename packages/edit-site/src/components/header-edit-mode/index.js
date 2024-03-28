@@ -25,6 +25,7 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
+	PostSavedState,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -44,9 +45,10 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown, PostPublishButtonOrToggle } =
+	unlock( editorPrivateApis );
 
-export default function HeaderEditMode() {
+export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 	const {
 		templateType,
 		isDistractionFree,
@@ -54,13 +56,19 @@ export default function HeaderEditMode() {
 		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
+		showPublishButton,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
 			select( blockEditorStore );
 		const { get: getPreference } = select( preferencesStore );
-		const { getDeviceType } = select( editorStore );
-
+		const {
+			getDeviceType,
+			getCurrentPostAttribute,
+			hasNonPostEntityChanges,
+		} = select( editorStore );
+		const currentPostIsDraft =
+			getCurrentPostAttribute( 'status' ) === 'draft';
 		return {
 			deviceType: getDeviceType(),
 			templateType: getEditedPostType(),
@@ -71,6 +79,10 @@ export default function HeaderEditMode() {
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
+			// TODO: by unmounting the `publish` button, we cannot render
+			// post-publish panel...
+			showPublishButton:
+				currentPostIsDraft && ! hasNonPostEntityChanges(),
 		};
 	}, [] );
 
@@ -185,6 +197,7 @@ export default function HeaderEditMode() {
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
+					{ showPublishButton && <PostSavedState /> }
 					{ isLargeViewport && (
 						<div
 							className={ classnames(
@@ -200,7 +213,15 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<PostViewLink />
-					<SaveButton size="compact" />
+					{ showPublishButton ? (
+						<PostPublishButtonOrToggle
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					) : (
+						<SaveButton size="compact" />
+					) }
 					{ ! isDistractionFree && (
 						<PinnedItems.Slot scope="core/edit-site" />
 					) }

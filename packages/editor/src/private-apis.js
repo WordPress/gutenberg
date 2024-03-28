@@ -16,6 +16,7 @@ import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
 import PostCardPanel from './components/post-card-panel';
+import PostPublishButtonOrToggle from './components/post-publish-button/post-publish-button-or-toggle';
 
 export const privateApis = {};
 lock( privateApis, {
@@ -32,6 +33,7 @@ lock( privateApis, {
 	PreviewDropdown,
 	PreferencesModal,
 	PostCardPanel,
+	PostPublishButtonOrToggle,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,

@@ -106,56 +106,7 @@ _Returns_
 
 ### PluginPostPublishPanel
 
-Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
-
-function MyPluginPostPublishPanel() {
-	return React.createElement(
-		PluginPostPublishPanel,
-		{
-			className: 'my-plugin-post-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPostPublishPanel = () => (
-	<PluginPostPublishPanel
-		className="my-plugin-post-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPostPublishPanel>
-);
-```
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+Undocumented declaration.
 
 ### PluginPostStatusInfo
 
@@ -203,56 +154,7 @@ _Returns_
 
 ### PluginPrePublishPanel
 
-Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
-
-function MyPluginPrePublishPanel() {
-	return React.createElement(
-		PluginPrePublishPanel,
-		{
-			className: 'my-plugin-pre-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPrePublishPanel = () => (
-	<PluginPrePublishPanel
-		className="my-plugin-pre-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPrePublishPanel>
-);
-```
-
-_Parameters_
-
--   _props_ `Object`: Component props.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+Undocumented declaration.
 
 ### PluginSidebar
 

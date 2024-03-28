@@ -15,12 +15,15 @@ import {
 	blockDefault,
 	keyboard,
 	symbol,
+	formatListBullets,
 } from '@wordpress/icons';
-import { useCommandLoader } from '@wordpress/commands';
+import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '@wordpress/editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -181,15 +184,42 @@ function useManipulateDocumentCommands() {
 function useEditUICommands() {
 	const { openGeneralSidebar, closeGeneralSidebar } =
 		useDispatch( editSiteStore );
-	const { canvasMode, activeSidebar } = useSelect( ( select ) => {
-		return {
-			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
-		};
-	}, [] );
+	const { canvasMode, activeSidebar, isPublishSidebarEnabled } = useSelect(
+		( select ) => {
+			return {
+				canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
+				activeSidebar: select(
+					interfaceStore
+				).getActiveComplementaryArea( editSiteStore.name ),
+				isPublishSidebarEnabled:
+					select( editorStore ).isPublishSidebarEnabled(),
+			};
+		},
+		[]
+	);
 	const { openModal } = useDispatch( interfaceStore );
+	const { toggle } = useDispatch( preferencesStore );
+	const { createInfoNotice } = useDispatch( noticesStore );
+	useCommand( {
+		name: 'core/toggle-publish-sidebar',
+		label: isPublishSidebarEnabled
+			? __( 'Disable pre-publish checks' )
+			: __( 'Enable pre-publish checks' ),
+		icon: formatListBullets,
+		callback: ( { close } ) => {
+			close();
+			toggle( 'core', 'isPublishSidebarEnabled' );
+			createInfoNotice(
+				isPublishSidebarEnabled
+					? __( 'Pre-publish checks disabled.' )
+					: __( 'Pre-publish checks enabled.' ),
+				{
+					id: 'core/editor/publish-sidebar/notice',
+					type: 'snackbar',
+				}
+			);
+		},
+	} );
 
 	if ( canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
