@@ -9,11 +9,14 @@ test.describe( 'Font Library', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 			/*
 			 * Delete all installed fonts, font files, the fonts directory, and user font settings
-			 * in global styles for the active theme before starting the tests.
+			 * in global styles for the active theme before and after starting the tests.
 			 */
 			await requestUtils.activatePlugin(
 				'gutenberg-test-delete-installed-fonts'
 			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-delete-installed-fonts'
 			);

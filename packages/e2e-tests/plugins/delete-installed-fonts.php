@@ -8,7 +8,30 @@
  */
 
 /**
- * Delete all user installed fonts, associated font files, the fonts directory, and user global styles typography
+ * Saves a randomly generated temporary font directory to use for e2e tests.
+ */
+function gutenberg_e2e_set_temp_font_dir() {
+	update_option( 'gutenberg_e2e_font_dir', '/e2e_fonts_' . wp_generate_uuid4() );
+}
+register_activation_hook( __FILE__, 'gutenberg_e2e_set_temp_font_dir' );
+
+/**
+ * Uses the randomly generated font directory for the duration of the font tests.
+ */
+ function gutenberg_filter_e2e_font_dir( $font_dir ) {
+	$subdir = get_option( 'gutenberg_e2e_font_dir' );
+
+	$font_dir['path']     .= $subdir;
+	$font_dir['url']      .= $subdir;
+	$font_dir['basedir']  .= $subdir;
+	$font_dir['baseurl']  .= $subdir;
+
+	return $font_dir;
+}
+add_filter( 'font_dir', 'gutenberg_filter_e2e_font_dir' );
+
+/**
+ * Deletes all user installed fonts, associated font files, the fonts directory, and user global styles typography
  * setings for the current theme so that we can test uploading/installing fonts in a clean environment.
  */
 function gutenberg_delete_installed_fonts() {
@@ -39,4 +62,7 @@ function gutenberg_delete_installed_fonts() {
 
 	rest_do_request( $request );
 }
-add_action( 'init', 'gutenberg_delete_installed_fonts' );
+
+// Clean up fonts on plugin activation and deactivation.
+register_activation_hook( __FILE__, 'gutenberg_delete_installed_fonts' );
+register_deactivation_hook( __FILE__, 'gutenberg_delete_installed_fonts' );
