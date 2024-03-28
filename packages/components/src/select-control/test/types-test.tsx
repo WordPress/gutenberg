@@ -79,7 +79,7 @@ import SelectControl from '..';
 			label: 'String',
 		},
 		{
-			// @ts-expect-error "string" is not "narrow" or "value", so throw an error
+			// @ts-expect-error "otherstring" is not "narrow" or "value", so throw an error
 			value: 'otherstring',
 			label: 'Other String',
 		},
@@ -192,7 +192,7 @@ import SelectControl from '..';
 			label: 'String',
 		},
 		{
-			// @ts-expect-error "string" is not "narrow" or "value", so throw an error
+			// @ts-expect-error "otherstring" is not "narrow" or "value", so throw an error
 			value: 'otherstring',
 			label: 'Other String',
 		},
