@@ -71,64 +71,48 @@ test.describe( 'RenderAppender prop of InnerBlocks', () => {
 			name: 'test/inner-blocks-render-appender-dynamic',
 		} );
 
+		const dynamimcAppender = page.locator( '.my-dynamic-blocks-appender' );
+		const addBlockBtn = dynamimcAppender.getByRole( 'button', {
+			name: 'Add block',
+		} );
+
 		// Verify if the custom block appender text is the expected one.
-		await expect(
-			page.locator( '.my-dynamic-blocks-appender' )
-		).toContainText( 'Empty Blocks Appender' );
+		await expect( dynamimcAppender ).toContainText(
+			'Empty Blocks Appender'
+		);
 
 		// Open the inserter of our custom block appender.
-		await page
-			.locator( '.my-dynamic-blocks-appender' )
-			.getByRole( 'button', {
-				name: 'Add block',
-			} )
-			.click();
+		await addBlockBtn.click();
 
 		// Verify if the blocks the custom inserter is rendering are the expected ones.
-		await expect(
-			page
-				.getByRole( 'listbox', { name: 'Blocks' } )
-				.getByRole( 'option' )
-		).toHaveText( [ 'Quote', 'Video' ] );
+		const blockListBox = page.getByRole( 'listbox', { name: 'Blocks' } );
+		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
+			'Quote',
+			'Video',
+		] );
 
 		// Insert a quote block.
-		await page
-			.getByRole( 'listbox', { name: 'Blocks' } )
-			.getByRole( 'option', { name: 'Quote' } )
-			.click();
+		await blockListBox.getByRole( 'option', { name: 'Quote' } ).click();
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		// Verify if the custom block appender text changed as expected.
 		await expect(
-			page
-				.locator( '.my-dynamic-blocks-appender' )
-				.getByText( 'Single Blocks Appender' )
+			dynamimcAppender.getByText( 'Single Blocks Appender' )
 		).toBeVisible();
 
 		// Insert a video block.
-		await page
-			.locator( '.my-dynamic-blocks-appender' )
-			.getByRole( 'button', {
-				name: 'Add block',
-			} )
-			.click();
-		await page
-			.getByRole( 'listbox', { name: 'Blocks' } )
-			.getByRole( 'option', { name: 'Video' } )
-			.click();
+		await addBlockBtn.click();
+		await blockListBox.getByRole( 'option', { name: 'Video' } ).click();
 
 		// Verify if the custom block appender text changed as expected.
 		await expect(
-			page
-				.locator( '.my-dynamic-blocks-appender' )
-				.getByText( 'Multiple Blocks Appender' )
+			dynamimcAppender.getByText( 'Multiple Blocks Appender' )
 		).toBeVisible();
 
 		// Verify that the custom appender button is now not being rendered.
-		await expect(
-			page.locator( '.my-dynamic-blocks-appender' ).getByRole( 'button', {
-				name: 'Add block',
-			} )
-		).toBeHidden();
+		await expect( addBlockBtn ).toBeHidden();
 
 		// Verify if the post content is the expected one.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
