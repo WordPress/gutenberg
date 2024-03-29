@@ -213,20 +213,21 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
 	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
-function setBlockEditMode( setEditMode, blocks, mode ) {
-	blocks.forEach( ( block ) => {
-		const editMode =
+function getInnerBlocksEditingModes( blocks, mode ) {
+	return blocks.flatMap( ( block ) => [
+		[
+			block.clientId,
 			mode ||
-			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
-
-		setBlockEditMode(
-			setEditMode,
+				( hasOverridableAttributes( block )
+					? 'contentOnly'
+					: 'disabled' ),
+		],
+		...getInnerBlocksEditingModes(
 			block.innerBlocks,
 			// Disable editing for nested patterns.
 			block.name === patternBlockName ? 'disabled' : mode
-		);
-	} );
+		),
+	] );
 }
 
 export default function ReusableBlockEdit( {
@@ -256,6 +257,7 @@ export default function ReusableBlockEdit( {
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		setBlockEditingMode,
+		setBlockEditingModes,
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
@@ -296,18 +298,18 @@ export default function ReusableBlockEdit( {
 
 	// Sync the editing mode of the pattern block with the inner blocks.
 	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
+		const modes = getInnerBlocksEditingModes(
 			innerBlocks,
 			// Disable editing if the pattern itself is disabled.
 			editingMode === 'disabled' || ! hasPatternOverridesSource
 				? 'disabled'
 				: undefined
 		);
+		setBlockEditingModes( modes );
 	}, [
 		editingMode,
 		innerBlocks,
-		setBlockEditingMode,
+		setBlockEditingModes,
 		hasPatternOverridesSource,
 	] );
 
