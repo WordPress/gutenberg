@@ -416,6 +416,9 @@ export const postRevisionsAction = {
 export const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
+	isEligible( post ) {
+		return post.status !== 'trash';
+	},
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const originalTitle = decodeEntities(
