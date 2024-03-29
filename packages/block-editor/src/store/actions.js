@@ -1448,12 +1448,32 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to disable editing mode for all blocks except the sections.
 		const sectionsContainerClientId = select.getSectionsContainerClientId();
 		let sectionsClientIds = [];
+		let sectionClientIdsInnerBlocks = [];
+		let disabledSectionsClientIds = [];
 		if ( sectionsContainerClientId ) {
 			sectionsClientIds = select.getClientIdsOfDescendants(
 				sectionsContainerClientId
 			);
 		} else {
-			sectionsClientIds = select.getBlockOrder( null );
+			sectionsClientIds = select.getBlockOrder();
+			disabledSectionsClientIds = sectionsClientIds
+				.map( ( clientId ) => {
+					return select.getBlock( clientId );
+				} )
+				.filter( ( block ) => block.name === 'core/template-part' )
+				.map( ( block ) => block.clientId );
+
+			sectionClientIdsInnerBlocks = sectionsClientIds.flatMap(
+				( clientId ) => {
+					const block = select.getBlock( clientId );
+					if ( block.name === 'core/template-part' ) {
+						return [];
+					}
+					return block.innerBlocks.map(
+						( innerBlock ) => innerBlock.clientId
+					);
+				}
+			);
 		}
 
 		if ( mode === 'zoom-out' ) {
@@ -1473,6 +1493,14 @@ export const __unstableSetEditorMode =
 					...sectionsClientIds.map( ( clientId ) => [
 						clientId,
 						'contentOnly',
+					] ),
+					...disabledSectionsClientIds.map( ( clientId ) => [
+						clientId,
+						'disabled',
+					] ),
+					...sectionClientIdsInnerBlocks.map( ( clientId ) => [
+						clientId,
+						'disabled',
 					] ),
 				];
 			}
