@@ -50,8 +50,7 @@ import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
 
-const { postManagementActions } = unlock( editorPrivateApis );
-const { usePostActions } = postManagementActions;
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis

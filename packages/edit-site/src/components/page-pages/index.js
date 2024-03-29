@@ -39,8 +39,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 
-const { postManagementActions } = unlock( editorPrivateApis );
-const { usePostActions } = postManagementActions;
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
