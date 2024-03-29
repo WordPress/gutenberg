@@ -354,18 +354,19 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		},
 		[ history ]
 	);
-	const postActions = usePostActions( onActionPerformed );
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
 	const actions = useMemo(
 		() => [
-			postActions.find( ( action ) => action.id === 'edit-post' ),
+			editAction,
 			resetTemplateAction,
 			renameTemplateAction,
-			postActions.find(
-				( action ) => action.id === 'view-post-revisions'
-			),
+			viewRevisionsAction,
 			deleteTemplateAction,
 		],
-		[ postActions ]
+		[ editAction, viewRevisionsAction ]
 	);
 
 	const onChangeView = useCallback(

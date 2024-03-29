@@ -413,11 +413,12 @@ export const postRevisionsAction = {
 	},
 };
 
-export function usePostActions( onActionPerformed ) {
+export function usePostActions( onActionPerformed, actionIds = null ) {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	return useMemo( () => {
-		const actions = [
+		// By default, return all actions...
+		const defaultActions = [
 			editPostAction,
 			viewPostAction,
 			restorePostAction,
@@ -425,6 +426,15 @@ export function usePostActions( onActionPerformed ) {
 			postRevisionsAction,
 			trashPostAction,
 		];
+
+		// ... unless `actionIds` was specified, in which case we find the
+		// actions matching the given IDs.
+		const actions = actionIds
+			? actionIds.map( ( actionId ) =>
+					defaultActions.find( ( { id } ) => actionId === id )
+			  )
+			: defaultActions;
+
 		if ( onActionPerformed ) {
 			for ( let i = 0; i < actions.length; ++i ) {
 				if ( actions[ i ].callback ) {
@@ -467,5 +477,10 @@ export function usePostActions( onActionPerformed ) {
 			}
 		}
 		return actions;
-	}, [ permanentlyDeletePostAction, restorePostAction, onActionPerformed ] );
+	}, [
+		actionIds,
+		permanentlyDeletePostAction,
+		restorePostAction,
+		onActionPerformed,
+	] );
 }
