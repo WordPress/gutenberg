@@ -859,7 +859,17 @@ test.describe( 'Image - lightbox', () => {
 		test.describe( 'Theme.json settings - allow editing TRUE, enabled FALSE', () => {
 			test.beforeEach(
 				async ( { requestUtils, admin, page, editor } ) => {
-					await requestUtils.activateTheme(
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-false-enabled-false'
+					);
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-false-enabled-true'
+					);
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-true-enabled-true'
+					);
+					await requestUtils.activateTheme( 'lightbox-tests' );
+					await requestUtils.activatePlugin(
 						'lightbox-allow-editing-true-enabled-false'
 					);
 
@@ -905,7 +915,17 @@ test.describe( 'Image - lightbox', () => {
 			);
 
 			test.afterEach( async ( { requestUtils, admin, page, editor } ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-false-enabled-true'
+				);
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+				await requestUtils.activateTheme( 'lightbox-tests' );
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -952,14 +972,10 @@ test.describe( 'Image - lightbox', () => {
 
 			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and disable lightbox on frontend when override is removed, while updating UI accordingly', async ( {
 				imageBlockUtils,
-				requestUtils,
 				page,
 				editor,
 				admin,
 			} ) => {
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-true-enabled-false'
-				);
 				await admin.visitSiteEditor( {
 					path: '/wp_global_styles',
 					canvas: 'edit',
@@ -1109,16 +1125,11 @@ test.describe( 'Image - lightbox', () => {
 			} );
 
 			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and continue disabling lightbox when override is removed, while updating UI accordingly', async ( {
-				requestUtils,
 				page,
 				admin,
 				editor,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-true-enabled-false'
-				);
-
 				await admin.visitSiteEditor( {
 					path: '/wp_global_styles',
 					canvas: 'edit',
@@ -1257,7 +1268,17 @@ test.describe( 'Image - lightbox', () => {
 		test.describe( 'Theme.json settings - allow editing TRUE, enabled TRUE', () => {
 			test.beforeEach(
 				async ( { requestUtils, admin, page, editor } ) => {
-					await requestUtils.activateTheme(
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-false-enabled-false'
+					);
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-false-enabled-true'
+					);
+					await requestUtils.deactivatePlugin(
+						'lightbox-allow-editing-true-enabled-false'
+					);
+					await requestUtils.activateTheme( 'lightbox-tests' );
+					await requestUtils.activatePlugin(
 						'lightbox-allow-editing-true-enabled-true'
 					);
 
@@ -1304,7 +1325,17 @@ test.describe( 'Image - lightbox', () => {
 			);
 
 			test.afterEach( async ( { requestUtils, admin, page, editor } ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-false-enabled-false'
+				);
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-false-enabled-true'
+				);
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+				await requestUtils.activateTheme( 'lightbox-tests' );
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -1350,15 +1381,11 @@ test.describe( 'Image - lightbox', () => {
 			} );
 
 			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and continue enabling lightbox on frontend when override is removed, while updating UI accordingly', async ( {
-				requestUtils,
 				admin,
 				page,
 				editor,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-true-enabled-true'
-				);
 				await admin.visitSiteEditor( {
 					path: '/wp_global_styles',
 					canvas: 'edit',
@@ -1501,16 +1528,11 @@ test.describe( 'Image - lightbox', () => {
 			} );
 
 			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and enable lightbox when override is removed, while updating UI accordingly', async ( {
-				requestUtils,
 				admin,
 				page,
 				editor,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
-					'lightbox-allow-editing-true-enabled-true'
-				);
-
 				await admin.visitSiteEditor( {
 					path: '/wp_global_styles',
 					canvas: 'edit',
@@ -1646,6 +1668,38 @@ test.describe( 'Image - lightbox', () => {
 	} );
 
 	test.describe( 'should respect theme.json settings and block overrides', () => {
+		test.beforeEach( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'lightbox-tests' );
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-false-enabled-false'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-false-enabled-true'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-true-enabled-false'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-true-enabled-true'
+			);
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'lightbox-tests' );
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-false-enabled-false'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-false-enabled-true'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-true-enabled-false'
+			);
+			await requestUtils.deactivatePlugin(
+				'lightbox-allow-editing-true-enabled-true'
+			);
+		} );
+
 		test.describe( 'Theme.json settings - allow editing FALSE, enabled FALSE', () => {
 			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI and disable lightbox on frontend when block override is undefined', async ( {
 				admin,
@@ -1654,7 +1708,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-false'
 				);
 
@@ -1697,7 +1751,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -1725,7 +1779,12 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-false'
 				);
 
@@ -1782,7 +1841,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -1810,9 +1869,15 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-false'
 				);
+
 				await page.goto(
 					`wp-admin/post.php?post=${ postId }&action=edit`
 				);
@@ -1879,7 +1944,7 @@ test.describe( 'Image - lightbox', () => {
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-false'
 				);
 
@@ -1929,7 +1994,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -1972,7 +2037,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -2054,7 +2119,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -2082,7 +2147,12 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -2211,7 +2281,7 @@ test.describe( 'Image - lightbox', () => {
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -2261,7 +2331,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-true'
 				);
 
@@ -2308,7 +2378,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -2336,7 +2406,12 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-true'
 				);
 
@@ -2385,7 +2460,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -2413,7 +2488,12 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-true'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-true'
 				);
 
@@ -2506,7 +2586,7 @@ test.describe( 'Image - lightbox', () => {
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-false-enabled-true'
 				);
 
@@ -2562,7 +2642,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -2609,7 +2689,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-false'
 				);
 
@@ -2637,7 +2717,12 @@ test.describe( 'Image - lightbox', () => {
 					.click();
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+
+				await requestUtils.deactivatePlugin(
+					'lightbox-allow-editing-true-enabled-false'
+				);
+
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -2719,7 +2804,7 @@ test.describe( 'Image - lightbox', () => {
 				requestUtils,
 				imageBlockUtils,
 			} ) => {
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
@@ -2837,7 +2922,7 @@ test.describe( 'Image - lightbox', () => {
 				await page.keyboard.press( 'Enter' );
 
 				const postId = await editor.publishPost();
-				await requestUtils.activateTheme(
+				await requestUtils.activatePlugin(
 					'lightbox-allow-editing-true-enabled-true'
 				);
 
