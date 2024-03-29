@@ -2280,36 +2280,39 @@ export function __experimentalGetDirectInsertBlock(
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
-		createSelector( ( state, patternName ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const pattern = patterns.find(
-				( { name } ) => name === patternName
-			);
-			if ( ! pattern ) {
-				return null;
-			}
-			const blocks = parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} );
-			if ( blocks.length === 1 ) {
-				blocks[ 0 ].attributes = {
-					...blocks[ 0 ].attributes,
-					metadata: {
-						...( blocks[ 0 ].attributes.metadata || {} ),
-						categories: pattern.categories,
-						patternName: pattern.name,
-						name:
-							blocks[ 0 ].attributes.metadata?.name ||
-							pattern.title,
-					},
+		createSelector(
+			( state, patternName ) => {
+				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+					patternName
+				);
+				if ( ! pattern ) {
+					return null;
+				}
+				const blocks = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} );
+				if ( blocks.length === 1 ) {
+					blocks[ 0 ].attributes = {
+						...blocks[ 0 ].attributes,
+						metadata: {
+							...( blocks[ 0 ].attributes.metadata || {} ),
+							categories: pattern.categories,
+							patternName: pattern.name,
+							name:
+								blocks[ 0 ].attributes.metadata?.name ||
+								pattern.title,
+						},
+					};
+				}
+				return {
+					...pattern,
+					blocks,
 				};
-			}
-			return {
-				...pattern,
-				blocks,
-			};
-		}, getAllPatternsDependants( select ) )
+			},
+			( state, patternName ) => [
+				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
+			]
+		)
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [

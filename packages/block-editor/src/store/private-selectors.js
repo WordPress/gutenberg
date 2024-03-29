@@ -290,6 +290,14 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
+export const getPatternBySlug = createRegistrySelector(
+	( select ) => ( state, patternName ) => {
+		return unlock( select( STORE_NAME ) )
+			.getAllPatterns()
+			.find( ( { name } ) => name === patternName );
+	}
+);
+
 export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
 		// This setting is left for back compat.
