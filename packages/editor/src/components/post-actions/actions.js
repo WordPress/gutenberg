@@ -416,71 +416,88 @@ export const postRevisionsAction = {
 export function usePostActions( onActionPerformed, actionIds = null ) {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
-	return useMemo( () => {
-		// By default, return all actions...
-		const defaultActions = [
-			editPostAction,
-			viewPostAction,
-			restorePostAction,
-			permanentlyDeletePostAction,
-			postRevisionsAction,
-			trashPostAction,
-		];
+	return useMemo(
+		() => {
+			// By default, return all actions...
+			const defaultActions = [
+				editPostAction,
+				viewPostAction,
+				restorePostAction,
+				permanentlyDeletePostAction,
+				postRevisionsAction,
+				trashPostAction,
+			];
 
-		// ... unless `actionIds` was specified, in which case we find the
-		// actions matching the given IDs.
-		const actions = actionIds
-			? actionIds.map( ( actionId ) =>
-					defaultActions.find( ( { id } ) => actionId === id )
-			  )
-			: defaultActions;
+			// ... unless `actionIds` was specified, in which case we find the
+			// actions matching the given IDs.
+			const actions = actionIds
+				? actionIds.map( ( actionId ) =>
+						defaultActions.find( ( { id } ) => actionId === id )
+				  )
+				: defaultActions;
 
-		if ( onActionPerformed ) {
-			for ( let i = 0; i < actions.length; ++i ) {
-				if ( actions[ i ].callback ) {
-					const existingCallback = actions[ i ].callback;
-					actions[ i ] = {
-						...actions[ i ],
-						callback: ( items, _onActionPerformed ) => {
-							existingCallback( items, ( _items ) => {
-								if ( _onActionPerformed ) {
-									_onActionPerformed( _items );
-								}
-								onActionPerformed( actions[ i ].id, _items );
-							} );
-						},
-					};
-				}
-				if ( actions[ i ].RenderModal ) {
-					const ExistingRenderModal = actions[ i ].RenderModal;
-					actions[ i ] = {
-						...actions[ i ],
-						RenderModal: ( props ) => {
-							return (
-								<ExistingRenderModal
-									items={ props.items }
-									closeModal={ props.closeModal }
-									onActionPerformed={ ( _items ) => {
-										if ( props.onActionPerformed ) {
-											props.onActionPerformed( _items );
-										}
-										onActionPerformed(
-											actions[ i ].id,
-											_items
-										);
-									} }
-								/>
-							);
-						},
-					};
+			if ( onActionPerformed ) {
+				for ( let i = 0; i < actions.length; ++i ) {
+					if ( actions[ i ].callback ) {
+						const existingCallback = actions[ i ].callback;
+						actions[ i ] = {
+							...actions[ i ],
+							callback: ( items, _onActionPerformed ) => {
+								existingCallback( items, ( _items ) => {
+									if ( _onActionPerformed ) {
+										_onActionPerformed( _items );
+									}
+									onActionPerformed(
+										actions[ i ].id,
+										_items
+									);
+								} );
+							},
+						};
+					}
+					if ( actions[ i ].RenderModal ) {
+						const ExistingRenderModal = actions[ i ].RenderModal;
+						actions[ i ] = {
+							...actions[ i ],
+							RenderModal: ( props ) => {
+								return (
+									<ExistingRenderModal
+										items={ props.items }
+										closeModal={ props.closeModal }
+										onActionPerformed={ ( _items ) => {
+											if ( props.onActionPerformed ) {
+												props.onActionPerformed(
+													_items
+												);
+											}
+											onActionPerformed(
+												actions[ i ].id,
+												_items
+											);
+										} }
+									/>
+								);
+							},
+						};
+					}
 				}
 			}
-		}
-		return actions;
-	}, [
-		actionIds,
-		permanentlyDeletePostAction,
-		restorePostAction,
-		onActionPerformed,
-	] );
+			return actions;
+		},
+
+		// Disable reason: if provided, `actionIds` is a shallow array of
+		// strings, and the strings themselves should be part of the useMemo
+		// dependencies. Two different disable statements are needed, as the
+		// first flags what it thinks are missing dependencies, and the second
+		// flags the array spread operation.
+		//
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			...( actionIds || [] ),
+			permanentlyDeletePostAction,
+			restorePostAction,
+			onActionPerformed,
+		]
+	);
 }
