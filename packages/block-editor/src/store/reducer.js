@@ -1970,20 +1970,65 @@ export function temporarilyEditingFocusModeRevert( state = '', action ) {
 }
 
 /**
+ * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * @typedef {import('./actions').ClientId} ClientId
+ */
+
+/**
+ * @typedef {import('./actions').ActionSetBlockEditingMode} ActionSetBlockEditingMode
+ */
+
+/**
+ * @typedef {import('./actions').ActionSetBlockEditingModes} ActionSetBlockEditingModes
+ */
+
+/**
+ * @typedef {import('./actions').ActionUnsetBlockEditingMode} ActionUnsetBlockEditingMode
+ */
+
+/**
+ * @typedef {import('./actions').ActionUnsetBlockEditingModes} ActionUnsetBlockEditingModes
+ */
+
+/**
+ * @typedef {import('./actions').ActionResetBlocks} ActionResetBlocks
+ */
+
+/**
+ * @typedef {ActionSetBlockEditingMode|ActionSetBlockEditingModes|ActionUnsetBlockEditingMode|ActionUnsetBlockEditingModes|ActionResetBlocks} BlockEditingModesAction
+ */
+
+/**
+ * @typedef {Map<ClientId, BlockEditingMode>} BlockEditingModesState
+ */
+
+/**
  * Reducer returning a map of block client IDs to block editing modes.
  *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {BlockEditingModesState}  state  Current state.
+ * @param {BlockEditingModesAction} action Dispatched action.
  *
- * @return {Map} Updated state.
+ * @return {BlockEditingModesState} Updated state.
  */
 export function blockEditingModes( state = new Map(), action ) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EDITING_MODE':
 			return new Map( state ).set( action.clientId, action.mode );
+		case 'SET_BLOCK_EDITING_MODES':
+			return new Map( [ ...state, ...action.modes ] );
 		case 'UNSET_BLOCK_EDITING_MODE': {
 			const newState = new Map( state );
 			newState.delete( action.clientId );
+			return newState;
+		}
+		case 'UNSET_BLOCK_EDITING_MODES': {
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				newState.delete( clientId );
+			}
 			return newState;
 		}
 		case 'RESET_BLOCKS': {

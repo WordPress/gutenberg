@@ -41,32 +41,27 @@ export default function DisableNonPageContentBlocks() {
 		);
 	}, [] );
 
-	const { setBlockEditingMode, unsetBlockEditingMode } =
+	const { setBlockEditingModes, unsetBlockEditingModes } =
 		useDispatch( blockEditorStore );
 
 	useEffect( () => {
-		setBlockEditingMode( '', 'disabled' );
-		for ( const clientId of contentOnlyIds ) {
-			setBlockEditingMode( clientId, 'contentOnly' );
-		}
-		for ( const clientId of disabledIds ) {
-			setBlockEditingMode( clientId, 'disabled' );
-		}
+		setBlockEditingModes( [
+			[ '', 'disabled' ],
+			...contentOnlyIds.map( ( clientId ) => [
+				clientId,
+				'contentOnly',
+			] ),
+			...disabledIds.map( ( clientId ) => [ clientId, 'disabled' ] ),
+		] );
 
 		return () => {
-			unsetBlockEditingMode( '' );
-			for ( const clientId of contentOnlyIds ) {
-				unsetBlockEditingMode( clientId );
-			}
-			for ( const clientId of disabledIds ) {
-				unsetBlockEditingMode( clientId );
-			}
+			unsetBlockEditingModes( [ '', ...contentOnlyIds, ...disabledIds ] );
 		};
 	}, [
 		contentOnlyIds,
 		disabledIds,
-		setBlockEditingMode,
-		unsetBlockEditingMode,
+		setBlockEditingModes,
+		unsetBlockEditingModes,
 	] );
 
 	return null;

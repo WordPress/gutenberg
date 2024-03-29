@@ -1889,7 +1889,18 @@ export const registerInserterMediaCategory =
 	};
 
 /**
+ * @typedef {string} ClientId
+ */
+
+/**
  * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
+ */
+
+/**
+ * @typedef {Object} ActionSetBlockEditingMode
+ * @property {'SET_BLOCK_EDITING_MODE'} type     Action type.
+ * @property {ClientId}                 clientId Block client ID.
+ * @property {BlockEditingMode}         mode     Block editing mode.
  */
 
 /**
@@ -1897,11 +1908,11 @@ export const registerInserterMediaCategory =
  *
  * @see useBlockEditingMode
  *
- * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {ClientId}         clientId The block client ID, or `''` for the root container.
  * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
  *                                    `'contentOnly'`, or `'default'`.
  *
- * @return {Object} Action object.
+ * @return {ActionSetBlockEditingMode} Action object.
  */
 export function setBlockEditingMode( clientId = '', mode ) {
 	return {
@@ -1912,13 +1923,50 @@ export function setBlockEditingMode( clientId = '', mode ) {
 }
 
 /**
+ * @typedef {Object} ActionSetBlockEditingModes
+ * @property {'SET_BLOCK_EDITING_MODES'}              type  Action type.
+ * @property {Iterable<[ClientId, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
+ */
+
+/**
+ * Sets the block editing mode for a multiple blocks.
+ *
+ * @see useBlockEditingMode
+ *
+ * @example
+ * ```js
+ * wp.data.dispatch('core/block-editor').setBlockEditingModes([
+ * 	['block-1', 'disabled'],
+ * 	['block-2', 'contentOnly'],
+ * 	['block-3', 'default'],
+ * ]);
+ * ```
+ *
+ * @param {Iterable<[ClientId, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
+ *
+ * @return {ActionSetBlockEditingModes} Action object.
+ */
+export function setBlockEditingModes( modes ) {
+	return {
+		type: 'SET_BLOCK_EDITING_MODES',
+		modes,
+	};
+}
+
+/**
+ * @typedef {Object} ActionUnsetBlockEditingMode
+ * @property {'UNSET_BLOCK_EDITING_MODE'} type     Action type.
+ * @property {ClientId}                   clientId Block client ID.
+ */
+
+/**
  * Clears the block editing mode for a given block.
  *
  * @see useBlockEditingMode
  *
- * @param {string} clientId The block client ID, or `''` for the root container.
+ * @param {ClientId} clientId The block client ID, or `''` for the root container.
  *
- * @return {Object} Action object.
+ * @return {ActionUnsetBlockEditingMode} Action object.
  */
 export function unsetBlockEditingMode( clientId = '' ) {
 	return {
@@ -1926,3 +1974,30 @@ export function unsetBlockEditingMode( clientId = '' ) {
 		clientId,
 	};
 }
+
+/**
+ * @typedef {Object} ActionUnsetBlockEditingModes
+ * @property {'UNSET_BLOCK_EDITING_MODES'} type      Action type.
+ * @property {Iterable<ClientId>}          clientIds Block client IDs.
+ */
+
+/**
+ * Clears the block editing mode for a given block.
+ *
+ * @see useBlockEditingMode
+ *
+ * @param {Iterable<ClientId>} clientIds List of the block client IDs. Use `''` for the root container.
+ *
+ * @return {ActionUnsetBlockEditingModes} Action object.
+ */
+export function unsetBlockEditingModes( clientIds = [] ) {
+	return {
+		type: 'UNSET_BLOCK_EDITING_MODES',
+		clientIds,
+	};
+}
+
+/**
+ * @typedef {Object} ActionResetBlocks
+ * @property {'RESET_BLOCKS'} type Action type.
+ */
