@@ -10,14 +10,14 @@ import type { Editor } from './index';
  * @param this
  */
 export async function updatePost( this: Editor ) {
-	const updateButton = this.page.getByRole( 'button', {
-		name: 'Update',
-	} );
-	await updateButton.click();
-
 	await this.page
-		.getByRole( 'button', {
-			name: 'Update',
-		} )
-		.waitFor();
+		.getByRole( 'region', { name: 'Editor top bar' } )
+		.getByRole( 'button', { name: 'Update' } )
+		.click();
+	const dismissNotice = this.page
+		.getByRole( 'button', { name: 'Dismiss this notice' } )
+		.filter( { hasText: 'updated' } );
+
+	await dismissNotice.waitFor();
+	await dismissNotice.click();
 }
