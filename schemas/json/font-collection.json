@@ -138,12 +138,7 @@
 								}
 							}
 						},
-						"required": [
-							"name",
-							"fontFamily",
-							"slug",
-							"fontFace"
-						],
+						"required": [ "name", "fontFamily", "slug" ],
 						"additionalProperties": false
 					},
 					"categories": {
