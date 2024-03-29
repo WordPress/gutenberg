@@ -7,15 +7,15 @@
  * @package gutenberg-lightbox-allow-editing-true-enabled-true
  */
 
- function filter_theme_json_theme( $theme_json ){
+function filter_theme_json_theme( $theme_json ) {
 	$new_data = array(
 		'version'  => 2,
 		'settings' => array(
 			'blocks' => array(
 				'core/image' => array(
-					'lightbox'  => array(
+					'lightbox' => array(
 						'allowEditing' => true,
-						'enabled'  => true
+						'enabled'      => true,
 					),
 				),
 			),
