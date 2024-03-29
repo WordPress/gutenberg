@@ -84,8 +84,11 @@ export default function Layout() {
 			keyboardShortcutsStore
 		);
 		const { getCanvasMode } = unlock( select( editSiteStore ) );
-		const { getCurrentPostAttribute, hasNonPostEntityChanges } =
-			select( editorStore );
+		const {
+			getCurrentPostAttribute,
+			hasNonPostEntityChanges,
+			isPublishSidebarOpened,
+		} = select( editorStore );
 		const currentPostIsDraft =
 			getCurrentPostAttribute( 'status' ) === 'draft';
 		return {
@@ -110,7 +113,8 @@ export default function Layout() {
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 			showPublishButton:
-				currentPostIsDraft && ! hasNonPostEntityChanges(),
+				! hasNonPostEntityChanges() &&
+				( currentPostIsDraft || isPublishSidebarOpened() ),
 		};
 	}, [] );
 	const navigateRegionsProps = useNavigateRegions( {
