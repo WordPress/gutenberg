@@ -106,7 +106,7 @@ export default function AdvancedPanel( {
 		);
 	}
 
-	const [ customCSS, setCustomeCSS ] = useState( '' );
+	const [ customCSS, setCustomCSS ] = useState( '' );
 	useEffect( () => {
 		if ( ! inheritedValue?.css ) {
 			return;
@@ -114,7 +114,7 @@ export default function AdvancedPanel( {
 		if ( customCSS !== '' ) {
 			return;
 		}
-		setCustomeCSS( ensureMinLines( inheritedValue?.css, EDITOR_ID ) );
+		setCustomCSS( ensureMinLines( inheritedValue?.css, EDITOR_ID ) );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [inheritedValue?.css])
 
