@@ -314,7 +314,7 @@ export const getPatternBySlug = createRegistrySelector(
 	( select ) => ( state, patternName ) => {
 		// Only fetch reusable blocks if we know we need them.
 		// To do: maybe use the entity record API to retrieve the block by slug.
-		if ( patternName.startsWith( 'core/block/' ) ) {
+		if ( patternName?.startsWith( 'core/block/' ) ) {
 			const _id = parseInt(
 				patternName.slice( 'core/block/'.length ),
 				10
