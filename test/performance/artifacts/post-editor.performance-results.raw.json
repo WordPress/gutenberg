@@ -1,0 +1,23 @@
+{
+	"serverResponse": [],
+	"firstPaint": [],
+	"domContentLoaded": [],
+	"loaded": [],
+	"firstContentfulPaint": [],
+	"firstBlock": [],
+	"type": [],
+	"typeWithoutInspector": [],
+	"typeWithTopToolbar": [],
+	"typeContainer": [],
+	"focus": [],
+	"listViewOpen": [],
+	"inserterOpen": [],
+	"inserterHover": [],
+	"inserterSearch": [],
+	"loadPatterns": [
+		6520.134291999999, 670.5597500000003, 506.68683299999975,
+		719.2165410000016, 771.6043750000026, 10102.817540999997,
+		641.4196670000092, 479.9243340000103, 664.5374169999996,
+		494.4980829999986
+	]
+}
