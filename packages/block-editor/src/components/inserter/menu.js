@@ -237,7 +237,11 @@ function InserterMenu(
 	);
 
 	return (
-		<div className="block-editor-inserter__menu">
+		<div
+			className={ classnames( 'block-editor-inserter__menu', {
+				'show-panel': showPatternPanel,
+			} ) }
+		>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
@@ -304,9 +308,6 @@ function InserterMenu(
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
 				</Popover>
-			) }
-			{ showPatternPanel && (
-				<div className="block-editor-inserter__pattern-panel-placeholder" />
 			) }
 		</div>
 	);

@@ -781,10 +781,14 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 	}
 
-	.block-editor-inserter__pattern-panel-placeholder {
-		display: block;
-		width: 300px;
-		height: 100%;
+	.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
 	}
 
 	.block-editor-inserter__media-dialog {
