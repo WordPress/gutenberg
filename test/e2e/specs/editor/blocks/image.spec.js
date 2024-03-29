@@ -868,6 +868,19 @@ test.describe( 'Image - lightbox', () => {
 						canvas: 'edit',
 					} );
 
+					const imageBlocks = editor.canvas.locator(
+						'role=document[name="Block: Image"i]'
+					);
+
+					const count = await imageBlocks.count(); // Get the count of elements
+
+					for ( let i = 0; i < count; i++ ) {
+						const block = imageBlocks.nth( i );
+						await block.click();
+						await page.keyboard.press( 'Backspace' );
+						await editor.saveSiteEditorEntities();
+					}
+
 					await page
 						.getByRole( 'region', { name: 'Editor top bar' } )
 						.getByRole( 'button', { name: 'Styles' } )
@@ -899,6 +912,19 @@ test.describe( 'Image - lightbox', () => {
 					canvas: 'edit',
 				} );
 
+				const imageBlocks = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				const count = await imageBlocks.count(); // Get the count of elements
+
+				for ( let i = 0; i < count; i++ ) {
+					const block = imageBlocks.nth( i );
+					await block.click();
+					await page.keyboard.press( 'Backspace' );
+					await editor.saveSiteEditorEntities();
+				}
+
 				await page
 					.getByRole( 'region', { name: 'Editor top bar' } )
 					.getByRole( 'button', { name: 'Styles' } )
@@ -919,7 +945,7 @@ test.describe( 'Image - lightbox', () => {
 				}
 			} );
 
-			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and disable lightbox on frontend when override is removed', async ( {
+			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and disable lightbox on frontend when override is removed, while updating UI accordingly', async ( {
 				imageBlockUtils,
 				requestUtils,
 				page,
@@ -933,6 +959,18 @@ test.describe( 'Image - lightbox', () => {
 					path: '/wp_global_styles',
 					canvas: 'edit',
 				} );
+
+				const imageBlocks = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				const count = await imageBlocks.count(); // Get the count of elements
+
+				for ( let i = 0; i < count; i++ ) {
+					const block = imageBlocks.nth( i );
+					await block.click();
+					await page.keyboard.press( 'Backspace' );
+				}
 
 				await page
 					.getByRole( 'region', { name: 'Editor top bar' } )
@@ -954,13 +992,35 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'checkbox', { name: 'Expand on click' } )
 					.setChecked( true );
 
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
 				await editor.saveSiteEditorEntities();
 
 				await admin.createNewPost();
 
 				await editor.insertBlock( { name: 'core/image' } );
 
-				const imageBlock = editor.canvas.locator(
+				imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
 				await expect( imageBlock ).toBeVisible();
@@ -1011,6 +1071,27 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'menuitem', { name: 'Reset all' } )
 					.click();
 
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+
+				await imageBlock.click();
+
+				await page.keyboard.press( 'Backspace' );
+
 				await editor.saveSiteEditorEntities();
 
 				await page.goto( `/?p=${ postId }` );
@@ -1019,7 +1100,7 @@ test.describe( 'Image - lightbox', () => {
 				await expect( lightboxImage ).toBeHidden();
 			} );
 
-			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and continue disabling lightbox when override is removed', async ( {
+			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and continue disabling lightbox when override is removed, while updating UI accordingly', async ( {
 				requestUtils,
 				page,
 				admin,
@@ -1060,13 +1141,35 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'checkbox', { name: 'Expand on click' } )
 					.setChecked( false );
 
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+
 				await editor.saveSiteEditorEntities();
 
 				await admin.createNewPost();
 
 				await editor.insertBlock( { name: 'core/image' } );
 
-				const imageBlock = editor.canvas.locator(
+				imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
 				await expect( imageBlock ).toBeVisible();
@@ -1113,6 +1216,27 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'menuitem', { name: 'Reset all' } )
 					.click();
 
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+
+				await imageBlock.click();
+
+				await page.keyboard.press( 'Backspace' );
+
 				await editor.saveSiteEditorEntities();
 
 				await page.goto( `/?p=${ postId }` );
@@ -1133,6 +1257,19 @@ test.describe( 'Image - lightbox', () => {
 						path: '/wp_global_styles',
 						canvas: 'edit',
 					} );
+
+					const imageBlocks = editor.canvas.locator(
+						'role=document[name="Block: Image"i]'
+					);
+
+					const count = await imageBlocks.count(); // Get the count of elements
+
+					for ( let i = 0; i < count; i++ ) {
+						const block = imageBlocks.nth( i );
+						await block.click();
+						await page.keyboard.press( 'Backspace' );
+						await editor.saveSiteEditorEntities();
+					}
 
 					await page
 						.getByRole( 'region', { name: 'Editor top bar' } )
@@ -1165,6 +1302,19 @@ test.describe( 'Image - lightbox', () => {
 					canvas: 'edit',
 				} );
 
+				const imageBlocks = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				const count = await imageBlocks.count(); // Get the count of elements
+
+				for ( let i = 0; i < count; i++ ) {
+					const block = imageBlocks.nth( i );
+					await block.click();
+					await page.keyboard.press( 'Backspace' );
+					await editor.saveSiteEditorEntities();
+				}
+
 				await page
 					.getByRole( 'region', { name: 'Editor top bar' } )
 					.getByRole( 'button', { name: 'Styles' } )
@@ -1185,7 +1335,7 @@ test.describe( 'Image - lightbox', () => {
 				}
 			} );
 
-			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and continue enabling lightbox on frontend when override is removed', async ( {
+			test( 'Global styles settings - lightbox enabled TRUE - should enable lightbox on frontend when global override is active, and continue enabling lightbox on frontend when override is removed, while updating UI accordingly', async ( {
 				requestUtils,
 				admin,
 				page,
@@ -1225,13 +1375,35 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'checkbox', { name: 'Expand on click' } )
 					.setChecked( true );
 
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
 				await editor.saveSiteEditorEntities();
 
 				await admin.createNewPost();
 
 				await editor.insertBlock( { name: 'core/image' } );
 
-				const imageBlock = editor.canvas.locator(
+				imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
 				await expect( imageBlock ).toBeVisible();
@@ -1282,6 +1454,27 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'menuitem', { name: 'Reset all' } )
 					.click();
 
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
+				await imageBlock.click();
+
+				await page.keyboard.press( 'Backspace' );
+
 				await editor.saveSiteEditorEntities();
 
 				await page.goto( `/?p=${ postId }` );
@@ -1293,7 +1486,7 @@ test.describe( 'Image - lightbox', () => {
 				await expect( lightbox ).toBeVisible();
 			} );
 
-			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and enable lightbox when override is removed', async ( {
+			test( 'Global styles settings - lightbox enabled FALSE - should disable lightbox on frontend when global override is active, and enable lightbox when override is removed, while updating UI accordingly', async ( {
 				requestUtils,
 				admin,
 				page,
@@ -1329,13 +1522,35 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'checkbox', { name: 'Expand on click' } )
 					.setChecked( false );
 
+				await editor.insertBlock( { name: 'core/image' } );
+
+				let imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+				await expect( imageBlock ).toBeVisible();
+
+				await imageBlockUtils.upload(
+					imageBlock.locator( 'data-testid=form-file-upload-input' )
+				);
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'menuitem', {
+						name: 'Expand on click',
+					} )
+				).toBeVisible();
+
 				await editor.saveSiteEditorEntities();
 
 				await admin.createNewPost();
 
 				await editor.insertBlock( { name: 'core/image' } );
 
-				const imageBlock = editor.canvas.locator(
+				imageBlock = editor.canvas.locator(
 					'role=document[name="Block: Image"i]'
 				);
 				await expect( imageBlock ).toBeVisible();
@@ -1381,6 +1596,27 @@ test.describe( 'Image - lightbox', () => {
 					.getByRole( 'menu', { name: 'Settings options' } )
 					.getByRole( 'menuitem', { name: 'Reset all' } )
 					.click();
+
+				imageBlock = editor.canvas.locator(
+					'role=document[name="Block: Image"i]'
+				);
+
+				await imageBlock.click();
+
+				await page
+					.getByLabel( 'Block tools' )
+					.getByLabel( 'Link' )
+					.click();
+
+				await expect(
+					page.getByRole( 'button', {
+						name: 'Disable expand on click',
+					} )
+				).toBeVisible();
+
+				await imageBlock.click();
+
+				await page.keyboard.press( 'Backspace' );
 
 				await editor.saveSiteEditorEntities();
 
