@@ -48,6 +48,8 @@ function ReplaceButton( {
 	isTemplatePartSelectionOpen,
 	setIsTemplatePartSelectionOpen,
 } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -76,6 +78,8 @@ function ReplaceButton( {
 }
 
 function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
 	const canReplace =
 		isEntityAvailable &&
