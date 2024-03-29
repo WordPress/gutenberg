@@ -1974,10 +1974,6 @@ export function temporarilyEditingFocusModeRevert( state = '', action ) {
  */
 
 /**
- * @typedef {import('./actions').ClientId} ClientId
- */
-
-/**
  * @typedef {import('./actions').ActionSetBlockEditingMode} ActionSetBlockEditingMode
  */
 
@@ -2002,7 +1998,7 @@ export function temporarilyEditingFocusModeRevert( state = '', action ) {
  */
 
 /**
- * @typedef {Map<ClientId, BlockEditingMode>} BlockEditingModesState
+ * @typedef {Map<string, BlockEditingMode>} BlockEditingModesState
  */
 
 /**

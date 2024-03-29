@@ -1889,17 +1889,13 @@ export const registerInserterMediaCategory =
 	};
 
 /**
- * @typedef {string} ClientId
- */
-
-/**
  * @typedef {import('../components/block-editing-mode').BlockEditingMode} BlockEditingMode
  */
 
 /**
  * @typedef {Object} ActionSetBlockEditingMode
  * @property {'SET_BLOCK_EDITING_MODE'} type     Action type.
- * @property {ClientId}                 clientId Block client ID.
+ * @property {string}                   clientId Block client ID.
  * @property {BlockEditingMode}         mode     Block editing mode.
  */
 
@@ -1908,7 +1904,7 @@ export const registerInserterMediaCategory =
  *
  * @see useBlockEditingMode
  *
- * @param {ClientId}         clientId The block client ID, or `''` for the root container.
+ * @param {string}           clientId The block client ID, or `''` for the root container.
  * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
  *                                    `'contentOnly'`, or `'default'`.
  *
@@ -1924,8 +1920,8 @@ export function setBlockEditingMode( clientId = '', mode ) {
 
 /**
  * @typedef {Object} ActionSetBlockEditingModes
- * @property {'SET_BLOCK_EDITING_MODES'}              type  Action type.
- * @property {Iterable<[ClientId, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
+ * @property {'SET_BLOCK_EDITING_MODES'}            type  Action type.
+ * @property {Iterable<[string, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
  */
 
 /**
@@ -1942,7 +1938,7 @@ export function setBlockEditingMode( clientId = '', mode ) {
  * ]);
  * ```
  *
- * @param {Iterable<[ClientId, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
+ * @param {Iterable<[string, BlockEditingMode]>} modes Iterable of tuples of client ids and block editing modes.
  *
  * @return {ActionSetBlockEditingModes} Action object.
  */
@@ -1956,7 +1952,7 @@ export function setBlockEditingModes( modes ) {
 /**
  * @typedef {Object} ActionUnsetBlockEditingMode
  * @property {'UNSET_BLOCK_EDITING_MODE'} type     Action type.
- * @property {ClientId}                   clientId Block client ID.
+ * @property {string}                     clientId Block client ID.
  */
 
 /**
@@ -1964,7 +1960,7 @@ export function setBlockEditingModes( modes ) {
  *
  * @see useBlockEditingMode
  *
- * @param {ClientId} clientId The block client ID, or `''` for the root container.
+ * @param {string} clientId The block client ID, or `''` for the root container.
  *
  * @return {ActionUnsetBlockEditingMode} Action object.
  */
@@ -1978,7 +1974,7 @@ export function unsetBlockEditingMode( clientId = '' ) {
 /**
  * @typedef {Object} ActionUnsetBlockEditingModes
  * @property {'UNSET_BLOCK_EDITING_MODES'} type      Action type.
- * @property {Iterable<ClientId>}          clientIds Block client IDs.
+ * @property {Iterable<string>}            clientIds Block client IDs.
  */
 
 /**
@@ -1986,7 +1982,7 @@ export function unsetBlockEditingMode( clientId = '' ) {
  *
  * @see useBlockEditingMode
  *
- * @param {Iterable<ClientId>} clientIds List of the block client IDs. Use `''` for the root container.
+ * @param {Iterable<string>} clientIds List of the block client IDs. Use `''` for the root container.
  *
  * @return {ActionUnsetBlockEditingModes} Action object.
  */

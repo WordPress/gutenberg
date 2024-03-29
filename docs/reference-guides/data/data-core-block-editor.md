@@ -1632,7 +1632,7 @@ _Related_
 
 _Parameters_
 
--   _clientId_ `ClientId`: The block client ID, or `''` for the root container.
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
 -   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
 
 _Returns_
@@ -1659,7 +1659,7 @@ wp.data.dispatch( 'core/block-editor' ).setBlockEditingModes( [
 
 _Parameters_
 
--   _modes_ `Iterable<[ClientId, BlockEditingMode]>`: Iterable of tuples of client ids and block editing modes.
+-   _modes_ `Iterable<[string, BlockEditingMode]>`: Iterable of tuples of client ids and block editing modes.
 
 _Returns_
 
@@ -1832,7 +1832,7 @@ _Related_
 
 _Parameters_
 
--   _clientId_ `ClientId`: The block client ID, or `''` for the root container.
+-   _clientId_ `string`: The block client ID, or `''` for the root container.
 
 _Returns_
 
@@ -1848,7 +1848,7 @@ _Related_
 
 _Parameters_
 
--   _clientIds_ `Iterable<ClientId>`: List of the block client IDs. Use `''` for the root container.
+-   _clientIds_ `Iterable<string>`: List of the block client IDs. Use `''` for the root container.
 
 _Returns_
 
