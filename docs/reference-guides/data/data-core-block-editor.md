@@ -1632,12 +1632,38 @@ _Related_
 
 _Parameters_
 
--   _clientId_ `string`: The block client ID, or `''` for the root container.
+-   _clientId_ `ClientId`: The block client ID, or `''` for the root container.
 -   _mode_ `BlockEditingMode`: The block editing mode. One of `'disabled'`, `'contentOnly'`, or `'default'`.
 
 _Returns_
 
--   `Object`: Action object.
+-   `ActionSetBlockEditingMode`: Action object.
+
+### setBlockEditingModes
+
+Sets the block editing mode for a multiple blocks.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Usage_
+
+```js
+wp.data.dispatch( 'core/block-editor' ).setBlockEditingModes( [
+	[ 'block-1', 'disabled' ],
+	[ 'block-2', 'contentOnly' ],
+	[ 'block-3', 'default' ],
+] );
+```
+
+_Parameters_
+
+-   _modes_ `Iterable<[ClientId, BlockEditingMode]>`: Iterable of tuples of client ids and block editing modes.
+
+_Returns_
+
+-   `ActionSetBlockEditingModes`: Action object.
 
 ### setBlockMovingClientId
 
@@ -1806,11 +1832,27 @@ _Related_
 
 _Parameters_
 
--   _clientId_ `string`: The block client ID, or `''` for the root container.
+-   _clientId_ `ClientId`: The block client ID, or `''` for the root container.
 
 _Returns_
 
--   `Object`: Action object.
+-   `ActionUnsetBlockEditingMode`: Action object.
+
+### unsetBlockEditingModes
+
+Clears the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientIds_ `Iterable<ClientId>`: List of the block client IDs. Use `''` for the root container.
+
+_Returns_
+
+-   `ActionUnsetBlockEditingModes`: Action object.
 
 ### updateBlock
 
