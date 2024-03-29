@@ -48,6 +48,8 @@ function ReplaceButton( {
 	isTemplatePartSelectionOpen,
 	setIsTemplatePartSelectionOpen,
 } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
@@ -75,21 +77,30 @@ function ReplaceButton( {
 	);
 }
 
-function TemplatesList( { availableTemplates, onSelect } ) {
-	const shownTemplates = useAsyncList( availableTemplates );
+function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const canReplace =
+		isEntityAvailable &&
+		!! blockPatterns.length &&
+		( area === 'header' || area === 'footer' );
+	const shownTemplates = useAsyncList( blockPatterns );
 
-	if ( ! availableTemplates ) {
+	if ( ! canReplace ) {
 		return null;
 	}
 
 	return (
-		<BlockPatternsList
-			label={ __( 'Templates' ) }
-			blockPatterns={ availableTemplates }
-			shownPatterns={ shownTemplates }
-			onClickPattern={ onSelect }
-			showTitle={ false }
-		/>
+		<PanelBody title={ __( 'Design' ) }>
+			<BlockPatternsList
+				label={ __( 'Templates' ) }
+				blockPatterns={ blockPatterns }
+				shownPatterns={ shownTemplates }
+				onClickPattern={ onSelect }
+				showTitle={ false }
+			/>
+		</PanelBody>
 	);
 }
 
@@ -155,22 +166,11 @@ export default function TemplatePartEdit( {
 		[ templatePartId, attributes.area, clientId ]
 	);
 
-	const { templateParts } = useAlternativeTemplateParts(
-		area,
-		templatePartId
-	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
-
-	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
 
 	const onPatternSelect = async ( pattern ) => {
 		await editEntityRecord(
@@ -293,18 +293,14 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				{ canReplace && blockPatterns.length > 0 && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Design' ) }>
-							<TemplatesList
-								availableTemplates={ blockPatterns }
-								onSelect={ ( pattern ) =>
-									onPatternSelect( pattern )
-								}
-							/>
-						</PanelBody>
-					</InspectorControls>
-				) }
+				<InspectorControls>
+					<TemplatesList
+						area={ area }
+						clientId={ clientId }
+						isEntityAvailable={ isEntityAvailable }
+						onSelect={ ( pattern ) => onPatternSelect( pattern ) }
+					/>
+				</InspectorControls>
 
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks
