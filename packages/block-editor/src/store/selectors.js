@@ -2985,12 +2985,19 @@ export const getSectionsContainerClientId = createRegistrySelector(
 			select( blocksStore ).getSectionRootBlockName();
 		const { getGroupingBlockName } = select( blocksStore );
 		const groupingBlockName = getGroupingBlockName();
+
 		if ( sectionRootBlockName === groupingBlockName ) {
 			const groupBlocks = getBlocksByName( state, sectionRootBlockName );
-			return groupBlocks.find(
+			const mainGroup = groupBlocks.find(
 				( clientId ) =>
 					getBlockAttributes( state, clientId )?.tagName === 'main'
 			);
+			if ( mainGroup ) {
+				return mainGroup;
+			}
+			// if there is no main group and no other block is specified
+			// as section root
+			return null;
 		}
 
 		const sectionRootBlocks = getBlocksByName(
@@ -3001,5 +3008,9 @@ export const getSectionsContainerClientId = createRegistrySelector(
 		if ( sectionRootBlocks?.length > 0 ) {
 			return sectionRootBlocks[ 0 ];
 		}
+
+		// if other block is specified
+		// as section root, but its not found
+		return null;
 	}
 );

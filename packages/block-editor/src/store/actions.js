@@ -1437,31 +1437,46 @@ export const __unstableSetEditorMode =
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
 			if ( firstSelectedClientId ) {
-				dispatch.selectBlock(
-					select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					)
+				const rootClientId = select.getBlockHierarchyRootClientId(
+					firstSelectedClientId
 				);
+				dispatch.selectBlock( rootClientId );
 			}
 		}
 
 		// TODO: Cleanup this for better performance/readability.
 		// When switching to zoom-out mode, we need to disable editing mode for all blocks except the sections.
 		const sectionsContainerClientId = select.getSectionsContainerClientId();
-		const sectionsClientIds = select.getClientIdsOfDescendants(
-			sectionsContainerClientId
-		);
+		let sectionsClientIds = [];
+		if ( sectionsContainerClientId ) {
+			sectionsClientIds = select.getClientIdsOfDescendants(
+				sectionsContainerClientId
+			);
+		} else {
+			sectionsClientIds = select.getBlockOrder( null );
+		}
+
 		if ( mode === 'zoom-out' ) {
-			dispatch(
-				setBlockEditingModes( [
+			let modes = [];
+			if ( sectionsContainerClientId ) {
+				modes = [
 					[ '' /* rootClientId */, 'disabled' ],
 					[ sectionsContainerClientId, 'contentOnly' ],
 					...sectionsClientIds.map( ( clientId ) => [
 						clientId,
 						'default',
 					] ),
-				] )
-			);
+				];
+			} else {
+				modes = [
+					[ '' /* rootClientId */, 'contentOnly' ],
+					...sectionsClientIds.map( ( clientId ) => [
+						clientId,
+						'contentOnly',
+					] ),
+				];
+			}
+			dispatch( setBlockEditingModes( modes ) );
 		} else {
 			const prevMode = select.__unstableGetEditorMode();
 			if ( prevMode === 'zoom-out' ) {
