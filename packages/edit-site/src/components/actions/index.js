@@ -8,10 +8,11 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	Button,
+	TextControl,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -409,5 +410,82 @@ export const postRevisionsAction = {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
 		document.location.href = href;
+	},
+};
+
+export const renamePostAction = {
+	id: 'rename-post',
+	label: __( 'Rename' ),
+	isEligible( post ) {
+		return post.status !== 'trash';
+	},
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const originalTitle = decodeEntities(
+			typeof item.title === 'string' ? item.title : item.title.rendered
+		);
+		const [ title, setTitle ] = useState( () => originalTitle );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		async function onRename( event ) {
+			event.preventDefault();
+			try {
+				await editEntityRecord( 'postType', item.type, item.id, {
+					title,
+				} );
+				// Update state before saving rerenders the list.
+				setTitle( '' );
+				closeModal();
+				// Persist edited entity.
+				await saveEditedEntityRecord( 'postType', item.type, item.id, {
+					throwOnError: true,
+				} );
+				createSuccessNotice( __( 'Name updated' ), {
+					type: 'snackbar',
+				} );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while updating the name' );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		return (
+			<form onSubmit={ onRename }>
+				<VStack spacing="5">
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						required
+					/>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								closeModal();
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		);
 	},
 };
