@@ -874,11 +874,13 @@ test.describe( 'Image - lightbox', () => {
 
 					const count = await imageBlocks.count(); // Get the count of elements
 
-					for ( let i = 0; i < count; i++ ) {
+					for ( let i = count - 1; i >= 0; i-- ) {
 						const block = imageBlocks.nth( i );
 						await block.click();
 						await page.keyboard.press( 'Backspace' );
-						await editor.saveSiteEditorEntities();
+						if ( i === 0 ) {
+							await editor.saveSiteEditorEntities();
+						}
 					}
 
 					await page
@@ -918,10 +920,13 @@ test.describe( 'Image - lightbox', () => {
 
 				const count = await imageBlocks.count(); // Get the count of elements
 
-				for ( let i = 0; i < count; i++ ) {
+				for ( let i = count - 1; i >= 0; i-- ) {
 					const block = imageBlocks.nth( i );
 					await block.click();
 					await page.keyboard.press( 'Backspace' );
+					if ( i === 0 ) {
+						await editor.saveSiteEditorEntities();
+					}
 					await editor.saveSiteEditorEntities();
 				}
 
@@ -966,10 +971,13 @@ test.describe( 'Image - lightbox', () => {
 
 				const count = await imageBlocks.count(); // Get the count of elements
 
-				for ( let i = 0; i < count; i++ ) {
+				for ( let i = count - 1; i >= 0; i-- ) {
 					const block = imageBlocks.nth( i );
 					await block.click();
 					await page.keyboard.press( 'Backspace' );
+					if ( i === 0 ) {
+						await editor.saveSiteEditorEntities();
+					}
 				}
 
 				await page
@@ -1264,10 +1272,13 @@ test.describe( 'Image - lightbox', () => {
 
 					const count = await imageBlocks.count(); // Get the count of elements
 
-					for ( let i = 0; i < count; i++ ) {
+					for ( let i = count - 1; i >= 0; i-- ) {
 						const block = imageBlocks.nth( i );
 						await block.click();
 						await page.keyboard.press( 'Backspace' );
+						if ( i === 0 ) {
+							await editor.saveSiteEditorEntities();
+						}
 						await editor.saveSiteEditorEntities();
 					}
 
@@ -1308,10 +1319,13 @@ test.describe( 'Image - lightbox', () => {
 
 				const count = await imageBlocks.count(); // Get the count of elements
 
-				for ( let i = 0; i < count; i++ ) {
+				for ( let i = count - 1; i >= 0; i-- ) {
 					const block = imageBlocks.nth( i );
 					await block.click();
 					await page.keyboard.press( 'Backspace' );
+					if ( i === 0 ) {
+						await editor.saveSiteEditorEntities();
+					}
 					await editor.saveSiteEditorEntities();
 				}
 
