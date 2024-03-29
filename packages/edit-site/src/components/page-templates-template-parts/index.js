@@ -355,7 +355,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		},
 		[ history ]
 	);
-	const postActions = usePostActions( { onActionPerformed } );
+	const postActions = usePostActions( onActionPerformed );
 	const actions = useMemo(
 		() => [
 			postActions.find( ( action ) => action.id === 'edit-post' ),

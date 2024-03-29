@@ -413,7 +413,7 @@ export const postRevisionsAction = {
 	},
 };
 
-export function usePostActions( { onActionPerformed } ) {
+export function usePostActions( onActionPerformed ) {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	return useMemo( () => {
