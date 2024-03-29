@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu } from '@wordpress/components';
+import { DropdownMenu, Button } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
@@ -31,7 +31,7 @@ const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
-export default function AddNewPattern() {
+export default function AddNewPattern( { showTextButton } ) {
 	const history = useHistory();
 	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
@@ -104,10 +104,12 @@ export default function AddNewPattern() {
 			<DropdownMenu
 				controls={ controls }
 				toggleProps={ {
-					as: SidebarButton,
+					as: showTextButton ? Button : SidebarButton,
+					variant: showTextButton ? 'primary' : undefined,
 				} }
-				icon={ plus }
-				label={ __( 'Create pattern' ) }
+				icon={ showTextButton ? null : plus }
+				label={ showTextButton ? undefined : __( 'Create pattern' ) }
+				text={ showTextButton ? __( 'Create pattern' ) : undefined }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal
