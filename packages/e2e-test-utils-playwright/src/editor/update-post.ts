@@ -4,7 +4,7 @@
 import type { Editor } from './index';
 
 /**
- * Publishes the post, resolving once the request is complete (once a notice
+ * Updates the post, resolving once the request is complete (once a notice
  * is displayed).
  *
  * @param this
