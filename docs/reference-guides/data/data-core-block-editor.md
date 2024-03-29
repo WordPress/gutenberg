@@ -1643,6 +1643,32 @@ _Returns_
 
 -   `Object`: Action object.
 
+### setBlockEditingModes
+
+Sets the block editing mode for a multiple blocks.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Usage_
+
+```js
+wp.data.dispatch( 'core/block-editor' ).setBlockEditingModes( [
+	[ 'block-1', 'disabled' ],
+	[ 'block-2', 'contentOnly' ],
+	[ 'block-3', 'default' ],
+] );
+```
+
+_Parameters_
+
+-   _modes_ `BlockEditingModes`: Iterable of client ids and block editing modes.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### setBlockMovingClientId
 
 Action that enables or disables the block moving mode.
@@ -1811,6 +1837,22 @@ _Related_
 _Parameters_
 
 -   _clientId_ `string`: The block client ID, or `''` for the root container.
+
+_Returns_
+
+-   `Object`: Action object.
+
+### unsetBlockEditingModes
+
+Clears the block editing mode for a given block.
+
+_Related_
+
+-   useBlockEditingMode
+
+_Parameters_
+
+-   _clientIds_ `string[]`: The block client ID, or `''` for the root container.
 
 _Returns_
 

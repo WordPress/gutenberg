@@ -1982,7 +1982,7 @@ export function blockEditingModes( state = new Map(), action ) {
 		case 'SET_BLOCK_EDITING_MODE':
 			return new Map( state ).set( action.clientId, action.mode );
 		case 'SET_BLOCK_EDITING_MODES':
-			return new Map( ...state, ...action.modes );
+			return new Map( [ ...state, ...action.modes ] );
 		case 'UNSET_BLOCK_EDITING_MODE': {
 			const newState = new Map( state );
 			newState.delete( action.clientId );
