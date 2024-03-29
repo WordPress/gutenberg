@@ -79,8 +79,6 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
-			// TODO: by unmounting the `publish` button, we cannot render
-			// post-publish panel...
 			showPublishButton:
 				currentPostIsDraft && ! hasNonPostEntityChanges(),
 		};
