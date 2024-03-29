@@ -133,20 +133,30 @@ const BindingConnector = ( {
 	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
 
 	const updateBoundAttibute = useCallback(
-		( newAttrValue, prev ) => {
+		( next, current ) =>
 			onPropValueChange( {
-				[ attrName ]: castValue( newAttrValue, prev ),
-			} );
-		},
+				[ attrName ]: castValue( next, current ),
+			} ),
 		[ attrName, onPropValueChange ]
 	);
 
 	useLayoutEffect( () => {
+		const rawAttrValue = getAttributeValue( attrValue );
 		if ( typeof propValue !== 'undefined' ) {
-			// Sync from external source propery to block attribute.
+			/*
+			 * On-sync from external property to attribute.
+			 * When the propValue is different from the previous one,
+			 * and also it's different from the current attribute value,
+			 * update the attribute value.
+			 */
 			if ( propValue !== prevPropValue.current ) {
+				if ( propValue !== rawAttrValue ) {
+					updateBoundAttibute( propValue, attrValue );
+					return; // close the sync cycle.
+				}
+
+				// Store the current propValue to compare in the next render.
 				prevPropValue.current = propValue;
-				return updateBoundAttibute( propValue, attrValue ); // close the loop.
 			}
 		} else if ( placeholder ) {
 			/*
@@ -161,16 +171,20 @@ const BindingConnector = ( {
 
 			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
 				updateBoundAttibute( null );
-				return;
+				return; // close the sync cycle.
 			}
 
-			return updateBoundAttibute( placeholder );
+			updateBoundAttibute( placeholder );
+			return; // close the sync cycle.
 		}
 
 		// Sync from block attribute to external source property.
-		const rawAttrValue = getAttributeValue( attrValue );
+		const prevRawAttrValue = getAttributeValue( prevAttrValue.current );
+		if ( rawAttrValue !== prevRawAttrValue ) {
+			if ( rawAttrValue === propValue ) {
+				return;
+			}
 
-		if ( rawAttrValue !== getAttributeValue( prevAttrValue.current ) ) {
 			prevAttrValue.current = attrValue;
 			updatePropValue( rawAttrValue );
 		}
