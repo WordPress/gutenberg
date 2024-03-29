@@ -3,11 +3,10 @@
  */
 import {
 	createUpgradedEmbedBlock,
-	getClassNames,
-	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
+	calculateEmbedRatio,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
@@ -136,17 +135,13 @@ const EmbedEdit = ( props ) => {
 		);
 
 	const toggleResponsive = () => {
-		const { allowResponsive, className } = attributes;
+		const { allowResponsive } = attributes;
 		const { html } = preview;
 		const newAllowResponsive = ! allowResponsive;
 
 		setAttributes( {
 			allowResponsive: newAllowResponsive,
-			className: getClassNames(
-				html,
-				className,
-				responsive && newAllowResponsive
-			),
+			aspectRatio: newAllowResponsive ? calculateEmbedRatio( html ) : '',
 		} );
 	};
 
@@ -203,13 +198,9 @@ const EmbedEdit = ( props ) => {
 
 	const onEditURL = useCallback(
 		( value ) => {
-			// If the embed URL was changed, we need to reset the aspect ratio class.
-			// To do this we have to remove the existing ratio class so it can be recalculated.
+			// Reset the aspect ratio
 			if ( attributes.url !== value ) {
-				const blockClass = removeAspectRatioClasses(
-					attributes.className
-				);
-				setAttributes( { className: blockClass } );
+				setAttributes( { aspectRation: '' } );
 			}
 
 			// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,

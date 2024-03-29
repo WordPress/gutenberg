@@ -38,6 +38,10 @@
 			"type": "boolean",
 			"default": true,
 			"__experimentalRole": "content"
+		},
+		"aspectRatio": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
