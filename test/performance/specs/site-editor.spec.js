@@ -90,7 +90,7 @@ test.describe( 'Site Editor Performance', () => {
 				// patterns are replaced.
 				await Promise.all( [
 					canvas
-						.locator( '.wp-block-post-content' )
+						.locator( '.wp-block-post-content .wp-block' )
 						.first()
 						.waitFor(),
 					page.waitForFunction(
