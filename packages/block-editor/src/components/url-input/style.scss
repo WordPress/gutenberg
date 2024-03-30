@@ -61,7 +61,6 @@ $input-size: 300px;
 	padding: 4px 0;
 	// To match the url-input width: input width + padding + 2 buttons.
 	width: $input-size + 2;
-	overflow-y: auto;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
@@ -85,6 +84,8 @@ $input-size: 300px;
 	border: none;
 	text-align: left;
 	box-shadow: none;
+	text-overflow: ellipsis;
+	overflow: hidden;
 
 	&:hover {
 		background: $gray-300;
