@@ -62,6 +62,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				__unstableGetEditorMode,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
+				canRemoveBlock,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -105,6 +106,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
+				canRemove: canRemoveBlock( clientId, rootClientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -117,6 +119,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		isBlockTemplatePart,
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
+		canRemove,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
@@ -318,15 +321,17 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				{ editorMode === 'zoom-out' && (
 					<Shuffle clientId={ clientId } as={ Button } />
 				) }
-				{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
-					<ToolbarButton
-						icon={ trash }
-						label="Delete"
-						onClick={ () => {
-							removeBlock( clientId );
-						} }
-					/>
-				) }
+				{ canRemove &&
+					editorMode === 'zoom-out' &&
+					! isBlockTemplatePart && (
+						<ToolbarButton
+							icon={ trash }
+							label="Delete"
+							onClick={ () => {
+								removeBlock( clientId );
+							} }
+						/>
+					) }
 				<FlexItem>
 					<Button
 						ref={ ref }
