@@ -37,6 +37,7 @@ import { usePrevious } from '@wordpress/compose';
 import Page from '../page';
 import {
 	LAYOUT_GRID,
+	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
@@ -65,6 +66,9 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -394,7 +398,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ onChangeView }
 					deferredRendering
-					supportedLayouts={ [ LAYOUT_GRID ] }
+					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>
