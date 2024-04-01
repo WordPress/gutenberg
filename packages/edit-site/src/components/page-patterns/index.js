@@ -69,7 +69,6 @@ const defaultConfigPerViewType = {
 		mediaField: 'preview',
 		primaryField: 'title',
 		displayAsBadgeFields: [ 'sync-status' ],
-		displayAsColumnFields: [ 'sync-status' ],
 	},
 };
 const DEFAULT_VIEW = {
@@ -309,10 +308,7 @@ export default function DataviewsPatterns() {
 					// Non-user patterns are all unsynced for the time being.
 					return (
 						<span
-							className={
-								'edit-site-patterns__field-sync-status-' +
-								item.syncStatus
-							}
+							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
 						>
 							{ SYNC_FILTERS.find(
 								( { value } ) => value === item.syncStatus

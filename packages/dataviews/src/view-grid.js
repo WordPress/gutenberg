@@ -35,8 +35,8 @@ function GridItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
+	badgeFields,
 	displayAsColumnFields,
-	displayAsBadgeFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -101,46 +101,46 @@ function GridItem( {
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
-			<HStack
-				className="dataviews-view-grid__badge-fields"
-				spacing={ 2 }
-				wrap
-				align="top"
-				justify="flex-start"
-			>
-				{ visibleFields.map( ( field ) => {
-					const renderedValue = field.render( {
-						item,
-					} );
-					if ( ! renderedValue ) {
-						return null;
-					}
-					return (
-						displayAsBadgeFields?.includes( field.id ) && (
+			{ !! badgeFields?.length && (
+				<HStack
+					className="dataviews-view-grid__badge-fields"
+					spacing={ 2 }
+					wrap
+					align="top"
+					justify="flex-start"
+				>
+					{ badgeFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
 							<FlexItem
+								key={ field.id }
 								className={ classnames(
 									'dataviews-view-grid__field-value',
-									'dataviews-view-grid__field-' + field.id,
+									`dataviews-view-grid__field-${ field.id }`,
 									'is-badge'
 								) }
 							>
 								{ renderedValue }
 							</FlexItem>
-						)
-					);
-				} ) }
-			</HStack>
-
-			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
-				{ visibleFields.map( ( field ) => {
-					const renderedValue = field.render( {
-						item,
-					} );
-					if ( ! renderedValue ) {
-						return null;
-					}
-					return (
-						! displayAsBadgeFields?.includes( field.id ) && (
+						);
+					} ) }
+				</HStack>
+			) }
+			{ !! visibleFields?.length && (
+				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+					{ visibleFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
 							<Flex
 								className={ classnames(
 									'dataviews-view-grid__field',
@@ -171,10 +171,10 @@ function GridItem( {
 									</FlexItem>
 								</>
 							</Flex>
-						)
-					);
-				} ) }
-			</VStack>
+						);
+					} ) }
+				</VStack>
+			) }
 		</VStack>
 	);
 }
@@ -196,12 +196,25 @@ export default function ViewGrid( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
-	const visibleFields = fields.filter(
-		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.mediaField, view.layout.primaryField ].includes(
-				field.id
-			)
+	const { visibleFields, badgeFields } = fields.reduce(
+		( accumulator, field ) => {
+			if (
+				view.hiddenFields.includes( field.id ) ||
+				[ view.layout.mediaField, view.layout.primaryField ].includes(
+					field.id
+				)
+			) {
+				return accumulator;
+			}
+			// If the field is a badge field, add it to the badgeFields array
+			// otherwise add it to the rest visibleFields array.
+			const key = view.layout.displayAsBadgeFields?.includes( field.id )
+				? 'badgeFields'
+				: 'visibleFields';
+			accumulator[ key ].push( field );
+			return accumulator;
+		},
+		{ visibleFields: [], badgeFields: [] }
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	const usedData = deferredRendering ? shownData : data;
@@ -229,11 +242,9 @@ export default function ViewGrid( {
 								mediaField={ mediaField }
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
+								badgeFields={ badgeFields }
 								displayAsColumnFields={
 									view.layout.displayAsColumnFields
-								}
-								displayAsBadgeFields={
-									view.layout.displayAsBadgeFields
 								}
 							/>
 						);
