@@ -318,7 +318,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:quote -->`
 		);
 		// Move the cursor to the start of the first paragraph of the quoted block.
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
