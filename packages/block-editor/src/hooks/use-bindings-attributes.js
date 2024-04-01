@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 
-const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+const DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
@@ -38,7 +38,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
 export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+	return blockName in DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS;
 }
 
 /**
@@ -52,7 +52,9 @@ export function canBindBlock( blockName ) {
 export function canBindAttribute( blockName, attributeName ) {
 	return (
 		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
+		DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes(
+			attributeName
+		)
 	);
 }
 
