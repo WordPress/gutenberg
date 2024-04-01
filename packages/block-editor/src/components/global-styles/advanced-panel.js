@@ -108,9 +108,6 @@ export default function AdvancedPanel( {
 
 	const [ customCSS, setCustomCSS ] = useState( '' );
 	useEffect( () => {
-		if ( ! inheritedValue?.css ) {
-			return;
-		}
 		if ( customCSS !== '' ) {
 			return;
 		}
