@@ -183,8 +183,9 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 	).getAllBlockBindingsSources();
 
 	/*
-	 * Create binding object filtering
-	 * only the attributes that can be bound.
+	 * Create allow binding object,
+	 * filtering only the valid bindings,
+	 * and populating the source handler.
 	 */
 	const allowBindings = Object.entries( bindings ).reduce(
 		( acc, [ attrName, settings ] ) => {
