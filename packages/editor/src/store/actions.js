@@ -406,7 +406,7 @@ export const enablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+			.set( 'core', 'isPublishSidebarEnabled', true );
 	};
 
 /**
@@ -417,7 +417,7 @@ export const disablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+			.set( 'core', 'isPublishSidebarEnabled', false );
 	};
 
 /**
