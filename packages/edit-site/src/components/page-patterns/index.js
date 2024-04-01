@@ -174,7 +174,7 @@ function Preview( { item, categoryId, viewType } ) {
 					{ ! isEmpty && (
 						<BlockPreview
 							blocks={ item.blocks }
-							viewportWidth={ item?.viewportWidth }
+							viewportWidth={ item.viewportWidth }
 						/>
 					) }
 				</PreviewWrapper>
