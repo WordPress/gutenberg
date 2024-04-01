@@ -467,8 +467,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 						getDefaultBlockName()
 					);
 					if ( replacement && replacement.length ) {
-						insertBlocks( replacement, getBlockIndex( clientId ) );
-						removeBlock( clientId, false );
+						replaceBlocks( clientId, replacement );
 					}
 				}
 			}
