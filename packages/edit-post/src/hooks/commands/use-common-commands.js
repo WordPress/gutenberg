@@ -126,13 +126,13 @@ export default function useCommonCommands() {
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
-			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
+			toggle( 'core', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
 					? __( 'Pre-publish checks disabled.' )
 					: __( 'Pre-publish checks enabled.' ),
 				{
-					id: 'core/edit-post/publish-sidebar/notice',
+					id: 'core/editor/publish-sidebar/notice',
 					type: 'snackbar',
 				}
 			);

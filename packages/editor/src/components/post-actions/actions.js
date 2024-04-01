@@ -8,21 +8,22 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo } from '@wordpress/element';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useMemo, useState } from '@wordpress/element';
+
 import {
 	Button,
+	TextControl,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { useHistory } = unlock( routerPrivateApis );
+function getItemTitle( item ) {
+	if ( typeof item.title === 'string' ) {
+		return decodeEntities( item.title );
+	}
+	return decodeEntities( item.title?.rendered || '' );
+}
 
 export const trashPostAction = {
 	id: 'move-to-trash',
@@ -34,7 +35,7 @@ export const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal, onPerform } ) => {
+	RenderModal: ( { items: posts, closeModal, onActionPerformed } ) => {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -45,7 +46,7 @@ export const trashPostAction = {
 						? sprintf(
 								// translators: %s: The page's title.
 								__( 'Are you sure you want to delete "%s"?' ),
-								decodeEntities( posts[ 0 ].title.rendered )
+								getItemTitle( posts[ 0 ] )
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
@@ -86,9 +87,7 @@ export const trashPostAction = {
 									successMessage = sprintf(
 										/* translators: The posts's title. */
 										__( '"%s" moved to the Trash.' ),
-										decodeEntities(
-											posts[ 0 ].title.rendered
-										)
+										getItemTitle( posts[ 0 ] )
 									);
 								} else {
 									successMessage = __(
@@ -151,8 +150,8 @@ export const trashPostAction = {
 									} );
 								}
 							}
-							if ( onPerform ) {
-								onPerform();
+							if ( onActionPerformed ) {
+								onActionPerformed( posts );
 							}
 							closeModal();
 						} }
@@ -178,7 +177,7 @@ export function usePermanentlyDeletePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( posts ) {
+			async callback( posts, onActionPerformed ) {
 				const promiseResult = await Promise.allSettled(
 					posts.map( ( post ) => {
 						return deleteEntityRecord(
@@ -201,7 +200,7 @@ export function usePermanentlyDeletePostAction() {
 						successMessage = sprintf(
 							/* translators: The posts's title. */
 							__( '"%s" permanently deleted.' ),
-							decodeEntities( posts[ 0 ].title.rendered )
+							getItemTitle( posts[ 0 ] )
 						);
 					} else {
 						successMessage = __(
@@ -212,6 +211,9 @@ export function usePermanentlyDeletePostAction() {
 						type: 'snackbar',
 						id: 'edit-site-post-permanently-deleted',
 					} );
+					if ( onActionPerformed ) {
+						onActionPerformed( posts );
+					}
 				} else {
 					// If there was at lease one failure.
 					let errorMessage;
@@ -285,7 +287,7 @@ export function useRestorePostAction() {
 			isEligible( { status } ) {
 				return status === 'trash';
 			},
-			async callback( posts ) {
+			async callback( posts, onActionPerformed ) {
 				try {
 					for ( const post of posts ) {
 						await editEntityRecord(
@@ -314,13 +316,16 @@ export function useRestorePostAction() {
 							: sprintf(
 									/* translators: The number of posts. */
 									__( '"%s" has been restored.' ),
-									decodeEntities( posts[ 0 ].title.rendered )
+									getItemTitle( posts[ 0 ] )
 							  ),
 						{
 							type: 'snackbar',
 							id: 'edit-site-post-restored',
 						}
 					);
+					if ( onActionPerformed ) {
+						onActionPerformed( posts );
+					}
 				} catch ( error ) {
 					let errorMessage;
 					if (
@@ -360,35 +365,29 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( posts ) {
+	callback( posts, onActionPerformed ) {
 		const post = posts[ 0 ];
 		window.open( post.link, '_blank' );
+		if ( onActionPerformed ) {
+			onActionPerformed( posts );
+		}
 	},
 };
 
-export function useEditPostAction() {
-	const history = useHistory();
-	return useMemo(
-		() => ( {
-			id: 'edit-post',
-			label: __( 'Edit' ),
-			isPrimary: true,
-			icon: edit,
-			isEligible( { status } ) {
-				return status !== 'trash';
-			},
-			callback( posts ) {
-				const post = posts[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			},
-		} ),
-		[ history ]
-	);
-}
+export const editPostAction = {
+	id: 'edit-post',
+	label: __( 'Edit' ),
+	isPrimary: true,
+	icon: edit,
+	isEligible( { status } ) {
+		return status !== 'trash';
+	},
+	callback( posts, onActionPerformed ) {
+		if ( onActionPerformed ) {
+			onActionPerformed( posts );
+		}
+	},
+};
 export const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
@@ -403,11 +402,181 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( posts ) {
+	callback( posts, onActionPerformed ) {
 		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
 		document.location.href = href;
+		if ( onActionPerformed ) {
+			onActionPerformed( posts );
+		}
 	},
 };
+
+export const renamePostAction = {
+	id: 'rename-post',
+	label: __( 'Rename' ),
+	isEligible( post ) {
+		return post.status !== 'trash';
+	},
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const originalTitle = decodeEntities(
+			typeof item.title === 'string' ? item.title : item.title.rendered
+		);
+		const [ title, setTitle ] = useState( () => originalTitle );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		async function onRename( event ) {
+			event.preventDefault();
+			try {
+				await editEntityRecord( 'postType', item.type, item.id, {
+					title,
+				} );
+				// Update state before saving rerenders the list.
+				setTitle( '' );
+				closeModal();
+				// Persist edited entity.
+				await saveEditedEntityRecord( 'postType', item.type, item.id, {
+					throwOnError: true,
+				} );
+				createSuccessNotice( __( 'Name updated' ), {
+					type: 'snackbar',
+				} );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while updating the name' );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		return (
+			<form onSubmit={ onRename }>
+				<VStack spacing="5">
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						required
+					/>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								closeModal();
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		);
+	},
+};
+
+export function usePostActions( onActionPerformed, actionIds = null ) {
+	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
+	const restorePostAction = useRestorePostAction();
+	return useMemo(
+		() => {
+			// By default, return all actions...
+			const defaultActions = [
+				editPostAction,
+				viewPostAction,
+				restorePostAction,
+				permanentlyDeletePostAction,
+				postRevisionsAction,
+				renamePostAction,
+				trashPostAction,
+			];
+
+			// ... unless `actionIds` was specified, in which case we find the
+			// actions matching the given IDs.
+			const actions = actionIds
+				? actionIds.map( ( actionId ) =>
+						defaultActions.find( ( { id } ) => actionId === id )
+				  )
+				: defaultActions;
+
+			if ( onActionPerformed ) {
+				for ( let i = 0; i < actions.length; ++i ) {
+					if ( actions[ i ].callback ) {
+						const existingCallback = actions[ i ].callback;
+						actions[ i ] = {
+							...actions[ i ],
+							callback: ( items, _onActionPerformed ) => {
+								existingCallback( items, ( _items ) => {
+									if ( _onActionPerformed ) {
+										_onActionPerformed( _items );
+									}
+									onActionPerformed(
+										actions[ i ].id,
+										_items
+									);
+								} );
+							},
+						};
+					}
+					if ( actions[ i ].RenderModal ) {
+						const ExistingRenderModal = actions[ i ].RenderModal;
+						actions[ i ] = {
+							...actions[ i ],
+							RenderModal: ( props ) => {
+								return (
+									<ExistingRenderModal
+										items={ props.items }
+										closeModal={ props.closeModal }
+										onActionPerformed={ ( _items ) => {
+											if ( props.onActionPerformed ) {
+												props.onActionPerformed(
+													_items
+												);
+											}
+											onActionPerformed(
+												actions[ i ].id,
+												_items
+											);
+										} }
+									/>
+								);
+							},
+						};
+					}
+				}
+			}
+			return actions;
+		},
+
+		// Disable reason: if provided, `actionIds` is a shallow array of
+		// strings, and the strings themselves should be part of the useMemo
+		// dependencies. Two different disable statements are needed, as the
+		// first flags what it thinks are missing dependencies, and the second
+		// flags the array spread operation.
+		//
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			...( actionIds || [] ),
+			permanentlyDeletePostAction,
+			restorePostAction,
+			onActionPerformed,
+		]
+	);
+}

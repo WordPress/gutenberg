@@ -78,37 +78,52 @@ export const closeModal =
 /**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function openPublishSidebar() {
-	return {
-		type: 'OPEN_PUBLISH_SIDEBAR',
+export const openPublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).openPublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').openPublishSidebar",
+		} );
+		registry.dispatch( editorStore ).openPublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user closed the
  * publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function closePublishSidebar() {
-	return {
-		type: 'CLOSE_PUBLISH_SIDEBAR',
+export const closePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).closePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').closePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).closePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user toggles the publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function togglePublishSidebar() {
-	return {
-		type: 'TOGGLE_PUBLISH_SIDEBAR',
+export const togglePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).togglePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').togglePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).togglePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used to enable or disable a panel in the editor.

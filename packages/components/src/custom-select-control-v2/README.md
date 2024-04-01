@@ -1,4 +1,4 @@
-# CustomSelect
+# CustomSelectControlV2
 
 <div class="callout callout-alert">
 This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
@@ -12,31 +12,31 @@ Used to render a customizable select control component.
 
 #### Uncontrolled Mode
 
-CustomSelect can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
+`CustomSelectControlV2` can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultValue` prop can be used to set the initial selected value. If this prop is not set, the first value from the children will be selected by default.
 
 ```jsx
-const UncontrolledCustomSelect = () => (
-	<CustomSelect label="Colors">
-		<CustomSelectItem value="Blue">
+const UncontrolledCustomSelectControlV2 = () => (
+	<CustomSelectControlV2 label="Colors">
+		<CustomSelectControlV2.Item value="Blue">
 			{ /* The `defaultValue` since it wasn't defined */ }
 			<span style={ { color: 'blue' } }>Blue</span>
-		</CustomSelectItem>
-		<CustomSelectItem value="Purple">
+		</CustomSelectControlV2.Item>
+		<CustomSelectControlV2.Item value="Purple">
 			<span style={ { color: 'purple' } }>Purple</span>
-		</CustomSelectItem>
-		<CustomSelectItem value="Pink">
+		</CustomSelectControlV2.Item>
+		<CustomSelectControlV2.Item value="Pink">
 			<span style={ { color: 'deeppink' } }>Pink</span>
-		</CustomSelectItem>
-	</CustomSelect>
+		</CustomSelectControlV2.Item>
+	</CustomSelectControlV2>
 );
 ```
 
 #### Controlled Mode
 
-CustomSelect can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
+`CustomSelectControlV2` can also be used in a controlled mode, where the parent component specifies the `value` and the `onChange` props to control selection.
 
 ```jsx
-const ControlledCustomSelect = () => {
+const ControlledCustomSelectControlV2 = () => {
 	const [ value, setValue ] = useState< string | string[] >();
 
     const renderControlledValue = ( renderValue: string | string[] ) => (
@@ -46,7 +46,7 @@ const ControlledCustomSelect = () => {
     );
 
 	return (
-		<CustomSelect
+		<CustomSelectControlV2
 			{ ...props }
 			onChange={ ( nextValue ) => {
 				setValue( nextValue );
@@ -55,11 +55,11 @@ const ControlledCustomSelect = () => {
 			value={ value }
 		>
 			{ [ 'blue', 'purple', 'pink' ].map( ( option ) => (
-				<CustomSelectItem key={ option } value={ option }>
+				<CustomSelectControlV2.Item key={ option } value={ option }>
 					{ renderControlledValue( option ) }
-				</CustomSelectItem>
+				</CustomSelectControlV2.Item>
 			) ) }
-		</CustomSelect>
+		</CustomSelectControlV2>
 	);
 };
 ```
@@ -70,23 +70,23 @@ Multiple selection can be enabled by using an array for the `value` and
 `defaultValue` props. The argument of the `onChange` function will also change accordingly.
 
 ```jsx
-const MultiSelectCustomSelect = () => (
-	<CustomSelect defaultValue={ [ 'blue', 'pink' ] } label="Colors">
+const MultiSelectCustomSelectControlV2 = () => (
+	<CustomSelectControlV2 defaultValue={ [ 'blue', 'pink' ] } label="Colors">
 		{ [ 'blue', 'purple', 'pink' ].map( ( item ) => (
-			<CustomSelectItem key={ item } value={ item }>
+			<CustomSelectControlV2.Item key={ item } value={ item }>
 				{ item }
-			</CustomSelectItem>
+			</CustomSelectControlV2.Item>
 		) ) }
-	</CustomSelect>
+	</CustomSelectControlV2>
 );
 ```
 
 ### Components and Sub-components
 
-CustomSelect is comprised of two individual components:
+`CustomSelectControlV2` is comprised of two individual components:
 
--   `CustomSelect`: a wrapper component and context provider. It is responsible for managing the state of the `CustomSelectItem` children.
--   `CustomSelectItem`: renders a single select item. The first `CustomSelectItem` child will be used as the `defaultValue` when `defaultValue` is undefined.
+-   `CustomSelectControlV2`: a wrapper component and context provider. It is responsible for managing the state of the `CustomSelectControlV2.Item` children.
+-   `CustomSelectControlV2.Item`: renders a single select item. The first `CustomSelectControlV2.Item` child will be used as the `defaultValue` when `defaultValue` is undefined.
 
 #### Props
 
@@ -94,7 +94,7 @@ The component accepts the following props:
 
 ##### `children`: `React.ReactNode`
 
-The child elements. This should be composed of CustomSelect.Item components.
+The child elements. This should be composed of `CustomSelectControlV2.Item` components.
 
 -   Required: yes
 
@@ -142,7 +142,7 @@ Can be used to externally control the value of the control.
 
 -   Required: no
 
-### `CustomSelectItem`
+### `CustomSelectControlV2.Item`
 
 Used to render a select item.
 
