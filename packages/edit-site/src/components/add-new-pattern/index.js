@@ -105,11 +105,11 @@ export default function AddNewPattern( { showTextButton } ) {
 				controls={ controls }
 				toggleProps={ {
 					as: showTextButton ? Button : SidebarButton,
-					variant: showTextButton ? 'primary' : undefined,
+					variant: showTextButton ? 'secondary' : undefined,
 				} }
 				icon={ showTextButton ? null : plus }
-				label={ showTextButton ? undefined : __( 'Create pattern' ) }
-				text={ showTextButton ? __( 'Create pattern' ) : undefined }
+				label={ showTextButton ? undefined : __( 'Add new pattern' ) }
+				text={ showTextButton ? __( 'Add new pattern' ) : undefined }
 			/>
 			{ showPatternModal && (
 				<CreatePatternModal

@@ -494,7 +494,7 @@ export default function PagePages() {
 			title={ __( 'Pages' ) }
 			actions={
 				<>
-					<Button variant="primary" onClick={ openModal }>
+					<Button variant="secondary" onClick={ openModal }>
 						{ __( 'Add new page' ) }
 					</Button>
 					{ showAddPageModal && (
