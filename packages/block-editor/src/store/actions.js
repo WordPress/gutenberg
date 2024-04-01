@@ -1432,7 +1432,7 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select } ) => {
+	( { dispatch, select, registry } ) => {
 		// When switching to zoom-out mode, we need to select the root block
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
@@ -1477,44 +1477,47 @@ export const __unstableSetEditorMode =
 		}
 
 		if ( mode === 'zoom-out' ) {
-			let modes = [];
-			if ( sectionsContainerClientId ) {
-				modes = [
-					[ '' /* rootClientId */, 'disabled' ],
-					[ sectionsContainerClientId, 'contentOnly' ],
-					...sectionsClientIds.map( ( clientId ) => [
-						clientId,
-						'default',
-					] ),
-				];
-			} else {
-				modes = [
-					[ '' /* rootClientId */, 'contentOnly' ],
-					...sectionsClientIds.map( ( clientId ) => [
-						clientId,
-						'contentOnly',
-					] ),
-					...disabledSectionsClientIds.map( ( clientId ) => [
-						clientId,
-						'disabled',
-					] ),
-					...sectionClientIdsInnerBlocks.map( ( clientId ) => [
-						clientId,
-						'disabled',
-					] ),
-				];
-			}
-			dispatch( setBlockEditingModes( modes ) );
+			registry.batch( () => {
+				const modes = sectionsContainerClientId
+					? [
+							[ '' /* rootClientId */, 'disabled' ],
+							[ sectionsContainerClientId, 'contentOnly' ],
+							...sectionsClientIds.map( ( clientId ) => [
+								clientId,
+								'default',
+							] ),
+					  ]
+					: [
+							[ '' /* rootClientId */, 'contentOnly' ],
+							...sectionsClientIds.map( ( clientId ) => [
+								clientId,
+								'contentOnly',
+							] ),
+							...disabledSectionsClientIds.map( ( clientId ) => [
+								clientId,
+								'disabled',
+							] ),
+							...sectionClientIdsInnerBlocks.map(
+								( clientId ) => [ clientId, 'disabled' ]
+							),
+					  ];
+				modes.forEach( ( [ clientId, newMode ] ) => {
+					dispatch( setBlockEditingMode( clientId, newMode ) );
+				} );
+			} );
 		} else {
 			const prevMode = select.__unstableGetEditorMode();
 			if ( prevMode === 'zoom-out' ) {
-				dispatch(
-					unsetBlockEditingModes( [
+				registry.batch( () => {
+					const modes = [
 						'' /* rootClientId */,
 						sectionsContainerClientId,
 						...sectionsClientIds,
-					] )
-				);
+					];
+					modes.forEach( ( clientId ) => {
+						dispatch( unsetBlockEditingMode( clientId ) );
+					} );
+				} );
 			}
 		}
 
