@@ -291,20 +291,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				<FlexItem>
 					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
-				<FlexItem>
-					{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
-						<BlockMover
-							clientIds={ [ clientId ] }
-							hideDragHandle
-							isBlockMoverUpButtonDisabled={
-								isPrevBlockTemplatePart
-							}
-							isBlockMoverDownButtonDisabled={
-								isNextBlockTemplatePart
-							}
-						/>
-					) }
-					{ editorMode === 'navigation' && (
+				{ canMove && (
+					<FlexItem>
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
 								<Button
@@ -319,41 +307,77 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 								/>
 							) }
 						</BlockDraggable>
-					) }
-				</FlexItem>
+					</FlexItem>
+				) }
+				{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
+					<FlexItem>
+						<BlockMover
+							clientIds={ [ clientId ] }
+							hideDragHandle
+							isBlockMoverUpButtonDisabled={
+								isPrevBlockTemplatePart
+							}
+							isBlockMoverDownButtonDisabled={
+								isNextBlockTemplatePart
+							}
+						/>
+					</FlexItem>
+				) }
+				{ editorMode === 'navigation' && (
+					<FlexItem>
+						<BlockDraggable clientIds={ [ clientId ] }>
+							{ ( draggableProps ) => (
+								<Button
+									icon={ dragHandle }
+									className="block-selection-button_drag-handle"
+									aria-hidden="true"
+									label={ dragHandleLabel }
+									// Should not be able to tab to drag handle as this
+									// button can only be used with a pointer device.
+									tabIndex="-1"
+									{ ...draggableProps }
+								/>
+							) }
+						</BlockDraggable>
+					</FlexItem>
+				) }
 				{ canMove && canRemove && editorMode === 'zoom-out' && (
 					<Shuffle clientId={ clientId } as={ Button } />
 				) }
 				{ canRemove &&
 					editorMode === 'zoom-out' &&
 					! isBlockTemplatePart && (
-						<ToolbarButton
-							icon={ trash }
-							label="Delete"
-							onClick={ () => {
-								removeBlock( clientId );
-							} }
-						/>
+						<FlexItem>
+							<ToolbarButton
+								icon={ trash }
+								label="Delete"
+								onClick={ () => {
+									removeBlock( clientId );
+								} }
+							/>
+						</FlexItem>
 					) }
-				<FlexItem>
-					<Button
-						ref={ ref }
-						onClick={
-							editorMode === 'navigation'
-								? () => setNavigationMode( false )
-								: undefined
-						}
-						onKeyDown={ onKeyDown }
-						label={ label }
-						showTooltip={ false }
-						className="block-selection-button_select-button"
-					>
-						<BlockTitle
-							clientId={ clientId }
-							maximumLength={ 35 }
-						/>
-					</Button>
-				</FlexItem>
+				{ editorMode === 'navigation' && (
+					<FlexItem>
+						<Button
+							ref={ ref }
+							onClick={
+								editorMode === 'navigation'
+									? () => setNavigationMode( false )
+									: undefined
+							}
+							onKeyDown={ onKeyDown }
+							label={ label }
+							showTooltip={ false }
+							className="block-selection-button_select-button"
+						>
+							<BlockTitle
+								clientId={ clientId }
+								maximumLength={ 35 }
+							/>
+						</Button>
+					</FlexItem>
+				) }
 			</Flex>
 		</div>
 	);
