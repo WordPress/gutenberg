@@ -72,6 +72,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
