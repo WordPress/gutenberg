@@ -74,14 +74,16 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 				</>
 			) : (
 				<EditorView
-					content={ attributes.content }
 					editorId={'block-library-html__editor'}
 					editorInstructionsId={'block-library-html__editor-instructions'}
 					editorInstructionsText={__(
 						`This editor allows you to input your custom HTML.`
 					)}
-					mode="html"
-					onChange={ onChange }
+					initialConfig={{
+						content: attributes.content,
+						onChange,
+						mode: 'html',
+					}}
 				/>
 			) }
 		</div>

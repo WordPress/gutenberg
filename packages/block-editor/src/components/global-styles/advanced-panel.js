@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
+import { Notice, __experimentalVStack as VStack, BaseControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -13,7 +13,6 @@ import EditorView from './editor-view';
 
 const EDITOR_ID =
 	'block-editor-global-styles-advanced-panel__custom-css-editor';
-const EDITOR_INSTRUCTIONS_ID = `${ EDITOR_ID }-instructions`;
 
 /**
  * Returns the value that should be set for the code editor height
@@ -117,19 +116,18 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<label
-				htmlFor={ EDITOR_ID }
-				className="block-editor-global-styles-advanced-panel__custom-css-label"
+			<BaseControl
+			id={ EDITOR_ID }
+				help={`${__(
+					`This editor allows you to input Additional CSS and customize the site's appearance with your own styles.`
+				)} ${__(
+					`Press Escape then Tab to move focus out of the editor.`
+				)}`
+			}
+				label={__( 'Additional CSS' )}
 			>
-				{ __( 'Additional CSS' ) }
-			</label>
-			{
 				<EditorView
 					editorId={EDITOR_ID}
-					editorInstructionsId={EDITOR_INSTRUCTIONS_ID}
-					editorInstructionsText={__(
-						`This editor allows you to input Additional CSS and customize the site's appearance with your own styles.`
-						)}
 					initialConfig={
 						{
 							callback: ensureMaxHeight,
@@ -139,8 +137,8 @@ export default function AdvancedPanel( {
 							mode: "css",
 						}
 					}
-				/>
-			}
+					/>
+			</BaseControl>
 		</VStack>
 	);
 }

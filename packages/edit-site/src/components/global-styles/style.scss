@@ -119,12 +119,6 @@
 	margin: $grid-unit-20;
 
 	.components-v-stack {
-		.block-editor-global-styles-advanced-panel__custom-css-label {
-			font-size: 11px;
-			font-weight: 500;
-			line-height: 1.4;
-			text-transform: uppercase;
-		}
 		.block-editor-global-styles-advanced-panel__custom-css-editor {
 			overflow-y: scroll;
 			@include input-style__neutral();
