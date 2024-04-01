@@ -52,6 +52,7 @@ export function registerBlockBindingsSource( source ) {
 		sourceName: source.name,
 		sourceLabel: source.label,
 		useSource: source.useSource,
+		settings: source.settings,
 		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }
