@@ -183,6 +183,11 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		user-select: none;
 	}
 
+	&.is-selected {
+		// So we can see it if a block is overlaping the selected one
+		z-index: z-index(".block-editor-block-list__block.is-selected");
+	}
+
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
 	}

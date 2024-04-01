@@ -4,6 +4,7 @@
 
 $z-layers: (
 	".block-editor-block-list__block::before": 0,
+	".block-editor-block-list__block.is-selected": 9999,
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
