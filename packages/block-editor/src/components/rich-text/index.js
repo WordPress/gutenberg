@@ -485,9 +485,7 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
-	return (
-		<PrivateRichText ref={ ref } { ...props } disableEditing={ false } />
-	);
+	return <PrivateRichText ref={ ref } { ...props } readonly={ false } />;
 } );
 
 PublicForwardedRichTextContainer.Content = Content;
