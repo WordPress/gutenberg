@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
@@ -40,7 +41,11 @@ function CopyMenuItem( { clientIds, onCopy, label } ) {
 		onCopy
 	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+	return (
+		<MenuItem ref={ ref } shortcut={ displayShortcut.primary( 'c' ) }>
+			{ copyMenuItemLabel }
+		</MenuItem>
+	);
 }
 
 export function BlockSettingsDropdown( {
