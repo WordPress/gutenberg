@@ -38,8 +38,6 @@ function useLayout( layout ) {
 	}
 }
 
-const parsedBlocksCache = new WeakMap();
-
 function NonEditableTemplatePartPreview( {
 	postId: id,
 	layout,
@@ -57,7 +55,8 @@ function NonEditableTemplatePartPreview( {
 			const editedRecord = getEditedEntityRecord(
 				'postType',
 				'wp_template_part',
-				id
+				id,
+				{ context: 'view' }
 			);
 			return {
 				editedBlocks: editedRecord.blocks,
@@ -66,8 +65,6 @@ function NonEditableTemplatePartPreview( {
 		},
 		[ id ]
 	);
-
-	const { getEntityRecord, getEntityRecordEdits } = useSelect( coreStore );
 
 	const blocks = useMemo( () => {
 		if ( ! id ) {
@@ -82,26 +79,8 @@ function NonEditableTemplatePartPreview( {
 			return [];
 		}
 
-		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original entry record.
-		const edits = getEntityRecordEdits(
-			'postType',
-			'wp_template_part',
-			id
-		);
-		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cacheKey = isUnedited
-			? getEntityRecord( 'postType', 'wp_template_part', id )
-			: edits;
-		let _blocks = parsedBlocksCache.get( cacheKey );
-
-		if ( ! _blocks ) {
-			_blocks = parse( content );
-			parsedBlocksCache.set( cacheKey, _blocks );
-		}
-
-		return _blocks;
-	}, [ id, editedBlocks, content, getEntityRecord, getEntityRecordEdits ] );
+		return parse( content );
+	}, [ id, editedBlocks, content ] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
