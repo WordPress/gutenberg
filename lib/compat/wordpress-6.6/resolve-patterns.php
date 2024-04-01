@@ -55,3 +55,21 @@ add_filter(
 	}
 );
 
+add_filter( 'rest_post_dispatch', function( $result, $server, $request ) {
+	if ( $request->get_route() !== '/wp/v2/block-patterns/patterns' ) {
+		return $result;
+	}
+
+	$data = $result->get_data();
+
+	foreach ( $data as $index => $pattern ) {
+		$blocks = parse_blocks( $pattern['content'] );
+		$blocks = replace_pattern_blocks( $blocks );
+		$data[ $index ]['content'] = serialize_blocks( $blocks );
+	}
+
+	$result->set_data( $data );
+
+	return $result;
+}, 10, 3 );
+
