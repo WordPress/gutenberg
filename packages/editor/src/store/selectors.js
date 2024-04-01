@@ -1788,3 +1788,14 @@ export const getPostTypeLabel = createRegistrySelector(
 		return postType?.labels?.singular_name;
 	}
 );
+
+/**
+ * Returns true if the publish sidebar is opened.
+ *
+ * @param {Object} state Global application state
+ *
+ * @return {boolean} Whether the publish sidebar is open.
+ */
+export function isPublishSidebarOpened( state ) {
+	return state.publishSidebarActive;
+}
