@@ -89,6 +89,7 @@ export default function QuoteEdit( {
 		template: TEMPLATE,
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
+		renderAppender: false,
 	} );
 
 	return (
