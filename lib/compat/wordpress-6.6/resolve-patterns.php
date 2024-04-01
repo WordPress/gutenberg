@@ -45,3 +45,13 @@ add_filter(
 	}
 );
 
+add_filter(
+	'get_block_template',
+	function( $template ) {
+		$blocks = parse_blocks( $template->content );
+		$blocks = replace_pattern_blocks( $blocks );
+		$template->content = serialize_blocks( $blocks );
+		return $template;
+	}
+);
+
