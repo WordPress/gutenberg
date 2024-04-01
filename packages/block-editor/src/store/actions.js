@@ -1478,44 +1478,36 @@ export const __unstableSetEditorMode =
 
 		if ( mode === 'zoom-out' ) {
 			registry.batch( () => {
-				const modes = sectionsContainerClientId
-					? [
-							[ '' /* rootClientId */, 'disabled' ],
-							[ sectionsContainerClientId, 'contentOnly' ],
-							...sectionsClientIds.map( ( clientId ) => [
-								clientId,
-								'default',
-							] ),
-					  ]
-					: [
-							[ '' /* rootClientId */, 'contentOnly' ],
-							...sectionsClientIds.map( ( clientId ) => [
-								clientId,
-								'contentOnly',
-							] ),
-							...disabledSectionsClientIds.map( ( clientId ) => [
-								clientId,
-								'disabled',
-							] ),
-							...sectionClientIdsInnerBlocks.map(
-								( clientId ) => [ clientId, 'disabled' ]
-							),
-					  ];
-				modes.forEach( ( [ clientId, newMode ] ) => {
-					dispatch( setBlockEditingMode( clientId, newMode ) );
-				} );
+				if ( sectionsContainerClientId ) {
+					setBlockEditingMode( '' /* rootClientId */, 'disabled' );
+					setBlockEditingMode(
+						sectionsContainerClientId,
+						'contentOnly'
+					);
+					sectionsClientIds.forEach( ( clientId ) =>
+						setBlockEditingMode( clientId, 'default' )
+					);
+				} else {
+					setBlockEditingMode( '' /* rootClientId */, 'contentOnly' );
+					sectionsClientIds.forEach( ( clientId ) =>
+						setBlockEditingMode( clientId, 'contentOnly' )
+					);
+					disabledSectionsClientIds.forEach( ( clientId ) =>
+						setBlockEditingMode( clientId, 'disabled' )
+					);
+					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
+						setBlockEditingMode( clientId, 'disabled' )
+					);
+				}
 			} );
 		} else {
 			const prevMode = select.__unstableGetEditorMode();
 			if ( prevMode === 'zoom-out' ) {
 				registry.batch( () => {
-					const modes = [
-						'' /* rootClientId */,
-						sectionsContainerClientId,
-						...sectionsClientIds,
-					];
-					modes.forEach( ( clientId ) => {
-						dispatch( unsetBlockEditingMode( clientId ) );
+					unsetBlockEditingMode( '' /* rootClientId */ );
+					unsetBlockEditingMode( sectionsContainerClientId );
+					sectionsClientIds.forEach( ( clientId ) => {
+						unsetBlockEditingMode( clientId );
 					} );
 				} );
 			}
@@ -1988,35 +1980,6 @@ export function setBlockEditingMode( clientId = '', mode ) {
 }
 
 /**
- * @typedef {Iterable.<[string, BlockEditingMode]>} BlockEditingModes
- */
-
-/**
- * Sets the block editing mode for a multiple blocks.
- *
- * @see useBlockEditingMode
- *
- * @example
- * ```js
- * wp.data.dispatch('core/block-editor').setBlockEditingModes([
- * 	['block-1', 'disabled'],
- * 	['block-2', 'contentOnly'],
- * 	['block-3', 'default'],
- * ]);
- * ```
- *
- * @param {BlockEditingModes} modes Iterable of client ids and block editing modes.
- *
- * @return {Object} Action object.
- */
-export function setBlockEditingModes( modes ) {
-	return {
-		type: 'SET_BLOCK_EDITING_MODES',
-		modes,
-	};
-}
-
-/**
  * Clears the block editing mode for a given block.
  *
  * @see useBlockEditingMode
@@ -2029,21 +1992,5 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
-	};
-}
-
-/**
- * Clears the block editing mode for a given block.
- *
- * @see useBlockEditingMode
- *
- * @param {string[]} clientIds The block client ID, or `''` for the root container.
- *
- * @return {Object} Action object.
- */
-export function unsetBlockEditingModes( clientIds = [] ) {
-	return {
-		type: 'UNSET_BLOCK_EDITING_MODES',
-		clientIds,
 	};
 }
