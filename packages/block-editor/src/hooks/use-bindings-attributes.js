@@ -34,11 +34,15 @@ const DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * Based on the given block name,
  * check if it is possible to bind the block.
  *
- * @param {string} blockName - The block name.
+ * @param {string} blockName   - The block name.
+ * @param {Object} allowBlocks - The allowed blocks settings.
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
-export function canBindBlock( blockName ) {
-	return blockName in DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS;
+export function canBindBlock(
+	blockName,
+	allowBlocks = DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS
+) {
+	return blockName in allowBlocks;
 }
 
 /**
@@ -47,14 +51,17 @@ export function canBindBlock( blockName ) {
  *
  * @param {string} blockName     - The block name.
  * @param {string} attributeName - The attribute name.
+ * @param {Object} allowBlocks   - The allowed blocks settings.
  * @return {boolean} Whether it is possible to bind the block attribute.
  */
-export function canBindAttribute( blockName, attributeName ) {
+export function canBindAttribute(
+	blockName,
+	attributeName,
+	allowBlocks = DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS
+) {
 	return (
-		canBindBlock( blockName ) &&
-		DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes(
-			attributeName
-		)
+		canBindBlock( blockName, allowBlocks ) &&
+		allowBlocks[ blockName ]?.includes( attributeName )
 	);
 }
 
@@ -65,7 +72,7 @@ export function canBindAttribute( blockName, attributeName ) {
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
  * @param {Object}   props.blockProps        - The block props with bound attribute.
- * @param {Object}   props.source            - Source handler.
+ * @param {Object}   props.sourceHandler     - Source handler.
  * @param {Object}   props.args              - The arguments to pass to the source.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
  * @return {null}                              Data-handling component. Render nothing.
@@ -74,10 +81,10 @@ const BindingConnector = ( {
 	args,
 	attrName,
 	blockProps,
-	source,
+	sourceHandler,
 	onPropValueChange,
 } ) => {
-	const { placeholder, value: propValue } = source.useSource(
+	const { placeholder, value: propValue } = sourceHandler.useSource(
 		blockProps,
 		args
 	);
@@ -167,24 +174,43 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
 
+	/*
+	 * Create binding object filtering
+	 * only the attributes that can be bound.
+	 */
+	const allowBindings = Object.entries( bindings ).reduce(
+		( acc, [ attrName, settings ] ) => {
+			const source = blockBindingsSources[ settings.source ];
+			// Check if the block has a valid source handler.
+			if ( ! source?.useSource ) {
+				return false;
+			}
+
+			// Check if the attribute can be bound.
+			const allowBlocks = source?.settings?.blocks;
+			if ( canBindAttribute( blockProps.name, attrName, allowBlocks ) ) {
+				acc[ attrName ] = {
+					...settings,
+					handler: source, // populate the source handler.
+				};
+			}
+
+			return acc;
+		},
+		{}
+	);
+
 	return (
 		<>
-			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ] ) => {
-					// Bail early if the block doesn't have a valid source handler.
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return null;
-					}
-
+			{ Object.entries( allowBindings ).map(
+				( [ attrName, settings ] ) => {
 					return (
 						<BindingConnector
 							key={ attrName }
 							attrName={ attrName }
-							source={ source }
+							sourceHandler={ settings.handler }
 							blockProps={ blockProps }
-							args={ boundAttribute.args }
+							args={ settings.args }
 							onPropValueChange={ onPropValueChange }
 						/>
 					);
@@ -210,15 +236,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			[]
 		);
 
-		/*
-		 * Create binding object filtering
-		 * only the attributes that can be bound.
-		 */
-		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
-				( [ attrName ] ) => canBindAttribute( props.name, attrName )
-			)
-		);
+		const bindings = props.attributes.metadata?.bindings || {};
 
 		return (
 			<>
