@@ -3,7 +3,7 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, select } from '@wordpress/data';
 import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -34,15 +34,26 @@ const DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * Based on the given block name,
  * check if it is possible to bind the block.
  *
- * @param {string} blockName   - The block name.
- * @param {Object} allowBlocks - The allowed blocks settings.
+ * @param {string} blockName - The block name.
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
-export function canBindBlock(
-	blockName,
-	allowBlocks = DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS
-) {
-	return blockName in allowBlocks;
+export function canBindBlock( blockName ) {
+	// Pick blocks list from all source handlers settings.
+	const blockBindingsSources = unlock(
+		select( blocksStore )
+	).getAllBlockBindingsSources();
+
+	let blockNames = Object.keys( DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS );
+	Object.keys( blockBindingsSources ).forEach( ( sourceName ) => {
+		const blocks = blockBindingsSources[ sourceName ].settings?.blocks;
+		if ( blocks ) {
+			blockNames.push( ...Object.keys( blocks ) );
+		}
+	} );
+
+	blockNames = [ ...new Set( blockNames ) ];
+
+	return blockNames.includes( blockName );
 }
 
 /**
@@ -59,10 +70,7 @@ export function canBindAttribute(
 	attributeName,
 	allowBlocks = DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS
 ) {
-	return (
-		canBindBlock( blockName, allowBlocks ) &&
-		allowBlocks[ blockName ]?.includes( attributeName )
-	);
+	return allowBlocks[ blockName ]?.includes( attributeName );
 }
 
 /**
