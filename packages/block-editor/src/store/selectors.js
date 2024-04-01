@@ -1236,11 +1236,22 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return getBlockOrder( state, clientId ).some(
-		( innerClientId ) =>
-			isBlockSelected( state, innerClientId ) ||
-			isBlockMultiSelected( state, innerClientId ) ||
-			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+
+	if ( ! selectedBlockClientIds.length ) {
+		return false;
+	}
+
+	if ( deep ) {
+		return selectedBlockClientIds.some( ( id ) =>
+			// Pass true because we don't care about order and it's more
+			// performant.
+			getBlockParents( state, id, true ).includes( clientId )
+		);
+	}
+
+	return selectedBlockClientIds.some(
+		( id ) => getBlockRootClientId( state, id ) === clientId
 	);
 }
 
