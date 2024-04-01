@@ -71,15 +71,18 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 					<>
 						{ __(
 							'Enter a word or two — without spaces — to make a unique web address just for this block, called an “anchor”. Then, you’ll be able to link directly to this section of your page.'
-						) }{ ' ' }
+						) }
 						{ isWeb && (
-							<ExternalLink
-								href={ __(
-									'https://wordpress.org/documentation/article/page-jumps/'
-								) }
-							>
-								{ __( 'Learn more about anchors' ) }
-							</ExternalLink>
+							<>
+								{ ' ' }
+								<ExternalLink
+									href={ __(
+										'https://wordpress.org/documentation/article/page-jumps/'
+									) }
+								>
+									{ __( 'Learn more about anchors' ) }
+								</ExternalLink>
+							</>
 						) }
 					</>
 				}
