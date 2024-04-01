@@ -55,3 +55,18 @@ export function registerBlockBindingsSource( source ) {
 		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }
+
+/**
+ * Returns an action object used to set the name of the block used
+ * to wrap sections
+ *
+ * @param {string} name Block name.
+ *
+ * @return {Object} Action object.
+ */
+export function setSectionRootBlockName( name = 'core/group' ) {
+	return {
+		type: 'SET_SECTION_ROOT_BLOCK_NAME',
+		name,
+	};
+}

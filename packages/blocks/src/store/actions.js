@@ -317,10 +317,3 @@ export function removeBlockCollection( namespace ) {
 		namespace,
 	};
 }
-
-export function setSectionRootBlockName( name = 'core/group' ) {
-	return {
-		type: 'SET_SECTION_ROOT_BLOCK_NAME',
-		name,
-	};
-}

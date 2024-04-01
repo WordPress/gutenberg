@@ -209,3 +209,14 @@ export function getAllBlockBindingsSources( state ) {
 export function getBlockBindingsSource( state, sourceName ) {
 	return state.blockBindingsSources[ sourceName ];
 }
+
+/**
+ * Returns the name of the block for handling the wrapping of sectios.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling the grouping of blocks.
+ */
+export function getSectionRootBlockName( state ) {
+	return state.sectionRootBlockName;
+}

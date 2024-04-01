@@ -28,6 +28,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
 import { removeTemplates } from './private-actions';
+import { unlock } from '../lock-unlock';
 
 /**
  * Dispatches an action that toggles a feature flag.
@@ -171,7 +172,7 @@ export function setNavigationMenu( navigationMenuId ) {
 	};
 }
 
-function getSectionRootBlockName( postType ) {
+function getSectionRootBlockNameFromPostType( postType ) {
 	const CONTENT_TYPES = [ 'post', 'page' ];
 
 	if ( CONTENT_TYPES.includes( postType ) ) {
@@ -192,11 +193,12 @@ function getSectionRootBlockName( postType ) {
 export const setEditedEntity =
 	( postType, postId, context ) =>
 	( { registry, dispatch } ) => {
-		registry
-			.dispatch( blocksStore )
-			.setSectionRootBlockName(
-				getSectionRootBlockName( context.postType )
-			);
+		const { setSectionRootBlockName } = unlock(
+			registry.dispatch( blocksStore )
+		);
+		setSectionRootBlockName(
+			getSectionRootBlockNameFromPostType( context.postType )
+		);
 		dispatch( {
 			type: 'SET_EDITED_POST',
 			postType,

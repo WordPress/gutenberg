@@ -2981,8 +2981,8 @@ export const isGroupable = createRegistrySelector(
 
 export const getSectionsContainerClientId = createRegistrySelector(
 	( select ) => ( state ) => {
-		const sectionRootBlockName =
-			select( blocksStore ).getSectionRootBlockName();
+		const { getSectionRootBlockName } = unlock( select( blocksStore ) );
+		const sectionRootBlockName = getSectionRootBlockName();
 		const { getGroupingBlockName } = select( blocksStore );
 		const groupingBlockName = getGroupingBlockName();
 
