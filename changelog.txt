@@ -1,7 +1,6 @@
 == Changelog ==
 
-= 18.0.0-rc.1 =
-
+= 18.0.0 =
 
 ## Changelog
 
@@ -81,6 +80,10 @@
 - Template Parts: Fix typo in translatable string. ([59816](https://github.com/WordPress/gutenberg/pull/59816))
 - Ensure consistent return type in `WP_Navigation_Block_Renderer::Get_markup_for_inner_block()`. ([59820](https://github.com/WordPress/gutenberg/pull/59820))
 - Return early from saving meta data for the navigation without a $post->ID. ([59875](https://github.com/WordPress/gutenberg/pull/59875))
+- Fix root ID calculation when check if block can be transformed. ([60167](https://github.com/WordPress/gutenberg/pull/60167))
+- Featured Image: Fix overlay rendering in the editor. ([60187](https://github.com/WordPress/gutenberg/pull/60187))
+- Fix self closing navigation overlay. ([60130](https://github.com/WordPress/gutenberg/pull/60130))
+- Navigation: Avoid content loss when only specific entity fields are edited. ([60071](https://github.com/WordPress/gutenberg/pull/60071))
 
 #### Font Library
 - Avoid auto-removing font families without font faces. ([59910](https://github.com/WordPress/gutenberg/pull/59910))
@@ -90,6 +93,8 @@
 - Polish Google Fonts consent box. ([59631](https://github.com/WordPress/gutenberg/pull/59631))
 - Refactors the upload handler in order to check if files being uploaded are valid font files. ([59648](https://github.com/WordPress/gutenberg/pull/59648))
 - Reset notices when navigating away from the collection. ([59981](https://github.com/WordPress/gutenberg/pull/59981))
+- Activate the fonts coming from the backend and not the data from the frontend. ([60093](https://github.com/WordPress/gutenberg/pull/60093))
+- Install fonts in sequence to work around race condition. ([60180](https://github.com/WordPress/gutenberg/pull/60180))
 
 #### Interactivity API
 - Backport fixes from Core. ([59903](https://github.com/WordPress/gutenberg/pull/59903))
@@ -122,6 +127,8 @@
 - Remove filter for same number of settings. ([59590](https://github.com/WordPress/gutenberg/pull/59590))
 - Site editor: Find font families for typography presets crashes editor. ([59806](https://github.com/WordPress/gutenberg/pull/59806))
 - Force root min-height of 100% for backgrounds. ([59809](https://github.com/WordPress/gutenberg/pull/59809))
+- Featured Image: Fix block support selectors after shadow support addition. ([60184](https://github.com/WordPress/gutenberg/pull/60184))
+- Fix list of base theme fonts when a theme variation is applied.. ([59959](https://github.com/WordPress/gutenberg/pull/59959))
 
 #### Patterns
 - Add pattern title in create modal in post editor. ([59550](https://github.com/WordPress/gutenberg/pull/59550))
@@ -224,6 +231,7 @@
 - Don't memoize callbacks in 'BlockSettingsDropdown'. ([59397](https://github.com/WordPress/gutenberg/pull/59397))
 - Link dialog: Remove CSS hack. ([59746](https://github.com/WordPress/gutenberg/pull/59746))
 - Pattern Explorer: Remove leftover source filter state handlers. ([60019](https://github.com/WordPress/gutenberg/pull/60019))
+- Fix code formatting in Nav block view file. ([60162](https://github.com/WordPress/gutenberg/pull/60162))
 
 #### Components
 - Button : Deprecate `isSmall` prop. ([59734](https://github.com/WordPress/gutenberg/pull/59734))
@@ -302,6 +310,8 @@ The following PRs were merged by first time contributors:
 The following contributors merged PRs in this release:
 
 @aaronrobertshaw @afercia @afragen @ajlende @alexstine @andrewfleming @anton-vlasenko @artemiomorales @bacoords @c4rl0sbr4v0 @carolinan @chrisbellboy @colinduwe @creativecoder @DAreRodz @dcalhoun @draganescu @ellatrix @enejb @enodekciw @flexseth @fluiddot @gaambo @georgestephanis @geriux @getdave @huzaifaalmesbah @inc2734 @J0n-92 @jaclync @jameskoster @jasmussen @Jayanth-Parthsarathy @jeryj @jorgefilipecosta @jsnajdr @kevin940726 @krokodok @luislard @Mamaduka @matiasbenedetto @mattsherman @mcsf @megane9988 @michalczaplinski @mirka @mujuonly @mzahir @ndiego @noisysocks @ntsekouras @oandregal @pbking @ramonjd @rcoll @SahilThakur02 @Sam-Xronn @scruffian @shail-mehta @SiobhyB @sirreal @Soean @Strangehill @sunil25393 @swissspidy @t-hamano @talldan @tellthemachines @TeresaGobble @tjcafferkey @tomepajk @tyxla @vcanales @youknowriad
+
+
 
 
 = 17.9.0 =

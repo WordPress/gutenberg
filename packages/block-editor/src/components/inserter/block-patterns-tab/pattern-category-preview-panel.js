@@ -10,6 +10,7 @@ import { focus } from '@wordpress/dom';
  */
 
 import { PatternCategoryPreviews } from './pattern-category-previews';
+import { useZoomOut } from '../../../hooks/use-zoom-out';
 
 export function PatternCategoryPreviewPanel( {
 	rootClientId,
@@ -28,6 +29,10 @@ export function PatternCategoryPreviewPanel( {
 		} );
 		return () => clearTimeout( timeout );
 	}, [ category ] );
+
+	// Move to zoom out mode when this component is mounted
+	// and back to the previous mode when unmounted.
+	useZoomOut();
 
 	return (
 		<div

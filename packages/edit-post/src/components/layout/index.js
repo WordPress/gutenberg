@@ -172,7 +172,7 @@ function Layout( { initialPost } ) {
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
-				) || select( editPostStore ).isPublishSidebarOpened()
+				) || select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),

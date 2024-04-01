@@ -32,7 +32,6 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
-import { useZoomOut } from '../../../hooks/use-zoom-out';
 
 const noop = () => {};
 
@@ -49,10 +48,6 @@ export function PatternCategoryPreviews( {
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
-
-	// Move to zoom out mode when this component is mounted
-	// and back to the previous mode when unmounted.
-	useZoomOut();
 
 	const availableCategories = usePatternCategories(
 		rootClientId,

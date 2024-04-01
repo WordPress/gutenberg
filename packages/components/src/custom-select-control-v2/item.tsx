@@ -26,4 +26,6 @@ export function CustomSelectItem( {
 	);
 }
 
+CustomSelectItem.displayName = 'CustomSelectControlV2.Item';
+
 export default CustomSelectItem;

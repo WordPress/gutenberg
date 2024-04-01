@@ -934,9 +934,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ /* Hide controls during upload to avoid component remount,
-				which causes duplicated image upload. */ }
-			{ ! temporaryURL && controls }
+			{ controls }
 			{ img }
 
 			<Caption
@@ -946,7 +944,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
-				disableEditing={ lockCaption }
+				readOnly={ lockCaption }
 			/>
 		</>
 	);

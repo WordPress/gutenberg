@@ -20,7 +20,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		} );
 
 		// Restore the Publish sidebar.
-		await editor.setPreferences( 'core/edit-post', {
+		await editor.setPreferences( 'core', {
 			isPublishSidebarEnabled: true,
 		} );
 	} );
@@ -154,7 +154,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await editor.setPreferences( 'core/edit-post', {
+		await editor.setPreferences( 'core', {
 			isPublishSidebarEnabled: false,
 		} );
 
