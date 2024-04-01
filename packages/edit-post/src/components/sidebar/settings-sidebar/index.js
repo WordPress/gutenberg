@@ -113,9 +113,9 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+					<PostCardPanel />
 					{ ! isEditingTemplate && (
 						<>
-							<PostCardPanel />
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
@@ -126,7 +126,6 @@ const SidebarContent = ( {
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
