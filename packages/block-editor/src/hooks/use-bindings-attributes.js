@@ -236,17 +236,19 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			[]
 		);
 
+		// Bail early if the block has no bindings metadata attribute.
 		const bindings = props.attributes.metadata?.bindings || {};
+		if ( ! Object.keys( bindings ).length ) {
+			return <BlockEdit { ...props } />;
+		}
 
 		return (
 			<>
-				{ Object.keys( bindings ).length > 0 && (
-					<BlockBindingBridge
-						blockProps={ props }
-						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
-					/>
-				) }
+				<BlockBindingBridge
+					blockProps={ props }
+					bindings={ bindings }
+					onPropValueChange={ updateBoundAttributes }
+				/>
 
 				<BlockEdit
 					{ ...props }
