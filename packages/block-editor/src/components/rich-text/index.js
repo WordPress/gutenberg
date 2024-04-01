@@ -111,7 +111,7 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		disableEditing,
+		readonly,
 		...props
 	},
 	forwardedRef
@@ -202,7 +202,7 @@ export function RichTextWrapper(
 		[ blockBindings, blockName ]
 	);
 
-	const shouldDisableEditing = disableEditing || disableBoundBlocks;
+	const shouldDisableEditing = readonly || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
