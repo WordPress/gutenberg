@@ -147,16 +147,3 @@ addFilter(
 	'core/color/addTransforms',
 	addTransforms
 );
-
-addFilter( 'blocks.htmlToBlocks', 'core/custom-class-name', ( block, node ) => {
-	if ( node.hasAttribute( 'class' ) ) {
-		return {
-			...block,
-			attributes: {
-				...block.attributes,
-				className: node.getAttribute( 'class' ),
-			},
-		};
-	}
-	return block;
-} );

@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -53,7 +52,10 @@ export function htmlToBlocks( html, handler ) {
 
 		if ( transform ) {
 			const block = transform( node, handler );
-			return applyFilters( 'blocks.htmlToBlocks', block, node );
+			if ( node.hasAttribute( 'class' ) ) {
+				block.attributes.className = node.getAttribute( 'class' );
+			}
+			return block;
 		}
 
 		return createBlock(
