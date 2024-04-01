@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { VisuallyHidden } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -75,16 +76,14 @@ const EditorView = ({content, editorId, editorInstructionsId, editorInstructions
 	}, [] );
 	return (
 		<>
-			<div
+			<VisuallyHidden
 				id={ editorInstructionsId }
-				className={ editorInstructionsId }
-				style={ { display: 'none' } }
 			>
 				{ editorInstructionsText }
 				{ __(
 					`Press Escape then Tab to move focus out of the editor.`
 				) }
-			</div>
+			</VisuallyHidden>
 			<div
 				ref={ editorRef }
 				id={ editorId }
