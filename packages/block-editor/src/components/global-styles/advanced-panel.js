@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Notice, __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,26 +19,22 @@ const EDITOR_INSTRUCTIONS_ID = `${ EDITOR_ID }-instructions`;
  * Returns the value that should be set for the code editor height
  */
 function getEditorHeight() {
-	const MARGIN = 53.4;
-	const wrapper = document.querySelector(
-		'.edit-site-global-styles-screen-css'
-	);
-	if ( wrapper ) {
-		const wrapperHeight = wrapper.offsetHeight;
-		const editorHeight = wrapperHeight - MARGIN;
-		return editorHeight;
-	}
-	return 0;
+	/**
+	 * (height of all the elements in the sidebar except the editor) + (height of the header) + (height of the footer)
+	 * Currently, it's desktop-optimized. 
+	 */
+	const MARGIN = 234 + 60 + 25;
+	const editorHeight = window.innerHeight - MARGIN;
+	return editorHeight;
 }
 
 /**
  * Ensure the editor has at least min lines of code, as the editor will shrink to fit the content.
  *
  * @param {string} content - The content to ensure min lines for.
- * @param {string} editorId - The ID of the editor.
- * @returns {string} The content with at least min lines.
+ * @return {string} The content with at least min lines.
  */
-function ensureMinLines( content, editorId ) {
+function ensureMinLines( content ) {
 	const MIN_LINES = 10;
 	const LINE_HEIGHT = 18.2; // Height of one line in the editor
 	// const MARGIN = 53.4;
@@ -52,12 +48,6 @@ function ensureMinLines( content, editorId ) {
 		// Calculate the minimum number of lines that should be displayed
 		const calcMinLineCount = Math.ceil( editorHeight / LINE_HEIGHT );
 		requiredLines = Math.max( MIN_LINES, calcMinLineCount );
-
-		// Set the max height of the editor allowing scrolling by `overflow-y: scroll`
-		const editor = document.getElementById( editorId );
-		if ( editor ) {
-			editor.style.height = `${ editorHeight }px`;
-		}
 	}
 
 	let result = content;
@@ -66,6 +56,20 @@ function ensureMinLines( content, editorId ) {
 	}
 
 	return result;
+}
+
+/**
+ * Ensure the editor has at most max height to allow scrolling by `overflow-y: scroll`.
+ * It needs to run after the editor DOM is mounted.
+ */
+function ensureMaxHeight() {
+	const editorHeight = getEditorHeight();
+	if ( editorHeight !== 0 ) {
+		const editor = document.getElementById( EDITOR_ID );
+		if ( editor ) {
+			editor.style.height = `${ editorHeight }px`;
+		}
+	}
 }
 
 export default function AdvancedPanel( {
@@ -106,15 +110,6 @@ export default function AdvancedPanel( {
 		);
 	}
 
-	const [ customCSS, setCustomCSS ] = useState( '' );
-	useEffect( () => {
-		if ( customCSS !== '' ) {
-			return;
-		}
-		setCustomCSS( ensureMinLines( inheritedValue?.css, EDITOR_ID ) );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [inheritedValue?.css])
-
 	return (
 		<VStack spacing={ 3 }>
 			{ cssError && (
@@ -129,17 +124,21 @@ export default function AdvancedPanel( {
 				{ __( 'Additional CSS' ) }
 			</label>
 			{
-				customCSS !== '' &&
 				<EditorView
-					content={ customCSS }
 					editorId={EDITOR_ID}
 					editorInstructionsId={EDITOR_INSTRUCTIONS_ID}
 					editorInstructionsText={__(
 						`This editor allows you to input Additional CSS and customize the site's appearance with your own styles.`
 						)}
-					mode="css"
-					onBlur={ handleOnBlur }
-					onChange={ handleOnChange }
+					initialConfig={
+						{
+							callback: ensureMaxHeight,
+							content: ensureMinLines( inheritedValue?.css ),
+							onBlur: handleOnBlur,
+							onChange: handleOnChange,
+							mode: "css",
+						}
+					}
 				/>
 			}
 		</VStack>

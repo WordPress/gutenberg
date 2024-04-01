@@ -17,18 +17,35 @@ function importLanguageSupport( mode ) {
 }
 
 /**
+ * @typedef {Object} Config
+ * @property {Function} callback - Callback after the editor is initialized.
+ * @property {string} content - Text content of the editor.
+ * @property {Function} onChange - Callback for when the content changes.
+ * @property {Function} [onBlur] - Callback for when the editor loses focus.
+ * @property {string} mode - Language mode for the editor. Currently supports 'css' and 'html'.
+ */
+
+/**
  * EditorView provided by CodeMirror
- * 
+ *
  * @param {Object} props
- * @param {string} props.content - Text content of the editor.
  * @param {string} props.editorId
  * @param {string} props.editorInstructionsId
  * @param {string} props.editorInstructionsText - Instructions text for accessibility.
- * @param {Function} props.onChange - Callback for when the content changes.
- * @param {Function} [props.onBlur] - Callback for when the editor loses focus.
- * @param {string} props.mode - Language mode for the editor. Currently supports 'css' and 'html'.
+ * @param {Config} props.initialConfig - Initial configuration for the editor. This can only be used for the initial setup of the editor.
  */
-const EditorView = ({content, editorId, editorInstructionsId, editorInstructionsText, onChange, onBlur, mode}) => {
+const EditorView = ({
+	editorId,
+	editorInstructionsId, 
+	editorInstructionsText, 
+	initialConfig: {
+		callback, 
+		content,
+		onChange,
+		onBlur,
+		mode,
+	},
+}) => {
 	const editorRef = useRef(null);
 	useEffect( () => {
 		( async () => {
@@ -69,6 +86,7 @@ const EditorView = ({content, editorId, editorInstructionsId, editorInstructions
 					],
 					parent: editorRef.current,
 				} );
+				callback();
 			}
 		} )();
 		// We only want to run this once, so we can ignore the dependency array.
