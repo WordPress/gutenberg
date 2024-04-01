@@ -172,6 +172,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 		version: '3.7',
 		services: {
 			mysql: {
+				userns_mode: 'host',
 				image: 'mariadb:lts',
 				ports: [ '3306' ],
 				environment: {
@@ -183,6 +184,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			'tests-mysql': {
+				userns_mode: 'host',
 				image: 'mariadb:lts',
 				ports: [ '3306' ],
 				environment: {
@@ -194,6 +196,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 			},
 			wordpress: {
+				userns_mode: 'host',
 				depends_on: [ 'mysql' ],
 				build: {
 					context: '.',
@@ -212,6 +215,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
+				userns_mode: 'host',
 				depends_on: [ 'tests-mysql' ],
 				build: {
 					context: '.',
@@ -230,6 +234,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			cli: {
+				userns_mode: 'host',
 				depends_on: [ 'wordpress' ],
 				build: {
 					context: '.',
@@ -246,6 +251,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-cli': {
+				userns_mode: 'host',
 				depends_on: [ 'tests-wordpress' ],
 				build: {
 					context: '.',
