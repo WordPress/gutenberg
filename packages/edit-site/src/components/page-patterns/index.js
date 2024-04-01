@@ -151,6 +151,7 @@ function Preview( { item, categoryId, viewType } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 
 	return (
@@ -201,6 +202,7 @@ function Title( { item, categoryId } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
