@@ -189,18 +189,18 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 	 */
 	const allowBindings = Object.entries( bindings ).reduce(
 		( acc, [ attrName, settings ] ) => {
-			const source = blockBindingsSources[ settings.source ];
+			const handler = blockBindingsSources[ settings.source ];
 			// Check if the block has a valid source handler.
-			if ( ! source?.useSource ) {
+			if ( ! handler?.useSource ) {
 				return false;
 			}
 
 			// Check if the attribute can be bound.
-			const allowBlocks = source?.settings?.blocks;
+			const allowBlocks = handler?.settings?.blocks;
 			if ( canBindAttribute( blockProps.name, attrName, allowBlocks ) ) {
 				acc[ attrName ] = {
 					...settings,
-					handler: source, // populate the source handler.
+					handler, // populate the source handler.
 				};
 			}
 
