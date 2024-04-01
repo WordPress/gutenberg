@@ -33,7 +33,7 @@ export function Caption( {
 	label = __( 'Caption text' ),
 	showToolbarButton = true,
 	className,
-	readonly,
+	readOnly,
 	tagName = 'figcaption',
 	addLabel = __( 'Add caption' ),
 	removeLabel = __( 'Remove caption' ),
@@ -111,7 +111,7 @@ export function Caption( {
 								createBlock( getDefaultBlockName() )
 							)
 						}
-						readonly={ readonly }
+						readOnly={ readOnly }
 						{ ...props }
 					/>
 				) }

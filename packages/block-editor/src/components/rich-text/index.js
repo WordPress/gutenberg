@@ -111,7 +111,7 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		readonly,
+		readOnly,
 		...props
 	},
 	forwardedRef
@@ -202,7 +202,7 @@ export function RichTextWrapper(
 		[ blockBindings, blockName ]
 	);
 
-	const shouldDisableEditing = readonly || disableBoundBlocks;
+	const shouldDisableEditing = readOnly || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -485,7 +485,7 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
-	return <PrivateRichText ref={ ref } { ...props } readonly={ false } />;
+	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
 } );
 
 PublicForwardedRichTextContainer.Content = Content;
