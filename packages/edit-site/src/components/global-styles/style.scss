@@ -127,16 +127,10 @@
 		}
 		.block-editor-global-styles-advanced-panel__custom-css-editor {
 			overflow-y: scroll;
-			border: 1px solid $gray-600;
-			border-radius: $radius-block-ui;
+			@include input-style__neutral();
 			&:focus-within {
-				box-shadow: 0 0 0 calc(1.5px - 1px) var(--wp-admin-theme-color);
-				border-color: var(--wp-admin-theme-color);
-				outline: transparent solid 2px;
+				@include input-style__focus();
 			}
-		}
-		.block-editor-global-styles-advanced-panel__custom-css-editor-instructions {
-			display: none;
 		}
 		.cm-editor {
 			// Override the default CodeMirror font-family.
