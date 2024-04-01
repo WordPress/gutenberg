@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { backup, trash } from '@wordpress/icons';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -25,95 +24,106 @@ import isTemplateRevertable from '../../utils/is-template-revertable';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-export function useResetTemplateAction() {
-	const { revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	return useMemo(
-		() => ( {
-			id: 'reset-template',
-			label: __( 'Reset' ),
-			isPrimary: true,
-			icon: backup,
-			isEligible: isTemplateRevertable,
-			supportsBulk: true,
-			async callback( templates ) {
-				try {
-					for ( const template of templates ) {
-						await revertTemplate( template, {
-							allowUndo: false,
-						} );
-						await saveEditedEntityRecord(
-							'postType',
-							template.type,
-							template.id
-						);
-					}
-
-					createSuccessNotice(
-						templates.length > 1
-							? sprintf(
-									/* translators: The number of items. */
-									__( '%s items reverted.' ),
-									templates.length
-							  )
-							: sprintf(
-									/* translators: The template/part's name. */
-									__( '"%s" reverted.' ),
-									decodeEntities(
-										templates[ 0 ].title.rendered
-									)
-							  ),
-						{
-							type: 'snackbar',
-							id: 'edit-site-template-reverted',
-						}
+export const resetTemplateAction = {
+	id: 'reset-template',
+	label: __( 'Clear customizations' ),
+	isEligible: isTemplateRevertable,
+	supportsBulk: true,
+	hideModalHeader: true,
+	RenderModal: ( { items, closeModal, onPerform } ) => {
+		const { revertTemplate } = useDispatch( editSiteStore );
+		const { saveEditedEntityRecord } = useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+		const onConfirm = async () => {
+			try {
+				for ( const template of items ) {
+					await revertTemplate( template, {
+						allowUndo: false,
+					} );
+					await saveEditedEntityRecord(
+						'postType',
+						template.type,
+						template.id
 					);
-				} catch ( error ) {
-					let fallbackErrorMessage;
-					if ( templates[ 0 ].type === TEMPLATE_POST_TYPE ) {
-						fallbackErrorMessage =
-							templates.length === 1
-								? __(
-										'An error occurred while reverting the template.'
-								  )
-								: __(
-										'An error occurred while reverting the templates.'
-								  );
-					} else {
-						fallbackErrorMessage =
-							templates.length === 1
-								? __(
-										'An error occurred while reverting the template part.'
-								  )
-								: __(
-										'An error occurred while reverting the template parts.'
-								  );
-					}
-					const errorMessage =
-						error.message && error.code !== 'unknown_error'
-							? error.message
-							: fallbackErrorMessage;
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
 				}
-			},
-		} ),
-		[
-			createErrorNotice,
-			createSuccessNotice,
-			revertTemplate,
-			saveEditedEntityRecord,
-		]
-	);
-}
+
+				createSuccessNotice(
+					items.length > 1
+						? sprintf(
+								/* translators: The number of items. */
+								__( '%s items reverted.' ),
+								items.length
+						  )
+						: sprintf(
+								/* translators: The template/part's name. */
+								__( '"%s" reverted.' ),
+								decodeEntities( items[ 0 ].title.rendered )
+						  ),
+					{
+						type: 'snackbar',
+						id: 'edit-site-template-reverted',
+					}
+				);
+			} catch ( error ) {
+				let fallbackErrorMessage;
+				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
+					fallbackErrorMessage =
+						items.length === 1
+							? __(
+									'An error occurred while reverting the template.'
+							  )
+							: __(
+									'An error occurred while reverting the templates.'
+							  );
+				} else {
+					fallbackErrorMessage =
+						items.length === 1
+							? __(
+									'An error occurred while reverting the template part.'
+							  )
+							: __(
+									'An error occurred while reverting the template parts.'
+							  );
+				}
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: fallbackErrorMessage;
+
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		};
+		return (
+			<VStack spacing="5">
+				<Text>
+					{ __(
+						'Are you sure you want to clear these customizations?'
+					) }
+				</Text>
+				<HStack justify="right">
+					<Button variant="tertiary" onClick={ closeModal }>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ async () => {
+							await onConfirm( items );
+							onPerform?.();
+							closeModal();
+						} }
+					>
+						{ __( 'Clear' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
 
 export const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
-	isPrimary: true,
-	icon: trash,
 	isEligible: isTemplateRemovable,
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -150,9 +160,7 @@ export const deleteTemplateAction = {
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
-							if ( onPerform ) {
-								onPerform();
-							}
+							onPerform?.();
 							closeModal();
 						} }
 					>
@@ -212,8 +220,6 @@ export const renameTemplateAction = {
 						throwOnError: true,
 					}
 				);
-				// TODO: this action will be reused in template parts list, so
-				// let's keep this for a bit, even it's always a `template` now.
 				createSuccessNotice(
 					template.type === TEMPLATE_POST_TYPE
 						? __( 'Template renamed.' )
@@ -242,16 +248,25 @@ export const renameTemplateAction = {
 				<VStack spacing="5">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ editedTitle }
 						onChange={ setEditedTitle }
 						required
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ closeModal }>
+						<Button
+							variant="tertiary"
+							onClick={ closeModal }
+							__next40pxDefaultSize
+						>
 							{ __( 'Cancel' ) }
 						</Button>
-						<Button variant="primary" type="submit">
+						<Button
+							variant="primary"
+							type="submit"
+							__next40pxDefaultSize
+						>
 							{ __( 'Save' ) }
 						</Button>
 					</HStack>

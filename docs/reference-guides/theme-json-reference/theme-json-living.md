@@ -98,6 +98,7 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 
@@ -203,19 +204,6 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 ---
 ## Styles
 
-
-### background
-
-Background styles
-
-| Property  | Type   |  Props  |
-| ---       | ---    |---   |
-| backgroundImage | string, object |  |
-| backgroundPosition | string, object |  |
-| backgroundRepeat | string, object |  |
-| backgroundSize | string, object |  |
-
----
 
 ### border
 

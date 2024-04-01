@@ -91,7 +91,7 @@ const BottomSheetSelectControl = ( {
 							label={ item.label }
 							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
-							leftAlign={ true }
+							leftAlign
 							key={ index }
 							accessibilityRole={ 'button' }
 							accessibilityLabel={

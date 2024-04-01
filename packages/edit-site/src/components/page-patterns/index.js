@@ -20,11 +20,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	sortByTextFields,
-	getPaginationResults,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -46,7 +42,7 @@ import {
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
+	OPERATOR_IS,
 } from '../../utils/constants';
 import {
 	exportJSONaction,
@@ -296,7 +292,6 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title,
 				render: ( { item } ) => (
 					<Title item={ item } categoryId={ categoryId } />
 				),
@@ -323,7 +318,7 @@ export default function DataviewsPatterns() {
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
-					operators: [ OPERATOR_IN ],
+					operators: [ OPERATOR_IS ],
 					isPrimary: true,
 				},
 				enableSorting: false,
@@ -338,27 +333,12 @@ export default function DataviewsPatterns() {
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! patterns ) {
-			return {
-				data: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredData = [ ...patterns ];
-		// Handle sorting.
-		if ( view.sort ) {
-			filteredData = sortByTextFields( {
-				data: filteredData,
-				view,
-				fields,
-				textFields: [ 'title', 'author' ],
-			} );
-		}
-		// Handle pagination.
-		return getPaginationResults( {
-			data: filteredData,
-			view,
-		} );
+		// Since filters are applied server-side,
+		// we need to remove them from the view
+		const viewWithoutFilters = { ...view };
+		delete viewWithoutFilters.search;
+		viewWithoutFilters.filters = [];
+		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
@@ -413,7 +393,7 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering={ true }
+					deferredRendering
 					supportedLayouts={ [ LAYOUT_GRID ] }
 				/>
 			</Page>

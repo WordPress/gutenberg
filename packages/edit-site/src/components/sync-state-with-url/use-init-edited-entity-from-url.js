@@ -160,7 +160,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			}
 
 			// Some URLs in list views are different
-			if ( path === '/pages' && postId ) {
+			if ( path === '/page' && postId ) {
 				return resolveTemplateForPostTypeAndId( 'page', postId );
 			}
 
@@ -196,7 +196,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		}
 
 		// Some URLs in list views are different
-		if ( path === '/pages' && postId ) {
+		if ( path === '/page' && postId ) {
 			return { postType: 'page', postId };
 		}
 
@@ -207,7 +207,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		return {};
 	}, [ homepageId, postType, postId, path ] );
 
-	if ( path === '/wp_template/all' && postId ) {
+	if ( path === '/wp_template' && postId ) {
 		return { isReady: true, postType: 'wp_template', postId, context };
 	}
 

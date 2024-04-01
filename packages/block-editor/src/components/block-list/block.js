@@ -112,7 +112,10 @@ function BlockListBlock( {
 		...context
 	} = useContext( PrivateBlockContext );
 	const { removeBlock } = useDispatch( blockEditorStore );
-	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
+	const onRemove = useCallback(
+		() => removeBlock( clientId ),
+		[ clientId, removeBlock ]
+	);
 
 	const parentLayout = useLayout() || {};
 
@@ -222,6 +225,11 @@ function BlockListBlock( {
 	// We set a new context with the adjusted and filtered wrapperProps (through
 	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
 	// access to.
+	// Note that the context value doesn't have to be memoized in this case
+	// because when it changes, this component will be re-rendered anyway, and
+	// none of the consumers (BlockListBlock and useBlockProps) are memoized or
+	// "pure". This is different from the public BlockEditContext, where
+	// consumers might be memoized or "pure".
 	return (
 		<PrivateBlockContext.Provider
 			value={ {

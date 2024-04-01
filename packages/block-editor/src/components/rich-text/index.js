@@ -13,7 +13,7 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	removeFormat,
@@ -52,6 +52,8 @@ import { canBindBlock } from '../../hooks/use-bindings-attributes';
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
 
+const instanceIdKey = Symbol( 'instanceId' );
+
 /**
  * Removes props used for the native version of RichText so that they are not
  * passed to the DOM element and log warnings.
@@ -75,7 +77,6 @@ function removeNativeProps( props ) {
 		fontStyle,
 		minWidth,
 		maxWidth,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		...restProps
@@ -117,6 +118,8 @@ export function RichTextWrapper(
 ) {
 	props = removeNativeProps( props );
 
+	const instanceId = useInstanceId( RichTextWrapper );
+
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
@@ -139,7 +142,9 @@ export function RichTextWrapper(
 			isSelected =
 				selectionStart.clientId === clientId &&
 				selectionEnd.clientId === clientId &&
-				selectionStart.attributeKey === identifier;
+				( identifier
+					? selectionStart.attributeKey === identifier
+					: selectionStart[ instanceIdKey ] === instanceId );
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
@@ -153,6 +158,7 @@ export function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
 		clientId,
 		identifier,
+		instanceId,
 		originalIsSelected,
 		isBlockSelected,
 	] );
@@ -213,6 +219,13 @@ export function RichTextWrapper(
 			const selection = {};
 			const unset = start === undefined && end === undefined;
 
+			const baseSelection = {
+				clientId,
+				[ identifier ? 'attributeKey' : instanceIdKey ]: identifier
+					? identifier
+					: instanceId,
+			};
+
 			if ( typeof start === 'number' || unset ) {
 				// If we are only setting the start (or the end below), which
 				// means a partial selection, and we're not updating a selection
@@ -227,8 +240,7 @@ export function RichTextWrapper(
 				}
 
 				selection.start = {
-					clientId,
-					attributeKey: identifier,
+					...baseSelection,
 					offset: start,
 				};
 			}
@@ -243,15 +255,22 @@ export function RichTextWrapper(
 				}
 
 				selection.end = {
-					clientId,
-					attributeKey: identifier,
+					...baseSelection,
 					offset: end,
 				};
 			}
 
 			selectionChange( selection );
 		},
-		[ clientId, identifier ]
+		[
+			clientId,
+			getBlockRootClientId,
+			getSelectionEnd,
+			getSelectionStart,
+			identifier,
+			instanceId,
+			selectionChange,
+		]
 	);
 
 	const {
@@ -426,7 +445,7 @@ export function RichTextWrapper(
 					anchorRef,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
-				suppressContentEditableWarning={ true }
+				suppressContentEditableWarning
 				className={ classnames(
 					'block-editor-rich-text__editable',
 					props.className,

@@ -276,11 +276,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
               </svg>
             </div>
           </button>
-          <div
-            class="emotion-15"
-            role="presentation"
-            style="opacity: 1;"
-          />
+          <div>
+            <div
+              class="emotion-15"
+              role="presentation"
+              style="opacity: 1;"
+            />
+          </div>
         </div>
         <div
           class="emotion-10 emotion-11"
@@ -823,11 +825,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
               </svg>
             </div>
           </button>
-          <div
-            class="emotion-15"
-            role="presentation"
-            style="opacity: 1;"
-          />
+          <div>
+            <div
+              class="emotion-15"
+              role="presentation"
+              style="opacity: 1;"
+            />
+          </div>
         </div>
         <div
           class="emotion-10 emotion-11"

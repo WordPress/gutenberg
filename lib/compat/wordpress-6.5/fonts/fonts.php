@@ -86,6 +86,8 @@ function gutenberg_create_initial_post_types() {
 
 /**
  * Initializes REST routes.
+ *
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_create_initial_rest_routes() {
 	global $wp_version;
@@ -101,6 +103,8 @@ add_action( 'rest_api_init', 'gutenberg_create_initial_rest_routes' );
 
 /**
  * Initializes REST routes and post types.
+ *
+ * @global string $wp_version The WordPress version string.
  */
 function gutenberg_init_font_library() {
 	global $wp_version;
@@ -166,7 +170,7 @@ function gutenberg_register_font_collections() {
 		array(
 			'name'          => _x( 'Google Fonts', 'font collection name', 'gutenberg' ),
 			'description'   => __( 'Install from Google Fonts. Fonts are copied to and served from your site.', 'gutenberg' ),
-			'font_families' => 'https://s.w.org/images/fonts/17.7/collections/google-fonts-with-preview.json',
+			'font_families' => 'https://s.w.org/images/fonts/wp-6.5/collections/google-fonts-with-preview.json',
 			'categories'    => array(
 				array(
 					'name' => _x( 'Sans Serif', 'font category', 'gutenberg' ),

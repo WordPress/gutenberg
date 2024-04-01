@@ -8,6 +8,7 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
+import background from './background';
 import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
@@ -47,6 +48,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	background,
 	style,
 	color,
 	dimensions,
@@ -78,3 +80,4 @@ export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
+export { useZoomOut } from './use-zoom-out';

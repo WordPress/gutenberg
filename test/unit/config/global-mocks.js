@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+import { TextDecoder, TextEncoder } from 'node:util';
+
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
@@ -36,3 +41,10 @@ if ( ! window.DOMRect ) {
  * @see https://github.com/jsdom/jsdom/issues/1695
  */
 global.Element.prototype.scrollIntoView = jest.fn();
+
+if ( ! global.TextDecoder ) {
+	global.TextDecoder = TextDecoder;
+}
+if ( ! global.TextEncoder ) {
+	global.TextEncoder = TextEncoder;
+}

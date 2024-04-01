@@ -9,7 +9,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider, store as editorStore } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	store as editorStore,
+} from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -143,7 +147,9 @@ class Editor extends Component {
 						useSubRegistry={ false }
 						{ ...props }
 					>
-						<Layout setTitleRef={ this.setTitleRef } />
+						<ErrorBoundary>
+							<Layout setTitleRef={ this.setTitleRef } />
+						</ErrorBoundary>
 					</EditorProvider>
 				</SlotFillProvider>
 			</GestureHandlerRootView>

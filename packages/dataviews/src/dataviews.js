@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
@@ -16,6 +13,7 @@ import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import BulkActions from './bulk-actions';
+import { normalizeFields } from './normalize-fields';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
@@ -36,7 +34,7 @@ export default function DataViews( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions,
+	actions = [],
 	data,
 	getItemId = defaultGetItemId,
 	isLoading = false,
@@ -79,12 +77,7 @@ export default function DataViews( {
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
 	).component;
-	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
-	}, [ fields ] );
+	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
 		actions,
@@ -92,69 +85,67 @@ export default function DataViews( {
 	);
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 3 } justify="flex-start">
+			<HStack
+				alignment="top"
+				justify="start"
+				className="dataviews-filters__view-actions"
+			>
 				<HStack
-					alignment="top"
 					justify="start"
-					className="dataviews-filters__view-actions"
+					className="dataviews-filters__container"
+					wrap
 				>
-					<HStack
-						justify="start"
-						className="dataviews-filters__container"
-						wrap
-					>
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
-						<Filters
-							fields={ _fields }
+					{ search && (
+						<Search
+							label={ searchLabel }
 							view={ view }
 							onChangeView={ onChangeView }
-							openedFilter={ openedFilter }
-							setOpenedFilter={ setOpenedFilter }
 						/>
-					</HStack>
-					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
-						hasPossibleBulkAction && (
-							<BulkActions
-								actions={ actions }
-								data={ data }
-								onSelectionChange={ onSetSelection }
-								selection={ selection }
-								getItemId={ getItemId }
-							/>
-						) }
-					<ViewActions
+					) }
+					<Filters
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
+						openedFilter={ openedFilter }
+						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
-				<ViewComponent
+				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+					hasPossibleBulkAction && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
+				<ViewActions
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					actions={ actions }
-					data={ data }
-					getItemId={ getItemId }
-					isLoading={ isLoading }
-					onSelectionChange={ onSetSelection }
-					onDetailsChange={ onDetailsChange }
-					selection={ selection }
-					deferredRendering={ deferredRendering }
-					setOpenedFilter={ setOpenedFilter }
+					supportedLayouts={ supportedLayouts }
 				/>
-				<Pagination
-					view={ view }
-					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
-				/>
-			</VStack>
+			</HStack>
+			<ViewComponent
+				fields={ _fields }
+				view={ view }
+				onChangeView={ onChangeView }
+				actions={ actions }
+				data={ data }
+				getItemId={ getItemId }
+				isLoading={ isLoading }
+				onSelectionChange={ onSetSelection }
+				onDetailsChange={ onDetailsChange }
+				selection={ selection }
+				deferredRendering={ deferredRendering }
+				setOpenedFilter={ setOpenedFilter }
+			/>
+			<Pagination
+				view={ view }
+				onChangeView={ onChangeView }
+				paginationInfo={ paginationInfo }
+			/>
 		</div>
 	);
 }

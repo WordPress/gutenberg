@@ -78,7 +78,7 @@ const ImageWrapper = ( { href, children } ) => {
 		<a
 			href={ href }
 			onClick={ ( event ) => event.preventDefault() }
-			aria-disabled={ true }
+			aria-disabled
 			style={ {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
@@ -274,6 +274,22 @@ export default function Image( {
 		}
 	}
 
+	function resetLightbox() {
+		// When deleting a link from an image while lightbox settings
+		// are enabled by default, we should disable the lightbox,
+		// otherwise the resulting UX looks like a mistake.
+		// See https://github.com/WordPress/gutenberg/pull/59890/files#r1532286123.
+		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
 	function onSetTitle( value ) {
 		// This is the HTML title attribute, separate from the media object
 		// title.
@@ -348,7 +364,10 @@ export default function Image( {
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxSetting =
-		!! lightbox || lightboxSetting?.allowEditing === true;
+		// If a block-level override is set, we should give users the option to
+		// remove that override, even if the lightbox UI is disabled in the settings.
+		( !! lightbox && lightbox?.enabled !== lightboxSetting?.enabled ) ||
+		lightboxSetting?.allowEditing;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
@@ -498,6 +517,7 @@ export default function Image( {
 							showLightboxSetting={ showLightboxSetting }
 							lightboxEnabled={ lightboxChecked }
 							onSetLightbox={ onSetLightbox }
+							resetLightbox={ resetLightbox }
 						/>
 					) }
 				{ allowCrop && (
@@ -647,7 +667,7 @@ export default function Image( {
 					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
-							isShownByDefault={ true }
+							isShownByDefault
 							hasValue={ () => !! alt }
 							onDeselect={ () =>
 								setAttributes( { alt: undefined } )
@@ -692,6 +712,7 @@ export default function Image( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
@@ -913,9 +934,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ /* Hide controls during upload to avoid component remount,
-				which causes duplicated image upload. */ }
-			{ ! temporaryURL && controls }
+			{ controls }
 			{ img }
 
 			<Caption

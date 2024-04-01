@@ -164,6 +164,10 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
 		return title;
 	}
 
+	if ( label.toPlainText ) {
+		return label.toPlainText();
+	}
+
 	// Strip any HTML (i.e. RichText formatting) before returning.
 	return stripHTML( label );
 }

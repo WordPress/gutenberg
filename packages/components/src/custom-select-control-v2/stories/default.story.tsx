@@ -11,15 +11,14 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelect from '../default-component';
-import { CustomSelectItem } from '..';
+import CustomSelectControlV2 from '..';
 
-const meta: Meta< typeof CustomSelect > = {
+const meta: Meta< typeof CustomSelectControlV2 > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Default',
-	component: CustomSelect,
+	component: CustomSelectControlV2,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		CustomSelectItem,
+		'CustomSelectControlV2.Item': CustomSelectControlV2.Item,
 	},
 	argTypes: {
 		children: { control: { type: null } },
@@ -48,10 +47,10 @@ const meta: Meta< typeof CustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
+const Template: StoryFn< typeof CustomSelectControlV2 > = ( props ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<CustomSelect
+		<CustomSelectControlV2
 			{ ...props }
 			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
@@ -68,15 +67,15 @@ Default.args = {
 	defaultValue: 'Select a color...',
 	children: (
 		<>
-			<CustomSelectItem value="Blue">
+			<CustomSelectControlV2.Item value="Blue">
 				<span style={ { color: 'blue' } }>Blue</span>
-			</CustomSelectItem>
-			<CustomSelectItem value="Purple">
+			</CustomSelectControlV2.Item>
+			<CustomSelectControlV2.Item value="Purple">
 				<span style={ { color: 'purple' } }>Purple</span>
-			</CustomSelectItem>
-			<CustomSelectItem value="Pink">
+			</CustomSelectControlV2.Item>
+			<CustomSelectControlV2.Item value="Pink">
 				<span style={ { color: 'deeppink' } }>Pink</span>
-			</CustomSelectItem>
+			</CustomSelectControlV2.Item>
 		</>
 	),
 };
@@ -100,9 +99,9 @@ MultipleSelection.args = {
 				'maroon',
 				'tangerine',
 			].map( ( item ) => (
-				<CustomSelectItem key={ item } value={ item }>
+				<CustomSelectControlV2.Item key={ item } value={ item }>
 					{ item }
-				</CustomSelectItem>
+				</CustomSelectControlV2.Item>
 			) ) }
 		</>
 	),
@@ -134,9 +133,9 @@ CustomSelectedValue.args = {
 		<>
 			{ [ 'mystery-person', 'identicon', 'wavatar', 'retro' ].map(
 				( option ) => (
-					<CustomSelectItem key={ option } value={ option }>
+					<CustomSelectControlV2.Item key={ option } value={ option }>
 						{ renderItem( option ) }
-					</CustomSelectItem>
+					</CustomSelectControlV2.Item>
 				)
 			) }
 		</>

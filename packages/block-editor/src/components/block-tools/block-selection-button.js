@@ -39,6 +39,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockMover from '../block-mover';
+import Shuffle from '../block-toolbar/shuffle';
 
 /**
  * Block selection button component, displaying the label of the block. If the block
@@ -59,6 +60,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				hasBlockMovingClientId,
 				getBlockListSettings,
 				__unstableGetEditorMode,
+				getNextBlockClientId,
+				getPreviousBlockClientId,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -68,6 +71,26 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 			const orientation =
 				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
+			const isBlockTemplatePart =
+				blockType?.name === 'core/template-part';
+
+			let isNextBlockTemplatePart = false;
+			const nextClientId = getNextBlockClientId();
+			if ( nextClientId ) {
+				const { name: nextName } = getBlock( nextClientId );
+				const nextBlockType = getBlockType( nextName );
+				isNextBlockTemplatePart =
+					nextBlockType?.name === 'core/template-part';
+			}
+
+			let isPrevBlockTemplatePart = false;
+			const prevClientId = getPreviousBlockClientId();
+			if ( prevClientId ) {
+				const { name: prevName } = getBlock( prevClientId );
+				const prevBlockType = getBlockType( prevName );
+				isPrevBlockTemplatePart =
+					prevBlockType?.name === 'core/template-part';
+			}
 
 			return {
 				blockMovingMode: hasBlockMovingClientId(),
@@ -79,20 +102,32 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					index + 1,
 					orientation
 				),
+				isBlockTemplatePart,
+				isNextBlockTemplatePart,
+				isPrevBlockTemplatePart,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const { label, icon, blockMovingMode, editorMode } = selected;
+	const {
+		label,
+		icon,
+		blockMovingMode,
+		editorMode,
+		isBlockTemplatePart,
+		isNextBlockTemplatePart,
+		isPrevBlockTemplatePart,
+	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.
 	useEffect( () => {
-		ref.current.focus();
-
-		speak( label );
-	}, [ label ] );
+		if ( editorMode === 'navigation' ) {
+			ref.current.focus();
+			speak( label );
+		}
+	}, [ label, editorMode ] );
 	const blockElement = useBlockElement( clientId );
 
 	const {
@@ -251,8 +286,17 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
 				<FlexItem>
-					{ editorMode === 'zoom-out' && (
-						<BlockMover clientIds={ [ clientId ] } hideDragHandle />
+					{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
+						<BlockMover
+							clientIds={ [ clientId ] }
+							hideDragHandle
+							isBlockMoverUpButtonDisabled={
+								isPrevBlockTemplatePart
+							}
+							isBlockMoverDownButtonDisabled={
+								isNextBlockTemplatePart
+							}
+						/>
 					) }
 					{ editorMode === 'navigation' && (
 						<BlockDraggable clientIds={ [ clientId ] }>
@@ -271,6 +315,9 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						</BlockDraggable>
 					) }
 				</FlexItem>
+				{ editorMode === 'zoom-out' && (
+					<Shuffle clientId={ clientId } as={ Button } />
+				) }
 				<FlexItem>
 					<Button
 						ref={ ref }

@@ -30,11 +30,12 @@ import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
+	OPERATOR_IS_ANY,
+	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
 import {
+	renamePostAction,
 	trashPostAction,
 	usePermanentlyDeletePostAction,
 	useRestorePostAction,
@@ -49,9 +50,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
-	? [ LAYOUT_GRID, LAYOUT_TABLE, LAYOUT_LIST ]
-	: [ LAYOUT_GRID, LAYOUT_TABLE ];
 
 function useView( postType ) {
 	const { params } = useLocation();
@@ -222,18 +220,18 @@ export default function PagePages() {
 		view.filters.forEach( ( filter ) => {
 			if (
 				filter.field === 'status' &&
-				filter.operator === OPERATOR_IN
+				filter.operator === OPERATOR_IS_ANY
 			) {
 				filters.status = filter.value;
 			}
 			if (
 				filter.field === 'author' &&
-				filter.operator === OPERATOR_IN
+				filter.operator === OPERATOR_IS_ANY
 			) {
 				filters.author = filter.value;
 			} else if (
 				filter.field === 'author' &&
-				filter.operator === OPERATOR_NOT_IN
+				filter.operator === OPERATOR_IS_NONE
 			) {
 				filters.author_exclude = filter.value;
 			}
@@ -331,13 +329,12 @@ export default function PagePages() {
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {
-					operators: [ OPERATOR_IN ],
+					operators: [ OPERATOR_IS_ANY ],
 				},
 			},
 			{
 				header: __( 'Date' ),
 				id: 'date',
-				getValue: ( { item } ) => item.date,
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
@@ -355,12 +352,13 @@ export default function PagePages() {
 	const editPostAction = useEditPostAction();
 	const actions = useMemo(
 		() => [
+			editPostAction,
 			viewPostAction,
-			trashPostAction,
 			restorePostAction,
 			permanentlyDeletePostAction,
-			editPostAction,
 			postRevisionsAction,
+			renamePostAction,
+			trashPostAction,
 		],
 		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
 	);
@@ -381,27 +379,17 @@ export default function PagePages() {
 	);
 
 	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
-	const openModal = useCallback( () => {
-		if ( ! showAddPageModal ) {
-			setShowAddPageModal( true );
-		}
-	}, [ showAddPageModal ] );
-	const closeModal = useCallback( () => {
-		if ( showAddPageModal ) {
-			setShowAddPageModal( false );
-		}
-	}, [ showAddPageModal ] );
-	const handleNewPage = useCallback(
-		( { type, id } ) => {
-			history.push( {
-				postId: id,
-				postType: type,
-				canvas: 'edit',
-			} );
-			closeModal();
-		},
-		[ history ]
-	);
+
+	const openModal = () => setShowAddPageModal( true );
+	const closeModal = () => setShowAddPageModal( false );
+	const handleNewPage = ( { type, id } ) => {
+		history.push( {
+			postId: id,
+			postType: type,
+			canvas: 'edit',
+		} );
+		closeModal();
+	};
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
@@ -430,7 +418,6 @@ export default function PagePages() {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

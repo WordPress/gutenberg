@@ -1,17 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, backup } from '@wordpress/icons';
+import { external, trash, edit, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	Button,
+	TextControl,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -49,8 +50,10 @@ export const trashPostAction = {
 						  )
 						: sprintf(
 								// translators: %d: The number of pages (2 or more).
-								__(
-									'Are you sure you want to delete %d pages?'
+								_n(
+									'Are you sure you want to delete %d page?',
+									'Are you sure you want to delete %d pages?',
+									posts.length
 								),
 								posts.length
 						  ) }
@@ -172,8 +175,6 @@ export function usePermanentlyDeletePostAction() {
 		() => ( {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
-			isPrimary: true,
-			icon: trash,
 			supportsBulk: true,
 			isEligible( { status } ) {
 				return status === 'trash';
@@ -362,7 +363,7 @@ export const viewPostAction = {
 	},
 	callback( posts ) {
 		const post = posts[ 0 ];
-		document.location.href = post.link;
+		window.open( post.link, '_blank' );
 	},
 };
 
@@ -372,6 +373,8 @@ export function useEditPostAction() {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
+			isPrimary: true,
+			icon: edit,
 			isEligible( { status } ) {
 				return status !== 'trash';
 			},
@@ -407,5 +410,82 @@ export const postRevisionsAction = {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
 		document.location.href = href;
+	},
+};
+
+export const renamePostAction = {
+	id: 'rename-post',
+	label: __( 'Rename' ),
+	isEligible( post ) {
+		return post.status !== 'trash';
+	},
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const originalTitle = decodeEntities(
+			typeof item.title === 'string' ? item.title : item.title.rendered
+		);
+		const [ title, setTitle ] = useState( () => originalTitle );
+		const { editEntityRecord, saveEditedEntityRecord } =
+			useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		async function onRename( event ) {
+			event.preventDefault();
+			try {
+				await editEntityRecord( 'postType', item.type, item.id, {
+					title,
+				} );
+				// Update state before saving rerenders the list.
+				setTitle( '' );
+				closeModal();
+				// Persist edited entity.
+				await saveEditedEntityRecord( 'postType', item.type, item.id, {
+					throwOnError: true,
+				} );
+				createSuccessNotice( __( 'Name updated' ), {
+					type: 'snackbar',
+				} );
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while updating the name' );
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		}
+
+		return (
+			<form onSubmit={ onRename }>
+				<VStack spacing="5">
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Name' ) }
+						value={ title }
+						onChange={ setTitle }
+						required
+					/>
+					<HStack justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								closeModal();
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		);
 	},
 };

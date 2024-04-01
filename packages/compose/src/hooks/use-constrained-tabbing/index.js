@@ -54,7 +54,7 @@ function useConstrainedTabbing() {
 				/** @type {HTMLElement} */ ( target ).contains( nextElement )
 			) {
 				event.preventDefault();
-				/** @type {HTMLElement} */ ( nextElement )?.focus();
+				nextElement?.focus();
 				return;
 			}
 
