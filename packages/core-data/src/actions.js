@@ -799,6 +799,59 @@ export const saveEditedEntityRecord =
 	};
 
 /**
+ * Action triggered to update only specified properties for the entity.
+ *
+ * @param {string} kind        Kind of the entity.
+ * @param {string} name        Name of the entity.
+ * @param {Object} recordId    ID of the record.
+ * @param {Array}  itemsToSave List of entity properties or property paths to save.
+ * @param {Object} options     Saving options.
+ */
+export const __experimentalUpdateSpecifiedEntityEdits =
+	( kind, name, recordId, itemsToSave, options ) =>
+	async ( { select, dispatch } ) => {
+		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
+			return;
+		}
+		const edits = select.getEntityRecordNonTransientEdits(
+			kind,
+			name,
+			recordId
+		);
+
+		// Get the base record from the datase to apply the edits to.
+		const base = select.getEntityRecord( kind, name, recordId ) || {};
+
+		// Use the base record as the starting point for the edits.
+		const editsToSave = base;
+
+		for ( const item of itemsToSave ) {
+			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
+		}
+
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+
+		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
+
+		// If a record key is provided then update the existing record.
+		// This necessitates providing `recordKey` to saveEntityRecord as part of the
+		// `record` argument (here called `editsToSave`) to stop that action creating
+		// a new record and instead cause it to update the existing record.
+		if ( recordId ) {
+			editsToSave[ entityIdKey ] = recordId;
+		}
+		return await dispatch.saveEntityRecord(
+			kind,
+			name,
+			editsToSave,
+			options
+		);
+	};
+
+/**
  * Action triggered to save only specified properties for the entity.
  *
  * @param {string} kind        Kind of the entity.
