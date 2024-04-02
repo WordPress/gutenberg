@@ -9,8 +9,8 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
-	store as editorStore,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -24,14 +24,13 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from '../../template-actions';
-import TemplateAreas from './template-areas';
 import PluginTemplateSettingPanel from '../../plugin-template-setting-panel';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 const { PostCardPanel } = unlock( editorPrivateApis );
-
+const { PatternOverridesPanel } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function TemplatesList( { availableTemplates, onSelect } ) {
@@ -113,9 +112,7 @@ export default function TemplatePanel() {
 						} }
 					/>
 				}
-			>
-				<TemplateAreas />
-			</PostCardPanel>
+			/>
 			<PluginTemplateSettingPanel.Slot />
 			{ availablePatterns?.length > 0 && (
 				<PanelBody
@@ -141,6 +138,7 @@ export default function TemplatePanel() {
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
+			<PatternOverridesPanel />
 		</>
 	);
 }

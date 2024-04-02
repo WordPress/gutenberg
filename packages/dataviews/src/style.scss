@@ -421,7 +421,7 @@
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
 
-		&:focus {
+		&:focus-visible {
 			&::before {
 				position: absolute;
 				content: "";

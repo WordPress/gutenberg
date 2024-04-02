@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
@@ -33,14 +34,18 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { clientIds, onCopy, label } ) {
+function CopyMenuItem( { clientIds, onCopy, label, shortcut } ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const ref = useCopyToClipboard(
 		() => serialize( getBlocksByClientId( clientIds ) ),
 		onCopy
 	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+	return (
+		<MenuItem ref={ ref } shortcut={ shortcut }>
+			{ copyMenuItemLabel }
+		</MenuItem>
+	);
 }
 
 export function BlockSettingsDropdown( {
@@ -279,6 +284,7 @@ export function BlockSettingsDropdown( {
 								<CopyMenuItem
 									clientIds={ clientIds }
 									onCopy={ onCopy }
+									shortcut={ displayShortcut.primary( 'c' ) }
 								/>
 								{ canDuplicate && (
 									<MenuItem

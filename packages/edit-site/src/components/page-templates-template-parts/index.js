@@ -23,6 +23,7 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -45,10 +46,11 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './actions';
-import { postRevisionsAction, useEditPostAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -339,16 +341,32 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const editTemplateAction = useEditPostAction();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
 	const actions = useMemo(
 		() => [
-			editTemplateAction,
+			editAction,
 			resetTemplateAction,
 			renameTemplateAction,
-			postRevisionsAction,
+			viewRevisionsAction,
 			deleteTemplateAction,
 		],
-		[ editTemplateAction ]
+		[ editAction, viewRevisionsAction ]
 	);
 
 	const onChangeView = useCallback(
@@ -401,7 +419,10 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
+				deferredRendering={
+					view.type === LAYOUT_GRID ||
+					! view.hiddenFields?.includes( 'preview' )
+				}
 			/>
 		</Page>
 	);

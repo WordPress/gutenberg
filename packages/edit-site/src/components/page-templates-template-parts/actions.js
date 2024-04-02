@@ -248,16 +248,25 @@ export const renameTemplateAction = {
 				<VStack spacing="5">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						label={ __( 'Name' ) }
 						value={ editedTitle }
 						onChange={ setEditedTitle }
 						required
 					/>
 					<HStack justify="right">
-						<Button variant="tertiary" onClick={ closeModal }>
+						<Button
+							variant="tertiary"
+							onClick={ closeModal }
+							__next40pxDefaultSize
+						>
 							{ __( 'Cancel' ) }
 						</Button>
-						<Button variant="primary" type="submit">
+						<Button
+							variant="primary"
+							type="submit"
+							__next40pxDefaultSize
+						>
 							{ __( 'Save' ) }
 						</Button>
 					</HStack>
