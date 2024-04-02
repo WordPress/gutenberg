@@ -35,7 +35,6 @@ import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
 import PluginSidebarEditPost from '../plugin-sidebar';
-import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
@@ -114,9 +113,9 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+					<PostCardPanel />
 					{ ! isEditingTemplate && (
 						<>
-							<PostCardPanel />
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
@@ -128,7 +127,6 @@ const SidebarContent = ( {
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
