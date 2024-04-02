@@ -2,3 +2,8 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 }
+
+// We need this so groups with negative margins overlap as expected
+:where(.wp-block-group.has-background) {
+	position: relative;
+}
