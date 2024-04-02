@@ -1435,54 +1435,31 @@ export const setNavigationMode =
 export const __unstableSetEditorMode =
 	( mode ) =>
 	( { dispatch, select, registry } ) => {
-		// When switching to zoom-out mode, we need to select the root block
-		if ( mode === 'zoom-out' ) {
-			const firstSelectedClientId = select.getBlockSelectionStart();
-			if ( firstSelectedClientId ) {
-				const rootClientId = select.getBlockHierarchyRootClientId(
-					firstSelectedClientId
-				);
-				dispatch.selectBlock( rootClientId );
-			}
-		}
+		registry.batch( () => {
+			dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
-		// TODO: Cleanup this for better performance/readability.
-		// When switching to zoom-out mode, we need to disable editing mode for all blocks except the sections.
-		const sectionsContainerClientId = unlock(
-			registry.select( STORE_NAME )
-		).getSectionsContainerClientId();
-		let sectionsClientIds = [];
-		let sectionClientIdsInnerBlocks = [];
-		let disabledSectionsClientIds = [];
-		if ( sectionsContainerClientId ) {
-			sectionsClientIds = select.getClientIdsOfDescendants(
-				sectionsContainerClientId
-			);
-		} else {
-			sectionsClientIds = select.getBlockOrder();
-			disabledSectionsClientIds = sectionsClientIds
-				.map( ( clientId ) => {
-					return select.getBlock( clientId );
-				} )
-				.filter( ( block ) => block.name === 'core/template-part' )
-				.map( ( block ) => block.clientId );
-
-			sectionClientIdsInnerBlocks = sectionsClientIds.flatMap(
-				( clientId ) => {
-					const block = select.getBlock( clientId );
-					if ( block.name === 'core/template-part' ) {
-						return [];
-					}
-					return block.innerBlocks.map(
-						( innerBlock ) => innerBlock.clientId
+			// When switching to zoom-out mode, we need to select the root block
+			if ( mode === 'zoom-out' ) {
+				const firstSelectedClientId = select.getBlockSelectionStart();
+				if ( firstSelectedClientId ) {
+					const rootClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
 					);
+					dispatch.selectBlock( rootClientId );
 				}
-			);
-		}
+			}
 
-		if ( mode === 'zoom-out' ) {
-			registry.batch( () => {
-				if ( sectionsContainerClientId ) {
+			const prevMode = select.__unstableGetEditorMode();
+
+			const sectionsContainerClientId = unlock(
+				registry.select( STORE_NAME )
+			).getSectionsContainerClientId();
+
+			if ( sectionsContainerClientId ) {
+				const sectionsClientIds = select.getClientIdsOfDescendants(
+					sectionsContainerClientId
+				);
+				if ( mode === 'zoom-out' ) {
 					dispatch.setBlockEditingMode(
 						'' /* rootClientId */,
 						'disabled'
@@ -1494,7 +1471,33 @@ export const __unstableSetEditorMode =
 					sectionsClientIds.forEach( ( clientId ) =>
 						dispatch.setBlockEditingMode( clientId, 'default' )
 					);
-				} else {
+				} else if ( prevMode === 'zoom-out' ) {
+					dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+					dispatch.unsetBlockEditingMode( sectionsContainerClientId );
+					sectionsClientIds.forEach( ( clientId ) => {
+						dispatch.unsetBlockEditingMode( clientId );
+					} );
+				}
+			} else {
+				const sectionsClientIds = select.getBlockOrder();
+				const disabledSectionsClientIds = sectionsClientIds.filter(
+					( clientId ) => {
+						const block = select.getBlock( clientId );
+						return block.name === 'core/template-part';
+					}
+				);
+				const sectionClientIdsInnerBlocks = sectionsClientIds.flatMap(
+					( clientId ) => {
+						const block = select.getBlock( clientId );
+						if ( block.name === 'core/template-part' ) {
+							return [];
+						}
+						return block.innerBlocks.map(
+							( innerBlock ) => innerBlock.clientId
+						);
+					}
+				);
+				if ( mode === 'zoom-out' ) {
 					dispatch.setBlockEditingMode(
 						'' /* rootClientId */,
 						'contentOnly'
@@ -1508,38 +1511,36 @@ export const __unstableSetEditorMode =
 					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
 						dispatch.setBlockEditingMode( clientId, 'disabled' )
 					);
+				} else if ( prevMode === 'zoom-out' ) {
+					dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+					sectionsClientIds.forEach( ( clientId ) =>
+						dispatch.unsetBlockEditingMode( clientId )
+					);
+					disabledSectionsClientIds.forEach( ( clientId ) =>
+						dispatch.unsetBlockEditingMode( clientId )
+					);
+					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
+						dispatch.unsetBlockEditingMode( clientId )
+					);
 				}
-			} );
-		} else {
-			const prevMode = select.__unstableGetEditorMode();
-			if ( prevMode === 'zoom-out' ) {
-				registry.batch( () => {
-					unsetBlockEditingMode( '' /* rootClientId */ );
-					unsetBlockEditingMode( sectionsContainerClientId );
-					sectionsClientIds.forEach( ( clientId ) => {
-						unsetBlockEditingMode( clientId );
-					} );
-				} );
 			}
-		}
 
-		dispatch( { type: 'SET_EDITOR_MODE', mode } );
-
-		if ( mode === 'navigation' ) {
-			speak(
-				__(
-					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-				)
-			);
-		} else if ( mode === 'edit' ) {
-			speak(
-				__(
-					'You are currently in edit mode. To return to the navigation mode, press Escape.'
-				)
-			);
-		} else if ( mode === 'zoom-out' ) {
-			speak( __( 'You are currently in zoom-out mode.' ) );
-		}
+			if ( mode === 'navigation' ) {
+				speak(
+					__(
+						'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
+					)
+				);
+			} else if ( mode === 'edit' ) {
+				speak(
+					__(
+						'You are currently in edit mode. To return to the navigation mode, press Escape.'
+					)
+				);
+			} else if ( mode === 'zoom-out' ) {
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		} );
 	};
 
 /**
