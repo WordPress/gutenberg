@@ -11,9 +11,15 @@ import { moreVertical } from '@wordpress/icons';
 import TrashPageMenuItem from './trash-page-menu-item';
 import RenamePostMenuItem from '../rename-post-menu-item';
 
-export default function PageActions( { onRemove, page, toggleProps } ) {
+export default function PageActions( {
+	className,
+	onRemove,
+	page,
+	toggleProps,
+} ) {
 	return (
 		<DropdownMenu
+			className={ className }
 			icon={ moreVertical }
 			label={ __( 'Actions' ) }
 			toggleProps={ toggleProps }
