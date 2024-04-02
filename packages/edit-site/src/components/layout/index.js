@@ -115,9 +115,9 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { areas, widths } = useLayoutAreas();
+	const { key: routeKey, areas, widths } = useLayoutAreas();
 	const animationRef = useMovingAnimation( {
-		triggerAnimationOnChange: canvasMode,
+		triggerAnimationOnChange: canvasMode + '__' + routeKey,
 	} );
 
 	// This determines which animation variant should apply to the header.
