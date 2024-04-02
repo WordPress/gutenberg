@@ -1479,24 +1479,30 @@ export const __unstableSetEditorMode =
 		if ( mode === 'zoom-out' ) {
 			registry.batch( () => {
 				if ( sectionsContainerClientId ) {
-					setBlockEditingMode( '' /* rootClientId */, 'disabled' );
-					setBlockEditingMode(
+					dispatch.setBlockEditingMode(
+						'' /* rootClientId */,
+						'disabled'
+					);
+					dispatch.setBlockEditingMode(
 						sectionsContainerClientId,
 						'contentOnly'
 					);
 					sectionsClientIds.forEach( ( clientId ) =>
-						setBlockEditingMode( clientId, 'default' )
+						dispatch.setBlockEditingMode( clientId, 'default' )
 					);
 				} else {
-					setBlockEditingMode( '' /* rootClientId */, 'contentOnly' );
+					dispatch.setBlockEditingMode(
+						'' /* rootClientId */,
+						'contentOnly'
+					);
 					sectionsClientIds.forEach( ( clientId ) =>
-						setBlockEditingMode( clientId, 'contentOnly' )
+						dispatch.setBlockEditingMode( clientId, 'contentOnly' )
 					);
 					disabledSectionsClientIds.forEach( ( clientId ) =>
-						setBlockEditingMode( clientId, 'disabled' )
+						dispatch.setBlockEditingMode( clientId, 'disabled' )
 					);
 					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
-						setBlockEditingMode( clientId, 'disabled' )
+						dispatch.setBlockEditingMode( clientId, 'disabled' )
 					);
 				}
 			} );
