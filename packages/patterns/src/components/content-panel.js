@@ -38,7 +38,7 @@ export default function ContentPanel() {
 	}
 
 	return (
-		<PanelBody title={ __( 'Content' ) }>
+		<PanelBody title={ __( 'Overrides' ) }>
 			<BlockQuickNavigation clientIds={ clientIdsWithOverrides } />
 		</PanelBody>
 	);
