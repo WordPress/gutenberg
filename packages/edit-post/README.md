@@ -106,43 +106,9 @@ _Returns_
 
 ### PluginPostPublishPanel
 
+> **Deprecated** since 6.6, use `wp.editor.PluginPostPublishPanel` instead.
+
 Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
-
-function MyPluginPostPublishPanel() {
-	return React.createElement(
-		PluginPostPublishPanel,
-		{
-			className: 'my-plugin-post-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPostPublishPanel = () => (
-	<PluginPostPublishPanel
-		className="my-plugin-post-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPostPublishPanel>
-);
-```
 
 _Parameters_
 
@@ -203,43 +169,9 @@ _Returns_
 
 ### PluginPrePublishPanel
 
+> **Deprecated** since 6.6, use `wp.editor.PluginPrePublishPanel` instead.
+
 Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
-
-function MyPluginPrePublishPanel() {
-	return React.createElement(
-		PluginPrePublishPanel,
-		{
-			className: 'my-plugin-pre-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPrePublishPanel = () => (
-	<PluginPrePublishPanel
-		className="my-plugin-pre-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPrePublishPanel>
-);
-```
 
 _Parameters_
 

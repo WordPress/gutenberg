@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
-import { PluginPrePublishPanel } from '@wordpress/editor';
+import { createSlotFill, PanelBody } from '@wordpress/components';
+import { usePluginContext } from '@wordpress/plugins';
+
+const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
 
 /**
  * Renders provided content to the pre-publish side panel in the publish flow
  * (side panel that opens when a user first pushes "Publish" from the main editor).
- *
- * @deprecated since 6.6, use `wp.editor.PluginPrePublishPanel` instead.
  *
  * @param {Object}                props                                 Component props.
  * @param {string}                [props.className]                     An optional class name added to the panel.
@@ -20,13 +20,48 @@ import { PluginPrePublishPanel } from '@wordpress/editor';
  *                                                                      the sidebar is pinned to toolbar.
  * @param {Element}               props.children                        Children to be rendered
  *
+ * @example
+ * ```jsx
+ * // Using ESNext syntax
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginPrePublishPanel } from '@wordpress/edit-post';
+ *
+ * const MyPluginPrePublishPanel = () => (
+ * 	<PluginPrePublishPanel
+ * 		className="my-plugin-pre-publish-panel"
+ * 		title={ __( 'My panel title' ) }
+ * 		initialOpen={ true }
+ * 	>
+ * 	    { __( 'My panel content' ) }
+ * 	</PluginPrePublishPanel>
+ * );
+ * ```
+ *
  * @return {Component} The component to be rendered.
  */
-export default function EditPostPluginPrePublishPanel( props ) {
-	deprecated( 'wp.editPost.PluginPrePublishPanel', {
-		since: '6.6',
-		version: '6.8',
-		alternative: 'wp.editor.PluginPrePublishPanel',
-	} );
-	return <PluginPrePublishPanel { ...props } />;
-}
+const PluginPrePublishPanel = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => {
+	const { icon: pluginIcon } = usePluginContext();
+
+	return (
+		<Fill>
+			<PanelBody
+				className={ className }
+				initialOpen={ initialOpen || ! title }
+				title={ title }
+				icon={ icon ?? pluginIcon }
+			>
+				{ children }
+			</PanelBody>
+		</Fill>
+	);
+};
+
+PluginPrePublishPanel.Slot = Slot;
+
+export default PluginPrePublishPanel;
