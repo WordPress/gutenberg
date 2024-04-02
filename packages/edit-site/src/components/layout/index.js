@@ -51,6 +51,7 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import useMovingAnimation from './animation';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -115,6 +116,9 @@ export default function Layout() {
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
 	const { areas, widths } = useLayoutAreas();
+	const animationRef = useMovingAnimation( {
+		triggerAnimationOnChange: canvasMode,
+	} );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -315,22 +319,7 @@ export default function Layout() {
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration: disableMotion
-															? 0
-															: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
+								<div
 									className={ classnames(
 										'edit-site-layout__canvas',
 										{
@@ -338,13 +327,7 @@ export default function Layout() {
 												isResizableFrameOversized,
 										}
 									) }
-									transition={ {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
+									ref={ animationRef }
 								>
 									<ErrorBoundary>
 										<ResizableFrame
@@ -373,7 +356,7 @@ export default function Layout() {
 											{ areas.preview }
 										</ResizableFrame>
 									</ErrorBoundary>
-								</motion.div>
+								</div>
 							) }
 						</div>
 					) }

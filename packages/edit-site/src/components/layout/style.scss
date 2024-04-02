@@ -93,6 +93,8 @@
 	position: relative;
 	flex-grow: 1;
 	z-index: z-index(".edit-site-layout__canvas-container");
+	// When animating the frame size can exceed its container size.
+	overflow: visible;
 
 	&.is-resizing::after {
 		// This covers the whole content which ensures mouse up triggers
