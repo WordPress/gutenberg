@@ -43,13 +43,14 @@ export default function WidgetAreasBlockEditorContent( {
 			{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
 			<BlockTools>
 				<KeyboardShortcuts />
-				<EditorStyles
-					styles={ styles }
-					scope=".editor-styles-wrapper"
-				/>
 				<BlockSelectionClearer>
 					<WritingFlow>
-						<BlockList className="edit-widgets-main-block-list" />
+						<EditorStyles
+							styles={ styles }
+							scope=".editor-styles-wrapper"
+						>
+							<BlockList className="edit-widgets-main-block-list" />
+						</EditorStyles>
 					</WritingFlow>
 				</BlockSelectionClearer>
 			</BlockTools>

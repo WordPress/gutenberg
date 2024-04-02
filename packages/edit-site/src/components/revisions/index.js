@@ -73,22 +73,23 @@ function Revisions( { userConfig, blocks } ) {
 				name="revisions"
 				tabIndex={ 0 }
 			>
-				<EditorStyles styles={ editorStyles } />
-				<style>
-					{
-						// Forming a "block formatting context" to prevent margin collapsing.
-						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-						`.is-root-container { display: flow-root; }`
-					}
-				</style>
-				<Disabled className="edit-site-revisions__example-preview__content">
-					<ExperimentalBlockEditorProvider
-						value={ renderedBlocksArray }
-						settings={ settings }
-					>
-						<BlockList renderAppender={ false } />
-					</ExperimentalBlockEditorProvider>
-				</Disabled>
+				<EditorStyles styles={ editorStyles }>
+					<style>
+						{
+							// Forming a "block formatting context" to prevent margin collapsing.
+							// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+							`.is-root-container { display: flow-root; }`
+						}
+					</style>
+					<Disabled className="edit-site-revisions__example-preview__content">
+						<ExperimentalBlockEditorProvider
+							value={ renderedBlocksArray }
+							settings={ settings }
+						>
+							<BlockList renderAppender={ false } />
+						</ExperimentalBlockEditorProvider>
+					</Disabled>
+				</EditorStyles>
 			</Iframe>
 		</EditorCanvasContainer>
 	);

@@ -124,7 +124,6 @@ export default function PreviewIframe( {
 					onMouseLeave={ () => setIsHovered( false ) }
 					tabIndex={ -1 }
 				>
-					<EditorStyles styles={ editorStyles } />
 					<motion.div
 						style={ {
 							height: normalizedHeight * ratio,
@@ -141,9 +140,13 @@ export default function PreviewIframe( {
 								: 'start'
 						}
 					>
-						{ []
-							.concat( children ) // This makes sure children is always an array.
-							.map( ( child, key ) => child( { ratio, key } ) ) }
+						<EditorStyles styles={ editorStyles }>
+							{ []
+								.concat( children ) // This makes sure children is always an array.
+								.map( ( child, key ) =>
+									child( { ratio, key } )
+								) }
+						</EditorStyles>
 					</motion.div>
 				</Iframe>
 			) }

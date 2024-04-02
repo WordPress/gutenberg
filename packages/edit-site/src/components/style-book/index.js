@@ -351,36 +351,39 @@ const StyleBookBody = ( {
 			tabIndex={ 0 }
 			{ ...( onClick ? buttonModeProps : {} ) }
 		>
-			<EditorStyles styles={ settings.styles } />
-			<style>
-				{
-					// Forming a "block formatting context" to prevent margin collapsing.
-					// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-					`.is-root-container { display: flow-root; }
+			<EditorStyles styles={ settings.styles }>
+				<style>
+					{
+						// Forming a "block formatting context" to prevent margin collapsing.
+						// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+						`.is-root-container { display: flow-root; }
 						body { position: relative; padding: 32px !important; }` +
-						STYLE_BOOK_IFRAME_STYLES +
-						buttonModeStyles
-				}
-			</style>
-			<Examples
-				className={ classnames( 'edit-site-style-book__examples', {
-					'is-wide': sizes.width > 600,
-				} ) }
-				examples={ examples }
-				category={ category }
-				label={
-					title
-						? sprintf(
-								// translators: %s: Category of blocks, e.g. Text.
-								__( 'Examples of blocks in the %s category' ),
-								title
-						  )
-						: __( 'Examples of blocks' )
-				}
-				isSelected={ isSelected }
-				onSelect={ onSelect }
-				key={ category }
-			/>
+							STYLE_BOOK_IFRAME_STYLES +
+							buttonModeStyles
+					}
+				</style>
+				<Examples
+					className={ classnames( 'edit-site-style-book__examples', {
+						'is-wide': sizes.width > 600,
+					} ) }
+					examples={ examples }
+					category={ category }
+					label={
+						title
+							? sprintf(
+									// translators: %s: Category of blocks, e.g. Text.
+									__(
+										'Examples of blocks in the %s category'
+									),
+									title
+							  )
+							: __( 'Examples of blocks' )
+					}
+					isSelected={ isSelected }
+					onSelect={ onSelect }
+					key={ category }
+				/>
+			</EditorStyles>
 		</Iframe>
 	);
 };

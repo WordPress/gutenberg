@@ -36,10 +36,6 @@ export function ExperimentalBlockCanvas( {
 				__unstableContentRef={ localRef }
 				style={ { height, display: 'flex' } }
 			>
-				<EditorStyles
-					styles={ styles }
-					scope=".editor-styles-wrapper"
-				/>
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
@@ -49,7 +45,12 @@ export function ExperimentalBlockCanvas( {
 						width: '100%',
 					} }
 				>
-					{ children }
+					<EditorStyles
+						styles={ styles }
+						scope=".editor-styles-wrapper"
+					>
+						{ children }
+					</EditorStyles>
 				</WritingFlow>
 			</BlockTools>
 		);
@@ -69,8 +70,7 @@ export function ExperimentalBlockCanvas( {
 				} }
 				name="editor-canvas"
 			>
-				<EditorStyles styles={ styles } />
-				{ children }
+				<EditorStyles styles={ styles }>{ children }</EditorStyles>
 			</Iframe>
 		</BlockTools>
 	);

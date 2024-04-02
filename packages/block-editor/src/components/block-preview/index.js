@@ -140,8 +140,9 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			value={ renderedBlocks }
 			settings={ settings }
 		>
-			<EditorStyles />
-			<BlockListItems renderAppender={ false } layout={ layout } />
+			<EditorStyles>
+				<BlockListItems renderAppender={ false } layout={ layout } />
+			</EditorStyles>
 		</ExperimentalBlockEditorProvider>
 	);
 

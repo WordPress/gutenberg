@@ -21,7 +21,7 @@ import {
  */
 import transformStyles from '../../utils/transform-styles';
 
-export const updateStyleContext = createContext( () => {} );
+export const updateStyleContext = createContext();
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -71,7 +71,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
-export default function EditorStyles( { styles, scope } ) {
+export default function EditorStyles( { styles, scope, children } ) {
 	const [ overrides, setOverrides ] = useState( new Map() );
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
@@ -122,6 +122,7 @@ export default function EditorStyles( { styles, scope } ) {
 				} }
 				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
 			/>
+			{ children }
 		</updateStyleContext.Provider>
 	);
 }
