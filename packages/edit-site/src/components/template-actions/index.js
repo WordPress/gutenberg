@@ -56,7 +56,7 @@ export default function TemplateActions( {
 					{ isRemovable && (
 						<>
 							<RenamePostMenuItem
-								item={ template }
+								post={ template }
 								onClose={ onClose }
 							/>
 							<DeleteMenuItem

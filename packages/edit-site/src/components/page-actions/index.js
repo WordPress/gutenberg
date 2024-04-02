@@ -20,7 +20,7 @@ export default function PageActions( { onRemove, page, toggleProps } ) {
 		>
 			{ ( { onClose } ) => (
 				<MenuGroup>
-					<RenamePostMenuItem item={ page } onClose={ onClose } />
+					<RenamePostMenuItem post={ page } onClose={ onClose } />
 					{ !! onRemove && (
 						<TrashPageMenuItem
 							page={ page }
