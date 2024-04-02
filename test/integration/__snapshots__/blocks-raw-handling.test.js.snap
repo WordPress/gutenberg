@@ -208,8 +208,8 @@ exports[`rawHandler should preserve all paragraphs 1`] = `
 <p>&nbsp;&nbsp;</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:paragraph -->
-<p></p>
+<!-- wp:paragraph {"className":"p"} -->
+<p class="p"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
