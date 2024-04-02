@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-export default function RenameMenuItem( { item, onClose } ) {
+export default function RenamePostMenuItem( { item, onClose } ) {
 	const title = decodeEntities(
 		typeof item.title === 'string' ? item.title : item.title.rendered
 	);
