@@ -43,6 +43,7 @@ import { unlock } from '../../../lock-unlock';
 const { PostCardPanel } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
+const { PatternOverridesPanel } = unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -123,6 +124,7 @@ const SidebarContent = ( {
 							<PostExcerptPanel />
 							<PostDiscussionPanel />
 							<PageAttributesPanel />
+							<PatternOverridesPanel />
 							<MetaBoxes location="side" />
 						</>
 					) }
