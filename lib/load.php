@@ -163,6 +163,8 @@ require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-families-contr
 require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-faces-controller.php';
 require __DIR__ . '/compat/wordpress-6.5/fonts/class-wp-rest-font-collections-controller.php';
 require __DIR__ . '/compat/wordpress-6.5/fonts/fonts.php';
+require __DIR__ . '/compat/wordpress-6.6/fonts/class-gutenberg-rest-font-faces-controller.php';
+require __DIR__ . '/compat/wordpress-6.6/fonts/fonts.php';
 
 // Load the Font Face and Font Face Resolver, if not already loaded by WordPress Core.
 if ( ! class_exists( 'WP_Font_Face' ) ) {
