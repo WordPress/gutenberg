@@ -6,13 +6,19 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-function TemplateValidationNotice( { isValid, ...props } ) {
+export default function TemplateValidationNotice() {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
+	const { isValid } = useSelect( ( select ) => {
+		return {
+			isValid: select( blockEditorStore ).isValidTemplate(),
+		};
+	}, [] );
+	const { setTemplateValidity, synchronizeTemplate } =
+		useDispatch( blockEditorStore );
 
 	if ( isValid ) {
 		return null;
@@ -27,7 +33,7 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 				actions={ [
 					{
 						label: __( 'Keep it as is' ),
-						onClick: props.resetTemplateValidity,
+						onClick: () => setTemplateValidity( true ),
 					},
 					{
 						label: __( 'Reset the template' ),
@@ -43,7 +49,7 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 				isOpen={ showConfirmDialog }
 				onConfirm={ () => {
 					setShowConfirmDialog( false );
-					props.synchronizeTemplate();
+					synchronizeTemplate();
 				} }
 				onCancel={ () => setShowConfirmDialog( false ) }
 			>
@@ -54,17 +60,3 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 		</>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => ( {
-		isValid: select( blockEditorStore ).isValidTemplate(),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { setTemplateValidity, synchronizeTemplate } =
-			dispatch( blockEditorStore );
-		return {
-			resetTemplateValidity: () => setTemplateValidity( true ),
-			synchronizeTemplate,
-		};
-	} ),
-] )( TemplateValidationNotice );
