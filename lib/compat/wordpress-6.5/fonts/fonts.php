@@ -392,7 +392,7 @@ function gutenberg_before_delete_font_face( $post_id, $post ) {
 		$site_path = '/sites/' . get_current_blog_id();
 	}
 
-	$font_dir   = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
+	$font_dir = path_join( WP_CONTENT_DIR, 'fonts' ) . $site_path;
 
 	foreach ( $font_files as $font_file ) {
 		$font_path = $font_dir . '/' . $font_file;
