@@ -4,11 +4,6 @@
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
- * WordPress dependencies
- */
-import { createSelector } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import getQueryParts from './get-query-parts';
@@ -108,7 +103,7 @@ function getQueriedItemsUncached( state, query ) {
  *
  * @return {?Array} Query items.
  */
-export const getQueriedItems = createSelector( ( state, query = {} ) => {
+export const getQueriedItems = ( state, query = {} ) => {
 	let queriedItemsCache = queriedItemsCacheByState.get( state );
 	if ( queriedItemsCache ) {
 		const queriedItems = queriedItemsCache.get( query );
@@ -123,7 +118,7 @@ export const getQueriedItems = createSelector( ( state, query = {} ) => {
 	const items = getQueriedItemsUncached( state, query );
 	queriedItemsCache.set( query, items );
 	return items;
-} );
+};
 
 export function getQueriedTotalItems( state, query = {} ) {
 	const { stableKey, context } = getQueryParts( query );
