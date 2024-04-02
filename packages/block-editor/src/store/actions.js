@@ -1451,77 +1451,83 @@ export const __unstableSetEditorMode =
 
 			const prevMode = select.__unstableGetEditorMode();
 
-			const sectionsContainerClientId = unlock(
-				registry.select( STORE_NAME )
-			).getSectionsContainerClientId();
+			if ( mode === 'zoom-out' || prevMode === 'zoom-out' ) {
+				const sectionsContainerClientId = unlock(
+					registry.select( STORE_NAME )
+				).getSectionsContainerClientId();
 
-			if ( sectionsContainerClientId ) {
-				const sectionsClientIds = select.getClientIdsOfDescendants(
-					sectionsContainerClientId
-				);
-				if ( mode === 'zoom-out' ) {
-					dispatch.setBlockEditingMode(
-						'' /* rootClientId */,
-						'disabled'
+				if ( sectionsContainerClientId ) {
+					const sectionsClientIds = select.getClientIdsOfDescendants(
+						sectionsContainerClientId
 					);
-					dispatch.setBlockEditingMode(
-						sectionsContainerClientId,
-						'contentOnly'
-					);
-					sectionsClientIds.forEach( ( clientId ) =>
-						dispatch.setBlockEditingMode( clientId, 'default' )
-					);
-				} else if ( prevMode === 'zoom-out' ) {
-					dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
-					dispatch.unsetBlockEditingMode( sectionsContainerClientId );
-					sectionsClientIds.forEach( ( clientId ) => {
-						dispatch.unsetBlockEditingMode( clientId );
-					} );
-				}
-			} else {
-				const sectionsClientIds = select.getBlockOrder();
-				const disabledSectionsClientIds = sectionsClientIds.filter(
-					( clientId ) => {
-						const block = select.getBlock( clientId );
-						return block.name === 'core/template-part';
+					if ( mode === 'zoom-out' ) {
+						dispatch.setBlockEditingMode(
+							'' /* rootClientId */,
+							'disabled'
+						);
+						dispatch.setBlockEditingMode(
+							sectionsContainerClientId,
+							'contentOnly'
+						);
+						sectionsClientIds.forEach( ( clientId ) =>
+							dispatch.setBlockEditingMode( clientId, 'default' )
+						);
+					} else if ( prevMode === 'zoom-out' ) {
+						dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+						dispatch.unsetBlockEditingMode(
+							sectionsContainerClientId
+						);
+						sectionsClientIds.forEach( ( clientId ) => {
+							dispatch.unsetBlockEditingMode( clientId );
+						} );
 					}
-				);
-				const sectionClientIdsInnerBlocks = sectionsClientIds.flatMap(
-					( clientId ) => {
-						const block = select.getBlock( clientId );
-						if ( block.name === 'core/template-part' ) {
-							return [];
+				} else {
+					const sectionsClientIds = select.getBlockOrder();
+					const disabledSectionsClientIds = sectionsClientIds.filter(
+						( clientId ) => {
+							const block = select.getBlock( clientId );
+							return block.name === 'core/template-part';
 						}
-						return block.innerBlocks.map(
-							( innerBlock ) => innerBlock.clientId
+					);
+					const sectionClientIdsInnerBlocks =
+						sectionsClientIds.flatMap( ( clientId ) => {
+							const block = select.getBlock( clientId );
+							if ( block.name === 'core/template-part' ) {
+								return [];
+							}
+							return block.innerBlocks.map(
+								( innerBlock ) => innerBlock.clientId
+							);
+						} );
+					if ( mode === 'zoom-out' ) {
+						dispatch.setBlockEditingMode(
+							'' /* rootClientId */,
+							'contentOnly'
+						);
+						sectionsClientIds.forEach( ( clientId ) =>
+							dispatch.setBlockEditingMode(
+								clientId,
+								'contentOnly'
+							)
+						);
+						disabledSectionsClientIds.forEach( ( clientId ) =>
+							dispatch.setBlockEditingMode( clientId, 'disabled' )
+						);
+						sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
+							dispatch.setBlockEditingMode( clientId, 'disabled' )
+						);
+					} else if ( prevMode === 'zoom-out' ) {
+						dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+						sectionsClientIds.forEach( ( clientId ) =>
+							dispatch.unsetBlockEditingMode( clientId )
+						);
+						disabledSectionsClientIds.forEach( ( clientId ) =>
+							dispatch.unsetBlockEditingMode( clientId )
+						);
+						sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
+							dispatch.unsetBlockEditingMode( clientId )
 						);
 					}
-				);
-				if ( mode === 'zoom-out' ) {
-					dispatch.setBlockEditingMode(
-						'' /* rootClientId */,
-						'contentOnly'
-					);
-					sectionsClientIds.forEach( ( clientId ) =>
-						dispatch.setBlockEditingMode( clientId, 'contentOnly' )
-					);
-					disabledSectionsClientIds.forEach( ( clientId ) =>
-						dispatch.setBlockEditingMode( clientId, 'disabled' )
-					);
-					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
-						dispatch.setBlockEditingMode( clientId, 'disabled' )
-					);
-				} else if ( prevMode === 'zoom-out' ) {
-					dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
-					sectionsClientIds.forEach( ( clientId ) =>
-						dispatch.unsetBlockEditingMode( clientId )
-					);
-					disabledSectionsClientIds.forEach( ( clientId ) =>
-						dispatch.unsetBlockEditingMode( clientId )
-					);
-					sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
-						dispatch.unsetBlockEditingMode( clientId )
-					);
 				}
 			}
 
