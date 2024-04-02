@@ -121,7 +121,6 @@ function GridItem( {
 								key={ field.id }
 								className={ classnames(
 									'dataviews-view-grid__field-value',
-									`dataviews-view-grid__field-${ field.id }`,
 									'is-badge'
 								) }
 							>
