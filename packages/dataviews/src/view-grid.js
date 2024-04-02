@@ -208,7 +208,7 @@ export default function ViewGrid( {
 			}
 			// If the field is a badge field, add it to the badgeFields array
 			// otherwise add it to the rest visibleFields array.
-			const key = view.layout.displayAsBadgeFields?.includes( field.id )
+			const key = view.layout.badgeFields?.includes( field.id )
 				? 'badgeFields'
 				: 'visibleFields';
 			accumulator[ key ].push( field );

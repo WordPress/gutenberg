@@ -68,7 +68,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
-		displayAsBadgeFields: [ 'sync-status' ],
+		badgeFields: [ 'sync-status' ],
 	},
 };
 const DEFAULT_VIEW = {
