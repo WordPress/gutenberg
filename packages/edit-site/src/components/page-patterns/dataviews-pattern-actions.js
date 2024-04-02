@@ -338,7 +338,9 @@ export const resetAction = {
 		const { removeTemplate } = useDispatch( editSiteStore );
 		return (
 			<VStack spacing="5">
-				<Text>{ __( 'Reset and clear all customizations?' ) }</Text>
+				<Text>
+					{ __( 'Reset to default and clear all customizations?' ) }
+				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
 						{ __( 'Cancel' ) }
