@@ -56,7 +56,7 @@ describe( 'ProgressBar', () => {
 		const indicator = container.firstChild?.firstChild;
 
 		expect( indicator ).toHaveStyle( {
-			width: '55%',
+			'--indicator-width': '55%',
 		} );
 	} );
 
