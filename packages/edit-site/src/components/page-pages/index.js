@@ -155,6 +155,7 @@ const STATUSES = [
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
 function FeaturedImage( { item, viewType } ) {
+	const isDisabled = item.status === 'trash';
 	const { onClick } = useLink( {
 		postId: item.id,
 		postType: item.type,
@@ -182,7 +183,8 @@ function FeaturedImage( { item, viewType } ) {
 					viewType === LAYOUT_TABLE,
 			} ) }
 			type="button"
-			onClick={ onClick }
+			onClick={ isDisabled ? undefined : onClick }
+			aria-disabled={ isDisabled }
 			aria-label={ item.title?.rendered || __( '(no title)' ) }
 		>
 			{ media }
