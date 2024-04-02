@@ -66,7 +66,6 @@ export function convertLegacyData( data ) {
 		'panels',
 		convertEditPostPanels
 	);
-	// TODO: check this..
 	data = moveIndividualPreference(
 		data,
 		{ from: 'core/editor', to: 'core' },
