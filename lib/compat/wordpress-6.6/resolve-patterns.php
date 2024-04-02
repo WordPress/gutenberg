@@ -8,14 +8,25 @@
  * @return array Array of blocks with patterns replaced.
  */
 function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
+	// Keep track of seen references to avoid infinite loops.
+	static $seen_refs = array();
 	$i = 0;
-	// Also process new blocks that are inserted.
 	while ( $i < count( $blocks ) ) {
 		if ( 'core/pattern' === $blocks[ $i ]['blockName'] ) {
+			$slug = $blocks[ $i ]['attrs']['slug'];
+
+			if ( isset( $seen_refs[ $slug ] ) ) {
+				// Skip recursive patterns.
+				array_splice( $blocks, $i, 1 );
+				continue;
+			}
+
 			$registry         = WP_Block_Patterns_Registry::get_instance();
-			$pattern          = $registry->get_registered( $blocks[ $i ]['attrs']['slug'] );
-			$pattern_content  = $pattern['content'];
-			$blocks_to_insert = parse_blocks( $pattern_content );
+			$pattern          = $registry->get_registered( $slug );
+			$blocks_to_insert = parse_blocks( $pattern['content'] );
+			$seen_refs[ $slug ] = true;
+			$blocks_to_insert = gutenberg_replace_pattern_blocks( $blocks_to_insert );
+			unset( $seen_refs[ $slug ] );
 			array_splice( $blocks, $i, 1, $blocks_to_insert );
 
 			// If we have inner content, we need to insert nulls in the
@@ -27,13 +38,18 @@ function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 				$nulls         = array_fill( 0, count( $blocks_to_insert ), null );
 				array_splice( $inner_content, $content_index, 1, $nulls );
 			}
-		} elseif ( ! empty( $blocks[ $i ]['innerBlocks'] ) ) {
-			$blocks[ $i ]['innerBlocks'] = gutenberg_replace_pattern_blocks(
-				$blocks[ $i ]['innerBlocks'],
-				$blocks[ $i ]['innerContent']
-			);
+
+			// Skip inserted blocks.
+			$i += count( $blocks_to_insert );
+		} else {
+			if ( ! empty( $blocks[ $i ]['innerBlocks'] ) ) {
+				$blocks[ $i ]['innerBlocks'] = gutenberg_replace_pattern_blocks(
+					$blocks[ $i ]['innerBlocks'],
+					$blocks[ $i ]['innerContent']
+				);
+			}
+			++$i;
 		}
-		++$i;
 	}
 	return $blocks;
 }
