@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,8 +11,10 @@ import { store as blockEditorStore } from '../store';
 
 /**
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+ *
+ * @param {boolean} zoomOut If we should enter into zoomOut mode or not
  */
-export function useZoomOut() {
+export function useZoomOut( zoomOut = true ) {
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { mode } = useSelect( ( select ) => {
 		return {
@@ -20,17 +22,26 @@ export function useZoomOut() {
 		};
 	}, [] );
 
-	// Intentionality left without any dependency.
-	// This effect should only run when the component is rendered and unmounted.
-	// The effect opens the zoom-out view if it is not open before when applying a style variation.
+	const originalEditingMode = useRef( null );
+
 	useEffect( () => {
-		if ( mode !== 'zoom-out' ) {
-			__unstableSetEditorMode( 'zoom-out' );
-			return () => {
-				// Revert to original mode
-				__unstableSetEditorMode( mode );
-			};
+		// Only set this on mount so we know what to return to when we unmount.
+		if ( ! originalEditingMode.current ) {
+			originalEditingMode.current = mode;
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+
+		return () => {
+			// Reset to original mode on unmount
+			__unstableSetEditorMode( originalEditingMode.current );
+		};
 	}, [] );
+
+	// The effect opens the zoom-out view if we want it open and it's not currently in zoom-out mode.
+	useEffect( () => {
+		if ( zoomOut && mode !== 'zoom-out' ) {
+			__unstableSetEditorMode( 'zoom-out' );
+		} else if ( ! zoomOut && originalEditingMode.current !== mode ) {
+			__unstableSetEditorMode( originalEditingMode.current );
+		}
+	}, [ zoomOut, mode ] );
 }
