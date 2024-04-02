@@ -28,8 +28,7 @@
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
-		"@wordpress/keycodes": "file:../keycodes",
-		"rememo": "^4.0.2"
+		"@wordpress/keycodes": "file:../keycodes"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

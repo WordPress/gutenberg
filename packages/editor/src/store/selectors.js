@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -14,7 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';

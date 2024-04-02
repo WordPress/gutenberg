@@ -482,6 +482,10 @@ _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
 
+### createSelector
+
+Undocumented declaration.
+
 ### dispatch
 
 Given a store descriptor, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.
