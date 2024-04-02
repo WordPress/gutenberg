@@ -10,7 +10,7 @@
 function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 	// Keep track of seen references to avoid infinite loops.
 	static $seen_refs = array();
-	$i = 0;
+	$i                = 0;
 	while ( $i < count( $blocks ) ) {
 		if ( 'core/pattern' === $blocks[ $i ]['blockName'] ) {
 			$slug = $blocks[ $i ]['attrs']['slug'];
@@ -21,11 +21,11 @@ function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 				continue;
 			}
 
-			$registry         = WP_Block_Patterns_Registry::get_instance();
-			$pattern          = $registry->get_registered( $slug );
-			$blocks_to_insert = parse_blocks( $pattern['content'] );
+			$registry          = WP_Block_Patterns_Registry::get_instance();
+			$pattern           = $registry->get_registered( $slug );
+			$blocks_to_insert  = parse_blocks( $pattern['content'] );
 			$seen_refs[ $slug ] = true;
-			$blocks_to_insert = gutenberg_replace_pattern_blocks( $blocks_to_insert );
+			$blocks_to_insert  = gutenberg_replace_pattern_blocks( $blocks_to_insert );
 			unset( $seen_refs[ $slug ] );
 			array_splice( $blocks, $i, 1, $blocks_to_insert );
 

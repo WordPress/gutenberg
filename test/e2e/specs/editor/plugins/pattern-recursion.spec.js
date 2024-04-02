@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'Preventing Pattern Recursion', () => {
+test.describe( 'Preventing Pattern Recursion (client)', () => {
 	test.beforeEach( async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
 		await editor.canvas
@@ -35,5 +35,51 @@ test.describe( 'Preventing Pattern Recursion', () => {
 			'Pattern "evil/recursive" cannot be rendered inside itself'
 		);
 		await expect( warning ).toBeVisible();
+	} );
+} );
+
+test.describe( 'Preventing Pattern Recursion (server)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-protection-against-recursive-patterns'
+		);
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-protection-against-recursive-patterns'
+		);
+	} );
+
+	test( 'prevents infinite loops due to recursive patterns', async ( {
+		page,
+		editor,
+	} ) => {
+		// Click the Toggle block inserter button
+		await page
+			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.click();
+		// Click the Patterns tab
+		await page.getByRole( 'tab', { name: 'Patterns' } ).click();
+		// Click the Uncategorized tab
+		await page.getByRole( 'button', { name: 'Uncategorized' } ).click();
+		// Click the Evil recursive pattern
+		await page.getByRole( 'option', { name: 'Evil recursive' } ).click();
+		// By simply checking the editor content, we know that the pattern
+		// endpoint did not crash.
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello' },
+			},
+		] );
 	} );
 } );
