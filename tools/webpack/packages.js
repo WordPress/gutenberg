@@ -165,6 +165,14 @@ module.exports = {
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},
+	optimization: {
+		splitChunks: {
+			cacheGroups: {
+				default: false,
+				defaultVendors: false,
+			},
+		},
+	},
 	plugins: [
 		...plugins,
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
