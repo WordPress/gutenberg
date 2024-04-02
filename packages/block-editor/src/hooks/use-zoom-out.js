@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { getPath } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -13,6 +14,16 @@ import { store as blockEditorStore } from '../store';
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
  */
 export function useZoomOut() {
+	const isSiteEditor = getPath( window.location.href )?.includes(
+		'site-editor.php'
+	);
+
+	// The site editor is the only one that should be allowed to enter zoom out mode.
+	// It's OK to violate the rules of hooks here, as this will always return the same on the same page load.
+	if ( ! isSiteEditor ) {
+		return;
+	}
+	/* eslint-disable react-hooks/rules-of-hooks */
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const { mode } = useSelect( ( select ) => {
 		return {
@@ -33,4 +44,5 @@ export function useZoomOut() {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
+	/* eslint-enable react-hooks/rules-of-hooks */
 }
