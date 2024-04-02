@@ -75,7 +75,6 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			) : (
 				<EditorView
 					editorId={'block-library-html__editor'}
-					editorInstructionsId={'block-library-html__editor-instructions'}
 					editorInstructionsText={__(
 						`This editor allows you to input your custom HTML.`
 					)}

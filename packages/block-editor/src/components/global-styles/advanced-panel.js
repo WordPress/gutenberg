@@ -4,15 +4,13 @@
 import { Notice, __experimentalVStack as VStack, BaseControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { default as transformStyles } from '../../utils/transform-styles';
 import EditorView from './editor-view';
-
-const EDITOR_ID =
-	'block-editor-global-styles-advanced-panel__custom-css-editor';
 
 /**
  * Returns the value that should be set for the code editor height
@@ -60,11 +58,13 @@ function ensureMinLines( content ) {
 /**
  * Ensure the editor has at most max height to allow scrolling by `overflow-y: scroll`.
  * It needs to run after the editor DOM is mounted.
+ * 
+ * @param {string} editorId - The id of the editor.
  */
-function ensureMaxHeight() {
+function ensureMaxHeight(editorId) {
 	const editorHeight = getEditorHeight();
 	if ( editorHeight !== 0 ) {
-		const editor = document.getElementById( EDITOR_ID );
+		const editor = document.getElementById( editorId );
 		if ( editor ) {
 			editor.style.height = `${ editorHeight }px`;
 		}
@@ -78,6 +78,8 @@ export default function AdvancedPanel( {
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
+	const instanceId = useInstanceId( AdvancedPanel );
+
 	function handleOnChange( newValue ) {
 		onChange( {
 			...value,
@@ -117,7 +119,7 @@ export default function AdvancedPanel( {
 				</Notice>
 			) }
 			<BaseControl
-			id={ EDITOR_ID }
+				id={ instanceId }
 				help={`${__(
 					`This editor allows you to input Additional CSS and customize the site's appearance with your own styles.`
 				)} ${__(
@@ -127,10 +129,10 @@ export default function AdvancedPanel( {
 				label={__( 'Additional CSS' )}
 			>
 				<EditorView
-					editorId={EDITOR_ID}
+					editorId={instanceId}
 					initialConfig={
 						{
-							callback: ensureMaxHeight,
+							callback: () => ensureMaxHeight(instanceId),
 							content: ensureMinLines( inheritedValue?.css ),
 							onBlur: handleOnBlur,
 							onChange: handleOnChange,

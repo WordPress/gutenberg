@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { VisuallyHidden } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -24,10 +25,10 @@ function importLanguageSupport( mode ) {
 /**
  * @typedef {Object} Config
  * @property {Function} [callback] - Callback after the editor is initialized.
- * @property {string} content - Text content of the editor.
- * @property {Function} onChange - Callback for when the content changes.
- * @property {Function} [onBlur] - Callback for when the editor loses focus.
- * @property {string} mode - Language mode for the editor. Currently supports 'css' and 'html'.
+ * @property {string}   content    - Text content of the editor.
+ * @property {Function} onChange   - Callback for when the content changes.
+ * @property {Function} [onBlur]   - Callback for when the editor loses focus.
+ * @property {string}   mode       - Language mode for the editor. Currently supports 'css' and 'html'.
  */
 
 /**
@@ -35,13 +36,11 @@ function importLanguageSupport( mode ) {
  *
  * @param {Object} props
  * @param {string} props.editorId
- * @param {string} [props.editorInstructionsId]
  * @param {string} [props.editorInstructionsText] - Instructions text for accessibility.
- * @param {Config} props.initialConfig - Initial configuration for the editor. This can only be used for the initial setup of the editor.
+ * @param {Config} props.initialConfig            - Initial configuration for the editor. This can only be used for the initial setup of the editor.
  */
 const EditorView = ({
 	editorId,
-	editorInstructionsId, 
 	editorInstructionsText, 
 	initialConfig: {
 		callback,
@@ -52,6 +51,7 @@ const EditorView = ({
 	},
 }) => {
 	const editorRef = useRef(null);
+	const instanceId = useInstanceId( EditorView );
 	useEffect( () => {
 		( async () => {
 			/**
@@ -101,8 +101,8 @@ const EditorView = ({
 	}, [] );
 	return (
 		<>
-			{editorInstructionsId && (<VisuallyHidden
-				id={ editorInstructionsId }
+			{editorInstructionsText && (<VisuallyHidden
+				id={ instanceId }
 			>
 				{ editorInstructionsText }
 				{ __(
@@ -113,7 +113,7 @@ const EditorView = ({
 				ref={ editorRef }
 				id={ editorId }
 				className={ editorId }
-				aria-describedby={ editorInstructionsId }
+				aria-describedby={ instanceId }
 			></div>
 		</>
 	);
