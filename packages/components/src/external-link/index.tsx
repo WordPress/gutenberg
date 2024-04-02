@@ -13,7 +13,6 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../visually-hidden';
 import type { ExternalLinkProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -67,13 +66,15 @@ function UnforwardedExternalLink(
 			<span className="components-external-link__contents">
 				{ children }
 			</span>
-			<VisuallyHidden as="span">
-				{
+			<span
+				className="components-external-link__icon"
+				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )
 				}
-			</VisuallyHidden>
-			<span className="components-external-link__icon">&#8599;</span>
+			>
+				&#8599;
+			</span>
 		</a>
 		/* eslint-enable react/jsx-no-target-blank */
 	);
