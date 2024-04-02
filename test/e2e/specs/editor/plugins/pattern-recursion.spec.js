@@ -4,20 +4,24 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preventing Pattern Recursion', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.activatePlugin(
-			'gutenberg-test-protection-against-recursive-patterns'
-		);
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor, page } ) => {
 		await admin.createNewPost();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-protection-against-recursive-patterns'
-		);
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+				__experimentalBlockPatterns: [
+					{
+						name: 'evil/recursive',
+						title: 'Evil recursive',
+						description: 'Evil recursive',
+						content:
+							'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph --><!-- wp:pattern {"slug":"evil/recursive"} /-->',
+					},
+				],
+			} );
+		} );
 	} );
 
 	test( 'prevents infinite loops due to recursive patterns', async ( {

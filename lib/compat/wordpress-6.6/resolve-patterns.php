@@ -23,7 +23,7 @@ if ( ! function_exists( 'gutenberg_replace_pattern_blocks' ) ) {
 				// inner content array, otherwise serialize_blocks will skip
 				// blocks.
 				if ( $inner_content ) {
-					$null_indices   = array_keys( $inner_content, null, true );
+					$null_indices  = array_keys( $inner_content, null, true );
 					$content_index = $null_indices[ $i ];
 					$nulls         = array_fill( 0, count( $blocks_to_insert ), null );
 					array_splice( $inner_content, $content_index, 1, $nulls );
@@ -84,4 +84,3 @@ add_filter(
 	10,
 	3
 );
-
