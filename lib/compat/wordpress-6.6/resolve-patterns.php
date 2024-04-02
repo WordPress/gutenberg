@@ -1,86 +1,81 @@
 <?php
 
-if ( ! function_exists( 'gutenberg_replace_pattern_blocks' ) ) {
-	/**
-	 * Replaces pattern blocks with their content.
-	 *
-	 * @param array $blocks Array of blocks.
-	 * @param array $inner_content Optional array of inner content.
-	 * @return array Array of blocks with patterns replaced.
-	 */
-	function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
-		$i = 0;
-		// Also process new blocks that are inserted.
-		while ( $i < count( $blocks ) ) {
-			if ( 'core/pattern' === $blocks[ $i ]['blockName'] ) {
-				$registry         = WP_Block_Patterns_Registry::get_instance();
-				$pattern          = $registry->get_registered( $blocks[ $i ]['attrs']['slug'] );
-				$pattern_content  = $pattern['content'];
-				$blocks_to_insert = parse_blocks( $pattern_content );
-				array_splice( $blocks, $i, 1, $blocks_to_insert );
+/**
+ * Replaces pattern blocks with their content.
+ *
+ * @param array $blocks Array of blocks.
+ * @param array $inner_content Optional array of inner content.
+ * @return array Array of blocks with patterns replaced.
+ */
+function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
+	$i = 0;
+	// Also process new blocks that are inserted.
+	while ( $i < count( $blocks ) ) {
+		if ( 'core/pattern' === $blocks[ $i ]['blockName'] ) {
+			$registry         = WP_Block_Patterns_Registry::get_instance();
+			$pattern          = $registry->get_registered( $blocks[ $i ]['attrs']['slug'] );
+			$pattern_content  = $pattern['content'];
+			$blocks_to_insert = parse_blocks( $pattern_content );
+			array_splice( $blocks, $i, 1, $blocks_to_insert );
 
-				// If we have inner content, we need to insert nulls in the
-				// inner content array, otherwise serialize_blocks will skip
-				// blocks.
-				if ( $inner_content ) {
-					$null_indices  = array_keys( $inner_content, null, true );
-					$content_index = $null_indices[ $i ];
-					$nulls         = array_fill( 0, count( $blocks_to_insert ), null );
-					array_splice( $inner_content, $content_index, 1, $nulls );
-				}
-			} elseif ( ! empty( $blocks[ $i ]['innerBlocks'] ) ) {
-				$blocks[ $i ]['innerBlocks'] = gutenberg_replace_pattern_blocks(
-					$blocks[ $i ]['innerBlocks'],
-					$blocks[ $i ]['innerContent']
-				);
+			// If we have inner content, we need to insert nulls in the
+			// inner content array, otherwise serialize_blocks will skip
+			// blocks.
+			if ( $inner_content ) {
+				$null_indices  = array_keys( $inner_content, null, true );
+				$content_index = $null_indices[ $i ];
+				$nulls         = array_fill( 0, count( $blocks_to_insert ), null );
+				array_splice( $inner_content, $content_index, 1, $nulls );
 			}
-			++$i;
+		} elseif ( ! empty( $blocks[ $i ]['innerBlocks'] ) ) {
+			$blocks[ $i ]['innerBlocks'] = gutenberg_replace_pattern_blocks(
+				$blocks[ $i ]['innerBlocks'],
+				$blocks[ $i ]['innerContent']
+			);
 		}
-		return $blocks;
+		++$i;
 	}
+	return $blocks;
 }
 
-add_filter(
-	'get_block_templates',
-	function ( $templates ) {
-		foreach ( $templates as $template ) {
-			$blocks            = parse_blocks( $template->content );
-			$blocks            = gutenberg_replace_pattern_blocks( $blocks );
-			$template->content = serialize_blocks( $blocks );
-		}
-		return $templates;
-	}
-);
-
-add_filter(
-	'get_block_template',
-	function ( $template ) {
+function gutenberg_replace_pattern_blocks_get_block_templates( $templates ) {
+	foreach ( $templates as $template ) {
 		$blocks            = parse_blocks( $template->content );
 		$blocks            = gutenberg_replace_pattern_blocks( $blocks );
 		$template->content = serialize_blocks( $blocks );
-		return $template;
 	}
-);
+	return $templates;
+}
 
-add_filter(
-	'rest_post_dispatch',
-	function ( $result, $server, $request ) {
-		if ( $request->get_route() !== '/wp/v2/block-patterns/patterns' ) {
-			return $result;
-		}
+function gutenberg_replace_pattern_blocks_get_block_template( $template ) {
+	$blocks            = parse_blocks( $template->content );
+	$blocks            = gutenberg_replace_pattern_blocks( $blocks );
+	$template->content = serialize_blocks( $blocks );
+	return $template;
+}
 
-		$data = $result->get_data();
-
-		foreach ( $data as $index => $pattern ) {
-			$blocks                    = parse_blocks( $pattern['content'] );
-			$blocks                    = gutenberg_replace_pattern_blocks( $blocks );
-			$data[ $index ]['content'] = serialize_blocks( $blocks );
-		}
-
-		$result->set_data( $data );
-
+function gutenberg_replace_pattern_blocks_patterns_endpoint( $result, $server, $request ) {
+	if ( $request->get_route() !== '/wp/v2/block-patterns/patterns' ) {
 		return $result;
-	},
-	10,
-	3
-);
+	}
+
+	$data = $result->get_data();
+
+	foreach ( $data as $index => $pattern ) {
+		$blocks                    = parse_blocks( $pattern['content'] );
+		$blocks                    = gutenberg_replace_pattern_blocks( $blocks );
+		$data[ $index ]['content'] = serialize_blocks( $blocks );
+	}
+
+	$result->set_data( $data );
+
+	return $result;
+}
+
+// For core merge, we should avoid the double parse and replace the patterns in templates here:
+// https://github.com/WordPress/wordpress-develop/blob/02fb53498f1ce7e63d807b9bafc47a7dba19d169/src/wp-includes/block-template-utils.php#L558
+add_filter( 'get_block_templates', 'gutenberg_replace_pattern_blocks_get_block_templates' );
+add_filter( 'get_block_template', 'gutenberg_replace_pattern_blocks_get_block_template' );
+// Similarly, for patterns, we can avoid the double parse here:
+// https://github.com/WordPress/wordpress-develop/blob/02fb53498f1ce7e63d807b9bafc47a7dba19d169/src/wp-includes/class-wp-block-patterns-registry.php#L175
+add_filter( 'rest_post_dispatch', 'gutenberg_replace_pattern_blocks_patterns_endpoint', 10, 3 );
