@@ -28,13 +28,12 @@ export default function AdvancedPanel( {
 			css: newValue,
 		} );
 		if ( cssError ) {
-			// Pass a wrapping selector to transformStyles to ensure that the CSS
-			// tested resembles actual CSS rules. This is necessary because the additional CSS
-			// field supports CSS rules that are not wrapped in a selector.
-			// Note: The wrapping selector here is not used in the actual output of any styles.
+			// Check if the new value is valid CSS, and pass a wrapping selector
+			// to ensure that `transformStyles` validates the CSS. Note that the
+			// wrapping selector here is not used in the actual output of any styles.
 			const [ transformed ] = transformStyles(
 				[ { css: newValue } ],
-				'.editor-styles-wrapper'
+				'.for-validation-only'
 			);
 			if ( transformed ) {
 				setCSSError( null );
@@ -47,13 +46,12 @@ export default function AdvancedPanel( {
 			return;
 		}
 
-		// Pass a wrapping selector to transformStyles to ensure that the CSS
-		// tested resembles actual CSS rules. This is necessary because the additional CSS
-		// field supports CSS rules that are not wrapped in a selector.
-		// Note: The wrapping selector here is not used in the actual output of any styles.
+		// Check if the new value is valid CSS, and pass a wrapping selector
+		// to ensure that `transformStyles` validates the CSS. Note that the
+		// wrapping selector here is not used in the actual output of any styles.
 		const [ transformed ] = transformStyles(
 			[ { css: event.target.value } ],
-			'.editor-styles-wrapper'
+			'.for-validation-only'
 		);
 
 		setCSSError(
