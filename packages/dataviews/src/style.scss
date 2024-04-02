@@ -373,11 +373,6 @@
 			align-items: center;
 			font-size: 12px;
 		}
-
-		&:not(:empty) + .dataviews-view-grid__fields:not(:empty) {
-			padding-top: $grid-unit-15;
-			border-top: 1px solid $gray-100;
-		}
 	}
 }
 

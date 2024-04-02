@@ -21,6 +21,7 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'featured-image',
 		primaryField: 'title',
+		badgeFields: [ 'author', 'status' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
