@@ -2,8 +2,14 @@
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import {
+	memo,
+	useMemo,
+	useEffect,
+	useId,
+	useState,
+	useContext,
+} from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -18,8 +24,8 @@ import {
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
-import { store as blockEditorStore } from '../store';
-import { unlock } from '../lock-unlock';
+import { updateStyleContext } from '../components/editor-styles';
+
 /**
  * External dependencies
  */
@@ -134,32 +140,30 @@ export function shouldSkipSerialization(
 }
 
 export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
-	const { setStyleOverride, deleteStyleOverride } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const setOverrides = useContext( updateStyleContext );
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
 		if ( ! css && ! assets ) return;
 		const _id = id || fallbackId;
-		setStyleOverride( _id, {
-			id,
-			css,
-			assets,
-			__unstableType,
+		setOverrides( ( prev ) => {
+			const next = new Map( prev );
+			next.set( _id, {
+				id,
+				css,
+				assets,
+				__unstableType,
+			} );
+			return next;
 		} );
 		return () => {
-			deleteStyleOverride( _id );
+			setOverrides( ( prev ) => {
+				const next = new Map( prev );
+				next.delete( _id );
+				return next;
+			} );
 		};
-	}, [
-		id,
-		css,
-		assets,
-		__unstableType,
-		fallbackId,
-		setStyleOverride,
-		deleteStyleOverride,
-	] );
+	}, [ id, css, assets, __unstableType, fallbackId, setOverrides ] );
 }
 
 /**

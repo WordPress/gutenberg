@@ -9,15 +9,19 @@ import a11yPlugin from 'colord/plugins/a11y';
  * WordPress dependencies
  */
 import { SVG } from '@wordpress/components';
-import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import {
+	useCallback,
+	useMemo,
+	createContext,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../utils/transform-styles';
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+
+export const updateStyleContext = createContext( () => {} );
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -68,10 +72,7 @@ function useDarkThemeBodyClassName( styles, scope ) {
 }
 
 export default function EditorStyles( { styles, scope } ) {
-	const overrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
-		[]
-	);
+	const [ overrides, setOverrides ] = useState( new Map() );
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
 
@@ -98,7 +99,7 @@ export default function EditorStyles( { styles, scope } ) {
 	}, [ styles, overrides, scope ] );
 
 	return (
-		<>
+		<updateStyleContext.Provider value={ setOverrides }>
 			{ /* Use an empty style element to have a document reference,
 			     but this could be any element. */ }
 			<style
@@ -121,6 +122,6 @@ export default function EditorStyles( { styles, scope } ) {
 				} }
 				dangerouslySetInnerHTML={ { __html: transformedSvgs } }
 			/>
-		</>
+		</updateStyleContext.Provider>
 	);
 }
