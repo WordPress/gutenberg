@@ -63,6 +63,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
+				canMoveBlock,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -107,6 +108,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
 				canRemove: canRemoveBlock( clientId, rootClientId ),
+				canMove: canMoveBlock( clientId, rootClientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -120,6 +122,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
 		canRemove,
+		canMove,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
@@ -318,7 +321,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 						</BlockDraggable>
 					) }
 				</FlexItem>
-				{ editorMode === 'zoom-out' && (
+				{ canMove && canRemove && editorMode === 'zoom-out' && (
 					<Shuffle clientId={ clientId } as={ Button } />
 				) }
 				{ canRemove &&
