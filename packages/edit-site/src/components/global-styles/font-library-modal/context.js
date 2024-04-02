@@ -39,8 +39,9 @@ import { toggleFont } from './utils/toggleFont';
 export const FontLibraryContext = createContext( {} );
 
 function FontLibraryProvider( { children } ) {
-	const { __experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits } =
-		useDispatch( coreStore );
+	const {
+		__experimentalUpdateSpecifiedEntityEdits: updateSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
 	const { globalStylesId } = useSelect( ( select ) => {
 		const { __experimentalGetCurrentGlobalStylesId } = select( coreStore );
 		return { globalStylesId: __experimentalGetCurrentGlobalStylesId() };
@@ -96,7 +97,7 @@ function FontLibraryProvider( { children } ) {
 
 	// Save font families to the global styles post in the database.
 	const saveFontFamilies = () => {
-		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
+		updateSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
 			'settings.typography.fontFamilies',
 		] );
 	};
@@ -325,7 +326,7 @@ function FontLibraryProvider( { children } ) {
 				activateCustomFontFamilies( fontFamiliesToActivate );
 
 				// Save the global styles to the database.
-				await saveSpecifiedEntityEdits(
+				await updateSpecifiedEntityEdits(
 					'root',
 					'globalStyles',
 					globalStylesId,
@@ -362,7 +363,7 @@ function FontLibraryProvider( { children } ) {
 			if ( uninstalledFontFamily.deleted ) {
 				deactivateFontFamily( fontFamilyToUninstall );
 				// Save the global styles to the database.
-				await saveSpecifiedEntityEdits(
+				await updateSpecifiedEntityEdits(
 					'root',
 					'globalStyles',
 					globalStylesId,
