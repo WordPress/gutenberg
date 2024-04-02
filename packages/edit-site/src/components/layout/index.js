@@ -57,7 +57,7 @@ const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.3;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -243,7 +243,9 @@ export default function Layout() {
 								} }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
 							>
