@@ -981,21 +981,6 @@ test.describe( 'Image - lightbox', () => {
 					canvas: 'edit',
 				} );
 
-				const imageBlocks = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-
-				const count = await imageBlocks.count(); // Get the count of elements
-
-				for ( let i = count - 1; i >= 0; i-- ) {
-					const block = imageBlocks.nth( i );
-					await block.click();
-					await page.keyboard.press( 'Backspace' );
-					if ( i === 0 ) {
-						await editor.saveSiteEditorEntities();
-					}
-				}
-
 				await page
 					.getByRole( 'region', { name: 'Editor top bar' } )
 					.getByRole( 'button', { name: 'Styles' } )
