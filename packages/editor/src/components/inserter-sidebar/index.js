@@ -5,13 +5,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,22 +33,34 @@ export default function InserterSidebar( {
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: null,
-	} );
 
 	const libraryRef = useRef();
 	useEffect( () => {
 		libraryRef.current.focusSearch();
 	}, [] );
 
+	const useEscape = useRefEffect( ( element ) => {
+		function onKeyDown( event ) {
+			const { keyCode } = event;
+
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( keyCode === ESCAPE ) {
+				event.preventDefault();
+				setIsInserterOpened( false );
+			}
+		}
+
+		element.addEventListener( 'keydown', onKeyDown );
+		return () => {
+			element.removeEventListener( 'keydown', onKeyDown );
+		};
+	}, [] );
+
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="editor-inserter-sidebar"
-		>
+		<div ref={ useEscape } className="editor-inserter-sidebar">
 			<TagName className="editor-inserter-sidebar__header">
 				<Button
 					icon={ close }
