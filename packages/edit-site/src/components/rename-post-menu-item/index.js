@@ -42,6 +42,10 @@ export default function RenamePostMenuItem( { post, onClose } ) {
 	async function onRename( event ) {
 		event.preventDefault();
 
+		if ( editedTitle === title ) {
+			return;
+		}
+
 		try {
 			await editEntityRecord( 'postType', post.type, post.id, {
 				title: editedTitle,
