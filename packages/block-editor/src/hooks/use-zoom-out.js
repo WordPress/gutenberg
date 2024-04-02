@@ -16,13 +16,10 @@ import { store as blockEditorStore } from '../store';
  */
 export function useZoomOut( zoomOut = true ) {
 	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
-	const { mode } = useSelect( ( select ) => {
-		return {
-			mode: select( blockEditorStore ).__unstableGetEditorMode(),
-		};
-	}, [] );
+	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 
 	const originalEditingMode = useRef( null );
+	const mode = __unstableGetEditorMode();
 
 	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
@@ -31,8 +28,10 @@ export function useZoomOut( zoomOut = true ) {
 		}
 
 		return () => {
-			// Reset to original mode on unmount
-			__unstableSetEditorMode( originalEditingMode.current );
+			// We need to use  __unstableGetEditorMode() here and not `mode`, as mode may not update on unmount
+			if ( __unstableGetEditorMode() !== originalEditingMode.current ) {
+				__unstableSetEditorMode( originalEditingMode.current );
+			}
 		};
 	}, [] );
 
