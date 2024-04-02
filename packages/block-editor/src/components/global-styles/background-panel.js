@@ -139,25 +139,25 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 
 	return (
 		<ItemGroup as="span">
-			<HStack justify="flex-start" as="span">
-				<span
-					className={ classnames(
-						'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
-						{
-							'has-image': imgUrl,
-						}
-					) }
-					aria-hidden
-				>
-					{ imgUrl && (
+			<HStack justify={ imgUrl ? 'flex-start' : 'center' } as="span">
+				{ imgUrl && (
+					<span
+						className={ classnames(
+							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
+							{
+								'has-image': imgUrl,
+							}
+						) }
+						aria-hidden
+					>
 						<span
 							className="block-editor-global-styles-background-panel__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
 						/>
-					) }
-				</span>
+					</span>
+				) }
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
