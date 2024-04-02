@@ -31,7 +31,7 @@ import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 const { PostCardPanel } = unlock( editorPrivateApis );
-const { PatternContentPanel } = unlock( editorPrivateApis );
+const { PatternOverridesPanel } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function TemplatesList( { availableTemplates, onSelect } ) {
@@ -141,7 +141,7 @@ export default function TemplatePanel() {
 			<PostExcerptPanel />
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
-			<PatternContentPanel />
+			<PatternOverridesPanel />
 		</>
 	);
 }

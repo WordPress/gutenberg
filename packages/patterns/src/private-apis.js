@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { lock } from './lock-unlock';
-import ContentPanel from './components/content-panel';
+import OverridesPanel from './components/overrides-panel';
 import {
 	default as CreatePatternModal,
 	CreatePatternModalContents,
@@ -29,7 +29,7 @@ import {
 
 export const privateApis = {};
 lock( privateApis, {
-	ContentPanel,
+	OverridesPanel,
 	CreatePatternModal,
 	CreatePatternModalContents,
 	DuplicatePatternModal,

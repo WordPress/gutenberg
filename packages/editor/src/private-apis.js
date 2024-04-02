@@ -10,7 +10,7 @@ import DocumentTools from './components/document-tools';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import ModeSwitcher from './components/mode-switcher';
-import PatternContentPanel from './components/pattern-content-panel';
+import PatternOverridesPanel from './components/pattern-overrides-panel';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostPanelRow from './components/post-panel-row';
 import PostViewLink from './components/post-view-link';
@@ -28,7 +28,7 @@ lock( privateApis, {
 	InserterSidebar,
 	ListViewSidebar,
 	ModeSwitcher,
-	PatternContentPanel,
+	PatternOverridesPanel,
 	PluginPostExcerpt,
 	PostPanelRow,
 	PostViewLink,

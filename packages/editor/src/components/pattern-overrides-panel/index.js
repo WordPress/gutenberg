@@ -10,17 +10,17 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { ContentPanel } = unlock( patternsPrivateApis );
+const { OverridesPanel } = unlock( patternsPrivateApis );
 
-export default function PatternContentPanel() {
-	const supportsPatternContentPanel = useSelect(
+export default function PatternOverridesPanel() {
+	const supportsPatternOverridesPanel = useSelect(
 		( select ) => select( editorStore ).getCurrentPostType() === 'wp_block',
 		[]
 	);
 
-	if ( ! supportsPatternContentPanel ) {
+	if ( ! supportsPatternOverridesPanel ) {
 		return null;
 	}
 
-	return <ContentPanel />;
+	return <OverridesPanel />;
 }

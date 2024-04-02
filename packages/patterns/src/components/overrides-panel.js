@@ -18,7 +18,7 @@ import { unlock } from '../lock-unlock';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
-export default function ContentPanel() {
+export default function OverridesPanel() {
 	const allClientIds = useSelect(
 		( select ) => select( blockEditorStore ).getClientIdsWithDescendants(),
 		[]
