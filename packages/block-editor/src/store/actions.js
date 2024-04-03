@@ -1455,6 +1455,9 @@ export const __unstableSetEditorMode =
 				).getSectionsContainerClientId();
 
 				if ( sectionsContainerClientId ) {
+					// If we have a sections container (usually a core/group
+					// <main> element), only allow editing of the contents of
+					// the container.
 					const sectionsClientIds = select.getClientIdsOfDescendants(
 						sectionsContainerClientId
 					);
@@ -1480,6 +1483,8 @@ export const __unstableSetEditorMode =
 						} );
 					}
 				} else {
+					// If we don't have a sections container, we get the top-level
+					// blocks and only allow editing those blocks.
 					const sectionsClientIds = select.getBlockOrder();
 					const disabledSectionsClientIds = sectionsClientIds.filter(
 						( clientId ) => {
