@@ -16,8 +16,6 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		/**
 		 * Creates a font face for the parent font family.
 		 *
-		 * @since 6.5.0
-		 *
 		 * @param WP_REST_Request $request Full details about the request.
 		 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 		 */
@@ -54,9 +52,11 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/file.php';
 			}
 
-			$srcs             = is_string( $settings['src'] ) ? array( $settings['src'] ) : $settings['src'];
-			$processed_srcs   = array();
-			$font_file_meta   = array();
+			$srcs           = is_string( $settings['src'] ) ? array( $settings['src'] ) : $settings['src'];
+			$processed_srcs = array();
+			$font_file_meta = array();
+
+			// @core-merge: add the next line to the body of the create_item method in WP_REST_Font_Faces_Controller.
 			$font_family_slug = $this->get_parent_font_family_post( $request['font_family_id'] )->post_name;
 
 			foreach ( $srcs as $src ) {
@@ -66,7 +66,8 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 					continue;
 				}
 
-				$file      = $file_params[ $src ];
+				$file = $file_params[ $src ];
+				// @core-merge: modify the the signature of handle_font_file_upload to accept a second parameter.
 				$font_file = $this->handle_font_file_upload_with_subdir( $file, $font_family_slug );
 				if ( is_wp_error( $font_file ) ) {
 					return $font_file;
@@ -100,8 +101,6 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 		/**
 		 * Handles the upload of a font file using wp_handle_upload().
 		 *
-		 * @since 6.5.0
-		 *
 		 * @param array $file Single file item from $_FILES.
 		 * @return array|WP_Error Array containing uploaded file attributes on success, or WP_Error object on failure.
 		 */
@@ -109,6 +108,7 @@ if ( class_exists( 'WP_REST_Font_Faces_Controller' ) ) {
 			add_filter( 'upload_mimes', array( 'WP_Font_Utils', 'get_allowed_font_mime_types' ) );
 			// Filter the upload directory to return the fonts directory.
 
+			// @core-merge: add the following filter function directly to handle_font_file_upload to use a subdirectory for uploading fonts.
 			$upload_filter = function ( $dir ) use ( $subdir ) {
 				$font_dir = _wp_filter_font_directory( $dir );
 
