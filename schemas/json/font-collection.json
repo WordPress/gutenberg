@@ -4,7 +4,7 @@
 	"type": "object",
 	"definitions": {
 		"fontFace": {
-			"description": "Font face theme.json settings, with added preview property.",
+			"description": "Font face settings, with added preview property.",
 			"type": "object",
 			"properties": {
 				"preview": {
@@ -107,7 +107,7 @@
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family theme.json settings, with added preview property.",
+						"description": "Font family settings, with added preview property.",
 						"type": "object",
 						"properties": {
 							"name": {
@@ -138,6 +138,7 @@
 								}
 							}
 						},
+						"required": [ "name", "fontFamily", "slug" ],
 						"additionalProperties": false
 					},
 					"categories": {
@@ -154,5 +155,5 @@
 		}
 	},
 	"additionalProperties": false,
-	"required": [ "$schema", "slug", "name", "font_families" ]
+	"required": [ "font_families" ]
 }

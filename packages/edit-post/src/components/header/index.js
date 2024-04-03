@@ -81,7 +81,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				!! select( editorStore ).getEditorSettings()
 					.onNavigateToPreviousEntityRecord,
 			isPublishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
+				select( editorStore ).isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 		};
 	}, [] );
