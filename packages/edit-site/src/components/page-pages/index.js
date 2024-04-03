@@ -387,6 +387,7 @@ export default function PagePages() {
 	return (
 		<Page
 			title={ __( 'Pages' ) }
+			className="edit-site-page-pages"
 			actions={
 				<>
 					<Button variant="primary" onClick={ openModal }>
