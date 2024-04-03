@@ -28,7 +28,7 @@ import {
 	getInsertBlockTypeDependants,
 } from './utils';
 import { orderBy } from '../utils/sorting';
-import { STORE_NAME } from './constants';
+import { ROOT_CONTAINER_CLIENT_ID, STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -182,7 +182,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 export function getBlocks( state, rootClientId ) {
 	const treeKey =
 		! rootClientId || ! areInnerBlocksControlled( state, rootClientId )
-			? rootClientId || ''
+			? rootClientId || ROOT_CONTAINER_CLIENT_ID
 			: 'controlled||' + rootClientId;
 	return state.blocks.tree.get( treeKey )?.innerBlocks || EMPTY_ARRAY;
 }
@@ -228,7 +228,7 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  * @return {Object[]} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = '' ) => {
+	( state, rootClientId = ROOT_CONTAINER_CLIENT_ID ) => {
 		deprecated(
 			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
 			{
@@ -293,7 +293,7 @@ export const getClientIdsOfDescendants = createSelector(
  * @return {Array} ids of top-level and descendant blocks.
  */
 export const getClientIdsWithDescendants = ( state ) =>
-	getClientIdsOfDescendants( state, '' );
+	getClientIdsOfDescendants( state, ROOT_CONTAINER_CLIENT_ID );
 
 /**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
@@ -1185,7 +1185,10 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.blocks.order.get( rootClientId || '' ) || EMPTY_ARRAY;
+	return (
+		state.blocks.order.get( rootClientId || ROOT_CONTAINER_CLIENT_ID ) ||
+		EMPTY_ARRAY
+	);
 }
 
 /**
@@ -1564,7 +1567,12 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
+	if (
+		getBlockEditingMode(
+			state,
+			rootClientId ?? ROOT_CONTAINER_CLIENT_ID
+		) === 'disabled'
+	) {
 		return false;
 	}
 
@@ -2888,15 +2896,15 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
  *
  * @see useBlockEditingMode
  *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID, or `''` for the root container.
+ * @param {Object}  state    Global application state.
+ * @param {string?} clientId The block client ID or the root container if omitted.
  *
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
-		( state, clientId = '' ) => {
+		( state, clientId = ROOT_CONTAINER_CLIENT_ID ) => {
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
@@ -2933,7 +2941,7 @@ export const getBlockEditingMode = createRegistrySelector(
  */
 export const isUngroupable = createRegistrySelector(
 	( select ) =>
-		( state, clientId = '' ) => {
+		( state, clientId = ROOT_CONTAINER_CLIENT_ID ) => {
 			const _clientId = clientId || getSelectedBlockClientId( state );
 			if ( ! _clientId ) {
 				return false;
