@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -22,12 +21,9 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	sortByTextFields,
-	getPaginationResults,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -41,20 +37,20 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
-	OPERATOR_IS_NONE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
 import {
-	useResetTemplateAction,
+	resetTemplateAction,
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './actions';
-import { postRevisionsAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -70,6 +66,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		displayAsColumnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -92,10 +89,6 @@ const DEFAULT_VIEW = {
 	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
 	filters: [],
 };
-
-function normalizeSearchInput( input = '' ) {
-	return removeAccents( input.trim().toLowerCase() );
-}
 
 function Title( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
@@ -148,7 +141,7 @@ function AuthorField( { item, viewType } ) {
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span>{ text }</span>
+			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
 }
@@ -297,6 +290,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				),
 				maxWidth: 400,
 				enableHiding: false,
+				enableGlobalSearch: true,
 			},
 		];
 		if ( postType === TEMPLATE_POST_TYPE ) {
@@ -324,6 +318,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				maxWidth: 400,
 				minWidth: 320,
 				enableSorting: false,
+				enableGlobalSearch: true,
 			} );
 		}
 		// TODO: The plan is to support fields reordering, which would require an API like `order` or something
@@ -343,77 +338,35 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	}, [ postType, authors, view.type ] );
 
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! records ) {
-			return {
-				data: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredData = [ ...records ];
-		// Handle global search.
-		if ( view.search ) {
-			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredData = filteredData.filter( ( item ) => {
-				const title = item.title?.rendered || item.slug;
-				return (
-					normalizeSearchInput( title ).includes(
-						normalizedSearch
-					) ||
-					normalizeSearchInput( item.description ).includes(
-						normalizedSearch
-					)
-				);
-			} );
-		}
-
-		// Handle filters.
-		if ( view.filters.length > 0 ) {
-			view.filters.forEach( ( filter ) => {
-				if (
-					filter.field === 'author' &&
-					filter.operator === OPERATOR_IS_ANY &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return filter.value.includes( item.author_text );
-					} );
-				} else if (
-					filter.field === 'author' &&
-					filter.operator === OPERATOR_IS_NONE &&
-					filter?.value?.length > 0
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return ! filter.value.includes( item.author_text );
-					} );
-				}
-			} );
-		}
-
-		// Handle sorting.
-		if ( view.sort ) {
-			filteredData = sortByTextFields( {
-				data: filteredData,
-				view,
-				fields,
-				textFields: [ 'title', 'author' ],
-			} );
-		}
-		// Handle pagination.
-		return getPaginationResults( {
-			data: filteredData,
-			view,
-		} );
+		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const resetTemplateAction = useResetTemplateAction();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
 	const actions = useMemo(
 		() => [
+			editAction,
 			resetTemplateAction,
 			renameTemplateAction,
-			postRevisionsAction,
+			viewRevisionsAction,
 			deleteTemplateAction,
 		],
-		[ resetTemplateAction ]
+		[ editAction, viewRevisionsAction ]
 	);
 
 	const onChangeView = useCallback(
@@ -466,7 +419,10 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
+				deferredRendering={
+					view.type === LAYOUT_GRID ||
+					! view.hiddenFields?.includes( 'preview' )
+				}
 			/>
 		</Page>
 	);

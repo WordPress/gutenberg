@@ -38,7 +38,7 @@ import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -90,21 +90,9 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function hasOverridableAttributes( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		)
-	);
-}
-
 function hasOverridableBlocks( blocks ) {
 	return blocks.some( ( block ) => {
-		if ( hasOverridableAttributes( block ) ) return true;
+		if ( isOverridableBlock( block ) ) return true;
 		return hasOverridableBlocks( block.innerBlocks );
 	} );
 }
@@ -133,7 +121,7 @@ function applyInitialContentValuesToInnerBlocks(
 		const metadataName =
 			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
 
-		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
+		if ( ! metadataName || ! isOverridableBlock( block ) ) {
 			return { ...block, innerBlocks };
 		}
 
@@ -184,7 +172,7 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
 		}
 		const metadataName =
 			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
-		if ( ! metadataName || ! hasOverridableAttributes( block ) ) {
+		if ( ! metadataName || ! isOverridableBlock( block ) ) {
 			continue;
 		}
 
@@ -217,7 +205,7 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
 		const editMode =
 			mode ||
-			( hasOverridableAttributes( block ) ? 'contentOnly' : 'disabled' );
+			( isOverridableBlock( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
 
 		setBlockEditMode(

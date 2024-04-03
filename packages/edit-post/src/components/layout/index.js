@@ -172,7 +172,7 @@ function Layout( { initialPost } ) {
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
-				) || select( editPostStore ).isPublishSidebarOpened()
+				) || select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
@@ -258,7 +258,12 @@ function Layout( { initialPost } ) {
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
-			return <InserterSidebar />;
+			return (
+				<InserterSidebar
+					closeGeneralSidebar={ closeGeneralSidebar }
+					isRightSidebarOpen={ sidebarIsOpened }
+				/>
+			);
 		}
 		if ( mode === 'visual' && isListViewOpened ) {
 			return <ListViewSidebar />;

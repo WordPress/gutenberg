@@ -190,6 +190,12 @@
 			> * {
 				flex-grow: 1;
 			}
+
+			&.dataviews-view-table__primary-field {
+				a {
+					flex-grow: 0;
+				}
+			}
 		}
 	}
 	.dataviews-view-table-header-button {
@@ -244,10 +250,10 @@
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
-		width: 100%;
+		flex-grow: 0;
 
 		&:hover {
-			color: $gray-900;
+			color: var(--wp-admin-theme-color);
 		}
 		@include link-reset();
 	}
@@ -327,7 +333,24 @@
 		}
 
 		.dataviews-view-grid__field {
-			.dataviews-view-grid__field-value {
+			align-items: flex-start;
+
+			&:not(.is-column) {
+				align-items: center;
+
+				.dataviews-view-grid__field-name {
+					width: 35%;
+				}
+
+				.dataviews-view-grid__field-value {
+					width: 65%;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+
+			.dataviews-view-grid__field-name {
 				color: $gray-700;
 			}
 		}
@@ -340,6 +363,7 @@
 
 	li {
 		margin: 0;
+		cursor: pointer;
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
@@ -355,14 +379,21 @@
 				background: $gray-100;
 				height: 1px;
 			}
+
+			> * {
+				width: 100%;
+			}
 		}
 
-		&:not(.is-selected):hover {
-			color: var(--wp-admin-theme-color);
-
-			.dataviews-view-list__primary-field,
-			.dataviews-view-list__fields {
+		&:not(.is-selected) {
+			&:hover,
+			&:focus-within {
 				color: var(--wp-admin-theme-color);
+
+				.dataviews-view-list__primary-field,
+				.dataviews-view-list__fields {
+					color: var(--wp-admin-theme-color);
+				}
 			}
 		}
 	}
@@ -388,8 +419,9 @@
 	.dataviews-view-list__item {
 		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-30;
 		width: 100%;
-		cursor: pointer;
-		&:focus {
+		scroll-margin: $grid-unit-10 0;
+
+		&:focus-visible {
 			&::before {
 				position: absolute;
 				content: "";
@@ -404,6 +436,7 @@
 		}
 		.dataviews-view-list__primary-field {
 			min-height: $grid-unit-05 * 5;
+			overflow: hidden;
 		}
 	}
 
@@ -449,7 +482,7 @@
 		line-height: $grid-unit-20;
 
 		.dataviews-view-list__field {
-			&:empty {
+			&:has(.dataviews-view-list__field-value:empty) {
 				display: none;
 			}
 		}

@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Draft a new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add new page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft a new page"i]' )
 		.locator( 'role=textbox[name="Page title"i]' )
@@ -97,26 +97,14 @@ test.describe( 'Pages', () => {
 		// Set up
 		await draftNewPage( page );
 		await addPageContent( editor, page );
-
-		/*
-		 * Test create page.Test creating a new page and editing the template.
-		 */
-		// Selecting a block in the template should display a notice.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Site Title',
-			} )
-			.click( { force: true } );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
-			)
-		).toBeVisible();
+		await editor.openDocumentSettingsSidebar();
 
 		// Switch to template editing focus.
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Page' } ).click();
+		await editorSettings
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
@@ -275,7 +263,9 @@ test.describe( 'Pages', () => {
 		await page
 			.locator( '.block-editor-block-patterns-list__list-item' )
 			.click();
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.
@@ -297,7 +287,9 @@ test.describe( 'Pages', () => {
 		await expect( templateItem ).toHaveCount( 1 );
 		await templateItem.click();
 		await expect( templateOptionsButton ).toHaveText( 'demo' );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Now reset, and apply the default template back.
 		await templateOptionsButton.click();

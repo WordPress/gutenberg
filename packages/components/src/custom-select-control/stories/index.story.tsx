@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { StoryFn } from '@storybook/react';
+
+/**
  * Internal dependencies
  */
 import CustomSelectControl from '..';
@@ -18,7 +23,7 @@ export default {
 	},
 };
 
-export const Default = CustomSelectControl.bind( {} );
+export const Default: StoryFn = CustomSelectControl.bind( {} );
 Default.args = {
 	label: 'Label',
 	options: [
@@ -46,7 +51,7 @@ Default.args = {
 	],
 };
 
-export const WithLongLabels = CustomSelectControl.bind( {} );
+export const WithLongLabels: StoryFn = CustomSelectControl.bind( {} );
 WithLongLabels.args = {
 	...Default.args,
 	options: [
@@ -65,7 +70,7 @@ WithLongLabels.args = {
 	],
 };
 
-export const WithHints = CustomSelectControl.bind( {} );
+export const WithHints: StoryFn = CustomSelectControl.bind( {} );
 WithHints.args = {
 	...Default.args,
 	options: [

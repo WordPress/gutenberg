@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.116.0
+-   [**] Highlight color formatting style improvements [#57650]
+
 ## 1.115.0
 -   [*] Improve consistency of the block outline indicating the currently selected block [#59415]
 -   [*] Gallery block items with in-progress, paused, or failed media uploads correctly display an highlight outline when selected [#59423]

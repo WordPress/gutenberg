@@ -300,7 +300,7 @@ export const Tooltip = styled.span< TooltipProps >`
 	) }
 `;
 
-// @todo: Refactor RangeControl with latest HStack configuration
+// @todo Refactor RangeControl with latest HStack configuration
 // @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;
