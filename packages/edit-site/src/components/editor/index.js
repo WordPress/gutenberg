@@ -254,7 +254,6 @@ export default function Editor( { isLoading, onClick } ) {
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
-							! isDistractionFree &&
 							isEditMode &&
 							isRightSidebarOpen &&
 							! isDistractionFree && (

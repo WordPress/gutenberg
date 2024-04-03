@@ -10,14 +10,17 @@ import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import NavigableRegion from '../navigable-region';
+
+const ANIMATION_DURATION = 0.2;
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -62,7 +65,13 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
+	const disableMotion = useReducedMotion();
 	const navigateRegionsProps = useNavigateRegions( shortcuts );
+	const defaultTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		ease: 'easeOut',
+	};
 
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -134,14 +143,21 @@ function InterfaceSkeleton(
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
-					{ !! secondarySidebar && (
-						<NavigableRegion
-							className="interface-interface-skeleton__secondary-sidebar"
-							ariaLabel={ mergedLabels.secondarySidebar }
-						>
-							{ secondarySidebar }
-						</NavigableRegion>
-					) }
+					<AnimatePresence initial={ false }>
+						{ !! secondarySidebar && (
+							<NavigableRegion
+								className="interface-interface-skeleton__secondary-sidebar"
+								ariaLabel={ mergedLabels.secondarySidebar }
+								as={ motion.div }
+								initial={ { x: '-100%' } }
+								animate={ { x: 0 } }
+								exit={ { x: '-100%' } }
+								transition={ defaultTransition }
+							>
+								{ secondarySidebar }
+							</NavigableRegion>
+						) }
+					</AnimatePresence>
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
 							{ notices }
@@ -153,14 +169,21 @@ function InterfaceSkeleton(
 					>
 						{ content }
 					</NavigableRegion>
-					{ !! sidebar && (
-						<NavigableRegion
-							className="interface-interface-skeleton__sidebar"
-							ariaLabel={ mergedLabels.sidebar }
-						>
-							{ sidebar }
-						</NavigableRegion>
-					) }
+					<AnimatePresence initial={ false }>
+						{ !! sidebar && (
+							<NavigableRegion
+								className="interface-interface-skeleton__sidebar"
+								ariaLabel={ mergedLabels.sidebar }
+								as={ motion.div }
+								initial={ { x: '100%' } }
+								animate={ { x: 0 } }
+								exit={ { x: '100%' } }
+								transition={ defaultTransition }
+							>
+								{ sidebar }
+							</NavigableRegion>
+						) }
+					</AnimatePresence>
 					{ !! actions && (
 						<NavigableRegion
 							className="interface-interface-skeleton__actions"
@@ -171,14 +194,21 @@ function InterfaceSkeleton(
 					) }
 				</div>
 			</div>
-			{ !! footer && (
-				<NavigableRegion
-					className="interface-interface-skeleton__footer"
-					ariaLabel={ mergedLabels.footer }
-				>
-					{ footer }
-				</NavigableRegion>
-			) }
+			<AnimatePresence initial={ false }>
+				{ !! footer && (
+					<NavigableRegion
+						className="interface-interface-skeleton__footer"
+						ariaLabel={ mergedLabels.footer }
+						as={ motion.div }
+						initial={ { y: '100%' } }
+						animate={ { y: 0 } }
+						exit={ { y: '100%' } }
+						transition={ defaultTransition }
+					>
+						{ footer }
+					</NavigableRegion>
+				) }
+			</AnimatePresence>
 		</div>
 	);
 }
