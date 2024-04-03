@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 (2024-04-03)
+
 ### Enhancement
 
 - The `enumeration` type has been removed and we'll introduce new field types soon. The existing filters will still work as before given they checked for field.elements, which is still a condition filters should have.
