@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.3.0 (2024-04-03)
+
 ### Bug Fix
 
 -   `Dropdown`: Fix bug with separator styling. ([#60336](https://github.com/WordPress/gutenberg/pull/60336)).
