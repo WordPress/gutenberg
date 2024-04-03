@@ -47,6 +47,7 @@ export default function TemplateValidationNotice() {
 			</Notice>
 			<ConfirmDialog
 				isOpen={ showConfirmDialog }
+				confirmButtonText={ __( 'Reset' ) }
 				onConfirm={ () => {
 					setShowConfirmDialog( false );
 					synchronizeTemplate();
