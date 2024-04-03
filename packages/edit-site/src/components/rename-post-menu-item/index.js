@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
-export default function RenamePostMenuItem( { post, onClose } ) {
+export default function RenamePostMenuItem( { post } ) {
 	const title = decodeEntities(
 		typeof post.title === 'string' ? post.title : post.title.rendered
 	);
@@ -54,7 +54,6 @@ export default function RenamePostMenuItem( { post, onClose } ) {
 			// Update state before saving rerenders the list.
 			setEditedTitle( '' );
 			setIsModalOpen( false );
-			onClose();
 
 			// Persist edited entity.
 			await saveSpecifiedEntityEdits(
