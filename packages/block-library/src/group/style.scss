@@ -3,7 +3,7 @@
 	box-sizing: border-box;
 }
 
-// We need this so groups with negative margins overlap as expected
+// We need this so groups with negative margins overlap as expected.
 :where(.wp-block-group.wp-block-group-is-layout-constrained) {
 	position: relative;
 }
