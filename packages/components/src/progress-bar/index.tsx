@@ -47,12 +47,3 @@ function UnforwardedProgressBar(
 export const ProgressBar = forwardRef( UnforwardedProgressBar );
 
 export default ProgressBar;
-
-type Test1 = { asd: 123 };
-type Test2 = { kljk: 121233 };
-
-type Compute< T > = { [ K in keyof T ]: T[ K ] };
-
-type Test = Compute< Test1 & Test2 >;
-//   ^?
-declare const test: Test;
