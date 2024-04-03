@@ -11,7 +11,8 @@ test.describe( 'Zoom Out', () => {
 		const zoomedOutCheckbox = page.getByLabel(
 			'Test a new zoomed out view on'
 		);
-		await zoomedOutCheckbox.click();
+
+		await zoomedOutCheckbox.setChecked( true );
 		await expect( zoomedOutCheckbox ).toBeChecked();
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 	} );
@@ -21,8 +22,7 @@ test.describe( 'Zoom Out', () => {
 		const zoomedOutCheckbox = page.getByLabel(
 			'Test a new zoomed out view on'
 		);
-		await expect( zoomedOutCheckbox ).toBeChecked();
-		await zoomedOutCheckbox.click();
+		await zoomedOutCheckbox.setChecked( false );
 		await expect( zoomedOutCheckbox ).not.toBeChecked();
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 		await requestUtils.activateTheme( 'twentytwentyone' );
@@ -37,13 +37,17 @@ test.describe( 'Zoom Out', () => {
 		await editor.canvas.locator( 'body' ).click();
 	} );
 
-	test( 'Zoom-out button should be available and actionable', async ( {
+	test( 'Zoom-out button should not steal focus when a block is focused', async ( {
 		page,
+		editor,
 	} ) => {
 		const zoomOutButton = page.getByRole( 'button', {
 			name: 'Zoom-out View',
 			exact: true,
 		} );
+
+		// Select a block for this test to surface the potential focus-stealing behavior
+		await editor.canvas.getByLabel( 'Site title text' ).click();
 
 		await zoomOutButton.click();
 
