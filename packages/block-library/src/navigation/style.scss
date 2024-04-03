@@ -61,7 +61,7 @@ $navigation-icon-size: 24px;
 	&.has-text-decoration-underline .wp-block-navigation-item__content {
 		text-decoration: underline;
 
-		&:focus,
+		&:focus-visible,
 		&:active {
 			text-decoration: underline;
 		}
@@ -70,7 +70,7 @@ $navigation-icon-size: 24px;
 	&.has-text-decoration-line-through .wp-block-navigation-item__content {
 		text-decoration: line-through;
 
-		&:focus,
+		&:focus-visible,
 		&:active {
 			text-decoration: line-through;
 		}
@@ -80,7 +80,7 @@ $navigation-icon-size: 24px;
 		a {
 			text-decoration: none;
 
-			&:focus,
+			&:focus-visible,
 			&:active {
 				text-decoration: none;
 			}
