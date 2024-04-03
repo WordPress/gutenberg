@@ -242,7 +242,7 @@ export function useMemo( factory: Function, inputs: any[] ) {
  * For wrapperless hydration.
  * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
  *
- * @param parent      - The parent element where the nodes will be replaced.
+ * @param parent      The parent element where the nodes will be replaced.
  * @param replaceNode - The node or array of nodes to replace in the parent element.
  * @return The created root fragment.
  */
