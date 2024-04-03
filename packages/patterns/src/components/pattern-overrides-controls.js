@@ -2,24 +2,48 @@
  * WordPress dependencies
  */
 import { useState, useId } from '@wordpress/element';
-import {
-	InspectorControls,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
 import { ToggleControl, BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../lock-unlock';
 import {
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 } from '../constants';
 import AllowOverridesModal from './allow-overrides-modal';
 
-const { removeBindings, addBindings } = unlock( blockEditorPrivateApis );
+function removeBindings( bindings, syncedAttributes ) {
+	let updatedBindings = {};
+	for ( const attributeName of syncedAttributes ) {
+		// Omit any bindings that's not the same source from the `updatedBindings` object.
+		if (
+			bindings?.[ attributeName ]?.source !==
+				PATTERN_OVERRIDES_BINDING_SOURCE &&
+			bindings?.[ attributeName ]?.source !== undefined
+		) {
+			updatedBindings[ attributeName ] = bindings[ attributeName ];
+		}
+	}
+	if ( ! Object.keys( updatedBindings ).length ) {
+		updatedBindings = undefined;
+	}
+	return updatedBindings;
+}
+
+function addBindings( bindings, syncedAttributes ) {
+	const updatedBindings = { ...bindings };
+	for ( const attributeName of syncedAttributes ) {
+		if ( ! bindings?.[ attributeName ] ) {
+			updatedBindings[ attributeName ] = {
+				source: PATTERN_OVERRIDES_BINDING_SOURCE,
+			};
+		}
+	}
+	return updatedBindings;
+}
 
 function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	const controlId = useId();
@@ -43,16 +67,8 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 
 		const prevBindings = attributes?.metadata?.bindings;
 		const updatedBindings = isChecked
-			? addBindings(
-					prevBindings,
-					syncedAttributes,
-					PATTERN_OVERRIDES_BINDING_SOURCE
-			  )
-			: removeBindings(
-					prevBindings,
-					syncedAttributes,
-					PATTERN_OVERRIDES_BINDING_SOURCE
-			  );
+			? addBindings( prevBindings, syncedAttributes )
+			: removeBindings( prevBindings, syncedAttributes );
 
 		const updatedMetadata = {
 			...attributes.metadata,
@@ -89,7 +105,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 							label={ __( 'Allow overrides' ) }
 							checked={ attributeSources.some(
 								( source ) =>
-									source === 'core/pattern-overrides'
+									source === PATTERN_OVERRIDES_BINDING_SOURCE
 							) }
 							onChange={ ( isChecked ) => {
 								updateBindings( isChecked );

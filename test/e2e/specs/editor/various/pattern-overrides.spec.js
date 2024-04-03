@@ -82,6 +82,17 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'button', { name: 'Save' } )
 				.click();
 
+			await editor.openDocumentSettingsSidebar();
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await editorSettings
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+			await editorSettings
+				.getByRole( 'checkbox', { name: 'Allow overrides' } )
+				.setChecked( true );
+
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/paragraph',

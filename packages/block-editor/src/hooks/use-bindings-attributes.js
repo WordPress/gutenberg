@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 
-export const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
@@ -54,35 +54,6 @@ export function canBindAttribute( blockName, attributeName ) {
 		canBindBlock( blockName ) &&
 		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
 	);
-}
-
-export function removeBindings( bindings, syncedAttributes, source ) {
-	let updatedBindings = {};
-	for ( const attributeName of syncedAttributes ) {
-		// Omit any bindings that's not the same source from the `updatedBindings` object.
-		if (
-			bindings?.[ attributeName ]?.source !== source &&
-			bindings?.[ attributeName ]?.source !== undefined
-		) {
-			updatedBindings[ attributeName ] = bindings[ attributeName ];
-		}
-	}
-	if ( ! Object.keys( updatedBindings ).length ) {
-		updatedBindings = undefined;
-	}
-	return updatedBindings;
-}
-
-export function addBindings( bindings, syncedAttributes, source ) {
-	const updatedBindings = { ...bindings };
-	for ( const attributeName of syncedAttributes ) {
-		if ( ! bindings?.[ attributeName ] ) {
-			updatedBindings[ attributeName ] = {
-				source,
-			};
-		}
-	}
-	return updatedBindings;
 }
 
 /**

@@ -9,7 +9,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 export default function AllowOverridesModal( {
@@ -18,6 +18,7 @@ export default function AllowOverridesModal( {
 	onSave,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( '' );
+	const descriptionId = useId();
 
 	const isNameValid = !! editedBlockName.trim();
 
@@ -42,6 +43,7 @@ export default function AllowOverridesModal( {
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-allow-overrides-modal"
 			focusOnMount="firstContentElement"
+			aria={ { describedby: descriptionId } }
 			size="small"
 		>
 			<form
@@ -55,14 +57,18 @@ export default function AllowOverridesModal( {
 					handleSubmit();
 				} }
 			>
+				<p id={ descriptionId }>
+					{ __( 'Enter a custom name for this block.' ) }
+				</p>
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
-						label={ __( 'Give the block a name' ) }
+						label={ __( 'Block name' ) }
+						hideLabelFromVision
 						help={ __(
-							'Naming your block will help people understand its purpose. e.g. recipe title, recipe photo, recipe ingredients, recipe instructions.'
+							'This name will be used to denote the override wherever the synced pattern is used. The name here will help people understand its purpose. E.g. if you\'re creating a recipe pattern, it can be "recipe", "ingredients", etc.'
 						) }
 						placeholder={ placeholder }
 						onChange={ setEditedBlockName }
