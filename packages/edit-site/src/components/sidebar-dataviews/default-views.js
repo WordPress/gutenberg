@@ -42,7 +42,7 @@ const DEFAULT_PAGE_BASE = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {
-		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_TABLE ],
+		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
 	},
 };
 
