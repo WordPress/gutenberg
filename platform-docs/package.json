@@ -25,8 +25,8 @@
 		"@mdx-js/react": "^3.0.0",
 		"clsx": "^1.2.1",
 		"docusaurus-lunr-search": "^3.3.2",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react": "^19.0.0-canary-a73c3450e-20240329",
+		"react-dom": "^19.0.0-canary-a73c3450e-20240329"
 	},
 	"devDependencies": {
 		"@docusaurus/module-type-aliases": "^3.1.1",

@@ -34,8 +34,8 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react": "^19.0.0-canary-a73c3450e-20240329",
+		"react-dom": "^19.0.0-canary-a73c3450e-20240329"
 	},
 	"publishConfig": {
 		"access": "public"
