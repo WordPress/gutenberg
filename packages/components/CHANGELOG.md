@@ -4,7 +4,7 @@
 
 ### Enhancement
 
--   `ProgressBar`: Improved CSS performance by moving the bar width styles away from emotion and into a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
+-   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
 
 ## 27.3.0 (2024-04-03)
 
