@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- Removed the `onDetailsChange` event only available for the list layout. We are looking into adding actions to the list layout, including primary ones.
+
 ## 0.9.0 (2024-04-03)
 
 ### Enhancement

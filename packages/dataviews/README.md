@@ -283,10 +283,6 @@ Whether the items should be rendered asynchronously. Useful when there's a field
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
 
-### `onDetailsChange`: `function`
-
-Callback that signals the user triggered the details for one of more items, and takes them as paremeter. So far, only the `list` view implements it.
-
 ## Types
 
 ### Layouts
