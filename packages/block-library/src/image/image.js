@@ -83,8 +83,7 @@ const ImageWrapper = ( { href, children } ) => {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
 				// Restore cursor style so it doesn't appear 'clickable'
-				// and remove pointer events. Safari needs the display property.
-				pointerEvents: 'none',
+				// Safari needs the display property.
 				cursor: 'default',
 				display: 'inline',
 			} }
@@ -944,7 +943,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
-				disableEditing={ lockCaption }
+				readOnly={ lockCaption }
 			/>
 		</>
 	);

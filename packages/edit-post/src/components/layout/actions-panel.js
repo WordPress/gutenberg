@@ -4,6 +4,8 @@
 import {
 	EntitiesSavedStates,
 	PostPublishPanel,
+	PluginPrePublishPanel,
+	PluginPostPublishPanel,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -14,8 +16,6 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import { store as editPostStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );

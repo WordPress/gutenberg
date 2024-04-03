@@ -23,31 +23,37 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import TemplateAreas from '../template-areas';
 
-export default function PostCardPanel( { className, actions, children } ) {
-	const { modified, title, templateInfo, icon } = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getCurrentPostType,
-			getCurrentPostId,
-			__experimentalGetTemplateInfo,
-		} = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _type = getCurrentPostType();
-		const _id = getCurrentPostId();
-		const _record = getEditedEntityRecord( 'postType', _type, _id );
-		const _templateInfo = __experimentalGetTemplateInfo( _record );
-		return {
-			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
-			modified: getEditedPostAttribute( 'modified' ),
-			id: _id,
-			templateInfo: _templateInfo,
-			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
-				area: _record?.area,
-			} ),
-		};
-	} );
+export default function PostCardPanel( { className, actions } ) {
+	const { modified, title, templateInfo, icon, postType } = useSelect(
+		( select ) => {
+			const {
+				getEditedPostAttribute,
+				getCurrentPostType,
+				getCurrentPostId,
+				__experimentalGetTemplateInfo,
+			} = select( editorStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const _type = getCurrentPostType();
+			const _id = getCurrentPostId();
+			const _record = getEditedEntityRecord( 'postType', _type, _id );
+			const _templateInfo = __experimentalGetTemplateInfo( _record );
+			return {
+				title:
+					_templateInfo?.title || getEditedPostAttribute( 'title' ),
+				modified: getEditedPostAttribute( 'modified' ),
+				id: _id,
+				postType: _type,
+				templateInfo: _templateInfo,
+				icon: unlock( select( editorStore ) ).getPostIcon( _type, {
+					area: _record?.area,
+				} ),
+			};
+		}
+	);
 	const description = templateInfo?.description;
 	const lastEditedText =
 		modified &&
@@ -94,10 +100,7 @@ export default function PostCardPanel( { className, actions, children } ) {
 							) }
 						</VStack>
 					) }
-					{
-						// Todo: move TemplateAreas (and the selectors it depends) to the editor package, and use it here removing the children prop.
-						children
-					}
+					{ postType === TEMPLATE_POST_TYPE && <TemplateAreas /> }
 				</VStack>
 			</div>
 		</PanelBody>
