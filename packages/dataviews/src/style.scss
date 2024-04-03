@@ -492,26 +492,6 @@
 		justify-content: space-between;
 	}
 
-	.dataviews-view-list__details-button {
-		align-self: center;
-		opacity: 0;
-	}
-
-	li.is-selected,
-	li:hover,
-	li:focus-within {
-		.dataviews-view-list__details-button {
-			opacity: 1;
-		}
-	}
-
-	li.is-selected {
-		.dataviews-view-list__details-button {
-			&:focus {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) currentColor;
-			}
-		}
-	}
 }
 
 .dataviews-action-modal {
