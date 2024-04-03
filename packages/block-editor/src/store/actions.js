@@ -1902,7 +1902,7 @@ export const registerInserterMediaCategory =
  *
  * @see useBlockEditingMode
  *
- * @param {string}           clientId The block client ID, or `''` for the root container.
+ * @param {string}           clientId The block client ID or the root container if omitted.
  * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
  *                                    `'contentOnly'`, or `'default'`.
  *
@@ -1924,7 +1924,7 @@ export function setBlockEditingMode(
  *
  * @see useBlockEditingMode
  *
- * @param {string} clientId The block client ID, or `''` for the root container.
+ * @param {string} clientId The block client ID, or the root container if omitted.
  *
  * @return {Object} Action object.
  */
