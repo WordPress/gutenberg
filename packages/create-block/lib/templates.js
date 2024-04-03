@@ -33,6 +33,7 @@ const predefinedPluginTemplates = {
 			editorScript: null,
 			editorStyle: null,
 			style: null,
+			viewStyle: null,
 			viewScript: 'file:./view.js',
 			example: {},
 		},
@@ -269,8 +270,7 @@ const getVariantVars = ( variants, variant ) => {
 	for ( const variantName of variantNames ) {
 		const key =
 			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
-		variantVars[ `is${ key }Variant` ] =
-			currentVariant === variantName ?? false;
+		variantVars[ `is${ key }Variant` ] = currentVariant === variantName;
 	}
 
 	return variantVars;

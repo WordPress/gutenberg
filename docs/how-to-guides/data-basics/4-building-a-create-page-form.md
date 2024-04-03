@@ -389,4 +389,4 @@ All that’s left is to refresh the page and enjoy the form:
 
 * **Next part:** [Adding a delete button](/docs/how-to-guides/data-basics/5-adding-a-delete-button.md)
 * **Previous part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository

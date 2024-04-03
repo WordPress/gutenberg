@@ -7,21 +7,12 @@ test.describe( 'New editor state', () => {
 	test( 'content should load, making the post dirty', async ( {
 		page,
 		admin,
+		editor,
 	} ) => {
 		await admin.visitAdminPage( 'post-new.php', 'gutenberg-demo' );
-		await page.waitForFunction( () => {
-			if ( ! window?.wp?.data?.dispatch ) {
-				return false;
-			}
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
-
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'fullscreenMode', false );
-
-			return true;
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+			fullscreenMode: false,
 		} );
 
 		const isDirty = await page.evaluate( () => {

@@ -23,8 +23,8 @@ export default function WelcomeGuidePage() {
 			'core/edit-site',
 			'welcomeGuide'
 		);
-		const { hasPageContentFocus } = select( editSiteStore );
-		return isPageActive && ! isEditorActive && hasPageContentFocus();
+		const { isPage } = select( editSiteStore );
+		return isPageActive && ! isEditorActive && isPage();
 	}, [] );
 
 	if ( ! isVisible ) {

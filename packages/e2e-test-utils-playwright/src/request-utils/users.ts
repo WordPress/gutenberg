@@ -5,6 +5,7 @@ import type { RequestUtils } from './index';
 
 export interface User {
 	id: number;
+	name: string;
 	email: string;
 }
 
@@ -110,8 +111,11 @@ async function deleteAllUsers( this: RequestUtils ) {
 	// The users endpoint doesn't support batch request yet.
 	const responses = await Promise.all(
 		users
-			// Do not delete root user.
-			.filter( ( user: User ) => user.id !== 1 )
+			// Do not delete neither root user nor the current user.
+			.filter(
+				( user: User ) =>
+					user.id !== 1 && user.name !== this.user.username
+			)
 			.map( ( user: User ) => deleteUser.bind( this )( user.id ) )
 	);
 

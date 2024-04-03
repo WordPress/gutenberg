@@ -5,11 +5,26 @@ import filterFonts from '../filter-fonts';
 
 describe( 'filterFonts', () => {
 	const mockFonts = [
-		{ name: 'Arial', category: 'sans-serif' },
-		{ name: 'Arial Condensed', category: 'sans-serif' },
-		{ name: 'Times New Roman', category: 'serif' },
-		{ name: 'Courier New', category: 'monospace' },
-		{ name: 'Romantic', category: 'cursive' },
+		{
+			font_family_settings: { name: 'Arial' },
+			categories: [ 'sans-serif' ],
+		},
+		{
+			font_family_settings: { name: 'Arial Condensed' },
+			categories: [ 'sans-serif' ],
+		},
+		{
+			font_family_settings: { name: 'Times New Roman' },
+			categories: [ 'serif' ],
+		},
+		{
+			font_family_settings: { name: 'Courier New' },
+			categories: [ 'monospace' ],
+		},
+		{
+			font_family_settings: { name: 'Romantic' },
+			categories: [ 'cursive' ],
+		},
 	];
 
 	it( 'should return all fonts if no filters are provided', () => {
@@ -20,7 +35,10 @@ describe( 'filterFonts', () => {
 	it( 'should filter by category', () => {
 		const result = filterFonts( mockFonts, { category: 'serif' } );
 		expect( result ).toEqual( [
-			{ name: 'Times New Roman', category: 'serif' },
+			{
+				font_family_settings: { name: 'Times New Roman' },
+				categories: [ 'serif' ],
+			},
 		] );
 	} );
 
@@ -32,15 +50,24 @@ describe( 'filterFonts', () => {
 	it( 'should filter by search', () => {
 		const result = filterFonts( mockFonts, { search: 'ari' } );
 		expect( result ).toEqual( [
-			{ name: 'Arial', category: 'sans-serif' },
-			{ name: 'Arial Condensed', category: 'sans-serif' },
+			{
+				font_family_settings: { name: 'Arial' },
+				categories: [ 'sans-serif' ],
+			},
+			{
+				font_family_settings: { name: 'Arial Condensed' },
+				categories: [ 'sans-serif' ],
+			},
 		] );
 	} );
 
 	it( 'should be case insensitive when filtering by search', () => {
 		const result = filterFonts( mockFonts, { search: 'RoMANtic' } );
 		expect( result ).toEqual( [
-			{ name: 'Romantic', category: 'cursive' },
+			{
+				font_family_settings: { name: 'Romantic' },
+				categories: [ 'cursive' ],
+			},
 		] );
 	} );
 
@@ -50,7 +77,10 @@ describe( 'filterFonts', () => {
 			search: 'Times',
 		} );
 		expect( result ).toEqual( [
-			{ name: 'Times New Roman', category: 'serif' },
+			{
+				font_family_settings: { name: 'Times New Roman' },
+				categories: [ 'serif' ],
+			},
 		] );
 	} );
 

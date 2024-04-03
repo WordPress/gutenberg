@@ -4,16 +4,16 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-init">
 	<div
 		data-testid="single init"
 		data-wp-context='{"isReady":[false],"calls":[0]}'
 		data-wp-init="actions.initOne"
 	>
-		<p data-wp-text="selector.isReady" data-testid="isReady">false</p>
-		<p data-wp-text="selector.calls" data-testid="calls">0</p>
+		<p data-wp-text="state.isReady" data-testid="isReady">false</p>
+		<p data-wp-text="state.calls" data-testid="calls">0</p>
 		<button data-wp-on--click="actions.reset">reset</button>
 	</div>
 	<div
@@ -22,8 +22,8 @@
 		data-wp-init--one="actions.initOne"
 		data-wp-init--two="actions.initTwo"
 	>
-		<p data-wp-text="selector.isReady" data-testid="isReady">false,false</p>
-		<p data-wp-text="selector.calls" data-testid="calls">0,0</p>
+		<p data-wp-text="state.isReady" data-testid="isReady">false,false</p>
+		<p data-wp-text="state.calls" data-testid="calls">0,0</p>
 	</div>
 	<div
 		data-testid="init show"
@@ -35,7 +35,7 @@
 		<button data-wp-on--click="actions.toggle" data-testid="toggle">
 			toggle
 		</button>
-		<p data-wp-text="selector.isMounted" data-testid="isMounted">
+		<p data-wp-text="state.isMounted" data-testid="isMounted">
 			true
 		</p>
 	</div>

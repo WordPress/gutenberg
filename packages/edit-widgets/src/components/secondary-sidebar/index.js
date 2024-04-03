@@ -13,7 +13,7 @@ import { store as editWidgetsStore } from '../../store';
 import InserterSidebar from './inserter-sidebar';
 import ListViewSidebar from './list-view-sidebar';
 
-export default function SecondarySidebar( { listViewToggleElement } ) {
+export default function SecondarySidebar() {
 	const { isInserterOpen, isListViewOpen } = useSelect( ( select ) => {
 		const { isInserterOpened, isListViewOpened } =
 			select( editWidgetsStore );
@@ -27,9 +27,7 @@ export default function SecondarySidebar( { listViewToggleElement } ) {
 		return <InserterSidebar />;
 	}
 	if ( isListViewOpen ) {
-		return (
-			<ListViewSidebar listViewToggleElement={ listViewToggleElement } />
-		);
+		return <ListViewSidebar />;
 	}
 	return null;
 }

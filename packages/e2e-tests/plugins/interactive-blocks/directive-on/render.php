@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-on">
 	<div>
 		<p data-wp-text="state.counter" data-testid="counter">0</p>
 		<button

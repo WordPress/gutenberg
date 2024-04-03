@@ -35,7 +35,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 		<>
 			{ 'hidden' !== type && (
 				<InspectorControls>
-					<PanelBody title={ __( 'Input settings' ) }>
+					<PanelBody title={ __( 'Settings' ) }>
 						{ 'checkbox' !== type && (
 							<CheckboxControl
 								label={ __( 'Inline label' ) }
@@ -59,7 +59,7 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 					</PanelBody>
 				</InspectorControls>
 			) }
-			<InspectorControls __experimentalGroup="advanced">
+			<InspectorControls group="advanced">
 				<TextControl
 					autoComplete="off"
 					label={ __( 'Name' ) }

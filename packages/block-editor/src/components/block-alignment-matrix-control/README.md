@@ -4,16 +4,6 @@ The alignment matrix control allows users to quickly adjust inner block alignmen
 
 ![Button components](https://i.imgur.com/PxYkgL5.png)
 
-## Table of contents
-
--   [Alignment Matrix Control](#alignment-matrix-control)
-    -   [Table of contents](#table-of-contents)
-    -   [Design guidelines](#design-guidelines)
-        -   [Usage](#usage)
-    -   [Development guidelines](#development-guidelines)
-        -   [Usage](#usage-1)
-        -   [Props](#props)
-
 ## Design guidelines
 
 ### Usage

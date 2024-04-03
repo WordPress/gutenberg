@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
+import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
  * WordPress dependencies
@@ -28,6 +28,7 @@ import {
 } from '../base-control/styles/base-control-styles';
 import { Spacer } from '../spacer';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const identity = ( value: string ) => value;
 
@@ -39,7 +40,7 @@ const identity = ( value: string ) => value;
  * Tokens are separated by the "," character. Suggestions can be selected with the up or down arrows and added with the tab or enter key.
  *
  * The `value` property is handled in a manner similar to controlled form components.
- * See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
+ * See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
  */
 export function FormTokenField( props: FormTokenFieldProps ) {
 	const {
@@ -74,10 +75,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalAutoSelectFirstMatch = false,
 		__nextHasNoMarginBottom = false,
 		tokenizeOnBlur = false,
-	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >(
-		props,
-		'wp.components.FormTokenField'
-	);
+	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -162,7 +160,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function onBlur() {
+	function onBlur( event: FocusEvent ) {
 		if (
 			inputHasValidValue() &&
 			__experimentalValidateInput( incompleteTokenValue )
@@ -176,7 +174,19 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			setIncompleteTokenValue( '' );
 			setInputOffsetFromEnd( 0 );
 			setIsActive( false );
-			setIsExpanded( false );
+
+			if ( __experimentalExpandOnFocus ) {
+				// If `__experimentalExpandOnFocus` is true, don't close the suggestions list when
+				// the user clicks on it (`tokensAndInput` will be the element that caused the blur).
+				const hasFocusWithin =
+					event.relatedTarget === tokensAndInput.current;
+				setIsExpanded( hasFocusWithin );
+			} else {
+				// Else collapse the suggestion list. This will result in the suggestion list closing
+				// after a suggestion has been submitted since that causes a blur.
+				setIsExpanded( false );
+			}
+
 			setSelectedSuggestionIndex( -1 );
 			setSelectedSuggestionScroll( false );
 		}
@@ -185,15 +195,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function onKeyDown( event: KeyboardEvent ) {
 		let preventDefault = false;
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 		switch ( event.key ) {
@@ -680,7 +682,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	if ( ! disabled ) {
 		tokenFieldProps = Object.assign( {}, tokenFieldProps, {
-			onKeyDown,
+			onKeyDown: withIgnoreIMEEvents( onKeyDown ),
 			onKeyPress,
 			onFocus: onFocusHandler,
 		} );
@@ -709,7 +711,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
-					wrap={ true }
+					wrap
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>

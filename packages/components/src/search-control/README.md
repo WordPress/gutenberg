@@ -2,11 +2,7 @@
 
 SearchControl components let users display a search control.
 
-
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
+Check out the [Storybook page](https://wordpress.github.io/gutenberg/?path=/docs/components-searchcontrol--docs) for a visual exploration of this component.
 
 ## Development guidelines
 
@@ -24,6 +20,7 @@ function MySearchControl( { className, setState } ) {
 
     return (
         <SearchControl
+            __nextHasNoMarginBottom
             label={ __( 'Search posts' ) }
             value={ searchInput }
             onChange={ setSearchInput }
@@ -39,13 +36,14 @@ Props not included in this set will be applied to the input element.
 
 #### label
 
-If this property is added, a label will be generated using label property as the content.
+The accessible label for the input.
 
 A label should always be provided as an accessibility best practice, even when a placeholder is defined
 and `hideLabelFromVision` is `true`.
 
 -   Type: `String`
--   Required: Yes
+-   Required: No
+-   Default: `__( 'Search' )`
 
 #### placeholder
 
@@ -76,6 +74,15 @@ A function that receives the value of the input.
 -   Type: `function`
 -   Required: Yes
 
+#### onClose
+
+When an `onClose` callback is provided, the search control will render a close button that will trigger the given callback.
+
+Use this if you want the button to trigger your own logic to close the search field entirely, rather than just clearing the input value.
+
+-   Type: `function`
+-   Required: No
+
 #### help
 
 If this property is added, a help text will be generated using help property as the content.
@@ -83,12 +90,21 @@ If this property is added, a help text will be generated using help property as 
 -   Type: `String|Element`
 -   Required: No
 
-### hideLabelFromVision
+#### hideLabelFromVision
 
 If true, the label will not be visible, but will be read by screen readers. Defaults to `true`.
 
 -   Type: `Boolean`
 -   Required: No
+-   Default: `true`
+
+#### __nextHasNoMarginBottom
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
 
 #### `size`: `'default'` | `'compact'`
 

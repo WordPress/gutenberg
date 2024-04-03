@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -9,6 +9,10 @@ import {
 	__experimentalFetchUrlData as fetchUrlData,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useViewportMatch } from '@wordpress/compose';
+import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,19 +20,25 @@ import { __ } from '@wordpress/i18n';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
+
+function __experimentalReusableBlocksSelect( select ) {
+	return (
+		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} ) ?? EMPTY_BLOCKS_LIST
+	);
+}
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'__experimentalPreferredStyleVariations',
-	'__experimentalSetIsInserterOpened',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
-	'allowedBlockTypes',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -46,29 +56,21 @@ const BLOCK_EDITOR_SETTINGS = [
 	'enableCustomSpacing',
 	'enableCustomUnits',
 	'enableOpenverseMediaCategory',
-	'focusMode',
-	'distractionFree',
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'hasFixedToolbar',
-	'hasInlineToolbar',
-	'isDistractionFree',
+	'onNavigateToEntityRecord',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
 	'imageSizes',
 	'isRTL',
-	'keepCaretInsideBlock',
 	'locale',
 	'maxWidth',
-	'onUpdateDefaultBlockStyles',
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
 	'styles',
-	'template',
-	'templateLock',
 	'titlePlaceholder',
 	'supportsLayout',
 	'widgetTypesToHideFromLegacyWidgetBlock',
@@ -76,54 +78,78 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableIsPreviewMode',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
+	'__experimentalArchiveTitleTypeLabel',
+	'__experimentalArchiveTitleNameLabel',
 ];
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object}  settings    EditorProvider settings prop.
- * @param {boolean} hasTemplate Whether template mode is enabled.
+ * @param {Object} settings EditorProvider settings prop.
+ * @param {string} postType Editor root level post type.
+ * @param {string} postId   Editor root level post ID.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, hasTemplate ) {
+function useBlockEditorSettings( settings, postType, postId ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
-		reusableBlocks,
+		allowRightClickOverrides,
+		blockTypes,
+		focusMode,
+		hasFixedToolbar,
+		isDistractionFree,
+		keepCaretInsideBlock,
 		hasUploadPermissions,
+		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
-		postType,
 		userPatternCategories,
-	} = useSelect( ( select ) => {
-		const { canUserUseUnfilteredHTML, getCurrentPostType } =
-			select( editorStore );
-		const isWeb = Platform.OS === 'web';
-		const { canUser, getEntityRecord, getUserPatternCategories } =
-			select( coreStore );
+		restBlockPatternCategories,
+	} = useSelect(
+		( select ) => {
+			const {
+				canUser,
+				getRawEntityRecord,
+				getEntityRecord,
+				getUserPatternCategories,
+				getBlockPatternCategories,
+			} = select( coreStore );
+			const { get } = select( preferencesStore );
+			const { getBlockTypes } = select( blocksStore );
+			const siteSettings = canUser( 'read', 'settings' )
+				? getEntityRecord( 'root', 'site' )
+				: undefined;
 
-		const siteSettings = canUser( 'read', 'settings' )
-			? getEntityRecord( 'root', 'site' )
-			: undefined;
-
-		return {
-			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: isWeb
-				? select( coreStore ).getEntityRecords(
-						'postType',
-						'wp_block',
-						{ per_page: -1 }
-				  )
-				: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
-			hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
-			userCanCreatePages: canUser( 'create', 'pages' ),
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
-			postType: getCurrentPostType(),
-			userPatternCategories: getUserPatternCategories(),
-		};
-	}, [] );
+			return {
+				allowRightClickOverrides: get(
+					'core',
+					'allowRightClickOverrides'
+				),
+				blockTypes: getBlockTypes(),
+				canUseUnfilteredHTML: getRawEntityRecord(
+					'postType',
+					postType,
+					postId
+				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				focusMode: get( 'core', 'focusMode' ),
+				hasFixedToolbar:
+					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
+				isDistractionFree: get( 'core', 'distractionFree' ),
+				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
+				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
+				userCanCreatePages: canUser( 'create', 'pages' ),
+				pageOnFront: siteSettings?.page_on_front,
+				pageForPosts: siteSettings?.page_for_posts,
+				userPatternCategories: getUserPatternCategories(),
+				restBlockPatternCategories: getBlockPatternCategories(),
+			};
+		},
+		[ postType, postId, isLargeViewport ]
+	);
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -132,33 +158,18 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		settings.__experimentalAdditionalBlockPatternCategories ?? // WP 6.0
 		settings.__experimentalBlockPatternCategories; // WP 5.9
 
-	const { restBlockPatterns, restBlockPatternCategories } = useSelect(
-		( select ) => ( {
-			restBlockPatterns: select( coreStore ).getBlockPatterns(),
-			restBlockPatternCategories:
-				select( coreStore ).getBlockPatternCategories(),
-		} ),
-		[]
-	);
-
 	const blockPatterns = useMemo(
 		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
+			[ ...( settingsBlockPatterns || [] ) ].filter(
+				( { postTypes } ) => {
 					return (
 						! postTypes ||
 						( Array.isArray( postTypes ) &&
 							postTypes.includes( postType ) )
 					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, postType ]
+				}
+			),
+		[ settingsBlockPatterns, postType ]
 	);
 
 	const blockPatternCategories = useMemo(
@@ -173,7 +184,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	const { undo } = useDispatch( editorStore );
+	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 
@@ -198,6 +209,27 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const allowedBlockTypes = useMemo( () => {
+		// Omit hidden block types if exists and non-empty.
+		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
+			// Defer to passed setting for `allowedBlockTypes` if provided as
+			// anything other than `true` (where `true` is equivalent to allow
+			// all block types).
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? blockTypes.map( ( { name } ) => name )
+					: settings.allowedBlockTypes || [];
+
+			return defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
+			);
+		}
+
+		return settings.allowedBlockTypes;
+	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
+
+	const forceDisableFocusMode = settings.focusMode === false;
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -205,38 +237,69 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowedBlockTypes,
+			allowRightClickOverrides,
+			focusMode: focusMode && ! forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
+			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+				unlock( select( coreStore ) ).getBlockPatternsForPostType(
+					postType
+				),
+			[ unlock( privateApis ).reusableBlocksSelectKey ]:
+				__experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
 			inserterMediaCategories,
 			__experimentalFetchRichUrlData: fetchUrlData,
+			// Todo: This only checks the top level post, not the post within a template or any other entity that can be edited.
+			// This might be better as a generic "canUser" selector.
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
+			//Todo: this is only needed for native and should probably be removed.
 			__experimentalUndo: undo,
-			outlineMode: hasTemplate,
+			// Check whether we want all site editor frames to have outlines
+			// including the navigation / pattern / parts editors.
+			outlineMode: postType === 'wp_template',
+			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			pageOnFront,
 			pageForPosts,
-			__experimentalPreferPatternsOnRoot: hasTemplate,
+			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
+			templateLock:
+				postType === 'wp_navigation' ? 'insert' : settings.templateLock,
+			template:
+				postType === 'wp_navigation'
+					? [ [ 'core/navigation', {}, [] ] ]
+					: settings.template,
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
 		[
+			allowedBlockTypes,
+			allowRightClickOverrides,
+			focusMode,
+			forceDisableFocusMode,
+			hasFixedToolbar,
+			isDistractionFree,
+			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
-			reusableBlocks,
 			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,
 			canUseUnfilteredHTML,
 			undo,
-			hasTemplate,
 			createPageEntity,
 			userCanCreatePages,
 			pageOnFront,
 			pageForPosts,
+			postType,
+			setIsInserterOpened,
 		]
 	);
 }

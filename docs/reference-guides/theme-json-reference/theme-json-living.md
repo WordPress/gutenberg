@@ -6,7 +6,7 @@
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification, and 
 > - the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
-This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/theme-json.md) for examples and guidance on how to use the `theme.json` file in your theme.
+This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/global-settings-and-styles.md) for examples and guidance on how to use the `theme.json` file in your theme.
 
 ## Schema
 
@@ -31,10 +31,10 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
-- dimensions: minHeight
+- color: link, heading, button, caption
+- dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -95,6 +95,9 @@ Settings related to colors.
 | link | boolean | false |  |
 | palette | array |  | color, name, slug |
 | text | boolean | true |  |
+| heading | boolean | true |  |
+| button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 
@@ -105,6 +108,7 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -114,6 +118,7 @@ Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
+| aspectRatio | boolean | false |  |
 | minHeight | boolean | false |  |
 
 ---
@@ -127,6 +132,7 @@ Settings related to layout.
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
+| allowCustomContentAndWideSize | boolean | true |  |
 
 ---
 
@@ -233,6 +239,7 @@ Dimensions styles
 
 | Property  | Type   |  Props  |
 | ---       | ---    |---   |
+| aspectRatio | string, object |  |
 | minHeight | string, object |  |
 
 ---

@@ -32,7 +32,7 @@ function useGlobalStylesRenderer() {
 			styles: [ ...nonGlobalStyles, ...styles ],
 			__experimentalFeatures: settings,
 		} );
-	}, [ styles, settings ] );
+	}, [ styles, settings, updateSettings, getSettings ] );
 }
 
 export function GlobalStylesRenderer() {

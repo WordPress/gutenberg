@@ -1,5 +1,7 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import static android.content.ClipData.Item;
+
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -10,17 +12,18 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Spannable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
@@ -41,12 +44,10 @@ import org.wordpress.aztec.plugins.IToolbarButton;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
-
-import static android.content.ClipData.*;
 
 public class ReactAztecText extends AztecText {
 
@@ -64,6 +65,7 @@ public class ReactAztecText extends AztecText {
     private @Nullable TextWatcherDelegator mTextWatcherDelegator;
     private @Nullable ContentSizeWatcher mContentSizeWatcher;
     private @Nullable ScrollWatcher mScrollWatcher;
+    private @Nullable Runnable mKeyboardRunnable;
 
     // FIXME: Used in `incrementAndGetEventCounter` but never read. I guess we can get rid of it, but before this
     // check when it's used in EditText in RN. (maybe tests?)
@@ -236,6 +238,21 @@ public class ReactAztecText extends AztecText {
         clearFocus();
     }
 
+    public void onMarkFormatting(String colorString) {
+        inlineFormatter.setMarkStyleColor(colorString);
+
+        Set<ITextFormat> selectedStylesSet = new HashSet<>(getSelectedStyles());
+        Set<ITextFormat> newFormatsSet = new HashSet<>();
+        newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
+
+        selectedStylesSet.removeAll(typingFormatsMap.keySet());
+        selectedStylesSet.addAll(newFormatsSet);
+
+        ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
+        setSelectedStyles(newStylesList);
+        updateToolbarButtons(newStylesList);
+    }
+
     @Override
     public void clearFocus() {
         setFocusableInTouchMode(false);
@@ -264,18 +281,46 @@ public class ReactAztecText extends AztecText {
     }
 
     private void showSoftKeyboard() {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        // If the text input is already focused we can show the keyboard.
+        if(hasWindowFocus()) {
+            showSoftKeyboardNow();
+        }
+        // Otherwise, we'll wait until it gets focused.
+        else {
+            getViewTreeObserver().addOnWindowFocusChangeListener(new ViewTreeObserver.OnWindowFocusChangeListener() {
+                @Override
+                public void onWindowFocusChanged(boolean hasFocus) {
+                    if (hasFocus) {
+                        showSoftKeyboardNow();
+                        getViewTreeObserver().removeOnWindowFocusChangeListener(this);
+                    }
+                }
+            });
+        }
+    }
+
+    private void showSoftKeyboardNow() {
+        // Cancel any previously scheduled Runnable
+        if (mKeyboardRunnable != null) {
+            removeCallbacks(mKeyboardRunnable);
+        }
+
+        mKeyboardRunnable = new Runnable() {
             @Override
             public void run() {
                 if (mInputMethodManager != null) {
-                    mInputMethodManager.showSoftInput(ReactAztecText.this, 0);
+                    mInputMethodManager.showSoftInput(ReactAztecText.this, InputMethodManager.SHOW_IMPLICIT);
                 }
             }
-        });
+        };
+
+        post(mKeyboardRunnable);
     }
 
     private void hideSoftKeyboard() {
-        mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+        if (mInputMethodManager != null) {
+            mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
     }
 
     public void setScrollWatcher(ScrollWatcher scrollWatcher) {
@@ -550,6 +595,7 @@ public class ReactAztecText extends AztecText {
                     break;
                 case "underline":
                     newFormatsSet.add(AztecTextFormat.FORMAT_UNDERLINE);
+                    break;
                 case "mark":
                     newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
                     break;

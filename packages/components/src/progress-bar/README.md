@@ -19,7 +19,7 @@ If a `value` is not specified, the progress bar will be considered indeterminate
 
 -   Required: No
 
-##### `className`: `string`
+#### `className`: `string`
 
 A CSS class to apply to the underlying `div` element, serving as a progress bar track.
 

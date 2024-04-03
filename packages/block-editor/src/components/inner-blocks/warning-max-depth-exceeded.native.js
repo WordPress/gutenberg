@@ -8,7 +8,7 @@ import { TouchableWithoutFeedback, View } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,54 +18,71 @@ import UnsupportedBlockDetails from '../unsupported-block-details';
 import { store as blockEditorStore } from '../../store';
 import { MAX_NESTING_DEPTH } from './constants';
 import useUnsupportedBlockEditor from '../use-unsupported-block-editor';
+import {
+	useConvertToGroupButtons,
+	useConvertToGroupButtonProps,
+} from '../convert-to-group-buttons';
+
+const EMPTY_ARRAY = [];
 
 const WarningMaxDepthExceeded = ( { clientId } ) => {
 	const [ showDetails, setShowDetails ] = useState( false );
 
-	const { isSelected, innerBlocks } = useSelect(
-		( select ) => {
-			const { getBlock, isBlockSelected } = select( blockEditorStore );
-			return {
-				innerBlocks: getBlock( clientId )?.innerBlocks || [],
-				isSelected: isBlockSelected( clientId ),
-			};
-		},
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
 	);
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+
+	// We rely on the logic related to the Group/Ungroup buttons used in the block options to
+	// determine whether to use the Ungroup action.
+	const convertToGroupButtonProps = useConvertToGroupButtonProps( [
+		clientId,
+	] );
+	const { isUngroupable } = convertToGroupButtonProps;
+	const convertToGroupButtons = useConvertToGroupButtons( {
+		...convertToGroupButtonProps,
+	} );
+	const onUngroup = convertToGroupButtons.ungroup.onSelect;
 
 	const {
 		isUnsupportedBlockEditorSupported,
 		canEnableUnsupportedBlockEditor,
 	} = useUnsupportedBlockEditor( clientId );
 
-	const onUngroup = () => {
-		if ( ! innerBlocks.length ) {
-			return;
-		}
-
-		replaceBlocks( clientId, innerBlocks );
-	};
-
-	let description;
-	// When UBE can't be used, the description mentions using the web browser to edit the block.
+	/* translators: Warning related to having blocks deeply nested. %d: The deepest nesting level. */
+	const descriptionFormat = __(
+		'Blocks nested deeper than %d levels may not render properly in the mobile editor.'
+	);
+	let description = sprintf( descriptionFormat, MAX_NESTING_DEPTH );
 	if (
 		! isUnsupportedBlockEditorSupported &&
 		! canEnableUnsupportedBlockEditor
 	) {
-		/* translators: Warning related to having blocks deeply nested. %d: The deepest nesting level. */
-		const descriptionFormat = __(
-			'Blocks nested deeper than %d levels may not render properly in the mobile editor. For this reason, we recommend flattening the content by ungrouping the block or editing the block using your web browser.'
-		);
-		description = sprintf( descriptionFormat, MAX_NESTING_DEPTH );
+		// When UBE can't be used, the description mentions using the web browser to edit the block.
+		description +=
+			' ' +
+			/* translators: Recommendation included in a warning related to having blocks deeply nested. */
+			__(
+				'For this reason, we recommend editing the block using your web browser.'
+			);
 	}
 	// Otherwise, the description mentions using the web editor (i.e. UBE).
 	else {
-		/* translators: Warning related to having blocks deeply nested. %d: The deepest nesting level. */
-		const descriptionFormat = __(
-			'Blocks nested deeper than %d levels may not render properly in the mobile editor. For this reason, we recommend flattening the content by ungrouping the block or editing the block using the web editor.'
-		);
-		description = sprintf( descriptionFormat, MAX_NESTING_DEPTH );
+		description +=
+			' ' +
+			/* translators: Recommendation included in a warning related to having blocks deeply nested. */
+			__(
+				'For this reason, we recommend editing the block using the web editor.'
+			);
+	}
+	// If the block can be flattened, we also suggest to ungroup the block.
+	if ( isUngroupable ) {
+		description +=
+			' ' +
+			/* translators: Alternative option included in a warning related to having blocks deeply nested. */
+			__(
+				'Alternatively, you can flatten the content by ungrouping the block.'
+			);
 	}
 
 	return (
@@ -88,9 +105,16 @@ const WarningMaxDepthExceeded = ( { clientId } ) => {
 					onCloseSheet={ () => setShowDetails( false ) }
 					title={ __( 'Deeply nested block' ) }
 					description={ description }
-					customActions={ [
-						{ label: __( 'Ungroup block' ), onPress: onUngroup },
-					] }
+					customActions={
+						isUngroupable
+							? [
+									{
+										label: __( 'Ungroup block' ),
+										onPress: onUngroup,
+									},
+							  ]
+							: EMPTY_ARRAY
+					}
 				/>
 			</View>
 		</TouchableWithoutFeedback>

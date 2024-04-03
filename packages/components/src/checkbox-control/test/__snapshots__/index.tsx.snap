@@ -5,14 +5,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -8,17 +8,31 @@
+@@ -8,13 +8,27 @@
         <span
           class="components-checkbox-control__input-container"
         >
           <input
             class="components-checkbox-control__input"
--           id="inspector-checkbox-control-5"
-+           id="inspector-checkbox-control-6"
+-           id="inspector-checkbox-control-6"
++           id="inspector-checkbox-control-7"
             type="checkbox"
             value="1"
 +         />
@@ -31,11 +31,6 @@ Snapshot Diff:
             />
 +         </svg>
         </span>
-        <label
-          class="components-checkbox-control__label"
--         for="inspector-checkbox-control-5"
-+         for="inspector-checkbox-control-6"
-        />
       </div>
     </div>
   </div>

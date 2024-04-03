@@ -10,6 +10,8 @@ export type CustomGradientPickerProps = {
 	 * can be safely removed once this happens.)
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMargin?: boolean;
 	/**

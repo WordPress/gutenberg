@@ -95,14 +95,20 @@
 }
 
 // This needs specificity because themes usually override it with things like .widget-area a.
-.wp-block-social-links .wp-block-social-link .wp-block-social-link-anchor {
-	&,
-	&:hover,
-	&:active,
-	&:visited,
-	svg {
-		color: currentColor;
-		fill: currentColor;
+.wp-block-social-links .wp-block-social-link.wp-social-link {
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+
+	.wp-block-social-link-anchor {
+		&,
+		&:hover,
+		&:active,
+		&:visited,
+		svg {
+			color: currentColor;
+			fill: currentColor;
+		}
 	}
 }
 

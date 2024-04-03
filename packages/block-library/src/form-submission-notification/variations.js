@@ -6,8 +6,8 @@ import { __ } from '@wordpress/i18n';
 const variations = [
 	{
 		name: 'form-submission-success',
-		title: __( 'Form submission success' ),
-		description: __( 'Success message for form submissions' ),
+		title: __( 'Form Submission Success' ),
+		description: __( 'Success message for form submissions.' ),
 		attributes: {
 			type: 'success',
 		},
@@ -31,8 +31,8 @@ const variations = [
 	},
 	{
 		name: 'form-submission-error',
-		title: __( 'Form submission error' ),
-		description: __( 'Error/failure message for form submissions' ),
+		title: __( 'Form Submission Error' ),
+		description: __( 'Error/failure message for form submissions.' ),
 		attributes: {
 			type: 'error',
 		},

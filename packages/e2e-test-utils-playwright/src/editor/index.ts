@@ -22,6 +22,7 @@ import { publishPost } from './publish-post';
 import { saveDraft } from './save-draft';
 import { selectBlocks } from './select-blocks';
 import { setContent } from './set-content';
+import { setPreferences } from './set-preferences';
 import { showBlockToolbar } from './show-block-toolbar';
 import { saveSiteEditorEntities } from './site-editor';
 import { setIsFixedToolbar } from './set-is-fixed-toolbar';
@@ -76,6 +77,8 @@ export class Editor {
 	selectBlocks: typeof selectBlocks = selectBlocks.bind( this );
 	/** @borrows setContent as this.setContent */
 	setContent: typeof setContent = setContent.bind( this );
+	/** @borrows setPreferences as this.setPreferences */
+	setPreferences: typeof setPreferences = setPreferences.bind( this );
 	/** @borrows showBlockToolbar as this.showBlockToolbar */
 	showBlockToolbar: typeof showBlockToolbar = showBlockToolbar.bind( this );
 	/** @borrows setIsFixedToolbar as this.setIsFixedToolbar */

@@ -47,5 +47,26 @@ test.describe( 'Hybrid theme', () => {
 				name: 'Block: Site Title',
 			} )
 		).toBeVisible();
+
+		await expect(
+			page.locator( 'role=dialog[name="Welcome to the site editor"i]' )
+		).toBeHidden();
+	} );
+
+	test( 'can not export Site Editor Templates', async ( { admin, page } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptyhybrid//header',
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Options' } )
+			.click();
+
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Export' } )
+		).toBeHidden();
 	} );
 } );

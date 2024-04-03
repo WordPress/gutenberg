@@ -301,9 +301,3 @@ exports[`recordToDom should remove padding 1`] = `
   ﻿
 </body>
 `;
-
-exports[`recordToDom should replace characters to format HTML with space 1`] = `
-<body>
-   
-</body>
-`;

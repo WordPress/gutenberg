@@ -1,7 +1,3 @@
-.block-editor-block-styles + .default-style-picker__default-switcher {
-	margin-top: $grid-unit-20;
-}
-
 .block-editor-block-styles__preview-panel {
 	display: none;
 	// Same layer as the sidebar from which it's triggered.
@@ -12,17 +8,6 @@
 		display: block;
 	}
 
-	// Overrides for InserterPreviewPanel.
-	.block-editor-inserter__preview-container {
-		left: auto;
-		right: auto;
-		top: auto;
-		position: static;
-	}
-
-	.block-editor-block-card__title.block-editor-block-card__title {
-		margin: 0;
-	}
 	.block-editor-block-icon {
 		display: none;
 	}

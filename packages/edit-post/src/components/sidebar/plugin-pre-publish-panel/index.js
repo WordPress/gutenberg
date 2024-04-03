@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
-import { usePluginContext } from '@wordpress/plugins';
-
-const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
+import deprecated from '@wordpress/deprecated';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 /**
  * Renders provided content to the pre-publish side panel in the publish flow
  * (side panel that opens when a user first pushes "Publish" from the main editor).
+ *
+ * @deprecated since 6.6, use `wp.editor.PluginPrePublishPanel` instead.
  *
  * @param {Object}                props                                 Component props.
  * @param {string}                [props.className]                     An optional class name added to the panel.
@@ -20,67 +20,13 @@ const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
  *                                                                      the sidebar is pinned to toolbar.
  * @param {Element}               props.children                        Children to be rendered
  *
- * @example
- * ```js
- * // Using ES5 syntax
- * var __ = wp.i18n.__;
- * var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
- *
- * function MyPluginPrePublishPanel() {
- * 	return React.createElement(
- * 		PluginPrePublishPanel,
- * 		{
- * 			className: 'my-plugin-pre-publish-panel',
- * 			title: __( 'My panel title' ),
- * 			initialOpen: true,
- * 		},
- * 		__( 'My panel content' )
- * 	);
- * }
- * ```
- *
- * @example
- * ```jsx
- * // Using ESNext syntax
- * import { __ } from '@wordpress/i18n';
- * import { PluginPrePublishPanel } from '@wordpress/edit-post';
- *
- * const MyPluginPrePublishPanel = () => (
- * 	<PluginPrePublishPanel
- * 		className="my-plugin-pre-publish-panel"
- * 		title={ __( 'My panel title' ) }
- * 		initialOpen={ true }
- * 	>
- * 	    { __( 'My panel content' ) }
- * 	</PluginPrePublishPanel>
- * );
- * ```
- *
  * @return {Component} The component to be rendered.
  */
-const PluginPrePublishPanel = ( {
-	children,
-	className,
-	title,
-	initialOpen = false,
-	icon,
-} ) => {
-	const { icon: pluginIcon } = usePluginContext();
-
-	return (
-		<Fill>
-			<PanelBody
-				className={ className }
-				initialOpen={ initialOpen || ! title }
-				title={ title }
-				icon={ icon ?? pluginIcon }
-			>
-				{ children }
-			</PanelBody>
-		</Fill>
-	);
-};
-
-PluginPrePublishPanel.Slot = Slot;
-
-export default PluginPrePublishPanel;
+export default function EditPostPluginPrePublishPanel( props ) {
+	deprecated( 'wp.editPost.PluginPrePublishPanel', {
+		since: '6.6',
+		version: '6.8',
+		alternative: 'wp.editor.PluginPrePublishPanel',
+	} );
+	return <PluginPrePublishPanel { ...props } />;
+}

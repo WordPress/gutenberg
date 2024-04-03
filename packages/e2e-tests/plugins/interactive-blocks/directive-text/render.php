@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-context">
 	<div>
 		<span
 			data-wp-text="state.text"
@@ -31,5 +31,19 @@
 		>
 			Toggle Context Text
 		</button>
+	</div>
+	<div>
+		<span
+			data-wp-text="state.component"
+			data-testid="show state component"
+		></span>
+		<span
+			data-wp-text="state.number"
+			data-testid="show state number"
+		></span>
+		<span
+			data-wp-text="state.boolean"
+			data-testid="show state boolean"
+		></span>
 	</div>
 </div>

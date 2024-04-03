@@ -86,7 +86,7 @@ const UnconnectedConfirmDialog = (
 					onRequestClose={ handleEvent( onCancel ) }
 					onKeyDown={ handleEnter }
 					closeButtonLabel={ cancelLabel }
-					isDismissible={ true }
+					isDismissible
 					ref={ forwardedRef }
 					overlayClassName={ wrapperClassName }
 					__experimentalHideHeader
@@ -96,6 +96,7 @@ const UnconnectedConfirmDialog = (
 						<Text>{ children }</Text>
 						<Flex direction="row" justify="flex-end">
 							<Button
+								__next40pxDefaultSize
 								ref={ cancelButtonRef }
 								variant="tertiary"
 								onClick={ handleEvent( onCancel ) }
@@ -103,6 +104,7 @@ const UnconnectedConfirmDialog = (
 								{ cancelLabel }
 							</Button>
 							<Button
+								__next40pxDefaultSize
 								ref={ confirmButtonRef }
 								variant="primary"
 								onClick={ handleEvent( onConfirm ) }

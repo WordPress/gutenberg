@@ -45,4 +45,10 @@ export type DimensionControlProps = {
 	 * @default ''
 	 */
 	className?: string;
+	/**
+	 * Start opting into the larger default height that will become the default size in a future version.
+	 *
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
 };

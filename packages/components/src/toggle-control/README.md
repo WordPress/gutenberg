@@ -22,8 +22,8 @@ const MyToggleControl = () => {
 					: 'No fixed background.'
 			}
 			checked={ hasFixedBackground }
-			onChange={ () => {
-				setHasFixedBackground( ( state ) => ! state );
+			onChange={ (newValue) => {
+				setHasFixedBackground( newValue );
 			} }
 		/>
 	);

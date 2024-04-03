@@ -71,9 +71,9 @@ To better understand the specific code example above:
 -   `wp.data.dispatch('core/notices')` accesses functionality registered to the block editor data store by the Notices package.
 -   `createNotice()` is a function offered by the Notices package to register a new notice. The block editor reads from the notice data store in order to know which notices to display.
 
-Check out the [_Loading JavaScript_](/docs/how-to-guides/javascript/loading-javascript.md) tutorial for a primer on how to load your custom JavaScript into the block editor.
+Check out the [_Enqueueing assets in the Editor_](/docs/how-to-guides/enqueueing-assets-in-the-editor.md) tutorial for a primer on how to load your custom JavaScript into the block editor.
 
-## Learn More
+## Learn more
 
 The block editor offers a complete API for generating notices. The official documentation is a great place to review what's possible.
 

@@ -6,11 +6,6 @@ This card contains information on the number of blocks selected, and in the case
 
 ![Multi selection inspector card](https://make.wordpress.org/core/files/2020/09/multi-selection-inspector-card.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

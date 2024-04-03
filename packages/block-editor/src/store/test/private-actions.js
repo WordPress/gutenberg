@@ -4,8 +4,11 @@
 import {
 	hideBlockInterface,
 	showBlockInterface,
+	expandBlock,
 	__experimentalUpdateSettings,
 	setOpenedBlockSettingsMenu,
+	startDragging,
+	stopDragging,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -92,6 +95,31 @@ describe( 'private actions', () => {
 			expect( setOpenedBlockSettingsMenu( 'abcd' ) ).toEqual( {
 				clientId: 'abcd',
 				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+			} );
+		} );
+	} );
+
+	describe( 'startDragging', () => {
+		it( 'should return the START_DRAGGING action', () => {
+			expect( startDragging() ).toEqual( {
+				type: 'START_DRAGGING',
+			} );
+		} );
+	} );
+
+	describe( 'stopDragging', () => {
+		it( 'should return the STOP_DRAGGING action', () => {
+			expect( stopDragging() ).toEqual( {
+				type: 'STOP_DRAGGING',
+			} );
+		} );
+	} );
+
+	describe( 'expandBlock', () => {
+		it( 'should return the SET_BLOCK_EXPANDED_IN_LIST_VIEW action', () => {
+			expect( expandBlock( 'block-1' ) ).toEqual( {
+				type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+				clientId: 'block-1',
 			} );
 		} );
 	} );

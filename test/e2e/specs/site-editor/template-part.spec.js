@@ -194,7 +194,9 @@ test.describe( 'Template Part', () => {
 				content: paragraphText,
 			},
 		} );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Visit the index.
 		await admin.visitSiteEditor();
@@ -211,9 +213,7 @@ test.describe( 'Template Part', () => {
 
 		// Detach the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
-		await editor.clickBlockOptionsMenuItem(
-			'Detach blocks from template part'
-		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
@@ -239,7 +239,9 @@ test.describe( 'Template Part', () => {
 			},
 		} );
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Visit the index.
 		await admin.visitSiteEditor();
@@ -384,8 +386,18 @@ test.describe( 'Template Part', () => {
 		// Insert a group block with a Site Title block inside.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/site-title' } ],
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+				{ name: 'core/site-title' },
+			],
 		} );
+
+		// Type within a first block.
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+		await page.keyboard.type( 'Modify' );
 
 		// Select the Site Title block inside the group.
 		const siteTitleInGroup = editor.canvas.getByRole( 'document', {
@@ -403,8 +415,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect(
-			page.locator( 'role=button[name="Change level"i]' )
-		).toBeFocused();
+		await expect( paragraph ).toBeFocused();
 	} );
 } );

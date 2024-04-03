@@ -1,7 +1,7 @@
 export { store } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
-export { create } from './create';
+export { RichTextData, create } from './create';
 export { getActiveFormat } from './get-active-format';
 export { getActiveFormats } from './get-active-formats';
 export { getActiveObject } from './get-active-object';
@@ -30,7 +30,6 @@ export {
 	default as __experimentalRichText,
 	useRichText as __unstableUseRichText,
 } from './component';
-export { default as __unstableFormatEdit } from './component/format-edit';
 
 /**
  * An object which represents a formatted string. See main `@wordpress/rich-text`

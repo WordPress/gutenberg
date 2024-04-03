@@ -4,7 +4,6 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -70,7 +69,7 @@ export function TemplatePartAdvancedControls( {
 	} ) );
 
 	return (
-		<InspectorControls group="advanced">
+		<>
 			{ isEntityAvailable && (
 				<>
 					<TextControl
@@ -95,6 +94,7 @@ export function TemplatePartAdvancedControls( {
 			) }
 			<SelectControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'HTML element' ) }
 				options={ [
 					{
@@ -123,6 +123,6 @@ export function TemplatePartAdvancedControls( {
 					setAttributes={ setAttributes }
 				/>
 			) }
-		</InspectorControls>
+		</>
 	);
 }

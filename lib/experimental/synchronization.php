@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraps synchrnoization (collborative editing).
+ * Bootstraps synchronization (collaborative editing).
  *
  * @package gutenberg
  */

@@ -6,7 +6,6 @@ import type { ForwardedRef } from 'react';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, useMemo, forwardRef } from '@wordpress/element';
@@ -31,7 +30,6 @@ import {
 	HeaderHint,
 	HeaderLabel,
 	HeaderToggle,
-	Controls,
 } from './styles';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
@@ -43,8 +41,7 @@ const UnforwardedFontSizePicker = (
 	ref: ForwardedRef< any >
 ) => {
 	const {
-		/** Start opting into the new margin-free styles that will become the default in a future version. */
-		__nextHasNoMarginBottom = false,
+		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
@@ -55,14 +52,6 @@ const UnforwardedFontSizePicker = (
 		withSlider = false,
 		withReset = true,
 	} = props;
-
-	if ( ! __nextHasNoMarginBottom ) {
-		deprecated( 'Bottom margin styles for wp.components.FontSizePicker', {
-			since: '6.1',
-			version: '6.4',
-			hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version.',
-		} );
-	}
 
 	const units = useCustomUnits( {
 		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
@@ -122,6 +111,7 @@ const UnforwardedFontSizePicker = (
 	);
 	const isValueUnitRelative =
 		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+	const isDisabled = value === undefined;
 
 	return (
 		<Container ref={ ref } className="components-font-size-picker">
@@ -152,19 +142,17 @@ const UnforwardedFontSizePicker = (
 								);
 							} }
 							isPressed={ showCustomValueControl }
-							isSmall
+							size="small"
 						/>
 					) }
 				</Header>
 			</Spacer>
-			<Controls
-				className="components-font-size-picker__controls"
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-			>
+			<div>
 				{ !! fontSizes.length &&
 					shouldUseSelectControl &&
 					! showCustomValueControl && (
 						<FontSizePickerSelect
+							__next40pxDefaultSize={ __next40pxDefaultSize }
 							fontSizes={ fontSizes }
 							value={ value }
 							disableCustomFontSizes={ disableCustomFontSizes }
@@ -193,7 +181,7 @@ const UnforwardedFontSizePicker = (
 					<FontSizePickerToggleGroup
 						fontSizes={ fontSizes }
 						value={ value }
-						__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+						__next40pxDefaultSize={ __next40pxDefaultSize }
 						size={ size }
 						onChange={ ( newValue ) => {
 							if ( newValue === undefined ) {
@@ -214,6 +202,7 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
+								__next40pxDefaultSize={ __next40pxDefaultSize }
 								label={ __( 'Custom' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -238,8 +227,9 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__nextHasNoMarginBottom={
-											__nextHasNoMarginBottom
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize={
+											__next40pxDefaultSize
 										}
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Custom Size' ) }
@@ -269,16 +259,18 @@ const UnforwardedFontSizePicker = (
 						{ withReset && (
 							<FlexItem>
 								<Button
-									disabled={ value === undefined }
+									disabled={ isDisabled }
+									__experimentalIsFocusable
 									onClick={ () => {
 										onChange?.( undefined );
 									} }
 									variant="secondary"
 									__next40pxDefaultSize
 									size={
-										size !== '__unstable-large'
-											? 'small'
-											: 'default'
+										size === '__unstable-large' ||
+										props.__next40pxDefaultSize
+											? 'default'
+											: 'small'
 									}
 								>
 									{ __( 'Reset' ) }
@@ -287,7 +279,7 @@ const UnforwardedFontSizePicker = (
 						) }
 					</Flex>
 				) }
-			</Controls>
+			</div>
 		</Container>
 	);
 };

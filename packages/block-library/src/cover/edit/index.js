@@ -335,6 +335,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			dropZoneElement: ref.current,
 		}
 	);
 
@@ -430,7 +431,8 @@ function CoverEdit( {
 			toggleSelection( true );
 			setAttributes( { minHeight: newMinHeight } );
 		},
-		showHandle: true,
+		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
+		showHandle: ! attributes.style?.dimensions?.aspectRatio ? true : false,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -462,7 +464,7 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
+								disableCustomColors
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
@@ -487,6 +489,9 @@ function CoverEdit( {
 		getPositionClassName( contentPosition )
 	);
 
+	const showOverlay =
+		url || ! useFeaturedImage || ( useFeaturedImage && ! url );
+
 	return (
 		<>
 			{ blockControls }
@@ -498,7 +503,7 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ ( ! useFeaturedImage || url ) && (
+				{ showOverlay && (
 					<span
 						aria-hidden="true"
 						className={ classnames(
@@ -523,7 +528,7 @@ function CoverEdit( {
 				{ ! url && useFeaturedImage && (
 					<Placeholder
 						className="wp-block-cover__image--placeholder-image"
-						withIllustration={ true }
+						withIllustration
 					/>
 				) }
 

@@ -10,11 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import CreatePatternModal from './create-pattern-modal';
-import { PATTERN_SYNC_TYPES } from '../constants';
+import { PATTERN_SYNC_TYPES, PATTERN_TYPES } from '../constants';
 
 function getTermLabels( pattern, categories ) {
-	// Theme patterns don't have an id and rely on core pattern categories.
-	if ( ! pattern.id ) {
+	// Theme patterns rely on core pattern categories.
+	if ( pattern.type !== PATTERN_TYPES.user ) {
 		return categories.core
 			?.filter( ( category ) =>
 				pattern.categories.includes( category.name )
@@ -29,11 +29,7 @@ function getTermLabels( pattern, categories ) {
 		.map( ( category ) => category.label );
 }
 
-export default function DuplicatePatternModal( {
-	pattern,
-	onClose,
-	onSuccess,
-} ) {
+export function useDuplicatePatternProps( { pattern, onSuccess } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const categories = useSelect( ( select ) => {
 		const { getUserPatternCategories, getBlockPatternCategories } =
@@ -44,17 +40,16 @@ export default function DuplicatePatternModal( {
 			user: getUserPatternCategories(),
 		};
 	} );
-
 	if ( ! pattern ) {
 		return null;
 	}
-
-	const duplicatedProps = {
+	return {
 		content: pattern.content,
 		defaultCategories: getTermLabels( pattern, categories ),
-		defaultSyncType: ! pattern.id // Theme patterns don't have an ID.
-			? PATTERN_SYNC_TYPES.unsynced
-			: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
+		defaultSyncType:
+			pattern.type !== PATTERN_TYPES.user // Theme patterns are unsynced by default.
+				? PATTERN_SYNC_TYPES.unsynced
+				: pattern.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 		defaultTitle: sprintf(
 			/* translators: %s: Existing pattern title */
 			__( '%s (Copy)' ),
@@ -62,31 +57,39 @@ export default function DuplicatePatternModal( {
 				? pattern.title
 				: pattern.title.raw
 		),
+		onSuccess: ( { pattern: newPattern } ) => {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					newPattern.title.raw
+				),
+				{
+					type: 'snackbar',
+					id: 'patterns-create',
+				}
+			);
+
+			onSuccess?.( { pattern: newPattern } );
+		},
 	};
+}
 
-	function handleOnSuccess( { pattern: newPattern } ) {
-		createSuccessNotice(
-			sprintf(
-				// translators: %s: The new pattern's title e.g. 'Call to action (copy)'.
-				__( '"%s" duplicated.' ),
-				newPattern.title.raw
-			),
-			{
-				type: 'snackbar',
-				id: 'patterns-create',
-			}
-		);
-
-		onSuccess?.( { pattern: newPattern } );
+export default function DuplicatePatternModal( {
+	pattern,
+	onClose,
+	onSuccess,
+} ) {
+	const duplicatedProps = useDuplicatePatternProps( { pattern, onSuccess } );
+	if ( ! pattern ) {
+		return null;
 	}
-
 	return (
 		<CreatePatternModal
 			modalTitle={ __( 'Duplicate pattern' ) }
 			confirmLabel={ __( 'Duplicate' ) }
 			onClose={ onClose }
 			onError={ onClose }
-			onSuccess={ handleOnSuccess }
 			{ ...duplicatedProps }
 		/>
 	);

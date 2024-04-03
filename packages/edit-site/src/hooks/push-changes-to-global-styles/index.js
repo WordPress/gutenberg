@@ -17,14 +17,16 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { useContext, useMemo, useCallback } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useSupportedStyles } from '../../components/global-styles/hooks';
 import { unlock } from '../../lock-unlock';
+import cloneDeep from '../../utils/clone-deep';
 
 const { cleanEmptyObject, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
@@ -274,10 +276,6 @@ function setNestedValue( object, path, value ) {
 	return object;
 }
 
-function cloneDeep( object ) {
-	return ! object ? {} : JSON.parse( JSON.stringify( object ) );
-}
-
 function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
@@ -388,24 +386,36 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const blockEditingMode = useBlockEditingMode();
-		const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
-			hasBlockSupport( props.name, feature )
-		);
+function PushChangesToGlobalStyles( props ) {
+	const blockEditingMode = useBlockEditingMode();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const supportsStyles = SUPPORTED_STYLES.some( ( feature ) =>
+		hasBlockSupport( props.name, feature )
+	);
+	const isDisplayed =
+		blockEditingMode === 'default' && supportsStyles && isBlockBasedTheme;
 
-		return (
-			<>
-				<BlockEdit { ...props } />
-				{ blockEditingMode === 'default' && supportsStyles && (
-					<InspectorAdvancedControls>
-						<PushChangesToGlobalStylesControl { ...props } />
-					</InspectorAdvancedControls>
-				) }
-			</>
-		);
+	if ( ! isDisplayed ) {
+		return null;
 	}
+
+	return (
+		<InspectorAdvancedControls>
+			<PushChangesToGlobalStylesControl { ...props } />
+		</InspectorAdvancedControls>
+	);
+}
+
+const withPushChangesToGlobalStyles = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => (
+		<>
+			<BlockEdit { ...props } />
+			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
+		</>
+	)
 );
 
 addFilter(

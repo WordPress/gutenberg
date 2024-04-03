@@ -26,6 +26,7 @@ export {
 	LinearGradient,
 	Stop,
 	Line,
+	SvgXml,
 } from 'react-native-svg';
 
 const AnimatedSvg = Animated.createAnimatedComponent(

@@ -8,16 +8,6 @@ Concretely, it handles the display of success messages and takes care of copying
 
 ![Copy/cut behaviours](https://user-images.githubusercontent.com/150562/81698101-6e341d80-945d-11ea-9bfb-b20781f55033.gif)
 
-## Table of contents
-
-- [Copy Handler](#copy-handler)
-	- [Table of contents](#table-of-contents)
-	- [Development guidelines](#development-guidelines)
-		- [Usage](#usage)
-		- [Props](#props)
-		- [`children`](#children)
-	- [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

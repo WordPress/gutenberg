@@ -14,7 +14,7 @@ The Gutenberg project uses GitHub for managing code and tracking issues. The mai
 
 Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find issues to work on. The [good first issue](https://github.com/wordpress/gutenberg/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22) and [good first review](https://github.com/WordPress/gutenberg/pulls?q=is%3Aopen+is%3Apr+label%3A%22Good+First+Review%22) labels are good starting points.
 
-## Contributor Resources
+## Contributor resources
 
 -   [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md) documents getting your development environment setup, this includes your test site and developer tools suggestions.
 -   [Git Workflow](/docs/contributors/code/git-workflow.md) documents the git process for deploying changes using pull requests.

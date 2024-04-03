@@ -10,7 +10,10 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import { PATTERN_CORE_SOURCES, PATTERN_TYPES } from '../../../utils/constants';
+import {
+	EXCLUDED_PATTERN_SOURCES,
+	PATTERN_TYPES,
+} from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 function injectThemeAttributeInBlockTemplateContent(
@@ -33,38 +36,51 @@ function injectThemeAttributeInBlockTemplateContent(
 	return block;
 }
 
-function preparePatterns( patterns, template, currentThemeStylesheet ) {
+/**
+ * Filter all patterns and return only the ones that are compatible with the current template.
+ *
+ * @param {Array}  patterns An array of patterns.
+ * @param {Object} template The current template.
+ * @return {Array} Array of patterns that are compatible with the current template.
+ */
+function filterPatterns( patterns, template ) {
 	// Filter out duplicates.
 	const filterOutDuplicatesByName = ( currentItem, index, items ) =>
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
-	// Filter out core patterns.
-	const filterOutCorePatterns = ( pattern ) =>
-		! PATTERN_CORE_SOURCES.includes( pattern.source );
+	// Filter out core/directory patterns not included in theme.json.
+	const filterOutExcludedPatternSources = ( pattern ) =>
+		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
 
-	// Filter only the patterns that are compatible with the current template.
+	// Looks for patterns that have the same template type as the current template,
+	// or have a block type that matches the current template area.
 	const filterCompatiblePatterns = ( pattern ) =>
-		pattern.templateTypes?.includes( template.slug );
+		pattern.templateTypes?.includes( template.slug ) ||
+		pattern.blockTypes?.includes( 'core/template-part/' + template.area );
 
-	return patterns
-		.filter(
-			filterOutCorePatterns &&
-				filterOutDuplicatesByName &&
-				filterCompatiblePatterns
-		)
-		.map( ( pattern ) => ( {
-			...pattern,
-			keywords: pattern.keywords || [],
-			type: PATTERN_TYPES.theme,
-			blocks: parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} ).map( ( block ) =>
-				injectThemeAttributeInBlockTemplateContent(
-					block,
-					currentThemeStylesheet
-				)
-			),
-		} ) );
+	return patterns.filter( ( pattern, index, items ) => {
+		return (
+			filterOutDuplicatesByName( pattern, index, items ) &&
+			filterOutExcludedPatternSources( pattern ) &&
+			filterCompatiblePatterns( pattern )
+		);
+	} );
+}
+
+function preparePatterns( patterns, template, currentThemeStylesheet ) {
+	return patterns.map( ( pattern ) => ( {
+		...pattern,
+		keywords: pattern.keywords || [],
+		type: PATTERN_TYPES.theme,
+		blocks: parse( pattern.content, {
+			__unstableSkipMigrationLogs: true,
+		} ).map( ( block ) =>
+			injectThemeAttributeInBlockTemplateContent(
+				block,
+				currentThemeStylesheet
+			)
+		),
+	} ) );
 }
 
 export function useAvailablePatterns( template ) {
@@ -88,8 +104,9 @@ export function useAvailablePatterns( template ) {
 			...( blockPatterns || [] ),
 			...( restBlockPatterns || [] ),
 		];
+		const filteredPatterns = filterPatterns( mergedPatterns, template );
 		return preparePatterns(
-			mergedPatterns,
+			filteredPatterns,
 			template,
 			currentThemeStylesheet
 		);

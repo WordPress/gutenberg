@@ -2,15 +2,7 @@
 
 RangeControls are used to make selections from a range of incremental values.
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
-
-A RangeControl for volume
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![A RangeControl for volume](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
 
 ## Design guidelines
 

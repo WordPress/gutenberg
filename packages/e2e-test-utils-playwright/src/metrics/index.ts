@@ -2,6 +2,11 @@
  * External dependencies
  */
 import type { Page, Browser } from '@playwright/test';
+import { join } from 'path';
+// resolution-mode support in TypeScript 5.3 will resolve this.
+// See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
+// @ts-expect-error
+import type { Metric } from 'web-vitals';
 
 type EventType =
 	| 'click'
@@ -32,10 +37,21 @@ type MetricsConstructorProps = {
 	page: Page;
 };
 
+interface WebVitalsMeasurements {
+	CLS?: number;
+	FCP?: number;
+	FID?: number;
+	INP?: number;
+	LCP?: number;
+	TTFB?: number;
+}
+
 export class Metrics {
 	browser: Browser;
 	page: Page;
 	trace: Trace;
+
+	webVitals: WebVitalsMeasurements = {};
 
 	constructor( { page }: MetricsConstructorProps ) {
 		this.page = page;
@@ -272,5 +288,96 @@ export class Metrics {
 					!! item.dur
 			)
 			.map( ( item ) => ( item.dur ? item.dur / 1000 : 0 ) );
+	}
+
+	/**
+	 * Initializes the web-vitals library upon next page navigation.
+	 *
+	 * Defaults to automatically triggering the navigation,
+	 * but it can also be done manually.
+	 *
+	 * @example
+	 * ```js
+	 * await metrics.initWebVitals();
+	 * console.log( await metrics.getWebVitals() );
+	 * ```
+	 *
+	 * @example
+	 * ```js
+	 * await metrics.initWebVitals( false );
+	 * await page.goto( '/some-other-page' );
+	 * console.log( await metrics.getWebVitals() );
+	 * ```
+	 *
+	 * @param reload Whether to force navigation by reloading the current page.
+	 */
+	async initWebVitals( reload = true ) {
+		await this.page.addInitScript( {
+			path: join(
+				__dirname,
+				'../../../../node_modules/web-vitals/dist/web-vitals.umd.cjs'
+			),
+		} );
+
+		await this.page.exposeFunction(
+			'__reportVitals__',
+			( data: string ) => {
+				const measurement: Metric = JSON.parse( data );
+				this.webVitals[ measurement.name ] = measurement.value;
+			}
+		);
+
+		await this.page.addInitScript( () => {
+			const reportVitals = ( measurement: unknown ) =>
+				window.__reportVitals__( JSON.stringify( measurement ) );
+
+			window.addEventListener( 'DOMContentLoaded', () => {
+				// @ts-ignore
+				window.webVitals.onCLS( reportVitals );
+				// @ts-ignore
+				window.webVitals.onFCP( reportVitals );
+				// @ts-ignore
+				window.webVitals.onFID( reportVitals );
+				// @ts-ignore
+				window.webVitals.onINP( reportVitals );
+				// @ts-ignore
+				window.webVitals.onLCP( reportVitals );
+				// @ts-ignore
+				window.webVitals.onTTFB( reportVitals );
+			} );
+		} );
+
+		if ( reload ) {
+			// By reloading the page the script will be applied.
+			await this.page.reload();
+		}
+	}
+
+	/**
+	 * Returns web vitals as collected by the web-vitals library.
+	 *
+	 * If the web-vitals library hasn't been loaded on the current page yet,
+	 * it will be initialized with a page reload.
+	 *
+	 * Reloads the page to force web-vitals to report all collected metrics.
+	 *
+	 * @return {WebVitalsMeasurements} Web vitals measurements.
+	 */
+	async getWebVitals() {
+		// Reset values.
+		this.webVitals = {};
+
+		const hasScript = await this.page.evaluate(
+			() => typeof window.webVitals !== 'undefined'
+		);
+
+		if ( ! hasScript ) {
+			await this.initWebVitals();
+		}
+
+		// Trigger navigation so the web-vitals library reports values on unload.
+		await this.page.reload();
+
+		return this.webVitals;
 	}
 }

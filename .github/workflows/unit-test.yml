@@ -21,17 +21,16 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript
+        name: JavaScript (Node.js ${{ matrix.node }})
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
         strategy:
             fail-fast: false
             matrix:
-                node: ['16']
+                node: ['20', '21']
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -40,17 +39,21 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Npm build
+            - name: Get number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
+
+            - name: npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -111,7 +114,7 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -126,7 +129,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@7fdd3ece872ec7ec4c098ae5ab7637d5e0a96067 # v2.26.0
+              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -145,7 +148,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
@@ -155,7 +158,6 @@ jobs:
             - name: Docker debug information
               run: |
                   docker -v
-                  docker-compose -v
 
             - name: General debug information
               run: |
@@ -221,12 +223,12 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@7fdd3ece872ec7ec4c098ae5ab7637d5e0a96067 # v2.26.0
+              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
               with:
                   php-version: '7.4'
                   coverage: none
@@ -239,7 +241,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -247,7 +249,7 @@ jobs:
             # Since Composer dependencies are installed using `composer update` and no lock file is in version control,
             # passing a custom cache suffix ensures that the cache is flushed at least once per week.
             - name: Install Composer dependencies
-              uses: ramsey/composer-install@83af392bf5f031813d25e6fe4cd626cdba9a2df6 # v2.2.0
+              uses: ramsey/composer-install@57532f8be5bda426838819c5ee9afb8af389d51a # v3.0.0
               with:
                   custom-cache-suffix: ${{ steps.get-date.outputs.date }}
 
@@ -290,9 +292,13 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Get number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -304,4 +310,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"

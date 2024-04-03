@@ -20,14 +20,6 @@ import {
 	formSubmissionNotificationError,
 } from './utils.js';
 
-const ALLOWED_BLOCKS = [
-	'core/paragraph',
-	'core/heading',
-	'core/form-input',
-	'core/form-submit-button',
-	'core/form-submission-notification',
-];
-
 const TEMPLATE = [
 	formSubmissionNotificationSuccess,
 	formSubmissionNotificationError,
@@ -74,7 +66,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		template: TEMPLATE,
 		renderAppender: hasInnerBlocks
 			? undefined

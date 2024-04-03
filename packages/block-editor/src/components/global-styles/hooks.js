@@ -24,6 +24,10 @@ const EMPTY_CONFIG = { settings: {}, styles: {} };
 const VALID_SETTINGS = [
 	'appearanceTools',
 	'useRootPaddingAwareAlignments',
+	'background.backgroundImage',
+	'background.backgroundRepeat',
+	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -46,6 +50,7 @@ const VALID_SETTINGS = [
 	'color.palette',
 	'color.text',
 	'custom',
+	'dimensions.aspectRatio',
 	'dimensions.minHeight',
 	'layout.contentSize',
 	'layout.definitions',
@@ -339,12 +344,14 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		if ( ! supportedStyles.includes( 'minHeight' ) ) {
-			updatedSettings.dimensions = {
-				...updatedSettings.dimensions,
-				minHeight: false,
-			};
-		}
+		[ 'aspectRatio', 'minHeight' ].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
+			}
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (

@@ -12,19 +12,24 @@ import { useRef } from '@wordpress/element';
  */
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 export default function useTabNav() {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const lastFocus = useRef();
+
 	const { hasMultiSelection, getSelectedBlockClientId, getBlockCount } =
 		useSelect( blockEditorStore );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode, setLastFocus } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isNavigationMode = useSelect(
 		( select ) => select( blockEditorStore ).isNavigationMode(),
 		[]
 	);
+
+	const { getLastFocus } = unlock( useSelect( blockEditorStore ) );
 
 	// Don't allow tabbing to this element in Navigation mode.
 	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
@@ -40,7 +45,7 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			lastFocus.current.focus();
+			getLastFocus()?.current.focus();
 		} else {
 			setNavigationMode( true );
 
@@ -158,7 +163,7 @@ export default function useTabNav() {
 		}
 
 		function onFocusOut( event ) {
-			lastFocus.current = event.target;
+			setLastFocus( { ...getLastFocus(), current: event.target } );
 
 			const { ownerDocument } = node;
 

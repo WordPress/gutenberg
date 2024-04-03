@@ -22,7 +22,9 @@ export const TabListWrapper = styled.div`
 `;
 
 export const Tab = styled( Ariakit.Tab )`
-	&& {
+	& {
+		display: inline-flex;
+		align-items: center;
 		position: relative;
 		border-radius: 0;
 		height: ${ space( 12 ) };
@@ -37,6 +39,10 @@ export const Tab = styled( Ariakit.Tab )`
 		&[aria-disabled='true'] {
 			cursor: default;
 			opacity: 0.3;
+		}
+
+		&:hover {
+			color: ${ COLORS.theme.accent };
 		}
 
 		&:focus:not( :disabled ) {
@@ -99,5 +105,21 @@ export const Tab = styled( Ariakit.Tab )`
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
 		}
+	}
+`;
+
+export const TabPanel = styled( Ariakit.TabPanel )`
+	&:focus {
+		box-shadow: none;
+		outline: none;
+	}
+
+	&:focus-visible {
+		border-radius: 2px;
+		box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+			${ COLORS.theme.accent };
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: 0;
 	}
 `;

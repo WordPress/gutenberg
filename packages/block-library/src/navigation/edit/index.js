@@ -16,15 +16,14 @@ import {
 import {
 	InspectorControls,
 	useBlockProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	store as blockEditorStore,
 	withColors,
 	ContrastChecker,
 	getColorClassName,
 	Warning,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseBlockOverlayActive as useBlockOverlayActive,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
@@ -40,7 +39,7 @@ import {
 	Spinner,
 	Notice,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { close, Icon } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
@@ -154,8 +153,8 @@ function Navigation( {
 		isError: createNavigationMenuIsError,
 	} = useCreateNavigationMenu( clientId );
 
-	const createUntitledEmptyNavigationMenu = () => {
-		createNavigationMenu( '' );
+	const createUntitledEmptyNavigationMenu = async () => {
+		await createNavigationMenu( '' );
 	};
 
 	const {
@@ -188,9 +187,9 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
 		hasResolvedCanUserDeleteNavigationMenu,
-		canUserCreateNavigationMenu,
-		isResolvingCanUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -290,7 +289,13 @@ function Navigation( {
 
 	const textDecoration = attributes.style?.typography?.textDecoration;
 
-	const hasBlockOverlay = useBlockOverlayActive( clientId );
+	const hasBlockOverlay = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableHasActiveBlockOverlayActive(
+				clientId
+			),
+		[ clientId ]
+	);
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -337,16 +342,7 @@ function Navigation( {
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
-		const navMenu = await convertClassicMenu(
-			classicMenu.id,
-			classicMenu.name,
-			'draft'
-		);
-		if ( navMenu ) {
-			handleUpdateMenu( navMenu.id, {
-				focusNavigationBlock: true,
-			} );
-		}
+		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
 	};
 
 	const onSelectNavigationMenu = ( menuId ) => {
@@ -397,6 +393,9 @@ function Navigation( {
 			showClassicMenuConversionNotice(
 				__( 'Classic menu imported successfully.' )
 			);
+			handleUpdateMenu( createNavigationMenuPost?.id, {
+				focusNavigationBlock: true,
+			} );
 		}
 
 		if ( classicMenuConversionStatus === CLASSIC_MENU_CONVERSION_ERROR ) {
@@ -409,6 +408,8 @@ function Navigation( {
 		classicMenuConversionError,
 		hideClassicMenuConversionNotice,
 		showClassicMenuConversionNotice,
+		createNavigationMenuPost?.id,
+		handleUpdateMenu,
 	] );
 
 	useEffect( () => {
@@ -466,8 +467,8 @@ function Navigation( {
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigationMenu &&
-				! canUserCreateNavigationMenu
+				hasResolvedCanUserCreateNavigationMenus &&
+				! canUserCreateNavigationMenus
 			) {
 				showNavigationMenuPermissionsNotice(
 					__(
@@ -481,8 +482,8 @@ function Navigation( {
 		isInnerBlockSelected,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
-		canUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 		ref,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
@@ -490,7 +491,7 @@ function Navigation( {
 	] );
 
 	const hasManagePermissions =
-		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
 	const overlayMenuPreviewClasses = classnames(
 		'wp-block-navigation__overlay-menu-preview',
@@ -667,7 +668,7 @@ function Navigation( {
 						panelId={ clientId }
 						{ ...colorGradientSettings }
 						gradients={ [] }
-						disableCustomGradients={ true }
+						disableCustomGradients
 					/>
 					{ enableContrastChecking && (
 						<>
@@ -800,9 +801,11 @@ function Navigation( {
 					isSelected={ isSelected }
 					currentMenuId={ ref }
 					clientId={ clientId }
-					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
-					isResolvingCanUserCreateNavigationMenu={
-						isResolvingCanUserCreateNavigationMenu
+					canUserCreateNavigationMenus={
+						canUserCreateNavigationMenus
+					}
+					isResolvingCanUserCreateNavigationMenus={
+						isResolvingCanUserCreateNavigationMenus
 					}
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
@@ -840,15 +843,11 @@ function Navigation( {
 						{ hasResolvedCanUserDeleteNavigationMenu &&
 							canUserDeleteNavigationMenu && (
 								<NavigationMenuDeleteControl
-									onDelete={ ( deletedMenuTitle = '' ) => {
+									onDelete={ () => {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
-											sprintf(
-												// translators: %s: the name of a menu (e.g. Header navigation).
-												__(
-													'Navigation menu %s successfully deleted.'
-												),
-												deletedMenuTitle
+											__(
+												'Navigation menu successfully deleted.'
 											)
 										);
 									} }
@@ -861,50 +860,52 @@ function Navigation( {
 					</InspectorControls>
 				) }
 
-				{ isLoading && (
-					<TagName { ...blockProps }>
+				<TagName
+					{ ...blockProps }
+					aria-describedby={
+						! isPlaceholder && ! isLoading
+							? accessibleDescriptionId
+							: undefined
+					}
+				>
+					{ isLoading && (
 						<div className="wp-block-navigation__loading-indicator-container">
 							<Spinner className="wp-block-navigation__loading-indicator" />
 						</div>
-					</TagName>
-				) }
+					) }
 
-				{ ! isLoading && (
-					<TagName
-						{ ...blockProps }
-						aria-describedby={
-							! isPlaceholder
-								? accessibleDescriptionId
-								: undefined
-						}
-					>
-						<AccessibleMenuDescription
-							id={ accessibleDescriptionId }
-						/>
-						<ResponsiveWrapper
-							id={ clientId }
-							onToggle={ setResponsiveMenuVisibility }
-							hasIcon={ hasIcon }
-							icon={ icon }
-							isOpen={ isResponsiveMenuOpen }
-							isResponsive={ isResponsive }
-							isHiddenByDefault={ 'always' === overlayMenu }
-							overlayBackgroundColor={ overlayBackgroundColor }
-							overlayTextColor={ overlayTextColor }
-						>
-							{ isEntityAvailable && (
-								<NavigationInnerBlocks
-									clientId={ clientId }
-									hasCustomPlaceholder={
-										!! CustomPlaceholder
-									}
-									templateLock={ templateLock }
-									orientation={ orientation }
-								/>
-							) }
-						</ResponsiveWrapper>
-					</TagName>
-				) }
+					{ ! isLoading && (
+						<>
+							<AccessibleMenuDescription
+								id={ accessibleDescriptionId }
+							/>
+							<ResponsiveWrapper
+								id={ clientId }
+								onToggle={ setResponsiveMenuVisibility }
+								hasIcon={ hasIcon }
+								icon={ icon }
+								isOpen={ isResponsiveMenuOpen }
+								isResponsive={ isResponsive }
+								isHiddenByDefault={ 'always' === overlayMenu }
+								overlayBackgroundColor={
+									overlayBackgroundColor
+								}
+								overlayTextColor={ overlayTextColor }
+							>
+								{ isEntityAvailable && (
+									<NavigationInnerBlocks
+										clientId={ clientId }
+										hasCustomPlaceholder={
+											!! CustomPlaceholder
+										}
+										templateLock={ templateLock }
+										orientation={ orientation }
+									/>
+								) }
+							</ResponsiveWrapper>
+						</>
+					) }
+				</TagName>
 			</RecursionProvider>
 		</EntityProvider>
 	);

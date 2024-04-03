@@ -95,8 +95,7 @@ describe( 'firstTimeContributorLabel', () => {
 
 		const expectedComment =
 			':wave: Thanks for your first Pull Request and for helping build the future of Gutenberg and WordPress, @ghost' +
-			"! In case you missed it, we'd love to have you join us in our [Slack community](https://make.wordpress.org/chat/)," +
-			' where we hold [regularly weekly meetings](https://make.wordpress.org/core/tag/core-editor-summary/) open to anyone to coordinate with each other.\n\n' +
+			"! In case you missed it, we'd love to have you join us in our [Slack community](https://make.wordpress.org/chat/).\n\n" +
 			'If you want to learn more about WordPress development in general, check out the [Core Handbook](https://make.wordpress.org/core/handbook/) full of helpful information.';
 
 		await firstTimeContributorLabel( payload, octokit );

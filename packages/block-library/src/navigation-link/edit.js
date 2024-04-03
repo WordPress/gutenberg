@@ -16,7 +16,7 @@ import {
 	Tooltip,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
+import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -27,16 +27,13 @@ import {
 	getColorClassName,
 	useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import {
-	placeCaretAtHorizontalEdge,
-	__unstableStripHTML as stripHTML,
-} from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -44,6 +41,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import { LinkUI } from './link-ui';
 import { updateAttributes } from './update-attributes';
 import { getColors } from '../navigation/edit/utils';
+
+const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -91,7 +90,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
-	}, [] );
+	}, [ elementRef ] );
 
 	return isDraggingWithin;
 };
@@ -169,9 +168,14 @@ export default function NavigationLinkEdit( {
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
 
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+		selectPreviousBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
+	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -179,6 +183,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add label…' );
 	const ref = useRef();
+	const prevUrl = usePrevious( url );
 
 	// Change the label using inspector causes rich text to change focus on firefox.
 	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
@@ -218,13 +223,13 @@ export default function NavigationLinkEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 			};
 		},
-		[ clientId ]
+		[ clientId, maxNestingLevel ]
 	);
 
 	/**
 	 * Transform to submenu block.
 	 */
-	function transformToSubmenu() {
+	const transformToSubmenu = () => {
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,
@@ -233,7 +238,7 @@ export default function NavigationLinkEdit( {
 				: [ createBlock( 'core/navigation-link' ) ]
 		);
 		replaceBlock( clientId, newSubmenu );
-	}
+	};
 
 	useEffect( () => {
 		// Show the LinkControl on mount if the URL is empty
@@ -267,20 +272,18 @@ export default function NavigationLinkEdit( {
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
-		if ( isLinkOpen && url ) {
-			// Does this look like a URL and have something TLD-ish?
-			if (
-				isURL( prependHTTP( label ) ) &&
-				/^.+\.[a-z]+/.test( label )
-			) {
-				// Focus and select the label text.
-				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
-			}
+		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
+		if (
+			! prevUrl &&
+			url &&
+			isLinkOpen &&
+			isURL( prependHTTP( label ) ) &&
+			/^.+\.[a-z]+/.test( label )
+		) {
+			// Focus and select the label text.
+			selectLabelText();
 		}
-	}, [ url ] );
+	}, [ prevUrl, url, isLinkOpen, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -327,11 +330,15 @@ export default function NavigationLinkEdit( {
 	} = getColors( context, ! isTopLevelLink );
 
 	function onKeyDown( event ) {
-		if (
-			isKeyboardEvent.primary( event, 'k' ) ||
-			( ( ! url || isDraft || isInvalid ) && event.keyCode === ENTER )
-		) {
+		if ( isKeyboardEvent.primary( event, 'k' ) ) {
+			// Required to prevent the command center from opening,
+			// as it shares the CMD+K shortcut.
+			// See https://github.com/WordPress/gutenberg/pull/59845.
+			event.preventDefault();
+			// If this link is a child of a parent submenu item, the parent submenu item event will also open, closing this popover
+			event.stopPropagation();
 			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
 		}
 	}
 
@@ -355,22 +362,12 @@ export default function NavigationLinkEdit( {
 		onKeyDown,
 	} );
 
-	const ALLOWED_BLOCKS = [
-		'core/navigation-link',
-		'core/navigation-submenu',
-		'core/page-list',
-	];
-	const DEFAULT_BLOCK = {
-		name: 'core/navigation-link',
-	};
-
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			...blockProps,
 			className: 'remove-outline', // Remove the outline from the inner blocks container.
 		},
 		{
-			allowedBlocks: ALLOWED_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 			renderAppender: false,
@@ -378,7 +375,10 @@ export default function NavigationLinkEdit( {
 	);
 
 	if ( ! url || isInvalid || isDraft ) {
-		blockProps.onClick = () => setIsLinkOpen( true );
+		blockProps.onClick = () => {
+			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
+		};
 	}
 
 	const classes = classnames( 'wp-block-navigation-item__content', {
@@ -404,7 +404,10 @@ export default function NavigationLinkEdit( {
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
+						onClick={ ( event ) => {
+							setIsLinkOpen( true );
+							setOpenedBy( event.currentTarget );
+						} }
 					/>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
@@ -421,18 +424,20 @@ export default function NavigationLinkEdit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ label ? stripHTML( label ) : '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
-						label={ __( 'Label' ) }
+						label={ __( 'Text' ) }
 						autoComplete="off"
 						onFocus={ () => setIsLabelFieldFocused( true ) }
 						onBlur={ () => setIsLabelFieldFocused( false ) }
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
-						value={ url || '' }
+						__next40pxDefaultSize
+						value={ url ? safeDecodeURI( url ) : '' }
 						onChange={ ( urlValue ) => {
 							updateAttributes(
 								{ url: urlValue },
@@ -440,7 +445,7 @@ export default function NavigationLinkEdit( {
 								attributes
 							);
 						} }
-						label={ __( 'URL' ) }
+						label={ __( 'Link' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
@@ -456,6 +461,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -468,6 +474,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -526,11 +533,6 @@ export default function NavigationLinkEdit( {
 												'core/image',
 												'core/strikethrough',
 											] }
-											onClick={ () => {
-												if ( ! url ) {
-													setIsLinkOpen( true );
-												}
-											} }
 										/>
 										{ description && (
 											<span className="wp-block-navigation-item__description">
@@ -571,7 +573,29 @@ export default function NavigationLinkEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								// If there is no link then remove the auto-inserted block.
+								// This avoids empty blocks which can provided a poor UX.
+								if ( ! url ) {
+									// Select the previous block to keep focus nearby
+									selectPreviousBlock( clientId, true );
+									// Remove the link.
+									onReplace( [] );
+									return;
+								}
+
+								setIsLinkOpen( false );
+								if ( openedBy ) {
+									openedBy.focus();
+									setOpenedBy( null );
+								} else if ( ref.current ) {
+									// select the ref when adding a new link
+									ref.current.focus();
+								} else {
+									// Fallback
+									selectPreviousBlock( clientId, true );
+								}
+							} }
 							anchor={ popoverAnchor }
 							onRemove={ removeLink }
 							onChange={ ( updatedValue ) => {

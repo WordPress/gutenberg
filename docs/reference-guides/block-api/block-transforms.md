@@ -22,7 +22,7 @@ export const settings = {
 };
 ```
 
-## Transformations Types
+## Transformations types
 
 This section goes through the existing types of transformations blocks support:
 

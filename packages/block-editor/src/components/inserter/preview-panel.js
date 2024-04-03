@@ -40,13 +40,13 @@ function InserterPreviewPanel( { item } ) {
 							blocks={ blocks }
 							viewportWidth={ example?.viewportWidth ?? 500 }
 							additionalStyles={ [
-								{ css: 'body { padding: 16px; }' },
+								{ css: 'body { padding: 24px; }' },
 							] }
 						/>
 					</div>
 				) : (
 					<div className="block-editor-inserter__preview-content-missing">
-						{ __( 'No Preview Available.' ) }
+						{ __( 'No preview available.' ) }
 					</div>
 				) }
 			</div>

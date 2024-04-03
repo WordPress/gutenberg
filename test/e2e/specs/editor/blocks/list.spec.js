@@ -8,6 +8,36 @@ test.describe( 'List (@firefox)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'can be copied from multi selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const copied = `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`;
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			copied + '\n\n' + copied
+		);
+	} );
+
 	test( 'can be created by using an asterisk at the start of a paragraph block', async ( {
 		editor,
 		page,
@@ -354,7 +384,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/paragraph' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -397,7 +427,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.transformBlockTo( 'core/quote' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -674,7 +704,7 @@ test.describe( 'List (@firefox)', () => {
 
 	test( 'should change the base list type', async ( { editor } ) => {
 		await editor.insertBlock( { name: 'core/list' } );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:list {"ordered":true} -->
@@ -694,7 +724,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.press( 'Enter' );
 		await editor.clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( '1' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1232,7 +1262,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( '2' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '3' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Ordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(
@@ -1264,7 +1294,7 @@ test.describe( 'List (@firefox)', () => {
 		await page.keyboard.type( 'b' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'c' );
-		await editor.clickBlockToolbarButton( 'Select List' );
+		await editor.clickBlockToolbarButton( 'Select parent block: List' );
 		await editor.clickBlockToolbarButton( 'Unordered' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe(

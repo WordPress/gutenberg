@@ -64,6 +64,17 @@ describe( 'getMergedItemIds', () => {
 
 		expect( result ).toEqual( [ 1, 3, 4 ] );
 	} );
+	it( 'should update a page properly if less items are provided than previously stored', () => {
+		let original = deepFreeze( [ 1, 2, 3 ] );
+		let result = getMergedItemIds( original, [ 1, 2 ], 1, 3 );
+
+		expect( result ).toEqual( [ 1, 2 ] );
+
+		original = deepFreeze( [ 1, 2, 3, 4, 5, 6 ] );
+		result = getMergedItemIds( original, [ 9 ], 2, 2 );
+
+		expect( result ).toEqual( [ 1, 2, 9, undefined, 5, 6 ] );
+	} );
 } );
 
 describe( 'itemIsComplete', () => {

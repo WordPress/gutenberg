@@ -93,11 +93,11 @@ export default function PostTermsEdit( {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ isLoading && hasPost && <Spinner /> }
-				{ ! isLoading && hasPostTerms && ( isSelected || prefix ) && (
+				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
+						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
-						multiline={ false }
 						aria-label={ __( 'Prefix' ) }
 						placeholder={ __( 'Prefix' ) + ' ' }
 						value={ prefix }
@@ -137,11 +137,11 @@ export default function PostTermsEdit( {
 					! hasPostTerms &&
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-				{ ! isLoading && hasPostTerms && ( isSelected || suffix ) && (
+				{ ! isLoading && ( isSelected || suffix ) && (
 					<RichText
+						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
-						multiline={ false }
 						aria-label={ __( 'Suffix' ) }
 						placeholder={ ' ' + __( 'Suffix' ) }
 						value={ suffix }
