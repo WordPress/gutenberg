@@ -12,10 +12,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function TemplateValidationNotice() {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-	const { isValid } = useSelect( ( select ) => {
-		return {
-			isValid: select( blockEditorStore ).isValidTemplate(),
-		};
+	const isValid = useSelect( ( select ) => {
+		return select( blockEditorStore ).isValidTemplate();
 	}, [] );
 	const { setTemplateValidity, synchronizeTemplate } =
 		useDispatch( blockEditorStore );
