@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -173,23 +168,24 @@ function FeaturedImage( { item, viewType } ) {
 			size={ size }
 		/>
 	) : null;
-	if ( viewType === LAYOUT_LIST ) {
-		return media;
-	}
+	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
-		<button
-			className={ classNames( 'page-pages-preview-field__button', {
-				'edit-site-page-pages__media-wrapper':
-					viewType === LAYOUT_TABLE,
-				'is-disabled': isDisabled,
-			} ) }
-			type="button"
-			onClick={ isDisabled ? undefined : onClick }
-			aria-disabled={ isDisabled }
-			aria-label={ item.title?.rendered || __( '(no title)' ) }
+		<div
+			className={ `edit-site-page-pages__featured-image-wrapper is-layout-${ viewType }` }
 		>
-			{ media }
-		</button>
+			{ renderButton ? (
+				<button
+					className="page-pages-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || __( '(no title)' ) }
+				>
+					{ media }
+				</button>
+			) : (
+				media
+			) }
+		</div>
 	);
 }
 
