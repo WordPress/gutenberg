@@ -88,6 +88,20 @@
 					}
 				}
 			}
+		},
+		{
+			"properties": {
+				"$schema": {},
+				"core": {},
+				"phpVersion": {},
+				"plugins": {},
+				"themes": {},
+				"port": {},
+				"config": {},
+				"mappings": {},
+				"env": {}
+			},
+			"additionalProperties": false
 		}
 	]
 }
