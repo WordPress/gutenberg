@@ -2904,17 +2904,17 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( ! clientId ) {
 				return 'default';
 			}
-			const rootClientId = getBlockRootClientId( state, clientId );
-			const templateLock = getTemplateLock( state, rootClientId );
+			const rootClientId = select.getBlockRootClientId( clientId );
+			const templateLock = select.getTemplateLock( rootClientId );
 			if ( templateLock === 'contentOnly' ) {
-				const name = getBlockName( state, clientId );
+				const name = select.getBlockName( clientId );
 				const isContent =
 					select( blocksStore ).__experimentalHasContentRoleAttribute(
 						name
 					);
 				return isContent ? 'contentOnly' : 'disabled';
 			}
-			const parentMode = getBlockEditingMode( state, rootClientId );
+			const parentMode = select.getBlockEditingMode( rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}
 );
