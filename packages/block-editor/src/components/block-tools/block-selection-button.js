@@ -281,6 +281,9 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 	);
 
 	const dragHandleLabel = __( 'Drag' );
+	const showBlockDraggable =
+		( canMove && editorMode === 'navigation' ) ||
+		( editorMode === 'zoom-out' && canMove && ! isBlockTemplatePart );
 
 	return (
 		<div className={ classNames }>
@@ -291,7 +294,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				<FlexItem>
 					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
-				{ canMove && (
+				{ showBlockDraggable && (
 					<FlexItem>
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
@@ -321,24 +324,6 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 								isNextBlockTemplatePart
 							}
 						/>
-					</FlexItem>
-				) }
-				{ editorMode === 'navigation' && (
-					<FlexItem>
-						<BlockDraggable clientIds={ [ clientId ] }>
-							{ ( draggableProps ) => (
-								<Button
-									icon={ dragHandle }
-									className="block-selection-button_drag-handle"
-									aria-hidden="true"
-									label={ dragHandleLabel }
-									// Should not be able to tab to drag handle as this
-									// button can only be used with a pointer device.
-									tabIndex="-1"
-									{ ...draggableProps }
-								/>
-							) }
-						</BlockDraggable>
 					</FlexItem>
 				) }
 				{ canMove && canRemove && editorMode === 'zoom-out' && (
