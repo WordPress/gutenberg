@@ -30,7 +30,7 @@ jobs:
                 node: ['20', '21']
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -39,6 +39,10 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
+            - name: Get number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
+
             - name: npm build
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
@@ -46,10 +50,10 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
             - name: Running the date tests
-              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -110,7 +114,7 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -154,7 +158,6 @@ jobs:
             - name: Docker debug information
               run: |
                   docker -v
-                  docker-compose -v
 
             - name: General debug information
               run: |
@@ -220,7 +223,7 @@ jobs:
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -238,7 +241,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -289,9 +292,13 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Get number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
@@ -303,4 +310,4 @@ jobs:
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"

@@ -178,15 +178,15 @@ test.describe( 'Block Renaming', () => {
 			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
-			const blockOptionsTrigger = listView.getByRole( 'button', {
-				name: 'Options for No Rename Support Block',
+			const blockActionsTrigger = listView.getByRole( 'button', {
+				name: 'Options',
 			} );
 
-			await blockOptionsTrigger.click();
+			await blockActionsTrigger.click();
 
 			const renameMenuItem = page
 				.getByRole( 'menu', {
-					name: 'Options for No Rename Support Block',
+					name: 'Options',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Rename',
@@ -196,7 +196,7 @@ test.describe( 'Block Renaming', () => {
 			await expect( renameMenuItem ).toBeHidden();
 		} );
 
-		test( 'displays Rename option in related menu when block is not selected', async ( {
+		test( 'displays Rename action in related menu when block is not selected', async ( {
 			editor,
 			page,
 			pageUtils,
@@ -222,16 +222,25 @@ test.describe( 'Block Renaming', () => {
 				} )
 				.click();
 
-			// Trigger options menu for the Heading (not the selected block).
-			const blockOptionsTrigger = listView.getByRole( 'button', {
-				name: 'Options for Heading',
+			// Trigger actions menu for the Heading (not the selected block).
+			const headingItem = listView.getByRole( 'gridcell', {
+				name: 'Heading',
 			} );
 
-			await blockOptionsTrigger.click();
+			// The options menu button is a sibling of the menu item gridcell.
+			const headingItemActions = headingItem
+				.locator( '..' ) // parent selector.
+				.getByRole( 'button', {
+					name: 'Options',
+				} );
 
+			await headingItemActions.click();
+
+			// usage of `page` is required because the options menu is rendered
+			// into a slot outside of the treegrid.
 			const renameMenuItem = page
 				.getByRole( 'menu', {
-					name: 'Options for Heading',
+					name: 'Options',
 				} )
 				.getByRole( 'menuitem', {
 					name: 'Rename',

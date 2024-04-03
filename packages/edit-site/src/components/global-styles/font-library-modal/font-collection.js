@@ -344,8 +344,9 @@ function FontCollection( { slug } ) {
 							size="small"
 							onClick={ () => {
 								setSelectedFont( null );
+								setNotice( null );
 							} }
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Heading
 							level={ 2 }

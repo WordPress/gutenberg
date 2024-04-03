@@ -45,6 +45,7 @@ function BlockPattern( {
 	pattern,
 	onClick,
 	onHover,
+	showTitle = true,
 	showTooltip,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -122,25 +123,27 @@ function BlockPattern( {
 								viewportWidth={ viewportWidth }
 							/>
 
-							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.type ===
-									INSERTER_PATTERN_TYPES.user &&
-									! pattern.syncStatus && (
-										<div className="block-editor-patterns__pattern-icon-wrapper">
-											<Icon
-												className="block-editor-patterns__pattern-icon"
-												icon={ symbol }
-											/>
+							{ showTitle && (
+								<HStack className="block-editor-patterns__pattern-details">
+									{ pattern.type ===
+										INSERTER_PATTERN_TYPES.user &&
+										! pattern.syncStatus && (
+											<div className="block-editor-patterns__pattern-icon-wrapper">
+												<Icon
+													className="block-editor-patterns__pattern-icon"
+													icon={ symbol }
+												/>
+											</div>
+										) }
+									{ ( ! showTooltip ||
+										pattern.type ===
+											INSERTER_PATTERN_TYPES.user ) && (
+										<div className="block-editor-block-patterns-list__item-title">
+											{ pattern.title }
 										</div>
 									) }
-								{ ( ! showTooltip ||
-									pattern.type ===
-										INSERTER_PATTERN_TYPES.user ) && (
-									<div className="block-editor-block-patterns-list__item-title">
-										{ pattern.title }
-									</div>
-								) }
-							</HStack>
+								</HStack>
+							) }
 
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
@@ -170,6 +173,7 @@ function BlockPatternsList(
 		onClickPattern,
 		orientation,
 		label = __( 'Block patterns' ),
+		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
 	},
@@ -203,6 +207,7 @@ function BlockPatternsList(
 						onClick={ onClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
+						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (

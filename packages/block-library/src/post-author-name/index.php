@@ -8,6 +8,8 @@
 /**
  * Renders the `core/post-author-name` block on the server.
  *
+ * @since 6.2.0
+ *
  * @param  array    $attributes Block attributes.
  * @param  string   $content    Block default content.
  * @param  WP_Block $block      Block instance.
@@ -43,6 +45,8 @@ function render_block_core_post_author_name( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-author-name` block on the server.
+ *
+ * @since 6.2.0
  */
 function register_block_core_post_author_name() {
 	register_block_type_from_metadata(

@@ -176,34 +176,43 @@ function LayoutPanelPure( {
 		return null;
 	}
 
+	/*
+	 * Try to find the layout type from either the
+	 * block's layout settings or any saved layout config.
+	 */
+	const blockSupportAndLayout = {
+		...layoutBlockSupport,
+		...layout,
+	};
+	const { type, default: { type: defaultType = 'default' } = {} } =
+		blockSupportAndLayout;
+	const blockLayoutType = type || defaultType;
+
 	// Only show the inherit toggle if it's supported,
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
-		( ! layout?.type ||
-			layout?.type === 'default' ||
-			layout?.type === 'constrained' ||
-			layout?.inherit )
+		( ! blockLayoutType ||
+			blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ||
+			blockSupportAndLayout.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const {
-		inherit = false,
-		type = 'default',
-		contentSize = null,
-	} = usedLayout;
+	const { inherit = false, contentSize = null } = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
 	if (
-		( type === 'default' || type === 'constrained' ) &&
+		( blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ) &&
 		! themeSupportsLayout
 	) {
 		return null;
 	}
-	const layoutType = getLayoutType( type );
+	const layoutType = getLayoutType( blockLayoutType );
 	const constrainedType = getLayoutType( 'constrained' );
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
@@ -256,7 +265,7 @@ function LayoutPanelPure( {
 
 					{ ! inherit && allowSwitching && (
 						<LayoutTypeSwitcher
-							type={ type }
+							type={ blockLayoutType }
 							onChange={ onChangeType }
 						/>
 					) }

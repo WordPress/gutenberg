@@ -18,10 +18,11 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
+	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
 
@@ -30,35 +31,28 @@ export default function useLayoutAreas() {
 
 	// Regular page
 	if ( path === '/page' ) {
+		const isListLayout = layout === 'list' || ! layout;
 		return {
+			key: 'pages-list',
 			areas: {
-				content: undefined,
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				content: <PagePages />,
+				preview: isListLayout && (
+					<Editor
+						isLoading={ isSiteEditorLoading }
+						onClick={ () =>
+							history.push( {
+								path,
+								postType: 'page',
+								postId,
+								canvas: 'edit',
+							} )
+						}
+					/>
+				),
 				mobile:
 					canvas === 'edit' ? (
 						<Editor isLoading={ isSiteEditorLoading } />
 					) : undefined,
-			},
-			widths: {
-				content: undefined,
-			},
-		};
-	}
-
-	// List layout is still experimental.
-	// Extracted it here out of the conditionals so it doesn't unintentionally becomes stable.
-	const isListLayout =
-		isCustom !== 'true' &&
-		layout === 'list' &&
-		window?.__experimentalAdminViews;
-
-	if ( path === '/pages' ) {
-		return {
-			areas: {
-				content: <PagePages />,
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -69,6 +63,7 @@ export default function useLayoutAreas() {
 	// Regular other post types
 	if ( postType && postId ) {
 		return {
+			key: 'page',
 			areas: {
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile:
@@ -80,8 +75,10 @@ export default function useLayoutAreas() {
 	}
 
 	// Templates
-	if ( path === '/wp_template/all' ) {
+	if ( path === '/wp_template' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
+			key: 'templates-list',
 			areas: {
 				content: (
 					<PageTemplatesTemplateParts
@@ -105,7 +102,9 @@ export default function useLayoutAreas() {
 
 	// Template parts
 	if ( path === '/wp_template_part/all' ) {
+		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
+			key: 'template-parts',
 			areas: {
 				content: (
 					<PageTemplatesTemplateParts
@@ -130,6 +129,7 @@ export default function useLayoutAreas() {
 	// Patterns
 	if ( path === '/patterns' ) {
 		return {
+			key: 'patterns',
 			areas: {
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
@@ -139,6 +139,7 @@ export default function useLayoutAreas() {
 
 	// Fallback shows the home page preview
 	return {
+		key: 'default',
 		areas: {
 			preview: <Editor isLoading={ isSiteEditorLoading } />,
 			mobile:

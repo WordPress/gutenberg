@@ -105,16 +105,29 @@ function FontLibraryProvider( { children } ) {
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
 	const [ libraryFontSelected, setLibraryFontSelected ] = useState( null );
 
-	const baseThemeFonts = baseFontFamilies?.theme
-		? baseFontFamilies.theme
-				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
-				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
-		: [];
-
+	// Themes Fonts are the fonts defined in the global styles (database persisted theme.json data).
 	const themeFonts = fontFamilies?.theme
 		? fontFamilies.theme
 				.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
 				.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		: [];
+
+	const themeFontsSlugs = new Set( themeFonts.map( ( f ) => f.slug ) );
+
+	/*
+	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
+	 *
+	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
+	 * Avoids incosistencies with the fonts listed in the font library modal as base (unactivated).
+	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variation is applied.
+	 */
+	const baseThemeFonts = baseFontFamilies?.theme
+		? themeFonts.concat(
+				baseFontFamilies.theme
+					.filter( ( f ) => ! themeFontsSlugs.has( f.slug ) )
+					.map( ( f ) => setUIValuesNeeded( f, { source: 'theme' } ) )
+					.sort( ( a, b ) => a.name.localeCompare( b.name ) )
+		  )
 		: [];
 
 	const customFonts = fontFamilies?.custom
@@ -144,8 +157,7 @@ function FontLibraryProvider( { children } ) {
 			return;
 		}
 
-		const fonts =
-			font.source === 'theme' ? baseThemeFonts : baseCustomFonts;
+		const fonts = font.source === 'theme' ? themeFonts : baseCustomFonts;
 
 		// Tries to find the font in the installed fonts
 		const fontSelected = fonts.find( ( f ) => f.slug === font.slug );
@@ -269,13 +281,29 @@ function FontLibraryProvider( { children } ) {
 					sucessfullyInstalledFontFaces?.length > 0 ||
 					alreadyInstalledFontFaces?.length > 0
 				) {
-					fontFamilyToInstall.fontFace = [
+					// Use font data from REST API not from client to ensure
+					// correct font information is used.
+					installedFontFamily.fontFace = [
 						...sucessfullyInstalledFontFaces,
-						...alreadyInstalledFontFaces,
 					];
-					fontFamiliesToActivate.push( fontFamilyToInstall );
-				} else if ( isANewFontFamily ) {
-					// If the font family is new, delete it to avoid having font families without font faces.
+
+					fontFamiliesToActivate.push( installedFontFamily );
+				}
+
+				// If it's a system font but was installed successfully, activate it.
+				if (
+					installedFontFamily &&
+					! fontFamilyToInstall?.fontFace?.length
+				) {
+					fontFamiliesToActivate.push( installedFontFamily );
+				}
+
+				// If the font family is new and is not a system font, delete it to avoid having font families without font faces.
+				if (
+					isANewFontFamily &&
+					fontFamilyToInstall?.fontFace?.length > 0 &&
+					sucessfullyInstalledFontFaces?.length === 0
+				) {
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
 
@@ -376,14 +404,29 @@ function FontLibraryProvider( { children } ) {
 	};
 
 	const activateCustomFontFamilies = ( fontsToAdd ) => {
-		// Merge the existing custom fonts with the new fonts.
+		// Removes the id from the families and faces to avoid saving that to global styles post content.
+		const fontsToActivate = fontsToAdd.map(
+			( { id: _familyDbId, fontFace, ...font } ) => ( {
+				...font,
+				...( fontFace && fontFace.length > 0
+					? {
+							fontFace: fontFace.map(
+								( { id: _faceDbId, ...face } ) => face
+							),
+					  }
+					: {} ),
+			} )
+		);
+
 		// Activate the fonts by set the new custom fonts array.
 		setFontFamilies( {
 			...fontFamilies,
-			custom: mergeFontFamilies( fontFamilies?.custom, fontsToAdd ),
+			// Merge the existing custom fonts with the new fonts.
+			custom: mergeFontFamilies( fontFamilies?.custom, fontsToActivate ),
 		} );
+
 		// Add custom fonts to the browser.
-		fontsToAdd.forEach( ( font ) => {
+		fontsToActivate.forEach( ( font ) => {
 			if ( font.fontFace ) {
 				font.fontFace.forEach( ( face ) => {
 					// Load font faces just in the iframe because they already are in the document.
@@ -411,15 +454,15 @@ function FontLibraryProvider( { children } ) {
 
 		const isFaceActivated = isFontActivated(
 			font.slug,
-			face.fontStyle,
-			face.fontWeight,
+			face?.fontStyle,
+			face?.fontWeight,
 			font.source
 		);
 
 		if ( isFaceActivated ) {
 			loadFontFaceInBrowser(
 				face,
-				getDisplaySrcFromFontFace( face.src ),
+				getDisplaySrcFromFontFace( face?.src ),
 				'all'
 			);
 		} else {

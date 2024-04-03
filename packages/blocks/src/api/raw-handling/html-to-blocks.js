@@ -51,7 +51,11 @@ export function htmlToBlocks( html, handler ) {
 		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
-			return transform( node, handler );
+			const block = transform( node, handler );
+			if ( node.hasAttribute( 'class' ) ) {
+				block.attributes.className = node.getAttribute( 'class' );
+			}
+			return block;
 		}
 
 		return createBlock(

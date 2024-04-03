@@ -8,6 +8,8 @@
 /**
  * Renders the `core/media-text` block on server.
  *
+ * @since 6.6.0
+ *
  * @param array  $attributes The block attributes.
  * @param string $content    The block rendered content.
  *
@@ -54,6 +56,8 @@ function render_block_core_media_text( $attributes, $content ) {
 
 /**
  * Registers the `core/media-text` block renderer on server.
+ *
+ * @since 6.6.0
  */
 function register_block_core_media_text() {
 	register_block_type_from_metadata(
