@@ -18,7 +18,7 @@ import groups from './groups';
  * TODO: Remove this hook, as having a toolbar with only a Replace button is a
  * misuse of the toolbar.
  */
-export function useHasAnyBlockControls() {
+export function useHasOtherBlockControls() {
 	const Slot = groups.other?.Slot;
 	const fills = useSlotFills( Slot?.__unstableName );
 	if ( ! Slot ) {

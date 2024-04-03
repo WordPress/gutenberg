@@ -7,7 +7,7 @@ import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls';
+import { useHasOtherBlockControls } from '../block-controls/use-has-block-controls';
 
 /**
  * Returns true if the block toolbar should be shown.
@@ -15,7 +15,7 @@ import { useHasAnyBlockControls } from '../block-controls/use-has-block-controls
  * @return {boolean} Whether the block toolbar component will be rendered.
  */
 export function useHasBlockToolbar() {
-	const hasAnyBlockControls = useHasAnyBlockControls();
+	const hasAnyBlockControls = useHasOtherBlockControls();
 	return useSelect(
 		( select ) => {
 			const {
