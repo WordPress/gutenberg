@@ -90,7 +90,6 @@ function AsyncBlockPreview( {
 const blockPreviewQueue = createQueue();
 
 export function BlockPreview( props ) {
-	// const instanceId = useInstanceId( BlockPreview );
 	const [ shouldRender, setShouldRender ] = useState( false );
 
 	useEffect( () => {
