@@ -119,7 +119,6 @@ function Root( { className, ...settings } ) {
 		},
 		settings
 	);
-
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
