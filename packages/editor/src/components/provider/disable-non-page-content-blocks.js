@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 
@@ -10,7 +11,6 @@ const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
 	'core/post-title',
 	'core/post-featured-image',
 	'core/post-content',
-	'core/template-part',
 ] );
 
 /**
@@ -21,6 +21,14 @@ export default function DisableNonPageContentBlocks() {
 	const contentOnlyIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockParents, getBlockName } =
 			select( blockEditorStore );
+
+		const canEditTemplate =
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+
+		if ( canEditTemplate ) {
+			CONTENT_ONLY_BLOCKS.push( 'core/template-part' );
+		}
+
 		return getBlocksByName( CONTENT_ONLY_BLOCKS ).filter( ( clientId ) =>
 			getBlockParents( clientId ).every( ( parentClientId ) => {
 				const parentBlockName = getBlockName( parentClientId );
