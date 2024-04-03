@@ -344,22 +344,20 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 }
 
-// Inner div required to avoid padding/margin
-// causing janky animation.
-.block-editor-link-control__drawer-inner {
-	display: flex; // allow for ordering.
-	flex-direction: column;
-	flex-basis: 100%; // occupy full width.
-	position: relative;
+.block-editor-link-control__tools {
+	padding: 0 $grid-unit-10;
 }
 
-.block-editor-link-control__setting {
-	margin-bottom: 0;
-	flex: 1;
-	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+.block-editor-link-control__settings {
+	display: flex; // Allow for ordering.
+	flex-direction: column;
+	flex-basis: 100%; // Occupy full width.
+	position: relative;
+	padding: $grid-unit-05 $grid-unit-10;
+	gap: $grid-unit-15;
 
 	.components-base-control__field {
-		display: flex; // don't allow label to wrap under checkbox.
+		display: flex; // Don't allow label to wrap under checkbox.
 
 		.components-checkbox-control__label {
 			color: $gray-900;
@@ -369,39 +367,6 @@ $block-editor-link-control-number-of-actions: 1;
 	// Cancel left margin inherited from WP Admin Forms CSS.
 	input {
 		margin-left: 0;
-	}
-
-	.is-preview & {
-		padding: 20px $grid-unit-10 $grid-unit-10 0;
-	}
-}
-
-.block-editor-link-control__tools {
-	padding: $grid-unit-10 $grid-unit-10 0 $grid-unit-10;
-	margin-top: #{$grid-unit-20 * -1};
-
-	.components-button.block-editor-link-control__drawer-toggle {
-		padding-left: 0;
-		gap: 0;
-
-		&[aria-expanded="true"] {
-			color: $gray-900;
-		}
-
-		// Point downwards when open (same as list view expander)
-		&[aria-expanded="true"] svg {
-			visibility: visible;
-			transition: transform 0.1s ease;
-			transform: rotate(90deg);
-			@include reduce-motion("transition");
-		}
-		// Point rightwards when closed (same as list view expander)
-		&[aria-expanded="false"] svg {
-			visibility: visible;
-			transform: rotate(0deg);
-			transition: transform 0.1s ease;
-			@include reduce-motion("transition");
-		}
 	}
 }
 
