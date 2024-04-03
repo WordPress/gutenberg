@@ -6,6 +6,7 @@ import {
 	Button,
 	Tooltip,
 	Flex,
+	Spinner,
 } from '@wordpress/components';
 import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
@@ -178,7 +179,7 @@ function Preview( { item, categoryId, viewType } ) {
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 					{ ! isEmpty && (
-						<Async>
+						<Async placeholder={ <Spinner /> }>
 							<BlockPreview
 								blocks={ item.blocks }
 								viewportWidth={ item.viewportWidth }

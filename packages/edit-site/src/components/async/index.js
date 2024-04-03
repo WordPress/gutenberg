@@ -10,7 +10,7 @@ const blockPreviewQueue = createQueue();
  * Renders a component at the next idle time.
  * @param {*} props
  */
-export function Async( { children } ) {
+export function Async( { children, placeholder } ) {
 	const [ shouldRender, setShouldRender ] = useState( false );
 
 	// In the future, we could try to use startTransition here, but currently
@@ -32,7 +32,7 @@ export function Async( { children } ) {
 	}, [] );
 
 	if ( ! shouldRender ) {
-		return null;
+		return placeholder;
 	}
 
 	return children;
