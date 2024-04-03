@@ -99,7 +99,7 @@ export function BlockPreview( props ) {
 			setShouldRender( true );
 		} );
 		return () => {
-			blockPreviewQueue.remove( context );
+			blockPreviewQueue.cancel( context );
 		};
 	}, [] );
 
