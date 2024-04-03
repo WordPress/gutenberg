@@ -31,7 +31,8 @@ jobs:
                 shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -68,7 +69,8 @@ jobs:
                 node: ['20', '21']
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -169,7 +171,8 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -349,7 +352,8 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
