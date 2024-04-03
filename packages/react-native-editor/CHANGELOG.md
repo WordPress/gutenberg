@@ -10,6 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+
+## 1.116.0
 -   [**] Highlight color formatting style improvements [#57650]
 
 ## 1.115.0

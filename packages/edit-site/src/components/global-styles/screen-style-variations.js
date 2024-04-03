@@ -19,7 +19,6 @@ function ScreenStyleVariations() {
 	return (
 		<>
 			<ScreenHeader
-				back="/"
 				title={ __( 'Browse styles' ) }
 				description={ __(
 					'Choose a variation to change the look of the site.'
