@@ -181,6 +181,7 @@ function FeaturedImage( { item, viewType } ) {
 			className={ classNames( 'page-pages-preview-field__button', {
 				'edit-site-page-pages__media-wrapper':
 					viewType === LAYOUT_TABLE,
+				'is-disabled': isDisabled,
 			} ) }
 			type="button"
 			onClick={ isDisabled ? undefined : onClick }

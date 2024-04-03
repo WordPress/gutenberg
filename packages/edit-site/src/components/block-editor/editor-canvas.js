@@ -92,13 +92,16 @@ function EditorCanvas( {
 			}
 		},
 		onClick: () => {
-			if ( currentPostIsTrashed ) {
-				return;
-			}
 			if ( !! onClick ) {
 				onClick();
 			} else {
 				setCanvasMode( 'edit' );
+			}
+		},
+		onClickCapture: ( event ) => {
+			if ( currentPostIsTrashed ) {
+				event.preventDefault();
+				event.stopPropagation();
 			}
 		},
 		readonly: true,

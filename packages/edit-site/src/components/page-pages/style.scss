@@ -4,11 +4,14 @@
 	padding: 0;
 	background-color: unset;
 	box-sizing: border-box;
-	cursor: pointer;
 	overflow: hidden;
 	height: 100%;
 	width: 100%;
 	border-radius: 3px 3px 0 0;
+
+	&:not(.is-disabled) {
+		cursor: pointer;
+	}
 
 	&:focus-visible {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
