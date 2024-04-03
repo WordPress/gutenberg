@@ -21,7 +21,7 @@
 				},
 				"phpVersion": {
 					"description": "The PHP version to use. If null is specified, wp-env will use the default version used with production release of WordPress.",
-					"default": "null",
+					"default": null,
 					"oneOf": [
 						{
 							"type": "string"
