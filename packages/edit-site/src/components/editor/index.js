@@ -228,7 +228,7 @@ export default function Editor( { isLoading, onClick } ) {
 							}
 						) }
 						header={
-							<AnimatePresence>
+							<AnimatePresence initial={ false }>
 								{ canvasMode === 'edit' && (
 									<motion.div
 										initial={ {
