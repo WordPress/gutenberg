@@ -28,7 +28,7 @@ jobs:
             fail-fast: false
             matrix:
                 node: ['20', '21']
-                shard: ['1/1']
+                shard: ['1/2', '2/2']
 
         steps:
             - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
