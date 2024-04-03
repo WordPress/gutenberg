@@ -2908,7 +2908,7 @@ export const getBlockEditingMode = createRegistrySelector(
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
-			const editorMode = select.__unstableGetEditorMode();
+			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
 				const sectionsContainerClientId = unlock(
 					select( STORE_NAME )
@@ -2918,7 +2918,8 @@ export const getBlockEditingMode = createRegistrySelector(
 					// If we have a sections container (usually a core/group
 					// <main> element), only allow editing of the contents of
 					// the container.
-					const sectionsClientIds = select.getClientIdsOfDescendants(
+					const sectionsClientIds = getClientIdsOfDescendants(
+						state,
 						sectionsContainerClientId
 					);
 					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
@@ -2931,13 +2932,15 @@ export const getBlockEditingMode = createRegistrySelector(
 				} else {
 					// If we don't have a sections container, we get the top-level
 					// blocks and only allow editing those blocks.
-					const sectionsClientIds = select.getBlockOrder();
-					const block = select.getBlock( clientId );
+					const sectionsClientIds = getBlockOrder( state );
+					const block = getBlock( state, clientId );
 
 					function isSectionChildClientId() {
 						return sectionsClientIds.some( ( sectionClientId ) => {
-							const sectionBlock =
-								select.getBlock( sectionClientId );
+							const sectionBlock = getBlock(
+								state,
+								sectionClientId
+							);
 							if ( sectionBlock.name === 'core/template-part' ) {
 								return false;
 							}
@@ -2967,17 +2970,17 @@ export const getBlockEditingMode = createRegistrySelector(
 			if ( ! clientId ) {
 				return 'default';
 			}
-			const rootClientId = select.getBlockRootClientId( clientId );
-			const templateLock = select.getTemplateLock( rootClientId );
+			const rootClientId = getBlockRootClientId( state, clientId );
+			const templateLock = getTemplateLock( state, rootClientId );
 			if ( templateLock === 'contentOnly' ) {
-				const name = select.getBlockName( clientId );
+				const name = getBlockName( state, clientId );
 				const isContent =
 					select( blocksStore ).__experimentalHasContentRoleAttribute(
 						name
 					);
 				return isContent ? 'contentOnly' : 'disabled';
 			}
-			const parentMode = select.getBlockEditingMode( rootClientId );
+			const parentMode = getBlockEditingMode( state, rootClientId );
 			return parentMode === 'contentOnly' ? 'default' : parentMode;
 		}
 );
