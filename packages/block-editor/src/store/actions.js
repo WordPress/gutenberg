@@ -32,7 +32,7 @@ import {
 	privateRemoveBlocks,
 } from './private-actions';
 import { unlock } from '../lock-unlock';
-import { STORE_NAME } from './constants';
+import { STORE_NAME, ROOT_CONTAINER_CLIENT_ID } from './constants';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -426,7 +426,12 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param {number}  index            The index to move the blocks to.
  */
 export const moveBlocksToPosition =
-	( clientIds, fromRootClientId = '', toRootClientId = '', index ) =>
+	(
+		clientIds,
+		fromRootClientId = ROOT_CONTAINER_CLIENT_ID,
+		toRootClientId = ROOT_CONTAINER_CLIENT_ID,
+		index
+	) =>
 	( { select, dispatch } ) => {
 		const canMoveBlocks = select.canMoveBlocks(
 			clientIds,
@@ -481,8 +486,8 @@ export const moveBlocksToPosition =
  */
 export function moveBlockToPosition(
 	clientId,
-	fromRootClientId = '',
-	toRootClientId = '',
+	fromRootClientId = ROOT_CONTAINER_CLIENT_ID,
+	toRootClientId = ROOT_CONTAINER_CLIENT_ID,
 	index
 ) {
 	return moveBlocksToPosition(
@@ -1463,7 +1468,7 @@ export const __unstableSetEditorMode =
 					);
 					if ( mode === 'zoom-out' ) {
 						dispatch.setBlockEditingMode(
-							'' /* rootClientId */,
+							ROOT_CONTAINER_CLIENT_ID,
 							'disabled'
 						);
 						dispatch.setBlockEditingMode(
@@ -1474,7 +1479,9 @@ export const __unstableSetEditorMode =
 							dispatch.setBlockEditingMode( clientId, 'default' )
 						);
 					} else if ( prevMode === 'zoom-out' ) {
-						dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+						dispatch.unsetBlockEditingMode(
+							ROOT_CONTAINER_CLIENT_ID
+						);
 						dispatch.unsetBlockEditingMode(
 							sectionsContainerClientId
 						);
@@ -1504,7 +1511,7 @@ export const __unstableSetEditorMode =
 						} );
 					if ( mode === 'zoom-out' ) {
 						dispatch.setBlockEditingMode(
-							'' /* rootClientId */,
+							ROOT_CONTAINER_CLIENT_ID,
 							'contentOnly'
 						);
 						sectionsClientIds.forEach( ( clientId ) =>
@@ -1520,7 +1527,9 @@ export const __unstableSetEditorMode =
 							dispatch.setBlockEditingMode( clientId, 'disabled' )
 						);
 					} else if ( prevMode === 'zoom-out' ) {
-						dispatch.unsetBlockEditingMode( '' /* rootClientId */ );
+						dispatch.unsetBlockEditingMode(
+							ROOT_CONTAINER_CLIENT_ID
+						);
 						sectionsClientIds.forEach( ( clientId ) =>
 							dispatch.unsetBlockEditingMode( clientId )
 						);
@@ -1993,7 +2002,10 @@ export const registerInserterMediaCategory =
  *
  * @return {Object} Action object.
  */
-export function setBlockEditingMode( clientId = '', mode ) {
+export function setBlockEditingMode(
+	clientId = ROOT_CONTAINER_CLIENT_ID,
+	mode
+) {
 	return {
 		type: 'SET_BLOCK_EDITING_MODE',
 		clientId,
@@ -2010,7 +2022,7 @@ export function setBlockEditingMode( clientId = '', mode ) {
  *
  * @return {Object} Action object.
  */
-export function unsetBlockEditingMode( clientId = '' ) {
+export function unsetBlockEditingMode( clientId = ROOT_CONTAINER_CLIENT_ID ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
