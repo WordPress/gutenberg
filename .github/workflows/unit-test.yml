@@ -77,17 +77,17 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: Get number of CPU cores
+            - name: Determine the number of CPU cores
               uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
               id: cpu-cores
 
-            - name: npm build
+            - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
-            - name: Running the date tests
+            - name: Run the date tests
               run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
