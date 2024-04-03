@@ -8,6 +8,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 
+// Initial control values where no block style is set.
+const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+	backgroundSize: 'cover',
+};
+
 const {
 	useGlobalStyle,
 	useGlobalSetting,
@@ -23,12 +28,21 @@ export default function BackgroundPanel() {
 	} );
 	const [ settings ] = useGlobalSetting( '' );
 
+	const defaultControls = {
+		backgroundImage: true,
+		backgroundSize:
+			!! style?.background?.backgroundImage ||
+			!! inheritedStyle?.background?.backgroundImage,
+	};
+
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
+			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
+			defaultControls={ defaultControls }
 		/>
 	);
 }

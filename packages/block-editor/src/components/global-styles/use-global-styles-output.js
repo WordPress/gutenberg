@@ -30,6 +30,7 @@ import { GlobalStylesContext } from './context';
 import { useGlobalSetting } from './hooks';
 import { getDuotoneFilter } from '../duotone/utils';
 import { getGapCSSValue } from '../../hooks/gap';
+import { setBackgroundStyleDefaults } from '../../hooks/background';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
@@ -390,6 +391,16 @@ export function getStylesDeclarations(
 		},
 		[]
 	);
+
+	// Set background defaults.
+	// Applies to all blocks/global styles.
+	blockStyles = {
+		...blockStyles,
+		background: {
+			...blockStyles.background,
+			...setBackgroundStyleDefaults( blockStyles.background ),
+		},
+	};
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
