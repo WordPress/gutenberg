@@ -419,10 +419,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={
-					view.type === LAYOUT_GRID ||
-					! view.hiddenFields?.includes( 'preview' )
-				}
 			/>
 		</Page>
 	);

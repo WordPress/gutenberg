@@ -8,8 +8,9 @@ import classnames from 'classnames';
  */
 import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { memo, useMemo } from '@wordpress/element';
+import { memo, useMemo, useState, useEffect } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import { BlockListItems } from '../block-list';
 
 const EMPTY_ADDITIONAL_STYLES = [];
 
-export function BlockPreview( {
+function AsyncBlockPreview( {
 	blocks,
 	viewportWidth = 1200,
 	minHeight,
@@ -84,6 +85,29 @@ export function BlockPreview( {
 			/>
 		</ExperimentalBlockEditorProvider>
 	);
+}
+
+const blockPreviewQueue = createQueue();
+
+export function BlockPreview( props ) {
+	// const instanceId = useInstanceId( BlockPreview );
+	const [ shouldRender, setShouldRender ] = useState( false );
+
+	useEffect( () => {
+		const context = {};
+		blockPreviewQueue.add( context, () => {
+			setShouldRender( true );
+		} );
+		return () => {
+			blockPreviewQueue.remove( context );
+		};
+	}, [] );
+
+	if ( ! shouldRender ) {
+		return null;
+	}
+
+	return <AsyncBlockPreview { ...props } />;
 }
 
 /**

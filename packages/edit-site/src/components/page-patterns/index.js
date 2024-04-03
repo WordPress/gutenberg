@@ -404,7 +404,6 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering
 					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>
