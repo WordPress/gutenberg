@@ -249,6 +249,7 @@ function Iframe( {
 			}
 			/*
 				This CSS Custom Properties aren't used anymore as defaults, but we still need to keep them for backward compatibility.
+				See: https://github.com/WordPress/gutenberg/pull/37381
 			 */
 			:root {
 				--wp--preset--font-size--normal: 16px;
