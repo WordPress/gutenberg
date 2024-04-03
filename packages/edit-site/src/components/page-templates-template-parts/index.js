@@ -28,6 +28,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
@@ -173,7 +174,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button

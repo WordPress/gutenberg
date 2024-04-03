@@ -15,7 +15,6 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -151,7 +150,6 @@ export default function ViewGrid( {
 	actions,
 	isLoading,
 	getItemId,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 } ) {
@@ -168,9 +166,7 @@ export default function ViewGrid( {
 				field.id
 			)
 	);
-	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = deferredRendering ? shownData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	return (
 		<>
 			{ hasData && (
@@ -181,7 +177,7 @@ export default function ViewGrid( {
 					className="dataviews-view-grid"
 					aria-busy={ isLoading }
 				>
-					{ usedData.map( ( item ) => {
+					{ data.map( ( item ) => {
 						return (
 							<GridItem
 								key={ getItemId( item ) }
