@@ -1438,37 +1438,35 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
-		registry.batch( () => {
-			// When switching to zoom-out mode, we need to select the root block
-			if ( mode === 'zoom-out' ) {
-				const firstSelectedClientId = select.getBlockSelectionStart();
-				if ( firstSelectedClientId ) {
-					const rootClientId = select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					);
-					dispatch.selectBlock( rootClientId );
-				}
-			}
-
-			dispatch( { type: 'SET_EDITOR_MODE', mode } );
-
-			if ( mode === 'navigation' ) {
-				speak(
-					__(
-						'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-					)
+	( { dispatch, select } ) => {
+		// When switching to zoom-out mode, we need to select the root block
+		if ( mode === 'zoom-out' ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			if ( firstSelectedClientId ) {
+				const rootClientId = select.getBlockHierarchyRootClientId(
+					firstSelectedClientId
 				);
-			} else if ( mode === 'edit' ) {
-				speak(
-					__(
-						'You are currently in edit mode. To return to the navigation mode, press Escape.'
-					)
-				);
-			} else if ( mode === 'zoom-out' ) {
-				speak( __( 'You are currently in zoom-out mode.' ) );
+				dispatch.selectBlock( rootClientId );
 			}
-		} );
+		}
+
+		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+
+		if ( mode === 'navigation' ) {
+			speak(
+				__(
+					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
+				)
+			);
+		} else if ( mode === 'edit' ) {
+			speak(
+				__(
+					'You are currently in edit mode. To return to the navigation mode, press Escape.'
+				)
+			);
+		} else if ( mode === 'zoom-out' ) {
+			speak( __( 'You are currently in zoom-out mode.' ) );
+		}
 	};
 
 /**
