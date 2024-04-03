@@ -19,12 +19,12 @@ describe( 'getTypographyClassesAndStyles', () => {
 			},
 		};
 		expect( getTypographyClassesAndStyles( attributes ) ).toEqual( {
-			className: 'has-tofu-font-family has-large-font-size',
+			className:
+				'has-tofu-font-family has-text-align-center has-large-font-size',
 			style: {
 				columnCount: 3,
 				letterSpacing: '22px',
 				fontSize: '2rem',
-				textAlign: 'center',
 				textTransform: 'uppercase',
 			},
 		} );

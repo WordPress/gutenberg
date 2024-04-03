@@ -175,13 +175,22 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	}
 
 	$attributes = array();
+	$classnames = array();
 	$styles     = gutenberg_style_engine_get_styles(
 		array( 'typography' => $typography_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
 	);
 
 	if ( ! empty( $styles['classnames'] ) ) {
-		$attributes['class'] = $styles['classnames'];
+		$classnames[] = $styles['classnames'];
+	}
+
+	if ( $has_text_align_support && ! $should_skip_text_align && isset( $block_attributes['style']['typography']['textAlign'] ) ) {
+		$classnames[] = 'has-text-align-' . $block_attributes['style']['typography']['textAlign'];
+	}
+
+	if ( ! empty( $classnames ) ) {
+		$attributes['class'] = implode( ' ', $classnames );
 	}
 
 	if ( ! empty( $styles['css'] ) ) {

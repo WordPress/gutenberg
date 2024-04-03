@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
@@ -10,7 +16,8 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
  */
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 
@@ -59,6 +66,35 @@ export function getValidTextAlignments( blockTextAlign ) {
 	return validTextAlignments;
 }
 
+/**
+ * Filters registered block settings, extending attributes to include `textAlign`.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+export function addAttribute( settings ) {
+	// Allow blocks to specify their default style if needed.
+	if ( settings.attributes?.style?.default?.typography?.textAlign ) {
+		return settings;
+	}
+	if ( hasBlockSupport( settings, TEXT_ALIGN_SUPPORT_KEY ) ) {
+		// Gracefully handle if settings.attributes is undefined.
+		settings.attributes = {
+			...settings.attributes,
+			style: {
+				...settings.attributes?.style,
+				typography: {
+					...settings.attributes?.style?.typography,
+					textAlign: undefined,
+				},
+			},
+		};
+	}
+
+	return settings;
+}
+
 function BlockEditTextAlignmentToolbarControlsPure( {
 	style,
 	name: blockName,
@@ -101,8 +137,78 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 
 export default {
 	edit: BlockEditTextAlignmentToolbarControlsPure,
+	useBlockProps,
+	addSaveProps: addAssignedTextAlign,
 	attributeKeys: [ 'style' ],
 	hasSupport( name ) {
 		return hasBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY, false );
 	},
 };
+
+function useBlockProps( { name, style } ) {
+	if ( ! style?.typography?.textAlign ) {
+		return null;
+	}
+
+	const validTextAlignments = getValidTextAlignments(
+		getBlockSupport( name, TEXT_ALIGN_SUPPORT_KEY )
+	);
+
+	if ( ! validTextAlignments.length ) {
+		return null;
+	}
+
+	if (
+		shouldSkipSerialization( name, TYPOGRAPHY_SUPPORT_KEY, 'textAlign' )
+	) {
+		return null;
+	}
+
+	const textAlign = style.typography.textAlign;
+
+	const className = classnames( {
+		[ `has-text-align-${ textAlign }` ]: textAlign,
+	} );
+	return { className };
+}
+
+/**
+ * Override props assigned to save component to inject text alignment class
+ * name if block supports it.
+ *
+ * @param {Object} props      Additional props applied to save element.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
+ *
+ * @return {Object} Filtered props applied to save element.
+ */
+export function addAssignedTextAlign( props, blockType, attributes ) {
+	if ( ! attributes?.style?.typography?.textAlign ) {
+		return props;
+	}
+
+	const { textAlign } = attributes.style.typography;
+	const blockTextAlign = getBlockSupport( blockType, TEXT_ALIGN_SUPPORT_KEY );
+	const isTextAlignValid =
+		getValidTextAlignments( blockTextAlign ).includes( textAlign );
+	if (
+		isTextAlignValid &&
+		! shouldSkipSerialization(
+			blockType,
+			TYPOGRAPHY_SUPPORT_KEY,
+			'textAlign'
+		)
+	) {
+		props.className = classnames(
+			`has-text-align-${ textAlign }`,
+			props.className
+		);
+	}
+	return props;
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/editor/text-align/addAttribute',
+	addAttribute
+);

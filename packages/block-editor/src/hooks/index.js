@@ -50,6 +50,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	textAlign,
 	background,
 	style,
 	color,
@@ -63,6 +64,7 @@ createBlockListBlockFilter( [
 ] );
 createBlockSaveFilter( [
 	align,
+	textAlign,
 	anchor,
 	ariaLabel,
 	customClassName,
