@@ -12,6 +12,11 @@ export default function TrashPageMenuItem( { page, onRemove } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
+
+	if ( page?.status === 'trash' ) {
+		return;
+	}
+
 	const title = decodeEntities(
 		typeof page.title === 'string' ? page.title : page.title.rendered
 	);
