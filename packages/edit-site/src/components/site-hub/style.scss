@@ -10,9 +10,12 @@
 	height: $header-height;
 	width: $header-height;
 	flex-shrink: 0;
-	background: $gray-900;
 
-	&.has-transparent-background {
+	.edit-site-layout__view-mode-toggle-icon {
+		background: $gray-900;
+	}
+
+	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
 		background: transparent;
 	}
 }
