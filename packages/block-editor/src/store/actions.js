@@ -1436,8 +1436,6 @@ export const __unstableSetEditorMode =
 	( mode ) =>
 	( { dispatch, select, registry } ) => {
 		registry.batch( () => {
-			dispatch( { type: 'SET_EDITOR_MODE', mode } );
-
 			// When switching to zoom-out mode, we need to select the root block
 			if ( mode === 'zoom-out' ) {
 				const firstSelectedClientId = select.getBlockSelectionStart();
@@ -1530,6 +1528,8 @@ export const __unstableSetEditorMode =
 					}
 				}
 			}
+
+			dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
 			if ( mode === 'navigation' ) {
 				speak(
