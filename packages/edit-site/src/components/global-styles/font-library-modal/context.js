@@ -101,6 +101,8 @@ function FontLibraryProvider( { children } ) {
 	 * It updates the global styles post content in the database just new font families.
 	 * This avoids saving other styles/settings done by the user using other parts of the editor.
 	 * 
+	 * It uses the font families from the param to avoid using the font families from a outdated state.
+	 * 
 	 * @param {Array} fonts - The font families that will be saved to the database.
 	 */
 	const saveFontFamilies = async ( fonts ) => {
