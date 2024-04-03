@@ -247,6 +247,13 @@ function Iframe( {
 				height: auto !important;
 				min-height: 100%;
 			}
+			/*
+				This CSS Custom Properties aren't used anymore as defaults, but we still need to keep them for backward compatibility.
+			 */
+			:root {
+				--wp--preset--font-size--normal: 16px;
+				--wp--preset--font-size--huge: 42px;
+			}
 			/* Lowest specificity to not override global styles */
 			:where(body) {
 				margin: 0;

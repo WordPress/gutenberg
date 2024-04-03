@@ -64,13 +64,6 @@
 	@include gradient-colors-deprecated();
 }
 
-// This CSS Custom Properties aren't used anymore as defaults,
-// but we still need to keep them for backward compatibility.
-:where(.editor-styles-wrapper) {
-	--wp--preset--font-size--normal: 16px;
-	--wp--preset--font-size--huge: 42px;
-}
-
 // Font sizes (not used now, kept because of backward compatibility).
 //
 // The reason we add the editor class wrapper here is
