@@ -31,8 +31,7 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { unlock } from '../lock-unlock';
-import { STORE_NAME, ROOT_CONTAINER_CLIENT_ID } from './constants';
+import { ROOT_CONTAINER_CLIENT_ID } from './constants';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1449,97 +1448,6 @@ export const __unstableSetEditorMode =
 						firstSelectedClientId
 					);
 					dispatch.selectBlock( rootClientId );
-				}
-			}
-
-			const prevMode = select.__unstableGetEditorMode();
-
-			if ( mode === 'zoom-out' || prevMode === 'zoom-out' ) {
-				const sectionsContainerClientId = unlock(
-					registry.select( STORE_NAME )
-				).getSectionsContainerClientId();
-
-				if ( sectionsContainerClientId ) {
-					// If we have a sections container (usually a core/group
-					// <main> element), only allow editing of the contents of
-					// the container.
-					const sectionsClientIds = select.getClientIdsOfDescendants(
-						sectionsContainerClientId
-					);
-					if ( mode === 'zoom-out' ) {
-						dispatch.setBlockEditingMode(
-							ROOT_CONTAINER_CLIENT_ID,
-							'disabled'
-						);
-						dispatch.setBlockEditingMode(
-							sectionsContainerClientId,
-							'contentOnly'
-						);
-						sectionsClientIds.forEach( ( clientId ) =>
-							dispatch.setBlockEditingMode( clientId, 'default' )
-						);
-					} else if ( prevMode === 'zoom-out' ) {
-						dispatch.unsetBlockEditingMode(
-							ROOT_CONTAINER_CLIENT_ID
-						);
-						dispatch.unsetBlockEditingMode(
-							sectionsContainerClientId
-						);
-						sectionsClientIds.forEach( ( clientId ) => {
-							dispatch.unsetBlockEditingMode( clientId );
-						} );
-					}
-				} else {
-					// If we don't have a sections container, we get the top-level
-					// blocks and only allow editing those blocks.
-					const sectionsClientIds = select.getBlockOrder();
-					const disabledSectionsClientIds = sectionsClientIds.filter(
-						( clientId ) => {
-							const block = select.getBlock( clientId );
-							return block.name === 'core/template-part';
-						}
-					);
-					const sectionClientIdsInnerBlocks =
-						sectionsClientIds.flatMap( ( clientId ) => {
-							const block = select.getBlock( clientId );
-							if ( block.name === 'core/template-part' ) {
-								return [];
-							}
-							return block.innerBlocks.map(
-								( innerBlock ) => innerBlock.clientId
-							);
-						} );
-					if ( mode === 'zoom-out' ) {
-						dispatch.setBlockEditingMode(
-							ROOT_CONTAINER_CLIENT_ID,
-							'contentOnly'
-						);
-						sectionsClientIds.forEach( ( clientId ) =>
-							dispatch.setBlockEditingMode(
-								clientId,
-								'contentOnly'
-							)
-						);
-						disabledSectionsClientIds.forEach( ( clientId ) =>
-							dispatch.setBlockEditingMode( clientId, 'disabled' )
-						);
-						sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
-							dispatch.setBlockEditingMode( clientId, 'disabled' )
-						);
-					} else if ( prevMode === 'zoom-out' ) {
-						dispatch.unsetBlockEditingMode(
-							ROOT_CONTAINER_CLIENT_ID
-						);
-						sectionsClientIds.forEach( ( clientId ) =>
-							dispatch.unsetBlockEditingMode( clientId )
-						);
-						disabledSectionsClientIds.forEach( ( clientId ) =>
-							dispatch.unsetBlockEditingMode( clientId )
-						);
-						sectionClientIdsInnerBlocks.forEach( ( clientId ) =>
-							dispatch.unsetBlockEditingMode( clientId )
-						);
-					}
 				}
 			}
 

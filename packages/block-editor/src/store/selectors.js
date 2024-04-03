@@ -2905,6 +2905,61 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = ROOT_CONTAINER_CLIENT_ID ) => {
+			// In zoom-out mode, override the behavior set by
+			// __unstableSetBlockEditingMode to only allow editing the top-level
+			// sections.
+			const editorMode = select.__unstableGetEditorMode();
+			if ( editorMode === 'zoom-out' ) {
+				const sectionsContainerClientId = unlock(
+					select( STORE_NAME )
+				).getSectionsContainerClientId();
+
+				if ( sectionsContainerClientId ) {
+					// If we have a sections container (usually a core/group
+					// <main> element), only allow editing of the contents of
+					// the container.
+					const sectionsClientIds = select.getClientIdsOfDescendants(
+						sectionsContainerClientId
+					);
+					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+						return 'disabled';
+					} else if ( clientId === sectionsContainerClientId ) {
+						return 'contentOnly';
+					} else if ( sectionsClientIds.includes( clientId ) ) {
+						return 'default';
+					}
+				} else {
+					// If we don't have a sections container, we get the top-level
+					// blocks and only allow editing those blocks.
+					const sectionsClientIds = select.getBlockOrder();
+					const block = select.getBlock( clientId );
+
+					function isSectionChildClientId() {
+						return sectionsClientIds.some( ( sectionClientId ) => {
+							const sectionBlock =
+								select.getBlock( sectionClientId );
+							if ( sectionBlock.name === 'core/template-part' ) {
+								return false;
+							}
+							return sectionBlock.innerBlocks.some(
+								( innerBlock ) =>
+									innerBlock.clientId === clientId
+							);
+						} );
+					}
+
+					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+						return 'contentOnly';
+					} else if ( sectionsClientIds.includes( clientId ) ) {
+						return 'contentOnly';
+					} else if ( block.name === 'core/template-part' ) {
+						return 'disabled';
+					} else if ( isSectionChildClientId() ) {
+						return 'disabled';
+					}
+				}
+			}
+
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
