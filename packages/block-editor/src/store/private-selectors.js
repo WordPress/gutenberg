@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,10 +13,18 @@ import {
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
-import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
+import {
+	checkAllowListRecursive,
+	getAllPatternsDependants,
+	getInsertBlockTypeDependants,
+} from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+import {
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -250,10 +253,6 @@ export const getInserterMediaCategories = createSelector(
 	]
 );
 
-export function getFetchedPatterns( state ) {
-	return state.blockPatterns;
-}
-
 /**
  * Returns whether there is at least one allowed pattern for inner blocks children.
  * This is useful for deferring the parsing of all patterns until needed.
@@ -285,11 +284,8 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			getAllPatternsDependants( state ),
-			state.settings.allowedBlockTypes,
-			state.settings.templateLock,
-			state.blockListSettings[ rootClientId ],
-			state.blocks.byClientId.get( rootClientId ),
+			...getAllPatternsDependants( select )( state ),
+			...getInsertBlockTypeDependants( state, rootClientId ),
 		]
 	)
 );
@@ -302,35 +298,47 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
 		} = state.settings;
-		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
-			( userPattern ) => {
-				return {
-					name: `core/block/${ userPattern.id }`,
-					id: userPattern.id,
-					type: INSERTER_PATTERN_TYPES.user,
-					title: userPattern.title.raw,
-					categories: userPattern.wp_pattern_category.map(
-						( catId ) => {
-							const category = (
-								__experimentalUserPatternCategories ?? []
-							).find( ( { id } ) => id === catId );
-							return category ? category.slug : catId;
-						}
-					),
-					content: userPattern.content.raw,
-					syncStatus: userPattern.wp_pattern_sync_status,
-				};
-			}
-		);
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		const userPatterns = (
+			reusableBlocksSelect
+				? reusableBlocksSelect( select )
+				: __experimentalReusableBlocks ?? []
+		).map( ( userPattern ) => {
+			return {
+				name: `core/block/${ userPattern.id }`,
+				id: userPattern.id,
+				type: INSERTER_PATTERN_TYPES.user,
+				title: userPattern.title.raw,
+				categories: userPattern.wp_pattern_category.map( ( catId ) => {
+					const category = (
+						__experimentalUserPatternCategories ?? []
+					).find( ( { id } ) => id === catId );
+					return category ? category.slug : catId;
+				} ),
+				content: userPattern.content.raw,
+				syncStatus: userPattern.wp_pattern_sync_status,
+			};
+		} );
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
-			...unlock( select( STORE_NAME ) ).getFetchedPatterns(),
+			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
-	}, getAllPatternsDependants )
+	}, getAllPatternsDependants( select ) )
+);
+
+const EMPTY_ARRAY = [];
+
+export const getReusableBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return reusableBlocksSelect
+			? reusableBlocksSelect( select )
+			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	}
 );
 
 /**
@@ -344,14 +352,6 @@ export function getLastFocus( state ) {
 	return state.lastFocus;
 }
 
-export function getAllBlockBindingsSources( state ) {
-	return state.blockBindingsSources;
-}
-
-export function getBlockBindingsSource( state, sourceName ) {
-	return state.blockBindingsSources[ sourceName ];
-}
-
 /**
  * Returns true if the user is dragging anything, or false otherwise. It is possible for a
  * user to be dragging data from outside of the editor, so this selector is separate from
@@ -363,4 +363,15 @@ export function getBlockBindingsSource( state, sourceName ) {
  */
 export function isDragging( state ) {
 	return state.isDragging;
+}
+
+/**
+ * Retrieves the expanded block from the state.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string|null} The client ID of the expanded block, if set.
+ */
+export function getExpandedBlock( state ) {
+	return state.expandedBlock;
 }

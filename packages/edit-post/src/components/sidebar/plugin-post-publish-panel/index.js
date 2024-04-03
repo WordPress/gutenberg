@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { usePluginContext } from '@wordpress/plugins';
-import { createSlotFill, PanelBody } from '@wordpress/components';
-
-const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
+import deprecated from '@wordpress/deprecated';
+import { PluginPostPublishPanel } from '@wordpress/editor';
 
 /**
  * Renders provided content to the post-publish panel in the publish flow
  * (side panel that opens after a user publishes the post).
+ *
+ * @deprecated since 6.6, use `wp.editor.PluginPostPublishPanel` instead.
  *
  * @param {Object}                props                                 Component properties.
  * @param {string}                [props.className]                     An optional class name added to the panel.
@@ -16,68 +16,13 @@ const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
  * @param {boolean}               [props.initialOpen=false]             Whether to have the panel initially opened. When no title is provided it is always opened.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  * @param {Element}               props.children                        Children to be rendered
- *
- * @example
- * ```js
- * // Using ES5 syntax
- * var __ = wp.i18n.__;
- * var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
- *
- * function MyPluginPostPublishPanel() {
- * 	return React.createElement(
- * 		PluginPostPublishPanel,
- * 		{
- * 			className: 'my-plugin-post-publish-panel',
- * 			title: __( 'My panel title' ),
- * 			initialOpen: true,
- * 		},
- * 		__( 'My panel content' )
- * 	);
- * }
- * ```
- *
- * @example
- * ```jsx
- * // Using ESNext syntax
- * import { __ } from '@wordpress/i18n';
- * import { PluginPostPublishPanel } from '@wordpress/edit-post';
- *
- * const MyPluginPostPublishPanel = () => (
- * 	<PluginPostPublishPanel
- * 		className="my-plugin-post-publish-panel"
- * 		title={ __( 'My panel title' ) }
- * 		initialOpen={ true }
- * 	>
- *         { __( 'My panel content' ) }
- * 	</PluginPostPublishPanel>
- * );
- * ```
- *
  * @return {Component} The component to be rendered.
  */
-const PluginPostPublishPanel = ( {
-	children,
-	className,
-	title,
-	initialOpen = false,
-	icon,
-} ) => {
-	const { icon: pluginIcon } = usePluginContext();
-
-	return (
-		<Fill>
-			<PanelBody
-				className={ className }
-				initialOpen={ initialOpen || ! title }
-				title={ title }
-				icon={ icon ?? pluginIcon }
-			>
-				{ children }
-			</PanelBody>
-		</Fill>
-	);
-};
-
-PluginPostPublishPanel.Slot = Slot;
-
-export default PluginPostPublishPanel;
+export default function EditPostPluginPostPublishPanel( props ) {
+	deprecated( 'wp.editPost.PluginPostPublishPanel', {
+		since: '6.6',
+		version: '6.8',
+		alternative: 'wp.editor.PluginPostPublishPanel',
+	} );
+	return <PluginPostPublishPanel { ...props } />;
+}

@@ -12,12 +12,13 @@ import {
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useViewportMatch } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
@@ -30,8 +31,8 @@ import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-gl
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
-import SidebarNavigationScreenPagesDataViews from '../sidebar-navigation-screen-pages-dataviews';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -50,6 +51,7 @@ function SidebarScreenWrapper( { className, ...props } ) {
 
 function SidebarScreens() {
 	useSyncPathWithURL();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
@@ -66,21 +68,23 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreenPages />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/pages">
-				<SidebarNavigationScreenPagesDataViews />
+				<SidebarNavigationScreen
+					title={ __( 'Manage pages' ) }
+					content={ <DataViewsSidebarContent /> }
+				/>
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplates />
+				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
+			{ ! isMobileViewport && (
+				<SidebarScreenWrapper path="/patterns">
+					<SidebarNavigationScreenPatterns />
+				</SidebarScreenWrapper>
+			) }
+			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">

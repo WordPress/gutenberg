@@ -237,9 +237,7 @@ function StyleBook( {
 		<EditorCanvasContainer
 			onClose={ onClose }
 			enableResizing={ enableResizing }
-			closeButtonLabel={
-				showCloseButton ? __( 'Close Style Book' ) : null
-			}
+			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
 		>
 			<div
 				className={ classnames( 'edit-site-style-book', {
@@ -425,7 +423,11 @@ const Example = ( { id, title, blocks, isSelected, onClick } ) => {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 

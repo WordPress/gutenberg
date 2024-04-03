@@ -29,6 +29,7 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
+import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
 
 const {
 	LayoutStyle,
@@ -39,6 +40,17 @@ const {
 } = unlock( blockEditorPrivateApis );
 
 const noop = () => {};
+
+/**
+ * These post types have a special editor where they don't allow you to fill the title
+ * and they don't apply the layout styles.
+ */
+const DESIGN_POST_TYPES = [
+	'wp_block',
+	'wp_template',
+	'wp_navigation',
+	'wp_template_part',
+];
 
 /**
  * Given an array of nested blocks, find the first Post Content
@@ -93,6 +105,7 @@ function EditorCanvas( {
 		wrapperUniqueId,
 		deviceType,
 		showEditorPadding,
+		isDesignPostType,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -110,7 +123,7 @@ function EditorCanvas( {
 
 		if ( postTypeSlug === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
-		} else if ( ! _renderingMode === 'post-only' ) {
+		} else if ( _renderingMode === 'post-only' ) {
 			_wrapperBlockName = 'core/post-content';
 		}
 
@@ -130,6 +143,7 @@ function EditorCanvas( {
 		return {
 			renderingMode: _renderingMode,
 			postContentAttributes: editorSettings.postContentAttributes,
+			isDesignPostType: DESIGN_POST_TYPES.includes( postTypeSlug ),
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
@@ -164,7 +178,7 @@ function EditorCanvas( {
 	// fallbackLayout is used if there is no Post Content,
 	// and for Post Title.
 	const fallbackLayout = useMemo( () => {
-		if ( renderingMode !== 'post-only' ) {
+		if ( renderingMode !== 'post-only' || isDesignPostType ) {
 			return { type: 'default' };
 		}
 
@@ -175,7 +189,12 @@ function EditorCanvas( {
 		}
 		// Set default layout for classic themes so all alignments are supported.
 		return { type: 'default' };
-	}, [ renderingMode, themeSupportsLayout, globalLayoutSettings ] );
+	}, [
+		renderingMode,
+		themeSupportsLayout,
+		globalLayoutSettings,
+		isDesignPostType,
+	] );
 
 	const newestPostContentAttributes = useMemo( () => {
 		if (
@@ -295,6 +314,9 @@ function EditorCanvas( {
 		useFlashEditableBlocks( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
+		useSelectNearestEditableBlock( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
 	] );
 
 	return (
@@ -318,7 +340,8 @@ function EditorCanvas( {
 		>
 			{ themeSupportsLayout &&
 				! themeHasDisabledLayoutStyles &&
-				renderingMode === 'post-only' && (
+				renderingMode === 'post-only' &&
+				! isDesignPostType && (
 					<>
 						<LayoutStyle
 							selector=".editor-editor-canvas__post-title-wrapper"
@@ -337,7 +360,7 @@ function EditorCanvas( {
 						) }
 					</>
 				) }
-			{ renderingMode === 'post-only' && (
+			{ renderingMode === 'post-only' && ! isDesignPostType && (
 				<div
 					className={ classnames(
 						'editor-editor-canvas__post-title-wrapper',
@@ -367,7 +390,7 @@ function EditorCanvas( {
 					className={ classnames(
 						className,
 						'is-' + deviceType.toLowerCase() + '-preview',
-						renderingMode !== 'post-only'
+						renderingMode !== 'post-only' || isDesignPostType
 							? 'wp-site-blocks'
 							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
 					) }

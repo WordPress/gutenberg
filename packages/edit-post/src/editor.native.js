@@ -9,7 +9,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { EditorProvider } from '@wordpress/editor';
+import {
+	EditorProvider,
+	ErrorBoundary,
+	store as editorStore,
+} from '@wordpress/editor';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -24,7 +28,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import Layout from './components/layout';
-import { store as editPostStore } from './store';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -144,7 +147,9 @@ class Editor extends Component {
 						useSubRegistry={ false }
 						{ ...props }
 					>
-						<Layout setTitleRef={ this.setTitleRef } />
+						<ErrorBoundary>
+							<Layout setTitleRef={ this.setTitleRef } />
+						</ErrorBoundary>
 					</EditorProvider>
 				</SlotFillProvider>
 			</GestureHandlerRootView>
@@ -154,14 +159,14 @@ class Editor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditorMode } = select( editPostStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
 			mode: getEditorMode(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( editPostStore );
+		const { switchEditorMode } = dispatch( editorStore );
 		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,

@@ -59,7 +59,7 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -194,7 +194,7 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -237,6 +237,9 @@ export const getEntityRecords =
 				meta = {
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
+					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
 					),
 				};
 			} else {
@@ -426,7 +429,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -679,7 +682,7 @@ export const getNavigationFallbackId =
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -694,7 +697,7 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
 		}
 	};
@@ -723,7 +726,7 @@ export const getDefaultTemplateId =
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -848,7 +851,7 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);

@@ -16,6 +16,10 @@ import { BottomSheet } from '@wordpress/components';
  */
 import styles from './style.scss';
 
+const EMPTY_OPTION = {
+	label: '',
+};
+
 const BottomSheetSelectControl = ( {
 	label,
 	icon,
@@ -34,9 +38,9 @@ const BottomSheetSelectControl = ( {
 		};
 	};
 
-	const selectedOption = items.find(
-		( option ) => option.value === selectedValue
-	);
+	const selectedOption =
+		items.find( ( option ) => option.value === selectedValue ) ??
+		EMPTY_OPTION;
 
 	const goBack = () => {
 		setShowSubSheet( false );
@@ -91,7 +95,7 @@ const BottomSheetSelectControl = ( {
 							label={ item.label }
 							icon={ item.icon }
 							onPress={ onChangeValue( item.value ) }
-							leftAlign={ true }
+							leftAlign
 							key={ index }
 							accessibilityRole={ 'button' }
 							accessibilityLabel={

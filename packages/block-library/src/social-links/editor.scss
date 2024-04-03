@@ -4,13 +4,6 @@
 		display: inline-block;
 		margin-left: $grid-unit-10;
 	}
-
-	// Unset background colors that can be inherited from Global Styles.
-	// This is a duplicate of a rule in style.scss, as it needs higher specificity in the editor.
-	// The rule can be removed if editor styles get lowered in specificity.
-	&.wp-block-social-links {
-		background: none;
-	}
 }
 
 // Prevent toolbar from jumping when selecting / hovering a link.
@@ -74,7 +67,6 @@
 .wp-block-social-links .wp-block-social-links__social-prompt {
 	min-height: $button-size-small;
 	list-style: none;
-	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
 
 	// Show as block UI.
 	font-family: $default-font;
@@ -93,7 +85,7 @@
 }
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
-// @todo: Look at improving the preview component to make this unnecessary.
+// @todo Look at improving the preview component to make this unnecessary.
 .block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
 }

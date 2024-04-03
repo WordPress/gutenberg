@@ -21,6 +21,7 @@ function InserterLibrary(
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
 		__experimentalFilterValue,
+		__experimentalOnPatternCategorySelection,
 		onSelect = noop,
 		shouldFocusBlock = false,
 	},
@@ -48,6 +49,9 @@ function InserterLibrary(
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
+			__experimentalOnPatternCategorySelection={
+				__experimentalOnPatternCategorySelection
+			}
 			shouldFocusBlock={ shouldFocusBlock }
 			ref={ ref }
 		/>

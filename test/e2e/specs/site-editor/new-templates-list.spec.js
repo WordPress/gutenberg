@@ -7,18 +7,17 @@ test.describe( 'Templates', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			requestUtils.setGutenbergExperiments( [ 'gutenberg-dataviews' ] ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
 		] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-			requestUtils.setGutenbergExperiments( [] ),
-		] );
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
 	} );
 	test( 'Sorting', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
 		// Descending by title.
 		await page
 			.getByRole( 'button', { name: 'Template', exact: true } )
@@ -48,7 +47,7 @@ test.describe( 'Templates', () => {
 			title: 'Date Archives',
 			content: 'hi',
 		} );
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'tag' );
 		const titles = page
@@ -56,7 +55,9 @@ test.describe( 'Templates', () => {
 			.getByRole( 'link', { includeHidden: true } );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
-		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Reset', exact: true } )
+			.click();
 		await expect( titles ).toHaveCount( 6 );
 
 		// Filter by author.
@@ -68,7 +69,9 @@ test.describe( 'Templates', () => {
 		await expect( titles.first() ).toHaveText( 'Date Archives' );
 
 		// Filter by author and text.
-		await page.getByRole( 'button', { name: 'Reset filters' } ).click();
+		await page
+			.getByRole( 'button', { name: 'Reset', exact: true } )
+			.click();
 		await page
 			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'archives' );
@@ -80,7 +83,7 @@ test.describe( 'Templates', () => {
 		await expect( titles ).toHaveCount( 2 );
 	} );
 	test( 'Field visibility', async ( { admin, page } ) => {
-		await admin.visitSiteEditor( { path: '/wp_template/all' } );
+		await admin.visitSiteEditor( { path: '/wp_template' } );
 		await page.getByRole( 'button', { name: 'Description' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 		await expect(

@@ -4,12 +4,10 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'directive-on-document-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-on-document" }'>
-	<button 
+<div data-wp-interactive="directive-on-document">
+	<button
 		data-testid="visibility"
 		data-wp-on--click="actions.visibilityHandler"
 	>

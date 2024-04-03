@@ -2,6 +2,41 @@
 
 ## Unreleased
 
+## 5.4.0 (2024-04-03)
+
+## 5.3.0 (2024-03-21)
+
+### Bug Fixes
+
+-   Prevent non-objects from being set in store state. ([#59886](https://github.com/WordPress/gutenberg/pull/59886))
+-   Ensure that stores are available for subscription before hydration. ([#59842](https://github.com/WordPress/gutenberg/pull/59842))
+-   Ensure scope is restored when catching exceptions thrown in async generator actions. ([#59708](https://github.com/WordPress/gutenberg/pull/59708))
+
+## 5.2.0 (2024-03-06)
+
+### Bug Fixes
+
+-   Prevent passing state proxies as receivers to deepSignal proxy handlers. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+-   Keep the same references to objects defined inside the context. ([#59553](https://github.com/WordPress/gutenberg/pull/59553))
+
+## 5.1.0 (2024-02-21)
+
+### Bug Fixes
+
+-   Only add proxies to plain objects inside the store. ([#59039](https://github.com/WordPress/gutenberg/pull/59039))
+-   Improve context merges using proxies. ([59187](https://github.com/WordPress/gutenberg/pull/59187))
+
+## 5.0.0 (2024-02-09)
+
+### New Features
+
+-   Export `getConfig()` to retrieve the server-defined configuration for the passed namespace. ([58749](https://github.com/WordPress/gutenberg/pull/58749))
+
+### Breaking changes
+
+-   Remove the style prop (`key`) and class name arguments the `data-wp-style` and `data-wp-class` directives. ([#58835](https://github.com/WordPress/gutenberg/pull/58835)).
+-   Remove the `data-wp-body` directive. ([#58835](https://github.com/WordPress/gutenberg/pull/58835))
+
 ### Enhancements
 
 -   Break up init with yielding to main to prevent long task from hydration. ([#58227](https://github.com/WordPress/gutenberg/pull/58227))

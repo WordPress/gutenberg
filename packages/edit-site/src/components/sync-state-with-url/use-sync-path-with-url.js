@@ -102,27 +102,11 @@ export default function useSyncPathWithURL() {
 					path: navigatorLocation.path,
 				} );
 			} else if (
-				navigatorLocation.path === '/wp_template/all' &&
-				! window?.__experimentalAdminViews
-			) {
-				// When the experiment is disabled, we only support table layout.
-				// Clear it out from the URL, so layouts other than table cannot be accessed.
-				updateUrlParams( {
-					postType: undefined,
-					categoryType: undefined,
-					categoryId: undefined,
-					path: navigatorLocation.path,
-					layout: undefined,
-				} );
-			} else if (
 				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
 				// The "type" property should be kept as well.
-				( navigatorLocation.path === '/pages' &&
-					window?.__experimentalAdminViews ) ||
-				( navigatorLocation.path === '/wp_template/all' &&
-					window?.__experimentalAdminViews ) ||
-				( navigatorLocation.path === '/wp_template_part/all' &&
-					window?.__experimentalAdminViews )
+				navigatorLocation.path === '/page' ||
+				navigatorLocation.path === '/wp_template' ||
+				navigatorLocation.path === '/wp_template_part/all'
 			) {
 				updateUrlParams( {
 					postType: undefined,

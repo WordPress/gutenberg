@@ -10,15 +10,11 @@ import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import { store as postEditorStore } from '../../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 function WritingMenu() {
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { toggleDistractionFree } = useDispatch( postEditorStore );
+	const { toggleDistractionFree } = useDispatch( editorStore );
 
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );

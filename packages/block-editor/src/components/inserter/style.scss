@@ -22,7 +22,6 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
-	overflow-y: hidden;
 
 	&.show-as-tabs {
 		gap: 0;
@@ -108,10 +107,6 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
-
-	.components-search-control__icon {
-		right: $grid-unit-10 + ($grid-unit-60 - $icon-size) * 0.5;
-	}
 }
 
 .block-editor-inserter__tabs {
@@ -146,6 +141,8 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__no-tab-container {
 	overflow-y: auto;
 	flex-grow: 1;
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
 }
 
 .block-editor-inserter__panel-header {
@@ -319,17 +316,6 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 		height: 100%;
 		padding: $grid-unit-20 $grid-unit-30;
-	}
-}
-
-.block-editor-block-patterns-list__list-item {
-	.block-editor-block-preview__container {
-		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-	}
-	&:hover {
-		.block-editor-block-preview__container {
-			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
-		}
 	}
 }
 
@@ -615,15 +601,9 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
-		&.components-search-control {
-			input[type="search"].components-search-control__input {
-				background: $white;
-			}
-			button.components-button {
-				min-width: auto;
-				padding-left: $grid-unit-05 * 0.5;
-				padding-right: $grid-unit-05 * 0.5;
-			}
+		// TODO: Consider using the Theme component to automatically adapt to a gray background.
+		&:not(:focus-within) {
+			--wp-components-color-background: #{$white};
 		}
 	}
 }
@@ -775,5 +755,19 @@ $block-inserter-tabs-height: 44px;
 		select.components-select-control__input {
 			height: 40px;
 		}
+	}
+}
+
+.is-zoom-out {
+	.block-editor-inserter__menu {
+		display: flex;
+	}
+
+	.block-editor-inserter__patterns-category-dialog {
+		position: static;
+	}
+
+	.block-editor-inserter__media-dialog {
+		position: static;
 	}
 }

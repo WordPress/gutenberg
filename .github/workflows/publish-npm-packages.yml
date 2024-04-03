@@ -31,7 +31,7 @@ jobs:
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   path: cli
                   ref: trunk
@@ -39,7 +39,7 @@ jobs:
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -49,7 +49,7 @@ jobs:
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
@@ -67,7 +67,7 @@ jobs:
 
             - name: Setup Node.js
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
@@ -75,7 +75,7 @@ jobs:
 
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

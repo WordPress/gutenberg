@@ -84,7 +84,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				value={ preload }
 				onChange={ onChangePreload }
 				options={ options }
-				hideCancelButton={ true }
+				hideCancelButton
 			/>
 		</>
 	);

@@ -39,7 +39,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'always' },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'Overlay menu interactions', async ( { page, pageUtils } ) => {
@@ -159,7 +161,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'Submenu interactions', async ( { page, pageUtils } ) => {
@@ -366,7 +370,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off' },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'submenu click on the arrow interactions', async ( { page } ) => {
@@ -456,7 +462,9 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				name: 'core/navigation',
 				attributes: { overlayMenu: 'off', openSubmenusOnClick: true },
 			} );
-			await editor.saveSiteEditorEntities();
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
 		} );
 
 		test( 'page-list submenu user interactions', async ( {

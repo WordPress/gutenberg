@@ -5,7 +5,7 @@ import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -16,6 +16,7 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { getPasteBlocks, setClipboardBlocks } from './utils';
 
 export default function useClipboardHandler() {
+	const registry = useRegistry();
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
@@ -104,7 +105,7 @@ export default function useClipboardHandler() {
 						blocks = [ head, ...inBetweenBlocks, tail ];
 					}
 
-					setClipboardBlocks( event, blocks );
+					setClipboardBlocks( event, blocks, registry );
 				}
 			}
 

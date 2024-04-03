@@ -8,7 +8,6 @@
 @import "./components/global-styles/style.scss";
 @import "./components/global-styles/screen-revisions/style.scss";
 @import "./components/header-edit-mode/style.scss";
-@import "./components/list/style.scss";
 @import "./components/page/style.scss";
 @import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
@@ -17,7 +16,6 @@
 @import "./components/sidebar-edit-mode/style.scss";
 @import "./components/sidebar-edit-mode/page-panels/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/sidebar-card/style.scss";
 @import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/create-template-part-modal/style.scss";
@@ -34,7 +32,6 @@
 @import "./components/sidebar-navigation-screen-details-footer/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menu/style.scss";
 @import "./components/sidebar-navigation-screen-page/style.scss";
-@import "./components/sidebar-navigation-screen-templates/style.scss";
 @import "components/sidebar-navigation-screen-details-panel/style.scss";
 @import "./components/sidebar-navigation-screen-pattern/style.scss";
 @import "./components/sidebar-navigation-screen-patterns/style.scss";
@@ -49,6 +46,7 @@
 @import "./hooks/push-changes-to-global-styles/style.scss";
 @import "./components/global-styles/font-library-modal/style.scss";
 @import "./components/pagination/style.scss";
+@import "./components/global-styles/variations/style.scss";
 
 body.js #wpadminbar {
 	display: none;
@@ -67,13 +65,8 @@ body.js.site-editor-php {
 	background: $gray-900;
 }
 
-.edit-site,
-// The modals are shown outside the .edit-site wrapper, they need these styles.
-.components-modal__frame {
-	@include reset;
-}
-
 .edit-site {
+	@include reset;
 	height: 100vh;
 
 	// On mobile the main content area has to scroll, otherwise you can invoke
@@ -103,7 +96,7 @@ body.js.site-editor-php {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $gray-900;
+		background-color: $gray-300;
 	}
 }
 

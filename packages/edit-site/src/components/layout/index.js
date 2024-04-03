@@ -28,7 +28,6 @@ import {
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	privateApis as blockEditorPrivateApis,
-	useBlockCommands,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
@@ -52,12 +51,13 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import useMovingAnimation from './animation';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.3;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -66,12 +66,12 @@ export default function Layout() {
 	useCommands();
 	useEditModeCommands();
 	useCommonCommands();
-	useBlockCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	const {
 		isDistractionFree,
+		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
@@ -98,6 +98,9 @@ export default function Layout() {
 				'core',
 				'distractionFree'
 			),
+			isZoomOutMode:
+				select( blockEditorStore ).__unstableGetEditorMode() ===
+				'zoom-out',
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
@@ -112,7 +115,10 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { areas, widths } = useLayoutAreas();
+	const { key: routeKey, areas, widths } = useLayoutAreas();
+	const animationRef = useMovingAnimation( {
+		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+	} );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -174,6 +180,7 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
+						'is-zoom-out': isZoomOutMode,
 					}
 				) }
 			>
@@ -236,7 +243,9 @@ export default function Layout() {
 								} }
 								transition={ {
 									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
+									duration: disableMotion
+										? 0
+										: ANIMATION_DURATION,
 									ease: 'easeOut',
 								} }
 							>
@@ -251,66 +260,68 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					<NavigableRegion
-						ariaLabel={ __( 'Navigation' ) }
-						className="edit-site-layout__sidebar-region"
-					>
-						<AnimatePresence>
-							{ canvasMode === 'view' && (
-								<motion.div
-									initial={ { opacity: 0 } }
-									animate={ { opacity: 1 } }
-									exit={ { opacity: 0 } }
-									transition={ {
-										type: 'tween',
-										duration:
-											// Disable transition in mobile to emulate a full page transition.
-											disableMotion || isMobileViewport
-												? 0
-												: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
-									className="edit-site-layout__sidebar"
-								>
-									<Sidebar />
-								</motion.div>
-							) }
-						</AnimatePresence>
-					</NavigableRegion>
+					{ ( ! isMobileViewport ||
+						( isMobileViewport && ! areas.mobile ) ) && (
+						<NavigableRegion
+							ariaLabel={ __( 'Navigation' ) }
+							className="edit-site-layout__sidebar-region"
+						>
+							<AnimatePresence>
+								{ canvasMode === 'view' && (
+									<motion.div
+										initial={ { opacity: 0 } }
+										animate={ { opacity: 1 } }
+										exit={ { opacity: 0 } }
+										transition={ {
+											type: 'tween',
+											duration:
+												// Disable transition in mobile to emulate a full page transition.
+												disableMotion ||
+												isMobileViewport
+													? 0
+													: ANIMATION_DURATION,
+											ease: 'easeOut',
+										} }
+										className="edit-site-layout__sidebar"
+									>
+										<Sidebar />
+									</motion.div>
+								) }
+							</AnimatePresence>
+						</NavigableRegion>
+					) }
 
 					<SavePanel />
 
-					{ areas.content && canvasMode !== 'edit' && (
+					{ isMobileViewport && areas.mobile && (
 						<div
-							className="edit-site-layout__area"
+							className="edit-site-layout__mobile"
 							style={ {
 								maxWidth: widths?.content,
 							} }
 						>
-							{ areas.content }
+							{ areas.mobile }
 						</div>
 					) }
 
-					{ areas.preview && (
+					{ ! isMobileViewport &&
+						areas.content &&
+						canvasMode !== 'edit' && (
+							<div
+								className="edit-site-layout__area"
+								style={ {
+									maxWidth: widths?.content,
+								} }
+							>
+								{ areas.content }
+							</div>
+						) }
+
+					{ ! isMobileViewport && areas.preview && (
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration: disableMotion
-															? 0
-															: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
+								<div
 									className={ classnames(
 										'edit-site-layout__canvas',
 										{
@@ -318,13 +329,7 @@ export default function Layout() {
 												isResizableFrameOversized,
 										}
 									) }
-									transition={ {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
+									ref={ animationRef }
 								>
 									<ErrorBoundary>
 										<ResizableFrame
@@ -353,7 +358,7 @@ export default function Layout() {
 											{ areas.preview }
 										</ResizableFrame>
 									</ErrorBoundary>
-								</motion.div>
+								</div>
 							) }
 						</div>
 					) }

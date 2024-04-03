@@ -38,8 +38,8 @@ export default function DataViewItem( {
 	const linkInfo = useLink( {
 		path,
 		layout,
-		activeView: isCustom === 'true' ? customViewId : slug,
-		isCustom,
+		activeView: isCustom ? customViewId : slug,
+		isCustom: isCustom ? 'true' : 'false',
 	} );
 	return (
 		<HStack

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
@@ -36,6 +36,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -72,7 +73,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		displayPreview,
 		previewHeight,
 	} = attributes;
-	const { getSettings } = useSelect( blockEditorStore );
 	const { media } = useSelect(
 		( select ) => ( {
 			media:
@@ -86,20 +86,13 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
+	useUploadMediaFromBlobURL( {
+		url: href,
+		onChange: onSelectFile,
+		onError: onUploadError,
+	} );
+
 	useEffect( () => {
-		// Upload a file drag-and-dropped into the editor.
-		if ( isBlobURL( href ) ) {
-			const file = getBlobByURL( href );
-
-			getSettings().mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ newMedia ] ) => onSelectFile( newMedia ),
-				onError: onUploadError,
-			} );
-
-			revokeBlobURL( href );
-		}
-
 		if ( RichText.isEmpty( downloadButtonText ) ) {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
@@ -261,6 +254,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 				) }
 				<div className={ 'wp-block-file__content-wrapper' }>
 					<RichText
+						identifier="fileName"
 						tagName="a"
 						value={ fileName }
 						placeholder={ __( 'Write file name…' ) }
@@ -280,6 +274,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						>
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button. */ }
 							<RichText
+								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
 								className={ classnames(

@@ -107,6 +107,16 @@ class EditorPage {
 		await typeString( this.driver, block, text, clear );
 	}
 
+	async typeKeyString( inputString ) {
+		const actions = this.driver.action( 'key' );
+
+		for ( const char of inputString ) {
+			await actions.down( char ).up( char );
+		}
+
+		await actions.perform();
+	}
+
 	async pasteClipboardToTextBlock( element, { timeout = 1000 } = {} ) {
 		if ( this.driver.isAndroid ) {
 			await longPressMiddleOfElement( this.driver, element );
@@ -203,6 +213,36 @@ class EditorPage {
 			);
 		}
 		return lastElementFound;
+	}
+
+	/**
+	 * Selects a block.
+	 *
+	 * @param {import('webdriverio').ChainablePromiseElement} block                           The block to select.
+	 * @param {Object}                                        options                         Configuration options.
+	 * @param {Object}                                        [options.offset={ x: 0, y: 0 }] The offset for the click position.
+	 * @param {number|Function}                               [options.offset.x=0]            The x-coordinate offset or a function that calculates the offset based on the block's width.
+	 * @param {number|Function}                               [options.offset.y=0]            The y-coordinate offset or a function that calculates the offset based on the block's height.
+	 *
+	 * @return {import('webdriverio').ChainablePromiseElement} The selected block.
+	 */
+	async selectBlock( block, options = {} ) {
+		const { offset = { x: 0, y: 0 } } = options;
+		const size = await block.getSize();
+
+		let offsetX = offset.x;
+		if ( typeof offset.x === 'function' ) {
+			offsetX = offset.x( size.width );
+		}
+
+		let offsetY = offset.y;
+		if ( typeof offset.y === 'function' ) {
+			offsetY = offset.y( size.height );
+		}
+
+		await block.click( { x: offsetX, y: offsetY } );
+
+		return block;
 	}
 
 	async getFirstBlockVisible() {
@@ -694,6 +734,22 @@ class EditorPage {
 		await element.click();
 	}
 
+	async toggleHighlightColor( color ) {
+		await this.toggleFormatting( 'Text color' );
+		let element = `~${ color }`;
+
+		if ( ! color ) {
+			element = isAndroid()
+				? '~Clear selected color'
+				: '(//XCUIElementTypeOther[@name="Clear selected color"])[2]';
+		}
+
+		await this.driver.waitUntil( this.driver.$( element ).isDisplayed );
+		const button = await this.driver.$( element );
+		await button.click();
+		await this.dismissBottomSheet();
+	}
+
 	// =========================
 	// Paragraph Block functions
 	// =========================
@@ -1076,6 +1132,8 @@ const blockNames = {
 	button: 'Button',
 	preformatted: 'Preformatted',
 	unsupported: 'Unsupported',
+	mediaText: 'Media & Text',
+	quote: 'Quote',
 };
 
 module.exports = { setupEditor, blockNames };

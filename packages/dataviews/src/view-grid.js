@@ -10,16 +10,20 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Tooltip,
+	Spinner,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
+
+import { useHasAPossibleBulkAction } from './bulk-actions';
 
 function GridItem( {
 	selection,
@@ -31,8 +35,9 @@ function GridItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
+	displayAsColumnFields,
 } ) {
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	return (
@@ -40,12 +45,15 @@ function GridItem( {
 			spacing={ 0 }
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
-				'is-selected': isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
+				'is-selected': hasBulkAction && isSelected,
 			} ) }
-			onMouseDown={ ( event ) => {
+			onClickCapture={ ( event ) => {
 				if ( event.ctrlKey || event.metaKey ) {
-					setHasNoPointerEvents( true );
+					event.stopPropagation();
+					event.preventDefault();
+					if ( ! hasBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
@@ -69,11 +77,6 @@ function GridItem( {
 					}
 				}
 			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
-				}
-			} }
 		>
 			<div className="dataviews-view-grid__media">
 				{ mediaField?.render( { item } ) }
@@ -90,6 +93,7 @@ function GridItem( {
 					getItemId={ getItemId }
 					data={ data }
 					primaryField={ primaryField }
+					disabled={ ! hasBulkAction }
 				/>
 				<HStack className="dataviews-view-grid__primary-field">
 					{ primaryField?.render( { item } ) }
@@ -105,17 +109,34 @@ function GridItem( {
 						return null;
 					}
 					return (
-						<VStack
-							className="dataviews-view-grid__field"
+						<Flex
+							className={ classnames(
+								'dataviews-view-grid__field',
+								displayAsColumnFields?.includes( field.id )
+									? 'is-column'
+									: 'is-row'
+							) }
 							key={ field.id }
-							spacing={ 1 }
+							gap={ 1 }
+							justify="flex-start"
+							expanded
+							style={ { height: 'auto' } }
+							direction={
+								displayAsColumnFields?.includes( field.id )
+									? 'column'
+									: 'row'
+							}
 						>
-							<Tooltip text={ field.header } placement="left">
-								<div className="dataviews-view-grid__field-value">
-									{ renderedValue }
-								</div>
-							</Tooltip>
-						</VStack>
+							<FlexItem className="dataviews-view-grid__field-name">
+								{ field.header }
+							</FlexItem>
+							<FlexItem
+								className="dataviews-view-grid__field-value"
+								style={ { maxHeight: 'none' } }
+							>
+								{ renderedValue }
+							</FlexItem>
+						</Flex>
 					);
 				} ) }
 			</VStack>
@@ -128,6 +149,7 @@ export default function ViewGrid( {
 	fields,
 	view,
 	actions,
+	isLoading,
 	getItemId,
 	deferredRendering,
 	selection,
@@ -148,29 +170,48 @@ export default function ViewGrid( {
 	);
 	const shownData = useAsyncList( data, { step: 3 } );
 	const usedData = deferredRendering ? shownData : data;
+	const hasData = !! usedData?.length;
 	return (
-		<Grid
-			gap={ 6 }
-			columns={ 2 }
-			alignment="top"
-			className="dataviews-view-grid"
-		>
-			{ usedData.map( ( item ) => {
-				return (
-					<GridItem
-						key={ getItemId( item ) }
-						selection={ selection }
-						data={ data }
-						onSelectionChange={ onSelectionChange }
-						getItemId={ getItemId }
-						item={ item }
-						actions={ actions }
-						mediaField={ mediaField }
-						primaryField={ primaryField }
-						visibleFields={ visibleFields }
-					/>
-				);
-			} ) }
-		</Grid>
+		<>
+			{ hasData && (
+				<Grid
+					gap={ 6 }
+					columns={ 2 }
+					alignment="top"
+					className="dataviews-view-grid"
+					aria-busy={ isLoading }
+				>
+					{ usedData.map( ( item ) => {
+						return (
+							<GridItem
+								key={ getItemId( item ) }
+								selection={ selection }
+								data={ data }
+								onSelectionChange={ onSelectionChange }
+								getItemId={ getItemId }
+								item={ item }
+								actions={ actions }
+								mediaField={ mediaField }
+								primaryField={ primaryField }
+								visibleFields={ visibleFields }
+								displayAsColumnFields={
+									view.layout.displayAsColumnFields
+								}
+							/>
+						);
+					} ) }
+				</Grid>
+			) }
+			{ ! hasData && (
+				<div
+					className={ classnames( {
+						'dataviews-loading': isLoading,
+						'dataviews-no-results': ! isLoading,
+					} ) }
+				>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
+				</div>
+			) }
+		</>
 	);
 }

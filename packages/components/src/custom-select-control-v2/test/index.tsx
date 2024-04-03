@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { click, press, sleep, type } from '@ariakit/test';
 
 /**
  * WordPress dependencies
@@ -12,15 +12,45 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { CustomSelect, CustomSelectItem } from '..';
+import UncontrolledCustomSelectControlV2 from '..';
 import type { CustomSelectProps } from '../types';
 
-const ControlledCustomSelect = ( props: CustomSelectProps ) => {
+const items = [
+	{
+		key: 'flower1',
+		value: 'violets',
+	},
+	{
+		key: 'flower2',
+		value: 'crimson clover',
+	},
+	{
+		key: 'flower3',
+		value: 'poppy',
+	},
+	{
+		key: 'color1',
+		value: 'amber',
+	},
+	{
+		key: 'color2',
+		value: 'aquamarine',
+	},
+];
+
+const defaultProps = {
+	label: 'label!',
+	children: items.map( ( { value, key } ) => (
+		<UncontrolledCustomSelectControlV2.Item value={ value } key={ key } />
+	) ),
+};
+
+const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
 	const [ value, setValue ] = useState< string | string[] >();
 	return (
-		<CustomSelect
+		<UncontrolledCustomSelectControlV2
 			{ ...props }
-			onChange={ ( nextValue ) => {
+			onChange={ ( nextValue: string | string[] ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
@@ -30,14 +60,182 @@ const ControlledCustomSelect = ( props: CustomSelectProps ) => {
 };
 
 describe.each( [
-	[ 'uncontrolled', CustomSelect ],
-	[ 'controlled', ControlledCustomSelect ],
-] )( 'CustomSelect %s', ( ...modeAndComponent ) => {
+	[ 'Uncontrolled', UncontrolledCustomSelectControlV2 ],
+	[ 'Controlled', ControlledCustomSelectControl ],
+] )( 'CustomSelectControlV2 (%s)', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
+
+	it( 'Should replace the initial selection when a new item is selected', async () => {
+		render( <Component { ...defaultProps } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await click( currentSelectedItem );
+
+		await click(
+			screen.getByRole( 'option', {
+				name: 'crimson clover',
+			} )
+		);
+
+		expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+
+		await click( currentSelectedItem );
+
+		await click(
+			screen.getByRole( 'option', {
+				name: 'poppy',
+			} )
+		);
+
+		expect( currentSelectedItem ).toHaveTextContent( 'poppy' );
+	} );
+
+	it( 'Should keep current selection if dropdown is closed without changing selection', async () => {
+		render( <Component { ...defaultProps } /> );
+
+		const currentSelectedItem = screen.getByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		await sleep();
+		await press.Tab();
+		await press.Enter();
+		expect(
+			screen.getByRole( 'listbox', {
+				name: 'label!',
+			} )
+		).toBeVisible();
+
+		await press.Escape();
+		expect(
+			screen.queryByRole( 'listbox', {
+				name: 'label!',
+			} )
+		).not.toBeInTheDocument();
+
+		expect( currentSelectedItem ).toHaveTextContent( items[ 0 ].value );
+	} );
+
+	describe( 'Keyboard behavior and accessibility', () => {
+		it( 'Should be able to change selection using keyboard', async () => {
+			render( <Component { ...defaultProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await sleep();
+			await press.Tab();
+			expect( currentSelectedItem ).toHaveFocus();
+
+			await press.Enter();
+			expect(
+				screen.getByRole( 'listbox', {
+					name: 'label!',
+				} )
+			).toHaveFocus();
+
+			await press.ArrowDown();
+			await press.Enter();
+
+			expect( currentSelectedItem ).toHaveTextContent( 'crimson clover' );
+		} );
+
+		it( 'Should be able to type characters to select matching options', async () => {
+			render( <Component { ...defaultProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await sleep();
+			await press.Tab();
+			await press.Enter();
+			expect(
+				screen.getByRole( 'listbox', {
+					name: 'label!',
+				} )
+			).toHaveFocus();
+
+			await type( 'a' );
+			await press.Enter();
+			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+		} );
+
+		it( 'Can change selection with a focused input and closed dropdown if typed characters match an option', async () => {
+			render( <Component { ...defaultProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await sleep();
+			await press.Tab();
+			expect( currentSelectedItem ).toHaveFocus();
+			expect( currentSelectedItem ).toHaveTextContent( 'violets' );
+
+			// Ideally we would test a multi-character typeahead, but anything more than a single character is flaky
+			await type( 'a' );
+
+			expect(
+				screen.queryByRole( 'listbox', {
+					name: 'label!',
+					hidden: true,
+				} )
+			).not.toBeInTheDocument();
+
+			// This Enter is a workaround for flakiness, and shouldn't be necessary in an actual browser
+			await press.Enter();
+
+			expect( currentSelectedItem ).toHaveTextContent( 'amber' );
+		} );
+
+		it( 'Should have correct aria-selected value for selections', async () => {
+			render( <Component { ...defaultProps } /> );
+
+			const currentSelectedItem = screen.getByRole( 'combobox', {
+				expanded: false,
+			} );
+
+			await click( currentSelectedItem );
+
+			// assert that first item has aria-selected="true"
+			expect(
+				screen.getByRole( 'option', {
+					name: 'violets',
+					selected: true,
+				} )
+			).toBeVisible();
+
+			// change the current selection
+			await click( screen.getByRole( 'option', { name: 'poppy' } ) );
+
+			// click combobox to mount listbox with options again
+			await click( currentSelectedItem );
+
+			// check that first item is has aria-selected="false" after new selection
+			expect(
+				screen.getByRole( 'option', {
+					name: 'violets',
+					selected: false,
+				} )
+			).toBeVisible();
+
+			// check that new selected item now has aria-selected="true"
+			expect(
+				screen.getByRole( 'option', {
+					name: 'poppy',
+					selected: true,
+				} )
+			).toBeVisible();
+		} );
+	} );
 
 	describe( 'Multiple selection', () => {
 		it( 'Should be able to select multiple items when provided an array', async () => {
-			const user = userEvent.setup();
 			const onChangeMock = jest.fn();
 
 			// initial selection as defaultValue
@@ -59,9 +257,12 @@ describe.each( [
 						'rose blush',
 						'ultraviolet morning light',
 					].map( ( item ) => (
-						<CustomSelectItem key={ item } value={ item }>
+						<UncontrolledCustomSelectControlV2.Item
+							key={ item }
+							value={ item }
+						>
 							{ item }
-						</CustomSelectItem>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -75,7 +276,7 @@ describe.each( [
 				`${ defaultValues.length } items selected`
 			);
 
-			await user.click( currentSelectedItem );
+			await click( currentSelectedItem );
 
 			expect( screen.getByRole( 'listbox' ) ).toHaveAttribute(
 				'aria-multiselectable'
@@ -100,7 +301,7 @@ describe.each( [
 			} );
 
 			// click next selection to add another item to current selection
-			await user.click( nextSelection );
+			await click( nextSelection );
 
 			// updated array containing defaultValues + the item just selected
 			const updatedSelection = defaultValues.concat( nextSelectionName );
@@ -116,8 +317,6 @@ describe.each( [
 		} );
 
 		it( 'Should be able to deselect items when provided an array', async () => {
-			const user = userEvent.setup();
-
 			// initial selection as defaultValue
 			const defaultValues = [
 				'aurora borealis green',
@@ -130,9 +329,12 @@ describe.each( [
 			render(
 				<Component defaultValue={ defaultValues } label="Multi-select">
 					{ defaultValues.map( ( item ) => (
-						<CustomSelectItem key={ item } value={ item }>
+						<UncontrolledCustomSelectControlV2.Item
+							key={ item }
+							value={ item }
+						>
 							{ item }
-						</CustomSelectItem>
+						</UncontrolledCustomSelectControlV2.Item>
 					) ) }
 				</Component>
 			);
@@ -141,7 +343,7 @@ describe.each( [
 				expanded: false,
 			} );
 
-			await user.click( currentSelectedItem );
+			await click( currentSelectedItem );
 
 			// Array containing items to deselect
 			const nextSelection = [
@@ -154,7 +356,7 @@ describe.each( [
 			// are reflected correctly
 			await Promise.all(
 				nextSelection.map( async ( value ) => {
-					await user.click(
+					await click(
 						screen.getByRole( 'option', { name: value } )
 					);
 					expect(
@@ -176,20 +378,18 @@ describe.each( [
 	} );
 
 	it( 'Should allow rendering a custom value when using `renderSelectedValue`', async () => {
-		const user = userEvent.setup();
-
 		const renderValue = ( value: string | string[] ) => {
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 
 		render(
 			<Component label="Rendered" renderSelectedValue={ renderValue }>
-				<CustomSelectItem value="april-29">
+				<UncontrolledCustomSelectControlV2.Item value="april-29">
 					{ renderValue( 'april-29' ) }
-				</CustomSelectItem>
-				<CustomSelectItem value="july-9">
+				</UncontrolledCustomSelectControlV2.Item>
+				<UncontrolledCustomSelectControlV2.Item value="july-9">
 					{ renderValue( 'july-9' ) }
-				</CustomSelectItem>
+				</UncontrolledCustomSelectControlV2.Item>
 			</Component>
 		);
 
@@ -208,7 +408,7 @@ describe.each( [
 			screen.queryByRole( 'img', { name: 'july-9' } )
 		).not.toBeInTheDocument();
 
-		await user.click( currentSelectedItem );
+		await click( currentSelectedItem );
 
 		// expect that the other image is only visible after opening popover with options
 		expect( screen.getByRole( 'img', { name: 'july-9' } ) ).toBeVisible();

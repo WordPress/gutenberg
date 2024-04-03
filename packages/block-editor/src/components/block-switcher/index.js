@@ -160,7 +160,7 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-export const BlockSwitcher = ( { clientIds } ) => {
+export const BlockSwitcher = ( { clientIds, disabled } ) => {
 	const {
 		canRemove,
 		hasBlockStyles,
@@ -182,7 +182,9 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
 				return { invalidBlocks: true };
 			}
-			const rootClientId = getBlockRootClientId( clientIds );
+			const rootClientId = getBlockRootClientId(
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
+			);
 			const [ { name: firstBlockName } ] = _blocks;
 			const _isSingleBlockSelected = _blocks.length === 1;
 			const blockType = getBlockType( firstBlockName );
@@ -229,8 +231,8 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	const blockSwitcherLabel = isSingleBlock
 		? blockTitle
 		: __( 'Multiple blocks selected' );
-	const hideDropdown = ! hasBlockStyles && ! canRemove;
 
+	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>

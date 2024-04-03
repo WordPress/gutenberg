@@ -266,7 +266,7 @@ export function editorSettings( state = EDITOR_SETTINGS_DEFAULTS, action ) {
 	return state;
 }
 
-export function renderingMode( state = 'all', action ) {
+export function renderingMode( state = 'post-only', action ) {
 	switch ( action.type ) {
 		case 'SET_RENDERING_MODE':
 			return action.mode;
@@ -360,6 +360,18 @@ export function listViewToggleRef( state = { current: null } ) {
 	return state;
 }
 
+export function publishSidebarActive( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_PUBLISH_SIDEBAR':
+			return true;
+		case 'CLOSE_PUBLISH_SIDEBAR':
+			return false;
+		case 'TOGGLE_PUBLISH_SIDEBAR':
+			return ! state;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -377,4 +389,5 @@ export default combineReducers( {
 	blockInserterPanel,
 	listViewPanel,
 	listViewToggleRef,
+	publishSidebarActive,
 } );

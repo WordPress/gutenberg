@@ -74,11 +74,28 @@ test.describe( 'Unsynced pattern', () => {
 				name: newCategory,
 			} )
 			.click();
-		await page.getByLabel( 'My unsynced pattern' ).click();
+		const pattern = page.getByLabel( 'My unsynced pattern' ).first();
 
-		await expect
-			.poll( editor.getBlocks )
-			.toEqual( [ ...before, ...before ] );
+		const insertedPatternId = await pattern.evaluate(
+			( element ) => element.id
+		);
+
+		await pattern.click();
+
+		await expect.poll( editor.getBlocks ).toEqual( [
+			...before,
+			{
+				...before[ 0 ],
+				attributes: {
+					...before[ 0 ].attributes,
+					metadata: {
+						categories: [ 'contact-details' ],
+						name: 'My unsynced pattern',
+						patternName: insertedPatternId,
+					},
+				},
+			},
+		] );
 	} );
 } );
 

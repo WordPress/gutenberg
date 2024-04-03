@@ -1,18 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 	__experimentalFetchUrlData as fetchUrlData,
-	fetchBlockPatterns,
 } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
+import { privateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -20,15 +20,23 @@ import { store as blocksStore } from '@wordpress/blocks';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
+
+function __experimentalReusableBlocksSelect( select ) {
+	return (
+		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} ) ?? EMPTY_BLOCKS_LIST
+	);
+}
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'__experimentalPreferredStyleVariations',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
 	'blockInspectorTabs',
@@ -52,7 +60,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'gradients',
 	'generateAnchors',
 	'onNavigateToEntityRecord',
-	'hasInlineToolbar',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
@@ -60,7 +67,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'isRTL',
 	'locale',
 	'maxWidth',
-	'onUpdateDefaultBlockStyles',
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
@@ -94,7 +100,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
-		reusableBlocks,
 		hasUploadPermissions,
 		hiddenBlockTypes,
 		canUseUnfilteredHTML,
@@ -105,13 +110,11 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		restBlockPatternCategories,
 	} = useSelect(
 		( select ) => {
-			const isWeb = Platform.OS === 'web';
 			const {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
 				getUserPatternCategories,
-				getEntityRecords,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
@@ -137,11 +140,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
-				reusableBlocks: isWeb
-					? getEntityRecords( 'postType', 'wp_block', {
-							per_page: -1,
-					  } )
-					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 				userCanCreatePages: canUser( 'create', 'pages' ),
 				pageOnFront: siteSettings?.page_on_front,
@@ -247,18 +245,12 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			__experimentalFetchBlockPatterns: async () => {
-				return ( await fetchBlockPatterns() ).filter(
-					( { postTypes } ) => {
-						return (
-							! postTypes ||
-							( Array.isArray( postTypes ) &&
-								postTypes.includes( postType ) )
-						);
-					}
-				);
-			},
-			__experimentalReusableBlocks: reusableBlocks,
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+				unlock( select( coreStore ) ).getBlockPatternsForPostType(
+					postType
+				),
+			[ unlock( privateApis ).reusableBlocksSelectKey ]:
+				__experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -297,7 +289,6 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			keepCaretInsideBlock,
 			settings,
 			hasUploadPermissions,
-			reusableBlocks,
 			userPatternCategories,
 			blockPatterns,
 			blockPatternCategories,

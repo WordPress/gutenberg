@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -14,7 +9,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems, getQueriedTotalItems } from './queried-data';
+import {
+	getQueriedItems,
+	getQueriedTotalItems,
+	getQueriedTotalPages,
+} from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
@@ -623,6 +622,11 @@ export const getEntityRecordsTotalPages = (
 	if ( query.per_page === -1 ) return 1;
 	const totalItems = getQueriedTotalItems( queriedState, query );
 	if ( ! totalItems ) return totalItems;
+	// If `per_page` is not set and the query relies on the defaults of the
+	// REST endpoint, get the info from query's meta.
+	if ( ! query.per_page ) {
+		return getQueriedTotalPages( queriedState, query );
+	}
 	return Math.ceil( totalItems / query.per_page );
 };
 
