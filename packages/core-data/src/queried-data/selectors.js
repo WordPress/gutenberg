@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
+
+/**
+ * WordPress dependencies
+ */
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
