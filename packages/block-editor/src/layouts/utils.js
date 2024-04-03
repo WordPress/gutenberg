@@ -17,12 +17,15 @@ import { LAYOUT_DEFINITIONS } from './definitions';
  * @return {string} - CSS selector.
  */
 export function appendSelectors( selectors, append = '' ) {
-	// Ideally we shouldn't need the `.editor-styles-wrapper` increased specificity here
-	// The problem though is that we have a `.editor-styles-wrapper p { margin: reset; }` style
-	// it's used to reset the default margin added by wp-admin to paragraphs
-	// so we need this to be higher speficity otherwise, it won't be applied to paragraphs inside containers
-	// When the post editor is fully iframed, this extra classname could be removed.
-
+	/*
+	 * Ideally we shouldn't need the `.editor-styles-wrapper` increased specificity here.
+	 * The problem though is that we have a `.editor-styles-wrapper p { margin: reset; }` style
+	 * that's used to reset the default margin added by wp-admin to paragraphs,
+	 * so we need this to be higher specificity otherwise it won't be applied to paragraphs inside containers.
+	 * When the post editor is fully i-framed, this extra classname could be removed.
+	 * Note: in the block editor,  `.editor-styles-wrapper` is added to the HTML element
+	 * in the `IFrame` component, packages/block-editor/src/components/iframe/index.js.
+	 */
 	return selectors
 		.split( ',' )
 		.map(

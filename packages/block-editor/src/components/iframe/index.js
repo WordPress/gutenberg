@@ -150,7 +150,9 @@ function Iframe( {
 			);
 			iFrameDocument = contentDocument;
 
-			documentElement.classList.add( 'block-editor-iframe__html' );
+			documentElement.classList.add(
+				'block-editor-iframe__html editor-styles-wrapper'
+			);
 
 			clearerRef( documentElement );
 
@@ -370,14 +372,13 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling throught the iframe
+						// We want to prevent React events from bubbling through the iframe
 						// we bubble these manually.
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ classnames(
 								'block-editor-iframe__body',
-								'editor-styles-wrapper',
 								...bodyClasses
 							) }
 						>
