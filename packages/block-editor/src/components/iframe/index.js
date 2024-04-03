@@ -265,9 +265,6 @@ function Iframe( {
 		${ styles }
 		${ scripts }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
 </html>`;
 
 	const [ src, cleanup ] = useMemo( () => {
@@ -368,7 +365,7 @@ function Iframe( {
 					}
 				} }
 			>
-				{ iframeDocument &&
+				{ iframeDocument?.body &&
 					createPortal(
 						// We want to prevent React events from bubbling throught the iframe
 						// we bubble these manually.
@@ -386,7 +383,7 @@ function Iframe( {
 								{ children }
 							</StyleProvider>
 						</body>,
-						iframeDocument.documentElement
+						iframeDocument?.documentElement
 					) }
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
