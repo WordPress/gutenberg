@@ -31,6 +31,8 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
+import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1446,7 +1448,9 @@ export const __unstableSetEditorMode =
 
 		// TODO: Cleanup this for better performance/readability.
 		// When switching to zoom-out mode, we need to disable editing mode for all blocks except the sections.
-		const sectionsContainerClientId = select.getSectionsContainerClientId();
+		const sectionsContainerClientId = unlock(
+			registry.select( STORE_NAME )
+		).getSectionsContainerClientId();
 		let sectionsClientIds = [];
 		let sectionClientIdsInnerBlocks = [];
 		let disabledSectionsClientIds = [];

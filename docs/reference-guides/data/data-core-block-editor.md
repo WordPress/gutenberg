@@ -726,10 +726,6 @@ _Returns_
 
 -   `?string`: Adjacent block's client ID, or null if none exists.
 
-### getSectionsContainerClientId
-
-Undocumented declaration.
-
 ### getSelectedBlock
 
 Returns the currently selected block, or null if there is no selected block.

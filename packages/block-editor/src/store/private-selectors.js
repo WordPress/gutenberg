@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -12,6 +13,8 @@ import {
 	getBlockEditingMode,
 	getSettings,
 	canInsertBlockType,
+	getBlocksByName,
+	getBlockAttributes,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -375,3 +378,47 @@ export function isDragging( state ) {
 export function getExpandedBlock( state ) {
 	return state.expandedBlock;
 }
+
+/**
+ * Retrieves the client id of the section container block.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string|null} The client ID of the section container block,
+ *                       null if not found.
+ */
+export const getSectionsContainerClientId = createRegistrySelector(
+	( select ) => ( state ) => {
+		const { getSectionRootBlockName } = unlock( select( blocksStore ) );
+		const sectionRootBlockName = getSectionRootBlockName();
+		const { getGroupingBlockName } = select( blocksStore );
+		const groupingBlockName = getGroupingBlockName();
+
+		if ( sectionRootBlockName === groupingBlockName ) {
+			const groupBlocks = getBlocksByName( state, sectionRootBlockName );
+			const mainGroup = groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( state, clientId )?.tagName === 'main'
+			);
+			if ( mainGroup ) {
+				return mainGroup;
+			}
+			// if there is no main group and no other block is specified
+			// as section root
+			return null;
+		}
+
+		const sectionRootBlocks = getBlocksByName(
+			state,
+			sectionRootBlockName
+		);
+
+		if ( sectionRootBlocks?.length > 0 ) {
+			return sectionRootBlocks[ 0 ];
+		}
+
+		// if other block is specified
+		// as section root, but its not found
+		return null;
+	}
+);

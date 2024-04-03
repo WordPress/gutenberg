@@ -2797,54 +2797,59 @@ export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
 
-export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
-	// 'disabled' then the overlay is redundant since the block can't be
-	// selected. If the mode is 'contentOnly' then the overlay is redundant
-	// since there will be no controls to interact with once selected.
-	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
-		return false;
-	}
+export const __unstableHasActiveBlockOverlayActive = createRegistrySelector(
+	( select ) =>
+		createSelector( ( state, clientId ) => {
+			// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
+			// 'disabled' then the overlay is redundant since the block can't be
+			// selected. If the mode is 'contentOnly' then the overlay is redundant
+			// since there will be no controls to interact with once selected.
+			if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
+				return false;
+			}
 
-	// If the block editing is locked, the block overlay is always active.
-	if ( ! canEditBlock( state, clientId ) ) {
-		return true;
-	}
+			// If the block editing is locked, the block overlay is always active.
+			if ( ! canEditBlock( state, clientId ) ) {
+				return true;
+			}
 
-	const editorMode = __unstableGetEditorMode( state );
+			const editorMode = __unstableGetEditorMode( state );
 
-	// In zoom-out mode, the block overlay is always active for top level blocks.
-	if (
-		editorMode === 'zoom-out' &&
-		clientId &&
-		getBlockRootClientId( state, clientId ) ===
-			getSectionsContainerClientId( state )
-	) {
-		return true;
-	}
+			// In zoom-out mode, the block overlay is always active for top level blocks.
+			if (
+				editorMode === 'zoom-out' &&
+				clientId &&
+				getBlockRootClientId( state, clientId ) ===
+					unlock( select( STORE_NAME ) ).getSectionsContainerClientId(
+						state
+					)
+			) {
+				return true;
+			}
 
-	// In navigation mode, the block overlay is active when the block is not
-	// selected (and doesn't contain a selected child). The same behavior is
-	// also enabled in all modes for blocks that have controlled children
-	// (reusable block, template part, navigation), unless explicitly disabled
-	// with `supports.__experimentalDisableBlockOverlay`.
-	const blockSupportDisable = hasBlockSupport(
-		getBlockName( state, clientId ),
-		'__experimentalDisableBlockOverlay',
-		false
-	);
-	const shouldEnableIfUnselected =
-		editorMode === 'navigation' ||
-		( blockSupportDisable
-			? false
-			: areInnerBlocksControlled( state, clientId ) );
+			// In navigation mode, the block overlay is active when the block is not
+			// selected (and doesn't contain a selected child). The same behavior is
+			// also enabled in all modes for blocks that have controlled children
+			// (reusable block, template part, navigation), unless explicitly disabled
+			// with `supports.__experimentalDisableBlockOverlay`.
+			const blockSupportDisable = hasBlockSupport(
+				getBlockName( state, clientId ),
+				'__experimentalDisableBlockOverlay',
+				false
+			);
+			const shouldEnableIfUnselected =
+				editorMode === 'navigation' ||
+				( blockSupportDisable
+					? false
+					: areInnerBlocksControlled( state, clientId ) );
 
-	return (
-		shouldEnableIfUnselected &&
-		! isBlockSelected( state, clientId ) &&
-		! hasSelectedInnerBlock( state, clientId, true )
-	);
-}
+			return (
+				shouldEnableIfUnselected &&
+				! isBlockSelected( state, clientId ) &&
+				! hasSelectedInnerBlock( state, clientId, true )
+			);
+		} )
+);
 
 export function __unstableIsWithinBlockOverlay( state, clientId ) {
 	let parent = state.blocks.parents.get( clientId );
@@ -2977,40 +2982,4 @@ export const isGroupable = createRegistrySelector(
 				canRemoveBlocks( state, _clientIds, rootClientId )
 			);
 		}
-);
-
-export const getSectionsContainerClientId = createRegistrySelector(
-	( select ) => ( state ) => {
-		const { getSectionRootBlockName } = unlock( select( blocksStore ) );
-		const sectionRootBlockName = getSectionRootBlockName();
-		const { getGroupingBlockName } = select( blocksStore );
-		const groupingBlockName = getGroupingBlockName();
-
-		if ( sectionRootBlockName === groupingBlockName ) {
-			const groupBlocks = getBlocksByName( state, sectionRootBlockName );
-			const mainGroup = groupBlocks.find(
-				( clientId ) =>
-					getBlockAttributes( state, clientId )?.tagName === 'main'
-			);
-			if ( mainGroup ) {
-				return mainGroup;
-			}
-			// if there is no main group and no other block is specified
-			// as section root
-			return null;
-		}
-
-		const sectionRootBlocks = getBlocksByName(
-			state,
-			sectionRootBlockName
-		);
-
-		if ( sectionRootBlocks?.length > 0 ) {
-			return sectionRootBlocks[ 0 ];
-		}
-
-		// if other block is specified
-		// as section root, but its not found
-		return null;
-	}
 );
