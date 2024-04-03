@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { usePrevious } from '@wordpress/compose';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -28,11 +29,20 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting } = useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
+		useSelect( blockEditorStore );
+	const prevMode = usePrevious( __unstableGetEditorMode() );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
 		if ( ! isBlockSelected( clientId ) || isMultiSelecting() ) {
+			return;
+		}
+
+		// This reruns when the editing mode changes, and if it changed from zoom-out
+		// we don't want to auto-focus the previously selected block as this will steal
+		// focus when the mode changes
+		if ( prevMode === 'zoom-out' ) {
 			return;
 		}
 
@@ -80,9 +90,8 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 				return;
 			}
 		}
-
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition, clientId ] );
+	}, [ initialPosition, clientId, prevMode ] );
 
 	return ref;
 }
