@@ -25,6 +25,7 @@
 		"@codemirror/commands": "6.3.3",
 		"@codemirror/lang-css": "6.2.1",
 		"@codemirror/lang-html": "6.4.8",
+		"@codemirror/state": "6.4.1",
 		"@codemirror/view": "6.26.0",
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",

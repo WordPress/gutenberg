@@ -59,16 +59,19 @@ const EditorView = ({
 			 * This should be replaced with native dynamic import once it's supported.
 			 * @see https://github.com/WordPress/gutenberg/pull/60155
 			 */
-			const [{ EditorView: CmEditorView, basicSetup }, { indentWithTab }, { keymap }, languageSupport] = 
+			const [{ EditorView: CmEditorView, basicSetup }, { indentWithTab }, { Compartment }, { keymap }, languageSupport] = 
 				await Promise.all([
 					import( 'codemirror' ), 
 					import( '@codemirror/commands' ), 
+					import( '@codemirror/state' ),
 					import( '@codemirror/view' ),
 					importLanguageSupport( mode )
 				])
 
 			if ( editorRef.current ) {
-				new CmEditorView( {
+				const isDarkTheme = editorRef.current.closest( '.is-dark-theme' );
+				const theme = new Compartment();
+				const view = new CmEditorView( {
 					doc: content,
 					extensions: [
 						basicSetup,
@@ -88,9 +91,28 @@ const EditorView = ({
 								return null;
 							}
 						)] : []),
+						theme.of(CmEditorView.theme({}, { dark: isDarkTheme })),
 					],
 					parent: editorRef.current,
 				} );
+
+				/**
+				 * Observe `body` to detect dark theme changes.
+				 */
+				const observer = new window.MutationObserver( ( mutations ) => {
+					mutations.forEach( ( mutation ) => {
+						if ( mutation.attributeName === 'class' ) {
+							view.dispatch({
+								effects: theme.reconfigure(CmEditorView.theme({}, { dark: editorRef.current.closest( '.is-dark-theme' ) })),
+							});
+						}
+					});
+				});
+				observer.observe( 
+					editorRef.current.closest( 'body' ),
+					{ attributes: true } 
+				);
+
 				if (typeof callback === 'function') {
 					callback();
 				}
