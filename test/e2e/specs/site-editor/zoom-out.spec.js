@@ -4,7 +4,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Zoom Out', () => {
-	test.beforeAll( async ( { requestUtils, admin, page } ) => {
+	test.beforeEach( async ( { requestUtils, admin, page, editor } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
 
@@ -15,9 +15,16 @@ test.describe( 'Zoom Out', () => {
 		await zoomedOutCheckbox.setChecked( true );
 		await expect( zoomedOutCheckbox ).toBeChecked();
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
+
+		// Select a template part with a few blocks.
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//header',
+			postType: 'wp_template_part',
+		} );
+		await editor.canvas.locator( 'body' ).click();
 	} );
 
-	test.afterAll( async ( { requestUtils, admin, page } ) => {
+	test.afterEach( async ( { requestUtils, admin, page } ) => {
 		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
 		const zoomedOutCheckbox = page.getByLabel(
 			'Test a new zoomed out view on'
@@ -26,15 +33,6 @@ test.describe( 'Zoom Out', () => {
 		await expect( zoomedOutCheckbox ).not.toBeChecked();
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
-	test.beforeEach( async ( { admin, editor } ) => {
-		// Select a template part with a few blocks.
-		await admin.visitSiteEditor( {
-			postId: 'emptytheme//header',
-			postType: 'wp_template_part',
-		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'Zoom-out button should not steal focus when a block is focused', async ( {
