@@ -20,11 +20,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	sortByTextFields,
-	getPaginationResults,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -41,6 +37,7 @@ import { usePrevious } from '@wordpress/compose';
 import Page from '../page';
 import {
 	LAYOUT_GRID,
+	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
@@ -69,6 +66,9 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -151,6 +151,7 @@ function Preview( { item, categoryId, viewType } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 
 	return (
@@ -175,7 +176,12 @@ function Preview( { item, categoryId, viewType } ) {
 				>
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+					{ ! isEmpty && (
+						<BlockPreview
+							blocks={ item.blocks }
+							viewportWidth={ item.viewportWidth }
+						/>
+					) }
 				</PreviewWrapper>
 			</div>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
@@ -201,6 +207,7 @@ function Title( { item, categoryId } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
@@ -337,27 +344,12 @@ export default function DataviewsPatterns() {
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! patterns ) {
-			return {
-				data: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredData = [ ...patterns ];
-		// Handle sorting.
-		if ( view.sort ) {
-			filteredData = sortByTextFields( {
-				data: filteredData,
-				view,
-				fields,
-				textFields: [ 'title', 'author' ],
-			} );
-		}
-		// Handle pagination.
-		return getPaginationResults( {
-			data: filteredData,
-			view,
-		} );
+		// Since filters are applied server-side,
+		// we need to remove them from the view
+		const viewWithoutFilters = { ...view };
+		delete viewWithoutFilters.search;
+		viewWithoutFilters.filters = [];
+		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
@@ -413,7 +405,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ onChangeView }
 					deferredRendering
-					supportedLayouts={ [ LAYOUT_GRID ] }
+					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.3.0 (2024-03-21)
+
 ### Bug Fixes
 
 -   Prevent non-objects from being set in store state. ([#59886](https://github.com/WordPress/gutenberg/pull/59886))

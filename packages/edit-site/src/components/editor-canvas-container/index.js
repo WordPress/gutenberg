@@ -134,7 +134,6 @@ function EditorCanvasContainer( {
 							icon={ closeSmall }
 							label={ closeButtonLabel || __( 'Close' ) }
 							onClick={ onCloseContainer }
-							showTooltip={ false }
 						/>
 					) }
 					{ childrenWithProps }

@@ -93,7 +93,7 @@ describe( 'NavigationMenuSelector', () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				hasResolvedNavigationMenus: true,
-				canUserCreateNavigationMenu: true,
+				canUserCreateNavigationMenus: true,
 				canSwitchNavigationMenu: true,
 			} );
 
@@ -115,7 +115,7 @@ describe( 'NavigationMenuSelector', () => {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
-				canUserCreateNavigationMenu: false,
+				canUserCreateNavigationMenus: false,
 				canSwitchNavigationMenu: true,
 			} );
 
@@ -152,7 +152,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -203,7 +203,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -226,7 +226,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -254,7 +254,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -278,7 +278,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: false,
 					isResolvingNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -303,7 +303,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					isResolvingNavigationMenus: false,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -331,7 +331,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: false,
 				} );
 
@@ -352,7 +352,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -391,7 +391,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: menusWithNoTitle,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -425,7 +425,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -453,7 +453,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -504,7 +504,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -526,7 +526,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -563,7 +563,7 @@ describe( 'NavigationMenuSelector', () => {
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canSwitchNavigationMenu: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -595,7 +595,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					isResolvingNavigationMenus: true,
 					hasResolvedNavigationMenus: false,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -628,7 +628,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {

@@ -31,7 +31,6 @@ import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-gl
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
@@ -69,13 +68,9 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreenPages />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/pages">
 				<SidebarNavigationScreen
 					title={ __( 'Manage pages' ) }
 					content={ <DataViewsSidebarContent /> }
-					backPath="/page"
 				/>
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">

@@ -6,11 +6,11 @@ A block's front-end markup can either be dynamically generated server-side upon 
 The post <a href="https://developer.wordpress.org/news/2023/02/27/static-vs-dynamic-blocks-whats-the-difference/">Static vs. dynamic blocks: What’s the difference?</a> provides a great introduction to this topic.
 </div>
 
-## Static rendering 
+## Static rendering
 
 Blocks with "static rendering" produce front-end output that is fixed and stored in the database upon saving. These blocks rely solely on their `save` function to define their [HTML markup](https://developer.wordpress.org/block-editor/getting-started/fundamentals/markup-representation-block/), which remains unchanged unless manually edited in the Block Editor.
 
-If a block does not use a dynamic rendering method—meaning it doesn't generate content on the fly via PHP when the page loads—it's considered a "static block." 
+If a block does not use a dynamic rendering method—meaning it doesn't generate content on the fly via PHP when the page loads—it's considered a "static block."
 
 The diagram below illustrates how static block content is saved in the database and then retrieved and rendered as HTML on the front end.
 
@@ -24,7 +24,7 @@ Blocks in WordPress are encapsulated within special comment tags that serve as u
 
 <details><summary><strong>View an example of static rendering in the Preformatted block</strong></summary>
 <br/>
-The following <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js"><code>save</code> function</a> for the <a hreh="https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted">Preformatted</a> core block looks like this:
+The following <a href="https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/preformatted/save.js"><code>save</code> function</a> for the <a href="https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted">Preformatted</a> core block looks like this:
 
 ```js
 import { RichText, useBlockProps } from '@wordpress/block-editor';
@@ -160,7 +160,7 @@ On the front end, the `render_callback` is used to dynamically render the markup
 
 ### HTML representation of dynamic blocks in the database (`save`)
 
-For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the block delimiter comment (along with any existing [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/)) to the database. These attributes are then passed into the server-side rendering callback, which will determine how to display the block on the front end of your site. 
+For dynamic blocks, the `save` callback function can return just `null`, which tells the editor to save only the block delimiter comment (along with any existing [block attributes](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/)) to the database. These attributes are then passed into the server-side rendering callback, which will determine how to display the block on the front end of your site.
 
 When `save` is `null`, the Block Editor will skip the [block markup validation process](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#validation), avoiding issues with frequently changing markup.
 

@@ -150,12 +150,13 @@ test.describe( 'List View', () => {
 		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
-	test( 'expands nested list items', async ( {
+	test( 'expands and collapses nested list items', async ( {
 		editor,
 		page,
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
+		await editor.insertBlock( { name: 'core/group' } );
 
 		// Click first color option from the block placeholder's color picker to
 		// make the inner blocks appear.
@@ -196,8 +197,9 @@ test.describe( 'List View', () => {
 			// intentionally aria-hidden. See the implementation for details.
 			.click( { force: true } );
 
-		// Check that we're collapsed.
-		await expect( listView.getByRole( 'row' ) ).toHaveCount( 1 );
+		// Check that blocks are collapsed:
+		// 2 blocks: (one Cover block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 
 		// Click the Cover block List View item.
 		await listView
@@ -221,6 +223,32 @@ test.describe( 'List View', () => {
 				selected: true,
 			} )
 		).toBeVisible();
+
+		// Check that blocks are expanded:
+		// 3 blocks: (one Cover block containing a Paragraph block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
+
+		await listView
+			.getByRole( 'gridcell', { name: 'Paragraph', exact: true } )
+			.click();
+
+		// Move down to the Group block.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Collapse all but the Group block.
+		await pageUtils.pressKeys( 'alt+l' );
+
+		// Check that the Cover block is collapsed.
+		await expect(
+			listView.getByRole( 'link', {
+				name: 'Cover',
+				expanded: false,
+			} )
+		).toBeVisible();
+
+		// Check that blocks are collapsed:
+		// 2 blocks: (one Cover block, one Group block).
+		await expect( listView.getByRole( 'row' ) ).toHaveCount( 2 );
 	} );
 
 	test( 'moves focus to start/end of list with Home/End keys', async ( {
@@ -280,7 +308,7 @@ test.describe( 'List View', () => {
 			imageItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 
@@ -295,7 +323,7 @@ test.describe( 'List View', () => {
 			groupItem
 				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Actions',
+					name: 'Options',
 				} )
 		).toBeFocused();
 	} );
@@ -936,12 +964,12 @@ test.describe( 'List View', () => {
 		const listView = await listViewUtils.openListView();
 
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Duplicate' } )
 			.click();
 		await expect
@@ -957,11 +985,11 @@ test.describe( 'List View', () => {
 
 		await page.keyboard.press( 'Shift+ArrowUp' );
 		await listView
-			.getByRole( 'button', { name: 'Actions' } )
+			.getByRole( 'button', { name: 'Options' } )
 			.first()
 			.click();
 		await page
-			.getByRole( 'menu', { name: 'Actions' } )
+			.getByRole( 'menu', { name: 'Options' } )
 			.getByRole( 'menuitem', { name: 'Delete' } )
 			.click();
 		await expect
@@ -979,9 +1007,9 @@ test.describe( 'List View', () => {
 			.filter( {
 				has: page.getByRole( 'gridcell', { name: 'File' } ),
 			} )
-			.getByRole( 'button', { name: 'Actions' } );
+			.getByRole( 'button', { name: 'Options' } );
 		const optionsForFileMenu = page.getByRole( 'menu', {
-			name: 'Actions',
+			name: 'Options',
 		} );
 		await expect(
 			optionsForFileToggle,

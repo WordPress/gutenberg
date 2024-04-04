@@ -1,12 +1,38 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
--	`Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
--	`Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. `MenuGroup` ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
+
+### Bug Fix
+
+-   `Dropdown`: Fix bug with separator styling. ([#60336](https://github.com/WordPress/gutenberg/pull/60336)).
+-   `InputControl`: Ignore IME events when `isPressEnterToChange` is enabled ([#60090](https://github.com/WordPress/gutenberg/pull/60090)).
+-   `TextControl`: Apply zero margin to input element ([#60282](https://github.com/WordPress/gutenberg/pull/60282)).
+
+### Experimental
+
+-   `CustomSelectControlV2`: Rename for consistency ([#60178](https://github.com/WordPress/gutenberg/pull/60178)).
+
+### Internal
+
+-   `Popover`, `ColorPicker`: Obviate pointer event trap #59449 ([#59449](https://github.com/WordPress/gutenberg/pull/59449)).
+-   `Popover`, `ToggleGroupControl`: Use `useReducedMotion()` ([#60168](https://github.com/WordPress/gutenberg/pull/60168)).
+-   `NavigatorProvider`: Simplify the router state logic ([#60190](https://github.com/WordPress/gutenberg/pull/60190)).
+-   Update `date-fns` to version `3.6.0` ([#60163](https://github.com/WordPress/gutenberg/pull/60163)).
+-   Update `use-lilius` to version `2.0.5` ([#60163](https://github.com/WordPress/gutenberg/pull/60163)).
+
+### Experimental
+
+-   `CustomSelectControlV2`: Fix hint behavior in legacy ([#60183](https://github.com/WordPress/gutenberg/pull/60183)).
+
+## 27.2.0 (2024-03-21)
+
+-   `Dropdown` : Add styling support for `MenuGroup` ([#59723](https://github.com/WordPress/gutenberg/pull/59723)).
+-   `Placeholder` : Allow overflow but only when placeholder is selected, to fix a layout shift. ([#59857](https://github.com/WordPress/gutenberg/pull/59857)).
 
 ### Enhancements
 
 -   `TextControl`: Add typings for `date`, `time` and `datetime-local` ([#59666](https://github.com/WordPress/gutenberg/pull/59666)).
+-   `Text`, `Heading`, `ItemGroup` : Update the line height from 1.2 to 1.4 ([#60041](https://github.com/WordPress/gutenberg/pull/60041)).
 
 ### Deprecation
 
@@ -17,12 +43,14 @@
 -   `Button`: Keep deprecated props in type definitions ([#59913](https://github.com/WordPress/gutenberg/pull/59913)).
 
 ### Bug Fix
+
 -   `PaletteEdit`: Fix number incrementing of default names for new colors added in non-en-US locales ([#52212](https://github.com/WordPress/gutenberg/pull/52212)).
 -   `DateTimePicker`: Change day button size back from 32px to 28px ([#59990](https://github.com/WordPress/gutenberg/pull/59990)).
 
 ## 27.1.0 (2024-03-06)
 
 ### Bug Fix
+
 -   `InputControl`: Fix sample code on InputControl docs [#59517](https://github.com/WordPress/gutenberg/pull/59517)
 -   `Tooltip`: Explicitly set system font to avoid CSS bleed ([#59307](https://github.com/WordPress/gutenberg/pull/59307)).
 -   `HStack`, `VStack`: Stop passing invalid props to underlying element ([#59416](https://github.com/WordPress/gutenberg/pull/59416)).

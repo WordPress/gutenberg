@@ -187,9 +187,9 @@ function Navigation( {
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
 		hasResolvedCanUserDeleteNavigationMenu,
-		canUserCreateNavigationMenu,
-		isResolvingCanUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		isResolvingCanUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 	} = useNavigationMenu( ref );
 
 	const navMenuResolvedButMissing =
@@ -467,8 +467,8 @@ function Navigation( {
 
 			if (
 				! ref &&
-				hasResolvedCanUserCreateNavigationMenu &&
-				! canUserCreateNavigationMenu
+				hasResolvedCanUserCreateNavigationMenus &&
+				! canUserCreateNavigationMenus
 			) {
 				showNavigationMenuPermissionsNotice(
 					__(
@@ -482,8 +482,8 @@ function Navigation( {
 		isInnerBlockSelected,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
-		canUserCreateNavigationMenu,
-		hasResolvedCanUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus,
 		ref,
 		hideNavigationMenuPermissionsNotice,
 		showNavigationMenuPermissionsNotice,
@@ -491,7 +491,7 @@ function Navigation( {
 	] );
 
 	const hasManagePermissions =
-		canUserCreateNavigationMenu || canUserUpdateNavigationMenu;
+		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
 	const overlayMenuPreviewClasses = classnames(
 		'wp-block-navigation__overlay-menu-preview',
@@ -801,9 +801,11 @@ function Navigation( {
 					isSelected={ isSelected }
 					currentMenuId={ ref }
 					clientId={ clientId }
-					canUserCreateNavigationMenu={ canUserCreateNavigationMenu }
-					isResolvingCanUserCreateNavigationMenu={
-						isResolvingCanUserCreateNavigationMenu
+					canUserCreateNavigationMenus={
+						canUserCreateNavigationMenus
+					}
+					isResolvingCanUserCreateNavigationMenus={
+						isResolvingCanUserCreateNavigationMenus
 					}
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onSelectClassicMenu={ onSelectClassicMenu }
