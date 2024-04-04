@@ -254,8 +254,6 @@ export default function Layout() {
 						</NavigableRegion>
 					) }
 
-					<SavePanel />
-
 					{ isMobileViewport && areas.mobile && (
 						<div
 							className="edit-site-layout__mobile"
@@ -326,6 +324,8 @@ export default function Layout() {
 						</div>
 					) }
 				</div>
+
+				<SavePanel />
 			</div>
 		</>
 	);

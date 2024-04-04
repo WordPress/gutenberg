@@ -55,7 +55,7 @@ test.describe( 'Hybrid theme', () => {
 
 	test( 'can not export Site Editor Templates', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( {
-			postId: 'emptyhybrid//header',
+			postId: 'gutenberg-test-themes/emptyhybrid//header',
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );
