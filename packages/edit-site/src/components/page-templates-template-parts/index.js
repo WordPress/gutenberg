@@ -11,7 +11,6 @@ import {
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	VisuallyHidden,
-	Spinner,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
@@ -175,7 +174,7 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<Async placeholder={ <Spinner /> }>
+					<Async>
 						<BlockPreview blocks={ blocks } />
 					</Async>
 				) }
@@ -191,7 +190,7 @@ function Preview( { item, viewType } ) {
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
 						{ ! isEmpty && (
-							<Async placeholder={ <Spinner /> }>
+							<Async>
 								<BlockPreview blocks={ blocks } />
 							</Async>
 						) }
