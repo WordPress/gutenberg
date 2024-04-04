@@ -25,7 +25,7 @@ import type { Flusher, ParentElement } from './types';
 /**
  * Executes a callback function after the next frame is rendered.
  *
- * @param callback - The callback function to be executed.
+ * @param callback The callback function to be executed.
  * @return A promise that resolves after the callback function is executed.
  */
 const afterNextFrame = ( callback: Function ) => {
@@ -51,8 +51,8 @@ const afterNextFrame = ( callback: Function ) => {
  * this.x: this._compute
  * https://github.com/preactjs/signals/blob/main/mangle.json
  *
- * @param compute - The function that computes the value to be flushed.
- * @param notify  - The function that notifies listeners when the value is flushed.
+ * @param compute The function that computes the value to be flushed.
+ * @param notify  The function that notifies listeners when the value is flushed.
  * @return The Flusher object with `flush` and `dispose` properties.
  */
 function createFlusher( compute: Function, notify: () => void ): Flusher {
@@ -72,7 +72,7 @@ function createFlusher( compute: Function, notify: () => void ): Flusher {
  * implementation comes from this PR, but we added short-cirtuiting to avoid
  * infinite loops: https://github.com/preactjs/signals/pull/290
  *
- * @param callback - The callback function to be executed.
+ * @param callback The callback function to be executed.
  */
 export function useSignalEffect( callback: Function ) {
 	_useEffect( () => {
@@ -249,7 +249,7 @@ export function useMemo( factory, inputs ) {
  * See https://gist.github.com/developit/f4c67a2ede71dc2fab7f357f39cff28c
  *
  * @param parent      The parent element where the nodes will be replaced.
- * @param replaceNode - The node or array of nodes to replace in the parent element.
+ * @param replaceNode The node or array of nodes to replace in the parent element.
  * @return The created root fragment.
  */
 export const createRootFragment = (
