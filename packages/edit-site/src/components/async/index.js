@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useTransition } from '@wordpress/element';
+import { useEffect, useState, flushSync } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
 const blockPreviewQueue = createQueue();
@@ -12,7 +12,6 @@ const blockPreviewQueue = createQueue();
  */
 export function Async( { children, placeholder } ) {
 	const [ shouldRender, setShouldRender ] = useState( false );
-	const [ , startTransition ] = useTransition();
 
 	// In the future, we could try to use startTransition here, but currently
 	// react will batch all transitions, which means all previews will be
@@ -25,7 +24,9 @@ export function Async( { children, placeholder } ) {
 	useEffect( () => {
 		const context = {};
 		blockPreviewQueue.add( context, () => {
-			startTransition( () => {
+			// Synchronously run all renders so it consumes timeRemaining.
+			// See https://github.com/WordPress/gutenberg/pull/48238
+			flushSync( () => {
 				setShouldRender( true );
 			} );
 		} );
