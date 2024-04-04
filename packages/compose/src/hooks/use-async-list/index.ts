@@ -56,7 +56,7 @@ function useAsyncList< T >(
 		}
 		setCurrent( firstItems );
 
-		const asyncQueue = createQueue();
+		const asyncQueue = createQueue( { once: true } );
 		for ( let i = firstItems.length; i < list.length; i += step ) {
 			asyncQueue.add( {}, () => {
 				flushSync( () => {

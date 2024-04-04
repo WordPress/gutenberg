@@ -4,7 +4,7 @@
 import { useEffect, useState, flushSync } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
-const blockPreviewQueue = createQueue();
+const blockPreviewQueue = createQueue( { once: true } );
 
 /**
  * Renders a component at the next idle time.
