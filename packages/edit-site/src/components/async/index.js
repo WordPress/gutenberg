@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, flushSync } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
-const blockPreviewQueue = createQueue( { once: true } );
+const blockPreviewQueue = createQueue();
 
 /**
  * Renders a component at the next idle time.
@@ -24,7 +24,11 @@ export function Async( { children, placeholder } ) {
 	useEffect( () => {
 		const context = {};
 		blockPreviewQueue.add( context, () => {
-			setShouldRender( true );
+			// Synchronously run all renders so it consumes timeRemaining.
+			// See https://github.com/WordPress/gutenberg/pull/48238
+			flushSync( () => {
+				setShouldRender( true );
+			} );
 		} );
 		return () => {
 			blockPreviewQueue.cancel( context );
