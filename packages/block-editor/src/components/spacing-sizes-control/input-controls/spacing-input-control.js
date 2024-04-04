@@ -242,7 +242,7 @@ export default function SpacingInputControl( {
 							}
 						} }
 						onDragEnd={ () => {
-							setMinValue( -Infinity );
+							setMinValue( minimumCustomValue );
 						} }
 					/>
 					<RangeControl
