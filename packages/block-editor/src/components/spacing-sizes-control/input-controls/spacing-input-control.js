@@ -92,6 +92,8 @@ export default function SpacingInputControl( {
 			! isValueSpacingPreset( value )
 	);
 
+	const [ minValue, setMinValue ] = useState( minimumCustomValue );
+
 	const previousValue = usePrevious( value );
 	if (
 		!! value &&
@@ -222,13 +224,26 @@ export default function SpacingInputControl( {
 						}
 						value={ currentValue }
 						units={ units }
-						min={ minimumCustomValue }
+						min={ minValue }
 						placeholder={ allPlaceholder }
 						disableUnits={ isMixed }
 						label={ ariaLabel }
 						hideLabelFromVision
 						className="spacing-sizes-control__custom-value-input"
 						size={ '__unstable-large' }
+						onDragStart={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDrag={ () => {
+							if ( value?.charAt( 0 ) === '-' ) {
+								setMinValue( 0 );
+							}
+						} }
+						onDragEnd={ () => {
+							setMinValue( -Infinity );
+						} }
 					/>
 					<RangeControl
 						onMouseOver={ onMouseOver }
