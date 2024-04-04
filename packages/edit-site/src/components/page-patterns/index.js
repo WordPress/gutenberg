@@ -34,6 +34,7 @@ import { usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import {
 	LAYOUT_GRID,
@@ -177,10 +178,12 @@ function Preview( { item, categoryId, viewType } ) {
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
 					{ ! isEmpty && (
-						<BlockPreview
-							blocks={ item.blocks }
-							viewportWidth={ item.viewportWidth }
-						/>
+						<Async>
+							<BlockPreview
+								blocks={ item.blocks }
+								viewportWidth={ item.viewportWidth }
+							/>
+						</Async>
 					) }
 				</PreviewWrapper>
 			</div>
@@ -404,7 +407,6 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering
 					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>

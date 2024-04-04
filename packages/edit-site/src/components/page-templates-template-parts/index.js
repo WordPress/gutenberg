@@ -28,6 +28,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
@@ -173,7 +174,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button
@@ -186,7 +189,11 @@ function Preview( { item, viewType } ) {
 							( item.type === TEMPLATE_POST_TYPE
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
-						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+						{ ! isEmpty && (
+							<Async>
+								<BlockPreview blocks={ blocks } />
+							</Async>
+						) }
 					</button>
 				) }
 			</div>
@@ -419,10 +426,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={
-					view.type === LAYOUT_GRID ||
-					! view.hiddenFields?.includes( 'preview' )
-				}
 			/>
 		</Page>
 	);

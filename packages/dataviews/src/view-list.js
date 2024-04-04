@@ -6,7 +6,7 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useAsyncList, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -128,13 +128,10 @@ export default function ViewList( {
 	getItemId,
 	onSelectionChange,
 	selection,
-	deferredRendering,
 	id: preferredId,
 } ) {
 	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
-	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = deferredRendering ? shownData : data;
-	const selectedItem = usedData?.findLast( ( item ) =>
+	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( item.id )
 	);
 
@@ -166,7 +163,7 @@ export default function ViewList( {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
 
-	const hasData = usedData?.length;
+	const hasData = data?.length;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -190,7 +187,7 @@ export default function ViewList( {
 			role="grid"
 			store={ store }
 		>
-			{ usedData.map( ( item ) => {
+			{ data.map( ( item ) => {
 				const id = getItemDomId( item );
 				return (
 					<ListItem
