@@ -33,11 +33,19 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 	};
 	return (
 		<ToolsPanelItem
-			hasValue={ () => {
-				return !! setting.colorValue || !! setting.gradientValue;
-			} }
+			hasValue={
+				typeof setting.hasValue === 'function'
+					? setting.hasValue
+					: () => {
+						return !! setting.colorValue || !! setting.gradientValue;
+					}
+			}
 			label={ setting.label }
-			onDeselect={ clearValue }
+			onDeselect={
+				typeof setting.onDeselect === 'function'
+					? setting.onDeselect
+					: clearValue
+			}
 			isShownByDefault={
 				setting.isShownByDefault !== undefined
 					? setting.isShownByDefault
