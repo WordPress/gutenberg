@@ -51,8 +51,10 @@ module.exports = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
-		'storybook-source-link',
-		'@geometricpanda/storybook-addon-badges',
+		/*'storybook-source-link',*/
+		/*'@geometricpanda/storybook-addon-badges',*/
+		'@storybook/addon-mdx-gfm',
+		'@storybook/addon-webpack5-compiler-babel',
 	],
 	framework: {
 		name: '@storybook/react-webpack5',
@@ -61,7 +63,7 @@ module.exports = {
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
-		storyStoreV7: true,
+		// storyStoreV7: true,
 	},
 	docs: {
 		autodocs: true,
@@ -76,13 +78,13 @@ module.exports = {
 					{
 						test: /\/stories\/.+\.story\.(j|t)sx?$/,
 						use: [
-							{
+							/*{
 								// Adds a `sourceLink` parameter to the story metadata, based on the file path
 								loader: path.resolve(
 									__dirname,
 									'./webpack/source-link-loader.js'
 								),
-							},
+							},*/
 							{
 								// Reads `tags` from the story metadata and copies them to `badges`
 								loader: path.resolve(

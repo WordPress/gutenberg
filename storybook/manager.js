@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { addons } from '@storybook/addons';
+import { addons } from '@storybook/manager-api';
 
 /**
  * Internal dependencies
