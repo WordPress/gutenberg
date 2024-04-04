@@ -112,10 +112,12 @@
 		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
 	}
 
-	.is-badge:has(.edit-site-patterns__field-sync-status-fully) {
-		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
-		color: var(--wp-block-synced-color);
-	}
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+			color: var(--wp-block-synced-color);
+		}
+	}	
 }
 
 .dataviews-action-modal__duplicate-pattern {

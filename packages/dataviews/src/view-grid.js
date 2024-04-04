@@ -118,10 +118,7 @@ function GridItem( {
 						return (
 							<FlexItem
 								key={ field.id }
-								className={ classnames(
-									'dataviews-view-grid__field-value',
-									'is-badge'
-								) }
+								className={ 'dataviews-view-grid__field-value' }
 							>
 								{ renderedValue }
 							</FlexItem>
