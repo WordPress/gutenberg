@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
- /**
+/**
  * Gets the template hierarchy for the given template slug to be created.
  *
  * Note: Always add `index` as the last fallback template.
@@ -20,7 +20,7 @@
  *                                Default empty string.
  * @return string[] The template hierarchy.
  */
- function gutenberg_get_template_hierarchy( $slug, $is_custom = false, $template_prefix = '' ) {
+function gutenberg_get_template_hierarchy( $slug, $is_custom = false, $template_prefix = '' ) {
 	if ( 'index' === $slug ) {
 		/** This filter is documented in wp-includes/template.php */
 		return apply_filters( 'index_template_hierarchy', array( 'index' ) );
@@ -105,7 +105,7 @@
 		list( $template_type ) = explode( '-', $slug );
 	}
 	$valid_template_types = array( '404', 'archive', 'attachment', 'author', 'category', 'date', 'embed', 'frontpage', 'home', 'index', 'page', 'paged', 'privacypolicy', 'search', 'single', 'singular', 'tag', 'taxonomy' );
-	if ( in_array( $template_type, $valid_template_types ) ) {
+	if ( in_array( $template_type, $valid_template_types, true ) ) {
 		/** This filter is documented in wp-includes/template.php */
 		return apply_filters( "{$template_type}_template_hierarchy", $template_hierarchy );
 	}
