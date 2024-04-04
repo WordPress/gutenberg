@@ -217,7 +217,36 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 	} );
 }
 
-export default function ReusableBlockEdit( {
+function RecursionWarning() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
+}
+
+// Wrap the main Edit function for the pattern block with a recursion wrapper
+// that allows short-circuiting rendering as early as possible, before any
+// of the other effects in the block edit have run.
+export default function ReusableBlockEditRecursionWrapper( props ) {
+	const { ref } = props.attributes;
+	const hasAlreadyRendered = useHasRecursion( ref );
+
+	if ( hasAlreadyRendered ) {
+		return <RecursionWarning />;
+	}
+
+	return (
+		<RecursionProvider uniqueId={ ref }>
+			<ReusableBlockEdit { ...props } />
+		</RecursionProvider>
+	);
+}
+
+function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
@@ -225,7 +254,6 @@ export default function ReusableBlockEdit( {
 	setAttributes,
 } ) {
 	const registry = useRegistry();
-	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -422,14 +450,6 @@ export default function ReusableBlockEdit( {
 
 	let children = null;
 
-	if ( hasAlreadyRendered ) {
-		children = (
-			<Warning>
-				{ __( 'Block cannot be rendered inside itself.' ) }
-			</Warning>
-		);
-	}
-
 	if ( isMissing ) {
 		children = (
 			<Warning>
@@ -447,7 +467,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
+		<>
 			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
@@ -477,6 +497,6 @@ export default function ReusableBlockEdit( {
 			) : (
 				<div { ...blockProps }>{ children }</div>
 			) }
-		</RecursionProvider>
+		</>
 	);
 }
