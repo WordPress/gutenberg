@@ -98,15 +98,15 @@ function FontLibraryProvider( { children } ) {
 	 * Save the font families to the database.
 
 	 * This function is called when the user activates or deactivates a font family.
-	 * It updates the global styles post content in the database just new font families.
-	 * This avoids saving other styles/settings done by the user using other parts of the editor.
+	 * It only updates the global styles post content in the database for new font families.
+	 * This avoids saving other styles/settings changed by the user using other parts of the editor.
 	 * 
-	 * It uses the font families from the param to avoid using the font families from a outdated state.
+	 * It uses the font families from the param to avoid using the font families from an outdated state.
 	 * 
 	 * @param {Array} fonts - The font families that will be saved to the database.
 	 */
 	const saveFontFamilies = async ( fonts ) => {
-		// Gets the global styles databsse post content.
+		// Gets the global styles database post content.
 		const updatedGlobalStyles = globalStyles.record;
 
 		// Updates the database version of global styles with the edited font families in the client.
