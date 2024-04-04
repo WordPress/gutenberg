@@ -23,6 +23,13 @@ function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 
 			$registry           = WP_Block_Patterns_Registry::get_instance();
 			$pattern            = $registry->get_registered( $slug );
+
+			// Skip unknown patterns.
+			if ( ! $pattern ) {
+				++$i;
+				continue;
+			}
+
 			$blocks_to_insert   = parse_blocks( $pattern['content'] );
 			$seen_refs[ $slug ] = true;
 			$blocks_to_insert   = gutenberg_replace_pattern_blocks( $blocks_to_insert );
