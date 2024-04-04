@@ -4,8 +4,11 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Zoom Out', () => {
-	test.beforeEach( async ( { requestUtils, admin, page, editor } ) => {
+	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.beforeEach( async ( { admin, page, editor } ) => {
 		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
 
 		const zoomedOutCheckbox = page.getByLabel(
@@ -24,7 +27,7 @@ test.describe( 'Zoom Out', () => {
 		await editor.canvas.locator( 'body' ).click();
 	} );
 
-	test.afterEach( async ( { requestUtils, admin, page } ) => {
+	test.afterEach( async ( { admin, page } ) => {
 		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
 		const zoomedOutCheckbox = page.getByLabel(
 			'Test a new zoomed out view on'
@@ -32,6 +35,9 @@ test.describe( 'Zoom Out', () => {
 		await zoomedOutCheckbox.setChecked( false );
 		await expect( zoomedOutCheckbox ).not.toBeChecked();
 		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
