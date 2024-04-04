@@ -19,7 +19,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useContext, useEffect, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronLeft } from '@wordpress/icons';
@@ -44,7 +44,6 @@ function InstalledFonts() {
 		uninstallFontFamily,
 		isResolvingLibrary,
 		isInstalling,
-		saveFontFamilies,
 		getFontFacesActivated,
 		fontFamiliesHasChanges,
 		notice,
@@ -54,13 +53,19 @@ function InstalledFonts() {
 	const customFontFamilyId =
 		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
 
-	const canUserDelete = useSelect(
+	const { __experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits } =
+		useDispatch( coreStore );
+
+	const { canUserDelete, globalStylesId } = useSelect(
 		( select ) => {
-			const { canUser } = select( coreStore );
-			return (
-				customFontFamilyId &&
-				canUser( 'delete', 'font-families', customFontFamilyId )
-			);
+			const { __experimentalGetCurrentGlobalStylesId, canUser } =
+				select( coreStore );
+			return {
+				canUserDelete:
+					customFontFamilyId &&
+					canUser( 'delete', 'font-families', customFontFamilyId ),
+				globalStylesId: __experimentalGetCurrentGlobalStylesId(),
+			};
 		},
 		[ customFontFamilyId ]
 	);
@@ -103,6 +108,13 @@ function InstalledFonts() {
 			variantsActive,
 			variantsInstalled
 		);
+	};
+
+	// Save font families to the global styles post in the database.
+	const saveFontFamilies = () => {
+		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
+			'settings.typography.fontFamilies',
+		] );
 	};
 
 	useEffect( () => {

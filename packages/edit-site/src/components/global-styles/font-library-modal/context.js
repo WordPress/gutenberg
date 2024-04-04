@@ -62,14 +62,11 @@ function FontLibraryProvider( { children } ) {
 		setRefreshKey( Date.now() );
 	};
 
-	const {
-		records: libraryPosts = [],
-		isResolving: isResolvingLibrary,
-		hasResolved: hasResolvedLibrary,
-	} = useEntityRecords( 'postType', 'wp_font_family', {
-		refreshKey,
-		_embed: true,
-	} );
+	const { records: libraryPosts = [], isResolving: isResolvingLibrary } =
+		useEntityRecords( 'postType', 'wp_font_family', {
+			refreshKey,
+			_embed: true,
+		} );
 
 	const libraryFonts =
 		( libraryPosts || [] ).map( ( fontFamilyPost ) => {
@@ -93,13 +90,6 @@ function FontLibraryProvider( { children } ) {
 		undefined,
 		'base'
 	);
-
-	// Save font families to the global styles post in the database.
-	const saveFontFamilies = () => {
-		saveSpecifiedEntityEdits( 'root', 'globalStyles', globalStylesId, [
-			'settings.typography.fontFamilies',
-		] );
-	};
 
 	// Library Fonts
 	const [ modalTabOpen, setModalTabOpen ] = useState( false );
@@ -528,16 +518,13 @@ function FontLibraryProvider( { children } ) {
 				installFonts,
 				uninstallFontFamily,
 				toggleActivateFont,
-				getAvailableFontsOutline,
 				modalTabOpen,
 				toggleModal,
 				refreshLibrary,
 				notice,
 				setNotice,
-				saveFontFamilies,
 				fontFamiliesHasChanges,
 				isResolvingLibrary,
-				hasResolvedLibrary,
 				isInstalling,
 				collections,
 				getFontCollection,
