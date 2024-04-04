@@ -182,6 +182,7 @@ function Preview( { item, categoryId, viewType } ) {
 							<BlockPreview
 								blocks={ item.blocks }
 								viewportWidth={ item.viewportWidth }
+								viewportHeight={ item.viewportWidth }
 							/>
 						</Async>
 					) }
