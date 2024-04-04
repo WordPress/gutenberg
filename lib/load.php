@@ -127,6 +127,7 @@ require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 // WordPress 6.6 compat.
 require __DIR__ . '/compat/wordpress-6.6/resolve-patterns.php';
 require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
+require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';
 require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
