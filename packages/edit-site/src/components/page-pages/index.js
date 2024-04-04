@@ -327,7 +327,7 @@ export default function PagePages() {
 				},
 			},
 			{
-				header: __( 'Publish date' ),
+				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
 					const formattedDate = dateI18n(
