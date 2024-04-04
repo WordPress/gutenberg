@@ -15,11 +15,18 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from '../global-styles-provider';
+import getValueFromObjectPath from '../../../utils/get-value-from-object-path';
+import setNestedValue from '../../../utils/set-nested-value';
 import { unlock } from '../../../lock-unlock';
 
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
+
+const PATHS_TO_AVOID_OVERWRITING = [
+	[ 'settings', 'typography', 'fontFamilies', 'custom' ],
+	[ 'settings', 'color', 'palette', 'custom' ],
+];
 
 export default function Variation( { variation, children } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -38,10 +45,20 @@ export default function Variation( { variation, children } ) {
 	);
 
 	const selectVariation = () => {
-		setUserConfig( () => ( {
-			settings: variation.settings,
-			styles: variation.styles,
-		} ) );
+		setUserConfig( ( currentConfig ) => {
+			// Avoids overwriting certain paths when applying a theme variation.
+			for ( const path of PATHS_TO_AVOID_OVERWRITING ) {
+				// Gets the value from the current config.
+				const value = getValueFromObjectPath( currentConfig, path );
+				// Sets the value in the applied variation.
+				setNestedValue( variation, path, value );
+			}
+
+			return {
+				settings: variation.settings,
+				styles: variation.styles,
+			};
+		} );
 	};
 
 	const selectOnEnter = ( event ) => {
