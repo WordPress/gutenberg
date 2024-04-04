@@ -186,9 +186,8 @@ export function useLayoutEffect( callback, inputs ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @param {Function} callback Imperative function that can return a cleanup
- *                            function.
- * @param {any[]}    inputs   If present, effect will only activate if the
+ * @param {Function} callback Callback function.
+ * @param {any[]}    inputs   If present, the callback will only be updated if the
  *                            values in the list change (using `===`).
  */
 export function useCallback( callback, inputs ) {
@@ -203,9 +202,8 @@ export function useCallback( callback, inputs ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed factory function.
  *
- * @param {Function} factory Imperative function that can return a cleanup
- *                           function.
- * @param {any[]}    inputs  If present, effect will only activate if the
+ * @param {Function} factory Factory function that returns that value for memoization.
+ * @param {any[]}    inputs  If present, the factory will only be run to recompute if the
  *                           values in the list change (using `===`).
  */
 export function useMemo( factory, inputs ) {
