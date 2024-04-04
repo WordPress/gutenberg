@@ -286,8 +286,7 @@
 	}
 
 	.edit-post-header {
-		backdrop-filter: blur(20px) !important;
-		background-color: rgba(255, 255, 255, 0.9);
+		background-color: $white;
 		border-bottom: 1px solid #e0e0e0;
 		position: absolute;
 		width: 100%;
