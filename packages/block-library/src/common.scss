@@ -46,6 +46,11 @@
 	text-align: right;
 }
 
+.has-text-align-justify {
+	/*rtl:ignore*/
+	text-align: justify;
+}
+
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;
