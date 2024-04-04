@@ -2941,10 +2941,10 @@ export const getBlockEditingMode = createRegistrySelector(
 								state,
 								sectionClientId
 							);
-							if ( sectionBlock.name === 'core/template-part' ) {
+							if ( sectionBlock?.name === 'core/template-part' ) {
 								return false;
 							}
-							return sectionBlock.innerBlocks.some(
+							return sectionBlock?.innerBlocks.some(
 								( innerBlock ) =>
 									innerBlock.clientId === clientId
 							);
@@ -2955,7 +2955,7 @@ export const getBlockEditingMode = createRegistrySelector(
 						return 'contentOnly';
 					} else if ( sectionsClientIds.includes( clientId ) ) {
 						return 'contentOnly';
-					} else if ( block.name === 'core/template-part' ) {
+					} else if ( block?.name === 'core/template-part' ) {
 						return 'disabled';
 					} else if ( isSectionChildClientId() ) {
 						return 'disabled';
