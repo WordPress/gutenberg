@@ -124,7 +124,6 @@ This example creates a new custom variable that can be used in the associated mu
 
 ```js
 transformer: ( view ) => {
-    const hex = getRandomHexCode();
       return {
          ...view,
          customVariable: `Custom Value`,
