@@ -25,6 +25,7 @@ const meta: Meta< typeof InputControl > = {
 		value: { control: { disable: true } },
 	},
 	parameters: {
+		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

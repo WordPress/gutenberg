@@ -6,6 +6,7 @@ import {
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
+	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -68,11 +69,8 @@ export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) return null;
-			const {
-				getBlockName,
-				getBlockAttributes,
-				__experimentalGetReusableBlockTitle,
-			} = select( blockEditorStore );
+			const { getBlockName, getBlockAttributes } =
+				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -80,12 +78,12 @@ export default function useBlockDisplayInformation( clientId ) {
 			if ( ! blockType ) return null;
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isReusable = isReusableBlock( blockType );
-			const resusableTitle = isReusable
-				? __experimentalGetReusableBlockTitle( attributes.ref )
+			const isSynced =
+				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const syncedTitle = isSynced
+				? getBlockLabel( blockType, attributes )
 				: undefined;
-			const title = resusableTitle || blockType.title;
-			const isSynced = isReusable || isTemplatePart( blockType );
+			const title = syncedTitle || blockType.title;
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,

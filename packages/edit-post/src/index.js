@@ -15,6 +15,7 @@ import {
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import {
+	PluginBlockSettingsMenuItem,
 	PluginDocumentSettingPanel,
 	privateApis as editorPrivateApis,
 	store as editorStore,
@@ -55,7 +56,6 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
-		isPublishSidebarEnabled: true,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -71,6 +71,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
@@ -161,7 +162,7 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
+export { PluginBlockSettingsMenuItem };
 export { PluginDocumentSettingPanel };
 export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';

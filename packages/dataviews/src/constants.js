@@ -16,9 +16,6 @@ import ViewTable from './view-table';
 import ViewGrid from './view-grid';
 import ViewList from './view-list';
 
-// Field types.
-export const ENUMERATION_TYPE = 'enumeration';
-
 // Filter operators.
 export const OPERATOR_IS = 'is';
 export const OPERATOR_IS_NOT = 'isNot';

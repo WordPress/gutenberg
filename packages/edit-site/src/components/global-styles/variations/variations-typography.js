@@ -14,8 +14,9 @@ import { useTypographyVariations } from '../hooks';
 import TypographyExample from '../typography-example';
 import PreviewIframe from '../preview-iframe';
 import Variation from './variation';
+import Subtitle from '../subtitle';
 
-export default function TypographyVariations() {
+export default function TypographyVariations( { title, gap = 2 } ) {
 	const typographyVariations = useTypographyVariations();
 
 	if ( ! typographyVariations?.length ) {
@@ -24,8 +25,10 @@ export default function TypographyVariations() {
 
 	return (
 		<VStack spacing={ 3 }>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
 			<Grid
 				columns={ 3 }
+				gap={ gap }
 				className="edit-site-global-styles-style-variations-container"
 			>
 				{ typographyVariations &&

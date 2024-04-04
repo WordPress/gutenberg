@@ -31,9 +31,9 @@
 		margin-top: 0;
 		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-10;
+	}
 
-		.is-alternate & {
-			border-color: $gray-900;
-		}
+	&.is-alternate .components-menu-group + .components-menu-group {
+		border-color: $gray-900;
 	}
 }

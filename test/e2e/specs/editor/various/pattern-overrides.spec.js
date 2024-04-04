@@ -113,10 +113,6 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save' } )
 				.click();
-			await page
-				.getByRole( 'region', { name: 'Save panel' } )
-				.getByRole( 'button', { name: 'Save', exact: true } )
-				.click();
 
 			await expect(
 				page.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -294,8 +290,8 @@ test.describe( 'Pattern Overrides', () => {
 			.getByRole( 'textbox', { name: 'Button text' } )
 			.focus();
 		await expect(
-			page.getByRole( 'link', { name: 'wp.org' } )
-		).toContainText( 'opens in a new tab' );
+			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
+		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
 
 		// The link popup doesn't have a role which is a bit unfortunate.
 		// These are the buttons in the link popup.

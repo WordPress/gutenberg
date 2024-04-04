@@ -119,6 +119,53 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'should create a empty paragraph block when pressing backspace at the beginning of the first empty heading block', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'should transform to a paragraph block when pressing backspace at the beginning of the first heading block', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a' },
+			},
+		] );
+	} );
+
+	test( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'a', level: 2 },
+			},
+		] );
+	} );
+
 	test( 'should correctly apply custom colors', async ( {
 		editor,
 		page,
