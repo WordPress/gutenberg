@@ -3,6 +3,23 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
+
+	.components-checkbox-control__input[type="checkbox"],
+	.components-checkbox-control__input-container {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+	}
+	.components-checkbox-control {
+		.components-base-control__field {
+			display: flex;
+		}
+	}
+
+	svg.components-checkbox-control__checked,
+	svg.components-checkbox-control__indeterminate {
+		top: - $grid-unit-05;
+		left: - $grid-unit-05;
+	}
 }
 
 .dataviews-filters__view-actions {
@@ -91,10 +108,6 @@
 
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
-		}
-
-		.components-checkbox-control__input-container {
-			margin: $grid-unit-05;
 		}
 	}
 	tr {
