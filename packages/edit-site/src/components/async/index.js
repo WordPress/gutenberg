@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useTransition } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
 
 const blockPreviewQueue = createQueue();
@@ -12,6 +12,7 @@ const blockPreviewQueue = createQueue();
  */
 export function Async( { children, placeholder } ) {
 	const [ shouldRender, setShouldRender ] = useState( false );
+	const [ , startTransition ] = useTransition();
 
 	// In the future, we could try to use startTransition here, but currently
 	// react will batch all transitions, which means all previews will be
@@ -24,7 +25,9 @@ export function Async( { children, placeholder } ) {
 	useEffect( () => {
 		const context = {};
 		blockPreviewQueue.add( context, () => {
-			setShouldRender( true );
+			startTransition( () => {
+				setShouldRender( true );
+			} );
 		} );
 		return () => {
 			blockPreviewQueue.cancel( context );
