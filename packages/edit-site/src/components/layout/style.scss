@@ -131,12 +131,15 @@
 		top: $canvas-padding;
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
-		transition: border-radius 0.4s;
-		// This ensure the radius work properly.
-		overflow: hidden;
 
-		.edit-site-layout:not(.is-full-canvas) & {
-			border-radius: $radius-block-ui * 4;
+		.edit-site-resizable-frame__inner-content {
+			transition: border-radius 0.4s;
+			// This ensure the radius work properly.
+			overflow: hidden;
+
+			.edit-site-layout:not(.is-full-canvas) & {
+				border-radius: $radius-block-ui * 4;
+			}
 		}
 	}
 
