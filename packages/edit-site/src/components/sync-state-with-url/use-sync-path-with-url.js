@@ -1,8 +1,12 @@
 /**
+ * External dependencies
+ */
+import { match } from 'path-to-regexp';
+
+/**
  * WordPress dependencies
  */
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useReducer, useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -41,107 +45,145 @@ export function getPathFromURL( urlParams ) {
 	return path;
 }
 
-function isSubset( subset, superset ) {
-	return Object.entries( subset ).every( ( [ key, value ] ) => {
-		return superset[ key ] === value;
-	} );
+function getParamsFromPath( path, params ) {
+	if ( params?.postType && params?.postId ) {
+		return {
+			postType: params?.postType,
+			postId: params?.postId,
+			path: undefined,
+			layout: undefined,
+		};
+	} else if ( path.startsWith( '/page/' ) && params?.postId ) {
+		return {
+			postType: 'page',
+			postId: params?.postId,
+			path: undefined,
+			layout: undefined,
+		};
+	} else if ( path === '/patterns' ) {
+		return {
+			postType: undefined,
+			postId: undefined,
+			canvas: undefined,
+			path,
+		};
+	} else if (
+		// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
+		// The "type" property should be kept as well.
+		path === '/page' ||
+		path === '/wp_template' ||
+		path === '/wp_template_part/all'
+	) {
+		return {
+			postType: undefined,
+			categoryType: undefined,
+			categoryId: undefined,
+			path,
+		};
+	}
+	return {
+		postType: undefined,
+		postId: undefined,
+		categoryType: undefined,
+		categoryId: undefined,
+		layout: undefined,
+		path: path === '/' ? undefined : path,
+	};
 }
 
-export default function useSyncPathWithURL() {
+function matchPath( path, pattern ) {
+	const matcher = match( pattern, { decode: decodeURIComponent } );
+	return matcher( path );
+}
+
+function patternMatch( path, screens ) {
+	for ( const screen of screens ) {
+		const matched = matchPath( path, screen.path );
+		if ( matched ) {
+			return { params: matched.params, id: screen.id };
+		}
+	}
+
+	return undefined;
+}
+
+function findParent( path, screens ) {
+	if ( ! path.startsWith( '/' ) ) {
+		return undefined;
+	}
+	const pathParts = path.split( '/' );
+	while ( pathParts.length > 1 ) {
+		pathParts.pop();
+		const parentPath = pathParts.join( '/' ) || '/';
+		if (
+			screens.some(
+				( screen ) => matchPath( parentPath, screen.path ) !== false
+			)
+		) {
+			return parentPath;
+		}
+	}
+
+	return undefined;
+}
+
+export function useRouter() {
 	const history = useHistory();
-	const { params: urlParams } = useLocation();
-	const {
-		location: navigatorLocation,
-		params: navigatorParams,
-		goTo,
-	} = useNavigator();
-	const isMounting = useRef( true );
+	const { params } = useLocation();
+	const path = getPathFromURL( params );
+	const [ screens, dispatch ] = useReducer( ( state, action ) => {
+		switch ( action.type ) {
+			case 'add':
+				return [ ...state, action.screen ];
+			case 'remove':
+				return state.filter( ( s ) => s.id !== action.screen.id );
+			default:
+				return state;
+		}
+	}, [] );
 
-	useEffect(
-		() => {
-			// The navigatorParams are only initially filled properly when the
-			// navigator screens mount. so we ignore the first synchronisation.
-			if ( isMounting.current ) {
-				isMounting.current = false;
-				return;
-			}
+	const matchedPath = useMemo( () => {
+		return path !== undefined ? patternMatch( path, screens ) : undefined;
+	}, [ path, screens ] );
 
-			function updateUrlParams( newUrlParams ) {
-				if ( isSubset( newUrlParams, urlParams ) ) {
-					return;
-				}
-				const updatedParams = {
-					...urlParams,
-					...newUrlParams,
-				};
-				history.push( updatedParams );
-			}
+	const goMethods = useMemo( () => {
+		const goTo = ( p ) => {
+			const matched = patternMatch( p, screens );
+			history.push( getParamsFromPath( p, matched?.params ?? {} ) );
+		};
 
-			if ( navigatorParams?.postType && navigatorParams?.postId ) {
-				updateUrlParams( {
-					postType: navigatorParams?.postType,
-					postId: navigatorParams?.postId,
-					path: undefined,
-					layout: undefined,
-				} );
-			} else if (
-				navigatorLocation.path.startsWith( '/page/' ) &&
-				navigatorParams?.postId
-			) {
-				updateUrlParams( {
-					postType: 'page',
-					postId: navigatorParams?.postId,
-					path: undefined,
-					layout: undefined,
-				} );
-			} else if ( navigatorLocation.path === '/patterns' ) {
-				updateUrlParams( {
-					postType: undefined,
-					postId: undefined,
-					canvas: undefined,
-					path: navigatorLocation.path,
-				} );
-			} else if (
-				// These sidebar paths are special in the sense that the url in these pages may or may not have a postId and we need to retain it if it has.
-				// The "type" property should be kept as well.
-				navigatorLocation.path === '/page' ||
-				navigatorLocation.path === '/wp_template' ||
-				navigatorLocation.path === '/wp_template_part/all'
-			) {
-				updateUrlParams( {
-					postType: undefined,
-					categoryType: undefined,
-					categoryId: undefined,
-					path: navigatorLocation.path,
-				} );
-			} else {
-				updateUrlParams( {
-					postType: undefined,
-					postId: undefined,
-					categoryType: undefined,
-					categoryId: undefined,
-					layout: undefined,
-					path:
-						navigatorLocation.path === '/'
-							? undefined
-							: navigatorLocation.path,
+		const goToParent = () => {
+			const parentPath = findParent( path, screens );
+			if ( parentPath !== undefined ) {
+				goTo( parentPath, {
+					isBack: true,
 				} );
 			}
-		},
-		// Trigger only when navigator changes to prevent infinite loops.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ navigatorLocation?.path, navigatorParams ]
+		};
+
+		const goBack = () => {
+			history.back();
+		};
+
+		return { goTo, goToParent, goBack };
+	}, [ history, screens, path ] );
+
+	const screenMethods = useMemo(
+		() => ( {
+			addScreen: ( screen ) => dispatch( { type: 'add', screen } ),
+			removeScreen: ( screen ) => dispatch( { type: 'remove', screen } ),
+		} ),
+		[]
 	);
 
-	useEffect(
-		() => {
-			const path = getPathFromURL( urlParams );
-			if ( navigatorLocation.path !== path ) {
-				goTo( path );
-			}
-		},
-		// Trigger only when URL changes to prevent infinite loops.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[ urlParams ]
+	return useMemo(
+		() => ( {
+			location: { path },
+			params: matchedPath?.params ?? {},
+			match: matchedPath?.id,
+			...goMethods,
+			...screenMethods,
+		} ),
+		[ path, matchedPath, goMethods, screenMethods ]
 	);
 }

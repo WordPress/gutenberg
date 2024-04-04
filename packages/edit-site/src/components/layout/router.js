@@ -12,7 +12,8 @@ import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
-
+import Sidebar from '../sidebar';
+import { useRouter } from '../sync-state-with-url/use-sync-path-with-url';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -25,6 +26,7 @@ export default function useLayoutAreas() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
+	const router = useRouter();
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -35,6 +37,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'pages-list',
 			areas: {
+				sidebar: <Sidebar router={ router } />,
 				content: <PagePages />,
 				preview: isListLayout && (
 					<Editor
@@ -67,11 +70,11 @@ export default function useLayoutAreas() {
 		return {
 			key: 'page',
 			areas: {
+				sidebar: <Sidebar router={ router } />,
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile:
-					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
+				mobile: canvas === 'edit' && (
+					<Editor isLoading={ isSiteEditorLoading } />
+				),
 			},
 		};
 	}
@@ -82,6 +85,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
+				sidebar: <Sidebar router={ router } />,
 				content: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_POST_TYPE }
@@ -108,6 +112,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'template-parts',
 			areas: {
+				sidebar: <Sidebar router={ router } />,
 				content: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_PART_POST_TYPE }
@@ -133,6 +138,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'patterns',
 			areas: {
+				sidebar: <Sidebar router={ router } />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
 			},
@@ -143,11 +149,11 @@ export default function useLayoutAreas() {
 	return {
 		key: 'default',
 		areas: {
+			sidebar: <Sidebar router={ router } />,
 			preview: <Editor isLoading={ isSiteEditorLoading } />,
-			mobile:
-				canvas === 'edit' ? (
-					<Editor isLoading={ isSiteEditorLoading } />
-				) : undefined,
+			mobile: canvas === 'edit' && (
+				<Editor isLoading={ isSiteEditorLoading } />
+			),
 		},
 	};
 }

@@ -6,12 +6,11 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
+import { memo } from '@wordpress/element';
 import {
 	__experimentalNavigatorProvider as NavigatorProvider,
 	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -22,20 +21,14 @@ import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
-import useSyncPathWithURL, {
-	getPathFromURL,
-} from '../sync-state-with-url/use-sync-path-with-url';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
-import { unlock } from '../../lock-unlock';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-
-const { useLocation } = unlock( routerPrivateApis );
 
 function SidebarScreenWrapper( { className, ...props } ) {
 	return (
@@ -50,7 +43,6 @@ function SidebarScreenWrapper( { className, ...props } ) {
 }
 
 function SidebarScreens() {
-	useSyncPathWithURL();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -97,15 +89,12 @@ function SidebarScreens() {
 	);
 }
 
-function Sidebar() {
-	const { params: urlParams } = useLocation();
-	const initialPath = useRef( getPathFromURL( urlParams ) );
-
+function Sidebar( { router } ) {
 	return (
 		<>
 			<NavigatorProvider
 				className="edit-site-sidebar__content"
-				initialPath={ initialPath.current }
+				router={ router }
 			>
 				<SidebarScreens />
 			</NavigatorProvider>
