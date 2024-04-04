@@ -192,7 +192,7 @@ export function useLayoutEffect( callback, inputs ) {
  *                            values in the list change (using `===`).
  */
 export function useCallback( callback, inputs ) {
-	_useCallback( withScope( callback ), inputs );
+	return _useCallback( withScope( callback ), inputs );
 }
 
 /**
@@ -209,7 +209,7 @@ export function useCallback( callback, inputs ) {
  *                           values in the list change (using `===`).
  */
 export function useMemo( factory, inputs ) {
-	_useMemo( withScope( factory ), inputs );
+	return _useMemo( withScope( factory ), inputs );
 }
 
 // For wrapperless hydration.
