@@ -60,6 +60,9 @@ module.exports = {
 		name: '@storybook/react-webpack5',
 		options: {},
 	},
+	typescript: {
+		reactDocgen: 'react-docgen-typescript',
+	},
 	features: {
 		babelModeV7: true,
 		emotionAlias: false,
