@@ -37,6 +37,11 @@ queue.add( ctx2, () => console.log( "This won't be printed" ) );
 queue.add( ctx2, () => console.log( 'This will be printed second' ) );
 ```
 
+_Parameters_
+
+-   _options_ `Object`:
+-   _options.once_ `boolean`: Execute only a callback once per idle callback.
+
 _Returns_
 
 -   `WPPriorityQueue`: Queue object with `add`, `flush` and `reset` methods.

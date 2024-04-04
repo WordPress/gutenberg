@@ -48,6 +48,9 @@ import requestIdleCallback from './request-idle-callback';
  * Creates a context-aware queue that only executes
  * the last task of a given context.
  *
+ * @param {Object}  options
+ * @param {boolean} options.once Execute only a callback once per idle callback.
+ *
  * @example
  *```js
  * import { createQueue } from '@wordpress/priority-queue';
@@ -66,7 +69,7 @@ import requestIdleCallback from './request-idle-callback';
  *
  * @return {WPPriorityQueue} Queue object with `add`, `flush` and `reset` methods.
  */
-export const createQueue = () => {
+export const createQueue = ( { once } = { once: false } ) => {
 	/** @type {Map<WPPriorityQueueContext, WPPriorityQueueCallback>} */
 	const waitingList = new Map();
 	let isRunning = false;
@@ -93,6 +96,7 @@ export const createQueue = () => {
 			callback();
 
 			if (
+				once ||
 				'number' === typeof deadline ||
 				deadline.timeRemaining() <= 0
 			) {
