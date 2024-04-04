@@ -24,12 +24,36 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    performance:
-        name: Run performance tests
+    generate-performance-suite-matrix:
+        name: Generate performance suite matrix
         runs-on: ubuntu-latest
+        outputs:
+            matrix: ${{ steps.suites.outputs.matrix }}
+        steps:
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Find and output suites
+              id: suites
+              run: echo matrix=$(node -e "console.log( JSON.stringify( require('fs').readdirSync('test/performance/specs').map( specFile => require('path').basename( specFile, '.spec.js' ) ) ) )") | tee "$GITHUB_OUTPUT"
+
+            - name: print
+              run: echo ${{ steps.suites.outputs.matrix }}
+
+    performance:
+        name: Run performance tests ${{ matrix.suite }}
+        needs: generate-performance-suite-matrix
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                suite: ${{ fromJSON( needs.generate-performance-suite-matrix.outputs.matrix ) }}
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         env:
             WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
 
         steps:
-            - run: echo hello
+            - run: echo ${{ matrix.suite }}
