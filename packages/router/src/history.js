@@ -13,18 +13,13 @@ const history = createBrowserHistory();
 const originalHistoryPush = history.push;
 const originalHistoryReplace = history.replace;
 
-function buildSearch( params ) {
-	const queryString = buildQueryString( params );
-	return queryString.length > 0 ? '?' + queryString : queryString;
-}
-
 function push( params, state ) {
-	const search = buildSearch( params );
+	const search = buildQueryString( params );
 	return originalHistoryPush.call( history, { search }, state );
 }
 
 function replace( params, state ) {
-	const search = buildSearch( params );
+	const search = buildQueryString( params );
 	return originalHistoryReplace.call( history, { search }, state );
 }
 

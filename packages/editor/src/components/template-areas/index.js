@@ -6,14 +6,15 @@ import {
 	Button,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { store as editorStore } from '@wordpress/editor';
+
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function TemplateAreaItem( { area, clientId } ) {
 	const { selectBlock, toggleBlockHighlight } =
@@ -37,7 +38,7 @@ function TemplateAreaItem( { area, clientId } ) {
 
 	return (
 		<Button
-			className="edit-site-template-card__template-areas-item"
+			className="editor-template-areas__item"
 			icon={ templatePartArea?.icon }
 			onMouseOver={ highlightBlock }
 			onMouseLeave={ cancelHighlightBlock }
@@ -54,7 +55,8 @@ function TemplateAreaItem( { area, clientId } ) {
 
 export default function TemplateAreas() {
 	const templateParts = useSelect(
-		( select ) => select( editSiteStore ).getCurrentTemplateTemplateParts(),
+		( select ) =>
+			unlock( select( editorStore ) ).getCurrentTemplateTemplateParts(),
 		[]
 	);
 
@@ -63,15 +65,12 @@ export default function TemplateAreas() {
 	}
 
 	return (
-		<section className="edit-site-template-card__template-areas">
-			<Heading
-				level={ 3 }
-				className="edit-site-template-card__template-areas-title"
-			>
+		<section className="editor-template-areas">
+			<Heading level={ 3 } className="editor-template-areas__title">
 				{ __( 'Areas' ) }
 			</Heading>
 
-			<ul className="edit-site-template-card__template-areas-list">
+			<ul className="editor-template-areas__list">
 				{ templateParts.map( ( { templatePart, block } ) => (
 					<li key={ block.clientId }>
 						<TemplateAreaItem

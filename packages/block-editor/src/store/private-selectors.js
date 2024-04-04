@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,7 +21,10 @@ import {
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-import { selectBlockPatternsKey } from './private-keys';
+import {
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -300,26 +298,27 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 			__experimentalUserPatternCategories = [],
 			__experimentalReusableBlocks = [],
 		} = state.settings;
-		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
-			( userPattern ) => {
-				return {
-					name: `core/block/${ userPattern.id }`,
-					id: userPattern.id,
-					type: INSERTER_PATTERN_TYPES.user,
-					title: userPattern.title.raw,
-					categories: userPattern.wp_pattern_category.map(
-						( catId ) => {
-							const category = (
-								__experimentalUserPatternCategories ?? []
-							).find( ( { id } ) => id === catId );
-							return category ? category.slug : catId;
-						}
-					),
-					content: userPattern.content.raw,
-					syncStatus: userPattern.wp_pattern_sync_status,
-				};
-			}
-		);
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		const userPatterns = (
+			reusableBlocksSelect
+				? reusableBlocksSelect( select )
+				: __experimentalReusableBlocks ?? []
+		).map( ( userPattern ) => {
+			return {
+				name: `core/block/${ userPattern.id }`,
+				id: userPattern.id,
+				type: INSERTER_PATTERN_TYPES.user,
+				title: userPattern.title.raw,
+				categories: userPattern.wp_pattern_category.map( ( catId ) => {
+					const category = (
+						__experimentalUserPatternCategories ?? []
+					).find( ( { id } ) => id === catId );
+					return category ? category.slug : catId;
+				} ),
+				content: userPattern.content.raw,
+				syncStatus: userPattern.wp_pattern_sync_status,
+			};
+		} );
 		return [
 			...userPatterns,
 			...__experimentalBlockPatterns,
@@ -329,6 +328,17 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
 	}, getAllPatternsDependants( select ) )
+);
+
+const EMPTY_ARRAY = [];
+
+export const getReusableBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return reusableBlocksSelect
+			? reusableBlocksSelect( select )
+			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	}
 );
 
 /**

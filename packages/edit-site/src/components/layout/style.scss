@@ -93,6 +93,8 @@
 	position: relative;
 	flex-grow: 1;
 	z-index: z-index(".edit-site-layout__canvas-container");
+	// When animating the frame size can exceed its container size.
+	overflow: visible;
 
 	&.is-resizing::after {
 		// This covers the whole content which ensures mouse up triggers
@@ -130,15 +132,15 @@
 		bottom: $canvas-padding;
 		width: calc(100% - #{$canvas-padding});
 
-		& > div {
-			border-radius: $radius-block-ui * 4;
-			// Not sure why this is necessary.
-			.edit-site-layout:not(.is-full-canvas) & .edit-site-visual-editor__editor-canvas,
-			.edit-site-layout:not(.is-full-canvas) & .interface-interface-skeleton__content {
+		.edit-site-resizable-frame__inner-content {
+			transition: border-radius 0.4s;
+			// This ensure the radius work properly.
+			overflow: hidden;
+
+			.edit-site-layout:not(.is-full-canvas) & {
 				border-radius: $radius-block-ui * 4;
 			}
 		}
-
 	}
 
 	.edit-site-layout.is-full-canvas & {
@@ -176,11 +178,6 @@
 	align-items: center;
 	justify-content: center;
 	border-bottom: 1px solid transparent;
-
-	.edit-site-layout.is-full-canvas & {
-		border-bottom-color: $gray-200;
-		transition: border-bottom-color 0.15s 0.4s ease-out;
-	}
 
 	&:hover,
 	&:active {

@@ -35,7 +35,6 @@ import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
 import PluginSidebarEditPost from '../plugin-sidebar';
-import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
@@ -43,6 +42,7 @@ import { unlock } from '../../../lock-unlock';
 const { PostCardPanel } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
+const { PatternOverridesPanel } = unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -113,9 +113,9 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+					<PostCardPanel />
 					{ ! isEditingTemplate && (
 						<>
-							<PostCardPanel />
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
@@ -123,10 +123,10 @@ const SidebarContent = ( {
 							<PostExcerptPanel />
 							<PostDiscussionPanel />
 							<PageAttributesPanel />
+							<PatternOverridesPanel />
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
