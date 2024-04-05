@@ -847,7 +847,7 @@ function Navigation( {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
 											__(
-												'Navigation menu successfully deleted.'
+												'Navigation Menu successfully deleted.'
 											)
 										);
 									} }

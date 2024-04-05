@@ -76,7 +76,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -87,7 +87,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
+	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
 
