@@ -41,10 +41,11 @@ export default function PageRenameModal() {
 
 	return (
 		<Modal
-			title={ __( 'Rename' ) }
-			onRequestClose={ closeModal }
 			closeModal={ closeModal }
+			focusOnMount="firstContentElement"
+			onRequestClose={ closeModal }
 			page={ page }
+			title={ __( 'Rename' ) }
 		>
 			<RenamePostModalContent
 				items={ [ page ] }
