@@ -52,7 +52,9 @@ export default function useLayoutAreas() {
 				mobile:
 					canvas === 'edit' ? (
 						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
+					) : (
+						<PagePages />
+					),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,

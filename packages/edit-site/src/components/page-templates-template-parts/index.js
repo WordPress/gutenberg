@@ -28,6 +28,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
@@ -66,7 +67,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
-		displayAsColumnFields: [ 'description' ],
+		columnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -75,7 +76,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -86,7 +87,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
+	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
 
@@ -173,7 +174,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button
@@ -186,7 +189,11 @@ function Preview( { item, viewType } ) {
 							( item.type === TEMPLATE_POST_TYPE
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
-						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+						{ ! isEmpty && (
+							<Async>
+								<BlockPreview blocks={ blocks } />
+							</Async>
+						) }
 					</button>
 				) }
 			</div>
@@ -419,10 +426,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={
-					view.type === LAYOUT_GRID ||
-					! view.hiddenFields?.includes( 'preview' )
-				}
 			/>
 		</Page>
 	);

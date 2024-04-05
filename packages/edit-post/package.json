@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "7.31.0",
+	"version": "7.32.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,8 +58,7 @@
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.3.1",
-		"memize": "^2.1.0",
-		"rememo": "^4.0.2"
+		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

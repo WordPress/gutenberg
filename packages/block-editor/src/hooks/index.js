@@ -29,7 +29,7 @@ import childLayout from './layout-child';
 import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
-import blockRenaming from './block-renaming';
+import './block-renaming';
 import './use-bindings-attributes';
 
 createBlockEditFilter(
@@ -44,7 +44,6 @@ createBlockEditFilter(
 		layout,
 		contentLockUI,
 		blockHooks,
-		blockRenaming,
 		childLayout,
 	].filter( Boolean )
 );
