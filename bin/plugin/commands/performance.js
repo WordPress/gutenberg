@@ -25,10 +25,11 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
 /**
  * @typedef WPPerformanceCommandOptions
  *
- * @property {boolean=} ci          Run on CI.
- * @property {number=}  rounds      Run each test suite this many times for each branch.
- * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
- * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
+ * @property {boolean}               [ci]          Run on CI.
+ * @property {number}                [rounds]      Run each test suite this many times for each branch.
+ * @property {ReadonlyArray<string>} [suite]       Run each test suite this many times for each branch.
+ * @property {string}                [testsBranch] The branch whose performance test files will be used for testing.
+ * @property {string}                [wpVersion]   The WordPress version to be used as the base install for testing.
  */
 
 /**
@@ -310,13 +311,6 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 0, 'Looking for test files' );
 
-	const testSuites = getFilesFromDir(
-		path.join( testRunnerDir, 'test/performance/specs' )
-	).map( ( file ) => {
-		logAtIndent( 1, 'Found:', formats.success( file ) );
-		return path.basename( file, '.spec.js' );
-	} );
-
 	logAtIndent( 0, 'Running tests' );
 
 	if ( wpZipUrl ) {
@@ -330,6 +324,18 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
+
+	// eslint-disable-next-line no-nested-ternary
+	const testSuites = options.suite
+		? Array.isArray( options.suite )
+			? options.suite
+			: [ options.suite ]
+		: getFilesFromDir(
+				path.join( testRunnerDir, 'test/performance/specs' )
+		  ).map( ( file ) => {
+				logAtIndent( 1, 'Found:', formats.success( file ) );
+				return path.basename( file, '.spec.js' );
+		  } );
 
 	for ( const testSuite of testSuites ) {
 		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {

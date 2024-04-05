@@ -99,6 +99,10 @@ program
 		'Run each test suite this many times for each branch; results are summarized, default = 1'
 	)
 	.option(
+		'--suite <count>',
+		'The desired test suite to run. May be provided multiple times. All suites run by default.'
+	)
+	.option(
 		'--tests-branch <branch>',
 		"Use this branch's performance test files"
 	)
