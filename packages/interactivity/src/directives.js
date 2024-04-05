@@ -256,7 +256,27 @@ export default () => {
 	// data-wp-watch--[name]
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
-			useWatch( () => evaluate( entry ) );
+			useWatch( () => {
+				const start = performance.now();
+				evaluate( entry );
+				performance.measure(
+					`interactivity api watch ${ entry.suffix }`,
+					{
+						start,
+						end: performance.now(),
+						detail: {
+							devtools: {
+								metadata: {
+									extensionName: 'Interactivity API Watch)',
+									dataType: 'track-entry',
+								},
+								color: 'primary',
+								track: 'Interactivity api events',
+							},
+						},
+					}
+				);
+			} );
 		} );
 	} );
 
@@ -264,7 +284,27 @@ export default () => {
 	directive( 'init', ( { directives: { init }, evaluate } ) => {
 		init.forEach( ( entry ) => {
 			// TODO: Replace with useEffect to prevent unneeded scopes.
-			useInit( () => evaluate( entry ) );
+			useInit( () => {
+				const start = performance.now();
+				evaluate( entry );
+				performance.measure(
+					`interactivity api init ${ entry.suffix }`,
+					{
+						start,
+						end: performance.now(),
+						detail: {
+							devtools: {
+								metadata: {
+									extensionName: 'Interactivity API Init)',
+									dataType: 'track-entry',
+								},
+								color: 'primary',
+								track: 'Interactivity api events',
+							},
+						},
+					}
+				);
+			} );
 		} );
 	} );
 
@@ -272,9 +312,24 @@ export default () => {
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
+				const start = performance.now();
 				element.props[ `on${ entry.suffix }` ] = ( event ) => {
 					evaluate( entry, event );
 				};
+				performance.measure( `interactivity api on ${ entry.suffix }`, {
+					start,
+					end: performance.now(),
+					detail: {
+						devtools: {
+							metadata: {
+								extensionName: 'Interactivity API On)',
+								dataType: 'track-entry',
+							},
+							color: 'primary',
+							track: 'Interactivity api events',
+						},
+					},
+				} );
 			}
 		);
 	} );
