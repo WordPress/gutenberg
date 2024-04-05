@@ -14,16 +14,11 @@ import { usePatternCategories } from '../block-patterns-tab/use-pattern-categori
 
 function PatternsExplorer( { initialCategory, rootClientId } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
-
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
 	);
 
-	const patternCategories = usePatternCategories(
-		rootClientId,
-		patternSourceFilter
-	);
+	const patternCategories = usePatternCategories( rootClientId );
 
 	return (
 		<div className="block-editor-block-patterns-explorer">
@@ -33,14 +28,12 @@ function PatternsExplorer( { initialCategory, rootClientId } ) {
 				onClickCategory={ setSelectedCategory }
 				searchValue={ searchValue }
 				setSearchValue={ setSearchValue }
-				patternSourceFilter={ patternSourceFilter }
-				setPatternSourceFilter={ setPatternSourceFilter }
 			/>
 			<PatternList
 				searchValue={ searchValue }
 				selectedCategory={ selectedCategory }
 				patternCategories={ patternCategories }
-				patternSourceFilter={ patternSourceFilter }
+				rootClientId={ rootClientId }
 			/>
 		</div>
 	);

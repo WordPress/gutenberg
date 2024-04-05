@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
@@ -228,13 +223,21 @@ export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 /**
  * Returns true if the publish sidebar is opened.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state
  *
  * @return {boolean} Whether the publish sidebar is open.
  */
-export function isPublishSidebarOpened( state ) {
-	return state.publishSidebarActive;
-}
+export const isPublishSidebarOpened = createRegistrySelector(
+	( select ) => () => {
+		deprecated( `select( 'core/edit-post' ).isPublishSidebarOpened`, {
+			since: '6.6',
+			alternative: `select( 'core/editor' ).isPublishSidebarOpened`,
+		} );
+		return select( editorStore ).isPublishSidebarOpened();
+	}
+);
 
 /**
  * Returns true if the given panel was programmatically removed, or false otherwise.

@@ -97,6 +97,17 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	}
 }
 
+// We are lowering the specificity so that the input element can override the rule for the input element inside the search block.
+:where(.wp-block-search__input) {
+	font-family: inherit;
+	font-weight: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	font-style: inherit;
+}
+
 // We are lowering the specificity so that the button element can override the rule for the button inside the search block.
 :where(.wp-block-search__button-inside .wp-block-search__inside-wrapper) {
 	padding: $grid-unit-05;

@@ -20,11 +20,7 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	sortByTextFields,
-	getPaginationResults,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import {
 	Icon,
 	header,
@@ -38,15 +34,17 @@ import { usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import {
 	LAYOUT_GRID,
+	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
+	OPERATOR_IS,
 } from '../../utils/constants';
 import {
 	exportJSONaction,
@@ -69,6 +67,9 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
@@ -151,6 +152,7 @@ function Preview( { item, categoryId, viewType } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 
 	return (
@@ -175,7 +177,14 @@ function Preview( { item, categoryId, viewType } ) {
 				>
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+					{ ! isEmpty && (
+						<Async>
+							<BlockPreview
+								blocks={ item.blocks }
+								viewportWidth={ item.viewportWidth }
+							/>
+						</Async>
+					) }
 				</PreviewWrapper>
 			</div>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
@@ -201,6 +210,7 @@ function Title( { item, categoryId } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
@@ -296,7 +306,6 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				getValue: ( { item } ) => item.title,
 				render: ( { item } ) => (
 					<Title item={ item } categoryId={ categoryId } />
 				),
@@ -323,7 +332,7 @@ export default function DataviewsPatterns() {
 				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
-					operators: [ OPERATOR_IN ],
+					operators: [ OPERATOR_IS ],
 					isPrimary: true,
 				},
 				enableSorting: false,
@@ -338,27 +347,12 @@ export default function DataviewsPatterns() {
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! patterns ) {
-			return {
-				data: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredData = [ ...patterns ];
-		// Handle sorting.
-		if ( view.sort ) {
-			filteredData = sortByTextFields( {
-				data: filteredData,
-				view,
-				fields,
-				textFields: [ 'title', 'author' ],
-			} );
-		}
-		// Handle pagination.
-		return getPaginationResults( {
-			data: filteredData,
-			view,
-		} );
+		// Since filters are applied server-side,
+		// we need to remove them from the view
+		const viewWithoutFilters = { ...view };
+		delete viewWithoutFilters.search;
+		viewWithoutFilters.filters = [];
+		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields ] );
 
 	const actions = useMemo(
@@ -413,8 +407,7 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering
-					supportedLayouts={ [ LAYOUT_GRID ] }
+					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

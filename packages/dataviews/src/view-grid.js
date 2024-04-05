@@ -10,11 +10,11 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Tooltip,
 	Spinner,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,6 +34,7 @@ function GridItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
+	displayAsColumnFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -107,17 +108,34 @@ function GridItem( {
 						return null;
 					}
 					return (
-						<VStack
-							className="dataviews-view-grid__field"
+						<Flex
+							className={ classnames(
+								'dataviews-view-grid__field',
+								displayAsColumnFields?.includes( field.id )
+									? 'is-column'
+									: 'is-row'
+							) }
 							key={ field.id }
-							spacing={ 1 }
+							gap={ 1 }
+							justify="flex-start"
+							expanded
+							style={ { height: 'auto' } }
+							direction={
+								displayAsColumnFields?.includes( field.id )
+									? 'column'
+									: 'row'
+							}
 						>
-							<Tooltip text={ field.header } placement="left">
-								<div className="dataviews-view-grid__field-value">
-									{ renderedValue }
-								</div>
-							</Tooltip>
-						</VStack>
+							<FlexItem className="dataviews-view-grid__field-name">
+								{ field.header }
+							</FlexItem>
+							<FlexItem
+								className="dataviews-view-grid__field-value"
+								style={ { maxHeight: 'none' } }
+							>
+								{ renderedValue }
+							</FlexItem>
+						</Flex>
 					);
 				} ) }
 			</VStack>
@@ -132,7 +150,6 @@ export default function ViewGrid( {
 	actions,
 	isLoading,
 	getItemId,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 } ) {
@@ -149,9 +166,7 @@ export default function ViewGrid( {
 				field.id
 			)
 	);
-	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = deferredRendering ? shownData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	return (
 		<>
 			{ hasData && (
@@ -162,7 +177,7 @@ export default function ViewGrid( {
 					className="dataviews-view-grid"
 					aria-busy={ isLoading }
 				>
-					{ usedData.map( ( item ) => {
+					{ data.map( ( item ) => {
 						return (
 							<GridItem
 								key={ getItemId( item ) }
@@ -175,6 +190,9 @@ export default function ViewGrid( {
 								mediaField={ mediaField }
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
+								displayAsColumnFields={
+									view.layout.displayAsColumnFields
+								}
 							/>
 						);
 					} ) }

@@ -111,10 +111,10 @@ test.describe( 'Sidebar', () => {
 			.getByRole( 'heading', { level: 2 } );
 
 		await expect( documentSettingsPanels ).toHaveText( [
+			'No Title',
 			'Summary',
 			'Categories',
 			'Tags',
-			'Featured image',
 			'Excerpt',
 			'Discussion',
 		] );
@@ -131,6 +131,6 @@ test.describe( 'Sidebar', () => {
 			removeEditorPanel( 'post-status' );
 		} );
 
-		await expect( documentSettingsPanels ).toHaveCount( 0 );
+		await expect( documentSettingsPanels ).toHaveCount( 1 );
 	} );
 } );

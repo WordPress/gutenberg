@@ -14,6 +14,7 @@ import {
 	PostSyncStatus,
 	PostURLPanel,
 	PostTemplatePanel,
+	PostFeaturedImagePanel,
 	store as editorStore,
 } from '@wordpress/editor';
 
@@ -60,6 +61,7 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PostFeaturedImagePanel withPanelBody={ false } />
 						<PostVisibility />
 						<PostSchedulePanel />
 						<PostTemplatePanel />

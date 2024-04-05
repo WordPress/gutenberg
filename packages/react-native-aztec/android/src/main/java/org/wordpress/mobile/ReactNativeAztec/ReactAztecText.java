@@ -238,6 +238,21 @@ public class ReactAztecText extends AztecText {
         clearFocus();
     }
 
+    public void onMarkFormatting(String colorString) {
+        inlineFormatter.setMarkStyleColor(colorString);
+
+        Set<ITextFormat> selectedStylesSet = new HashSet<>(getSelectedStyles());
+        Set<ITextFormat> newFormatsSet = new HashSet<>();
+        newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
+
+        selectedStylesSet.removeAll(typingFormatsMap.keySet());
+        selectedStylesSet.addAll(newFormatsSet);
+
+        ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
+        setSelectedStyles(newStylesList);
+        updateToolbarButtons(newStylesList);
+    }
+
     @Override
     public void clearFocus() {
         setFocusableInTouchMode(false);
@@ -580,6 +595,7 @@ public class ReactAztecText extends AztecText {
                     break;
                 case "underline":
                     newFormatsSet.add(AztecTextFormat.FORMAT_UNDERLINE);
+                    break;
                 case "mark":
                     newFormatsSet.add(AztecTextFormat.FORMAT_MARK);
                     break;
