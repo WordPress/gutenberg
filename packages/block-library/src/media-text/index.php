@@ -29,8 +29,16 @@ function render_block_core_media_text( $attributes, $content ) {
 		return $content;
 	}
 
-	$image_tag = '<figure class="wp-block-media-text__media"><img>';
-	$content   = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
+	/*
+	 * If the block is linked, insert the image inside the `a` tag.
+	 * Otherwise, insert the image inside the `figure` tag.
+	 */
+	$find_link = new WP_HTML_Tag_Processor( $content );
+	if ( $find_link->next_tag( 'a' ) ) {
+		$content = preg_replace( '/(<\/a>)/', '<img></a>', $content );
+	} else {
+		$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', '<figure class="wp-block-media-text__media"><img>', $content );
+	}
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
