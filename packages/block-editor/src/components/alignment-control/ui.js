@@ -3,7 +3,7 @@
  */
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
-import {alignLeft, alignRight, alignCenter, alignJustify} from '@wordpress/icons';
+import { alignLeft, alignRight, alignCenter, alignJustify } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
@@ -25,7 +25,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 		icon: alignJustify,
 		title: __( 'Justify text' ),
 		align: 'justify',
-	}
+	},
 ];
 
 const POPOVER_PROPS = {
