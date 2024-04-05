@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import( 'preact/debug' );
 import { hydrate } from 'preact';
 /**
  * Internal dependencies

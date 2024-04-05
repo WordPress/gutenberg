@@ -1,5 +1,4 @@
 /* @jsx createElement */
-
 /**
  * External dependencies
  */
@@ -90,7 +89,7 @@ interface DirectivesProps {
 	originalProps: any;
 	previousScope?: Scope;
 }
-
+let directivesName = '';
 // Main context.
 const context = createContext< any >( {} );
 
@@ -333,6 +332,11 @@ const Directives = ( {
 	scope.attributes = element.props;
 
 	// Recursively render the wrapper for the next priority level.
+	// Setting displayName is not working recursevely.
+	const directivesNames = Object.keys( element.props ).filter( ( key ) =>
+		key.startsWith( 'data-wp-' )
+	);
+	directivesName = directivesNames[ 0 ];
 	const children =
 		nextPriorityLevels.length > 0 ? (
 			<Directives
@@ -345,7 +349,6 @@ const Directives = ( {
 		) : (
 			element
 		);
-
 	const props = { ...originalProps, children };
 	const directiveArgs = {
 		directives,
@@ -359,7 +362,9 @@ const Directives = ( {
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) props.children = wrapper;
+		if ( wrapper !== undefined ) {
+			props.children = wrapper;
+		}
 	}
 
 	resetScope();
@@ -388,7 +393,9 @@ options.vnode = ( vnode: VNode< any > ) => {
 				element: createElement( vnode.type as any, props ),
 				top: true,
 			};
+
 			vnode.type = Directives;
+			vnode.type.displayName = directivesName;
 		}
 	}
 
