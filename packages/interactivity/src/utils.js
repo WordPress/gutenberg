@@ -206,7 +206,7 @@ export function useCallback( callback, inputs ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed factory function.
  *
- * @template {unknown} T The momized value.
+ * @template {unknown} T The memoized value.
  *
  * @param {() => T}                factory Factory function that returns that value for memoization.
  * @param {ReadonlyArray<unknown>} inputs  If present, the factory will only be run to recompute if
