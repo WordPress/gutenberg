@@ -374,15 +374,7 @@ test.describe( 'Heading', () => {
 			'Heading content'
 		);
 
-		await listView
-			.getByRole( 'button', { name: 'Options for Heading' } )
-			.click();
-
-		await page
-			.getByRole( 'menu', { name: 'Options for Heading' } )
-			.getByRole( 'menuitem', { name: 'Rename' } )
-			.click();
-
+		await editor.clickBlockOptionsMenuItem( 'Rename' );
 		await page
 			.getByRole( 'dialog', { name: 'Rename' } )
 			.getByRole( 'textbox', { name: 'Block name' } )

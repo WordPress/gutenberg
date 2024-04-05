@@ -72,14 +72,7 @@ test.describe( 'Pattern Overrides', () => {
 				.filter( { hasText: 'This paragraph can be edited' } )
 				.focus();
 
-			await page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Options' } )
-				.click();
-			await page
-				.getByRole( 'menu', { name: 'Options' } )
-				.getByRole( 'menuitem', { name: 'Rename' } )
-				.click();
+			await editor.clickBlockOptionsMenuItem( 'Rename' );
 			await page
 				.getByRole( 'dialog', { name: 'Rename' } )
 				.getByRole( 'textbox', { name: 'Block name' } )
