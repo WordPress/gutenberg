@@ -41,7 +41,11 @@ function render_block_core_file( $attributes, $content ) {
 
 		$filename     = $processor->get_attribute( 'aria-label' );
 		$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
-		$label        = $has_filename ? sprintf( __( 'Embed of %s.' ), $filename ) : __( 'PDF embed' );
+		$label        = $has_filename ? sprintf(
+			/* translators: %s: filename. */
+			__( 'Embed of %s.' ),
+			$filename
+		) : __( 'PDF embed' );
 
 		// Update object's aria-label attribute if present in block HTML.
 		// Match an aria-label attribute from an object tag.
