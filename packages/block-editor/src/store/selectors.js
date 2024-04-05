@@ -2918,25 +2918,42 @@ export const getBlockEditingMode = createRegistrySelector(
 					// If we have a sections container (usually a core/group
 					// <main> element), only allow editing of the contents of
 					// the container.
+
+					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+						return 'disabled';
+					}
+
+					if ( clientId === sectionsContainerClientId ) {
+						return 'contentOnly';
+					}
+
 					const sectionsClientIds = getClientIdsOfDescendants(
 						state,
 						sectionsContainerClientId
 					);
-					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
-						return 'disabled';
-					} else if ( clientId === sectionsContainerClientId ) {
-						return 'contentOnly';
-					} else if ( sectionsClientIds.includes( clientId ) ) {
+					if ( sectionsClientIds.includes( clientId ) ) {
 						return 'default';
 					}
 				} else {
 					// If we don't have a sections container, we get the top-level
 					// blocks and only allow editing those blocks.
-					const sectionsClientIds = getBlockOrder( state );
-					const block = getBlock( state, clientId );
 
-					function isSectionChildClientId() {
-						return sectionsClientIds.some( ( sectionClientId ) => {
+					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+						return 'contentOnly';
+					}
+
+					const sectionsClientIds = getBlockOrder( state );
+					if ( sectionsClientIds.includes( clientId ) ) {
+						return 'contentOnly';
+					}
+
+					const block = getBlock( state, clientId );
+					if ( block?.name === 'core/template-part' ) {
+						return 'disabled';
+					}
+
+					const isSectionChildClientId = sectionsClientIds.some(
+						( sectionClientId ) => {
 							const sectionBlock = getBlock(
 								state,
 								sectionClientId
@@ -2948,16 +2965,9 @@ export const getBlockEditingMode = createRegistrySelector(
 								( innerBlock ) =>
 									innerBlock.clientId === clientId
 							);
-						} );
-					}
-
-					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
-						return 'contentOnly';
-					} else if ( sectionsClientIds.includes( clientId ) ) {
-						return 'contentOnly';
-					} else if ( block?.name === 'core/template-part' ) {
-						return 'disabled';
-					} else if ( isSectionChildClientId() ) {
+						}
+					);
+					if ( isSectionChildClientId ) {
 						return 'disabled';
 					}
 				}
