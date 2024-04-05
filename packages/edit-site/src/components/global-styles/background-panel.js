@@ -8,6 +8,11 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 
+// Initial control values where no block style is set.
+const BACKGROUND_DEFAULT_VALUES = {
+	backgroundSize: 'auto',
+};
+
 const {
 	useGlobalStyle,
 	useGlobalSetting,
@@ -29,6 +34,7 @@ export default function BackgroundPanel() {
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
+			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 		/>
 	);
 }
