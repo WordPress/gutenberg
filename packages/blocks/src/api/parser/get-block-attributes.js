@@ -138,6 +138,9 @@ export function getBlockAttribute(
 			value = commentAttributes
 				? commentAttributes[ attributeKey ]
 				: undefined;
+			if ( value && attributeSchema.type === 'rich-text' ) {
+				value = RichTextData.fromHTMLString( value );
+			}
 			break;
 		// raw source means that it's the original raw block content.
 		case 'raw':
