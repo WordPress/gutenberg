@@ -31,6 +31,7 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { Suspense } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -72,7 +73,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-export default function Editor( { isLoading, onClick } ) {
+function Editor( { onClick } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -168,23 +169,15 @@ export default function Editor( { isLoading, onClick } ) {
 	// Only announce the title once the editor is ready to prevent "Replace"
 	// action in <URLQueryController> from double-announcing.
 	useTitle( hasLoadedPost && title );
-
-	const loadingProgressId = useInstanceId(
-		CanvasLoader,
-		'edit-site-editor__loading-progress'
-	);
-
 	const { closeGeneralSidebar } = useDispatch( editSiteStore );
 
 	const settings = useSpecificEditorSettings();
 	const isReady =
-		! isLoading &&
-		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
-			( ! postWithTemplate && !! editedPost ) );
+		( postWithTemplate && !! contextPost && !! editedPost ) ||
+		( ! postWithTemplate && !! editedPost );
 
 	return (
 		<>
-			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
 				<Notice status="warning" isDismissible={ false }>
@@ -278,3 +271,18 @@ export default function Editor( { isLoading, onClick } ) {
 		</>
 	);
 }
+
+function EditorWithLoader( props ) {
+	const loadingProgressId = useInstanceId(
+		CanvasLoader,
+		'edit-site-editor__loading-progress'
+	);
+
+	return (
+		<Suspense fallback={ <CanvasLoader id={ loadingProgressId } /> }>
+			<Editor { ...props } />
+		</Suspense>
+	);
+}
+
+export default EditorWithLoader;

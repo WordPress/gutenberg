@@ -80,7 +80,6 @@ function ResizableFrame( {
 	isFullWidth,
 	isOversized,
 	setIsOversized,
-	isReady,
 	children,
 	/** The default (unresized) width/height of the frame, based on the space availalbe in the viewport. */
 	defaultSize,
@@ -235,8 +234,7 @@ function ResizableFrame( {
 				top: false,
 				right: false,
 				bottom: false,
-				// Resizing will be disabled until the editor content is loaded.
-				left: isReady,
+				left: true,
 				topRight: false,
 				bottomRight: false,
 				bottomLeft: false,

@@ -42,7 +42,7 @@ import {
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSuspenseSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { crop, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -84,7 +84,7 @@ const SiteLogo = ( {
 	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
-	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
+	const { imageEditing, maxWidth, title } = useSuspenseSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',

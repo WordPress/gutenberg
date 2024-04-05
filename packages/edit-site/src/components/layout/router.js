@@ -7,7 +7,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
@@ -21,7 +20,6 @@ import {
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function useLayoutAreas() {
-	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
@@ -38,7 +36,6 @@ export default function useLayoutAreas() {
 				content: <PagePages />,
 				preview: isListLayout && (
 					<Editor
-						isLoading={ isSiteEditorLoading }
 						onClick={ () =>
 							history.push( {
 								path,
@@ -49,10 +46,7 @@ export default function useLayoutAreas() {
 						}
 					/>
 				),
-				mobile:
-					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
+				mobile: canvas === 'edit' ? <Editor /> : undefined,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -65,11 +59,8 @@ export default function useLayoutAreas() {
 		return {
 			key: 'page',
 			areas: {
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile:
-					canvas === 'edit' ? (
-						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
+				preview: <Editor />,
+				mobile: canvas === 'edit' ? <Editor /> : undefined,
 			},
 		};
 	}
@@ -85,9 +76,7 @@ export default function useLayoutAreas() {
 						postType={ TEMPLATE_POST_TYPE }
 					/>
 				),
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: isListLayout && <Editor />,
 				mobile: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_POST_TYPE }
@@ -111,9 +100,7 @@ export default function useLayoutAreas() {
 						postType={ TEMPLATE_PART_POST_TYPE }
 					/>
 				),
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
+				preview: isListLayout && <Editor />,
 				mobile: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_PART_POST_TYPE }
@@ -141,11 +128,8 @@ export default function useLayoutAreas() {
 	return {
 		key: 'default',
 		areas: {
-			preview: <Editor isLoading={ isSiteEditorLoading } />,
-			mobile:
-				canvas === 'edit' ? (
-					<Editor isLoading={ isSiteEditorLoading } />
-				) : undefined,
+			preview: <Editor />,
+			mobile: canvas === 'edit' ? <Editor /> : undefined,
 		},
 	};
 }

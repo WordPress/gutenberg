@@ -49,7 +49,6 @@ import KeyboardShortcutsRegister from '../keyboard-shortcuts/register';
 import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
-import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
 
@@ -112,7 +111,6 @@ export default function Layout() {
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
 	const [ fullResizer ] = useResizeObserver();
-	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
 	const { key: routeKey, areas, widths } = useLayoutAreas();
@@ -333,7 +331,6 @@ export default function Layout() {
 								>
 									<ErrorBoundary>
 										<ResizableFrame
-											isReady={ ! isEditorLoading }
 											isFullWidth={
 												canvasMode === 'edit'
 											}

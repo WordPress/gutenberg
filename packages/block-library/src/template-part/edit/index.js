@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { serialize } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useSuspenseSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	useBlockProps,
@@ -128,7 +128,7 @@ export default function TemplatePartEdit( {
 		area,
 		onNavigateToEntityRecord,
 		title,
-	} = useSelect(
+	} = useSuspenseSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
