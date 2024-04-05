@@ -31,7 +31,8 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { ROOT_CONTAINER_CLIENT_ID } from './constants';
+import { ROOT_CONTAINER_CLIENT_ID, STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
