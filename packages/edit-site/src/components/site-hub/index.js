@@ -159,7 +159,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 							<HStack
 								spacing={ 0 }
 								expanded={ false }
-								style={ { flexShrink: '0' } }
+								className="edit-site-site-hub__actions"
 							>
 								<Button
 									href={ homeUrl }
