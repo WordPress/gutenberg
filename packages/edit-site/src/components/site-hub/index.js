@@ -156,7 +156,11 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 							<div className="edit-site-site-hub__title">
 								{ decodeEntities( siteTitle ) }
 							</div>
-							<HStack spacing={ 0 } expanded={ false }>
+							<HStack
+								spacing={ 0 }
+								expanded={ false }
+								style={ { flexShrink: '0' } }
+							>
 								<Button
 									href={ homeUrl }
 									target="_blank"
