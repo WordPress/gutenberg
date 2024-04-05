@@ -384,7 +384,7 @@ export const useUnsupportedBlocks = ( clientId ) => {
 					 *  - supports.interactivity = true;
 					 *  - supports.interactivity.clientNavigation = true;
 					 */
-					const blockSupportsInteractivityBool = Object.is(
+					const blockSupportsInteractivity = Object.is(
 						getBlockSupport( blockName, 'interactivity' ),
 						true
 					);
@@ -394,7 +394,7 @@ export const useUnsupportedBlocks = ( clientId ) => {
 							'interactivity.clientNavigation'
 						);
 					const blockInteractivity =
-						blockSupportsInteractivityBool ||
+						blockSupportsInteractivity ||
 						blockSupportsInteractivityClientNavigation;
 					if ( ! blockInteractivity ) {
 						blocks.hasBlocksFromPlugins = true;
