@@ -294,12 +294,7 @@ export default function Layout() {
 					<SavePanel />
 
 					{ isMobileViewport && areas.mobile && (
-						<div
-							className="edit-site-layout__mobile"
-							style={ {
-								maxWidth: widths?.content,
-							} }
-						>
+						<div className="edit-site-layout__mobile">
 							{ areas.mobile }
 						</div>
 					) }
