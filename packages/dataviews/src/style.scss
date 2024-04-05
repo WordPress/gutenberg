@@ -328,8 +328,9 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: $grid-unit-15;
+			padding: $grid-unit-15 0;
 			padding-top: 0;
+			margin: 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
@@ -353,6 +354,24 @@
 			.dataviews-view-grid__field-name {
 				color: $gray-700;
 			}
+		}
+	}
+
+	.dataviews-view-grid__badge-fields {
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
+		.dataviews-view-grid__field-value {
+			width: fit-content;
+			background: $gray-100;
+			padding: 0 $grid-unit-10;
+			min-height: $grid-unit-30;
+			border-radius: $radius-block-ui;
+			display: flex;
+			align-items: center;
+			font-size: 12px;
 		}
 	}
 }

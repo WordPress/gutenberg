@@ -73,6 +73,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		badgeFields: [ 'sync-status' ],
 	},
 };
 const DEFAULT_VIEW = {
@@ -314,19 +315,23 @@ export default function DataviewsPatterns() {
 		];
 		if ( type === PATTERN_TYPES.theme ) {
 			_fields.push( {
-				header: __( 'Sync Status' ),
+				header: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
-						SYNC_FILTERS.find(
-							( { value } ) => value === item.syncStatus
-						)?.label ||
-						SYNC_FILTERS.find(
-							( { value } ) =>
-								value === PATTERN_SYNC_TYPES.unsynced
-						).label
+						<span
+							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
+						>
+							{ SYNC_FILTERS.find(
+								( { value } ) => value === item.syncStatus
+							)?.label ||
+								SYNC_FILTERS.find(
+									( { value } ) =>
+										value === PATTERN_SYNC_TYPES.unsynced
+								).label }
+						</span>
 					);
 				},
 				type: ENUMERATION_TYPE,
