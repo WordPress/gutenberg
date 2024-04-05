@@ -29,7 +29,6 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP, safeDecodeURI } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -424,7 +423,7 @@ export default function NavigationLinkEdit( {
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						value={ label ? stripHTML( label ) : '' }
+						value={ label.toPlainText() }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
