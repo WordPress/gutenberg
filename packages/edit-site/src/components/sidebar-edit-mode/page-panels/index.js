@@ -17,13 +17,11 @@ import {
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import PageActions from '../../page-actions';
 import PageContent from './page-content';
 import PageSummary from './page-summary';
 
