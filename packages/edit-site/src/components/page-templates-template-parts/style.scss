@@ -60,12 +60,6 @@
 }
 
 .edit-site-page-template-template-parts-dataviews {
-	margin-top: $header-height;
-
-	@include break-medium {
-		margin-top: 0;
-	}
-
 	.dataviews-pagination {
 		z-index: z-index(".edit-site-templates__dataviews-list-pagination");
 	}

@@ -1,11 +1,3 @@
-.edit-site-page-pages {
-	margin-top: $header-height;
-
-	@include break-medium {
-		margin-top: 0;
-	}
-}
-
 .page-pages-preview-field__button {
 	box-shadow: none;
 	border: none;
