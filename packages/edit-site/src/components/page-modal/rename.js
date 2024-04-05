@@ -3,16 +3,21 @@
  */
 import { Modal } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { PAGE_MODALS } from './';
-import RenameModalContent from '../rename-modal-content';
 import useEditedEntityRecord from '../use-edited-entity-record';
+
+const { RenamePostModalContent } = unlock( editorPrivateApis );
 
 export default function PageRenameModal() {
 	const { postId, postType } = useSelect( ( select ) => {
@@ -41,7 +46,10 @@ export default function PageRenameModal() {
 			closeModal={ closeModal }
 			page={ page }
 		>
-			<RenameModalContent items={ [ page ] } closeModal={ closeModal } />
+			<RenamePostModalContent
+				items={ [ page ] }
+				closeModal={ closeModal }
+			/>
 		</Modal>
 	);
 }

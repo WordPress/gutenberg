@@ -8,7 +8,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import {
 	Button,
 	__experimentalText as Text,
@@ -19,7 +19,7 @@ import {
 /**
  * Internal dependencies
  */
-import RenameModalContent from '../rename-modal-content';
+import RenamePostModalContent from './rename-post-modal-content';
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -423,7 +423,7 @@ export const renamePostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	RenderModal: RenameModalContent,
+	RenderModal: RenamePostModalContent,
 };
 
 export function usePostActions( onActionPerformed, actionIds = null ) {

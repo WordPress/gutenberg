@@ -14,7 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
-export default function RenameModalContent( { items, closeModal } ) {
+export default function RenamePostModalContent( { items, closeModal } ) {
 	const [ item ] = items;
 	const originalTitle = decodeEntities(
 		typeof item.title === 'string' ? item.title : item.title.rendered
