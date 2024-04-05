@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
@@ -19,7 +18,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
-const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
+export const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 
 const TEXT_ALIGNMENT_OPTIONS = [
 	{
@@ -64,35 +63,6 @@ export function getValidTextAlignments( blockTextAlign ) {
 	}
 
 	return validTextAlignments;
-}
-
-/**
- * Filters registered block settings, extending attributes to include `textAlign`.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-export function addAttribute( settings ) {
-	// Allow blocks to specify their default style if needed.
-	if ( settings.attributes?.style?.default?.typography?.textAlign ) {
-		return settings;
-	}
-	if ( hasBlockSupport( settings, TEXT_ALIGN_SUPPORT_KEY ) ) {
-		// Gracefully handle if settings.attributes is undefined.
-		settings.attributes = {
-			...settings.attributes,
-			style: {
-				...settings.attributes?.style,
-				typography: {
-					...settings.attributes?.style?.typography,
-					textAlign: undefined,
-				},
-			},
-		};
-	}
-
-	return settings;
 }
 
 function BlockEditTextAlignmentToolbarControlsPure( {
@@ -206,9 +176,3 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 	}
 	return props;
 }
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/editor/text-align/addAttribute',
-	addAttribute
-);

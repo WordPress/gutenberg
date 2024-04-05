@@ -8,7 +8,6 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
-import textAlign from './text-align';
 import background from './background';
 import './lock';
 import anchor from './anchor';
@@ -22,6 +21,7 @@ import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
+import textAlign from './text-align';
 import border from './border';
 import position from './position';
 import layout from './layout';

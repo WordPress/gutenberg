@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
@@ -26,34 +25,6 @@ describe( 'textAlign', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
-		} );
-	} );
-
-	describe( 'addAttribute()', () => {
-		const filterRegisterBlockType = applyFilters.bind(
-			null,
-			'blocks.registerBlockType'
-		);
-
-		it( 'should do nothing if the block settings does not define text align support', () => {
-			const settings = filterRegisterBlockType( blockSettings );
-
-			expect( settings.attributes ).toBeUndefined();
-		} );
-
-		it( 'should assign a new text align attribute', () => {
-			const settings = filterRegisterBlockType( {
-				...blockSettings,
-				supports: {
-					typography: {
-						textAlign: true,
-					},
-				},
-			} );
-
-			expect( settings.attributes.style.typography ).toHaveProperty(
-				'textAlign'
-			);
 		} );
 	} );
 
