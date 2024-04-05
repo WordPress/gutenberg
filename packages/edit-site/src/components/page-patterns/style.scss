@@ -43,7 +43,7 @@
 }
 
 .edit-site-page-patterns-dataviews {
-	margin-top: 60px;
+	margin-top: $header-height;
 
 	@include break-medium {
 		margin-top: 0;
