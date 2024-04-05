@@ -64,6 +64,9 @@ function gutenberg_replace_pattern_blocks_get_block_templates( $templates ) {
 }
 
 function gutenberg_replace_pattern_blocks_get_block_template( $template ) {
+	if ( null === $template ) {
+		return $template;
+	}
 	$blocks            = parse_blocks( $template->content );
 	$blocks            = gutenberg_replace_pattern_blocks( $blocks );
 	$template->content = serialize_blocks( $blocks );
