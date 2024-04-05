@@ -7,8 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport } from '@wordpress/blocks';
-import { useMemo, Platform, useCallback } from '@wordpress/element';
+import { getBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { useMemo, Platform, useCallback, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -228,7 +228,7 @@ function styleToAttributes( style ) {
 
 function attributesToStyle( attributes ) {
 	return {
-		...attributes.style,
+		elements: structuredClone( attributes.style?.elements ),
 		color: {
 			...attributes.style?.color,
 			text: attributes.textColor
@@ -291,6 +291,24 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 		setAttributes( styleToAttributes( newStyle ) );
 	};
 
+	const stableAttributesDefaults = useRef();
+	useSelect(
+		( select ) => {
+			const { attributes } = select( blocksStore ).getBlockType( name );
+			stableAttributesDefaults.current = {
+				style: attributes.style.default,
+				textColor: attributes.textColor?.default,
+				backgroundColor: attributes.backgroundColor?.default,
+				gradient: attributes.gradient?.default,
+			};
+		},
+		[ name ]
+	);
+	const defaults = useMemo(
+		() => attributesToStyle( stableAttributesDefaults.current ),
+		[]
+	);
+
 	if ( ! isEnabled ) {
 		return null;
 	}
@@ -321,6 +339,7 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 			value={ value }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
+			resetValue={ defaults }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [

@@ -109,6 +109,54 @@ export function useHasBackgroundPanel( settings ) {
 	);
 }
 
+const ELEMENTS = [
+	{
+		name: 'caption',
+		label: __( 'Captions' ),
+		showPanel: useHasCaptionPanel,
+	},
+	{
+		name: 'button',
+		label: __( 'Button' ),
+		showPanel: useHasButtonPanel,
+	},
+	{
+		name: 'heading',
+		label: __( 'Heading' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h1',
+		label: __( 'H1' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h2',
+		label: __( 'H2' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h3',
+		label: __( 'H3' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h4',
+		label: __( 'H4' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h5',
+		label: __( 'H5' ),
+		showPanel: useHasHeadingPanel,
+	},
+	{
+		name: 'h6',
+		label: __( 'H6' ),
+		showPanel: useHasHeadingPanel,
+	},
+];
+
 function ColorToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -301,6 +349,7 @@ function ColorPanelDropdown( {
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
 	value,
+	resetValue = {},
 	onChange,
 	inheritedValue = value,
 	settings,
@@ -345,7 +394,9 @@ export default function ColorPanel( {
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
+	const hasBackground = () =>
+		userBackgroundColor !== decodeValue( resetValue?.color?.background ) ||
+		userGradient !== decodeValue( resetValue?.color?.gradient );
 	const setBackgroundColor = ( newColor ) => {
 		const newValue = setImmutably(
 			value,
@@ -368,9 +419,10 @@ export default function ColorPanel( {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
-			undefined
+			resetValue.backgroundColor ?? resetValue?.color?.background
 		);
-		newValue.color.gradient = undefined;
+		newValue.color.gradient =
+			resetValue.gradient ?? resetValue?.color?.gradient;
 		onChange( newValue );
 	};
 
@@ -404,17 +456,26 @@ export default function ColorPanel( {
 			)
 		);
 	};
-	const hasLink = () => !! userLinkColor || !! userHoverLinkColor;
+	const hasLink = () => {
+		const {
+			color: { text: resetLinkColor } = {},
+			':hover': { color: { text: resetHoverColor } = {} } = {},
+		} = resetValue?.elements?.link ?? {};
+		return (
+			userLinkColor !== decodeValue( resetLinkColor ) ||
+			userHoverLinkColor !== decodeValue( resetHoverColor )
+		);
+	};
 	const resetLink = () => {
 		let newValue = setImmutably(
 			value,
 			[ 'elements', 'link', ':hover', 'color', 'text' ],
-			undefined
+			resetValue?.elements?.link?.[ ':hover' ]?.color?.text
 		);
 		newValue = setImmutably(
 			newValue,
 			[ 'elements', 'link', 'color', 'text' ],
-			undefined
+			resetValue?.elements?.link?.color?.text
 		);
 		onChange( newValue );
 	};
@@ -423,7 +484,8 @@ export default function ColorPanel( {
 	const showTextPanel = useHasTextPanel( settings );
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
-	const hasTextColor = () => !! userTextColor;
+	const hasTextColor = () =>
+		userTextColor !== decodeValue( resetValue?.color?.text );
 	const setTextColor = ( newColor ) => {
 		let changedObject = setImmutably(
 			value,
@@ -440,82 +502,37 @@ export default function ColorPanel( {
 
 		onChange( changedObject );
 	};
-	const resetTextColor = () => setTextColor( undefined );
+	const resetTextColor = () => setTextColor( resetValue?.color?.text );
 
-	// Elements
-	const elements = [
-		{
-			name: 'caption',
-			label: __( 'Captions' ),
-			showPanel: useHasCaptionPanel( settings ),
-		},
-		{
-			name: 'button',
-			label: __( 'Button' ),
-			showPanel: useHasButtonPanel( settings ),
-		},
-		{
-			name: 'heading',
-			label: __( 'Heading' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h1',
-			label: __( 'H1' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h2',
-			label: __( 'H2' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h3',
-			label: __( 'H3' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h4',
-			label: __( 'H4' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h5',
-			label: __( 'H5' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-		{
-			name: 'h6',
-			label: __( 'H6' ),
-			showPanel: useHasHeadingPanel( settings ),
-		},
-	];
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			color: undefined,
-			elements: {
-				...previousValue?.elements,
-				link: {
-					...previousValue?.elements?.link,
-					color: undefined,
-					':hover': {
-						color: undefined,
-					},
-				},
-				...elements.reduce( ( acc, element ) => {
-					return {
-						...acc,
-						[ element.name ]: {
-							...previousValue?.elements?.[ element.name ],
-							color: undefined,
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			const resetElements = resetValue?.elements;
+			return {
+				...previousValue,
+				color: resetValue?.color,
+				elements: {
+					...previousValue?.elements,
+					link: {
+						...previousValue?.elements?.link,
+						color: resetElements?.link?.color,
+						':hover': {
+							color: resetElements?.link?.[ ':hover' ]?.color,
 						},
-					};
-				}, {} ),
-			},
-		};
-	}, [] );
+					},
+					...ELEMENTS.reduce( ( acc, element ) => {
+						return {
+							...acc,
+							[ element.name ]: {
+								...previousValue?.elements?.[ element.name ],
+								color: resetElements?.[ element.name ]?.color,
+							},
+						};
+					}, {} ),
+				},
+			};
+		},
+		[ resetValue?.color, resetValue?.elements ]
+	);
 
 	const items = [
 		showTextPanel && {
@@ -586,8 +603,11 @@ export default function ColorPanel( {
 		},
 	].filter( Boolean );
 
-	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+	for ( const { name, label, showPanel: useShowPanel } of ELEMENTS ) {
+		// Disable reason: The array being iterated is constant and thus the
+		// hook invokations are too.
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		if ( ! useShowPanel( settings ) ) continue;
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background
@@ -601,26 +621,32 @@ export default function ColorPanel( {
 		const elementBackgroundUserColor = decodeValue(
 			value?.elements?.[ name ]?.color?.background
 		);
-		const elementGradientUserColor = decodeValue(
+		const elementGradientUser = decodeValue(
 			value?.elements?.[ name ]?.color?.gradient
 		);
 		const elementTextUserColor = decodeValue(
 			value?.elements?.[ name ]?.color?.text
 		);
-		const hasElement = () =>
-			!! (
-				elementTextUserColor ||
-				elementBackgroundUserColor ||
-				elementGradientUserColor
+		const hasElement = () => {
+			const { color: resetColor = {} } =
+				resetValue.elements?.[ name ] ?? {};
+			return (
+				elementTextUserColor !== decodeValue( resetColor.text ) ||
+				elementBackgroundUserColor !==
+					decodeValue( resetColor.background ) ||
+				elementGradientUser !== decodeValue( resetColor.gradient )
 			);
+		};
 		const resetElement = () => {
+			const { color: resetColor = {} } =
+				resetValue.elements?.[ name ] ?? {};
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
-				undefined
+				resetColor.background
 			);
-			newValue.elements[ name ].color.gradient = undefined;
-			newValue.elements[ name ].color.text = undefined;
+			newValue.elements[ name ].color.gradient = resetColor.gradient;
+			newValue.elements[ name ].color.text = resetColor.text;
 			onChange( newValue );
 		};
 
@@ -696,12 +722,12 @@ export default function ColorPanel( {
 						label: __( 'Gradient' ),
 						inheritedValue: elementGradient,
 						setValue: setElementGradient,
-						userValue: elementGradientUserColor,
+						userValue: elementGradientUser,
 						isGradient: true,
 					},
 			].filter( Boolean ),
 		} );
-	} );
+	}
 
 	return (
 		<Wrapper
