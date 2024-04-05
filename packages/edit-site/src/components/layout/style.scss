@@ -26,7 +26,7 @@
 	}
 }
 
-.edit-site-layout__header-container:has(+ .edit-site-layout__content > .edit-site-layout__mobile) {
+.edit-site-layout__header-container:has(+ .edit-site-layout__content > .edit-site-layout__mobile>.edit-site-page) {
 	margin-bottom: $header-height;
 	@include break-medium {
 		margin-bottom: 0;
