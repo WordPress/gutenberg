@@ -15,7 +15,7 @@
 	z-index: z-index(".edit-site-layout__hub");
 
 	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$grid-unit-30});
+		width: calc(#{$nav-sidebar-width} - #{$grid-unit-15});
 	}
 
 	.edit-site-layout.is-full-canvas & {
