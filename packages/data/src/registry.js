@@ -313,16 +313,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return store.store;
 	}
 
-	function batch( callback ) {
+	async function batch( callback ) {
 		// If we're already batching, just call the callback.
 		if ( emitter.isPaused ) {
-			callback();
+			await callback();
 			return;
 		}
 
 		emitter.pause();
 		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
-		callback();
+		await callback();
 		emitter.resume();
 		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
 	}
