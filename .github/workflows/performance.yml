@@ -110,7 +110,11 @@ jobs:
                   BRANCHES: ${{ github.event.inputs.branches }}
                   WP_VERSION: ${{ github.event.inputs.wpversion }}
               run: |
-                  ./bin/plugin/cli.js perf $(echo $BRANCHES | tr ',' ' ') --tests-branch $GITHUB_SHA --wp-version "$WP_VERSION"
+                  ./bin/plugin/cli.js perf \
+                    $(echo $BRANCHES | tr ',' ' ') \
+                    --tests-branch "$GITHUB_SHA" \
+                    --wp-version "$WP_VERSION" \
+                    --suite "${{ matrix.suite }}"
 
             - name: Archive performance results
               if: success()
