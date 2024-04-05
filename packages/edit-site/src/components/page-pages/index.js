@@ -21,6 +21,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  * Internal dependencies
  */
 import Page from '../page';
+import PageCommandsModal from '../page-modal';
 import { default as Link, useLink } from '../routes/link';
 import {
 	DEFAULT_VIEWS,
@@ -411,6 +412,7 @@ export default function PagePages() {
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
 			/>
+			{ view?.type !== LAYOUT_LIST && <PageCommandsModal /> }
 		</Page>
 	);
 }
