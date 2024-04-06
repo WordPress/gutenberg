@@ -391,7 +391,6 @@ test.describe( 'Columns', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowUp' );
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'Delete' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
