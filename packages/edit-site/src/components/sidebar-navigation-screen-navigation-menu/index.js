@@ -64,7 +64,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __(
-					'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+					'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 				) }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />

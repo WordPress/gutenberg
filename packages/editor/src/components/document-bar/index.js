@@ -32,7 +32,7 @@ const TYPE_LABELS = {
 	// translators: 1: Pattern title.
 	wp_pattern: __( 'Editing pattern: %s' ),
 	// translators: 1: Navigation menu title.
-	wp_navigation: __( 'Editing navigation menu: %s' ),
+	wp_navigation: __( 'Editing Navigation Menu: %s' ),
 	// translators: 1: Template title.
 	wp_template: __( 'Editing template: %s' ),
 	// translators: 1: Template part title.
