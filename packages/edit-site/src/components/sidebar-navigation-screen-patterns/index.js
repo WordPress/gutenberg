@@ -115,13 +115,6 @@ export default function SidebarNavigationScreenPatterns() {
 
 	const footer = ! isMobileViewport ? (
 		<ItemGroup>
-			<SidebarNavigationItem
-				as="a"
-				href="edit.php?post_type=wp_block"
-				withChevron
-			>
-				{ __( 'Manage all of my patterns' ) }
-			</SidebarNavigationItem>
 			{ ( isBlockBasedTheme || isTemplatePartsMode ) && (
 				<SidebarNavigationItem withChevron { ...templatePartsLink }>
 					{ __( 'Manage all template parts' ) }

@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UncontrolledCustomSelect from '..';
+import UncontrolledCustomSelectControl from '..';
 
 const customClass = 'amber-skies';
 
@@ -48,14 +48,14 @@ const legacyProps = {
 	],
 };
 
-const LegacyControlledCustomSelect = ( {
+const ControlledCustomSelectControl = ( {
 	options,
 	onChange,
 	...restProps
-}: React.ComponentProps< typeof UncontrolledCustomSelect > ) => {
+}: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
 	const [ value, setValue ] = useState( options[ 0 ] );
 	return (
-		<UncontrolledCustomSelect
+		<UncontrolledCustomSelectControl
 			{ ...restProps }
 			options={ options }
 			onChange={ ( args: any ) => {
@@ -70,8 +70,8 @@ const LegacyControlledCustomSelect = ( {
 };
 
 describe.each( [
-	[ 'Uncontrolled', UncontrolledCustomSelect ],
-	[ 'Controlled', LegacyControlledCustomSelect ],
+	[ 'Uncontrolled', UncontrolledCustomSelectControl ],
+	[ 'Controlled', ControlledCustomSelectControl ],
 ] )( 'CustomSelectControl (%s)', ( ...modeAndComponent ) => {
 	const [ , Component ] = modeAndComponent;
 
@@ -248,7 +248,7 @@ describe.each( [
 		);
 	} );
 
-	it( 'shows selected hint in list of options when added', async () => {
+	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
 		render(
 			<Component
 				{ ...legacyProps }
@@ -260,7 +260,6 @@ describe.each( [
 						__experimentalHint: 'Hint',
 					},
 				] }
-				__experimentalShowSelectedHint
 			/>
 		);
 

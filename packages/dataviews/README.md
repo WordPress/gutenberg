@@ -275,17 +275,9 @@ Whether the data is loading. `false` by default.
 
 Array of layouts supported. By default, all are: `table`, `grid`, `list`.
 
-### `deferredRendering`: `boolean`
-
-Whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
-
 ### `onSelectionChange`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
-
-### `onDetailsChange`: `function`
-
-Callback that signals the user triggered the details for one of more items, and takes them as paremeter. So far, only the `list` view implements it.
 
 ## Types
 

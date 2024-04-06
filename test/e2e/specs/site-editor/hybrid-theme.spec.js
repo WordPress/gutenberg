@@ -19,7 +19,7 @@ test.describe( 'Hybrid theme', () => {
 		);
 
 		await expect(
-			page.getByRole( 'table' ).getByRole( 'link', { name: 'header' } )
+			page.getByRole( 'link', { name: 'header' } )
 		).toBeVisible();
 	} );
 
@@ -29,9 +29,7 @@ test.describe( 'Hybrid theme', () => {
 			'postType=wp_template_part&path=/wp_template_part/all'
 		);
 
-		const templatePart = page
-			.getByRole( 'table' )
-			.getByRole( 'link', { name: 'header' } );
+		const templatePart = page.getByRole( 'link', { name: 'header' } );
 
 		await expect( templatePart ).toBeVisible();
 		await templatePart.click();

@@ -33,6 +33,7 @@ export default function useLayoutAreas() {
 	if ( path === '/page' ) {
 		const isListLayout = layout === 'list' || ! layout;
 		return {
+			key: 'pages-list',
 			areas: {
 				content: <PagePages />,
 				preview: isListLayout && (
@@ -51,7 +52,9 @@ export default function useLayoutAreas() {
 				mobile:
 					canvas === 'edit' ? (
 						<Editor isLoading={ isSiteEditorLoading } />
-					) : undefined,
+					) : (
+						<PagePages />
+					),
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -62,6 +65,7 @@ export default function useLayoutAreas() {
 	// Regular other post types
 	if ( postType && postId ) {
 		return {
+			key: 'page',
 			areas: {
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile:
@@ -76,6 +80,7 @@ export default function useLayoutAreas() {
 	if ( path === '/wp_template' ) {
 		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
+			key: 'templates-list',
 			areas: {
 				content: (
 					<PageTemplatesTemplateParts
@@ -101,6 +106,7 @@ export default function useLayoutAreas() {
 	if ( path === '/wp_template_part/all' ) {
 		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
+			key: 'template-parts',
 			areas: {
 				content: (
 					<PageTemplatesTemplateParts
@@ -125,6 +131,7 @@ export default function useLayoutAreas() {
 	// Patterns
 	if ( path === '/patterns' ) {
 		return {
+			key: 'patterns',
 			areas: {
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
@@ -134,6 +141,7 @@ export default function useLayoutAreas() {
 
 	// Fallback shows the home page preview
 	return {
+		key: 'default',
 		areas: {
 			preview: <Editor isLoading={ isSiteEditorLoading } />,
 			mobile:

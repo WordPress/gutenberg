@@ -23,10 +23,12 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
@@ -45,10 +47,11 @@ import {
 	deleteTemplateAction,
 	renameTemplateAction,
 } from './actions';
-import { postRevisionsAction, useEditPostAction } from '../actions';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -64,6 +67,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		columnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -72,7 +76,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -83,7 +87,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
+	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
 
@@ -138,7 +142,7 @@ function AuthorField( { item, viewType } ) {
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span>{ text }</span>
+			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
 }
@@ -170,7 +174,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button
@@ -183,7 +189,11 @@ function Preview( { item, viewType } ) {
 							( item.type === TEMPLATE_POST_TYPE
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
-						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+						{ ! isEmpty && (
+							<Async>
+								<BlockPreview blocks={ blocks } />
+							</Async>
+						) }
 					</button>
 				) }
 			</div>
@@ -338,16 +348,32 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const editTemplateAction = useEditPostAction();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
 	const actions = useMemo(
 		() => [
-			editTemplateAction,
+			editAction,
 			resetTemplateAction,
 			renameTemplateAction,
-			postRevisionsAction,
+			viewRevisionsAction,
 			deleteTemplateAction,
 		],
-		[ editTemplateAction ]
+		[ editAction, viewRevisionsAction ]
 	);
 
 	const onChangeView = useCallback(
@@ -400,7 +426,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
 	);

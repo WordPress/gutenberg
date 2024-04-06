@@ -10,11 +10,13 @@ import DocumentTools from './components/document-tools';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import ModeSwitcher from './components/mode-switcher';
+import PatternOverridesPanel from './components/pattern-overrides-panel';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostPanelRow from './components/post-panel-row';
 import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
+import { usePostActions } from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
 
 export const privateApis = {};
@@ -26,11 +28,13 @@ lock( privateApis, {
 	InserterSidebar,
 	ListViewSidebar,
 	ModeSwitcher,
+	PatternOverridesPanel,
 	PluginPostExcerpt,
 	PostPanelRow,
 	PostViewLink,
 	PreviewDropdown,
 	PreferencesModal,
+	usePostActions,
 	PostCardPanel,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.

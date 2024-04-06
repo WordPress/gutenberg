@@ -164,7 +164,7 @@ class PostTitle extends Component {
 				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText.Raw
-					setRef={ this.setRef }
+					ref={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }

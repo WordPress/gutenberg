@@ -34,9 +34,11 @@ import { usePrevious } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import {
 	LAYOUT_GRID,
+	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
@@ -65,9 +67,13 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
+	[ LAYOUT_TABLE ]: {
+		primaryField: 'title',
+	},
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		badgeFields: [ 'sync-status' ],
 	},
 };
 const DEFAULT_VIEW = {
@@ -147,6 +153,7 @@ function Preview( { item, categoryId, viewType } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 
 	return (
@@ -171,7 +178,14 @@ function Preview( { item, categoryId, viewType } ) {
 				>
 					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && <BlockPreview blocks={ item.blocks } /> }
+					{ ! isEmpty && (
+						<Async>
+							<BlockPreview
+								blocks={ item.blocks }
+								viewportWidth={ item.viewportWidth }
+							/>
+						</Async>
+					) }
 				</PreviewWrapper>
 			</div>
 			{ ariaDescriptions.map( ( ariaDescription, index ) => (
@@ -197,6 +211,7 @@ function Title( { item, categoryId } ) {
 		postId: isUserPattern ? item.id : item.name,
 		categoryId,
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
+		canvas: 'edit',
 	} );
 	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
 		itemIcon = templatePartIcons[ categoryId ];
@@ -300,19 +315,23 @@ export default function DataviewsPatterns() {
 		];
 		if ( type === PATTERN_TYPES.theme ) {
 			_fields.push( {
-				header: __( 'Sync Status' ),
+				header: __( 'Sync status' ),
 				id: 'sync-status',
 				render: ( { item } ) => {
 					// User patterns can have their sync statuses checked directly.
 					// Non-user patterns are all unsynced for the time being.
 					return (
-						SYNC_FILTERS.find(
-							( { value } ) => value === item.syncStatus
-						)?.label ||
-						SYNC_FILTERS.find(
-							( { value } ) =>
-								value === PATTERN_SYNC_TYPES.unsynced
-						).label
+						<span
+							className={ `edit-site-patterns__field-sync-status-${ item.syncStatus }` }
+						>
+							{ SYNC_FILTERS.find(
+								( { value } ) => value === item.syncStatus
+							)?.label ||
+								SYNC_FILTERS.find(
+									( { value } ) =>
+										value === PATTERN_SYNC_TYPES.unsynced
+								).label }
+						</span>
 					);
 				},
 				type: ENUMERATION_TYPE,
@@ -393,8 +412,7 @@ export default function DataviewsPatterns() {
 					isLoading={ isResolving }
 					view={ view }
 					onChangeView={ onChangeView }
-					deferredRendering
-					supportedLayouts={ [ LAYOUT_GRID ] }
+					supportedLayouts={ [ LAYOUT_GRID, LAYOUT_TABLE ] }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

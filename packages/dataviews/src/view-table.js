@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -369,7 +368,6 @@ function ViewTable( {
 	data,
 	getItemId,
 	isLoading = false,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 	setOpenedFilter,
@@ -386,7 +384,6 @@ function ViewTable( {
 		}
 	} );
 
-	const asyncData = useAsyncList( data );
 	const tableNoticeId = useId();
 
 	if ( nextHeaderMenuToFocus ) {
@@ -409,8 +406,7 @@ function ViewTable( {
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField ].includes( field.id )
 	);
-	const usedData = deferredRendering ? asyncData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 
 	const primaryField = fields.find(
@@ -502,7 +498,7 @@ function ViewTable( {
 				</thead>
 				<tbody>
 					{ hasData &&
-						usedData.map( ( item, index ) => (
+						data.map( ( item, index ) => (
 							<TableRow
 								key={ getItemId( item ) }
 								item={ item }

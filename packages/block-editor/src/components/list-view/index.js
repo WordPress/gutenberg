@@ -37,6 +37,7 @@ import ListViewDropIndicatorPreview from './drop-indicator';
 import useBlockSelection from './use-block-selection';
 import useListViewBlockIndexes from './use-list-view-block-indexes';
 import useListViewClientIds from './use-list-view-client-ids';
+import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
@@ -45,6 +46,9 @@ import { focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 
 const expanded = ( state, action ) => {
+	if ( action.type === 'clear' ) {
+		return {};
+	}
 	if ( Array.isArray( action.clientIds ) ) {
 		return {
 			...state,
@@ -194,7 +198,10 @@ function ListViewComponent(
 			if ( ! clientId ) {
 				return;
 			}
-			setExpandedState( { type: 'expand', clientIds: [ clientId ] } );
+			const clientIds = Array.isArray( clientId )
+				? clientId
+				: [ clientId ];
+			setExpandedState( { type: 'expand', clientIds } );
 		},
 		[ setExpandedState ]
 	);
@@ -207,6 +214,9 @@ function ListViewComponent(
 		},
 		[ setExpandedState ]
 	);
+	const collapseAll = useCallback( () => {
+		setExpandedState( { type: 'clear' } );
+	}, [ setExpandedState ] );
 	const expandRow = useCallback(
 		( row ) => {
 			expand( row?.dataset?.block );
@@ -231,6 +241,11 @@ function ListViewComponent(
 		},
 		[ updateBlockSelection ]
 	);
+
+	useListViewCollapseItems( {
+		collapseAll,
+		expand,
+	} );
 
 	const firstDraggedBlockClientId = draggedClientIds?.[ 0 ];
 
@@ -282,6 +297,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			AdditionalBlockContent,
@@ -299,6 +315,7 @@ function ListViewComponent(
 			expand,
 			firstDraggedBlockIndex,
 			collapse,
+			collapseAll,
 			BlockSettingsMenu,
 			instanceId,
 			AdditionalBlockContent,

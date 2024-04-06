@@ -38,6 +38,14 @@ class WP_Theme_JSON_Gutenberg {
 	protected static $blocks_metadata = array();
 
 	/**
+	 * The CSS selector for the top-level preset settings.
+	 *
+	 * @since 6.6.0
+	 * @var string
+	 */
+	const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
+
+	/**
 	 * The CSS selector for the top-level styles.
 	 *
 	 * @since 5.8.0
@@ -278,25 +286,30 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Indirect properties are not output directly by `compute_style_properties`,
 	 * but are used elsewhere in the processing of global styles. The indirect
-	 * property is used to validate whether or not a style value is allowed.
+	 * property is used to validate whether a style value is allowed.
 	 *
 	 * @since 6.2.0
+	 * @since 6.6.0 Added background-image properties.
 	 *
 	 * @var array
 	 */
 	const INDIRECT_PROPERTIES_METADATA = array(
-		'gap'        => array(
+		'gap'              => array(
 			array( 'spacing', 'blockGap' ),
 		),
-		'column-gap' => array(
+		'column-gap'       => array(
 			array( 'spacing', 'blockGap', 'left' ),
 		),
-		'row-gap'    => array(
+		'row-gap'          => array(
 			array( 'spacing', 'blockGap', 'top' ),
 		),
-		'max-width'  => array(
+		'max-width'        => array(
 			array( 'layout', 'contentSize' ),
 			array( 'layout', 'wideSize' ),
+		),
+		'background-image' => array(
+			array( 'background', 'backgroundImage', 'url' ),
+			array( 'background', 'backgroundImage', 'source' ),
 		),
 	);
 
@@ -682,7 +695,6 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
 		array( 'typography', 'lineHeight' ),
-		array( 'shadow', 'defaultPresets' ),
 	);
 
 	/**
@@ -1351,7 +1363,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 6.6.0
 	 *
-	 * @param array $css The block css node.
+	 * @param array  $css The block css node.
 	 * @param string $selector The block selector.
 	 *
 	 * @return string The global styles custom CSS for the block.
@@ -1602,6 +1614,16 @@ class WP_Theme_JSON_Gutenberg {
 							! empty( $base_style_rule['rules'] )
 						) {
 							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
+								// Skip rules that reference content size or wide size if they are not defined in the theme.json.
+								if (
+									is_string( $css_value ) &&
+									( str_contains( $css_value, '--global--content-size' ) || str_contains( $css_value, '--global--wide-size' ) ) &&
+									! isset( $this->theme_json['settings']['layout']['contentSize'] ) &&
+									! isset( $this->theme_json['settings']['layout']['wideSize'] )
+								) {
+									continue;
+								}
+
 								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
 									$declarations[] = array(
 										'name'  => $css_property,
@@ -1751,7 +1773,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+		if ( static::ROOT_BLOCK_SELECTOR === $selector || static::ROOT_CSS_PROPERTIES_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
@@ -2277,7 +2299,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Top-level.
 		$nodes[] = array(
 			'path'     => array( 'settings' ),
-			'selector' => static::ROOT_BLOCK_SELECTOR,
+			'selector' => static::ROOT_CSS_PROPERTIES_SELECTOR,
 		);
 
 		// Calculate paths for blocks.
@@ -2672,7 +2694,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2689,7 +2711,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.
@@ -2704,6 +2726,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Outputs the CSS for layout rules on the root.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Use `ROOT_CSS_PROPERTIES_SELECTOR` for CSS custom properties.
 	 *
 	 * @param string $selector The root node selector.
 	 * @param array  $block_metadata The metadata for the root block.
@@ -2715,16 +2738,6 @@ class WP_Theme_JSON_Gutenberg {
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
 		/*
-		* Reset default browser margin on the root body element.
-		* This is set on the root selector **before** generating the ruleset
-		* from the `theme.json`. This is to ensure that if the `theme.json` declares
-		* `margin` in its `spacing` declaration for the `body` element then these
-		* user-generated values take precedence in the CSS cascade.
-		* @link https://github.com/WordPress/gutenberg/issues/36147.
-		*/
-		$css .= 'body { margin: 0;';
-
-		/*
 		* If there are content and wide widths in theme.json, output them
 		* as custom properties on the body element so all blocks can use them.
 		*/
@@ -2733,11 +2746,19 @@ class WP_Theme_JSON_Gutenberg {
 			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css         .= '--wp--style--global--content-size: ' . $content_size . ';';
-			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+			$css         .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
+			$css         .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
 		}
 
-		$css .= ' }';
+		/*
+		* Reset default browser margin on the body element.
+		* This is set on the body selector **before** generating the ruleset
+		* from the `theme.json`. This is to ensure that if the `theme.json` declares
+		* `margin` in its `spacing` declaration for the `body` element then these
+		* user-generated values take precedence in the CSS cascade.
+		* @link https://github.com/WordPress/gutenberg/issues/36147.
+		*/
+		$css .= 'body { margin: 0; }';
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
@@ -2767,7 +2788,7 @@ class WP_Theme_JSON_Gutenberg {
 			$css            .= ':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
+			$css .= static::ROOT_CSS_PROPERTIES_SELECTOR . " { --wp--style--block-gap: $block_gap_value; }";
 		}
 		$css .= $this->get_layout_styles( $block_metadata );
 

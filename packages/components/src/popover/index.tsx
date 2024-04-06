@@ -16,7 +16,7 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
 // eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -33,6 +33,7 @@ import {
 	createPortal,
 } from '@wordpress/element';
 import {
+	useReducedMotion,
 	useViewportMatch,
 	useMergeRefs,
 	__experimentalUseDialog as useDialog,
