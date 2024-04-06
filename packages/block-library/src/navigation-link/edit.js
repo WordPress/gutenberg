@@ -423,7 +423,7 @@ export default function NavigationLinkEdit( {
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
-						value={ label.toPlainText() }
+						value={ label.toPlainText?.() ?? label }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
