@@ -11,7 +11,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -33,23 +36,32 @@ function EditorCanvas( {
 	onClick,
 	...props
 } ) {
-	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
-		useSelect( ( select ) => {
-			const { getBlockCount, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const { getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _templateType = getEditedPostType();
+	const {
+		hasBlocks,
+		isFocusMode,
+		templateType,
+		canvasMode,
+		isZoomOutMode,
+		currentPostIsTrashed,
+	} = useSelect( ( select ) => {
+		const { getBlockCount, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const { getEditedPostType, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _templateType = getEditedPostType();
 
-			return {
-				templateType: _templateType,
-				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-				canvasMode: getCanvasMode(),
-				hasBlocks: !! getBlockCount(),
-			};
-		}, [] );
+		return {
+			templateType: _templateType,
+			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			canvasMode: getCanvasMode(),
+			hasBlocks: !! getBlockCount(),
+			currentPostIsTrashed:
+				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
+				'trash',
+		};
+	}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -63,6 +75,7 @@ function EditorCanvas( {
 	// to switch to edit mode, with a meaningful label and no title attribute.
 	const viewModeIframeProps = {
 		'aria-label': __( 'Edit' ),
+		'aria-disabled': currentPostIsTrashed,
 		title: null,
 		role: 'button',
 		tabIndex: 0,
@@ -70,7 +83,10 @@ function EditorCanvas( {
 		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
-			if ( keyCode === ENTER || keyCode === SPACE ) {
+			if (
+				( keyCode === ENTER || keyCode === SPACE ) &&
+				! currentPostIsTrashed
+			) {
 				event.preventDefault();
 				setCanvasMode( 'edit' );
 			}
@@ -80,6 +96,12 @@ function EditorCanvas( {
 				onClick();
 			} else {
 				setCanvasMode( 'edit' );
+			}
+		},
+		onClickCapture: ( event ) => {
+			if ( currentPostIsTrashed ) {
+				event.preventDefault();
+				event.stopPropagation();
 			}
 		},
 		readonly: true,
@@ -107,12 +129,14 @@ function EditorCanvas( {
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
 					canvasMode === 'view'
-						? 'cursor: pointer; min-height: 100vh;'
+						? `min-height: 100vh; ${
+								currentPostIsTrashed ? '' : 'cursor: pointer;'
+						  }`
 						: ''
 				}}}`,
 			},
 		],
-		[ settings.styles, enableResizing, canvasMode ]
+		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
 
 	const frameSize = isZoomOutMode ? 20 : undefined;
