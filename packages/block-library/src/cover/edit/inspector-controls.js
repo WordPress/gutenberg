@@ -114,7 +114,9 @@ export default function CoverInspectorControls( {
 		overlayColor,
 	} = currentSettings;
 
-	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { gradientValue, setGradient } = __experimentalUseGradient( {
+		attributes,
+	} );
 
 	const toggleParallax = () => {
 		setAttributes( {

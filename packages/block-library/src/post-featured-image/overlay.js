@@ -21,7 +21,9 @@ import { dimRatioToClass } from './utils';
 
 const Overlay = ( { attributes, overlayColor } ) => {
 	const { dimRatio } = attributes;
-	const { gradientClass, gradientValue } = __experimentalUseGradient();
+	const { gradientClass, gradientValue } = __experimentalUseGradient( {
+		attributes,
+	} );
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	const borderProps = useBorderProps( attributes );
