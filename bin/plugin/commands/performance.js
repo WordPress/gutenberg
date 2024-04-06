@@ -437,6 +437,22 @@ async function runPerformanceTests( branches, options ) {
 			}
 		}
 
+		if ( branches.length === 2 ) {
+			const [ branch1, branch2 ] = branches;
+			for ( const metric in invertedResult ) {
+				const value1 = parseFloat(
+					invertedResult[ metric ][ branch1 ]
+				);
+				const value2 = parseFloat(
+					invertedResult[ metric ][ branch2 ]
+				);
+				const percentageChange = ( ( value1 - value2 ) / value2 ) * 100;
+				invertedResult[ metric ][
+					'% Change'
+				] = `${ percentageChange.toFixed( 2 ) }%`;
+			}
+		}
+
 		// Print the results.
 		console.table( invertedResult );
 	}
