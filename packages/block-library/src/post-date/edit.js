@@ -16,6 +16,7 @@ import {
 	useBlockProps,
 	__experimentalDateFormatPicker as DateFormatPicker,
 	__experimentalPublishDateTimePicker as PublishDateTimePicker,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
@@ -30,8 +31,9 @@ import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
 export default function PostDateEdit( {
+	clientId,
 	attributes: { textAlign, format, isLink, displayType },
-	context: { postId, postType: postTypeSlug, queryId },
+	context: { postId, postType: postTypeSlug },
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
@@ -50,7 +52,16 @@ export default function PostDateEdit( {
 		[ popoverAnchor ]
 	);
 
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
 	const dateSettings = getDateSettings();
 	const [ siteFormat = dateSettings.formats.date ] = useEntityProp(
 		'root',

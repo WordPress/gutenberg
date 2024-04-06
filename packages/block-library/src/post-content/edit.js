@@ -8,6 +8,7 @@ import {
 	RecursionProvider,
 	useHasRecursion,
 	Warning,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	useEntityProp,
@@ -82,14 +83,27 @@ function EditableContent( { context = {} } ) {
 }
 
 function Content( props ) {
-	const { context: { queryId, postType, postId } = {}, layoutClassNames } =
-		props;
+	const {
+		clientId,
+		context: { postType, postId } = {},
+		layoutClassNames,
+	} = props;
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
+
 	if ( userCanEdit === undefined ) {
 		return null;
 	}
 
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const isEditable = userCanEdit && ! isDescendentOfQueryLoop;
 
 	return isEditable ? (
@@ -139,6 +153,7 @@ function RecursionError() {
 }
 
 export default function PostContentEdit( {
+	clientId,
 	context,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
@@ -153,6 +168,7 @@ export default function PostContentEdit( {
 		<RecursionProvider uniqueId={ contextPostId }>
 			{ contextPostId && contextPostType ? (
 				<Content
+					clientId={ clientId }
 					context={ context }
 					layoutClassNames={ layoutClassNames }
 				/>

@@ -22,7 +22,7 @@
 			"default": 55
 		}
 	},
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": {

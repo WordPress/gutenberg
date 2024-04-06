@@ -15,6 +15,7 @@ import {
 	RichText,
 	Warning,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -28,12 +29,22 @@ import { useCanEditEntity } from '../utils/hooks';
 const ELLIPSIS = '…';
 
 export default function PostExcerptEditor( {
+	clientId,
 	attributes: { textAlign, moreText, showMoreOnNewLine, excerptLength },
 	setAttributes,
 	isSelected,
-	context: { postId, postType, queryId },
+	context: { postId, postType },
 } ) {
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
 		rawExcerpt,

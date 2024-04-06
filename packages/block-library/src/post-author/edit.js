@@ -12,6 +12,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	ComboboxControl,
@@ -32,11 +33,21 @@ const AUTHORS_QUERY = {
 
 function PostAuthorEdit( {
 	isSelected,
-	context: { postType, postId, queryId },
+	clientId,
+	context: { postType, postId },
 	attributes,
 	setAttributes,
 } ) {
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser, getUsers } =

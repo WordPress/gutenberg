@@ -57,7 +57,7 @@
 			"default": false
 		}
 	},
-	"usesContext": [ "postId", "postType", "queryId" ],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"color": {

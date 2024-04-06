@@ -14,41 +14,47 @@ import {
 	PlainText,
 	HeadingLevelDropdown,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { useCanEditEntity } from '../utils/hooks';
+
 export default function PostTitleEdit( {
+	clientId,
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context: { postType, postId, queryId },
+	context: { postType, postId },
 	insertBlocksAfter,
 } ) {
 	const TagName = 'h' + level;
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
-	const userCanEdit = useSelect(
+	const isDescendentOfQueryLoop = useSelect(
 		( select ) => {
-			/**
-			 * useCanEditEntity may trigger an OPTIONS request to the REST API
-			 * via the canUser resolver. However, when the Post Title is a
-			 * descendant of a Query Loop block, the title cannot be edited. In
-			 * order to avoid these unnecessary requests, we call the hook
-			 * without the proper data, resulting in returning early without
-			 * making them.
-			 */
-			if ( isDescendentOfQueryLoop ) {
-				return false;
-			}
-			return select( coreStore ).canUserEditEntityRecord(
-				'postType',
-				postType,
-				postId
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
 			);
 		},
-		[ isDescendentOfQueryLoop, postType, postId ]
+		[ clientId ]
+	);
+	/**
+	 * Hack: useCanEditEntity may trigger an OPTIONS request to the REST API via the canUser resolver.
+	 * However, when the Post Title is a descendant of a Query Loop block, the title cannot be edited.
+	 * In order to avoid these unnecessary requests, we call the hook without
+	 * the proper data, resulting in returning early without making them.
+	 */
+	const userCanEdit = useCanEditEntity(
+		'postType',
+		! isDescendentOfQueryLoop && postType,
+		postId
 	);
 	const [ rawTitle = '', setTitle, fullTitle ] = useEntityProp(
 		'postType',
