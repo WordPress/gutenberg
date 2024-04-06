@@ -185,6 +185,7 @@ export default function PostTemplateEdit( {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
 					...restQueryArgs,
+					_embed: true,
 				} ),
 				blocks: getBlocks( clientId ),
 			};

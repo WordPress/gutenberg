@@ -15,16 +15,11 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Spinner, TextControl } from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import usePostTerms from './use-post-terms';
 
 // Allowed formats for the prefix and suffix fields.
 const ALLOWED_FORMATS = [
@@ -47,19 +42,22 @@ export default function PostTermsEdit( {
 	const { term, textAlign, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
 
-	const selectedTerm = useSelect(
-		( select ) => {
-			if ( ! term ) return {};
-			const { getTaxonomy } = select( coreStore );
-			const taxonomy = getTaxonomy( term );
-			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
-		},
-		[ term ]
+	const post = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+		[ postType, postId ]
 	);
-	const { postTerms, hasPostTerms, isLoading } = usePostTerms( {
-		postId,
-		term: selectedTerm,
-	} );
+	const postTerms = post?._embedded?.[ 'wp:term' ]?.[ 0 ]?.filter(
+		( { taxonomy } ) => taxonomy === term
+	);
+	const hasPostTerms = !! postTerms?.length;
+	const noTermsLabel = useSelect(
+		( select ) => {
+			if ( hasPostTerms ) return;
+			return select( coreStore ).getTaxonomy( term )?.labels?.no_terms;
+		},
+		[ hasPostTerms, term ]
+	);
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
@@ -92,8 +90,7 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && hasPost && <Spinner /> }
-				{ ! isLoading && ( isSelected || prefix ) && (
+				{ ( isSelected || prefix ) && (
 					<RichText
 						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
@@ -111,7 +108,6 @@ export default function PostTermsEdit( {
 					<span>{ blockInformation.title }</span>
 				) }
 				{ hasPost &&
-					! isLoading &&
 					hasPostTerms &&
 					postTerms
 						.map( ( postTerm ) => (
@@ -133,11 +129,9 @@ export default function PostTermsEdit( {
 							</>
 						) ) }
 				{ hasPost &&
-					! isLoading &&
 					! hasPostTerms &&
-					( selectedTerm?.labels?.no_terms ||
-						__( 'Term items not found.' ) ) }
-				{ ! isLoading && ( isSelected || suffix ) && (
+					( noTermsLabel || __( 'Term items not found.' ) ) }
+				{ ( isSelected || suffix ) && (
 					<RichText
 						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
