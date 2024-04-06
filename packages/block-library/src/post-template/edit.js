@@ -6,16 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
-	__experimentalUseBlockPreview as useBlockPreview,
 	useBlockProps,
 	useInnerBlocksProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Spinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -34,42 +32,6 @@ function PostTemplateInnerBlocks() {
 	);
 	return <li { ...innerBlocksProps } />;
 }
-
-function PostTemplateBlockPreview( {
-	blocks,
-	blockContextId,
-	isHidden,
-	setActiveBlockContextId,
-} ) {
-	const blockPreviewProps = useBlockPreview( {
-		blocks,
-		props: {
-			className: 'wp-block-post',
-		},
-	} );
-
-	const handleOnClick = () => {
-		setActiveBlockContextId( blockContextId );
-	};
-
-	const style = {
-		display: isHidden ? 'none' : undefined,
-	};
-
-	return (
-		<li
-			{ ...blockPreviewProps }
-			tabIndex={ 0 }
-			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
-			role="button"
-			onClick={ handleOnClick }
-			onKeyPress={ handleOnClick }
-			style={ style }
-		/>
-	);
-}
-
-const MemoizedPostTemplateBlockPreview = memo( PostTemplateBlockPreview );
 
 export default function PostTemplateEdit( {
 	setAttributes,
@@ -103,11 +65,9 @@ export default function PostTemplateEdit( {
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
-	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
-	const { posts, blocks } = useSelect(
+	const { posts } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
-			const { getBlocks } = select( blockEditorStore );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -186,7 +146,6 @@ export default function PostTemplateEdit( {
 					...query,
 					...restQueryArgs,
 				} ),
-				blocks: getBlocks( clientId ),
 			};
 		},
 		[
@@ -277,23 +236,7 @@ export default function PostTemplateEdit( {
 							key={ blockContext.postId }
 							value={ blockContext }
 						>
-							{ blockContext.postId ===
-							( activeBlockContextId ||
-								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
-							) : null }
-							<MemoizedPostTemplateBlockPreview
-								blocks={ blocks }
-								blockContextId={ blockContext.postId }
-								setActiveBlockContextId={
-									setActiveBlockContextId
-								}
-								isHidden={
-									blockContext.postId ===
-									( activeBlockContextId ||
-										blockContexts[ 0 ]?.postId )
-								}
-							/>
+							<PostTemplateInnerBlocks />
 						</BlockContextProvider>
 					) ) }
 			</ul>
