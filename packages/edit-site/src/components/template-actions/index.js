@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import RenameMenuItem from './rename-menu-item';
+import RenamePostMenuItem from '../rename-post-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function TemplateActions( {
@@ -55,8 +55,8 @@ export default function TemplateActions( {
 				<MenuGroup>
 					{ isRemovable && (
 						<>
-							<RenameMenuItem
-								template={ template }
+							<RenamePostMenuItem
+								post={ template }
 								onClose={ onClose }
 							/>
 							<DeleteMenuItem
@@ -98,7 +98,7 @@ function ResetMenuItem( { template, onClose } ) {
 			createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
-					__( '"%s" reverted.' ),
+					__( '"%s" reset.' ),
 					decodeEntities( template.title.rendered )
 				),
 				{
@@ -123,11 +123,8 @@ function ResetMenuItem( { template, onClose } ) {
 	}
 	return (
 		<>
-			<MenuItem
-				info={ __( 'Use the template as supplied by the theme.' ) }
-				onClick={ () => setIsModalOpen( true ) }
-			>
-				{ __( 'Clear customizations' ) }
+			<MenuItem onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Reset' ) }
 			</MenuItem>
 			<ConfirmDialog
 				isOpen={ isModalOpen }
@@ -136,9 +133,9 @@ function ResetMenuItem( { template, onClose } ) {
 					onClose();
 				} }
 				onCancel={ () => setIsModalOpen( false ) }
-				confirmButtonText={ __( 'Clear' ) }
+				confirmButtonText={ __( 'Reset' ) }
 			>
-				{ __( 'Are you sure you want to clear these customizations?' ) }
+				{ __( 'Rese to default and clear all customizations?' ) }
 			</ConfirmDialog>
 		</>
 	);

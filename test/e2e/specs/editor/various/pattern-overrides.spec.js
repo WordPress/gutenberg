@@ -71,22 +71,16 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.filter( { hasText: 'This paragraph can be edited' } )
 				.focus();
-			await editor.openDocumentSettingsSidebar();
-			const editorSettings = page.getByRole( 'region', {
-				name: 'Editor settings',
-			} );
-			const advancedPanel = editorSettings.getByRole( 'button', {
-				name: 'Advanced',
-			} );
-			if (
-				( await advancedPanel.getAttribute( 'aria-expanded' ) ) ===
-				'false'
-			) {
-				await advancedPanel.click();
-			}
-			await editorSettings
-				.getByRole( 'textbox', { name: 'Block Name' } )
+
+			await editor.clickBlockOptionsMenuItem( 'Rename' );
+			await page
+				.getByRole( 'dialog', { name: 'Rename' } )
+				.getByRole( 'textbox', { name: 'Block name' } )
 				.fill( editableParagraphName );
+			await page
+				.getByRole( 'dialog', { name: 'Rename' } )
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -290,8 +284,8 @@ test.describe( 'Pattern Overrides', () => {
 			.getByRole( 'textbox', { name: 'Button text' } )
 			.focus();
 		await expect(
-			page.getByRole( 'link', { name: 'wp.org' } )
-		).toContainText( 'opens in a new tab' );
+			page.getByRole( 'link', { name: 'wp.org' } ).getByText( '↗' )
+		).toHaveAttribute( 'aria-label', '(opens in a new tab)' );
 
 		// The link popup doesn't have a role which is a bit unfortunate.
 		// These are the buttons in the link popup.
