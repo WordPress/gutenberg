@@ -22,6 +22,8 @@ type WPShortcodeAttrs = {
 	numeric: string[];
 };
 
+type ShortcodeType = 'single' | 'self-closing' | 'closed';
+
 /**
  * Shortcode object.
  *
@@ -49,7 +51,7 @@ type WPShortcodeOptions = {
 	/**
 	 * Shortcode type.
 	 */
-	type: 'single' | 'self-closing' | 'closed';
+	type: ShortcodeType;
 };
 
 /**
@@ -279,7 +281,7 @@ export const attrs = memize( ( text: string ): WPShortcodeAttrs => {
  * @return {WPShortcode} Shortcode instance.
  */
 export function fromMatch( match: RegExpExecArray ): WPShortcode {
-	let type: 'single' | 'self-closing' | 'closed';
+	let type: ShortcodeType;
 
 	if ( match[ 4 ] ) {
 		type = 'self-closing';
@@ -325,7 +327,7 @@ function isWPShortcodeAttrsObject(
 class shortcode {
 	tag?: string;
 	attrs: WPShortcodeAttrs;
-	type?: 'single' | 'self-closing' | 'closed';
+	type?: ShortcodeType;
 	content?: string;
 
 	constructor( options: WPShortcodeOptions ) {
