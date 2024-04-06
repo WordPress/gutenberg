@@ -187,6 +187,8 @@ function Items( {
 				const isParentSelected = selectedBlockClientId === rootClientId;
 				const isRootWithoutSelectedBlock =
 					! selectedBlockClientId && ! rootClientId;
+				const canRenderAppender =
+					isParentSelected || isRootWithoutSelectedBlock;
 				return {
 					order: getBlockOrder( rootClientId ),
 					selectedBlocks: getSelectedBlockClientIds(),
@@ -194,12 +196,12 @@ function Items( {
 					shouldRenderAppender:
 						hasAppender &&
 						( hasCustomAppender
-							? isParentSelected &&
+							? canRenderAppender &&
 							  ! getTemplateLock( rootClientId ) &&
 							  getBlockEditingMode( rootClientId ) !==
 									'disabled' &&
 							  __unstableGetEditorMode() !== 'zoom-out'
-							: isParentSelected || isRootWithoutSelectedBlock ),
+							: canRenderAppender ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]
