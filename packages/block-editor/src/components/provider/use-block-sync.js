@@ -10,6 +10,7 @@ import { cloneBlock } from '@wordpress/blocks';
  */
 import { store as blockEditorStore } from '../../store';
 import { undoIgnoreBlocks } from '../../store/undo-ignore';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 const noop = () => {};
 
@@ -94,11 +95,20 @@ export default function useBlockSync( {
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
+	const lastControlledBlocks = useRef( [] );
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
 			return;
 		}
+
+		if (
+			isShallowEqual( controlledBlocks, lastControlledBlocks.current )
+		) {
+			return;
+		}
+
+		lastControlledBlocks.current = controlledBlocks;
 
 		// We don't need to persist this change because we only replace
 		// controlled inner blocks when the change was caused by an entity,
