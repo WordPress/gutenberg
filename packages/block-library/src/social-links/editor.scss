@@ -86,7 +86,7 @@
 }
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
-// @todo: Look at improving the preview component to make this unnecessary.
+// @todo Look at improving the preview component to make this unnecessary.
 .block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
 }

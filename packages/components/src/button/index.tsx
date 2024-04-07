@@ -44,7 +44,7 @@ function useDeprecatedProps( {
 	let computedVariant = variant;
 
 	const newProps: { 'aria-pressed'?: boolean } = {
-		// @TODO Mark `isPressed` as deprecated
+		// @todo Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
 	};
 
