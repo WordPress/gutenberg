@@ -143,6 +143,7 @@ function BlockListBlock( {
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
 			blockEditingMode={ context.blockEditingMode }
+			isPreviewMode={ context.isPreviewMode }
 		/>
 	);
 
@@ -572,6 +573,7 @@ function BlockListBlockProvider( props ) {
 			} = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
+				isPreviewMode,
 				blockWithoutAttributes,
 				name: blockName,
 				attributes,
@@ -671,6 +673,7 @@ function BlockListBlockProvider( props ) {
 	);
 
 	const {
+		isPreviewMode,
 		// Fill values that end up as a public API and may not be defined in
 		// preview mode.
 		mode = 'visual',
@@ -728,6 +731,7 @@ function BlockListBlockProvider( props ) {
 	}
 
 	const privateContext = {
+		isPreviewMode,
 		clientId,
 		className,
 		index,

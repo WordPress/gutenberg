@@ -3,7 +3,7 @@
  */
 import { Children, createElement } from './react';
 
-/** @typedef {{children: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
+/** @typedef {{children: string, tagName?: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
 
 /**
  * Component used as equivalent of Fragment with unescaped HTML, in cases where
@@ -17,7 +17,7 @@ import { Children, createElement } from './react';
  *
  * @return {JSX.Element} Dangerously-rendering component.
  */
-export default function RawHTML( { children, ...props } ) {
+export default function RawHTML( { children, tagName = 'div', ...props } ) {
 	let rawHtml = '';
 
 	// Cast children as an array, and concatenate each element if it is a string.
@@ -29,7 +29,7 @@ export default function RawHTML( { children, ...props } ) {
 
 	// The `div` wrapper will be stripped by the `renderElement` serializer in
 	// `./serialize.js` unless there are non-children props present.
-	return createElement( 'div', {
+	return createElement( tagName, {
 		dangerouslySetInnerHTML: { __html: rawHtml },
 		...props,
 	} );

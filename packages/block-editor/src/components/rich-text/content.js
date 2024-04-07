@@ -15,16 +15,10 @@ import RichText from './';
  */
 import { getMultilineTag } from './utils';
 
-export function Content( {
-	value,
-	tagName: Tag,
-	multiline,
-	format,
-	...props
-} ) {
+export function Content( { value, multiline, format, ...props } ) {
 	if ( RichText.isEmpty( value ) ) {
-		const MultilineTag = getMultilineTag( multiline );
-		value = MultilineTag ? <MultilineTag /> : null;
+		const multilineTag = getMultilineTag( multiline );
+		value = `<${ multilineTag }></${ multilineTag }>`;
 	} else if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
 			since: '6.1',
@@ -32,16 +26,14 @@ export function Content( {
 			alternative: 'value prop as string',
 			link: 'https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/',
 		} );
-		value = <RawHTML>{ childrenSource.toHTML( value ) }</RawHTML>;
-	} else if ( typeof value === 'string' ) {
-		// To do: deprecate.
-		value = <RawHTML>{ value }</RawHTML>;
-	} else {
+		value = childrenSource.toHTML( value );
+	} else if ( typeof value !== 'string' ) {
+		// To do: deprecate string type.
 		// To do: create a toReactComponent method on RichTextData, which we
 		// might in the future also use for the editable tree. See
 		// https://github.com/WordPress/gutenberg/pull/41655.
-		value = <RawHTML>{ value.toHTMLString() }</RawHTML>;
+		value = value.toHTMLString();
 	}
 
-	return Tag ? <Tag { ...props }>{ value }</Tag> : value;
+	return <RawHTML { ...props }>{ value }</RawHTML>;
 }
