@@ -227,18 +227,22 @@ function ColorPanelTab( {
 	userValue,
 	setValue,
 	colorGradientControlSettings,
+	clearToInherited,
 } ) {
+	const value = userValue ?? inheritedValue;
+	const state = isGradient
+		? { gradientValue: value, onGradientChange: setValue }
+		: { colorValue: value, onColorChange: setValue };
 	return (
 		<ColorGradientControl
 			{ ...colorGradientControlSettings }
+			{ ...state }
 			showTitle={ false }
 			enableAlpha
 			__experimentalIsRenderedInSidebar
-			colorValue={ isGradient ? undefined : inheritedValue }
-			gradientValue={ isGradient ? inheritedValue : undefined }
-			onColorChange={ isGradient ? undefined : setValue }
-			onGradientChange={ isGradient ? setValue : undefined }
-			clearable={ inheritedValue === userValue }
+			clearable={
+				clearToInherited ? userValue !== inheritedValue : !! userValue
+			}
 			headingLevel={ 3 }
 		/>
 	);
@@ -349,9 +353,9 @@ function ColorPanelDropdown( {
 export default function ColorPanel( {
 	as: Wrapper = ColorToolsPanel,
 	value,
-	resetValue = {},
 	onChange,
 	inheritedValue = value,
+	resetToInherited = false,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -395,9 +399,12 @@ export default function ColorPanel( {
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const userGradient = decodeValue( value?.color?.gradient );
 	const hasBackground = () =>
-		userBackgroundColor !== decodeValue( resetValue?.color?.background ) ||
-		userGradient !== decodeValue( resetValue?.color?.gradient );
+		resetToInherited
+			? userBackgroundColor !== backgroundColor ||
+			  userGradient !== gradient
+			: !! ( userBackgroundColor || userGradient );
 	const setBackgroundColor = ( newColor ) => {
+		if ( resetToInherited ) newColor ??= backgroundColor;
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
@@ -407,6 +414,7 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
+		if ( resetToInherited ) newGradient ??= gradient;
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'gradient' ],
@@ -416,13 +424,15 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 	const resetBackground = () => {
+		const [ backgroundColorReset, gradientReset ] = resetToInherited
+			? [ backgroundColor, gradient ]
+			: [];
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
-			resetValue.backgroundColor ?? resetValue?.color?.background
+			backgroundColorReset
 		);
-		newValue.color.gradient =
-			resetValue.gradient ?? resetValue?.color?.gradient;
+		newValue.color.gradient = gradientReset;
 		onChange( newValue );
 	};
 
@@ -433,6 +443,7 @@ export default function ColorPanel( {
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
 	const setLinkColor = ( newColor ) => {
+		if ( resetToInherited ) newColor ??= linkColor;
 		onChange(
 			setImmutably(
 				value,
@@ -448,6 +459,7 @@ export default function ColorPanel( {
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
 	const setHoverLinkColor = ( newColor ) => {
+		if ( resetToInherited ) newColor ??= hoverLinkColor;
 		onChange(
 			setImmutably(
 				value,
@@ -456,26 +468,24 @@ export default function ColorPanel( {
 			)
 		);
 	};
-	const hasLink = () => {
-		const {
-			color: { text: resetLinkColor } = {},
-			':hover': { color: { text: resetHoverColor } = {} } = {},
-		} = resetValue?.elements?.link ?? {};
-		return (
-			userLinkColor !== decodeValue( resetLinkColor ) ||
-			userHoverLinkColor !== decodeValue( resetHoverColor )
-		);
-	};
+	const hasLink = () =>
+		resetToInherited
+			? userLinkColor !== linkColor ||
+			  userHoverLinkColor !== hoverLinkColor
+			: !! userLinkColor;
 	const resetLink = () => {
+		const [ linkColorReset, hoverLinkColorReset ] = resetToInherited
+			? [ linkColor, hoverLinkColor ]
+			: [];
 		let newValue = setImmutably(
 			value,
 			[ 'elements', 'link', ':hover', 'color', 'text' ],
-			resetValue?.elements?.link?.[ ':hover' ]?.color?.text
+			hoverLinkColorReset
 		);
 		newValue = setImmutably(
 			newValue,
 			[ 'elements', 'link', 'color', 'text' ],
-			resetValue?.elements?.link?.color?.text
+			linkColorReset
 		);
 		onChange( newValue );
 	};
@@ -485,8 +495,9 @@ export default function ColorPanel( {
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColor = () =>
-		userTextColor !== decodeValue( resetValue?.color?.text );
+		resetToInherited ? userTextColor !== textColor : !! userTextColor;
 	const setTextColor = ( newColor ) => {
+		if ( resetToInherited ) newColor ??= textColor;
 		let changedObject = setImmutably(
 			value,
 			[ 'color', 'text' ],
@@ -502,21 +513,31 @@ export default function ColorPanel( {
 
 		onChange( changedObject );
 	};
-	const resetTextColor = () => setTextColor( resetValue?.color?.text );
+	const resetTextColor = () =>
+		setTextColor( resetToInherited ? textColor : undefined );
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
-			const resetElements = resetValue?.elements;
+			const inheritedElements = inheritedValue?.elements;
+			const [ colorReset, linkReset, hoverReset, elementsReset ] =
+				resetToInherited
+					? [
+							inheritedValue?.color,
+							inheritedElements?.link?.color,
+							inheritedElements?.link?.[ ':hover' ]?.color,
+							inheritedElements,
+					  ]
+					: [];
 			return {
 				...previousValue,
-				color: resetValue?.color,
+				color: colorReset,
 				elements: {
 					...previousValue?.elements,
 					link: {
 						...previousValue?.elements?.link,
-						color: resetElements?.link?.color,
+						color: linkReset,
 						':hover': {
-							color: resetElements?.link?.[ ':hover' ]?.color,
+							color: hoverReset,
 						},
 					},
 					...ELEMENTS.reduce( ( acc, element ) => {
@@ -524,14 +545,14 @@ export default function ColorPanel( {
 							...acc,
 							[ element.name ]: {
 								...previousValue?.elements?.[ element.name ],
-								color: resetElements?.[ element.name ]?.color,
+								color: elementsReset?.[ element.name ]?.color,
 							},
 						};
 					}, {} ),
 				},
 			};
 		},
-		[ resetValue?.color, resetValue?.elements ]
+		[ resetToInherited, inheritedValue?.color, inheritedValue?.elements ]
 	);
 
 	const items = [
@@ -541,7 +562,7 @@ export default function ColorPanel( {
 			hasValue: hasTextColor,
 			resetValue: resetTextColor,
 			isShownByDefault: defaultControls.text,
-			indicators: [ textColor ],
+			indicators: [ userTextColor ?? textColor ],
 			tabs: [
 				{
 					key: 'text',
@@ -549,6 +570,7 @@ export default function ColorPanel( {
 					inheritedValue: textColor,
 					setValue: setTextColor,
 					userValue: userTextColor,
+					clearToInherited: resetToInherited,
 				},
 			],
 		},
@@ -558,7 +580,12 @@ export default function ColorPanel( {
 			hasValue: hasBackground,
 			resetValue: resetBackground,
 			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
+			indicators: [
+				userGradient ??
+					userBackgroundColor ??
+					gradient ??
+					backgroundColor,
+			],
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
@@ -566,6 +593,7 @@ export default function ColorPanel( {
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
+					clearToInherited: resetToInherited,
 				},
 				hasGradientColors && {
 					key: 'gradient',
@@ -574,6 +602,7 @@ export default function ColorPanel( {
 					setValue: setGradient,
 					userValue: userGradient,
 					isGradient: true,
+					clearToInherited: resetToInherited,
 				},
 			].filter( Boolean ),
 		},
@@ -583,7 +612,10 @@ export default function ColorPanel( {
 			hasValue: hasLink,
 			resetValue: resetLink,
 			isShownByDefault: defaultControls.link,
-			indicators: [ linkColor, hoverLinkColor ],
+			indicators: [
+				userLinkColor ?? linkColor,
+				userHoverLinkColor ?? hoverLinkColor,
+			],
 			tabs: [
 				{
 					key: 'link',
@@ -591,6 +623,7 @@ export default function ColorPanel( {
 					inheritedValue: linkColor,
 					setValue: setLinkColor,
 					userValue: userLinkColor,
+					clearToInherited: resetToInherited,
 				},
 				{
 					key: 'hover',
@@ -598,6 +631,7 @@ export default function ColorPanel( {
 					inheritedValue: hoverLinkColor,
 					setValue: setHoverLinkColor,
 					userValue: userHoverLinkColor,
+					clearToInherited: resetToInherited,
 				},
 			],
 		},
@@ -627,19 +661,20 @@ export default function ColorPanel( {
 		const elementTextUserColor = decodeValue(
 			value?.elements?.[ name ]?.color?.text
 		);
-		const hasElement = () => {
-			const { color: resetColor = {} } =
-				resetValue.elements?.[ name ] ?? {};
-			return (
-				elementTextUserColor !== decodeValue( resetColor.text ) ||
-				elementBackgroundUserColor !==
-					decodeValue( resetColor.background ) ||
-				elementGradientUser !== decodeValue( resetColor.gradient )
-			);
-		};
+		const hasElement = () =>
+			resetToInherited
+				? elementTextUserColor !== elementTextColor ||
+				  elementBackgroundUserColor !== elementBackgroundColor ||
+				  elementGradientUser !== elementGradient
+				: !! (
+						elementTextUserColor ||
+						elementBackgroundUserColor ||
+						elementGradientUser
+				  );
 		const resetElement = () => {
-			const { color: resetColor = {} } =
-				resetValue.elements?.[ name ] ?? {};
+			const resetColor = resetToInherited
+				? inheritedValue.elements?.[ name ]?.color
+				: {};
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
@@ -651,6 +686,7 @@ export default function ColorPanel( {
 		};
 
 		const setElementTextColor = ( newTextColor ) => {
+			if ( resetToInherited ) newTextColor ??= elementTextColor;
 			onChange(
 				setImmutably(
 					value,
@@ -660,6 +696,8 @@ export default function ColorPanel( {
 			);
 		};
 		const setElementBackgroundColor = ( newBackgroundColor ) => {
+			if ( resetToInherited )
+				newBackgroundColor ??= elementBackgroundColor;
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
@@ -669,6 +707,7 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 		const setElementGradient = ( newGradient ) => {
+			if ( resetToInherited ) newGradient ??= elementGradient;
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'gradient' ],
@@ -682,23 +721,22 @@ export default function ColorPanel( {
 		// as there isn't yet a way to set padding for the element.
 		const supportsBackground = name !== 'caption';
 
+		const indicators = [
+			supportsTextColor && ( elementTextUserColor ?? elementTextColor ),
+			supportsBackground &&
+				( elementGradientUser ??
+					elementGradient ??
+					elementBackgroundUserColor ??
+					elementBackgroundColor ),
+		].filter( ( v ) => v !== false );
+
 		items.push( {
 			key: name,
 			label,
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
-			indicators:
-				supportsTextColor && supportsBackground
-					? [
-							elementTextColor,
-							elementGradient ?? elementBackgroundColor,
-					  ]
-					: [
-							supportsTextColor
-								? elementTextColor
-								: elementGradient ?? elementBackgroundColor,
-					  ],
+			indicators,
 			tabs: [
 				hasSolidColors &&
 					supportsTextColor && {
@@ -707,6 +745,7 @@ export default function ColorPanel( {
 						inheritedValue: elementTextColor,
 						setValue: setElementTextColor,
 						userValue: elementTextUserColor,
+						clearToInherited: resetToInherited,
 					},
 				hasSolidColors &&
 					supportsBackground && {
@@ -715,6 +754,7 @@ export default function ColorPanel( {
 						inheritedValue: elementBackgroundColor,
 						setValue: setElementBackgroundColor,
 						userValue: elementBackgroundUserColor,
+						clearToInherited: resetToInherited,
 					},
 				hasGradientColors &&
 					supportsBackground && {
@@ -724,6 +764,7 @@ export default function ColorPanel( {
 						setValue: setElementGradient,
 						userValue: elementGradientUser,
 						isGradient: true,
+						clearToInherited: resetToInherited,
 					},
 			].filter( Boolean ),
 		} );

@@ -337,9 +337,10 @@ export function ColorEdit( { clientId, name, setAttributes, settings } ) {
 			panelId={ clientId }
 			settings={ settings }
 			value={ value }
+			inheritedValue={ defaults }
+			resetToInherited
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			resetValue={ defaults }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [
