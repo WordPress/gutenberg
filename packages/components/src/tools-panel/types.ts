@@ -176,6 +176,7 @@ export type ToolsPanelContext = {
 	registerResetAllFilter: ( filter: ResetAllFilter ) => void;
 	deregisterResetAllFilter: ( filter: ResetAllFilter ) => void;
 	flagItemCustomization: (
+		value: boolean,
 		label: string,
 		group?: ToolsPanelMenuItemKey
 	) => void;
