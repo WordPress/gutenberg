@@ -18,7 +18,7 @@ import { getMultilineTag } from './utils';
 export function Content( { value, multiline, format, ...props } ) {
 	if ( RichText.isEmpty( value ) ) {
 		const multilineTag = getMultilineTag( multiline );
-		value = `<${ multilineTag }></${ multilineTag }>`;
+		value = multilineTag ? `<${ multilineTag }></${ multilineTag }>` : '';
 	} else if ( Array.isArray( value ) ) {
 		deprecated( 'wp.blockEditor.RichText value prop as children type', {
 			since: '6.1',
