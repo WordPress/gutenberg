@@ -214,7 +214,7 @@ function render_block_core_latest_posts( $attributes ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
 	return sprintf(
-		'<ul %1$s>%2$s</ul>',
+		'<div><ul %1$s>%2$s</ul></div',
 		$wrapper_attributes,
 		$list_items_markup
 	);
