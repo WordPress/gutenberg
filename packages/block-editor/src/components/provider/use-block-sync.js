@@ -95,7 +95,7 @@ export default function useBlockSync( {
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
-	const lastControlledBlocks = useRef( [] );
+	const lastControlledBlocks = useRef();
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
