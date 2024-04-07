@@ -96,9 +96,8 @@ describe( 'onBlockDrop', () => {
 	it( 'does nothing if the event is not a block type drop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const getBlockIndex = noop;
-		const getClientIdsOfDescendants = noop;
 		const moveBlocks = jest.fn();
+		const registry = { select: () => ( {} ), dispatch: () => ( {} ) };
 
 		const event = {
 			dataTransfer: {
@@ -111,10 +110,9 @@ describe( 'onBlockDrop', () => {
 		};
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -127,8 +125,11 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		// Target and source block index is the same.
 		const getBlockIndex = jest.fn( () => targetBlockIndex );
-		const getClientIdsOfDescendants = noop;
 		const moveBlocks = jest.fn();
+		const registry = {
+			select: () => ( { getBlockIndex } ),
+			dispatch: () => ( {} ),
+		};
 
 		const event = {
 			dataTransfer: {
@@ -144,10 +145,9 @@ describe( 'onBlockDrop', () => {
 		};
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -159,8 +159,11 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const getBlockIndex = jest.fn( () => 6 );
-		const getClientIdsOfDescendants = noop;
 		const moveBlocks = jest.fn();
+		const registry = {
+			select: () => ( { getBlockIndex } ),
+			dispatch: () => ( {} ),
+		};
 
 		const event = {
 			dataTransfer: {
@@ -176,10 +179,9 @@ describe( 'onBlockDrop', () => {
 		};
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -196,6 +198,10 @@ describe( 'onBlockDrop', () => {
 			targetRootClientId,
 		] );
 		const moveBlocks = jest.fn();
+		const registry = {
+			select: () => ( { getBlockIndex, getClientIdsOfDescendants } ),
+			dispatch: () => ( {} ),
+		};
 
 		const event = {
 			dataTransfer: {
@@ -210,10 +216,9 @@ describe( 'onBlockDrop', () => {
 		};
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -229,6 +234,10 @@ describe( 'onBlockDrop', () => {
 		const getBlockIndex = jest.fn( () => 1 );
 		const getClientIdsOfDescendants = () => [];
 		const moveBlocks = jest.fn();
+		const registry = {
+			select: () => ( { getBlockIndex, getClientIdsOfDescendants } ),
+			dispatch: () => ( {} ),
+		};
 
 		const event = {
 			dataTransfer: {
@@ -243,10 +252,9 @@ describe( 'onBlockDrop', () => {
 		};
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -267,6 +275,10 @@ describe( 'onBlockDrop', () => {
 		// Dragged block is being dropped as a descendant of itself.
 		const getClientIdsOfDescendants = () => [];
 		const moveBlocks = jest.fn();
+		const registry = {
+			select: () => ( { getBlockIndex, getClientIdsOfDescendants } ),
+			dispatch: () => ( {} ),
+		};
 
 		const event = {
 			dataTransfer: {
@@ -284,10 +296,9 @@ describe( 'onBlockDrop', () => {
 		const insertIndex = targetBlockIndex - sourceClientIds.length;
 
 		const eventHandler = onBlockDrop(
+			registry,
 			targetRootClientId,
 			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
 			moveBlocks
 		);
 		eventHandler( event );
@@ -307,12 +318,14 @@ describe( 'onFilesDrop', () => {
 		const insertOrReplaceBlocks = jest.fn();
 		const targetRootClientId = '1';
 		const getSettings = jest.fn( () => ( {} ) );
+		const registry = {
+			select: () => ( { getSettings } ),
+			dispatch: () => ( { updateBlockAttributes, canInsertBlockType } ),
+		};
 
 		const onFileDropHandler = onFilesDrop(
+			registry,
 			targetRootClientId,
-			getSettings,
-			updateBlockAttributes,
-			canInsertBlockType,
 			insertOrReplaceBlocks
 		);
 		onFileDropHandler();
@@ -332,8 +345,13 @@ describe( 'onFilesDrop', () => {
 		const getSettings = jest.fn( () => ( {
 			mediaUpload: true,
 		} ) );
+		const registry = {
+			select: () => ( { getSettings } ),
+			dispatch: () => ( { updateBlockAttributes, canInsertBlockType } ),
+		};
 
 		const onFileDropHandler = onFilesDrop(
+			registry,
 			targetRootClientId,
 			getSettings,
 			updateBlockAttributes,
@@ -360,12 +378,14 @@ describe( 'onFilesDrop', () => {
 		const getSettings = jest.fn( () => ( {
 			mediaUpload: true,
 		} ) );
+		const registry = {
+			select: () => ( { getSettings } ),
+			dispatch: () => ( { updateBlockAttributes, canInsertBlockType } ),
+		};
 
 		const onFileDropHandler = onFilesDrop(
+			registry,
 			targetRootClientId,
-			getSettings,
-			updateBlockAttributes,
-			canInsertBlockType,
 			insertOrReplaceBlocks
 		);
 		const files = 'test';

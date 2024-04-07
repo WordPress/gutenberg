@@ -195,6 +195,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			}
 
 			const {
+				getSettings,
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
@@ -205,11 +206,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockSettings,
 				isDragging,
 			} = unlock( select( blockEditorStore ) );
+			const isPreviewMode = getSettings().__unstableIsPreviewMode;
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const enableClickThrough =
 				__unstableGetEditorMode() === 'navigation';
-			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
 			return {
@@ -228,7 +229,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled: blockEditingMode === 'disabled',
+				isDropZoneDisabled:
+					isPreviewMode ||
+					getBlockEditingMode( clientId ) === 'disabled',
 				defaultLayout,
 			};
 		},
@@ -249,12 +252,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
-		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
+		__unstableDisableDropZone || isDropZoneDisabled
+			? null
+			: blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
