@@ -108,7 +108,7 @@ function InstalledFonts() {
 	useEffect( () => {
 		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
-	}, [] );
+	}, [ handleSetLibraryFontSelected, libraryFontSelected, refreshLibrary ] );
 
 	return (
 		<div className="font-library-modal__tabpanel-layout">
