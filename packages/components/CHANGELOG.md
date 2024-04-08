@@ -5,6 +5,9 @@
 ### Enhancements
 
 -   `Tabs`: Animate indicator ([#60560](https://github.com/WordPress/gutenberg/pull/60560)).
+-   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
+-   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
+-   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
 
 ## 27.3.0 (2024-04-03)
 

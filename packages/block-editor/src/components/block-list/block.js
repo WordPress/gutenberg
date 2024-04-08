@@ -562,14 +562,42 @@ function BlockListBlockProvider( props ) {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
 			} = select( blocksStore );
-			const _isSelected = isBlockSelected( clientId );
-			const canRemove = canRemoveBlock( clientId, rootClientId );
-			const canMove = canMoveBlock( clientId, rootClientId );
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
+			const {
+				outlineMode,
+				supportsLayout,
+				__unstableIsPreviewMode: isPreviewMode,
+			} = getSettings();
+			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const previewContext = {
+				blockWithoutAttributes,
+				name: blockName,
+				attributes,
+				isValid,
+				themeSupportsLayout: supportsLayout,
+				index: getBlockIndex( clientId ),
+				isReusable: isReusableBlock( blockType ),
+				className: hasLightBlockWrapper
+					? attributes.className
+					: undefined,
+				defaultClassName: hasLightBlockWrapper
+					? getBlockDefaultClassName( blockName )
+					: undefined,
+				blockTitle: blockType?.title,
+			};
+
+			// When in preview mode, we can avoid a lot of selection and
+			// editing related selectors.
+			if ( isPreviewMode ) {
+				return previewContext;
+			}
+
+			const _isSelected = isBlockSelected( clientId );
+			const canRemove = canRemoveBlock( clientId, rootClientId );
+			const canMove = canMoveBlock( clientId, rootClientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const { outlineMode, supportsLayout } = getSettings();
 			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
@@ -577,23 +605,18 @@ function BlockListBlockProvider( props ) {
 				checkDeep
 			);
 			const typing = isTyping();
-			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
 
 			return {
+				...previewContext,
 				mode: getBlockMode( clientId ),
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				templateLock: getTemplateLock( clientId ),
 				canRemove,
 				canMove,
-				blockWithoutAttributes,
-				name: blockName,
-				attributes,
-				isValid,
 				isSelected: _isSelected,
-				themeSupportsLayout: supportsLayout,
 				isTemporarilyEditingAsBlocks:
 					__unstableGetTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode,
@@ -609,7 +632,6 @@ function BlockListBlockProvider( props ) {
 						'__experimentalExposeControlsToChildren',
 						false
 					) && hasSelectedInnerBlock( clientId ),
-				index: getBlockIndex( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
 				isSubtreeDisabled:
@@ -629,7 +651,6 @@ function BlockListBlockProvider( props ) {
 					isMultiSelected &&
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
-				isReusable: isReusableBlock( blockType ),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
 				removeOutline: _isSelected && outlineMode && typing,
@@ -644,28 +665,24 @@ function BlockListBlockProvider( props ) {
 				hasEditableOutline:
 					blockEditingMode !== 'disabled' &&
 					getBlockEditingMode( rootClientId ) === 'disabled',
-				className: hasLightBlockWrapper
-					? attributes.className
-					: undefined,
-				defaultClassName: hasLightBlockWrapper
-					? getBlockDefaultClassName( blockName )
-					: undefined,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
 
 	const {
-		mode,
-		isSelectionEnabled,
-		isLocked,
-		canRemove,
-		canMove,
+		// Fill values that end up as a public API and may not be defined in
+		// preview mode.
+		mode = 'visual',
+		isSelectionEnabled = false,
+		isLocked = false,
+		canRemove = false,
+		canMove = false,
 		blockWithoutAttributes,
 		name,
 		attributes,
 		isValid,
-		isSelected,
+		isSelected = false,
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,

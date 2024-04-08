@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -155,6 +150,7 @@ const STATUSES = [
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
 function FeaturedImage( { item, viewType } ) {
+	const isDisabled = item.status === 'trash';
 	const { onClick } = useLink( {
 		postId: item.id,
 		postType: item.type,
@@ -172,21 +168,24 @@ function FeaturedImage( { item, viewType } ) {
 			size={ size }
 		/>
 	) : null;
-	if ( viewType === LAYOUT_LIST ) {
-		return media;
-	}
+	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
-		<button
-			className={ classNames( 'page-pages-preview-field__button', {
-				'edit-site-page-pages__media-wrapper':
-					viewType === LAYOUT_TABLE,
-			} ) }
-			type="button"
-			onClick={ onClick }
-			aria-label={ item.title?.rendered || __( '(no title)' ) }
+		<div
+			className={ `edit-site-page-pages__featured-image-wrapper is-layout-${ viewType }` }
 		>
-			{ media }
-		</button>
+			{ renderButton ? (
+				<button
+					className="page-pages-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || __( '(no title)' ) }
+				>
+					{ media }
+				</button>
+			) : (
+				media
+			) }
+		</div>
 	);
 }
 
@@ -281,9 +280,10 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-						view.type
-					) ? (
+					const addLink =
+						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						item.status !== 'trash';
+					return addLink ? (
 						<Link
 							params={ {
 								postId: item.id,

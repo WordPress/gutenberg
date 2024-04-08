@@ -190,7 +190,6 @@ export default function NavigationLinkEdit( {
 	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
 
 	const {
-		innerBlocks,
 		isAtMaxNesting,
 		isTopLevelLink,
 		isParentOfSelectedBlock,
@@ -198,7 +197,6 @@ export default function NavigationLinkEdit( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlocks,
 				getBlockCount,
 				getBlockName,
 				getBlockRootClientId,
@@ -207,7 +205,6 @@ export default function NavigationLinkEdit( {
 			} = select( blockEditorStore );
 
 			return {
-				innerBlocks: getBlocks( clientId ),
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, [
 						'core/navigation-link',
@@ -225,11 +222,13 @@ export default function NavigationLinkEdit( {
 		},
 		[ clientId, maxNestingLevel ]
 	);
+	const { getBlocks } = useSelect( blockEditorStore );
 
 	/**
 	 * Transform to submenu block.
 	 */
 	const transformToSubmenu = () => {
+		const innerBlocks = getBlocks( clientId );
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,

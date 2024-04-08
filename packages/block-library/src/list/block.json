@@ -38,6 +38,7 @@
 	},
 	"supports": {
 		"anchor": true,
+		"html": false,
 		"className": false,
 		"typography": {
 			"fontSize": true,

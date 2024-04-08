@@ -26,7 +26,7 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export const resetTemplateAction = {
 	id: 'reset-template',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: isTemplateRevertable,
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -52,12 +52,12 @@ export const resetTemplateAction = {
 					items.length > 1
 						? sprintf(
 								/* translators: The number of items. */
-								__( '%s items reverted.' ),
+								__( '%s items reset.' ),
 								items.length
 						  )
 						: sprintf(
 								/* translators: The template/part's name. */
-								__( '"%s" reverted.' ),
+								__( '"%s" reset.' ),
 								decodeEntities( items[ 0 ].title.rendered )
 						  ),
 					{
@@ -97,9 +97,7 @@ export const resetTemplateAction = {
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
+					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -113,7 +111,7 @@ export const resetTemplateAction = {
 							closeModal();
 						} }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>
