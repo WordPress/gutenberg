@@ -237,7 +237,7 @@
 .dataviews-view-table__primary-field {
 	font-size: $default-font-size;
 	font-weight: 500;
-	color: $gray-900;
+	color: $gray-700;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	display: block;
@@ -245,12 +245,12 @@
 
 	a {
 		text-decoration: none;
-		color: inherit;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
 		flex-grow: 0;
+		color: $gray-900;
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
@@ -405,6 +405,9 @@
 		}
 
 		&:not(.is-selected) {
+			.dataviews-view-list__primary-field {
+				color: $gray-900;
+			}
 			&:hover,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
