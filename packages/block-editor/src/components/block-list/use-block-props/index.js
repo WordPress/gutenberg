@@ -8,7 +8,11 @@ import classnames from 'classnames';
  */
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
+import {
+	__unstableGetBlockProps as getBlockProps,
+	isReusableBlock,
+	getBlockDefaultClassName,
+} from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
@@ -76,13 +80,12 @@ import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const {
 		clientId,
-		className,
+		attributes,
 		wrapperProps = {},
 		isAligned,
 		index,
 		mode,
 		name,
-		blockApiVersion,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -93,7 +96,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
-		isReusable,
+		blockType,
 		isDragging,
 		hasChildSelected,
 		removeOutline,
@@ -102,7 +105,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isEditingDisabled,
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
-		defaultClassName,
 		templateLock,
 	} = useContext( PrivateBlockContext );
 
@@ -132,6 +134,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasBlockBindings && canBindBlock( name )
 			? { '--wp-admin-theme-color': 'var(--wp-bound-block-color)' }
 			: {};
+	const blockApiVersion = blockType?.apiVersion || 1;
+	const hasLightBlockWrapper = blockApiVersion > 1;
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -162,7 +166,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-highlighted': isHighlighted,
 				'is-multi-selected': isMultiSelected,
 				'is-partially-selected': isPartiallySelected,
-				'is-reusable': isReusable,
+				'is-reusable': isReusableBlock( blockType ),
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
 				'remove-outline': removeOutline,
@@ -173,10 +177,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},
-			className,
+			hasLightBlockWrapper ? attributes.className : undefined,
 			props.className,
 			wrapperProps.className,
-			defaultClassName
+			hasLightBlockWrapper ? getBlockDefaultClassName( name ) : undefined
 		),
 		style: { ...wrapperProps.style, ...props.style, ...bindingsStyle },
 	};

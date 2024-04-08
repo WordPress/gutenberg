@@ -14,15 +14,12 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import {
-	getBlockType,
 	getSaveContent,
 	isUnmodifiedDefaultBlock,
 	serializeRawBlock,
 	switchToBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,
-	isReusableBlock,
-	getBlockDefaultClassName,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
@@ -146,7 +143,7 @@ function BlockListBlock( {
 		/>
 	);
 
-	const blockType = getBlockType( name );
+	const { blockType } = context;
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -561,6 +558,7 @@ function BlockListBlockProvider( props ) {
 			const {
 				hasBlockSupport: _hasBlockSupport,
 				getActiveBlockVariation,
+				getBlockType,
 			} = select( blocksStore );
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
@@ -570,7 +568,6 @@ function BlockListBlockProvider( props ) {
 				supportsLayout,
 				__unstableIsPreviewMode: isPreviewMode,
 			} = getSettings();
-			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				blockWithoutAttributes,
 				name: blockName,
@@ -578,13 +575,7 @@ function BlockListBlockProvider( props ) {
 				isValid,
 				themeSupportsLayout: supportsLayout,
 				index: getBlockIndex( clientId ),
-				isReusable: isReusableBlock( blockType ),
-				className: hasLightBlockWrapper
-					? attributes.className
-					: undefined,
-				defaultClassName: hasLightBlockWrapper
-					? getBlockDefaultClassName( blockName )
-					: undefined,
+				blockType,
 				blockTitle: blockType?.title,
 			};
 
@@ -632,7 +623,6 @@ function BlockListBlockProvider( props ) {
 						'__experimentalExposeControlsToChildren',
 						false
 					) && hasSelectedInnerBlock( clientId ),
-				blockApiVersion: blockType?.apiVersion || 1,
 				blockTitle: match?.title || blockType?.title,
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
@@ -689,7 +679,6 @@ function BlockListBlockProvider( props ) {
 		mayDisplayControls,
 		mayDisplayParentControls,
 		index,
-		blockApiVersion,
 		blockTitle,
 		isSubtreeDisabled,
 		isOutlineEnabled,
@@ -698,7 +687,7 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
-		isReusable,
+		blockType,
 		isDragging,
 		hasChildSelected,
 		removeOutline,
@@ -707,8 +696,6 @@ function BlockListBlockProvider( props ) {
 		templateLock,
 		isEditingDisabled,
 		hasEditableOutline,
-		className,
-		defaultClassName,
 	} = selectedProps;
 
 	// Users of the editor.BlockListBlock filter used to be able to
@@ -729,11 +716,10 @@ function BlockListBlockProvider( props ) {
 
 	const privateContext = {
 		clientId,
-		className,
+		attributes,
 		index,
 		mode,
 		name,
-		blockApiVersion,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -744,7 +730,7 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
-		isReusable,
+		blockType,
 		isDragging,
 		hasChildSelected,
 		removeOutline,
@@ -754,7 +740,6 @@ function BlockListBlockProvider( props ) {
 		isEditingDisabled,
 		hasEditableOutline,
 		isTemporarilyEditingAsBlocks,
-		defaultClassName,
 		mayDisplayControls,
 		mayDisplayParentControls,
 		themeSupportsLayout,
