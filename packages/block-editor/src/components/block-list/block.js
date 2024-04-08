@@ -586,7 +586,8 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				// Fill in these boolean values that end up as a public API.
+				// Fill in these values that end up as a public API.
+				mode: 'visual',
 				isSelectionEnabled: false,
 				isLocked: false,
 				templateLock: false,
