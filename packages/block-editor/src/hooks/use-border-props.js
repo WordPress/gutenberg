@@ -38,10 +38,11 @@ export function getBorderClassesAndStyles( attributes ) {
  * @return {Object} ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const { colors } = useMultipleOriginColorsAndGradients();
-	const { borderColor } = attributes;
+	const { borderColor, style } = attributes;
+	const isDisabled = ! borderColor && ! style?.border;
+	const { colors } = useMultipleOriginColorsAndGradients( { isDisabled } );
 
-	if ( ! borderColor ) {
+	if ( isDisabled ) {
 		return {};
 	}
 

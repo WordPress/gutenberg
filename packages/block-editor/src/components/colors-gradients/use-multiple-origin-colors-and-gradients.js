@@ -3,11 +3,14 @@
  */
 import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useSettings } from '../use-settings';
+import { useBlockEditContext } from '../block-edit';
+import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Retrieves color and gradient related settings.
@@ -15,9 +18,14 @@ import { useSettings } from '../use-settings';
  * The arrays for colors and gradients are made up of color palettes from each
  * origin i.e. "Core", "Theme", and "User".
  *
+ * @param {Object}  settings
+ * @param {boolean} settings.isDisabled
  * @return {Object} Color and gradient related settings.
  */
-export default function useMultipleOriginColorsAndGradients() {
+export default function useMultipleOriginColorsAndGradients( {
+	isDisabled,
+} = {} ) {
+	const { clientId = null } = useBlockEditContext();
 	const [
 		enableCustomColors,
 		customColors,
@@ -29,17 +37,26 @@ export default function useMultipleOriginColorsAndGradients() {
 		themeGradients,
 		defaultGradients,
 		shouldDisplayDefaultGradients,
-	] = useSettings(
-		'color.custom',
-		'color.palette.custom',
-		'color.palette.theme',
-		'color.palette.default',
-		'color.defaultPalette',
-		'color.customGradient',
-		'color.gradients.custom',
-		'color.gradients.theme',
-		'color.gradients.default',
-		'color.defaultGradients'
+	] = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return [];
+			}
+			return unlock( select( blockEditorStore ) ).getBlockSettings(
+				clientId,
+				'color.custom',
+				'color.palette.custom',
+				'color.palette.theme',
+				'color.palette.default',
+				'color.defaultPalette',
+				'color.customGradient',
+				'color.gradients.custom',
+				'color.gradients.theme',
+				'color.gradients.default',
+				'color.defaultGradients'
+			);
+		},
+		[ clientId, isDisabled ]
 	);
 
 	const colorGradientSettings = {
@@ -48,6 +65,9 @@ export default function useMultipleOriginColorsAndGradients() {
 	};
 
 	colorGradientSettings.colors = useMemo( () => {
+		if ( isDisabled ) {
+			return [];
+		}
 		const result = [];
 		if ( themeColors && themeColors.length ) {
 			result.push( {
@@ -86,9 +106,13 @@ export default function useMultipleOriginColorsAndGradients() {
 		themeColors,
 		defaultColors,
 		shouldDisplayDefaultColors,
+		isDisabled,
 	] );
 
 	colorGradientSettings.gradients = useMemo( () => {
+		if ( isDisabled ) {
+			return [];
+		}
 		const result = [];
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
@@ -127,7 +151,12 @@ export default function useMultipleOriginColorsAndGradients() {
 		themeGradients,
 		defaultGradients,
 		shouldDisplayDefaultGradients,
+		isDisabled,
 	] );
+
+	if ( isDisabled ) {
+		return {};
+	}
 
 	colorGradientSettings.hasColorsOrGradients =
 		!! colorGradientSettings.colors.length ||
