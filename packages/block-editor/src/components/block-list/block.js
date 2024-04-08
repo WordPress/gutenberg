@@ -644,7 +644,9 @@ function BlockListBlockProvider( props ) {
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
 				initialPosition:
-					_isSelected && __unstableGetEditorMode() === 'edit'
+					_isSelected &&
+					( __unstableGetEditorMode() === 'edit' ||
+						__unstableGetEditorMode() === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
