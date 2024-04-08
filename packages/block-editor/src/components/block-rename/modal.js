@@ -110,7 +110,6 @@ export default function BlockRenameModal( {
 						<Button
 							__next40pxDefaultSize
 							aria-disabled={ ! isNameValid }
-							isDestructive={ hasOverridesWarning }
 							variant="primary"
 							type="submit"
 						>

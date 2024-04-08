@@ -379,6 +379,7 @@ test.describe( 'Heading', () => {
 			.getByRole( 'dialog', { name: 'Rename' } )
 			.getByRole( 'textbox', { name: 'Block name' } )
 			.fill( 'My new name' );
+
 		await page
 			.getByRole( 'dialog', { name: 'Rename' } )
 			.getByRole( 'button', { name: 'Save' } )
