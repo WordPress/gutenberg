@@ -67,16 +67,13 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
-			render={
-				<TabListWrapper
-					style={
-						{
-							'--indicator-left': `${ indicatorPosition.left }px`,
-							'--indicator-width': `${ indicatorPosition.width }px`,
-						} as CSSProperties
-					}
-				/>
+			style={
+				{
+					'--indicator-left': `${ indicatorPosition.left }px`,
+					'--indicator-width': `${ indicatorPosition.width }px`,
+				} as CSSProperties
 			}
+			render={ <TabListWrapper /> }
 			onBlur={ onBlur }
 			{ ...otherProps }
 		>
