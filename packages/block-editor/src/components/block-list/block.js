@@ -586,14 +586,6 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				// Fill in these values that end up as a public API.
-				mode: 'visual',
-				isSelectionEnabled: false,
-				isLocked: false,
-				templateLock: false,
-				canRemove: false,
-				canMove: false,
-				isSelected: false,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -679,16 +671,18 @@ function BlockListBlockProvider( props ) {
 	);
 
 	const {
-		mode,
-		isSelectionEnabled,
-		isLocked,
-		canRemove,
-		canMove,
+		// Fill values that end up as a public API and may not be defined in
+		// preview mode.
+		mode = 'visual',
+		isSelectionEnabled = false,
+		isLocked = false,
+		canRemove = false,
+		canMove = false,
 		blockWithoutAttributes,
 		name,
 		attributes,
 		isValid,
-		isSelected,
+		isSelected = false,
 		themeSupportsLayout,
 		isTemporarilyEditingAsBlocks,
 		blockEditingMode,
