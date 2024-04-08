@@ -27,6 +27,7 @@ import {
 	PostTaxonomiesPanel,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -39,7 +40,7 @@ import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
-const { PostCardPanel } = unlock( editorPrivateApis );
+const { PostCardPanel, PostActions } = unlock( editorPrivateApis );
 
 const { Tabs } = unlock( componentsPrivateApis );
 const { PatternOverridesPanel } = unlock( editorPrivateApis );
@@ -52,6 +53,15 @@ export const sidebars = {
 	document: 'edit-post/document',
 	block: 'edit-post/block',
 };
+
+function onActionPerformed( actionId, items ) {
+	if ( actionId === 'move-to-trash' ) {
+		const postType = items[ 0 ].type;
+		document.location.href = addQueryArgs( 'edit.php', {
+			post_type: postType,
+		} );
+	}
+}
 
 const SidebarContent = ( {
 	sidebarName,
@@ -113,7 +123,13 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostCardPanel />
+					<PostCardPanel
+						actions={
+							<PostActions
+								onActionPerformed={ onActionPerformed }
+							/>
+						}
+					/>
 					{ ! isEditingTemplate && (
 						<>
 							<PostStatus />
