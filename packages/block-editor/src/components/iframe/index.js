@@ -134,13 +134,26 @@ function Iframe( {
 			setIframeDocument( node.contentDocument );
 		};
 		let iFrameDocument;
+		let iFrameLoadTimeout;
+
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
 			event.preventDefault();
 		}
-		function onLoad() {
+		function onLoad( event, retry = 0 ) {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
+
+			// Sometimes Safari fires the load event before the document is ready.
+			if ( contentDocument.body === null && retry < 3 ) {
+				retry++;
+				iFrameLoadTimeout = setTimeout(
+					() => onLoad( event, retry ),
+					100
+				);
+				return;
+			}
+
 			// Get any CSS classes the iframe document body may initially have
 			// to re-apply them later together with the ones of the main document
 			// body. This is necessary for some CSS classes for example the
@@ -214,6 +227,7 @@ function Iframe( {
 				'drop',
 				preventFileDropDefault
 			);
+			clearTimeout( iFrameLoadTimeout );
 		};
 	}, [] );
 
