@@ -3,7 +3,7 @@
  */
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -19,17 +19,10 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockRootClientId, getBlockIndex } =
-		useSelect( blockEditorStore );
-	const { insertAfterBlock, removeBlock } = useDispatch( blockEditorStore );
-
+export function useEventHandlers( clientId ) {
+	const registry = useRegistry();
 	return useRefEffect(
 		( node ) => {
-			if ( ! isSelected ) {
-				return;
-			}
-
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
 			 * key event occurs on wrapper node. This can occur when the block has
@@ -56,6 +49,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				event.preventDefault();
 
+				const { insertAfterBlock, removeBlock } =
+					registry.dispatch( blockEditorStore );
+
 				if ( keyCode === ENTER ) {
 					insertAfterBlock( clientId );
 				} else {
@@ -81,13 +77,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				node.removeEventListener( 'dragstart', onDragStart );
 			};
 		},
-		[
-			clientId,
-			isSelected,
-			getBlockRootClientId,
-			getBlockIndex,
-			insertAfterBlock,
-			removeBlock,
-		]
+		[ clientId, registry ]
 	);
 }

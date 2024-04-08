@@ -8,7 +8,7 @@ import {
 	isTextField,
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
-import { useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -28,10 +28,12 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
-		useSelect( blockEditorStore );
+	const registry = useRegistry();
 
 	useEffect( () => {
+		const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
+			registry.select( blockEditorStore );
+
 		// Check if the block is still selected at the time this effect runs.
 		if (
 			! isBlockSelected( clientId ) ||
@@ -86,7 +88,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			}
 		}
 		placeCaretAtHorizontalEdge( target, isReverse );
-	}, [ initialPosition, clientId ] );
+	}, [ initialPosition, clientId, registry ] );
 
 	return ref;
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -15,11 +15,14 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useNavModeExit( clientId ) {
-	const { isNavigationMode, isBlockSelected } = useSelect( blockEditorStore );
-	const { setNavigationMode, selectBlock } = useDispatch( blockEditorStore );
+	const registry = useRegistry();
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
+				const { isNavigationMode, isBlockSelected } =
+					registry.select( blockEditorStore );
+				const { setNavigationMode, selectBlock } =
+					registry.dispatch( blockEditorStore );
 				// Don't select a block if it's already handled by a child
 				// block.
 				if ( isNavigationMode() && ! event.defaultPrevented ) {
@@ -41,6 +44,6 @@ export function useNavModeExit( clientId ) {
 				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ clientId, isNavigationMode, isBlockSelected, setNavigationMode ]
+		[ clientId ]
 	);
 }
