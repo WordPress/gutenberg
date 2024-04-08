@@ -14,11 +14,9 @@ function gutenberg_reregister_interactivity_script_modules() {
 	wp_deregister_script_module( '@wordpress/interactivity' );
 	wp_deregister_script_module( '@wordpress/interactivity-router' );
 
-	$should_use_debug_version = wp_is_development_mode( 'plugin' ) || wp_is_development_mode( 'core' );
-
 	wp_register_script_module(
 		'@wordpress/interactivity',
-		gutenberg_url( '/build/interactivity/' . ( $should_use_debug_version ? 'debug.min.js' : 'index.min.js' ) ),
+		gutenberg_url( '/build/interactivity/' . ( SCRIPT_DEBUG ? 'debug.min.js' : 'index.min.js' ) ),
 		array(),
 		$default_version
 	);
