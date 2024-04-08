@@ -2112,6 +2112,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 export const getBlockTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		const normalizedBlocks = Array.isArray( blocks ) ? blocks : [ blocks ];
+		const filteredBlocks = normalizedBlocks.filter( ( block ) => !! block );
 		const buildBlockTypeTransformItem = buildBlockTypeItem( state, {
 			buildScope: 'transform',
 		} );
@@ -2129,7 +2130,7 @@ export const getBlockTransformItems = createSelector(
 		);
 
 		const possibleTransforms = getPossibleBlockTransformations(
-			normalizedBlocks
+			filteredBlocks
 		).reduce( ( accumulator, block ) => {
 			if ( itemsByName[ block?.name ] ) {
 				accumulator.push( itemsByName[ block.name ] );
