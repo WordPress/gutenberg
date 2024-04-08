@@ -572,7 +572,6 @@ function BlockListBlockProvider( props ) {
 			} = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
-				isSelected: false,
 				blockWithoutAttributes,
 				name: blockName,
 				attributes,
@@ -587,6 +586,13 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
+				// Fill in these boolean values that end up as a public API.
+				isSelectionEnabled: false,
+				isLocked: false,
+				templateLock: false,
+				canRemove: false,
+				canMove: false,
+				isSelected: false,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
