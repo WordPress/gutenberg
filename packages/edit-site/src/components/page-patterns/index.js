@@ -134,11 +134,13 @@ function Preview( { item, categoryId, viewType } ) {
 		isUserPattern || ( isTemplatePart && item.isCustom );
 	const ariaDescriptions = [];
 	if ( isCustomPattern ) {
-		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
+		// User patterns can be edited and deleted, so include some help text.
 		ariaDescriptions.push(
 			__( 'Press Enter to edit, or Delete to delete the pattern.' )
 		);
-	} else if ( item.description ) {
+	}
+
+	if ( item.description ) {
 		ariaDescriptions.push( item.description );
 	}
 

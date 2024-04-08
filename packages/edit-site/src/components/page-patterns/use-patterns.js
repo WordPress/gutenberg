@@ -222,6 +222,7 @@ const convertPatternPostToItem = ( patternPost, categories ) => ( {
 	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 	title: patternPost.title.raw,
 	type: patternPost.type,
+	description: patternPost.excerpt.raw,
 	patternPost,
 } );
 
