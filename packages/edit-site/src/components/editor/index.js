@@ -83,7 +83,7 @@ const interfaceLabels = {
 	header: __( 'Editor top bar' ),
 };
 
-const ANIMATION_DURATION = 0.3;
+const ANIMATION_DURATION = 0.25;
 
 export default function Editor( { isLoading, onClick } ) {
 	const {
@@ -248,7 +248,7 @@ export default function Editor( { isLoading, onClick } ) {
 												! isLargeViewport
 													? 0
 													: ANIMATION_DURATION,
-											ease: 'easeOut',
+											ease: [ 0.6, 0, 0.4, 1 ],
 										} }
 									>
 										<Header />
