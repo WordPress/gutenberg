@@ -15,7 +15,6 @@ import {
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
-	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -116,7 +115,7 @@ function InstalledFonts() {
 			{ isResolvingLibrary && (
 				<HStack align="center">
 					<Spacer />
-					<Spinner />
+					<ProgressBar />
 					<Spacer />
 				</HStack>
 			) }

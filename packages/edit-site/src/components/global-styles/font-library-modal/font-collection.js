@@ -19,12 +19,12 @@ import {
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
-	Spinner,
 	FlexItem,
 	Flex,
 	Button,
 	DropdownMenu,
 	SearchControl,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
@@ -45,6 +45,8 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
+import { unlock } from '../../../lock-unlock';
+const { ProgressBar } = unlock( componentsPrivateApis );
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -309,7 +311,11 @@ function FontCollection( { slug } ) {
 					<Spacer margin={ 4 } />
 
 					{ ! selectedCollection?.font_families && ! notice && (
-						<Spinner />
+						<HStack align="center">
+							<Spacer />
+							<ProgressBar />
+							<Spacer />
+						</HStack>
 					) }
 
 					{ !! selectedCollection?.font_families?.length &&
