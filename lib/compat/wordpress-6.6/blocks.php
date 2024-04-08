@@ -10,4 +10,3 @@
  */
 
 add_post_type_support( 'wp_block', 'excerpt' );
-
