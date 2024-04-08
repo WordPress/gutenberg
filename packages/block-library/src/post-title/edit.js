@@ -21,8 +21,6 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
-
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
@@ -126,7 +124,6 @@ export default function PostTitleEdit( {
 				<>
 					<BlockControls group="block">
 						<HeadingLevelDropdown
-							options={ HEADING_LEVELS }
 							value={ level }
 							onChange={ ( newLevel ) =>
 								setAttributes( { level: newLevel } )
