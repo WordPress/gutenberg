@@ -344,7 +344,7 @@ export function setIsSaveViewOpened( isOpen ) {
  *                                      reverting the template. Default true.
  */
 export const revertTemplate =
-	( template, { allowUndo } = {} ) =>
+	( template, { allowUndo = true } = {} ) =>
 	( { registry } ) => {
 		unlock( registry.dispatch( editorStore ) ).revertTemplate(
 			template,
