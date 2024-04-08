@@ -153,7 +153,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-// Copied as is from packages/dataviews/src/utils.js
+// Copied as is from packages/dataviews/src/view-table.js
 function WithDropDownMenuSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
