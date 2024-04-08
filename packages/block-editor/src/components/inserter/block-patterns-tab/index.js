@@ -42,9 +42,7 @@ function BlockPatternsTab( {
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<Tabs
 						selectOnMove={ false }
-						selectedTabId={
-							selectedCategory ? selectedCategory.name : null
-						}
+						selectedOnMount={ false }
 						orientation={ 'vertical' }
 						onSelect={ ( categoryId ) => {
 							// Pass the full category object
