@@ -18,6 +18,11 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 import { store as editorStore } from '../../store';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -71,6 +76,15 @@ export default function PostActions( { onActionPerformed } ) {
 			{ primaryActions: [], secondaryActions: [] }
 		);
 	}, [ actions, item ] );
+	if (
+		[
+			TEMPLATE_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType )
+	) {
+		return null;
+	}
 	return (
 		<DropdownMenu
 			trigger={

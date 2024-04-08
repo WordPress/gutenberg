@@ -20,3 +20,4 @@ export const ONE_MINUTE_IN_MS = 60 * 1000;
 export const AUTOSAVE_PROPERTIES = [ 'title', 'excerpt', 'content' ];
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
+export const PATTERN_POST_TYPE = 'wp_block';
