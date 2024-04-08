@@ -236,6 +236,9 @@ export function makeFontFacesFormData( font ) {
 export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 	const responses = [];
 
+	const informationCodes = [ 'rest_duplicate_font_face' ];
+	const warningCodes = [];
+
 	/*
 	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work
 	 * around a race condition that can cause an error when the fonts directory doesn't exist yet.
@@ -255,6 +258,8 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 	const results = {
 		errors: [],
 		successes: [],
+		infos: [],
+		warnings: [],
 	};
 
 	responses.forEach( ( result, index ) => {
@@ -268,6 +273,16 @@ export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
 					message: `Error: ${ response.message }`,
 				} );
 			}
+		} else if ( informationCodes.includes( result?.reason?.code ) ) {
+			results.infos.push( {
+				data: fontFacesData[ index ],
+				message: result.reason.message,
+			} );
+		} else if ( warningCodes.includes( result?.reason?.code ) ) {
+			results.warnings.push( {
+				data: fontFacesData[ index ],
+				message: result.reason.message,
+			} );
 		} else {
 			// Handle network errors or other fetch-related errors
 			results.errors.push( {
