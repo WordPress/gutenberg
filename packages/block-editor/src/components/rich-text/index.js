@@ -44,7 +44,7 @@ import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
-import { Content } from './content';
+import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
@@ -492,8 +492,11 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		// Remove all non-content props.
 		const {
 			children,
+			tagName: Tag = 'div',
+			value,
 			onChange,
 			isSelected,
+			multiline,
 			inlineToolbar,
 			wrapperClassName,
 			autocompleters,
@@ -516,7 +519,14 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 			readOnly,
 			...contentProps
 		} = removeNativeProps( props );
-		return <Content { ...contentProps } />;
+		return (
+			<Tag
+				{ ...contentProps }
+				dangerouslySetInnerHTML={ {
+					__html: valueToHTMLString( value, multiline ),
+				} }
+			/>
+		);
 	}
 
 	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
