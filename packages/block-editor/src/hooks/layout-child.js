@@ -172,7 +172,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
 	edit: ChildLayoutControlsPure,
-	attributeKeys: [ 'style' ],
+	attributeKeys: [ 'style.layout' ],
 	hasSupport() {
 		return true;
 	},
