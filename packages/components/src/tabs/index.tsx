@@ -30,13 +30,18 @@ function Tabs( {
 	orientation = 'horizontal',
 	onSelect,
 	children,
+	selectedOnMount = true,
 	selectedTabId,
 }: TabsProps ) {
 	const instanceId = useInstanceId( Tabs, 'tabs' );
+
 	const store = Ariakit.useTabStore( {
 		selectOnMove,
 		orientation,
-		defaultSelectedId: defaultTabId && `${ instanceId }-${ defaultTabId }`,
+		defaultSelectedId:
+			defaultTabId && selectedOnMount
+				? `${ instanceId }-${ defaultTabId }`
+				: null,
 		setSelectedId: ( selectedId ) => {
 			const strippedDownId =
 				typeof selectedId === 'string'
@@ -48,7 +53,6 @@ function Tabs( {
 	} );
 
 	const isControlled = selectedTabId !== undefined;
-
 	const { items, selectedId, activeId } = store.useState();
 	const { setSelectedId, setActiveId } = store;
 
@@ -83,17 +87,25 @@ function Tabs( {
 			return;
 		}
 
+		const setInitialTab = ( tabId: string | undefined ) => {
+			if ( selectedOnMount ) {
+				setSelectedId( tabId );
+			} else {
+				setActiveId( tabId );
+			}
+		};
+
 		// If the currently selected tab is missing (i.e. removed from the DOM),
 		// fall back to the initial tab or the first enabled tab if there is
 		// one. Otherwise, no tab should be selected.
 		if ( ! items.find( ( item ) => item.id === selectedId ) ) {
 			if ( initialTab && ! initialTab.dimmed ) {
-				setSelectedId( initialTab?.id );
+				setInitialTab( initialTab?.id );
 				return;
 			}
 
 			if ( firstEnabledTab ) {
-				setSelectedId( firstEnabledTab.id );
+				setInitialTab( firstEnabledTab.id );
 			} else if ( tabsHavePopulated.current ) {
 				setSelectedId( null );
 			}
@@ -105,6 +117,8 @@ function Tabs( {
 		isControlled,
 		items,
 		selectedId,
+		selectedOnMount,
+		setActiveId,
 		setSelectedId,
 	] );
 
