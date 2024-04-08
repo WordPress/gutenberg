@@ -38,6 +38,10 @@ export function ExperimentalBlockCanvas( {
 			>
 				<EditorStyles
 					styles={ styles }
+					/*
+					 * The wrapper selector needs a little specificity but not too much, so block
+					 * styles can override root layout styles but not block style variations.
+					 */
 					scope="div:where(.editor-styles-wrapper)"
 				/>
 				<WritingFlow
