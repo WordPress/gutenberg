@@ -150,10 +150,10 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 		// Edge case where the Reading settings has a posts page set but not a static homepage.
 		$aria_current = ' aria-current="page"';
 	}
-	
+
 	// If the home link is inside a navigation block, it should be wrapped in a list item with additional attributes.
 	// Use the block context to determine if the home link is inside a navigation block.
-	$in_navigation = !empty( $block->context );
+	$in_navigation = ! empty( $block->context );
 
 	if ( $in_navigation ) {
 		$item_markup = '<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%3$s" rel="home"%4$s>%5$s</a></li>';
