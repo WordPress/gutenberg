@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,19 +17,36 @@ import type { TabListProps } from './types';
 import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
+import type { CSSProperties } from 'react';
 
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
 >( function TabList( { children, ...otherProps }, ref ) {
 	const context = useTabsContext();
+
+	const [ indicatorPosition, setIndicatorPosition ] = useState( {
+		left: 0,
+		width: 0,
+	} );
+	const selectedId = context?.store.useState( 'selectedId' );
+	const selectedTabEl = context?.store.item( selectedId )?.element;
+
+	useEffect( () => {
+		if ( selectedTabEl )
+			setIndicatorPosition( {
+				left: selectedTabEl.offsetLeft,
+				width: selectedTabEl.getBoundingClientRect().width,
+			} );
+	}, [ selectedTabEl ] );
+
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
 	const { store } = context;
 
-	const { selectedId, activeId, selectOnMove } = store.useState();
+	const { activeId, selectOnMove } = store.useState();
 	const { setActiveId } = store;
 
 	const onBlur = () => {
@@ -50,7 +67,16 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
-			render={ <TabListWrapper /> }
+			render={
+				<TabListWrapper
+					style={
+						{
+							'--indicator-left': `${ indicatorPosition.left }px`,
+							'--indicator-width': `${ indicatorPosition.width }px`,
+						} as CSSProperties
+					}
+				/>
+			}
 			onBlur={ onBlur }
 			{ ...otherProps }
 		>

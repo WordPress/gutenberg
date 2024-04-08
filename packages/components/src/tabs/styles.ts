@@ -13,11 +13,30 @@ import { space } from '../utils/space';
 import { reduceMotion } from '../utils/reduce-motion';
 
 export const TabListWrapper = styled.div`
+	position: relative;
 	display: flex;
 	align-items: stretch;
 	flex-direction: row;
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
+	}
+	&::after {
+		content: '';
+		position: absolute;
+		left: var( --indicator-left );
+		bottom: 0;
+		width: var( --indicator-width );
+		height: 0;
+		border-bottom: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
+		pointer-events: none;
+		@media not ( prefers-reduced-motion: reduce ) {
+			transition: left 0.2s ease-out;
+		}
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
 	}
 `;
 
@@ -49,34 +68,6 @@ export const Tab = styled( Ariakit.Tab )`
 			position: relative;
 			box-shadow: none;
 			outline: none;
-		}
-
-		// Tab indicator
-		&::after {
-			content: '';
-			position: absolute;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			pointer-events: none;
-
-			// Draw the indicator.
-			background: ${ COLORS.theme.accent };
-			height: calc( 0 * var( --wp-admin-border-width-focus ) );
-			border-radius: 0;
-
-			// Animation
-			transition: all 0.1s linear;
-			${ reduceMotion( 'transition' ) };
-		}
-
-		// Active.
-		&[aria-selected='true']::after {
-			height: calc( 1 * var( --wp-admin-border-width-focus ) );
-
-			// Windows high contrast mode.
-			outline: 2px solid transparent;
-			outline-offset: -1px;
 		}
 
 		// Focus.
