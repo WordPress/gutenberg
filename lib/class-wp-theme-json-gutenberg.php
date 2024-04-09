@@ -875,6 +875,27 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
+		/*
+		 * Generate a schema for blocks.
+		 * - Block styles can contain `elements` & `variations` definitions.
+		 * - Variations definitions cannot be nested.
+		 * - Variations can contain styles for inner `blocks`.
+		 * - Variation inner `blocks` styles can contain `elements`.
+		 *
+		 * As each variation needs a `blocks` schema but further nested
+		 * inner `blocks`, the overall schema will be generated in multiple passes.
+		 */
+		foreach ( $valid_block_names as $block ) {
+			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+		}
+
+		$block_style_variation_styles             = static::VALID_STYLES;
+		$block_style_variation_styles['blocks']   = $schema_styles_blocks;
+		$block_style_variation_styles['elements'] = $schema_styles_elements;
+
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -891,12 +912,9 @@ class WP_Theme_JSON_Gutenberg {
 
 			$schema_styles_variations = array();
 			if ( ! empty( $style_variation_names ) ) {
-				$schema_styles_variations = array_fill_keys( $style_variation_names, $styles_non_top_level );
+				$schema_styles_variations = array_fill_keys( $style_variation_names, $block_style_variation_styles );
 			}
 
-			$schema_settings_blocks[ $block ]             = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]               = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements']   = $schema_styles_elements;
 			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
 		}
 
@@ -906,6 +924,12 @@ class WP_Theme_JSON_Gutenberg {
 		$schema['settings']                               = static::VALID_SETTINGS;
 		$schema['settings']['blocks']                     = $schema_settings_blocks;
 		$schema['settings']['typography']['fontFamilies'] = static::schema_in_root_and_per_origin( static::FONT_FAMILY_SCHEMA );
+
+		/*
+		 * Shared block style variations can be registered from the theme.json data so we can't
+		 * validate them against pre-registered block style variations.
+		 */
+		$schema['styles']['blocks']['variations'] = null;
 
 		// Remove anything that's not present in the schema.
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
