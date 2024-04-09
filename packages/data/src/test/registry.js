@@ -250,7 +250,7 @@ describe( 'createRegistry', () => {
 			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should behave as a side effect for the given selector, with arguments', () => {
+		it( 'should behave as a side effect for the given selector, with arguments', async () => {
 			const resolver = jest.fn();
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
@@ -263,14 +263,14 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
 			expect( value ).toBe( 'OK' );
+			await new Promise( process.nextTick );
 			expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
+			await new Promise( process.nextTick );
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
-			jest.runAllTimers();
+			await new Promise( process.nextTick );
 			expect( resolver ).toHaveBeenCalledTimes( 2 );
 		} );
 
@@ -287,11 +287,10 @@ describe( 'createRegistry', () => {
 			} );
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
-			jest.runAllTimers();
 			expect( value ).toBe( 'OK' );
 		} );
 
-		it( 'should use isFulfilled definition before calling the side effect', () => {
+		it( 'should use isFulfilled definition before calling the side effect', async () => {
 			const fulfill = jest.fn().mockImplementation( ( state, page ) => {
 				return { type: 'SET_PAGE', page, result: [] };
 			} );
@@ -323,30 +322,28 @@ describe( 'createRegistry', () => {
 
 			store.dispatch( { type: 'SET_PAGE', page: 4, result: [] } );
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
+
+			await new Promise( process.nextTick );
 
 			expect( fulfill ).toHaveBeenCalledTimes( 2 );
 
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
-			jest.runAllTimers();
+
+			await new Promise( process.nextTick );
 
 			// Expected: First and second page fulfillments already triggered, so
 			// should only be one more than previous assertion set.
 			expect( fulfill ).toHaveBeenCalledTimes( 3 );
 
 			registry.select( 'demo' ).getPage( 1 );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 2 );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 3, {} );
-			jest.runAllTimers();
 			registry.select( 'demo' ).getPage( 4 );
+
+			await new Promise( process.nextTick );
 
 			// Expected:
 			//  - Fourth page was pre-filled. Necessary to determine via
