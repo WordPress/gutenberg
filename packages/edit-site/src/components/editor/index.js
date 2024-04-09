@@ -23,6 +23,7 @@ import {
 	BlockToolbar,
 	store as blockEditorStore,
 	BlockInspector,
+	BlockKeyboardShortcuts,
 } from '@wordpress/block-editor';
 import {
 	EditorKeyboardShortcutsRegister,
@@ -44,7 +45,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
-import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -275,9 +275,9 @@ export default function Editor( { isLoading, onClick } ) {
 								) }
 								{ isEditMode && (
 									<>
-										<KeyboardShortcutsEditMode />
 										<EditorKeyboardShortcutsRegister />
 										<EditorKeyboardShortcuts />
+										<BlockKeyboardShortcuts />
 									</>
 								) }
 							</>

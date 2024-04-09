@@ -11,7 +11,10 @@ import {
 	useResourcePermissions,
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	BlockKeyboardShortcuts,
+} from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -111,6 +114,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	return (
 		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				onInput={ onInput }

@@ -193,6 +193,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-inspector/README.md>
 
+### BlockKeyboardShortcuts
+
+Undocumented declaration.
+
 ### BlockList
 
 Undocumented declaration.

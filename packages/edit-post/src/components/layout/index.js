@@ -23,6 +23,7 @@ import {
 	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
+	BlockKeyboardShortcuts,
 } from '@wordpress/block-editor';
 import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -286,6 +287,7 @@ function Layout( { initialPost } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
+			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isWideViewport }

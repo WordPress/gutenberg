@@ -11,6 +11,7 @@ import {
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
+	BlockKeyboardShortcuts,
 } from '@wordpress/block-editor';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -99,6 +100,7 @@ export default function SidebarBlockEditor( {
 	return (
 		<>
 			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
 				<KeyboardShortcuts
