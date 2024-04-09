@@ -407,11 +407,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			}
 			actions={
 				postType === TEMPLATE_POST_TYPE ? (
-					<AddNewTemplate
-						templateType={ postType }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
+					<AddNewTemplate />
 				) : (
 					<AddNewTemplatePart />
 				)
