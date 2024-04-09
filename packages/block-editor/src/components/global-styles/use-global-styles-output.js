@@ -619,6 +619,33 @@ function pickStyleKeys( treeToPickFrom ) {
 	return Object.fromEntries( clonedEntries );
 }
 
+function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = JSON.parse( JSON.stringify( selectors ) );
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
+}
+
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
 	const nodes = [];
 
@@ -651,14 +678,104 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 
 			if ( node?.variations ) {
 				const variations = {};
-				Object.keys( node.variations ).forEach( ( variation ) => {
-					variations[ variation ] = pickStyleKeys(
-						node.variations[ variation ]
-					);
-				} );
+				Object.entries( node.variations ).forEach(
+					( [ variationName, variation ] ) => {
+						variations[ variationName ] =
+							pickStyleKeys( variation );
+
+						const variationSelector =
+							blockSelectors[ blockName ]
+								.styleVariationSelectors?.[ variationName ];
+
+						// Process the variation's inner element styles.
+						// This comes before the inner block styles so the
+						// element styles within the block type styles take
+						// precedence over these.
+						Object.entries( variation?.elements ?? {} ).forEach(
+							( [ element, elementStyles ] ) => {
+								if ( elementStyles && ELEMENTS[ element ] ) {
+									nodes.push( {
+										styles: elementStyles,
+										selector: scopeSelector(
+											variationSelector,
+											ELEMENTS[ element ]
+										),
+									} );
+								}
+							}
+						);
+
+						// Process the variations inner block type styles.
+						Object.entries( variation?.blocks ?? {} ).forEach(
+							( [
+								variationBlockName,
+								variationBlockStyles,
+							] ) => {
+								const variationBlockSelector = scopeSelector(
+									variationSelector,
+									blockSelectors[ variationBlockName ]
+										.selector
+								);
+								const variationDuotoneSelector = scopeSelector(
+									variationSelector,
+									blockSelectors[ variationBlockName ]
+										.duotoneSelector
+								);
+								const variationFeatureSelectors =
+									scopeFeatureSelectors(
+										variationSelector,
+										blockSelectors[ variationBlockName ]
+											.featureSelectors
+									);
+
+								nodes.push( {
+									selector: variationBlockSelector,
+									duotoneSelector: variationDuotoneSelector,
+									featureSelectors: variationFeatureSelectors,
+									fallbackGapValue:
+										blockSelectors[ variationBlockName ]
+											.fallbackGapValue,
+									hasLayoutSupport:
+										blockSelectors[ variationBlockName ]
+											.hasLayoutSupport,
+									styles: pickStyleKeys(
+										variationBlockStyles
+									),
+								} );
+
+								// Process element styles for the inner blocks
+								// of the variation.
+								Object.entries(
+									variationBlockStyles.elements ?? {}
+								).forEach(
+									( [
+										variationBlockElement,
+										variationBlockElementStyles,
+									] ) => {
+										if (
+											variationBlockElementStyles &&
+											ELEMENTS[ variationBlockElement ]
+										) {
+											nodes.push( {
+												styles: variationBlockElementStyles,
+												selector: scopeSelector(
+													variationBlockSelector,
+													ELEMENTS[
+														variationBlockElement
+													]
+												),
+											} );
+										}
+									}
+								);
+							}
+						);
+					}
+				);
 				blockStyles.variations = variations;
 			}
-			if ( blockStyles && blockSelectors?.[ blockName ]?.selector ) {
+
+			if ( blockSelectors?.[ blockName ]?.selector ) {
 				nodes.push( {
 					duotoneSelector:
 						blockSelectors[ blockName ].duotoneSelector,
