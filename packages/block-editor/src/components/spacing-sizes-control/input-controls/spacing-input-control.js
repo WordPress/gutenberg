@@ -203,6 +203,8 @@ export default function SpacingInputControl( {
 		typeLabel
 	).trim();
 
+	const areNegativeValuesAllowed = minValue < 0;
+
 	return (
 		<HStack className="spacing-sizes-control__wrapper">
 			{ icon && (
@@ -250,6 +252,7 @@ export default function SpacingInputControl( {
 						onMouseOut={ onMouseOut }
 						onFocus={ onMouseOver }
 						onBlur={ onMouseOut }
+						disabled={ areNegativeValuesAllowed }
 						value={ customRangeValue }
 						min={ 0 }
 						max={ CUSTOM_VALUE_SETTINGS[ selectedUnit ]?.max ?? 10 }
