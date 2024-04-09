@@ -720,14 +720,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
+	 * @since 6.6.0 Added configurable directory to allow block style variations
+	 *              to reside in a different directory to theme style variations.
 	 *
+	 * @param string $dir Directory to search for variation partials.
 	 * @return array
 	 */
-	public static function get_style_variations() {
+	public static function get_style_variations( $dir = 'styles' ) {
 		$variation_files    = array();
 		$variations         = array();
-		$base_directory     = get_stylesheet_directory() . '/styles';
-		$template_directory = get_template_directory() . '/styles';
+		$base_directory     = get_stylesheet_directory() . '/' . $dir;
+		$template_directory = get_template_directory() . '/' . $dir;
 		if ( is_dir( $base_directory ) ) {
 			$variation_files = static::recursively_iterate_json( $base_directory );
 		}
