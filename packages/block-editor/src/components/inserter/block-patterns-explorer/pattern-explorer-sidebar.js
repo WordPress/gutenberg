@@ -22,6 +22,7 @@ function PatternCategoriesList( {
 						onClick={ () => {
 							onClickCategory( name );
 						} }
+						tabIndex={ 0 }
 					>
 						{ label }
 					</Button>
