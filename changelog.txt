@@ -1,5 +1,27 @@
 == Changelog ==
 
+= 18.1.0-rc.2 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Add null check to prevent errors in `get_block_template` filter. ([60491](https://github.com/WordPress/gutenberg/pull/60491))
+
+#### Layout
+- Skip outputting base layout rules that reference content or wide sizes if no layout sizes exist. ([60489](https://github.com/WordPress/gutenberg/pull/60489))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong @okmttdhr
+
+
 = 18.1.0-rc.1 =
 
 
