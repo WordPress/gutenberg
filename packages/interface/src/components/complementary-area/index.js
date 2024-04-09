@@ -17,10 +17,14 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
+import {
+	useReducedMotion,
+	useViewportMatch,
+	usePrevious,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -45,25 +49,49 @@ const variants = {
 	mobileOpen: { width: '100vw' },
 };
 
-function ComplementaryAreaFill( { isActive, scope, children, className, id } ) {
+function ComplementaryAreaFill( {
+	activeArea,
+	isActive,
+	scope,
+	children,
+	className,
+	id,
+} ) {
 	const disableMotion = useReducedMotion();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const defaultTransition = {
+	// This is used to delay the exit animation to the next tick.
+	// The reason this is done is to allow us to apply the right transition properties
+	// When we switch from an open sidebar to another open sidebar.
+	// we don't want to animate in this case.
+	const previousActiveArea = usePrevious( activeArea );
+	const previousIsActive = usePrevious( isActive );
+	const [ , setState ] = useState( {} );
+	useEffect( () => {
+		setState( {} );
+	}, [ isActive ] );
+	const transition = {
 		type: 'tween',
-		duration: disableMotion || isMobileViewport ? 0 : ANIMATION_DURATION,
+		duration:
+			disableMotion ||
+			isMobileViewport ||
+			( !! previousActiveArea &&
+				!! activeArea &&
+				activeArea !== previousActiveArea )
+				? 0
+				: ANIMATION_DURATION,
 		ease: [ 0.6, 0, 0.4, 1 ],
 	};
 
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
 			<AnimatePresence initial={ false }>
-				{ isActive && (
+				{ ( previousIsActive || isActive ) && (
 					<motion.div
 						variants={ variants }
 						initial="closed"
 						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
 						exit="closed"
-						transition={ defaultTransition }
+						transition={ transition }
 					>
 						<div
 							id={ id }
@@ -250,6 +278,7 @@ function ComplementaryArea( {
 				</ComplementaryAreaMoreMenuItem>
 			) }
 			<ComplementaryAreaFill
+				activeArea={ activeArea }
 				isActive={ isActive }
 				className={ classnames(
 					'interface-complementary-area',
