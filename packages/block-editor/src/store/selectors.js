@@ -28,7 +28,7 @@ import {
 	getInsertBlockTypeDependants,
 } from './utils';
 import { orderBy } from '../utils/sorting';
-import { ROOT_CONTAINER_CLIENT_ID, STORE_NAME } from './constants';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -182,7 +182,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 export function getBlocks( state, rootClientId ) {
 	const treeKey =
 		! rootClientId || ! areInnerBlocksControlled( state, rootClientId )
-			? rootClientId || ROOT_CONTAINER_CLIENT_ID
+			? rootClientId || ''
 			: 'controlled||' + rootClientId;
 	return state.blocks.tree.get( treeKey )?.innerBlocks || EMPTY_ARRAY;
 }
@@ -228,7 +228,7 @@ export const __unstableGetClientIdWithClientIdsTree = createSelector(
  * @return {Object[]} Client IDs of the post blocks.
  */
 export const __unstableGetClientIdsTree = createSelector(
-	( state, rootClientId = ROOT_CONTAINER_CLIENT_ID ) => {
+	( state, rootClientId = '' ) => {
 		deprecated(
 			"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree",
 			{
@@ -293,7 +293,7 @@ export const getClientIdsOfDescendants = createSelector(
  * @return {Array} ids of top-level and descendant blocks.
  */
 export const getClientIdsWithDescendants = ( state ) =>
-	getClientIdsOfDescendants( state, ROOT_CONTAINER_CLIENT_ID );
+	getClientIdsOfDescendants( state, '' );
 
 /**
  * Returns the total number of blocks, or the total number of blocks with a specific name in a post.
@@ -1185,10 +1185,7 @@ export const __unstableGetSelectedBlocksWithPartialSelection = ( state ) => {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return (
-		state.blocks.order.get( rootClientId || ROOT_CONTAINER_CLIENT_ID ) ||
-		EMPTY_ARRAY
-	);
+	return state.blocks.order.get( rootClientId || '' ) || EMPTY_ARRAY;
 }
 
 /**
@@ -1567,12 +1564,7 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	if (
-		getBlockEditingMode(
-			state,
-			rootClientId ?? ROOT_CONTAINER_CLIENT_ID
-		) === 'disabled'
-	) {
+	if ( getBlockEditingMode( state, rootClientId ?? '' ) === 'disabled' ) {
 		return false;
 	}
 
@@ -2896,15 +2888,15 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
  *
  * @see useBlockEditingMode
  *
- * @param {Object}  state    Global application state.
- * @param {string?} clientId The block client ID or the root container if omitted.
+ * @param {Object} state    Global application state.
+ * @param {string} clientId The block client ID, or `''` for the root container.
  *
  * @return {BlockEditingMode} The block editing mode. One of `'disabled'`,
  *                            `'contentOnly'`, or `'default'`.
  */
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
-		( state, clientId = ROOT_CONTAINER_CLIENT_ID ) => {
+		( state, clientId = '' ) => {
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
@@ -2919,7 +2911,7 @@ export const getBlockEditingMode = createRegistrySelector(
 					// <main> element), only allow editing of the contents of
 					// the container.
 
-					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+					if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 						return 'disabled';
 					}
 
@@ -2938,7 +2930,7 @@ export const getBlockEditingMode = createRegistrySelector(
 					// If we don't have a sections container, we get the top-level
 					// blocks and only allow editing those blocks.
 
-					if ( clientId === ROOT_CONTAINER_CLIENT_ID ) {
+					if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
 						return 'contentOnly';
 					}
 
@@ -3009,7 +3001,7 @@ export const getBlockEditingMode = createRegistrySelector(
  */
 export const isUngroupable = createRegistrySelector(
 	( select ) =>
-		( state, clientId = ROOT_CONTAINER_CLIENT_ID ) => {
+		( state, clientId = '' ) => {
 			const _clientId = clientId || getSelectedBlockClientId( state );
 			if ( ! _clientId ) {
 				return false;

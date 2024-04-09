@@ -31,7 +31,7 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { ROOT_CONTAINER_CLIENT_ID, STORE_NAME } from './constants';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -426,12 +426,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param {number}  index            The index to move the blocks to.
  */
 export const moveBlocksToPosition =
-	(
-		clientIds,
-		fromRootClientId = ROOT_CONTAINER_CLIENT_ID,
-		toRootClientId = ROOT_CONTAINER_CLIENT_ID,
-		index
-	) =>
+	( clientIds, fromRootClientId = '', toRootClientId = '', index ) =>
 	( { select, dispatch } ) => {
 		const canMoveBlocks = select.canMoveBlocks(
 			clientIds,
@@ -486,8 +481,8 @@ export const moveBlocksToPosition =
  */
 export function moveBlockToPosition(
 	clientId,
-	fromRootClientId = ROOT_CONTAINER_CLIENT_ID,
-	toRootClientId = ROOT_CONTAINER_CLIENT_ID,
+	fromRootClientId = '',
+	toRootClientId = '',
 	index
 ) {
 	return moveBlocksToPosition(
@@ -1919,16 +1914,13 @@ export const registerInserterMediaCategory =
  *
  * @see useBlockEditingMode
  *
- * @param {string}           clientId The block client ID or the root container if omitted.
+ * @param {string}           clientId The block client ID, or `''` for the root container.
  * @param {BlockEditingMode} mode     The block editing mode. One of `'disabled'`,
  *                                    `'contentOnly'`, or `'default'`.
  *
  * @return {Object} Action object.
  */
-export function setBlockEditingMode(
-	clientId = ROOT_CONTAINER_CLIENT_ID,
-	mode
-) {
+export function setBlockEditingMode( clientId = '', mode ) {
 	return {
 		type: 'SET_BLOCK_EDITING_MODE',
 		clientId,
@@ -1941,11 +1933,11 @@ export function setBlockEditingMode(
  *
  * @see useBlockEditingMode
  *
- * @param {string} clientId The block client ID, or the root container if omitted.
+ * @param {string} clientId The block client ID, or `''` for the root container.
  *
  * @return {Object} Action object.
  */
-export function unsetBlockEditingMode( clientId = ROOT_CONTAINER_CLIENT_ID ) {
+export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
