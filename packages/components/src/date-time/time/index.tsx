@@ -32,7 +32,12 @@ import {
 import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
-import { inputToDate, from12hTo24h, buildPadInputStateReducer } from '../utils';
+import {
+	inputToDate,
+	from12hTo24h,
+	buildPadInputStateReducer,
+	validateInputElementTarget,
+} from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 /**
@@ -91,18 +96,7 @@ export function TimePicker( {
 		method: 'hours' | 'minutes' | 'date' | 'year'
 	) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
-			// `instanceof` checks need to get the instance definition from the
-			// corresponding window object — therefore, the following logic makes
-			// the component work correctly even when rendered inside an iframe.
-			const HTMLInputElementInstance =
-				( event.target as HTMLInputElement )?.ownerDocument.defaultView
-					?.HTMLInputElement ?? HTMLInputElement;
-
-			if ( ! ( event.target instanceof HTMLInputElementInstance ) ) {
-				return;
-			}
-
-			if ( ! event.target.validity.valid ) {
+			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
 
