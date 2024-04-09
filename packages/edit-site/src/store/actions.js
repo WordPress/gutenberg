@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import {
-	store as blocksStore,
-	parse,
-	__unstableSerializeAndClean,
-} from '@wordpress/blocks';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
@@ -28,7 +24,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
 import { removeTemplates } from './private-actions';
-import { unlock } from '../lock-unlock';
 
 /**
  * Dispatches an action that toggles a feature flag.
@@ -172,15 +167,6 @@ export function setNavigationMenu( navigationMenuId ) {
 	};
 }
 
-function getSectionRootBlockNameFromPostType( postType ) {
-	const CONTENT_TYPES = [ 'post', 'page' ];
-
-	if ( CONTENT_TYPES.includes( postType ) ) {
-		return 'core/post-content';
-	}
-	return 'core/group';
-}
-
 /**
  * Action that sets an edited entity.
  *
@@ -190,22 +176,14 @@ function getSectionRootBlockNameFromPostType( postType ) {
  *
  * @return {Object} Action object.
  */
-export const setEditedEntity =
-	( postType, postId, context ) =>
-	( { registry, dispatch } ) => {
-		const { setSectionRootBlockName } = unlock(
-			registry.dispatch( blocksStore )
-		);
-		setSectionRootBlockName(
-			getSectionRootBlockNameFromPostType( context.postType )
-		);
-		dispatch( {
-			type: 'SET_EDITED_POST',
-			postType,
-			id: postId,
-			context,
-		} );
+export function setEditedEntity( postType, postId, context ) {
+	return {
+		type: 'SET_EDITED_POST',
+		postType,
+		id: postId,
+		context,
 	};
+}
 
 /**
  * @deprecated
