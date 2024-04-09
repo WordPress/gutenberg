@@ -98,7 +98,7 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	height: $header-height + $grid-unit-15;
+	height: $header-height + $grid-unit-10;
 	width: 100%;
 	z-index: z-index(".components-modal__header");
 	position: absolute;
@@ -150,7 +150,7 @@
 // Modal contents.
 .components-modal__content {
 	flex: 1;
-	margin-top: $header-height + $grid-unit-15;
+	margin-top: $header-height + $grid-unit-10;
 	// Small top padding required to avoid cutting off the visible outline when the first child element is focusable.
 	padding: $grid-unit-05 $grid-unit-40 $grid-unit-40;
 	overflow: auto;

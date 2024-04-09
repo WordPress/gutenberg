@@ -22,8 +22,8 @@
 		// Allow focus ring to be fully visible on furthest right button.
 		@include break-medium() {
 			padding-right: var(--wp-admin-border-width-focus);
-			// Account for the site hub, which is 60x60px.
-			flex-basis: calc(37.5% - 60px);
+			// Account for the site hub, which is 64x64px.
+			flex-basis: calc(37.5% - #{$header-height});
 			// We need this to be overflow hidden so the block toolbar can
 			// overflow scroll. If the overflow is visible, flexbox allows
 			// the toolbar to grow outside of the allowed container space.
@@ -199,7 +199,7 @@
 		.block-editor-block-toolbar {
 			height: 100%;
 			// Push down so that buttons are centered vertically.
-			// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+			// It should be 16px (64px header height - 32px compact button height = 32 / 2),
 			// but there is a -1px top-margin down the stack that affects this.
 			padding-top: math.div($header-height - $button-size-compact, 2) + 1;
 
