@@ -20,7 +20,11 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
-import type { Flusher, ParentElement } from './types';
+
+interface Flusher {
+	flush: () => void;
+	dispose: () => void;
+}
 
 /**
  * Executes a callback function after the next frame is rendered.
@@ -28,7 +32,7 @@ import type { Flusher, ParentElement } from './types';
  * @param callback The callback function to be executed.
  * @return A promise that resolves after the callback function is executed.
  */
-const afterNextFrame = ( callback: Function ) => {
+const afterNextFrame = ( callback: () => void ) => {
 	return new Promise< void >( ( resolve ) => {
 		const done = () => {
 			clearTimeout( timeout );
@@ -55,7 +59,7 @@ const afterNextFrame = ( callback: Function ) => {
  * @param notify  The function that notifies listeners when the value is flushed.
  * @return The Flusher object with `flush` and `dispose` properties.
  */
-function createFlusher( compute: Function, notify: () => void ): Flusher {
+function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
 	let flush: () => void;
 	const dispose = effect( function () {
 		flush = this.c.bind( this );
@@ -63,7 +67,7 @@ function createFlusher( compute: Function, notify: () => void ): Flusher {
 		this.c = notify;
 		return compute();
 	} );
-	return { flush, dispose };
+	return { flush, dispose } as const;
 }
 
 /**
@@ -74,14 +78,11 @@ function createFlusher( compute: Function, notify: () => void ): Flusher {
  *
  * @param callback The callback function to be executed.
  */
-export function useSignalEffect( callback: Function ) {
+export function useSignalEffect( callback: () => unknown ) {
 	_useEffect( () => {
 		let eff = null;
 		let isExecuting = false;
 
-		/**
-		 * Notifies the callback function to execute after the next frame.
-		 */
 		const notify = async () => {
 			if ( eff && ! isExecuting ) {
 				isExecuting = true;
@@ -253,15 +254,20 @@ export function useMemo( factory, inputs ) {
  * @return The created root fragment.
  */
 export const createRootFragment = (
-	parent: ParentElement,
+	parent: Element,
 	replaceNode: Node | Node[]
 ) => {
 	replaceNode = [].concat( replaceNode );
 	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;
 	function insert( c: any, r: any ) {
+		/**
+		 * c address for children.
+		 * r address for root.
+		 * s address for sibling.
+		 */
 		parent.insertBefore( c, r || s );
 	}
-	return ( parent.__k = {
+	return ( ( parent as any ).__k = {
 		nodeType: 1,
 		parentNode: parent,
 		firstChild: replaceNode[ 0 ],

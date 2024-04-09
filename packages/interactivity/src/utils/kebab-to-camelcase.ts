@@ -2,7 +2,7 @@
  * Transforms a kebab-case string to camelCase.
  *
  * @param str The kebab-case string to transform to camelCase.
- * @return     The transformed camelCase string.
+ * @return The transformed camelCase string.
  */
 export function kebabToCamelCase( str: string ): string {
 	return str
