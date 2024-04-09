@@ -258,7 +258,7 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 	const forceDisableFocusMode = settings.focusMode === false;
 
 	return useMemo( () => {
-		const _settings = {
+		const blockEditorSettings = {
 			...Object.fromEntries(
 				Object.entries( settings ).filter( ( [ key ] ) =>
 					BLOCK_EDITOR_SETTINGS.includes( key )
@@ -306,10 +306,10 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
-		lock( _settings, {
+		lock( blockEditorSettings, {
 			sectionRootClientId,
 		} );
-		return _settings;
+		return blockEditorSettings;
 	}, [
 		allowedBlockTypes,
 		allowRightClickOverrides,
