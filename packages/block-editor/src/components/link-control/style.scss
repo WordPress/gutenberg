@@ -265,11 +265,10 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		span {
-			display: inline;
 			font-weight: normal;
 		}
 
-		svg {
+		.components-external-link__icon {
 			display: none; // specifically requested to be removed visually as well.
 		}
 	}
