@@ -110,22 +110,22 @@ export function SidebarComplementaryAreaFills() {
 		supportsGlobalStyles,
 		isEditingPage,
 	} = useSelect( ( select ) => {
-		const _sidebar =
+		const sidebar =
 			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
 
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
 			SIDEBAR_TEMPLATE,
-		].includes( _sidebar );
+		].includes( sidebar );
+		let _tabName = sidebar;
+		if ( ! _isEditorSidebarOpened ) {
+			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
+				? SIDEBAR_BLOCK
+				: SIDEBAR_TEMPLATE;
+		}
 
 		return {
-			tabName:
-				select( interfaceStore ).getActiveComplementaryArea(
-					STORE_NAME
-				) ??
-				( !! select( blockEditorStore ).getBlockSelectionStart()
-					? SIDEBAR_BLOCK
-					: SIDEBAR_TEMPLATE ),
+			tabName: _tabName,
 			isEditorSidebarOpened: _isEditorSidebarOpened,
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),

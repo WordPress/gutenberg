@@ -155,14 +155,24 @@ const SettingsSidebar = () => {
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 
+			const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+				editPostStore.name
+			);
+			const _isEditorSidebarOpened = [
+				sidebars.block,
+				sidebars.document,
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = !! select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document;
+			}
+
 			return {
-				tabName:
-					select( interfaceStore ).getActiveComplementaryArea(
-						editPostStore.name
-					) ??
-					( !! select( blockEditorStore ).getBlockSelectionStart()
-						? sidebars.block
-						: sidebars.document ),
+				tabName: _tabName,
 				keyboardShortcut: shortcut,
 				isEditingTemplate:
 					select( editorStore ).getCurrentPostType() ===
