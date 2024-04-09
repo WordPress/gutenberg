@@ -1432,7 +1432,7 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select } ) => {
+	( { dispatch, select, registry } ) => {
 		// When switching to zoom-out mode, we need to select the root block
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
@@ -1461,6 +1461,22 @@ export const __unstableSetEditorMode =
 			);
 		} else if ( mode === 'zoom-out' ) {
 			speak( __( 'You are currently in zoom-out mode.' ) );
+			const { sectionRootClientId } = select.getSettings();
+			const sectionsClientIds =
+				select.getBlockOrder( sectionRootClientId );
+			registry.batch( () => {
+				dispatch.setBlockEditingMode(
+					'' /* rootClientId */,
+					'contentOnly'
+				);
+				dispatch.setBlockEditingMode(
+					sectionRootClientId,
+					'contentOnly'
+				);
+				sectionsClientIds.forEach( ( clientId ) =>
+					dispatch.setBlockEditingMode( clientId, 'default' )
+				);
+			} );
 		}
 	};
 

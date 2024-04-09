@@ -164,10 +164,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			[]
 		);
 		const { id, type } = rootLevelPost;
+		const { type: contextPostType } = post;
+
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
 			type,
-			id
+			id,
+			contextPostType
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,

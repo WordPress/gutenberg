@@ -12,7 +12,10 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as blocksStore } from '@wordpress/blocks';
-import { privateApis } from '@wordpress/block-editor';
+import {
+	privateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -85,17 +88,20 @@ const BLOCK_EDITOR_SETTINGS = [
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object} settings EditorProvider settings prop.
- * @param {string} postType Editor root level post type.
- * @param {string} postId   Editor root level post ID.
+ * @param {Object} settings        EditorProvider settings prop.
+ * @param {string} postType        Editor root level post type.
+ * @param {string} postId          Editor root level post ID.
+ * @param {string} contextPostType The post type of the edited post.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, postType, postId ) {
+function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
 		blockTypes,
+		getBlocksByName,
+		getBlockAttributes,
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
@@ -119,6 +125,10 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const {
+				getBlocksByName: getBlocks,
+				getBlockAttributes: getAttributes,
+			} = select( blockEditorStore );
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
@@ -146,6 +156,8 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
+				getBlocksByName: getBlocks,
+				getBlockAttributes: getAttributes,
 			};
 		},
 		[ postType, postId, isLargeViewport ]
@@ -230,6 +242,30 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
+	const getSectionRootBlock = useCallback( () => {
+		if ( ! contextPostType ) {
+			return null;
+		}
+		const CONTENT_TYPES = [ 'post', 'page' ];
+
+		if ( CONTENT_TYPES.includes( contextPostType ) ) {
+			const postContentBlocks = getBlocksByName( 'core/post-content' );
+			if ( postContentBlocks.length > 0 ) {
+				return postContentBlocks[ 0 ];
+			}
+		} else {
+			const groupBlocks = getBlocksByName( 'core/group' );
+			const mainGroup = groupBlocks.find(
+				( clientId ) =>
+					getBlockAttributes( clientId )?.tagName === 'main'
+			);
+			if ( mainGroup ) {
+				return mainGroup.clientId;
+			}
+		}
+		return null;
+	}, [ getBlocksByName, getBlockAttributes, contextPostType ] );
+
 	return useMemo(
 		() => ( {
 			...Object.fromEntries(
@@ -278,6 +314,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			sectionRootClientId: getSectionRootBlock(),
 		} ),
 		[
 			allowedBlockTypes,
@@ -300,6 +337,7 @@ function useBlockEditorSettings( settings, postType, postId ) {
 			pageForPosts,
 			postType,
 			setIsInserterOpened,
+			getSectionRootBlock,
 		]
 	);
 }
