@@ -267,7 +267,8 @@ export default function createReduxStore( key, options ) {
 					selectorName,
 					resolver,
 					store,
-					resolversCache
+					resolversCache,
+					registry
 				);
 			}
 
@@ -570,6 +571,8 @@ function mapResolvers( resolvers ) {
 	} );
 }
 
+const queue = [];
+
 /**
  * Returns a selector with a matched resolver.
  * Resolvers are side effects invoked once per argument set of a given selector call,
@@ -580,13 +583,15 @@ function mapResolvers( resolvers ) {
  * @param {Object} resolver       Resolver to call.
  * @param {Object} store          The redux store to which the resolvers should be mapped.
  * @param {Object} resolversCache Resolvers Cache.
+ * @param {Object} registry
  */
 function mapSelectorWithResolver(
 	selector,
 	selectorName,
 	resolver,
 	store,
-	resolversCache
+	resolversCache,
+	registry
 ) {
 	function fulfillSelector( args ) {
 		const state = store.getState();
@@ -613,7 +618,7 @@ function mapSelectorWithResolver(
 
 		resolversCache.markAsRunning( selectorName, args );
 
-		setTimeout( async () => {
+		queue.push( async () => {
 			resolversCache.clear( selectorName, args );
 			store.dispatch(
 				metadataActions.startResolution( selectorName, args )
@@ -631,7 +636,19 @@ function mapSelectorWithResolver(
 					metadataActions.failResolution( selectorName, args, error )
 				);
 			}
-		}, 0 );
+		} );
+
+		window.queueMicrotask( () => {
+			if ( queue.length ) {
+				const _queue = [ ...queue ];
+				queue.length = 0;
+				registry.batch( async () => {
+					while ( _queue.length ) {
+						await _queue.shift()();
+					}
+				} );
+			}
+		} );
 	}
 
 	const selectorResolver = ( ...args ) => {
