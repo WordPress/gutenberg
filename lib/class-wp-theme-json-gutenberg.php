@@ -2131,7 +2131,7 @@ class WP_Theme_JSON_Gutenberg {
 		return $result;
 	}
 
-	/**
+		/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
@@ -2198,7 +2198,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Processes background styles.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
+				$background_styles = gutenberg_get_background_support_styles( $styles['background'] );
 				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
 			}
 
