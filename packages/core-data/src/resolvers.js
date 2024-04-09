@@ -193,81 +193,75 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	( { dispatch, registry } ) => {
-		registry.batch( async () => {
-			const configs = await dispatch(
-				getOrLoadEntitiesConfig( kind, name )
-			);
-			const entityConfig = configs.find(
-				( config ) => config.name === name && config.kind === kind
-			);
-			if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
-				return;
+	async ( { dispatch, registry } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+			return;
+		}
+
+		const lock = await dispatch.__unstableAcquireStoreLock(
+			STORE_NAME,
+			[ 'entities', 'records', kind, name ],
+			{ exclusive: false }
+		);
+
+		try {
+			if ( query._fields ) {
+				// If requesting specific fields, items and query association to said
+				// records are stored by ID reference. Thus, fields must always include
+				// the ID.
+				query = {
+					...query,
+					_fields: [
+						...new Set( [
+							...( getNormalizedCommaSeparable( query._fields ) ||
+								[] ),
+							entityConfig.key || DEFAULT_ENTITY_KEY,
+						] ),
+					].join(),
+				};
 			}
 
-			const lock = await dispatch.__unstableAcquireStoreLock(
-				STORE_NAME,
-				[ 'entities', 'records', kind, name ],
-				{ exclusive: false }
-			);
+			const path = addQueryArgs( entityConfig.baseURL, {
+				...entityConfig.baseURLParams,
+				...query,
+			} );
 
-			try {
-				if ( query._fields ) {
-					// If requesting specific fields, items and query association to said
-					// records are stored by ID reference. Thus, fields must always include
-					// the ID.
-					query = {
-						...query,
-						_fields: [
-							...new Set( [
-								...( getNormalizedCommaSeparable(
-									query._fields
-								) || [] ),
-								entityConfig.key || DEFAULT_ENTITY_KEY,
-							] ),
-						].join(),
-					};
-				}
+			let records, meta;
+			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
+				const response = await apiFetch( { path, parse: false } );
+				records = Object.values( await response.json() );
+				meta = {
+					totalItems: parseInt(
+						response.headers.get( 'X-WP-Total' )
+					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
+				};
+			} else {
+				records = Object.values( await apiFetch( { path } ) );
+			}
 
-				const path = addQueryArgs( entityConfig.baseURL, {
-					...entityConfig.baseURLParams,
-					...query,
-				} );
-
-				let records, meta;
-				if (
-					entityConfig.supportsPagination &&
-					query.per_page !== -1
-				) {
-					const response = await apiFetch( { path, parse: false } );
-					records = Object.values( await response.json() );
-					meta = {
-						totalItems: parseInt(
-							response.headers.get( 'X-WP-Total' )
-						),
-						totalPages: parseInt(
-							response.headers.get( 'X-WP-TotalPages' )
-						),
-					};
-				} else {
-					records = Object.values( await apiFetch( { path } ) );
-				}
-
-				// If we request fields but the result doesn't contain the fields,
-				// explicitly set these fields as "undefined"
-				// that way we consider the query "fulfilled".
-				if ( query._fields ) {
-					records = records.map( ( record ) => {
-						query._fields.split( ',' ).forEach( ( field ) => {
-							if ( ! record.hasOwnProperty( field ) ) {
-								record[ field ] = undefined;
-							}
-						} );
-
-						return record;
+			// If we request fields but the result doesn't contain the fields,
+			// explicitly set these fields as "undefined"
+			// that way we consider the query "fulfilled".
+			if ( query._fields ) {
+				records = records.map( ( record ) => {
+					query._fields.split( ',' ).forEach( ( field ) => {
+						if ( ! record.hasOwnProperty( field ) ) {
+							record[ field ] = undefined;
+						}
 					} );
-				}
 
+					return record;
+				} );
+			}
+
+			registry.batch( () => {
 				dispatch.receiveEntityRecords(
 					kind,
 					name,
@@ -298,10 +292,12 @@ export const getEntityRecords =
 						args: resolutionsArgs,
 					} );
 				}
-			} finally {
+
 				dispatch.__unstableReleaseStoreLock( lock );
-			}
-		} );
+			} );
+		} catch ( e ) {
+			dispatch.__unstableReleaseStoreLock( lock );
+		}
 	};
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
