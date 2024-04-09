@@ -93,6 +93,19 @@ const ImageWrapper = ( { href, children } ) => {
 	);
 };
 
+function ImageEditorWithClientWidth( {
+	imageRef,
+	containerRef,
+	align,
+	...props
+} ) {
+	const clientWidth = useClientWidth( containerRef, [ align ] );
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback to clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+	return <ImageEditor { ...props } clientWidth={ fallbackClientWidth } />;
+}
+
 export default function Image( {
 	temporaryURL,
 	attributes,
@@ -176,7 +189,6 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
@@ -788,19 +800,14 @@ export default function Image( {
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
-	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
-	// So we try using the imageRef width first and fallback to clientWidth.
-	const fallbackClientWidth = imageRef.current?.width || clientWidth;
-
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageWrapper href={ href }>
-				<ImageEditor
+				<ImageEditorWithClientWidth
 					id={ id }
 					url={ url }
 					width={ numericWidth }
 					height={ numericHeight }
-					clientWidth={ fallbackClientWidth }
 					naturalHeight={ naturalHeight }
 					naturalWidth={ naturalWidth }
 					onSaveImage={ ( imageAttributes ) =>
@@ -810,6 +817,9 @@ export default function Image( {
 						setIsEditingImage( false );
 					} }
 					borderProps={ isRounded ? undefined : borderProps }
+					imageRef={ imageRef }
+					containerRef={ containerRef }
+					align={ align }
 				/>
 			</ImageWrapper>
 		);

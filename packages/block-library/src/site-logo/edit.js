@@ -60,6 +60,19 @@ import { MIN_SIZE } from '../image/constants';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const ACCEPT_MEDIA_STRING = 'image/*';
 
+function ImageEditorWithClientWidth( {
+	imageRef,
+	containerRef,
+	align,
+	...props
+} ) {
+	const clientWidth = useClientWidth( containerRef, [ align ] );
+	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
+	// So we try using the imageRef width first and fallback to clientWidth.
+	const fallbackClientWidth = imageRef.current?.width || clientWidth;
+	return <ImageEditor { ...props } clientWidth={ fallbackClientWidth } />;
+}
+
 const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
@@ -74,7 +87,6 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
@@ -154,14 +166,7 @@ const SiteLogo = ( {
 		);
 	}
 
-	let imageWidthWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-	}
-
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
@@ -222,12 +227,11 @@ const SiteLogo = ( {
 
 	const imgEdit =
 		canEditImage && isEditingImage ? (
-			<ImageEditor
+			<ImageEditorWithClientWidth
 				id={ logoId }
 				url={ logoUrl }
 				width={ currentWidth }
 				height={ currentHeight }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
@@ -236,6 +240,8 @@ const SiteLogo = ( {
 				onFinishEditing={ () => {
 					setIsEditingImage( false );
 				} }
+				containerRef={ containerRef }
+				align={ align }
 			/>
 		) : (
 			<ResizableBox
