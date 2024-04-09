@@ -15,7 +15,7 @@ function getAbsolutePosition( element ) {
 	};
 }
 
-const ANIMATION_DURATION = 325;
+const ANIMATION_DURATION = 250;
 
 /**
  * Hook used to compute the styles required to move a div into a new position.
@@ -67,7 +67,7 @@ function useMovingAnimation( { triggerAnimationOnChange } ) {
 			height: prevRect.height,
 			config: {
 				duration: ANIMATION_DURATION,
-				easing: easings.easeInOutQuad,
+				easing: easings.easeInOutQuint,
 			},
 			onChange( { value } ) {
 				if ( ! ref.current ) {
