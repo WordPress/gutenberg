@@ -67,7 +67,7 @@ function useMovingAnimation( { triggerAnimationOnChange } ) {
 			height: prevRect.height,
 			config: {
 				duration: ANIMATION_DURATION,
-				easing: easings.easeInOutExpo,
+				easing: easings.easeInOutQuad,
 			},
 			onChange( { value } ) {
 				if ( ! ref.current ) {
