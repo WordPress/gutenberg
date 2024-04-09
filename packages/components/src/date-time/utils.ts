@@ -24,6 +24,15 @@ export function inputToDate( input: Date | string | number ): Date {
 }
 
 /**
+ * Converts a 12-hour time to a 24-hour time.
+ * @param hours
+ * @param isPm
+ */
+export function from12hTo24h( hours: number, isPm: boolean ) {
+	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
+}
+
+/**
  * Creates an InputControl reducer used to pad an input so that it is always a
  * given width. For example, the hours and minutes inputs are padded to 2 so
  * that '4' appears as '04'.

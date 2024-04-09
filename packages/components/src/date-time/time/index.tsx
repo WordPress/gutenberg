@@ -32,12 +32,8 @@ import {
 import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
-import { inputToDate, buildPadInputStateReducer } from '../utils';
+import { inputToDate, from12hTo24h, buildPadInputStateReducer } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
-
-function from12hTo24h( hours: number, isPm: boolean ) {
-	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
-}
 
 /**
  * TimePicker is a React component that renders a clock for time selection.
