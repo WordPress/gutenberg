@@ -54,7 +54,7 @@ const UnforwardedFontSizePicker = (
 	} = props;
 
 	const units = useCustomUnits( {
-		availableUnits: unitsProp || [ 'px', 'em', 'rem' ],
+		availableUnits: unitsProp || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	} );
 
 	const shouldUseSelectControl = fontSizes.length > 5;
