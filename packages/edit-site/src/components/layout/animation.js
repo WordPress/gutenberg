@@ -15,7 +15,7 @@ function getAbsolutePosition( element ) {
 	};
 }
 
-const ANIMATION_DURATION = 300;
+const ANIMATION_DURATION = 250;
 
 /**
  * Hook used to compute the styles required to move a div into a new position.
