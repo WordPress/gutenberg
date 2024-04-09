@@ -210,13 +210,17 @@ export function useToolsPanel(
 	// separately to optional items and have different display states,
 	// we need to update that when their value is customized.
 	const flagItemCustomization = useCallback(
-		( label: string, group: ToolsPanelMenuItemKey = 'default' ) => {
+		(
+			value: boolean,
+			label: string,
+			group: ToolsPanelMenuItemKey = 'default'
+		) => {
 			setMenuItems( ( items ) => {
 				const newState = {
 					...items,
 					[ group ]: {
 						...items[ group ],
-						[ label ]: true,
+						[ label ]: value,
 					},
 				};
 				return newState;
