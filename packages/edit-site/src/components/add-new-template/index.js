@@ -59,7 +59,6 @@ import {
 	usePostTypeArchiveMenuItems,
 } from './utils';
 import AddCustomGenericTemplateModalContent from './add-custom-generic-template-modal-content';
-import TemplateActionsLoadingScreen from './template-actions-loading-screen';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -147,28 +146,27 @@ const modalContentMap = {
 	customGenericTemplate: 3,
 };
 
-function NewTemplate() {
-	const [ showModal, setShowModal ] = useState( false );
+function NewTemplateModal( { onClose } ) {
 	const [ modalContent, setModalContent ] = useState(
 		modalContentMap.templatesList
 	);
 	const [ entityForSuggestions, setEntityForSuggestions ] = useState( {} );
-	const [ isCreatingTemplate, setIsCreatingTemplate ] = useState( false );
-
+	const [ isSubmitting, setIsSubmitting ] = useState( false );
+	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
+		setModalContent( modalContentMap.customTemplate )
+	);
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 
-	const { homeUrl, postType } = useSelect( ( select ) => {
+	const { homeUrl } = useSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
-			getPostType,
 		} = select( coreStore );
 
 		return {
 			homeUrl: getUnstableBase()?.home,
-			postType: getPostType( TEMPLATE_POST_TYPE ),
 		};
 	}, [] );
 
@@ -182,10 +180,10 @@ function NewTemplate() {
 	};
 
 	async function createTemplate( template, isWPSuggestion = true ) {
-		if ( isCreatingTemplate ) {
+		if ( isSubmitting ) {
 			return;
 		}
-		setIsCreatingTemplate( true );
+		setIsSubmitting( true );
 		try {
 			const { title, description, slug } = template;
 			const newTemplate = await saveEntityRecord(
@@ -230,20 +228,13 @@ function NewTemplate() {
 				type: 'snackbar',
 			} );
 		} finally {
-			setIsCreatingTemplate( false );
+			setIsSubmitting( false );
 		}
 	}
 	const onModalClose = () => {
-		setShowModal( false );
+		onClose();
 		setModalContent( modalContentMap.templatesList );
 	};
-
-	const missingTemplates = useMissingTemplates( setEntityForSuggestions, () =>
-		setModalContent( modalContentMap.customTemplate )
-	);
-	if ( ! missingTemplates.length ) {
-		return null;
-	}
 
 	let modalTitle = __( 'Add template' );
 	if ( modalContent === modalContentMap.customTemplate ) {
@@ -256,13 +247,109 @@ function NewTemplate() {
 		modalTitle = __( 'Create custom template' );
 	}
 
+	return (
+		<Modal
+			title={ modalTitle }
+			className={ classnames( 'edit-site-add-new-template__modal', {
+				'edit-site-add-new-template__modal_template_list':
+					modalContent === modalContentMap.templatesList,
+				'edit-site-custom-template-modal':
+					modalContent === modalContentMap.customTemplate,
+			} ) }
+			onRequestClose={ onModalClose }
+			overlayClassName={
+				modalContent === modalContentMap.customGenericTemplate
+					? 'edit-site-custom-generic-template__modal'
+					: undefined
+			}
+		>
+			{ modalContent === modalContentMap.templatesList && (
+				<Grid
+					columns={ 3 }
+					gap={ 4 }
+					align="flex-start"
+					justify="center"
+					className="edit-site-add-new-template__template-list__contents"
+				>
+					<Flex className="edit-site-add-new-template__template-list__prompt">
+						{ __(
+							'Select what the new template should apply to:'
+						) }
+					</Flex>
+					{ missingTemplates.map( ( template ) => {
+						const { title, slug, onClick } = template;
+						return (
+							<TemplateListItem
+								key={ slug }
+								title={ title }
+								direction="column"
+								className="edit-site-add-new-template__template-button"
+								description={
+									TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
+								}
+								icon={ TEMPLATE_ICONS[ slug ] || layout }
+								onClick={ () =>
+									onClick
+										? onClick( template )
+										: createTemplate( template )
+								}
+							/>
+						);
+					} ) }
+					<TemplateListItem
+						title={ __( 'Custom template' ) }
+						direction="row"
+						className="edit-site-add-new-template__custom-template-button"
+						icon={ edit }
+						onClick={ () =>
+							setModalContent(
+								modalContentMap.customGenericTemplate
+							)
+						}
+					>
+						<Text
+							lineHeight={ 1.53846153846 } // 20px
+						>
+							{ __(
+								'A custom template can be manually applied to any post or page.'
+							) }
+						</Text>
+					</TemplateListItem>
+				</Grid>
+			) }
+			{ modalContent === modalContentMap.customTemplate && (
+				<AddCustomTemplateModalContent
+					onSelect={ createTemplate }
+					entityForSuggestions={ entityForSuggestions }
+				/>
+			) }
+			{ modalContent === modalContentMap.customGenericTemplate && (
+				<AddCustomGenericTemplateModalContent
+					onClose={ onModalClose }
+					createTemplate={ createTemplate }
+				/>
+			) }
+		</Modal>
+	);
+}
+
+function NewTemplate() {
+	const [ showModal, setShowModal ] = useState( false );
+
+	const { postType } = useSelect( ( select ) => {
+		const { getPostType } = select( coreStore );
+
+		return {
+			postType: getPostType( TEMPLATE_POST_TYPE ),
+		};
+	}, [] );
+
 	if ( ! postType ) {
 		return null;
 	}
 
 	return (
 		<>
-			{ isCreatingTemplate && <TemplateActionsLoadingScreen /> }
 			<Button
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
@@ -271,94 +358,7 @@ function NewTemplate() {
 				{ postType.labels.add_new_item }
 			</Button>
 			{ showModal && (
-				<Modal
-					title={ modalTitle }
-					className={ classnames(
-						'edit-site-add-new-template__modal',
-						{
-							'edit-site-add-new-template__modal_template_list':
-								modalContent === modalContentMap.templatesList,
-							'edit-site-custom-template-modal':
-								modalContent === modalContentMap.customTemplate,
-						}
-					) }
-					onRequestClose={ onModalClose }
-					overlayClassName={
-						modalContent === modalContentMap.customGenericTemplate
-							? 'edit-site-custom-generic-template__modal'
-							: undefined
-					}
-				>
-					{ modalContent === modalContentMap.templatesList && (
-						<Grid
-							columns={ 3 }
-							gap={ 4 }
-							align="flex-start"
-							justify="center"
-							className="edit-site-add-new-template__template-list__contents"
-						>
-							<Flex className="edit-site-add-new-template__template-list__prompt">
-								{ __(
-									'Select what the new template should apply to:'
-								) }
-							</Flex>
-							{ missingTemplates.map( ( template ) => {
-								const { title, slug, onClick } = template;
-								return (
-									<TemplateListItem
-										key={ slug }
-										title={ title }
-										direction="column"
-										className="edit-site-add-new-template__template-button"
-										description={
-											TEMPLATE_SHORT_DESCRIPTIONS[ slug ]
-										}
-										icon={
-											TEMPLATE_ICONS[ slug ] || layout
-										}
-										onClick={ () =>
-											onClick
-												? onClick( template )
-												: createTemplate( template )
-										}
-									/>
-								);
-							} ) }
-							<TemplateListItem
-								title={ __( 'Custom template' ) }
-								direction="row"
-								className="edit-site-add-new-template__custom-template-button"
-								icon={ edit }
-								onClick={ () =>
-									setModalContent(
-										modalContentMap.customGenericTemplate
-									)
-								}
-							>
-								<Text
-									lineHeight={ 1.53846153846 } // 20px
-								>
-									{ __(
-										'A custom template can be manually applied to any post or page.'
-									) }
-								</Text>
-							</TemplateListItem>
-						</Grid>
-					) }
-					{ modalContent === modalContentMap.customTemplate && (
-						<AddCustomTemplateModalContent
-							onSelect={ createTemplate }
-							entityForSuggestions={ entityForSuggestions }
-						/>
-					) }
-					{ modalContent ===
-						modalContentMap.customGenericTemplate && (
-						<AddCustomGenericTemplateModalContent
-							onClose={ onModalClose }
-							createTemplate={ createTemplate }
-						/>
-					) }
-				</Modal>
+				<NewTemplateModal onClose={ () => setShowModal( false ) } />
 			) }
 		</>
 	);
