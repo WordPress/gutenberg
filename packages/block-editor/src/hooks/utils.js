@@ -568,7 +568,7 @@ export function createBlockListBlockFilter( features ) {
 						useBlockProps,
 					} = feature;
 
-					const neededProps = {};
+					const neededProps = { clientId: props.clientId };
 					for ( const key of attributeKeys ) {
 						if ( props.attributes[ key ] ) {
 							neededProps[ key ] = props.attributes[ key ];
