@@ -1196,7 +1196,11 @@ const getSelectorsConfig = ( blockType, rootSelector ) => {
 	return config;
 };
 
-export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
+export const getBlockSelectors = (
+	blockTypes,
+	getBlockStyles,
+	variationInstanceId
+) => {
 	const result = {};
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
@@ -1226,16 +1230,19 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors = {};
-		if ( blockStyleVariations?.length ) {
-			blockStyleVariations.forEach( ( variation ) => {
-				const styleVariationSelector = getBlockStyleVariationSelector(
-					variation.name,
-					selector
-				);
-				styleVariationSelectors[ variation.name ] =
-					styleVariationSelector;
-			} );
-		}
+		blockStyleVariations?.forEach( ( variation ) => {
+			const variationSuffix = variationInstanceId
+				? `-${ variationInstanceId }`
+				: '';
+			const variationName = `${ variation.name }${ variationSuffix }`;
+			const styleVariationSelector = getBlockStyleVariationSelector(
+				variationName,
+				selector
+			);
+
+			styleVariationSelectors[ variationName ] = styleVariationSelector;
+		} );
+
 		// For each block support feature add any custom selectors.
 		const featureSelectors = getSelectorsConfig( blockType, selector );
 
@@ -1248,8 +1255,7 @@ export const getBlockSelectors = ( blockTypes, getBlockStyles ) => {
 			hasLayoutSupport,
 			name,
 			selector,
-			styleVariationSelectors: Object.keys( styleVariationSelectors )
-				.length
+			styleVariationSelectors: blockStyleVariations?.length
 				? styleVariationSelectors
 				: undefined,
 		};
