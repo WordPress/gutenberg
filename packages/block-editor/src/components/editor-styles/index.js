@@ -68,14 +68,32 @@ function useDarkThemeBodyClassName( styles, scope ) {
 }
 
 function EditorStyles( { styles, scope } ) {
-	const overrides = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
+	const { overrides, clientIds } = useSelect(
+		( select ) => ( {
+			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
+			clientIds: select( blockEditorStore ).getClientIdsWithDescendants(),
+		} ),
 		[]
 	);
+
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
+		const clientIdMap = clientIds.reduce( ( acc, clientId, index ) => {
+			acc[ clientId ] = index;
+			return acc;
+		}, {} );
+
+		// Sort overrides to match the order of blocks they relate to.
+		// This is useful to maintain the correct CSS cascade order for
+		// nested block style variations.
+		const sortedOverrides = [ ...overrides ].sort( ( a, b ) => {
+			const aIndex = clientIdMap[ a[ 1 ].clientId ] ?? -1;
+			const bIndex = clientIdMap[ b[ 1 ].clientId ] ?? -1;
+			return aIndex - bIndex;
+		} );
+
 		const _styles = Object.values( styles ?? [] );
 
-		for ( const [ id, override ] of overrides ) {
+		for ( const [ id, override ] of sortedOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
 			const overrideWithId = { ...override, id };
 			if ( index === -1 ) {
@@ -95,7 +113,7 @@ function EditorStyles( { styles, scope } ) {
 				.map( ( style ) => style.assets )
 				.join( '' ),
 		];
-	}, [ styles, overrides, scope ] );
+	}, [ styles, overrides, scope, clientIds ] );
 
 	return (
 		<>
