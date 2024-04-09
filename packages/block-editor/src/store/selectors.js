@@ -2896,9 +2896,7 @@ export const getBlockEditingMode = createRegistrySelector(
 					return 'disabled';
 				}
 
-				const {
-					__experimentalSectionRootClientId: sectionRootClientId,
-				} = getSettings( state );
+				const { sectionRootClientId } = unlock( getSettings( state ) );
 				if ( clientId === sectionRootClientId ) {
 					return 'contentOnly';
 				}

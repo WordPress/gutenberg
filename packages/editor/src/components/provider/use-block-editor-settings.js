@@ -23,7 +23,7 @@ import {
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { lock, unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -257,8 +257,8 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 
 	const forceDisableFocusMode = settings.focusMode === false;
 
-	return useMemo(
-		() => ( {
+	return useMemo( () => {
+		const _settings = {
 			...Object.fromEntries(
 				Object.entries( settings ).filter( ( [ key ] ) =>
 					BLOCK_EDITOR_SETTINGS.includes( key )
@@ -305,32 +305,34 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-			__experimentalSectionRootClientId: sectionRootClientId,
-		} ),
-		[
-			allowedBlockTypes,
-			allowRightClickOverrides,
-			focusMode,
-			forceDisableFocusMode,
-			hasFixedToolbar,
-			isDistractionFree,
-			keepCaretInsideBlock,
-			settings,
-			hasUploadPermissions,
-			userPatternCategories,
-			blockPatterns,
-			blockPatternCategories,
-			canUseUnfilteredHTML,
-			undo,
-			createPageEntity,
-			userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
-			postType,
-			setIsInserterOpened,
+		};
+		lock( _settings, {
 			sectionRootClientId,
-		]
-	);
+		} );
+		return _settings;
+	}, [
+		allowedBlockTypes,
+		allowRightClickOverrides,
+		focusMode,
+		forceDisableFocusMode,
+		hasFixedToolbar,
+		isDistractionFree,
+		keepCaretInsideBlock,
+		settings,
+		hasUploadPermissions,
+		userPatternCategories,
+		blockPatterns,
+		blockPatternCategories,
+		canUseUnfilteredHTML,
+		undo,
+		createPageEntity,
+		userCanCreatePages,
+		pageOnFront,
+		pageForPosts,
+		postType,
+		setIsInserterOpened,
+		sectionRootClientId,
+	] );
 }
 
 export default useBlockEditorSettings;
