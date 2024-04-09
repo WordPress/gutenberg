@@ -59,7 +59,7 @@ function FontSizePicker( {
 	const label = __( 'Font Size' );
 
 	const units = useCustomUnits( {
-		availableUnits: [ 'px', 'em', 'rem' ],
+		availableUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
 	} );
 
 	const accessibilityLabel = sprintf(
