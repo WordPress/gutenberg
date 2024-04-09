@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 18.0.1 =
+
+## Bug fixes
+
+Make sure display name is correctly formatted in comments. (#60579)
+
+
 = 18.1.0-rc.2 =
 
 
