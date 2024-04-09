@@ -141,13 +141,6 @@ function Iframe( {
 		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
-			// Get any CSS classes the iframe document body may initially have
-			// to re-apply them later together with the ones of the main document
-			// body. This is necessary for some CSS classes for example the
-			// `is-dark-theme` class added by useDarkThemeBodyClassName.
-			const initialIframeBodyClasses = Array.from(
-				contentDocument.body.classList
-			);
 			iFrameDocument = contentDocument;
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
@@ -158,15 +151,12 @@ function Iframe( {
 			// be added in the editor too, which we'll somehow have to get from
 			// the server in the future (which will run the PHP filters).
 			setBodyClasses(
-				Array.from( ownerDocument.body.classList )
-					.concat( initialIframeBodyClasses )
-					.filter(
-						( name ) =>
-							name.startsWith( 'admin-color-' ) ||
-							name.startsWith( 'post-type-' ) ||
-							name === 'wp-embed-responsive' ||
-							name === 'is-dark-theme'
-					)
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
+						name === 'wp-embed-responsive'
+				)
 			);
 
 			contentDocument.dir = ownerDocument.dir;
