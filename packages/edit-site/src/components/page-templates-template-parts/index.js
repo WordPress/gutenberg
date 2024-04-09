@@ -175,7 +175,11 @@ function Preview( { item, viewType } ) {
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
 					<Async>
-						<BlockPreview blocks={ blocks } />
+						<BlockPreview
+							blocks={ blocks }
+							viewportWidth={ 1200 }
+							viewportHeight={ 1200 }
+						/>
 					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
@@ -191,7 +195,11 @@ function Preview( { item, viewType } ) {
 								: __( 'Empty template part' ) ) }
 						{ ! isEmpty && (
 							<Async>
-								<BlockPreview blocks={ blocks } />
+								<BlockPreview
+									blocks={ blocks }
+									viewportWidth={ 1200 }
+									viewportHeight={ 1200 }
+								/>
 							</Async>
 						) }
 					</button>

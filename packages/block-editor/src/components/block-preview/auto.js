@@ -22,6 +22,7 @@ const EMPTY_ADDITIONAL_STYLES = [];
 
 function ScaledBlockPreview( {
 	viewportWidth,
+	viewportHeight,
 	containerWidth,
 	minHeight,
 	additionalStyles = EMPTY_ADDITIONAL_STYLES,
@@ -30,8 +31,13 @@ function ScaledBlockPreview( {
 		viewportWidth = containerWidth;
 	}
 
-	const [ contentResizeListener, { height: contentHeight } ] =
+	let [ contentResizeListener, { height: contentHeight } ] =
 		useResizeObserver();
+
+	if ( viewportHeight ) {
+		contentHeight = viewportHeight;
+	}
+
 	const { styles } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
@@ -75,6 +81,7 @@ function ScaledBlockPreview( {
 				maxHeight:
 					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
 				minHeight,
+				height: viewportHeight,
 			} }
 		>
 			<Iframe

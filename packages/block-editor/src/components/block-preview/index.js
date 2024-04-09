@@ -25,6 +25,7 @@ const EMPTY_ADDITIONAL_STYLES = [];
 export function BlockPreview( {
 	blocks,
 	viewportWidth = 1200,
+	viewportHeight,
 	minHeight,
 	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 	// Deprecated props:
@@ -79,6 +80,7 @@ export function BlockPreview( {
 		>
 			<AutoHeightBlockPreview
 				viewportWidth={ viewportWidth }
+				viewportHeight={ viewportHeight }
 				minHeight={ minHeight }
 				additionalStyles={ additionalStyles }
 			/>
