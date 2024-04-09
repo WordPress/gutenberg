@@ -561,6 +561,7 @@ export default function DimensionsPanel( {
 						<BoxControl
 							values={ marginValues }
 							onChange={ setMarginValues }
+							min={ -Infinity }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
