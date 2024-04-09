@@ -163,11 +163,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			},
 			[]
 		);
-		const { id, type } = rootLevelPost;
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
-			type,
-			id,
+			rootLevelPost.type,
+			rootLevelPost.id,
 			post.type
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
@@ -263,7 +262,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ mode === 'template-locked' && (
 								<DisableNonPageContentBlocks />
 							) }
-							{ type === 'wp_navigation' && (
+							{ rootLevelPost.type === 'wp_navigation' && (
 								<NavigationBlockEditingMode />
 							) }
 							<BlockRemovalWarnings />
