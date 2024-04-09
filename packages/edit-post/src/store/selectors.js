@@ -566,7 +566,6 @@ export const getEditedPostTemplate = createRegistrySelector(
 			id: postId,
 			type: postType,
 			slug,
-			template: currentTemplate,
 		} = select( editorStore ).getCurrentPost();
 		const { getSite, getEditedEntityRecord, getEntityRecords } =
 			select( coreStore );
@@ -575,9 +574,7 @@ export const getEditedPostTemplate = createRegistrySelector(
 		const isPostsPage = +postId === siteSettings?.page_for_posts;
 		if ( isPostsPage ) {
 			const defaultTemplateId = select( coreStore ).getDefaultTemplateId(
-				{
-					slug: 'front-page',
-				}
+				{ slug: 'home' }
 			);
 			return getEditedEntityRecord(
 				'postType',
@@ -585,6 +582,8 @@ export const getEditedPostTemplate = createRegistrySelector(
 				defaultTemplateId
 			);
 		}
+		const currentTemplate =
+			select( editorStore ).getEditedPostAttribute( 'template' );
 		if ( currentTemplate ) {
 			const templateWithSameSlug = getEntityRecords(
 				'postType',
