@@ -248,7 +248,7 @@ function gutenberg_add_global_styles_block_custom_css() {
  * Adds global style rules to the inline style for each block.
  *
  * @global WP_Styles $wp_styles
- * 
+ *
  * @return void
  */
 function gutenberg_add_global_styles_for_blocks() {
