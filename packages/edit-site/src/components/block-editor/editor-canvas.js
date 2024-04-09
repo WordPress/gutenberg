@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	store as editorStore,
@@ -139,18 +139,16 @@ function EditorCanvas( {
 		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
 
-	const zoomOutScaleFn = useCallback(
-		( contentWidth ) =>
-			computeIFrameScale(
-				{ width: 1000, scale: 0.45 },
-				{ width: 400, scale: 0.9 },
-				contentWidth
-			),
-		[]
-	);
-
 	const frameSize = isZoomOutMode ? 20 : undefined;
-	const scale = isZoomOutMode ? zoomOutScaleFn : undefined;
+
+	const scale = isZoomOutMode
+		? ( contentWidth ) =>
+				computeIFrameScale(
+					{ width: 1000, scale: 0.45 },
+					{ width: 400, scale: 0.9 },
+					contentWidth
+				)
+		: undefined;
 
 	return (
 		<EditorCanvasRoot
