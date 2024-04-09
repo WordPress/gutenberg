@@ -1175,8 +1175,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *                       - `presets`: only the classes for the presets.
 	 * @param array $origins A list of origins to include. By default it includes VALID_ORIGINS.
 	 * @param array $options An array of options for now used for internal purposes only (may change without notice).
-	 *                       The options currently supported are 'scope' that makes sure all style are scoped to a given selector,
-	 *                       and root_selector which overwrites and forces a given selector to be used on the root node.
+	 *                       The options currently supported are:
+	 *                       - 'scope' that makes sure all style are scoped to a given selector
+	 *                       - `root_selector` which overwrites and forces a given selector to be used on the root node
+	 *                       - `skip_root_layout_styles` which omits root layout styles from the generated stylesheet.
 	 * @return string The resulting stylesheet.
 	 */
 	public function get_stylesheet( $types = array( 'variables', 'styles', 'presets' ), $origins = null, $options = array() ) {
@@ -1229,7 +1231,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		if ( in_array( 'styles', $types, true ) ) {
-			if ( false !== $root_style_key ) {
+			if ( false !== $root_style_key && empty( $options['skip_root_layout_styles'] ) ) {
 				$stylesheet .= $this->get_root_layout_rules( $style_nodes[ $root_style_key ]['selector'], $style_nodes[ $root_style_key ] );
 			}
 			$stylesheet .= $this->get_block_classes( $style_nodes );
