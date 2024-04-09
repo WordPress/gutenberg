@@ -175,7 +175,7 @@ $block-editor-link-control-number-of-actions: 1;
 		border: 0;
 		width: 100%;
 		cursor: default;
-		padding: $grid-unit-20;
+		padding: $grid-unit-15;
 	}
 
 	.block-editor-link-control__search-item-header {
@@ -183,7 +183,7 @@ $block-editor-link-control-number-of-actions: 1;
 		flex-direction: row;
 		align-items: center;
 		margin-right: $grid-unit-10;
-		gap: $grid-unit-10;
+		gap: $grid-unit-15;
 
 		// Force text to wrap to improve UX when encountering long lines
 		// of text, particular those with no spaces.
@@ -193,7 +193,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 		.block-editor-link-control__search-item-info {
 			color: $gray-700;
-			line-height: 1.1;
+			line-height: 1;
 			font-size: $helptext-font-size;
 			word-break: break-all;
 		}
@@ -364,7 +364,7 @@ $block-editor-link-control-number-of-actions: 1;
 .block-editor-link-control__setting {
 	margin-bottom: 0;
 	flex: 1;
-	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-30;
+	padding: $grid-unit-10 0 $grid-unit-05 $grid-unit-15;
 
 	.components-base-control__field {
 		display: flex; // don't allow label to wrap under checkbox.
