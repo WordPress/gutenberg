@@ -1092,7 +1092,7 @@ export const toStyles = (
 								return;
 							}
 
-							// `selector` maybe provided in a form
+							// `selector` may be provided in a form
 							// where block level selectors have sub element
 							// selectors appended to them as a comma separated
 							// string.
