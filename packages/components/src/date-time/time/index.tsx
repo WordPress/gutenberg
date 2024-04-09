@@ -32,43 +32,11 @@ import {
 import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
-import type { InputState } from '../../input-control/reducer/state';
-import type { InputAction } from '../../input-control/reducer/actions';
-import {
-	COMMIT,
-	PRESS_DOWN,
-	PRESS_UP,
-} from '../../input-control/reducer/actions';
-import { inputToDate } from '../utils';
+import { inputToDate, buildPadInputStateReducer } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
-}
-
-/**
- * Creates an InputControl reducer used to pad an input so that it is always a
- * given width. For example, the hours and minutes inputs are padded to 2 so
- * that '4' appears as '04'.
- *
- * @param pad How many digits the value should be.
- */
-function buildPadInputStateReducer( pad: number ) {
-	return ( state: InputState, action: InputAction ) => {
-		const nextState = { ...state };
-		if (
-			action.type === COMMIT ||
-			action.type === PRESS_UP ||
-			action.type === PRESS_DOWN
-		) {
-			if ( nextState.value !== undefined ) {
-				nextState.value = nextState.value
-					.toString()
-					.padStart( pad, '0' );
-			}
-		}
-		return nextState;
-	};
 }
 
 /**
