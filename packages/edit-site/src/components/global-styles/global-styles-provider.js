@@ -16,6 +16,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import setNestedValue from '../../utils/set-nested-value';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
 	blockEditorPrivateApis
@@ -28,6 +29,37 @@ export function mergeBaseAndUserConfigs( base, user ) {
 		// to override the old array (no merging).
 		isMergeableObject: isPlainObject,
 	} );
+}
+
+function resolveBlockStyleVariations( userConfig ) {
+	const sharedVariations = userConfig.styles?.blocks?.variations;
+
+	if ( ! sharedVariations ) {
+		return userConfig;
+	}
+
+	const variationsConfig = JSON.parse( JSON.stringify( userConfig ) );
+
+	Object.entries( sharedVariations ).forEach(
+		( [ variationName, variation ] ) => {
+			if ( ! variation?.supportedBlockTypes ) {
+				return;
+			}
+
+			variation.supportedBlockTypes.forEach( ( blockName ) => {
+				const path = [
+					'styles',
+					'blocks',
+					blockName,
+					'variations',
+					variationName,
+				];
+				setNestedValue( variationsConfig, path, variation );
+			} );
+		}
+	);
+
+	return deepmerge( variationsConfig, userConfig );
 }
 
 function useGlobalStylesUserConfig() {
@@ -122,23 +154,33 @@ function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+
+	const userConfigWithVariations = useMemo( () => {
+		if ( ! userConfig ) {
+			return userConfig;
+		}
+		return resolveBlockStyleVariations( userConfig );
+	}, [ userConfig ] );
+
 	const mergedConfig = useMemo( () => {
-		if ( ! baseConfig || ! userConfig ) {
+		if ( ! baseConfig || ! userConfigWithVariations ) {
 			return {};
 		}
-		return mergeBaseAndUserConfigs( baseConfig, userConfig );
-	}, [ userConfig, baseConfig ] );
+
+		return mergeBaseAndUserConfigs( baseConfig, userConfigWithVariations );
+	}, [ userConfigWithVariations, baseConfig ] );
+
 	const context = useMemo( () => {
 		return {
 			isReady: isUserConfigReady && isBaseConfigReady,
-			user: userConfig,
+			user: userConfigWithVariations,
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
 		};
 	}, [
 		mergedConfig,
-		userConfig,
+		userConfigWithVariations,
 		baseConfig,
 		setUserConfig,
 		isUserConfigReady,
