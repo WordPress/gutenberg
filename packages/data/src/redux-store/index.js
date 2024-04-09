@@ -638,13 +638,15 @@ function mapSelectorWithResolver(
 			}
 		} );
 
+		// Many resolvers can be called at once. The point of this is to at
+		// least batch `startResolution` actions all together.
 		window.queueMicrotask( () => {
 			if ( queue.length ) {
-				const _queue = [ ...queue ];
-				queue.length = 0;
-				registry.batch( async () => {
-					while ( _queue.length ) {
-						await _queue.shift()();
+				registry.batch( () => {
+					while ( queue.length ) {
+						// Do not await here, we only want to batch the sync
+						// actions.
+						queue.shift()();
 					}
 				} );
 			}
