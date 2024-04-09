@@ -44,7 +44,7 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 	/*
 	 * "theme" source implies relative path to the theme directory
 	 */
-	if ( 'theme' === $background_image_source ) {
+	if ( ! empty( $background_styles['backgroundImage']['url'] ) && 'theme' === $background_image_source ) {
 		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
 	}
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );

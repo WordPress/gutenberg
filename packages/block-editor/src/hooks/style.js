@@ -10,11 +10,16 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	BackgroundImagePanel,
+	getBackgroundSupportStyles,
+} from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -34,6 +39,7 @@ import {
 } from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as blockEditorStore } from '../store';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -288,7 +294,8 @@ export function addSaveProps(
 	props,
 	blockNameOrType,
 	attributes,
-	skipPaths = skipSerializationPathsSave
+	skipPaths = skipSerializationPathsSave,
+	settings,
 ) {
 	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
@@ -311,6 +318,18 @@ export function addSaveProps(
 			} );
 		}
 	} );
+
+	// Set background defaults.
+	// Applies to all blocks/global styles.
+	if ( !! style.background ) {
+		style = {
+			...style,
+			background: {
+				...style.background,
+				...getBackgroundSupportStyles( style.background, settings ),
+			},
+		};
+	}
 
 	props.style = {
 		...getInlineStyles( style ),
@@ -369,6 +388,12 @@ const elementTypes = [
 ];
 
 function useBlockProps( { name, style } ) {
+	const { themeDirURI } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeDirURI: _settings?.currentTheme?.theme_directory_uri,
+		};
+	} );
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 		useBlockProps
 	) }`;
@@ -455,7 +480,10 @@ function useBlockProps( { name, style } ) {
 		{ className: blockElementsContainerIdentifier },
 		name,
 		{ style },
-		skipSerializationPathsEdit
+		skipSerializationPathsEdit,
+		{
+			themeDirURI,
+		}
 	);
 }
 

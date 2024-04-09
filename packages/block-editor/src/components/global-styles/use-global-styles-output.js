@@ -35,6 +35,7 @@ import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import { getBackgroundSupportStyles } from '../../hooks/background';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -321,7 +322,8 @@ export function getStylesDeclarations(
 	selector = '',
 	useRootPaddingAlign,
 	tree = {},
-	isTemplate = true
+	isTemplate = true,
+	settings
 ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
@@ -390,6 +392,21 @@ export function getStylesDeclarations(
 		},
 		[]
 	);
+
+	// Set background defaults.
+	// Applies to all blocks/global styles.
+	if ( !! blockStyles.background ) {
+		blockStyles = {
+			...blockStyles,
+			background: {
+				...blockStyles.background,
+				...getBackgroundSupportStyles(
+					blockStyles.background,
+					settings
+				),
+			},
+		};
+	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
@@ -777,7 +794,8 @@ export const toStyles = (
 	hasFallbackGapSupport,
 	disableLayoutStyles = false,
 	isTemplate = true,
-	styleOptions = undefined
+	styleOptions = undefined,
+	settings = {}
 ) => {
 	// These allow opting out of certain sets of styles.
 	const options = {
@@ -905,7 +923,8 @@ export const toStyles = (
 										styleVariations,
 										styleVariationSelector,
 										useRootPaddingAlign,
-										tree
+										tree,
+										settings
 									);
 								if ( styleVariationDeclarations.length ) {
 									ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
@@ -947,19 +966,20 @@ export const toStyles = (
 					} );
 				}
 
-				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-				const declarations = getStylesDeclarations(
-					styles,
-					selector,
-					useRootPaddingAlign,
-					tree,
-					isTemplate
-				);
-				if ( declarations?.length ) {
-					ruleset += `:where(${ selector }){${ declarations.join(
-						';'
-					) };}`;
-				}
+			// Process the remaining block styles (they use either normal block class or __experimentalSelector).
+			const declarations = getStylesDeclarations(
+				styles,
+				selector,
+				useRootPaddingAlign,
+				tree,
+				isTemplate,
+				settings
+			);
+			if ( declarations?.length ) {
+				ruleset += `:where(${ selector }){${ declarations.join(
+					';'
+				) };}`;
+			}
 
 				// Check for pseudo selector in `styles` and handle separately.
 				const pseudoSelectorStyles = Object.entries( styles ).filter(
@@ -1219,9 +1239,13 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
-	const disableLayoutStyles = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return !! getSettings().disableLayoutStyles;
+
+	const { themeDirURI, disableLayoutStyles } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			themeDirURI: _settings?.currentTheme?.theme_directory_uri,
+			disableLayoutStyles: !! _settings.disableLayoutStyles,
+		};
 	} );
 
 	const blockContext = useContext( BlockContext );
@@ -1252,7 +1276,10 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
-			isTemplate
+			isTemplate,
+			{
+				themeDirURI,
+			}
 		);
 		const svgs = toSvgFilters( updatedConfig, blockSelectors );
 
@@ -1301,6 +1328,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		disableLayoutStyles,
 		isTemplate,
 		getBlockStyles,
+		themeDirURI,
 	] );
 }
 
