@@ -22,6 +22,8 @@ export default function BlockRenameModal( {
 	originalBlockName,
 	onClose,
 	onSave,
+	// Pattern Overrides is a WordPress-only feature but it also uses the Block Binding API.
+	// Ideally this should not be inside the block editor package, but we keep it here for simplicity.
 	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
