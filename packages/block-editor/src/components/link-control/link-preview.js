@@ -33,6 +33,7 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
+	onChange,
 } ) {
 	const showIconLabels = useSelect(
 		( select ) =>
@@ -152,8 +153,8 @@ export default function LinkPreview( {
 					disabled={ isEmptyURL }
 					size="compact"
 				/>
-				<ViewerSlot fillProps={ value } />
 			</div>
+			<ViewerSlot fillProps={ { value, onChange } } />
 		</div>
 	);
 }

@@ -431,6 +431,7 @@ function LinkControl( {
 						onRemove();
 						setIsEditingLink( true );
 					} }
+					onChange={ onChange }
 				/>
 			) }
 
