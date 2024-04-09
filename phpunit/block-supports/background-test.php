@@ -213,4 +213,44 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Tests generating background styles.
+	 *
+	 * @covers ::gutenberg_get_background_support_styles
+	 *
+	 * @dataProvider data_get_background_support_styles
+	 *
+	 * @param mixed  $background_style The background styles within the block attributes.
+	 * @param string $expected_css     Expected markup for the block wrapper.
+	 */
+	public function test_get_background_support_styles( $background_style, $expected_css ) {
+		switch_theme( 'block-theme' );
+		$actual = gutenberg_get_background_support_styles( $background_style )['css'];
+
+		$this->assertEquals(
+			$expected_css,
+			$actual,
+			'Background CSS should be correct.'
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_background_support_styles() {
+		return array(
+			'css generated with theme source 2' => array(
+				'background_style' => array(
+					'backgroundImage' => array(
+						'url'    => 'assets/image/not_there.png',
+						'source' => 'theme',
+					),
+				),
+				'expected_css'     => "background-image:url('http://localhost:8889/wp-content/plugins/gutenberg/phpunit/data/themedir1/block-theme/assets/image/not_there.png');",
+			),
+		);
+	}
 }
