@@ -8,6 +8,10 @@
 -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
 -   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
 
+### Bug Fix
+
+-   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
+
 ## 27.3.0 (2024-04-03)
 
 ### Bug Fix
