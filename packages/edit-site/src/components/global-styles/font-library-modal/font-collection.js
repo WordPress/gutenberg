@@ -311,11 +311,11 @@ function FontCollection( { slug } ) {
 					<Spacer margin={ 4 } />
 
 					{ ! selectedCollection?.font_families && ! notice && (
-						<HStack align="center">
-							<Spacer />
-							<ProgressBar />
-							<Spacer />
-						</HStack>
+						<Spacer paddingY={ 6 }>
+							<Flex justify="center" align="center">
+								<ProgressBar />
+							</Flex>
+						</Spacer>
 					) }
 
 					{ !! selectedCollection?.font_families?.length &&
