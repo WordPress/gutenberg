@@ -8,6 +8,7 @@
 
 // eslint-disable-next-line no-restricted-imports
 export {
+	animate as __unstableAnimate,
 	motion as __unstableMotion,
 	AnimatePresence as __unstableAnimatePresence,
 	MotionContext as __unstableMotionContext,

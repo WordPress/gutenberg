@@ -18,6 +18,12 @@ export type DraggableProps = {
 		onDraggableEnd: ( event: DragEvent ) => void;
 	} ) => JSX.Element | null;
 	/**
+	 * Whether to animate the cloned element to its final position.
+	 *
+	 * @default false
+	 */
+	animateToFinalPosition?: boolean;
+	/**
 	 * Whether to append the cloned element to the `ownerDocument` body.
 	 * By default, elements sourced by id are appended to the element's wrapper.
 	 *
@@ -32,6 +38,10 @@ export type DraggableProps = {
 	 * The HTML id of the element to clone on drag
 	 */
 	elementId: string;
+	/**
+	 * A function that returns the final position for the cloned element.
+	 */
+	getFinalPosition?: () => { x: number; y: number } | null;
 	/**
 	 * A function called when dragging ends. This callback receives the `event`
 	 * object from the `dragend` event as its first parameter.
