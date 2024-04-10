@@ -35,6 +35,7 @@ import ScreenTypography from './screen-typography';
 import ScreenTypographyElement from './screen-typography-element';
 import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
+import ScreenShadows from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
@@ -335,6 +336,10 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path="/colors">
 				<ScreenColors />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path="/shadows">
+				<ScreenShadows />
 			</GlobalStylesNavigationScreen>
 
 			<GlobalStylesNavigationScreen path="/layout">
