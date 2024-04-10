@@ -119,12 +119,12 @@ export function withScope<
 	? Promise< Return >
 	: never;
 export function withScope< Func extends Function >( func: Func ): Func;
-export function withScope( func ) {
+export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 	const scope = getScope();
 	const ns = getNamespace();
 	if ( func?.constructor?.name === 'GeneratorFunction' ) {
-		return async ( ...args ) => {
-			const gen = func( ...args );
+		return async ( ...args: Parameters< typeof func > ) => {
+			const gen = func( ...args ) as Generator;
 			let value: any;
 			let it: any;
 			while ( true ) {
@@ -146,7 +146,7 @@ export function withScope( func ) {
 			return value;
 		};
 	}
-	return ( ...args ) => {
+	return ( ...args: Parameters< typeof func > ) => {
 		setNamespace( ns );
 		setScope( scope );
 		try {
