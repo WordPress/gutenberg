@@ -56,9 +56,18 @@ export default function PostFeaturedImageEdit( {
 	clientId,
 	attributes,
 	setAttributes,
-	context: { postId, postType: postTypeSlug, queryId },
+	context: { postId, postType: postTypeSlug },
 } ) {
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
 	const {
 		isLink,
 		aspectRatio,

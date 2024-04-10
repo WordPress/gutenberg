@@ -14,6 +14,7 @@ import {
 	PlainText,
 	HeadingLevelDropdown,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -22,13 +23,23 @@ import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export default function PostTitleEdit( {
+	clientId,
 	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context: { postType, postId, queryId },
+	context: { postType, postId },
 	insertBlocksAfter,
 } ) {
 	const TagName = 'h' + level;
-	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const isDescendentOfQueryLoop = useSelect(
+		( select ) => {
+			const { getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			return getBlockParents( clientId ).some(
+				( id ) => getBlockName( id ) === 'core/query'
+			);
+		},
+		[ clientId ]
+	);
 	const userCanEdit = useSelect(
 		( select ) => {
 			/**

@@ -33,7 +33,7 @@
 			"default": "_self"
 		}
 	},
-	"usesContext": [ "postType", "postId", "queryId" ],
+	"usesContext": [ "postType", "postId" ],
 	"supports": {
 		"html": false,
 		"spacing": {
