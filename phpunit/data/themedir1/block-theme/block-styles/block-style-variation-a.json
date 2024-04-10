@@ -1,0 +1,10 @@
+{
+	"version": 2,
+	"supportedBlockTypes": [ "core/group", "core/columns" ],
+	"styles": {
+		"color": {
+			"background": "indigo",
+			"text": "plum"
+		}
+	}
+}
