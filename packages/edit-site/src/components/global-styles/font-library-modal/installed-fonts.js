@@ -114,7 +114,7 @@ function InstalledFonts() {
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
 				<Spacer paddingY={ 6 }>
-					<Flex justify="center" align="center">
+					<Flex justify="center">
 						<ProgressBar />
 					</Flex>
 				</Spacer>
