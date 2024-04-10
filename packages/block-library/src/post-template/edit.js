@@ -27,9 +27,35 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function useClassNameFromBlockContext( postId, postType ) {
+	const post = useSelect(
+		( select ) =>
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				postType,
+				postId
+			),
+		[ postType, postId ]
+	);
+
+	const { post_class: postClass } = post;
+
+	let classes = 'wp-block-post';
+
+	if ( postClass ) {
+		classes = classnames( classes, postClass );
+	}
+	return classes;
+}
+
+function PostTemplateInnerBlocks( { blockContextId, blockContextPostType } ) {
+	const classes = useClassNameFromBlockContext(
+		blockContextId,
+		blockContextPostType
+	);
+
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-post' },
+		{ className: classes },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -38,13 +64,19 @@ function PostTemplateInnerBlocks() {
 function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
+	blockContextPostType,
 	isHidden,
 	setActiveBlockContextId,
 } ) {
+	const classes = useClassNameFromBlockContext(
+		blockContextId,
+		blockContextPostType
+	);
+
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: 'wp-block-post',
+			className: classes,
 		},
 	} );
 
@@ -280,11 +312,17 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									blockContextId={ blockContext.postId }
+									blockContextPostType={
+										blockContext.postType
+									}
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
+								blockContextPostType={ blockContext.postType }
 								setActiveBlockContextId={
 									setActiveBlockContextId
 								}
