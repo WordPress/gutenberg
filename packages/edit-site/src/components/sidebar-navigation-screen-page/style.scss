@@ -64,4 +64,7 @@
 
 .edit-site-sidebar-navigation-screen__actions .editor-all-actions-button {
 	color: inherit;
+	&:active {
+		color: inherit;
+	}
 }
