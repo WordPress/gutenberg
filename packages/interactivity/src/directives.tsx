@@ -495,6 +495,11 @@ export default () => {
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
 		const entry = text.find( ( { suffix } ) => suffix === 'default' );
+		if ( ! entry ) {
+			element.props.children = null;
+			return;
+		}
+
 		try {
 			const result = evaluate( entry );
 			element.props.children =

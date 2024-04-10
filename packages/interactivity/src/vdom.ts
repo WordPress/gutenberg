@@ -1,17 +1,19 @@
 /**
  * External dependencies
  */
-import { h } from 'preact';
+import { h, type VNode, type JSX } from 'preact';
 /**
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
 import { warn } from './utils/warn';
 
+type TreeWalkerReturn = string | Node | VNode< any > | null;
+
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
-const namespaces = [];
+const namespaces: Array< string > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
@@ -39,35 +41,49 @@ export const hydratedIslands = new WeakSet();
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param {Node} root The root element or node to start traversing on.
- * @return {import('preact').VNode[]} The resulting vDOM tree.
+ * @param root The root element or node to start traversing on.
+ * @return The resulting vDOM tree.
  */
-export function toVdom( root ) {
+export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 	const treeWalker = document.createTreeWalker(
 		root,
 		205 // ELEMENT + TEXT + COMMENT + CDATA_SECTION + PROCESSING_INSTRUCTION
 	);
 
-	function walk( node ) {
-		const { attributes, nodeType, localName } = node;
+	function walk( node: Node ): [ string | VNode | null, Node | null ] {
+		const { nodeType } = node;
 
+		// TEXT_NODE (3)
 		if ( nodeType === 3 ) {
-			return [ node.data ];
+			return [ ( node as Text ).data, null ];
 		}
+
+		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			const next = treeWalker.nextSibling();
-			node.replaceWith( new window.Text( node.nodeValue ) );
+			( node as CDATASection ).replaceWith(
+				new window.Text( ( node as CDATASection ).nodeValue ?? '' )
+			);
 			return [ node.nodeValue, next ];
 		}
+
+		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
 		if ( nodeType === 8 || nodeType === 7 ) {
 			const next = treeWalker.nextSibling();
-			node.remove();
+			( node as Comment | ProcessingInstruction ).remove();
 			return [ null, next ];
 		}
 
+		const elementNode = node as HTMLElement;
+
+		const attributes = elementNode.attributes;
+		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
+
 		const props: Record< string, any > = {};
-		const children = [];
-		const directives = [];
+		const children: Array< TreeWalkerReturn > = [];
+		const directives: Array<
+			[ name: string, namespace: string | null, value: unknown ]
+		> = [];
 		let ignore = false;
 		let island = false;
 
@@ -84,14 +100,14 @@ export function toVdom( root ) {
 						.exec( attributes[ i ].value )
 						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
 					try {
-						value = JSON.parse( value );
+						value = JSON.parse( value as string );
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
 						namespaces.push(
 							typeof value === 'string'
 								? value
-								: value?.namespace ?? null
+								: ( value as any )?.namespace ?? null
 						);
 					} else {
 						directives.push( [ n, ns, value ] );
@@ -105,15 +121,16 @@ export function toVdom( root ) {
 
 		if ( ignore && ! island ) {
 			return [
-				h( localName, {
+				h< any, any >( localName, {
 					...props,
-					innerHTML: node.innerHTML,
+					innerHTML: elementNode.innerHTML,
 					__directives: { ignore: true },
 				} ),
+				null,
 			];
 		}
 		if ( island ) {
-			hydratedIslands.add( node );
+			hydratedIslands.add( elementNode );
 		}
 
 		if ( directives.length ) {
@@ -139,10 +156,11 @@ export function toVdom( root ) {
 			);
 		}
 
+		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
 		if ( localName === 'template' ) {
-			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
-				toVdom( childNode )
-			);
+			props.content = [
+				...( elementNode as HTMLTemplateElement ).content.childNodes,
+			].map( ( childNode ) => toVdom( childNode ) );
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
@@ -162,7 +180,7 @@ export function toVdom( root ) {
 			namespaces.pop();
 		}
 
-		return [ h( localName, props, children ) ];
+		return [ h( localName, props, children ), null ];
 	}
 
 	return walk( treeWalker.currentNode );
