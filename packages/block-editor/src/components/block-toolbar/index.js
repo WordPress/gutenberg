@@ -38,6 +38,7 @@ import Shuffle from './shuffle';
 import BlockBindingsIndicator from '../block-bindings-toolbar-indicator';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import { InlineCommentToolbar } from '../inline-comment';
 /**
  * Renders the block toolbar.
  *
@@ -187,6 +188,9 @@ export function PrivateBlockToolbar( {
 									<BlockMover
 										clientIds={ blockClientIds }
 										hideDragHandle={ hideDragHandle }
+									/>
+									<InlineCommentToolbar
+										clientIds={ blockClientIds }
 									/>
 								</>
 							) }
