@@ -107,7 +107,7 @@ export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 						namespaces.push(
 							typeof value === 'string'
 								? value
-								: value?.namespace ?? null
+								: ( value as any )?.namespace ?? null
 						);
 					} else {
 						directives.push( [ n, ns, value ] );
