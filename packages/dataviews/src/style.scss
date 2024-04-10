@@ -260,13 +260,16 @@
 
 	button.components-button.is-link {
 		text-decoration: none;
-		color: inherit;
 		font-weight: inherit;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
 		width: 100%;
+		color: $gray-900;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 
