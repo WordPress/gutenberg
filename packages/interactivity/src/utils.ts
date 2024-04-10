@@ -63,7 +63,7 @@ const afterNextFrame = ( callback: () => void ) => {
  */
 function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
 	let flush: () => void;
-	const dispose = effect( function () {
+	const dispose = effect( function ( this: any ) {
 		flush = this.c.bind( this );
 		this.x = compute;
 		this.c = notify;

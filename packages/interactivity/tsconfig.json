@@ -8,7 +8,6 @@
 		"strictNullChecks": false,
 		"strictPropertyInitialization": false,
 
-		"noImplicitThis": false,
 		"noImplicitAny": false
 	},
 	"include": [ "src/**/*" ]
