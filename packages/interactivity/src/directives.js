@@ -267,7 +267,7 @@ export default () => {
 						detail: {
 							devtools: {
 								metadata: {
-									extensionName: 'Interactivity API Watch)',
+									extensionName: 'Interactivity API: Watch',
 									dataType: 'track-entry',
 								},
 								color: 'primary',
@@ -296,7 +296,7 @@ export default () => {
 						detail: {
 							devtools: {
 								metadata: {
-									extensionName: 'Interactivity API Init)',
+									extensionName: 'Interactivity API: Init',
 									dataType: 'track-entry',
 								},
 								color: 'primary',
@@ -325,7 +325,7 @@ export default () => {
 							detail: {
 								devtools: {
 									metadata: {
-										extensionName: 'Interactivity API On)',
+										extensionName: 'Interactivity API: On',
 										dataType: 'track-entry',
 									},
 									color: 'primary',
