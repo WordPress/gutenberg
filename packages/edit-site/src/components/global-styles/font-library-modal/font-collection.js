@@ -312,7 +312,7 @@ function FontCollection( { slug } ) {
 
 					{ ! selectedCollection?.font_families && ! notice && (
 						<Spacer paddingY={ 6 }>
-							<Flex justify="center" align="center">
+							<Flex justify="center">
 								<ProgressBar />
 							</Flex>
 						</Spacer>
