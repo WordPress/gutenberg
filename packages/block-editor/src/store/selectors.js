@@ -2813,8 +2813,13 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	const editorMode = __unstableGetEditorMode( state );
 
-	// In zoom-out mode, the block overlay is always active for top level blocks.
-	if ( editorMode === 'zoom-out' && clientId ) {
+	// In zoom-out mode, the block overlay is always active for section level blocks.
+	if ( editorMode === 'zoom-out' ) {
+		const { sectionRootClientId } = unlock( getSettings( state ) );
+		const sectionClientIds = getBlockOrder( state, sectionRootClientId );
+		if ( sectionClientIds?.includes( clientId ) ) {
+			return true;
+		}
 		return true;
 	}
 
