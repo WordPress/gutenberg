@@ -43,6 +43,7 @@ interface DirectiveArgs {
 	element: VNode< {
 		class?: string;
 		style?: string | Record< string, string | number >;
+		content?: ComponentChildren;
 	} >;
 	/**
 	 * The inherited context.
@@ -56,7 +57,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | null;
+	( args: DirectiveArgs ): VNode | null | void;
 }
 
 interface DirectiveOptions {
@@ -71,7 +72,7 @@ interface DirectiveOptions {
 
 interface Scope {
 	evaluate: Evaluate;
-	context: Context< any >;
+	context?: object;
 	ref: RefObject< HTMLElement >;
 	attributes: createElement.JSX.HTMLAttributes;
 }
