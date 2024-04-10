@@ -5,8 +5,6 @@
 		"rootDir": "src",
 		"declarationDir": "build-types",
 
-		"strictPropertyInitialization": false,
-
 		"noImplicitAny": false
 	},
 	"include": [ "src/**/*" ]
