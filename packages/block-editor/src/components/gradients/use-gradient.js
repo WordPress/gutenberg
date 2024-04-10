@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -55,6 +55,7 @@ export function getGradientSlugByValue( gradients, value ) {
 }
 
 export function __experimentalUseGradient( {
+	attributes,
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
 } = {} ) {
@@ -77,17 +78,8 @@ export function __experimentalUseGradient( {
 		],
 		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
 	);
-	const { gradient, customGradient } = useSelect(
-		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
-			const attributes = getBlockAttributes( clientId ) || {};
-			return {
-				customGradient: attributes[ customGradientAttribute ],
-				gradient: attributes[ gradientAttribute ],
-			};
-		},
-		[ clientId, gradientAttribute, customGradientAttribute ]
-	);
+	const customGradient = attributes[ customGradientAttribute ];
+	const gradient = attributes[ gradientAttribute ];
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(

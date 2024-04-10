@@ -23,7 +23,9 @@ const Overlay = ( {
 	setOverlayColor,
 } ) => {
 	const { dimRatio } = attributes;
-	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { gradientValue, setGradient } = __experimentalUseGradient( {
+		attributes,
+	} );
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {

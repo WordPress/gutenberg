@@ -162,7 +162,9 @@ function CoverEdit( {
 		: originalBackgroundType;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { gradientClass, gradientValue } = __experimentalUseGradient();
+	const { gradientClass, gradientValue } = __experimentalUseGradient( {
+		attributes,
+	} );
 
 	const onSelectMedia = async ( newMedia ) => {
 		const mediaAttributes = attributesFromMedia( newMedia );
