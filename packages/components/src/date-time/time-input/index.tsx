@@ -29,18 +29,18 @@ import type { InputChangeCallback } from '../../input-control/types';
 
 export function TimeInput( {
 	is12Hour,
-	hours: initHours = new Date().getHours(),
-	minutes: initMinutes = new Date().getMinutes(),
+	hours: entryHours = new Date().getHours(),
+	minutes: entryMinutes = new Date().getMinutes(),
 	minutesStep = 1,
 	onChange,
 }: TimeInputProps ) {
-	const _initDayPeriod = initHours < 12 ? 'AM' : 'PM';
+	const _initDayPeriod = entryHours < 12 ? 'AM' : 'PM';
 	const _initHours = is12Hour
-		? from24hTo12h( initHours )
-		: from12hTo24h( initHours, _initDayPeriod === 'PM' );
+		? from24hTo12h( entryHours )
+		: from12hTo24h( entryHours, _initDayPeriod === 'PM' );
 
 	const [ hours, setHours ] = useState( _initHours );
-	const [ minutes, setMinutes ] = useState( initMinutes );
+	const [ minutes, setMinutes ] = useState( entryMinutes );
 	const [ dayPeriod, setDayPeriod ] = useState( _initDayPeriod );
 
 	const buildNumberControlChangeCallback = (
@@ -76,6 +76,11 @@ export function TimeInput( {
 			setDayPeriod( value );
 		};
 	};
+
+	useEffect( () => {
+		setHours( entryHours );
+		setMinutes( entryMinutes );
+	}, [ entryHours, entryMinutes ] );
 
 	useEffect( () => {
 		onChange?.( { hours, minutes } );
