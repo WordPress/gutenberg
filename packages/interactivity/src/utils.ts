@@ -258,14 +258,9 @@ export const createRootFragment = (
 	replaceNode: Node | Node[]
 ) => {
 	replaceNode = [].concat( replaceNode );
-	const s = replaceNode[ replaceNode.length - 1 ].nextSibling;
-	function insert( c: any, r: any ) {
-		/**
-		 * c address for children.
-		 * r address for root.
-		 * s address for sibling.
-		 */
-		parent.insertBefore( c, r || s );
+	const sibling = replaceNode[ replaceNode.length - 1 ].nextSibling;
+	function insert( child: any, root: any ) {
+		parent.insertBefore( child, root || sibling );
 	}
 	return ( ( parent as any ).__k = {
 		nodeType: 1,
