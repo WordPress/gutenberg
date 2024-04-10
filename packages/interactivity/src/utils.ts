@@ -22,8 +22,8 @@ import {
 } from './hooks';
 
 interface Flusher {
-	flush: () => void;
-	dispose: () => void;
+	readonly flush: () => void;
+	readonly dispose: () => void;
 }
 
 /**
