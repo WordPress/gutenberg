@@ -72,7 +72,7 @@ interface DirectiveOptions {
 
 interface Scope {
 	evaluate: Evaluate;
-	context?: object;
+	context: object;
 	ref: RefObject< HTMLElement >;
 	attributes: createElement.JSX.HTMLAttributes;
 }
