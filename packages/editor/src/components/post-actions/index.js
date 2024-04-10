@@ -36,6 +36,7 @@ const POST_ACTIONS_WHILE_EDITING = [
 	'view-post-revisions',
 	'rename-post',
 	'move-to-trash',
+	'duplicate-post',
 ];
 
 export default function PostActions( { onActionPerformed, buttonProps } ) {
