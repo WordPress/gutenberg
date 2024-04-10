@@ -8,7 +8,7 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import { deepSignal, peek } from 'deepsignal';
+import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 
 /**
  * Internal dependencies
@@ -50,7 +50,7 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
 	contextObjectToFallback.set( current, inherited );
 	if ( ! contextObjectToProxy.has( current ) ) {
 		const proxy = new Proxy( current, {
-			get: ( target, k ) => {
+			get: ( target: DeepSignal< any >, k ) => {
 				const fallback = contextObjectToFallback.get( current );
 				// Always subscribe to prop changes in the current context.
 				const currentProp = target[ k ];
@@ -131,9 +131,12 @@ const proxifyContext = ( current: object, inherited: object = {} ): object => {
  * Recursively update values within a deepSignal object.
  *
  * @param target A deepSignal instance.
- * @param source Object with properties to update in `target`
+ * @param source Object with properties to update in `target`.
  */
-const updateSignals = ( target: object, source: object ) => {
+const updateSignals = (
+	target: DeepSignal< any >,
+	source: DeepSignal< any >
+) => {
 	for ( const k in source ) {
 		if (
 			isPlainObject( peek( target, k ) ) &&
@@ -182,7 +185,9 @@ const empty = ' ';
  * @param val CSS string.
  * @return CSS object.
  */
-const cssStringToObject = ( val: string ): object => {
+const cssStringToObject = (
+	val: string
+): Record< string, string | number > => {
 	const tree = [ {} ];
 	let block, left;
 
@@ -473,6 +478,8 @@ export default () => {
 				type: Type,
 				props: { innerHTML, ...rest },
 			},
+		}: {
+			element: any;
 		} ) => {
 			// Preserve the initial inner HTML.
 			const cached = useMemo( () => innerHTML, [] );
