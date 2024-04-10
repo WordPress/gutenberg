@@ -115,7 +115,7 @@ export function TimeInput( {
 						label={ __( 'Hours' ) }
 						hideLabelFromVision
 						__next40pxDefaultSize
-						value={ hours }
+						value={ String( hours ).padStart( 2, '0' ) }
 						step={ 1 }
 						min={ is12Hour ? 1 : 0 }
 						max={ is12Hour ? 12 : 23 }
@@ -140,7 +140,7 @@ export function TimeInput( {
 						label={ __( 'Minutes' ) }
 						hideLabelFromVision
 						__next40pxDefaultSize
-						value={ minutes }
+						value={ String( minutes ).padStart( 2, '0' ) }
 						step={ minutesStep }
 						min={ 0 }
 						max={ 59 }
