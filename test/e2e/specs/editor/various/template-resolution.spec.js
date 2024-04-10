@@ -47,6 +47,7 @@ test.describe( 'Template resolution', () => {
 		test( 'Post editor proper template resolution', async ( {
 			page,
 			admin,
+			editor,
 			requestUtils,
 		} ) => {
 			const newPage = await requestUtils.createPage( {
@@ -54,6 +55,7 @@ test.describe( 'Template resolution', () => {
 				status: 'publish',
 			} );
 			await admin.editPost( newPage.id );
+			await editor.openDocumentSettingsSidebar();
 			await expect(
 				page.getByRole( 'button', { name: 'Template options' } )
 			).toHaveText( 'Single Entries' );
