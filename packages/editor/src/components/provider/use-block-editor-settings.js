@@ -89,14 +89,14 @@ const BLOCK_EDITOR_SETTINGS = [
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object} settings        EditorProvider settings prop.
- * @param {string} postType        Editor root level post type.
- * @param {string} postId          Editor root level post ID.
- * @param {string} contextPostType The post type of the edited post.
+ * @param {Object} settings      EditorProvider settings prop.
+ * @param {string} postType      Editor root level post type.
+ * @param {string} postId        Editor root level post ID.
+ * @param {string} renderingMode Editor rendering mode.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
+function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
@@ -132,21 +132,15 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 				: undefined;
 
 			function getSectionRootBlock() {
-				if ( ! contextPostType ) {
-					return null;
-				}
-
-				if ( [ 'post', 'page' ].includes( contextPostType ) ) {
-					return (
-						getBlocksByName( 'core/post-content' )?.[ 0 ] ?? null
-					);
+				if ( renderingMode === 'template-locked' ) {
+					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
 				}
 
 				return (
 					getBlocksByName( 'core/group' ).find(
 						( clientId ) =>
 							getBlockAttributes( clientId )?.tagName === 'main'
-					) ?? null
+					) ?? ''
 				);
 			}
 
@@ -176,7 +170,7 @@ function useBlockEditorSettings( settings, postType, postId, contextPostType ) {
 				sectionRootClientId: getSectionRootBlock(),
 			};
 		},
-		[ postType, postId, isLargeViewport, contextPostType ]
+		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
 	const settingsBlockPatterns =
