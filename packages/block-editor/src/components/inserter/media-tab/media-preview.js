@@ -121,9 +121,16 @@ export function MediaPreview( { media, onClick, category } ) {
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
+	const { getSettings } = useSelect( blockEditorStore );
+	const { imageDefaultSize } = getSettings();
 	const [ block, preview ] = useMemo(
-		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
-		[ media, category.mediaType ]
+		() =>
+			getBlockAndPreviewFromMedia(
+				media,
+				category.mediaType,
+				imageDefaultSize
+			),
+		[ media, category.mediaType, imageDefaultSize ]
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
