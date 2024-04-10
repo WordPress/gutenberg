@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [*] Add empty fallback option for the BottomSheetSelectControl component
+-   [*] Prevent passing potential false values to the onPress prop [#60595]
 
 ## 1.116.0
 -   [**] Highlight color formatting style improvements [#57650]
