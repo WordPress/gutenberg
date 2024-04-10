@@ -524,7 +524,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
+import { PluginPostPublishPanel } from '@wordpress/editor';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -559,7 +559,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
