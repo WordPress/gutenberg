@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useId } from '@wordpress/element';
+import { useState, useId, useRef, flushSync } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import { ToggleControl, BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -47,6 +47,7 @@ function addBindings( bindings, syncedAttributes ) {
 
 function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	const controlId = useId();
+	const toggleRef = useRef();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
 		useState( false );
 
@@ -60,11 +61,6 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	);
 
 	function updateBindings( isChecked, customName ) {
-		if ( isChecked && ! attributes.metadata?.name && ! customName ) {
-			setShowAllowOverridesModal( true );
-			return;
-		}
-
 		const prevBindings = attributes?.metadata?.bindings;
 		const updatedBindings = isChecked
 			? addBindings( prevBindings, syncedAttributes )
@@ -110,12 +106,13 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 							onChange={ ( isChecked ) => {
 								updateBindings( isChecked );
 							} }
+							ref={ toggleRef }
 						/>
 					) : (
 						<Button
 							className="pattern-overrides-control__allow-overrides-button"
 							variant="secondary"
-							onClick={ () => updateBindings( true ) }
+							onClick={ () => setShowAllowOverridesModal( true ) }
 						>
 							{ __( 'Allow overrides' ) }
 						</Button>
@@ -127,7 +124,10 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 				<AllowOverridesModal
 					onClose={ () => setShowAllowOverridesModal( false ) }
 					onSave={ ( newName ) => {
-						updateBindings( true, newName );
+						flushSync( () => {
+							updateBindings( true, newName );
+						} );
+						toggleRef.current?.focus();
 					} }
 				/>
 			) }
