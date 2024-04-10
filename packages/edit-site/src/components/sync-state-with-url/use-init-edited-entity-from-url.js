@@ -50,8 +50,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 				: null;
 		const _postsPageId =
 			siteData?.show_on_front === 'page' &&
-			[ 'number', 'string' ].includes( typeof siteData.page_for_posts ) &&
-			!! +siteData.page_for_posts // We also need to check if it's not zero(`0`).
+			[ 'number', 'string' ].includes( typeof siteData.page_for_posts )
 				? siteData.page_for_posts.toString()
 				: null;
 		let _frontPageTemplateId;
