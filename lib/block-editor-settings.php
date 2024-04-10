@@ -76,6 +76,13 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		}
 	}
 
+	// Could house also `__unstableIsBlockBasedTheme` as 'isBlockTheme' => $current_theme->is_block_theme().
+	$current_theme            = wp_get_theme();
+	$settings['currentTheme'] = array(
+		'parentDirectoryURI' => $current_theme->get_template_directory_uri(),
+		'directoryURI'       => $current_theme->get_stylesheet_directory_uri(),
+	);
+
 	$settings['styles'] = array_merge( $global_styles, get_block_editor_theme_styles() );
 
 	$settings['__experimentalFeatures'] = gutenberg_get_global_settings();

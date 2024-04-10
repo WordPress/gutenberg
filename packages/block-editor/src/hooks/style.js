@@ -287,7 +287,7 @@ export function omitStyle( style, paths, preserveReference = false ) {
  * @param {Object|string}             blockNameOrType Block type.
  * @param {Object}                    attributes      Block attributes.
  * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
- *
+ * @param {Object}                    editorSettings  Current editor settings.
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
@@ -295,7 +295,7 @@ export function addSaveProps(
 	blockNameOrType,
 	attributes,
 	skipPaths = skipSerializationPathsSave,
-	settings,
+	editorSettings
 ) {
 	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
@@ -326,7 +326,10 @@ export function addSaveProps(
 			...style,
 			background: {
 				...style.background,
-				...getBackgroundSupportStyles( style.background, settings ),
+				...getBackgroundSupportStyles(
+					style.background,
+					editorSettings
+				),
 			},
 		};
 	}
@@ -391,7 +394,7 @@ function useBlockProps( { name, style } ) {
 	const { themeDirURI } = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
-			themeDirURI: _settings?.currentTheme?.theme_directory_uri,
+			themeDirURI: _settings?.currentTheme?.directoryURI,
 		};
 	} );
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(

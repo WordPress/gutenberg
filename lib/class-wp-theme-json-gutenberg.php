@@ -2131,7 +2131,7 @@ class WP_Theme_JSON_Gutenberg {
 		return $result;
 	}
 
-		/**
+	/**
 	 * Given a styles array, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
