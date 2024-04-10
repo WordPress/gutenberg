@@ -21,6 +21,7 @@
 -   `Navigator`: Navigation to the active path doesn't create a new location history ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
 -   `FormToggle`: Forwards ref to input ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
 -   `ToggleControl`: Forwards ref to FormToggle ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+-   `BoxControl`: Allow negative values for margin controls ([#60347](https://github.com/WordPress/gutenberg/pull/60347)).
 
 ### Bug Fix
 
