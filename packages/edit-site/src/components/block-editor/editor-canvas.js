@@ -144,7 +144,7 @@ function EditorCanvas( {
 	const scale = isZoomOutMode
 		? ( contentWidth ) =>
 				computeIFrameScale(
-					{ width: 1000, scale: 0.6 },
+					{ width: 1000, scale: 0.5 },
 					{ width: 400, scale: 0.9 },
 					contentWidth
 				)
