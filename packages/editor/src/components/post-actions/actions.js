@@ -509,7 +509,13 @@ export const duplicatePostAction = {
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-		const [ title, setTitle ] = useState( getItemTitle( item ) );
+		const [ title, setTitle ] = useState(
+			sprintf(
+				/* translators: %s: Existing item title */
+				__( '%s (Copy)' ),
+				getItemTitle( item )
+			)
+		);
 
 		const { saveEntityRecord } = useDispatch( coreStore );
 		const { createErrorNotice, createSuccessNotice } =
