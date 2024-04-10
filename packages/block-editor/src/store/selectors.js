@@ -2909,6 +2909,13 @@ export const getBlockEditingMode = createRegistrySelector(
 				if ( clientId === sectionRootClientId ) {
 					return 'contentOnly';
 				}
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( ! sectionsClientIds?.includes( clientId ) ) {
+					return 'disabled';
+				}
 			}
 
 			const blockEditingMode = state.blockEditingModes.get( clientId );
