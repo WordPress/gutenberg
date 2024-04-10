@@ -2,16 +2,18 @@
  * WordPress dependencies
  */
 import { useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import PostURLCheck from './check';
 import PostURL from './index';
-import { usePostURLLabel } from './label';
 import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
 
 export default function PostURLPanel() {
 	// Use internal state instead of a ref to make sure that the component
@@ -25,7 +27,7 @@ export default function PostURLPanel() {
 
 	return (
 		<PostURLCheck>
-			<PostPanelRow label={ __( 'URL' ) } ref={ setPopoverAnchor }>
+			<PostPanelRow label={ __( 'Slug' ) } ref={ setPopoverAnchor }>
 				<Dropdown
 					popoverProps={ popoverProps }
 					className="editor-post-url__panel-dropdown"
@@ -44,18 +46,22 @@ export default function PostURLPanel() {
 }
 
 function PostURLToggle( { isOpen, onClick } ) {
-	const label = usePostURLLabel();
+	const slug = useSelect(
+		( select ) =>
+			safeDecodeURIComponent( select( editorStore ).getEditedPostSlug() ),
+		[]
+	);
 	return (
 		<Button
 			__next40pxDefaultSize
 			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
-			// translators: %s: Current post URL.
-			aria-label={ sprintf( __( 'Change URL: %s' ), label ) }
+			// translators: %s: Current post slug.
+			aria-label={ sprintf( __( 'Change slug: %s' ), slug ) }
 			onClick={ onClick }
 		>
-			{ label }
+			{ slug }
 		</Button>
 	);
 }
