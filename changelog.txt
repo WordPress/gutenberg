@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 18.1.0-rc.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+- Revert #60300: Make sure the CSS class id-dark-theme is added to the editor iframe body. ([60616](https://github.com/WordPress/gutenberg/pull/60616))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@glendaviesnz
+
+
 = 18.1.0-rc.2 =
 
 
