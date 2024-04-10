@@ -1,9 +1,12 @@
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
+
 /* @jsx createElement */
 
 /**
  * External dependencies
  */
-import { h as createElement } from 'preact';
+import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
@@ -37,12 +40,12 @@ const descriptor = Reflect.getOwnPropertyDescriptor;
  * By default, all plain objects inside the context are wrapped, unless it is
  * listed in the `ignore` option.
  *
- * @param {Object} current   Current context.
- * @param {Object} inherited Inherited context, used as fallback.
+ * @param current   Current context.
+ * @param inherited Inherited context, used as fallback.
  *
- * @return {Object} The wrapped context object.
+ * @return The wrapped context object.
  */
-const proxifyContext = ( current, inherited = {} ) => {
+const proxifyContext = ( current: object, inherited: object = {} ): object => {
 	// Update the fallback object reference when it changes.
 	contextObjectToFallback.set( current, inherited );
 	if ( ! contextObjectToProxy.has( current ) ) {
@@ -127,10 +130,10 @@ const proxifyContext = ( current, inherited = {} ) => {
 /**
  * Recursively update values within a deepSignal object.
  *
- * @param {Object} target A deepSignal instance.
- * @param {Object} source Object with properties to update in `target`
+ * @param target A deepSignal instance.
+ * @param source Object with properties to update in `target`
  */
-const updateSignals = ( target, source ) => {
+const updateSignals = ( target: object, source: object ) => {
 	for ( const k in source ) {
 		if (
 			isPlainObject( peek( target, k ) ) &&
@@ -146,23 +149,23 @@ const updateSignals = ( target, source ) => {
 /**
  * Recursively clone the passed object.
  *
- * @param {Object} source Source object.
- * @return {Object} Cloned object.
+ * @param source Source object.
+ * @return Cloned object.
  */
-const deepClone = ( source ) => {
+function deepClone< T >( source: T ): T {
 	if ( isPlainObject( source ) ) {
 		return Object.fromEntries(
-			Object.entries( source ).map( ( [ key, value ] ) => [
+			Object.entries( source as object ).map( ( [ key, value ] ) => [
 				key,
 				deepClone( value ),
 			] )
-		);
+		) as T;
 	}
 	if ( Array.isArray( source ) ) {
-		return source.map( ( i ) => deepClone( i ) );
+		return source.map( ( i ) => deepClone( i ) ) as T;
 	}
 	return source;
-};
+}
 
 const newRule =
 	/(?:([\u0080-\uFFFF\w-%@]+) *:? *([^{;]+?);|([^;}{]*?) *{)|(}\s*)/g;
@@ -176,10 +179,10 @@ const empty = ' ';
  * Made by Cristian Bote (@cristianbote) for Goober.
  * https://unpkg.com/browse/goober@2.1.13/src/core/astish.js
  *
- * @param {string} val CSS string.
- * @return {Object} CSS object.
+ * @param val CSS string.
+ * @return CSS object.
  */
-const cssStringToObject = ( val ) => {
+const cssStringToObject = ( val: string ): object => {
 	const tree = [ {} ];
 	let block, left;
 
@@ -203,10 +206,9 @@ const cssStringToObject = ( val ) => {
  * Creates a directive that adds an event listener to the global window or
  * document object.
  *
- * @param {string} type 'window' or 'document'
- * @return {void}
+ * @param type 'window' or 'document'
  */
-const getGlobalEventDirective = ( type ) => {
+const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
@@ -217,7 +219,7 @@ const getGlobalEventDirective = ( type ) => {
 					const globalVar = type === 'window' ? window : document;
 					globalVar.addEventListener( eventName, cb );
 					return () => globalVar.removeEventListener( eventName, cb );
-				}, [] );
+				} );
 			} );
 	};
 };
@@ -333,9 +335,13 @@ export default () => {
 						 * need deps because it only needs to do it the first time.
 						 */
 						if ( ! result ) {
-							element.ref.current.classList.remove( className );
+							(
+								element.ref as RefObject< HTMLElement >
+							 ).current!.classList.remove( className );
 						} else {
-							element.ref.current.classList.add( className );
+							(
+								element.ref as RefObject< HTMLElement >
+							 ).current!.classList.add( className );
 						}
 					} );
 				} );
@@ -368,9 +374,13 @@ export default () => {
 					 * because it only needs to do it the first time.
 					 */
 					if ( ! result ) {
-						element.ref.current.style.removeProperty( styleProp );
+						(
+							element.ref as RefObject< HTMLElement >
+						 ).current!.style.removeProperty( styleProp );
 					} else {
-						element.ref.current.style[ styleProp ] = result;
+						(
+							element.ref as RefObject< HTMLElement >
+						 ).current!.style[ styleProp ] = result;
 					}
 				} );
 			} );
@@ -390,7 +400,8 @@ export default () => {
 				 * first time. After that, Preact will handle the changes.
 				 */
 				useInit( () => {
-					const el = element.ref.current;
+					const el = ( element.ref as RefObject< HTMLElement > )
+						.current!;
 
 					/*
 					 * We set the value directly to the corresponding HTMLElement instance

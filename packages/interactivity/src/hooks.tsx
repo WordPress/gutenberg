@@ -11,6 +11,7 @@ import {
 	options,
 	createContext,
 	cloneElement,
+	type ComponentChildren,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
@@ -36,11 +37,14 @@ interface DirectiveArgs {
 	/**
 	 * Props present in the current element.
 	 */
-	props: Object;
+	props: { children?: ComponentChildren };
 	/**
 	 * Virtual node representing the element.
 	 */
-	element: VNode;
+	element: VNode< {
+		class?: string;
+		style?: string | Record< string, string | number >;
+	} >;
 	/**
 	 * The inherited context.
 	 */
@@ -53,7 +57,7 @@ interface DirectiveArgs {
 }
 
 interface DirectiveCallback {
-	( args: DirectiveArgs ): VNode | void;
+	( args: DirectiveArgs ): VNode | null;
 }
 
 interface DirectiveOptions {
