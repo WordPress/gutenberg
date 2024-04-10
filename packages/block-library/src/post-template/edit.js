@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { memo, useMemo, useState } from '@wordpress/element';
+import { memo, useMemo, useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -27,9 +28,35 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function useClassNameFromBlockContext( blockContextId ) {
+	const [ className, setClassName ] = useState( '' );
+
+	useEffect( () => {
+		if ( ! blockContextId ) {
+			return;
+		}
+
+		let initialClassName = 'wp-block-post';
+
+		apiFetch( {
+			path: `/wp/v2/postclass/${ blockContextId }`,
+		} ).then( ( res ) => {
+			if ( res ) {
+				initialClassName = classnames( initialClassName, res );
+			}
+
+			setClassName( initialClassName );
+		} );
+	}, [ blockContextId ] );
+
+	return className;
+}
+
+function PostTemplateInnerBlocks( { blockContextId } ) {
+	const classes = useClassNameFromBlockContext( blockContextId );
+
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-post' },
+		{ className: classes },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -41,10 +68,12 @@ function PostTemplateBlockPreview( {
 	isHidden,
 	setActiveBlockContextId,
 } ) {
+	const classes = useClassNameFromBlockContext( blockContextId );
+
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: 'wp-block-post',
+			className: classes,
 		},
 	} );
 
@@ -280,7 +309,9 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									blockContextId={ blockContext.postId }
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
