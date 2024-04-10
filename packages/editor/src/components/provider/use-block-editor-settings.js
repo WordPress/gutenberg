@@ -73,6 +73,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
+	'sectionRootClientId',
 	'styles',
 	'titlePlaceholder',
 	'supportsLayout',

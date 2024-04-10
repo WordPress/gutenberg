@@ -2892,18 +2892,12 @@ export const getBlockEditingMode = createRegistrySelector(
 			// sections.
 			const editorMode = __unstableGetEditorMode( state );
 			if ( editorMode === 'zoom-out' ) {
-				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
-					return 'disabled';
-				}
-
 				const { sectionRootClientId } = unlock( getSettings( state ) );
+				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
+					return sectionRootClientId ? 'disabled' : 'contentOnly';
+				}
 				if ( clientId === sectionRootClientId ) {
 					return 'contentOnly';
-				}
-
-				const sectionsClientIds = getBlockOrder( state );
-				if ( sectionsClientIds.includes( clientId ) ) {
-					return 'default';
 				}
 			}
 
