@@ -2892,6 +2892,11 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
+			// Some selectors that call this provide `null` as the default
+			// rootClientId, but the default rootClientId is actually `''`.
+			if ( clientId === null ) {
+				clientId = '';
+			}
 			// In zoom-out mode, override the behavior set by
 			// __unstableSetBlockEditingMode to only allow editing the top-level
 			// sections.
