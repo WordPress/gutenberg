@@ -23,8 +23,8 @@ const contextObjectToProxy = new WeakMap();
 const contextProxyToObject = new WeakMap();
 const contextObjectToFallback = new WeakMap();
 
-const isPlainObject = ( item ) =>
-	item && typeof item === 'object' && item.constructor === Object;
+const isPlainObject = ( item: unknown ): boolean =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const descriptor = Reflect.getOwnPropertyDescriptor;
 
