@@ -103,10 +103,23 @@ export function useSignalEffect( callback: () => unknown ) {
  * accessible whenever the function runs. This is primarily to make the scope
  * available inside hook callbacks.
  *
+ * Asyncronous functions should use generators that yield promises instead of awaiting them.
+ * See the documentation for details: https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#the-store
+ *
  * @param func The passed function.
  * @return The wrapped function.
  */
-export const withScope = ( func: Function ): ( () => void ) => {
+export function withScope<
+	Func extends ( ...args: any[] ) => Generator< any, any >,
+>(
+	func: Func
+): (
+	...args: Parameters< Func >
+) => ReturnType< Func > extends Generator< any, infer Return >
+	? Promise< Return >
+	: never;
+export function withScope< Func extends Function >( func: Func ): Func;
+export function withScope( func ) {
 	const scope = getScope();
 	const ns = getNamespace();
 	if ( func?.constructor?.name === 'GeneratorFunction' ) {
@@ -143,7 +156,7 @@ export const withScope = ( func: Function ): ( () => void ) => {
 			resetScope();
 		}
 	};
-};
+}
 
 /**
  * Accepts a function that contains imperative code which runs whenever any of
