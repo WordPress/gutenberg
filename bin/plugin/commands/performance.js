@@ -4,7 +4,7 @@
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const SimpleGit = require( 'simple-git' );
+const SimpleGit = require( 'simple-git' ).default;
 
 /**
  * Internal dependencies
@@ -152,7 +152,6 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 	fs.mkdirSync( sourceDir );
 
-	// @ts-ignore
 	const sourceGit = SimpleGit( sourceDir );
 	logAtIndent(
 		2,
@@ -206,7 +205,6 @@ async function runPerformanceTests( branches, options ) {
 		'Checking out branch:',
 		formats.success( testRunnerBranch )
 	);
-	// @ts-ignore
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 	logAtIndent( 2, 'Installing dependencies and building' );
@@ -233,6 +231,9 @@ async function runPerformanceTests( branches, options ) {
 		wpZipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 	}
 
+	/**
+	 * @type {Record<string,string>}
+	 */
 	const branchDirs = {};
 	for ( const branch of branches ) {
 		logAtIndent( 2, 'Branch:', formats.success( branch ) );
@@ -241,7 +242,6 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Creating directory:', formats.success( envDir ) );
 		fs.mkdirSync( envDir );
-		// @ts-ignore
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
 
@@ -249,7 +249,6 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
 		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
 		logAtIndent( 3, 'Installing dependencies and building' );
