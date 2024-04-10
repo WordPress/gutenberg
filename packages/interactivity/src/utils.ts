@@ -6,6 +6,8 @@ import {
 	useCallback as _useCallback,
 	useEffect as _useEffect,
 	useLayoutEffect as _useLayoutEffect,
+	type EffectCallback,
+	type Inputs,
 } from 'preact/hooks';
 import { effect } from '@preact/signals';
 
@@ -153,7 +155,7 @@ export const withScope = ( func: Function ): ( () => void ) => {
  *
  * @param callback The hook callback.
  */
-export function useWatch( callback: Function ) {
+export function useWatch( callback: () => unknown ) {
 	useSignalEffect( withScope( callback ) );
 }
 
@@ -166,7 +168,7 @@ export function useWatch( callback: Function ) {
  *
  * @param callback The hook callback.
  */
-export function useInit( callback: Function ) {
+export function useInit( callback: EffectCallback ) {
 	_useEffect( withScope( callback ), [] );
 }
 
@@ -183,7 +185,7 @@ export function useInit( callback: Function ) {
  * @param inputs   If present, effect will only activate if the
  *                 values in the list change (using `===`).
  */
-export function useEffect( callback: Function, inputs: any[] ) {
+export function useEffect( callback: EffectCallback, inputs: Inputs ) {
 	_useEffect( withScope( callback ), inputs );
 }
 
@@ -200,7 +202,7 @@ export function useEffect( callback: Function, inputs: any[] ) {
  * @param inputs   If present, effect will only activate if the
  *                 values in the list change (using `===`).
  */
-export function useLayoutEffect( callback: Function, inputs: any[] ) {
+export function useLayoutEffect( callback: EffectCallback, inputs: Inputs ) {
 	_useLayoutEffect( withScope( callback ), inputs );
 }
 
@@ -212,16 +214,17 @@ export function useLayoutEffect( callback: Function, inputs: any[] ) {
  * scope available so functions like `getElement()` and `getContext()` can be
  * used inside the passed callback.
  *
- * @template {Function} T The callback function type.
+ * @param callback Callback function.
+ * @param inputs   If present, the callback will only be updated if the
+ *                 values in the list change (using `===`).
  *
- * @param {T}                      callback Callback function.
- * @param {ReadonlyArray<unknown>} inputs   If present, the callback will only be updated if the
- *                                          values in the list change (using `===`).
- *
- * @return {T} The callback function.
+ * @return The callback function.
  */
-export function useCallback( callback, inputs ) {
-	return _useCallback( withScope( callback ), inputs );
+export function useCallback< T extends Function >(
+	callback: T,
+	inputs: Inputs
+): T {
+	return _useCallback< T >( withScope( callback ), inputs );
 }
 
 /**
@@ -232,15 +235,13 @@ export function useCallback( callback, inputs ) {
  * available so functions like `getElement()` and `getContext()` can be used
  * inside the passed factory function.
  *
- * @template {unknown} T The memoized value.
+ * @param factory Factory function that returns that value for memoization.
+ * @param inputs  If present, the factory will only be run to recompute if
+ *                the values in the list change (using `===`).
  *
- * @param {() => T}                factory Factory function that returns that value for memoization.
- * @param {ReadonlyArray<unknown>} inputs  If present, the factory will only be run to recompute if
- *                                         the values in the list change (using `===`).
- *
- * @return {T} The memoized value.
+ * @return The memoized value.
  */
-export function useMemo( factory, inputs ) {
+export function useMemo< T >( factory: () => T, inputs: Inputs ): T {
 	return _useMemo( withScope( factory ), inputs );
 }
 
