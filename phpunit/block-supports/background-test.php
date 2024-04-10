@@ -242,7 +242,16 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_background_support_styles() {
 		return array(
-			'css generated with theme source 2' => array(
+			'css generated with theme background image path' => array(
+				'background_style' => array(
+					'backgroundImage' => array(
+						'url'    => '/assets/image/not_there.png',
+						'source' => 'theme',
+					),
+				),
+				'expected_css'     => "background-image:url('http://localhost:8889/wp-content/plugins/gutenberg/phpunit/data/themedir1/block-theme/assets/image/not_there.png');",
+			),
+			'css generated with theme background image path and no preceding slash' => array(
 				'background_style' => array(
 					'backgroundImage' => array(
 						'url'    => 'assets/image/not_there.png',

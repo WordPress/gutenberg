@@ -50,6 +50,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
+	'currentTheme',
 	'disableCustomColors',
 	'disableCustomFontSizes',
 	'disableCustomSpacingSizes',
@@ -101,7 +102,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const {
 		allowRightClickOverrides,
 		blockTypes,
-		currentTheme,
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
@@ -123,7 +123,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getBlockPatternCategories,
-				getCurrentTheme,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
@@ -132,6 +131,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
+
 			const _currentTheme = getCurrentTheme();
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
@@ -152,10 +152,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					'allowRightClickOverrides'
 				),
 				blockTypes: getBlockTypes(),
-				currentTheme: {
-					name: _currentTheme?.name,
-					theme_directory_uri: _currentTheme?.theme_directory_uri,
-				},
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
@@ -267,7 +263,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			allowedBlockTypes,
 			allowRightClickOverrides,
-			currentTheme,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
@@ -334,7 +329,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
-		currentTheme,
 	] );
 }
 
