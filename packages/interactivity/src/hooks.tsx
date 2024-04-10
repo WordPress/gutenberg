@@ -1,5 +1,8 @@
 /* @jsx createElement */
 
+// eslint-disable-next-line eslint-comments/disable-enable-pair
+/* eslint-disable react-hooks/exhaustive-deps */
+
 /**
  * External dependencies
  */
@@ -18,7 +21,7 @@ import type { VNode, Context, RefObject } from 'preact';
 import { store, stores, universalUnlock } from './store';
 import { warn } from './utils/warn';
 interface DirectiveEntry {
-	value: string | Object;
+	value: string | object;
 	namespace: string;
 	suffix: string;
 }
@@ -102,7 +105,7 @@ const immutableError = () => {
 		'Please use `data-wp-bind` to modify the attributes of an element.'
 	);
 };
-const immutableHandlers = {
+const immutableHandlers: ProxyHandler< object > = {
 	get( target, key, receiver ) {
 		const value = Reflect.get( target, key, receiver );
 		return !! value && typeof value === 'object'
@@ -112,7 +115,7 @@ const immutableHandlers = {
 	set: immutableError,
 	deleteProperty: immutableError,
 };
-const deepImmutable = < T extends Object = {} >( target: T ): T => {
+const deepImmutable = < T extends object = {} >( target: T ): T => {
 	if ( ! immutableMap.has( target ) ) {
 		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
 	}
@@ -260,7 +263,7 @@ export const directive = (
 };
 
 // Resolve the path to some property of the store object.
-const resolve = ( path, namespace ) => {
+const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
 			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
