@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ import MobileTabNavigation from '../mobile-tab-navigation';
 
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
