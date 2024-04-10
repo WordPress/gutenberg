@@ -56,8 +56,14 @@ function BlockKeyboardShortcuts() {
 			description: __( 'Transform heading to paragraph.' ),
 			keyCombination: {
 				modifier: 'access',
-				character: `0`,
+				character: '0',
 			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: '7',
+				},
+			],
 		} );
 
 		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
