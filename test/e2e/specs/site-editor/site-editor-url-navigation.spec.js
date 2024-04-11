@@ -30,19 +30,7 @@ test.describe( 'Site editor url navigation', () => {
 				status: 'publish',
 			} );
 			await admin.visitSiteEditor();
-			// We need to wait the response from the `posts` request in order to click the augmented menu item,
-			// that includes the options for creating templates for specific posts.
-			await Promise.all( [
-				page.waitForResponse(
-					( resp ) =>
-						resp
-							.url()
-							.includes(
-								'/index.php?rest_route=%2Fwp%2Fv2%2Fposts&context=view'
-							) && resp.status() === 200
-				),
-				page.click( 'role=button[name="Templates"]' ),
-			] );
+			await page.click( 'role=button[name="Templates"]' );
 			await page.click( 'role=button[name="Add New Template"i]' );
 			await page
 				.getByRole( 'button', {

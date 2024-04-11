@@ -63,7 +63,6 @@ function InterfaceSkeleton(
 	ref
 ) {
 	const navigateRegionsProps = useNavigateRegions( shortcuts );
-
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
