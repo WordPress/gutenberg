@@ -57,13 +57,14 @@ export function TimeInput( {
 			switch ( method ) {
 				case 'hours':
 					if ( is12Hour ) {
-						setHours12Format( numberValue );
 						setHours(
 							from12hTo24h( numberValue, dayPeriod === 'PM' )
 						);
+						setHours12Format( numberValue );
 					} else {
-						setHours12Format( from24hTo12h( numberValue ) );
 						setHours( numberValue );
+						setHours12Format( from24hTo12h( numberValue ) );
+						setDayPeriod( parseDayPeriod( numberValue ) );
 					}
 					break;
 
