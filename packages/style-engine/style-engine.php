@@ -30,7 +30,6 @@
  *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
  *     @type string      $selector                   Optional. When a selector is passed, the value of `$css` in the return value will comprise a full CSS rule `$selector { ...$css_declarations }`,
  *                                                   otherwise, the value will be a concatenated string of CSS declarations.
- *     @type string      $base_url                   A URL to the theme directory to be used as a base for relative URLs.
  * }
  *
  * @return array {

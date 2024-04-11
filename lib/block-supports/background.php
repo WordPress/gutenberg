@@ -39,16 +39,18 @@ function gutenberg_register_background_support( $block_type ) {
  * @return array                     Style engine array of CSS string and style declarations.
  */
 function gutenberg_get_background_support_styles( $background_styles = array() ) {
-	$style_engine_options    = array();
 	$background_image_source = ! empty( $background_styles['backgroundImage']['source'] ) ? $background_styles['backgroundImage']['source'] : null;
 
 	/*
 	 * "theme" source implies relative path to the theme directory
 	 */
 	if ( ! empty( $background_styles['backgroundImage']['url'] ) && is_string( $background_styles['backgroundImage']['url'] ) && 'theme' === $background_image_source ) {
-		$style_engine_options['base_url'] = esc_url( get_stylesheet_directory_uri() );
+		if ( ! str_starts_with( $background_styles['backgroundImage']['url'], '/' ) ) {
+			$background_styles['backgroundImage']['url'] = '/' . $background_styles['backgroundImage']['url'];
+		}
+		$background_styles['backgroundImage']['url'] = esc_url( get_stylesheet_directory_uri() . $background_styles['backgroundImage']['url'] );
 	}
-	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ), $style_engine_options );
+	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 }
 
 
