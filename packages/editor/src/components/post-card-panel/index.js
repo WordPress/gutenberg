@@ -75,9 +75,8 @@ export default function PostCardPanel( { className, actions } ) {
 			humanTimeDiff( modified )
 		);
 	const showPostContentInfo =
-		! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
-			postType
-		) && ! isPostsPage;
+		! isPostsPage &&
+		! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes( postType );
 	return (
 		<PanelBody>
 			<div
@@ -177,7 +176,7 @@ function PostContentInfo( { postContent } ) {
 	return (
 		<Text>
 			{ sprintf(
-				/* translators: 1: How many words a post has(eg. 30 words). 2: the number of minutes of read time(eg. 2 minutes read time) */
+				/* translators: 1: How many words a post has (e.g. 30 words). 2: the number of minutes of read time (e.g. 2 minutes read time) */
 				/* translators: %1s: is the number of minutes. */
 				'%1$s, %2$s.',
 				wordsCountText,
