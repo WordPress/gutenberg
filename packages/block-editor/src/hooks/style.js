@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	BACKGROUND_SUPPORT_KEY,
 	BackgroundImagePanel,
-	getBackgroundSupportStyles,
+	setBackgroundStyleDefaults,
 } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
@@ -319,19 +319,13 @@ export function addSaveProps(
 		}
 	} );
 
-	// Set background defaults.
-	// Applies to all blocks/global styles.
+	/*
+	 * Set styles defaults.
+	 * Applies default values to the style object based on the block settings.
+	 * Only applies to background styles for now.
+	 */
 	if ( !! style.background ) {
-		style = {
-			...style,
-			background: {
-				...style.background,
-				...getBackgroundSupportStyles(
-					style.background,
-					editorSettings
-				),
-			},
-		};
+		style = setBackgroundStyleDefaults( style, editorSettings );
 	}
 
 	props.style = {

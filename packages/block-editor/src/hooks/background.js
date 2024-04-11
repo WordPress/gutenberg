@@ -50,68 +50,46 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function getBackgroundSupportStyles( backgroundStyle, options ) {
-	const backgroundImage = backgroundStyle?.backgroundImage;
+export function setBackgroundStyleDefaults( blockStyles, options ) {
+	const backgroundImage = blockStyles?.background?.backgroundImage;
+	const newBackgroundStyles = {};
+
 	if (
 		backgroundImage?.source === 'theme' &&
 		!! backgroundImage?.url &&
-		options?.themeDirURI
+		!! options?.themeDirURI
 	) {
-		return {
-			backgroundImage: {
-				url: `${ options.themeDirURI }${ backgroundImage.url }`,
-				source: 'file',
-			},
+		const url = `${ options.themeDirURI }${
+			backgroundImage.url.startsWith( '/' )
+				? backgroundImage.url
+				: `/${ backgroundImage.url }`
+		}`;
+
+		newBackgroundStyles.backgroundImage = {
+			...backgroundImage,
+			url,
 		};
 	}
-}
-
-export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if ( ! backgroundStyle ) {
-		return;
-	}
-
-	const backgroundImage = backgroundStyle?.backgroundImage;
-	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if ( !! backgroundImage?.url ) {
-		if ( ! backgroundStyle?.backgroundSize ) {
-			backgroundStylesWithDefaults = {
-				backgroundSize: 'cover',
-			};
+	if ( ! options?.isRoot && !! backgroundImage?.url ) {
+		if ( ! blockStyles?.background?.backgroundSize ) {
+			newBackgroundStyles.backgroundSize = 'cover';
 		}
 
 		if (
-			'contain' === backgroundStyle?.backgroundSize &&
-			! backgroundStyle?.backgroundPosition
+			'contain' === blockStyles?.background?.backgroundSize &&
+			! blockStyles?.background?.backgroundPosition
 		) {
-			backgroundStylesWithDefaults = {
-				backgroundPosition: 'center',
-			};
+			newBackgroundStyles.backgroundPosition = 'center';
 		}
 	}
 
-	return backgroundStylesWithDefaults;
-}
-
-function useBlockProps( { name, style } ) {
-	if (
-		! hasBackgroundSupport( name ) ||
-		! style?.background?.backgroundImage
-	) {
-		return;
-	}
-
-	const backgroundStyles = setBackgroundStyleDefaults( style?.background );
-
-	if ( ! backgroundStyles ) {
-		return;
-	}
-
 	return {
-		style: {
-			...backgroundStyles,
+		...blockStyles,
+		background: {
+			...blockStyles.background,
+			...newBackgroundStyles,
 		},
 	};
 }
@@ -198,7 +176,6 @@ export function BackgroundImagePanel( {
 }
 
 export default {
-	useBlockProps,
 	attributeKeys: [ 'style' ],
 	hasSupport: hasBackgroundSupport,
 };
