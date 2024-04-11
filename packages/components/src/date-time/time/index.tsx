@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { startOfMinute, format, set, setHours, setMonth } from 'date-fns';
+import { startOfMinute, format, set, setMonth } from 'date-fns';
 
 /**
  * WordPress dependencies
@@ -13,32 +13,26 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BaseControl from '../../base-control';
-import Button from '../../button';
-import ButtonGroup from '../../button-group';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
-import type { TimePickerProps } from '../types';
+import type { TimeInputChangeArgs, TimePickerProps } from '../types';
 import {
 	Wrapper,
 	Fieldset,
-	HoursInput,
-	TimeSeparator,
-	MinutesInput,
 	MonthSelectWrapper,
 	DayInput,
 	YearInput,
-	TimeWrapper,
 } from './styles';
 import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
 import {
 	inputToDate,
-	from12hTo24h,
 	buildPadInputStateReducer,
 	validateInputElementTarget,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
+import { TimeInput } from '../time-input';
 
 /**
  * TimePicker is a React component that renders a clock for time selection.
@@ -80,7 +74,7 @@ export function TimePicker( {
 		);
 	}, [ currentTime ] );
 
-	const { day, month, year, minutes, hours, am } = useMemo(
+	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
 			day: format( date, 'dd' ),
 			month: format( date, 'MM' ),
@@ -92,23 +86,14 @@ export function TimePicker( {
 		[ date, is12Hour ]
 	);
 
-	const buildNumberControlChangeCallback = (
-		method: 'hours' | 'minutes' | 'date' | 'year'
-	) => {
+	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
 			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
 
 			// We can safely assume value is a number if target is valid.
-			let numberValue = Number( value );
-
-			// If the 12-hour format is being used and the 'PM' period is
-			// selected, then the incoming value (which ranges 1-12) should be
-			// increased by 12 to match the expected 24-hour format.
-			if ( method === 'hours' && is12Hour ) {
-				numberValue = from12hTo24h( numberValue, am === 'PM' );
-			}
+			const numberValue = Number( value );
 
 			const newDate = set( date, { [ method ]: numberValue } );
 			setDate( newDate );
@@ -117,22 +102,17 @@ export function TimePicker( {
 		return callback;
 	};
 
-	function buildAmPmChangeCallback( value: 'AM' | 'PM' ) {
-		return () => {
-			if ( am === value ) {
-				return;
-			}
-
-			const parsedHours = parseInt( hours, 10 );
-
-			const newDate = setHours(
-				date,
-				from12hTo24h( parsedHours, value === 'PM' )
-			);
-			setDate( newDate );
-			onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
-		};
-	}
+	const onTimeInputChangeCallback = ( {
+		hours: newHours,
+		minutes: newMinutes,
+	}: TimeInputChangeArgs ) => {
+		const newDate = set( date, {
+			hours: newHours,
+			minutes: newMinutes,
+		} );
+		setDate( newDate );
+		onChange?.( format( newDate, TIMEZONELESS_FORMAT ) );
+	};
 
 	const dayField = (
 		<DayInput
@@ -199,84 +179,12 @@ export function TimePicker( {
 				<HStack
 					className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
 				>
-					<TimeWrapper
-						className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
-					>
-						<HoursInput
-							className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
-							label={ __( 'Hours' ) }
-							hideLabelFromVision
-							__next40pxDefaultSize
-							value={ hours }
-							step={ 1 }
-							min={ is12Hour ? 1 : 0 }
-							max={ is12Hour ? 12 : 23 }
-							required
-							spinControls="none"
-							isPressEnterToChange
-							isDragEnabled={ false }
-							isShiftStepEnabled={ false }
-							onChange={ buildNumberControlChangeCallback(
-								'hours'
-							) }
-							__unstableStateReducer={ buildPadInputStateReducer(
-								2
-							) }
-						/>
-						<TimeSeparator
-							className="components-datetime__time-separator" // Unused, for backwards compatibility.
-							aria-hidden="true"
-						>
-							:
-						</TimeSeparator>
-						<MinutesInput
-							className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
-							label={ __( 'Minutes' ) }
-							hideLabelFromVision
-							__next40pxDefaultSize
-							value={ minutes }
-							step={ 1 }
-							min={ 0 }
-							max={ 59 }
-							required
-							spinControls="none"
-							isPressEnterToChange
-							isDragEnabled={ false }
-							isShiftStepEnabled={ false }
-							onChange={ buildNumberControlChangeCallback(
-								'minutes'
-							) }
-							__unstableStateReducer={ buildPadInputStateReducer(
-								2
-							) }
-						/>
-					</TimeWrapper>
-					{ is12Hour && (
-						<ButtonGroup
-							className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
-						>
-							<Button
-								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
-								variant={
-									am === 'AM' ? 'primary' : 'secondary'
-								}
-								__next40pxDefaultSize
-								onClick={ buildAmPmChangeCallback( 'AM' ) }
-							>
-								{ __( 'AM' ) }
-							</Button>
-							<Button
-								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
-								variant={
-									am === 'PM' ? 'primary' : 'secondary'
-								}
-								__next40pxDefaultSize
-								onClick={ buildAmPmChangeCallback( 'PM' ) }
-							>
-								{ __( 'PM' ) }
-							</Button>
-						</ButtonGroup>
-					) }
+					<TimeInput
+						hours={ Number( hours ) }
+						minutes={ Number( minutes ) }
+						is12Hour={ is12Hour }
+						onChange={ onTimeInputChangeCallback }
+					/>
 					<Spacer />
 					<TimeZone />
 				</HStack>
