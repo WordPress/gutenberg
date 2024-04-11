@@ -2816,11 +2816,17 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// In zoom-out mode, the block overlay is always active for section level blocks.
 	if ( editorMode === 'zoom-out' ) {
 		const { sectionRootClientId } = unlock( getSettings( state ) );
-		const sectionClientIds = getBlockOrder( state, sectionRootClientId );
-		if ( sectionClientIds?.includes( clientId ) ) {
+		if ( sectionRootClientId ) {
+			const sectionClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
+			if ( sectionClientIds?.includes( clientId ) ) {
+				return true;
+			}
+		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
 			return true;
 		}
-		return true;
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
