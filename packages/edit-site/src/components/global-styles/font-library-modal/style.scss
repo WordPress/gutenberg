@@ -72,6 +72,11 @@
 	.font-library-modal__font-card__count {
 		color: $gray-700;
 	}
+
+	.font-library-modal__font-variant_demo-text {
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
 }
 
 .font-library-modal__font-variant_demo-image {
