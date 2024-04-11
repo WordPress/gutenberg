@@ -132,9 +132,7 @@ test.describe( 'Style Book', () => {
 		} );
 
 		// Close Style Book via click event.
-		await styleBookRegion
-			.getByRole( 'button', { name: 'Close Style Book' } )
-			.click();
+		await styleBookRegion.getByRole( 'button', { name: 'Close' } ).click();
 
 		await expect(
 			styleBookRegion,

@@ -406,7 +406,7 @@ export const enablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', true );
+			.set( 'core', 'isPublishSidebarEnabled', true );
 	};
 
 /**
@@ -417,7 +417,7 @@ export const disablePublishSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( preferencesStore )
-			.set( 'core/edit-post', 'isPublishSidebarEnabled', false );
+			.set( 'core', 'isPublishSidebarEnabled', false );
 	};
 
 /**
@@ -583,7 +583,6 @@ export function updateEditorSettings( settings ) {
 /**
  * Returns an action used to set the rendering mode of the post editor. We support multiple rendering modes:
  *
- * -   `all`: This is the default mode. It renders the post editor with all the features available. If a template is provided, it's preferred over the post.
  * -   `post-only`: This mode extracts the post blocks from the template and renders only those. The idea is to allow the user to edit the post/page in isolation without the wrapping template.
  * -   `template-locked`: This mode renders both the template and the post blocks but the template blocks are locked and can't be edited. The post blocks are editable.
  *
@@ -819,6 +818,41 @@ export const switchEditorMode =
 			speak( __( 'Code editor selected' ), 'assertive' );
 		}
 	};
+
+/**
+ * Returns an action object used in signalling that the user opened the publish
+ * sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function openPublishSidebar() {
+	return {
+		type: 'OPEN_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user closed the
+ * publish sidebar.
+ *
+ * @return {Object} Action object.
+ */
+export function closePublishSidebar() {
+	return {
+		type: 'CLOSE_PUBLISH_SIDEBAR',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user toggles the publish sidebar.
+ *
+ * @return {Object} Action object
+ */
+export function togglePublishSidebar() {
+	return {
+		type: 'TOGGLE_PUBLISH_SIDEBAR',
+	};
+}
 
 /**
  * Backward compatibility

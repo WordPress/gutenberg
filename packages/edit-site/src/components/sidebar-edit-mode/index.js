@@ -22,7 +22,6 @@ import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
-import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
 import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -96,7 +95,6 @@ const FillContents = ( {
 						focusable={ false }
 					>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
-						<PluginTemplateSettingPanel.Slot />
 					</Tabs.TabPanel>
 					<Tabs.TabPanel tabId={ SIDEBAR_BLOCK } focusable={ false }>
 						<InspectorSlot bubblesVirtually />

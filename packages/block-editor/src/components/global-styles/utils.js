@@ -11,6 +11,7 @@ import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
 export const ROOT_BLOCK_SELECTOR = 'body';
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{

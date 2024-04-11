@@ -1,5 +1,3 @@
-$header-toolbar-min-width: 335px;
-
 .edit-site-header-edit-mode {
 	height: $header-height;
 	align-items: center;
@@ -16,46 +14,62 @@ $header-toolbar-min-width: 335px;
 		display: flex;
 		border: none;
 		align-items: center;
+		flex-grow: 1;
 		flex-shrink: 2;
-		// We need this to be overflow hidden so the block toolbar can
-		// overflow scroll. If the overflow is visible, flexbox allows
-		// the toolbar to grow outside of the allowed container space.
-		overflow: hidden;
 		// Take up the full height of the header so the border focus
 		// is visible on toolbar buttons.
 		height: 100%;
 		// Allow focus ring to be fully visible on furthest right button.
 		@include break-medium() {
-			padding-right: 2px;
+			padding-right: var(--wp-admin-border-width-focus);
+			// Account for the site hub, which is 60x60px.
+			flex-basis: calc(37.5% - 60px);
+			// We need this to be overflow hidden so the block toolbar can
+			// overflow scroll. If the overflow is visible, flexbox allows
+			// the toolbar to grow outside of the allowed container space.
+			overflow: hidden;
 		}
 	}
 
 	.edit-site-header-edit-mode__end {
 		display: flex;
 		justify-content: flex-end;
+		height: 100%;
+		flex-grow: 1;
+		flex-shrink: 1;
+
+		@include break-medium() {
+			flex-basis: 37.5%;
+		}
 	}
 
 	.edit-site-header-edit-mode__center {
-		display: flex;
 		align-items: center;
-		height: 100%;
+		display: flex;
+		flex-basis: 100%;
 		flex-grow: 1;
-		margin: 0 $grid-unit-20;
+		flex-shrink: 2;
+		height: 100%;
 		justify-content: center;
+
 		// Flex items will, by default, refuse to shrink below a minimum
 		// intrinsic width. In order to shrink this flexbox item, and
 		// subsequently truncate child text, we set an explicit min-width.
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
+
+		@include break-medium() {
+			flex-basis: 25%;
+		}
 	}
 
 }
 
 .edit-site-header-edit-mode__toolbar {
-	display: flex;
 	align-items: center;
-	padding-left: $grid-unit-20;
+	display: flex;
 	gap: $grid-unit-10;
+	padding-left: $grid-unit-20;
 
 	@include break-medium() {
 		padding-left: $grid-unit-50 * 0.5;
@@ -87,12 +101,9 @@ $header-toolbar-min-width: 335px;
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: nowrap;
-	padding-right: $grid-unit-05;
-
-	@include break-small () {
-		padding-right: $grid-unit-10;
-	}
-
+	// Ensure actions do not press against .edit-site-header-edit-mode__center.
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	gap: $grid-unit-10;
 }
 

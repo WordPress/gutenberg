@@ -41,122 +41,11 @@ _Parameters_
 
 ### PluginBlockSettingsMenuItem
 
-Renders a new item in the block settings menu.
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginBlockSettingsMenuItem = wp.editPost.PluginBlockSettingsMenuItem;
-
-function doOnClick() {
-	// To be called when the user clicks the menu item.
-}
-
-function MyPluginBlockSettingsMenuItem() {
-	return React.createElement( PluginBlockSettingsMenuItem, {
-		allowedBlocks: [ 'core/paragraph' ],
-		icon: 'dashicon-name',
-		label: __( 'Menu item text' ),
-		onClick: doOnClick,
-	} );
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
-
-const doOnClick = () => {
-	// To be called when the user clicks the menu item.
-};
-
-const MyPluginBlockSettingsMenuItem = () => (
-	<PluginBlockSettingsMenuItem
-		allowedBlocks={ [ 'core/paragraph' ] }
-		icon="dashicon-name"
-		label={ __( 'Menu item text' ) }
-		onClick={ doOnClick }
-	/>
-);
-```
-
-_Parameters_
-
--   _props_ `Object`: Component props.
--   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the allowed list.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
--   _props.label_ `string`: The menu item text.
--   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
--   _props.small_ `[boolean]`: Whether to render the label or not.
--   _props.role_ `[string]`: The ARIA role for the menu item.
-
-_Returns_
-
--   `Component`: The component to be rendered.
+Undocumented declaration.
 
 ### PluginDocumentSettingPanel
 
-Renders items below the Status & Availability panel in the Document Sidebar.
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var el = React.createElement;
-var __ = wp.i18n.__;
-var registerPlugin = wp.plugins.registerPlugin;
-var PluginDocumentSettingPanel = wp.editPost.PluginDocumentSettingPanel;
-
-function MyDocumentSettingPlugin() {
-	return el(
-		PluginDocumentSettingPanel,
-		{
-			className: 'my-document-setting-plugin',
-			title: 'My Panel',
-			name: 'my-panel',
-		},
-		__( 'My Document Setting Panel' )
-	);
-}
-
-registerPlugin( 'my-document-setting-plugin', {
-	render: MyDocumentSettingPlugin,
-} );
-```
-
-```jsx
-// Using ESNext syntax
-import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-
-const MyDocumentSettingTest = () => (
-	<PluginDocumentSettingPanel
-		className="my-document-setting-plugin"
-		title="My Panel"
-		name="my-panel"
-	>
-		<p>My Document Setting Panel</p>
-	</PluginDocumentSettingPanel>
-);
-
-registerPlugin( 'document-setting-test', { render: MyDocumentSettingTest } );
-```
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.name_ `string`: Required. A machine-friendly name for the panel.
--   _props.className_ `[string]`: An optional class name added to the row.
--   _props.title_ `[string]`: The title of the panel
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+Undocumented declaration.
 
 ### PluginMoreMenuItem
 
@@ -217,43 +106,9 @@ _Returns_
 
 ### PluginPostPublishPanel
 
+> **Deprecated** since 6.6, use `wp.editor.PluginPostPublishPanel` instead.
+
 Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
-
-function MyPluginPostPublishPanel() {
-	return React.createElement(
-		PluginPostPublishPanel,
-		{
-			className: 'my-plugin-post-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPostPublishPanel = () => (
-	<PluginPostPublishPanel
-		className="my-plugin-post-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPostPublishPanel>
-);
-```
 
 _Parameters_
 
@@ -314,43 +169,9 @@ _Returns_
 
 ### PluginPrePublishPanel
 
+> **Deprecated** since 6.6, use `wp.editor.PluginPrePublishPanel` instead.
+
 Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
-
-_Usage_
-
-```js
-// Using ES5 syntax
-var __ = wp.i18n.__;
-var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
-
-function MyPluginPrePublishPanel() {
-	return React.createElement(
-		PluginPrePublishPanel,
-		{
-			className: 'my-plugin-pre-publish-panel',
-			title: __( 'My panel title' ),
-			initialOpen: true,
-		},
-		__( 'My panel content' )
-	);
-}
-```
-
-```jsx
-// Using ESNext syntax
-import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
-
-const MyPluginPrePublishPanel = () => (
-	<PluginPrePublishPanel
-		className="my-plugin-pre-publish-panel"
-		title={ __( 'My panel title' ) }
-		initialOpen={ true }
-	>
-		{ __( 'My panel content' ) }
-	</PluginPrePublishPanel>
-);
-```
 
 _Parameters_
 
