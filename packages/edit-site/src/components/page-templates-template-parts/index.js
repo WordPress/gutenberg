@@ -35,7 +35,6 @@ import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
@@ -98,11 +97,6 @@ function Title( { item, viewType } ) {
 			canvas: 'edit',
 		},
 	};
-	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
-		linkProps.state = {
-			backPath: '/wp_template_part/all',
-		};
-	}
 	return (
 		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
