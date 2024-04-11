@@ -4,22 +4,7 @@
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
 
-	.components-checkbox-control__input[type="checkbox"],
-	.components-checkbox-control__input-container {
-		width: $grid-unit-20;
-		height: $grid-unit-20;
-	}
-	.components-checkbox-control {
-		.components-base-control__field {
-			display: flex;
-		}
-	}
-
-	svg.components-checkbox-control__checked,
-	svg.components-checkbox-control__indeterminate {
-		height: #{$grid-unit-05 * 5};
-		width: #{$grid-unit-05 * 5};
-	}
+	--wp-components-checkbox-control-size: 16px;
 }
 
 .dataviews-filters__view-actions {
