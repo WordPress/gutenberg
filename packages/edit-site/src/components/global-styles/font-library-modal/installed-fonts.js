@@ -181,7 +181,6 @@ function InstalledFonts() {
 							) ) }
 						</>
 					) }
-					<Spacer margin={ 16 } />
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/fontFamily">
