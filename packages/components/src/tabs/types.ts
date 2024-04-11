@@ -45,13 +45,6 @@ export type TabsProps = {
 	 */
 	defaultTabId?: string;
 	/**
-	 * If the initial tab should show the tab pane (be selected) or only
-	 * show the active tab.
-	 *
-	 * @default true
-	 */
-	selectedOnMount?: boolean;
-	/**
 	 * The function called when a tab has been selected.
 	 * It is passed the id of the newly selected tab as an argument.
 	 */
