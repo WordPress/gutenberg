@@ -73,23 +73,18 @@
 		color: $gray-700;
 	}
 
+	.font-library-modal__font-variant_demo-image {
+		display: block;
+		height: $grid-unit-30;
+		width: auto;
+	}
+
 	.font-library-modal__font-variant_demo-text {
 		white-space: nowrap;
-		text-overflow: ellipsis;
+		flex-shrink: 0;
+		transition: opacity 0.3s ease-in-out;
+		@include reduce-motion("transition");
 	}
-}
-
-.font-library-modal__font-variant_demo-image {
-	display: block;
-	height: $grid-unit-30;
-	width: auto;
-}
-
-.font-library-modal__font-variant_demo-text {
-	white-space: nowrap;
-	flex-shrink: 0;
-	transition: opacity 0.3s ease-in-out;
-	@include reduce-motion("transition");
 }
 
 .font-library-modal__font-variant {
