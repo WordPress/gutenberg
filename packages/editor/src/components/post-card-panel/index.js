@@ -15,45 +15,57 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
+import { count as wordCount } from '@wordpress/wordcount';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
 
 export default function PostCardPanel( { className, actions } ) {
-	const { modified, title, templateInfo, icon, postType } = useSelect(
-		( select ) => {
-			const {
-				getEditedPostAttribute,
-				getCurrentPostType,
-				getCurrentPostId,
-				__experimentalGetTemplateInfo,
-			} = select( editorStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const _type = getCurrentPostType();
-			const _id = getCurrentPostId();
-			const _record = getEditedEntityRecord( 'postType', _type, _id );
-			const _templateInfo = __experimentalGetTemplateInfo( _record );
-			return {
-				title:
-					_templateInfo?.title || getEditedPostAttribute( 'title' ),
-				modified: getEditedPostAttribute( 'modified' ),
-				id: _id,
-				postType: _type,
-				templateInfo: _templateInfo,
-				icon: unlock( select( editorStore ) ).getPostIcon( _type, {
-					area: _record?.area,
-				} ),
-			};
-		}
-	);
+	const {
+		modified,
+		title,
+		templateInfo,
+		icon,
+		postType,
+		postContent,
+		isPostsPage,
+	} = useSelect( ( select ) => {
+		const {
+			getEditedPostAttribute,
+			getCurrentPostType,
+			getCurrentPostId,
+			__experimentalGetTemplateInfo,
+		} = select( editorStore );
+		const { getEditedEntityRecord, getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+		const _type = getCurrentPostType();
+		const _id = getCurrentPostId();
+		const _record = getEditedEntityRecord( 'postType', _type, _id );
+		const _templateInfo = __experimentalGetTemplateInfo( _record );
+		return {
+			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
+			modified: getEditedPostAttribute( 'modified' ),
+			id: _id,
+			postType: _type,
+			templateInfo: _templateInfo,
+			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
+				area: _record?.area,
+			} ),
+			isPostsPage: +_id === siteSettings?.page_for_posts,
+			postContent: _record?.content?.rendered || _record?.content,
+		};
+	}, [] );
 	const description = templateInfo?.description;
 	const lastEditedText =
 		modified &&
@@ -62,7 +74,10 @@ export default function PostCardPanel( { className, actions } ) {
 			__( 'Last edited %s.' ),
 			humanTimeDiff( modified )
 		);
-
+	const showPostContentInfo =
+		! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+			postType
+		) && ! isPostsPage;
 	return (
 		<PanelBody>
 			<div
@@ -89,20 +104,85 @@ export default function PostCardPanel( { className, actions } ) {
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
-					{ ( description || lastEditedText ) && (
+					{ ( description ||
+						lastEditedText ||
+						showPostContentInfo ) && (
 						<VStack
 							className="editor-post-card-panel__description"
 							spacing={ 2 }
 						>
 							{ description && <Text>{ description }</Text> }
-							{ lastEditedText && (
-								<Text>{ lastEditedText }</Text>
-							) }
+							<span>
+								{ showPostContentInfo && (
+									<PostContentInfo
+										postContent={ postContent }
+									/>
+								) }{ ' ' }
+								{ lastEditedText && (
+									<Text>{ lastEditedText }</Text>
+								) }
+							</span>
 						</VStack>
 					) }
 					{ postType === TEMPLATE_POST_TYPE && <TemplateAreas /> }
 				</VStack>
 			</div>
 		</PanelBody>
+	);
+}
+
+// Taken from packages/editor/src/components/time-to-read/index.js.
+const AVERAGE_READING_RATE = 189;
+
+// This component renders the wordcount and reading time for the post.
+function PostContentInfo( { postContent } ) {
+	/*
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const wordsCounted = postContent
+		? wordCount( postContent, wordCountType )
+		: 0;
+	if ( ! wordsCounted ) {
+		return null;
+	}
+	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
+	let wordsCountText;
+	if ( ! wordsCounted.toLocaleString() ) {
+		wordsCountText = __( 'Unknown' );
+	} else {
+		wordsCountText =
+			wordsCounted === 1
+				? __( '1 word' )
+				: sprintf(
+						// translators: %s: the number of words in the post.
+						_n( '%s word', '%s words', wordsCounted ),
+						wordsCounted.toLocaleString()
+				  );
+	}
+	const readingTimeText =
+		readingTime <= 1
+			? __( '1 minute read time' )
+			: sprintf(
+					// translators: %s: the number of words in the post.
+					_n(
+						'%s minute read time',
+						'%s minutes read time',
+						readingTime
+					),
+					readingTime.toLocaleString()
+			  );
+	return (
+		<Text>
+			{ sprintf(
+				/* translators: 1: How many words a post has(eg. 30 words). 2: the number of minutes of read time(eg. 2 minutes read time) */
+				/* translators: %1s: is the number of minutes. */
+				'%1$s, %2$s.',
+				wordsCountText,
+				readingTimeText
+			) }
+		</Text>
 	);
 }
