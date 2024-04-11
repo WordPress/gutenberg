@@ -286,38 +286,29 @@ function Iframe( {
 			// Hack to get proper margins when scaling the iframe document.
 			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
-			iframeDocument.body.classList.add( 'is-zoomed-out' );
-
 			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
 			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * scale ) {
-				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
-				) }px`;
-			}
 
 			return () => {
-				iframeDocument.body.classList.remove( 'is-zoomed-out' );
 				iframeDocument.documentElement.style.transform = '';
 				iframeDocument.documentElement.style.marginTop = '';
 				iframeDocument.documentElement.style.marginBottom = '';
-				iframeDocument.body.style.minHeight = '';
 			};
 		}
-	}, [
-		scale,
-		frameSize,
-		iframeDocument,
-		contentHeight,
-		iframeWindowInnerHeight,
-		contentWidth,
-	] );
+	}, [ scale, frameSize, iframeDocument, contentHeight ] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
+
+	const scaleMinHeight =
+		scale !== 1 && iframeWindowInnerHeight > contentHeight * scale
+			? `${ Math.floor(
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
+			  ) }px`
+			: undefined;
 
 	return (
 		<>
@@ -369,10 +360,14 @@ function Iframe( {
 						<body
 							ref={ bodyRef }
 							className={ classnames(
+								scale !== 1 && 'is-zoomed-out',
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
 							) }
+							style={ {
+								minHeight: scaleMinHeight,
+							} }
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
