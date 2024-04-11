@@ -21,7 +21,14 @@ export default function PostURLPanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
-		() => ( { anchor: popoverAnchor, placement: 'bottom-end' } ),
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
 		[ popoverAnchor ]
 	);
 
@@ -47,10 +54,10 @@ export default function PostURLPanel() {
 
 function PostURLToggle( { isOpen, onClick } ) {
 	const slug = useSelect(
-		( select ) =>
-			safeDecodeURIComponent( select( editorStore ).getEditedPostSlug() ),
+		( select ) => select( editorStore ).getEditedPostSlug(),
 		[]
 	);
+	const decodedSlug = safeDecodeURIComponent( slug );
 	return (
 		<Button
 			__next40pxDefaultSize
@@ -58,10 +65,10 @@ function PostURLToggle( { isOpen, onClick } ) {
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			// translators: %s: Current post link.
-			aria-label={ sprintf( __( 'Change link: %s' ), slug ) }
+			aria-label={ sprintf( __( 'Change link: %s' ), decodedSlug ) }
 			onClick={ onClick }
 		>
-			{ slug }
+			{ decodedSlug }
 		</Button>
 	);
 }

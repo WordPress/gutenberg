@@ -64,16 +64,18 @@ export default function PostURL( { onClose } ) {
 				onClose={ onClose }
 			/>
 			<VStack spacing={ 3 }>
-				<div>
-					{ __( 'Customize the last part of the URL. ' ) }
-					<ExternalLink
-						href={ __(
-							'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-						) }
-					>
-						{ __( 'Learn more.' ) }
-					</ExternalLink>
-				</div>
+				{ isEditable && (
+					<div>
+						{ __( 'Customize the last part of the URL. ' ) }
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+							) }
+						>
+							{ __( 'Learn more.' ) }
+						</ExternalLink>
+					</div>
+				) }
 				<div>
 					{ isEditable && (
 						<InputControl
