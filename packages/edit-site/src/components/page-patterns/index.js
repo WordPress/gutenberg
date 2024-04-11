@@ -36,6 +36,8 @@ import {
 } from '@wordpress/icons';
 import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -71,6 +73,8 @@ import { useAddedBy } from '../page-templates-template-parts/hooks';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+const { usePostActions } = unlock( editorPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
@@ -150,11 +154,6 @@ function Preview( { item, categoryId, viewType } ) {
 		ariaDescriptions.push( item.description );
 	}
 
-	if ( isNonUserPattern ) {
-		ariaDescriptions.push(
-			__( 'Theme & plugin patterns cannot be edited.' )
-		);
-	}
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -165,47 +164,46 @@ function Preview( { item, categoryId, viewType } ) {
 	} );
 
 	return (
-		<>
-			<div
-				className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
-				style={ { backgroundColor } }
+		<div
+			className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
+			style={ { backgroundColor } }
+		>
+			<PreviewWrapper
+				item={ item }
+				onClick={ onClick }
+				ariaDescribedBy={
+					ariaDescriptions.length
+						? ariaDescriptions
+								.map(
+									( _, index ) =>
+										`${ descriptionId }-${ index }`
+								)
+								.join( ' ' )
+						: undefined
+				}
 			>
-				<PreviewWrapper
-					item={ item }
-					onClick={ onClick }
-					ariaDescribedBy={
-						ariaDescriptions.length
-							? ariaDescriptions
-									.map(
-										( _, index ) =>
-											`${ descriptionId }-${ index }`
-									)
-									.join( ' ' )
-							: undefined
-					}
-				>
-					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
-					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && (
-						<Async>
-							<BlockPreview
-								blocks={ item.blocks }
-								viewportWidth={ item.viewportWidth }
-							/>
-						</Async>
-					) }
-				</PreviewWrapper>
-			</div>
-			{ ariaDescriptions.map( ( ariaDescription, index ) => (
-				<div
-					key={ index }
-					hidden
-					id={ `${ descriptionId }-${ index }` }
-				>
-					{ ariaDescription }
-				</div>
-			) ) }
-		</>
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
+				{ ! isEmpty && (
+					<Async>
+						<BlockPreview
+							blocks={ item.blocks }
+							viewportWidth={ item.viewportWidth }
+						/>
+					</Async>
+				) }
+			</PreviewWrapper>
+			{ ! isNonUserPattern &&
+				ariaDescriptions.map( ( ariaDescription, index ) => (
+					<div
+						key={ index }
+						hidden
+						id={ `${ descriptionId }-${ index }` }
+					>
+						{ ariaDescription }
+					</div>
+				) ) }
+		</div>
 	);
 }
 
@@ -439,17 +437,45 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const actions = useMemo(
-		() => [
+	const history = useHistory();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					categoryId,
+					categoryType: type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
+	const actions = useMemo( () => {
+		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			return [
+				editAction,
+				renameAction,
+				duplicateTemplatePartAction,
+				viewRevisionsAction,
+				resetAction,
+				deleteAction,
+			];
+		}
+		return [
 			renameAction,
 			duplicatePatternAction,
-			duplicateTemplatePartAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		],
-		[]
-	);
+		];
+	}, [ type, editAction, viewRevisionsAction ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
