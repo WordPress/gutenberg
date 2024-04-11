@@ -258,7 +258,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'edited Editable',
-					metadata: undefined,
+					metadata: { name: paragraphName },
 				},
 			},
 		] );
