@@ -257,6 +257,37 @@ Object.defineProperties( Node.prototype, {
 			return sibling;
 		},
 	},
+	dataset: {
+		get() {
+			const self = this;
+
+			// Helper function to convert property name to data-* attribute name
+			function toDataAttributeName( property ) {
+				return (
+					'data-' +
+					property.replace(
+						/[A-Z]/g,
+						( match ) => '-' + match.toLowerCase()
+					)
+				);
+			}
+			return new Proxy(
+				{},
+				{
+					set( _target, property, value ) {
+						const attributeName = toDataAttributeName( property );
+						self.setAttribute( attributeName, value );
+						return true;
+					},
+					get( _target, property ) {
+						const attributeName = toDataAttributeName( property );
+						return self.getAttribute( attributeName );
+					},
+				}
+			);
+		},
+		set() {},
+	},
 } );
 
 class DOMParser {
