@@ -459,13 +459,17 @@ export default function DataviewsPatterns() {
 		},
 		[ history ]
 	);
-	const [ editAction ] = usePostActions( onActionPerformed, [ 'edit-post' ] );
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
 				renameAction,
 				duplicateTemplatePartAction,
+				viewRevisionsAction,
 				resetAction,
 				deleteAction,
 			];
@@ -477,7 +481,7 @@ export default function DataviewsPatterns() {
 			resetAction,
 			deleteAction,
 		];
-	}, [ type, editAction ] );
+	}, [ type, editAction, viewRevisionsAction ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
