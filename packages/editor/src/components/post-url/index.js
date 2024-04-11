@@ -65,9 +65,7 @@ export default function PostURL( { onClose } ) {
 			/>
 			<VStack spacing={ 3 }>
 				<div>
-					{ __(
-						'The slug forms the last part of the URL for a page. '
-					) }
+					{ __( 'Customize the last part of the URL. ' ) }
 					<ExternalLink
 						href={ __(
 							'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
