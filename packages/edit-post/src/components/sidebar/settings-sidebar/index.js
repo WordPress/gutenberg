@@ -20,12 +20,14 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
 	PageAttributesPanel,
+	PluginDocumentSettingPanel,
 	PostDiscussionPanel,
 	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -33,14 +35,15 @@ import {
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
-import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
-import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
+const { PostCardPanel, PostActions } = unlock( editorPrivateApis );
+
 const { Tabs } = unlock( componentsPrivateApis );
+const { PatternOverridesPanel } = unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -50,6 +53,15 @@ export const sidebars = {
 	document: 'edit-post/document',
 	block: 'edit-post/block',
 };
+
+function onActionPerformed( actionId, items ) {
+	if ( actionId === 'move-to-trash' ) {
+		const postType = items[ 0 ].type;
+		document.location.href = addQueryArgs( 'edit.php', {
+			post_type: postType,
+		} );
+	}
+}
 
 const SidebarContent = ( {
 	sidebarName,
@@ -111,20 +123,26 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
+					<PostCardPanel
+						actions={
+							<PostActions
+								onActionPerformed={ onActionPerformed }
+							/>
+						}
+					/>
 					{ ! isEditingTemplate && (
 						<>
 							<PostStatus />
 							<PluginDocumentSettingPanel.Slot />
 							<PostLastRevisionPanel />
 							<PostTaxonomiesPanel />
-							<PostFeaturedImagePanel />
 							<PostExcerptPanel />
 							<PostDiscussionPanel />
 							<PageAttributesPanel />
+							<PatternOverridesPanel />
 							<MetaBoxes location="side" />
 						</>
 					) }
-					{ isEditingTemplate && <TemplateSummary /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />

@@ -15,6 +15,7 @@ import {
 	mayDisplayParentControlsKey,
 	blockEditingModeKey,
 	blockBindingsKey,
+	isPreviewModeKey,
 } from './context';
 
 /**
@@ -31,6 +32,7 @@ export default function BlockEdit( {
 	mayDisplayControls,
 	mayDisplayParentControls,
 	blockEditingMode,
+	isPreviewMode,
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
 	...props
@@ -65,6 +67,7 @@ export default function BlockEdit( {
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
+					[ isPreviewModeKey ]: isPreviewMode,
 				} ),
 				[
 					name,
@@ -77,6 +80,7 @@ export default function BlockEdit( {
 					mayDisplayParentControls,
 					blockEditingMode,
 					bindings,
+					isPreviewMode,
 				]
 			) }
 		>

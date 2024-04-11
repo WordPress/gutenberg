@@ -3,10 +3,11 @@
 	align-items: center;
 
 	// Hide all action buttons except the inserter on mobile.
-	.editor-document-tools__left > .components-button {
+	.editor-document-tools__left > .editor-history__redo,
+	.editor-document-tools__left > .editor-history__undo {
 		display: none;
 
-		@include break-small() {
+		@include break-medium() {
 			display: inline-flex;
 		}
 	}
@@ -39,7 +40,7 @@
 	// here to the original button styles
 	.editor-document-tools__left > .components-button.has-icon,
 	.editor-document-tools__left > .components-dropdown > .components-button.has-icon {
-		// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+		// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 		// This is best fixed by making the mover control area a proper single toolbar group.
 		// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
 		height: $button-size-compact;
@@ -70,14 +71,6 @@
 	// Some plugins add buttons here despite best practices.
 	// Push them a bit rightwards to fit the top toolbar.
 	margin-right: $grid-unit-10;
-
-	@include break-medium() {
-		padding-left: $grid-unit-50 * 0.5;
-	}
-
-	@include break-wide() {
-		padding-right: $grid-unit-10;
-	}
 }
 
 .editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {

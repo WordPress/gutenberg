@@ -42,7 +42,6 @@ export const Track = styled.div`
 
 export const Indicator = styled.div< {
 	isIndeterminate: boolean;
-	value?: number;
 } >`
 	display: inline-block;
 	position: absolute;
@@ -60,7 +59,7 @@ export const Indicator = styled.div< {
 	outline: 2px solid transparent;
 	outline-offset: -2px;
 
-	${ ( { isIndeterminate, value } ) =>
+	${ ( { isIndeterminate } ) =>
 		isIndeterminate
 			? css( {
 					animationDuration: '1.5s',
@@ -70,7 +69,7 @@ export const Indicator = styled.div< {
 					width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 			  } )
 			: css( {
-					width: `${ value }%`,
+					width: 'var(--indicator-width)',
 					transition: 'width 0.4s ease-in-out',
 			  } ) };
 `;

@@ -223,7 +223,7 @@ Once approved, the new Gutenberg version will be available to WordPress users al
 
 The final step is to write a release post on [make.wordpress.org/core](https://make.wordpress.org/core/). You can find some tips on that below.
 
-#### Troubleshooting the release
+### Troubleshooting the release
 
 > The plugin was published to the WordPress.org plugin directory but the workflow failed.
 

@@ -24,6 +24,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
@@ -35,6 +36,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import DimensionControls from './dimension-controls';
+import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -144,6 +146,7 @@ export default function PostFeaturedImageEdit( {
 		style: { width, height, aspectRatio },
 	} );
 	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const blockEditingMode = useBlockEditingMode();
 
 	const placeholder = ( content ) => {
@@ -158,6 +161,7 @@ export default function PostFeaturedImageEdit( {
 					height: !! aspectRatio && '100%',
 					width: !! aspectRatio && '100%',
 					...borderProps.style,
+					...shadowProps.style,
 				} }
 			>
 				{ content }
@@ -178,7 +182,7 @@ export default function PostFeaturedImageEdit( {
 
 	const controls = blockEditingMode === 'default' && (
 		<>
-			<Overlay
+			<OverlayControls
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				clientId={ clientId }
@@ -259,6 +263,11 @@ export default function PostFeaturedImageEdit( {
 					) : (
 						placeholder()
 					) }
+					<Overlay
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
 				</div>
 			</>
 		);
@@ -267,6 +276,7 @@ export default function PostFeaturedImageEdit( {
 	const label = __( 'Add a featured image' );
 	const imageStyles = {
 		...borderProps.style,
+		...shadowProps.style,
 		height: aspectRatio ? '100%' : height,
 		width: !! aspectRatio && '100%',
 		objectFit: !! ( height || aspectRatio ) && scale,
@@ -363,6 +373,11 @@ export default function PostFeaturedImageEdit( {
 				) : (
 					image
 				) }
+				<Overlay
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
 			</figure>
 		</>
 	);

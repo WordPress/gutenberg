@@ -142,6 +142,10 @@ export default function KeyboardShortcutHelpModal() {
 				title={ __( 'Text formatting' ) }
 				shortcuts={ textFormattingShortcuts }
 			/>
+			<ShortcutCategorySection
+				title={ __( 'List View shortcuts' ) }
+				categoryName="list-view"
+			/>
 		</Modal>
 	);
 }

@@ -32,7 +32,7 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 
-const inputLabel = __( 'Search for commands' );
+const inputLabel = __( 'Search commands and settings' );
 
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
@@ -278,12 +278,12 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
-						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
+						<Icon icon={ inputIcon } />
 					</div>
 					<Command.List ref={ commandListRef }>
 						{ search && ! isLoading && (

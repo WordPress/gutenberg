@@ -18,7 +18,9 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { ENTER, SPACE } from '@wordpress/keycodes';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 /**
  * Internal dependencies
@@ -30,6 +32,8 @@ import {
 	OPERATOR_IS_NOT,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
+	OPERATOR_IS_ALL,
+	OPERATOR_IS_NOT_ALL,
 } from './constants';
 
 const FilterText = ( { activeElements, filterInView, filter } ) => {
@@ -59,6 +63,30 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 			sprintf(
 				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is none: Admin, Editor". */
 				__( '<Name>%1$s is none: </Name><Value>%2$s</Value>' ),
+				filter.name,
+				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		);
+	}
+
+	if ( filterInView?.operator === OPERATOR_IS_ALL ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is all: Admin, Editor". */
+				__( '<Name>%1$s is all: </Name><Value>%2$s</Value>' ),
+				filter.name,
+				activeElements.map( ( element ) => element.label ).join( ', ' )
+			),
+			filterTextWrappers
+		);
+	}
+
+	if ( filterInView?.operator === OPERATOR_IS_NOT_ALL ) {
+		return createInterpolateElement(
+			sprintf(
+				/* translators: 1: Filter name. 3: Filter value. e.g.: "Author is not all: Admin, Editor". */
+				__( '<Name>%1$s is not all: </Name><Value>%2$s</Value>' ),
 				filter.name,
 				activeElements.map( ( element ) => element.label ).join( ', ' )
 			),
@@ -203,9 +231,7 @@ export default function FilterSummary( {
 							tabIndex={ 0 }
 							onClick={ onToggle }
 							onKeyDown={ ( event ) => {
-								if (
-									[ ENTER, SPACE ].includes( event.keyCode )
-								) {
+								if ( [ ENTER, SPACE ].includes( event.key ) ) {
 									onToggle();
 									event.preventDefault();
 								}
