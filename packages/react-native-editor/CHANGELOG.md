@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Add empty fallback option for the BottomSheetSelectControl component [#60333]
 -   [*] Fix Quote Block styles [#60476]
+-   [*] Fix a crash when pasting file images and special comment markup [#60476]
 
 ## 1.116.0
 -   [**] Highlight color formatting style improvements [#57650]
