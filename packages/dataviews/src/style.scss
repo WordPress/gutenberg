@@ -250,7 +250,7 @@
 .dataviews-view-table__primary-field {
 	font-size: $default-font-size;
 	font-weight: 500;
-	color: $gray-900;
+	color: $gray-700;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	display: block;
@@ -258,12 +258,12 @@
 
 	a {
 		text-decoration: none;
-		color: inherit;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
 		flex-grow: 0;
+		color: $gray-900;
 
 		&:hover {
 			color: var(--wp-admin-theme-color);
@@ -273,13 +273,16 @@
 
 	button.components-button.is-link {
 		text-decoration: none;
-		color: inherit;
 		font-weight: inherit;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		overflow: hidden;
 		display: block;
 		width: 100%;
+		color: $gray-900;
+		&:hover {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 
@@ -341,8 +344,9 @@
 		line-height: 16px;
 
 		&:not(:empty) {
-			padding: $grid-unit-15;
+			padding: $grid-unit-15 0;
 			padding-top: 0;
+			margin: 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
@@ -366,6 +370,24 @@
 			.dataviews-view-grid__field-name {
 				color: $gray-700;
 			}
+		}
+	}
+
+	.dataviews-view-grid__badge-fields {
+		&:not(:empty) {
+			padding: $grid-unit-15;
+			padding-top: 0;
+		}
+
+		.dataviews-view-grid__field-value {
+			width: fit-content;
+			background: $gray-100;
+			padding: 0 $grid-unit-10;
+			min-height: $grid-unit-30;
+			border-radius: $radius-block-ui;
+			display: flex;
+			align-items: center;
+			font-size: 12px;
 		}
 	}
 }
@@ -399,6 +421,9 @@
 		}
 
 		&:not(.is-selected) {
+			.dataviews-view-list__primary-field {
+				color: $gray-900;
+			}
 			&:hover,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);

@@ -67,7 +67,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
-		displayAsColumnFields: [ 'description' ],
+		columnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -407,11 +407,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			}
 			actions={
 				postType === TEMPLATE_POST_TYPE ? (
-					<AddNewTemplate
-						templateType={ postType }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
+					<AddNewTemplate />
 				) : (
 					<AddNewTemplatePart />
 				)

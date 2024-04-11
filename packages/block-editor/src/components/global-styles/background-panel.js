@@ -492,9 +492,9 @@ function BackgroundSizeToolsPanelItem( {
 					label={ __( 'Fixed' ) }
 				/>
 			</ToggleGroupControl>
-			{ sizeValue !== undefined &&
-			sizeValue !== 'cover' &&
-			sizeValue !== 'contain' ? (
+			{ currentValueForToggle !== undefined &&
+			currentValueForToggle !== 'cover' &&
+			currentValueForToggle !== 'contain' ? (
 				<UnitControl
 					size={ '__unstable-large' }
 					onChange={ updateBackgroundSize }

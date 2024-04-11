@@ -145,10 +145,10 @@ export const trashPostAction = {
 											[ ...errorMessages ].join( ',' )
 										);
 									}
-									createErrorNotice( errorMessage, {
-										type: 'snackbar',
-									} );
 								}
+								createErrorNotice( errorMessage, {
+									type: 'snackbar',
+								} );
 							}
 							if ( onActionPerformed ) {
 								onActionPerformed( posts );
@@ -260,10 +260,10 @@ export function usePermanentlyDeletePostAction() {
 								[ ...errorMessages ].join( ',' )
 							);
 						}
-						createErrorNotice( errorMessage, {
-							type: 'snackbar',
-						} );
 					}
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
 				}
 			},
 		} ),
