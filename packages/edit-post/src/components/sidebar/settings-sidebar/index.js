@@ -63,11 +63,7 @@ function onActionPerformed( actionId, items ) {
 	}
 }
 
-const SidebarContent = ( {
-	sidebarName,
-	keyboardShortcut,
-	isEditingTemplate,
-} ) => {
+const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
@@ -86,7 +82,7 @@ const SidebarContent = ( {
 			// We are purposefully using a custom `data-tab-id` attribute here
 			// because we don't want rely on any assumptions about `Tabs`
 			// component internals.
-			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
+			( element ) => element.getAttribute( 'data-tab-id' ) === tabName
 		);
 		const activeElement = selectedTabElement?.ownerDocument.activeElement;
 		const tabsHasFocus = tabsElements.some( ( element ) => {
@@ -99,11 +95,11 @@ const SidebarContent = ( {
 		) {
 			selectedTabElement?.focus();
 		}
-	}, [ sidebarName ] );
+	}, [ tabName ] );
 
 	return (
 		<PluginSidebarEditPost
-			identifier={ sidebarName }
+			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<SettingsHeader ref={ tabListRef } />
@@ -153,41 +149,38 @@ const SidebarContent = ( {
 };
 
 const SettingsSidebar = () => {
-	const {
-		sidebarName,
-		isSettingsSidebarActive,
-		keyboardShortcut,
-		isEditingTemplate,
-	} = useSelect( ( select ) => {
-		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
-		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
-		// If one of the two sidebars is active the component will contain the content of that sidebar.
-		// When neither of the two sidebars is active we can not simply return null, because the PluginSidebarEditPost
-		// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
-		// should contain the sidebar that will be active when the toggle button is pressed. If a block
-		// is selected, that should be edit-post/block otherwise it's edit-post/document.
-		let sidebar = select( interfaceStore ).getActiveComplementaryArea(
-			editPostStore.name
-		);
-		let isSettingsSidebar = true;
-		if ( ! [ sidebars.document, sidebars.block ].includes( sidebar ) ) {
-			isSettingsSidebar = false;
-			if ( select( blockEditorStore ).getBlockSelectionStart() ) {
-				sidebar = sidebars.block;
+	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
+		( select ) => {
+			const shortcut = select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+
+			const sidebar = select( interfaceStore ).getActiveComplementaryArea(
+				editPostStore.name
+			);
+			const _isEditorSidebarOpened = [
+				sidebars.block,
+				sidebars.document,
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = !! select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document;
 			}
-			sidebar = sidebars.document;
-		}
-		const shortcut = select(
-			keyboardShortcutsStore
-		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
-		return {
-			sidebarName: sidebar,
-			isSettingsSidebarActive: isSettingsSidebar,
-			keyboardShortcut: shortcut,
-			isEditingTemplate:
-				select( editorStore ).getCurrentPostType() === 'wp_template',
-		};
-	}, [] );
+
+			return {
+				tabName: _tabName,
+				keyboardShortcut: shortcut,
+				isEditingTemplate:
+					select( editorStore ).getCurrentPostType() ===
+					'wp_template',
+			};
+		},
+		[]
+	);
 
 	const { openGeneralSidebar } = useDispatch( editPostStore );
 
@@ -202,17 +195,12 @@ const SettingsSidebar = () => {
 
 	return (
 		<Tabs
-			// Due to how this component is controlled (via a value from the
-			// `interfaceStore`), when the sidebar closes the currently selected
-			// tab can't be found. This causes the component to continuously reset
-			// the selection to `null` in an infinite loop.Proactively setting
-			// the selected tab to `null` avoids that.
-			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
+			selectedTabId={ tabName }
 			onSelect={ onTabSelect }
 			selectOnMove={ false }
 		>
 			<SidebarContent
-				sidebarName={ sidebarName }
+				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				isEditingTemplate={ isEditingTemplate }
 			/>
