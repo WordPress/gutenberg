@@ -160,28 +160,3 @@ function register_block_core_post_template() {
 	);
 }
 add_action( 'init', 'register_block_core_post_template' );
-
-/**
- * Adds the post classes to the REST API response.
- *
- * @since 6.6.0?
- */
-function add_post_class_to_api( $data, $post, $context ) {
-	$data->data['post_class'] = get_post_class( '', $post->ID );
-
-	return $data;
-}
-
-/**
- * Adds the post classes to all post types in the REST API.
- *
- * @since 6.6.0?
- */
-function add_post_class_to_all_post_types() {
-	$post_types = get_post_types( array( 'public' => true ), 'names' );
-
-	foreach ( $post_types as $post_type ) {
-		add_filter( "rest_prepare_{$post_type}", 'add_post_class_to_api', 10, 3 );
-	}
-}
-add_action( 'rest_api_init', 'add_post_class_to_all_post_types' );
