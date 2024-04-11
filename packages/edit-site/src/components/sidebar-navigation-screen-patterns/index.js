@@ -5,7 +5,6 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { getQueryArgs } from '@wordpress/url';
@@ -17,7 +16,6 @@ import { file } from '@wordpress/icons';
  * Internal dependencies
  */
 import AddNewPattern from '../add-new-pattern';
-import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -25,10 +23,8 @@ import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
-import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
-import { store as editSiteStore } from '../../store';
 
 function CategoriesGroup( {
 	templatePartAreas,
@@ -106,7 +102,6 @@ function CategoriesGroup( {
 }
 
 export default function SidebarNavigationScreenPatterns() {
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
 	const currentType = categoryType || PATTERN_TYPES.theme;
@@ -118,28 +113,6 @@ export default function SidebarNavigationScreenPatterns() {
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
 		[]
 	);
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
-
-	const templatePartsLink = useLink( {
-		path: '/wp_template_part/all',
-		// If a classic theme that supports template parts accessed
-		// the Patterns page directly, preserve that state in the URL.
-		didAccessPatternsPage:
-			! isBlockBasedTheme && isTemplatePartsMode ? 1 : undefined,
-	} );
-
-	const footer = ! isMobileViewport ? (
-		<ItemGroup>
-			{ ( isBlockBasedTheme || isTemplatePartsMode ) && (
-				<SidebarNavigationItem withChevron { ...templatePartsLink }>
-					{ __( 'Manage all template parts' ) }
-				</SidebarNavigationItem>
-			) }
-		</ItemGroup>
-	) : undefined;
 
 	return (
 		<SidebarNavigationScreen
@@ -149,7 +122,6 @@ export default function SidebarNavigationScreenPatterns() {
 				'Manage what patterns are available when editing the site.'
 			) }
 			actions={ <AddNewPattern /> }
-			footer={ footer }
 			content={
 				<>
 					{ isLoading && __( 'Loading patterns…' ) }
