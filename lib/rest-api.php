@@ -22,15 +22,15 @@ add_action( 'rest_api_init', 'gutenberg_register_global_styles_endpoints' );
 /**
  * Adds the post classes to the REST API response.
  *
- * @param WP_REST_Response $data    Response object.
+ * @param WP_REST_Response $response    Response object.
  * @param WP_Post          $post    Post object.
  *
  * @return WP_REST_Response Response object.
  */
-function gutenberg_add_post_class_to_api_response( $data, $post ) {
-	$data->data['post_class'] = get_post_class( '', $post->ID );
+function gutenberg_add_post_class_to_api_response( $response, $post ) {
+	$response->data['post_class'] = get_post_class( '', $post->ID );
 
-	return $data;
+	return $response;
 }
 
 /**
