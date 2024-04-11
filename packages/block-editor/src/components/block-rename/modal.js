@@ -92,7 +92,7 @@ export default function BlockRenameModal( {
 						help={
 							hasOverridesWarning
 								? __(
-										'This block allows overrides. Note that renaming could potentially break existing connections.'
+										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
 								  )
 								: undefined
 						}

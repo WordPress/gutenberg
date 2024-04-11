@@ -68,7 +68,7 @@ export default function AllowOverridesModal( {
 						label={ __( 'Block name' ) }
 						hideLabelFromVision
 						help={ __(
-							'This name will be used to denote the override wherever the synced pattern is used. The name here will help people understand its purpose. E.g. if you\'re creating a recipe pattern, it can be "recipe", "ingredients", etc.'
+							'This name will be used to denote the override wherever the synced pattern is used. The name here will help people understand its purpose. E.g. if you\'re creating a recipe pattern, it can be "Recipe Title", "Recipe Description", etc.'
 						) }
 						placeholder={ placeholder }
 						onChange={ setEditedBlockName }
