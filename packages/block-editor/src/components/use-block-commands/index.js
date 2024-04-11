@@ -47,7 +47,7 @@ export const useTransformCommands = () => {
 			// In order to prevent discrepancies between selectedBlockClientIds and selectedBlocks, we effectively treat the entire selection as invalid.
 			// We return a set of empty arrays to indicate that nothing is really selected and no transforms can be performed on this 'illegal' selection.
 			// @see https://github.com/WordPress/gutenberg/pull/59410#issuecomment-2006304536
-			if ( selectedBlocks.filter( ( block ) => ! block ) ) {
+			if ( selectedBlocks.filter( ( block ) => ! block ).length > 0 ) {
 				return {
 					blocks: [],
 					clientIds: [],
