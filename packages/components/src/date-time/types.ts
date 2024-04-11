@@ -18,6 +18,17 @@ export type TimePickerProps = {
 	onChange?: ( time: string ) => void;
 };
 
+export type TimeInputChangeArgs = {
+	/**
+	 * The hours value.
+	 */
+	hours: number;
+
+	/**
+	 * The minutes value.
+	 */
+	minutes: number;
+};
 export type TimeInputProps = {
 	/**
 	 * Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is
@@ -44,7 +55,7 @@ export type TimeInputProps = {
 	 * The function is called when a new time has been selected.
 	 * Passing hours and minutes as an object properties.
 	 */
-	onChange?: ( time: { hours: number; minutes: number } ) => void;
+	onChange?: ( time: TimeInputChangeArgs ) => void;
 };
 
 export type DatePickerEvent = {
