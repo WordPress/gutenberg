@@ -166,7 +166,12 @@ function Tabs( {
 				! focusedElement ||
 				! items.some( ( item ) => focusedElement === item.element )
 			) {
-				return; // Return early if no tabs are focused.
+				// If there is no focused or active tab, fallback to place focus on the first enabled tab
+				// so there is always an active element
+				if ( ! activeId && firstEnabledTab?.id ) {
+					setActiveId( firstEnabledTab.id );
+				}
+				return;
 			}
 
 			// If, after ariakit re-computes the active tab, that tab doesn't match
@@ -177,7 +182,7 @@ function Tabs( {
 				setActiveId( focusedElement.id );
 			}
 		} );
-	}, [ activeId, isControlled, items, setActiveId ] );
+	}, [ activeId, isControlled, items, setActiveId, firstEnabledTab ] );
 
 	const contextValue = useMemo(
 		() => ( {
