@@ -1592,7 +1592,11 @@ class WP_Theme_JSON_Gutenberg {
 						is_string( $layout_definition['displayMode'] ) &&
 						in_array( $layout_definition['displayMode'], $valid_display_modes, true )
 					) {
-						$layout_selector = ".$class_name";
+						$layout_selector = sprintf(
+							'%s .%s',
+							$selector,
+							$class_name
+						);
 						$block_rules    .= static::to_ruleset(
 							$layout_selector,
 							array(
