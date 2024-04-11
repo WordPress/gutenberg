@@ -150,11 +150,6 @@ function Preview( { item, categoryId, viewType } ) {
 		ariaDescriptions.push( item.description );
 	}
 
-	if ( isNonUserPattern ) {
-		ariaDescriptions.push(
-			__( 'Theme & plugin patterns cannot be edited.' )
-		);
-	}
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -165,47 +160,46 @@ function Preview( { item, categoryId, viewType } ) {
 	} );
 
 	return (
-		<>
-			<div
-				className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
-				style={ { backgroundColor } }
+		<div
+			className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
+			style={ { backgroundColor } }
+		>
+			<PreviewWrapper
+				item={ item }
+				onClick={ onClick }
+				ariaDescribedBy={
+					ariaDescriptions.length
+						? ariaDescriptions
+								.map(
+									( _, index ) =>
+										`${ descriptionId }-${ index }`
+								)
+								.join( ' ' )
+						: undefined
+				}
 			>
-				<PreviewWrapper
-					item={ item }
-					onClick={ onClick }
-					ariaDescribedBy={
-						ariaDescriptions.length
-							? ariaDescriptions
-									.map(
-										( _, index ) =>
-											`${ descriptionId }-${ index }`
-									)
-									.join( ' ' )
-							: undefined
-					}
-				>
-					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
-					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && (
-						<Async>
-							<BlockPreview
-								blocks={ item.blocks }
-								viewportWidth={ item.viewportWidth }
-							/>
-						</Async>
-					) }
-				</PreviewWrapper>
-			</div>
-			{ ariaDescriptions.map( ( ariaDescription, index ) => (
-				<div
-					key={ index }
-					hidden
-					id={ `${ descriptionId }-${ index }` }
-				>
-					{ ariaDescription }
-				</div>
-			) ) }
-		</>
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
+				{ ! isEmpty && (
+					<Async>
+						<BlockPreview
+							blocks={ item.blocks }
+							viewportWidth={ item.viewportWidth }
+						/>
+					</Async>
+				) }
+			</PreviewWrapper>
+			{ ! isNonUserPattern &&
+				ariaDescriptions.map( ( ariaDescription, index ) => (
+					<div
+						key={ index }
+						hidden
+						id={ `${ descriptionId }-${ index }` }
+					>
+						{ ariaDescription }
+					</div>
+				) ) }
+		</div>
 	);
 }
 
