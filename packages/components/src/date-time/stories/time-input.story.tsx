@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
 
 /**
  * Internal dependencies
@@ -18,11 +19,16 @@ const meta: Meta< typeof TimeInput > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	args: {},
+	args: {
+		is12Hour: true,
+		onChange: ( obj ) => {
+			action( 'onChange' )( obj );
+		},
+	},
 };
 export default meta;
 
-const Template: StoryFn< typeof TimeInput > = ( { onChange, ...args } ) => {
+const Template: StoryFn< typeof TimeInput > = ( args ) => {
 	return <TimeInput { ...args } />;
 };
 

@@ -26,12 +26,12 @@ export type TimeInputProps = {
 	is12Hour?: boolean;
 
 	/**
-	 * The current hours value.
+	 * The 24-hours format value.
 	 */
 	hours?: number;
 
 	/**
-	 * The current minutes value.
+	 * The minutes value.
 	 */
 	minutes?: number;
 

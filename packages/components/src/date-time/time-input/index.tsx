@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,9 +19,9 @@ import Button from '../../button';
 import ButtonGroup from '../../button-group';
 import BaseControl from '../../base-control';
 import {
-	buildPadInputStateReducer,
 	from12hTo24h,
 	from24hTo12h,
+	buildPadInputStateReducer,
 	validateInputElementTarget,
 } from '../utils';
 import type { TimeInputProps } from '../types';
@@ -34,14 +34,16 @@ export function TimeInput( {
 	minutesStep = 1,
 	onChange,
 }: TimeInputProps ) {
-	const _initDayPeriod = entryHours < 12 ? 'AM' : 'PM';
-	const _initHours = is12Hour
-		? from24hTo12h( entryHours )
-		: from12hTo24h( entryHours, _initDayPeriod === 'PM' );
-
-	const [ hours, setHours ] = useState( _initHours );
+	const [ hours, setHours ] = useState( entryHours );
+	const [ hours12Format, setHours12Format ] = useState(
+		from24hTo12h( entryHours )
+	);
 	const [ minutes, setMinutes ] = useState( entryMinutes );
-	const [ dayPeriod, setDayPeriod ] = useState( _initDayPeriod );
+	const [ dayPeriod, setDayPeriod ] = useState(
+		parseDayPeriod( entryHours )
+	);
+
+	const prevValues = useRef( { hours: entryHours, minutes: entryMinutes } );
 
 	const buildNumberControlChangeCallback = (
 		method: 'hours' | 'minutes'
@@ -56,8 +58,17 @@ export function TimeInput( {
 
 			switch ( method ) {
 				case 'hours':
-					setHours( numberValue );
+					if ( is12Hour ) {
+						setHours12Format( numberValue );
+						setHours(
+							from12hTo24h( numberValue, dayPeriod === 'PM' )
+						);
+					} else {
+						setHours12Format( from24hTo12h( numberValue ) );
+						setHours( numberValue );
+					}
 					break;
+
 				case 'minutes':
 					setMinutes( numberValue );
 					break;
@@ -74,26 +85,33 @@ export function TimeInput( {
 			}
 
 			setDayPeriod( value );
+			setHours( from12hTo24h( hours12Format, value === 'PM' ) );
 		};
 	};
+
+	function parseDayPeriod( _hours: number ) {
+		return _hours < 12 ? 'AM' : 'PM';
+	}
 
 	useEffect( () => {
 		setHours( entryHours );
 		setMinutes( entryMinutes );
+
+		setDayPeriod( parseDayPeriod( entryHours ) );
+		setHours12Format( from24hTo12h( entryHours ) );
 	}, [ entryHours, entryMinutes ] );
 
 	useEffect( () => {
-		onChange?.( { hours, minutes } );
-	}, [ onChange, hours, minutes ] );
+		if (
+			prevValues.current.hours !== hours ||
+			prevValues.current.minutes !== minutes
+		) {
+			onChange?.( { hours, minutes } );
+		}
 
-	useEffect( () => {
-		setHours(
-			is12Hour
-				? from24hTo12h( hours )
-				: from12hTo24h( hours, dayPeriod === 'PM' )
-		);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ is12Hour ] );
+		prevValues.current.hours = hours;
+		prevValues.current.minutes = minutes;
+	}, [ onChange, hours, minutes ] );
 
 	return (
 		<Fieldset>
@@ -115,7 +133,9 @@ export function TimeInput( {
 						label={ __( 'Hours' ) }
 						hideLabelFromVision
 						__next40pxDefaultSize
-						value={ String( hours ).padStart( 2, '0' ) }
+						value={ String(
+							is12Hour ? hours12Format : hours
+						).padStart( 2, '0' ) }
 						step={ 1 }
 						min={ is12Hour ? 1 : 0 }
 						max={ is12Hour ? 12 : 23 }
