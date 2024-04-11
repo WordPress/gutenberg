@@ -8,7 +8,6 @@ import { useState, useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import {
-	Fieldset,
 	TimeWrapper,
 	TimeSeparator,
 	HoursInput,
@@ -17,7 +16,6 @@ import {
 import { HStack } from '../../h-stack';
 import Button from '../../button';
 import ButtonGroup from '../../button-group';
-import BaseControl from '../../base-control';
 import {
 	from12hTo24h,
 	from24hTo12h,
@@ -114,97 +112,77 @@ export function TimeInput( {
 	}, [ onChange, hours, minutes ] );
 
 	return (
-		<Fieldset>
-			<BaseControl.VisualLabel
-				as="legend"
-				className="components-datetime__time-legend" // Unused, for backwards compatibility.
+		<HStack alignment="left">
+			<TimeWrapper
+				className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
 			>
-				{ __( 'Time' ) }
-			</BaseControl.VisualLabel>
-			<HStack
-				className="components-datetime__time-wrapper" // Unused, for backwards compatibility.
-				alignment="left"
-			>
-				<TimeWrapper
-					className="components-datetime__time-field components-datetime__time-field-time" // Unused, for backwards compatibility.
+				<HoursInput
+					className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
+					label={ __( 'Hours' ) }
+					hideLabelFromVision
+					__next40pxDefaultSize
+					value={ String( is12Hour ? hours12Format : hours ).padStart(
+						2,
+						'0'
+					) }
+					step={ 1 }
+					min={ is12Hour ? 1 : 0 }
+					max={ is12Hour ? 12 : 23 }
+					required
+					spinControls="none"
+					isPressEnterToChange
+					isDragEnabled={ false }
+					isShiftStepEnabled={ false }
+					onChange={ buildNumberControlChangeCallback( 'hours' ) }
+					__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
+				/>
+				<TimeSeparator
+					className="components-datetime__time-separator" // Unused, for backwards compatibility.
+					aria-hidden="true"
 				>
-					<HoursInput
-						className="components-datetime__time-field-hours-input" // Unused, for backwards compatibility.
-						label={ __( 'Hours' ) }
-						hideLabelFromVision
+					:
+				</TimeSeparator>
+				<MinutesInput
+					className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
+					label={ __( 'Minutes' ) }
+					hideLabelFromVision
+					__next40pxDefaultSize
+					value={ String( minutes ).padStart( 2, '0' ) }
+					step={ minutesStep }
+					min={ 0 }
+					max={ 59 }
+					required
+					spinControls="none"
+					isPressEnterToChange
+					isDragEnabled={ false }
+					isShiftStepEnabled={ false }
+					onChange={ buildNumberControlChangeCallback( 'minutes' ) }
+					__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
+				/>
+			</TimeWrapper>
+			{ is12Hour && (
+				<ButtonGroup
+					className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
+				>
+					<Button
+						className="components-datetime__time-am-button" // Unused, for backwards compatibility.
+						variant={ dayPeriod === 'AM' ? 'primary' : 'secondary' }
 						__next40pxDefaultSize
-						value={ String(
-							is12Hour ? hours12Format : hours
-						).padStart( 2, '0' ) }
-						step={ 1 }
-						min={ is12Hour ? 1 : 0 }
-						max={ is12Hour ? 12 : 23 }
-						required
-						spinControls="none"
-						isPressEnterToChange
-						isDragEnabled={ false }
-						isShiftStepEnabled={ false }
-						onChange={ buildNumberControlChangeCallback( 'hours' ) }
-						__unstableStateReducer={ buildPadInputStateReducer(
-							2
-						) }
-					/>
-					<TimeSeparator
-						className="components-datetime__time-separator" // Unused, for backwards compatibility.
-						aria-hidden="true"
+						onClick={ buildAmPmChangeCallback( 'AM' ) }
 					>
-						:
-					</TimeSeparator>
-					<MinutesInput
-						className="components-datetime__time-field-minutes-input" // Unused, for backwards compatibility.
-						label={ __( 'Minutes' ) }
-						hideLabelFromVision
+						{ __( 'AM' ) }
+					</Button>
+					<Button
+						className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
+						variant={ dayPeriod === 'PM' ? 'primary' : 'secondary' }
 						__next40pxDefaultSize
-						value={ String( minutes ).padStart( 2, '0' ) }
-						step={ minutesStep }
-						min={ 0 }
-						max={ 59 }
-						required
-						spinControls="none"
-						isPressEnterToChange
-						isDragEnabled={ false }
-						isShiftStepEnabled={ false }
-						onChange={ buildNumberControlChangeCallback(
-							'minutes'
-						) }
-						__unstableStateReducer={ buildPadInputStateReducer(
-							2
-						) }
-					/>
-				</TimeWrapper>
-				{ is12Hour && (
-					<ButtonGroup
-						className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
+						onClick={ buildAmPmChangeCallback( 'PM' ) }
 					>
-						<Button
-							className="components-datetime__time-am-button" // Unused, for backwards compatibility.
-							variant={
-								dayPeriod === 'AM' ? 'primary' : 'secondary'
-							}
-							__next40pxDefaultSize
-							onClick={ buildAmPmChangeCallback( 'AM' ) }
-						>
-							{ __( 'AM' ) }
-						</Button>
-						<Button
-							className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
-							variant={
-								dayPeriod === 'PM' ? 'primary' : 'secondary'
-							}
-							__next40pxDefaultSize
-							onClick={ buildAmPmChangeCallback( 'PM' ) }
-						>
-							{ __( 'PM' ) }
-						</Button>
-					</ButtonGroup>
-				) }
-			</HStack>
-		</Fieldset>
+						{ __( 'PM' ) }
+					</Button>
+				</ButtonGroup>
+			) }
+		</HStack>
 	);
 }
 export default TimeInput;
