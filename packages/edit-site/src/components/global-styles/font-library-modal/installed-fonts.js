@@ -114,14 +114,7 @@ function InstalledFonts() {
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
 				<div className="font-library-modal__loading">
-					<HStack
-						justify="center"
-						style={ {
-							height: '100%',
-						} }
-					>
-						<ProgressBar />
-					</HStack>
+					<ProgressBar />
 				</div>
 			) }
 

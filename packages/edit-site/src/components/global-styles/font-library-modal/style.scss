@@ -37,11 +37,14 @@ $footer-height: 70px;
 	margin-top: $grid-unit-40;
 
 	.font-library-modal__loading {
+		width: 100%;
+		height: 100%;
+		display: flex;
 		position: absolute;
-		top: #{$header-height + $grid-unit-15 + $grid-unit-60}; // (modal header) + (height of the tabs) = 120px
-		bottom: 0;
 		left: 0;
-		right: 0;
+		top: $header-height;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.font-library-modal__tabpanel-layout__footer {
@@ -102,7 +105,6 @@ $footer-height: 70px;
 	[role="tablist"] {
 		position: sticky;
 		top: 0;
-		height: $grid-unit-60;
 		border-bottom: 1px solid $gray-300;
 		background: $white;
 		margin: 0 #{$grid-unit-40 * -1};

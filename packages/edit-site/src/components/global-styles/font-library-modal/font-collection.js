@@ -266,14 +266,7 @@ function FontCollection( { slug } ) {
 		<div className="font-library-modal__tabpanel-layout">
 			{ isLoading && (
 				<div className="font-library-modal__loading">
-					<HStack
-						justify="center"
-						style={ {
-							height: '100%',
-						} }
-					>
-						<ProgressBar />
-					</HStack>
+					<ProgressBar />
 				</div>
 			) }
 
