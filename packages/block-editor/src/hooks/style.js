@@ -15,7 +15,11 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
+import {
+	BACKGROUND_SUPPORT_KEY,
+	BackgroundImagePanel,
+	getBackgroundSupportStyles,
+} from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -53,16 +57,15 @@ const hasStyleSupport = ( nameOrType ) =>
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param {Object} styles  Styles configuration.
- * @param {Object} options Style engine options.
+ * @param {Object} styles Styles configuration.
  *
  * @return {Object} Flattened CSS variables declaration.
  */
-export function getInlineStyles( styles = {}, options ) {
+export function getInlineStyles( styles = {} ) {
 	const output = {};
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	getCSSRules( styles, options ).forEach( ( rule ) => {
+	getCSSRules( styles ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
@@ -316,10 +319,23 @@ export function addSaveProps(
 		}
 	} );
 
+	// Set background defaults.
+	// Applies to all blocks/global styles.
+	if ( !! style.background ) {
+		style = {
+			...style,
+			background: {
+				...style.background,
+				...getBackgroundSupportStyles(
+					style.background,
+					editorSettings
+				),
+			},
+		};
+	}
+
 	props.style = {
-		...getInlineStyles( style, {
-			baseUrl: editorSettings?.themeDirURI,
-		} ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 
