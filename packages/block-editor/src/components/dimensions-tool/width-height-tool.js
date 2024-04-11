@@ -60,15 +60,13 @@ export default function WidthHeightTool( {
 	const height = value.height === 'auto' ? '' : value.height ?? '';
 
 	const onDimensionChange = ( dimension ) => ( nextDimension ) => {
-		// Readies the nextValue by omitting the dimension to be changed.
-		const { [ dimension ]: existingDimensionValue, ...nextValue } = value;
-		// Bails when both nextDimension and its existing value are falsy. This
-		// can occur when a `onDeselect` callback runs after the state has
-		// already updated. In such cases calling onChange would be redundant.
-		if ( ! nextDimension && ! existingDimensionValue ) return;
-
-		// Adds dimension only if non-falsy ('' or undefined may be passed).
-		if ( !! nextDimension ) nextValue[ dimension ] = nextDimension;
+		const nextValue = { ...value };
+		// Empty strings or undefined may be passed and both represent removing the value.
+		if ( ! nextDimension ) {
+			delete nextValue[ dimension ];
+		} else {
+			nextValue[ dimension ] = nextDimension;
+		}
 		onChange( nextValue );
 	};
 
