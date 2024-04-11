@@ -84,7 +84,6 @@ const {
 	FiltersPanel: StylesFiltersPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
-	setBackgroundStyleDefaults,
 } = unlock( blockEditorPrivateApis );
 
 function ScreenBlock( { name, variation } ) {
@@ -241,19 +240,6 @@ function ScreenBlock( { name, variation } ) {
 		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
 	};
 
-	const onChangeBackground = ( newStyle ) => {
-		const backgroundStyles = setBackgroundStyleDefaults(
-			newStyle?.background
-		);
-		setStyle( {
-			...newStyle,
-			background: {
-				...newStyle?.background,
-				...backgroundStyles,
-			},
-		} );
-	};
-
 	return (
 		<>
 			<ScreenHeader
@@ -322,7 +308,7 @@ function ScreenBlock( { name, variation } ) {
 				<StylesBackgroundPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ onChangeBackground }
+					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 					defaultControls={
