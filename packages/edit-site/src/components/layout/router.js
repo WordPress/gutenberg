@@ -131,35 +131,6 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// Template parts
-	if ( path === '/wp_template_part/all' ) {
-		const isListLayout = isCustom !== 'true' && layout === 'list';
-		return {
-			key: 'template-parts',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
-				),
-				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
-			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
-		};
-	}
-
 	// Patterns
 	if ( path === '/patterns' ) {
 		return {
