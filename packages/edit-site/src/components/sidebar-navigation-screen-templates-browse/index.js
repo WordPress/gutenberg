@@ -10,10 +10,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import { store as editSiteStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../utils/constants';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import DataviewsTemplatesSidebarContent from './content';
 
