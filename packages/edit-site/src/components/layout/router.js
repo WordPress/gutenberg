@@ -112,18 +112,12 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
 				),
 				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
+					<PageTemplatesTemplateParts />
 				),
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
-				),
+				mobile: <PageTemplatesTemplateParts />,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
