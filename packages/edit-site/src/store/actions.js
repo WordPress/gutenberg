@@ -130,8 +130,8 @@ export const addTemplate =
  */
 export const removeTemplate =
 	( template ) =>
-	async ( { registry } ) => {
-		await unlock( registry.dispatch( editorStore ) ).removeTemplates( [
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).removeTemplates( [
 			template,
 		] );
 	};
@@ -345,8 +345,8 @@ export function setIsSaveViewOpened( isOpen ) {
  */
 export const revertTemplate =
 	( template, options ) =>
-	async ( { registry } ) => {
-		await unlock( registry.dispatch( editorStore ) ).revertTemplate(
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).revertTemplate(
 			template,
 			options
 		);
