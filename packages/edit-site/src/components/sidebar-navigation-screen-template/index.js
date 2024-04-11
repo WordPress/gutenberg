@@ -114,7 +114,7 @@ export default function SidebarNavigationScreenTemplate() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( postType );
+							navigator.goTo( '/' + postType );
 						} }
 					/>
 					<SidebarButton
