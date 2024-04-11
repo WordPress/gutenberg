@@ -6,7 +6,7 @@ import { match } from 'path-to-regexp';
 /**
  * WordPress dependencies
  */
-import { useReducer, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -20,6 +20,20 @@ import {
 } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+
+const SCREENS = [
+	'/',
+	'/wp_global_styles',
+	'/patterns',
+	'/navigation',
+	'/navigation/:postType/:postId',
+	'/page',
+	'/page/:postId',
+	'/:postType(wp_template_part)/all',
+	'/:postType(wp_template_part|wp_block)/:postId',
+	'/:postType(wp_template)',
+	'/:postType(wp_template)/:postId',
+].map( ( path, id ) => ( { id, path } ) );
 
 export function getPathFromURL( urlParams ) {
 	let path = urlParams?.path ?? '/';
@@ -131,29 +145,19 @@ export function useRouter() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const path = getPathFromURL( params );
-	const [ screens, dispatch ] = useReducer( ( state, action ) => {
-		switch ( action.type ) {
-			case 'add':
-				return [ ...state, action.screen ];
-			case 'remove':
-				return state.filter( ( s ) => s.id !== action.screen.id );
-			default:
-				return state;
-		}
-	}, [] );
 
 	const matchedPath = useMemo( () => {
-		return path !== undefined ? patternMatch( path, screens ) : undefined;
-	}, [ path, screens ] );
+		return path !== undefined ? patternMatch( path, SCREENS ) : undefined;
+	}, [ path ] );
 
 	const goMethods = useMemo( () => {
 		const goTo = ( p ) => {
-			const matched = patternMatch( p, screens );
+			const matched = patternMatch( p, SCREENS );
 			history.push( getParamsFromPath( p, matched?.params ?? {} ) );
 		};
 
 		const goToParent = () => {
-			const parentPath = findParent( path, screens );
+			const parentPath = findParent( path, SCREENS );
 			if ( parentPath !== undefined ) {
 				goTo( parentPath, {
 					isBack: true,
@@ -166,15 +170,7 @@ export function useRouter() {
 		};
 
 		return { goTo, goToParent, goBack };
-	}, [ history, screens, path ] );
-
-	const screenMethods = useMemo(
-		() => ( {
-			addScreen: ( screen ) => dispatch( { type: 'add', screen } ),
-			removeScreen: ( screen ) => dispatch( { type: 'remove', screen } ),
-		} ),
-		[]
-	);
+	}, [ history, path ] );
 
 	return useMemo(
 		() => ( {
@@ -182,8 +178,7 @@ export function useRouter() {
 			params: matchedPath?.params ?? {},
 			match: matchedPath?.id,
 			...goMethods,
-			...screenMethods,
 		} ),
-		[ path, matchedPath, goMethods, screenMethods ]
+		[ path, matchedPath, goMethods ]
 	);
 }

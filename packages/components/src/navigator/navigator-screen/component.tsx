@@ -33,7 +33,6 @@ function UnconnectedNavigatorScreen(
 	props: WordPressComponentProps< NavigatorScreenProps, 'div', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const screenId = useId();
 	const { children, className, path, ...otherProps } = useContextSystem(
 		props,
 		'NavigatorScreen'
@@ -41,10 +40,13 @@ function UnconnectedNavigatorScreen(
 
 	const { location, match, addScreen, removeScreen } =
 		useContext( NavigatorContext );
-	const isMatch = match === screenId;
 	const wrapperRef = useRef< HTMLDivElement >( null );
 
+	const screenId = useId();
 	useEffect( () => {
+		if ( ! path ) {
+			return;
+		}
 		const screen = {
 			id: screenId,
 			path: escapeAttribute( path ),
@@ -53,6 +55,7 @@ function UnconnectedNavigatorScreen(
 		return () => removeScreen( screen );
 	}, [ screenId, path, addScreen, removeScreen ] );
 
+	const isMatch = ! path || match === screenId;
 	const isRTL = isRTLFn();
 	const { isInitial, isBack } = location;
 	const cx = useCx();
@@ -131,11 +134,15 @@ function UnconnectedNavigatorScreen(
 
 	const mergedWrapperRef = useMergeRefs( [ forwardedRef, wrapperRef ] );
 
-	return isMatch ? (
+	if ( ! isMatch ) {
+		return null;
+	}
+
+	return (
 		<View ref={ mergedWrapperRef } className={ classes } { ...otherProps }>
 			{ children }
 		</View>
-	) : null;
+	);
 }
 
 /**

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -12,8 +13,17 @@ import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
-import Sidebar from '../sidebar';
-import { useRouter } from '../sync-state-with-url/use-sync-path-with-url';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
+import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
+import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
+import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
+import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
+import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
+import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
+import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
+import DataViewsSidebarContent from '../sidebar-dataviews';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -26,7 +36,6 @@ export default function useLayoutAreas() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
-	const router = useRouter();
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -37,7 +46,14 @@ export default function useLayoutAreas() {
 		return {
 			key: 'pages-list',
 			areas: {
-				sidebar: <Sidebar router={ router } />,
+				sidebar: postId ? (
+					<SidebarNavigationScreenPage />
+				) : (
+					<SidebarNavigationScreen
+						title={ __( 'Manage pages' ) }
+						content={ <DataViewsSidebarContent /> }
+					/>
+				),
 				content: <PagePages />,
 				preview: isListLayout && (
 					<Editor
@@ -67,10 +83,18 @@ export default function useLayoutAreas() {
 
 	// Regular other post types
 	if ( postType && postId ) {
+		let sidebar;
+		if ( postType === 'wp_template_part' || postType === 'wp_block' ) {
+			sidebar = <SidebarNavigationScreenPattern />;
+		} else if ( postType === 'wp_template' ) {
+			sidebar = <SidebarNavigationScreenTemplate />;
+		} else {
+			sidebar = <SidebarNavigationScreenNavigationMenu />;
+		}
 		return {
 			key: 'page',
 			areas: {
-				sidebar: <Sidebar router={ router } />,
+				sidebar,
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />
@@ -85,7 +109,11 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
-				sidebar: <Sidebar router={ router } />,
+				sidebar: postId ? (
+					<SidebarNavigationScreenTemplate />
+				) : (
+					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
+				),
 				content: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_POST_TYPE }
@@ -112,7 +140,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'template-parts',
 			areas: {
-				sidebar: <Sidebar router={ router } />,
+				sidebar: (
+					<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
+				),
 				content: (
 					<PageTemplatesTemplateParts
 						postType={ TEMPLATE_PART_POST_TYPE }
@@ -138,9 +168,37 @@ export default function useLayoutAreas() {
 		return {
 			key: 'patterns',
 			areas: {
-				sidebar: <Sidebar router={ router } />,
+				sidebar: <SidebarNavigationScreenPatterns />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
+			},
+		};
+	}
+
+	// Styles
+	if ( path === '/wp_global_styles' ) {
+		return {
+			key: 'styles',
+			areas: {
+				sidebar: <SidebarNavigationScreenGlobalStyles />,
+				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				mobile: canvas === 'edit' && (
+					<Editor isLoading={ isSiteEditorLoading } />
+				),
+			},
+		};
+	}
+
+	// Navigation
+	if ( path === '/navigation' ) {
+		return {
+			key: 'styles',
+			areas: {
+				sidebar: <SidebarNavigationScreenNavigationMenus />,
+				preview: <Editor isLoading={ isSiteEditorLoading } />,
+				mobile: canvas === 'edit' && (
+					<Editor isLoading={ isSiteEditorLoading } />
+				),
 			},
 		};
 	}
@@ -149,7 +207,7 @@ export default function useLayoutAreas() {
 	return {
 		key: 'default',
 		areas: {
-			sidebar: <Sidebar router={ router } />,
+			sidebar: <SidebarNavigationScreenMain />,
 			preview: <Editor isLoading={ isSiteEditorLoading } />,
 			mobile: canvas === 'edit' && (
 				<Editor isLoading={ isSiteEditorLoading } />

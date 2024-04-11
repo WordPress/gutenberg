@@ -3,8 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -39,10 +37,7 @@ const config = {
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenTemplatesBrowse() {
-	const {
-		params: { postType },
-	} = useNavigator();
+export default function SidebarNavigationScreenTemplatesBrowse( { postType } ) {
 	const {
 		params: { didAccessPatternsPage, activeView = 'all' },
 	} = useLocation();
