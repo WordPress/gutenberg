@@ -40,6 +40,7 @@ const templatePartToPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: decodeEntities( templatePart.title.rendered ),
 	type: templatePart.type,
+	_links: templatePart._links,
 	templatePart,
 } );
 

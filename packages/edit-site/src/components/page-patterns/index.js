@@ -36,6 +36,8 @@ import {
 } from '@wordpress/icons';
 import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -71,6 +73,8 @@ import { useAddedBy } from '../page-templates-template-parts/hooks';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+const { usePostActions } = unlock( editorPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
@@ -433,17 +437,45 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const actions = useMemo(
-		() => [
+	const history = useHistory();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					categoryId,
+					categoryType: type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
+	const actions = useMemo( () => {
+		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			return [
+				editAction,
+				renameAction,
+				duplicateTemplatePartAction,
+				viewRevisionsAction,
+				resetAction,
+				deleteAction,
+			];
+		}
+		return [
 			renameAction,
 			duplicatePatternAction,
-			duplicateTemplatePartAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		],
-		[]
-	);
+		];
+	}, [ type, editAction, viewRevisionsAction ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
