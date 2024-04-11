@@ -259,7 +259,7 @@ Object.defineProperties( Node.prototype, {
 	},
 	dataset: {
 		get() {
-			const self = this;
+			const node = this;
 
 			// Helper function to convert property name to data-* attribute name
 			function toDataAttributeName( property ) {
@@ -276,12 +276,12 @@ Object.defineProperties( Node.prototype, {
 				{
 					set( _target, property, value ) {
 						const attributeName = toDataAttributeName( property );
-						self.setAttribute( attributeName, value );
+						node.setAttribute( attributeName, value );
 						return true;
 					},
 					get( _target, property ) {
 						const attributeName = toDataAttributeName( property );
-						return self.getAttribute( attributeName );
+						return node.getAttribute( attributeName );
 					},
 				}
 			);
