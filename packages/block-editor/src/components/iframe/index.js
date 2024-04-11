@@ -277,12 +277,14 @@ function Iframe( {
 			? scale( contentWidth, contentHeight )
 			: scale;
 
+	const isZoomedOut = scale !== 1;
+
 	useEffect( () => {
 		if ( ! iframeDocument ) {
 			return;
 		}
 
-		if ( scale !== 1 ) {
+		if ( isZoomedOut ) {
 			// Hack to get proper margins when scaling the iframe document.
 			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
@@ -297,14 +299,14 @@ function Iframe( {
 				iframeDocument.documentElement.style.marginBottom = '';
 			};
 		}
-	}, [ scale, frameSize, iframeDocument, contentHeight ] );
+	}, [ scale, frameSize, iframeDocument, contentHeight, isZoomedOut ] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
 	const scaleMinHeight =
-		scale !== 1 && iframeWindowInnerHeight > contentHeight * scale
+		isZoomedOut && iframeWindowInnerHeight > contentHeight * scale
 			? `${ Math.floor(
 					( iframeWindowInnerHeight - 2 * frameSize ) / scale
 			  ) }px`
@@ -359,7 +361,7 @@ function Iframe( {
 						<body
 							ref={ bodyRef }
 							className={ classnames(
-								scale !== 1 && 'is-zoomed-out',
+								isZoomedOut && 'is-zoomed-out',
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
