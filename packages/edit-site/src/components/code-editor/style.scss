@@ -1,7 +1,7 @@
 .edit-site-code-editor {
 	position: relative;
 	width: 100%;
-	min-height: 100%;
+	min-height: min-content;
 	background-color: $white;
 
 	&__body {
