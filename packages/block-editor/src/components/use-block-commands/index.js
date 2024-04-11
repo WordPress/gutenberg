@@ -40,7 +40,21 @@ export const useTransformCommands = () => {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
-			).filter( Boolean ); // This can have `null`s when something tries to call `selectBlock` with an inexistent clientId. These nulls will cause fatal errors.
+			);
+
+			// selectedBlocks can have `null`s when something tries to call `selectBlock` with an inexistent clientId.
+			// These nulls will cause fatal errors down the line.
+			// In order to prevent discrepancies between selectedBlockClientIds and selectedBlocks, we effectively treat the entire selection as invalid.
+			// We return a set of empty arrays to indicate that nothing is really selected and no transforms can be performed on this 'illegal' selection.
+			// @see https://github.com/WordPress/gutenberg/pull/59410#issuecomment-2006304536
+			if ( selectedBlocks.filter( ( block ) => ! block ) ) {
+				return {
+					blocks: [],
+					clientIds: [],
+					possibleBlockTransformations: [],
+					canRemove: false,
+				};
+			}
 
 			const rootClientId = getBlockRootClientId(
 				selectedBlockClientIds[ 0 ]
