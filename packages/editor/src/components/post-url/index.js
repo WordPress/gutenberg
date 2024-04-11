@@ -97,6 +97,7 @@ export default function PostURL( { onClose } ) {
 							autoComplete="off"
 							spellCheck="false"
 							type="text"
+							className="editor-post-url__input"
 							onChange={ ( newValue ) => {
 								editPost( { slug: newValue } );
 								// When we delete the field the permalink gets
@@ -121,29 +122,34 @@ export default function PostURL( { onClose } ) {
 									setForceEmptyField( false );
 								}
 							} }
+							help={
+								<ExternalLink
+									className="editor-post-url__link"
+									href={ postLink }
+									target="_blank"
+								>
+									<span className="editor-post-url__link-prefix">
+										{ permalinkPrefix }
+									</span>
+									<span className="editor-post-url__link-slug">
+										{ postSlug }
+									</span>
+									<span className="editor-post-url__link-suffix">
+										{ permalinkSuffix }
+									</span>
+								</ExternalLink>
+							}
 						/>
 					) }
-					<ExternalLink
-						className="editor-post-url__link"
-						href={ postLink }
-						target="_blank"
-					>
-						{ isEditable ? (
-							<>
-								<span className="editor-post-url__link-prefix">
-									{ permalinkPrefix }
-								</span>
-								<span className="editor-post-url__link-slug">
-									{ postSlug }
-								</span>
-								<span className="editor-post-url__link-suffix">
-									{ permalinkSuffix }
-								</span>
-							</>
-						) : (
-							postLink
-						) }
-					</ExternalLink>
+					{ ! isEditable && (
+						<ExternalLink
+							className="editor-post-url__link"
+							href={ postLink }
+							target="_blank"
+						>
+							{ postLink }
+						</ExternalLink>
+					) }
 				</div>
 			</VStack>
 		</div>
