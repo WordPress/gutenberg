@@ -557,7 +557,7 @@ export function getLayoutStyles( {
 					displayMode &&
 					validDisplayModes.includes( displayMode )
 				) {
-					ruleset += `:where(.${ className }) { display:${ displayMode }; }`;
+					ruleset += `${ selector } .${ className } { display:${ displayMode }; }`;
 				}
 
 				if ( baseStyles?.length ) {
