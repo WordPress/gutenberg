@@ -11,8 +11,8 @@ import {
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
-	BlockKeyboardShortcuts,
 } from '@wordpress/block-editor';
+import { BlockKeyboardShortcuts } from '@wordpress/block-library';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
 

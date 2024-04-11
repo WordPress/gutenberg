@@ -23,8 +23,8 @@ import {
 	BlockToolbar,
 	store as blockEditorStore,
 	BlockInspector,
-	BlockKeyboardShortcuts,
 } from '@wordpress/block-editor';
+import { BlockKeyboardShortcuts } from '@wordpress/block-library';
 import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,

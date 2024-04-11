@@ -24,7 +24,6 @@ export {
 export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
-export { default as BlockKeyboardShortcuts } from './block-keyboard-shortcuts';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockStyles } from './block-styles';
 export { default as HeadingLevelDropdown } from './block-heading-level-dropdown';

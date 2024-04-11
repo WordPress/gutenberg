@@ -330,3 +330,5 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 				.forEach( ( { init } ) => init() );
 	  }
 	: undefined;
+
+export { default as BlockKeyboardShortcuts } from './block-keyboard-shortcuts';

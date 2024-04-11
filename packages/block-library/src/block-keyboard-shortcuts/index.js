@@ -9,11 +9,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function BlockKeyboardShortcuts() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
