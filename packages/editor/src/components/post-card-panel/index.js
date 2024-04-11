@@ -111,16 +111,12 @@ export default function PostCardPanel( { className, actions } ) {
 							spacing={ 2 }
 						>
 							{ description && <Text>{ description }</Text> }
-							<span>
-								{ showPostContentInfo && (
-									<PostContentInfo
-										postContent={ postContent }
-									/>
-								) }{ ' ' }
-								{ lastEditedText && (
-									<Text>{ lastEditedText }</Text>
-								) }
-							</span>
+							{ showPostContentInfo && (
+								<PostContentInfo postContent={ postContent } />
+							) }
+							{ lastEditedText && (
+								<Text>{ lastEditedText }</Text>
+							) }
 						</VStack>
 					) }
 					{ postType === TEMPLATE_POST_TYPE && <TemplateAreas /> }
@@ -148,19 +144,16 @@ function PostContentInfo( { postContent } ) {
 		return null;
 	}
 	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
-	let wordsCountText;
-	if ( ! wordsCounted.toLocaleString() ) {
-		wordsCountText = __( 'Unknown' );
-	} else {
-		wordsCountText =
-			wordsCounted === 1
-				? __( '1 word' )
-				: sprintf(
-						// translators: %s: the number of words in the post.
-						_n( '%s word', '%s words', wordsCounted ),
-						wordsCounted.toLocaleString()
-				  );
-	}
+	const wordsCountText =
+		wordsCounted.toLocaleString() &&
+		( wordsCounted === 1
+			? __( '1 word' )
+			: sprintf(
+					// translators: %s: the number of words in the post.
+					_n( '%s word', '%s words', wordsCounted ),
+					wordsCounted.toLocaleString()
+			  ) );
+
 	const readingTimeText =
 		readingTime <= 1
 			? __( '1 minute read time' )
@@ -175,12 +168,19 @@ function PostContentInfo( { postContent } ) {
 			  );
 	return (
 		<Text>
-			{ sprintf(
-				/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
-				__( '%1$s, %2$s.' ),
-				wordsCountText,
-				readingTimeText
-			) }
+			{ wordsCountText
+				? sprintf(
+						/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
+						__( '%1$s, %2$s.' ),
+						wordsCountText,
+						readingTimeText
+				  )
+				: sprintf(
+						/* translators: %s is a short phrase without any closing punctuation (e.g. "2 minutes read time"). Please translate only if you need a punctuation sign other than a period. */
+						__( '%s.' ),
+						wordsCountText,
+						readingTimeText
+				  ) }
 		</Text>
 	);
 }
