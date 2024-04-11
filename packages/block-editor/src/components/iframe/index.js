@@ -228,7 +228,7 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		windowResizeRef,
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards

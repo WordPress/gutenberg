@@ -91,7 +91,7 @@ export default function SiteEditorCanvas( { onClick } ) {
 								settings={ settings }
 								onClick={ onClick }
 							>
-								{ resizeObserver }
+								{ enableResizing && resizeObserver }
 							</EditorCanvas>
 						</ResizableEditor>
 					</div>
