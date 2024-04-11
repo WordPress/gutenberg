@@ -177,7 +177,7 @@ function PostContentInfo( { postContent } ) {
 		<Text>
 			{ sprintf(
 				/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
-				'%1$s, %2$s.',
+				__( '%1$s, %2$s.' ),
 				wordsCountText,
 				readingTimeText
 			) }
