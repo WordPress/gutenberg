@@ -154,6 +154,7 @@ export default function Editor( { isLoading, onClick } ) {
 
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
+	const isZoomOutMode = blockEditorMode === 'zoom-out';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
 	const shouldShowBlockBreadcrumbs =
 		! isDistractionFree &&
@@ -220,6 +221,7 @@ export default function Editor( { isLoading, onClick } ) {
 					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
+						isZoomOutMode={ isZoomOutMode }
 						enableRegionNavigation={ false }
 						className={ classnames(
 							'edit-site-editor__interface-skeleton',

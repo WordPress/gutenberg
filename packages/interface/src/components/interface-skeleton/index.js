@@ -25,6 +25,7 @@ import {
 import NavigableRegion from '../navigable-region';
 
 const SECONDARY_SIDEBAR_WIDTH = 350;
+const SECONDARY_SIDEBAR_DIALOG_WIDTH = 650;
 const ANIMATION_DURATION = 0.25;
 
 function useHTMLClass( className ) {
@@ -56,9 +57,16 @@ const secondarySidebarVariants = {
 	mobileOpen: { width: '100vw' },
 };
 
+const secondarySidebarDiaglogVariants = {
+	open: { width: SECONDARY_SIDEBAR_DIALOG_WIDTH },
+	closed: { width: 0 },
+	mobileOpen: { width: '100vw' },
+};
+
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
+		isZoomOutMode,
 		footer,
 		header,
 		editorNotices,
@@ -78,12 +86,16 @@ function InterfaceSkeleton(
 ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
+	const sidebarAnimationDuration = isZoomOutMode ? 0 : ANIMATION_DURATION;
 	const defaultTransition = {
 		type: 'tween',
-		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		duration: disableMotion ? 0 : sidebarAnimationDuration,
 		ease: 'easeOut',
 	};
 	const navigateRegionsProps = useNavigateRegions( shortcuts );
+	const sidebarWidth = isZoomOutMode
+		? SECONDARY_SIDEBAR_DIALOG_WIDTH
+		: SECONDARY_SIDEBAR_WIDTH;
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -165,7 +177,11 @@ function InterfaceSkeleton(
 									isMobileViewport ? 'mobileOpen' : 'open'
 								}
 								exit="closed"
-								variants={ secondarySidebarVariants }
+								variants={
+									isZoomOutMode
+										? secondarySidebarDiaglogVariants
+										: secondarySidebarVariants
+								}
 								transition={ defaultTransition }
 							>
 								<div
@@ -173,7 +189,7 @@ function InterfaceSkeleton(
 										position: 'absolute',
 										width: isMobileViewport
 											? '100vw'
-											: SECONDARY_SIDEBAR_WIDTH,
+											: sidebarWidth,
 										height: '100%',
 										right: 0,
 									} }
