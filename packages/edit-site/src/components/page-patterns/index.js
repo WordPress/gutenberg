@@ -439,17 +439,23 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const actions = useMemo(
-		() => [
+	const actions = useMemo( () => {
+		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			return [
+				renameAction,
+				duplicateTemplatePartAction,
+				resetAction,
+				deleteAction,
+			];
+		}
+		return [
 			renameAction,
 			duplicatePatternAction,
-			duplicateTemplatePartAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		],
-		[]
-	);
+		];
+	}, [ type ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
