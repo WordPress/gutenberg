@@ -68,7 +68,7 @@ import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
-import { useAddedBy } from '../page-templates-template-parts/hooks';
+import { useAddedBy } from '../page-templates/hooks';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis

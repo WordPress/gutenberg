@@ -195,7 +195,7 @@ const TEMPLATE_ACTIONS = [
 	'delete-template',
 ];
 
-export default function PageTemplatesTemplateParts() {
+export default function PageTemplates() {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {

@@ -12,6 +12,7 @@ import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
+import PageTemplates from '../page-templates';
 import PageTemplatesTemplateParts from '../page-templates-template-parts';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
@@ -24,10 +25,6 @@ import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -112,12 +109,12 @@ export default function useLayoutAreas() {
 					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
 				),
 				content: (
-					<PageTemplatesTemplateParts />
+					<PageTemplates />
 				),
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
-				mobile: <PageTemplatesTemplateParts />,
+				mobile: <PageTemplates />,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
