@@ -336,14 +336,40 @@ export default function useOnBlockDrop(
 
 	const moveBlocks = useCallback(
 		( sourceClientIds, sourceRootClientId, insertIndex ) => {
+			const sourceBlocks = getBlocksByClientId( sourceClientIds );
+
+			// TODO: Figure out a better place for this. useOnBlockDrop shouldn't care about layout styles.
+			const unpinBlock = () => {
+				updateBlockAttributes(
+					sourceClientIds,
+					sourceBlocks.reduce( ( accumulator, sourceBlock ) => {
+						if (
+							sourceBlock.attributes.style?.layout?.columnStart ||
+							sourceBlock.attributes.style?.layout?.rowStart
+						) {
+							const { columnStart, rowStart, ...layout } =
+								sourceBlock.attributes.style.layout;
+							accumulator[ sourceBlock.clientId ] = {
+								style: {
+									...sourceBlock.attributes.style,
+									layout,
+								},
+							};
+						}
+						return accumulator;
+					}, {} ),
+					/* uniqueByBlock: */ true
+				);
+			};
+
 			if ( operation === 'replace' ) {
-				const sourceBlocks = getBlocksByClientId( sourceClientIds );
 				const targetBlockClientIds =
 					getBlockOrder( targetRootClientId );
 				const targetBlockClientId =
 					targetBlockClientIds[ targetBlockIndex ];
 
 				registry.batch( () => {
+					unpinBlock();
 					// Remove the source blocks.
 					removeBlocks( sourceClientIds, false );
 					// Replace the target block with the source blocks.
@@ -355,12 +381,15 @@ export default function useOnBlockDrop(
 					);
 				} );
 			} else {
-				moveBlocksToPosition(
-					sourceClientIds,
-					sourceRootClientId,
-					targetRootClientId,
-					insertIndex
-				);
+				registry.batch( () => {
+					unpinBlock();
+					moveBlocksToPosition(
+						sourceClientIds,
+						sourceRootClientId,
+						targetRootClientId,
+						insertIndex
+					);
+				} );
 			}
 		},
 		[
