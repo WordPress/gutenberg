@@ -134,7 +134,7 @@ export const LAYOUT_DEFINITIONS = {
 				},
 			},
 			{
-				selector: ' > *',
+				selector: ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 				rules: {
 					margin: '0',
 				},
@@ -156,7 +156,7 @@ export const LAYOUT_DEFINITIONS = {
 		displayMode: 'grid',
 		baseStyles: [
 			{
-				selector: ' > *',
+				selector: ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 				rules: {
 					margin: '0',
 				},

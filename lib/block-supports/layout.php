@@ -146,7 +146,7 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 				array(
-					'selector' => ' > *',
+					'selector' => ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 					'rules'    => array(
 						'margin' => '0',
 					),
@@ -168,7 +168,7 @@ function gutenberg_get_layout_definitions() {
 			'displayMode'   => 'grid',
 			'baseStyles'    => array(
 				array(
-					'selector' => ' > *',
+					'selector' => ' > :is(*, div)',  // :is(*, div) instead of just * increases the specificity by 001.
 					'rules'    => array(
 						'margin' => '0',
 					),
