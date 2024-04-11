@@ -132,6 +132,14 @@ const BindingConnector = ( {
 	const prevAttrValue = useRef( attrValue );
 	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
 
+	/*
+	 * Update the bound attribute value,
+	 * casting the value to the original type.
+	 *
+	 * @param {string} next    - The new attribute value.
+	 * @param {string} current - The current attribute value.
+	 * @return {void}
+	 */
 	const updateBoundAttibute = useCallback(
 		( next, current ) =>
 			onPropValueChange( {
@@ -142,6 +150,7 @@ const BindingConnector = ( {
 
 	useLayoutEffect( () => {
 		const rawAttrValue = getAttributeValue( attrValue );
+
 		if ( typeof propValue !== 'undefined' ) {
 			/*
 			 * On-sync from external property to attribute.
@@ -150,13 +159,13 @@ const BindingConnector = ( {
 			 * update the attribute value.
 			 */
 			if ( propValue !== prevPropValue.current ) {
+				// Store the current propValue to compare in the next render.
+				prevPropValue.current = propValue;
+
 				if ( propValue !== rawAttrValue ) {
 					updateBoundAttibute( propValue, attrValue );
 					return; // close the sync cycle.
 				}
-
-				// Store the current propValue to compare in the next render.
-				prevPropValue.current = propValue;
 			}
 		} else if ( placeholder ) {
 			/*
