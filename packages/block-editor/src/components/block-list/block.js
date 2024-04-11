@@ -143,6 +143,7 @@ function BlockListBlock( {
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
 			blockEditingMode={ context.blockEditingMode }
+			isPreviewMode={ context.isPreviewMode }
 		/>
 	);
 
@@ -572,6 +573,7 @@ function BlockListBlockProvider( props ) {
 			} = getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
+				isPreviewMode,
 				blockWithoutAttributes,
 				name: blockName,
 				attributes,
@@ -642,7 +644,9 @@ function BlockListBlockProvider( props ) {
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
 				initialPosition:
-					_isSelected && __unstableGetEditorMode() === 'edit'
+					_isSelected &&
+					( __unstableGetEditorMode() === 'edit' ||
+						__unstableGetEditorMode() === 'zoom-out' ) // Don't recalculate the initialPosition when toggling in/out of zoom-out mode
 						? getSelectedBlocksInitialCaretPosition()
 						: undefined,
 				isHighlighted: isBlockHighlighted( clientId ),
@@ -671,6 +675,7 @@ function BlockListBlockProvider( props ) {
 	);
 
 	const {
+		isPreviewMode,
 		// Fill values that end up as a public API and may not be defined in
 		// preview mode.
 		mode = 'visual',
@@ -728,6 +733,7 @@ function BlockListBlockProvider( props ) {
 	}
 
 	const privateContext = {
+		isPreviewMode,
 		clientId,
 		className,
 		index,
