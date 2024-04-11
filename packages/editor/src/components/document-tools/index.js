@@ -121,20 +121,22 @@ function DocumentTools( {
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">
-				<ToolbarItem
-					ref={ inserterButton }
-					as={ Button }
-					className="editor-document-tools__inserter-toggle"
-					variant="primary"
-					isPressed={ isInserterOpened }
-					onMouseDown={ preventDefault }
-					onClick={ toggleInserter }
-					disabled={ disableBlockTools }
-					icon={ plus }
-					label={ showIconLabels ? shortLabel : longLabel }
-					showTooltip={ ! showIconLabels }
-					aria-expanded={ isInserterOpened }
-				/>
+				{ ! isDistractionFree && (
+					<ToolbarItem
+						ref={ inserterButton }
+						as={ Button }
+						className="editor-document-tools__inserter-toggle"
+						variant="primary"
+						isPressed={ isInserterOpened }
+						onMouseDown={ preventDefault }
+						onClick={ toggleInserter }
+						disabled={ disableBlockTools }
+						icon={ plus }
+						label={ showIconLabels ? shortLabel : longLabel }
+						showTooltip={ ! showIconLabels }
+						aria-expanded={ isInserterOpened }
+					/>
+				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
 						{ isLargeViewport && ! hasFixedToolbar && (

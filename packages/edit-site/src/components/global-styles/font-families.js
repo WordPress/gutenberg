@@ -37,7 +37,7 @@ function FontFamilies() {
 				/>
 			) }
 
-			<VStack spacing={ 3 }>
+			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					<HStack justify="flex-end">

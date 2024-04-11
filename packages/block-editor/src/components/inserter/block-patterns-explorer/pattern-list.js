@@ -47,10 +47,16 @@ function PatternsListHeader( { filterValue, filteredBlockPatternsLength } ) {
 	);
 }
 
-function PatternList( { searchValue, selectedCategory, patternCategories } ) {
+function PatternList( {
+	searchValue,
+	selectedCategory,
+	patternCategories,
+	rootClientId,
+} ) {
 	const container = useRef();
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
+		rootClientId,
 		shouldFocusBlock: true,
 	} );
 	const [ patterns, , onClickPattern ] = usePatternsState(

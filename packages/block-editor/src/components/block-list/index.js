@@ -160,6 +160,9 @@ export default function BlockList( settings ) {
 	);
 }
 
+const EMPTY_ARRAY = [];
+const EMPTY_SET = new Set();
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -175,6 +178,7 @@ function Items( {
 		useSelect(
 			( select ) => {
 				const {
+					getSettings,
 					getBlockOrder,
 					getSelectedBlockClientId,
 					getSelectedBlockClientIds,
@@ -183,9 +187,20 @@ function Items( {
 					getBlockEditingMode,
 					__unstableGetEditorMode,
 				} = select( blockEditorStore );
+
+				const _order = getBlockOrder( rootClientId );
+
+				if ( getSettings().__unstableIsPreviewMode ) {
+					return {
+						order: _order,
+						selectedBlocks: EMPTY_ARRAY,
+						visibleBlocks: EMPTY_SET,
+					};
+				}
+
 				const selectedBlockClientId = getSelectedBlockClientId();
 				return {
-					order: getBlockOrder( rootClientId ),
+					order: _order,
 					selectedBlocks: getSelectedBlockClientIds(),
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:

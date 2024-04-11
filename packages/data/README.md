@@ -482,6 +482,23 @@ _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
 
+### createSelector
+
+Creates a memoized selector that caches the computed values according to the array of "dependants" and the selector parameters, and recomputes the values only when any of them changes.
+
+_Related_
+
+-   The documentation for the `rememo` package from which the `createSelector` function is reexported.
+
+_Parameters_
+
+-   _selector_ `Function`: Selector function that calculates a value from state and parameters.
+-   _getDependants_ `Function`: Function that returns an array of "dependant" objects.
+
+_Returns_
+
+-   `Function`: A memoized version of `selector` that caches the calculated return values.
+
 ### dispatch
 
 Given a store descriptor, returns an object of the store's action creators. Calling an action creator will cause it to be dispatched, updating the state value accordingly.

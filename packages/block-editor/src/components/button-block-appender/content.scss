@@ -56,7 +56,11 @@
 		}
 
 		.block-editor-inserter {
-			visibility: hidden;
+			opacity: 0;
+
+			&:focus-within {
+				opacity: 1;
+			}
 		}
 
 		&.is-drag-over {

@@ -29,6 +29,7 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
+import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
 
 const {
 	LayoutStyle,
@@ -311,6 +312,9 @@ function EditorCanvas( {
 		localRef,
 		renderingMode === 'post-only' ? typewriterRef : noop,
 		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
+		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 	] );

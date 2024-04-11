@@ -12,7 +12,6 @@
 
 .editor-post-featured-image__container {
 	position: relative;
-	aspect-ratio: 2/1;
 
 	&:hover,
 	&:focus,
@@ -31,8 +30,9 @@
 	@include reduce-motion("transition");
 	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
-	outline: $border-width solid rgba(0, 0, 0, 0.1);
 	outline-offset: -#{$border-width};
+	min-height: $grid-unit-50 * 2;
+	margin-bottom: $grid-unit-20;
 
 	display: flex;
 	justify-content: center;
@@ -40,6 +40,7 @@
 
 .editor-post-featured-image__preview {
 	height: auto;
+	outline: $border-width solid rgba($black, 0.1);
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;

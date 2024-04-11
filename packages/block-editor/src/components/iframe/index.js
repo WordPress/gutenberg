@@ -208,17 +208,14 @@ function Iframe( {
 	}, [] );
 
 	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
 		const onResize = () => {
-			setIframeWindowInnerHeight(
-				node.ownerDocument.defaultView.innerHeight
-			);
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		};
-		node.ownerDocument.defaultView.addEventListener( 'resize', onResize );
+		nodeWindow.addEventListener( 'resize', onResize );
 		return () => {
-			node.ownerDocument.defaultView.removeEventListener(
-				'resize',
-				onResize
-			);
+			nodeWindow.removeEventListener( 'resize', onResize );
 		};
 	}, [] );
 
@@ -247,12 +244,12 @@ function Iframe( {
 				height: auto !important;
 				min-height: 100%;
 			}
-
-			body {
+			/* Lowest specificity to not override global styles */
+			:where(body) {
 				margin: 0;
 				/* Default background color in case zoom out mode background
 				colors the html element */
-				background: white;
+				background-color: white;
 			}
 		</style>
 		${ styles }

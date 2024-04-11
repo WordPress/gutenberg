@@ -47,7 +47,6 @@ function ListViewBlockSelectButton(
 		onDragEnd,
 		draggable,
 		isExpanded,
-		ariaLabel,
 		ariaDescribedBy,
 		updateFocusAndSelection,
 	},
@@ -65,6 +64,7 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlockParents,
 		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
@@ -73,7 +73,7 @@ function ListViewBlockSelectButton(
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-	const { rootClientId } = useListViewContext();
+	const { collapseAll, expand, rootClientId } = useListViewContext();
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -228,6 +228,17 @@ function ListViewBlockSelectButton(
 				blockClientIds[ blockClientIds.length - 1 ],
 				null
 			);
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+			const { firstBlockClientId } = getBlocksToUpdate();
+			const blockParents = getBlockParents( firstBlockClientId, false );
+			// Collapse all blocks.
+			collapseAll();
+			// Expand all parents of the current block.
+			expand( blockParents );
 		}
 	}
 
@@ -249,7 +260,6 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-label={ ariaLabel }
 				aria-describedby={ ariaDescribedBy }
 				aria-expanded={ isExpanded }
 			>
