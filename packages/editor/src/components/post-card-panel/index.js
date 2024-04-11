@@ -165,7 +165,7 @@ function PostContentInfo( { postContent } ) {
 		readingTime <= 1
 			? __( '1 minute read time' )
 			: sprintf(
-					// translators: %s: the number of words in the post.
+					// translators: %s: the number of minutes to read the post.
 					_n(
 						'%s minute read time',
 						'%s minutes read time',
@@ -176,8 +176,7 @@ function PostContentInfo( { postContent } ) {
 	return (
 		<Text>
 			{ sprintf(
-				/* translators: 1: How many words a post has (e.g. 30 words). 2: the number of minutes of read time (e.g. 2 minutes read time) */
-				/* translators: %1s: is the number of minutes. */
+				/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
 				'%1$s, %2$s.',
 				wordsCountText,
 				readingTimeText
