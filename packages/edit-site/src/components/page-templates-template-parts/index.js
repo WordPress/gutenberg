@@ -374,7 +374,7 @@ export default function PageTemplatesTemplateParts() {
 
 	return (
 		<Page
-			className="edit-site-page-template-template-parts-dataviews"
+			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
 			actions={ <AddNewTemplate /> }
 		>
