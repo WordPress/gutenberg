@@ -226,10 +226,6 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		return { isReady: true, postType: 'wp_template', postId, context };
 	}
 
-	if ( path === '/wp_template_part/all' && postId ) {
-		return { isReady: true, postType: 'wp_template_part', postId, context };
-	}
-
 	if ( postTypesWithoutParentTemplate.includes( postType ) ) {
 		return { isReady: true, postType, postId, context };
 	}
