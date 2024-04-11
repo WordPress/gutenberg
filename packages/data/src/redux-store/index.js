@@ -571,7 +571,7 @@ function mapResolvers( resolvers ) {
 	} );
 }
 
-const queue = [];
+const queuesByRegistry = new WeakMap();
 
 /**
  * Returns a selector with a matched resolver.
@@ -618,11 +618,21 @@ function mapSelectorWithResolver(
 
 		resolversCache.markAsRunning( selectorName, args );
 
-		queue.push( async () => {
+		let queue = queuesByRegistry.get( registry );
+
+		if ( ! queue ) {
+			queue = [];
+			queuesByRegistry.set( registry, queue );
+		}
+
+		function startResolution() {
 			resolversCache.clear( selectorName, args );
 			store.dispatch(
 				metadataActions.startResolution( selectorName, args )
 			);
+		}
+
+		async function fulfillResolution() {
 			try {
 				const action = resolver.fulfill( ...args );
 				if ( action ) {
@@ -636,19 +646,25 @@ function mapSelectorWithResolver(
 					metadataActions.failResolution( selectorName, args, error )
 				);
 			}
-		} );
+		}
 
-		// Many resolvers can be called at once. The point of this is to at
-		// least batch `startResolution` actions all together.
+		queue.push( [ startResolution, fulfillResolution ] );
+
 		window.queueMicrotask( () => {
 			if ( queue.length ) {
+				// Many resolvers can be called at once. The point of this is to
+				// at least batch `startResolution` actions all together.
 				registry.batch( () => {
-					while ( queue.length ) {
-						// Do not await here, we only want to batch the sync
-						// actions.
-						queue.shift()();
+					for ( const [ start ] of queue ) {
+						start();
 					}
 				} );
+
+				for ( const [ , fulfill ] of queue ) {
+					fulfill();
+				}
+
+				queue.length = 0;
 			}
 		} );
 	}
