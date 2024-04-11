@@ -321,7 +321,7 @@ const Directives = ( {
 	previousScope,
 }: DirectivesProps ) => {
 	// Initialize the priority levels in the first Directives component.
-	const [ currentPriorityLevel, ...nextPriorityLevels ] =
+	const [ currentPriorityLevel = [], ...nextPriorityLevels ] =
 		priorityLevels ?? getPriorityLevels( directives );
 
 	// Initialize the scope of this element. These scopes are different per each
