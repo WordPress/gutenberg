@@ -17,8 +17,8 @@
 
 	svg.components-checkbox-control__checked,
 	svg.components-checkbox-control__indeterminate {
-		top: - $grid-unit-05;
-		left: - $grid-unit-05;
+		height: #{$grid-unit-05 * 5};
+		width: #{$grid-unit-05 * 5};
 	}
 }
 
