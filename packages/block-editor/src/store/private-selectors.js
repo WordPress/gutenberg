@@ -310,35 +310,48 @@ function mapUserPattern(
 	};
 }
 
-export const getPatternBySlug = createRegistrySelector(
-	( select ) => ( state, patternName ) => {
-		// Only fetch reusable blocks if we know we need them.
-		// To do: maybe use the entity record API to retrieve the block by slug.
-		if ( patternName?.startsWith( 'core/block/' ) ) {
-			const _id = parseInt(
-				patternName.slice( 'core/block/'.length ),
-				10
-			);
-			const block = unlock( select( STORE_NAME ) )
-				.getReusableBlocks()
-				.find( ( { id } ) => id === _id );
+export const getPatternBySlug = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, patternName ) => {
+			// Only fetch reusable blocks if we know we need them. To do: maybe
+			// use the entity record API to retrieve the block by slug.
+			if ( patternName?.startsWith( 'core/block/' ) ) {
+				const _id = parseInt(
+					patternName.slice( 'core/block/'.length ),
+					10
+				);
+				const block = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( { id } ) => id === _id );
 
-			if ( ! block ) {
-				return null;
+				if ( ! block ) {
+					return null;
+				}
+
+				return mapUserPattern(
+					block,
+					state.settings.__experimentalUserPatternCategories
+				);
 			}
 
-			return mapUserPattern(
-				block,
-				state.settings.__experimentalUserPatternCategories
-			);
-		}
-
-		return [
-			// This setting is left for back compat.
-			...( state.settings.__experimentalBlockPatterns ?? [] ),
-			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
-		].find( ( { name } ) => name === patternName );
-	}
+			return [
+				// This setting is left for back compat.
+				...( state.settings.__experimentalBlockPatterns ?? [] ),
+				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
+					[] ),
+			].find( ( { name } ) => name === patternName );
+		},
+		( state, patternName ) =>
+			patternName?.startsWith( 'core/block/' )
+				? [
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						state.settings.__experimentalReusableBlocks,
+				  ]
+				: [
+						state.settings.__experimentalBlockPatterns,
+						state.settings[ selectBlockPatternsKey ]?.( select ),
+				  ]
+	)
 );
 
 export const getAllPatterns = createRegistrySelector( ( select ) =>
