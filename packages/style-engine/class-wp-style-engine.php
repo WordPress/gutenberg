@@ -355,7 +355,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param string   $store_name       A valid store key.
 		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-		 * @param string $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string   $rules_group        Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 * @return void.
 		 */
@@ -589,14 +589,19 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * Style value parser that constructs a CSS definition array comprising a single CSS property and value.
 		 * If the provided value is an array containing a `url` property, the function will return a CSS definition array
 		 * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
-		 * e.g., array( 'background-image' => "url( '...' )" ).
+		 * e.g., array( 'background-image' => "url( '...' )" ). If a $base_url exists, it will be appended to the URL.
 		 *
 		 * @param array $style_value      A single raw style value from $block_styles array.
 		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array $options         {
+		 *      Optional. An array of options. Default empty array.
+		 *
+		 *      @type string $base_url A URL to the theme directory to be used as a base for relative URLs.
+		 * }
 		 *
 		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 */
-		protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
+		protected static function get_url_or_value_css_declaration( $style_value, $style_definition, $options = array() ) {
 			if ( empty( $style_value ) ) {
 				return array();
 			}
@@ -605,9 +610,15 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 			if ( isset( $style_definition['property_keys']['default'] ) ) {
 				$value = null;
-
-				if ( ! empty( $style_value['url'] ) ) {
-					$value = "url('" . $style_value['url'] . "')";
+				if ( ! empty( $style_value['url'] ) && is_string( $style_value['url'] ) ) {
+					$url = $style_value['url'];
+					if ( ! empty( $options['base_url'] ) ) {
+						if ( ! str_starts_with( $url, '/' ) ) {
+							$url = '/' . $url;
+						}
+						$url = esc_url( $options['base_url'] . $url );
+					}
+					$value = "url('" . $url . "')";
 				} elseif ( is_string( $style_value ) ) {
 					$value = $style_value;
 				}

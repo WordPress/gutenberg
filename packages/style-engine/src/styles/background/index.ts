@@ -9,14 +9,20 @@ const backgroundImage = {
 	generate: ( style: Style, options: StyleOptions ) => {
 		const _backgroundImage = style?.background?.backgroundImage;
 		if ( typeof _backgroundImage === 'object' && _backgroundImage?.url ) {
+			const url = !! options?.baseUrl
+				? `${ options.baseUrl }${
+						_backgroundImage.url.startsWith( '/' )
+							? _backgroundImage.url
+							: `/${ _backgroundImage.url }`
+				  }`
+				: _backgroundImage.url;
+
 			return [
 				{
 					selector: options.selector,
 					key: 'backgroundImage',
 					// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-					value: `url( '${ encodeURI(
-						safeDecodeURI( _backgroundImage.url )
-					) }' )`,
+					value: `url( '${ encodeURI( safeDecodeURI( url ) ) }' )`,
 				},
 			];
 		}
