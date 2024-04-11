@@ -60,7 +60,7 @@ export default function PostURL( { onClose } ) {
 	return (
 		<div className="editor-post-url">
 			<InspectorPopoverHeader
-				title={ __( 'Slug' ) }
+				title={ __( 'Link' ) }
 				onClose={ onClose }
 			/>
 			<VStack spacing={ 3 }>
@@ -91,7 +91,7 @@ export default function PostURL( { onClose } ) {
 									ref={ copyButtonRef }
 								/>
 							}
-							label={ __( 'Slug' ) }
+							label={ __( 'Link' ) }
 							hideLabelFromVision
 							value={ forceEmptyField ? '' : postSlug }
 							autoComplete="off"
