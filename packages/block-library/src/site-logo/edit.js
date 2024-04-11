@@ -11,7 +11,6 @@ import {
 	createInterpolateElement,
 	useEffect,
 	useState,
-	useRef,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
@@ -50,11 +49,6 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import useClientWidth from '../image/use-client-width';
-
-/**
- * Module constants
- */
 import { MIN_SIZE } from '../image/constants';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -63,7 +57,6 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
-	containerRef,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -74,7 +67,6 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
@@ -154,14 +146,7 @@ const SiteLogo = ( {
 		);
 	}
 
-	let imageWidthWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-	}
-
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
@@ -227,7 +212,6 @@ const SiteLogo = ( {
 				url={ logoUrl }
 				width={ currentWidth }
 				height={ currentHeight }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
@@ -408,7 +392,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const ref = useRef();
 
 	const {
 		siteLogoId,
@@ -551,7 +534,6 @@ export default function LogoEdit( {
 				alt={ alt }
 				attributes={ attributes }
 				className={ className }
-				containerRef={ ref }
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
 				logoUrl={ logoUrl }
@@ -588,10 +570,7 @@ export default function LogoEdit( {
 		'is-default-size': ! width,
 	} );
 
-	const blockProps = useBlockProps( {
-		ref,
-		className: classes,
-	} );
+	const blockProps = useBlockProps( { className: classes } );
 
 	const label = __( 'Add a site logo' );
 
