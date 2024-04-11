@@ -183,6 +183,11 @@ function ComplementaryArea( {
 	toggleShortcut,
 	isActiveByDefault,
 } ) {
+	// This state is used to delay the rendering of the Fill
+	// until the initial effect runs.
+	// This prevents the animation from running on mount if
+	// the complementary area is active by default.
+	const [ isReady, setIsReady ] = useState( false );
 	const {
 		isLoading,
 		isActive,
@@ -236,6 +241,7 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
+		setIsReady( true );
 	}, [
 		activeArea,
 		isActiveByDefault,
@@ -245,6 +251,10 @@ function ComplementaryArea( {
 		enableComplementaryArea,
 		disableComplementaryArea,
 	] );
+
+	if ( ! isReady ) {
+		return;
+	}
 
 	return (
 		<>
