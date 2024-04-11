@@ -90,6 +90,7 @@ export interface StyleOptions {
 	 * CSS selector for the generated style.
 	 */
 	selector?: string;
+	baseUrl?: string;
 }
 
 export interface GeneratedCSSRule {

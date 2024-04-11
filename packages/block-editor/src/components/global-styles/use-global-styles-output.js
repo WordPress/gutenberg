@@ -35,7 +35,6 @@ import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import { getBackgroundSupportStyles } from '../../hooks/background';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -394,24 +393,11 @@ export function getStylesDeclarations(
 		[]
 	);
 
-	// Set background defaults.
-	// Applies to all blocks/global styles.
-	if ( !! blockStyles.background ) {
-		blockStyles = {
-			...blockStyles,
-			background: {
-				...blockStyles.background,
-				...getBackgroundSupportStyles(
-					blockStyles.background,
-					editorSettings
-				),
-			},
-		};
-	}
-
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( blockStyles );
+	const extraRules = getCSSRules( blockStyles, {
+		baseUrl: editorSettings?.themeDirURI,
+	} );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (

@@ -50,22 +50,6 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function getBackgroundSupportStyles( backgroundStyle, options ) {
-	const backgroundImage = backgroundStyle?.backgroundImage;
-	if (
-		backgroundImage?.source === 'theme' &&
-		!! backgroundImage?.url &&
-		options?.themeDirURI
-	) {
-		return {
-			backgroundImage: {
-				url: `${ options.themeDirURI }${ backgroundImage.url }`,
-				source: 'file',
-			},
-		};
-	}
-}
-
 export function setBackgroundStyleDefaults( backgroundStyle ) {
 	if ( ! backgroundStyle ) {
 		return;
