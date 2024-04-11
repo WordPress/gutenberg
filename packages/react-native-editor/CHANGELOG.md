@@ -10,7 +10,8 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
--   [*] Add empty fallback option for the BottomSheetSelectControl component
+-   [*] Add empty fallback option for the BottomSheetSelectControl component [#60333]
+-   [*] Fix Quote Block styles [#60476]
 -   [*] Prevent passing potential false values to the onPress prop [#60595]
 
 ## 1.116.0
