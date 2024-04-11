@@ -106,6 +106,7 @@ function castValue( value, original ) {
  *
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
+ * @param {string}   props.attrValue         - The attribute value.
  * @param {Object}   props.blockProps        - The block props with bound attribute.
  * @param {Object}   props.source            - Source handler.
  * @param {Object}   props.args              - The arguments to pass to the source.
@@ -115,6 +116,7 @@ function castValue( value, original ) {
 const BindingConnector = ( {
 	args,
 	attrName,
+	attrValue,
 	blockProps,
 	source,
 	onPropValueChange,
@@ -126,7 +128,6 @@ const BindingConnector = ( {
 	} = source.useSource( blockProps, args );
 
 	const { name: blockName } = blockProps;
-	const attrValue = blockProps.attributes[ attrName ];
 
 	// Store previous values for the attribute and external property
 	const prevAttrValue = useRef( attrValue );
@@ -188,8 +189,7 @@ const BindingConnector = ( {
 		}
 
 		// Sync from block attribute to external source property.
-		const prevRawAttrValue = getAttributeValue( prevAttrValue.current );
-		if ( rawAttrValue !== prevRawAttrValue ) {
+		if ( rawAttrValue !== getAttributeValue( prevAttrValue.current ) ) {
 			if ( rawAttrValue === propValue ) {
 				return;
 			}
@@ -205,6 +205,7 @@ const BindingConnector = ( {
 		attrName,
 		updatePropValue,
 		attrValue,
+		blockProps,
 	] );
 
 	return null;
@@ -219,10 +220,16 @@ const BindingConnector = ( {
  * @param {Object}   props                   - The component props.
  * @param {Object}   props.blockProps        - The BlockEdit props object.
  * @param {Object}   props.bindings          - The block bindings settings.
+ * @param {Object}   props.boundAttributes   - The bound attributes state.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
  * @return {null}                              Data-handling component. Render nothing.
  */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
+function BlockBindingBridge( {
+	blockProps,
+	bindings,
+	boundAttributes,
+	onPropValueChange,
+} ) {
 	const blockBindingsSources = unlock(
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
@@ -242,6 +249,7 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 						<BindingConnector
 							key={ attrName }
 							attrName={ attrName }
+							attrValue={ boundAttributes[ attrName ] }
 							source={ source }
 							blockProps={ blockProps }
 							args={ boundAttribute.args }
@@ -280,12 +288,46 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			)
 		);
 
+		/**
+		 * Custom setAttributes function that
+		 * updates the bound and unbound attributes.
+		 *
+		 * @param {Object} newAttributes - The new attributes values.
+		 * @return {void}
+		 */
+		function setAttributes( newAttributes ) {
+			// Get the bound and unbound attributes.
+			const attrs = Object.entries( newAttributes ).reduce(
+				( acc, [ key, value ] ) => {
+					if ( key in bindings ) {
+						acc.bounds[ key ] = value;
+					} else {
+						acc.unbounds[ key ] = value;
+					}
+
+					return acc;
+				},
+				{ bounds: {}, unbounds: {} }
+			);
+
+			// Update the unbound attributes in case of any.
+			if ( Object.keys( attrs.unbounds ).length > 0 ) {
+				props.setAttributes( attrs.unbounds );
+			}
+
+			// Update the bound attributes in case of any.
+			if ( Object.keys( attrs.bounds ).length > 0 ) {
+				updateBoundAttributes( attrs.bounds );
+			}
+		}
+
 		return (
 			<>
 				{ Object.keys( bindings ).length > 0 && (
 					<BlockBindingBridge
 						blockProps={ props }
 						bindings={ bindings }
+						boundAttributes={ boundAttributes }
 						onPropValueChange={ updateBoundAttributes }
 					/>
 				) }
@@ -293,6 +335,7 @@ const withBlockBindingSupport = createHigherOrderComponent(
 				<BlockEdit
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
+					setAttributes={ setAttributes }
 				/>
 			</>
 		);
