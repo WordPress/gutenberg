@@ -4,7 +4,7 @@
 const os = require( 'os' );
 const fs = require( 'fs' );
 const path = require( 'path' );
-const SimpleGit = require( 'simple-git' );
+const SimpleGit = require( 'simple-git' ).default;
 
 /**
  * Internal dependencies
@@ -25,10 +25,11 @@ const RESULTS_FILE_SUFFIX = '.performance-results.json';
 /**
  * @typedef WPPerformanceCommandOptions
  *
- * @property {boolean=} ci          Run on CI.
- * @property {number=}  rounds      Run each test suite this many times for each branch.
- * @property {string=}  testsBranch The branch whose performance test files will be used for testing.
- * @property {string=}  wpVersion   The WordPress version to be used as the base install for testing.
+ * @property {boolean}               [ci]          Run on CI.
+ * @property {number}                [rounds]      Run each test suite this many times for each branch.
+ * @property {ReadonlyArray<string>} [suite]       Run each test suite this many times for each branch.
+ * @property {string}                [testsBranch] The branch whose performance test files will be used for testing.
+ * @property {string}                [wpVersion]   The WordPress version to be used as the base install for testing.
  */
 
 /**
@@ -151,7 +152,6 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 2, 'Creating directory:', formats.success( sourceDir ) );
 	fs.mkdirSync( sourceDir );
 
-	// @ts-ignore
 	const sourceGit = SimpleGit( sourceDir );
 	logAtIndent(
 		2,
@@ -205,7 +205,6 @@ async function runPerformanceTests( branches, options ) {
 		'Checking out branch:',
 		formats.success( testRunnerBranch )
 	);
-	// @ts-ignore
 	await SimpleGit( testRunnerDir ).raw( 'checkout', testRunnerBranch );
 
 	logAtIndent( 2, 'Installing dependencies and building' );
@@ -232,6 +231,9 @@ async function runPerformanceTests( branches, options ) {
 		wpZipUrl = `https://wordpress.org/wordpress-${ zipVersion }.zip`;
 	}
 
+	/**
+	 * @type {Record<string,string>}
+	 */
 	const branchDirs = {};
 	for ( const branch of branches ) {
 		logAtIndent( 2, 'Branch:', formats.success( branch ) );
@@ -240,7 +242,6 @@ async function runPerformanceTests( branches, options ) {
 
 		logAtIndent( 3, 'Creating directory:', formats.success( envDir ) );
 		fs.mkdirSync( envDir );
-		// @ts-ignore
 		branchDirs[ branch ] = envDir;
 		const buildDir = path.join( envDir, 'plugin' );
 
@@ -248,7 +249,6 @@ async function runPerformanceTests( branches, options ) {
 		await runShellScript( `cp -R ${ sourceDir } ${ buildDir }` );
 
 		logAtIndent( 3, 'Checking out:', formats.success( branch ) );
-		// @ts-ignore
 		await SimpleGit( buildDir ).raw( 'checkout', branch );
 
 		logAtIndent( 3, 'Installing dependencies and building' );
@@ -310,13 +310,6 @@ async function runPerformanceTests( branches, options ) {
 
 	logAtIndent( 0, 'Looking for test files' );
 
-	const testSuites = getFilesFromDir(
-		path.join( testRunnerDir, 'test/performance/specs' )
-	).map( ( file ) => {
-		logAtIndent( 1, 'Found:', formats.success( file ) );
-		return path.basename( file, '.spec.js' );
-	} );
-
 	logAtIndent( 0, 'Running tests' );
 
 	if ( wpZipUrl ) {
@@ -330,6 +323,18 @@ async function runPerformanceTests( branches, options ) {
 	}
 
 	const wpEnvPath = path.join( testRunnerDir, 'node_modules/.bin/wp-env' );
+
+	// eslint-disable-next-line no-nested-ternary
+	const testSuites = options.suite
+		? Array.isArray( options.suite )
+			? options.suite
+			: [ options.suite ]
+		: getFilesFromDir(
+				path.join( testRunnerDir, 'test/performance/specs' )
+		  ).map( ( file ) => {
+				logAtIndent( 1, 'Found:', formats.success( file ) );
+				return path.basename( file, '.spec.js' );
+		  } );
 
 	for ( const testSuite of testSuites ) {
 		for ( let i = 1; i <= TEST_ROUNDS; i++ ) {
