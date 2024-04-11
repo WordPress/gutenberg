@@ -3,7 +3,6 @@
 	// the content width, we should use that prop instead of this style.
 	// see https://github.com/WordPress/gutenberg/issues/54471.
 	&.font-library-modal {
-
 		@include break-medium() {
 			width: 65vw;
 		}
@@ -30,8 +29,15 @@
 }
 
 .font-library-modal__tabpanel-layout {
-
 	margin-top: $grid-unit-40;
+
+	.font-library-modal__loading {
+		position: absolute;
+		top: #{$header-height + $grid-unit-15 + $grid-unit-60}; // (modal header) + (height of the tabs) = 120px
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
 
 	.font-library-modal__tabpanel-layout__footer {
 		border-top: 1px solid $gray-300;
@@ -90,6 +96,7 @@
 	[role="tablist"] {
 		position: sticky;
 		top: 0;
+		height: $grid-unit-60;
 		border-bottom: 1px solid $gray-300;
 		background: $white;
 		margin: 0 #{$grid-unit-40 * -1};
