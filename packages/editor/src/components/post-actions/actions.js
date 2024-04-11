@@ -33,7 +33,7 @@ function getItemTitle( item ) {
 	return decodeEntities( item.title?.rendered || '' );
 }
 
-export const trashPostAction = {
+const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
@@ -172,7 +172,7 @@ export const trashPostAction = {
 	},
 };
 
-export function usePermanentlyDeletePostAction() {
+function usePermanentlyDeletePostAction() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { deleteEntityRecord } = useDispatch( coreStore );
@@ -279,7 +279,7 @@ export function usePermanentlyDeletePostAction() {
 	);
 }
 
-export function useRestorePostAction() {
+function useRestorePostAction() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord, saveEditedEntityRecord } =
@@ -365,7 +365,7 @@ export function useRestorePostAction() {
 	);
 }
 
-export const viewPostAction = {
+const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
 	isPrimary: true,
@@ -382,7 +382,7 @@ export const viewPostAction = {
 	},
 };
 
-export const editPostAction = {
+const editPostAction = {
 	id: 'edit-post',
 	label: __( 'Edit' ),
 	isPrimary: true,
@@ -396,7 +396,7 @@ export const editPostAction = {
 		}
 	},
 };
-export const postRevisionsAction = {
+const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
 	isPrimary: false,
@@ -422,7 +422,7 @@ export const postRevisionsAction = {
 	},
 };
 
-export const renamePostAction = {
+const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
@@ -499,7 +499,7 @@ export const renamePostAction = {
 	},
 };
 
-export const resetTemplateAction = {
+const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: isTemplateRevertable,
@@ -611,7 +611,7 @@ function isTemplateRemovable( template ) {
 	);
 }
 
-export const deleteTemplateAction = {
+const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
 	isEligible: isTemplateRemovable,
@@ -662,7 +662,7 @@ export const deleteTemplateAction = {
 	},
 };
 
-export const renameTemplateAction = {
+const renameTemplateAction = {
 	id: 'rename-template',
 	label: __( 'Rename' ),
 	isEligible: ( template ) => {
