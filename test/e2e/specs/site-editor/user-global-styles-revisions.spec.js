@@ -101,7 +101,7 @@ test.describe( 'Style Revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Are you sure you want to apply this revision? Any unsaved changes will be lost./
+			/^Are you sure you want to apply this revision\? Any unsaved changes will be lost./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
