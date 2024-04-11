@@ -297,9 +297,7 @@ export default function Editor( { isLoading, onClick } ) {
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
-							! isDistractionFree &&
 							isEditMode &&
-							isRightSidebarOpen &&
 							! isDistractionFree && (
 								<ComplementaryArea.Slot scope="core/edit-site" />
 							)
