@@ -80,10 +80,10 @@ export function TimePicker( {
 			month: format( date, 'MM' ),
 			year: format( date, 'yyyy' ),
 			minutes: format( date, 'mm' ),
-			hours: format( date, is12Hour ? 'hh' : 'HH' ),
+			hours: format( date, 'HH' ),
 			am: format( date, 'a' ),
 		} ),
-		[ date, is12Hour ]
+		[ date ]
 	);
 
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
