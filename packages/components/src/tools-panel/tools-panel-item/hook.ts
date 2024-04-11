@@ -145,7 +145,7 @@ export function useToolsPanelItem(
 			onSelect?.();
 		}
 
-		if ( ! isMenuItemChecked && wasMenuItemChecked ) {
+		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
 			onDeselect?.();
 		}
 	}, [
