@@ -7,6 +7,7 @@ import { isPlainObject } from 'is-plain-object';
 /**
  * WordPress dependencies
  */
+import { registerBlockStyle, store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -32,35 +33,57 @@ export function mergeBaseAndUserConfigs( base, user ) {
 	} );
 }
 
-function resolveBlockStyleVariations( userConfig ) {
-	const sharedVariations = userConfig.styles?.blocks?.variations;
+// Resolves shared block style variation definitions from the user origin
+// under their respective block types and registers the block style if required.
+function useResolvedBlockStyleVariationsConfig( userConfig ) {
+	const getBlockStyles = useSelect( ( select ) => {
+		return select( blocksStore ).getBlockStyles;
+	}, [] );
 
-	if ( ! sharedVariations ) {
-		return userConfig;
-	}
+	return useMemo( () => {
+		const sharedVariations = userConfig?.styles?.blocks?.variations;
 
-	const variationsConfig = cloneDeep( userConfig );
-
-	Object.entries( sharedVariations ).forEach(
-		( [ variationName, variation ] ) => {
-			if ( ! variation?.supportedBlockTypes ) {
-				return;
-			}
-
-			variation.supportedBlockTypes.forEach( ( blockName ) => {
-				const path = [
-					'styles',
-					'blocks',
-					blockName,
-					'variations',
-					variationName,
-				];
-				setNestedValue( variationsConfig, path, variation );
-			} );
+		if ( ! sharedVariations ) {
+			return userConfig;
 		}
-	);
 
-	return deepmerge( variationsConfig, userConfig );
+		const variationsConfig = cloneDeep( userConfig );
+
+		Object.entries( sharedVariations ).forEach(
+			( [ variationName, variation ] ) => {
+				if ( ! variation?.supportedBlockTypes ) {
+					return;
+				}
+
+				variation.supportedBlockTypes.forEach( ( blockName ) => {
+					// Register any block style variations that have been added
+					// by a theme style variation and are not already registered.
+					const blockStyles = getBlockStyles( blockName );
+					const registeredBlockStyle = blockStyles.find(
+						( { name } ) => name === variationName
+					);
+
+					if ( ! registeredBlockStyle ) {
+						registerBlockStyle( blockName, {
+							name: variationName,
+							label: variationName,
+						} );
+					}
+
+					const path = [
+						'styles',
+						'blocks',
+						blockName,
+						'variations',
+						variationName,
+					];
+					setNestedValue( variationsConfig, path, variation );
+				} );
+			}
+		);
+
+		return deepmerge( variationsConfig, userConfig );
+	}, [ userConfig, getBlockStyles ] );
 }
 
 function useGlobalStylesUserConfig() {
@@ -161,13 +184,8 @@ export function useGlobalStylesContext() {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
-
-	const userConfigWithVariations = useMemo( () => {
-		if ( ! userConfig ) {
-			return userConfig;
-		}
-		return resolveBlockStyleVariations( userConfig );
-	}, [ userConfig ] );
+	const userConfigWithVariations =
+		useResolvedBlockStyleVariationsConfig( userConfig );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfigWithVariations ) {
