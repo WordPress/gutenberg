@@ -529,7 +529,7 @@ function BackgroundToolsPanel( {
 	return (
 		<VStack
 			as={ ToolsPanel }
-			spacing={ 6 }
+			spacing={ 4 }
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
@@ -542,7 +542,7 @@ function BackgroundToolsPanel( {
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
-	backgroundSize: true,
+	backgroundSize: false,
 };
 
 export default function BackgroundPanel( {
