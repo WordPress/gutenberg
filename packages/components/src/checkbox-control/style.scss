@@ -1,9 +1,9 @@
-$checkbox-input-size: var(--wp-components-checkbox-control-size);
-$checkbox-input-size-sm: var(--wp-components-checkbox-control-size-sm);
+.components-checkbox-control {
+	--checkbox-input-size: 24px; // Width & height for small viewports.
 
-:root {
-	--wp-components-checkbox-control-size: 20px;
-	--wp-components-checkbox-control-size-sm: 24px; // Width & height for small viewports.
+	@include break-small() {
+		--checkbox-input-size: var(--wp-components-checkbox-control-size, 20px);
+	}
 }
 
 .components-checkbox-control__input[type="checkbox"] {
@@ -19,13 +19,8 @@ $checkbox-input-size-sm: var(--wp-components-checkbox-control-size-sm);
 	padding: 0 !important;
 	text-align: center;
 	vertical-align: top;
-	width: var(--wp-components-checkbox-control-size-sm);
-	height: var(--wp-components-checkbox-control-size-sm);
-
-	@include break-small() {
-		height: var(--wp-components-checkbox-control-size);
-		width: var(--wp-components-checkbox-control-size);
-	}
+	width: var(--checkbox-input-size);
+	aspect-ratio: 1;
 
 	appearance: none;
 	transition: 0.1s border-color ease-in-out;
@@ -56,31 +51,26 @@ $checkbox-input-size-sm: var(--wp-components-checkbox-control-size-sm);
 	display: inline-block;
 	margin-right: 12px;
 	vertical-align: middle;
-	width: var(--wp-components-checkbox-control-size-sm);
-	height: var(--wp-components-checkbox-control-size-sm);
-
-	@include break-small() {
-		width: var(--wp-components-checkbox-control-size);
-		height: var(--wp-components-checkbox-control-size);
-	}
+	width: var(--checkbox-input-size);
+	aspect-ratio: 1;
 }
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
+	--checkmark-size: var(--checkbox-input-size);
+
 	fill: $white;
 	cursor: pointer;
 	position: absolute;
 	left: 50%;
 	top: 50%;
 	transform: translate(-50%, -50%);
-	width: $button-size-small;
-	height: $button-size-small;
-	max-width: var(--wp-components-checkbox-control-size-sm);
+	width: var(--checkmark-size);
+	height: var(--checkmark-size);
 	user-select: none;
 	pointer-events: none;
 
 	@include break-small() {
-		// Ensure icon is never too large for the checkbox
-		max-width: var(--wp-components-checkbox-control-size);
+		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
 	}
 }
