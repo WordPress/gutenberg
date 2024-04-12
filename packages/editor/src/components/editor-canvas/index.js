@@ -17,10 +17,10 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,8 +38,6 @@ const {
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
-
-const noop = () => {};
 
 /**
  * These post types have a special editor where they don't allow you to fill the title
@@ -97,6 +95,7 @@ function EditorCanvas( {
 	iframeProps,
 	children,
 } ) {
+	const registry = useRegistry();
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -308,9 +307,39 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
+	const paddingAppenderRef = useRefEffect( ( node ) => {
+		function onMouseDown( event ) {
+			if ( event.target !== node ) {
+				return;
+			}
+
+			// only handle clicks under the last child
+			const lastChild = node.lastElementChild;
+			if ( ! lastChild ) {
+				return;
+			}
+
+			const lastChildRect = lastChild.getBoundingClientRect();
+			if ( event.clientY < lastChildRect.bottom ) {
+				return;
+			}
+
+			const { insertDefaultBlock } =
+				registry.dispatch( blockEditorStore );
+
+			insertDefaultBlock();
+
+			event.preventDefault();
+		}
+		node.addEventListener( 'mousedown', onMouseDown );
+		return () => {
+			node.removeEventListener( 'mousedown', onMouseDown );
+		};
+	}, [] );
 	const contentRef = useMergeRefs( [
 		localRef,
-		renderingMode === 'post-only' ? typewriterRef : noop,
+		renderingMode === 'post-only' ? typewriterRef : null,
+		renderingMode === 'post-only' ? paddingAppenderRef : null,
 		useFlashEditableBlocks( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
