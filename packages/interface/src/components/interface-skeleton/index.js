@@ -13,19 +13,14 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import {
-	useMergeRefs,
-	useReducedMotion,
-	useViewportMatch,
-	useResizeObserver,
-} from '@wordpress/compose';
+import { useMergeRefs, useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import NavigableRegion from '../navigable-region';
 
-const ANIMATION_DURATION = 0.25;
+const ANIMATION_DURATION = 0.3;
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -50,6 +45,11 @@ const headerVariants = {
 	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
 };
 
+const secondarySidebarVariants = {
+	open: { x: 0 },
+	closed: { x: '-100%' },
+};
+
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
@@ -70,9 +70,6 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
-	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
-		useResizeObserver();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
 		type: 'tween',
@@ -157,26 +154,12 @@ function InterfaceSkeleton(
 								ariaLabel={ mergedLabels.secondarySidebar }
 								as={ motion.div }
 								initial="closed"
-								animate={
-									isMobileViewport ? 'mobileOpen' : 'open'
-								}
+								animate="open"
 								exit="closed"
-								variants={ {
-									open: { width: secondarySidebarSize.width },
-									closed: { width: 0 },
-									mobileOpen: { width: '100vw' },
-								} }
+								variants={ secondarySidebarVariants }
 								transition={ defaultTransition }
 							>
-								<div
-									style={ {
-										position: 'absolute',
-										width: 'fit-content',
-										height: '100%',
-										right: 0,
-									} }
-								>
-									{ secondarySidebarResizeListener }
+								<div className="interface-interface-skeleton__secondary-sidebar-inner">
 									{ secondarySidebar }
 								</div>
 							</NavigableRegion>

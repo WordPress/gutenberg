@@ -42,11 +42,9 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-const SIDEBAR_WIDTH = 280;
 const variants = {
-	open: { width: SIDEBAR_WIDTH },
-	closed: { width: 0 },
-	mobileOpen: { width: '100vw' },
+	open: { x: 0 },
+	closed: { x: '100%' },
 };
 
 function ComplementaryAreaFill( {
@@ -87,23 +85,15 @@ function ComplementaryAreaFill( {
 			<AnimatePresence initial={ false }>
 				{ ( previousIsActive || isActive ) && (
 					<motion.div
+						id={ id }
+						className={ className }
 						variants={ variants }
 						initial="closed"
-						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
+						animate="open"
 						exit="closed"
 						transition={ transition }
 					>
-						<div
-							id={ id }
-							className={ className }
-							style={ {
-								width: isMobileViewport
-									? '100vw'
-									: SIDEBAR_WIDTH,
-							} }
-						>
-							{ children }
-						</div>
+						{ children }
 					</motion.div>
 				) }
 			</AnimatePresence>
