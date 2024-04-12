@@ -7,6 +7,9 @@ import {
 	__experimentalVStack as VStack,
     __experimentalSpacer as Spacer,
     __experimentalItemGroup as ItemGroup,
+    __experimentalHeading as Heading,
+    Popover,
+    RangeControl,
     Button,
     DropdownMenu,
     NavigableMenu,
@@ -15,7 +18,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { Icon, check, plus, moreVertical, shadow as shadowIcon, lineSolid } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,6 +27,17 @@ import { unlock } from '../../lock-unlock';
 import Subtitle from './subtitle';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+
+const shadowIndicatorStyle = {
+    border: '1px solid #e0e0e0',
+    borderRadius: '2px',
+    boxSizing: 'border-box',
+    color: '#2f2f2f',
+    cursor: 'pointer',
+    height: '26px',
+    width: '26px',
+    padding: 0,
+}
 
 export default function ShadowsPanel() {
     const [ defaultShadows, setDefaultShadows ] = useGlobalSetting(
@@ -46,18 +60,26 @@ export default function ShadowsPanel() {
         </VStack>;
 }
 
-function ShadowsEditor({label, placeholder, shadows, canCreate, onCreate}) {
+function ShadowsEditor({label, placeholder, shadows: savedShadows, canCreate, onCreate}) {
     const [isEditing, setIsEditing] = useState(false);
+    const [shadows, setShadows] = useState(savedShadows || []);
+
+    // useEffect(() => {
+    //     setShadows(savedShadows);
+    // }, [savedShadows]);
 
     const handleAddShadow = () => {
-        onCreate([
+        const newShadows = [
             ...shadows,
             {
                 name: 'Custom shadow ' + (shadows.length + 1),
                 slug: 'custom-shadow-' + (shadows.length + 1),
-                shadow: '0 0 0 0 rgba(0, 0, 0, 0)',
+                shadow: '0 0 4 4 rgba(0, 0, 0, 0.3)',
             }
-        ]);
+        ]
+        setShadows(newShadows);
+
+        // onCreate();
     }
 
     return <div>
@@ -65,7 +87,7 @@ function ShadowsEditor({label, placeholder, shadows, canCreate, onCreate}) {
             <Subtitle level={2}>
                 { label }
             </Subtitle>
-            <div>
+            <div style={{display: 'flex', alignItems: 'center'}}>
                 { isEditing && (
                     <Button
                         size="small"
@@ -137,10 +159,6 @@ function ShadowsReadOnlyView({label, shadows, placeholder}) {
     <ShadowIndicator
         key={ slug }
         label={ name }
-        // isActive={ shadow === activeShadow }
-        // onSelect={ () =>
-        //     onSelect( shadow === activeShadow ? undefined : shadow )
-        // }
         shadow={ shadow }
     />
 ) ) }
@@ -150,10 +168,9 @@ function ShadowsReadOnlyView({label, shadows, placeholder}) {
 function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
 	return (
         <Button
-            className={ 'block-editor-global-styles__shadow-indicator' }
             onClick={ onSelect }
             label={ label }
-            style={ { boxShadow: shadow } }
+            style={ { ...shadowIndicatorStyle, boxShadow: shadow } }
             showTooltip
         >
             { isActive && <Icon icon={ check } /> }
@@ -174,13 +191,135 @@ function ShadowsEditorView({label, shadows}) {
 }
 
 function ShadowEditableItem({label, shadow}) {
-    return <HStack justify="flex-start">
-        <div>
-            <Icon icon={ shadowIcon } />
+    const [isEditing, setIsEditing] = useState(false);
+    const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+    const popoverProps = useMemo(
+		() => ( {
+            placement: 'left-start',
+            offset: 36,
+            shift: true,
+			anchor: popoverAnchor,
+		} ),
+		[ popoverAnchor ]
+	);
+
+    return <div>
+        <div ref={setPopoverAnchor} style={{display: 'flex', alignItems: 'center', padding: '6px', border: '1px solid rgba(0, 0, 0, 0.1)'}}>
+            <div style={{marginBottom: '-4px'}}>
+                <Icon icon={ shadowIcon } />
+            </div>
+            <div style={{flexGrow: 1, margin: '0 6px'}} onClick={() => {setIsEditing(true)}}>{label}</div>
+            <div style={{marginBottom: '-4px'}}>
+                <Icon icon={ lineSolid } />
+            </div>
         </div>
-        <div style={{flexGrow: 1}}>{label}</div>
-        <div>
-            <Icon icon={ lineSolid } />
-        </div>
-    </HStack>
+        {
+            isEditing && <ShadowPopover shadow={shadow} popoverProps={popoverProps} onClose={ () => setIsEditing( false ) } />
+        }
+    </div>
+}
+
+function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
+    const shadowParts = shadowStringToObject(savedShadow || '');
+    const [ shadow, setShadow ] = useState( {
+        x: shadowParts.x, 
+        y: shadowParts.y, 
+        blur: shadowParts.blur, 
+        spread: shadowParts.spread, 
+        color: shadowParts.color,
+    } );
+
+    const shadowString = `${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread}px ${shadow.color}`;
+
+    const onChange = ( key, value ) => {
+        setShadow( {
+            ...shadow,
+            [ key ]: value,
+        } );
+    };
+
+    return <Popover {...popoverProps} onClose={onClose}>
+        <div className="block-editor-global-styles__shadow-popover-container">
+			<VStack spacing={ 4 }>
+				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
+                <div style={{padding: '0.5rem',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+                    <div style={ { ...shadowIndicatorStyle, boxShadow: shadowString } }
+                    ></div>
+                </div>
+				<div style={{padding:'0 1rem',display:'grid',gridTemplateColumns:'1fr 1fr',gap:'1rem'}}>
+                    <div>
+                        <RangeControl label="X position"
+                            value={ shadow.x }
+                            onChange={ ( value ) => onChange( 'x', value ) }
+                            withInputField={ false }
+                            min={ 0 }
+                            max={ 10 }
+                        />
+                    </div>
+                    <div>
+                        <RangeControl label="Y position"
+                            value={ shadow.y }
+                            onChange={ ( value ) => onChange( 'y', value ) }
+                            withInputField={ false }
+                            min={ 0 }
+                            max={ 10 }
+                        />
+                    </div>
+                    <div>
+                        <RangeControl label="Blur"
+                            value={ shadow.blur }
+                            onChange={ ( value ) => onChange( 'blur', value ) }
+                            withInputField={ false }
+                            min={ 0 }
+                            max={ 10 }
+                        />
+                    </div>
+                    <div>
+                        <RangeControl label="Spread"
+                            value={ shadow.spread }
+                            onChange={ ( value ) => onChange( 'spread', value ) }
+                            withInputField={ false }
+                            min={ 0 }
+                            max={ 10 }
+                        />
+                    </div>
+                    {/* <div>Color</div> */}
+                </div>
+			</VStack>
+		</div>
+    </Popover>
+}
+
+function shadowStringToObject(shadow) {
+    const colorStart = shadow.indexOf('rgb');
+    let color = 'rgba(0, 0, 0, 0.5)';
+    let shadows = [];
+    if (colorStart !== -1) {
+        color = shadow.substring(colorStart);
+        shadows = shadow.substring(0, colorStart).trim().split(' ');
+    } else {
+        shadows = shadow.split(' ');
+    }
+
+    return shadows.length === 4 ? ({
+        x: parseInt(shadows[0].replace('px', '')),
+        y: parseInt(shadows[1].replace('px', '')),
+        blur: parseInt(shadows[2].replace('px', '')),
+        spread: parseInt(shadows[3].replace('px', '')),
+        color: color,
+    }) : shadows.length === 3 ? ({
+        x: parseInt(shadows[0].replace('px', '')),
+        y: parseInt(shadows[1].replace('px', '')),
+        blur: parseInt(shadows[2].replace('px', '')),
+        spread: 0,
+        color: color,
+    }) : shadows.length === 2 ? ({
+        x: parseInt(shadows[0].replace('px', '')),
+        y: parseInt(shadows[1].replace('px', '')),
+        blur: 0,
+        spread: 0,
+        color: color,
+    }) : ({
+        x: 0, y: 0, blur: 0, spread: 0, color: color,
+    });
 }
