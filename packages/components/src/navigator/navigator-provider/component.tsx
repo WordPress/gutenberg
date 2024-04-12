@@ -146,7 +146,6 @@ function routerReducer(
 	action: RouterAction
 ): RouterState {
 	let { screens, locationHistory, matchedPath } = state;
-
 	switch ( action.type ) {
 		case 'add':
 			screens = addScreen( state, action.screen );
@@ -158,6 +157,13 @@ function routerReducer(
 			locationHistory = goBack( state );
 			break;
 		case 'goto':
+			if (
+				locationHistory.length &&
+				action.path ===
+					locationHistory[ locationHistory.length - 1 ].path
+			) {
+				break;
+			}
 			locationHistory = goTo( state, action.path, action.options );
 			break;
 		case 'gotoparent':

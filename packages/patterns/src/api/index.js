@@ -15,6 +15,7 @@ export function isOverridableBlock( block ) {
 		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
 			block.name
 		) &&
+		!! block.attributes.metadata?.name &&
 		!! block.attributes.metadata?.bindings &&
 		Object.values( block.attributes.metadata.bindings ).some(
 			( binding ) => binding.source === 'core/pattern-overrides'

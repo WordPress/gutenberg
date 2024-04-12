@@ -232,7 +232,31 @@ test.describe( 'Site Editor Performance', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
+		test( 'Run the test', async ( {
+			page,
+			admin,
+			perfUtils,
+			editor,
+			requestUtils,
+		} ) => {
+			await Promise.all(
+				Array.from( { length: 10 }, async () => {
+					const { id } = await requestUtils.createPost( {
+						status: 'publish',
+						title: 'A post',
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
 			const samples = 10;
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without

@@ -15,8 +15,9 @@ import { pencil } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
 import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -26,17 +27,16 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
-import PageActions from '../page-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
 const { useHistory } = unlock( routerPrivateApis );
+const { PostActions } = unlock( editorPrivateApis );
 
 export default function SidebarNavigationScreenPage( { backPath } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const history = useHistory();
 	const {
 		params: { postId },
-		goTo,
 	} = useNavigator();
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
@@ -82,6 +82,20 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 		}
 	}, [ hasResolved, history ] );
 
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'move-to-trash' ) {
+				history.push( {
+					path: '/' + items[ 0 ].type,
+					postId: undefined,
+					postType: undefined,
+					canvas: 'view',
+				} );
+			}
+		},
+		[ history ]
+	);
+
 	const featureImageAltText = featuredMediaAltText
 		? decodeEntities( featuredMediaAltText )
 		: decodeEntities( record?.title?.rendered || __( 'Featured image' ) );
@@ -94,13 +108,7 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 			) }
 			actions={
 				<>
-					<PageActions
-						page={ record }
-						toggleProps={ { as: SidebarButton } }
-						onRemove={ () => {
-							goTo( '/page' );
-						} }
-					/>
+					<PostActions onActionPerformed={ onActionPerformed } />
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }
 						label={ __( 'Edit' ) }

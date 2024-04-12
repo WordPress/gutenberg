@@ -290,38 +290,83 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
+function mapUserPattern(
+	userPattern,
+	__experimentalUserPatternCategories = []
+) {
+	return {
+		name: `core/block/${ userPattern.id }`,
+		id: userPattern.id,
+		type: INSERTER_PATTERN_TYPES.user,
+		title: userPattern.title.raw,
+		categories: userPattern.wp_pattern_category.map( ( catId ) => {
+			const category = __experimentalUserPatternCategories.find(
+				( { id } ) => id === catId
+			);
+			return category ? category.slug : catId;
+		} ),
+		content: userPattern.content.raw,
+		syncStatus: userPattern.wp_pattern_sync_status,
+	};
+}
+
+export const getPatternBySlug = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, patternName ) => {
+			// Only fetch reusable blocks if we know we need them. To do: maybe
+			// use the entity record API to retrieve the block by slug.
+			if ( patternName?.startsWith( 'core/block/' ) ) {
+				const _id = parseInt(
+					patternName.slice( 'core/block/'.length ),
+					10
+				);
+				const block = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( { id } ) => id === _id );
+
+				if ( ! block ) {
+					return null;
+				}
+
+				return mapUserPattern(
+					block,
+					state.settings.__experimentalUserPatternCategories
+				);
+			}
+
+			return [
+				// This setting is left for back compat.
+				...( state.settings.__experimentalBlockPatterns ?? [] ),
+				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
+					[] ),
+			].find( ( { name } ) => name === patternName );
+		},
+		( state, patternName ) =>
+			patternName?.startsWith( 'core/block/' )
+				? [
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						state.settings.__experimentalReusableBlocks,
+				  ]
+				: [
+						state.settings.__experimentalBlockPatterns,
+						state.settings[ selectBlockPatternsKey ]?.( select ),
+				  ]
+	)
+);
+
 export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
-		// This setting is left for back compat.
-		const {
-			__experimentalBlockPatterns = [],
-			__experimentalUserPatternCategories = [],
-			__experimentalReusableBlocks = [],
-		} = state.settings;
-		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		const userPatterns = (
-			reusableBlocksSelect
-				? reusableBlocksSelect( select )
-				: __experimentalReusableBlocks ?? []
-		).map( ( userPattern ) => {
-			return {
-				name: `core/block/${ userPattern.id }`,
-				id: userPattern.id,
-				type: INSERTER_PATTERN_TYPES.user,
-				title: userPattern.title.raw,
-				categories: userPattern.wp_pattern_category.map( ( catId ) => {
-					const category = (
-						__experimentalUserPatternCategories ?? []
-					).find( ( { id } ) => id === catId );
-					return category ? category.slug : catId;
-				} ),
-				content: userPattern.content.raw,
-				syncStatus: userPattern.wp_pattern_sync_status,
-			};
-		} );
 		return [
-			...userPatterns,
-			...__experimentalBlockPatterns,
+			...unlock( select( STORE_NAME ) )
+				.getReusableBlocks()
+				.map( ( userPattern ) =>
+					mapUserPattern(
+						userPattern,
+						state.settings.__experimentalUserPatternCategories
+					)
+				),
+			// This setting is left for back compat.
+			...( state.settings.__experimentalBlockPatterns ?? [] ),
 			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>

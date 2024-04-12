@@ -2280,36 +2280,39 @@ export function __experimentalGetDirectInsertBlock(
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
-		createSelector( ( state, patternName ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const pattern = patterns.find(
-				( { name } ) => name === patternName
-			);
-			if ( ! pattern ) {
-				return null;
-			}
-			const blocks = parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} );
-			if ( blocks.length === 1 ) {
-				blocks[ 0 ].attributes = {
-					...blocks[ 0 ].attributes,
-					metadata: {
-						...( blocks[ 0 ].attributes.metadata || {} ),
-						categories: pattern.categories,
-						patternName: pattern.name,
-						name:
-							blocks[ 0 ].attributes.metadata?.name ||
-							pattern.title,
-					},
+		createSelector(
+			( state, patternName ) => {
+				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+					patternName
+				);
+				if ( ! pattern ) {
+					return null;
+				}
+				const blocks = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} );
+				if ( blocks.length === 1 ) {
+					blocks[ 0 ].attributes = {
+						...blocks[ 0 ].attributes,
+						metadata: {
+							...( blocks[ 0 ].attributes.metadata || {} ),
+							categories: pattern.categories,
+							patternName: pattern.name,
+							name:
+								blocks[ 0 ].attributes.metadata?.name ||
+								pattern.title,
+						},
+					};
+				}
+				return {
+					...pattern,
+					blocks,
 				};
-			}
-			return {
-				...pattern,
-				blocks,
-			};
-		}, getAllPatternsDependants( select ) )
+			},
+			( state, patternName ) => [
+				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
+			]
+		)
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
@@ -2813,13 +2816,20 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	const editorMode = __unstableGetEditorMode( state );
 
-	// In zoom-out mode, the block overlay is always active for top level blocks.
-	if (
-		editorMode === 'zoom-out' &&
-		clientId &&
-		! getBlockRootClientId( state, clientId )
-	) {
-		return true;
+	// In zoom-out mode, the block overlay is always active for section level blocks.
+	if ( editorMode === 'zoom-out' ) {
+		const { sectionRootClientId } = unlock( getSettings( state ) );
+		if ( sectionRootClientId ) {
+			const sectionClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
+			if ( sectionClientIds?.includes( clientId ) ) {
+				return true;
+			}
+		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
+			return true;
+		}
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
@@ -2891,6 +2901,32 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
+			// Some selectors that call this provide `null` as the default
+			// rootClientId, but the default rootClientId is actually `''`.
+			if ( clientId === null ) {
+				clientId = '';
+			}
+			// In zoom-out mode, override the behavior set by
+			// __unstableSetBlockEditingMode to only allow editing the top-level
+			// sections.
+			const editorMode = __unstableGetEditorMode( state );
+			if ( editorMode === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings( state ) );
+				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
+					return sectionRootClientId ? 'disabled' : 'contentOnly';
+				}
+				if ( clientId === sectionRootClientId ) {
+					return 'contentOnly';
+				}
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( ! sectionsClientIds?.includes( clientId ) ) {
+					return 'disabled';
+				}
+			}
+
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;

@@ -34,7 +34,8 @@ function GridItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
-	displayAsColumnFields,
+	badgeFields,
+	columnFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -99,46 +100,76 @@ function GridItem( {
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
-			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
-				{ visibleFields.map( ( field ) => {
-					const renderedValue = field.render( {
-						item,
-					} );
-					if ( ! renderedValue ) {
-						return null;
-					}
-					return (
-						<Flex
-							className={ classnames(
-								'dataviews-view-grid__field',
-								displayAsColumnFields?.includes( field.id )
-									? 'is-column'
-									: 'is-row'
-							) }
-							key={ field.id }
-							gap={ 1 }
-							justify="flex-start"
-							expanded
-							style={ { height: 'auto' } }
-							direction={
-								displayAsColumnFields?.includes( field.id )
-									? 'column'
-									: 'row'
-							}
-						>
-							<FlexItem className="dataviews-view-grid__field-name">
-								{ field.header }
-							</FlexItem>
+			{ !! badgeFields?.length && (
+				<HStack
+					className="dataviews-view-grid__badge-fields"
+					spacing={ 2 }
+					wrap
+					align="top"
+					justify="flex-start"
+				>
+					{ badgeFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
 							<FlexItem
-								className="dataviews-view-grid__field-value"
-								style={ { maxHeight: 'none' } }
+								key={ field.id }
+								className={ 'dataviews-view-grid__field-value' }
 							>
 								{ renderedValue }
 							</FlexItem>
-						</Flex>
-					);
-				} ) }
-			</VStack>
+						);
+					} ) }
+				</HStack>
+			) }
+			{ !! visibleFields?.length && (
+				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+					{ visibleFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
+							<Flex
+								className={ classnames(
+									'dataviews-view-grid__field',
+									columnFields?.includes( field.id )
+										? 'is-column'
+										: 'is-row'
+								) }
+								key={ field.id }
+								gap={ 1 }
+								justify="flex-start"
+								expanded
+								style={ { height: 'auto' } }
+								direction={
+									columnFields?.includes( field.id )
+										? 'column'
+										: 'row'
+								}
+							>
+								<>
+									<FlexItem className="dataviews-view-grid__field-name">
+										{ field.header }
+									</FlexItem>
+									<FlexItem
+										className="dataviews-view-grid__field-value"
+										style={ { maxHeight: 'none' } }
+									>
+										{ renderedValue }
+									</FlexItem>
+								</>
+							</Flex>
+						);
+					} ) }
+				</VStack>
+			) }
 		</VStack>
 	);
 }
@@ -159,12 +190,25 @@ export default function ViewGrid( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
-	const visibleFields = fields.filter(
-		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.mediaField, view.layout.primaryField ].includes(
-				field.id
-			)
+	const { visibleFields, badgeFields } = fields.reduce(
+		( accumulator, field ) => {
+			if (
+				view.hiddenFields.includes( field.id ) ||
+				[ view.layout.mediaField, view.layout.primaryField ].includes(
+					field.id
+				)
+			) {
+				return accumulator;
+			}
+			// If the field is a badge field, add it to the badgeFields array
+			// otherwise add it to the rest visibleFields array.
+			const key = view.layout.badgeFields?.includes( field.id )
+				? 'badgeFields'
+				: 'visibleFields';
+			accumulator[ key ].push( field );
+			return accumulator;
+		},
+		{ visibleFields: [], badgeFields: [] }
 	);
 	const hasData = !! data?.length;
 	return (
@@ -190,9 +234,8 @@ export default function ViewGrid( {
 								mediaField={ mediaField }
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
-								displayAsColumnFields={
-									view.layout.displayAsColumnFields
-								}
+								badgeFields={ badgeFields }
+								columnFields={ view.layout.columnFields }
 							/>
 						);
 					} ) }

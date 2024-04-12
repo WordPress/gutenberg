@@ -31,6 +31,8 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1432,16 +1434,30 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select } ) => {
-		// When switching to zoom-out mode, we need to select the root block
+	( { dispatch, select, registry } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			if ( firstSelectedClientId ) {
-				dispatch.selectBlock(
-					select.getBlockHierarchyRootClientId(
+			const { sectionRootClientId } = unlock(
+				registry.select( STORE_NAME ).getSettings()
+			);
+			if ( sectionRootClientId ) {
+				const sectionClientIds =
+					select.getBlockOrder( sectionRootClientId );
+				if ( sectionClientIds ) {
+					const parents = select.getBlockParents(
 						firstSelectedClientId
-					)
+					);
+					const firstSectionClientId = parents.find( ( parent ) =>
+						sectionClientIds.includes( parent )
+					);
+					dispatch.selectBlock( firstSectionClientId );
+				}
+			} else if ( firstSelectedClientId ) {
+				const rootClientId = select.getBlockHierarchyRootClientId(
+					firstSelectedClientId
 				);
+				dispatch.selectBlock( rootClientId );
 			}
 		}
 
