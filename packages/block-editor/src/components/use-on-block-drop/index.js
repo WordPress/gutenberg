@@ -10,7 +10,7 @@ import {
 	pasteHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
@@ -56,29 +56,26 @@ export function parseDropEvent( event ) {
 /**
  * A function that returns an event handler function for block drop events.
  *
- * @param {string}   targetRootClientId        The root client id where the block(s) will be inserted.
- * @param {number}   targetBlockIndex          The index where the block(s) will be inserted.
- * @param {Function} getBlockIndex             A function that gets the index of a block.
- * @param {Function} getClientIdsOfDescendants A function that gets the client ids of descendant blocks.
- * @param {Function} moveBlocks                A function that moves blocks.
- * @param {Function} insertOrReplaceBlocks     A function that inserts or replaces blocks.
- * @param {Function} clearSelectedBlock        A function that clears block selection.
- * @param {string}   operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
- * @param {Function} getBlock                  A function that returns a block given its client id.
+ * @param {Object}   registry
+ * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
+ * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
+ * @param {Function} moveBlocks            A function that moves blocks.
+ * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
+ * @param {string}   operation             The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
  * @return {Function} The event handler for a block drop event.
  */
 export function onBlockDrop(
+	registry,
 	targetRootClientId,
 	targetBlockIndex,
-	getBlockIndex,
-	getClientIdsOfDescendants,
 	moveBlocks,
 	insertOrReplaceBlocks,
-	clearSelectedBlock,
-	operation,
-	getBlock
+	operation
 ) {
 	return ( event ) => {
+		const { getBlockIndex, getClientIdsOfDescendants, getBlock } =
+			registry.select( blockEditorStore );
+		const { clearSelectedBlock } = registry.dispatch( blockEditorStore );
 		const {
 			srcRootClientId: sourceRootClientId,
 			srcClientIds: sourceClientIds,
@@ -153,26 +150,25 @@ export function onBlockDrop(
 /**
  * A function that returns an event handler function for block-related file drop events.
  *
+ * @param {Object}   registry
  * @param {string}   targetRootClientId    The root client id where the block(s) will be inserted.
- * @param {Function} getSettings           A function that gets the block editor settings.
- * @param {Function} updateBlockAttributes A function that updates a block's attributes.
- * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
  * @param {Function} insertOrReplaceBlocks A function that inserts or replaces blocks.
  *
  * @return {Function} The event handler for a block-related file drop event.
  */
 export function onFilesDrop(
+	registry,
 	targetRootClientId,
-	getSettings,
-	updateBlockAttributes,
-	canInsertBlockType,
 	insertOrReplaceBlocks
 ) {
 	return ( files ) => {
+		const { canInsertBlockType, getSettings } =
+			registry.select( blockEditorStore );
+
 		if ( ! getSettings().mediaUpload ) {
 			return;
 		}
-
+		const { updateBlockAttributes } = registry.dispatch( blockEditorStore );
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) =>
@@ -224,25 +220,6 @@ export default function useOnBlockDrop(
 	options = {}
 ) {
 	const { operation = 'insert', nearestSide = 'right' } = options;
-	const {
-		canInsertBlockType,
-		getBlockIndex,
-		getClientIdsOfDescendants,
-		getBlockOrder,
-		getBlocksByClientId,
-		getSettings,
-		getBlock,
-		isGroupable,
-	} = useSelect( blockEditorStore );
-	const { getGroupingBlockName } = useSelect( blocksStore );
-	const {
-		insertBlocks,
-		moveBlocksToPosition,
-		updateBlockAttributes,
-		clearSelectedBlock,
-		replaceBlocks,
-		removeBlocks,
-	} = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
 	const insertOrReplaceBlocks = useCallback(
@@ -252,6 +229,12 @@ export default function useOnBlockDrop(
 			initialPosition = 0,
 			clientIdsToReplace = []
 		) => {
+			const { canInsertBlockType, getBlockOrder, getBlock, isGroupable } =
+				registry.select( blockEditorStore );
+			const { getGroupingBlockName } = registry.select( blocksStore );
+			const { insertBlocks, replaceBlocks } =
+				registry.dispatch( blockEditorStore );
+
 			if ( ! Array.isArray( blocks ) ) blocks = [ blocks ];
 
 			const clientIds = getBlockOrder( targetRootClientId );
@@ -320,22 +303,20 @@ export default function useOnBlockDrop(
 			}
 		},
 		[
-			getBlockOrder,
 			targetRootClientId,
 			targetBlockIndex,
-			isGroupable,
 			operation,
-			replaceBlocks,
-			getBlock,
 			nearestSide,
-			canInsertBlockType,
-			getGroupingBlockName,
-			insertBlocks,
+			registry,
 		]
 	);
 
 	const moveBlocks = useCallback(
 		( sourceClientIds, sourceRootClientId, insertIndex ) => {
+			const { getBlockOrder, getBlocksByClientId } =
+				registry.select( blockEditorStore );
+			const { moveBlocksToPosition, replaceBlocks, removeBlocks } =
+				registry.dispatch( blockEditorStore );
 			if ( operation === 'replace' ) {
 				const sourceBlocks = getBlocksByClientId( sourceClientIds );
 				const targetBlockClientIds =
@@ -363,35 +344,20 @@ export default function useOnBlockDrop(
 				);
 			}
 		},
-		[
-			operation,
-			getBlockOrder,
-			getBlocksByClientId,
-			moveBlocksToPosition,
-			registry,
-			removeBlocks,
-			replaceBlocks,
-			targetBlockIndex,
-			targetRootClientId,
-		]
+		[ operation, registry, targetBlockIndex, targetRootClientId ]
 	);
 
 	const _onDrop = onBlockDrop(
+		registry,
 		targetRootClientId,
 		targetBlockIndex,
-		getBlockIndex,
-		getClientIdsOfDescendants,
 		moveBlocks,
 		insertOrReplaceBlocks,
-		clearSelectedBlock,
-		operation,
-		getBlock
+		operation
 	);
 	const _onFilesDrop = onFilesDrop(
+		registry,
 		targetRootClientId,
-		getSettings,
-		updateBlockAttributes,
-		canInsertBlockType,
 		insertOrReplaceBlocks
 	);
 	const _onHTMLDrop = onHTMLDrop( insertOrReplaceBlocks );

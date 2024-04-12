@@ -104,26 +104,43 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isTemporarilyEditingAsBlocks,
 		defaultClassName,
 		templateLock,
+		isPreviewMode,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
+	const focusFirstElementRef = useFocusFirstElement( {
+		clientId,
+		initialPosition,
+	} );
+	const blockRefProviderRef = useBlockRefProvider( clientId );
+	const focusHandlerRef = useFocusHandler( clientId );
+	const eventHandlersRef = useEventHandlers( clientId );
+	const navModeExitRef = useNavModeExit( clientId );
+	const isHoveredRef = useIsHovered();
+	const intersectionObserverRef = useIntersectionObserver();
+	const movingAnimationRef = useMovingAnimation( {
+		triggerAnimationOnChange: index,
+		clientId,
+	} );
+	const disabledRef = useDisabled();
+	const flashEditableBlocksRef = useFlashEditableBlocks( clientId );
 	const mergedRefs = useMergeRefs( [
 		props.ref,
-		useFocusFirstElement( { clientId, initialPosition } ),
-		useBlockRefProvider( clientId ),
-		useFocusHandler( clientId ),
-		useEventHandlers( { clientId, isSelected } ),
-		useNavModeExit( clientId ),
-		useIsHovered( { isEnabled: isOutlineEnabled } ),
-		useIntersectionObserver(),
-		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
-		useDisabled( { isDisabled: ! hasOverlay } ),
-		useFlashEditableBlocks( {
-			clientId,
-			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
-		} ),
+		isPreviewMode ? null : focusFirstElementRef,
+		isPreviewMode ? null : blockRefProviderRef,
+		isPreviewMode ? null : focusHandlerRef,
+		isPreviewMode || ! isSelected ? null : eventHandlersRef,
+		isPreviewMode ? null : navModeExitRef,
+		isPreviewMode || ! isOutlineEnabled ? null : isHoveredRef,
+		isPreviewMode ? null : intersectionObserverRef,
+		isPreviewMode ? null : movingAnimationRef,
+		isPreviewMode || ! hasOverlay ? null : disabledRef,
+		isPreviewMode ||
+		( name !== 'core/block' && templateLock !== 'contentOnly' )
+			? null
+			: flashEditableBlocksRef,
 	] );
 
 	const blockEditContext = useBlockEditContext();

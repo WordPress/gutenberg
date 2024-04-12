@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	useThrottle,
@@ -293,30 +293,12 @@ export default function useBlockDropZone( {
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
 	parentClientId: parentBlockClientId = '',
-	isDisabled = false,
 } = {} ) {
 	const registry = useRegistry();
 	const [ dropTarget, setDropTarget ] = useState( {
 		index: null,
 		operation: 'insert',
 	} );
-
-	const { getBlockType } = useSelect( blocksStore );
-	const {
-		getBlockListSettings,
-		getBlocks,
-		getBlockIndex,
-		getDraggedBlockClientIds,
-		getBlockNamesByClientId,
-		getAllowedBlocks,
-		isDragging,
-	} = unlock( useSelect( blockEditorStore ) );
-	const {
-		showInsertionPoint,
-		hideInsertionPoint,
-		startDragging,
-		stopDragging,
-	} = unlock( useDispatch( blockEditorStore ) );
 
 	const onBlockDrop = useOnBlockDrop(
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
@@ -331,6 +313,20 @@ export default function useBlockDropZone( {
 	const throttled = useThrottle(
 		useCallback(
 			( event, ownerDocument ) => {
+				const { getBlockType } = registry.select( blocksStore );
+				const {
+					getBlockListSettings,
+					getBlocks,
+					getBlockIndex,
+					getDraggedBlockClientIds,
+					getBlockNamesByClientId,
+					getAllowedBlocks,
+					isDragging,
+				} = unlock( registry.select( blockEditorStore ) );
+				const { showInsertionPoint, startDragging } = unlock(
+					registry.dispatch( blockEditorStore )
+				);
+
 				if ( ! isDragging() ) {
 					// When dragging from the desktop, no drag start event is fired.
 					// So, ensure that the drag state is set when the user drags over a drop zone.
@@ -422,20 +418,10 @@ export default function useBlockDropZone( {
 				} );
 			},
 			[
-				getAllowedBlocks,
 				targetRootClientId,
-				getBlockNamesByClientId,
-				getDraggedBlockClientIds,
-				getBlockType,
-				getBlocks,
-				getBlockListSettings,
 				dropZoneElement,
 				parentBlockClientId,
-				getBlockIndex,
 				registry,
-				showInsertionPoint,
-				isDragging,
-				startDragging,
 			]
 		),
 		200
@@ -443,7 +429,6 @@ export default function useBlockDropZone( {
 
 	return useDropZone( {
 		dropZoneElement,
-		isDisabled,
 		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
@@ -452,11 +437,17 @@ export default function useBlockDropZone( {
 			throttled( event, event.currentTarget.ownerDocument );
 		},
 		onDragLeave() {
+			const { hideInsertionPoint } = unlock(
+				registry.dispatch( blockEditorStore )
+			);
 			throttled.cancel();
 			hideInsertionPoint();
 		},
 		onDragEnd() {
 			throttled.cancel();
+			const { hideInsertionPoint, stopDragging } = unlock(
+				registry.dispatch( blockEditorStore )
+			);
 			stopDragging();
 			hideInsertionPoint();
 		},

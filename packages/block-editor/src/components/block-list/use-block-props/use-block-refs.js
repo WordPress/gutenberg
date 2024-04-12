@@ -33,7 +33,7 @@ export function useBlockRefProvider( clientId ) {
 		return () => {
 			refs.delete( ref );
 		};
-	}, [ clientId ] );
+	}, [ clientId, refs ] );
 	return useRefEffect(
 		( element ) => {
 			// Update the ref in the provider.
@@ -79,7 +79,7 @@ function useBlockRef( clientId ) {
 				return element;
 			},
 		} ),
-		[]
+		[ refs ]
 	);
 }
 
@@ -105,7 +105,7 @@ function useBlockElement( clientId ) {
 		return () => {
 			callbacks.delete( setElement );
 		};
-	}, [ clientId ] );
+	}, [ clientId, callbacks ] );
 
 	return ref.current || element;
 }

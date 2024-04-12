@@ -195,6 +195,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			}
 
 			const {
+				getSettings,
 				getBlockName,
 				isBlockSelected,
 				hasSelectedInnerBlock,
@@ -206,42 +207,50 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				isDragging,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
-			const blockName = getBlockName( clientId );
-			const enableClickThrough =
-				__unstableGetEditorMode() === 'navigation';
-			const blockEditingMode = getBlockEditingMode( clientId );
+			const isPreviewMode = getSettings().__unstableIsPreviewMode;
+			const name = getBlockName( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
+
+			const previewProps = {
+				blockType: getBlockType( name ),
+				name,
+				parentClientId,
+				defaultLayout,
+			};
+
+			if ( isPreviewMode ) {
+				return previewProps;
+			}
+
 			return {
+				...previewProps,
 				__experimentalCaptureToolbars: hasBlockSupport(
-					blockName,
+					name,
 					'__experimentalExposeControlsToChildren',
 					false
 				),
 				hasOverlay:
-					blockName !== 'core/template' &&
+					name !== 'core/template' &&
 					! isBlockSelected( clientId ) &&
 					! hasSelectedInnerBlock( clientId, true ) &&
-					enableClickThrough &&
+					__unstableGetEditorMode() === 'navigation' &&
 					! isDragging(),
-				name: blockName,
-				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
-				parentClientId,
-				isDropZoneDisabled: blockEditingMode === 'disabled',
-				defaultLayout,
+				isDropZoneDisabled:
+					getBlockEditingMode( clientId ) === 'disabled',
 			};
 		},
 		[ clientId ]
 	);
 	const {
-		__experimentalCaptureToolbars,
-		hasOverlay,
+		__experimentalCaptureToolbars = false,
+		hasOverlay = false,
 		name,
 		blockType,
 		parentLock,
 		parentClientId,
-		isDropZoneDisabled,
+		isDropZoneDisabled = true,
 		defaultLayout,
 	} = selected;
 
@@ -249,12 +258,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
-		isDisabled: isDropZoneDisabled,
 	} );
 
 	const ref = useMergeRefs( [
 		props.ref,
-		__unstableDisableDropZone ? null : blockDropZoneRef,
+		__unstableDisableDropZone || isDropZoneDisabled
+			? null
+			: blockDropZoneRef,
 	] );
 
 	const innerBlocksProps = {
