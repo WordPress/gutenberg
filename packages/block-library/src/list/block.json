@@ -39,7 +39,6 @@
 	"supports": {
 		"anchor": true,
 		"html": false,
-		"className": true,
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
