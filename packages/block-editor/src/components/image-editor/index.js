@@ -19,7 +19,6 @@ export default function ImageEditor( {
 	url,
 	width,
 	height,
-	clientWidth,
 	naturalHeight,
 	naturalWidth,
 	onSaveImage,
@@ -40,7 +39,6 @@ export default function ImageEditor( {
 				url={ url }
 				width={ width }
 				height={ height }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 			/>

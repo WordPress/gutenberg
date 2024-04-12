@@ -372,7 +372,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		const { height } = await paragraphBlock.boundingBox();
 		await paragraphBlock.click( { position: { x: 0, y: height / 2 } } );
 		await paragraphBlock.click( {
-			position: { x: 20, y: height / 2 },
+			position: { x: 25, y: height / 2 },
 			modifiers: [ 'Shift' ],
 		} );
 		await page.keyboard.type( 'hi' );

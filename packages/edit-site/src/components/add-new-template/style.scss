@@ -96,28 +96,6 @@
 	}
 }
 
-.edit-site-template-actions-loading-screen-modal {
-	backdrop-filter: none;
-	background-color: transparent;
-
-	&.is-full-screen {
-		background-color: $white;
-		box-shadow: 0 0 0 transparent;
-		min-width: 100%;
-		min-height: 100%;
-	}
-
-	&__content {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		position: absolute;
-		left: 50%;
-		transform: translateX(-50%);
-	}
-}
-
 .edit-site-add-new-template__modal {
 	max-width: $grid-unit-80 * 13;
 	width: calc(100% - #{$grid-unit-80});

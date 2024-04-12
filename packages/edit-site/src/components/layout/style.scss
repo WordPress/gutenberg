@@ -37,18 +37,6 @@
 	z-index: z-index(".edit-site-layout__header-container");
 }
 
-.edit-site-layout__header {
-	height: $header-height;
-	display: flex;
-	z-index: z-index(".edit-site-layout__header");
-
-	// This is only necessary for the exit animation
-	.edit-site-layout:not(.is-full-canvas) & {
-		position: fixed;
-		width: 100vw;
-	}
-}
-
 .edit-site-layout__content {
 	height: 100%;
 	flex-grow: 1;
@@ -272,26 +260,14 @@
 			div {
 				transform: translateX(0) translateY(0) translateZ(0) !important;
 			}
-
-			.edit-site-layout__header {
-				opacity: 1 !important;
-			}
 		}
 	}
 
-	.edit-site-site-hub,
-	.edit-site-layout__header {
+	.edit-site-site-hub {
 		position: absolute;
 		top: 0;
-		z-index: z-index(".edit-site-layout__header");
-	}
-	.edit-site-site-hub {
 		z-index: z-index(".edit-site-layout__hub");
 	}
-	.edit-site-layout__header {
-		width: 100%;
-	}
-
 }
 
 .edit-site-layout__area {
