@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
@@ -122,20 +122,6 @@ const BindingConnector = ( {
 		if ( typeof propValue !== 'undefined' ) {
 			updateBoundAttribute( propValue, attrValue );
 		} else if ( placeholder ) {
-			/*
-			 * Placeholder fallback.
-			 * If the attribute is `src` or `href`,
-			 * a placeholder can't be used because it is not a valid url.
-			 * Adding this workaround until
-			 * attributes and metadata fields types are improved and include `url`.
-			 */
-			const htmlAttribute =
-				getBlockType( blockName ).attributes[ attrName ].attribute;
-
-			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttribute( null );
-				return;
-			}
 			updateBoundAttribute( placeholder );
 		}
 	}, [ propValue, attrValue, placeholder, blockName, attrName ] );

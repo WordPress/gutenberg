@@ -12,7 +12,7 @@ import { store as editorStore } from '../store';
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
-	useSource( props, sourceAttributes ) {
+	useSource( props, sourceAttributes, attributeName ) {
 		const { getCurrentPostType } = useSelect( editorStore );
 		const { context } = props;
 		const { key: metaKey } = sourceAttributes;
@@ -27,8 +27,18 @@ export default {
 			context.postId
 		);
 
+		let placeholder = metaKey;
+		/*
+		 * Placeholder fallback.
+		 * If the attribute is `url`,
+		 * a meta key placeholder can't be used because it is not a valid url.
+		 */
+		if ( attributeName === 'url' ) {
+			placeholder = null;
+		}
+
 		if ( postType === 'wp_template' ) {
-			return { placeholder: metaKey };
+			return { placeholder };
 		}
 		const metaValue = meta[ metaKey ];
 		const updateMetaValue = ( newValue ) => {
@@ -36,7 +46,7 @@ export default {
 		};
 
 		return {
-			placeholder: metaKey,
+			placeholder,
 			value: metaValue,
 			updateValue: updateMetaValue,
 		};
