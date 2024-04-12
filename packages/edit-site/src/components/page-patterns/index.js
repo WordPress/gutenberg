@@ -145,15 +145,16 @@ function Preview( { item, categoryId, viewType } ) {
 	const isCustomPattern =
 		isUserPattern || ( isTemplatePart && item.isCustom );
 	const ariaDescriptions = [];
-	if ( isCustomPattern ) {
-		// User patterns can be edited and deleted, so include some help text.
-		ariaDescriptions.push(
-			__( 'Press Enter to edit, or Delete to delete the pattern.' )
-		);
-	}
 
 	if ( item.description ) {
 		ariaDescriptions.push( item.description );
+	}
+
+	if ( isCustomPattern ) {
+		// User patterns can be edited and deleted, so include some help text.
+		ariaDescriptions.push(
+			__( '—Press Enter to edit, or Delete to delete the pattern.' )
+		);
 	}
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
