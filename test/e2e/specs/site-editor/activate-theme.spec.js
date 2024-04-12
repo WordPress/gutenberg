@@ -3,14 +3,6 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-async function activateTheme( { page } ) {
-	await page.getByRole( 'button', { name: 'Activate Emptytheme' } ).click();
-	await page.getByRole( 'button', { name: 'Activate', exact: true } ).click();
-	await expect(
-		page.getByRole( 'button', { name: 'Dismiss this notice' } )
-	).toContainText( 'Site updated' );
-}
-
 test.describe( 'Activate theme', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.visitAdminPage( 'themes.php' );
@@ -23,7 +15,15 @@ test.describe( 'Activate theme', () => {
 		admin,
 		page,
 	} ) => {
-		await activateTheme( { page } );
+		await page
+			.getByRole( 'button', { name: 'Activate Emptytheme' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Activate', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toContainText( 'Site updated' );
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
@@ -37,9 +37,16 @@ test.describe( 'Activate theme', () => {
 			0
 		);
 		await editor.canvas.locator( 'body' ).click();
-		// Close the welcome guide.
-		await page.getByRole( 'button', { name: 'Get started' } ).click();
-		await activateTheme( { page } );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Activate Emptytheme' } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Activate', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toContainText( 'Site updated' );
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
