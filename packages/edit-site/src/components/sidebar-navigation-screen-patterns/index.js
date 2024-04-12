@@ -117,10 +117,18 @@ export default function SidebarNavigationScreenPatterns() {
 	return (
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
-			title={ __( 'Patterns' ) }
-			description={ __(
-				'Manage what patterns are available when editing the site.'
-			) }
+			title={
+				isBlockBasedTheme ? __( 'Patterns' ) : __( 'Template Parts' )
+			}
+			description={
+				isBlockBasedTheme
+					? __(
+							'Manage what patterns are available when editing the site.'
+					  )
+					: __(
+							'Manage what template parts are available when editing the site.'
+					  )
+			}
 			actions={ <AddNewPattern /> }
 			content={
 				<>
@@ -129,11 +137,7 @@ export default function SidebarNavigationScreenPatterns() {
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
 								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<Item>
-										{ __(
-											'No template parts or patterns found'
-										) }
-									</Item>
+									<Item>{ __( 'No items found' ) }</Item>
 								</ItemGroup>
 							) }
 							<CategoriesGroup
