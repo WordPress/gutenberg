@@ -38,7 +38,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
@@ -217,42 +216,6 @@ export default function Layout() {
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
-
-					<AnimatePresence initial={ false }>
-						{ canvasMode === 'edit' && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion
-										? 0
-										: ANIMATION_DURATION,
-									ease: 'easeOut',
-								} }
-							>
-								<Header />
-							</NavigableRegion>
-						) }
-					</AnimatePresence>
 				</motion.div>
 
 				<div className="edit-site-layout__content">
@@ -290,8 +253,6 @@ export default function Layout() {
 							</AnimatePresence>
 						</NavigableRegion>
 					) }
-
-					<SavePanel />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
@@ -358,6 +319,8 @@ export default function Layout() {
 						</div>
 					) }
 				</div>
+
+				<SavePanel />
 			</div>
 		</>
 	);

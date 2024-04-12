@@ -93,11 +93,6 @@ function useTemplateDetails( postType, postId ) {
 	return { title, description, content, footer };
 }
 
-const POST_TYPE_PATH = {
-	wp_template: '/wp_template',
-	wp_template_part: '/wp_template_part/all',
-};
-
 export default function SidebarNavigationScreenTemplate() {
 	const navigator = useNavigator();
 	const {
@@ -119,7 +114,7 @@ export default function SidebarNavigationScreenTemplate() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( POST_TYPE_PATH[ postType ] );
+							navigator.goTo( '/' + postType );
 						} }
 					/>
 					<SidebarButton

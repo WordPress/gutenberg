@@ -50,13 +50,7 @@ function hasLayoutBlockSupport( blockName ) {
  */
 export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
-	const rootPaddingAlignment = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalFeatures
-			?.useRootPaddingAwareAlignments;
-	}, [] );
 	const { layout } = blockAttributes;
-
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 	const usedLayout =
@@ -78,12 +72,20 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
-	if (
-		( usedLayout?.inherit ||
-			usedLayout?.contentSize ||
-			usedLayout?.type === 'constrained' ) &&
-		rootPaddingAlignment
-	) {
+	const hasGlobalPadding = useSelect(
+		( select ) => {
+			return (
+				( usedLayout?.inherit ||
+					usedLayout?.contentSize ||
+					usedLayout?.type === 'constrained' ) &&
+				select( blockEditorStore ).getSettings().__experimentalFeatures
+					?.useRootPaddingAwareAlignments
+			);
+		},
+		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
+	);
+
+	if ( hasGlobalPadding ) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -353,7 +355,11 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
+function BlockWithLayoutStyles( {
+	block: BlockListBlock,
+	props,
+	blockGapSupport,
+} ) {
 	const { name, attributes } = props;
 	const id = useInstanceId( BlockListBlock );
 	const { layout } = attributes;
@@ -369,7 +375,6 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
-	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 
 	// Get CSS string for the current layout type.
@@ -410,26 +415,44 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockSupportsLayout = hasLayoutBlockSupport( props.name );
-		const shouldRenderLayoutStyles = useSelect(
+		const { clientId, name } = props;
+		const blockSupportsLayout = hasLayoutBlockSupport( name );
+		const extraProps = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.
 				if ( ! blockSupportsLayout ) {
-					return false;
+					return;
 				}
 
-				return ! select( blockEditorStore ).getSettings()
-					.disableLayoutStyles;
+				const { getSettings, getBlockSettings } = unlock(
+					select( blockEditorStore )
+				);
+				const { disableLayoutStyles } = getSettings();
+
+				if ( disableLayoutStyles ) {
+					return;
+				}
+
+				const [ blockGapSupport ] = getBlockSettings(
+					clientId,
+					'spacing.blockGap'
+				);
+
+				return { blockGapSupport };
 			},
-			[ blockSupportsLayout ]
+			[ blockSupportsLayout, clientId ]
 		);
 
-		if ( ! shouldRenderLayoutStyles ) {
+		if ( ! extraProps ) {
 			return <BlockListBlock { ...props } />;
 		}
 
 		return (
-			<BlockWithLayoutStyles block={ BlockListBlock } props={ props } />
+			<BlockWithLayoutStyles
+				block={ BlockListBlock }
+				props={ props }
+				{ ...extraProps }
+			/>
 		);
 	},
 	'withLayoutStyles'

@@ -20,7 +20,7 @@ import {
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
 // Initial control values where no block style is set.
-const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+const BACKGROUND_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
 };
 
@@ -173,7 +173,7 @@ export function BackgroundImagePanel( {
 			as={ BackgroundInspectorControl }
 			panelId={ clientId }
 			defaultControls={ defaultControls }
-			defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
+			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			settings={ updatedSettings }
 			onChange={ onChange }
 			value={ style }
