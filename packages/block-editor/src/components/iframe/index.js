@@ -228,7 +228,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		windowResizeRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -269,29 +272,29 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
+	scale =
+		typeof scale === 'function'
+			? scale( contentWidth, contentHeight )
+			: scale;
+
 	useEffect( () => {
 		if ( ! iframeDocument ) {
 			return;
 		}
 
-		const _scale =
-			typeof scale === 'function'
-				? scale( contentWidth, contentHeight )
-				: scale;
-
-		if ( _scale !== 1 ) {
+		if ( scale !== 1 ) {
 			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - _scale );
+			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
 			iframeDocument.body.classList.add( 'is-zoomed-out' );
 
-			iframeDocument.documentElement.style.transform = `scale( ${ _scale } )`;
+			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
 			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * _scale ) {
+			if ( iframeWindowInnerHeight > contentHeight * scale ) {
 				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / _scale
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
 				) }px`;
 			}
 

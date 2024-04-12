@@ -35,18 +35,13 @@ import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-import {
-	resetTemplateAction,
-	deleteTemplateAction,
-	renameTemplateAction,
-} from './actions';
+
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
@@ -102,11 +97,6 @@ function Title( { item, viewType } ) {
 			canvas: 'edit',
 		},
 	};
-	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
-		linkProps.state = {
-			backPath: '/wp_template_part/all',
-		};
-	}
 	return (
 		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
@@ -200,6 +190,14 @@ function Preview( { item, viewType } ) {
 		</ExperimentalBlockEditorProvider>
 	);
 }
+
+const TEMPLATE_ACTIONS = [
+	'edit-post',
+	'reset-template',
+	'rename-template',
+	'view-post-revisions',
+	'delete-template',
+];
 
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
@@ -361,20 +359,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		},
 		[ history ]
 	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
-	const actions = useMemo(
-		() => [
-			editAction,
-			resetTemplateAction,
-			renameTemplateAction,
-			viewRevisionsAction,
-			deleteTemplateAction,
-		],
-		[ editAction, viewRevisionsAction ]
-	);
+
+	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
 
 	const onChangeView = useCallback(
 		( newView ) => {
