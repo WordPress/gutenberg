@@ -19,6 +19,11 @@ import { MoreExamplesStory } from './utils/more-examples';
 import { HideIfEmptyStory } from './utils/hide-if-empty';
 import './style.css';
 
+/**
+ * Render a navigation list with optional groupings and hierarchy.
+ *
+ * This component is deprecated. Consider using `Navigator` instead.
+ */
 const meta: Meta< typeof Navigation > = {
 	title: 'Components (Deprecated)/Navigation',
 	id: 'components-navigation',
