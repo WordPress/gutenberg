@@ -35,7 +35,7 @@ function GridItem( {
 	primaryField,
 	visibleFields,
 	badgeFields,
-	displayAsColumnFields,
+	columnFields,
 } ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
@@ -139,7 +139,7 @@ function GridItem( {
 							<Flex
 								className={ classnames(
 									'dataviews-view-grid__field',
-									displayAsColumnFields?.includes( field.id )
+									columnFields?.includes( field.id )
 										? 'is-column'
 										: 'is-row'
 								) }
@@ -149,7 +149,7 @@ function GridItem( {
 								expanded
 								style={ { height: 'auto' } }
 								direction={
-									displayAsColumnFields?.includes( field.id )
+									columnFields?.includes( field.id )
 										? 'column'
 										: 'row'
 								}
@@ -235,9 +235,7 @@ export default function ViewGrid( {
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
 								badgeFields={ badgeFields }
-								displayAsColumnFields={
-									view.layout.displayAsColumnFields
-								}
+								columnFields={ view.layout.columnFields }
 							/>
 						);
 					} ) }

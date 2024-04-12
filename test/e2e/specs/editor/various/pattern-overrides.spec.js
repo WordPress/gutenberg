@@ -82,6 +82,17 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'button', { name: 'Save' } )
 				.click();
 
+			await editor.openDocumentSettingsSidebar();
+			const editorSettings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await editorSettings
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+			await editorSettings
+				.getByRole( 'checkbox', { name: 'Allow overrides' } )
+				.setChecked( true );
+
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/paragraph',
@@ -212,10 +223,10 @@ test.describe( 'Pattern Overrides', () => {
 		requestUtils,
 		editor,
 	} ) => {
-		const paragraphId = 'paragraph-id';
+		const paragraphName = 'paragraph-name';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"id":"${ paragraphId }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
 <p>Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -247,7 +258,7 @@ test.describe( 'Pattern Overrides', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'edited Editable',
-					metadata: undefined,
+					metadata: { name: paragraphName },
 				},
 			},
 		] );

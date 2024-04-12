@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -30,6 +35,9 @@ import {
 	lockSmall,
 } from '@wordpress/icons';
 import { usePrevious } from '@wordpress/compose';
+import { useEntityRecords } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -39,6 +47,7 @@ import Page from '../page';
 import {
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
+	LAYOUT_LIST,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
@@ -59,10 +68,13 @@ import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
+import { useAddedBy } from '../page-templates-template-parts/hooks';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
+const { usePostActions } = unlock( editorPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
@@ -142,11 +154,6 @@ function Preview( { item, categoryId, viewType } ) {
 		ariaDescriptions.push( item.description );
 	}
 
-	if ( isNonUserPattern ) {
-		ariaDescriptions.push(
-			__( 'Theme & plugin patterns cannot be edited.' )
-		);
-	}
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
@@ -157,47 +164,79 @@ function Preview( { item, categoryId, viewType } ) {
 	} );
 
 	return (
-		<>
-			<div
-				className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
-				style={ { backgroundColor } }
+		<div
+			className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
+			style={ { backgroundColor } }
+		>
+			<PreviewWrapper
+				item={ item }
+				onClick={ onClick }
+				ariaDescribedBy={
+					ariaDescriptions.length
+						? ariaDescriptions
+								.map(
+									( _, index ) =>
+										`${ descriptionId }-${ index }`
+								)
+								.join( ' ' )
+						: undefined
+				}
 			>
-				<PreviewWrapper
-					item={ item }
-					onClick={ onClick }
-					ariaDescribedBy={
-						ariaDescriptions.length
-							? ariaDescriptions
-									.map(
-										( _, index ) =>
-											`${ descriptionId }-${ index }`
-									)
-									.join( ' ' )
-							: undefined
-					}
-				>
-					{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
-					{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
-					{ ! isEmpty && (
-						<Async>
-							<BlockPreview
-								blocks={ item.blocks }
-								viewportWidth={ item.viewportWidth }
-							/>
-						</Async>
-					) }
-				</PreviewWrapper>
-			</div>
-			{ ariaDescriptions.map( ( ariaDescription, index ) => (
+				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
+				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
+				{ ! isEmpty && (
+					<Async>
+						<BlockPreview
+							blocks={ item.blocks }
+							viewportWidth={ item.viewportWidth }
+						/>
+					</Async>
+				) }
+			</PreviewWrapper>
+			{ ! isNonUserPattern &&
+				ariaDescriptions.map( ( ariaDescription, index ) => (
+					<div
+						key={ index }
+						hidden
+						id={ `${ descriptionId }-${ index }` }
+					>
+						{ ariaDescription }
+					</div>
+				) ) }
+		</div>
+	);
+}
+
+function Author( { item, viewType } ) {
+	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
+	const withIcon = viewType !== LAYOUT_LIST;
+
+	return (
+		<HStack alignment="left" spacing={ 1 }>
+			{ withIcon && imageUrl && (
 				<div
-					key={ index }
-					hidden
-					id={ `${ descriptionId }-${ index }` }
+					className={ classnames(
+						'page-templates-author-field__avatar',
+						{
+							'is-loaded': isImageLoaded,
+						}
+					) }
 				>
-					{ ariaDescription }
+					<img
+						onLoad={ () => setIsImageLoaded( true ) }
+						alt=""
+						src={ imageUrl }
+					/>
 				</div>
-			) ) }
-		</>
+			) }
+			{ withIcon && ! imageUrl && (
+				<div className="page-templates-author-field__icon">
+					<Icon icon={ icon } />
+				</div>
+			) }
+			<span className="page-templates-author-field__name">{ text }</span>
+		</HStack>
 	);
 }
 
@@ -289,6 +328,24 @@ export default function DataviewsPatterns() {
 			syncStatus: viewSyncStatus,
 		}
 	);
+
+	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
+		per_page: -1,
+	} );
+	const authors = useMemo( () => {
+		if ( ! records ) {
+			return EMPTY_ARRAY;
+		}
+		const authorsSet = new Set();
+		records.forEach( ( template ) => {
+			authorsSet.add( template.author_text );
+		} );
+		return Array.from( authorsSet ).map( ( author ) => ( {
+			value: author,
+			label: author,
+		} ) );
+	}, [ records ] );
+
 	const fields = useMemo( () => {
 		const _fields = [
 			{
@@ -313,6 +370,7 @@ export default function DataviewsPatterns() {
 				enableHiding: false,
 			},
 		];
+
 		if ( type === PATTERN_TYPES.theme ) {
 			_fields.push( {
 				header: __( 'Sync status' ),
@@ -342,9 +400,26 @@ export default function DataviewsPatterns() {
 				},
 				enableSorting: false,
 			} );
+		} else if ( type === TEMPLATE_PART_POST_TYPE ) {
+			_fields.push( {
+				header: __( 'Author' ),
+				id: 'author',
+				getValue: ( { item } ) => item.templatePart.author_text,
+				render: ( { item } ) => {
+					return <Author viewType={ view.type } item={ item } />;
+				},
+				type: ENUMERATION_TYPE,
+				elements: authors,
+				filterBy: {
+					isPrimary: true,
+				},
+				width: '1%',
+			} );
 		}
+
 		return _fields;
-	}, [ view.type, categoryId, type ] );
+	}, [ view.type, categoryId, type, authors ] );
+
 	// Reset the page number when the category changes.
 	useEffect( () => {
 		if ( previousCategoryId !== categoryId ) {
@@ -352,25 +427,55 @@ export default function DataviewsPatterns() {
 		}
 	}, [ categoryId, previousCategoryId ] );
 	const { data, paginationInfo } = useMemo( () => {
-		// Since filters are applied server-side,
-		// we need to remove them from the view
+		// Search is managed server-side as well as filters for patterns.
+		// However, the author filter in template parts is done client-side.
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
-		viewWithoutFilters.filters = [];
+		if ( type !== TEMPLATE_PART_POST_TYPE ) {
+			viewWithoutFilters.filters = [];
+		}
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
-	}, [ patterns, view, fields ] );
+	}, [ patterns, view, fields, type ] );
 
-	const actions = useMemo(
-		() => [
+	const history = useHistory();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					categoryId,
+					categoryType: type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
+	);
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		onActionPerformed,
+		[ 'edit-post', 'view-post-revisions' ]
+	);
+	const actions = useMemo( () => {
+		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			return [
+				editAction,
+				renameAction,
+				duplicateTemplatePartAction,
+				viewRevisionsAction,
+				resetAction,
+				deleteAction,
+			];
+		}
+		return [
 			renameAction,
 			duplicatePatternAction,
-			duplicateTemplatePartAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		],
-		[]
-	);
+		];
+	}, [ type, editAction, viewRevisionsAction ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

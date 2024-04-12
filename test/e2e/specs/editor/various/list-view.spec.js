@@ -496,7 +496,7 @@ test.describe( 'List View', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should cut, copy, paste, select, duplicate, delete, and deselect blocks using keyboard', async ( {
+	test( 'should cut, copy, paste, select, duplicate, insert, delete, and deselect blocks using keyboard', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -663,8 +663,44 @@ test.describe( 'List View', () => {
 				{ name: 'core/file', focused: true },
 			] );
 
-		// Move focus to the first file block, and then delete it.
-		await page.keyboard.press( 'ArrowUp' );
+		// Test insert before.
+		await pageUtils.pressKeys( 'primaryAlt+t' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Inserting a block before should move selection and focus to the inserted block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: false },
+				{ name: 'core/paragraph', focused: true, selected: true },
+				{ name: 'core/file', selected: false },
+			] );
+
+		// Test insert after.
+		await pageUtils.pressKeys( 'primaryAlt+y' );
+
+		await expect
+			.poll(
+				listViewUtils.getBlocksWithA11yAttributes,
+				'Inserting a block before should move selection and focus to the inserted block.'
+			)
+			.toMatchObject( [
+				{ name: 'core/group' },
+				{ name: 'core/columns' },
+				{ name: 'core/file', selected: false },
+				{ name: 'core/paragraph', focused: false, selected: false },
+				{ name: 'core/paragraph', focused: true, selected: true },
+				{ name: 'core/file', selected: false },
+			] );
+
+		// Remove the inserted blocks.
+		await page.keyboard.press( 'Delete' );
+		await page.keyboard.press( 'Delete' );
+
+		// Delete the first File block.
 		await page.keyboard.press( 'Delete' );
 		await expect
 			.poll(
