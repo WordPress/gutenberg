@@ -244,7 +244,7 @@ function GridLayoutColumnsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount = 3 } = layout;
+	const { columnCount = 3, rowCount } = layout;
 
 	return (
 		<>
