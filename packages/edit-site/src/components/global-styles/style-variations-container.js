@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
  */
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
-import { isVariationOfSingleProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { isVariationWithSingleProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 
 export default function StyleVariationsContainer( { gap = 2 } ) {
 	const variations = useSelect( ( select ) => {
@@ -24,8 +24,8 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 	// Filter out variations that are of single property type, i.e. color or typography variations.
 	const multiplePropertyVariations = variations?.filter( ( variation ) => {
 		return (
-			! isVariationOfSingleProperty( variation, 'color' ) &&
-			! isVariationOfSingleProperty( variation, 'typography' )
+			! isVariationWithSingleProperty( variation, 'color' ) &&
+			! isVariationWithSingleProperty( variation, 'typography' )
 		);
 	} );
 
@@ -36,13 +36,13 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				settings: {},
 				styles: {},
 			},
-			...( filteredVariations ?? [] ).map( ( variation ) => ( {
+			...( multiplePropertyVariations ?? [] ).map( ( variation ) => ( {
 				...variation,
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
 			} ) ),
 		];
-	}, [ filteredVariations ] );
+	}, [ multiplePropertyVariations ] );
 
 	return (
 		<Grid

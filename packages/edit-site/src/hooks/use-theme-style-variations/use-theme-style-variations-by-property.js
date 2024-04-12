@@ -187,7 +187,7 @@ export default function useThemeStyleVariationsByProperty( {
  * @param {string} property  The property to compare.
  * @return {boolean} Whether the variation contains only a single property.
  */
-export function isVariationOfSingleProperty( variation, property ) {
+export function isVariationWithSingleProperty( variation, property ) {
 	const variationWithProperty = filterObjectByProperty(
 		cloneDeep( variation ),
 		property
