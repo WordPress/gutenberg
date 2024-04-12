@@ -30,7 +30,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
-import { usePaddingAppender } from './use-padding-appender';
 
 const {
 	LayoutStyle,
@@ -94,6 +93,7 @@ function EditorCanvas( {
 	styles,
 	disableIframe = false,
 	iframeProps,
+	contentRef,
 	children,
 } ) {
 	const {
@@ -307,11 +307,10 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const paddingAppenderRef = usePaddingAppender();
-	const contentRef = useMergeRefs( [
+	contentRef = useMergeRefs( [
 		localRef,
+		contentRef,
 		renderingMode === 'post-only' ? typewriterRef : null,
-		renderingMode === 'post-only' ? paddingAppenderRef : null,
 		useFlashEditableBlocks( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
