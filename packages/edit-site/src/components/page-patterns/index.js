@@ -119,16 +119,25 @@ const SYNC_FILTERS = [
 ];
 
 function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
-	if ( item.type === PATTERN_TYPES.theme ) {
-		return children;
-	}
 	return (
 		<button
 			className="page-patterns-preview-field__button"
 			type="button"
-			onClick={ onClick }
+			onClick={ ( event ) => {
+				if ( item.type === PATTERN_TYPES.theme ) {
+					event.preventDefault();
+				} else {
+					onClick( event );
+				}
+			} }
 			aria-label={ item.title }
 			aria-describedby={ ariaDescribedBy }
+			aria-disabled={ item.type === PATTERN_TYPES.theme }
+			title={
+				item.type === PATTERN_TYPES.theme
+					? __( 'This pattern cannot be edited.' )
+					: undefined
+			}
 		>
 			{ children }
 		</button>
@@ -138,7 +147,6 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 function Preview( { item, categoryId, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isEmpty = ! item.blocks?.length;
 
@@ -172,7 +180,7 @@ function Preview( { item, categoryId, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ ! isNonUserPattern && item.description && (
+			{ item.description && (
 				<div hidden id={ descriptionId }>
 					{ item.description }
 				</div>
