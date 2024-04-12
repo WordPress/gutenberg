@@ -318,11 +318,11 @@ function MediaTextEdit( {
 						onDrag={ imperativeFocalPointPreview }
 					/>
 				) }
-			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
+			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
 				<TextareaControl
 					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt || featuredImageAlt }
+					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>
