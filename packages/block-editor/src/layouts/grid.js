@@ -69,7 +69,9 @@ export default {
 		layout = {},
 		onChange,
 		clientId,
+		layoutBlockSupport = {},
 	} ) {
+		const { allowSizingOnChildren = false } = layoutBlockSupport;
 		return (
 			<>
 				<GridLayoutTypeControl
@@ -80,6 +82,7 @@ export default {
 					<GridLayoutColumnsControl
 						layout={ layout }
 						onChange={ onChange }
+						allowSizingOnChildren={ allowSizingOnChildren }
 					/>
 				) : (
 					<GridLayoutMinimumWidthControl
@@ -236,7 +239,11 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 }
 
 // Enables setting number of grid columns
-function GridLayoutColumnsControl( { layout, onChange } ) {
+function GridLayoutColumnsControl( {
+	layout,
+	onChange,
+	allowSizingOnChildren,
+} ) {
 	const { columnCount = 3, rowCount = 3 } = layout;
 
 	return (
@@ -284,44 +291,46 @@ function GridLayoutColumnsControl( { layout, onChange } ) {
 					</FlexItem>
 				</Flex>
 			</fieldset>
-			<fieldset>
-				<BaseControl.VisualLabel as="legend">
-					{ __( 'Rows' ) }
-				</BaseControl.VisualLabel>
-				<Flex gap={ 4 }>
-					<FlexItem isBlock>
-						<NumberControl
-							size={ '__unstable-large' }
-							onChange={ ( value ) => {
-								onChange( {
-									...layout,
-									rowCount: value,
-								} );
-							} }
-							value={ rowCount }
-							min={ 1 }
-							label={ __( 'Rows' ) }
-							hideLabelFromVision
-						/>
-					</FlexItem>
-					<FlexItem isBlock>
-						<RangeControl
-							value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
-							onChange={ ( value ) =>
-								onChange( {
-									...layout,
-									rowCount: value,
-								} )
-							}
-							min={ 1 }
-							max={ 16 }
-							withInputField={ false }
-							label={ __( 'Rows' ) }
-							hideLabelFromVision
-						/>
-					</FlexItem>
-				</Flex>
-			</fieldset>
+			{ allowSizingOnChildren && (
+				<fieldset>
+					<BaseControl.VisualLabel as="legend">
+						{ __( 'Rows' ) }
+					</BaseControl.VisualLabel>
+					<Flex gap={ 4 }>
+						<FlexItem isBlock>
+							<NumberControl
+								size={ '__unstable-large' }
+								onChange={ ( value ) => {
+									onChange( {
+										...layout,
+										rowCount: value,
+									} );
+								} }
+								value={ rowCount }
+								min={ 1 }
+								label={ __( 'Rows' ) }
+								hideLabelFromVision
+							/>
+						</FlexItem>
+						<FlexItem isBlock>
+							<RangeControl
+								value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
+								onChange={ ( value ) =>
+									onChange( {
+										...layout,
+										rowCount: value,
+									} )
+								}
+								min={ 1 }
+								max={ 16 }
+								withInputField={ false }
+								label={ __( 'Rows' ) }
+								hideLabelFromVision
+							/>
+						</FlexItem>
+					</Flex>
+				</fieldset>
+			) }
 		</>
 	);
 }
