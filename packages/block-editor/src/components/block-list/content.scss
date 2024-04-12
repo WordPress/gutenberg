@@ -183,10 +183,12 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		user-select: none;
 	}
 
-	&.is-selected,
-	&.has-child-selected {
-		// Bring the selected block forward so we can see it.
-		z-index: z-index(".block-editor-block-list__block.is-selected");
+	&.has-negative-margin {
+		&.is-selected,
+		&.has-child-selected {
+			// Bring the selected block forward so we can see it.
+			z-index: z-index(".block-editor-block-list__block.is-selected");
+		}
 	}
 
 	.reusable-block-edit-panel * {

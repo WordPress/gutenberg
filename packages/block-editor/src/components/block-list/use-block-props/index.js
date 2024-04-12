@@ -144,6 +144,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
+	let hasNegativeMargin = false;
+	if (
+		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
+	) {
+		hasNegativeMargin = true;
+	}
+
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
@@ -174,6 +184,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
+				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},
