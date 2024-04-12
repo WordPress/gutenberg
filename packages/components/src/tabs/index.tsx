@@ -154,6 +154,14 @@ function Tabs( {
 	}, [ isControlled, selectedTab, selectedTabId, setSelectedId ] );
 
 	useEffect( () => {
+		// If there is no active tab, fallback to place focus on the first enabled tab
+		// so there is always an active element
+		if ( selectedTabId === null && ! activeId && firstEnabledTab?.id ) {
+			setActiveId( firstEnabledTab.id );
+		}
+	}, [ selectedTabId, activeId, firstEnabledTab?.id, setActiveId ] );
+
+	useEffect( () => {
 		if ( ! isControlled ) {
 			return;
 		}
@@ -166,11 +174,6 @@ function Tabs( {
 				! focusedElement ||
 				! items.some( ( item ) => focusedElement === item.element )
 			) {
-				// If there is no focused or active tab, fallback to place focus on the first enabled tab
-				// so there is always an active element
-				if ( ! activeId && firstEnabledTab?.id ) {
-					setActiveId( firstEnabledTab.id );
-				}
 				return;
 			}
 
@@ -182,7 +185,7 @@ function Tabs( {
 				setActiveId( focusedElement.id );
 			}
 		} );
-	}, [ activeId, isControlled, items, setActiveId, firstEnabledTab ] );
+	}, [ activeId, isControlled, items, setActiveId ] );
 
 	const contextValue = useMemo(
 		() => ( {
