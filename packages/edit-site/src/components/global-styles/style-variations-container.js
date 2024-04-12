@@ -22,7 +22,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 	}, [] );
 
 	// Filter out variations that are of single property type, i.e. color and typography variations.
-	const filteredVariations = variations?.filter( ( variation ) => {
+	const multiplePropertyVariations = variations?.filter( ( variation ) => {
 		return (
 			! isVariationOfSingleProperty( variation, 'color' ) &&
 			! isVariationOfSingleProperty( variation, 'typography' )
