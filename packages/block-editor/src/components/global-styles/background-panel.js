@@ -40,6 +40,10 @@ import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
+const DEFAULT_CONTROLS = {
+	backgroundImage: true,
+	backgroundSize: false,
+};
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -248,7 +252,7 @@ function BackgroundImageToolsPanelItem( {
 
 	const onFilesDrop = ( filesList ) => {
 		mediaUpload( {
-			allowedTypes: [ 'image' ],
+			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
@@ -539,11 +543,6 @@ function BackgroundToolsPanel( {
 		</VStack>
 	);
 }
-
-const DEFAULT_CONTROLS = {
-	backgroundImage: true,
-	backgroundSize: false,
-};
 
 export default function BackgroundPanel( {
 	as: Wrapper = BackgroundToolsPanel,

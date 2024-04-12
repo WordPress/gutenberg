@@ -29,6 +29,13 @@ export default function BackgroundPanel() {
 	} );
 	const [ settings ] = useGlobalSetting( '' );
 
+	const defaultControls = {
+		backgroundImage: true,
+		backgroundSize:
+			!! style?.background?.backgroundImage &&
+			!! inheritedStyle?.background?.backgroundImage,
+	};
+
 	return (
 		<StylesBackgroundPanel
 			inheritedValue={ inheritedStyle }
@@ -37,6 +44,7 @@ export default function BackgroundPanel() {
 			settings={ settings }
 			headerLabel={ __( 'Image' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
+			defaultControls={ defaultControls }
 		/>
 	);
 }
