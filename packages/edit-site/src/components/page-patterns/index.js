@@ -141,21 +141,6 @@ function Preview( { item, categoryId, viewType } ) {
 	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isEmpty = ! item.blocks?.length;
-	// Only custom patterns or custom template parts can be renamed or deleted.
-	const isCustomPattern =
-		isUserPattern || ( isTemplatePart && item.isCustom );
-	const ariaDescriptions = [];
-
-	if ( item.description ) {
-		ariaDescriptions.push( item.description );
-	}
-
-	if ( isCustomPattern ) {
-		// User patterns can be edited and deleted, so include some help text.
-		ariaDescriptions.push(
-			__( '—Press Enter to edit, or Delete to delete the pattern.' )
-		);
-	}
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
@@ -174,16 +159,7 @@ function Preview( { item, categoryId, viewType } ) {
 			<PreviewWrapper
 				item={ item }
 				onClick={ onClick }
-				ariaDescribedBy={
-					ariaDescriptions.length
-						? ariaDescriptions
-								.map(
-									( _, index ) =>
-										`${ descriptionId }-${ index }`
-								)
-								.join( ' ' )
-						: undefined
-				}
+				ariaDescribedBy={ item.description ? descriptionId : undefined }
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
@@ -196,16 +172,11 @@ function Preview( { item, categoryId, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ ! isNonUserPattern &&
-				ariaDescriptions.map( ( ariaDescription, index ) => (
-					<div
-						key={ index }
-						hidden
-						id={ `${ descriptionId }-${ index }` }
-					>
-						{ ariaDescription }
-					</div>
-				) ) }
+			{ ! isNonUserPattern && item.description && (
+				<div hidden id={ descriptionId }>
+					{ item.description }
+				</div>
+			) }
 		</div>
 	);
 }
