@@ -292,32 +292,32 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'max-width' => 'none' ),
 				)
 			);
+		}
 
-			if ( isset( $block_spacing ) ) {
-				$block_spacing_values = gutenberg_style_engine_get_styles(
-					array(
-						'spacing' => $block_spacing,
-					)
+		if ( isset( $block_spacing ) ) {
+			$block_spacing_values = gutenberg_style_engine_get_styles(
+				array(
+					'spacing' => $block_spacing,
+				)
+			);
+
+			/*
+			 * Handle negative margins for alignfull children of blocks with custom padding set.
+			 * They're added separately because padding might only be set on one side.
+			 */
+			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$layout_styles[] = array(
+					'selector'     => "$selector > .alignfull",
+					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
-
-				/*
-				 * Handle negative margins for alignfull children of blocks with custom padding set.
-				 * They're added separately because padding might only be set on one side.
-				 */
-				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-					$padding_right   = $block_spacing_values['declarations']['padding-right'];
-					$layout_styles[] = array(
-						'selector'     => "$selector > .alignfull",
-						'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
-					);
-				}
-				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-					$padding_left    = $block_spacing_values['declarations']['padding-left'];
-					$layout_styles[] = array(
-						'selector'     => "$selector > .alignfull",
-						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
-					);
-				}
+			}
+			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$layout_styles[] = array(
+					'selector'     => "$selector > .alignfull",
+					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
+				);
 			}
 		}
 
