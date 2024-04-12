@@ -113,6 +113,10 @@ export const fontSizeStyles = ( { inputSize: size }: InputProps ) => {
 	return css`
 		font-size: ${ fontSizeMobile };
 
+		&::placeholder {
+			font-size: ${ fontSize };
+		}
+
 		@media ( min-width: 600px ) {
 			font-size: ${ fontSize };
 		}
