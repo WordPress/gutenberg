@@ -12,6 +12,10 @@
 
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
 
+### Internal
+
+-   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
+
 ## 27.3.0 (2024-04-03)
 
 ### Bug Fix
