@@ -449,7 +449,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 				<BlockListBlock
 					{ ...props }
 					__unstableLayoutClassNames={
-						layoutClasses.length > 0 ? layoutClasses : undefined
+						blockSupportsLayout ? layoutClasses : undefined
 					}
 				/>
 			);
