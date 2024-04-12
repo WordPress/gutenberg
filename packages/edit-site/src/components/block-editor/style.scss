@@ -127,11 +127,8 @@
 	&:hover,
 	&:active {
 		opacity: 1;
-		&.is-variation-default::after {
-			background: $gray-400;
-		}
-		&.is-variation-separator::after {
-			background: var(--wp-admin-theme-color);
+		&::after {
+			background-color: var(--wp-admin-theme-color);
 		}
 	}
 
