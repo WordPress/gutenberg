@@ -210,8 +210,7 @@ function Items( {
 							  getBlockEditingMode( rootClientId ) !==
 									'disabled' &&
 							  __unstableGetEditorMode() !== 'zoom-out'
-							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId && ! selectedBlockClientId ) ),
+							: rootClientId === selectedBlockClientId ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]
