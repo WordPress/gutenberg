@@ -71,79 +71,70 @@
 	direction: ltr;
 }
 
-.block-editor-global-styles-background-panel__inspector-media-replace-container {
+.block-editor-global-styles-background-panel__container {
 	position: relative;
-	// Since there is no option to skip rendering the drag'n'drop icon in drop
-	// zone, we hide it for now.
-	.components-drop-zone__content-icon {
-		display: none;
-	}
 
-	button.components-button {
+	&:hover,
+	&:focus,
+	&:focus-within {
+		.block-editor-global-styles-background-panel__actions {
+			opacity: 1;
+		}
+	}
+}
+
+.block-editor-global-styles-background-panel__toggle,
+.block-editor-global-styles-background-panel__preview {
+	width: 100%;
+	padding: 0;
+	transition: all 0.1s ease-out;
+	@include reduce-motion("transition");
+	box-shadow: 0 0 0 0 var(--wp-admin-theme-color);
+	overflow: hidden; // Ensure the focus style properly encapsulates the image.
+	outline-offset: -#{$border-width};
+	height: $grid-unit-80;
+	margin-bottom: $grid-unit-20;
+	display: flex;
+	justify-content: center;
+}
+
+.block-editor-global-styles-background-panel__toggle {
+	border-radius: $radius-block-ui;
+	background-color: $gray-100;
+	line-height: 20px;
+	padding: $grid-unit-10 0;
+	text-align: center;
+
+	&:hover {
+		background: $gray-300;
 		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-300;
+	}
+}
+
+.block-editor-global-styles-background-panel__preview {
+	outline: $border-width solid rgba($black, 0.1);
+
+	.block-editor-global-styles-background-panel__preview-image {
+		object-fit: cover;
 		width: 100%;
-		display: block;
-		height: $grid-unit-50;
-
-		&:hover {
-			color: var(--wp-admin-theme-color);
-		}
-
-		&:focus {
-			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-	}
-
-	.block-editor-global-styles-background-panel__inspector-media-replace-title {
-		word-break: break-all;
-		// The Button component is white-space: nowrap, and that won't work with line-clamp.
-		white-space: normal;
-
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
-		text-align: start;
-		text-align-last: center;
-	}
-
-	.components-dropdown {
-		display: block;
+		object-position: 50% 50%;
+		aspect-ratio: 2/1;
 	}
 }
 
-.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
-	background: #fff linear-gradient(-45deg, transparent 48%, $gray-300 48%, $gray-300 52%, transparent 52%); // Show a diagonal line (crossed out) for empty background image.
-	border-radius: $radius-round !important; // Override the default border-radius inherited from FlexItem.
-	box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
-	display: block;
-	width: 20px;
-	height: 20px;
-	flex: none;
-
-	&.has-image {
-		background: #fff; // No diagonal line for non-empty background image. A background color is in use to account for partially transparent images.
-	}
-}
-
-.block-editor-global-styles-background-panel__inspector-image-indicator {
-	background-size: cover;
-	border-radius: $radius-round;
-	width: 20px;
-	height: 20px;
-	display: block;
-	position: relative;
-}
-
-.block-editor-global-styles-background-panel__inspector-image-indicator::after {
-	content: "";
+.block-editor-global-styles-background-panel__actions {
+	@include reduce-motion("transition");
+	bottom: 0;
+	opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
+	padding: $grid-unit-10;
 	position: absolute;
-	top: -1px;
-	left: -1px;
-	bottom: -1px;
-	right: -1px;
-	border-radius: $radius-round;
-	box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
-	// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
-	border: 1px solid transparent;
-	box-sizing: inherit;
+	transition: opacity 50ms ease-out;
+}
+
+.block-editor-global-styles-background-panel__action {
+	backdrop-filter: blur(16px) saturate(180%);
+	background: rgba(255, 255, 255, 0.75);
+	flex-grow: 1;
+	justify-content: center;
 }
 

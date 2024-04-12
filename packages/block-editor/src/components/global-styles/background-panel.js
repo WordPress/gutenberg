@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,20 +10,15 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 	DropZone,
-	FlexItem,
 	FocalPointPicker,
-	MenuItem,
-	VisuallyHidden,
-	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
+	Spinner,
+	Button,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { getFilename } from '@wordpress/url';
-import { useCallback, Platform, useRef } from '@wordpress/element';
+import { useCallback, Platform, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
 
 /**
@@ -36,10 +26,14 @@ import { isBlobURL } from '@wordpress/blob';
  */
 import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
-import MediaReplaceFlow from '../media-replace-flow';
+import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
 import { store as blockEditorStore } from '../../store';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
+const ALLOWED_MEDIA_TYPES = [ IMAGE_BACKGROUND_TYPE ];
+const DEFAULT_BACKGROUND_IMAGE_LABEL = __( 'Background image' );
+const DEFAULT_SET_BACKGROUND_IMAGE_LABEL = __( 'Set background image' );
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -134,51 +128,6 @@ export const backgroundPositionToCoords = ( value ) => {
 	return { x, y };
 };
 
-function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel = label || getFilename( imgUrl );
-	return (
-		<ItemGroup as="span">
-			<HStack justify="flex-start" as="span">
-				<span
-					className={ classnames(
-						'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
-						{
-							'has-image': imgUrl,
-						}
-					) }
-					aria-hidden
-				>
-					{ imgUrl && (
-						<span
-							className="block-editor-global-styles-background-panel__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					) }
-				</span>
-				<FlexItem as="span">
-					<Truncate
-						numberOfLines={ 1 }
-						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
-					>
-						{ imgLabel }
-					</Truncate>
-					<VisuallyHidden as="span">
-						{ filename
-							? sprintf(
-									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
-							  )
-							: __( 'No image selected' ) }
-					</VisuallyHidden>
-				</FlexItem>
-			</HStack>
-		</ItemGroup>
-	);
-}
-
 function BackgroundImageToolsPanelItem( {
 	panelId,
 	isShownByDefault,
@@ -186,6 +135,7 @@ function BackgroundImageToolsPanelItem( {
 	style,
 	inheritedValue,
 } ) {
+	const [ isLoading, setIsLoading ] = useState( false );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 		[]
@@ -195,7 +145,7 @@ function BackgroundImageToolsPanelItem( {
 		...inheritedValue?.background?.backgroundImage,
 	};
 
-	const replaceContainerRef = useRef();
+	const toggleRef = useRef();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
@@ -247,13 +197,15 @@ function BackgroundImageToolsPanelItem( {
 
 	const onFilesDrop = ( filesList ) => {
 		mediaUpload( {
-			allowedTypes: [ 'image' ],
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
+					setIsLoading( true );
 					return;
 				}
 				onSelectMedia( image );
+				setIsLoading( false );
 			},
 			onError: onUploadError,
 		} );
@@ -283,48 +235,77 @@ function BackgroundImageToolsPanelItem( {
 			resetAllFilter={ resetAllFilter }
 			panelId={ panelId }
 		>
-			<div
-				className="block-editor-global-styles-background-panel__inspector-media-replace-container"
-				ref={ replaceContainerRef }
+			<MediaUploadCheck
+				fallback={
+					<p>
+						{ __(
+							'To edit the background image, you need permission to upload media.'
+						) }
+					</p>
+				}
 			>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-					accept="image/*"
+				<MediaUpload
+					title={ title || DEFAULT_BACKGROUND_IMAGE_LABEL }
 					onSelect={ onSelectMedia }
-					name={
-						<InspectorImagePreview
-							label={ __( 'Background image' ) }
-							filename={ title || __( 'Untitled' ) }
-							url={ url }
-						/>
-					}
-					variant="secondary"
-				>
-					{ hasValue && (
-						<MenuItem
-							onClick={ () => {
-								const [ toggleButton ] = focus.tabbable.find(
-									replaceContainerRef.current
-								);
-								// Focus the toggle button and close the dropdown menu.
-								// This ensures similar behaviour as to selecting an image, where the dropdown is
-								// closed and focus is redirected to the dropdown toggle button.
-								toggleButton?.focus();
-								toggleButton?.click();
-								resetBackgroundImage();
-							} }
-						>
-							{ __( 'Reset ' ) }
-						</MenuItem>
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					modalClass="block-editor-global-styles-background-panel__media-modal"
+					render={ ( { open } ) => (
+						<div className="block-editor-global-styles-background-panel__container">
+							<Button
+								ref={ toggleRef }
+								className={
+									! id
+										? 'block-editor-global-styles-background-panel__toggle'
+										: 'block-editor-global-styles-background-panel__preview'
+								}
+								onClick={ open }
+								aria-label={
+									! id
+										? null
+										: __( 'Edit or replace the image' )
+								}
+							>
+								{ !! id && url && (
+									<img
+										className="block-editor-global-styles-background-panel__preview-image"
+										src={ url }
+										alt=""
+									/>
+								) }
+								{ isLoading && <Spinner /> }
+								{ ! id &&
+									! isLoading &&
+									DEFAULT_SET_BACKGROUND_IMAGE_LABEL }
+							</Button>
+
+							<DropZone
+								onFilesDrop={ onFilesDrop }
+								label={ __( 'Drop to upload' ) }
+							/>
+							{ !! id && (
+								<HStack className="block-editor-global-styles-background-panel__actions">
+									<Button
+										className="block-editor-global-styles-background-panel__action"
+										onClick={ open }
+									>
+										{ __( 'Replace' ) }
+									</Button>
+									<Button
+										className="block-editor-global-styles-background-panel__action"
+										onClick={ () => {
+											resetBackgroundImage();
+											toggleRef.current.focus();
+										} }
+									>
+										{ __( 'Remove' ) }
+									</Button>
+								</HStack>
+							) }
+						</div>
 					) }
-				</MediaReplaceFlow>
-				<DropZone
-					onFilesDrop={ onFilesDrop }
-					label={ __( 'Drop to upload' ) }
+					value={ id }
 				/>
-			</div>
+			</MediaUploadCheck>
 		</ToolsPanelItem>
 	);
 }
