@@ -11,16 +11,6 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [
-		"textColor",
-		"customTextColor",
-		"backgroundColor",
-		"customBackgroundColor",
-		"fontSize",
-		"customFontSize",
-		"style",
-		"showSubmenuIcon"
-	],
 	"supports": {
 		"reusable": false,
 		"html": false,

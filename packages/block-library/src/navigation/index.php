@@ -23,6 +23,7 @@ class WP_Navigation_Block_Renderer {
 	private static $needs_list_item_wrapper = array(
 		'core/site-title',
 		'core/site-logo',
+		'core/home-link',
 	);
 
 	/**
@@ -133,7 +134,16 @@ class WP_Navigation_Block_Renderer {
 		$inner_block_content = $inner_block->render();
 		if ( ! empty( $inner_block_content ) ) {
 			if ( static::does_block_need_a_list_item_wrapper( $inner_block ) ) {
-				return '<li class="wp-block-navigation-item">' . $inner_block_content . '</li>';
+
+				$current_menu_item = '';
+				if ( is_front_page() ) {
+					$current_menu_item = ' current-menu-item';
+				} elseif ( is_home() && ( (int) get_option( 'page_for_posts' ) !== get_queried_object_id() ) ) {
+					// Edge case where the Reading settings has a posts page set but not a static homepage.
+					$current_menu_item = ' current-menu-item';
+				}
+
+				return '<li class="wp-block-navigation-item' . $current_menu_item . '">' . $inner_block_content . '</li>';
 			}
 		}
 

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -18,7 +13,7 @@ import { useEffect } from '@wordpress/element';
 
 const preventDefault = ( event ) => event.preventDefault();
 
-export default function HomeEdit( { attributes, setAttributes, context } ) {
+export default function HomeEdit( { attributes, setAttributes } ) {
 	const { homeUrl } = useSelect( ( select ) => {
 		const {
 			getUnstableBase, // Site index.
@@ -30,19 +25,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	const { textColor, backgroundColor, style } = context;
-	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-navigation-item', {
-			'has-text-color': !! textColor || !! style?.color?.text,
-			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': !! backgroundColor || !! style?.color?.background,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-		} ),
-		style: {
-			color: style?.color?.text,
-			backgroundColor: style?.color?.background,
-		},
-	} );
+	const blockProps = useBlockProps();
 
 	const { label } = attributes;
 
@@ -51,19 +34,14 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { label: __( 'Home' ) } );
 		}
-	}, [ label ] );
+	}, [ __unstableMarkNextChangeAsNotPersistent, label, setAttributes ] );
 
 	return (
 		<>
 			<div { ...blockProps }>
-				<a
-					className="wp-block-home-link__content wp-block-navigation-item__content"
-					href={ homeUrl }
-					onClick={ preventDefault }
-				>
+				<a href={ homeUrl } onClick={ preventDefault }>
 					<RichText
 						identifier="label"
-						className="wp-block-home-link__label"
 						value={ label }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );

@@ -6,125 +6,6 @@
  */
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the home link markup in the front-end.
- *
- * @since 6.0.0
- *
- * @param  array $context home link block context.
- * @return array Colors CSS classes and inline styles.
- */
-function block_core_home_link_build_css_colors( $context ) {
-	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $context );
-	$has_custom_text_color = isset( $context['style']['color']['text'] );
-
-	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
-		$colors['css_classes'][] = 'has-text-color';
-	}
-
-	if ( $has_named_text_color ) {
-		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
-	} elseif ( $has_custom_text_color ) {
-		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
-	}
-
-	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
-	$has_custom_background_color = isset( $context['style']['color']['background'] );
-
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background class.
-		$colors['css_classes'][] = 'has-background';
-	}
-
-	if ( $has_named_background_color ) {
-		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
-	}
-
-	return $colors;
-}
-
-/**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the home link markup in the front-end.
- *
- * @since 6.0.0
- *
- * @param  array $context Home link block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_home_link_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %s;', $context['style']['typography']['fontSize'] );
-	}
-
-	return $font_sizes;
-}
-
-/**
- * Builds an array with classes and style for the li wrapper
- *
- * @since 6.0.0
- *
- * @param  array $context    Home link block context.
- * @return string The li wrapper attributes.
- */
-function block_core_home_link_build_li_wrapper_attributes( $context ) {
-	$colors          = block_core_home_link_build_css_colors( $context );
-	$font_sizes      = block_core_home_link_build_css_font_sizes( $context );
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
-	);
-	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
-	$classes[]       = 'wp-block-navigation-item';
-
-	if ( is_front_page() ) {
-		$classes[] = 'current-menu-item';
-	} elseif ( is_home() && ( (int) get_option( 'page_for_posts' ) !== get_queried_object_id() ) ) {
-		// Edge case where the Reading settings has a posts page set but not a static homepage.
-		$classes[] = 'current-menu-item';
-	}
-
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $style_attribute,
-		)
-	);
-
-	return $wrapper_attributes;
-}
-
-/**
  * Renders the `core/home-link` block.
  *
  * @since 6.0.0
@@ -151,19 +32,8 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 		$aria_current = ' aria-current="page"';
 	}
 
-	// If the home link is inside a navigation block, it should be wrapped in a list item with additional attributes.
-	// Use the block context to determine if the home link is inside a navigation block.
-	$in_navigation = ! empty( $block->context );
-
-	if ( $in_navigation ) {
-		$item_markup = '<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%3$s" rel="home"%4$s>%5$s</a></li>';
-	} else {
-		$item_markup = '<a %2$s href="%3$s" rel="home"%4$s>%5$s</a>';
-	}
-
 	return sprintf(
-		$item_markup,
-		block_core_home_link_build_li_wrapper_attributes( $block->context ),
+		'<a %1$s href="%2$s" rel="home"%3$s>%4$s</a>',
 		get_block_wrapper_attributes(),
 		esc_url( home_url() ),
 		$aria_current,
