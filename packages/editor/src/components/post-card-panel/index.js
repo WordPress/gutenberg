@@ -63,7 +63,7 @@ export default function PostCardPanel( { className, actions } ) {
 				area: _record?.area,
 			} ),
 			isPostsPage: +_id === siteSettings?.page_for_posts,
-			postContent: _record?.content?.rendered || _record?.content,
+			postContent: getEditedPostAttribute( 'content' ),
 		};
 	}, [] );
 	const description = templateInfo?.description;
@@ -144,43 +144,27 @@ function PostContentInfo( { postContent } ) {
 		return null;
 	}
 	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
-	const wordsCountText =
-		wordsCounted.toLocaleString() &&
-		( wordsCounted === 1
-			? __( '1 word' )
-			: sprintf(
-					// translators: %s: the number of words in the post.
-					_n( '%s word', '%s words', wordsCounted ),
-					wordsCounted.toLocaleString()
-			  ) );
-
-	const readingTimeText =
+	const wordsCountText = sprintf(
+		// translators: %s: the number of words in the post.
+		_n( '%s word', '%s words', wordsCounted ),
+		wordsCounted.toLocaleString()
+	);
+	const minutesText =
 		readingTime <= 1
-			? __( '1 minute read time' )
+			? __( '1 minute' )
 			: sprintf(
 					// translators: %s: the number of minutes to read the post.
-					_n(
-						'%s minute read time',
-						'%s minutes read time',
-						readingTime
-					),
+					_n( '%s minute', '%s minutes', readingTime ),
 					readingTime.toLocaleString()
 			  );
 	return (
 		<Text>
-			{ wordsCountText
-				? sprintf(
-						/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
-						__( '%1$s, %2$s.' ),
-						wordsCountText,
-						readingTimeText
-				  )
-				: sprintf(
-						/* translators: %s is a short phrase without any closing punctuation (e.g. "2 minutes read time"). Please translate only if you need a punctuation sign other than a period. */
-						__( '%s.' ),
-						wordsCountText,
-						readingTimeText
-				  ) }
+			{ sprintf(
+				/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
+				__( '%1$s, %2$s read time.' ),
+				wordsCountText,
+				minutesText
+			) }
 		</Text>
 	);
 }
