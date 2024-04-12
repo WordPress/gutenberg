@@ -31,7 +31,9 @@ export const TabListWrapper = styled.div`
 			${ COLORS.theme.accent };
 		pointer-events: none;
 		@media not ( prefers-reduced-motion: reduce ) {
-			transition: left 0.2s ease-out;
+			transition-property: left width;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
 		}
 
 		// Windows high contrast mode.
