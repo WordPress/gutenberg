@@ -150,9 +150,6 @@ export const saveDirtyEntities =
 				);
 			}
 		);
-		if ( ! entitiesToSave.length ) {
-			return;
-		}
 		close?.( entitiesToSave );
 		const siteItemsToSave = [];
 		const pendingSavedRecords = [];
