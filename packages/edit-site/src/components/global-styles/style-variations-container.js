@@ -21,7 +21,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		).__experimentalGetCurrentThemeGlobalStylesVariations();
 	}, [] );
 
-	// Filter out variations that are of single property type, i.e. color and typography variations.
+	// Filter out variations that are of single property type, i.e. color or typography variations.
 	const multiplePropertyVariations = variations?.filter( ( variation ) => {
 		return (
 			! isVariationOfSingleProperty( variation, 'color' ) &&
