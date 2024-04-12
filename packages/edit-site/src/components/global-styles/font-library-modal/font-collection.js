@@ -380,10 +380,7 @@ function FontCollection( { slug } ) {
 							) }
 							<Spacer margin={ 4 } />
 							<Text>
-								{ ' ' }
-								{ __(
-									'Select font variants to install.'
-								) }{ ' ' }
+								{ __( 'Select font variants to install.' ) }
 							</Text>
 							<Spacer margin={ 4 } />
 							<VStack spacing={ 0 }>
