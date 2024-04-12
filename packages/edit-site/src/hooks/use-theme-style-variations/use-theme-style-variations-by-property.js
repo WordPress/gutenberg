@@ -180,6 +180,21 @@ export default function useThemeStyleVariationsByProperty( {
 						result
 					);
 				}
+
+				// Detect if this is a duplicate variation.
+				const isDuplicate = accumulator.some( ( item ) => {
+					return (
+						JSON.stringify( item.styles ) ===
+							JSON.stringify( result?.styles ) &&
+						JSON.stringify( item.settings ) ===
+							JSON.stringify( result?.settings )
+					);
+				} );
+				if ( isDuplicate ) {
+					return accumulator;
+				}
+
+				// If the variation is not a duplicate, add it to the accumulator.
 				accumulator.push( result );
 				return accumulator;
 			},
