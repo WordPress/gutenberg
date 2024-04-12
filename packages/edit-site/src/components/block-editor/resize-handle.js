@@ -52,6 +52,7 @@ export default function ResizeHandle( {
 					variants={ resizeHandleVariants }
 					whileFocus="active"
 					whileHover="active"
+					whileTap="active"
 					key="handle"
 					role="separator"
 					aria-orientation="vertical"
