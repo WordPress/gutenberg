@@ -24,10 +24,11 @@ function getVariationNameFromClass( className ) {
 function useBlockSyleVariation( name, variation, clientId ) {
 	const { user: userStyles } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const { __experimentalFeatures, __experimentalStyles } =
+			select( blockEditorStore ).getSettings();
 		return {
-			globalSettings: getSettings().__experimentalFeatures,
-			globalStyles: getSettings().__experimentalStyles,
+			globalSettings: __experimentalFeatures,
+			globalStyles: __experimentalStyles,
 		};
 	}, [] );
 
