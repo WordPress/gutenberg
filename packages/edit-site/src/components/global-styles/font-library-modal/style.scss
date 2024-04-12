@@ -42,9 +42,10 @@ $footer-height: 70px;
 		display: flex;
 		position: absolute;
 		left: 0;
-		top: $header-height;
+		top: 0;
 		align-items: center;
 		justify-content: center;
+		padding-top: $header-height;
 	}
 
 	.font-library-modal__tabpanel-layout__footer {
