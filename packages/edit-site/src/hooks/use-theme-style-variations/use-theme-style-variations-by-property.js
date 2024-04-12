@@ -153,22 +153,38 @@ export default function useThemeStyleVariationsByProperty( {
 				? cloneDeep( baseVariation )
 				: null;
 
-		let processedStyleVariations = variations.map( ( variation ) => {
-			let result = {
-				...filterObjectByProperty( cloneDeep( variation ), property ),
-				title: variation?.title,
-				description: variation?.description,
-			};
+		let processedStyleVariations = variations
+			// Remove variations that are empty once the property is filtered out.
+			.filter( ( variation ) => {
+				const variationFilteredByProperty = filterObjectByProperty(
+					cloneDeep( variation ),
+					property
+				);
+				return Object.keys( variationFilteredByProperty ).length > 0;
+			} )
+			.map( ( variation ) => {
+				const variationFilteredByProperty = filterObjectByProperty(
+					cloneDeep( variation ),
+					property
+				);
+				let result = {
+					...variationFilteredByProperty,
+					title: variation?.title,
+					description: variation?.description,
+				};
 
-			if ( clonedBaseVariation ) {
-				/*
-				 * Overwrites all baseVariation object `styleProperty` properties
-				 * with the theme variation `styleProperty` properties.
-				 */
-				result = mergeBaseAndUserConfigs( clonedBaseVariation, result );
-			}
-			return result;
-		} );
+				if ( clonedBaseVariation ) {
+					/*
+					 * Overwrites all baseVariation object `styleProperty` properties
+					 * with the theme variation `styleProperty` properties.
+					 */
+					result = mergeBaseAndUserConfigs(
+						clonedBaseVariation,
+						result
+					);
+				}
+				return result;
+			} );
 
 		if ( 'function' === typeof filter ) {
 			processedStyleVariations =
