@@ -174,7 +174,7 @@ function Tabs( {
 				! focusedElement ||
 				! items.some( ( item ) => focusedElement === item.element )
 			) {
-				return;
+				return; // Return early if no tabs are focused.
 			}
 
 			// If, after ariakit re-computes the active tab, that tab doesn't match
