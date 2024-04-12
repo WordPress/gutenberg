@@ -8,7 +8,7 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef, useEffect, useState } from '@wordpress/element';
+import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,13 +31,38 @@ export const TabList = forwardRef<
 	} );
 	const selectedId = context?.store.useState( 'selectedId' );
 	const selectedTabEl = context?.store.item( selectedId )?.element;
+	const resizeObserverRef = useRef< ResizeObserver >();
+	const observedElementRef = useRef< HTMLElement >();
 
 	useEffect( () => {
-		if ( selectedTabEl )
+		if ( selectedTabEl === observedElementRef.current ) return;
+		observedElementRef.current = selectedTabEl ?? undefined;
+
+		function updateIndicator( element: HTMLElement ) {
 			setIndicatorPosition( {
-				left: selectedTabEl.offsetLeft,
-				width: selectedTabEl.getBoundingClientRect().width,
+				left: element.offsetLeft,
+				width: element.getBoundingClientRect().width,
 			} );
+		}
+
+		// Set up a ResizeObserver.
+		if ( ! resizeObserverRef.current ) {
+			resizeObserverRef.current = new ResizeObserver( () => {
+				if ( observedElementRef.current )
+					updateIndicator( observedElementRef.current );
+			} );
+		}
+		const { current: resizeObserver } = resizeObserverRef;
+
+		// Unobserve previous element.
+		const { current: observedElement } = observedElementRef;
+		if ( observedElement ) resizeObserver.unobserve( observedElement );
+
+		// Observe new element.
+		if ( selectedTabEl ) {
+			updateIndicator( selectedTabEl );
+			resizeObserver.observe( selectedTabEl );
+		}
 	}, [ selectedTabEl ] );
 
 	if ( ! context ) {
