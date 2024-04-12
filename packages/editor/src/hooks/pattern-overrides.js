@@ -6,6 +6,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 const {
-	useSetPatternBindings,
+	PatternOverridesControls,
 	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
@@ -38,7 +39,6 @@ const withPatternOverrideControls = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ isSupportedBlock && <BindingUpdater { ...props } /> }
 				{ props.isSelected && isSupportedBlock && (
 					<ControlsWithStoreSubscription { ...props } />
 				) }
@@ -47,22 +47,24 @@ const withPatternOverrideControls = createHigherOrderComponent(
 	}
 );
 
-function BindingUpdater( props ) {
-	const postType = useSelect(
-		( select ) => select( editorStore ).getCurrentPostType(),
-		[]
-	);
-	useSetPatternBindings( props, postType );
-	return null;
-}
-
 // Split into a separate component to avoid a store subscription
 // on every block.
 function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
-	const isEditingPattern = useSelect(
-		( select ) =>
-			select( editorStore ).getCurrentPostType() === PATTERN_TYPES.user,
+	const { hasPatternOverridesSource, isEditingPattern } = useSelect(
+		( select ) => {
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+
+			return {
+				// For editing link to the site editor if the theme and user permissions support it.
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
+				isEditingPattern:
+					select( editorStore ).getCurrentPostType() ===
+					PATTERN_TYPES.user,
+			};
+		},
 		[]
 	);
 
@@ -73,14 +75,23 @@ function ControlsWithStoreSubscription( props ) {
 			( binding ) => binding.source === 'core/pattern-overrides'
 		);
 
+	const shouldShowPatternOverridesControls =
+		isEditingPattern && blockEditingMode === 'default';
 	const shouldShowResetOverridesControl =
 		! isEditingPattern &&
 		!! props.attributes.metadata?.name &&
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;
 
+	if ( ! hasPatternOverridesSource ) {
+		return null;
+	}
+
 	return (
 		<>
+			{ shouldShowPatternOverridesControls && (
+				<PatternOverridesControls { ...props } />
+			) }
 			{ shouldShowResetOverridesControl && (
 				<ResetOverridesControl { ...props } />
 			) }
