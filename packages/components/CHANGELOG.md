@@ -15,6 +15,10 @@
 
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
 
+### Experimental
+
+-   `Tabs`: Fallback to first enabled tab if no active tab id ([#60681](https://github.com/WordPress/gutenberg/pull/60681)).
+
 ## 27.3.0 (2024-04-03)
 
 ### Bug Fix
