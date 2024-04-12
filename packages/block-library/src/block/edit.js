@@ -40,7 +40,8 @@ import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { isOverridableBlock } = unlock( patternsPrivateApis );
+const { isOverridableBlock, PARTIAL_SYNCING_SUPPORTED_BLOCKS } =
+	unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 

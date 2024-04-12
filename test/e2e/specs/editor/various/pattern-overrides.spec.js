@@ -105,7 +105,7 @@ test.describe( 'Pattern Overrides', () => {
 						metadata: {
 							name: editableParagraphName,
 							bindings: {
-								content: {
+								__default: {
 									source: 'core/pattern-overrides',
 								},
 							},
@@ -234,7 +234,7 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphName = 'paragraph-name';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <p>Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -324,7 +324,7 @@ test.describe( 'Pattern Overrides', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"text":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"linkTarget":{"source":"core/pattern-overrides"},"rel":{"source":"core/pattern-overrides"}}}} -->
+<div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
@@ -434,14 +434,14 @@ test.describe( 'Pattern Overrides', () => {
 		const headingName = 'Editable heading';
 		const innerPattern = await requestUtils.createBlock( {
 			title: 'Inner Pattern',
-			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <p>Inner paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
 		const outerPattern = await requestUtils.createBlock( {
 			title: 'Outer Pattern',
-			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <h2 class="wp-block-heading">Outer heading</h2>
 <!-- /wp:heading -->
 <!-- wp:block {"ref":${ innerPattern.id },"content":{"${ paragraphName }":{"content":"Inner paragraph (edited)"}}} /-->`,
@@ -535,10 +535,10 @@ test.describe( 'Pattern Overrides', () => {
 		const paragraphName = 'Editable paragraph';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:heading {"metadata":{"name":"${ headingName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
-<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <p>Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
@@ -694,7 +694,7 @@ test.describe( 'Pattern Overrides', () => {
 		);
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
-			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"id":{"source":"core/pattern-overrides"},"url":{"source":"core/pattern-overrides"},"title":{"source":"core/pattern-overrides"},"alt":{"source":"core/pattern-overrides"}}}} -->
+			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
 <figure class="wp-block-image"><img alt=""/></figure>
 <!-- /wp:image -->`,
 			status: 'publish',

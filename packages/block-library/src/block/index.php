@@ -78,13 +78,48 @@ function render_block_core_block( $attributes ) {
 	 * filter so that it is available when a pattern's inner blocks are
 	 * rendering via do_blocks given it only receives the inner content.
 	 */
-	$has_pattern_overrides = isset( $attributes['content'] );
+	$has_pattern_overrides = isset( $attributes['content'] ) && null !== get_block_bindings_source( 'core/pattern-overrides' );
 	if ( $has_pattern_overrides ) {
 		$filter_block_context = static function ( $context ) use ( $attributes ) {
 			$context['pattern/overrides'] = $attributes['content'];
 			return $context;
 		};
 		add_filter( 'render_block_context', $filter_block_context, 1 );
+
+		// Add bindings for the default pattern overrides source.
+		$apply_default_pattern_overrides_bindings = static function ( $parsed_block ) {
+			$supported_block_attrs = array(
+				'core/paragraph' => array( 'content' ),
+				'core/heading'   => array( 'content' ),
+				'core/image'     => array( 'id', 'url', 'title', 'alt' ),
+				'core/button'    => array( 'url', 'text', 'linkTarget', 'rel' ),
+			);
+
+			if (
+				// Return early if the block isn't one of the supported block types,
+				! isset( $supported_block_attrs[ $parsed_block['blockName'] ] ) ||
+				// or doesn't have a name,
+				! isset( $parsed_block['attrs']['metadata']['name'] ) ||
+				// or doesn't have the default binding.
+				empty( $parsed_block['attrs']['metadata']['bindings']['__default'] ) ||
+				// or the default binding isn't the pattern overrides source.
+				'core/pattern-overrides' !== $parsed_block['attrs']['metadata']['bindings']['__default']['source']
+			) {
+				return $parsed_block;
+			}
+
+			$bindings = array();
+			foreach ( $supported_block_attrs[ $parsed_block['blockName'] ] as $attribute_name ) {
+				$bindings[ $attribute_name ] = array( 'source' => 'core/pattern-overrides' );
+			}
+			$parsed_block['attrs']['metadata']['bindings'] = array_merge(
+				$bindings,
+				$parsed_block['attrs']['metadata']['bindings']
+			);
+
+			return $parsed_block;
+		};
+		add_filter( 'render_block_data', $apply_default_pattern_overrides_bindings, 10, 1 );
 	}
 
 	$content = do_blocks( $content );

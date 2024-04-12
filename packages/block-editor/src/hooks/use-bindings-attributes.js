@@ -29,6 +29,8 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
 
+const DEFAULT_ATTRIBUTES = '__default';
+
 /**
  * Based on the given block name,
  * check if it is possible to bind the block.
@@ -68,11 +70,20 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				return;
 			}
 
+			const bindingsEntries = Object.entries( bindings );
 			const attributes = {};
 
-			for ( const [ attributeName, boundAttribute ] of Object.entries(
-				bindings
-			) ) {
+			if ( bindings[ DEFAULT_ATTRIBUTES ] !== undefined ) {
+				const defaultAttributes = BLOCK_BINDINGS_ALLOWED_BLOCKS[ name ];
+				bindingsEntries.push(
+					...defaultAttributes.map( ( attributeName ) => [
+						attributeName,
+						bindings[ DEFAULT_ATTRIBUTES ],
+					] )
+				);
+			}
+
+			for ( const [ attributeName, boundAttribute ] of bindingsEntries ) {
 				const source = sources[ boundAttribute.source ];
 				if (
 					! source?.getValue ||
@@ -122,14 +133,17 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 						keptAttributes
 					) ) {
 						if (
-							! bindings[ attributeName ] ||
-							! canBindAttribute( name, attributeName )
+							( ! bindings[ attributeName ] ||
+								! canBindAttribute( name, attributeName ) ) &&
+							! bindings[ DEFAULT_ATTRIBUTES ]
 						) {
 							continue;
 						}
 
-						const source =
-							sources[ bindings[ attributeName ].source ];
+						const binding =
+							bindings[ attributeName ] ??
+							bindings[ DEFAULT_ATTRIBUTES ];
+						const source = sources[ binding?.source ];
 						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
 						}
@@ -157,12 +171,15 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 									attributeName,
 									value,
 								] of Object.entries( attributes ) ) {
+									const binding =
+										bindings[ attributeName ] ??
+										bindings[ DEFAULT_ATTRIBUTES ];
 									source.setValue( {
 										registry,
 										context,
 										clientId,
 										attributeName,
-										args: bindings[ attributeName ].args,
+										args: binding.args,
 										value,
 									} );
 								}

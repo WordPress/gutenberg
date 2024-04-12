@@ -20,6 +20,7 @@ import {
 
 function removeBindings( bindings, syncedAttributes ) {
 	let updatedBindings = {};
+	// Back-compat: Remove existing duplicate bindings.
 	for ( const attributeName of syncedAttributes ) {
 		// Omit any bindings that's not the same source from the `updatedBindings` object.
 		if (
@@ -37,12 +38,17 @@ function removeBindings( bindings, syncedAttributes ) {
 }
 
 function addBindings( bindings, syncedAttributes ) {
-	const updatedBindings = { ...bindings };
+	const updatedBindings = {
+		...bindings,
+		__default: { source: PATTERN_OVERRIDES_BINDING_SOURCE },
+	};
+	// Back-compat: Remove existing duplicate bindings.
 	for ( const attributeName of syncedAttributes ) {
-		if ( ! bindings?.[ attributeName ] ) {
-			updatedBindings[ attributeName ] = {
-				source: PATTERN_OVERRIDES_BINDING_SOURCE,
-			};
+		if (
+			updatedBindings[ attributeName ]?.source ===
+			PATTERN_OVERRIDES_BINDING_SOURCE
+		) {
+			delete updatedBindings[ attributeName ];
 		}
 	}
 	return updatedBindings;
@@ -60,9 +66,18 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 		( attributeName ) =>
 			attributes.metadata?.bindings?.[ attributeName ]?.source
 	);
-	const isConnectedToOtherSources = attributeSources.every(
-		( source ) => source && source !== 'core/pattern-overrides'
-	);
+	const defaultBindings = attributes.metadata?.bindings?.__default;
+	const allowOverrides =
+		defaultBindings?.source === PATTERN_OVERRIDES_BINDING_SOURCE ||
+		attributeSources.some(
+			( source ) => source === PATTERN_OVERRIDES_BINDING_SOURCE
+		);
+	const isConnectedToOtherSources =
+		( defaultBindings?.source &&
+			defaultBindings.source !== PATTERN_OVERRIDES_BINDING_SOURCE ) ||
+		attributeSources.every(
+			( source ) => source && source !== PATTERN_OVERRIDES_BINDING_SOURCE
+		);
 
 	function updateBindings( isChecked, customName ) {
 		const prevBindings = attributes?.metadata?.bindings;
