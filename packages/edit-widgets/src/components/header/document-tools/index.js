@@ -22,7 +22,7 @@ import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-a
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
+const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
 function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -75,14 +75,11 @@ function DocumentTools() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	const { showFixedToolbar } = useShowBlockTools();
-
 	return (
 		<NavigableToolbar
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
-			shouldUseKeyboardFocusShortcut={ ! showFixedToolbar }
+			shouldUseKeyboardFocusShortcut={ ! useHasBlockToolbar() }
 			variant="unstyled"
 		>
 			<ToolbarItem

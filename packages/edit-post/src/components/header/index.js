@@ -40,7 +40,7 @@ import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
+const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
@@ -56,10 +56,75 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
+function TopToolbar( { blockSelectionStart, hasHistory } ) {
+	const blockToolbarRef = useRef();
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	// TODO: Change this to "isBlockToolbarVisible" or similar
+	const hasBlockToolbar = useHasBlockToolbar();
+	const hasBlockSelection = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
+
+	return (
+		<>
+			{ hasBlockToolbar && (
+				<>
+					<div
+						className={ classnames(
+							'selected-block-tools-wrapper',
+							{
+								'is-collapsed':
+									isBlockToolsCollapsed ||
+									! hasBlockSelection,
+							}
+						) }
+					>
+						<BlockToolbar hideDragHandle />
+					</div>
+					<Popover.Slot
+						ref={ blockToolbarRef }
+						name="block-toolbar"
+					/>
+					<Button
+						className="edit-post-header__block-tools-toggle"
+						icon={ isBlockToolsCollapsed ? next : previous }
+						onClick={ () => {
+							setIsBlockToolsCollapsed(
+								( collapsed ) => ! collapsed
+							);
+						} }
+						label={
+							isBlockToolsCollapsed
+								? __( 'Show block tools' )
+								: __( 'Hide block tools' )
+						}
+						size="compact"
+					/>
+				</>
+			) }
+			{ hasHistory && (
+				<div
+					className={ classnames( 'edit-post-header__center', {
+						'is-collapsed': ! isBlockToolsCollapsed,
+					} ) }
+				>
+					<DocumentBar />
+				</div>
+			) }
+		</>
+	);
+}
+
 function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const blockToolbarRef = useRef();
 	const {
 		isTextEditor,
 		blockSelectionStart,
@@ -67,6 +132,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editorStore );
@@ -82,22 +148,11 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			isPublishSidebarOpened:
 				select( editorStore ).isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 
-	const { showFixedToolbar } = useShowBlockTools();
-	const showTopToolbar = isLargeViewport && showFixedToolbar;
-
-	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
-		useState( true );
-	const hasBlockSelection = !! blockSelectionStart;
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ blockSelectionStart ] );
+	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
 
 	return (
 		<div className="edit-post-header">
@@ -118,51 +173,12 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				className="edit-post-header__toolbar"
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
-				{ showTopToolbar && (
-					<>
-						<div
-							className={ classnames(
-								'selected-block-tools-wrapper',
-								{
-									'is-collapsed':
-										isBlockToolsCollapsed ||
-										! hasBlockSelection,
-								}
-							) }
-						>
-							<BlockToolbar hideDragHandle />
-						</div>
-						<Popover.Slot
-							ref={ blockToolbarRef }
-							name="block-toolbar"
-						/>
-						<Button
-							className="edit-post-header__block-tools-toggle"
-							icon={ isBlockToolsCollapsed ? next : previous }
-							onClick={ () => {
-								setIsBlockToolsCollapsed(
-									( collapsed ) => ! collapsed
-								);
-							} }
-							label={
-								isBlockToolsCollapsed
-									? __( 'Show block tools' )
-									: __( 'Hide block tools' )
-							}
-							size="compact"
-						/>
-					</>
+				{ hasTopToolbar && (
+					<TopToolbar
+						blockSelectionStart={ blockSelectionStart }
+						hasHistory={ hasHistory }
+					/>
 				) }
-				<div
-					className={ classnames( 'edit-post-header__center', {
-						'is-collapsed':
-							hasHistory &&
-							! isBlockToolsCollapsed &&
-							showTopToolbar,
-					} ) }
-				>
-					{ hasHistory && <DocumentBar /> }
-				</div>
 			</motion.div>
 			<motion.div
 				variants={ slideY }
