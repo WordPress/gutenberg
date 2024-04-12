@@ -335,7 +335,7 @@ describe( 'Modal', () => {
 		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount={ true } /> );
+			render( <FocusMountDemo focusOnMount /> );
 
 			const opener = screen.getByRole( 'button', {
 				name: 'Toggle Modal',

@@ -50,13 +50,7 @@ function hasLayoutBlockSupport( blockName ) {
  */
 export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
-	const rootPaddingAlignment = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalFeatures
-			?.useRootPaddingAwareAlignments;
-	}, [] );
 	const { layout } = blockAttributes;
-
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
 	const usedLayout =
@@ -78,12 +72,20 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 		layoutClassnames.push( baseClassName, compoundClassName );
 	}
 
-	if (
-		( usedLayout?.inherit ||
-			usedLayout?.contentSize ||
-			usedLayout?.type === 'constrained' ) &&
-		rootPaddingAlignment
-	) {
+	const hasGlobalPadding = useSelect(
+		( select ) => {
+			return (
+				( usedLayout?.inherit ||
+					usedLayout?.contentSize ||
+					usedLayout?.type === 'constrained' ) &&
+				select( blockEditorStore ).getSettings().__experimentalFeatures
+					?.useRootPaddingAwareAlignments
+			);
+		},
+		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
+	);
+
+	if ( hasGlobalPadding ) {
 		layoutClassnames.push( 'has-global-padding' );
 	}
 
@@ -125,14 +127,13 @@ export function useLayoutStyles( blockAttributes = {}, blockName, selector ) {
 	const fullLayoutType = getLayoutType( usedLayout?.type || 'default' );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
-	const css = fullLayoutType?.getLayoutStyle?.( {
+	return fullLayoutType?.getLayoutStyle?.( {
 		blockName,
 		selector,
 		layout,
 		style,
 		hasBlockGapSupport,
 	} );
-	return css;
 }
 
 function LayoutPanelPure( {
@@ -144,8 +145,6 @@ function LayoutPanelPure( {
 	const settings = useBlockSettings( blockName );
 	// Block settings come from theme.json under settings.[blockName].
 	const { layout: layoutSettings } = settings;
-	// Layout comes from block attributes.
-	const [ defaultThemeLayout ] = useSettings( 'layout' );
 	const { themeSupportsLayout } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -179,36 +178,43 @@ function LayoutPanelPure( {
 		return null;
 	}
 
+	/*
+	 * Try to find the layout type from either the
+	 * block's layout settings or any saved layout config.
+	 */
+	const blockSupportAndLayout = {
+		...layoutBlockSupport,
+		...layout,
+	};
+	const { type, default: { type: defaultType = 'default' } = {} } =
+		blockSupportAndLayout;
+	const blockLayoutType = type || defaultType;
+
 	// Only show the inherit toggle if it's supported,
-	// a default theme layout is set (e.g. one that provides `contentSize` and/or `wideSize` values),
 	// and either the default / flow or the constrained layout type is in use, as the toggle switches from one to the other.
 	const showInheritToggle = !! (
 		allowInheriting &&
-		!! defaultThemeLayout &&
-		( ! layout?.type ||
-			layout?.type === 'default' ||
-			layout?.type === 'constrained' ||
-			layout?.inherit )
+		( ! blockLayoutType ||
+			blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ||
+			blockSupportAndLayout.inherit )
 	);
 
 	const usedLayout = layout || defaultBlockLayout || {};
-	const {
-		inherit = false,
-		type = 'default',
-		contentSize = null,
-	} = usedLayout;
+	const { inherit = false, contentSize = null } = usedLayout;
 	/**
 	 * `themeSupportsLayout` is only relevant to the `default/flow` or
 	 * `constrained` layouts and it should not be taken into account when other
 	 * `layout` types are used.
 	 */
 	if (
-		( type === 'default' || type === 'constrained' ) &&
+		( blockLayoutType === 'default' ||
+			blockLayoutType === 'constrained' ) &&
 		! themeSupportsLayout
 	) {
 		return null;
 	}
-	const layoutType = getLayoutType( type );
+	const layoutType = getLayoutType( blockLayoutType );
 	const constrainedType = getLayoutType( 'constrained' );
 	const displayControlsForLegacyLayouts =
 		! usedLayout.type && ( contentSize || inherit );
@@ -261,7 +267,7 @@ function LayoutPanelPure( {
 
 					{ ! inherit && allowSwitching && (
 						<LayoutTypeSwitcher
-							type={ type }
+							type={ blockLayoutType }
 							onChange={ onChangeType }
 						/>
 					) }
@@ -349,7 +355,11 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
+function BlockWithLayoutStyles( {
+	block: BlockListBlock,
+	props,
+	blockGapSupport,
+} ) {
 	const { name, attributes } = props;
 	const id = useInstanceId( BlockListBlock );
 	const { layout } = attributes;
@@ -365,7 +375,6 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
 	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
-	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	const hasBlockGapSupport = blockGapSupport !== null;
 
 	// Get CSS string for the current layout type.
@@ -406,26 +415,44 @@ function BlockWithLayoutStyles( { block: BlockListBlock, props } ) {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const blockSupportsLayout = hasLayoutBlockSupport( props.name );
-		const shouldRenderLayoutStyles = useSelect(
+		const { clientId, name } = props;
+		const blockSupportsLayout = hasLayoutBlockSupport( name );
+		const extraProps = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.
 				if ( ! blockSupportsLayout ) {
-					return false;
+					return;
 				}
 
-				return ! select( blockEditorStore ).getSettings()
-					.disableLayoutStyles;
+				const { getSettings, getBlockSettings } = unlock(
+					select( blockEditorStore )
+				);
+				const { disableLayoutStyles } = getSettings();
+
+				if ( disableLayoutStyles ) {
+					return;
+				}
+
+				const [ blockGapSupport ] = getBlockSettings(
+					clientId,
+					'spacing.blockGap'
+				);
+
+				return { blockGapSupport };
 			},
-			[ blockSupportsLayout ]
+			[ blockSupportsLayout, clientId ]
 		);
 
-		if ( ! shouldRenderLayoutStyles ) {
+		if ( ! extraProps ) {
 			return <BlockListBlock { ...props } />;
 		}
 
 		return (
-			<BlockWithLayoutStyles block={ BlockListBlock } props={ props } />
+			<BlockWithLayoutStyles
+				block={ BlockListBlock }
+				props={ props }
+				{ ...extraProps }
+			/>
 		);
 	},
 	'withLayoutStyles'

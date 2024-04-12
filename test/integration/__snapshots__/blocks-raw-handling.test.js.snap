@@ -198,3 +198,21 @@ exports[`rawHandler should preserve alignment 1`] = `
 <p class="has-text-align-center">center</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`rawHandler should preserve all paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>&nbsp;&nbsp;</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"p"} -->
+<p class="p"></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;

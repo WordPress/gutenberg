@@ -7,7 +7,6 @@ import {
 	DropZone,
 	Button,
 	Spinner,
-	ResponsiveWrapper,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
@@ -99,10 +98,7 @@ function PostFeaturedImage( {
 	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
-	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
-		media,
-		currentPostId
-	);
+	const { mediaSourceUrl } = getMediaDetails( media, currentPostId );
 
 	function onDropFiles( filesList ) {
 		getSettings().mediaUpload( {
@@ -183,16 +179,11 @@ function PostFeaturedImage( {
 									}
 								>
 									{ !! featuredImageId && media && (
-										<ResponsiveWrapper
-											naturalWidth={ mediaWidth }
-											naturalHeight={ mediaHeight }
-											isInline
-										>
-											<img
-												src={ mediaSourceUrl }
-												alt=""
-											/>
-										</ResponsiveWrapper>
+										<img
+											className="editor-post-featured-image__preview-image"
+											src={ mediaSourceUrl }
+											alt=""
+										/>
 									) }
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&

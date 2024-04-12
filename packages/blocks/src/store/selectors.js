@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
 import { pipe } from '@wordpress/compose';
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies

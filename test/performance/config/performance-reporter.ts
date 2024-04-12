@@ -49,29 +49,15 @@ export interface WPPerformanceResults {
 	firstContentfulPaint?: number;
 	firstBlock?: number;
 	type?: number;
-	minType?: number;
-	maxType?: number;
 	typeWithoutInspector?: number;
 	typeWithTopToolbar?: number;
 	typeContainer?: number;
-	minTypeContainer?: number;
-	maxTypeContainer?: number;
 	focus?: number;
-	minFocus?: number;
-	maxFocus?: number;
 	inserterOpen?: number;
-	minInserterOpen?: number;
-	maxInserterOpen?: number;
 	inserterSearch?: number;
-	minInserterSearch?: number;
-	maxInserterSearch?: number;
 	inserterHover?: number;
-	minInserterHover?: number;
-	maxInserterHover?: number;
 	loadPatterns?: number;
 	listViewOpen?: number;
-	minListViewOpen?: number;
-	maxListViewOpen?: number;
 	navigate?: number;
 }
 
@@ -96,29 +82,15 @@ export function curateResults(
 		firstContentfulPaint: median( results.firstContentfulPaint ),
 		firstBlock: median( results.firstBlock ),
 		type: average( results.type ),
-		minType: minimum( results.type ),
-		maxType: maximum( results.type ),
 		typeWithoutInspector: average( results.typeWithoutInspector ),
 		typeWithTopToolbar: average( results.typeWithTopToolbar ),
 		typeContainer: average( results.typeContainer ),
-		minTypeContainer: minimum( results.typeContainer ),
-		maxTypeContainer: maximum( results.typeContainer ),
 		focus: average( results.focus ),
-		minFocus: minimum( results.focus ),
-		maxFocus: maximum( results.focus ),
 		inserterOpen: average( results.inserterOpen ),
-		minInserterOpen: minimum( results.inserterOpen ),
-		maxInserterOpen: maximum( results.inserterOpen ),
 		inserterSearch: average( results.inserterSearch ),
-		minInserterSearch: minimum( results.inserterSearch ),
-		maxInserterSearch: maximum( results.inserterSearch ),
 		inserterHover: average( results.inserterHover ),
-		minInserterHover: minimum( results.inserterHover ),
-		maxInserterHover: maximum( results.inserterHover ),
 		loadPatterns: average( results.loadPatterns ),
 		listViewOpen: average( results.listViewOpen ),
-		minListViewOpen: minimum( results.listViewOpen ),
-		maxListViewOpen: maximum( results.listViewOpen ),
 		navigate: median( results.navigate ),
 	};
 

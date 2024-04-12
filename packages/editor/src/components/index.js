@@ -26,6 +26,10 @@ export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesPanel } from './page-attributes/panel';
 export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template/classic-theme';
+export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
+export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginPostPublishPanel } from './plugin-post-publish-panel';
+export { default as PluginPrePublishPanel } from './plugin-pre-publish-panel';
 export { default as PostTemplatePanel } from './post-template/panel';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
@@ -64,10 +68,7 @@ export { default as PostSlugCheck } from './post-slug/check';
 export { default as PostSticky } from './post-sticky';
 export { default as PostStickyCheck } from './post-sticky/check';
 export { default as PostSwitchToDraftButton } from './post-switch-to-draft-button';
-export {
-	default as PostSyncStatus,
-	PostSyncStatusModal,
-} from './post-sync-status';
+export { default as PostSyncStatus } from './post-sync-status';
 export { default as PostTaxonomies } from './post-taxonomies';
 export { FlatTermSelector as PostTaxonomiesFlatTermSelector } from './post-taxonomies/flat-term-selector';
 export { HierarchicalTermSelector as PostTaxonomiesHierarchicalTermSelector } from './post-taxonomies/hierarchical-term-selector';

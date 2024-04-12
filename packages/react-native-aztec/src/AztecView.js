@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
 	Pressable,
@@ -232,6 +233,22 @@ class AztecView extends Component {
 	isFocused() {
 		const focusedElement = AztecInputState.getCurrentFocusedElement();
 		return focusedElement && focusedElement === this.aztecViewRef.current;
+	}
+
+	onRemoveMarkFormatting() {
+		UIManager.dispatchViewManagerCommand(
+			findNodeHandle( this.aztecViewRef.current ),
+			'onRemoveMarkFormatting',
+			[]
+		);
+	}
+
+	onMarkFormatting( color ) {
+		UIManager.dispatchViewManagerCommand(
+			findNodeHandle( this.aztecViewRef.current ),
+			'onMarkFormatting',
+			[ color ]
+		);
 	}
 
 	_onPress( event ) {

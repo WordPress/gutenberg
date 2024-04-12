@@ -560,4 +560,12 @@ describe( 'rawHandler', () => {
 		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
+
+	it( 'should preserve all paragraphs', () => {
+		const HTML = `<p></p>
+<p>&nbsp;&nbsp;</p>
+<p class="p"></p>
+<p style="border: 1px solid tomato;"></p>`;
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
 } );

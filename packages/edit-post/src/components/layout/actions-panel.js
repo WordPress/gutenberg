@@ -4,17 +4,18 @@
 import {
 	EntitiesSavedStates,
 	PostPublishPanel,
+	PluginPrePublishPanel,
+	PluginPostPublishPanel,
 	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import { store as editPostStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
@@ -27,7 +28,7 @@ export default function ActionsPanel( {
 	isEntitiesSavedStatesOpen,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
-		useDispatch( editPostStore );
+		useDispatch( editorStore );
 	const {
 		publishSidebarOpened,
 		hasActiveMetaboxes,
@@ -35,7 +36,7 @@ export default function ActionsPanel( {
 	} = useSelect(
 		( select ) => ( {
 			publishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
+				select( editorStore ).isPublishSidebarOpened(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),

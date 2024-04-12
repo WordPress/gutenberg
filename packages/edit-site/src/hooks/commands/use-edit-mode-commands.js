@@ -154,9 +154,7 @@ function useManipulateDocumentCommands() {
 						decodeEntities( template.title )
 				  );
 		const path =
-			template.type === TEMPLATE_POST_TYPE
-				? '/wp_template'
-				: '/wp_template_part/all';
+			template.type === TEMPLATE_POST_TYPE ? '/wp_template' : '/patterns';
 		commands.push( {
 			name: 'core/remove-template',
 			label,

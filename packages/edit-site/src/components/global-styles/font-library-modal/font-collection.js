@@ -10,7 +10,6 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalInputControl as InputControl,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
@@ -21,20 +20,15 @@ import {
 	Notice,
 	SelectControl,
 	Spinner,
-	Icon,
 	FlexItem,
 	Flex,
 	Button,
 	DropdownMenu,
+	SearchControl,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
-import {
-	search,
-	closeSmall,
-	moreVertical,
-	chevronLeft,
-} from '@wordpress/icons';
+import { moreVertical, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -77,7 +71,7 @@ function FontCollection( { slug } ) {
 	const {
 		collections,
 		getFontCollection,
-		installFont,
+		installFonts,
 		isInstalling,
 		notice,
 		setNotice,
@@ -168,11 +162,6 @@ function FontCollection( { slug } ) {
 		setPage( 1 );
 	};
 
-	const resetSearch = () => {
-		setFilters( { ...filters, search: '' } );
-		setPage( 1 );
-	};
-
 	const handleToggleVariant = ( font, face ) => {
 		const newFontsToInstall = toggleFont( font, face, fontsToInstall );
 		setFontsToInstall( newFontsToInstall );
@@ -214,7 +203,7 @@ function FontCollection( { slug } ) {
 		}
 
 		try {
-			await installFont( fontFamily );
+			await installFonts( [ fontFamily ] );
 			setNotice( {
 				type: 'success',
 				message: __( 'Fonts were installed successfully.' ),
@@ -288,20 +277,14 @@ function FontCollection( { slug } ) {
 					<Spacer margin={ 4 } />
 					<Flex>
 						<FlexItem>
-							<InputControl
+							<SearchControl
+								className="font-library-modal__search"
 								value={ filters.search }
 								placeholder={ __( 'Font name…' ) }
 								label={ __( 'Search' ) }
 								onChange={ debouncedUpdateSearchInput }
-								prefix={ <Icon icon={ search } /> }
-								suffix={
-									filters?.search ? (
-										<Icon
-											icon={ closeSmall }
-											onClick={ resetSearch }
-										/>
-									) : null
-								}
+								__nextHasNoMarginBottom
+								hideLabelFromVision={ false }
 							/>
 						</FlexItem>
 						<FlexItem>
@@ -358,11 +341,12 @@ function FontCollection( { slug } ) {
 					<Flex justify="flex-start">
 						<NavigatorToParentButton
 							icon={ chevronLeft }
-							isSmall
+							size="small"
 							onClick={ () => {
 								setSelectedFont( null );
+								setNotice( null );
 							} }
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Heading
 							level={ 2 }
@@ -458,13 +442,13 @@ function FontCollection( { slug } ) {
 							sprintf(
 								// translators: %s: Total number of pages.
 								_x(
-									'Page <CurrenPageControl /> of %s',
+									'Page <CurrentPageControl /> of %s',
 									'paging'
 								),
 								totalPages
 							),
 							{
-								CurrenPageControl: (
+								CurrentPageControl: (
 									<SelectControl
 										aria-label={ __( 'Current page' ) }
 										value={ page }

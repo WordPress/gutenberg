@@ -238,6 +238,30 @@ describe.each( [
 		).toHaveTextContent( 'Hint' );
 	} );
 
+	it( 'shows selected hint in list of options when added, regardless of __experimentalShowSelectedHint prop', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Component
+				{ ...props }
+				label="Custom select"
+				options={ [
+					{
+						key: 'one',
+						name: 'One',
+						__experimentalHint: 'Hint',
+					},
+				] }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Custom select' } )
+		);
+
+		expect( screen.getByRole( 'option', { name: /hint/i } ) ).toBeVisible();
+	} );
+
 	describe( 'Keyboard behavior and accessibility', () => {
 		it( 'Captures the keypress event and does not let it propagate', async () => {
 			const user = userEvent.setup();

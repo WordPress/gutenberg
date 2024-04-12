@@ -1,5 +1,9 @@
+// Fixed height for the modal footer.
+// Ensures that the footer is always visible when the modal content is scrollable.
+$footer-height: 70px;
+
 .font-library-modal {
-	// @todo: If a new prop is added to the Modal component that constrains
+	// @todo If a new prop is added to the Modal component that constrains
 	// the content width, we should use that prop instead of this style.
 	// see https://github.com/WordPress/gutenberg/issues/54471.
 	&.font-library-modal {
@@ -15,6 +19,7 @@
 
 	.components-modal__content {
 		padding-top: 0;
+		margin-bottom: $footer-height;
 	}
 
 	.font-library-modal__subtitle {
@@ -40,6 +45,7 @@
 		position: absolute;
 		bottom: $grid-unit-40;
 		width: 100%;
+		height: $footer-height;
 		background-color: $white;
 	}
 }
@@ -125,13 +131,22 @@ button.font-library-modal__upload-area {
 	align-items: center;
 	margin-top: $grid-unit-80;
 
-	h3 {
-		font-size: 1.4rem;
+	p {
+		line-height: $default-line-height;
+	}
+
+	h2 {
+		font-size: 1.2rem;
+		font-weight: 400;
 	}
 
 	.components-card {
-		width: 50%;
-		min-width: 350px;
-		max-width: 400px;
+		padding: $grid-unit-20;
+		width: 400px;
+	}
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
 	}
 }

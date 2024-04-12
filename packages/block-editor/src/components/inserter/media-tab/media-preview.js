@@ -211,7 +211,7 @@ export function MediaPreview( { media, onClick, category } ) {
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
 						className={ classnames(
