@@ -14,11 +14,13 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import { Select } from './styles/select-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
 import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 
 const noop = () => {};
 
@@ -104,9 +106,20 @@ function UnforwardedSelectControl(
 				label={ label }
 				size={ size }
 				suffix={
-					suffix || ( ! multiple && <SelectControlChevronDown /> )
+					( suffix && (
+						<InputControlSuffixWrapper>
+							{ suffix }
+						</InputControlSuffixWrapper>
+					) ) ||
+					( ! multiple && <SelectControlChevronDown /> )
 				}
-				prefix={ prefix }
+				prefix={
+					prefix && (
+						<InputControlPrefixWrapper>
+							{ prefix }
+						</InputControlPrefixWrapper>
+					)
+				}
 				labelPosition={ labelPosition }
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 			>
