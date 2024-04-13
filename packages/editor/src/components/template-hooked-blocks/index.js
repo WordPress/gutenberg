@@ -6,7 +6,7 @@ import { PanelBody } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 
-function findAnchorBlocks( blocks ) {
+function findHookedBlocks( blocks ) {
 	let hookedBlocks = new Set();
 	blocks.forEach( ( block ) => {
 		if (
@@ -18,7 +18,7 @@ function findAnchorBlocks( blocks ) {
 			hookedBlocks = hookedBlocks.union( hookedBlocksForBlock );
 		}
 		hookedBlocks = hookedBlocks.union(
-			findAnchorBlocks( block.innerBlocks )
+			findHookedBlocks( block.innerBlocks )
 		);
 	} );
 	return hookedBlocks;
@@ -34,7 +34,7 @@ function TemplateHookedBlocks() {
 	} );
 
 	console.log( blocks );
-	console.log( findAnchorBlocks( blocks ) );
+	console.log( findHookedBlocks( blocks ) );
 
 	return (
 		<PanelBody title={ __( 'Blocks added' ) }>
