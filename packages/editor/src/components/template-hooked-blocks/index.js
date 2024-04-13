@@ -2,8 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	__experimentalHStack as HStack,
+	PanelBody,
+} from '@wordpress/components';
+import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
@@ -43,7 +46,12 @@ function TemplateHookedBlocks() {
 	return (
 		<PanelBody title={ __( 'Blocks added' ) }>
 			{ hookedBlocks.map( ( block ) => {
-				return <div key={ block.name }>{ block.title }</div>;
+				return (
+					<HStack justify="flex-start" key={ block.name }>
+						<BlockIcon icon={ block.icon } />
+						<span>{ block.title }</span>
+					</HStack>
+				);
 			} ) }
 		</PanelBody>
 	);
