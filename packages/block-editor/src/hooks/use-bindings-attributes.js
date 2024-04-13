@@ -112,6 +112,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
+				const keptAttributes = { ...nextAttributes };
 				registry.batch( () => {
 					const bindings = Object.fromEntries(
 						Object.entries(
@@ -146,12 +147,12 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 									value,
 									args: bindings[ attributeKey ].args,
 								} );
-								delete nextAttributes[ attributeKey ];
+								delete keptAttributes[ attributeKey ];
 							}
 						}
 					}
 
-					setAttributes( nextAttributes );
+					setAttributes( keptAttributes );
 				} );
 			},
 			[
