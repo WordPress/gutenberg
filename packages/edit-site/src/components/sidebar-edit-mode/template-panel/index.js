@@ -9,6 +9,7 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	TemplateHookedBlocks,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -139,6 +140,7 @@ export default function TemplatePanel() {
 			<PostDiscussionPanel />
 			<PageAttributesPanel />
 			<PatternOverridesPanel />
+			<TemplateHookedBlocks />
 		</>
 	);
 }

@@ -91,6 +91,7 @@ export {
 } from './post-visibility/label';
 export { default as PostVisibilityCheck } from './post-visibility/check';
 export { default as TableOfContents } from './table-of-contents';
+export { default as TemplateHookedBlocks } from './template-hooked-blocks';
 export { default as ThemeSupportCheck } from './theme-support-check';
 export { default as UnsavedChangesWarning } from './unsaved-changes-warning';
 export { default as WordCount } from './word-count';
