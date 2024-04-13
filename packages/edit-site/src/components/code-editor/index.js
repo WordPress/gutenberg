@@ -23,22 +23,34 @@ import { store as editSiteStore } from '../../store';
 
 export default function CodeEditor() {
 	const instanceId = useInstanceId( CodeEditor );
-	const { shortcut, content, blocks, type, id } = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
-		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const _type = getEditedPostType();
-		const _id = getEditedPostId();
-		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
+	const { shortcut, content, blocks, type, id, isRichEditingEnabled } =
+		useSelect( ( select ) => {
+			const { getEditedEntityRecord } = select( coreStore );
+			const { getEditedPostType, getEditedPostId } =
+				select( editSiteStore );
+			const { getEditorSettings } = select( editorStore );
+			const { getShortcutRepresentation } = select(
+				keyboardShortcutsStore
+			);
+			const _type = getEditedPostType();
+			const _id = getEditedPostId();
+			const editedRecord = getEditedEntityRecord(
+				'postType',
+				_type,
+				_id
+			);
 
-		return {
-			shortcut: getShortcutRepresentation( 'core/editor/toggle-mode' ),
-			content: editedRecord?.content,
-			blocks: editedRecord?.blocks,
-			type: _type,
-			id: _id,
-		};
-	}, [] );
+			return {
+				shortcut: getShortcutRepresentation(
+					'core/editor/toggle-mode'
+				),
+				content: editedRecord?.content,
+				blocks: editedRecord?.blocks,
+				type: _type,
+				id: _id,
+				isRichEditingEnabled: getEditorSettings().richEditingEnabled,
+			};
+		}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
 	// Replicates the logic found in getEditedPostContent().
 	const realContent = useMemo( () => {
@@ -56,16 +68,18 @@ export default function CodeEditor() {
 	const { switchEditorMode } = useDispatch( editorStore );
 	return (
 		<div className="edit-site-code-editor">
-			<div className="edit-site-code-editor__toolbar">
-				<h2>{ __( 'Editing code' ) }</h2>
-				<Button
-					variant="tertiary"
-					onClick={ () => switchEditorMode( 'visual' ) }
-					shortcut={ shortcut }
-				>
-					{ __( 'Exit code editor' ) }
-				</Button>
-			</div>
+			{ isRichEditingEnabled && (
+				<div className="edit-site-code-editor__toolbar">
+					<h2>{ __( 'Editing code' ) }</h2>
+					<Button
+						variant="tertiary"
+						onClick={ () => switchEditorMode( 'visual' ) }
+						shortcut={ shortcut }
+					>
+						{ __( 'Exit code editor' ) }
+					</Button>
+				</div>
+			) }
 			<div className="edit-site-code-editor__body">
 				<VisuallyHidden
 					as="label"

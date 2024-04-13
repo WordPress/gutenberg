@@ -151,7 +151,6 @@ export function useSpecificEditorSettings() {
 		return {
 			...settings,
 
-			richEditingEnabled: true,
 			supportsTemplateMode: true,
 			focusMode: canvasMode !== 'view',
 			defaultRenderingMode,
