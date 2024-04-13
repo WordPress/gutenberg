@@ -2819,7 +2819,7 @@ class WP_Theme_JSON_Gutenberg {
 			// Right and left padding are applied to the first container with `.has-global-padding` class.
 			$css .= '.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }';
 			// Nested containers with `.has-global-padding` class do not get padding.
-			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignwide, .alignfull)) { padding-right: 0; padding-left: 0; }';
+			$css .= '.has-global-padding :where(.has-global-padding:not(.wp-block-block, .alignfull)) { padding-right: 0; padding-left: 0; }';
 			// Alignfull children of the container with left and right padding have negative margins so they can still be full width.
 			$css .= '.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }';
 			// The above rule is negated for alignfull children of nested containers.
