@@ -25,20 +25,20 @@ function findHookedBlocks( blocks ) {
 }
 
 function TemplateHookedBlocks() {
-	const { blocks } = useSelect( ( select ) => {
+	const { hookedBlocks } = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
+		const blocks = getBlocks();
 
 		return {
-			blocks: getBlocks(),
+			hookedBlocks: findHookedBlocks( blocks ),
 		};
 	} );
 
-	console.log( blocks );
-	console.log( findHookedBlocks( blocks ) );
-
 	return (
 		<PanelBody title={ __( 'Blocks added' ) }>
-			<p>Template Hooked Blocks</p>
+			{ Array.from( hookedBlocks ).map( ( block ) => {
+				return <div key={ block }>{ block }</div>;
+			} ) }
 		</PanelBody>
 	);
 }
