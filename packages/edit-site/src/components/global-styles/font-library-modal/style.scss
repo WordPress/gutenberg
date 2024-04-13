@@ -45,7 +45,9 @@ $footer-height: 70px;
 		top: 0;
 		align-items: center;
 		justify-content: center;
-		padding-top: $header-height;
+		// Push down so that the progress bar is centered vertically.
+		// It should be 120px (72px modal header height + 48px tab height)
+		padding-top: $header-height + $grid-unit-15 + $grid-unit-60;
 	}
 
 	.font-library-modal__tabpanel-layout__footer {
