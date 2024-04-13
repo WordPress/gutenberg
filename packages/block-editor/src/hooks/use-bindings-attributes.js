@@ -100,7 +100,7 @@ const BindingConnector = ( {
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
 
-	const updateBoundAttibute = useCallback(
+	const updateBoundAttribute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
 			/*
 			 * If the attribute is a RichTextData instance,
@@ -134,7 +134,7 @@ const BindingConnector = ( {
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue, attrValue );
+			updateBoundAttribute( propValue, attrValue );
 		} else if ( placeholder ) {
 			/*
 			 * Placeholder fallback.
@@ -147,14 +147,14 @@ const BindingConnector = ( {
 				getBlockType( blockName ).attributes[ attrName ].attribute;
 
 			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
+				updateBoundAttribute( null );
 				return;
 			}
 
-			updateBoundAttibute( placeholder );
+			updateBoundAttribute( placeholder );
 		}
 	}, [
-		updateBoundAttibute,
+		updateBoundAttribute,
 		propValue,
 		attrValue,
 		placeholder,
