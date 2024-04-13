@@ -141,7 +141,7 @@ const BindingConnector = ( {
 	 * @param {string} current - The current attribute value.
 	 * @return {void}
 	 */
-	const updateBoundAttibute = useCallback(
+	const updateBoundAttribute = useCallback(
 		( next, current ) =>
 			onPropValueChange( {
 				[ attrName ]: castValue( next, current ),
@@ -164,7 +164,7 @@ const BindingConnector = ( {
 				prevPropValue.current = propValue;
 
 				if ( propValue !== rawAttrValue ) {
-					updateBoundAttibute( propValue, attrValue );
+					updateBoundAttribute( propValue, attrValue );
 					return; // close the sync cycle.
 				}
 			}
@@ -180,11 +180,11 @@ const BindingConnector = ( {
 				getBlockType( blockName ).attributes[ attrName ].attribute;
 
 			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
+				updateBoundAttribute( null );
 				return; // close the sync cycle.
 			}
 
-			updateBoundAttibute( placeholder );
+			updateBoundAttribute( placeholder );
 			return; // close the sync cycle.
 		}
 
@@ -198,7 +198,7 @@ const BindingConnector = ( {
 			updatePropValue( rawAttrValue );
 		}
 	}, [
-		updateBoundAttibute,
+		updateBoundAttribute,
 		propValue,
 		placeholder,
 		blockName,
