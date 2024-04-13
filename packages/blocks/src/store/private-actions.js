@@ -51,7 +51,8 @@ export function registerBlockBindingsSource( source ) {
 		type: 'REGISTER_BLOCK_BINDINGS_SOURCE',
 		sourceName: source.name,
 		sourceLabel: source.label,
-		useSource: source.useSource,
+		getValue: source.getValue,
+		setValue: source.setValue,
 		lockAttributesEditing: source.lockAttributesEditing,
 	};
 }

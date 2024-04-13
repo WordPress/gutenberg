@@ -4,9 +4,8 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -56,194 +55,121 @@ export function canBindAttribute( blockName, attributeName ) {
 	);
 }
 
-/**
- * This component is responsible for detecting and
- * propagating data changes from the source to the block.
- *
- * @param {Object}   props                   - The component props.
- * @param {string}   props.attrName          - The attribute name.
- * @param {Object}   props.blockProps        - The block props with bound attribute.
- * @param {Object}   props.source            - Source handler.
- * @param {Object}   props.args              - The arguments to pass to the source.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @return {null}                              Data-handling component. Render nothing.
- */
-const BindingConnector = ( {
-	args,
-	attrName,
-	blockProps,
-	source,
-	onPropValueChange,
-} ) => {
-	const {
-		placeholder,
-		value: propValue,
-		updateValue: updateValueFunction,
-	} = source.useSource( blockProps, args, attrName );
+export const withBlockBindingSupport = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		const registry = useRegistry();
 
-	const { name: blockName } = blockProps;
-	const attrValue = blockProps.attributes[ attrName ];
+		const boundAttributes = useSelect(
+			( select ) => {
+				const bindings = Object.fromEntries(
+					Object.entries(
+						props.attributes.metadata?.bindings || {}
+					).filter( ( [ attrName ] ) =>
+						canBindAttribute( props.name, attrName )
+					)
+				);
 
-	const updateBoundAttribute = useCallback(
-		( newAttrValue, prevAttrValue ) => {
-			/*
-			 * If the attribute is a RichTextData instance,
-			 * (core/paragraph, core/heading, core/button, etc.)
-			 * compare its HTML representation with the new value.
-			 *
-			 * To do: it looks like a workaround.
-			 * Consider improving the attribute and metadata fields types.
-			 */
-			if ( prevAttrValue instanceof RichTextData ) {
-				// Bail early if the Rich Text value is the same.
-				if ( prevAttrValue.toHTMLString() === newAttrValue ) {
+				if ( ! Object.keys( bindings ).length > 0 ) {
 					return;
 				}
 
-				/*
-				 * To preserve the value type,
-				 * convert the new value to a RichTextData instance.
-				 */
-				newAttrValue = RichTextData.fromHTMLString( newAttrValue );
-			}
+				const blockBindingsSources = unlock(
+					select( blocksStore )
+				).getAllBlockBindingsSources();
 
-			if ( prevAttrValue === newAttrValue ) {
-				return;
-			}
+				return Object.entries( bindings ).reduce(
+					( accu, [ attrName, boundAttribute ] ) => {
+						// Bail early if the block doesn't have a valid source handler.
+						const source =
+							blockBindingsSources[ boundAttribute.source ];
 
-			onPropValueChange( {
-				[ attrName ]: { newAttrValue, updateValueFunction },
-			} );
-		},
-		[ attrName, onPropValueChange, updateValueFunction ]
-	);
+						if ( ! source?.getValue ) {
+							return accu;
+						}
 
-	useLayoutEffect( () => {
-		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttribute( propValue, attrValue );
-		} else if ( placeholder ) {
-			updateBoundAttribute( placeholder );
-		}
-	}, [ propValue, attrValue, placeholder, blockName, attrName ] );
-
-	return null;
-};
-
-/**
- * BlockBindingBridge acts like a component wrapper
- * that connects the bound attributes of a block
- * to the source handlers.
- * For this, it creates a BindingConnector for each bound attribute.
- *
- * @param {Object}   props                   - The component props.
- * @param {Object}   props.blockProps        - The BlockEdit props object.
- * @param {Object}   props.bindings          - The block bindings settings.
- * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
- * @return {null}                              Data-handling component. Render nothing.
- */
-function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
-	const blockBindingsSources = unlock(
-		useSelect( blocksStore )
-	).getAllBlockBindingsSources();
-
-	return (
-		<>
-			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ] ) => {
-					// Bail early if the block doesn't have a valid source handler.
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return null;
-					}
-
-					return (
-						<BindingConnector
-							key={ attrName }
-							attrName={ attrName }
-							source={ source }
-							blockProps={ blockProps }
-							args={ boundAttribute.args }
-							onPropValueChange={ onPropValueChange }
-						/>
-					);
-				}
-			) }
-		</>
-	);
-}
-
-const withBlockBindingSupport = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => {
-		const { setAttributes } = props;
-		/*
-		 * Collect and update the bound attributes
-		 * in a separate state.
-		 */
-		const [ boundAttributes, setBoundAttributes ] = useState( {} );
-		const [ updateFunctions, setUpdateFunctions ] = useState( {} );
-		const updateBoundAttributes = useCallback( ( newAttributes ) => {
-			for ( const [ attributeName, object ] of Object.entries(
-				newAttributes
-			) ) {
-				const { newAttrValue, updateValueFunction } = object;
-				setBoundAttributes( ( prev ) => ( {
-					...prev,
-					[ attributeName ]: newAttrValue,
-				} ) );
-				if ( updateValueFunction )
-					setUpdateFunctions( ( prev ) => ( {
-						...prev,
-						[ attributeName ]: updateValueFunction,
-					} ) );
-			}
-		}, [] );
-
-		const updatedSetAttributes = useCallback(
-			( nextAttributes ) => {
-				for ( const [ attribute, value ] of Object.entries(
-					nextAttributes
-				) ) {
-					if ( attribute in updateFunctions ) {
-						updateFunctions[ attribute ]( value, nextAttributes );
-					} else {
-						setAttributes( nextAttributes );
-					}
-				}
+						accu[ attrName ] = source.getValue( {
+							registry,
+							context: props.context,
+							clientId: props.clientId,
+							attributeName: attrName,
+							args: boundAttribute.args,
+						} );
+						return accu;
+					},
+					{}
+				);
 			},
-			[ updateFunctions ]
+			[
+				props.attributes.metadata?.bindings,
+				props.name,
+				props.context,
+				props.clientId,
+				registry,
+			]
 		);
 
-		const registry = useRegistry();
+		const { setAttributes } = props;
 
-		/*
-		 * Create binding object filtering
-		 * only the attributes that can be bound.
-		 */
-		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
-				( [ attrName ] ) => canBindAttribute( props.name, attrName )
-			)
+		const _setAttributes = useCallback(
+			( nextAttributes ) => {
+				registry.batch( () => {
+					const bindings = Object.fromEntries(
+						Object.entries(
+							props.attributes.metadata?.bindings || {}
+						).filter( ( [ attrName ] ) =>
+							canBindAttribute( props.name, attrName )
+						)
+					);
+
+					if ( ! Object.keys( bindings ).length > 0 ) {
+						return setAttributes( nextAttributes );
+					}
+
+					const blockBindingsSources = unlock(
+						registry.select( blocksStore )
+					).getAllBlockBindingsSources();
+
+					for ( const [ attributeKey, value ] of Object.entries(
+						nextAttributes
+					) ) {
+						if ( bindings[ attributeKey ] ) {
+							const source =
+								blockBindingsSources[
+									bindings[ attributeKey ].source
+								];
+							if ( source?.setValue ) {
+								source.setValue( {
+									registry,
+									context: props.context,
+									clientId: props.clientId,
+									attributeName: attributeKey,
+									value,
+									args: bindings[ attributeKey ].args,
+								} );
+								delete nextAttributes[ attributeKey ];
+							}
+						}
+					}
+
+					setAttributes( nextAttributes );
+				} );
+			},
+			[
+				registry,
+				props.attributes.metadata?.bindings,
+				props.name,
+				props.context,
+				props.clientId,
+				setAttributes,
+			]
 		);
 
 		return (
 			<>
-				{ Object.keys( bindings ).length > 0 && (
-					<BlockBindingBridge
-						blockProps={ props }
-						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
-					/>
-				) }
-
 				<BlockEdit
 					{ ...props }
 					attributes={ { ...props.attributes, ...boundAttributes } }
-					setAttributes={ ( newAttributes ) => {
-						registry.batch( () => {
-							updatedSetAttributes( newAttributes );
-						} );
-					} }
+					setAttributes={ _setAttributes }
 				/>
 			</>
 		);
