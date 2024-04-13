@@ -27,10 +27,9 @@ function findHookedBlocks( blocks ) {
 function TemplateHookedBlocks() {
 	const { hookedBlocks } = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
-		const blocks = getBlocks();
 
 		return {
-			hookedBlocks: findHookedBlocks( blocks ),
+			hookedBlocks: findHookedBlocks( getBlocks() ),
 		};
 	} );
 
