@@ -57,16 +57,3 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
-
-register_meta(
-	'post',
-	'post_text_custom_field',
-	array(
-		'object_subtype' => 'post',
-		'show_in_rest' => true,
-		'single'       => true,
-		'type'         => 'string',
-		'default'	   => 'Post field value',
-		'revisions_enabled' => true
-	)
-);
