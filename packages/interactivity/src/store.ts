@@ -349,63 +349,28 @@ export const populateInitialData = ( data?: {
 const data = parseInitialData();
 populateInitialData( data );
 
-function createFilteredReplacer( object ) {
-	const propertiesWithGettersSetters = {};
-
-	// Loop over each property to find getters or setters
-	for ( const key of Object.keys( object ) ) {
-		const descriptor = Object.getOwnPropertyDescriptor( object, key );
-		if ( descriptor.get || descriptor.set ) {
-			propertiesWithGettersSetters[ key ] = true;
+const deepClone = ( source: any ) => {
+	const clone = {};
+	for ( const key in source ) {
+		const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
+		if ( typeof getter === 'function' ) {
+			continue;
+		} else if ( isObject( source[ key ] ) ) {
+			clone[ key ] = deepClone( source[ key ] );
+		} else {
+			clone[ key ] = source[ key ];
 		}
 	}
-
-	// Return a replacer function that checks against this list
-	return function ( key, value ) {
-		if ( propertiesWithGettersSetters[ key ] ) {
-			// Replace getter/setter with undefined or any custom value
-			return undefined;
-		}
-		// Pass other values through
-		return value;
-	};
-}
-
-function replacer( key, value ) {
-	// Determine the type of the value
-	const type = typeof value;
-
-	// Handle arrays explicitly to keep them in the output
-	if ( Array.isArray( value ) ) {
-		return value;
-	}
-
-	// Check for objects, ignore null, functions, and others
-	if ( type === 'object' && value !== null ) {
-		// Skip getters and setters (functions within objects)
-		const plainObject = {};
-		for ( const [ k, v ] of Object.entries( value ) ) {
-			if ( ! Object.getOwnPropertyDescriptor( value, k ).get ) {
-				plainObject[ k ] = v;
-			}
-		}
-		return plainObject;
-	}
-
-	// Allow only strings and numbers, ignore functions and symbols
-	if ( type === 'string' || type === 'number' ) {
-		return value;
-	}
-
-	// Ignore functions, symbols, undefined
-	return undefined;
-}
+	return clone;
+};
 
 // Serialize the current store.
 export const serializeStore = () => {
 	const stateData = { state: {} };
 	for ( const [ namespace, value ] of stores.entries() ) {
-		stateData.state[ namespace ] = JSON.stringify( value.state, replacer );
+		stateData.state[ namespace ] = JSON.stringify(
+			deepClone( value.state )
+		);
 	}
 
 	return JSON.stringify( stateData );
