@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 
 function findHookedBlocks( blocks ) {
@@ -27,16 +28,22 @@ function findHookedBlocks( blocks ) {
 function TemplateHookedBlocks() {
 	const { hookedBlocks } = useSelect( ( select ) => {
 		const { getBlocks } = select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+
+		const hookedBlockNames = Array.from( findHookedBlocks( getBlocks() ) );
+		const _hookedBlocks = hookedBlockNames.map( ( blockName ) =>
+			getBlockType( blockName )
+		);
 
 		return {
-			hookedBlocks: findHookedBlocks( getBlocks() ),
+			hookedBlocks: _hookedBlocks,
 		};
 	} );
 
 	return (
 		<PanelBody title={ __( 'Blocks added' ) }>
-			{ Array.from( hookedBlocks ).map( ( block ) => {
-				return <div key={ block }>{ block }</div>;
+			{ hookedBlocks.map( ( block ) => {
+				return <div key={ block.name }>{ block.title }</div>;
 			} ) }
 		</PanelBody>
 	);
