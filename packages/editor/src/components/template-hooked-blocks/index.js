@@ -12,11 +12,8 @@ function findAnchorBlocks( blocks ) {
 		if (
 			Array.isArray( block.attributes?.metadata?.ignoredHookedBlocks )
 		) {
-			block.attributes.metadata.ignoredHookedBlocks.forEach(
-				( hookedBlock ) => {
-					hookedBlocks.add( hookedBlock );
-				}
-			);
+			const hookedBlocksForBlock = new Set( block.attributes.metadata.ignoredHookedBlocks );
+			hookedBlocks = hookedBlocks.union( hookedBlocksForBlock );
 		}
 		hookedBlocks = hookedBlocks.union(
 			findAnchorBlocks( block.innerBlocks )
