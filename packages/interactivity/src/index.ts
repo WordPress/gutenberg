@@ -64,28 +64,16 @@ if (
 	document.prerendering
 ) {
 	document.addEventListener( 'prerenderingchange', () => {
-		const token = window.sessionStorage.getItem( 'interactivity-token' );
-		const bc = new BroadcastChannel( token );
-		bc.addEventListener( 'message', ( event ) => {
-			// First, populate the state from the previous page.
-			populateInitialData( JSON.parse( event.data ) );
-			// Then, overwrite it with the state from the new HTML.
-			const data = parseInitialData();
-			populateInitialData( data );
-		} );
-		bc.postMessage( 'state_request' );
+		const store = window.sessionStorage.getItem(
+			'interactivity-api-store'
+		);
+		populateInitialData( JSON.parse( store ) );
 	} );
 } else {
-	// Create a unique token for this session.
-	// eslint-disable-next-line no-restricted-syntax
-	const token = Math.random().toString( 36 ).slice( 2 );
-	window.sessionStorage.setItem( 'interactivity-token', token );
-
-	// Now, listen to the message event that
-	const bc = new BroadcastChannel( token );
-	bc.addEventListener( 'message', ( event ) => {
-		if ( event.data === 'state_request' ) {
-			bc.postMessage( serializeStore() );
-		}
+	window.addEventListener( 'beforeunload', () => {
+		window.sessionStorage.setItem(
+			'interactivity-api-store',
+			serializeStore()
+		);
 	} );
 }
