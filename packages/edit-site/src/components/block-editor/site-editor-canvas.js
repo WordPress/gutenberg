@@ -91,7 +91,12 @@ export default function SiteEditorCanvas( { onClick } ) {
 								settings={ settings }
 								onClick={ onClick }
 							>
-								{ resizeObserver }
+								{
+									// Avoid resize listeners when not needed,
+									// these will trigger unnecessary re-renders
+									// when animating the iframe width.
+									enableResizing && resizeObserver
+								}
 							</EditorCanvas>
 						</ResizableEditor>
 					</div>

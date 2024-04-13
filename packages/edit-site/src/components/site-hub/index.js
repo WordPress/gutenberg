@@ -156,25 +156,32 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 							<div className="edit-site-site-hub__title">
 								{ decodeEntities( siteTitle ) }
 							</div>
+							<HStack
+								spacing={ 0 }
+								expanded={ false }
+								className="edit-site-site-hub__actions"
+							>
+								<Button
+									href={ homeUrl }
+									target="_blank"
+									label={ __(
+										'View site (opens in a new tab)'
+									) }
+									aria-label={ __(
+										'View site (opens in a new tab)'
+									) }
+									icon={ external }
+									className="edit-site-site-hub__site-view-link"
+								/>
 
-							<Button
-								href={ homeUrl }
-								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
-								aria-label={ __(
-									'View site (opens in a new tab)'
-								) }
-								icon={ external }
-								className="edit-site-site-hub__site-view-link"
-							/>
-
-							<Button
-								className="edit-site-site-hub_toggle-command-center"
-								icon={ search }
-								onClick={ () => openCommandCenter() }
-								label={ __( 'Open command palette' ) }
-								shortcut={ displayShortcut.primary( 'k' ) }
-							/>
+								<Button
+									className="edit-site-site-hub_toggle-command-center"
+									icon={ search }
+									onClick={ () => openCommandCenter() }
+									label={ __( 'Open command palette' ) }
+									shortcut={ displayShortcut.primary( 'k' ) }
+								/>
+							</HStack>
 						</HStack>
 					) }
 				</AnimatePresence>

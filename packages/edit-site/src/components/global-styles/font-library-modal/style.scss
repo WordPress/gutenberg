@@ -1,3 +1,7 @@
+// Fixed height for the modal footer.
+// Ensures that the footer is always visible when the modal content is scrollable.
+$footer-height: 70px;
+
 .font-library-modal {
 	// @todo If a new prop is added to the Modal component that constrains
 	// the content width, we should use that prop instead of this style.
@@ -15,6 +19,7 @@
 
 	.components-modal__content {
 		padding-top: 0;
+		margin-bottom: $footer-height;
 	}
 
 	.font-library-modal__subtitle {
@@ -40,6 +45,7 @@
 		position: absolute;
 		bottom: $grid-unit-40;
 		width: 100%;
+		height: $footer-height;
 		background-color: $white;
 	}
 }

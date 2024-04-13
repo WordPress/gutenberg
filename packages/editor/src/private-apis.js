@@ -16,6 +16,7 @@ import PostPanelRow from './components/post-panel-row';
 import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
+import PostActions from './components/post-actions';
 import { usePostActions } from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
 
@@ -30,6 +31,7 @@ lock( privateApis, {
 	ModeSwitcher,
 	PatternOverridesPanel,
 	PluginPostExcerpt,
+	PostActions,
 	PostPanelRow,
 	PostViewLink,
 	PreviewDropdown,
