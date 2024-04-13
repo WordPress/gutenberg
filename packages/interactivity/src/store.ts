@@ -343,6 +343,18 @@ export const populateInitialData = ( data?: {
 	}
 };
 
+// Get the parent state from the referent page.
+
 // Parse and populate the initial state and config.
 const data = parseInitialData();
 populateInitialData( data );
+
+// Serialize the current store.
+export const serializeStore = () => {
+	const stateData = { state: {} };
+	for ( const [ namespace, value ] of stores.entries() ) {
+		stateData.state[ namespace ] = JSON.stringify( value.state );
+	}
+
+	return JSON.stringify( stateData );
+};
