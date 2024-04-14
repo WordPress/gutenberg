@@ -89,7 +89,7 @@ function remove( object ) {
 
 function createElementHTML( { type, attributes, object, children } ) {
 	if ( type === '#comment' ) {
-		return `<!--${ attributes[ 'data-rich-text-comment' ] }-->`;
+		return `</${ attributes[ 'data-rich-text-comment' ] }>`;
 	}
 
 	let attributeString = '';

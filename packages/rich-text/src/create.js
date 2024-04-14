@@ -145,10 +145,7 @@ export class RichTextData {
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
 	toHTMLString( { preserveWhiteSpace } = {} ) {
-		return (
-			this.originalHTML ||
-			toHTMLString( { value: this.#value, preserveWhiteSpace } )
-		);
+		return toHTMLString( { value: this.#value, preserveWhiteSpace } );
 	}
 	valueOf() {
 		return this.toHTMLString();
