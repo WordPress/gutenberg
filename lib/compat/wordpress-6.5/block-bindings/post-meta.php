@@ -18,10 +18,12 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 		return null;
 	}
 
-	if ( empty( $block_instance->context['postId'] ) ) {
+	global $post;
+	$post_id = $post->ID;
+	if ( empty( $post_id ) ) {
 		return null;
 	}
-	$post_id = $block_instance->context['postId'];
+
 	// If a post isn't public, we need to prevent unauthorized users from accessing the post meta.
 	$post = get_post( $post_id );
 	if ( ( ! is_post_publicly_viewable( $post ) && ! current_user_can( 'read_post', $post_id ) ) || post_password_required( $post ) ) {
@@ -34,7 +36,7 @@ function gutenberg_block_bindings_post_meta_callback( $source_attrs, $block_inst
 	}
 
 	// Check if the meta field is registered to be shown in REST.
-	$meta_keys = get_registered_meta_keys( 'post', $block_instance->context['postType'] );
+	$meta_keys = get_registered_meta_keys( 'post', $post->post_type );
 	// Add fields registered for all subtypes.
 	$meta_keys = array_merge( $meta_keys, get_registered_meta_keys( 'post', '' ) );
 	if ( empty( $meta_keys[ $source_attrs['key'] ]['show_in_rest'] ) ) {
@@ -57,7 +59,6 @@ function gutenberg_register_block_bindings_post_meta_source() {
 		array(
 			'label'              => _x( 'Post Meta', 'block bindings source' ),
 			'get_value_callback' => 'gutenberg_block_bindings_post_meta_callback',
-			'uses_context'       => array( 'postId', 'postType' ),
 		)
 	);
 }

@@ -4,6 +4,9 @@
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
+import { useContext } from '@wordpress/element';
+import { BlockContext } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
@@ -13,8 +16,8 @@ export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
 	useSource( props, sourceAttributes ) {
+		const context = useContext( BlockContext );
 		const { getCurrentPostType } = useSelect( editorStore );
-		const { context } = props;
 		const { key: metaKey } = sourceAttributes;
 		const postType = context.postType
 			? context.postType
