@@ -139,7 +139,8 @@ export const backgroundPositionToCoords = ( value ) => {
 };
 
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel = label || getFilename( imgUrl ) || __( 'Add image' );
+	const imgLabel =
+		label || getFilename( imgUrl ) || __( 'Add background image' );
 
 	return (
 		<ItemGroup as="span">
