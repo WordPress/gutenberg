@@ -57,6 +57,12 @@
 @import "./post-content/editor.scss";
 @import "./editor-elements.scss";
 
+:root .editor-styles-wrapper {
+	@include background-colors-deprecated();
+	@include foreground-colors-deprecated();
+	@include gradient-colors-deprecated();
+}
+
 // Font sizes (not used now, kept because of backward compatibility).
 //
 // The reason we add the editor class wrapper here is
