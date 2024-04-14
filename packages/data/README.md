@@ -859,7 +859,7 @@ _Returns_
 
 ### useSuspenseSelect
 
-A variant of the `useSelect` hook that has the same API, but will throw a suspense Promise if any of the called selectors is in an unresolved state.
+A variant of the `useSelect` hook that has the same API, but is a compatible Suspense-enabled data source.
 
 _Parameters_
 

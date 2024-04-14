@@ -20,6 +20,9 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 const renderQueue = createQueue();
 
 /**
+ * @typedef {import('react').SuspensePromiseError} SuspensePromiseError
+ */
+/**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../../types').AnyConfig} C
  */
@@ -319,8 +322,8 @@ export default function useSelect( mapSelect, deps ) {
 }
 
 /**
- * A variant of the `useSelect` hook that has the same API, but will throw a
- * suspense Promise if any of the called selectors is in an unresolved state.
+ * A variant of the `useSelect` hook that has the same API, but is a compatible
+ * Suspense-enabled data source.
  *
  * @template {MapSelect} T
  * @param {T}     mapSelect Function called on every state change. The
@@ -331,6 +334,9 @@ export default function useSelect( mapSelect, deps ) {
  * @param {Array} deps      A dependency array used to memoize the `mapSelect`
  *                          so that the same `mapSelect` is invoked on every
  *                          state change unless the dependencies change.
+ *
+ * @throws {Promise} A suspense Promise that is thrown if any of the called
+ * selectors is in an unresolved state.
  *
  * @return {ReturnType<T>} Data object returned by the `mapSelect` function.
  */
