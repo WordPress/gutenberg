@@ -20,9 +20,6 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 const renderQueue = createQueue();
 
 /**
- * @typedef {import('react').SuspensePromiseError} SuspensePromiseError
- */
-/**
  * @typedef {import('../../types').StoreDescriptor<C>} StoreDescriptor
  * @template {import('../../types').AnyConfig} C
  */
