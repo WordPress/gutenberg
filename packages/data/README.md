@@ -863,12 +863,12 @@ A variant of the `useSelect` hook that has the same API, but will throw a suspen
 
 _Parameters_
 
--   _mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
 -   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Object`: Data object returned by the `mapSelect` function.
+-   `ReturnType<T>`: Data object returned by the `mapSelect` function.
 
 ### withDispatch
 
