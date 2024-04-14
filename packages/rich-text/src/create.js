@@ -469,6 +469,34 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
+		if (
+			node.nodeType === node.COMMENT_NODE ||
+			( node.nodeType === node.ELEMENT_NODE &&
+				node.tagName === 'SPAN' &&
+				node.hasAttribute( 'data-rich-text-comment' ) )
+		) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type: '#comment',
+						attributes: {
+							'data-rich-text-comment':
+								node.nodeType === node.COMMENT_NODE
+									? node.nodeValue
+									: node.getAttribute(
+											'data-rich-text-comment'
+									  ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
+			continue;
+		}
+
 		if ( node.nodeType !== node.ELEMENT_NODE ) {
 			continue;
 		}

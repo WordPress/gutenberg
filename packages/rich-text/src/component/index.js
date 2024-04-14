@@ -38,6 +38,7 @@ export function useRichText( {
 	const registry = useRegistry();
 	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
+	const replacementRefs = useRef( [] );
 
 	function createRecord() {
 		const {
@@ -62,6 +63,15 @@ export function useRichText( {
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
+
+		ref.current
+			.querySelectorAll( '[data-rich-text-comment]' )
+			.forEach( ( node, i ) => {
+				if ( replacementRefs.current[ i ] !== node ) {
+					replacementRefs.current[ i ] = node;
+					forceRender();
+				}
+			} );
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
@@ -218,6 +228,7 @@ export function useRichText( {
 		getValue: () => record.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		replacementRefs: replacementRefs.current,
 	};
 }
 

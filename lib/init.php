@@ -57,3 +57,15 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
+
+register_meta(
+	'post',
+	'isbn',
+	array(
+		'object_subtype' => 'post',
+		'show_in_rest' => true,
+		'single'       => true,
+		'type'         => 'string',
+		'revisions_enabled' => true
+	)
+);
