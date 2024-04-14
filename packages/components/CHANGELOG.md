@@ -19,6 +19,10 @@
 
 -   `Tabs`: Fallback to first enabled tab if no active tab id ([#60681](https://github.com/WordPress/gutenberg/pull/60681)).
 
+### Internal
+
+-   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
+
 ## 27.3.0 (2024-04-03)
 
 ### Bug Fix
