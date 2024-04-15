@@ -1,5 +1,4 @@
 .wp-block-cover {
-
 	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
 	.editor-styles-wrapper & {
 		box-sizing: border-box;
@@ -74,6 +73,7 @@
 		bottom: 0;
 		left: 0;
 	}
+
 }
 
 [data-align="left"] > .wp-block-cover,

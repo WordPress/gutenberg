@@ -482,17 +482,15 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
-			setTemporaryURL( media?.url );
+			setTemporaryURL( media.url );
 			setLogo( undefined );
 			return;
 		}
 
-		setTemporaryURL( media?.url );
 		setLogo( media.id, shouldForceSync );
 	};
 
 	const onRemoveLogo = () => {
-		setTemporaryURL();
 		setLogo( null );
 		setAttributes( { width: undefined } );
 	};
@@ -509,7 +507,7 @@ export default function LogoEdit( {
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
-					setTemporaryURL( image?.url );
+					setTemporaryURL( image.url );
 					return;
 				}
 				onInitialSelectLogo( image );

@@ -187,10 +187,10 @@ export default function PostFeaturedImageEdit( {
 
 	// Reset temporary url when media is available.
 	useEffect( () => {
-		if ( media && temporaryURL ) {
+		if ( mediaUrl && temporaryURL ) {
 			setTemporaryURL();
 		}
-	}, [ media, temporaryURL ] );
+	}, [ mediaUrl, temporaryURL ] );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
