@@ -1,33 +1,17 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	BlockToolbar,
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	PostSavedState,
 	PostPreviewButton,
 	store as editorStore,
-	DocumentBar,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
+import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	Button,
-	__unstableMotion as motion,
-	Popover,
-} from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -37,10 +21,10 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
+import ContextualToolbar from './contextual-toolbar';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
@@ -55,72 +39,6 @@ const slideX = {
 	distractionFreeInactive: { x: 0 },
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
-
-function TopToolbar( { blockSelectionStart, hasHistory } ) {
-	const blockToolbarRef = useRef();
-	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
-		useState( true );
-
-	// TODO: Change this to "isBlockToolbarVisible" or similar
-	const hasBlockToolbar = useHasBlockToolbar();
-	const hasBlockSelection = !! blockSelectionStart;
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ blockSelectionStart ] );
-
-	return (
-		<>
-			{ hasBlockToolbar && (
-				<>
-					<div
-						className={ classnames(
-							'selected-block-tools-wrapper',
-							{
-								'is-collapsed':
-									isBlockToolsCollapsed ||
-									! hasBlockSelection,
-							}
-						) }
-					>
-						<BlockToolbar hideDragHandle />
-					</div>
-					<Popover.Slot
-						ref={ blockToolbarRef }
-						name="block-toolbar"
-					/>
-					<Button
-						className="edit-post-header__block-tools-toggle"
-						icon={ isBlockToolsCollapsed ? next : previous }
-						onClick={ () => {
-							setIsBlockToolsCollapsed(
-								( collapsed ) => ! collapsed
-							);
-						} }
-						label={
-							isBlockToolsCollapsed
-								? __( 'Show block tools' )
-								: __( 'Hide block tools' )
-						}
-						size="compact"
-					/>
-				</>
-			) }
-			{ hasHistory && (
-				<div
-					className={ classnames( 'edit-post-header__center', {
-						'is-collapsed': ! isBlockToolsCollapsed,
-					} ) }
-				>
-					<DocumentBar />
-				</div>
-			) }
-		</>
-	);
-}
 
 function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
@@ -174,7 +92,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<TopToolbar
+					<ContextualToolbar
 						blockSelectionStart={ blockSelectionStart }
 						hasHistory={ hasHistory }
 					/>
