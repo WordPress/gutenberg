@@ -40,15 +40,13 @@ export default function useLayoutAreas() {
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
 
-	// Regular page
+	// Page list
 	if ( path === '/page' ) {
 		const isListLayout = layout === 'list' || ! layout;
 		return {
 			key: 'pages-list',
 			areas: {
-				sidebar: postId ? (
-					<SidebarNavigationScreenPage />
-				) : (
+				sidebar: (
 					<SidebarNavigationScreen
 						title={ __( 'Manage pages' ) }
 						content={ <DataViewsSidebarContent /> }
@@ -60,7 +58,6 @@ export default function useLayoutAreas() {
 						isLoading={ isSiteEditorLoading }
 						onClick={ () =>
 							history.push( {
-								path,
 								postType: 'page',
 								postId,
 								canvas: 'edit',
@@ -88,6 +85,8 @@ export default function useLayoutAreas() {
 			sidebar = <SidebarNavigationScreenPattern />;
 		} else if ( postType === 'wp_template' ) {
 			sidebar = <SidebarNavigationScreenTemplate />;
+		} else if ( postType === 'page' ) {
+			sidebar = <SidebarNavigationScreenPage />;
 		} else {
 			sidebar = <SidebarNavigationScreenNavigationMenu />;
 		}

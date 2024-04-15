@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { getQueryArgs } from '@wordpress/url';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -19,11 +19,14 @@ import { unlock } from '../../lock-unlock';
 import TemplateActions from '../template-actions';
 import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+
 export default function SidebarNavigationScreenPattern() {
-	const navigator = useNavigator();
+	const history = useHistory();
+	const location = useLocation();
 	const {
 		params: { postType, postId },
-	} = navigator;
+	} = location;
 	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
@@ -36,8 +39,8 @@ export default function SidebarNavigationScreenPattern() {
 	// page and the back button should return them to that list page.
 	const backPath =
 		! categoryType && postType === TEMPLATE_PART_POST_TYPE
-			? '/wp_template_part/all'
-			: '/patterns';
+			? { path: '/wp_template_part/all' }
+			: { path: '/patterns' };
 
 	return (
 		<SidebarNavigationScreen
@@ -48,7 +51,7 @@ export default function SidebarNavigationScreenPattern() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( backPath );
+							history.push( backPath );
 						} }
 					/>
 					<SidebarButton

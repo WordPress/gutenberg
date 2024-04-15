@@ -2,24 +2,25 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import { postType } from '.';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 function useDeleteNavigationMenu() {
-	const { goTo } = useNavigator();
-
 	const { deleteEntityRecord } = useDispatch( coreStore );
-
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	const history = useHistory();
 
 	const handleDelete = async ( navigationMenu ) => {
 		const postId = navigationMenu?.id;
@@ -41,7 +42,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			goTo( '/navigation' );
+			history.push( { path: '/navigation' } );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
@@ -132,8 +133,7 @@ function useSaveNavigationMenu() {
 }
 
 function useDuplicateNavigationMenu() {
-	const { goTo } = useNavigator();
-
+	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
 
 	const { createSuccessNotice, createErrorNotice } =
@@ -165,7 +165,7 @@ function useDuplicateNavigationMenu() {
 				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
 					type: 'snackbar',
 				} );
-				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
+				history.push( { postType, postId: savedRecord.id } );
 			}
 		} catch ( error ) {
 			createErrorNotice(

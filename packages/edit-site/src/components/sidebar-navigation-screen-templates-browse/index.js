@@ -30,7 +30,7 @@ const config = {
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
-		backPath: '/patterns',
+		backPath: { path: '/patterns' },
 		contentTitle: __( 'All template parts' ),
 	},
 };
