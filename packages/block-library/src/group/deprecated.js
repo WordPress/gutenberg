@@ -42,6 +42,139 @@ const migrateAttributes = ( attributes ) => {
 };
 
 const deprecated = [
+	// Version with preset gradient color and background image.
+	// If there is a background image and gradient preset, remove the gradient classname.
+	{
+		attributes: {
+			tagName: {
+				type: 'string',
+				default: 'div',
+			},
+			templateLock: {
+				type: [ 'string', 'boolean' ],
+				enum: [ 'all', 'insert', 'contentOnly', false ],
+			},
+			allowedBlocks: {
+				type: 'array',
+			},
+		},
+		supports: {
+			__experimentalOnEnter: true,
+			__experimentalOnMerge: true,
+			__experimentalSettings: true,
+			align: [ 'wide', 'full' ],
+			anchor: true,
+			ariaLabel: true,
+			html: false,
+			background: {
+				backgroundImage: true,
+				backgroundSize: true,
+				__experimentalDefaultControls: {
+					backgroundImage: true,
+				},
+			},
+			color: {
+				gradients: true,
+				heading: true,
+				button: true,
+				link: true,
+				__experimentalDefaultControls: {
+					background: true,
+					text: true,
+				},
+			},
+			spacing: {
+				margin: [ 'top', 'bottom' ],
+				padding: true,
+				blockGap: true,
+				__experimentalDefaultControls: {
+					padding: true,
+					blockGap: true,
+				},
+			},
+			dimensions: {
+				minHeight: true,
+			},
+			__experimentalBorder: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+				__experimentalDefaultControls: {
+					color: true,
+					radius: true,
+					style: true,
+					width: true,
+				},
+			},
+			position: {
+				sticky: true,
+			},
+			typography: {
+				fontSize: true,
+				lineHeight: true,
+				__experimentalFontFamily: true,
+				__experimentalFontWeight: true,
+				__experimentalFontStyle: true,
+				__experimentalTextTransform: true,
+				__experimentalTextDecoration: true,
+				__experimentalLetterSpacing: true,
+				__experimentalDefaultControls: {
+					fontSize: true,
+				},
+			},
+			layout: {
+				allowSizingOnChildren: true,
+			},
+			interactivity: {
+				clientNavigation: true,
+			},
+		},
+		save( { attributes: { tagName: Tag } } ) {
+			return (
+				<Tag { ...useInnerBlocksProps.save( useBlockProps.save() ) } />
+			);
+		},
+		isEligible( { gradient, style } ) {
+			return (
+				gradient &&
+				( typeof style?.background?.backgroundImage === 'string' ||
+					typeof style?.background?.backgroundImage?.url ===
+						'string' )
+			);
+		},
+		migrate( attributes ) {
+			const { style = null, gradient } = attributes;
+
+			const hasBackgroundImage =
+				typeof style?.background?.backgroundImage === 'string' ||
+				typeof style?.background?.backgroundImage?.url === 'string';
+
+			if ( hasBackgroundImage && gradient ) {
+				let newClassName = attributes?.className;
+				if ( newClassName ) {
+					const regex = new RegExp(
+						`has-${ gradient }-gradient-background[\\s]?`,
+						'g'
+					);
+					newClassName = newClassName.replace( regex, '' ).trim();
+				}
+				return {
+					...attributes,
+					className: newClassName ? newClassName : undefined,
+					style: {
+						...style,
+						color: {
+							...style.color,
+							gradient: `var(--wp--preset--gradient--${ gradient })`,
+						},
+					},
+					gradient: null,
+				};
+			}
+			return attributes;
+		},
+	},
 	// Version with default layout.
 	{
 		attributes: {

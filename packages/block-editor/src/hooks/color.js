@@ -159,9 +159,14 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 		? getColorClassName( 'color', textColor )
 		: undefined;
 
-	const gradientClass = shouldSerialize( 'gradients' )
-		? __experimentalGetGradientClass( gradient )
-		: undefined;
+	// Do not add gradient class if there is a background image, because the values are merged into `background-image`.
+	const hasBackgroundImage =
+		typeof style?.background?.backgroundImage === 'string' ||
+		typeof style?.background?.backgroundImage?.url === 'string';
+	const gradientClass =
+		! hasBackgroundImage && shouldSerialize( 'gradients' )
+			? __experimentalGetGradientClass( gradient )
+			: undefined;
 
 	const backgroundClass = shouldSerialize( 'background' )
 		? getColorClassName( 'background-color', backgroundColor )
@@ -201,15 +206,24 @@ function styleToAttributes( style ) {
 		? backgroundColorValue.substring( 'var:preset|color|'.length )
 		: undefined;
 	const gradientValue = style?.color?.gradient;
+
+	// Do not add gradient class if there is a background image, because the values are merged into `background-image`.
+	const hasBackgroundImage =
+		typeof style?.background?.backgroundImage === 'string' ||
+		typeof style?.background?.backgroundImage?.url === 'string';
 	const gradientSlug = gradientValue?.startsWith( 'var:preset|gradient|' )
 		? gradientValue.substring( 'var:preset|gradient|'.length )
 		: undefined;
 	const updatedStyle = { ...style };
+
 	updatedStyle.color = {
 		...updatedStyle.color,
 		text: textColorSlug ? undefined : textColorValue,
 		background: backgroundColorSlug ? undefined : backgroundColorValue,
-		gradient: gradientSlug ? undefined : gradientValue,
+		// @TODO this is not quite right. We don't want to add a background style value if there is a gradient.
+		// But we let the preset var pass to the style engine.
+		gradient:
+			! hasBackgroundImage && gradientSlug ? undefined : gradientValue,
 	};
 	return {
 		style: cleanEmptyObject( updatedStyle ),

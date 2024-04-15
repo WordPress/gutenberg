@@ -47,7 +47,14 @@ export function getColorClassesAndStyles( attributes ) {
 	);
 	const textClass = getColorClassName( 'color', textColor );
 
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	// Do not add gradient class if there is a background image, because the values are merged into `background-image`.
+	const hasBackgroundImage =
+		typeof style?.background?.backgroundImage === 'string' ||
+		typeof style?.background?.backgroundImage?.url === 'string';
+	const gradientClass = ! hasBackgroundImage
+		? __experimentalGetGradientClass( gradient )
+		: undefined;
+
 	const hasGradient = gradientClass || style?.color?.gradient;
 
 	// Determine color CSS class name list.
