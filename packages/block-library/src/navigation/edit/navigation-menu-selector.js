@@ -192,7 +192,7 @@ function NavigationMenuSelector( {
 								} ) }
 							</MenuGroup>
 						) }
-						{ canUserCreateNavigationMenu && (
+						{ canUserCreateNavigationMenus && (
 							<MenuGroup label={ __( 'Tools' ) }>
 								<MenuItem
 									onClick={ async () => {
