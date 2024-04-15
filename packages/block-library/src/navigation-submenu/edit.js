@@ -28,7 +28,6 @@ import {
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef } from '@wordpress/element';
-import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { useResourcePermissions } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
@@ -139,9 +138,14 @@ export default function NavigationSubmenuEdit( {
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
-	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		__unstableMarkNextChangeAsNotPersistent,
+		replaceBlock,
+		selectBlock,
+	} = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
+	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -241,9 +245,6 @@ export default function NavigationSubmenuEdit( {
 			) {
 				// Focus and select the label text.
 				selectLabelText();
-			} else {
-				// Focus it (but do not select).
-				placeCaretAtHorizontalEdge( ref.current, true );
 			}
 		}
 	}, [ url ] );
@@ -283,7 +284,10 @@ export default function NavigationSubmenuEdit( {
 			// as it shares the CMD+K shortcut.
 			// See https://github.com/WordPress/gutenberg/pull/59845.
 			event.preventDefault();
+			// If we don't stop propogation, this event bubbles up to the parent submenu item
+			event.stopPropagation();
 			setIsLinkOpen( true );
+			setOpenedBy( ref.current );
 		}
 	}
 
@@ -370,7 +374,10 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => setIsLinkOpen( true ) }
+							onClick={ ( event ) => {
+								setIsLinkOpen( true );
+								setOpenedBy( event.currentTarget );
+							} }
 						/>
 					) }
 
@@ -389,20 +396,22 @@ export default function NavigationSubmenuEdit( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ label || '' }
 						onChange={ ( labelValue ) => {
 							setAttributes( { label: labelValue } );
 						} }
-						label={ __( 'Label' ) }
+						label={ __( 'Text' ) }
 						autoComplete="off"
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ url || '' }
 						onChange={ ( urlValue ) => {
 							setAttributes( { url: urlValue } );
 						} }
-						label={ __( 'URL' ) }
+						label={ __( 'Link' ) }
 						autoComplete="off"
 					/>
 					<TextareaControl
@@ -420,6 +429,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ title || '' }
 						onChange={ ( titleValue ) => {
 							setAttributes( { title: titleValue } );
@@ -432,6 +442,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -471,6 +482,7 @@ export default function NavigationSubmenuEdit( {
 							onClick={ () => {
 								if ( ! openSubmenusOnClick && ! url ) {
 									setIsLinkOpen( true );
+									setOpenedBy( ref.current );
 								}
 							} }
 						/>
@@ -479,7 +491,15 @@ export default function NavigationSubmenuEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								setIsLinkOpen( false );
+								if ( openedBy ) {
+									openedBy.focus();
+									setOpenedBy( null );
+								} else {
+									selectBlock( clientId );
+								}
+							} }
 							anchor={ popoverAnchor }
 							hasCreateSuggestion={ userCanCreate }
 							onRemove={ () => {

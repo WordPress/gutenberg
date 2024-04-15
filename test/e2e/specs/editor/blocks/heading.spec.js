@@ -119,6 +119,53 @@ test.describe( 'Heading', () => {
 		] );
 	} );
 
+	test( 'should create a empty paragraph block when pressing backspace at the beginning of the first empty heading block', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'should transform to a paragraph block when pressing backspace at the beginning of the first heading block', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a' },
+			},
+		] );
+	} );
+
+	test( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async ( {
+		editor,
+		page,
+	} ) => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '## a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: { content: 'a', level: 2 },
+			},
+		] );
+	} );
+
 	test( 'should correctly apply custom colors', async ( {
 		editor,
 		page,
@@ -290,6 +337,58 @@ test.describe( 'Heading', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'Should have proper label in the list view', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/heading' } );
+
+		await editor.publishPost();
+		await page.reload();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		const headingListViewItem = listView.getByRole( 'link' );
+
+		await expect(
+			headingListViewItem,
+			'should show default block name if the content is empty'
+		).toHaveText( 'Heading' );
+
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Heading',
+			} )
+			.fill( 'Heading content' );
+
+		await expect( headingListViewItem, 'should show content' ).toHaveText(
+			'Heading content'
+		);
+
+		await editor.clickBlockOptionsMenuItem( 'Rename' );
+		await page
+			.getByRole( 'dialog', { name: 'Rename' } )
+			.getByRole( 'textbox', { name: 'Block name' } )
+			.fill( 'My new name' );
+
+		await page
+			.getByRole( 'dialog', { name: 'Rename' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		await expect(
+			headingListViewItem,
+			'should show custom name'
+		).toHaveText( 'My new name' );
 	} );
 
 	test.describe( 'Block transforms', () => {

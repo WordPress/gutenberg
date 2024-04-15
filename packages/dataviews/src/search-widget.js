@@ -73,7 +73,7 @@ function ListBox( { view, filter, onChangeView } ) {
 	const compositeStore = useCompositeStore( {
 		virtualFocus: true,
 		focusLoop: true,
-		// When we have no or just one operators, we can set the first item as active.
+		// When we have no or just one operator, we can set the first item as active.
 		// We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,

@@ -21,16 +21,18 @@ concurrency:
 
 jobs:
     unit-js:
-        name: JavaScript (Node.js ${{ matrix.node }})
+        name: JavaScript (Node.js ${{ matrix.node }}) ${{ matrix.shard }}
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
                 node: ['20', '21']
+                shard: ['1/4', '2/4', '3/4', '4/4']
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -39,17 +41,56 @@ jobs:
               with:
                   node-version: ${{ matrix.node }}
 
-            - name: npm build
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
+
+            - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: |
+                  npm run test:unit -- \
+                    --ci \
+                    --maxWorkers="${{ steps.cpu-cores.outputs.count }}" \
+                    --shard="${{ matrix.shard }}" \
+                    --cacheDirectory="$HOME/.jest-cache"
 
-            - name: Running the date tests
-              run: npm run test:unit:date -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+    unit-js-date:
+        name: JavaScript Date Tests (Node.js ${{ matrix.node }})
+        runs-on: ubuntu-latest
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['20', '21']
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+              with:
+                  node-version: ${{ matrix.node }}
+
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
+
+            - name: Run build scripts
+              # It's not necessary to run the full build, since Jest can interpret
+              # source files with `babel-jest`. Some packages have their own custom
+              # build tasks, however. These must be run.
+              run: npx lerna run build
+
+            - name: Run the date tests
+              run: npm run test:unit:date -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"
 
     compute-previous-wordpress-version:
         name: Compute previous WordPress version
@@ -76,9 +117,29 @@ jobs:
                   echo "previous-wordpress-version=${PREVIOUS_WP_VERSION}" >> $GITHUB_OUTPUT
                   rm versions.json
 
+    build-assets:
+        name: Build JavaScript assets for PHP unit tests
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Run build scripts
+              run: npm run build
+
+            - name: Upload built JavaScript assets
+              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              with:
+                  name: build-assets
+                  path: ./build/
+
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }}${{ matrix.wordpress != '' && format( ' (WP {0}) ', matrix.wordpress ) || '' }} on ubuntu-latest
-        needs: compute-previous-wordpress-version
+        needs: [compute-previous-wordpress-version, build-assets]
         runs-on: ubuntu-latest
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -86,8 +147,6 @@ jobs:
             fail-fast: true
             matrix:
                 php:
-                    - '7.0'
-                    - '7.1'
                     - '7.2'
                     - '7.3'
                     - '7.4'
@@ -110,7 +169,8 @@ jobs:
             WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', matrix.wordpress ) }}
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
@@ -125,7 +185,7 @@ jobs:
             # dependency versions are installed and cached.
             ##
             - name: Set up PHP
-              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
+              uses: shivammathur/setup-php@8872c784b04a1420e81191df5d64fbd59d3d3033 # v2.30.2
               with:
                   php-version: '${{ matrix.php }}'
                   ini-file: development
@@ -148,13 +208,15 @@ jobs:
               with:
                   custom-cache-suffix: $(/bin/date -u --date='last Mon' "+%F")
 
-            - name: Npm build
-              run: npm run build
+            - name: Download built JavaScript assets
+              uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
+              with:
+                  name: build-assets
+                  path: ./build
 
             - name: Docker debug information
               run: |
                   docker -v
-                  docker-compose -v
 
             - name: General debug information
               run: |
@@ -162,7 +224,6 @@ jobs:
                   node --version
                   curl --version
                   git --version
-                  svn --version
                   locale -a
 
             - name: Start Docker environment
@@ -225,7 +286,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Set up PHP
-              uses: shivammathur/setup-php@a4e22b60bbb9c1021113f2860347b0759f66fe5d # v2.30.0
+              uses: shivammathur/setup-php@8872c784b04a1420e81191df5d64fbd59d3d3033 # v2.30.2
               with:
                   php-version: '7.4'
                   coverage: none
@@ -238,7 +299,7 @@ jobs:
               run: echo "date=$(/bin/date -u --date='last Mon' "+%F")" >> $GITHUB_OUTPUT
 
             - name: Cache PHPCS scan cache
-              uses: actions/cache@ab5e6d0c87105b4c9c2047343972218f562e4319 # v4.0.1
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
               with:
                   path: .cache/phpcs.json
                   key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpcs-cache-${{ hashFiles('**/composer.json', 'phpcs.xml.dist') }}
@@ -289,18 +350,23 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+            - name: Checkout repository
+              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+
+            - name: Determine the number of CPU cores
+              uses: SimenB/github-actions-cpu-cores@97ba232459a8e02ff6121db9362b09661c875ab8 # v2.0.0
+              id: cpu-cores
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Npm build
+            - name: Run build scripts
               # It's not necessary to run the full build, since Jest can interpret
               # source files with `babel-jest`. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npx lerna run build
 
             - name: Running the tests
-              run: npm run test:native -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+              run: npm run test:native -- --ci --maxWorkers=${{ steps.cpu-cores.outputs.count }} --cacheDirectory="$HOME/.jest-cache"

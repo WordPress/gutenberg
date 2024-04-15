@@ -46,4 +46,8 @@ export const textFormattingShortcuts = [
 			'Convert the current paragraph or heading to a heading of level 1 to 6.'
 		),
 	},
+	{
+		keyCombination: { modifier: 'primaryShift', character: 'SPACE' },
+		description: __( 'Add non breaking space.' ),
+	},
 ];

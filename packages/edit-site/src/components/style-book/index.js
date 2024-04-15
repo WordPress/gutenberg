@@ -237,9 +237,7 @@ function StyleBook( {
 		<EditorCanvasContainer
 			onClose={ onClose }
 			enableResizing={ enableResizing }
-			closeButtonLabel={
-				showCloseButton ? __( 'Close Style Book' ) : null
-			}
+			closeButtonLabel={ showCloseButton ? __( 'Close' ) : null }
 		>
 			<div
 				className={ classnames( 'edit-site-style-book', {

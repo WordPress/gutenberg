@@ -74,7 +74,13 @@ test.describe( 'Unsynced pattern', () => {
 				name: newCategory,
 			} )
 			.click();
-		await page.getByLabel( 'My unsynced pattern' ).click();
+		const pattern = page.getByLabel( 'My unsynced pattern' ).first();
+
+		const insertedPatternId = await pattern.evaluate(
+			( element ) => element.id
+		);
+
+		await pattern.click();
 
 		await expect.poll( editor.getBlocks ).toEqual( [
 			...before,
@@ -82,7 +88,11 @@ test.describe( 'Unsynced pattern', () => {
 				...before[ 0 ],
 				attributes: {
 					...before[ 0 ].attributes,
-					metadata: { categories: [ 'contact-details' ] },
+					metadata: {
+						categories: [ 'contact-details' ],
+						name: 'My unsynced pattern',
+						patternName: insertedPatternId,
+					},
 				},
 			},
 		] );
