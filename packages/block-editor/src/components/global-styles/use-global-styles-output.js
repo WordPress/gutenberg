@@ -402,7 +402,7 @@ export function getStylesDeclarations(
 	if ( !! blockStyles?.background ) {
 		blockStyles = setBackgroundStyleDefaults( blockStyles, {
 			...editorSettings,
-			isRoot,
+			selector,
 		} );
 	}
 

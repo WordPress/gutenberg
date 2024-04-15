@@ -4,6 +4,7 @@
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import {
 	useHasBackgroundPanel,
 	hasBackgroundImageValue,
 } from '../components/global-styles/background-panel';
+import { ROOT_BLOCK_SELECTOR } from '../components/global-styles/utils';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -50,7 +52,23 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
+/**
+ * Updates a styles object with default background values.
+ *
+ * @param {Object} blockStyles         A styles object.
+ * @param {Object} options             Optional settings.
+ * @param {string} options.themeDirURI The URI of the current theme directory.
+ * @param {string} options.selector    The block selector.
+ * @return {Object}                     Updated styles.
+ */
 export function setBackgroundStyleDefaults( blockStyles, options ) {
+	if (
+		typeof blockStyles?.background !== 'object' ||
+		Object.keys( blockStyles?.background ).length === 0
+	) {
+		return blockStyles;
+	}
+
 	const backgroundImage = blockStyles?.background?.backgroundImage;
 	const newBackgroundStyles = {};
 
@@ -67,12 +85,12 @@ export function setBackgroundStyleDefaults( blockStyles, options ) {
 
 		newBackgroundStyles.backgroundImage = {
 			...backgroundImage,
-			url,
+			url: encodeURI( safeDecodeURI( url ) ),
 		};
 	}
 
 	// Set block background defaults.
-	if ( ! options?.isRoot && !! backgroundImage?.url ) {
+	if ( options?.selector !== ROOT_BLOCK_SELECTOR && !! backgroundImage ) {
 		if ( ! blockStyles?.background?.backgroundSize ) {
 			newBackgroundStyles.backgroundSize = 'cover';
 		}
