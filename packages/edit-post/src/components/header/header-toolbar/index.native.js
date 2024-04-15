@@ -53,6 +53,7 @@ function HeaderToolbar( {
 	undo,
 	showInserter,
 	showKeyboardHideButton,
+	isCompactMode,
 	insertBlock,
 	onHideKeyboard,
 	isRTL,
@@ -60,12 +61,19 @@ function HeaderToolbar( {
 } ) {
 	const anchorNodeRef = useRef();
 
+	const compactStyles = usePreferredColorSchemeStyle(
+		styles[ 'header-toolbar__container-compact' ],
+		styles[ 'header-toolbar__container-compact--dark' ]
+	);
+
 	const containerStyle = [
 		usePreferredColorSchemeStyle(
 			styles[ 'header-toolbar__container' ],
 			styles[ 'header-toolbar__container--dark' ]
 		),
 		{ borderTopWidth: StyleSheet.hairlineWidth },
+		isCompactMode && compactStyles,
+		isCompactMode && { borderBottomWidth: StyleSheet.hairlineWidth },
 	];
 
 	useEffect( () => {
@@ -191,8 +199,11 @@ function HeaderToolbar( {
 			>
 				<Inserter disabled={ ! showInserter } />
 
-				{ noContentSelected && renderMediaButtons }
-				<BlockToolbar anchorNodeRef={ anchorNodeRef.current } />
+				{ ! isCompactMode && noContentSelected && renderMediaButtons }
+				<BlockToolbar
+					anchorNodeRef={ anchorNodeRef.current }
+					isCompactMode={ isCompactMode }
+				/>
 			</ScrollView>
 			{ showKeyboardHideButton && (
 				<ToolbarGroup passedStyle={ showKeyboardButtonStyles }>
@@ -217,9 +228,11 @@ export default compose( [
 			getBlockSelectionEnd,
 			hasInserterItems,
 			hasSelectedBlock,
+			getSettings,
 		} = select( blockEditorStore );
 		const { getEditorSettings } = select( editorStore );
 		const isAnyBlockSelected = hasSelectedBlock();
+		const isCompactMode = getSettings()?.capabilities?.compactMode ?? false;
 		return {
 			hasRedo: select( editorStore ).hasEditorRedo(),
 			hasUndo: select( editorStore ).hasEditorUndo(),
@@ -234,6 +247,7 @@ export default compose( [
 				select( editPostStore ).getEditorMode() === 'text',
 			isRTL: select( blockEditorStore ).getSettings().isRTL,
 			noContentSelected: ! isAnyBlockSelected,
+			isCompactMode,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

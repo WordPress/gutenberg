@@ -10,7 +10,7 @@ import { setBlockTypeImpressions } from '@wordpress/react-native-bridge';
 import { store as blockEditorStore } from '../../../store';
 
 function useBlockTypeImpressions( blockTypes ) {
-	const { blockTypeImpressions } = useSelect( ( select ) => {
+	const { blockTypeImpressions = [] } = useSelect( ( select ) => {
 		const { getSettings: getBlockEditorSettings } =
 			select( blockEditorStore );
 		const { impressions } = getBlockEditorSettings();

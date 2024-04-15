@@ -12,6 +12,14 @@
 	border-top-color: $dark-quaternary;
 }
 
+.header-toolbar__container-compact {
+	border-bottom-color: $light-quaternary;
+}
+
+.header-toolbar__container-compact--dark {
+	border-bottom-color: $dark-quaternary;
+}
+
 .header-toolbar__container--expanded {
 	height: $mobile-header-toolbar-expanded-height;
 }

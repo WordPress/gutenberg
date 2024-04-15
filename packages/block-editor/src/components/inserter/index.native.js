@@ -164,7 +164,11 @@ export class Inserter extends Component {
 	}
 
 	onToggle( isOpen ) {
-		const { blockTypeImpressions, onToggle, updateSettings } = this.props;
+		const {
+			blockTypeImpressions = [],
+			onToggle,
+			updateSettings,
+		} = this.props;
 
 		if ( ! isOpen ) {
 			const impressionsRemain = Object.values(

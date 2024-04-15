@@ -6,7 +6,11 @@ import { I18nManager, LogBox } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { unregisterBlockType, getBlockType } from '@wordpress/blocks';
+import {
+	unregisterBlockType,
+	getBlockType,
+	getBlockTypes,
+} from '@wordpress/blocks';
 import { addAction, addFilter, doAction } from '@wordpress/hooks';
 import * as wpData from '@wordpress/data';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -50,6 +54,18 @@ const setupInitHooks = () => {
 			capabilities.reusableBlock !== true
 		) {
 			unregisterBlockType( 'core/block' );
+		}
+
+		// Filter supported blocks
+		const currentRegisteredBlocks = getBlockTypes();
+		const supportedBlocks = capabilities?.supportedBlocks ?? [];
+
+		if ( supportedBlocks.length > 0 ) {
+			currentRegisteredBlocks.forEach( ( block ) => {
+				if ( ! supportedBlocks.includes( block.name ) ) {
+					unregisterBlockType( block.name );
+				}
+			} );
 		}
 
 		doAction( 'native.post-register-core-blocks', props );

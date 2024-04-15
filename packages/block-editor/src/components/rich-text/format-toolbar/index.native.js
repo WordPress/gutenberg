@@ -4,7 +4,7 @@
 
 import { Slot } from '@wordpress/components';
 
-const FormatToolbar = () => {
+const FormatToolbar = ( { isCompactMode } ) => {
 	return (
 		<>
 			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
@@ -13,7 +13,7 @@ const FormatToolbar = () => {
 					key={ format }
 				/>
 			) ) }
-			<Slot name="RichText.ToolbarControls" />
+			{ ! isCompactMode && <Slot name="RichText.ToolbarControls" /> }
 		</>
 	);
 };

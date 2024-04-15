@@ -4,11 +4,11 @@
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 
-const FormatToolbarContainer = () => {
+const FormatToolbarContainer = ( { isCompactMode } ) => {
 	// Render regular toolbar.
 	return (
 		<BlockControls group="inline">
-			<FormatToolbar />
+			<FormatToolbar isCompactMode={ isCompactMode } />
 		</BlockControls>
 	);
 };

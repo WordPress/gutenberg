@@ -33,7 +33,7 @@ public protocol GutenbergBridgeDataSource: AnyObject {
     /// to handle media loading.
     ///
     /// - Returns: An object conforming to TextViewAttachmentDelegate.
-    func aztecAttachmentDelegate() -> TextViewAttachmentDelegate
+    func aztecAttachmentDelegate() -> TextViewAttachmentDelegate?
 
     /// Asks the data source for the locale to be used by the editor.
     /// Return `nil` to show the default one (`en`).
@@ -53,7 +53,7 @@ public protocol GutenbergBridgeDataSource: AnyObject {
     /// Ask the data source what capabilities should be enabled.
     /// Implement this method to enable one or more capabilities.
     /// Defaults are not enabled.
-    func gutenbergCapabilities() -> [Capabilities: Bool]
+    func gutenbergCapabilities() -> [Capabilities: Any]
 
     /// Asks the data source for a list of theme colors.
     func gutenbergEditorSettings() -> GutenbergEditorSettings?
@@ -79,7 +79,6 @@ public extension GutenbergBridgeDataSource {
         return [:]
     }
 }
-
 public protocol GutenbergEditorSettings {
     var isFSETheme: Bool { get }
     var galleryWithImageBlocks: Bool { get }

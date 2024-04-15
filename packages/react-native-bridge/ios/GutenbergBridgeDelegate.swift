@@ -44,6 +44,8 @@ public enum Capabilities: String {
     case shouldUseFastImage
     case supportSection
     case onlyCoreBlocks
+    case supportedBlocks
+    case compactMode
 }
 
 /// Wrapper for single block data

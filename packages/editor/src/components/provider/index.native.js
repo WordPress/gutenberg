@@ -197,23 +197,30 @@ class NativeEditorProvider extends Component {
 			this.onHardwareBackPress
 		);
 
-		// Request current block impressions from native app.
-		requestBlockTypeImpressions( ( storedImpressions ) => {
-			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
+		if ( ! capabilities?.isCompactMode ) {
+			// Request current block impressions from native app.
+			requestBlockTypeImpressions( ( storedImpressions ) => {
+				const impressions = {
+					...NEW_BLOCK_TYPES,
+					...storedImpressions,
+				};
 
-			// Persist impressions to JavaScript store.
-			updateBlockEditorSettings( { impressions } );
+				// Persist impressions to JavaScript store.
+				updateBlockEditorSettings( { impressions } );
 
-			// Persist impressions to native store if they do not include latest
-			// `NEW_BLOCK_TYPES` configuration.
-			const storedImpressionKeys = Object.keys( storedImpressions );
-			const storedImpressionsCurrent = Object.keys(
-				NEW_BLOCK_TYPES
-			).every( ( newKey ) => storedImpressionKeys.includes( newKey ) );
-			if ( ! storedImpressionsCurrent ) {
-				setBlockTypeImpressions( impressions );
-			}
-		} );
+				// Persist impressions to native store if they do not include latest
+				// `NEW_BLOCK_TYPES` configuration.
+				const storedImpressionKeys = Object.keys( storedImpressions );
+				const storedImpressionsCurrent = Object.keys(
+					NEW_BLOCK_TYPES
+				).every( ( newKey ) =>
+					storedImpressionKeys.includes( newKey )
+				);
+				if ( ! storedImpressionsCurrent ) {
+					setBlockTypeImpressions( impressions );
+				}
+			} );
+		}
 	}
 
 	componentWillUnmount() {
@@ -277,7 +284,8 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! prevProps.isReady && this.props.isReady ) {
+		const { isReady, capabilities } = this.props;
+		if ( ! capabilities?.isCompactMode && ! prevProps.isReady && isReady ) {
 			const blocks = this.props.blocks;
 			const isUnsupportedBlock = ( { name } ) =>
 				name === getUnregisteredTypeHandlerName();

@@ -161,11 +161,14 @@ export class MediaUpload extends Component {
 			allowedTypes = [],
 			__experimentalOnlyMediaLibrary,
 			isAudioBlockMediaUploadEnabled,
+			isCompactMode,
 		} = this.props;
 
 		return this.getAllSources()
 			.filter( ( source ) => {
-				if ( __experimentalOnlyMediaLibrary ) {
+				if ( isCompactMode ) {
+					return source.id === URL_MEDIA_SOURCE;
+				} else if ( __experimentalOnlyMediaLibrary ) {
 					return source.mediaLibrary;
 				} else if (
 					allowedTypes.every(
@@ -346,9 +349,11 @@ function URLInput( props ) {
 export default compose( [
 	withSelect( ( select ) => {
 		const { capabilities } = select( blockEditorStore ).getSettings();
+		const isCompactMode = capabilities?.compactMode ?? false;
 		return {
 			isAudioBlockMediaUploadEnabled:
 				capabilities?.isAudioBlockMediaUploadEnabled === true,
+			isCompactMode,
 		};
 	} ),
 ] )( MediaUpload );

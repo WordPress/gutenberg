@@ -122,7 +122,8 @@ export function RichTextWrapper(
 
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const { __experimentalUndo: undo } = getSettings();
+		const { __experimentalUndo: undo, capabilities } = getSettings();
+		const isCompactMode = capabilities?.compactMode ?? false;
 
 		let isSelected;
 
@@ -151,6 +152,7 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			isCompactMode,
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
 			undo,
@@ -164,6 +166,7 @@ export function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		isSelected,
+		isCompactMode,
 		didAutomaticChange,
 		disabled,
 		undo,
@@ -609,6 +612,7 @@ export function RichTextWrapper(
 					{ nestedIsSelected && hasFormats && (
 						<FormatToolbarContainer
 							inline={ inlineToolbar }
+							isCompactMode={ isCompactMode }
 							anchorRef={ fallbackRef.current }
 						/>
 					) }

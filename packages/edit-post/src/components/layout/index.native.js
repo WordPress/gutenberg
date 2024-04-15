@@ -101,17 +101,23 @@ class Layout extends Component {
 	}
 
 	renderVisual() {
-		const { isReady } = this.props;
+		const { isCompactMode, isReady } = this.props;
 
 		if ( ! isReady ) {
 			return null;
 		}
 
-		return <VisualEditor setTitleRef={ this.props.setTitleRef } />;
+		return (
+			<VisualEditor
+				isCompactMode={ isCompactMode }
+				setTitleRef={ this.props.setTitleRef }
+			/>
+		);
 	}
 
 	render() {
-		const { getStylesFromColorScheme, mode, globalStyles } = this.props;
+		const { isCompactMode, getStylesFromColorScheme, mode, globalStyles } =
+			this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -143,6 +149,30 @@ class Layout extends Component {
 				backgroundColor: globalStyles.background,
 			},
 		];
+
+		if ( isCompactMode ) {
+			return (
+				<SafeAreaView
+					style={ containerStyles }
+					onLayout={ this.onRootViewLayout }
+				>
+					<Header />
+
+					<OfflineStatus />
+					<View style={ editorStyles }>
+						{ this.renderVisual() }
+						<NoticeList />
+					</View>
+					<View
+						style={ {
+							flex: 0,
+							flexBasis: marginBottom,
+							height: marginBottom,
+						} }
+					/>
+				</SafeAreaView>
+			);
+		}
 
 		return (
 			<Tooltip.Slot>
@@ -196,8 +226,10 @@ export default compose( [
 		const { getSettings } = select( blockEditorStore );
 		const globalStyles =
 			getSettings()?.__experimentalGlobalStylesBaseStyles?.color;
+		const isCompactMode = getSettings()?.capabilities?.compactMode ?? false;
 
 		return {
+			isCompactMode,
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
 			globalStyles,

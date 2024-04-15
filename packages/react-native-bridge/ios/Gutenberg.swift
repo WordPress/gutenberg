@@ -356,9 +356,9 @@ public extension Gutenberg.MediaSource {
     }
 }
 
-private extension Dictionary where Key == Capabilities, Value == Bool {
-    func toJSPayload() -> [String: Bool] {
-        Dictionary<String, Bool>(uniqueKeysWithValues: self.map { key, value in
+private extension Dictionary where Key == Capabilities, Value == Any {
+    func toJSPayload() -> [String: Any] {
+        Dictionary<String, Any>(uniqueKeysWithValues: self.map { key, value in
             (key.rawValue, value)
         })
     }

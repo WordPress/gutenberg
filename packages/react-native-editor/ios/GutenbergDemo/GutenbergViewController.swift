@@ -368,6 +368,10 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
+    func aztecAttachmentDelegate() -> (any Aztec.TextViewAttachmentDelegate)? {
+        return nil
+    }
+    
     class EditorSettings: GutenbergEditorSettings {
         var isFSETheme: Bool = true
         var galleryWithImageBlocks: Bool = true
@@ -409,10 +413,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
-    func gutenbergCapabilities() -> [Capabilities : Bool] {
+    func gutenbergCapabilities() -> [Capabilities : Any] {
         return [
-            .mentions: true,
-            .xposts: true,
+            .mentions: false,
+            .xposts: false,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .tiledGalleryBlock: true,
@@ -424,7 +428,9 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .instagramEmbed: true,
             .loomEmbed: true,
             .smartframeEmbed: true,
-            .supportSection: true
+            .supportSection: true,
+            .supportedBlocks: ["core/paragraph", "core/list", "core/quote", "core/missing", "core/embed", "core/image"],
+            .compactMode: true
         ]
     }
 

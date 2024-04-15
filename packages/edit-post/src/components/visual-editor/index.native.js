@@ -21,11 +21,11 @@ export default class VisualEditor extends Component {
 	}
 
 	render() {
-		const { safeAreaBottomInset } = this.props;
+		const { safeAreaBottomInset, isCompactMode } = this.props;
 
 		return (
 			<BlockList
-				header={ this.renderHeader }
+				{ ...( ! isCompactMode && { render: this.renderHeader } ) }
 				safeAreaBottomInset={ safeAreaBottomInset }
 			/>
 		);
