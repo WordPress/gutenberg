@@ -15,7 +15,7 @@
 		fill: $gray-400 !important;
 	}
 
-	:hover {
+	.components-button:hover {
 		background: none !important; // !important to simplify the selector.
 	}
 
