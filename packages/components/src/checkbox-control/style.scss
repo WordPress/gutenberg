@@ -1,4 +1,5 @@
 .components-checkbox-control {
+	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
 	--checkbox-input-size: 24px; // Width & height for small viewports.
 
 	@include break-small() {
