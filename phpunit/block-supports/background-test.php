@@ -226,7 +226,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_background_support_styles( $background_style, $expected_css ) {
 		switch_theme( 'block-theme' );
-		$actual = gutenberg_get_background_support_styles( $background_style )['css'];
+		$actual = gutenberg_get_background_support_styles( $background_style )['css'] ?? null;
 
 		$this->assertEquals(
 			$expected_css,
@@ -242,6 +242,12 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_background_support_styles() {
 		return array(
+			'no css generated with no block styles' => array(
+				'background_style' => array(
+					'backgroundImage' => array(),
+				),
+				'expected_css'     => null,
+			),
 			'css generated with theme background image path' => array(
 				'background_style' => array(
 					'backgroundImage' => array(
