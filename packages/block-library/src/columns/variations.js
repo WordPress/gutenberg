@@ -19,11 +19,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M42 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h40c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h44a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		innerBlocks: [ [ 'core/column' ] ],
@@ -36,11 +36,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M42 0H23.5c-.6 0-1 .4-1 1v30c0 .6.4 1 1 1H42c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2zM20.5 0H2C.9 0 0 .9 0 2v28c0 1.1.9 2 2 2h18.5c.6 0 1-.4 1-1V1c0-.6-.4-1-1-1z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm25 0a2 2 0 0 1 2-2h19a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H27a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		isDefault: true,
@@ -54,11 +54,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M1 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1ZM16 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h27a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H16Z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm17 0a2 2 0 0 1 2-2h27a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H19a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		innerBlocks: [
@@ -74,11 +74,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M1 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h27a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H1ZM31 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H31Z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h27a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V10Zm33 0a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H35a2 2 0 0 1-2-2V10Z" />
 			</SVG>
 		),
 		innerBlocks: [
@@ -94,11 +94,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M0 1a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v30a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1ZM15 1a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v30a1 1 0 0 1-1 1H16a1 1 0 0 1-1-1V1ZM31 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H31Z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h10.531c1.105 0 1.969.895 1.969 2v28c0 1.105-.864 2-1.969 2H2a2 2 0 0 1-2-2V10Zm16.5 0c0-1.105.864-2 1.969-2H29.53c1.105 0 1.969.895 1.969 2v28c0 1.105-.864 2-1.969 2H18.47c-1.105 0-1.969-.895-1.969-2V10Zm17 0c0-1.105.864-2 1.969-2H46a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2H35.469c-1.105 0-1.969-.895-1.969-2V10Z" />
 			</SVG>
 		),
 		innerBlocks: [
@@ -115,11 +115,11 @@ const variations = [
 		icon: (
 			<SVG
 				xmlns="http://www.w3.org/2000/svg"
-				width="44"
-				height="32"
-				viewBox="0 0 44 32"
+				width="48"
+				height="48"
+				viewBox="0 0 48 48"
 			>
-				<Path d="M0 1a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v30a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1ZM12 1a1 1 0 0 1 1-1h18a1 1 0 0 1 1 1v30a1 1 0 0 1-1 1H13a1 1 0 0 1-1-1V1ZM34 0a1 1 0 0 0-1 1v30a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1h-9Z" />
+				<Path d="M0 10a2 2 0 0 1 2-2h7.531c1.105 0 1.969.895 1.969 2v28c0 1.105-.864 2-1.969 2H2a2 2 0 0 1-2-2V10Zm13.5 0c0-1.105.864-2 1.969-2H32.53c1.105 0 1.969.895 1.969 2v28c0 1.105-.864 2-1.969 2H15.47c-1.105 0-1.969-.895-1.969-2V10Zm23 0c0-1.105.864-2 1.969-2H46a2 2 0 0 1 2 2v28a2 2 0 0 1-2 2h-7.531c-1.105 0-1.969-.895-1.969-2V10Z" />
 			</SVG>
 		),
 		innerBlocks: [
