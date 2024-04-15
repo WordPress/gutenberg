@@ -277,7 +277,7 @@
 	}
 
 	.block-editor-block-icon {
-		margin-right: $grid-unit-05;
+		margin-right: $grid-unit-10;
 		flex: 0 0 $icon-size;
 	}
 
@@ -482,7 +482,7 @@ $block-navigation-max-indent: 8;
 	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"]
 	.block-editor-list-view__expander {
 		@if $i - 1 >= 0 {
-			margin-left: ($grid-unit-20 * $i);
+			margin-left: (20px * $i);
 		} @else {
 			margin-left: 0;
 		}
