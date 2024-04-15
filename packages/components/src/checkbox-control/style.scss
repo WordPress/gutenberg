@@ -2,7 +2,7 @@
 	--checkbox-input-size: 24px; // Width & height for small viewports.
 
 	@include break-small() {
-		--checkbox-input-size: var(--wp-components-checkbox-control-size, 20px);
+		--checkbox-input-size: 20px;
 	}
 }
 
