@@ -289,8 +289,9 @@ const withBlockBindingSupport = createHigherOrderComponent(
 		);
 
 		/**
-		 * Custom setAttributes function that
-		 * updates the bound and unbound attributes.
+		 * Custom setAttributes function.
+		 * It reorganizes bound and unbound attributes
+		 * in a new object and treats their updating separately.
 		 *
 		 * @param {Object} newAttributes - The new attributes values.
 		 * @return {void}
@@ -299,23 +300,19 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			// Get the bound and unbound attributes.
 			const attrs = Object.entries( newAttributes ).reduce(
 				( acc, [ key, value ] ) => {
-					if ( key in bindings ) {
-						acc.bounds[ key ] = value;
-					} else {
-						acc.unbounds[ key ] = value;
-					}
-
+					acc[ key in bindings ? 'bounds' : 'unbounds' ][ key ] =
+						value;
 					return acc;
 				},
 				{ bounds: {}, unbounds: {} }
 			);
 
-			// Update the unbound attributes in case of any.
+			// Update the `unbound` attributes in case of any.
 			if ( Object.keys( attrs.unbounds ).length > 0 ) {
 				props.setAttributes( attrs.unbounds );
 			}
 
-			// Update the bound attributes in case of any.
+			// Update the `bound` attributes in case of any.
 			if ( Object.keys( attrs.bounds ).length > 0 ) {
 				updateBoundAttributes( attrs.bounds );
 			}
