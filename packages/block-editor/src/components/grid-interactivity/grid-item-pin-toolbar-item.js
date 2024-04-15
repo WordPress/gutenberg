@@ -10,7 +10,7 @@ import { pin as pinIcon } from '@wordpress/icons';
  */
 import BlockControls from '../block-controls';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import { calculateGridRect } from './utils';
 
 export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -28,26 +28,13 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 	}
 
 	function pinBlock() {
-		const gridElement = blockElement.parentElement;
-		const columnGap = parseFloat(
-			getComputedCSS( gridElement, 'column-gap' )
+		const rect = calculateGridRect(
+			blockElement.parentElement,
+			blockElement
 		);
-		const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
-		const gridColumnTracks = getGridTracks(
-			getComputedCSS( gridElement, 'grid-template-columns' ),
-			columnGap
-		);
-		const gridRowTracks = getGridTracks(
-			getComputedCSS( gridElement, 'grid-template-rows' ),
-			rowGap
-		);
-		const columnStart =
-			getClosestTrack( gridColumnTracks, blockElement.offsetLeft ) + 1;
-		const rowStart =
-			getClosestTrack( gridRowTracks, blockElement.offsetTop ) + 1;
 		onChange( {
-			columnStart,
-			rowStart,
+			columnStart: rect.columnStart,
+			rowStart: rect.rowStart,
 		} );
 	}
 

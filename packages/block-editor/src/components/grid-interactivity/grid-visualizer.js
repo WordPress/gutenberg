@@ -15,7 +15,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, range, Rect } from './utils';
+import { getComputedCSS, range, GridRect, calculateGridRect } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 export function GridVisualizer( { clientId } ) {
@@ -114,43 +114,57 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
 							isHighlighted={
-								highlightedRect?.contains(
-									column - 1,
-									row - 1
-								) ?? false
+								highlightedRect?.contains( column, row ) ??
+								false
 							}
 							validateDrag={ ( srcClientId ) => {
+								const isCellOccupied = Array.from(
+									blockElement.children
+								).some( ( childElement ) => {
+									const rect = calculateGridRect(
+										blockElement,
+										childElement
+									);
+									return rect.contains( column, row );
+								} );
+								if ( isCellOccupied ) {
+									return false;
+								}
+
 								const attributes =
 									getBlockAttributes( srcClientId );
-								const columnSpan =
-									attributes.style?.layout?.columnSpan ?? 1;
-								const rowSpan =
-									attributes.style?.layout?.rowSpan ?? 1;
-								return new Rect( {
-									width: gridInfo.numColumns,
-									height: gridInfo.numRows,
+								const isInBounds = new GridRect( {
+									columnSpan: gridInfo.numColumns,
+									rowSpan: gridInfo.numRows,
 								} ).containsRect(
-									new Rect( {
-										x: column - 1,
-										y: row - 1,
-										width: columnSpan,
-										height: rowSpan,
+									new GridRect( {
+										columnStart: column,
+										rowStart: row,
+										columnSpan:
+											attributes.style?.layout
+												?.columnSpan,
+										rowSpan:
+											attributes.style?.layout?.rowSpan,
 									} )
 								);
+								if ( ! isInBounds ) {
+									return false;
+								}
+
+								return true;
 							} }
 							onDragEnter={ ( srcClientId ) => {
 								const attributes =
 									getBlockAttributes( srcClientId );
-								const columnSpan =
-									attributes.style?.layout?.columnSpan ?? 1;
-								const rowSpan =
-									attributes.style?.layout?.rowSpan ?? 1;
 								setHighlightedRect(
-									new Rect( {
-										x: column - 1,
-										y: row - 1,
-										width: columnSpan,
-										height: rowSpan,
+									new GridRect( {
+										columnStart: column,
+										rowStart: row,
+										columnSpan:
+											attributes.style?.layout
+												?.columnSpan,
+										rowSpan:
+											attributes.style?.layout?.rowSpan,
 									} )
 								);
 							} }
@@ -159,8 +173,9 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 								// their mouse quickly, so only clear the highlight if it was set
 								// by this cell.
 								setHighlightedRect( ( prevHighlightedRect ) =>
-									prevHighlightedRect?.x === column - 1 &&
-									prevHighlightedRect?.y === row - 1
+									prevHighlightedRect?.columnStart ===
+										column &&
+									prevHighlightedRect?.rowStart === row
 										? null
 										: prevHighlightedRect
 								);
