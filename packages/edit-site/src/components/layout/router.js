@@ -31,6 +31,15 @@ import {
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
+export function useDirection() {
+	const { params } = useLocation();
+
+	if ( params.path || params.postType ) {
+		return true; // forward
+	}
+	return false;
+}
+
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();

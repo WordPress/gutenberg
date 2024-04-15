@@ -102,14 +102,10 @@ export default function SidebarNavigationScreen( {
 						<SidebarButton
 							onClick={ () => {
 								const backPath =
-									backPathProp ?? location.state?.backPath;
-								if ( backPath ) {
-									history.push( backPath );
-								} else {
-									history.push(
-										getBackPath( location.params )
-									);
-								}
+									backPathProp ??
+									location.state?.backPath ??
+									getBackPath( location.params );
+								history.push( backPath );
 							} }
 							icon={ icon }
 							label={ __( 'Back' ) }

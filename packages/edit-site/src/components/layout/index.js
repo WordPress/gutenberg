@@ -48,7 +48,7 @@ import KeyboardShortcutsGlobal from '../keyboard-shortcuts/global';
 import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
-import useLayoutAreas from './router';
+import useLayoutAreas, { useDirection } from './router';
 import useMovingAnimation from './animation';
 import SaveHub from '../save-hub';
 
@@ -58,6 +58,20 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { NavigableRegion } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
+
+function SidebarContent( { children } ) {
+	const isForward = useDirection();
+	return (
+		<div
+			className={ classnames( 'edit-site-sidebar__content', {
+				'fade-in-from-right': isForward,
+				'fade-in-from-left': ! isForward,
+			} ) }
+		>
+			{ children }
+		</div>
+	);
+}
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -247,9 +261,9 @@ export default function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<div className="edit-site-sidebar__content">
+										<SidebarContent>
 											{ areas.sidebar }
-										</div>
+										</SidebarContent>
 										<SaveHub />
 									</motion.div>
 								) }
