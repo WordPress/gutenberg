@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Test the variations block support.
+ * Test the block style variations block support.
  *
  * @package Gutenberg
  */
 
-class WP_Block_Supports_Variations_Test extends WP_UnitTestCase {
+class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	/**
 	 * Theme root directory.
 	 *
@@ -101,9 +101,12 @@ class WP_Block_Supports_Variations_Test extends WP_UnitTestCase {
 		$expected     = array(
 			'variations' => array(
 				'my-variation'            => $variation_styles_data,
-				// The following variations are registered automatically from
-				// their respective JSON files within the theme's `block-styles`
-				// directory.
+
+				/*
+				 * The following block style variations are registered
+				 * automatically from their respective JSON files within the
+				 * theme's `block-styles` directory.
+				 */
 				'block-style-variation-a' => array(
 					'color' => array(
 						'background' => 'indigo',
