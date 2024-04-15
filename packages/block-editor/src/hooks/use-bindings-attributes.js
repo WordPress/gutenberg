@@ -131,7 +131,7 @@ const BindingConnector = ( {
 
 	// Store previous values for the attribute and external property
 	const prevAttrValue = useRef( attrValue );
-	const prevPropValue = useRef(); // `undefined` for the fisrt sync (from source to block).
+	const prevPropValue = useRef(); // `undefined` for the first sync (from external property to attribute).
 
 	/*
 	 * Update the bound attribute value,
@@ -142,31 +142,34 @@ const BindingConnector = ( {
 	 * @return {void}
 	 */
 	const updateBoundAttribute = useCallback(
-		( next, current ) =>
+		( next, current ) => {
+			if ( next === prevPropValue.current ) {
+				return;
+			}
+
+			// Update previous values for the next cycle.
+			prevPropValue.current = next;
+			prevAttrValue.current = next;
+
 			onPropValueChange( {
 				[ attrName ]: castValue( next, current ),
-			} ),
+			} );
+		},
 		[ attrName, onPropValueChange ]
 	);
 
 	useLayoutEffect( () => {
-		const rawAttrValue = getAttributeValue( attrValue );
+		const prevRawAttrValue = getAttributeValue( prevAttrValue.current );
 
 		if ( typeof propValue !== 'undefined' ) {
 			/*
 			 * On-sync from external property to attribute.
-			 * When the propValue is different from the previous one,
-			 * and also it's different from the current attribute value,
-			 * update the attribute value.
+			 * Update the block attribute when the previous attribute one
+			 * is different from the new external property.
 			 */
-			if ( propValue !== prevPropValue.current ) {
-				// Store the current propValue to compare in the next render.
-				prevPropValue.current = propValue;
-
-				if ( propValue !== rawAttrValue ) {
-					updateBoundAttribute( propValue, attrValue );
-					return; // close the sync cycle.
-				}
+			if ( propValue !== prevRawAttrValue ) {
+				updateBoundAttribute( propValue, attrValue );
+				return; // close the sync cycle.
 			}
 		} else if ( placeholder ) {
 			/*
@@ -189,11 +192,8 @@ const BindingConnector = ( {
 		}
 
 		// Sync from block attribute to external source property.
-		if ( rawAttrValue !== getAttributeValue( prevAttrValue.current ) ) {
-			if ( rawAttrValue === propValue ) {
-				return;
-			}
-
+		const rawAttrValue = getAttributeValue( attrValue );
+		if ( rawAttrValue !== prevRawAttrValue ) {
 			prevAttrValue.current = attrValue;
 			updatePropValue( rawAttrValue );
 		}
