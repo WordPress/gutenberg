@@ -188,7 +188,6 @@ function Option< T extends Color | Gradient >( {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
-	console.log({receivedPopoverProps})
 	const popoverProps = useMemo(
 		() => ( {
 			...receivedPopoverProps,

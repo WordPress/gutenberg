@@ -8,6 +8,7 @@ import {
     __experimentalSpacer as Spacer,
     __experimentalItemGroup as ItemGroup,
     __experimentalHeading as Heading,
+    __experimentalInputControl as InputControl,
     Popover,
     RangeControl,
     Button,
@@ -33,7 +34,7 @@ const shadowIndicatorStyle = {
     borderRadius: '2px',
     boxSizing: 'border-box',
     color: '#2f2f2f',
-    cursor: 'pointer',
+    cursor: 'default',
     height: '26px',
     width: '26px',
     padding: 0,
@@ -56,11 +57,11 @@ export default function ShadowsPanel() {
 		>
             <ShadowsEditor label={ __( 'Default' ) } shadows={ defaultShadows || [] } />
             <ShadowsEditor label={ __( 'Theme' ) } shadows={ themeShadows || [] } placeholder={ __('Theme shadows are empty!') } />
-            <ShadowsEditor label={ __( 'Custom' ) } shadows={ customShadows || [] } placeholder={ __('Custom shadows are empty!') } canCreate={true} onCreate={setCustomShadows}/>
+            <ShadowsEditor label={ __( 'Custom' ) } shadows={ customShadows || [] } placeholder={ __('Custom shadows are empty!') } isCustom={true} onCreate={setCustomShadows}/>
         </VStack>;
 }
 
-function ShadowsEditor({label, placeholder, shadows: savedShadows, canCreate, onCreate}) {
+function ShadowsEditor({label, placeholder, shadows: savedShadows, isCustom, onCreate}) {
     const [isEditing, setIsEditing] = useState(false);
     const [shadows, setShadows] = useState(savedShadows || []);
 
@@ -74,12 +75,21 @@ function ShadowsEditor({label, placeholder, shadows: savedShadows, canCreate, on
             {
                 name: 'Custom shadow ' + (shadows.length + 1),
                 slug: 'custom-shadow-' + (shadows.length + 1),
-                shadow: '0 0 4 4 rgba(0, 0, 0, 0.3)',
+                shadow: '0 0 4px 4px rgba(0, 0, 0, 0.3)',
             }
         ]
         setShadows(newShadows);
 
         // onCreate();
+    }
+
+    const handleShadowChange = (index, shadow) => {
+        const newShadows = [
+            ...shadows.slice(0, index),
+            shadow,
+            ...shadows.slice(index + 1),
+        ];
+        setShadows(newShadows);
     }
 
     return <div>
@@ -99,7 +109,7 @@ function ShadowsEditor({label, placeholder, shadows: savedShadows, canCreate, on
                         { __( 'Done' ) }
                     </Button>
                 ) }
-                {canCreate && <Button
+                {isCustom && <Button
                     size="small"
                     icon={ plus }
                     label={ __( 'Add shadow' ) }
@@ -138,7 +148,7 @@ function ShadowsEditor({label, placeholder, shadows: savedShadows, canCreate, on
         </div>
         <Spacer height={ 4 } />
 
-        { isEditing ? <ShadowsEditorView label={label} shadows={shadows} /> : <ShadowsReadOnlyView label={label} shadows={shadows} placeholder={placeholder} /> }
+        { isEditing ? <ShadowsEditorView label={label} shadows={shadows} isCustom={isCustom} onChange={handleShadowChange} /> : <ShadowsReadOnlyView label={label} shadows={shadows} placeholder={placeholder} /> }
         
     </div>
 }
@@ -178,19 +188,22 @@ function ShadowIndicator( { label, isActive, onSelect, shadow } ) {
     );
 }
 
-function ShadowsEditorView({label, shadows}) {
+function ShadowsEditorView({label, shadows, isCustom, onChange}) {
     return <VStack spacing={ 3 }>
         <ItemGroup isRounded>
             {
-                shadows.map( ( { name, slug, shadow } ) => (
-                    <ShadowEditableItem key={ slug } label={ name } shadow={ shadow } />
+                shadows.map( ( { name, slug, shadow }, index ) => (
+                    <ShadowEditableItem key={ slug } label={ name } shadow={ shadow } isCustom={isCustom} onChange={(updated) => onChange(index, ({
+                        name, slug,
+                        shadow: updated,
+                    }))} />
                 ) )
             }
         </ItemGroup>
     </VStack>
 }
 
-function ShadowEditableItem({label, shadow}) {
+function ShadowEditableItem({label, shadow, onChange, isCustom}) {
     const [isEditing, setIsEditing] = useState(false);
     const [ popoverAnchor, setPopoverAnchor ] = useState( null );
     const popoverProps = useMemo(
@@ -208,18 +221,27 @@ function ShadowEditableItem({label, shadow}) {
             <div style={{marginBottom: '-4px'}}>
                 <Icon icon={ shadowIcon } />
             </div>
-            <div style={{flexGrow: 1, margin: '0 6px'}} onClick={() => {setIsEditing(true)}}>{label}</div>
+            <div style={{flexGrow: 1, margin: '0 6px'}}>
+                {
+                    isCustom ? 
+                    <InputControl
+                        value={ label }
+                        onChange={ () => {} }
+                        onFocus={ () => {setIsEditing(true)} }
+                    /> : <div style={{cursor: 'pointer'}} onClick={() => {setIsEditing(true)}}>{label}</div>
+                }
+            </div>
             <div style={{marginBottom: '-4px'}}>
                 <Icon icon={ lineSolid } />
             </div>
         </div>
         {
-            isEditing && <ShadowPopover shadow={shadow} popoverProps={popoverProps} onClose={ () => setIsEditing( false ) } />
+            isEditing && <ShadowPopover shadow={shadow} popoverProps={popoverProps} onClose={ () => setIsEditing( false ) } onChange={onChange} />
         }
     </div>
 }
 
-function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
+function ShadowPopover({shadow: savedShadow, popoverProps, onClose, onChange}) {
     const shadowParts = shadowStringToObject(savedShadow || '');
     const [ shadow, setShadow ] = useState( {
         x: shadowParts.x, 
@@ -231,7 +253,8 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
 
     const shadowString = `${shadow.x}px ${shadow.y}px ${shadow.blur}px ${shadow.spread}px ${shadow.color}`;
 
-    const onChange = ( key, value ) => {
+    const handleChange = ( key, value ) => {
+        onChange(shadowString);
         setShadow( {
             ...shadow,
             [ key ]: value,
@@ -241,7 +264,9 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
     return <Popover {...popoverProps} onClose={onClose}>
         <div className="block-editor-global-styles__shadow-popover-container">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
+                <div style={{padding: '0.5rem'}}>
+				    <Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
+                </div>
                 <div style={{padding: '0.5rem',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
                     <div style={ { ...shadowIndicatorStyle, boxShadow: shadowString } }
                     ></div>
@@ -250,7 +275,7 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
                     <div>
                         <RangeControl label="X position"
                             value={ shadow.x }
-                            onChange={ ( value ) => onChange( 'x', value ) }
+                            onChange={ ( value ) => handleChange( 'x', value ) }
                             withInputField={ false }
                             min={ 0 }
                             max={ 10 }
@@ -259,7 +284,7 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
                     <div>
                         <RangeControl label="Y position"
                             value={ shadow.y }
-                            onChange={ ( value ) => onChange( 'y', value ) }
+                            onChange={ ( value ) => handleChange( 'y', value ) }
                             withInputField={ false }
                             min={ 0 }
                             max={ 10 }
@@ -268,7 +293,7 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
                     <div>
                         <RangeControl label="Blur"
                             value={ shadow.blur }
-                            onChange={ ( value ) => onChange( 'blur', value ) }
+                            onChange={ ( value ) => handleChange( 'blur', value ) }
                             withInputField={ false }
                             min={ 0 }
                             max={ 10 }
@@ -277,7 +302,7 @@ function ShadowPopover({shadow: savedShadow, popoverProps, onClose}) {
                     <div>
                         <RangeControl label="Spread"
                             value={ shadow.spread }
-                            onChange={ ( value ) => onChange( 'spread', value ) }
+                            onChange={ ( value ) => handleChange( 'spread', value ) }
                             withInputField={ false }
                             min={ 0 }
                             max={ 10 }
