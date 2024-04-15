@@ -46,10 +46,6 @@ export type NavigatorProviderProps = {
 	 */
 	initialPath: string;
 	/**
-	 * External router
-	 */
-	router?: NavigatorContext;
-	/**
 	 * The children elements.
 	 */
 	children: ReactNode;

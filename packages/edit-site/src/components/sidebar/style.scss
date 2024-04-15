@@ -1,9 +1,7 @@
 .edit-site-sidebar__content {
 	flex-grow: 1;
 	overflow-y: auto;
-}
 
-.edit-site-sidebar__screen-wrapper {
 	@include custom-scrollbars-on-hover(transparent, $gray-700);
 	scrollbar-gutter: stable;
 	display: flex;

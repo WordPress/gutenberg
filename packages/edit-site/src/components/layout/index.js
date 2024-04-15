@@ -11,8 +11,6 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -52,7 +50,6 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
-import { useRouter } from '../sync-state-with-url/use-sync-path-with-url';
 import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -122,7 +119,6 @@ export default function Layout() {
 	const animationRef = useMovingAnimation( {
 		triggerAnimationOnChange: canvasMode + '__' + routeKey,
 	} );
-	const router = useRouter();
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -251,14 +247,9 @@ export default function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<NavigatorProvider
-											className="edit-site-sidebar__content"
-											router={ router }
-										>
-											<NavigatorScreen className="edit-site-sidebar__screen-wrapper">
-												{ areas.sidebar }
-											</NavigatorScreen>
-										</NavigatorProvider>
+										<div className="edit-site-sidebar__content">
+											{ areas.sidebar }
+										</div>
 										<SaveHub />
 									</motion.div>
 								) }

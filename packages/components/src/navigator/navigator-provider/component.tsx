@@ -203,7 +203,13 @@ function routerReducer(
 	return { screens, locationHistory, matchedPath };
 }
 
-function useMemoryRouter( initialPath: string ): NavigatorContextType {
+function UnconnectedNavigatorProvider(
+	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
+	forwardedRef: ForwardedRef< any >
+) {
+	const { initialPath, children, className, ...otherProps } =
+		useContextSystem( props, 'NavigatorProvider' );
+
 	const [ routerState, dispatch ] = useReducer(
 		routerReducer,
 		initialPath,
@@ -232,7 +238,7 @@ function useMemoryRouter( initialPath: string ): NavigatorContextType {
 
 	const { locationHistory, matchedPath } = routerState;
 
-	return useMemo(
+	const navigatorContextValue: NavigatorContextType = useMemo(
 		() => ( {
 			location: {
 				...locationHistory[ locationHistory.length - 1 ],
@@ -244,17 +250,6 @@ function useMemoryRouter( initialPath: string ): NavigatorContextType {
 		} ),
 		[ locationHistory, matchedPath, methods ]
 	);
-}
-
-function UnconnectedNavigatorProvider(
-	props: WordPressComponentProps< NavigatorProviderProps, 'div' >,
-	forwardedRef: ForwardedRef< any >
-) {
-	const { initialPath, children, className, router, ...otherProps } =
-		useContextSystem( props, 'NavigatorProvider' );
-
-	const memoryRouter = useMemoryRouter( initialPath );
-	const navigatorContextValue = router ?? memoryRouter;
 
 	const cx = useCx();
 	const classes = useMemo(
