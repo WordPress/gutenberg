@@ -43,7 +43,7 @@ export const updateHead = async ( newHead ) => {
  * @param {Document} document     The document from which to fetch head assets. It should support standard DOM querying methods.
  * @param {Map}      headElements A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
  *
- * @return {HTMLElement[]} Returns an array of HTML elements representing the head assets.
+ * @return {Promise<HTMLElement[]>} Returns an array of HTML elements representing the head assets.
  */
 export const fetchHeadAssets = async ( document, headElements ) => {
 	const headTags = [];
