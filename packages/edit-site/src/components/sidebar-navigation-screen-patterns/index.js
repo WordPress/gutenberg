@@ -38,6 +38,22 @@ function TemplatePartGroup( { areas, currentArea, currentType } ) {
 				<Heading level={ 2 }>{ __( 'Template parts' ) }</Heading>
 			</div>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
+				<CategoryItem
+					key="all"
+					count={ Object.values( areas )
+						.map(
+							( { templateParts } ) => templateParts?.length || 0
+						)
+						.reduce( ( acc, val ) => acc + val, 0 ) }
+					icon={ getTemplatePartIcon() } /* no name, so it provides the fallback icon */
+					label={ __( 'All template parts' ) }
+					id={ 'all-parts' }
+					type={ TEMPLATE_PART_POST_TYPE }
+					isActive={
+						currentArea === 'all-parts' &&
+						currentType === TEMPLATE_PART_POST_TYPE
+					}
+				/>
 				{ Object.entries( areas ).map(
 					( [ area, { label, templateParts } ] ) => (
 						<CategoryItem
