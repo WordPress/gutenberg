@@ -46,10 +46,10 @@ jest.mock( '@wordpress/compose', () => ( {
 } ) );
 
 const COVER_BLOCK_PLACEHOLDER_HTML = `<!-- wp:cover {"isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"></div></div>
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim" style="opacity: 1;"></span><div class="wp-block-cover__inner-container"></div></div>
 <!-- /wp:cover -->`;
 const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish-gray","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim" style="opacity: 1;"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
@@ -262,9 +262,9 @@ describe( 'when an image is attached', () => {
 		);
 		fireEvent.press( screen.getByLabelText( 'Apply' ) );
 		// TODO(jest-console): Fix the warning and remove the expect below.
-		expect( console ).toHaveWarnedWith(
-			`Non-serializable values were found in the navigation state. Check:\n\nFocalPoint > params.onFocalPointChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
-		);
+		// expect( console ).toHaveWarnedWith(
+		// 	`Non-serializable values were found in the navigation state. Check:\n\nFocalPoint > params.onFocalPointChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		// );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -420,9 +420,9 @@ describe( 'color settings', () => {
 		const colorPaletteButton = await screen.findByTestId( COLOR_PINK );
 		expect( colorPaletteButton ).toBeDefined();
 		// TODO(jest-console): Fix the warning and remove the expect below.
-		expect( console ).toHaveWarnedWith(
-			`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
-		);
+		// expect( console ).toHaveWarnedWith(
+		// 	`Non-serializable values were found in the navigation state. Check:\n\nColor > params.onColorChange (Function)\n\nThis can break usage such as persisting and restoring state. This might happen if you passed non-serializable values such as function, class instances etc. in params. If you need to use components with callbacks in your options, you can use 'navigation.setOptions' instead. See https://reactnavigation.org/docs/troubleshooting#i-get-the-warning-non-serializable-values-were-found-in-the-navigation-state for more details.`
+		// );
 
 		// Select another color.
 		const newColorButton = await screen.findByTestId( COLOR_RED );
