@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalItemGroup as ItemGroup,
-	__experimentalNavigatorButton as NavigatorButton,
-} from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
 import { useDispatch } from '@wordpress/data';
@@ -39,44 +36,40 @@ export default function SidebarNavigationScreenMain() {
 			content={
 				<>
 					<ItemGroup>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
+						<SidebarNavigationItem
 							path="/navigation"
 							withChevron
 							icon={ navigation }
 						>
 							{ __( 'Navigation' ) }
-						</NavigatorButton>
+						</SidebarNavigationItem>
 						<SidebarNavigationItemGlobalStyles
 							withChevron
 							icon={ styles }
 						>
 							{ __( 'Styles' ) }
 						</SidebarNavigationItemGlobalStyles>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
+						<SidebarNavigationItem
 							path="/page"
 							withChevron
 							icon={ page }
 						>
 							{ __( 'Pages' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
+						</SidebarNavigationItem>
+						<SidebarNavigationItem
 							path="/wp_template"
 							withChevron
 							icon={ layout }
 						>
 							{ __( 'Templates' ) }
-						</NavigatorButton>
-						<NavigatorButton
-							as={ SidebarNavigationItem }
+						</SidebarNavigationItem>
+						<SidebarNavigationItem
 							path="/patterns"
 							withChevron
 							icon={ symbol }
 						>
 							{ __( 'Patterns' ) }
-						</NavigatorButton>
+						</SidebarNavigationItem>
 					</ItemGroup>
 				</>
 			}
