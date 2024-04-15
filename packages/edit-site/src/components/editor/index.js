@@ -24,7 +24,6 @@ import {
 	store as blockEditorStore,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import { BlockKeyboardShortcuts } from '@wordpress/block-library';
 import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
@@ -35,6 +34,7 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -67,6 +67,8 @@ const {
 	ComplementaryArea,
 	interfaceStore,
 } = unlock( editorPrivateApis );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */

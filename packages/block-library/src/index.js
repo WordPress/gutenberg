@@ -331,4 +331,4 @@ export const __experimentalRegisterExperimentalCoreBlocks = process.env
 	  }
 	: undefined;
 
-export { default as BlockKeyboardShortcuts } from './block-keyboard-shortcuts';
+export { privateApis } from './private-apis';

@@ -12,9 +12,9 @@ import {
 } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { BlockKeyboardShortcuts } from '@wordpress/block-library';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -28,6 +28,8 @@ import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,

@@ -25,8 +25,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ScrollLock } from '@wordpress/components';
-import { BlockKeyboardShortcuts } from '@wordpress/block-library';
-import { Button, ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -36,6 +34,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -66,6 +65,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */

@@ -12,9 +12,9 @@ import {
 	privateApis as blockEditorPrivateApis,
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import { BlockKeyboardShortcuts } from '@wordpress/block-library';
 import { uploadMedia } from '@wordpress/media-utils';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -31,6 +31,8 @@ import { unlock } from '../../lock-unlock';
 const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
