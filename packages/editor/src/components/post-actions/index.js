@@ -35,7 +35,10 @@ const POST_ACTIONS_WHILE_EDITING = [
 	'view-post',
 	'view-post-revisions',
 	'rename-post',
+	'rename-template',
 	'move-to-trash',
+	'reset-template',
+	'delete-template',
 ];
 
 export default function PostActions( { onActionPerformed, buttonProps } ) {
@@ -51,13 +54,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		POST_ACTIONS_WHILE_EDITING
 	);
 
-	if (
-		[
-			TEMPLATE_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType )
-	) {
+	if ( PATTERN_POST_TYPE === postType ) {
 		return null;
 	}
 	return (

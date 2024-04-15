@@ -6,6 +6,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
 import { Icon } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { useCallback } from '@wordpress/element';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -18,9 +21,11 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import { useAddedBy } from '../page-templates-template-parts/hooks';
-import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
+
+const { PostActions } = unlock( editorPrivateApis );
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
@@ -104,20 +109,25 @@ export default function SidebarNavigationScreenTemplate() {
 		postType,
 		postId
 	);
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'delete-template' ) {
+				navigator.goTo(
+					items[ 0 ].type === TEMPLATE_PART_POST_TYPE
+						? '/' + TEMPLATE_PART_POST_TYPE + '/all'
+						: '/' + items[ 0 ].type
+				);
+			}
+		},
+		[ navigator ]
+	);
 
 	return (
 		<SidebarNavigationScreen
 			title={ title }
 			actions={
 				<>
-					<TemplateActions
-						postType={ postType }
-						postId={ postId }
-						toggleProps={ { as: SidebarButton } }
-						onRemove={ () => {
-							history.push( { path: '/' + postType } );
-						} }
-					/>
+					<PostActions onActionPerformed={ onActionPerformed } />
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }
 						label={ __( 'Edit' ) }

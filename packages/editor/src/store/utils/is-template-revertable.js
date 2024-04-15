@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS } from '../constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../constants';
 
 // Copy of the function from packages/edit-site/src/utils/is-template-revertable.js
 
@@ -12,7 +16,11 @@ import { TEMPLATE_ORIGINS } from '../constants';
  * @return {boolean} Whether the template is revertable.
  */
 export default function isTemplateRevertable( template ) {
-	if ( ! template ) {
+	if (
+		! template ||
+		( template.type !== TEMPLATE_POST_TYPE &&
+			template.type !== TEMPLATE_PART_POST_TYPE )
+	) {
 		return false;
 	}
 	/* eslint-disable camelcase */

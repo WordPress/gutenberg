@@ -18,18 +18,18 @@ import { useAsyncList } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import TemplateActions from '../../template-actions';
 import PluginTemplateSettingPanel from '../../plugin-template-setting-panel';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
-const { PostCardPanel } = unlock( editorPrivateApis );
+const { PostCardPanel, PostActions } = unlock( editorPrivateApis );
 const { PatternOverridesPanel } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -49,11 +49,6 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 		/>
 	);
 }
-
-const POST_TYPE_PATH = {
-	wp_template: '/wp_template',
-	wp_template_part: '/patterns',
-};
 
 export default function TemplatePanel() {
 	const { title, description, record, postType, postId } = useSelect(
@@ -81,6 +76,22 @@ export default function TemplatePanel() {
 		[]
 	);
 	const history = useHistory();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'delete-template' ) {
+				history.push( {
+					path:
+						items[ 0 ].type === TEMPLATE_PART_POST_TYPE
+							? '/' + TEMPLATE_PART_POST_TYPE + '/all'
+							: '/' + items[ 0 ].type,
+					postId: undefined,
+					postType: undefined,
+					canvas: 'view',
+				} );
+			}
+		},
+		[ history ]
+	);
 	const availablePatterns = useAvailablePatterns( record );
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -100,17 +111,7 @@ export default function TemplatePanel() {
 			<PostCardPanel
 				className="edit-site-template-card"
 				actions={
-					<TemplateActions
-						postType={ postType }
-						postId={ postId }
-						className="edit-site-template-card__actions"
-						toggleProps={ { size: 'small' } }
-						onRemove={ () => {
-							history.push( {
-								path: POST_TYPE_PATH[ postType ],
-							} );
-						} }
-					/>
+					<PostActions onActionPerformed={ onActionPerformed } />
 				}
 			/>
 			<PluginTemplateSettingPanel.Slot />

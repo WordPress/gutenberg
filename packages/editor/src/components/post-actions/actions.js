@@ -21,7 +21,12 @@ import {
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
@@ -33,13 +38,19 @@ function getItemTitle( item ) {
 	return decodeEntities( item.title?.rendered || '' );
 }
 
+const SITE_EDITING_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+];
+
 const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
 	icon: trash,
-	isEligible( { status } ) {
-		return status !== 'trash';
+	isEligible( { type, status } ) {
+		return status !== 'trash' && ! SITE_EDITING_POST_TYPES.includes( type );
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -182,8 +193,11 @@ function usePermanentlyDeletePostAction() {
 			id: 'permanently-delete',
 			label: __( 'Permanently delete' ),
 			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
+			isEligible( { status, type } ) {
+				return (
+					status === 'trash' &&
+					! SITE_EDITING_POST_TYPES.includes( type )
+				);
 			},
 			async callback( posts, onActionPerformed ) {
 				const promiseResult = await Promise.allSettled(
@@ -292,8 +306,11 @@ function useRestorePostAction() {
 			isPrimary: true,
 			icon: backup,
 			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
+			isEligible( { status, type } ) {
+				return (
+					status === 'trash' &&
+					! SITE_EDITING_POST_TYPES.includes( type )
+				);
 			},
 			async callback( posts, onActionPerformed ) {
 				try {
@@ -371,7 +388,10 @@ const viewPostAction = {
 	isPrimary: true,
 	icon: external,
 	isEligible( post ) {
-		return post.status !== 'trash';
+		return (
+			post.status !== 'trash' &&
+			! SITE_EDITING_POST_TYPES.includes( post.type )
+		);
 	},
 	callback( posts, onActionPerformed ) {
 		const post = posts[ 0 ];
@@ -387,8 +407,8 @@ const editPostAction = {
 	label: __( 'Edit' ),
 	isPrimary: true,
 	icon: edit,
-	isEligible( { status } ) {
-		return status !== 'trash';
+	isEligible( { status, type } ) {
+		return status !== 'trash' && ! SITE_EDITING_POST_TYPES.includes( type );
 	},
 	callback( posts, onActionPerformed ) {
 		if ( onActionPerformed ) {
@@ -396,12 +416,16 @@ const editPostAction = {
 		}
 	},
 };
+
 const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
 	isPrimary: false,
 	isEligible: ( post ) => {
-		if ( post.status === 'trash' ) {
+		if (
+			post.status === 'trash' ||
+			SITE_EDITING_POST_TYPES.includes( post.type )
+		) {
 			return false;
 		}
 		const lastRevisionId =
@@ -426,7 +450,10 @@ const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
-		return post.status !== 'trash';
+		return (
+			post.status !== 'trash' &&
+			! SITE_EDITING_POST_TYPES.includes( post.type )
+		);
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -534,7 +561,7 @@ const resetTemplateAction = {
 						: sprintf(
 								/* translators: The template/part's name. */
 								__( '"%s" reset.' ),
-								decodeEntities( items[ 0 ].title.rendered )
+								getItemTitle( items[ 0 ] )
 						  ),
 					{
 						type: 'snackbar',
@@ -603,7 +630,11 @@ const resetTemplateAction = {
  * @return {boolean} Whether the template is revertable.
  */
 function isTemplateRemovable( template ) {
-	if ( ! template ) {
+	if (
+		! template ||
+		( template.type !== TEMPLATE_POST_TYPE &&
+			template.type !== TEMPLATE_PART_POST_TYPE )
+	) {
 		return false;
 	}
 
@@ -636,9 +667,7 @@ const deleteTemplateAction = {
 						: sprintf(
 								// translators: %s: The template or template part's titles
 								__( 'Delete "%s"?' ),
-								decodeEntities(
-									templates?.[ 0 ]?.title?.rendered
-								)
+								getItemTitle( templates[ 0 ] )
 						  ) }
 				</Text>
 				<HStack justify="right">
@@ -679,7 +708,7 @@ const renameTemplateAction = {
 	},
 	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
 		const template = templates[ 0 ];
-		const title = decodeEntities( template.title.rendered );
+		const title = getItemTitle( template );
 		const [ editedTitle, setEditedTitle ] = useState( title );
 		const {
 			editEntityRecord,
