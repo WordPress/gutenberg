@@ -79,7 +79,7 @@ export default {
 					onChange={ onChange }
 				/>
 				{ layout?.columnCount ? (
-					<GridLayoutColumnsControl
+					<GridLayoutColumnsAndRowsControl
 						layout={ layout }
 						onChange={ onChange }
 						allowSizingOnChildren={ allowSizingOnChildren }
@@ -239,7 +239,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 }
 
 // Enables setting number of grid columns
-function GridLayoutColumnsControl( {
+function GridLayoutColumnsAndRowsControl( {
 	layout,
 	onChange,
 	allowSizingOnChildren,
