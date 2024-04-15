@@ -10,11 +10,11 @@
  * Get the class name for this application of this block's variation styles.
  *
  * @param array  $block     Block object.
- * @param string $variation Slug for the variation.
+ * @param string $variation Slug for the block style variation.
  *
  * @return string The unique class name.
  */
-function gutenberg_get_variation_class_name( $block, $variation ) {
+function gutenberg_get_block_style_variation_class_name( $block, $variation ) {
 	return 'is-style-' . $variation . '--' . md5( serialize( $block ) );
 }
 
@@ -23,9 +23,9 @@ function gutenberg_get_variation_class_name( $block, $variation ) {
  *
  * @param string $class_string CSS class string to look for a variation in.
  *
- * @return string|null The variation name if found.
+ * @return string|null The block style variation name if found.
  */
-function gutenberg_get_variation_name_from_class( $class_string ) {
+function gutenberg_get_block_style_variation_name_from_class( $class_string ) {
 	if ( ! is_string( $class_string ) ) {
 		return null;
 	}
@@ -46,11 +46,11 @@ function gutenberg_get_variation_name_from_class( $class_string ) {
  *
  * @param array $parsed_block The parsed block.
  *
- * @return array The same parsed block with variation classname added if appropriate.
+ * @return array The parsed block with block style variation classname added.
  */
-function gutenberg_render_variation_support_styles( $parsed_block ) {
+function gutenberg_render_block_style_variation_support_styles( $parsed_block ) {
 	$classes   = $parsed_block['attrs']['className'] ?? null;
-	$variation = gutenberg_get_variation_name_from_class( $classes );
+	$variation = gutenberg_get_block_style_variation_name_from_class( $classes );
 
 	if ( ! $variation ) {
 		return $parsed_block;
@@ -69,7 +69,7 @@ function gutenberg_render_variation_support_styles( $parsed_block ) {
 		'styles'  => $variation_data,
 	);
 
-	$class_name         = gutenberg_get_variation_class_name( $parsed_block, $variation );
+	$class_name         = gutenberg_get_block_style_variation_class_name( $parsed_block, $variation );
 	$updated_class_name = $parsed_block['attrs']['className'] . " $class_name";
 
 	$class_name = ".$class_name";
@@ -97,8 +97,8 @@ function gutenberg_render_variation_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	wp_register_style( 'variation-styles', false, array( 'global-styles' ) );
-	wp_add_inline_style( 'variation-styles', $variation_styles );
+	wp_register_style( 'block-style-variation-styles', false, array( 'global-styles' ) );
+	wp_add_inline_style( 'block-style-variation-styles', $variation_styles );
 
 	/*
 	 * Add variation instance class name to block's className string so it can
@@ -114,14 +114,14 @@ function gutenberg_render_variation_support_styles( $parsed_block ) {
  * block attributes in the `render_block_data` filter gets applied to the
  * block's markup.
  *
- * @see gutenberg_render_variation_support_styles
+ * @see gutenberg_render_block_style_variation_support_styles
  *
  * @param  string $block_content Rendered block content.
  * @param  array  $block         Block object.
  *
  * @return string                Filtered block content.
  */
-function gutenberg_render_variation_class_name( $block_content, $block ) {
+function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
 		return $block_content;
 	}
@@ -130,7 +130,7 @@ function gutenberg_render_variation_class_name( $block_content, $block ) {
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally a hash.
 	 *
-	 * See `gutenberg_get_variation_class_name` for class generation.
+	 * See `gutenberg_get_block_style_variation_class_name` for class generation.
 	 */
 	preg_match( '/\bis-style-(\S+?--\w+)\b/', $block['attrs']['className'], $matches );
 
@@ -144,7 +144,7 @@ function gutenberg_render_variation_class_name( $block_content, $block ) {
 		/*
 		 * Ensure the variation instance class name set in the
 		 * `render_block_data` filter is applied in markup.
-		 * See `gutenberg_render_variation_support_styles`.
+		 * See `gutenberg_render_block_style_variation_support_styles`.
 		 */
 		$tags->add_class( $matches[0] );
 	}
@@ -322,16 +322,16 @@ function gutenberg_resolve_block_style_variations_from_styles_registry( $theme_j
 /**
  * Enqueues styles for block style variations.
  */
-function gutenberg_enqueue_variation_styles() {
-	wp_enqueue_style( 'variation-styles' );
+function gutenberg_enqueue_block_style_variation_styles() {
+	wp_enqueue_style( 'block-style-variation-styles' );
 }
 
 // Register the block support.
-WP_Block_Supports::get_instance()->register( 'variation', array() );
+WP_Block_Supports::get_instance()->register( 'block-style-variation', array() );
 
-add_filter( 'render_block_data', 'gutenberg_render_variation_support_styles', 10, 2 );
-add_filter( 'render_block', 'gutenberg_render_variation_class_name', 10, 2 );
-add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_variation_styles', 1 );
+add_filter( 'render_block_data', 'gutenberg_render_block_style_variation_support_styles', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_block_style_variation_class_name', 10, 2 );
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_style_variation_styles', 1 );
 
 // Resolve block style variations from all their potential sources. The order here is deliberate.
 add_filter( 'wp_theme_json_data_theme', 'gutenberg_resolve_block_style_variations_from_primary_theme_json', 10, 1 );
