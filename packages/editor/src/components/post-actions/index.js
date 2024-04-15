@@ -89,7 +89,7 @@ export default function PostActions( { onActionPerformed } ) {
 		<DropdownMenu
 			trigger={
 				<Button
-					size="compact"
+					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={
