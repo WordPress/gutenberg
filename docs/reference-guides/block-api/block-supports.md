@@ -61,7 +61,7 @@ supports: {
 -   Type: `boolean` or `array`
 -   Default value: `false`
 
-This property adds block controls which allow you to change the block's alignment.
+This property adds block controls, which enable changes to a block's alignment.
 
 ```js
 supports: {
@@ -113,7 +113,7 @@ ARIA-labels let you define an accessible label for elements. This property allow
 
 ```js
 supports: {
-	// Add support for the aria label.
+	// Add support for an aria label.
 	ariaLabel: true
 }
 ```

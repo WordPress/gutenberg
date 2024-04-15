@@ -207,6 +207,20 @@ function Iframe( {
 		};
 	}, [] );
 
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		const onResize = () => {
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -214,6 +228,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -229,12 +247,12 @@ function Iframe( {
 				height: auto !important;
 				min-height: 100%;
 			}
-
-			body {
+			/* Lowest specificity to not override global styles */
+			:where(body) {
 				margin: 0;
 				/* Default background color in case zoom out mode background
 				colors the html element */
-				background: white;
+				background-color: white;
 			}
 		</style>
 		${ styles }
@@ -254,32 +272,48 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
+	scale =
+		typeof scale === 'function'
+			? scale( contentWidth, contentHeight )
+			: scale;
+
 	useEffect( () => {
 		if ( ! iframeDocument ) {
 			return;
 		}
 
-		const _scale =
-			typeof scale === 'function'
-				? scale( contentWidth, contentHeight )
-				: scale;
-
-		if ( _scale !== 1 ) {
+		if ( scale !== 1 ) {
 			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - _scale );
+			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
-			iframeDocument.documentElement.style.transform = `scale( ${ _scale } )`;
+			iframeDocument.body.classList.add( 'is-zoomed-out' );
+
+			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
 			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
+			if ( iframeWindowInnerHeight > contentHeight * scale ) {
+				iframeDocument.body.style.minHeight = `${ Math.floor(
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
+				) }px`;
+			}
 
 			return () => {
+				iframeDocument.body.classList.remove( 'is-zoomed-out' );
 				iframeDocument.documentElement.style.transform = '';
 				iframeDocument.documentElement.style.marginTop = '';
 				iframeDocument.documentElement.style.marginBottom = '';
+				iframeDocument.body.style.minHeight = '';
 			};
 		}
-	}, [ scale, frameSize, contentHeight, contentWidth, iframeDocument ] );
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		contentHeight,
+		iframeWindowInnerHeight,
+		contentWidth,
+	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.

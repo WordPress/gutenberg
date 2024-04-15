@@ -15,13 +15,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
-import {
-	chevronLeftSmall,
-	chevronRightSmall,
-	page as pageIcon,
-	navigation as navigationIcon,
-	symbol,
-} from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
@@ -32,6 +26,7 @@ import { useReducedMotion } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const TYPE_LABELS = {
 	// translators: 1: Pattern title.
@@ -42,11 +37,6 @@ const TYPE_LABELS = {
 	wp_template: __( 'Editing template: %s' ),
 	// translators: 1: Template part title.
 	wp_template_part: __( 'Editing template part: %s' ),
-};
-
-const ICONS = {
-	wp_block: symbol,
-	wp_navigation: navigationIcon,
 };
 
 const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
@@ -74,7 +64,8 @@ export default function DocumentBar() {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, getIsResolving } = select( coreStore );
+		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
+			select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
@@ -86,13 +77,18 @@ export default function DocumentBar() {
 		return {
 			postType: _postType,
 			document: _document,
-			isResolving: getIsResolving(
+			isResolving: isResolvingSelector(
 				'getEditedEntityRecord',
 				'postType',
 				_postType,
 				_postId
 			),
-			templateIcon: _templateInfo.icon,
+			templateIcon: unlock( select( editorStore ) ).getPostIcon(
+				_postType,
+				{
+					area: _document?.area,
+				}
+			),
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -103,7 +99,6 @@ export default function DocumentBar() {
 	const isReducedMotion = useReducedMotion();
 
 	const isNotFound = ! document && ! isResolving;
-	const icon = ICONS[ postType ] ?? pageIcon;
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
@@ -176,7 +171,7 @@ export default function DocumentBar() {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
+						<BlockIcon icon={ templateIcon } />
 						<Text
 							size="body"
 							as="h1"

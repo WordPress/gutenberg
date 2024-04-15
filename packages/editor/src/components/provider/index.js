@@ -167,7 +167,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const blockEditorSettings = useBlockEditorSettings(
 			editorSettings,
 			type,
-			id
+			id,
+			mode
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
@@ -232,7 +233,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setRenderingMode( settings.defaultRenderingMode ?? 'post-only' );
 		}, [ settings.defaultRenderingMode, setRenderingMode ] );
 
-		useHideBlocksFromInserter( post.type );
+		useHideBlocksFromInserter( post.type, mode );
 
 		// Register the editor commands.
 		useCommands();

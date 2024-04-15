@@ -118,7 +118,6 @@ export default function PreviewIframe( {
 				<Iframe
 					className="edit-site-global-styles-preview__iframe"
 					style={ {
-						width: '100%',
 						height: normalizedHeight * ratio,
 					} }
 					onMouseEnter={ () => setIsHovered( true ) }

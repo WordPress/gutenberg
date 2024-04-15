@@ -26,17 +26,14 @@ function ScreenTypography() {
 			<ScreenHeader
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Manage the typography settings for different elements.'
+					'Typography styles and the application of those styles on site elements.'
 				) }
 			/>
-			<div className="edit-site-global-styles-screen-typography">
-				<VStack spacing={ 6 }>
-					<TypographyVariations />
-					{ ! window.__experimentalDisableFontLibrary && (
-						<VStack spacing={ 3 }>
-							{ fontLibraryEnabled && <FontFamilies /> }
-						</VStack>
-					) }
+			<div className="edit-site-global-styles-screen">
+				<VStack spacing={ 7 }>
+					<TypographyVariations title={ __( 'Presets' ) } />
+					{ ! window.__experimentalDisableFontLibrary &&
+						fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
 				</VStack>
 			</div>

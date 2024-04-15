@@ -11,8 +11,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -24,8 +24,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-17haj95-View-large-item-spacedAround e19lxcc00"
+-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-gg7ygh-View-large-item-spacedAround e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -44,8 +44,8 @@ Snapshot Diff:
       role="listitem"
     >
       <div
--       class="components-item css-cl593w-View-medium-item e19lxcc00"
-+       class="components-item css-1yvqxd-View-large-item e19lxcc00"
+-       class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
++       class="components-item css-1vv4aem-View-large-item e19lxcc00"
         data-wp-c16t="true"
         data-wp-component="Item"
       >
@@ -74,7 +74,7 @@ exports[`ItemGroup ItemGroup component should render correctly 1`] = `
 }
 
 .emotion-3 {
-  padding: calc((36px - calc(13px * 1.2) - 2px) / 2) 12px;
+  padding: calc((36px - calc(13px * 1.4) - 2px) / 2) 12px;
   box-sizing: border-box;
   width: 100%;
   display: block;
@@ -125,8 +125,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-cl593w-View-medium-item e19lxcc00"
+-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >
@@ -153,8 +153,8 @@ Snapshot Diff:
         role="listitem"
       >
         <div
--         class="components-item css-ufjlmj-View-medium-item-spacedAround e19lxcc00"
-+         class="components-item css-cl593w-View-medium-item e19lxcc00"
+-         class="components-item css-1n28wmo-View-medium-item-spacedAround e19lxcc00"
++         class="components-item css-1lf4kzd-View-medium-item e19lxcc00"
           data-wp-c16t="true"
           data-wp-component="Item"
         >

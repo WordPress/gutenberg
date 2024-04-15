@@ -207,10 +207,10 @@ class TemplateRevertUtils {
 		await this.page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Actions"i]'
 		);
-		await this.page.click( 'role=menuitem[name=/Clear customizations/i]' );
-		await this.page.getByRole( 'button', { name: 'Clear' } ).click();
+		await this.page.click( 'role=menuitem[name=/Reset/i]' );
+		await this.page.getByRole( 'button', { name: 'Reset' } ).click();
 		await this.page.waitForSelector(
-			'role=button[name="Dismiss this notice"i] >> text=/ reverted./'
+			'role=button[name="Dismiss this notice"i] >> text=/ reset./'
 		);
 	}
 
