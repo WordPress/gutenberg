@@ -221,6 +221,27 @@ const getGlobalEventDirective =
 			} );
 	};
 
+class IgnoredComponent extends Component {
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	render( props ) {
+		const {
+			element: {
+				type: Type,
+				props: { innerHTML, ...rest },
+			},
+		} = props;
+		return (
+			<Type
+				dangerouslySetInnerHTML={ { __html: innerHTML } }
+				{ ...rest }
+			/>
+		);
+	}
+}
+
 export default () => {
 	// data-wp-context
 	directive(
@@ -440,29 +461,9 @@ export default () => {
 	} );
 
 	// data-wp-ignore
-	directive(
-		'ignore',
-		class extends Component {
-			shouldComponentUpdate() {
-				return false;
-			}
-
-			render( props ) {
-				const {
-					element: {
-						type: Type,
-						props: { innerHTML, ...rest },
-					},
-				} = props;
-				return (
-					<Type
-						dangerouslySetInnerHTML={ { __html: innerHTML } }
-						{ ...rest }
-					/>
-				);
-			}
-		}
-	);
+	directive( 'ignore', ( { element } ) => {
+		return <IgnoredComponent element={ element } />;
+	} );
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
