@@ -1,5 +1,4 @@
 .wp-block-cover {
-	position: relative;
 
 	/* Extra specificity needed because the reset.css applied in the editor context is overriding this rule. */
 	.editor-styles-wrapper & {
@@ -32,9 +31,18 @@
 	}
 
 	// Applied while media is being uploaded
-	&.is-transient::before {
-		background-color: #fff;
-		opacity: 0.3;
+	&.is-transient {
+		position: relative;
+
+		&::before {
+			background-color: #fff;
+			content: "";
+			height: 100%;
+			opacity: 0.3;
+			position: absolute;
+			width: 100%;
+			z-index: 1;
+		}
 	}
 
 	// Shown while media is being uploaded
@@ -65,11 +73,6 @@
 		right: 0;
 		bottom: 0;
 		left: 0;
-	}
-
-	// When image being uploaded.
-	&.is-transient img {
-		opacity: 0.3;
 	}
 }
 
