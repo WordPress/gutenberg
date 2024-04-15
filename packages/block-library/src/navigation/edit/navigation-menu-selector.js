@@ -59,7 +59,7 @@ function NavigationMenuSelector( {
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
-		canUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
 		canSwitchNavigationMenu,
 	} = useNavigationMenu();
 
@@ -100,7 +100,7 @@ function NavigationMenuSelector( {
 	const hasNavigationMenus = !! navigationMenus?.length;
 	const hasClassicMenus = !! classicMenus?.length;
 	const showNavigationMenus = !! canSwitchNavigationMenu;
-	const showClassicMenus = !! canUserCreateNavigationMenu;
+	const showClassicMenus = !! canUserCreateNavigationMenus;
 
 	const noMenuSelected = hasNavigationMenus && ! currentMenuId;
 	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
@@ -113,7 +113,7 @@ function NavigationMenuSelector( {
 		selectorLabel = __( 'Loading…' );
 	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
 		// Note: classic Menus may be available.
-		selectorLabel = __( 'Choose or create a Navigation menu' );
+		selectorLabel = __( 'Choose or create a Navigation Menu' );
 	} else {
 		// Current Menu's title.
 		selectorLabel = currentTitle;
@@ -129,7 +129,7 @@ function NavigationMenuSelector( {
 	}, [
 		hasResolvedNavigationMenus,
 		createNavigationMenuIsSuccess,
-		canUserCreateNavigationMenu,
+		canUserCreateNavigationMenus,
 		createNavigationMenuIsError,
 		isUpdatingMenuRef,
 		menuUnavailable,
@@ -187,7 +187,7 @@ function NavigationMenuSelector( {
 						</MenuGroup>
 					) }
 
-					{ canUserCreateNavigationMenu && (
+					{ canUserCreateNavigationMenus && (
 						<MenuGroup label={ __( 'Tools' ) }>
 							<MenuItem
 								onClick={ async () => {

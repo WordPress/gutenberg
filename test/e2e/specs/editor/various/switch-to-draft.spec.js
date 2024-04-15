@@ -65,9 +65,12 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 
 					await switchToDraftUtils.switchToDraftButton.click();
 
+					const confirmButtonText =
+						postStatus === 'publish' ? 'Unpublish' : 'Unschedule';
+
 					await page
 						.getByRole( 'dialog' )
-						.getByRole( 'button', { name: 'OK' } )
+						.getByRole( 'button', { name: confirmButtonText } )
 						.click();
 
 					await expect(

@@ -380,4 +380,33 @@ test.describe( 'Columns', () => {
 			] );
 		} );
 	} );
+
+	test( 'should arrow up into empty columns', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/columns',
+			innerBlocks: [ { name: 'core/column' }, { name: 'core/column' } ],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'Delete' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/columns',
+				innerBlocks: [
+					{
+						name: 'core/column',
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '' },
+			},
+		] );
+	} );
 } );

@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
 import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
@@ -32,7 +31,6 @@ import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-gl
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SaveHub from '../save-hub';
 import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import DataViewsSidebarContent from '../sidebar-dataviews';
 import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
@@ -70,27 +68,23 @@ function SidebarScreens() {
 				<SidebarNavigationScreenGlobalStyles />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreenPages />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/pages">
 				<SidebarNavigationScreen
 					title={ __( 'Manage pages' ) }
 					content={ <DataViewsSidebarContent /> }
-					backPath="/page"
 				/>
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/page/:postId">
 				<SidebarNavigationScreenPage />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplates />
+				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			{ ! isMobileViewport && (
 				<SidebarScreenWrapper path="/patterns">
 					<SidebarNavigationScreenPatterns />
 				</SidebarScreenWrapper>
 			) }
-			<SidebarScreenWrapper path="/:postType(wp_template|wp_template_part)/all">
+			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
 				<SidebarNavigationScreenTemplatesBrowse />
 			</SidebarScreenWrapper>
 			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">

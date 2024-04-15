@@ -5,11 +5,6 @@ import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PostPublishButton, store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
-
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	hasPublishAction,
@@ -85,12 +80,11 @@ export default compose(
 		isPublished: select( editorStore ).isCurrentPostPublished(),
 		isPublishSidebarEnabled:
 			select( editorStore ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened:
-			select( editPostStore ).isPublishSidebarOpened(),
+		isPublishSidebarOpened: select( editorStore ).isPublishSidebarOpened(),
 		isScheduled: select( editorStore ).isCurrentPostScheduled(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( editPostStore );
+		const { togglePublishSidebar } = dispatch( editorStore );
 		return {
 			togglePublishSidebar,
 		};

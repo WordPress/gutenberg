@@ -1,3 +1,3 @@
 <!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td>This</td><td>is</td></tr><tr><td>table</td><td>block</td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td>This</td><td>is</td></tr><tr><td>table</td><td>block</td></tr></tbody></table></figure>
 <!-- /wp:table -->

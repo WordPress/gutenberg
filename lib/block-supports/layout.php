@@ -471,6 +471,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
 			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
+				);
+			}
 		} else {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
@@ -858,7 +864,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	 * are still present in the wrapper as they are in this example. Frequently, additional classes
 	 * will also be present; rarely should classes be removed.
 	 *
-	 * @TODO: Find a better way to match the first inner block. If it's possible to identify where the
+	 * @todo Find a better way to match the first inner block. If it's possible to identify where the
 	 *        first inner block starts, then it will be possible to find the last tag before it starts
 	 *        and then that tag, if an opening tag, can be solidly identified as a wrapping element.
 	 *        Can some unique value or class or ID be added to the inner blocks when they process

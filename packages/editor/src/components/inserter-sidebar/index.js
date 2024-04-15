@@ -19,7 +19,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-export default function InserterSidebar() {
+export default function InserterSidebar( {
+	closeGeneralSidebar,
+	isRightSidebarOpen,
+} ) {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
 		const { getInsertionPoint } = unlock( select( editorStore ) );
 		const { get } = select( preferencesStore );
@@ -65,6 +68,9 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					__experimentalOnPatternCategorySelection={
+						isRightSidebarOpen ? closeGeneralSidebar : undefined
+					}
 					ref={ libraryRef }
 				/>
 			</div>

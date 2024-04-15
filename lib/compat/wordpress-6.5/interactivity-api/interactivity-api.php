@@ -71,7 +71,7 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 	 * Uses a priority of 100 to ensure that other filters can edit $parsed_block
 	 * without crashing the SSR.
 	 */
-	add_filter( 'render_block_data', 'wp_interactivity_process_directives_of_interactive_blocks', 100, 1 );
+	add_filter( 'render_block_data', 'wp_interactivity_process_directives_of_interactive_blocks', 100 );
 }
 
 if ( ! function_exists( 'wp_interactivity' ) ) {

@@ -23,7 +23,7 @@ test.describe( 'Post visibility', () => {
 
 			await page.click( 'role=radio[name="Private"i]' );
 
-			await page.click( 'role=button[name="OK"i]' );
+			await page.click( 'role=button[name="Publish"i]' );
 
 			const currentStatus = await page.evaluate( () => {
 				return window.wp.data
@@ -99,7 +99,7 @@ test.describe( 'Post visibility', () => {
 
 		await page.click( 'role=radio[name="Private"i]' );
 
-		await page.click( 'role=button[name="OK"i]' );
+		await page.click( 'role=button[name="Publish"i]' );
 
 		const currentStatus = await page.evaluate( () => {
 			return window.wp.data

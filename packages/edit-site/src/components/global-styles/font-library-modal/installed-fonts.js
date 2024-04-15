@@ -49,6 +49,7 @@ function InstalledFonts() {
 		fontFamiliesHasChanges,
 		notice,
 		setNotice,
+		fontFamilies,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const customFontFamilyId =
@@ -180,7 +181,6 @@ function InstalledFonts() {
 							) ) }
 						</>
 					) }
-					<Spacer margin={ 16 } />
 				</NavigatorScreen>
 
 				<NavigatorScreen path="/fontFamily">
@@ -262,7 +262,9 @@ function InstalledFonts() {
 				) }
 				<Button
 					variant="primary"
-					onClick={ saveFontFamilies }
+					onClick={ () => {
+						saveFontFamilies( fontFamilies );
+					} }
 					disabled={ ! fontFamiliesHasChanges }
 					__experimentalIsFocusable
 				>

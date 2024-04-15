@@ -212,7 +212,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
+		padding: ($grid-unit-15 * 0.5) ($grid-unit-15 * 0.5) ($grid-unit-15 * 0.5) 0;
 		text-align: left;
 		border-radius: $radius-block-ui;
 		position: relative;
@@ -309,14 +309,14 @@
 
 		&,
 		.components-button.has-icon {
-			width: 24px;
-			min-width: 24px;
+			width: $button-size-small;
+			min-width: $button-size-small;
 			padding: 0;
 		}
 	}
 
 	.block-editor-list-view-block__menu-cell {
-		padding-right: $grid-unit-05;
+		padding-right: $grid-unit-15 * 0.5; // 6px.
 
 		.components-button.has-icon {
 			height: 24px;
