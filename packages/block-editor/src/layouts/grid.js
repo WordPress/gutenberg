@@ -291,46 +291,47 @@ function GridLayoutColumnsAndRowsControl( {
 					</FlexItem>
 				</Flex>
 			</fieldset>
-			{ allowSizingOnChildren && (
-				<fieldset>
-					<BaseControl.VisualLabel as="legend">
-						{ __( 'Rows' ) }
-					</BaseControl.VisualLabel>
-					<Flex gap={ 4 }>
-						<FlexItem isBlock>
-							<NumberControl
-								size={ '__unstable-large' }
-								onChange={ ( value ) => {
-									onChange( {
-										...layout,
-										rowCount: value,
-									} );
-								} }
-								value={ rowCount }
-								min={ 1 }
-								label={ __( 'Rows' ) }
-								hideLabelFromVision
-							/>
-						</FlexItem>
-						<FlexItem isBlock>
-							<RangeControl
-								value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
-								onChange={ ( value ) =>
-									onChange( {
-										...layout,
-										rowCount: value,
-									} )
-								}
-								min={ 1 }
-								max={ 16 }
-								withInputField={ false }
-								label={ __( 'Rows' ) }
-								hideLabelFromVision
-							/>
-						</FlexItem>
-					</Flex>
-				</fieldset>
-			) }
+			{ allowSizingOnChildren &&
+				window.__experimentalEnableGridInteractivity && (
+					<fieldset>
+						<BaseControl.VisualLabel as="legend">
+							{ __( 'Rows' ) }
+						</BaseControl.VisualLabel>
+						<Flex gap={ 4 }>
+							<FlexItem isBlock>
+								<NumberControl
+									size={ '__unstable-large' }
+									onChange={ ( value ) => {
+										onChange( {
+											...layout,
+											rowCount: value,
+										} );
+									} }
+									value={ rowCount }
+									min={ 1 }
+									label={ __( 'Rows' ) }
+									hideLabelFromVision
+								/>
+							</FlexItem>
+							<FlexItem isBlock>
+								<RangeControl
+									value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
+									onChange={ ( value ) =>
+										onChange( {
+											...layout,
+											rowCount: value,
+										} )
+									}
+									min={ 1 }
+									max={ 16 }
+									withInputField={ false }
+									label={ __( 'Rows' ) }
+									hideLabelFromVision
+								/>
+							</FlexItem>
+						</Flex>
+					</fieldset>
+				) }
 		</>
 	);
 }
