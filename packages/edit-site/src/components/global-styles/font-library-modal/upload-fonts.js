@@ -187,11 +187,30 @@ function UploadFonts() {
 				message: __( 'Fonts were installed successfully.' ),
 			} );
 		} catch ( error ) {
-			setNotice( {
-				type: 'error',
-				message: error.message,
-				errors: error?.installationErrors,
-			} );
+			if ( error?.installationErrors ) {
+				setNotice( {
+					type: 'error',
+					message: error.message,
+					errors: error?.installationErrors,
+				} );
+			} else if ( error?.installationWarnings ) {
+				setNotice( {
+					type: 'warning',
+					message: error.message,
+					errors: error?.installationWarnings,
+				} );
+			} else if ( error?.installationInfos ) {
+				setNotice( {
+					type: 'info',
+					message: error.message,
+					errors: error?.installationInfos,
+				} );
+			} else {
+				setNotice( {
+					type: 'error',
+					message: error.message,
+				} );
+			}
 		}
 
 		setIsUploading( false );

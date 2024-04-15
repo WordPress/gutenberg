@@ -237,6 +237,8 @@ function FontLibraryProvider( { children } ) {
 		try {
 			const fontFamiliesToActivate = [];
 			let installationErrors = [];
+			let installationInfos = [];
+			let installationWarnings = [];
 
 			for ( const fontFamilyToInstall of fontFamiliesToInstall ) {
 				let isANewFontFamily = false;
@@ -284,14 +286,18 @@ function FontLibraryProvider( { children } ) {
 
 				// Install the fonts (upload the font files to the server and create the post in the database).
 				let sucessfullyInstalledFontFaces = [];
-				let unsucessfullyInstalledFontFaces = [];
+				let unsucessfullyInstalledFontFacesError = [];
+				let unsucessfullyInstalledFontFacesWarning = [];
+				let unsucessfullyInstalledFontFacesInfo = [];
 				if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 					const response = await batchInstallFontFaces(
 						installedFontFamily.id,
 						makeFontFacesFormData( fontFamilyToInstall )
 					);
 					sucessfullyInstalledFontFaces = response?.successes;
-					unsucessfullyInstalledFontFaces = response?.errors;
+					unsucessfullyInstalledFontFacesError = response?.errors;
+					unsucessfullyInstalledFontFacesWarning = response?.warnings;
+					unsucessfullyInstalledFontFacesInfo = response?.infos;
 				}
 
 				// Use the sucessfully installed font faces
@@ -327,11 +333,35 @@ function FontLibraryProvider( { children } ) {
 				}
 
 				installationErrors = installationErrors.concat(
-					unsucessfullyInstalledFontFaces
+					unsucessfullyInstalledFontFacesError
+				);
+
+				installationWarnings = installationWarnings.concat(
+					unsucessfullyInstalledFontFacesWarning
+				);
+
+				installationInfos = installationInfos.concat(
+					unsucessfullyInstalledFontFacesInfo
 				);
 			}
 
 			installationErrors = installationErrors.reduce(
+				( unique, item ) =>
+					unique.includes( item.message )
+						? unique
+						: [ ...unique, item.message ],
+				[]
+			);
+
+			installationInfos = installationInfos.reduce(
+				( unique, item ) =>
+					unique.includes( item.message )
+						? unique
+						: [ ...unique, item.message ],
+				[]
+			);
+
+			installationWarnings = installationWarnings.reduce(
 				( unique, item ) =>
 					unique.includes( item.message )
 						? unique
@@ -358,6 +388,22 @@ function FontLibraryProvider( { children } ) {
 				installError.installationErrors = installationErrors;
 
 				throw installError;
+			}
+
+			if ( installationWarnings.length > 0 ) {
+				const installWarning = new Error( __( 'Warning.' ) );
+
+				installWarning.installationWarnings = installationWarnings;
+
+				throw installWarning;
+			}
+
+			if ( installationInfos.length > 0 ) {
+				const installInfo = new Error( __( 'Info.' ) );
+
+				installInfo.installationInfos = installationInfos;
+
+				throw installInfo;
 			}
 		} finally {
 			setIsInstalling( false );
