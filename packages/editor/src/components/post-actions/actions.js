@@ -428,7 +428,7 @@ const renamePostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	RenderModal: ( { items, closeModal } ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const originalTitle = decodeEntities(
 			typeof item.title === 'string' ? item.title : item.title.rendered
@@ -455,6 +455,7 @@ const renamePostAction = {
 				createSuccessNotice( __( 'Name updated' ), {
 					type: 'snackbar',
 				} );
+				onActionPerformed?.( items );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
@@ -582,7 +583,7 @@ const resetTemplateAction = {
 						variant="primary"
 						onClick={ async () => {
 							await onConfirm( items );
-							onActionPerformed?.();
+							onActionPerformed?.( items );
 							closeModal();
 						} }
 					>
@@ -650,7 +651,7 @@ const deleteTemplateAction = {
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
-							onActionPerformed?.();
+							onActionPerformed?.( templates );
 							closeModal();
 						} }
 					>
@@ -676,7 +677,7 @@ const renameTemplateAction = {
 		}
 		return true;
 	},
-	RenderModal: ( { items: templates, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
 		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
 		const [ editedTitle, setEditedTitle ] = useState( title );
@@ -718,6 +719,7 @@ const renameTemplateAction = {
 						type: 'snackbar',
 					}
 				);
+				onActionPerformed?.( templates );
 			} catch ( error ) {
 				const fallbackErrorMessage =
 					template.type === TEMPLATE_POST_TYPE
