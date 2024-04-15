@@ -717,20 +717,41 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	}
 
 	/**
+	 * Determines if a supplied style variation matches the provided scope.
+	 *
+	 * For backwards compatibility, if a variation does not explicitly define
+	 * a scope, it is assumed to be a theme style variation.
+	 *
+	 * @param array  $variation Theme.json shaped style variation object.
+	 * @param string $scope     Scope to check e.g. theme, block etc.
+	 * @return boolean
+	 */
+	private static function style_variation_has_scope( $variation, $scope ) {
+		$scopes = $variation['scope'] ?? array();
+
+		if ( count( $scopes ) === 0 ) {
+			return 'theme' === $scope;
+		}
+
+		return in_array( $scope, $scopes, true );
+	}
+
+	/**
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
-	 * @since 6.6.0 Added configurable directory to allow block style variations
-	 *              to reside in a different directory to theme style variations.
+	 * @since 6.6.0 Added configurable scope parameter to allow filtering
+	 *              theme.json partial files by the scope to which they
+	 *              can be applied e.g. theme vs block etc.
 	 *
-	 * @param string $dir Directory to search for variation partials.
+	 * @param string $scope The scope or type of style variation to retrieve e.g. theme, block etc.
 	 * @return array
 	 */
-	public static function get_style_variations( $dir = 'styles' ) {
+	public static function get_style_variations( $scope = 'theme' ) {
 		$variation_files    = array();
 		$variations         = array();
-		$base_directory     = get_stylesheet_directory() . '/' . $dir;
-		$template_directory = get_template_directory() . '/' . $dir;
+		$base_directory     = get_stylesheet_directory() . '/styles';
+		$template_directory = get_template_directory() . '/styles';
 		if ( is_dir( $base_directory ) ) {
 			$variation_files = static::recursively_iterate_json( $base_directory );
 		}
@@ -749,7 +770,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		ksort( $variation_files );
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
-			if ( is_array( $decoded_file ) ) {
+			if ( is_array( $decoded_file ) && static::style_variation_has_scope( $decoded_file, $scope ) ) {
 				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
 				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 				if ( empty( $variation['title'] ) ) {

@@ -1,5 +1,6 @@
 {
 	"version": 2,
+	"scope": [ "block" ],
 	"supportedBlockTypes": [ "core/group", "core/columns" ],
 	"styles": {
 		"color": {

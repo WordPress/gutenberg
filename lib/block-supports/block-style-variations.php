@@ -273,7 +273,7 @@ function gutenberg_resolve_block_style_variations_from_theme_style_variation( $t
  * @return WP_Theme_JSON_Data_Gutenberg
  */
 function gutenberg_resolve_block_style_variations_from_theme_json_partials( $theme_json ) {
-	$block_style_variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( '/block-styles' );
+	$block_style_variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
 	$variations_data        = gutenberg_resolve_and_register_block_style_variations( $block_style_variations );
 
 	return gutenberg_merge_block_style_variations_data( $variations_data, $theme_json );

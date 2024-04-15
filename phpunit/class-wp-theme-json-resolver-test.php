@@ -985,22 +985,21 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 	 * including parent variations if the theme is a child, and that the child
 	 * variation overwrites the parent variation of the same name.
 	 *
-	 * Note: This covers both theme style variations (`/styles`) and block style
-	 * variations (`/block-styles`).
+	 * Note: This covers both theme and block style variations.
 	 *
 	 * @covers WP_Theme_JSON_Resolver::get_style_variations
 	 *
 	 * @dataProvider data_get_style_variations
 	 *
 	 * @param string $theme               Name of the theme to use.
-	 * @param string $dir                 The directory to retrieve variation json files from.
+	 * @param string $scope               Scope to filter variations by e.g. theme vs block.
 	 * @param array  $expected_variations Collection of expected variations.
 	 */
-	public function test_get_style_variations( $theme, $dir, $expected_variations ) {
+	public function test_get_style_variations( $theme, $scope, $expected_variations ) {
 		switch_theme( $theme );
 		wp_set_current_user( self::$administrator_id );
 
-		$actual_variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( $dir );
+		$actual_variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( $scope );
 
 		wp_recursive_ksort( $actual_variations );
 		wp_recursive_ksort( $expected_variations );
@@ -1017,7 +1016,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		return array(
 			'theme_style_variations' => array(
 				'theme'               => 'block-theme-child',
-				'dir'                 => 'styles',
+				'scope'               => 'theme',
 				'expected_variations' => array(
 					array(
 						'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -1091,7 +1090,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			'block_style_variations' => array(
 				'theme'               => 'block-theme-child-with-block-style-variations',
-				'dir'                 => 'block-styles',
+				'scope'               => 'block',
 				'expected_variations' => array(
 					array(
 						'supportedBlockTypes' => array( 'core/group', 'core/columns', 'core/media-text' ),
