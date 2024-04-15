@@ -188,7 +188,7 @@ test.describe( 'Preview', () => {
 			.getByRole( 'button', { name: 'Switch to draft' } )
 			.click();
 		// FIXME: The confirmation dialog is not named yet.
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
+		await page.click( 'role=dialog >> role=button[name="Unpublish"i]' );
 
 		// Wait for the status change.
 		// @see https://github.com/WordPress/gutenberg/pull/43933

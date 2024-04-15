@@ -68,7 +68,7 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			onCancel={ () => setIsDialogOpen( false ) }
 		>
 			{ __(
-				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages.'
+				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages. Would you like to edit the template?.'
 			) }
 		</ConfirmDialog>
 	);
