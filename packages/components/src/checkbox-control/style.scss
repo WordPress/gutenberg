@@ -20,7 +20,7 @@
 	text-align: center;
 	vertical-align: top;
 	width: var(--checkbox-input-size);
-	aspect-ratio: 1;
+	height: var(--checkbox-input-size);
 
 	appearance: none;
 	transition: 0.1s border-color ease-in-out;
