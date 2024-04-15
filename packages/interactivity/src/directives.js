@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { h as createElement } from 'preact';
+import { h as createElement, Component } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
@@ -442,20 +442,25 @@ export default () => {
 	// data-wp-ignore
 	directive(
 		'ignore',
-		( {
-			element: {
-				type: Type,
-				props: { innerHTML, ...rest },
-			},
-		} ) => {
-			// Preserve the initial inner HTML.
-			const cached = useMemo( () => innerHTML, [] );
-			return (
-				<Type
-					dangerouslySetInnerHTML={ { __html: cached } }
-					{ ...rest }
-				/>
-			);
+		class extends Component {
+			shouldComponentUpdate() {
+				return false;
+			}
+
+			render( props ) {
+				const {
+					element: {
+						type: Type,
+						props: { innerHTML, ...rest },
+					},
+				} = props;
+				return (
+					<Type
+						dangerouslySetInnerHTML={ { __html: innerHTML } }
+						{ ...rest }
+					/>
+				);
+			}
 		}
 	);
 
