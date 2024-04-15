@@ -79,7 +79,7 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	$current_theme            = wp_get_theme();
 	$settings['currentTheme'] = array(
 		// Directory of the current theme. Will be the child theme directory if a child theme is active.
-		'directoryURI'       => $current_theme->get_stylesheet_directory_uri(),
+		'directoryURI' => $current_theme->get_stylesheet_directory_uri(),
 		// `__unstableIsBlockBasedTheme` could also be relocated here, e.g., 'isBlockTheme' => $current_theme->is_block_theme().
 	);
 
