@@ -10,8 +10,10 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -24,6 +26,9 @@ import {
 import './hooks';
 import { store as editSiteStore } from './store';
 import App from './components/app';
+import { unlock } from './lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.

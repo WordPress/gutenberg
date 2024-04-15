@@ -11,7 +11,6 @@ import {
 	VisuallyHidden,
 	DropdownMenu,
 } from '@wordpress/components';
-import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
@@ -39,7 +38,8 @@ import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher } = unlock( editorPrivateApis );
+const { ModeSwitcher, ActionItem, interfaceStore } =
+	unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );

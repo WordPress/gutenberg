@@ -25,11 +25,6 @@ import {
 	BlockInspector,
 } from '@wordpress/block-editor';
 import {
-	InterfaceSkeleton,
-	ComplementaryArea,
-	store as interfaceStore,
-} from '@wordpress/interface';
-import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
 	EditorNotices,
@@ -68,6 +63,9 @@ const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
 	ListViewSidebar,
+	InterfaceSkeleton,
+	ComplementaryArea,
+	interfaceStore,
 } = unlock( editorPrivateApis );
 
 const interfaceLabels = {

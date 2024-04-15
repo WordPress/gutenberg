@@ -1,10 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { ActionItem } from '@wordpress/interface';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 import { withPluginContext } from '@wordpress/plugins';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { ActionItem } = unlock( editorPrivateApis );
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.

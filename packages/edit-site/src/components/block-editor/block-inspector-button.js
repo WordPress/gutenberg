@@ -5,8 +5,8 @@ import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -14,6 +14,9 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as editSiteStore } from '../../store';
 import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function BlockInspectorButton( { onClick = () => {} } ) {
 	const { shortcut, isBlockInspectorOpen } = useSelect(
