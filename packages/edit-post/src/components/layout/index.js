@@ -56,7 +56,6 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
-import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -364,7 +363,6 @@ function Layout( { initialPost } ) {
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
-			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>
