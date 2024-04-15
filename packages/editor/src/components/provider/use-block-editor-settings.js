@@ -132,7 +132,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
-			const _currentTheme = getCurrentTheme();
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
 					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';

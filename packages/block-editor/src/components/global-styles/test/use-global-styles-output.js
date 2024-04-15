@@ -990,6 +990,34 @@ describe( 'global styles renderer', () => {
 				'letter-spacing: 2px',
 			] );
 		} );
+
+		it( 'should process styles and set CSS default values', () => {
+			const styles = {
+				background: {
+					backgroundImage: {
+						url: 'image.jpg',
+						source: 'theme',
+					},
+				},
+			};
+			const editorSettings = {
+				themeDirURI: 'http://example.com/theme',
+			};
+
+			expect(
+				getStylesDeclarations(
+					styles,
+					'.wp-block',
+					false,
+					{},
+					false,
+					editorSettings
+				)
+			).toEqual( [
+				"background-image: url( 'http://example.com/theme/image.jpg' )",
+				'background-size: cover',
+			] );
+		} );
 	} );
 
 	describe( 'processCSSNesting', () => {
