@@ -39,7 +39,7 @@ const POST_ACTIONS_WHILE_EDITING = [
 	'move-to-trash',
 ];
 
-export default function PostActions( { onActionPerformed } ) {
+export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const { postType, item } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPost } = select( editorStore );
 		return {
@@ -88,6 +88,7 @@ export default function PostActions( { onActionPerformed } ) {
 						! primaryActions.length && ! secondaryActions.length
 					}
 					className="editor-all-actions-button"
+					{ ...buttonProps }
 				/>
 			}
 			placement="bottom-end"
