@@ -20,7 +20,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { NavigateContext } from '../layout';
+import { SidebarNavigationContext } from '../sidebar';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -35,17 +35,17 @@ export default function SidebarNavigationItem( {
 	...props
 } ) {
 	const history = useHistory();
-	const navigate = useContext( NavigateContext );
+	const navigate = useContext( SidebarNavigationContext );
 
 	// If there is no custom click handler, create one that navigates to `path`.
 	function handleClick( e ) {
 		if ( onClick ) {
 			onClick( e );
-			navigate( false );
+			navigate( 'forward' );
 		} else if ( path ) {
 			e.preventDefault();
 			history.push( { path } );
-			navigate( false, `[id="${ path }"]` );
+			navigate( 'forward', `[id="${ path }"]` );
 		}
 	}
 

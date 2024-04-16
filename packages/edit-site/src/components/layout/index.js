@@ -18,13 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import {
-	useCallback,
-	createContext,
-	useState,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -37,7 +31,6 @@ import {
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -57,6 +50,7 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
+import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
@@ -65,72 +59,6 @@ const { useGlobalStyle } = unlock( blockEditorPrivateApis );
 const { NavigableRegion } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
-
-export const NavigateContext = createContext( () => {} );
-
-function getAnim( isBack ) {
-	switch ( isBack ) {
-		case true:
-			return {
-				initial: { opacity: 0, x: '-50px' },
-				animate: { opacity: 1, x: '0' },
-			};
-		case false:
-			return {
-				initial: { opacity: 0, x: '50px' },
-				animate: { opacity: 1, x: '0' },
-			};
-		default:
-			return { initial: false, animate: false };
-	}
-}
-
-function SidebarContent( { routeKey, children } ) {
-	const [ { navDirection, focusSelector }, setNavDirection ] = useState( {
-		navDirection: null,
-		focusSelector: null,
-	} );
-
-	const navigate = useCallback( ( isBack, backFocusSelector ) => {
-		setNavDirection( ( prevDir ) => ( {
-			navDirection: isBack,
-			focusSelector:
-				! isBack && backFocusSelector
-					? backFocusSelector
-					: prevDir.focusSelector,
-		} ) );
-	}, [] );
-	const { initial, animate } = getAnim( navDirection );
-
-	const wrapperRef = useRef();
-	useEffect( () => {
-		let elementToFocus;
-		if ( navDirection === false ) {
-			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
-			elementToFocus = firstTabbable ?? wrapperRef.current;
-		} else if ( navDirection === true && focusSelector ) {
-			elementToFocus = wrapperRef.current.querySelector( focusSelector );
-		}
-		elementToFocus?.focus();
-	}, [ navDirection, focusSelector ] );
-
-	return (
-		<NavigateContext.Provider value={ navigate }>
-			<div className="edit-site-sidebar__content">
-				<motion.div
-					ref={ wrapperRef }
-					key={ routeKey }
-					className="edit-site-sidebar__screen-wrapper"
-					initial={ initial }
-					animate={ animate }
-					transition={ { duration: 0.14 } }
-				>
-					{ children }
-				</motion.div>
-			</div>
-		</NavigateContext.Provider>
-	);
-}
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.

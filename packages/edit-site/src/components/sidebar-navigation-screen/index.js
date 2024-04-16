@@ -28,7 +28,7 @@ import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
-import { NavigateContext } from '../layout';
+import { SidebarNavigationContext } from '../sidebar';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
@@ -81,7 +81,7 @@ export default function SidebarNavigationScreen( {
 	);
 	const location = useLocation();
 	const history = useHistory();
-	const navigate = useContext( NavigateContext );
+	const navigate = useContext( SidebarNavigationContext );
 	const icon = isRTL() ? chevronRight : chevronLeft;
 	return (
 		<>
@@ -108,7 +108,7 @@ export default function SidebarNavigationScreen( {
 									location.state?.backPath ??
 									getBackPath( location.params );
 								history.push( backPath );
-								navigate( true );
+								navigate( 'back' );
 							} }
 							icon={ icon }
 							label={ __( 'Back' ) }
