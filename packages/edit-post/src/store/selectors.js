@@ -2,10 +2,12 @@
  * WordPress dependencies
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -13,6 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { unlock } from '../lock-unlock';
 
+const { interfaceStore } = unlock( editorPrivateApis );
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 

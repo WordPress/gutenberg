@@ -22,7 +22,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Button,
@@ -42,7 +41,7 @@ import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { DocumentTools, PostViewLink, PreviewDropdown } =
+const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
 const slideY = {

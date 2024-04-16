@@ -12,13 +12,15 @@ describe( 'getTypographyClassesAndStyles', () => {
 				typography: {
 					letterSpacing: '22px',
 					fontSize: '2rem',
+					textAlign: 'center',
 					textColumns: 3,
 					textTransform: 'uppercase',
 				},
 			},
 		};
 		expect( getTypographyClassesAndStyles( attributes ) ).toEqual( {
-			className: 'has-tofu-font-family has-large-font-size',
+			className:
+				'has-tofu-font-family has-text-align-center has-large-font-size',
 			style: {
 				columnCount: 3,
 				letterSpacing: '22px',

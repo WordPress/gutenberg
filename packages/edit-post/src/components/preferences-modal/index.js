@@ -5,7 +5,6 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
@@ -19,7 +18,7 @@ import EnablePublishSidebarOption from './enable-publish-sidebar';
 const { PreferencesModalSection, PreferenceToggleControl } = unlock(
 	preferencesPrivateApis
 );
-const { PreferencesModal } = unlock( editorPrivateApis );
+const { PreferencesModal, interfaceStore } = unlock( editorPrivateApis );
 
 export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
 

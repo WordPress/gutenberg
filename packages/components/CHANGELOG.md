@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecation
+
+-   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
+
 ### Enhancements
 
 -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
@@ -22,6 +26,7 @@
 ### Internal
 
 -   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
+-   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
 
 ## 27.3.0 (2024-04-03)
 

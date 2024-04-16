@@ -28,12 +28,6 @@ import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import {
-	ComplementaryArea,
-	FullscreenMode,
-	InterfaceSkeleton,
-	store as interfaceStore,
-} from '@wordpress/interface';
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
@@ -56,7 +50,6 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
-import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -64,7 +57,14 @@ import useCommonCommands from '../../hooks/commands/use-common-commands';
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { InserterSidebar, ListViewSidebar } = unlock( editorPrivateApis );
+const {
+	InserterSidebar,
+	ListViewSidebar,
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+	interfaceStore,
+} = unlock( editorPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -364,7 +364,6 @@ function Layout( { initialPost } ) {
 			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
-			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>

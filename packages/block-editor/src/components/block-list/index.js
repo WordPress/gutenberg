@@ -211,7 +211,9 @@ function Items( {
 									'disabled' &&
 							  __unstableGetEditorMode() !== 'zoom-out'
 							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId && ! selectedBlockClientId ) ),
+							  ( ! rootClientId &&
+									! selectedBlockClientId &&
+									! _order.length ) ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]

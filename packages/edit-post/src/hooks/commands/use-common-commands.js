@@ -13,8 +13,10 @@ import {
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -23,6 +25,9 @@ import { store as noticesStore } from '@wordpress/notices';
 import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function useCommonCommands() {
 	const { openGeneralSidebar, closeGeneralSidebar } =

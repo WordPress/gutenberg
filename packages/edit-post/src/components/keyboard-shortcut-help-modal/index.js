@@ -14,7 +14,7 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { withSelect, withDispatch, useSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { store as interfaceStore } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,7 +22,9 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
+import { unlock } from '../../lock-unlock';
 
+const { interfaceStore } = unlock( editorPrivateApis );
 export const KEYBOARD_SHORTCUT_HELP_MODAL_NAME =
 	'edit-post/keyboard-shortcut-help';
 

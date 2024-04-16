@@ -64,6 +64,9 @@ function UnforwardedNavigationBackButton(
 	);
 }
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export const NavigationBackButton = forwardRef(
 	UnforwardedNavigationBackButton
 );

@@ -359,6 +359,7 @@ function BlockWithLayoutStyles( {
 	block: BlockListBlock,
 	props,
 	blockGapSupport,
+	layoutClasses,
 } ) {
 	const { name, attributes } = props;
 	const id = useInstanceId( BlockListBlock );
@@ -369,7 +370,6 @@ function BlockWithLayoutStyles( {
 		layout?.inherit || layout?.contentSize || layout?.wideSize
 			? { ...layout, type: 'constrained' }
 			: layout || defaultBlockLayout || {};
-	const layoutClasses = useLayoutClasses( attributes, name );
 
 	const { kebabCase } = unlock( componentsPrivateApis );
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
@@ -415,8 +415,9 @@ function BlockWithLayoutStyles( {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { clientId, name } = props;
+		const { clientId, name, attributes } = props;
 		const blockSupportsLayout = hasLayoutBlockSupport( name );
+		const layoutClasses = useLayoutClasses( attributes, name );
 		const extraProps = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.
@@ -444,13 +445,21 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 
 		if ( ! extraProps ) {
-			return <BlockListBlock { ...props } />;
+			return (
+				<BlockListBlock
+					{ ...props }
+					__unstableLayoutClassNames={
+						blockSupportsLayout ? layoutClasses : undefined
+					}
+				/>
+			);
 		}
 
 		return (
 			<BlockWithLayoutStyles
 				block={ BlockListBlock }
 				props={ props }
+				layoutClasses={ layoutClasses }
 				{ ...extraProps }
 			/>
 		);

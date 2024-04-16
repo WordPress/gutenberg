@@ -1,3 +1,5 @@
+@import "../../interface/src/style.scss";
+
 @import "./components/autocompleters/style.scss";
 @import "./components/block-manager/style.scss";
 @import "./components/document-bar/style.scss";
@@ -30,5 +32,6 @@
 @import "./components/post-visibility/style.scss";
 @import "./components/post-trash/style.scss";
 @import "./components/preview-dropdown/style.scss";
+@import "./components/start-page-options/style.scss";
 @import "./components/table-of-contents/style.scss";
 @import "./components/template-areas/style.scss";

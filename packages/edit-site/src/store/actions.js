@@ -4,9 +4,11 @@
 import { parse } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -19,6 +21,8 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
 import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Dispatches an action that toggles a feature flag.

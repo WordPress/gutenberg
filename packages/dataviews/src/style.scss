@@ -92,10 +92,6 @@
 		&.dataviews-view-table__checkbox-column {
 			padding-right: 0;
 		}
-
-		.components-checkbox-control__input-container {
-			margin: $grid-unit-05;
-		}
 	}
 	tr {
 		border-bottom: 1px solid $gray-100;
@@ -532,16 +528,25 @@
 	justify-content: center;
 }
 
-.dataviews-view-table-selection-checkbox label {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
+.dataviews-view-table-selection-checkbox {
+	// Experimental override for CheckboxControl size (fragile)
+	--checkbox-input-size: 24px;
+	@include break-small() {
+		--checkbox-input-size: 16px;
+	}
+
+	line-height: 0;
+	label {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
+	}
 }
 
 .dataviews-filters__custom-menu-radio-item-prefix {

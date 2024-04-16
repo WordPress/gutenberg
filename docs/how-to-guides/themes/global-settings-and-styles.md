@@ -265,6 +265,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
