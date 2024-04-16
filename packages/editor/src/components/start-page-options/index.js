@@ -3,19 +3,19 @@
  */
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockPatternsList as BlockPatternsList,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
-import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../store';
+import { store as editorStore } from '../../store';
 
 function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -23,11 +23,19 @@ function useStartPatterns() {
 	// the current post type is part of the postTypes declared.
 	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
 		( select ) => {
-			const { getPatternsByBlockTypes } = select( blockEditorStore );
-			const { getCurrentPostType } = select( editorStore );
+			const { getPatternsByBlockTypes, getBlocksByName } =
+				select( blockEditorStore );
+			const { getCurrentPostType, getRenderingMode } =
+				select( editorStore );
+			const rootClientId =
+				getRenderingMode() === 'post-only'
+					? ''
+					: getBlocksByName( 'core/post-content' )?.[ 0 ];
 			return {
-				blockPatternsWithPostContentBlockType:
-					getPatternsByBlockTypes( 'core/post-content' ),
+				blockPatternsWithPostContentBlockType: getPatternsByBlockTypes(
+					'core/post-content',
+					rootClientId
+				),
 				postType: getCurrentPostType(),
 			};
 		},
@@ -49,13 +57,21 @@ function useStartPatterns() {
 
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
 	const shownBlockPatterns = useAsyncList( blockPatterns );
-	const { resetEditorBlocks } = useDispatch( editorStore );
+	const { editEntityRecord } = useDispatch( coreStore );
+	const { postType, postId } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
+	}, [] );
 	return (
 		<BlockPatternsList
 			blockPatterns={ blockPatterns }
 			shownPatterns={ shownBlockPatterns }
 			onClickPattern={ ( _pattern, blocks ) => {
-				resetEditorBlocks( blocks );
+				editEntityRecord( 'postType', postType, postId, { blocks } );
 				onChoosePattern();
 			} }
 		/>
@@ -72,12 +88,11 @@ function StartPageOptionsModal( { onClose } ) {
 
 	return (
 		<Modal
-			className="edit-post-start-page-options__modal"
 			title={ __( 'Choose a pattern' ) }
 			isFullScreen
 			onRequestClose={ onClose }
 		>
-			<div className="edit-post-start-page-options__modal-content">
+			<div className="editor-start-page-options__modal-content">
 				<PatternSelection
 					blockPatterns={ startPatterns }
 					onChoosePattern={ onClose }
@@ -89,16 +104,28 @@ function StartPageOptionsModal( { onClose } ) {
 
 export default function StartPageOptions() {
 	const [ isClosed, setIsClosed ] = useState( false );
-	const shouldEnableModal = useSelect( ( select ) => {
-		const { isCleanNewPost, getRenderingMode } = select( editorStore );
-		const { isFeatureActive } = select( editPostStore );
+	const { shouldEnableModal, postType, postId } = useSelect( ( select ) => {
+		const {
+			isEditedPostDirty,
+			isEditedPostEmpty,
+			getCurrentPostType,
+			getCurrentPostId,
+			getEditorSettings,
+		} = select( editorStore );
+		const { __unstableIsPreviewMode: isPreviewMode } = getEditorSettings();
 
-		return (
-			getRenderingMode() === 'post-only' &&
-			! isFeatureActive( 'welcomeGuide' ) &&
-			isCleanNewPost()
-		);
+		return {
+			shouldEnableModal:
+				! isPreviewMode && ! isEditedPostDirty() && isEditedPostEmpty(),
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+		};
 	}, [] );
+
+	useEffect( () => {
+		// Should reset the modal state when navigating to a new page/post.
+		setIsClosed( false );
+	}, [ postType, postId ] );
 
 	if ( ! shouldEnableModal || isClosed ) {
 		return null;
