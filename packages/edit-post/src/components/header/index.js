@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
+	DocumentBar,
 	PostSavedState,
 	PostPreviewButton,
 	store as editorStore,
@@ -12,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-
+import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -71,6 +77,18 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
 
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			setIsBlockToolsCollapsed( false );
+		}
+	}, [ blockSelectionStart ] );
+
+	const hasBlockSelection = !! blockSelectionStart;
+
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
@@ -91,11 +109,29 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<ContextualToolbar
-						blockSelectionStart={ blockSelectionStart }
-						hasHistory={ hasHistory }
-					/>
+					<>
+						<ContextualToolbar
+							isCollapsed={
+								isBlockToolsCollapsed || ! hasBlockSelection
+							}
+							onCollapse={ () => {
+								setIsBlockToolsCollapsed(
+									( collapsed ) => ! collapsed
+								);
+							} }
+						/>
+					</>
 				) }
+				<div
+					className={ classnames( 'edit-post-header__center', {
+						'is-collapsed':
+							hasHistory &&
+							! isBlockToolsCollapsed &&
+							hasTopToolbar,
+					} ) }
+				>
+					{ hasHistory && <DocumentBar /> }
+				</div>
 			</motion.div>
 			<motion.div
 				variants={ slideY }
