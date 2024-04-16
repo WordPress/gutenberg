@@ -56,8 +56,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that block style variations registered via either
 	 * `gutenberg_register_block_style` with a style object, or a standalone
-	 * block style variation file within `/block-styles`, are added to the
-	 * theme data.
+	 * block style variation file within `/styles`, are added to the theme data.
 	 */
 	public function test_add_registered_block_styles_to_theme_data() {
 		switch_theme( 'block-theme' );
@@ -105,7 +104,7 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 				/*
 				 * The following block style variations are registered
 				 * automatically from their respective JSON files within the
-				 * theme's `block-styles` directory.
+				 * theme's `/styles` directory.
 				 */
 				'block-style-variation-a' => array(
 					'color' => array(
