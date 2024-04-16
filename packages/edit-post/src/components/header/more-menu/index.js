@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuGroup, DropdownMenu } from '@wordpress/components';
-import { ActionItem, PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { moreVertical } from '@wordpress/icons';
@@ -16,7 +15,7 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import WritingMenu from '../writing-menu';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher } = unlock( editorPrivateApis );
+const { ModeSwitcher, ActionItem, PinnedItems } = unlock( editorPrivateApis );
 
 const MoreMenu = ( { showIconLabels } ) => {
 	const isLargeViewport = useViewportMatch( 'large' );

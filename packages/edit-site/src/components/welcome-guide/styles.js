@@ -4,14 +4,17 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import WelcomeGuideImage from './image';
 import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function WelcomeGuideStyles() {
 	const { toggle } = useDispatch( preferencesStore );
