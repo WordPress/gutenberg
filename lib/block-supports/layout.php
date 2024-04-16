@@ -714,7 +714,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( empty( $fallback_layout ) ) {
 		$fallback_layout = $block_type->supports['__experimentalLayout']['default'] ?? array();
 	}
-	$used_layout = $block['attrs']['layout'] ?? $fallback_layout;
+	$used_layout    = $block['attrs']['layout'] ?? $fallback_layout;
+	$used_alignment = $block['attrs']['align'] ?? array();
 
 	$class_names        = array();
 	$layout_definitions = gutenberg_get_layout_definitions();
@@ -736,7 +737,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$root_padding_aware_alignments = $global_settings['useRootPaddingAwareAlignments'] ?? false;
 
-	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) && 'constrained' === $used_layout['type'] ) {
+	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) || 'full' === $used_alignment ) {
 		$class_names[] = 'has-global-padding';
 	}
 
