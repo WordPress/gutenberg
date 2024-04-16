@@ -24,7 +24,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock } from '@wordpress/components';
+import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -139,8 +139,7 @@ function Layout( { initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar } =
-		useDispatch( editPostStore );
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
@@ -205,11 +204,6 @@ function Layout( { initialPost } ) {
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	const openSidebarPanel = () =>
-		openGeneralSidebar(
-			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
-		);
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -313,25 +307,8 @@ function Layout( { initialPost } ) {
 				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
-					( ( isMobileViewport && sidebarIsOpened ) ||
-						( ! isMobileViewport && ! isDistractionFree ) ) && (
-						<>
-							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toggle-sidebar-panel">
-									<Button
-										variant="secondary"
-										className="edit-post-layout__toggle-sidebar-panel-button"
-										onClick={ openSidebarPanel }
-										aria-expanded={ false }
-									>
-										{ hasBlockSelected
-											? __( 'Open block settings' )
-											: __( 'Open document settings' ) }
-									</Button>
-								</div>
-							) }
-							<ComplementaryArea.Slot scope="core/edit-post" />
-						</>
+					! isDistractionFree && (
+						<ComplementaryArea.Slot scope="core/edit-post" />
 					)
 				}
 				notices={ <EditorSnackbars /> }

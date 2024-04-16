@@ -68,8 +68,13 @@ function ListViewBlockSelectButton(
 		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { duplicateBlocks, multiSelect, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		duplicateBlocks,
+		multiSelect,
+		removeBlocks,
+		insertAfterBlock,
+		insertBeforeBlock,
+	} = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
@@ -189,6 +194,30 @@ function ListViewBlockSelectButton(
 					updateFocusAndSelection( updatedBlocks[ 0 ], false );
 				}
 			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertBeforeBlock( blocksToUpdate[ 0 ] );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertAfterBlock( blocksToUpdate.at( -1 ) );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			if ( event.defaultPrevented ) {
 				return;

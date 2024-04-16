@@ -1,12 +1,4 @@
 .wp-block-separator {
-	border-top: 2px solid currentColor;
-	// Default, thin style, is stored in theme.scss so it can be opted out of
-
-	// Unset the left, right and bottom borders by default, otherwise some browsers will render them as "inset".
-	border-left: none;
-	border-right: none;
-	border-bottom: none;
-
 	// Dots style
 	&.is-style-dots {
 		// Override any background themes often set on the hr tag for this style.
@@ -27,4 +19,15 @@
 			font-family: serif;
 		}
 	}
+}
+
+// Lowest specificity to avoid overriding global styles.
+:where(.wp-block-separator) {
+	border-top: 2px solid currentColor;
+	// Default, thin style, is stored in theme.scss so it can be opted out of
+
+	// Unset the left, right and bottom borders by default, otherwise some browsers will render them as "inset".
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
 }
