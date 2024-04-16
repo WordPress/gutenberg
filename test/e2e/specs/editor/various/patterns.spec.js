@@ -70,7 +70,7 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 			.click();
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'tab', {
 				name: newCategory,
 			} )
 			.click();
@@ -185,7 +185,7 @@ test.describe( 'Synced pattern', () => {
 			} )
 			.click();
 		await page
-			.getByRole( 'button', {
+			.getByRole( 'tab', {
 				name: newCategory,
 			} )
 			.click();
