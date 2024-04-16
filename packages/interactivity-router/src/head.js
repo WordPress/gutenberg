@@ -64,12 +64,17 @@ export const fetchHeadAssets = async ( document, headElements ) => {
 			Array.from( tags ).map( async ( tag ) => {
 				const attributeValue = tag.getAttribute( attribute );
 				if ( ! headElements.has( attributeValue ) ) {
-					const response = await fetch( attributeValue );
-					const text = await response.text();
-					headElements.set( attributeValue, {
-						tag,
-						text,
-					} );
+					try {
+						const response = await fetch( attributeValue );
+						const text = await response.text();
+						headElements.set( attributeValue, {
+							tag,
+							text,
+						} );
+					} catch ( e ) {
+						// eslint-disable-next-line no-console
+						console.error( e );
+					}
 				}
 
 				const headElement = headElements.get( attributeValue );
