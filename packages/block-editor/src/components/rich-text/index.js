@@ -491,11 +491,11 @@ function Binding( { content } ) {
 		return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
 	} );
 
-	if ( ! content.startsWith( '/' ) ) {
+	if ( ! content.startsWith( '/wp:' ) ) {
 		return null;
 	}
 
-	const fakeHTML = '<' + content.slice( 1 ) + '>';
+	const fakeHTML = '<' + content.slice( 4 ) + '>';
 	const body = document.implementation.createHTMLDocument( '' ).body;
 	body.innerHTML = fakeHTML;
 	const element = body.firstElementChild;
