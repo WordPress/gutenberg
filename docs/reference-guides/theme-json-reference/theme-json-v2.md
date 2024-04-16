@@ -178,6 +178,7 @@ Settings related to typography.
 | fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | writingMode | boolean | false |  |
