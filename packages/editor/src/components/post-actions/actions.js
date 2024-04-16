@@ -1,6 +1,13 @@
 /**
+ * External dependencies
+ */
+import { paramCase as kebabCase } from 'change-case';
+import { downloadZip } from 'client-zip';
+
+/**
  * WordPress dependencies
  */
+import { downloadBlob } from '@wordpress/blob';
 import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -9,6 +16,8 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 import {
 	Button,
@@ -30,6 +39,17 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
+
+// Patterns.
+export const {
+	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_USER_CATEGORY,
+	EXCLUDED_PATTERN_SOURCES,
+	PATTERN_SYNC_TYPES,
+	CreatePatternModalContents,
+	useDuplicatePatternProps,
+} = unlock( patternsPrivateApis );
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -988,6 +1008,202 @@ const renameTemplateAction = {
 	},
 };
 
+function getJsonFromItem( item ) {
+	return JSON.stringify(
+		{
+			__file: item.type,
+			title: item.title || item.name,
+			content: item.patternPost.content.raw,
+			syncStatus: item.patternPost.wp_pattern_sync_status,
+		},
+		null,
+		2
+	);
+}
+
+export const exportPatternAsJSONAction = {
+	id: 'export-pattern',
+	label: __( 'Export as JSON' ),
+	supportsBulk: true,
+	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
+	callback: async ( items ) => {
+		if ( items.length === 1 ) {
+			return downloadBlob(
+				`${ kebabCase( items[ 0 ].title || items[ 0 ].name ) }.json`,
+				getJsonFromItem( items[ 0 ] ),
+				'application/json'
+			);
+		}
+		const nameCount = {};
+		const filesToZip = items.map( ( item ) => {
+			const name = kebabCase( item.title || item.name );
+			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
+			return {
+				name: `${
+					name +
+					( nameCount[ name ] > 1
+						? '-' + ( nameCount[ name ] - 1 )
+						: '' )
+				}.json`,
+				lastModified: new Date(),
+				input: getJsonFromItem( item ),
+			};
+		} );
+		return downloadBlob(
+			__( 'patterns-export' ) + '.zip',
+			await downloadZip( filesToZip ).blob(),
+			'application/zip'
+		);
+	},
+};
+
+const canDeleteOrReset = ( item ) => {
+	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+	const isUserPattern = item.type === PATTERN_TYPES.user;
+	return isUserPattern || ( isTemplatePart && item.isCustom );
+};
+
+export const deletePatternAction = {
+	id: 'delete-pattern',
+	label: __( 'Delete' ),
+	isEligible: ( item ) => {
+		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
+		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
+		return canDeleteOrReset( item ) && ! hasThemeFile;
+	},
+	hideModalHeader: true,
+	supportsBulk: true,
+	RenderModal: ( { items, closeModal, onPerform } ) => {
+		const { __experimentalDeleteReusableBlock } =
+			useDispatch( reusableBlocksStore );
+		const { createErrorNotice, createSuccessNotice } =
+			useDispatch( noticesStore );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
+
+		const deletePattern = async () => {
+			const promiseResult = await Promise.allSettled(
+				items.map( ( item ) => {
+					return __experimentalDeleteReusableBlock( item.id );
+				} )
+			);
+			// If all the promises were fulfilled with success.
+			if (
+				promiseResult.every( ( { status } ) => status === 'fulfilled' )
+			) {
+				let successMessage;
+				if ( promiseResult.length === 1 ) {
+					successMessage = sprintf(
+						/* translators: The posts's title. */
+						__( '"%s" deleted.' ),
+						items[ 0 ].title
+					);
+				} else {
+					successMessage = __( 'The patterns were deleted.' );
+				}
+				createSuccessNotice( successMessage, {
+					type: 'snackbar',
+					id: 'edit-site-page-trashed',
+				} );
+			} else {
+				// If there was at lease one failure.
+				let errorMessage;
+				// If we were trying to delete a single pattern.
+				if ( promiseResult.length === 1 ) {
+					if ( promiseResult[ 0 ].reason?.message ) {
+						errorMessage = promiseResult[ 0 ].reason.message;
+					} else {
+						errorMessage = __(
+							'An error occurred while deleting the pattern.'
+						);
+					}
+					// If we were trying to delete multiple patterns.
+				} else {
+					const errorMessages = new Set();
+					const failedPromises = promiseResult.filter(
+						( { status } ) => status === 'rejected'
+					);
+					for ( const failedPromise of failedPromises ) {
+						if ( failedPromise.reason?.message ) {
+							errorMessages.add( failedPromise.reason.message );
+						}
+					}
+					if ( errorMessages.size === 0 ) {
+						errorMessage = __(
+							'An error occurred while deleting the patterns.'
+						);
+					} else if ( errorMessages.size === 1 ) {
+						errorMessage = sprintf(
+							/* translators: %s: an error message */
+							__(
+								'An error occurred while deleting the patterns: %s'
+							),
+							[ ...errorMessages ][ 0 ]
+						);
+					} else {
+						errorMessage = sprintf(
+							/* translators: %s: a list of comma separated error messages */
+							__(
+								'Some errors occurred while deleting the patterns: %s'
+							),
+							[ ...errorMessages ].join( ',' )
+						);
+					}
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
+				}
+			}
+		};
+		const deleteItem = () => {
+			if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
+				removeTemplates( items );
+			} else {
+				deletePattern();
+			}
+			if ( onPerform ) {
+				onPerform();
+			}
+			closeModal();
+		};
+		let questionMessage;
+		if ( items.length === 1 ) {
+			questionMessage = sprintf(
+				// translators: %s: The page's title.
+				__( 'Are you sure you want to delete "%s"?' ),
+				decodeEntities( items[ 0 ].title || items[ 0 ].name )
+			);
+		} else if (
+			items.length > 1 &&
+			items[ 0 ].type === TEMPLATE_PART_POST_TYPE
+		) {
+			questionMessage = sprintf(
+				// translators: %d: The number of template parts (2 or more).
+				__( 'Are you sure you want to delete %d template parts?' ),
+				items.length
+			);
+		} else {
+			questionMessage = sprintf(
+				// translators: %d: The number of patterns (2 or more).
+				__( 'Are you sure you want to delete %d patterns?' ),
+				items.length
+			);
+		}
+		return (
+			<VStack spacing="5">
+				<Text>{ questionMessage }</Text>
+				<HStack justify="right">
+					<Button variant="tertiary" onClick={ closeModal }>
+						{ __( 'Cancel' ) }
+					</Button>
+					<Button variant="primary" onClick={ deleteItem }>
+						{ __( 'Delete' ) }
+					</Button>
+				</HStack>
+			</VStack>
+		);
+	},
+};
+
 export function usePostActions( postType, onActionPerformed ) {
 	const { postTypeObject } = useSelect(
 		( select ) => {
@@ -1026,6 +1242,8 @@ export function usePostActions( postType, onActionPerformed ) {
 				: false,
 			! isTemplateOrTemplatePart && renamePostAction,
 			isTemplateOrTemplatePart && renameTemplateAction,
+			isPattern && exportPatternAsJSONAction,
+			isPattern && deletePatternAction,
 			! isTemplateOrTemplatePart && trashPostAction,
 		].filter( Boolean );
 
