@@ -12,25 +12,28 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useId } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
-export default function AllowOverridesModal( {
+export function AllowOverridesModal( {
 	placeholder,
+	initialName = '',
 	onClose,
 	onSave,
 } ) {
-	const [ editedBlockName, setEditedBlockName ] = useState( '' );
+	const [ editedBlockName, setEditedBlockName ] = useState( initialName );
 	const descriptionId = useId();
 
 	const isNameValid = !! editedBlockName.trim();
 
 	const handleSubmit = () => {
-		const message = sprintf(
-			/* translators: %s: new name/label for the block */
-			__( 'Block name changed to: "%s".' ),
-			editedBlockName
-		);
+		if ( editedBlockName !== initialName ) {
+			const message = sprintf(
+				/* translators: %s: new name/label for the block */
+				__( 'Block name changed to: "%s".' ),
+				editedBlockName
+			);
 
-		// Must be assertive to immediately announce change.
-		speak( message, 'assertive' );
+			// Must be assertive to immediately announce change.
+			speak( message, 'assertive' );
+		}
 		onSave( editedBlockName );
 
 		// Immediate close avoids ability to hit save multiple times.
@@ -88,10 +91,56 @@ export default function AllowOverridesModal( {
 							variant="primary"
 							type="submit"
 						>
-							{ __( 'Save' ) }
+							{ __( 'Allow overrides' ) }
 						</Button>
 					</HStack>
 				</VStack>
+			</form>
+		</Modal>
+	);
+}
+
+export function DisallowOverridesModal( { onClose, onSave } ) {
+	const descriptionId = useId();
+
+	return (
+		<Modal
+			title={ __( 'Disallow overrides' ) }
+			onRequestClose={ onClose }
+			overlayClassName="block-editor-block-disallow-overrides-modal"
+			aria={ { describedby: descriptionId } }
+			size="small"
+		>
+			<form
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					onSave();
+					onClose();
+				} }
+			>
+				<p id={ descriptionId }>
+					{ __(
+						'Are you sure you want to disallow the overrides? This could cause problems with content entered into instances of this pattern.'
+					) }
+				</p>
+
+				<HStack justify="right">
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ onClose }
+					>
+						{ __( 'Cancel' ) }
+					</Button>
+
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						type="submit"
+					>
+						{ __( 'Disallow overrides' ) }
+					</Button>
+				</HStack>
 			</form>
 		</Modal>
 	);

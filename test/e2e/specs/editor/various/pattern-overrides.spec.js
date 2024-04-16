@@ -90,8 +90,12 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'button', { name: 'Advanced' } )
 				.click();
 			await editorSettings
-				.getByRole( 'checkbox', { name: 'Allow overrides' } )
-				.setChecked( true );
+				.getByRole( 'button', { name: 'Allow overrides' } )
+				.click();
+			await page
+				.getByRole( 'dialog', { name: 'Allow overrides' } )
+				.getByRole( 'button', { name: 'Allow overrides' } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
