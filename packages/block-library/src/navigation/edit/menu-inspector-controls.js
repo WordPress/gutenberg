@@ -143,7 +143,10 @@ const MenuInspectorControls = ( props ) => {
 	return (
 		<InspectorControls group="list">
 			<PanelBody title={ null }>
-				<HStack className="wp-block-navigation-off-canvas-editor__header">
+				<HStack
+					wrap
+					className="wp-block-navigation-off-canvas-editor__header"
+				>
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"
 						level={ 2 }
