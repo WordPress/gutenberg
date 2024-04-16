@@ -513,7 +513,7 @@ function Binding( { content } ) {
 		{ key: element.getAttribute( 'key' ) }
 	);
 
-	return value.value.toString();
+	return value.value.toString() || value.placeholder;
 }
 
 // This is the private API for the RichText component.
