@@ -25,6 +25,10 @@
 	// Leave enough room for the focus ring to show.
 	padding: 2px 0;
 	align-items: center;
+	// Allow focus ring to be fully visible on furthest right button.
+	@include break-medium() {
+		padding-right: var(--wp-admin-border-width-focus);
+	}
 
 	.table-of-contents {
 		display: none;
@@ -286,8 +290,7 @@
 	}
 
 	.edit-post-header {
-		backdrop-filter: blur(20px) !important;
-		background-color: rgba(255, 255, 255, 0.9);
+		background-color: $white;
 		border-bottom: 1px solid #e0e0e0;
 		position: absolute;
 		width: 100%;
@@ -298,7 +301,6 @@
 			visibility: hidden;
 		}
 
-		& > .edit-post-header__toolbar .editor-document-tools__inserter-toggle,
 		& > .edit-post-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .edit-post-header__settings > .editor-preview-dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {

@@ -58,16 +58,20 @@ if ( ! function_exists( 'wp_interactivity_process_directives_of_interactive_bloc
 				};
 
 				/*
-				* Uses a priority of 20 to ensure that other filters can add additional
-				* directives before the processing starts.
-				*/
-				add_filter( 'render_block_' . $block_name, $process_interactive_blocks, 20, 2 );
+				 * Uses a priority of 100 to ensure that other filters can add additional
+				 * directives before the processing starts.
+				 */
+				add_filter( 'render_block_' . $block_name, $process_interactive_blocks, 100, 2 );
 			}
 		}
 
 		return $parsed_block;
 	}
-	add_filter( 'render_block_data', 'wp_interactivity_process_directives_of_interactive_blocks' );
+	/*
+	 * Uses a priority of 100 to ensure that other filters can edit $parsed_block
+	 * without crashing the SSR.
+	 */
+	add_filter( 'render_block_data', 'wp_interactivity_process_directives_of_interactive_blocks', 100 );
 }
 
 if ( ! function_exists( 'wp_interactivity' ) ) {
@@ -176,5 +180,26 @@ if ( ! function_exists( 'wp_interactivity_data_wp_context' ) ) {
 		( $store_namespace ? $store_namespace . '::' : '' ) .
 		( empty( $context ) ? '{}' : wp_json_encode( $context, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP ) ) .
 		'\'';
+	}
+}
+
+if ( ! function_exists( 'data_wp_context' ) ) {
+	/**
+	 * `data_wp_context()` was renamed to follow WordPress Core naming schemes.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/pull/59465/
+	 * @link https://core.trac.wordpress.org/ticket/60575
+	 *
+	 * @since 6.5.0
+	 * @deprecated 6.5.0
+	 *
+	 * @param array  $context         The array of context data to encode.
+	 * @param string $store_namespace Optional. The unique store namespace identifier.
+	 * @return string A complete `data-wp-context` directive with a JSON encoded value representing the context array and
+	 *                the store namespace if specified.
+	 */
+	function data_wp_context( array $context, string $store_namespace = '' ): string {
+		_deprecated_function( __FUNCTION__, '6.5', 'wp_interactivity_data_wp_context()' );
+		return wp_interactivity_data_wp_context( $context, $store_namespace );
 	}
 }

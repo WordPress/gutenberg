@@ -8,6 +8,8 @@
 /**
  * Renders the `core/social-link` block on server.
  *
+ * @since 5.4.0
+ *
  * @param Array    $attributes The block attributes.
  * @param String   $content    InnerBlocks content of the Block.
  * @param WP_Block $block      Block object.
@@ -17,10 +19,10 @@
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service     = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url         = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label       = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
-	$rel         = ( isset( $attributes['rel'] ) ) ? $attributes['rel'] : '';
+	$service     = isset( $attributes['service'] ) ? $attributes['service'] : 'Icon';
+	$url         = isset( $attributes['url'] ) ? $attributes['url'] : false;
+	$label       = ! empty( $attributes['label'] ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$rel         = isset( $attributes['rel'] ) ? $attributes['rel'] : '';
 	$show_labels = array_key_exists( 'showLabels', $block->context ) ? $block->context['showLabels'] : false;
 
 	// Don't render a link if there is no URL set.
@@ -55,9 +57,8 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	$link  = '<li ' . $wrapper_attributes . '>';
 	$link .= '<a href="' . esc_url( $url ) . '" class="wp-block-social-link-anchor">';
 	$link .= $icon;
-	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">';
-	$link .= esc_html( $label );
-	$link .= '</span></a></li>';
+	$link .= '<span class="wp-block-social-link-label' . ( $show_labels ? '' : ' screen-reader-text' ) . '">' . esc_html( $label ) . '</span>';
+	$link .= '</a></li>';
 
 	$processor = new WP_HTML_Tag_Processor( $link );
 	$processor->next_tag( 'a' );
@@ -72,6 +73,8 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/social-link` blocks.
+ *
+ * @since 5.4.0
  */
 function register_block_core_social_link() {
 	register_block_type_from_metadata(
@@ -86,6 +89,8 @@ add_action( 'init', 'register_block_core_social_link' );
 
 /**
  * Returns the SVG for social link.
+ *
+ * @since 5.4.0
  *
  * @param string $service The service icon.
  *
@@ -103,6 +108,8 @@ function block_core_social_link_get_icon( $service ) {
 /**
  * Returns the brand name for social link.
  *
+ * @since 5.4.0
+ *
  * @param string $service The service icon.
  *
  * @return string Brand label.
@@ -118,6 +125,8 @@ function block_core_social_link_get_name( $service ) {
 
 /**
  * Returns the SVG for social link.
+ *
+ * @since 5.4.0
  *
  * @param string $service The service slug to extract data from.
  * @param string $field The field ('name', 'icon', etc) to extract for a service.
@@ -332,6 +341,8 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 /**
  * Returns CSS styles for icon and icon background colors.
  *
+ * @since 5.7.0
+ *
  * @param array $context Block context passed to Social Link.
  *
  * @return string Inline CSS styles for link's icon and background colors.
@@ -352,6 +363,8 @@ function block_core_social_link_get_color_styles( $context ) {
 
 /**
  * Returns CSS classes for icon and icon background colors.
+ *
+ * @since 6.3.0
  *
  * @param array $context Block context passed to Social Sharing Link.
  *

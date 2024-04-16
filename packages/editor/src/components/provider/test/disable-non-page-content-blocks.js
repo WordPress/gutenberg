@@ -55,6 +55,13 @@ describe( 'DisableNonPageContentBlocks', () => {
 					getBlockName( state, clientId ) {
 						return testBlocks[ clientId ];
 					},
+					getBlockOrder( state, rootClientId ) {
+						return Object.keys( testBlocks ).filter(
+							( clientId ) =>
+								clientId.startsWith( rootClientId ) &&
+								clientId !== rootClientId
+						);
+					},
 				},
 				actions: {
 					setBlockEditingMode,
@@ -69,22 +76,36 @@ describe( 'DisableNonPageContentBlocks', () => {
 			</RegistryProvider>
 		);
 
-		expect( setBlockEditingMode.mock.calls ).toEqual( [
-			[ '', 'disabled' ], // root
-			[ '10', 'contentOnly' ], // post-title
-			[ '11', 'contentOnly' ], // post-featured-image
-			[ '12', 'contentOnly' ], // post-content
-			// NOT the post-featured-image nested within post-content
-			// NOT any of the content blocks within query
-		] );
+		expect( setBlockEditingMode.mock.calls ).toEqual(
+			expect.arrayContaining( [
+				[ '', 'disabled' ], // root
+				[ '0', 'contentOnly' ], // core/template-part
+				[ '00', 'disabled' ], // core/site-title
+				[ '01', 'disabled' ], // core/navigation
+				[ '10', 'contentOnly' ], // post-title
+				[ '11', 'contentOnly' ], // post-featured-image
+				[ '12', 'contentOnly' ], // post-content
+				[ '3', 'contentOnly' ], // core/template-part
+				[ '30', 'disabled' ], // core/paragraph
+				// NOT the post-featured-image nested within post-content
+				// NOT any of the content blocks within query
+			] )
+		);
 
 		unmount();
 
-		expect( unsetBlockEditingMode.mock.calls ).toEqual( [
-			[ '' ], // root
-			[ '10' ], // post-title
-			[ '11' ], // post-featured-image
-			[ '12' ], // post-content
-		] );
+		expect( unsetBlockEditingMode.mock.calls ).toEqual(
+			expect.arrayContaining( [
+				[ '' ], // root
+				[ '0' ], // core/template-part
+				[ '00' ], // core/site-title
+				[ '01' ], // core/navigation
+				[ '10' ], // post-title
+				[ '11' ], // post-featured-image
+				[ '12' ], // post-content
+				[ '3' ], // core/template-part
+				[ '30' ], // core/paragraph
+			] )
+		);
 	} );
 } );

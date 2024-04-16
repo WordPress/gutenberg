@@ -134,9 +134,9 @@ export function unloadFontFaceInBrowser( fontFace, removeFrom = 'all' ) {
 	const unloadFontFace = ( fonts ) => {
 		fonts.forEach( ( f ) => {
 			if (
-				f.family === formatFontFaceName( fontFace.fontFamily ) &&
-				f.weight === fontFace.fontWeight &&
-				f.style === fontFace.fontStyle
+				f.family === formatFontFaceName( fontFace?.fontFamily ) &&
+				f.weight === fontFace?.fontWeight &&
+				f.style === fontFace?.fontStyle
 			) {
 				fonts.delete( f );
 			}
@@ -234,10 +234,23 @@ export function makeFontFacesFormData( font ) {
 }
 
 export async function batchInstallFontFaces( fontFamilyId, fontFacesData ) {
-	const promises = fontFacesData.map( ( faceData ) =>
-		fetchInstallFontFace( fontFamilyId, faceData )
-	);
-	const responses = await Promise.allSettled( promises );
+	const responses = [];
+
+	/*
+	 * Uses the same response format as Promise.allSettled, but executes requests in sequence to work
+	 * around a race condition that can cause an error when the fonts directory doesn't exist yet.
+	 */
+	for ( const faceData of fontFacesData ) {
+		try {
+			const response = await fetchInstallFontFace(
+				fontFamilyId,
+				faceData
+			);
+			responses.push( { status: 'fulfilled', value: response } );
+		} catch ( error ) {
+			responses.push( { status: 'rejected', reason: error } );
+		}
+	}
 
 	const results = {
 		errors: [],

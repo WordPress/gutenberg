@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 import {
 	store as keyboardShortcutsStore,
 	__unstableUseShortcutEventMatch,
@@ -33,31 +34,31 @@ const POPOVER_PROPS = {
 	placement: 'bottom-start',
 };
 
-function CopyMenuItem( { clientIds, onCopy, label } ) {
+function CopyMenuItem( { clientIds, onCopy, label, shortcut } ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const ref = useCopyToClipboard(
 		() => serialize( getBlocksByClientId( clientIds ) ),
 		onCopy
 	);
 	const copyMenuItemLabel = label ? label : __( 'Copy' );
-	return <MenuItem ref={ ref }>{ copyMenuItemLabel }</MenuItem>;
+	return (
+		<MenuItem ref={ ref } shortcut={ shortcut }>
+			{ copyMenuItemLabel }
+		</MenuItem>
+	);
 }
 
 export function BlockSettingsDropdown( {
 	block,
 	clientIds,
-	__experimentalSelectBlock,
 	children,
-	__unstableDisplayLocation,
+	__experimentalSelectBlock,
 	...props
 } ) {
 	// Get the client id of the current block for this menu, if one is set.
 	const currentClientId = block?.clientId;
-	const blockClientIds = Array.isArray( clientIds )
-		? clientIds
-		: [ clientIds ];
-	const count = blockClientIds.length;
-	const firstBlockClientId = blockClientIds[ 0 ];
+	const count = clientIds.length;
+	const firstBlockClientId = clientIds[ 0 ];
 	const {
 		firstParentClientId,
 		onlyBlock,
@@ -283,6 +284,7 @@ export function BlockSettingsDropdown( {
 								<CopyMenuItem
 									clientIds={ clientIds }
 									onCopy={ onCopy }
+									shortcut={ displayShortcut.primary( 'c' ) }
 								/>
 								{ canDuplicate && (
 									<MenuItem
@@ -341,9 +343,6 @@ export function BlockSettingsDropdown( {
 									firstBlockClientId,
 								} }
 								clientIds={ clientIds }
-								__unstableDisplayLocation={
-									__unstableDisplayLocation
-								}
 							/>
 							{ typeof children === 'function'
 								? children( { onClose } )
