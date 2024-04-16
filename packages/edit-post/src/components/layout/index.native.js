@@ -19,7 +19,6 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
-	Tooltip,
 	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
 import {
@@ -145,46 +144,44 @@ class Layout extends Component {
 		];
 
 		return (
-			<Tooltip.Slot>
-				<SafeAreaView
-					style={ containerStyles }
-					onLayout={ this.onRootViewLayout }
-				>
-					<AutosaveMonitor disableIntervalChecks />
-					<OfflineStatus />
-					<View style={ editorStyles }>
-						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
-						{ ! isHtmlView && Platform.OS === 'android' && (
-							<FloatingToolbar />
-						) }
-						<NoticeList />
-					</View>
-					<View
-						style={ {
-							flex: 0,
-							flexBasis: marginBottom,
-							height: marginBottom,
-						} }
-					/>
-					{ ! isHtmlView && (
-						<KeyboardAvoidingView
-							parentHeight={ this.state.rootViewHeight }
-							style={ toolbarKeyboardAvoidingViewStyle }
-							withAnimatedHeight
-						>
-							{ Platform.OS === 'ios' && (
-								<>
-									<AutocompletionItemsSlot />
-									<FloatingToolbar />
-								</>
-							) }
-							<Header />
-							<BottomSheetSettings />
-						</KeyboardAvoidingView>
+			<SafeAreaView
+				style={ containerStyles }
+				onLayout={ this.onRootViewLayout }
+			>
+				<AutosaveMonitor disableIntervalChecks />
+				<OfflineStatus />
+				<View style={ editorStyles }>
+					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+					{ ! isHtmlView && Platform.OS === 'android' && (
+						<FloatingToolbar />
 					) }
-					{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
-				</SafeAreaView>
-			</Tooltip.Slot>
+					<NoticeList />
+				</View>
+				<View
+					style={ {
+						flex: 0,
+						flexBasis: marginBottom,
+						height: marginBottom,
+					} }
+				/>
+				{ ! isHtmlView && (
+					<KeyboardAvoidingView
+						parentHeight={ this.state.rootViewHeight }
+						style={ toolbarKeyboardAvoidingViewStyle }
+						withAnimatedHeight
+					>
+						{ Platform.OS === 'ios' && (
+							<>
+								<AutocompletionItemsSlot />
+								<FloatingToolbar />
+							</>
+						) }
+						<Header />
+						<BottomSheetSettings />
+					</KeyboardAvoidingView>
+				) }
+				{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
+			</SafeAreaView>
 		);
 	}
 }
