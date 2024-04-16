@@ -10,7 +10,7 @@ import { BlockToolbar } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 
-function TopToolbar( { isCollapsed } ) {
+function TopBlockToolbar( { isCollapsed } ) {
 	const blockToolbarRef = useRef();
 
 	return (
@@ -27,4 +27,4 @@ function TopToolbar( { isCollapsed } ) {
 	);
 }
 
-export default TopToolbar;
+export default TopBlockToolbar;
