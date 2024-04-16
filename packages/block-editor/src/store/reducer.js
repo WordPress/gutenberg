@@ -884,7 +884,7 @@ export const blocks = pipe(
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
 						action.uniqueByBlock
-							? action.attributes[ clientId ]
+							? action.attributes[ clientId ] ?? {}
 							: action.attributes ?? {}
 					);
 					if ( updatedAttributeEntries.length === 0 ) {

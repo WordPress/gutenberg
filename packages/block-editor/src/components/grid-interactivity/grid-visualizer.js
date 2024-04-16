@@ -63,8 +63,9 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { getBlockAttributes, getBlockIndex } = useSelect( blockEditorStore );
+	const { moveBlockToPosition, updateBlockAttributes } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const observers = [];
@@ -120,10 +121,11 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 							validateDrag={ ( srcClientId ) => {
 								const isCellOccupied = Array.from(
 									blockElement.children
-								).some( ( childElement ) => {
-									const rect =
-										getGridItemRect( childElement );
-									return rect.contains( column, row );
+								).some( ( child ) => {
+									return getGridItemRect( child ).contains(
+										column,
+										row
+									);
 								} );
 								if ( isCellOccupied ) {
 									return false;
@@ -179,18 +181,68 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 								);
 							} }
 							onDrop={ ( srcClientId ) => {
-								const attributes =
-									getBlockAttributes( srcClientId );
-								updateBlockAttributes( srcClientId, {
-									style: {
-										...attributes.style,
-										layout: {
-											...attributes.style?.layout,
-											columnStart: column,
-											rowStart: row,
-										},
-									},
+								const leadingCellColumn =
+									column > 1
+										? column - 1
+										: gridInfo.numColumns;
+								const leadingCellRow =
+									column > 1 ? row : row - 1;
+								const leadingGridItem = Array.from(
+									blockElement.children
+								).find( ( child ) => {
+									return getGridItemRect( child ).contains(
+										leadingCellColumn,
+										leadingCellRow
+									);
 								} );
+								const leadingBlockClientId =
+									leadingGridItem?.dataset.block;
+
+								if (
+									leadingBlockClientId &&
+									leadingBlockClientId !== srcClientId
+								) {
+									moveBlockToPosition(
+										srcClientId,
+										clientId,
+										clientId,
+										getBlockIndex( leadingBlockClientId ) +
+											1
+									);
+									const attributes =
+										getBlockAttributes( srcClientId );
+									if (
+										attributes.style?.layout?.columnStart ||
+										attributes.style?.layout?.rowStart
+									) {
+										const {
+											columnStart,
+											rowStart,
+											...layout
+										} = attributes.style.layout;
+										updateBlockAttributes( srcClientId, {
+											style: {
+												...attributes.style,
+												layout,
+											},
+										} );
+									}
+								} else {
+									// TODO: call moveBlockToPosition() here.
+									const attributes =
+										getBlockAttributes( srcClientId );
+									updateBlockAttributes( srcClientId, {
+										style: {
+											...attributes.style,
+											layout: {
+												...attributes.style?.layout,
+												columnStart: column,
+												rowStart: row,
+											},
+										},
+									} );
+								}
+
 								setHighlightedRect( null );
 							} }
 						/>
