@@ -69,3 +69,46 @@ register_meta(
 		'revisions_enabled' => true
 	)
 );
+
+add_filter(
+	'the_content',
+	function ( $content ) {
+		$sources = get_all_registered_block_bindings_sources();
+		// To do: use HTML API.
+		return preg_replace_callback(
+			'/<\/\/([^>]*)>/',
+			function ( $matches ) use ( $sources ) {
+				$attributes = explode(' ', $matches[1]);
+				$key = array_shift($attributes);
+				if ( ! isset( $sources["core/$key"] ) ) {
+					return '';
+				}
+				$attributes = array_reduce(
+					$attributes,
+					function ( $carry, $item ) {
+						$parts = explode('=', $item);
+						$carry[ $parts[0] ] = $parts[1];
+						return $carry;
+					},
+					array()
+				);
+				// We need to change this function so it doesn't rely on a block
+				// instance.
+				return $sources["core/$key"]->get_value(
+					$attributes,
+					new WP_Block(
+						array(
+							'blockName' => 'core/paragraph',
+						),
+						array(
+							'postId' => get_the_ID(),
+							'postType' => get_post_type(),
+						)
+					),
+					''
+				);
+			},
+			$content
+		);
+	},
+);
