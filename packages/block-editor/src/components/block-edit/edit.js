@@ -13,6 +13,10 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { useContext, useMemo } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import { InspectorControls, BlockControls } from '../../components';
 
 /**
  * Internal dependencies
@@ -37,12 +41,31 @@ const Edit = ( props ) => {
 		return null;
 	}
 
+	const controls = [];
+
+	if ( blockType.attributeControls?.length > 0 ) {
+		for ( const control of blockType.attributeControls ) {
+			const Wrapper =
+				control.type === 'toolbar' ? BlockControls : InspectorControls;
+
+			controls.push(
+				<Wrapper group={ control.group } key={ control.key }>
+					<control.Control { ...props } />
+				</Wrapper>
+			);
+		}
+	}
+
 	// `edit` and `save` are functions or components describing the markup
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
 
-	return <Component { ...props } />;
+	return [
+		<Component { ...props } key="content">
+			{ controls }
+		</Component>,
+	];
 };
 
 const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
