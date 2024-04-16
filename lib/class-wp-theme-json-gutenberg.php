@@ -1615,7 +1615,7 @@ class WP_Theme_JSON_Gutenberg {
 						if ( ! wp_theme_has_theme_json() && ( 'default' === $layout_definition['name'] || 'constrained' === $layout_definition['name'] ) ) {
 							continue;
 						}
-				
+
 						if (
 							isset( $base_style_rule['selector'] ) &&
 							preg_match( $layout_selector_pattern, $base_style_rule['selector'] ) &&
