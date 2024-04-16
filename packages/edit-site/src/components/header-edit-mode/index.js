@@ -13,9 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
-import { Button, __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
@@ -126,21 +124,11 @@ export default function HeaderEditMode() {
 						<>
 							<TopBlockToolbar
 								isCollapsed={ isBlockToolsCollapsed }
-							/>
-							<Button
-								className="edit-site-header-edit-mode__block-tools-toggle"
-								icon={ isBlockToolsCollapsed ? next : previous }
-								onClick={ () => {
+								onCollapse={ () => {
 									setIsBlockToolsCollapsed(
 										( collapsed ) => ! collapsed
 									);
 								} }
-								label={
-									isBlockToolsCollapsed
-										? __( 'Show block tools' )
-										: __( 'Hide block tools' )
-								}
-								size="compact"
 							/>
 						</>
 					) }

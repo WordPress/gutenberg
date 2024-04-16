@@ -9,7 +9,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
