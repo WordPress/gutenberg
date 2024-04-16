@@ -53,7 +53,12 @@ function _gutenberg_add_client_side_navigation_directives( $content ) {
 	}
 	// Hack to add the necessary directives to the body tag.
 	// TODO: Find a proper way to add directives to the body tag.
-	return (string) $p . '<body data-wp-interactive="core/experimental" data-wp-context="{}">';
+	static $body_interactive_added;
+	if ( ! $body_interactive_added ) {
+		$body_interactive_added = true;
+		return (string) $p . '<body data-wp-interactive="core/experimental" data-wp-context="{}">';
+	}
+	return (string) $p;
 }
 
 // TODO: Explore moving this to the server directive processing.
