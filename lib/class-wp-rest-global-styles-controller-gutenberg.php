@@ -335,7 +335,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			} elseif ( isset( $existing_config['settings'] ) ) {
 				$config['settings'] = $existing_config['settings'];
 			}
-
 			$config['isGlobalStylesUserThemeJSON'] = true;
 			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
 			$changes->post_content                 = wp_json_encode( $config );
