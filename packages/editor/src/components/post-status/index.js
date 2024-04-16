@@ -26,6 +26,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { Icon, chevronDownSmall } from '@wordpress/icons';
 
 function PostStatusLabel() {
 	const status = useSelect(
@@ -58,6 +59,7 @@ function PostStatusLabel() {
 			} ) }
 		>
 			{ statusLabel }
+			<Icon icon={ chevronDownSmall } />
 		</Text>
 	);
 }
