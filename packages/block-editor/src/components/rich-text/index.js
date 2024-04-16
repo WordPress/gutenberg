@@ -11,6 +11,8 @@ import {
 	useCallback,
 	forwardRef,
 	createContext,
+	createPortal,
+	useContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
@@ -48,6 +50,7 @@ import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
+import BlockContext from '../block-context';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
@@ -321,6 +324,7 @@ export function RichTextWrapper(
 		getValue,
 		onChange,
 		ref: richTextRef,
+		replacementRefs,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
@@ -464,8 +468,52 @@ export function RichTextWrapper(
 				}
 				data-wp-block-attribute-key={ identifier }
 			/>
+			{ replacementRefs.map( ( ref ) => {
+				return (
+					ref &&
+					createPortal(
+						<Binding
+							content={ ref.getAttribute(
+								'data-rich-text-comment'
+							) }
+						/>,
+						ref
+					)
+				);
+			} ) }
 		</>
 	);
+}
+
+function Binding( { content } ) {
+	const context = useContext( BlockContext );
+	const blockBindingsSources = useSelect( ( select ) => {
+		return unlock( select( blocksStore ) ).getAllBlockBindingsSources();
+	} );
+
+	if ( ! content.startsWith( '/wp:' ) ) {
+		return null;
+	}
+
+	const fakeHTML = '<' + content.slice( 4 ) + '>';
+	const body = document.implementation.createHTMLDocument( '' ).body;
+	body.innerHTML = fakeHTML;
+	const element = body.firstElementChild;
+	const tag = 'core/' + element.tagName.toLowerCase();
+	const source = blockBindingsSources[ tag ];
+
+	if ( ! source ) {
+		return null;
+	}
+
+	const value = source.useSource(
+		{
+			context,
+		},
+		{ key: element.getAttribute( 'key' ) }
+	);
+
+	return value.value.toString() || value.placeholder;
 }
 
 // This is the private API for the RichText component.

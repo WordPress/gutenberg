@@ -145,10 +145,7 @@ export class RichTextData {
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
 	toHTMLString( { preserveWhiteSpace } = {} ) {
-		return (
-			this.originalHTML ||
-			toHTMLString( { value: this.#value, preserveWhiteSpace } )
-		);
+		return toHTMLString( { value: this.#value, preserveWhiteSpace } );
 	}
 	valueOf() {
 		return this.toHTMLString();
@@ -466,6 +463,34 @@ function createFromElement( { element, range, isEditableTree } ) {
 			accumulator.formats.length += text.length;
 			accumulator.replacements.length += text.length;
 			accumulator.text += text;
+			continue;
+		}
+
+		if (
+			node.nodeType === node.COMMENT_NODE ||
+			( node.nodeType === node.ELEMENT_NODE &&
+				node.tagName === 'SPAN' &&
+				node.hasAttribute( 'data-rich-text-comment' ) )
+		) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type: '#comment',
+						attributes: {
+							'data-rich-text-comment':
+								node.nodeType === node.COMMENT_NODE
+									? node.nodeValue
+									: node.getAttribute(
+											'data-rich-text-comment'
+									  ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 
