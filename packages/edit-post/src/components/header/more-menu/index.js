@@ -46,7 +46,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					<WritingMenu />
 					<ModeSwitcher />
 					<ActionItem.Slot
-						name="core/edit-post/plugin-more-menu"
+						name="core/editor/plugin-more-menu"
 						label={ __( 'Plugins' ) }
 						as={ MenuGroup }
 						fillProps={ { onClick: onClose } }

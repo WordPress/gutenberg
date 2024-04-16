@@ -17,6 +17,7 @@ import {
 import {
 	PluginBlockSettingsMenuItem,
 	PluginDocumentSettingPanel,
+	PluginMoreMenuItem,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -164,7 +165,7 @@ export function reinitializeEditor() {
 
 export { PluginBlockSettingsMenuItem };
 export { PluginDocumentSettingPanel };
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export { PluginMoreMenuItem };
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
