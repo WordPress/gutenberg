@@ -417,7 +417,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'OK' } )
+			.getByRole( 'button', { name: 'Move to trash' } )
 			.click();
 
 		await expect(

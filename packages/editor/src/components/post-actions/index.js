@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState, Fragment, Children } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -41,23 +40,16 @@ const POST_ACTIONS_WHILE_EDITING = [
 ];
 
 export default function PostActions( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+	const { postType, item } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPost } = select( editorStore );
 		return {
 			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
+			item: getCurrentPost(),
 		};
 	} );
 	const actions = usePostActions(
 		onActionPerformed,
 		POST_ACTIONS_WHILE_EDITING
-	);
-	const item = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord( 'postType', postType, postId );
-		},
-		[ postType, postId ]
 	);
 
 	const { primaryActions, secondaryActions } = useMemo( () => {
@@ -89,7 +81,7 @@ export default function PostActions( { onActionPerformed } ) {
 		<DropdownMenu
 			trigger={
 				<Button
-					size="compact"
+					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
 					disabled={

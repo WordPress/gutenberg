@@ -31,10 +31,13 @@ export default function PostSwitchToDraftButton() {
 	const isDisabled = isSaving || ( ! isPublished && ! isScheduled );
 
 	let alertMessage;
+	let confirmButtonText;
 	if ( isPublished ) {
 		alertMessage = __( 'Are you sure you want to unpublish this post?' );
+		confirmButtonText = __( 'Unpublish' );
 	} else if ( isScheduled ) {
 		alertMessage = __( 'Are you sure you want to unschedule this post?' );
+		confirmButtonText = __( 'Unschedule' );
 	}
 
 	const handleConfirm = () => {
@@ -63,6 +66,7 @@ export default function PostSwitchToDraftButton() {
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
+				confirmButtonText={ confirmButtonText }
 			>
 				{ alertMessage }
 			</ConfirmDialog>
