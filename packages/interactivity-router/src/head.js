@@ -40,12 +40,12 @@ export const updateHead = async ( newHead ) => {
  * Fetches and processes head assets (stylesheets and scripts) from a specified document.
  *
  * @async
- * @param {Document} document     The document from which to fetch head assets. It should support standard DOM querying methods.
+ * @param {Document} doc          The document from which to fetch head assets. It should support standard DOM querying methods.
  * @param {Map}      headElements A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
  *
  * @return {Promise<HTMLElement[]>} Returns an array of HTML elements representing the head assets.
  */
-export const fetchHeadAssets = async ( document, headElements ) => {
+export const fetchHeadAssets = async ( doc, headElements ) => {
 	const headTags = [];
 	const assets = [
 		{
@@ -57,7 +57,7 @@ export const fetchHeadAssets = async ( document, headElements ) => {
 	];
 	for ( const asset of assets ) {
 		const { tagName, selector, attribute } = asset;
-		const tags = document.querySelectorAll( selector );
+		const tags = doc.querySelectorAll( selector );
 
 		// Use Promise.all to wait for fetch to complete
 		await Promise.all(
@@ -78,7 +78,7 @@ export const fetchHeadAssets = async ( document, headElements ) => {
 				}
 
 				const headElement = headElements.get( attributeValue );
-				const element = document.createElement( tagName );
+				const element = doc.createElement( tagName );
 				element.innerText = headElement.text;
 				for ( const attr of headElement.tag.attributes ) {
 					element.setAttribute( attr.name, attr.value );
@@ -89,8 +89,8 @@ export const fetchHeadAssets = async ( document, headElements ) => {
 	}
 
 	return [
-		document.querySelector( 'title' ),
-		...document.querySelectorAll( 'style' ),
+		doc.querySelector( 'title' ),
+		...doc.querySelectorAll( 'style' ),
 		...headTags,
 	];
 };
