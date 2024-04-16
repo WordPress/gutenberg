@@ -14,11 +14,13 @@ import {
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { NavigateContext } from '../layout';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -33,15 +35,18 @@ export default function SidebarNavigationItem( {
 	...props
 } ) {
 	const history = useHistory();
-	let handleClick = onClick;
+	const navigate = useContext( NavigateContext );
 
 	// If there is no custom click handler, create one that navigates to `path`.
-	if ( ! handleClick && path ) {
-		handleClick = ( e ) => {
+	function handleClick( e ) {
+		if ( onClick ) {
+			onClick( e );
+			navigate( false );
+		} else if ( path ) {
 			e.preventDefault();
-			// history.replaceState( { focusTargetSelector: `[$id="${ path }"]` } );
 			history.push( { path } );
-		};
+			navigate( false, `[id="${ path }"]` );
+		}
 	}
 
 	return (
