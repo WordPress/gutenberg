@@ -57,6 +57,7 @@ export default function SidebarNavigationItem( {
 				className
 			) }
 			onClick={ handleClick }
+			id={ path }
 			{ ...props }
 		>
 			<HStack justify="flex-start">
