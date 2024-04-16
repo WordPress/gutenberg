@@ -108,7 +108,10 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 			) }
 			actions={
 				<>
-					<PostActions onActionPerformed={ onActionPerformed } />
+					<PostActions
+						onActionPerformed={ onActionPerformed }
+						buttonProps={ { size: 'default' } }
+					/>
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }
 						label={ __( 'Edit' ) }
