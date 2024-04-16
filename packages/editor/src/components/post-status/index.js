@@ -187,16 +187,15 @@ export default function PostStatus() {
 	const handleStatus = ( value ) => {
 		let newDate = date;
 		let newPassword = password;
-		if ( [ 'publish', 'draft' ].includes( value ) ) {
-			if ( new Date( date ) > new Date() ) {
-				newDate = new Date();
-			}
+		if ( status === 'future' && new Date( date ) > new Date() ) {
+			newDate = null;
 		} else if ( value === 'future' ) {
 			if ( ! date || new Date( date ) < new Date() ) {
 				newDate = new Date();
 				newDate.setDate( newDate.getDate() + 7 );
 			}
-		} else if ( value === 'private' && password ) {
+		}
+		if ( value === 'private' && password ) {
 			newPassword = '';
 		}
 		updatePost( {
@@ -239,7 +238,9 @@ export default function PostStatus() {
 								label={ __( 'Status' ) }
 								options={ STATUS_OPTIONS }
 								onChange={ handleStatus }
-								selected={ status }
+								selected={
+									status === 'auto-draft' ? 'draft' : status
+								}
 							/>
 							{ status !== 'private' && (
 								<VStack
