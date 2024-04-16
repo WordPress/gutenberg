@@ -61,9 +61,13 @@ const fetchPage = async ( url, { html } ) => {
 const regionsToVdom = async ( dom, { vdom } = {} ) => {
 	const regions = {};
 	let head;
-	if ( navigationMode === 'fullPage' ) {
-		head = await fetchHeadAssets( dom, headElements );
-		regions.body = vdom ? vdom.get( document.body ) : toVdom( dom.body );
+	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+		if ( navigationMode === 'fullPage' ) {
+			head = await fetchHeadAssets( dom, headElements );
+			regions.body = vdom
+				? vdom.get( document.body )
+				: toVdom( dom.body );
+		}
 	}
 	if ( navigationMode === 'regionBased' ) {
 		const attrName = `data-${ directivePrefix }-router-region`;
@@ -82,11 +86,13 @@ const regionsToVdom = async ( dom, { vdom } = {} ) => {
 // Render all interactive regions contained in the given page.
 const renderRegions = ( page ) => {
 	batch( () => {
-		if ( navigationMode === 'fullPage' ) {
-			// Once this code is tested and more mature, the head should be updated for region based navigation as well.
-			updateHead( page.head );
-			const fragment = getRegionRootFragment( document.body );
-			render( page.regions.body, fragment );
+		if ( process.env.IS_GUTENBERG_PLUGIN ) {
+			if ( navigationMode === 'fullPage' ) {
+				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
+				updateHead( page.head );
+				const fragment = getRegionRootFragment( document.body );
+				render( page.regions.body, fragment );
+			}
 		}
 		if ( navigationMode === 'regionBased' ) {
 			populateInitialData( page.initialData );
@@ -136,15 +142,17 @@ window.addEventListener( 'popstate', async () => {
 
 // Initialize the router and cache the initial page using the initial vDOM.
 // Once this code is tested and more mature, the head should be updated for region based navigation as well.
-if ( navigationMode === 'fullPage' ) {
-	// Cache the scripts. Has to be called before fetching the assets.
-	[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
-		headElements.set( script.getAttribute( 'src' ), {
-			tag: script,
-			text: script.textContent,
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( navigationMode === 'fullPage' ) {
+		// Cache the scripts. Has to be called before fetching the assets.
+		[].map.call( document.querySelectorAll( 'script[src]' ), ( script ) => {
+			headElements.set( script.getAttribute( 'src' ), {
+				tag: script,
+				text: script.textContent,
+			} );
 		} );
-	} );
-	await fetchHeadAssets( document, headElements );
+		await fetchHeadAssets( document, headElements );
+	}
 }
 pages.set(
 	getPagePath( window.location ),
