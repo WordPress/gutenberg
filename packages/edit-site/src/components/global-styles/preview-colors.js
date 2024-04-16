@@ -40,7 +40,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 					} }
 				>
 					<HStack
-						spacing={ 10 * ratio }
+						spacing={ 5 * ratio }
 						justify="center"
 						style={ {
 							height: '100%',
@@ -48,7 +48,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 						} }
 					>
 						<HighlightedColors
-							normalizedColorSwatchSize={ 66 }
+							normalizedColorSwatchSize={ 56 }
 							ratio={ ratio }
 						/>
 					</HStack>

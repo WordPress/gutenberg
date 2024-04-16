@@ -89,11 +89,11 @@ describe( 'NavigationMenuSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should show correct dropdown toggle prompt to choose a menu when navigation menus have resolved', async () => {
+		it( 'should show correct dropdown toggle prompt to choose a menu when Navigation Menus have resolved', async () => {
 			useNavigationMenu.mockReturnValue( {
 				navigationMenus: [],
 				hasResolvedNavigationMenus: true,
-				canUserCreateNavigationMenu: true,
+				canUserCreateNavigationMenus: true,
 				canSwitchNavigationMenu: true,
 			} );
 
@@ -101,7 +101,7 @@ describe( 'NavigationMenuSelector', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
+					name: 'Choose or create a Navigation Menu',
 				} )
 			).toBeInTheDocument();
 		} );
@@ -115,7 +115,7 @@ describe( 'NavigationMenuSelector', () => {
 				navigationMenus: [],
 				isResolvingNavigationMenus: true,
 				hasResolvedNavigationMenus: false,
-				canUserCreateNavigationMenu: false,
+				canUserCreateNavigationMenus: false,
 				canSwitchNavigationMenu: true,
 			} );
 
@@ -152,14 +152,14 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
 				render( <NavigationMenuSelector /> );
 
 				const toggleButton = screen.getByRole( 'button', {
-					name: 'Choose or create a Navigation menu',
+					name: 'Choose or create a Navigation Menu',
 				} );
 
 				await user.click( toggleButton );
@@ -169,7 +169,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuPopover ).toHaveAttribute(
 					'aria-label',
 					expect.stringContaining(
-						'Choose or create a Navigation menu'
+						'Choose or create a Navigation Menu'
 					)
 				);
 
@@ -203,7 +203,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -226,7 +226,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -254,7 +254,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -278,7 +278,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: false,
 					isResolvingNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -303,7 +303,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					hasResolvedNavigationMenus: true,
 					isResolvingNavigationMenus: false,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -324,14 +324,14 @@ describe( 'NavigationMenuSelector', () => {
 			} );
 		} );
 
-		describe( 'Navigation menus', () => {
+		describe( 'Navigation Menus', () => {
 			it( 'should not show a list of menus when menus exist but user does not have permission to switch menus', async () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: false,
 				} );
 
@@ -352,7 +352,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -391,7 +391,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: menusWithNoTitle,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -425,7 +425,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -445,7 +445,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuItem ).toBeChecked();
 			} );
 
-			it( 'should call the handler when the navigation menu is selected', async () => {
+			it( 'should call the handler when the Navigation Menu is selected', async () => {
 				const user = userEvent.setup();
 
 				const handler = jest.fn();
@@ -453,7 +453,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 					canSwitchNavigationMenu: true,
 				} );
 
@@ -504,7 +504,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
-					canUserCreateNavigationMenu: false,
+					canUserCreateNavigationMenus: false,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -526,7 +526,7 @@ describe( 'NavigationMenuSelector', () => {
 				const user = userEvent.setup();
 
 				useNavigationMenu.mockReturnValue( {
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -563,7 +563,7 @@ describe( 'NavigationMenuSelector', () => {
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
 					canSwitchNavigationMenu: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -595,7 +595,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					isResolvingNavigationMenus: true,
 					hasResolvedNavigationMenus: false,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {
@@ -628,7 +628,7 @@ describe( 'NavigationMenuSelector', () => {
 					navigationMenus: [],
 					isResolvingNavigationMenus: false,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenu: true,
+					canUserCreateNavigationMenus: true,
 				} );
 
 				useNavigationEntities.mockReturnValue( {

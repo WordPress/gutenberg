@@ -19,12 +19,12 @@ import {
 	__experimentalHeading as Heading,
 	Notice,
 	SelectControl,
-	Spinner,
 	FlexItem,
 	Flex,
 	Button,
 	DropdownMenu,
 	SearchControl,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x } from '@wordpress/i18n';
@@ -45,6 +45,8 @@ import GoogleFontsConfirmDialog from './google-fonts-confirm-dialog';
 import { downloadFontFaceAssets } from './utils';
 import { sortFontFaces } from './utils/sort-font-faces';
 import CollectionFontVariant from './collection-font-variant';
+import { unlock } from '../../../lock-unlock';
+const { ProgressBar } = unlock( componentsPrivateApis );
 
 const DEFAULT_CATEGORY = {
 	slug: 'all',
@@ -135,6 +137,8 @@ function FontCollection( { slug } ) {
 		() => filterFonts( collectionFonts, filters ),
 		[ collectionFonts, filters ]
 	);
+
+	const isLoading = ! selectedCollection?.font_families && ! notice;
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
@@ -260,234 +264,255 @@ function FontCollection( { slug } ) {
 
 	return (
 		<div className="font-library-modal__tabpanel-layout">
-			<NavigatorProvider
-				initialPath="/"
-				className="font-library-modal__tabpanel-layout"
-			>
-				<NavigatorScreen path="/">
-					<HStack justify="space-between">
-						<VStack>
-							<Heading level={ 2 } size={ 13 }>
-								{ selectedCollection.name }
-							</Heading>
-							<Text>{ selectedCollection.description }</Text>
-						</VStack>
-						<ActionsComponent />
-					</HStack>
-					<Spacer margin={ 4 } />
-					<Flex>
-						<FlexItem>
-							<SearchControl
-								className="font-library-modal__search"
-								value={ filters.search }
-								placeholder={ __( 'Font name…' ) }
-								label={ __( 'Search' ) }
-								onChange={ debouncedUpdateSearchInput }
-								__nextHasNoMarginBottom
-								hideLabelFromVision={ false }
-							/>
-						</FlexItem>
-						<FlexItem>
-							<SelectControl
-								label={ __( 'Category' ) }
-								value={ filters.category }
-								onChange={ handleCategoryFilter }
-							>
-								{ categories &&
-									categories.map( ( category ) => (
-										<option
-											value={ category.slug }
-											key={ category.slug }
-										>
-											{ category.name }
-										</option>
-									) ) }
-							</SelectControl>
-						</FlexItem>
-					</Flex>
-
-					<Spacer margin={ 4 } />
-
-					{ ! selectedCollection?.font_families && ! notice && (
-						<Spinner />
-					) }
-
-					{ !! selectedCollection?.font_families?.length &&
-						! fonts.length && (
-							<Text>
-								{ __(
-									'No fonts found. Try with a different search term'
-								) }
-							</Text>
-						) }
-
-					<div className="font-library-modal__fonts-grid__main">
-						{ items.map( ( font ) => (
-							<FontCard
-								key={ font.font_family_settings.slug }
-								font={ font.font_family_settings }
-								navigatorPath={ '/fontFamily' }
-								onClick={ () => {
-									setSelectedFont(
-										font.font_family_settings
-									);
-								} }
-							/>
-						) ) }
-					</div>
-				</NavigatorScreen>
-
-				<NavigatorScreen path="/fontFamily">
-					<Flex justify="flex-start">
-						<NavigatorToParentButton
-							icon={ chevronLeft }
-							size="small"
-							onClick={ () => {
-								setSelectedFont( null );
-							} }
-							label={ __( 'Back' ) }
-						/>
-						<Heading
-							level={ 2 }
-							size={ 13 }
-							className="edit-site-global-styles-header"
-						>
-							{ selectedFont?.name }
-						</Heading>
-					</Flex>
-					{ notice && (
-						<>
-							<Spacer margin={ 1 } />
-							<Notice
-								status={ notice.type }
-								onRemove={ () => setNotice( null ) }
-							>
-								{ notice.message }
-							</Notice>
-							<Spacer margin={ 1 } />
-						</>
-					) }
-					<Spacer margin={ 4 } />
-					<Text> { __( 'Select font variants to install.' ) } </Text>
-					<Spacer margin={ 4 } />
-					<VStack spacing={ 0 }>
-						<Spacer margin={ 8 } />
-						{ getSortedFontFaces( selectedFont ).map(
-							( face, i ) => (
-								<CollectionFontVariant
-									font={ selectedFont }
-									face={ face }
-									key={ `face${ i }` }
-									handleToggleVariant={ handleToggleVariant }
-									selected={ isFontFontFaceInOutline(
-										selectedFont.slug,
-										selectedFont.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is in the outline
-										fontToInstallOutline
-									) }
-								/>
-							)
-						) }
-					</VStack>
-					<Spacer margin={ 16 } />
-				</NavigatorScreen>
-			</NavigatorProvider>
-
-			{ selectedFont && (
-				<Flex
-					justify="flex-end"
-					className="font-library-modal__tabpanel-layout__footer"
-				>
-					<Button
-						variant="primary"
-						onClick={ handleInstall }
-						isBusy={ isInstalling }
-						disabled={ fontsToInstall.length === 0 || isInstalling }
-						__experimentalIsFocusable
-					>
-						{ __( 'Install' ) }
-					</Button>
-				</Flex>
+			{ isLoading && (
+				<div className="font-library-modal__loading">
+					<ProgressBar />
+				</div>
 			) }
 
-			{ ! selectedFont && (
-				<Flex
-					justify="center"
-					className="font-library-modal__tabpanel-layout__footer"
-				>
-					<Button
-						label={ __( 'First page' ) }
-						size="compact"
-						onClick={ () => setPage( 1 ) }
-						disabled={ page === 1 }
-						__experimentalIsFocusable
+			{ ! isLoading && (
+				<>
+					<NavigatorProvider
+						initialPath="/"
+						className="font-library-modal__tabpanel-layout"
 					>
-						<span>«</span>
-					</Button>
-					<Button
-						label={ __( 'Previous page' ) }
-						size="compact"
-						onClick={ () => setPage( page - 1 ) }
-						disabled={ page === 1 }
-						__experimentalIsFocusable
-					>
-						<span>‹</span>
-					</Button>
-					<HStack
-						justify="flex-start"
-						expanded={ false }
-						spacing={ 2 }
-					>
-						{ createInterpolateElement(
-							sprintf(
-								// translators: %s: Total number of pages.
-								_x(
-									'Page <CurrentPageControl /> of %s',
-									'paging'
-								),
-								totalPages
-							),
-							{
-								CurrentPageControl: (
-									<SelectControl
-										aria-label={ __( 'Current page' ) }
-										value={ page }
-										options={ [
-											...Array( totalPages ),
-										].map( ( e, i ) => {
-											return {
-												label: i + 1,
-												value: i + 1,
-											};
-										} ) }
-										onChange={ ( newPage ) =>
-											setPage( parseInt( newPage ) )
-										}
-										size={ 'compact' }
+						<NavigatorScreen path="/">
+							<HStack justify="space-between">
+								<VStack>
+									<Heading level={ 2 } size={ 13 }>
+										{ selectedCollection.name }
+									</Heading>
+									<Text>
+										{ selectedCollection.description }
+									</Text>
+								</VStack>
+								<ActionsComponent />
+							</HStack>
+							<Spacer margin={ 4 } />
+							<Flex>
+								<FlexItem>
+									<SearchControl
+										className="font-library-modal__search"
+										value={ filters.search }
+										placeholder={ __( 'Font name…' ) }
+										label={ __( 'Search' ) }
+										onChange={ debouncedUpdateSearchInput }
 										__nextHasNoMarginBottom
+										hideLabelFromVision={ false }
 									/>
-								),
-							}
-						) }
-					</HStack>
-					<Button
-						label={ __( 'Next page' ) }
-						size="compact"
-						onClick={ () => setPage( page + 1 ) }
-						disabled={ page === totalPages }
-						__experimentalIsFocusable
-					>
-						<span>›</span>
-					</Button>
-					<Button
-						label={ __( 'Last page' ) }
-						size="compact"
-						onClick={ () => setPage( totalPages ) }
-						disabled={ page === totalPages }
-						__experimentalIsFocusable
-					>
-						<span>»</span>
-					</Button>
-				</Flex>
+								</FlexItem>
+								<FlexItem>
+									<SelectControl
+										label={ __( 'Category' ) }
+										value={ filters.category }
+										onChange={ handleCategoryFilter }
+									>
+										{ categories &&
+											categories.map( ( category ) => (
+												<option
+													value={ category.slug }
+													key={ category.slug }
+												>
+													{ category.name }
+												</option>
+											) ) }
+									</SelectControl>
+								</FlexItem>
+							</Flex>
+
+							<Spacer margin={ 4 } />
+
+							{ !! selectedCollection?.font_families?.length &&
+								! fonts.length && (
+									<Text>
+										{ __(
+											'No fonts found. Try with a different search term'
+										) }
+									</Text>
+								) }
+
+							<div className="font-library-modal__fonts-grid__main">
+								{ items.map( ( font ) => (
+									<FontCard
+										key={ font.font_family_settings.slug }
+										font={ font.font_family_settings }
+										navigatorPath={ '/fontFamily' }
+										onClick={ () => {
+											setSelectedFont(
+												font.font_family_settings
+											);
+										} }
+									/>
+								) ) }
+							</div>
+						</NavigatorScreen>
+
+						<NavigatorScreen path="/fontFamily">
+							<Flex justify="flex-start">
+								<NavigatorToParentButton
+									icon={ chevronLeft }
+									size="small"
+									onClick={ () => {
+										setSelectedFont( null );
+										setNotice( null );
+									} }
+									label={ __( 'Back' ) }
+								/>
+								<Heading
+									level={ 2 }
+									size={ 13 }
+									className="edit-site-global-styles-header"
+								>
+									{ selectedFont?.name }
+								</Heading>
+							</Flex>
+							{ notice && (
+								<>
+									<Spacer margin={ 1 } />
+									<Notice
+										status={ notice.type }
+										onRemove={ () => setNotice( null ) }
+									>
+										{ notice.message }
+									</Notice>
+									<Spacer margin={ 1 } />
+								</>
+							) }
+							<Spacer margin={ 4 } />
+							<Text>
+								{ __( 'Select font variants to install.' ) }
+							</Text>
+							<Spacer margin={ 4 } />
+							<VStack spacing={ 0 }>
+								<Spacer margin={ 8 } />
+								{ getSortedFontFaces( selectedFont ).map(
+									( face, i ) => (
+										<CollectionFontVariant
+											font={ selectedFont }
+											face={ face }
+											key={ `face${ i }` }
+											handleToggleVariant={
+												handleToggleVariant
+											}
+											selected={ isFontFontFaceInOutline(
+												selectedFont.slug,
+												selectedFont.fontFace
+													? face
+													: null, // If the font has no fontFace, we want to check if the font is in the outline
+												fontToInstallOutline
+											) }
+										/>
+									)
+								) }
+							</VStack>
+							<Spacer margin={ 16 } />
+						</NavigatorScreen>
+					</NavigatorProvider>
+
+					{ selectedFont && (
+						<Flex
+							justify="flex-end"
+							className="font-library-modal__tabpanel-layout__footer"
+						>
+							<Button
+								variant="primary"
+								onClick={ handleInstall }
+								isBusy={ isInstalling }
+								disabled={
+									fontsToInstall.length === 0 || isInstalling
+								}
+								__experimentalIsFocusable
+							>
+								{ __( 'Install' ) }
+							</Button>
+						</Flex>
+					) }
+
+					{ ! selectedFont && (
+						<Flex
+							justify="center"
+							className="font-library-modal__tabpanel-layout__footer"
+						>
+							<Button
+								label={ __( 'First page' ) }
+								size="compact"
+								onClick={ () => setPage( 1 ) }
+								disabled={ page === 1 }
+								__experimentalIsFocusable
+							>
+								<span>«</span>
+							</Button>
+							<Button
+								label={ __( 'Previous page' ) }
+								size="compact"
+								onClick={ () => setPage( page - 1 ) }
+								disabled={ page === 1 }
+								__experimentalIsFocusable
+							>
+								<span>‹</span>
+							</Button>
+							<HStack
+								justify="flex-start"
+								expanded={ false }
+								spacing={ 2 }
+							>
+								{ createInterpolateElement(
+									sprintf(
+										// translators: %s: Total number of pages.
+										_x(
+											'Page <CurrentPageControl /> of %s',
+											'paging'
+										),
+										totalPages
+									),
+									{
+										CurrentPageControl: (
+											<SelectControl
+												aria-label={ __(
+													'Current page'
+												) }
+												value={ page }
+												options={ [
+													...Array( totalPages ),
+												].map( ( e, i ) => {
+													return {
+														label: i + 1,
+														value: i + 1,
+													};
+												} ) }
+												onChange={ ( newPage ) =>
+													setPage(
+														parseInt( newPage )
+													)
+												}
+												size={ 'compact' }
+												__nextHasNoMarginBottom
+											/>
+										),
+									}
+								) }
+							</HStack>
+							<Button
+								label={ __( 'Next page' ) }
+								size="compact"
+								onClick={ () => setPage( page + 1 ) }
+								disabled={ page === totalPages }
+								__experimentalIsFocusable
+							>
+								<span>›</span>
+							</Button>
+							<Button
+								label={ __( 'Last page' ) }
+								size="compact"
+								onClick={ () => setPage( totalPages ) }
+								disabled={ page === totalPages }
+								__experimentalIsFocusable
+							>
+								<span>»</span>
+							</Button>
+						</Flex>
+					) }
+				</>
 			) }
 		</div>
 	);

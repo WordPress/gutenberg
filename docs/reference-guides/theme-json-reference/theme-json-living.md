@@ -39,7 +39,6 @@ Setting that enables the following UI tools:
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
-- shadow: defaultPresets
 
 
 ---
@@ -74,7 +73,7 @@ Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
-| defaultPresets | boolean | false |  |
+| defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
 ---
@@ -99,6 +98,7 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 
@@ -187,6 +187,7 @@ Settings related to typography.
 | fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | writingMode | boolean | false |  |
@@ -270,6 +271,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textAlign | string |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |

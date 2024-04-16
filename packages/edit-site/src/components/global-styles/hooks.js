@@ -10,6 +10,7 @@ import a11yPlugin from 'colord/plugins/a11y';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,6 +65,13 @@ export function useStylesPreviewColors() {
 	const [ headingColor = textColor ] = useGlobalStyle(
 		'elements.h1.color.text'
 	);
+	const [ linkColor = headingColor ] = useGlobalStyle(
+		'elements.link.color.text'
+	);
+
+	const [ buttonBackgroundColor = linkColor ] = useGlobalStyle(
+		'elements.button.color.background'
+	);
 	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
 	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
 	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
@@ -71,10 +79,20 @@ export function useStylesPreviewColors() {
 	const paletteColors = ( themeColors ?? [] )
 		.concat( customColors ?? [] )
 		.concat( coreColors ?? [] );
-	const highlightedColors = paletteColors
+
+	const textColorObject = paletteColors.filter(
+		( { color } ) => color === textColor
+	);
+	const buttonBackgroundColorObject = paletteColors.filter(
+		( { color } ) => color === buttonBackgroundColor
+	);
+
+	const highlightedColors = textColorObject
+		.concat( buttonBackgroundColorObject )
+		.concat( paletteColors )
 		.filter(
-			// we exclude these two colors because they are already visible in the preview.
-			( { color } ) => color !== backgroundColor && color !== headingColor
+			// we exclude these background color because it is already visible in the preview.
+			( { color } ) => color !== backgroundColor
 		)
 		.slice( 0, 2 );
 
@@ -99,7 +117,26 @@ export function useSupportedStyles( name, element ) {
 	return supportedPanels;
 }
 
-export function useUniqueTypographyVariations() {
+export function useColorVariations() {
+	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
+		property: 'color',
+	} );
+	/*
+	 * Filter out variations with no settings or styles.
+	 */
+	return colorVariations?.length
+		? colorVariations.filter( ( variation ) => {
+				const { settings, styles, title } = variation;
+				return (
+					title === __( 'Default' ) || // Always preseve the default variation.
+					Object.keys( settings ).length > 0 ||
+					Object.keys( styles ).length > 0
+				);
+		  } )
+		: [];
+}
+
+export function useTypographyVariations() {
 	const typographyVariations =
 		useCurrentMergeThemeStyleVariationsWithUserConfig( {
 			property: 'typography',
@@ -107,7 +144,8 @@ export function useUniqueTypographyVariations() {
 
 	const { base } = useContext( GlobalStylesContext );
 	/*
-	 * Filter duplicate variations based on the font families used in the variation.
+	 * Filter duplicate variations based on whether the variaitons
+	 * have different heading and body font families.
 	 */
 	return typographyVariations?.length
 		? Object.values(
@@ -116,7 +154,13 @@ export function useUniqueTypographyVariations() {
 						getFontFamilies(
 							mergeBaseAndUserConfigs( base, variation )
 						);
-					if (
+
+					// Always preseve the default variation.
+					if ( variation?.title === 'Default' ) {
+						acc[
+							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
+						] = variation;
+					} else if (
 						headingFontFamily?.name &&
 						bodyFontFamily?.name &&
 						! acc[
@@ -127,7 +171,6 @@ export function useUniqueTypographyVariations() {
 							`${ headingFontFamily?.name }:${ bodyFontFamily?.name }`
 						] = variation;
 					}
-
 					return acc;
 				}, {} )
 		  )

@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { ComplementaryAreaMoreMenuItem } = unlock( editorPrivateApis );
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down,

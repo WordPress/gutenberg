@@ -1,10 +1,15 @@
 /**
  * WordPress dependencies
  */
-import {
-	ComplementaryArea,
-	ComplementaryAreaMoreMenuItem,
-} from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { ComplementaryArea, ComplementaryAreaMoreMenuItem } =
+	unlock( editorPrivateApis );
 
 export default function DefaultSidebar( {
 	className,

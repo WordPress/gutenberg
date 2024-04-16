@@ -43,7 +43,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with is-secondary and is-small class', () => {
-			render( <Button variant="secondary" isSmall /> );
+			render( <Button variant="secondary" size="small" /> );
 			const button = screen.getByRole( 'button' );
 
 			expect( button ).toHaveClass( 'is-secondary' );

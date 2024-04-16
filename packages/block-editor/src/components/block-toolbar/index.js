@@ -171,22 +171,29 @@ export function PrivateBlockToolbar( {
 					<BlockBindingsIndicator />
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					isDefaultEditingMode && (
+					( isDefaultEditingMode || isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
-								<BlockMover
+								<BlockSwitcher
 									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
+									disabled={ ! isDefaultEditingMode }
 								/>
+								{ isDefaultEditingMode && (
+									<>
+										{ ! isMultiToolbar && (
+											<BlockLockToolbar
+												clientId={ blockClientId }
+											/>
+										) }
+										<BlockMover
+											clientIds={ blockClientIds }
+											hideDragHandle={ hideDragHandle }
+										/>
+									</>
+								) }
 							</ToolbarGroup>
 						</div>
 					) }

@@ -27,6 +27,7 @@ const VALID_SETTINGS = [
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',

@@ -25,7 +25,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getActiveColors } from './inline.js';
+import { getActiveColors } from './inline.native.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
