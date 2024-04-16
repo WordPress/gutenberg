@@ -8,19 +8,14 @@ import classnames from 'classnames';
  */
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
-	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
-import {
-	Button,
-	__unstableMotion as motion,
-	Popover,
-} from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
@@ -43,7 +38,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown, PinnedItems } =
+const { PostViewLink, PreviewDropdown, PinnedItems, TopBlockToolbar } =
 	unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
@@ -80,7 +75,6 @@ export default function HeaderEditMode() {
 	const hasFixedToolbar = useHasBlockToolbar() && isFixedToolbar;
 	const showTopToolbar =
 		isLargeViewport && hasFixedToolbar && blockEditorMode !== 'zoom-out';
-	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -130,19 +124,8 @@ export default function HeaderEditMode() {
 					/>
 					{ showTopToolbar && (
 						<>
-							<div
-								className={ classnames(
-									'selected-block-tools-wrapper',
-									{
-										'is-collapsed': isBlockToolsCollapsed,
-									}
-								) }
-							>
-								<BlockToolbar hideDragHandle />
-							</div>
-							<Popover.Slot
-								ref={ blockToolbarRef }
-								name="block-toolbar"
+							<TopBlockToolbar
+								isCollapsed={ isBlockToolsCollapsed }
 							/>
 							<Button
 								className="edit-site-header-edit-mode__block-tools-toggle"

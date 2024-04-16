@@ -6,15 +6,15 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
-	BlockToolbar,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
-import { DocumentBar } from '@wordpress/editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
+	DocumentBar,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
-import { Popover, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,9 +22,9 @@ import { Popover, Button } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
+const { TopBlockToolbar } = unlock( editorPrivateApis );
 
 function ContextualToolbar( { blockSelectionStart, hasHistory } ) {
-	const blockToolbarRef = useRef();
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
@@ -43,21 +43,10 @@ function ContextualToolbar( { blockSelectionStart, hasHistory } ) {
 		<>
 			{ hasBlockToolbar && (
 				<>
-					<div
-						className={ classnames(
-							'selected-block-tools-wrapper',
-							{
-								'is-collapsed':
-									isBlockToolsCollapsed ||
-									! hasBlockSelection,
-							}
-						) }
-					>
-						<BlockToolbar hideDragHandle />
-					</div>
-					<Popover.Slot
-						ref={ blockToolbarRef }
-						name="block-toolbar"
+					<TopBlockToolbar
+						isCollapsed={
+							isBlockToolsCollapsed || ! hasBlockSelection
+						}
 					/>
 					<Button
 						className="edit-post-header__block-tools-toggle"
