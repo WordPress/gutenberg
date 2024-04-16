@@ -432,6 +432,7 @@ _Parameters_
 
 -   _$1_ `Object`: Named argements.
 -   _$1.value_ `RichTextValue`: Rich text value.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Preserves newlines if true.
 
 _Returns_
 

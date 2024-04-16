@@ -127,7 +127,7 @@ export default function ListViewSidebar() {
 				// render where no tab is selected. This ensures that the
 				// tabpanel height is correct so the relevant scroll container
 				// can be rendered internally.
-				initialTabId="list-view"
+				defaultTabId="list-view"
 			>
 				<div className="edit-post-editor__document-overview-panel__header">
 					<Button
@@ -135,6 +135,7 @@ export default function ListViewSidebar() {
 						icon={ closeSmall }
 						label={ __( 'Close' ) }
 						onClick={ closeListView }
+						size="small"
 					/>
 					<Tabs.TabList
 						className="editor-list-view-sidebar__tabs-tablist"

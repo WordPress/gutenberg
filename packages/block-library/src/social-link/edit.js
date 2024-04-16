@@ -59,7 +59,7 @@ const SocialLinkURLPopover = ( {
 							setAttributes( { url: nextURL } )
 						}
 						placeholder={ __( 'Enter address' ) }
-						disableSuggestions={ true }
+						disableSuggestions
 						onKeyDown={ ( event ) => {
 							if (
 								!! url ||
@@ -142,7 +142,7 @@ const SocialLinkEdit = ( {
 							) }
 							value={ label || '' }
 							onChange={ ( value ) =>
-								setAttributes( { label: value } )
+								setAttributes( { label: value || undefined } )
 							}
 						/>
 					</PanelRow>

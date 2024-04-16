@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,11 +13,18 @@ import {
 	getSettings,
 	canInsertBlockType,
 } from './selectors';
-import { checkAllowListRecursive, getAllPatternsDependants } from './utils';
+import {
+	checkAllowListRecursive,
+	getAllPatternsDependants,
+	getInsertBlockTypeDependants,
+} from './utils';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
-import { selectBlockPatternsKey } from './private-keys';
+import {
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
 
@@ -282,52 +284,106 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 			} );
 		},
 		( state, rootClientId ) => [
-			getAllPatternsDependants( select )( state ),
-			state.settings.allowedBlockTypes,
-			state.settings.templateLock,
-			state.blockListSettings[ rootClientId ],
-			state.blocks.byClientId.get( rootClientId ),
+			...getAllPatternsDependants( select )( state ),
+			...getInsertBlockTypeDependants( state, rootClientId ),
 		]
+	)
+);
+
+function mapUserPattern(
+	userPattern,
+	__experimentalUserPatternCategories = []
+) {
+	return {
+		name: `core/block/${ userPattern.id }`,
+		id: userPattern.id,
+		type: INSERTER_PATTERN_TYPES.user,
+		title: userPattern.title.raw,
+		categories: userPattern.wp_pattern_category.map( ( catId ) => {
+			const category = __experimentalUserPatternCategories.find(
+				( { id } ) => id === catId
+			);
+			return category ? category.slug : catId;
+		} ),
+		content: userPattern.content.raw,
+		syncStatus: userPattern.wp_pattern_sync_status,
+	};
+}
+
+export const getPatternBySlug = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, patternName ) => {
+			// Only fetch reusable blocks if we know we need them. To do: maybe
+			// use the entity record API to retrieve the block by slug.
+			if ( patternName?.startsWith( 'core/block/' ) ) {
+				const _id = parseInt(
+					patternName.slice( 'core/block/'.length ),
+					10
+				);
+				const block = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( { id } ) => id === _id );
+
+				if ( ! block ) {
+					return null;
+				}
+
+				return mapUserPattern(
+					block,
+					state.settings.__experimentalUserPatternCategories
+				);
+			}
+
+			return [
+				// This setting is left for back compat.
+				...( state.settings.__experimentalBlockPatterns ?? [] ),
+				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
+					[] ),
+			].find( ( { name } ) => name === patternName );
+		},
+		( state, patternName ) =>
+			patternName?.startsWith( 'core/block/' )
+				? [
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						state.settings.__experimentalReusableBlocks,
+				  ]
+				: [
+						state.settings.__experimentalBlockPatterns,
+						state.settings[ selectBlockPatternsKey ]?.( select ),
+				  ]
 	)
 );
 
 export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
-		// This setting is left for back compat.
-		const {
-			__experimentalBlockPatterns = [],
-			__experimentalUserPatternCategories = [],
-			__experimentalReusableBlocks = [],
-		} = state.settings;
-		const userPatterns = ( __experimentalReusableBlocks ?? [] ).map(
-			( userPattern ) => {
-				return {
-					name: `core/block/${ userPattern.id }`,
-					id: userPattern.id,
-					type: INSERTER_PATTERN_TYPES.user,
-					title: userPattern.title.raw,
-					categories: userPattern.wp_pattern_category.map(
-						( catId ) => {
-							const category = (
-								__experimentalUserPatternCategories ?? []
-							).find( ( { id } ) => id === catId );
-							return category ? category.slug : catId;
-						}
-					),
-					content: userPattern.content.raw,
-					syncStatus: userPattern.wp_pattern_sync_status,
-				};
-			}
-		);
 		return [
-			...userPatterns,
-			...__experimentalBlockPatterns,
+			...unlock( select( STORE_NAME ) )
+				.getReusableBlocks()
+				.map( ( userPattern ) =>
+					mapUserPattern(
+						userPattern,
+						state.settings.__experimentalUserPatternCategories
+					)
+				),
+			// This setting is left for back compat.
+			...( state.settings.__experimentalBlockPatterns ?? [] ),
 			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>
 				index === arr.findIndex( ( y ) => x.name === y.name )
 		);
 	}, getAllPatternsDependants( select ) )
+);
+
+const EMPTY_ARRAY = [];
+
+export const getReusableBlocks = createRegistrySelector(
+	( select ) => ( state ) => {
+		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		return reusableBlocksSelect
+			? reusableBlocksSelect( select )
+			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	}
 );
 
 /**
@@ -341,14 +397,6 @@ export function getLastFocus( state ) {
 	return state.lastFocus;
 }
 
-export function getAllBlockBindingsSources( state ) {
-	return state.blockBindingsSources;
-}
-
-export function getBlockBindingsSource( state, sourceName ) {
-	return state.blockBindingsSources[ sourceName ];
-}
-
 /**
  * Returns true if the user is dragging anything, or false otherwise. It is possible for a
  * user to be dragging data from outside of the editor, so this selector is separate from
@@ -360,4 +408,15 @@ export function getBlockBindingsSource( state, sourceName ) {
  */
 export function isDragging( state ) {
 	return state.isDragging;
+}
+
+/**
+ * Retrieves the expanded block from the state.
+ *
+ * @param {Object} state Block editor state.
+ *
+ * @return {string|null} The client ID of the expanded block, if set.
+ */
+export function getExpandedBlock( state ) {
+	return state.expandedBlock;
 }

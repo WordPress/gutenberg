@@ -73,7 +73,7 @@ export default function save( { attributes } ) {
 							'wp-block-file__button',
 							__experimentalGetElementClassName( 'button' )
 						) }
-						download={ true }
+						download
 						aria-describedby={ describedById }
 					>
 						<RichText.Content value={ downloadButtonText } />

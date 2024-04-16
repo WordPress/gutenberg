@@ -13,10 +13,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 import { unlock } from '../lock-unlock';
 
 /*
@@ -36,14 +33,11 @@ import { unlock } from '../lock-unlock';
 export function getTypographyClassesAndStyles( attributes, settings ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
-	const fluidTypographySettings =
-		getFluidTypographyOptionsFromSettings( settings );
-
 	typographyStyles = {
 		...typographyStyles,
 		fontSize: getTypographyFontSizeValue(
 			{ size: attributes?.style?.typography?.fontSize },
-			fluidTypographySettings
+			settings
 		),
 	};
 

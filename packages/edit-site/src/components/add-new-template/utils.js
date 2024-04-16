@@ -14,6 +14,8 @@ import { blockMeta, post, archive } from '@wordpress/icons';
  */
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
+const EMPTY_OBJECT = {};
+
 /**
  * @typedef IHasNameAndId
  * @property {string|number} id   The entity's id.
@@ -622,14 +624,14 @@ const useTemplatesToExclude = (
 const useEntitiesInfo = (
 	entityName,
 	templatePrefixes,
-	additionalQueryParameters = {}
+	additionalQueryParameters = EMPTY_OBJECT
 ) => {
 	const recordsToExcludePerEntity = useTemplatesToExclude(
 		entityName,
 		templatePrefixes,
 		additionalQueryParameters
 	);
-	const entitiesInfo = useSelect(
+	const entitiesHasRecords = useSelect(
 		( select ) => {
 			return Object.keys( templatePrefixes || {} ).reduce(
 				( accumulator, slug ) => {
@@ -637,26 +639,42 @@ const useEntitiesInfo = (
 						recordsToExcludePerEntity?.[ slug ]?.map(
 							( { id } ) => id
 						) || [];
-					accumulator[ slug ] = {
-						hasEntities: !! select( coreStore ).getEntityRecords(
-							entityName,
-							slug,
-							{
-								per_page: 1,
-								_fields: 'id',
-								context: 'view',
-								exclude: existingEntitiesIds,
-								...additionalQueryParameters[ slug ],
-							}
-						)?.length,
-						existingEntitiesIds,
-					};
+					accumulator[ slug ] = !! select(
+						coreStore
+					).getEntityRecords( entityName, slug, {
+						per_page: 1,
+						_fields: 'id',
+						context: 'view',
+						exclude: existingEntitiesIds,
+						...additionalQueryParameters[ slug ],
+					} )?.length;
 					return accumulator;
 				},
 				{}
 			);
 		},
-		[ templatePrefixes, recordsToExcludePerEntity ]
+		[
+			templatePrefixes,
+			recordsToExcludePerEntity,
+			entityName,
+			additionalQueryParameters,
+		]
 	);
+	const entitiesInfo = useMemo( () => {
+		return Object.keys( templatePrefixes || {} ).reduce(
+			( accumulator, slug ) => {
+				const existingEntitiesIds =
+					recordsToExcludePerEntity?.[ slug ]?.map(
+						( { id } ) => id
+					) || [];
+				accumulator[ slug ] = {
+					hasEntities: entitiesHasRecords[ slug ],
+					existingEntitiesIds,
+				};
+				return accumulator;
+			},
+			{}
+		);
+	}, [ templatePrefixes, recordsToExcludePerEntity, entitiesHasRecords ] );
 	return entitiesInfo;
 };

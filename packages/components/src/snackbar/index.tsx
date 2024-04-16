@@ -138,9 +138,12 @@ function UnforwardedSnackbar(
 			className={ classes }
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
-			role={ ! explicitDismiss ? 'button' : '' }
+			role={ ! explicitDismiss ? 'button' : undefined }
 			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
-			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
+			aria-label={
+				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
+			}
+			data-testid="snackbar"
 		>
 			<div className={ snackbarContentClassnames }>
 				{ icon && (
@@ -165,7 +168,7 @@ function UnforwardedSnackbar(
 				{ explicitDismiss && (
 					<span
 						role="button"
-						aria-label="Dismiss this notice"
+						aria-label={ __( 'Dismiss this notice' ) }
 						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }

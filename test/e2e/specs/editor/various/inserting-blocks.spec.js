@@ -26,6 +26,27 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
+	test( 'inserts a default block on bottom padding click', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( { name: 'core/image' } );
+		const body = editor.canvas.locator( 'body' );
+		const box = await body.boundingBox();
+		await body.click( {
+			position: {
+				x: box.width / 2,
+				y: box.height - 10,
+			},
+		} );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/image' },
+			{ name: 'core/paragraph' },
+		] );
+	} );
+
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
 		admin,
 		page,

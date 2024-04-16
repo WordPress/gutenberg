@@ -15,7 +15,7 @@ import DataViewItem from './dataview-item';
 import CustomDataViewsList from './custom-dataviews-list';
 
 const PATH_TO_TYPE = {
-	'/pages': 'page',
+	'/page': 'page',
 };
 
 export default function DataViewsSidebarContent() {
@@ -25,6 +25,7 @@ export default function DataViewsSidebarContent() {
 	if ( ! path || ! PATH_TO_TYPE[ path ] ) {
 		return null;
 	}
+	const isCustomBoolean = isCustom === 'true';
 	const type = PATH_TO_TYPE[ path ];
 
 	return (
@@ -39,10 +40,10 @@ export default function DataViewsSidebarContent() {
 							icon={ dataview.icon }
 							type={ dataview.view.type }
 							isActive={
-								isCustom === 'false' &&
+								! isCustomBoolean &&
 								dataview.slug === activeView
 							}
-							isCustom="false"
+							isCustom={ false }
 						/>
 					);
 				} ) }
@@ -51,7 +52,7 @@ export default function DataViewsSidebarContent() {
 				<CustomDataViewsList
 					activeView={ activeView }
 					type={ type }
-					isCustom="true"
+					isCustom
 				/>
 			) }
 		</>

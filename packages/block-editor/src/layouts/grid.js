@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -22,6 +23,7 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import { GridVisualizer } from '../components/grid-visualizer';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -66,7 +68,10 @@ export default {
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
+		clientId,
+		layoutBlockSupport = {},
 	} ) {
+		const { allowSizingOnChildren = false } = layoutBlockSupport;
 		return (
 			<>
 				<GridLayoutTypeControl
@@ -74,9 +79,10 @@ export default {
 					onChange={ onChange }
 				/>
 				{ layout?.columnCount ? (
-					<GridLayoutColumnsControl
+					<GridLayoutColumnsAndRowsControl
 						layout={ layout }
 						onChange={ onChange }
+						allowSizingOnChildren={ allowSizingOnChildren }
 					/>
 				) : (
 					<GridLayoutMinimumWidthControl
@@ -84,10 +90,13 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
+				{ window.__experimentalEnableGridInteractivity && (
+					<GridVisualizer clientId={ clientId } />
+				) }
 			</>
 		);
 	},
-	toolBarControls: function DefaultLayoutToolbarControls() {
+	toolBarControls: function GridLayoutToolbarControls() {
 		return null;
 	},
 	getLayoutStyle: function getLayoutStyle( {
@@ -98,7 +107,11 @@ export default {
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
-		const { minimumColumnWidth = '12rem', columnCount = null } = layout;
+		const {
+			minimumColumnWidth = '12rem',
+			columnCount = null,
+			rowCount = null,
+		} = layout;
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -115,6 +128,11 @@ export default {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
+			if ( rowCount ) {
+				rules.push(
+					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
+				);
+			}
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
@@ -200,6 +218,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						value={ value }
 						units={ units }
 						min={ 0 }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 				<FlexItem isBlock>
@@ -209,6 +229,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
+						label={ __( 'Minimum column width' ) }
+						hideLabelFromVision
 					/>
 				</FlexItem>
 			</Flex>
@@ -217,22 +239,100 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 }
 
 // Enables setting number of grid columns
-function GridLayoutColumnsControl( { layout, onChange } ) {
-	const { columnCount = 3 } = layout;
+function GridLayoutColumnsAndRowsControl( {
+	layout,
+	onChange,
+	allowSizingOnChildren,
+} ) {
+	const { columnCount = 3, rowCount } = layout;
 
 	return (
-		<RangeControl
-			label={ __( 'Columns' ) }
-			value={ columnCount }
-			onChange={ ( value ) =>
-				onChange( {
-					...layout,
-					columnCount: value,
-				} )
-			}
-			min={ 1 }
-			max={ 6 }
-		/>
+		<>
+			<fieldset>
+				<BaseControl.VisualLabel as="legend">
+					{ __( 'Columns' ) }
+				</BaseControl.VisualLabel>
+				<Flex gap={ 4 }>
+					<FlexItem isBlock>
+						<NumberControl
+							size={ '__unstable-large' }
+							onChange={ ( value ) => {
+								/**
+								 * If the input is cleared, avoid switching
+								 * back to "Auto" by setting a value of "1".
+								 */
+								const validValue = value !== '' ? value : '1';
+								onChange( {
+									...layout,
+									columnCount: validValue,
+								} );
+							} }
+							value={ columnCount }
+							min={ 1 }
+							label={ __( 'Columns' ) }
+							hideLabelFromVision
+						/>
+					</FlexItem>
+					<FlexItem isBlock>
+						<RangeControl
+							value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
+							onChange={ ( value ) =>
+								onChange( {
+									...layout,
+									columnCount: value,
+								} )
+							}
+							min={ 1 }
+							max={ 16 }
+							withInputField={ false }
+							label={ __( 'Columns' ) }
+							hideLabelFromVision
+						/>
+					</FlexItem>
+				</Flex>
+			</fieldset>
+			{ allowSizingOnChildren &&
+				window.__experimentalEnableGridInteractivity && (
+					<fieldset>
+						<BaseControl.VisualLabel as="legend">
+							{ __( 'Rows' ) }
+						</BaseControl.VisualLabel>
+						<Flex gap={ 4 }>
+							<FlexItem isBlock>
+								<NumberControl
+									size={ '__unstable-large' }
+									onChange={ ( value ) => {
+										onChange( {
+											...layout,
+											rowCount: value,
+										} );
+									} }
+									value={ rowCount }
+									min={ 1 }
+									label={ __( 'Rows' ) }
+									hideLabelFromVision
+								/>
+							</FlexItem>
+							<FlexItem isBlock>
+								<RangeControl
+									value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
+									onChange={ ( value ) =>
+										onChange( {
+											...layout,
+											rowCount: value,
+										} )
+									}
+									min={ 1 }
+									max={ 16 }
+									withInputField={ false }
+									label={ __( 'Rows' ) }
+									hideLabelFromVision
+								/>
+							</FlexItem>
+						</Flex>
+					</fieldset>
+				) }
+		</>
 	);
 }
 
@@ -269,21 +369,21 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom={ true }
+			__nextHasNoMarginBottom
 			label={ __( 'Type' ) }
 			value={ isManual }
 			onChange={ onChangeType }
-			isBlock={ true }
+			isBlock
 		>
-			<ToggleGroupControlOption
-				key={ 'manual' }
-				value="manual"
-				label={ __( 'Manual' ) }
-			/>
 			<ToggleGroupControlOption
 				key={ 'auto' }
 				value="auto"
 				label={ __( 'Auto' ) }
+			/>
+			<ToggleGroupControlOption
+				key={ 'manual' }
+				value="manual"
+				label={ __( 'Manual' ) }
 			/>
 		</ToggleGroupControl>
 	);

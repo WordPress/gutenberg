@@ -16,6 +16,7 @@ import styles from './container.native.scss';
 import InspectorControls from '../inspector-controls';
 import ImageLinkDestinationsScreen from '../image-link-destinations';
 import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
+import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 
 export const blockSettingsScreens = {
 	settings: 'Settings',
@@ -46,7 +47,10 @@ export default function BottomSheetSettings( props ) {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.settings }
 				>
-					<InspectorControls.Slot />
+					<>
+						<InspectorControls.Slot />
+						<AdvancedControls />
+					</>
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ BottomSheet.SubSheet.screenName }
