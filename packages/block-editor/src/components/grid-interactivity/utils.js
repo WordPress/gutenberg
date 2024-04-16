@@ -78,7 +78,7 @@ function getClosestTrack( tracks, position, edge = 'start' ) {
 	);
 }
 
-export function calculateGridRect( gridElement, target ) {
+export function getGridRect( gridElement, rect ) {
 	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
 	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
 	const gridColumnTracks = getGridTracks(
@@ -89,26 +89,27 @@ export function calculateGridRect( gridElement, target ) {
 		getComputedCSS( gridElement, 'grid-template-rows' ),
 		rowGap
 	);
-	const offsetRect =
-		target instanceof window.DOMRect
-			? target
-			: new window.DOMRect(
-					target.offsetLeft,
-					target.offsetTop,
-					target.offsetWidth,
-					target.offsetHeight
-			  );
-	const columnStart =
-		getClosestTrack( gridColumnTracks, offsetRect.left ) + 1;
-	const rowStart = getClosestTrack( gridRowTracks, offsetRect.top ) + 1;
+	const columnStart = getClosestTrack( gridColumnTracks, rect.left ) + 1;
+	const rowStart = getClosestTrack( gridRowTracks, rect.top ) + 1;
 	const columnEnd =
-		getClosestTrack( gridColumnTracks, offsetRect.right, 'end' ) + 1;
-	const rowEnd =
-		getClosestTrack( gridRowTracks, offsetRect.bottom, 'end' ) + 1;
+		getClosestTrack( gridColumnTracks, rect.right, 'end' ) + 1;
+	const rowEnd = getClosestTrack( gridRowTracks, rect.bottom, 'end' ) + 1;
 	return new GridRect( {
 		columnStart,
 		columnEnd,
 		rowStart,
 		rowEnd,
 	} );
+}
+
+export function getGridItemRect( gridItemElement ) {
+	return getGridRect(
+		gridItemElement.parentElement,
+		new window.DOMRect(
+			gridItemElement.offsetLeft,
+			gridItemElement.offsetTop,
+			gridItemElement.offsetWidth,
+			gridItemElement.offsetHeight
+		)
+	);
 }

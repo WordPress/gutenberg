@@ -8,7 +8,7 @@ import { ResizableBox } from '@wordpress/components';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { calculateGridRect } from './utils';
+import { getGridRect } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -38,7 +38,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 					topRight: false,
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const rect = calculateGridRect(
+					const rect = getGridRect(
 						blockElement.parentElement,
 						new window.DOMRect(
 							blockElement.offsetLeft,

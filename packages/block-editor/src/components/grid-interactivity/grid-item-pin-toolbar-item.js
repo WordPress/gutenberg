@@ -10,7 +10,7 @@ import { pin as pinIcon } from '@wordpress/icons';
  */
 import BlockControls from '../block-controls';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { calculateGridRect } from './utils';
+import { getGridItemRect } from './utils';
 
 export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 	const blockElement = useBlockElement( clientId );
@@ -28,10 +28,7 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 	}
 
 	function pinBlock() {
-		const rect = calculateGridRect(
-			blockElement.parentElement,
-			blockElement
-		);
+		const rect = getGridItemRect( blockElement );
 		onChange( {
 			columnStart: rect.columnStart,
 			rowStart: rect.rowStart,

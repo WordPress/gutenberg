@@ -15,7 +15,7 @@ import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, range, GridRect, calculateGridRect } from './utils';
+import { getComputedCSS, range, GridRect, getGridItemRect } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 export function GridVisualizer( { clientId } ) {
@@ -121,10 +121,8 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 								const isCellOccupied = Array.from(
 									blockElement.children
 								).some( ( childElement ) => {
-									const rect = calculateGridRect(
-										blockElement,
-										childElement
-									);
+									const rect =
+										getGridItemRect( childElement );
 									return rect.contains( column, row );
 								} );
 								if ( isCellOccupied ) {
