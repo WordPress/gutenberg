@@ -23,6 +23,10 @@
 
 -   `Tabs`: Fallback to first enabled tab if no active tab id ([#60681](https://github.com/WordPress/gutenberg/pull/60681)).
 
+### Internal
+
+-   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
+
 ## 27.3.0 (2024-04-03)
 
 ### Bug Fix
