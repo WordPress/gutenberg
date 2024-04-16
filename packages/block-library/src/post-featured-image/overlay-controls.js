@@ -8,7 +8,7 @@ import {
 import {
 	withColors,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseGradient,
+	__experimentalUseGradient as useGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
@@ -22,7 +22,7 @@ const Overlay = ( {
 	setOverlayColor,
 } ) => {
 	const { dimRatio } = attributes;
-	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { gradientValue, setGradient } = useGradient();
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
