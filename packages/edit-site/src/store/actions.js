@@ -222,7 +222,7 @@ export function setEditedPostContext( context ) {
  *
  * @deprecated
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setPage() {
 	deprecated( "dispatch( 'core/edit-site' ).setPage", {
