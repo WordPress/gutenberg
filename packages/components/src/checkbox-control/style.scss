@@ -5,6 +5,10 @@
 	@include break-small() {
 		--checkbox-input-size: 20px;
 	}
+
+	.components-base-control__help {
+		margin-left: calc(var(--checkbox-input-size) + #{$grid-unit-15});
+	}
 }
 
 .components-checkbox-control__input[type="checkbox"] {
@@ -50,7 +54,7 @@
 .components-checkbox-control__input-container {
 	position: relative;
 	display: inline-block;
-	margin-right: 12px;
+	margin-right: $grid-unit-15;
 	vertical-align: middle;
 	width: var(--checkbox-input-size);
 	aspect-ratio: 1;
