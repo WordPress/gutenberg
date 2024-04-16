@@ -1611,6 +1611,11 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( $base_style_rules as $base_style_rule ) {
 						$declarations = array();
 
+						// Skip outputting base styles for flow and constrained layout types if theme doesn't support theme.json.
+						if ( ! wp_theme_has_theme_json() && ( 'default' === $layout_definition['name'] || 'constrained' === $layout_definition['name'] ) ) {
+							continue;
+						}
+				
 						if (
 							isset( $base_style_rule['selector'] ) &&
 							preg_match( $layout_selector_pattern, $base_style_rule['selector'] ) &&
