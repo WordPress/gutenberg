@@ -224,9 +224,11 @@ export default function ChildLayoutControl( {
 									value={ columnStart }
 									min={ 1 }
 									max={
-										parentLayout?.columnCount -
-										columnSpan +
-										1
+										parentLayout?.columnCount
+											? parentLayout.columnCount -
+											  ( columnSpan ?? 1 ) +
+											  1
+											: undefined
 									}
 								/>
 							</FlexItem>
@@ -245,6 +247,13 @@ export default function ChildLayoutControl( {
 									} }
 									value={ rowStart }
 									min={ 1 }
+									max={
+										parentLayout?.rowCount
+											? parentLayout.rowCount -
+											  ( rowSpan ?? 1 ) +
+											  1
+											: undefined
+									}
 								/>
 							</FlexItem>
 						</Flex>
