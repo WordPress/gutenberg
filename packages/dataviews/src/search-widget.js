@@ -190,7 +190,6 @@ function ComboboxList( { view, filter, onChangeView } ) {
 		( _filter ) => _filter.field === filter.field
 	);
 	const currentValue = getCurrentValue( filter, currentFilter );
-	const [ selectedValues, setSelectedValues ] = useState( currentValue );
 	const matches = useMemo( () => {
 		const normalizedSearch = normalizeSearchInput( deferredSearchValue );
 		return filter.elements.filter( ( item ) =>
@@ -199,9 +198,9 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
-			selectedValue={ selectedValues }
+			value={ searchValue }
+			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
-				setSelectedValues( value );
 				const newFilters = currentFilter
 					? [
 							...view.filters.map( ( _filter ) => {
