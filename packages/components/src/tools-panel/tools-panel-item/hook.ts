@@ -44,7 +44,6 @@ export function useToolsPanelItem(
 		registerPanelItem,
 		deregisterPanelItem,
 		flagItemCustomization,
-		isResetting,
 		shouldRenderPlaceholderItems: shouldRenderPlaceholder,
 		firstDisplayedItem,
 		lastDisplayedItem,
@@ -78,6 +77,8 @@ export function useToolsPanelItem(
 				isShownByDefault,
 				label,
 				panelId,
+				onDeselect,
+				onSelect,
 			} );
 		}
 
@@ -99,6 +100,8 @@ export function useToolsPanelItem(
 		previousPanelId,
 		registerPanelItem,
 		deregisterPanelItem,
+		onDeselect,
+		onSelect,
 	] );
 
 	useEffect( () => {
@@ -121,7 +124,6 @@ export function useToolsPanelItem(
 	// `ToolsPanel`.
 	const menuGroup = isShownByDefault ? 'default' : 'optional';
 	const isMenuItemChecked = menuItems?.[ menuGroup ]?.[ label ];
-	const wasMenuItemChecked = usePrevious( isMenuItemChecked );
 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
 
 	const isValueSet = hasValue();
@@ -141,40 +143,10 @@ export function useToolsPanelItem(
 		isShownByDefault,
 	] );
 
-	// Determine if the panel item's corresponding menu is being toggled and
-	// trigger appropriate callback if it is.
-	useEffect( () => {
-		// We check whether this item is currently registered as items rendered
-		// via fills can persist through the parent panel being remounted.
-		// See: https://github.com/WordPress/gutenberg/pull/45673
-		if ( ! isRegistered || isResetting || ! hasMatchingPanel ) {
-			return;
-		}
-
-		if ( isMenuItemChecked && ! isValueSet && ! wasMenuItemChecked ) {
-			onSelect?.();
-		}
-
-		if ( ! isMenuItemChecked && isValueSet && wasMenuItemChecked ) {
-			onDeselect?.();
-		}
-	}, [
-		hasMatchingPanel,
-		isMenuItemChecked,
-		isRegistered,
-		isResetting,
-		isValueSet,
-		wasMenuItemChecked,
-		onSelect,
-		onDeselect,
-	] );
-
 	// The item is shown if it is a default control regardless of whether it
 	// has a value. Optional items are shown when they are checked or have
 	// a value.
-	const isShown = isShownByDefault
-		? menuItems?.[ menuGroup ]?.[ label ] !== undefined
-		: isMenuItemChecked;
+	const isShown = isShownByDefault ? isRegistered : isMenuItemChecked;
 
 	const cx = useCx();
 	const classes = useMemo( () => {
