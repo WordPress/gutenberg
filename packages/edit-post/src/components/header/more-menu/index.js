@@ -40,7 +40,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					{ showIconLabels && ! isLargeViewport && (
 						<PinnedItems.Slot
 							className={ showIconLabels && 'show-icon-labels' }
-							scope="core/edit-post"
+							scope="core/editor"
 						/>
 					) }
 					<WritingMenu />

@@ -80,7 +80,7 @@ export default function PluginSidebarEditSite( { className, ...props } ) {
 		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-site-sidebar-edit-mode"
-			scope="core/edit-site"
+			scope="core/editor"
 			{ ...props }
 		/>
 	);

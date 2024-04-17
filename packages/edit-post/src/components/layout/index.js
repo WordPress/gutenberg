@@ -309,7 +309,7 @@ function Layout( { initialPost } ) {
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					! isDistractionFree && (
-						<ComplementaryArea.Slot scope="core/edit-post" />
+						<ComplementaryArea.Slot scope="core/editor" />
 					)
 				}
 				notices={ <EditorSnackbars /> }

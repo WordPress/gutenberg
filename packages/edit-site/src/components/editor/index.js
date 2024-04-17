@@ -297,7 +297,7 @@ export default function Editor( { isLoading, onClick } ) {
 						sidebar={
 							isEditMode &&
 							! isDistractionFree && (
-								<ComplementaryArea.Slot scope="core/edit-site" />
+								<ComplementaryArea.Slot scope="core/editor" />
 							)
 						}
 						footer={
