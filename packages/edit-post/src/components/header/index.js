@@ -107,13 +107,11 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<>
-						<ContextualToolbar
-							isCollapsed={ isBlockToolsCollapsed }
-							blockSelectionStart={ blockSelectionStart }
-							toggleCollapse={ handleToggleCollapse }
-						/>
-					</>
+					<ContextualToolbar
+						isCollapsed={ isBlockToolsCollapsed }
+						blockSelectionStart={ blockSelectionStart }
+						toggleCollapse={ handleToggleCollapse }
+					/>
 				) }
 				<div
 					className={ classnames( 'edit-post-header__center', {
