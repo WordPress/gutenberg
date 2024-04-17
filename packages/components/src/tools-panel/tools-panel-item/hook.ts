@@ -125,11 +125,19 @@ export function useToolsPanelItem(
 	const isRegistered = menuItems?.[ menuGroup ]?.[ label ] !== undefined;
 
 	const isValueSet = hasValue();
-	// Notify the panel when an item's value has changed.
-	useEffect(
-		() => flagItemCustomization( isValueSet, label, menuGroup ),
-		[ isValueSet, menuGroup, label, flagItemCustomization ]
-	);
+	// Notify the panel when an item's value has changed except for optional
+	// items without value because the item should not cause itself to hide.
+	useEffect( () => {
+		if ( ! isShownByDefault && ! isValueSet ) return;
+
+		flagItemCustomization( isValueSet, label, menuGroup );
+	}, [
+		isValueSet,
+		menuGroup,
+		label,
+		flagItemCustomization,
+		isShownByDefault,
+	] );
 
 	// Determine if the panel item's corresponding menu is being toggled and
 	// trigger appropriate callback if it is.
