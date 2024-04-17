@@ -53,7 +53,7 @@ export default function SidebarContent( { routeKey, children } ) {
 		if ( navDirection === 'back' && focusSelector ) {
 			elementToFocus = wrapperRef.current.querySelector( focusSelector );
 		}
-		if ( ! elementToFocus ) {
+		if ( navDirection !== null && ! elementToFocus ) {
 			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
