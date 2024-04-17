@@ -130,6 +130,7 @@ $z-layers: (
 	".block-editor-block-rename-modal": 1000001,
 	".edit-site-list__rename-modal": 1000001,
 	".dataviews-action-modal": 1000001,
+	".editor-action-modal": 1000001,
 	".editor-post-template__swap-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
 
@@ -190,7 +191,6 @@ $z-layers: (
 	// Site editor layout
 	".edit-site-layout__header-container": 4,
 	".edit-site-layout__hub": 3,
-	".edit-site-layout__header": 2,
 	".edit-site-page-header": 2,
 	".edit-site-page-content": 1,
 	".edit-site-patterns__header": 2,

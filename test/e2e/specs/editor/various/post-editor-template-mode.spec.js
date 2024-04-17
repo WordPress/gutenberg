@@ -58,8 +58,14 @@ test.describe( 'Post Editor Template mode', () => {
 
 		// Save changes.
 		await page.click( 'role=button[name="Back"i]' );
-		await page.click( 'role=button[name="Publish"i]' );
-		await page.click( 'role=button[name="Save"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
 
 		// Preview changes.
 		const previewPage = await editor.openPreviewPage();
@@ -251,18 +257,19 @@ class PostEditorTemplateMode {
 
 	async saveTemplateWithoutPublishing() {
 		await this.page.click( 'role=button[name="Back"i]' );
-		await this.page.click( 'role=button[name="Publish"i]' );
-		const editorPublishRegion = this.page.locator(
-			'role=region[name="Editor publish"i]'
-		);
-		const saveButton = editorPublishRegion.locator(
-			'role=button[name="Save"i]'
-		);
-		await saveButton.click();
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		const editorPublishRegion = this.page.getByRole( 'region', {
+			name: 'Editor publish',
+		} );
+		await editorPublishRegion
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
 		// Avoid publishing the post.
-		const cancelButton = editorPublishRegion.locator(
-			'role=button[name="Cancel"i]'
-		);
-		await cancelButton.click();
+		await editorPublishRegion
+			.getByRole( 'button', { name: 'Cancel' } )
+			.click();
 	}
 }

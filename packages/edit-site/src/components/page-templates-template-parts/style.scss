@@ -103,6 +103,11 @@
 	}
 }
 
+.page-templates-author-field__name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
 .edit-site-list__rename-modal {
 	// The rename dropdown popover is open at the same time as the rename modal. The latter has to be higher.
 	z-index: z-index(".edit-site-list__rename-modal");

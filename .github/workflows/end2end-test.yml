@@ -16,42 +16,6 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-    e2e-puppeteer:
-        name: Puppeteer
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-
-        steps:
-            - uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              run: npm run build
-
-            - name: Install WordPress
-              run: |
-                  npm run wp-env start
-
-            - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-              if: always()
-              with:
-                  name: failures-artifacts
-                  path: artifacts
-                  if-no-files-found: ignore
-
-            - name: Archive flaky tests report
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
-              if: always()
-              with:
-                  name: flaky-tests-report
-                  path: flaky-tests
-                  if-no-files-found: ignore
-
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: ubuntu-latest
@@ -85,7 +49,7 @@ jobs:
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive debug artifacts (screenshots, traces)
               uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
@@ -105,7 +69,7 @@ jobs:
 
     report-to-issues:
         name: Report to GitHub
-        needs: [e2e-puppeteer, e2e-playwright]
+        needs: [e2e-playwright]
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
