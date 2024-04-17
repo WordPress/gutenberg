@@ -2756,50 +2756,6 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- */
-export const __unstableGetContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if (
-				getBlockName( state, current ) === 'core/block' ||
-				getTemplateLock( state, current ) === 'contentOnly'
-			) {
-				result = current;
-			}
-		}
-		return result;
-	},
-	( state ) => [ state.blocks.parents, state.blockListSettings ]
-);
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
-}
-
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
 	// 'disabled' then the overlay is redundant since the block can't be
