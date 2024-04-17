@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -79,15 +79,9 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ blockSelectionStart ] );
-
-	const hasBlockSelection = !! blockSelectionStart;
+	const handleToggleCollapse = ( isCollapsed ) => {
+		setIsBlockToolsCollapsed( isCollapsed );
+	};
 
 	return (
 		<div className="edit-post-header">
@@ -111,14 +105,9 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				{ hasTopToolbar && (
 					<>
 						<ContextualToolbar
-							isCollapsed={
-								isBlockToolsCollapsed || ! hasBlockSelection
-							}
-							onCollapse={ () => {
-								setIsBlockToolsCollapsed(
-									( collapsed ) => ! collapsed
-								);
-							} }
+							isCollapsed={ isBlockToolsCollapsed }
+							blockSelectionStart={ blockSelectionStart }
+							toggleCollapse={ handleToggleCollapse }
 						/>
 					</>
 				) }

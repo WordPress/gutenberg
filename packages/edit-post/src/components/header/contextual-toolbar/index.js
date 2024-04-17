@@ -10,7 +10,7 @@ import {
 	BlockToolbar,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { Button, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
@@ -22,9 +22,22 @@ import { unlock } from '../../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
-function ContextualToolbar( { isCollapsed, onCollapse } ) {
+function ContextualToolbar( {
+	blockSelectionStart,
+	isCollapsed,
+	toggleCollapse,
+} ) {
 	const blockToolbarRef = useRef();
 	const hasBlockToolbar = useHasBlockToolbar();
+
+	const hasBlockSelection = !! blockSelectionStart;
+
+	useEffect( () => {
+		// If we have a new block selection, show the block tools
+		if ( blockSelectionStart ) {
+			toggleCollapse( false );
+		}
+	}, [ blockSelectionStart, toggleCollapse ] );
 
 	if ( ! hasBlockToolbar ) {
 		return null;
@@ -34,7 +47,7 @@ function ContextualToolbar( { isCollapsed, onCollapse } ) {
 		<>
 			<div
 				className={ classnames( 'selected-block-tools-wrapper', {
-					'is-collapsed': isCollapsed,
+					'is-collapsed': isCollapsed || ! hasBlockSelection,
 				} ) }
 			>
 				<BlockToolbar hideDragHandle />
@@ -44,7 +57,9 @@ function ContextualToolbar( { isCollapsed, onCollapse } ) {
 			<Button
 				className="edit-post-header__block-tools-toggle"
 				icon={ isCollapsed ? next : previous }
-				onClick={ onCollapse }
+				onClick={ () => {
+					toggleCollapse( ! isCollapsed );
+				} }
 				label={
 					isCollapsed
 						? __( 'Show block tools' )
