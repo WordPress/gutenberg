@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { pin as pinIcon } from '@wordpress/icons';
 
 /**
@@ -37,16 +37,14 @@ export function GridItemPinToolbarItem( { clientId, layout, onChange } ) {
 
 	return (
 		<BlockControls group="parent">
-			<ToolbarGroup>
-				<ToolbarButton
-					icon={ pinIcon }
-					label={
-						isPinned ? __( 'Pinned to grid' ) : __( 'Pin to grid' )
-					}
-					isPressed={ isPinned }
-					onClick={ isPinned ? unpinBlock : pinBlock }
-				/>
-			</ToolbarGroup>
+			<ToolbarButton
+				icon={ pinIcon }
+				label={
+					isPinned ? __( 'Pinned to grid' ) : __( 'Pin to grid' )
+				}
+				isPressed={ isPinned }
+				onClick={ isPinned ? unpinBlock : pinBlock }
+			/>
 		</BlockControls>
 	);
 }
