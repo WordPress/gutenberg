@@ -95,7 +95,7 @@ export function AllowOverridesModal( {
 							variant="primary"
 							type="submit"
 						>
-							{ __( 'Enable overrides' ) }
+							{ __( 'Enable' ) }
 						</Button>
 					</HStack>
 				</VStack>
@@ -146,7 +146,7 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 							variant="primary"
 							type="submit"
 						>
-							{ __( 'Disable overrides' ) }
+							{ __( 'Disable' ) }
 						</Button>
 					</HStack>
 				</VStack>
