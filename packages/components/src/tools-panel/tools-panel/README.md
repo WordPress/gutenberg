@@ -60,7 +60,7 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import {
-	__experimentalBoxControl as BoxControl,
+	BoxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,

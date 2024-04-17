@@ -10,7 +10,7 @@ BoxControl components let users set values for Top, Right, Bottom, and Left. Thi
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import { BoxControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ values, setValues ] = useState( {
