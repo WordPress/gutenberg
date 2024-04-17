@@ -6,7 +6,7 @@ import { DOWN } from '@wordpress/keycodes';
 import {
 	ToolbarButton,
 	Dropdown,
-	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
+	AlignmentMatrixControl,
 } from '@wordpress/components';
 
 const noop = () => {};
