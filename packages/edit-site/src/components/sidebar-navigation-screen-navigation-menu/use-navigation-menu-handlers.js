@@ -36,7 +36,7 @@ function useDeleteNavigationMenu() {
 				}
 			);
 			createSuccessNotice(
-				__( 'Navigation menu successfully deleted.' ),
+				__( 'Navigation Menu successfully deleted.' ),
 				{
 					type: 'snackbar',
 				}
@@ -46,7 +46,7 @@ function useDeleteNavigationMenu() {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to delete Navigation menu (%s).` ),
+					__( `Unable to delete Navigation Menu (%s).` ),
 					error?.message
 				),
 
@@ -107,7 +107,7 @@ function useSaveNavigationMenu() {
 					throwOnError: true,
 				}
 			);
-			createSuccessNotice( __( 'Renamed Navigation menu' ), {
+			createSuccessNotice( __( 'Renamed Navigation Menu' ), {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
@@ -117,7 +117,7 @@ function useSaveNavigationMenu() {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be renamed. */
-					__( `Unable to rename Navigation menu (%s).` ),
+					__( `Unable to rename Navigation Menu (%s).` ),
 					error?.message
 				),
 
@@ -162,7 +162,7 @@ function useDuplicateNavigationMenu() {
 			);
 
 			if ( savedRecord ) {
-				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
+				createSuccessNotice( __( 'Duplicated Navigation Menu' ), {
 					type: 'snackbar',
 				} );
 				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
@@ -171,7 +171,7 @@ function useDuplicateNavigationMenu() {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: error message describing why the navigation menu could not be deleted. */
-					__( `Unable to duplicate Navigation menu (%s).` ),
+					__( `Unable to duplicate Navigation Menu (%s).` ),
 					error?.message
 				),
 
