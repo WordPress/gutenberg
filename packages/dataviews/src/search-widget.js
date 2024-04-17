@@ -199,6 +199,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
+			resetValueOnSelect={ false }
 			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter
