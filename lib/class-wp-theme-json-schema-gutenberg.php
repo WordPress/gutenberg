@@ -128,7 +128,8 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		 * it as it controls the PRESETS_METADATA prevent_override which was
 		 * previously hardcoded to false. This only needs to happen when the
 		 * theme provided font sizes as they could match the default ones and
-		 * affect the generated CSS.
+		 * affect the generated CSS. And in v2 we provided default font sizes
+		 * when the theme did not provide any.
 		 */
 		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
 			if ( ! isset( $new['settings'] ) ) {
