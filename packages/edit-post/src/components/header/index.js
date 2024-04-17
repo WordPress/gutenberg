@@ -18,7 +18,7 @@ import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -79,9 +79,13 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-	const handleToggleCollapse = ( isCollapsed ) => {
-		setIsBlockToolsCollapsed( isCollapsed );
-	};
+
+	const handleToggleCollapse = useCallback(
+		( isCollapsed ) => {
+			setIsBlockToolsCollapsed( isCollapsed );
+		},
+		[ setIsBlockToolsCollapsed ]
+	);
 
 	return (
 		<div className="edit-post-header">
