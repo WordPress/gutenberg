@@ -11,7 +11,7 @@ import { registerBlockStyle, store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useMemo, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,7 +43,39 @@ export function mergeBaseAndUserConfigs( base, user ) {
 function useResolvedBlockStyleVariationsConfig( userConfig ) {
 	const { getBlockStyles } = useSelect( blocksStore );
 
-	return useMemo( () => {
+	// Register any block style variations that have been added
+	// by a theme style variation and are not already registered.
+	useEffect( () => {
+		const sharedVariations = userConfig?.styles?.blocks?.variations;
+
+		if ( ! sharedVariations ) {
+			return;
+		}
+
+		Object.entries( sharedVariations ).forEach(
+			( [ variationName, variation ] ) => {
+				if ( ! variation?.supportedBlockTypes ) {
+					return;
+				}
+
+				variation.supportedBlockTypes.forEach( ( blockName ) => {
+					const blockStyles = getBlockStyles( blockName );
+					const registeredBlockStyle = blockStyles.find(
+						( { name } ) => name === variationName
+					);
+
+					if ( ! registeredBlockStyle ) {
+						registerBlockStyle( blockName, {
+							name: variationName,
+							label: variationName,
+						} );
+					}
+				} );
+			}
+		);
+	}, [ userConfig?.styles?.blocks?.variations, getBlockStyles ] );
+
+	const updatedConfig = useMemo( () => {
 		const sharedVariations = userConfig?.styles?.blocks?.variations;
 
 		if ( ! sharedVariations ) {
@@ -59,20 +91,6 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 				}
 
 				variation.supportedBlockTypes.forEach( ( blockName ) => {
-					// Register any block style variations that have been added
-					// by a theme style variation and are not already registered.
-					const blockStyles = getBlockStyles( blockName );
-					const registeredBlockStyle = blockStyles.find(
-						( { name } ) => name === variationName
-					);
-
-					if ( ! registeredBlockStyle ) {
-						registerBlockStyle( blockName, {
-							name: variationName,
-							label: variationName,
-						} );
-					}
-
 					const path = [
 						'styles',
 						'blocks',
@@ -86,7 +104,9 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 		);
 
 		return deepmerge( variationsConfig, userConfig );
-	}, [ userConfig, getBlockStyles ] );
+	}, [ userConfig ] );
+
+	return updatedConfig;
 }
 
 function useGlobalStylesUserConfig() {
