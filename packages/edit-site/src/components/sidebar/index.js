@@ -32,16 +32,16 @@ function getAnim( direction ) {
 }
 
 export default function SidebarContent( { routeKey, children } ) {
-	const [ { navDirection, focusSelector }, setNavDirection ] = useState( {
+	const [ { navDirection, focusSelector }, setNavState ] = useState( {
 		navDirection: null,
 		focusSelector: null,
 	} );
 
-	const navigate = useCallback( ( direction, backFocusSelector ) => {
-		setNavDirection( ( prevDir ) => ( {
+	const navigate = useCallback( ( direction, backFocusSelector = null ) => {
+		setNavState( ( prevDir ) => ( {
 			navDirection: direction,
 			focusSelector:
-				direction === 'forward' && backFocusSelector
+				direction === 'forward'
 					? backFocusSelector
 					: prevDir.focusSelector,
 		} ) );
@@ -50,11 +50,12 @@ export default function SidebarContent( { routeKey, children } ) {
 	const wrapperRef = useRef();
 	useEffect( () => {
 		let elementToFocus;
-		if ( navDirection === 'forward' ) {
+		if ( navDirection === 'back' && focusSelector ) {
+			elementToFocus = wrapperRef.current.querySelector( focusSelector );
+		}
+		if ( ! elementToFocus ) {
 			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
 			elementToFocus = firstTabbable ?? wrapperRef.current;
-		} else if ( navDirection === 'back' && focusSelector ) {
-			elementToFocus = wrapperRef.current.querySelector( focusSelector );
 		}
 		elementToFocus?.focus();
 	}, [ navDirection, focusSelector ] );
