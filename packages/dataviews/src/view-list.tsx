@@ -21,6 +21,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+<<<<<<< HEAD:packages/dataviews/src/view-list.tsx
 import type {
 	Data,
 	Item,
@@ -48,6 +49,9 @@ interface ListViewItemProps {
 	primaryField?: NormalizedField;
 	visibleFields: NormalizedField[];
 }
+=======
+import ItemActions from './item-actions';
+>>>>>>> c2605916bd (Use actions in the ListItem):packages/dataviews/src/view-list.js
 
 const {
 	useCompositeStoreV2: useCompositeStore,
@@ -57,6 +61,7 @@ const {
 } = unlock( componentsPrivateApis );
 
 function ListItem( {
+	actions,
 	id,
 	item,
 	isSelected,
@@ -142,6 +147,21 @@ function ListItem( {
 						</HStack>
 					</CompositeItem>
 				</div>
+				<div role="gridcell">
+					<CompositeItem
+						// To be able to pass ItemActions directly, it should pass the incoming props to the underlying element:
+						// https://ariakit.org/guide/composition#custom-components-must-be-open-for-extension
+						render={ ( props ) => (
+							<ItemActions
+								actions={ props.actions }
+								item={ props.item }
+								isCompact
+							/>
+						) }
+						item={ item }
+						actions={ actions }
+					/>
+				</div>
 			</HStack>
 		</CompositeRow>
 	);
@@ -149,6 +169,7 @@ function ListItem( {
 
 export default function ViewList( props: ListViewProps ) {
 	const {
+		actions,
 		data,
 		fields,
 		getItemId,
@@ -221,6 +242,7 @@ export default function ViewList( props: ListViewProps ) {
 					<ListItem
 						key={ id }
 						id={ id }
+						actions={ actions }
 						item={ item }
 						isSelected={ item === selectedItem }
 						onSelect={ onSelect }
