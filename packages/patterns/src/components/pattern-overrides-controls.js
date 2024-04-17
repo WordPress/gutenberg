@@ -101,7 +101,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 					id={ controlId }
 					label={ __( 'Overrides' ) }
 					help={ __(
-						'Allow attributes within this block to be overridden by pattern instances.'
+						'Allow changes to this block throughout instances of this pattern.'
 					) }
 				>
 					<Button
@@ -116,8 +116,8 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 						} }
 					>
 						{ allowOverrides
-							? __( 'Disallow overrides' )
-							: __( 'Allow overrides' ) }
+							? __( 'Disable overrides' )
+							: __( 'Enable overrides' ) }
 					</Button>
 				</BaseControl>
 			</InspectorControls>
