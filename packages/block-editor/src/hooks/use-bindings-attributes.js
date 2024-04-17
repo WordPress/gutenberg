@@ -3,7 +3,7 @@
  */
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, select } from '@wordpress/data';
 import { useLayoutEffect, useCallback, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData } from '@wordpress/rich-text';
@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
  * @return {WPHigherOrderComponent} Higher-order component.
  */
 
-const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
+const DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'url', 'title', 'alt' ],
@@ -38,7 +38,22 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
 export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+	// Pick blocks list from all source handlers settings.
+	const blockBindingsSources = unlock(
+		select( blocksStore )
+	).getAllBlockBindingsSources();
+
+	let blockNames = Object.keys( DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS );
+	Object.keys( blockBindingsSources ).forEach( ( sourceName ) => {
+		const blocks = blockBindingsSources[ sourceName ].settings?.blocks;
+		if ( blocks ) {
+			blockNames.push( ...Object.keys( blocks ) );
+		}
+	} );
+
+	blockNames = [ ...new Set( blockNames ) ];
+
+	return blockNames.includes( blockName );
 }
 
 /**
@@ -47,13 +62,15 @@ export function canBindBlock( blockName ) {
  *
  * @param {string} blockName     - The block name.
  * @param {string} attributeName - The attribute name.
+ * @param {Object} allowBlocks   - The allowed blocks settings.
  * @return {boolean} Whether it is possible to bind the block attribute.
  */
-export function canBindAttribute( blockName, attributeName ) {
-	return (
-		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
-	);
+export function canBindAttribute(
+	blockName,
+	attributeName,
+	allowBlocks = DEFAULT_BLOCK_BINDINGS_ALLOWED_BLOCKS
+) {
+	return allowBlocks[ blockName ]?.includes( attributeName );
 }
 
 /**
@@ -63,7 +80,7 @@ export function canBindAttribute( blockName, attributeName ) {
  * @param {Object}   props                   - The component props.
  * @param {string}   props.attrName          - The attribute name.
  * @param {Object}   props.blockProps        - The block props with bound attribute.
- * @param {Object}   props.source            - Source handler.
+ * @param {Object}   props.sourceHandler     - Source handler.
  * @param {Object}   props.args              - The arguments to pass to the source.
  * @param {Function} props.onPropValueChange - The function to call when the attribute value changes.
  * @return {null}                              Data-handling component. Render nothing.
@@ -72,10 +89,10 @@ const BindingConnector = ( {
 	args,
 	attrName,
 	blockProps,
-	source,
+	sourceHandler,
 	onPropValueChange,
 } ) => {
-	const { placeholder, value: propValue } = source.useSource(
+	const { placeholder, value: propValue } = sourceHandler.useSource(
 		blockProps,
 		args
 	);
@@ -83,7 +100,7 @@ const BindingConnector = ( {
 	const { name: blockName } = blockProps;
 	const attrValue = blockProps.attributes[ attrName ];
 
-	const updateBoundAttibute = useCallback(
+	const updateBoundAttribute = useCallback(
 		( newAttrValue, prevAttrValue ) => {
 			/*
 			 * If the attribute is a RichTextData instance,
@@ -117,7 +134,7 @@ const BindingConnector = ( {
 
 	useLayoutEffect( () => {
 		if ( typeof propValue !== 'undefined' ) {
-			updateBoundAttibute( propValue, attrValue );
+			updateBoundAttribute( propValue, attrValue );
 		} else if ( placeholder ) {
 			/*
 			 * Placeholder fallback.
@@ -130,14 +147,14 @@ const BindingConnector = ( {
 				getBlockType( blockName ).attributes[ attrName ].attribute;
 
 			if ( htmlAttribute === 'src' || htmlAttribute === 'href' ) {
-				updateBoundAttibute( null );
+				updateBoundAttribute( null );
 				return;
 			}
 
-			updateBoundAttibute( placeholder );
+			updateBoundAttribute( placeholder );
 		}
 	}, [
-		updateBoundAttibute,
+		updateBoundAttribute,
 		propValue,
 		attrValue,
 		placeholder,
@@ -165,24 +182,44 @@ function BlockBindingBridge( { blockProps, bindings, onPropValueChange } ) {
 		useSelect( blocksStore )
 	).getAllBlockBindingsSources();
 
+	/*
+	 * Create allow binding object,
+	 * filtering only the valid bindings,
+	 * and populating the source handler.
+	 */
+	const allowBindings = Object.entries( bindings ).reduce(
+		( acc, [ attrName, settings ] ) => {
+			const handler = blockBindingsSources[ settings.source ];
+			// Check if the block has a valid source handler.
+			if ( ! handler?.useSource ) {
+				return false;
+			}
+
+			// Check if the attribute can be bound.
+			const allowBlocks = handler?.settings?.blocks;
+			if ( canBindAttribute( blockProps.name, attrName, allowBlocks ) ) {
+				acc[ attrName ] = {
+					...settings,
+					handler, // populate the source handler.
+				};
+			}
+
+			return acc;
+		},
+		{}
+	);
+
 	return (
 		<>
-			{ Object.entries( bindings ).map(
-				( [ attrName, boundAttribute ] ) => {
-					// Bail early if the block doesn't have a valid source handler.
-					const source =
-						blockBindingsSources[ boundAttribute.source ];
-					if ( ! source?.useSource ) {
-						return null;
-					}
-
+			{ Object.entries( allowBindings ).map(
+				( [ attrName, settings ] ) => {
 					return (
 						<BindingConnector
 							key={ attrName }
 							attrName={ attrName }
-							source={ source }
+							sourceHandler={ settings.handler }
 							blockProps={ blockProps }
-							args={ boundAttribute.args }
+							args={ settings.args }
 							onPropValueChange={ onPropValueChange }
 						/>
 					);
@@ -208,25 +245,19 @@ const withBlockBindingSupport = createHigherOrderComponent(
 			[]
 		);
 
-		/*
-		 * Create binding object filtering
-		 * only the attributes that can be bound.
-		 */
-		const bindings = Object.fromEntries(
-			Object.entries( props.attributes.metadata?.bindings || {} ).filter(
-				( [ attrName ] ) => canBindAttribute( props.name, attrName )
-			)
-		);
+		// Bail early if the block has no bindings metadata attribute.
+		const bindings = props.attributes.metadata?.bindings || {};
+		if ( ! Object.keys( bindings ).length ) {
+			return <BlockEdit { ...props } />;
+		}
 
 		return (
 			<>
-				{ Object.keys( bindings ).length > 0 && (
-					<BlockBindingBridge
-						blockProps={ props }
-						bindings={ bindings }
-						onPropValueChange={ updateBoundAttributes }
-					/>
-				) }
+				<BlockBindingBridge
+					blockProps={ props }
+					bindings={ bindings }
+					onPropValueChange={ updateBoundAttributes }
+				/>
 
 				<BlockEdit
 					{ ...props }

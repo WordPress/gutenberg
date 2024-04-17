@@ -41,4 +41,12 @@ export default {
 			updateValue: updateMetaValue,
 		};
 	},
+	settings: {
+		blocks: {
+			'core/paragraph': [ 'content' ],
+			'core/heading': [ 'content' ],
+			'core/image': [ 'url', 'title', 'alt' ],
+			'core/button': [ 'url', 'text', 'linkTarget' ],
+		},
+	},
 };
