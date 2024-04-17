@@ -41,9 +41,7 @@ export function mergeBaseAndUserConfigs( base, user ) {
  * @return {Object} Updated global styles data.
  */
 function useResolvedBlockStyleVariationsConfig( userConfig ) {
-	const getBlockStyles = useSelect( ( select ) => {
-		return select( blocksStore ).getBlockStyles;
-	}, [] );
+	const { getBlockStyles } = useSelect( blocksStore );
 
 	return useMemo( () => {
 		const sharedVariations = userConfig?.styles?.blocks?.variations;

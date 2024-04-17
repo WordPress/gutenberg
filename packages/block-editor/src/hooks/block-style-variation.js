@@ -69,9 +69,7 @@ function useBlockProps( { name, className, clientId } ) {
 	const variation = getVariationNameFromClass( className );
 	const variationClass = `is-style-${ variation }-${ clientId }`;
 
-	const getBlockStyles = useSelect( ( select ) => {
-		return select( blocksStore ).getBlockStyles;
-	}, [] );
+	const { getBlockStyles } = useSelect( blocksStore );
 
 	const { settings, styles } = useBlockSyleVariation(
 		name,
