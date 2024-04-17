@@ -163,7 +163,8 @@ const isValidLink = ( ref ) =>
 	ref.origin === window.location.origin &&
 	! ref.pathname.startsWith( '/wp-admin' ) &&
 	! ref.pathname.startsWith( '/wp-login.php' ) &&
-	! new URL( ref.href ).searchParams.get( '_wpnonce' );
+	! ref.getAttribute( 'href' ).startsWith( '#' ) &&
+	! new URL( ref.href ).searchParams.has( '_wpnonce' );
 
 // Check if the event is valid for client-side navigation.
 const isValidEvent = ( event ) =>
