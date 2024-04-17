@@ -308,10 +308,10 @@ test.describe( 'Pattern Overrides', () => {
 			name: 'Edit link',
 			exact: true,
 		} );
-		const saveLinkButton = page.getByRole( 'button', {
-			name: 'Save',
-			exact: true,
-		} );
+
+		const saveLinkButton = page.locator(
+			'.block-editor-link-control__search-submit'
+		);
 
 		await editLinkButton.click();
 		if (
@@ -353,7 +353,7 @@ test.describe( 'Pattern Overrides', () => {
 		// Update the post.
 		const updateButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Update' } );
+			.getByRole( 'button', { name: 'Save' } );
 		await updateButton.click();
 		await expect( updateButton ).toBeDisabled();
 

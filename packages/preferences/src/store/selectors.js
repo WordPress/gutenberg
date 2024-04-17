@@ -19,6 +19,8 @@ const withDeprecatedKeys = ( originalGet ) => ( state, scope, name ) => {
 		'showIconLabels',
 		'showListViewByDefault',
 		'isPublishSidebarEnabled',
+		'isComplementaryAreaVisible',
+		'pinnedItems',
 	];
 
 	if (

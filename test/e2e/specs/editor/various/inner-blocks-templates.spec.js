@@ -48,7 +48,7 @@ test.describe( 'Inner blocks templates', () => {
 		);
 		const undoButton = editorTopBar.locator( 'role=button[name="Undo"i]' );
 		const updateButton = editorTopBar.locator(
-			'role=button[name="Update"i]'
+			'role=button[name="Save"i]'
 		);
 		await expect( undoButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		await expect( updateButton ).toHaveAttribute( 'aria-disabled', 'true' );

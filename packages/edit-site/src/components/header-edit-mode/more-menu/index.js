@@ -120,7 +120,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 						<ModeSwitcher />
 						<ActionItem.Slot
-							name="core/edit-site/plugin-more-menu"
+							name="core/plugin-more-menu"
 							label={ __( 'Plugins' ) }
 							as={ MenuGroup }
 							fillProps={ { onClick: onClose } }

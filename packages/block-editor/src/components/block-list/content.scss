@@ -487,8 +487,9 @@ body.is-zoomed-out {
 }
 
 .block-editor-iframe__html {
-	transition: all 0.3s;
 	transform-origin: top center;
+	transition: all 0.3s;
+	@include reduce-motion("transition");
 }
 
 .block-editor-iframe__html[style*="scale"] {

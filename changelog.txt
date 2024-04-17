@@ -1,5 +1,19 @@
 == Changelog ==
 
+= 18.1.1 =
+
+## Bug Fixes
+
+- Add null check to prevent errors in `get_block_template` filter ([60491](https://github.com/WordPress/gutenberg/pull/60491))
+- Fix activating a theme in site editor when previewing ([60699](https://github.com/WordPress/gutenberg/pull/60699))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@okmttdhr @ntsekouras 
+
+
 = 18.1.0 =
 
 ## Changelog

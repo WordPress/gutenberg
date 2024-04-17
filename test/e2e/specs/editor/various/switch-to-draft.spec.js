@@ -47,32 +47,19 @@ test.describe( 'Clicking "Switch to draft" on a published/scheduled post/page', 
 
 					await editor.openDocumentSettingsSidebar();
 
-					await switchToDraftUtils.switchToDraftButton.click();
+					const postStatusButton = page.locator(
+						'.editor-post-status-trigger'
+					);
+					await postStatusButton.click();
+					await page.getByRole( 'radio', { name: 'Draft' } ).click();
 
-					await page
-						.getByRole( 'dialog' )
-						.getByRole( 'button', { name: 'Cancel' } )
-						.click();
-
-					await expect
-						.poll(
-							switchToDraftUtils.getPostStatus,
-							`should leave a ${ postStatus }-ed ${ postType } ${ postStatus }-ed if canceled`
-						)
-						.toBe(
-							postStatus === 'schedule' ? 'future' : postStatus
-						);
-
-					await switchToDraftUtils.switchToDraftButton.click();
-
-					const confirmButtonText =
-						postStatus === 'publish' ? 'Unpublish' : 'Unschedule';
-
-					await page
-						.getByRole( 'dialog' )
-						.getByRole( 'button', { name: confirmButtonText } )
-						.click();
-
+					if ( viewport === 'small' ) {
+						await page
+							.getByRole( 'region', { name: 'Editor settings' } )
+							.getByRole( 'button', { name: 'Close Settings' } )
+							.click();
+					}
+					await page.getByRole( 'button', { name: 'Save' } ).click();
 					await expect(
 						page.getByRole( 'button', {
 							name: 'Dismiss this notice',
@@ -105,10 +92,6 @@ class SwitchToDraftUtils {
 		this.#page = page;
 		this.#admin = admin;
 		this.#requestUtils = requestUtils;
-
-		this.switchToDraftButton = page.locator(
-			'role=button[name="Switch to draft"i]'
-		);
 	}
 
 	/**
@@ -146,7 +129,7 @@ class SwitchToDraftUtils {
 	};
 
 	getPostStatus = async () => {
-		return await this.#page.evaluate( () =>
+		return this.#page.evaluate( () =>
 			window.wp.data
 				.select( 'core/editor' )
 				.getEditedPostAttribute( 'status' )

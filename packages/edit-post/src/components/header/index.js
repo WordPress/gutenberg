@@ -190,7 +190,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					}
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
-					<PinnedItems.Slot scope="core/edit-post" />
+					<PinnedItems.Slot scope="core" />
 				) }
 				<MoreMenu showIconLabels={ showIconLabels } />
 			</motion.div>

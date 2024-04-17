@@ -25,6 +25,7 @@
 
 ### Internal
 
+-   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
 -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
 
 ## 27.3.0 (2024-04-03)
