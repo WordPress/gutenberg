@@ -40,21 +40,6 @@ function CategoriesGroup( {
 
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-			{ allPatterns && (
-				<CategoryItem
-					key={ allPatterns.name }
-					count={ allPatterns.count }
-					label={ allPatterns.label }
-					icon={ file }
-					id={ allPatterns.name }
-					type="pattern"
-					isActive={
-						currentCategory === `${ allPatterns.name }` &&
-						( currentType === PATTERN_TYPES.theme ||
-							currentType === PATTERN_TYPES.user )
-					}
-				/>
-			) }
 			<CategoryItem
 				key="all"
 				count={ Object.values( templatePartAreas )
@@ -84,6 +69,22 @@ function CategoriesGroup( {
 						}
 					/>
 				)
+			) }
+			<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
+			{ allPatterns && (
+				<CategoryItem
+					key={ allPatterns.name }
+					count={ allPatterns.count }
+					label={ allPatterns.label }
+					icon={ file }
+					id={ allPatterns.name }
+					type="pattern"
+					isActive={
+						currentCategory === `${ allPatterns.name }` &&
+						( currentType === PATTERN_TYPES.theme ||
+							currentType === PATTERN_TYPES.user )
+					}
+				/>
 			) }
 			{ otherPatterns.map( ( category ) => (
 				<CategoryItem
