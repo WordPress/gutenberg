@@ -40,7 +40,7 @@ export default function useCommonCommands() {
 			return {
 				activeSidebar:
 					select( interfaceStore ).getActiveComplementaryArea(
-						'core/editor'
+						'core'
 					),
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),

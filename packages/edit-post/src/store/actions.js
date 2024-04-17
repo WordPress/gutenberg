@@ -28,7 +28,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( 'core/editor', name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -37,9 +37,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( 'core/editor' );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -222,11 +220,11 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/editor', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core/editor', pluginName );
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**

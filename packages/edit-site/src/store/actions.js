@@ -365,7 +365,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( 'core/editor', name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -374,9 +374,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( 'core/editor' );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 	};
 
 /**

@@ -20,9 +20,7 @@ export default function WelcomeGuideStyles() {
 
 	const { isActive, isStylesOpen } = useSelect( ( select ) => {
 		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/editor'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		return {
 			isActive: !! select( preferencesStore ).get(

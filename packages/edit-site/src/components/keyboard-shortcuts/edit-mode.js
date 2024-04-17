@@ -18,9 +18,8 @@ const { interfaceStore } = unlock( editorPrivateApis );
 function KeyboardShortcutsEditMode() {
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/editor'
-			) === SIDEBAR_BLOCK,
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			SIDEBAR_BLOCK,
 		[]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } =
@@ -63,9 +62,9 @@ function KeyboardShortcutsEditMode() {
 		event.preventDefault();
 
 		if ( isBlockInspectorOpen ) {
-			disableComplementaryArea( 'core/editor' );
+			disableComplementaryArea( 'core' );
 		} else {
-			enableComplementaryArea( 'core/editor', SIDEBAR_BLOCK );
+			enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 		}
 	} );
 

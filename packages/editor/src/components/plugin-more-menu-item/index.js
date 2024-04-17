@@ -67,7 +67,7 @@ export default compose(
 		return {
 			as: ownProps.as ?? MenuItem,
 			icon: ownProps.icon || context.icon,
-			name: 'core/editor/plugin-more-menu',
+			name: 'core/plugin-more-menu',
 		};
 	} )
 )( ActionItem );

@@ -40,13 +40,13 @@ const MoreMenu = ( { showIconLabels } ) => {
 					{ showIconLabels && ! isLargeViewport && (
 						<PinnedItems.Slot
 							className={ showIconLabels && 'show-icon-labels' }
-							scope="core/editor"
+							scope="core"
 						/>
 					) }
 					<WritingMenu />
 					<ModeSwitcher />
 					<ActionItem.Slot
-						name="core/editor/plugin-more-menu"
+						name="core/plugin-more-menu"
 						label={ __( 'Plugins' ) }
 						as={ MenuGroup }
 						fillProps={ { onClick: onClose } }

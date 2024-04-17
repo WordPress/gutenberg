@@ -155,9 +155,7 @@ const SettingsSidebar = () => {
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 
 			const sidebar =
-				select( interfaceStore ).getActiveComplementaryArea(
-					'core/editor'
-				);
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
 			const _isEditorSidebarOpened = [
 				sidebars.block,
 				sidebars.document,

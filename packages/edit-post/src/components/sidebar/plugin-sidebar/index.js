@@ -95,7 +95,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			panelClassName={ className }
 			className="edit-post-sidebar"
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
-			scope="core/editor"
+			scope="core"
 			toggleShortcut={ shortcut }
 			{ ...props }
 		/>

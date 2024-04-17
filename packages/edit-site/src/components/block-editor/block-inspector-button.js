@@ -26,7 +26,7 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 			),
 			isBlockInspectorOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
-					'core/editor'
+					'core'
 				) === SIDEBAR_BLOCK,
 		} ),
 		[]
@@ -42,10 +42,10 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		<MenuItem
 			onClick={ () => {
 				if ( isBlockInspectorOpen ) {
-					disableComplementaryArea( 'core/editor' );
+					disableComplementaryArea( 'core' );
 					speak( __( 'Block settings closed' ) );
 				} else {
-					enableComplementaryArea( 'core/editor', SIDEBAR_BLOCK );
+					enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'

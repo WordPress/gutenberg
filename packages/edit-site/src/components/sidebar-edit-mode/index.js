@@ -110,9 +110,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditingPage,
 	} = useSelect( ( select ) => {
 		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/editor'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
@@ -145,10 +143,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( 'core/editor', SIDEBAR_BLOCK );
+				enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 			}
 		} else {
-			enableComplementaryArea( 'core/editor', SIDEBAR_TEMPLATE );
+			enableComplementaryArea( 'core', SIDEBAR_TEMPLATE );
 		}
 	}, [
 		hasBlockSelection,
@@ -164,7 +162,7 @@ export function SidebarComplementaryAreaFills() {
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( 'core/editor', newSelectedTabId );
+				enableComplementaryArea( 'core', newSelectedTabId );
 			}
 		},
 		[ enableComplementaryArea ]

@@ -201,9 +201,7 @@ export default function HeaderEditMode() {
 					) }
 					<PostViewLink />
 					<SaveButton size="compact" />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/editor" />
-					) }
+					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
 					<MoreMenu showIconLabels={ showIconLabels } />
 				</motion.div>
 			</div>

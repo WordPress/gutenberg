@@ -26,7 +26,7 @@ export default function DefaultSidebar( {
 		<>
 			<ComplementaryArea
 				className={ className }
-				scope="core/editor"
+				scope="core"
 				identifier={ identifier }
 				title={ title }
 				smallScreenTitle={ title }
@@ -39,7 +39,7 @@ export default function DefaultSidebar( {
 				{ children }
 			</ComplementaryArea>
 			<ComplementaryAreaMoreMenuItem
-				scope="core/editor"
+				scope="core"
 				identifier={ identifier }
 				icon={ icon }
 			>

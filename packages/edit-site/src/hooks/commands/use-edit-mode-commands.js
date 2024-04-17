@@ -186,9 +186,7 @@ function useEditUICommands() {
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
 			activeSidebar:
-				select( interfaceStore ).getActiveComplementaryArea(
-					'core/editor'
-				),
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );

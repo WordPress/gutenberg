@@ -45,7 +45,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/editor' )
+				.getActiveComplementaryArea( 'core' )
 		).toBe( 'test/sidebar' );
 
 		registry
@@ -54,7 +54,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/editor' )
+				.getActiveComplementaryArea( 'core' )
 		).toBeNull();
 	} );
 
@@ -79,15 +79,11 @@ describe( 'actions', () => {
 		// Sidebars are pinned by default.
 		// @See https://github.com/WordPress/gutenberg/pull/21645
 		expect(
-			registry
-				.select( interfaceStore )
-				.isItemPinned( 'core/editor', 'rigatoni' )
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
 		).toBe( false );
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		expect(
-			registry
-				.select( interfaceStore )
-				.isItemPinned( 'core/editor', 'rigatoni' )
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
 		).toBe( true );
 	} );
 
