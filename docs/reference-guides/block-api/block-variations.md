@@ -131,7 +131,7 @@ If `isActive` is not set, the Editor cannot distinguish between an instance of t
 
 The property can be set to either a function or an array of strings (`string[]`).
 
-The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them.
+The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them and returning a `true` or `false` (indicating whether this variation is inactive for this block instance).
 
 As an example, in the core Embed block, the `providerNameSlug` attribute is used to determine the embed provider (e.g. 'youtube' or 'twitter'). The variations may be declared like this:
 
