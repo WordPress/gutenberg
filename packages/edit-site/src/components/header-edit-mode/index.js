@@ -77,7 +77,8 @@ export default function HeaderEditMode() {
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const hasFixedToolbar = useHasBlockToolbar() && isFixedToolbar;
+	const hasBlockToolbar = useHasBlockToolbar();
+	const hasFixedToolbar = hasBlockToolbar && isFixedToolbar;
 	const showTopToolbar =
 		isLargeViewport && hasFixedToolbar && blockEditorMode !== 'zoom-out';
 	const blockToolbarRef = useRef();

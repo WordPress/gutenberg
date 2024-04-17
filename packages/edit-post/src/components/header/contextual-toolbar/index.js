@@ -26,31 +26,33 @@ function ContextualToolbar( { isCollapsed, onCollapse } ) {
 	const blockToolbarRef = useRef();
 	const hasBlockToolbar = useHasBlockToolbar();
 
-	return (
-		hasBlockToolbar && (
-			<>
-				<div
-					className={ classnames( 'selected-block-tools-wrapper', {
-						'is-collapsed': isCollapsed,
-					} ) }
-				>
-					<BlockToolbar hideDragHandle />
-				</div>
-				<Popover.Slot ref={ blockToolbarRef } name="block-toolbar" />
+	if ( ! hasBlockToolbar ) {
+		return null;
+	}
 
-				<Button
-					className="edit-post-header__block-tools-toggle"
-					icon={ isCollapsed ? next : previous }
-					onClick={ onCollapse }
-					label={
-						isCollapsed
-							? __( 'Show block tools' )
-							: __( 'Hide block tools' )
-					}
-					size="compact"
-				/>
-			</>
-		)
+	return (
+		<>
+			<div
+				className={ classnames( 'selected-block-tools-wrapper', {
+					'is-collapsed': isCollapsed,
+				} ) }
+			>
+				<BlockToolbar hideDragHandle />
+			</div>
+			<Popover.Slot ref={ blockToolbarRef } name="block-toolbar" />
+
+			<Button
+				className="edit-post-header__block-tools-toggle"
+				icon={ isCollapsed ? next : previous }
+				onClick={ onCollapse }
+				label={
+					isCollapsed
+						? __( 'Show block tools' )
+						: __( 'Hide block tools' )
+				}
+				size="compact"
+			/>
+		</>
 	);
 }
 
