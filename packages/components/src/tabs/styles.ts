@@ -84,13 +84,24 @@ export const Tab = styled( Ariakit.Tab )`
 
 export const TabIndicator = styled( __unstableMotion.div )`
 	position: absolute;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-	height: 0;
-	border-bottom: var( --wp-admin-border-width-focus ) solid
-		${ COLORS.theme.accent };
 	pointer-events: none;
+
+	&:not( .is-vertical ) {
+		left: 0;
+		bottom: 0;
+		width: 100%;
+		border-bottom: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
+	}
+
+	&.is-vertical {
+		right: 0;
+		top: 0;
+		height: 100%;
+		width: 0;
+		border-left: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
+	}
 
 	// Windows high contrast mode.
 	outline: 2px solid transparent;

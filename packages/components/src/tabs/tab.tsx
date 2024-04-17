@@ -19,6 +19,7 @@ export const Tab = forwardRef<
 >( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
 	const context = useTabsContext();
 	const activeId = context?.store.useState( 'activeId' );
+	const orientation = context?.store.useState( 'orientation' );
 	if ( ! context ) {
 		warning( '`Tabs.Tab` must be wrapped in a `Tabs` component.' );
 		return null;
@@ -36,7 +37,12 @@ export const Tab = forwardRef<
 		>
 			{ children }
 			{ activeId === instancedTabId && (
-				<TabIndicator layoutId={ instanceId } />
+				<TabIndicator
+					layoutId={ instanceId }
+					className={
+						orientation === 'vertical' ? 'is-vertical' : ''
+					}
+				/>
 			) }
 		</StyledTab>
 	);
