@@ -21,6 +21,7 @@ import {
 	ROOT_BLOCK_SELECTOR,
 	ROOT_CSS_PROPERTIES_SELECTOR,
 	scopeSelector,
+	scopeFeatureSelectors,
 	appendToSelector,
 	getBlockStyleVariationSelector,
 } from './utils';
@@ -612,33 +613,6 @@ function pickStyleKeys( treeToPickFrom ) {
 		JSON.parse( JSON.stringify( style ) ),
 	] );
 	return Object.fromEntries( clonedEntries );
-}
-
-function scopeFeatureSelectors( scope, selectors ) {
-	if ( ! scope || ! selectors ) {
-		return;
-	}
-
-	const featureSelectors = JSON.parse( JSON.stringify( selectors ) );
-
-	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
-		if ( typeof selector === 'string' ) {
-			featureSelectors[ feature ] = scopeSelector( scope, selector );
-		}
-
-		if ( typeof selector === 'object' ) {
-			Object.entries( selector ).forEach(
-				( [ subfeature, subfeatureSelector ] ) => {
-					featureSelectors[ feature ][ subfeature ] = scopeSelector(
-						scope,
-						subfeatureSelector
-					);
-				}
-			);
-		}
-	} );
-
-	return featureSelectors;
 }
 
 export const getNodesWithStyles = ( tree, blockSelectors ) => {
