@@ -88,7 +88,7 @@ _Usage_
 // Using ES5 syntax
 var el = React.createElement;
 var Fragment = wp.element.Fragment;
-var PluginSidebar = wp.editor.PluginSidebar;
+var PluginSidebar = wp.editPost.PluginSidebar;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
 var registerPlugin = wp.plugins.registerPlugin;
 var moreIcon = React.createElement( 'svg' ); //... svg element.
@@ -123,8 +123,7 @@ registerPlugin( 'plugin-name', {
 
 ```js
 // Using ESNext syntax
-import { PluginSidebar } from '@wordpress/editor';
-import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { PluginSidebar, PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
 import { registerPlugin } from '@wordpress/plugins';
 import { more } from '@wordpress/icons';
 
