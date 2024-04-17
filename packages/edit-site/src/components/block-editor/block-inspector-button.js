@@ -11,8 +11,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -28,7 +26,7 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 			),
 			isBlockInspectorOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
-					editSiteStore.name
+					'core'
 				) === SIDEBAR_BLOCK,
 		} ),
 		[]
@@ -44,10 +42,10 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		<MenuItem
 			onClick={ () => {
 				if ( isBlockInspectorOpen ) {
-					disableComplementaryArea( STORE_NAME );
+					disableComplementaryArea( 'core' );
 					speak( __( 'Block settings closed' ) );
 				} else {
-					enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+					enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'

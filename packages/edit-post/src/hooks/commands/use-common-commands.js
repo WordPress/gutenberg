@@ -38,9 +38,10 @@ export default function useCommonCommands() {
 			const { get } = select( preferencesStore );
 
 			return {
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editPostStore.name ),
+				activeSidebar:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					),
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
 				isFullscreen: get( 'core/edit-post', 'fullscreenMode' ),

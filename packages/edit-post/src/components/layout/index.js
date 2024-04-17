@@ -169,9 +169,8 @@ function Layout( { initialPost } ) {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
-				) || select( editorStore ).isPublishSidebarOpened()
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ) ||
+				select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
@@ -308,7 +307,7 @@ function Layout( { initialPost } ) {
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					! isDistractionFree && (
-						<ComplementaryArea.Slot scope="core/edit-post" />
+						<ComplementaryArea.Slot scope="core" />
 					)
 				}
 				notices={ <EditorSnackbars /> }
