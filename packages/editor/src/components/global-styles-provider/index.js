@@ -33,8 +33,13 @@ export function mergeBaseAndUserConfigs( base, user ) {
 	} );
 }
 
-// Resolves shared block style variation definitions from the user origin
-// under their respective block types and registers the block style if required.
+/**
+ * Resolves shared block style variation definitions from the user origin
+ * under their respective block types and registers the block style if required.
+ *
+ * @param {Object} userConfig Current user origin global styles data.
+ * @return {Object} Updated global styles data.
+ */
 function useResolvedBlockStyleVariationsConfig( userConfig ) {
 	const getBlockStyles = useSelect( ( select ) => {
 		return select( blocksStore ).getBlockStyles;
