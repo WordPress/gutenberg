@@ -140,9 +140,7 @@ export default function Editor( { isLoading, onClick } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			isRightSidebarOpen: getActiveComplementaryArea( 'core/editor' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),

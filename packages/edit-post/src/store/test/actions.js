@@ -45,7 +45,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/edit-post' )
+				.getActiveComplementaryArea( 'core/editor' )
 		).toBe( 'test/sidebar' );
 
 		registry
@@ -54,7 +54,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/edit-post' )
+				.getActiveComplementaryArea( 'core/editor' )
 		).toBeNull();
 	} );
 
@@ -81,13 +81,13 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.isItemPinned( editPostStore.name, 'rigatoni' )
+				.isItemPinned( 'core/editor', 'rigatoni' )
 		).toBe( false );
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		expect(
 			registry
 				.select( interfaceStore )
-				.isItemPinned( editPostStore.name, 'rigatoni' )
+				.isItemPinned( 'core/editor', 'rigatoni' )
 		).toBe( true );
 	} );
 

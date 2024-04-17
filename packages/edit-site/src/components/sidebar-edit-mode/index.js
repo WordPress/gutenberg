@@ -18,7 +18,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
-import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
@@ -111,7 +110,9 @@ export function SidebarComplementaryAreaFills() {
 		isEditingPage,
 	} = useSelect( ( select ) => {
 		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+			select( interfaceStore ).getActiveComplementaryArea(
+				'core/editor'
+			);
 
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
@@ -144,10 +145,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+				enableComplementaryArea( 'core/editor', SIDEBAR_BLOCK );
 			}
 		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+			enableComplementaryArea( 'core/editor', SIDEBAR_TEMPLATE );
 		}
 	}, [
 		hasBlockSelection,
@@ -163,7 +164,7 @@ export function SidebarComplementaryAreaFills() {
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( STORE_NAME, newSelectedTabId );
+				enableComplementaryArea( 'core/editor', newSelectedTabId );
 			}
 		},
 		[ enableComplementaryArea ]

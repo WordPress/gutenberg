@@ -171,7 +171,7 @@ function Layout( { initialPost } ) {
 				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
+					'core/editor'
 				) || select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:

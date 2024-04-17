@@ -14,7 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -366,7 +365,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editSiteStoreName, name );
+			.enableComplementaryArea( 'core/editor', name );
 	};
 
 /**
@@ -377,7 +376,7 @@ export const closeGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.disableComplementaryArea( editSiteStoreName );
+			.disableComplementaryArea( 'core/editor' );
 	};
 
 /**

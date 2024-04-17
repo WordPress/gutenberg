@@ -78,7 +78,7 @@ export function initializeEditor( id, settings ) {
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(
-		'core/edit-site',
+		'core/editor',
 		'edit-site/template'
 	);
 
