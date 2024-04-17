@@ -1,117 +1,84 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { memo, useRef } from '@wordpress/element';
+import { __unstableMotion as motion } from '@wordpress/components';
+import { useReducedMotion } from '@wordpress/compose';
 import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-} from '@wordpress/components';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useViewportMatch } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+	useCallback,
+	createContext,
+	useState,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
-/**
- * Internal dependencies
- */
-import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
-import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
-import useSyncPathWithURL, {
-	getPathFromURL,
-} from '../sync-state-with-url/use-sync-path-with-url';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
-import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
-import SaveHub from '../save-hub';
-import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
+export const SidebarNavigationContext = createContext( () => {} );
 
-const { useLocation } = unlock( routerPrivateApis );
-
-function SidebarScreenWrapper( { className, ...props } ) {
-	return (
-		<NavigatorScreen
-			className={ classNames(
-				'edit-site-sidebar__screen-wrapper',
-				className
-			) }
-			{ ...props }
-		/>
-	);
+function getAnim( direction ) {
+	switch ( direction ) {
+		case 'back':
+			return {
+				initial: { opacity: 0, x: '-50px' },
+				animate: { opacity: 1, x: '0' },
+			};
+		case 'forward':
+			return {
+				initial: { opacity: 0, x: '50px' },
+				animate: { opacity: 1, x: '0' },
+			};
+		default:
+			return { initial: false, animate: false };
+	}
 }
 
-function SidebarScreens() {
-	useSyncPathWithURL();
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
+export default function SidebarContent( { routeKey, children } ) {
+	const [ navState, setNavState ] = useState( {
+		direction: null,
+		focusSelector: null,
+	} );
+
+	const navigate = useCallback( ( direction, focusSelector = null ) => {
+		setNavState( ( prevState ) => ( {
+			direction,
+			focusSelector:
+				direction === 'forward' && focusSelector
+					? focusSelector
+					: prevState.focusSelector,
+		} ) );
+	}, [] );
+
+	const wrapperRef = useRef();
+	useEffect( () => {
+		let elementToFocus;
+		if ( navState.direction === 'back' && navState.focusSelector ) {
+			elementToFocus = wrapperRef.current.querySelector(
+				navState.focusSelector
+			);
+		}
+		if ( navState.direction !== null && ! elementToFocus ) {
+			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
+			elementToFocus = firstTabbable ?? wrapperRef.current;
+		}
+		elementToFocus?.focus();
+	}, [ navState ] );
+
+	const disableMotion = useReducedMotion();
+	const { initial, animate } = getAnim( navState.direction );
 
 	return (
-		<>
-			<SidebarScreenWrapper path="/">
-				<SidebarNavigationScreenMain />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/navigation">
-				<SidebarNavigationScreenNavigationMenus />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/navigation/:postType/:postId">
-				<SidebarNavigationScreenNavigationMenu />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/wp_global_styles">
-				<SidebarNavigationScreenGlobalStyles />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/page">
-				<SidebarNavigationScreen
-					title={ __( 'Manage pages' ) }
-					content={ <DataViewsSidebarContent /> }
-				/>
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/page/:postId">
-				<SidebarNavigationScreenPage />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</SidebarScreenWrapper>
-			{ ! isMobileViewport && (
-				<SidebarScreenWrapper path="/patterns">
-					<SidebarNavigationScreenPatterns />
-				</SidebarScreenWrapper>
-			) }
-			<SidebarScreenWrapper path="/:postType(wp_template_part)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template_part|wp_block)/:postId">
-				<SidebarNavigationScreenPattern />
-			</SidebarScreenWrapper>
-			<SidebarScreenWrapper path="/:postType(wp_template)/:postId">
-				<SidebarNavigationScreenTemplate />
-			</SidebarScreenWrapper>
-		</>
+		<SidebarNavigationContext.Provider value={ navigate }>
+			<div className="edit-site-sidebar__content">
+				<motion.div
+					ref={ wrapperRef }
+					key={ routeKey }
+					className="edit-site-sidebar__screen-wrapper"
+					initial={ ! disableMotion && initial }
+					animate={ ! disableMotion && animate }
+					transition={ { duration: 0.14 } }
+				>
+					{ children }
+				</motion.div>
+			</div>
+		</SidebarNavigationContext.Provider>
 	);
 }
-
-function Sidebar() {
-	const { params: urlParams } = useLocation();
-	const initialPath = useRef( getPathFromURL( urlParams ) );
-
-	return (
-		<>
-			<NavigatorProvider
-				className="edit-site-sidebar__content"
-				initialPath={ initialPath.current }
-			>
-				<SidebarScreens />
-			</NavigatorProvider>
-			<SaveHub />
-		</>
-	);
-}
-
-export default memo( Sidebar );
