@@ -719,21 +719,25 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	/**
 	 * Determines if a supplied style variation matches the provided scope.
 	 *
-	 * For backwards compatibility, if a variation does not explicitly define
-	 * a scope, it is assumed to be a theme style variation.
+	 * For backwards compatibility, if a variation does not define any scope
+	 * related property, e.g. `supportedBlockTypes`, it is assumed to be a
+	 * theme style variation.
 	 *
 	 * @param array  $variation Theme.json shaped style variation object.
 	 * @param string $scope     Scope to check e.g. theme, block etc.
+	 *
 	 * @return boolean
 	 */
 	private static function style_variation_has_scope( $variation, $scope ) {
-		$scopes = $variation['scope'] ?? array();
-
-		if ( count( $scopes ) === 0 ) {
-			return 'theme' === $scope;
+		if ( 'block' === $scope ) {
+			return isset( $variation['supportedBlockTypes'] );
 		}
 
-		return in_array( $scope, $scopes, true );
+		if ( 'theme' === $scope ) {
+			return ! isset( $variation['supportedBlockTypes'] );
+		}
+
+		return false;
 	}
 
 	/**

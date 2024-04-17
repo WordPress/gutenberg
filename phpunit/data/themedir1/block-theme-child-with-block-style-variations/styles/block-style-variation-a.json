@@ -1,6 +1,5 @@
 {
 	"version": 2,
-	"scope": [ "block" ],
 	"supportedBlockTypes": [ "core/group", "core/columns", "core/media-text" ],
 	"styles": {
 		"color": {
