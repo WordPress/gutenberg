@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	store,
-	privateApis,
-	getConfig,
-	getElement,
-} from '@wordpress/interactivity';
+import { store, privateApis, getConfig } from '@wordpress/interactivity';
 
 /**
  * Internal dependencies
@@ -200,34 +195,23 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string|Event} eventOrUrl                         The page href or the event handler in case it is used directly in a directive.
-		 * @param {Object}       [options]                          Options object.
-		 * @param {boolean}      [options.force]                    If true, it forces re-fetching the URL.
-		 * @param {string}       [options.html]                     HTML string to be used instead of fetching the requested URL.
-		 * @param {boolean}      [options.replace]                  If true, it replaces the current entry in the browser session history.
-		 * @param {number}       [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean}      [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
-		 * @param {boolean}      [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param {string}  href                               The page href.
+		 * @param {Object}  [options]                          Options object.
+		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
+		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
 		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
 		 */
-		*navigate( eventOrUrl, options = {} ) {
+		*navigate( href, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
-			const url = ! ( eventOrUrl instanceof Event ) && eventOrUrl;
-			const event = eventOrUrl instanceof Event && eventOrUrl;
-			let ref;
-			// The getElement() function can only be called when it is an event.
-			if ( event ) {
-				ref = getElement().ref;
+			if ( clientNavigationDisabled ) {
+				yield forcePageReload( href );
 			}
-			if (
-				clientNavigationDisabled ||
-				! ( url || ( isValidLink( ref ) && isValidEvent( event ) ) )
-			) {
-				yield forcePageReload( url );
-			}
-			if ( event ) event.preventDefault();
-			const href = url ? url : ref.href;
+
 			const pagePath = getPagePath( href );
 			const { navigation } = state;
 			const {
@@ -316,29 +300,50 @@ export const { state, actions } = store( 'core/router', {
 		 * The function normalizes the URL and stores internally the fetch
 		 * promise, to avoid triggering a second fetch for an ongoing request.
 		 *
-		 * @param {string|Event} eventOrUrl      The page href or the event handler in case it is used directly in a directive.
-		 * @param {Object}       [options]       Options object.
-		 * @param {boolean}      [options.force] Force fetching the URL again.
-		 * @param {string}       [options.html]  HTML string to be used instead of fetching the requested URL.
+		 * @param {string}  url             The page URL.
+		 * @param {Object}  [options]       Options object.
+		 * @param {boolean} [options.force] Force fetching the URL again.
+		 * @param {string}  [options.html]  HTML string to be used instead of fetching the requested URL.
 		 */
-		prefetch( eventOrUrl, options = {} ) {
-			const url = ! ( eventOrUrl instanceof Event ) && eventOrUrl;
-			const event = eventOrUrl instanceof Event && eventOrUrl;
-			let ref;
-			// The getElement() function can only be called when it is an event.
-			if ( event ) {
-				ref = getElement().ref;
-			}
+		prefetch( url, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
-			if (
-				clientNavigationDisabled ||
-				! ( url || ( isValidLink( ref ) && isValidEvent( event ) ) )
-			)
-				return;
-			const pagePath = getPagePath( url ? url : ref.href );
+			if ( clientNavigationDisabled ) return;
+
+			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
 				pages.set( pagePath, fetchPage( pagePath, options ) );
 			}
 		},
 	},
 } );
+
+// Add click and prefetch to all links.
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( navigationMode === 'fullPage' ) {
+		// Navigate on click.
+		document.addEventListener(
+			'click',
+			function ( event ) {
+				const ref = event.target.closest( 'a' );
+				if ( isValidLink( ref ) && isValidEvent( event ) ) {
+					event.preventDefault();
+					actions.navigate( ref.href );
+				}
+			},
+			true
+		);
+		// Prefetch on hover.
+		document.addEventListener(
+			'mouseenter',
+			function ( event ) {
+				if ( event.target?.nodeName === 'A' ) {
+					const ref = event.target.closest( 'a' );
+					if ( isValidLink( ref ) && isValidEvent( event ) ) {
+						actions.prefetch( ref.href );
+					}
+				}
+			},
+			true
+		);
+	}
+}
