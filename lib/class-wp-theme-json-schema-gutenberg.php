@@ -125,16 +125,20 @@ class WP_Theme_JSON_Schema_Gutenberg {
 
 		/*
 		 * Even though defaultFontSizes is a new setting, we need to migrate
-		 * it to false as it controls the PRESETS_METADATA prevent_override
-		 * which controls how CSS is generated and was hardcoded to false.
+		 * it as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided font sizes as they could match the default ones and
+		 * affect the generated CSS.
 		 */
-		if ( ! isset( $new['settings'] ) ) {
-			$new['settings'] = array();
+		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
+			if ( ! isset( $new['settings'] ) ) {
+				$new['settings'] = array();
+			}
+			if ( ! isset( $new['settings']['typography'] ) ) {
+				$new['settings']['typography'] = array();
+			}
+			$new['settings']['typography']['defaultFontSizes'] = false;
 		}
-		if ( ! isset( $new['settings']['typography'] ) ) {
-			$new['settings']['typography'] = array();
-		}
-		$new['settings']['typography']['defaultFontSizes'] = false;
 
 		return $new;
 	}
