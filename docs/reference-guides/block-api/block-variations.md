@@ -133,7 +133,7 @@ The property can be set to either a function or an array of strings (`string[]`)
 
 The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them.
 
-As an example, in the core Embed block, the `providerNameSlug` attribute is used to determine the embed provider (e.g. 'YouTube' or 'Twitter'). The variations may be declared like this:
+As an example, in the core Embed block, the `providerNameSlug` attribute is used to determine the embed provider (e.g. 'youtube' or 'twitter'). The variations may be declared like this:
 
 ```js
 const variations = [
@@ -162,7 +162,7 @@ const variations = [
 ]
 ```
 
- The `isActive` function can compare the block instance value for `providerNameSlug` to the value declared in the variation's declaration (as shown in the example above) to determine which embed variation is active:
+ The `isActive` function can compare the block instance value for `providerNameSlug` to the value declared in the variation's declaration (the values in the code snippet above) to determine which embed variation is active:
 
 ```js
 isActive: ( blockAttributes, variationAttributes ) =>
