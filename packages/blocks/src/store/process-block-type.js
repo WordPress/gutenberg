@@ -46,6 +46,7 @@ const LEGACY_CATEGORY_MAPPING = {
 export const processBlockType =
 	( name, blockSettings ) =>
 	( { select } ) => {
+		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 		const blockType = {
 			name,
 			icon: BLOCK_ICON_DEFAULT,
@@ -56,11 +57,14 @@ export const processBlockType =
 			selectors: {},
 			supports: {},
 			styles: [],
-			variations: [],
 			blockHooks: {},
 			save: () => null,
-			...select.getBootstrappedBlockType( name ),
+			...bootstrappedBlockType,
 			...blockSettings,
+			variations: [
+				...( bootstrappedBlockType?.variations || [] ),
+				...( blockSettings?.variations || [] ),
+			],
 		};
 
 		const settings = applyFilters(
