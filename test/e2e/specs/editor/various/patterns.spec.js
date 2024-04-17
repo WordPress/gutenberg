@@ -245,7 +245,7 @@ test.describe( 'Synced pattern', () => {
 		await page.keyboard.type( 'Einen ' );
 
 		// Save the reusable block and update the post.
-		await editorTopBar.getByRole( 'button', { name: 'Update' } ).click();
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Pattern updated.' } )
@@ -586,7 +586,7 @@ test.describe( 'Synced pattern', () => {
 			name: 'Editor top bar',
 		} );
 
-		await editorTopBar.getByRole( 'button', { name: 'Update' } ).click();
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Pattern updated.' } )

@@ -24,6 +24,7 @@ import PreferencesModal from './components/preferences-modal';
 import PostActions from './components/post-actions';
 import { usePostActions } from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
+import PostStatus from './components/post-status';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -45,6 +46,7 @@ lock( privateApis, {
 	PreferencesModal,
 	usePostActions,
 	PostCardPanel,
+	PostStatus,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useBlockEditorSettings,
