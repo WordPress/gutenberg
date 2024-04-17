@@ -19,25 +19,22 @@ import { getComputedCSS, range, GridRect, getGridItemRect } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 export function GridVisualizer( { clientId } ) {
-	const blockElement = useBlockElement( clientId );
-	if ( ! blockElement ) {
+	const gridElement = useBlockElement( clientId );
+	if ( ! gridElement ) {
 		return null;
 	}
 	return (
-		<GridVisualizerGrid
-			clientId={ clientId }
-			blockElement={ blockElement }
-		/>
+		<GridVisualizerGrid clientId={ clientId } gridElement={ gridElement } />
 	);
 }
 
-function getGridInfo( blockElement ) {
+function getGridInfo( gridElement ) {
 	const gridTemplateColumns = getComputedCSS(
-		blockElement,
+		gridElement,
 		'grid-template-columns'
 	);
 	const gridTemplateRows = getComputedCSS(
-		blockElement,
+		gridElement,
 		'grid-template-rows'
 	);
 	const numColumns = gridTemplateColumns.split( ' ' ).length;
@@ -50,15 +47,15 @@ function getGridInfo( blockElement ) {
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,
-			gap: getComputedCSS( blockElement, 'gap' ),
-			padding: getComputedCSS( blockElement, 'padding' ),
+			gap: getComputedCSS( gridElement, 'gap' ),
+			padding: getComputedCSS( gridElement, 'padding' ),
 		},
 	};
 }
 
-function GridVisualizerGrid( { clientId, blockElement } ) {
+function GridVisualizerGrid( { clientId, gridElement } ) {
 	const [ gridInfo, setGridInfo ] = useState( () =>
-		getGridInfo( blockElement )
+		getGridInfo( gridElement )
 	);
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
@@ -69,9 +66,9 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 
 	useEffect( () => {
 		const observers = [];
-		for ( const element of [ blockElement, ...blockElement.children ] ) {
+		for ( const element of [ gridElement, ...gridElement.children ] ) {
 			const observer = new window.ResizeObserver( () => {
-				setGridInfo( getGridInfo( blockElement ) );
+				setGridInfo( getGridInfo( gridElement ) );
 			} );
 			observer.observe( element );
 			observers.push( observer );
@@ -81,7 +78,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 				observer.disconnect();
 			}
 		};
-	}, [ blockElement ] );
+	}, [ gridElement ] );
 
 	useEffect( () => {
 		function onGlobalDrag() {
@@ -120,7 +117,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 							}
 							validateDrag={ ( srcClientId ) => {
 								const isCellOccupied = Array.from(
-									blockElement.children
+									gridElement.children
 								).some( ( child ) => {
 									return getGridItemRect( child ).contains(
 										column,
@@ -188,7 +185,7 @@ function GridVisualizerGrid( { clientId, blockElement } ) {
 								const leadingCellRow =
 									column > 1 ? row : row - 1;
 								const leadingGridItem = Array.from(
-									blockElement.children
+									gridElement.children
 								).find( ( child ) => {
 									return getGridItemRect( child ).contains(
 										leadingCellColumn,
