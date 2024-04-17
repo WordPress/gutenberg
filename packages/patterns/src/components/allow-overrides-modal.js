@@ -5,7 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	Text,
+	__experimentalText as Text,
 	TextControl,
 	Modal,
 } from '@wordpress/components';
