@@ -123,28 +123,34 @@
 			background-color: #f8f8f8;
 		}
 
-		&:not(.is-touch-device) {
-			.components-checkbox-control__input.components-checkbox-control__input {
-				opacity: 0;
+		.components-checkbox-control__input.components-checkbox-control__input {
+			opacity: 0;
 
-				&:checked,
-				&:indeterminate,
-				&:focus {
-					opacity: 1;
-				}
+			&:checked,
+			&:indeterminate,
+			&:focus {
+				opacity: 1;
 			}
+		}
 
+		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+			opacity: 0;
+		}
+
+		&:focus-within,
+		&.is-hovered,
+		&:hover {
+			.components-checkbox-control__input,
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
-				opacity: 0;
+				opacity: 1;
 			}
+		}
 
-			&:focus-within,
-			&.is-hovered,
-			&:hover {
-				.components-checkbox-control__input,
-				.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
-					opacity: 1;
-				}
+		@media (hover: none) {
+			// Show checkboxes and quick-actions on devices that do not support hover
+			.components-checkbox-control__input.components-checkbox-control__input,
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+				opacity: 1;
 			}
 		}
 
