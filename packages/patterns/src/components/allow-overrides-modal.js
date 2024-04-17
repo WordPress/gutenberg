@@ -5,6 +5,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
+	Text,
 	TextControl,
 	Modal,
 } from '@wordpress/components';
@@ -44,7 +45,6 @@ export function AllowOverridesModal( {
 		<Modal
 			title={ __( 'Enable overrides' ) }
 			onRequestClose={ onClose }
-			overlayClassName="block-editor-block-allow-overrides-modal"
 			focusOnMount="firstContentElement"
 			aria={ { describedby: descriptionId } }
 			size="small"
@@ -61,14 +61,11 @@ export function AllowOverridesModal( {
 				} }
 			>
 				<VStack spacing="6">
-					<p
-						id={ descriptionId }
-						className="block-editor-block-allow-overrides-modal__description"
-					>
+					<Text id={ descriptionId }>
 						{ __(
 							'Overrides are changes you make to a block within a synced pattern instance. Use overrides to customize a synced pattern instance to suit its new context. Name this block to specify an override.'
 						) }
-					</p>
+					</Text>
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
@@ -111,7 +108,6 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 		<Modal
 			title={ __( 'Disable overrides' ) }
 			onRequestClose={ onClose }
-			overlayClassName="block-editor-block-disallow-overrides-modal"
 			aria={ { describedby: descriptionId } }
 			size="small"
 		>
@@ -123,14 +119,11 @@ export function DisallowOverridesModal( { onClose, onSave } ) {
 				} }
 			>
 				<VStack spacing="6">
-					<p
-						id={ descriptionId }
-						className="block-editor-block-allow-overrides-modal__description"
-					>
+					<Text id={ descriptionId }>
 						{ __(
 							'Are you sure you want to disable overrides? Disabling overrides will revert all applied overrides for this block throughout instances of this pattern.'
 						) }
-					</p>
+					</Text>
 
 					<HStack justify="right">
 						<Button
