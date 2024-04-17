@@ -114,9 +114,9 @@ function getMergedFontSizes( settings ) {
 	const fontSizes = settings?.typography?.fontSizes;
 	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
 	return [
-		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
-		...( fontSizes?.theme ?? [] ),
 		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
 	];
 }
 
