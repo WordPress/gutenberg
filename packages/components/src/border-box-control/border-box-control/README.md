@@ -28,7 +28,7 @@ show "Mixed" placeholder text.
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
+import { BorderBoxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const colors = [

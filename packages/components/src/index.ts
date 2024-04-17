@@ -36,6 +36,10 @@ export {
 	hasSplitBorders as __experimentalHasSplitBorders,
 	isDefinedBorder as __experimentalIsDefinedBorder,
 	isEmptyBorder as __experimentalIsEmptyBorder,
+	BorderBoxControl,
+	hasSplitBorders,
+	isDefinedBorder,
+	isEmptyBorder,
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {

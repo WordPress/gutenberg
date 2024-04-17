@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
-import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
+import { hasSplitBorders } from '@wordpress/components';
 import { Platform, useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { useSelect } from '@wordpress/data';

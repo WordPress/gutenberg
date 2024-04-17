@@ -9,7 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
-	__experimentalHasSplitBorders as hasSplitBorders,
+	hasSplitBorders,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 

@@ -26,7 +26,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarDropdownMenu,
-	__experimentalHasSplitBorders as hasSplitBorders,
+	hasSplitBorders,
 } from '@wordpress/components';
 import {
 	alignLeft,
