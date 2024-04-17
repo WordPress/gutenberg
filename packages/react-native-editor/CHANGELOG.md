@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] KeyboardAwareFlatList - Enable FlatList virtualization for iOS [#59833]
 
 ## 1.117.0
 -   [*] Add empty fallback option for the BottomSheetSelectControl component [#60333]
