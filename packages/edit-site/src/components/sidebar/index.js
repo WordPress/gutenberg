@@ -32,36 +32,38 @@ function getAnim( direction ) {
 }
 
 export default function SidebarContent( { routeKey, children } ) {
-	const [ { navDirection, focusSelector }, setNavState ] = useState( {
-		navDirection: null,
+	const [ navState, setNavState ] = useState( {
+		direction: null,
 		focusSelector: null,
 	} );
 
-	const navigate = useCallback( ( direction, backFocusSelector = null ) => {
-		setNavState( ( prevDir ) => ( {
-			navDirection: direction,
+	const navigate = useCallback( ( direction, focusSelector = null ) => {
+		setNavState( ( prevState ) => ( {
+			direction,
 			focusSelector:
-				direction === 'forward'
-					? backFocusSelector
-					: prevDir.focusSelector,
+				direction === 'forward' && focusSelector
+					? focusSelector
+					: prevState.focusSelector,
 		} ) );
 	}, [] );
 
 	const wrapperRef = useRef();
 	useEffect( () => {
 		let elementToFocus;
-		if ( navDirection === 'back' && focusSelector ) {
-			elementToFocus = wrapperRef.current.querySelector( focusSelector );
+		if ( navState.direction === 'back' && navState.focusSelector ) {
+			elementToFocus = wrapperRef.current.querySelector(
+				navState.focusSelector
+			);
 		}
-		if ( navDirection !== null && ! elementToFocus ) {
+		if ( navState.direction !== null && ! elementToFocus ) {
 			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
 			elementToFocus = firstTabbable ?? wrapperRef.current;
 		}
 		elementToFocus?.focus();
-	}, [ navDirection, focusSelector ] );
+	}, [ navState ] );
 
 	const disableMotion = useReducedMotion();
-	const { initial, animate } = getAnim( navDirection );
+	const { initial, animate } = getAnim( navState.direction );
 
 	return (
 		<SidebarNavigationContext.Provider value={ navigate }>
