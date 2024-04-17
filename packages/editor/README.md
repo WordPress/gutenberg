@@ -607,6 +607,50 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
+### PluginPostStatusInfo
+
+Renders a row in the Summary panel of the Document sidebar. It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginPostStatusInfo = wp.editor.PluginPostStatusInfo;
+
+function MyPluginPostStatusInfo() {
+	return React.createElement(
+		PluginPostStatusInfo,
+		{
+			className: 'my-plugin-post-status-info',
+		},
+		__( 'My post status info' )
+	);
+}
+```
+
+```jsx
+// Using ESNext syntax
+import { __ } from '@wordpress/i18n';
+import { PluginPostStatusInfo } from '@wordpress/editor';
+
+const MyPluginPostStatusInfo = () => (
+	<PluginPostStatusInfo className="my-plugin-post-status-info">
+		{ __( 'My post status info' ) }
+	</PluginPostStatusInfo>
+);
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### PluginPrePublishPanel
 
 Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
