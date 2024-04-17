@@ -259,6 +259,7 @@ function TableRow( {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
+				'is-touch-device': isTouchDevice.current,
 			} ) }
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
