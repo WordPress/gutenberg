@@ -149,14 +149,14 @@ function ListItem( {
 
 export default function ViewList( props: ListViewProps ) {
 	const {
-		view,
-		fields,
 		data,
-		isLoading,
+		fields,
 		getItemId,
+		id: preferredId,
+		isLoading,
 		onSelectionChange,
 		selection,
-		id: preferredId,
+		view,
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
 	const selectedItem = data?.findLast( ( item ) =>

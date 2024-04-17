@@ -175,14 +175,14 @@ function GridItem( {
 }
 
 export default function ViewGrid( {
+	actions,
 	data,
 	fields,
-	view,
-	actions,
-	isLoading,
 	getItemId,
-	selection,
+	isLoading,
 	onSelectionChange,
+	selection,
+	view,
 } ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
