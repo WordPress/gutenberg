@@ -105,6 +105,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 					) }
 				>
 					<Button
+						__next40pxDefaultSize
 						className="pattern-overrides-control__allow-overrides-button"
 						variant="secondary"
 						onClick={ () => {

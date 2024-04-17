@@ -90,7 +90,7 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'button', { name: 'Advanced' } )
 				.click();
 			await editorSettings
-				.getByRole( 'button', { name: 'Enable' } )
+				.getByRole( 'button', { name: 'Enable overrides' } )
 				.click();
 			await page
 				.getByRole( 'dialog', { name: 'Enable overrides' } )
