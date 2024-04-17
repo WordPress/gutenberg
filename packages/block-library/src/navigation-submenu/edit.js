@@ -11,6 +11,7 @@ import {
 	PanelBody,
 	TextControl,
 	TextareaControl,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -134,7 +135,8 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, type, url, description, rel, title } = attributes;
+	const { label, type, url, description, rel, title, opensInNewTab } =
+		attributes;
 
 	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
 
@@ -452,6 +454,16 @@ export default function NavigationSubmenuEdit( {
 						help={ __(
 							'The relationship of the linked URL as space-separated link types.'
 						) }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Open in new tab' ) }
+						onChange={ ( value ) =>
+							setAttributes( {
+								opensInNewTab: value,
+							} )
+						}
+						checked={ opensInNewTab }
 					/>
 				</PanelBody>
 			</InspectorControls>
