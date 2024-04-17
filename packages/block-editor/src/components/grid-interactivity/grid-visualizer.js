@@ -115,35 +115,34 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 								false
 							}
 							validateDrag={ ( srcClientId ) => {
-								const isCellOccupied = Array.from(
-									gridElement.children
-								).some( ( child ) => {
-									return getGridItemRect( child ).contains(
-										column,
-										row
-									);
-								} );
-								if ( isCellOccupied ) {
-									return false;
-								}
-
 								const attributes =
 									getBlockAttributes( srcClientId );
+								const rect = new GridRect( {
+									columnStart: column,
+									rowStart: row,
+									columnSpan:
+										attributes.style?.layout?.columnSpan,
+									rowSpan: attributes.style?.layout?.rowSpan,
+								} );
+
 								const isInBounds = new GridRect( {
 									columnSpan: gridInfo.numColumns,
 									rowSpan: gridInfo.numRows,
-								} ).containsRect(
-									new GridRect( {
-										columnStart: column,
-										rowStart: row,
-										columnSpan:
-											attributes.style?.layout
-												?.columnSpan,
-										rowSpan:
-											attributes.style?.layout?.rowSpan,
-									} )
-								);
+								} ).containsRect( rect );
 								if ( ! isInBounds ) {
+									return false;
+								}
+
+								const isOverlapping = Array.from(
+									gridElement.children
+								).some(
+									( child ) =>
+										child.dataset.block !== srcClientId &&
+										rect.intersectsRect(
+											getGridItemRect( child )
+										)
+								);
+								if ( isOverlapping ) {
 									return false;
 								}
 

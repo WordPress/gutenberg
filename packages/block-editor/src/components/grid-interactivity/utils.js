@@ -48,6 +48,15 @@ export class GridRect {
 			this.contains( rect.columnEnd, rect.rowEnd )
 		);
 	}
+
+	intersectsRect( rect ) {
+		return (
+			this.columnStart <= rect.columnEnd &&
+			this.columnEnd >= rect.columnStart &&
+			this.rowStart <= rect.rowEnd &&
+			this.rowEnd >= rect.rowStart
+		);
+	}
 }
 
 export function getComputedCSS( element, property ) {
