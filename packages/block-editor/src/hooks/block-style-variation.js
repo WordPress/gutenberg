@@ -22,7 +22,12 @@ function getVariationNameFromClass( className ) {
 }
 
 function useBlockSyleVariation( name, variation, clientId ) {
-	const { user: userStyles } = useContext( GlobalStylesContext );
+	// Prefer global styles data in GlobalStylesContext, which are available
+	// if in the site editor. Otherwise fall back to whatever is in the
+	// editor settings and available in the post editor.
+	// This can be updated once the global styles data is consistently
+	// available across the editors.
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
 		const { __experimentalFeatures, __experimentalStyles } =
 			select( blockEditorStore ).getSettings();
@@ -33,12 +38,12 @@ function useBlockSyleVariation( name, variation, clientId ) {
 	}, [] );
 
 	return useMemo( () => {
-		const styles = userStyles?.styles ?? globalStyles;
+		const styles = mergedConfig?.styles ?? globalStyles;
 		const variationStyles =
 			styles?.blocks?.[ name ]?.variations?.[ variation ];
 
 		return {
-			settings: userStyles?.settings ?? globalSettings,
+			settings: mergedConfig?.settings ?? globalSettings,
 			// The variation style data is all that is needed to generate
 			// the styles for the current application to a block. The variation
 			// name is updated to match the instance specific class name.
@@ -53,7 +58,7 @@ function useBlockSyleVariation( name, variation, clientId ) {
 			},
 		};
 	}, [
-		userStyles,
+		mergedConfig,
 		globalSettings,
 		globalStyles,
 		variation,
