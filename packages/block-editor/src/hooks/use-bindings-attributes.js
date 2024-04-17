@@ -58,122 +58,99 @@ export function canBindAttribute( blockName, attributeName ) {
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
+		const sources = useSelect( ( select ) =>
+			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
+		);
+		const bindings = props.attributes.metadata?.bindings;
+		const { name, clientId, context } = props;
+		const boundAttributes = useSelect( () => {
+			if ( ! bindings ) {
+				return;
+			}
 
-		const boundAttributes = useSelect(
-			( select ) => {
-				const bindings = Object.fromEntries(
-					Object.entries(
-						props.attributes.metadata?.bindings || {}
-					).filter( ( [ attrName ] ) =>
-						canBindAttribute( props.name, attrName )
-					)
-				);
+			const attributes = {};
 
-				if ( ! Object.keys( bindings ).length > 0 ) {
-					return;
+			for ( const [ attributeName, boundAttribute ] of Object.entries(
+				bindings
+			) ) {
+				const source = sources[ boundAttribute.source ];
+				if (
+					! source?.getValue ||
+					! canBindAttribute( name, attributeName )
+				) {
+					continue;
 				}
 
-				const blockBindingsSources = unlock(
-					select( blocksStore )
-				).getAllBlockBindingsSources();
+				const args = {
+					registry,
+					context,
+					clientId,
+					attributeName,
+					args: boundAttribute.args,
+				};
 
-				return Object.entries( bindings ).reduce(
-					( accu, [ attrName, boundAttribute ] ) => {
-						// Bail early if the block doesn't have a valid source handler.
-						const source =
-							blockBindingsSources[ boundAttribute.source ];
+				attributes[ attributeName ] = source.getValue( args );
 
-						if ( ! source?.getValue ) {
-							return accu;
-						}
+				if ( attributes[ attributeName ] === undefined ) {
+					if ( attributeName === 'url' ) {
+						attributes[ attributeName ] = null;
+					} else {
+						attributes[ attributeName ] =
+							source.getPlaceholder?.( args );
+					}
+				}
+			}
 
-						const args = {
-							registry,
-							context: props.context,
-							clientId: props.clientId,
-							attributeName: attrName,
-							args: boundAttribute.args,
-						};
-
-						accu[ attrName ] = source.getValue( args );
-
-						if ( accu[ attrName ] === undefined ) {
-							if ( attrName === 'url' ) {
-								accu[ attrName ] = null;
-							} else {
-								accu[ attrName ] =
-									source.getPlaceholder?.( args );
-							}
-						}
-
-						return accu;
-					},
-					{}
-				);
-			},
-			[
-				props.attributes.metadata?.bindings,
-				props.name,
-				props.context,
-				props.clientId,
-				registry,
-			]
-		);
+			return attributes;
+		}, [ bindings, name, clientId, context, registry, sources ] );
 
 		const { setAttributes } = props;
 
 		const _setAttributes = useCallback(
 			( nextAttributes ) => {
-				const keptAttributes = { ...nextAttributes };
 				registry.batch( () => {
-					const bindings = Object.fromEntries(
-						Object.entries(
-							props.attributes.metadata?.bindings || {}
-						).filter( ( [ attrName ] ) =>
-							canBindAttribute( props.name, attrName )
-						)
-					);
-
-					if ( ! Object.keys( bindings ).length > 0 ) {
+					if ( ! bindings ) {
 						return setAttributes( nextAttributes );
 					}
 
-					const blockBindingsSources = unlock(
-						registry.select( blocksStore )
-					).getAllBlockBindingsSources();
+					const keptAttributes = { ...nextAttributes };
 
-					for ( const [ attributeKey, value ] of Object.entries(
-						nextAttributes
-					) ) {
-						if ( bindings[ attributeKey ] ) {
-							const source =
-								blockBindingsSources[
-									bindings[ attributeKey ].source
-								];
-							if ( source?.setValue ) {
-								source.setValue( {
-									registry,
-									context: props.context,
-									clientId: props.clientId,
-									attributeName: attributeKey,
-									value,
-									args: bindings[ attributeKey ].args,
-								} );
-								delete keptAttributes[ attributeKey ];
-							}
+					for ( const [
+						attributeName,
+						boundAttribute,
+					] of Object.entries( bindings ) ) {
+						const source = sources[ boundAttribute.source ];
+						if (
+							! source?.setValue ||
+							! canBindAttribute( name, attributeName )
+						) {
+							continue;
 						}
+
+						source.setValue( {
+							registry,
+							context,
+							clientId,
+							attributeName,
+							args: boundAttribute.args,
+							value: nextAttributes[ attributeName ],
+						} );
+						delete keptAttributes[ attributeName ];
 					}
 
-					setAttributes( keptAttributes );
+					if ( Object.keys( keptAttributes ).length ) {
+						setAttributes( keptAttributes );
+					}
 				} );
 			},
 			[
 				registry,
-				props.attributes.metadata?.bindings,
-				props.name,
-				props.context,
-				props.clientId,
+				bindings,
+				name,
+				clientId,
+				context,
 				setAttributes,
+				sources,
 			]
 		);
 
