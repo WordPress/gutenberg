@@ -1,15 +1,12 @@
 $vertical-tabs-width: 160px;
 
 .preferences__tabs-tablist {
-	position: absolute !important;
+	position: absolute;
 	top: $header-height + $grid-unit-30;
 	// Aligns button text instead of button box.
 	left: $grid-unit-20;
 	width: $vertical-tabs-width;
 
-	&::after {
-		content: none !important;
-	}
 }
 
 .preferences__tabs-tab {
@@ -20,6 +17,10 @@ $vertical-tabs-width: 160px;
 		background: $gray-100;
 		box-shadow: none;
 		font-weight: 500;
+	}
+
+	&[aria-selected="true"]::after {
+		content: none;
 	}
 
 	&[role="tab"]:focus:not(:disabled) {
