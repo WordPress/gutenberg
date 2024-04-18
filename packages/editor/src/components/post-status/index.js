@@ -25,6 +25,12 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { Icon, chevronDownSmall } from '@wordpress/icons';
 
@@ -123,6 +129,13 @@ const STATUS_OPTIONS = [
 	},
 ];
 
+const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+];
+
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
 		( select ) => {
@@ -166,6 +179,18 @@ export default function PostStatus() {
 		[ popoverAnchor ]
 	);
 
+	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+		return null;
+	}
+
+	if ( ! canEdit ) {
+		return (
+			<div className="editor-post-status">
+				<PostStatusLabel />
+			</div>
+		);
+	}
+
 	const updatePost = ( {
 		status: newStatus = status,
 		password: newPassword = password,
@@ -205,14 +230,6 @@ export default function PostStatus() {
 			password: newPassword,
 		} );
 	};
-
-	if ( ! canEdit ) {
-		return (
-			<div className="editor-post-status">
-				<PostStatusLabel />
-			</div>
-		);
-	}
 
 	return (
 		<Dropdown
