@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControlV2 from '..';
 
 const meta: Meta< typeof CustomSelectControlV2 > = {
-	title: 'Components (Experimental)/CustomSelectControl v2/Default',
+	title: 'Components/CustomSelectControl v2/Default',
 	component: CustomSelectControlV2,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170

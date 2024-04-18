@@ -203,6 +203,8 @@ export default function FontAppearanceControl( props ) {
 		);
 	};
 
+	console.debug('selectOptions: ', selectOptions );
+
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
@@ -212,8 +214,11 @@ export default function FontAppearanceControl( props ) {
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
 				value={ currentSelection }
-				onChange={ ( { selectedItem } ) =>
-					onChange( selectedItem.style )
+				onChange={ ( { selectedItem } ) => {
+						console.debug( selectedItem );
+						// @todo style is missing from the object
+						onChange( selectedItem.style );
+					}
 				}
 			/>
 		)
