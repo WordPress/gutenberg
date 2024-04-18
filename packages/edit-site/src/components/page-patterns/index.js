@@ -70,9 +70,7 @@ import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates-template-parts/hooks';
 
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -154,7 +152,6 @@ function Preview( { item, categoryId, viewType } ) {
 		ariaDescriptions.push( item.description );
 	}
 
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
@@ -166,7 +163,6 @@ function Preview( { item, categoryId, viewType } ) {
 	return (
 		<div
 			className={ `page-patterns-preview-field is-viewtype-${ viewType }` }
-			style={ { backgroundColor } }
 		>
 			<PreviewWrapper
 				item={ item }
