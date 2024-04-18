@@ -21,7 +21,7 @@ const config = {
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenTemplatesBrowse( { postType } ) {
+export default function SidebarNavigationScreenTemplatesBrowse() {
 	const {
 		params: { activeView = 'all' },
 	} = useLocation();
@@ -34,7 +34,6 @@ export default function SidebarNavigationScreenTemplatesBrowse( { postType } ) {
 			content={
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }
-					postType={ postType }
 					title={ config.contentTitle }
 				/>
 			}

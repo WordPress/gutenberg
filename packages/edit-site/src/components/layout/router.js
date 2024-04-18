@@ -104,9 +104,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
-				),
+				sidebar: <SidebarNavigationScreenTemplatesBrowse />,
 				content: <PageTemplates />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />

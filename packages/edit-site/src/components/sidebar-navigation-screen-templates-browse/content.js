@@ -11,6 +11,7 @@ import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import DataViewItem from '../sidebar-dataviews/dataview-item';
 import { useAddedBy } from '../page-templates/hooks';
 import { layout } from '@wordpress/icons';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_ARRAY = [];
 
@@ -30,10 +31,9 @@ function TemplateDataviewItem( { template, isActive } ) {
 
 export default function DataviewsTemplatesSidebarContent( {
 	activeView,
-	postType,
 	title,
 } ) {
-	const { records } = useEntityRecords( 'postType', postType, {
+	const { records } = useEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 		per_page: -1,
 	} );
 	const firstItemPerAuthorText = useMemo( () => {
