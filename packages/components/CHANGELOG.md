@@ -29,6 +29,7 @@
 -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
 -   Deprecate `reduceMotion` util ([#60839](https://github.com/WordPress/gutenberg/pull/60839)).
 -   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
+-   Removed dependency on `valtio`, replaced its usage in `SlotFill` with a custom object [#60xxx](https://github.com/WordPress/gutenberg/pull/60xxx)).
 
 ## 27.3.0 (2024-04-03)
 
