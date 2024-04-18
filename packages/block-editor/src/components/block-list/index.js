@@ -55,15 +55,14 @@ function Root( { className, ...settings } ) {
 		const {
 			getSettings,
 			__unstableGetEditorMode,
-			__unstableGetTemporarilyEditingAsBlocks,
-		} = select( blockEditorStore );
+			getTemporarilyEditingAsBlocks,
+		} = unlock( select( blockEditorStore ) );
 		const { outlineMode, focusMode } = getSettings();
 		return {
 			isOutlineMode: outlineMode,
 			isFocusMode: focusMode,
 			editorMode: __unstableGetEditorMode(),
-			temporarilyEditingAsBlocks:
-				__unstableGetTemporarilyEditingAsBlocks(),
+			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 		};
 	}, [] );
 	const registry = useRegistry();

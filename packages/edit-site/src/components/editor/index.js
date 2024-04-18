@@ -140,9 +140,7 @@ export default function Editor( { isLoading, onClick } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -297,7 +295,7 @@ export default function Editor( { isLoading, onClick } ) {
 						sidebar={
 							isEditMode &&
 							! isDistractionFree && (
-								<ComplementaryArea.Slot scope="core/edit-site" />
+								<ComplementaryArea.Slot scope="core" />
 							)
 						}
 						footer={

@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	PluginPostStatusInfo,
 	PostAuthorPanel,
 	PostSchedulePanel,
 	PostSyncStatus,
@@ -25,7 +26,6 @@ import PostTrash from '../post-trash';
 import PostSticky from '../post-sticky';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
-import PluginPostStatusInfo from '../plugin-post-status-info';
 import { unlock } from '../../../lock-unlock';
 
 const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
