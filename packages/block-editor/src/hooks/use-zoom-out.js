@@ -33,7 +33,7 @@ export function useZoomOut( zoomOut = true ) {
 				__unstableSetEditorMode( originalEditingMode.current );
 			}
 		};
-	}, [] );
+	}, [ __unstableGetEditorMode, __unstableSetEditorMode, mode ] );
 
 	// The effect opens the zoom-out view if we want it open and it's not currently in zoom-out mode.
 	useEffect( () => {
