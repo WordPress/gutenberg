@@ -756,31 +756,20 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Higher-order reducer which adds the selected pattern category to the outer block.
+ * Adds the selected pattern category to the outer block.
  *
- * @param {Function} reducer Original reducer function.
+ * @param {Object} action        Dispatched action.
+ * @param {Object} action.meta   The meta object from the action.
+ * @param {Array}  action.blocks The array of blocks to insert.
  *
- * @return {Function} Enhanced reducer function.
+ * @return {Array} The blocks array.
  */
-const withPatternCategory = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'INSERT_BLOCKS' ) {
-		const { blocks, meta } = action;
-		if ( meta?.category && blocks.length === 1 ) {
-			const newState = { ...state };
-			newState.attributes = new Map( state.attributes );
-			newState.attributes.set( blocks[ 0 ].clientId, {
-				...blocks[ 0 ].attributes,
-				metadata: {
-					...( blocks[ 0 ].attributes.metadata || {} ),
-					categories: [ meta.category.name ],
-				},
-			} );
-			return reducer( newState, action );
-		}
+function addSelectedPatternCategoryToOuterBlock( { meta, blocks } ) {
+	if ( meta?.category && blocks.length === 1 ) {
+		blocks[ 0 ].attributes.metadata.categories = [ meta.category.name ];
 	}
-
-	return reducer( state, action );
-};
+	return blocks;
+}
 
 /**
  * Reducer returning the blocks state.
@@ -799,8 +788,7 @@ export const blocks = pipe(
 	withBlockReset,
 	withPersistentBlockChange,
 	withIgnoredBlockChange,
-	withResetControlledBlocks,
-	withPatternCategory
+	withResetControlledBlocks
 )( {
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
@@ -875,7 +863,12 @@ export const blocks = pipe(
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
 				const newState = new Map( state );
-				getFlattenedBlockAttributes( action.blocks ).forEach(
+
+				// Adds the selected pattern category to the outer block.
+				const newBlocks =
+					addSelectedPatternCategoryToOuterBlock( action );
+
+				getFlattenedBlockAttributes( newBlocks ).forEach(
 					( [ key, value ] ) => {
 						newState.set( key, value );
 					}
