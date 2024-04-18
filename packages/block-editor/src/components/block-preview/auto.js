@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useResizeObserver, useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useSelect, AsyncModeProvider } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import { Disabled } from '@wordpress/components';
 
@@ -111,7 +111,9 @@ function ScaledBlockPreview( {
 			>
 				<EditorStyles styles={ editorStyles } />
 				{ contentResizeListener }
-				<MemoizedBlockList renderAppender={ false } />
+				<AsyncModeProvider value overrideChildren>
+					<MemoizedBlockList renderAppender={ false } />
+				</AsyncModeProvider>
 			</Iframe>
 		</Disabled>
 	);

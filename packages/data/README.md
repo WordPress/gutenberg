@@ -311,11 +311,14 @@ It is possible to nest multiple levels of AsyncModeProvider to fine-tune the ren
 
 _Parameters_
 
+-   _props_ `Object`: The component props.
 -   _props.value_ `boolean`: Enable Async Mode.
+-   _props.overrideChildren_ `boolean`: Forces the async mode value to all children AsyncModeProviders.
+-   _props.children_ `ReactNode`: The children to be rendered.
 
 _Returns_
 
--   `Component`: The component to be rendered.
+-   `ReactNode`: The component to be rendered.
 
 ### combineReducers
 

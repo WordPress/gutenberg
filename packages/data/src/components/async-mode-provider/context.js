@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createContext } from '@wordpress/element';
+import { createContext, useContext, useMemo } from '@wordpress/element';
 
-export const Context = createContext( false );
+/** @typedef {import('react').ReactNode} ReactNode */
 
-const { Consumer, Provider } = Context;
-
-export const AsyncModeConsumer = Consumer;
+export const Context = createContext( {
+	value: false,
+	overrideChildren: false,
+} );
 
 /**
  * Context Provider Component used to switch the data module component rerendering
@@ -41,7 +42,28 @@ export const AsyncModeConsumer = Consumer;
  * the rerendering is delayed until the browser becomes IDLE.
  * It is possible to nest multiple levels of AsyncModeProvider to fine-tune the rendering behavior.
  *
- * @param {boolean} props.value Enable Async Mode.
- * @return {Component} The component to be rendered.
+ * @param {Object}    props                  The component props.
+ * @param {boolean}   props.value            Enable Async Mode.
+ * @param {boolean}   props.overrideChildren Forces the async mode value to all children AsyncModeProviders.
+ * @param {ReactNode} props.children         The children to be rendered.
+ * @return {ReactNode} The component to be rendered.
  */
-export default Provider;
+function AsyncModeProvider( { value, children, overrideChildren = false } ) {
+	const { value: parentValue } = useContext( Context );
+	const currentValue = useMemo(
+		() => ( {
+			value,
+			overrideChildren,
+		} ),
+		[ value, overrideChildren ]
+	);
+	const appliedValue = parentValue.overrideChildren
+		? parentValue
+		: currentValue;
+
+	return (
+		<Context.Provider value={ appliedValue }>{ children }</Context.Provider>
+	);
+}
+
+export default AsyncModeProvider;
