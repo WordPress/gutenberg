@@ -151,6 +151,10 @@ export default function FontAppearanceControl( props ) {
 				key: value,
 				name,
 				style: { fontStyle: undefined, fontWeight: value },
+				className: 'yay-custom-class-name-yolo',
+				arbitrary: 'property',
+				foo: 'bar',
+				bar: 'foooo',
 			} );
 		} );
 		return combinedOptions;
@@ -212,9 +216,9 @@ export default function FontAppearanceControl( props ) {
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
 				value={ currentSelection }
-				onChange={ ( { selectedItem } ) =>
-					onChange( selectedItem.style )
-				}
+				onChange={ ( { selectedItem } ) => {
+					onChange( selectedItem.style );
+				} }
 			/>
 		)
 	);
