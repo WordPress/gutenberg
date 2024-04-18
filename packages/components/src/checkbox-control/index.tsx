@@ -11,12 +11,12 @@ import { useState } from '@wordpress/element';
 import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
-import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { HStack } from '../h-stack';
 import type { CheckboxControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
