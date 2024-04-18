@@ -22,6 +22,7 @@ import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 } from '../../utils/constants';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
@@ -43,10 +44,10 @@ function CategoriesGroup( {
 					.reduce( ( acc, val ) => acc + val, 0 ) }
 				icon={ getTemplatePartIcon() } /* no name, so it provides the fallback icon */
 				label={ __( 'All template parts' ) }
-				id={ 'all-parts' }
+				id={ TEMPLATE_PART_ALL_AREAS_CATEGORY }
 				type={ TEMPLATE_PART_POST_TYPE }
 				isActive={
-					currentCategory === 'all-parts' &&
+					currentCategory === TEMPLATE_PART_ALL_AREAS_CATEGORY &&
 					currentType === TEMPLATE_PART_POST_TYPE
 				}
 			/>
@@ -103,9 +104,19 @@ function CategoriesGroup( {
 
 const EMPTY_ARRAY = [];
 export default function SidebarNavigationScreenPatterns() {
-	const { categoryType, categoryId } = getQueryArgs( window.location.href );
-	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = categoryType || PATTERN_TYPES.theme;
+	const { categoryType, categoryId, path } = getQueryArgs(
+		window.location.href
+	);
+	const currentCategory =
+		categoryId ||
+		( path === '/wp_template_part/all'
+			? TEMPLATE_PART_ALL_AREAS_CATEGORY
+			: PATTERN_DEFAULT_CATEGORY );
+	const currentType =
+		categoryType ||
+		( path === '/wp_template_part/all'
+			? TEMPLATE_PART_POST_TYPE
+			: PATTERN_TYPES.theme );
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
