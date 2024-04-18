@@ -429,6 +429,8 @@ export function getExpandedBlock( state ) {
  *
  * @param {Object} state    Global application state.
  * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
  */
 export const getContentLockingParent = createSelector(
 	( state, clientId ) => {
