@@ -798,6 +798,22 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
+### TextAlignControl
+
+Control to facilitate text alignment selections.
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.className_ `string`: Class name to add to the control.
+-   _props.value_ `string`: Currently selected text align.
+-   _props.onChange_ `Function`: Handles change in text alignment selection.
+-   _props.controls_ `Array`: Array of text align controls to display.
+
+_Returns_
+
+-   `Element`: Text align control.
+
 ### ToolSelector
 
 Undocumented declaration.
