@@ -93,6 +93,16 @@ function EditorKeyboardShortcutsRegister() {
 				character: ',',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/editor/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;

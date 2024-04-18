@@ -99,16 +99,6 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/keyboard-shortcuts',
-			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'h',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-post/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),

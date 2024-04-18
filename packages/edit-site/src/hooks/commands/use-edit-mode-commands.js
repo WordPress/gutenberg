@@ -13,7 +13,6 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboard,
 	symbol,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
@@ -31,7 +30,6 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
@@ -230,15 +228,6 @@ function useEditUICommands() {
 		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
-		icon: keyboard,
-		callback: () => {
-			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
 

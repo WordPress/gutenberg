@@ -7,7 +7,6 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboard,
 	fullscreen,
 	formatListBullets,
 } from '@wordpress/icons';
@@ -22,7 +21,6 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -112,15 +110,6 @@ export default function useCommonCommands() {
 		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
-		},
-	} );
-
-	useCommand( {
-		name: 'core/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
-		icon: keyboard,
-		callback: () => {
-			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
 
