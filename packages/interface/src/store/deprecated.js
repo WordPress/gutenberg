@@ -15,3 +15,23 @@ export function normalizeComplementaryAreaScope( scope ) {
 
 	return scope;
 }
+
+export function normalizeComplementaryAreaName( scope, name ) {
+	if ( scope === 'core' && name === 'edit-site/template' ) {
+		deprecated( `edit-site/template sidebar`, {
+			alternative: 'edit-post/document.',
+			version: '6.6',
+		} );
+		return 'edit-post/document';
+	}
+
+	if ( scope === 'core' && name === 'edit-site/block-inspector' ) {
+		deprecated( `edit-site/template sidebar`, {
+			alternative: 'edit-post/document.',
+			version: '6.6',
+		} );
+		return 'edit-post/block';
+	}
+
+	return name;
+}
