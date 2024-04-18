@@ -1,16 +1,12 @@
 # BoxControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 BoxControl components let users set values for Top, Right, Bottom, and Left. This can be used as an input control for values like `padding` or `margin`.
 
 ## Usage
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import { BoxControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ values, setValues ] = useState( {
