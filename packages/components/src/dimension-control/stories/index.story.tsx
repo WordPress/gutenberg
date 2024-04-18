@@ -15,7 +15,7 @@ import { desktop, tablet, mobile } from '@wordpress/icons';
 
 export default {
 	component: DimensionControl,
-	title: 'Components (Experimental)/DimensionControl',
+	title: 'Components/DimensionControl',
 	argTypes: {
 		onChange: { action: 'onChange' },
 		value: { control: { type: null } },

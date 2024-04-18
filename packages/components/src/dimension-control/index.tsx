@@ -23,7 +23,7 @@ import type { SelectControlSingleSelectionProps } from '../select-control/types'
  * This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
  *
  * ```jsx
- * import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
+ * import { DimensionControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
  * export default function MyCustomDimensionControl() {
