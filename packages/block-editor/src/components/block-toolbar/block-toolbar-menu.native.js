@@ -446,8 +446,7 @@ export default compose(
 					moveBlocksDown( [ clientId ], rootClientId, ...args ),
 				onMoveUp: ( ...args ) =>
 					moveBlocksUp( [ clientId ], rootClientId, ...args ),
-				openGeneralSidebar: () =>
-					openGeneralSidebar( 'edit-post/block' ),
+				openGeneralSidebar: () => openGeneralSidebar( 'editor/block' ),
 				pasteBlock: ( clipboardBlock ) => {
 					const canReplaceBlock = isUnmodifiedDefaultBlock(
 						getBlock( getBlockSelectionEnd() )

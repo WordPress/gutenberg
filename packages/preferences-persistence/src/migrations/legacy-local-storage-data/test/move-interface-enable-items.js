@@ -10,7 +10,7 @@ describe( 'moveInterfaceEnableItems', () => {
 				enableItems: {
 					singleEnableItems: {
 						complementaryArea: {
-							'core/edit-post': 'edit-post/document',
+							'core/edit-post': 'editor/document',
 							'core/edit-site': 'edit-site/global-styles',
 						},
 					},
@@ -34,7 +34,7 @@ describe( 'moveInterfaceEnableItems', () => {
 			'core/preferences': {
 				preferences: {
 					'core/edit-post': {
-						complementaryArea: 'edit-post/document',
+						complementaryArea: 'editor/document',
 						pinnedItems: {
 							'plugin-1': true,
 						},
@@ -59,7 +59,7 @@ describe( 'moveInterfaceEnableItems', () => {
 				enableItems: {
 					singleEnableItems: {
 						complementaryArea: {
-							'core/edit-post': 'edit-post/document',
+							'core/edit-post': 'editor/document',
 							'core/edit-site': 'edit-site/global-styles',
 						},
 					},
@@ -96,7 +96,7 @@ describe( 'moveInterfaceEnableItems', () => {
 					'core/edit-post': {
 						preferenceA: 1,
 						preferenceB: 2,
-						complementaryArea: 'edit-post/document',
+						complementaryArea: 'editor/document',
 						pinnedItems: {
 							'plugin-1': true,
 						},

@@ -17,17 +17,11 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { isEditorSidebarOpened } = useSelect( editPostStore );
-	const { openGeneralSidebar, closeGeneralSidebar, toggleFeature } =
-		useDispatch( editPostStore );
+	const { toggleFeature } = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const {
-		getBlockName,
-		getSelectedBlockClientId,
-		getBlockAttributes,
-		getBlockSelectionStart,
-	} = useSelect( blockEditorStore );
+	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( blockEditorStore );
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();
@@ -65,16 +59,6 @@ function KeyboardShortcuts() {
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'f',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-post/toggle-sidebar',
-			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: ',',
 			},
 		} );
 
@@ -149,21 +133,6 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
-	} );
-
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
-
-		if ( isEditorSidebarOpened() ) {
-			closeGeneralSidebar();
-		} else {
-			const sidebarToOpen = getBlockSelectionStart()
-				? 'edit-post/block'
-				: 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
-		}
 	} );
 
 	useShortcut( 'core/edit-post/transform-heading-to-paragraph', ( event ) =>

@@ -124,7 +124,7 @@ describe( 'listener hook tests', () => {
 
 			expect(
 				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/block' );
+			).toHaveBeenCalledWith( 'editor/block' );
 		} );
 		it( 'opens document sidebar if block is not selected', () => {
 			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
@@ -140,7 +140,7 @@ describe( 'listener hook tests', () => {
 
 			expect(
 				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/document' );
+			).toHaveBeenCalledWith( 'editor/document' );
 		} );
 		it( 'does not open block sidebar if block is selected and distraction free mode is on', () => {
 			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );

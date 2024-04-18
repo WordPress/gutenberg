@@ -40,9 +40,9 @@ export const useBlockSelectionListener = () => {
 			return;
 		}
 		if ( hasBlockSelection ) {
-			openGeneralSidebar( 'edit-post/block' );
+			openGeneralSidebar( 'editor/block' );
 		} else {
-			openGeneralSidebar( 'edit-post/document' );
+			openGeneralSidebar( 'editor/document' );
 		}
 	}, [
 		hasBlockSelection,

@@ -21,7 +21,6 @@ import GlobalStylesSidebar from './global-styles-sidebar';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -86,13 +85,10 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 				isActiveByDefault
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabPanel
-						tabId={ SIDEBAR_TEMPLATE }
-						focusable={ false }
-					>
+					<Tabs.TabPanel tabId="editor/document" focusable={ false }>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 					</Tabs.TabPanel>
-					<Tabs.TabPanel tabId={ SIDEBAR_BLOCK } focusable={ false }>
+					<Tabs.TabPanel tabId="editor/block" focusable={ false }>
 						<InspectorSlot bubblesVirtually />
 					</Tabs.TabPanel>
 				</Tabs.Context.Provider>
@@ -114,14 +110,14 @@ export function SidebarComplementaryAreaFills() {
 			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		const _isEditorSidebarOpened = [
-			SIDEBAR_BLOCK,
-			SIDEBAR_TEMPLATE,
+			'editor/block',
+			'editor/document',
 		].includes( sidebar );
 		let _tabName = sidebar;
 		if ( ! _isEditorSidebarOpened ) {
 			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? SIDEBAR_BLOCK
-				: SIDEBAR_TEMPLATE;
+				? 'editor/block'
+				: 'editor/document';
 		}
 
 		return {
@@ -144,10 +140,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( 'core', SIDEBAR_BLOCK );
+				enableComplementaryArea( 'core', 'editor/block' );
 			}
 		} else {
-			enableComplementaryArea( 'core', SIDEBAR_TEMPLATE );
+			enableComplementaryArea( 'core', 'editor/document' );
 		}
 	}, [
 		hasBlockSelection,

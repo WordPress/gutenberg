@@ -42,7 +42,7 @@ export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar =
 			select( interfaceStore ).getActiveComplementaryArea( 'core' );
-		return [ 'edit-post/document', 'edit-post/block' ].includes(
+		return [ 'editor/document', 'editor/block' ].includes(
 			activeGeneralSidebar
 		);
 	}
@@ -61,7 +61,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
 			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return (
 			!! activeGeneralSidebar &&
-			! [ 'edit-post/document', 'edit-post/block' ].includes(
+			! [ 'editor/document', 'editor/block' ].includes(
 				activeGeneralSidebar
 			)
 		);
@@ -75,7 +75,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
  *
  * Examples:
  *
- *  - `edit-post/document`
+ *  - `editor/document`
  *  - `my-plugin/insert-image-sidebar`
  *
  * @param {Object} state Global application state.

@@ -49,8 +49,8 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	native: false,
 } );
 export const sidebars = {
-	document: 'edit-post/document',
-	block: 'edit-post/block',
+	document: 'editor/document',
+	block: 'editor/block',
 };
 
 function onActionPerformed( actionId, items ) {
@@ -152,7 +152,7 @@ const SettingsSidebar = () => {
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
 			const sidebar =
 				select( interfaceStore ).getActiveComplementaryArea( 'core' );

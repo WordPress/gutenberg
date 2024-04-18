@@ -594,7 +594,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 		return {
-			openSidebar: () => openGeneralSidebar( 'edit-post/block' ),
+			openSidebar: () => openGeneralSidebar( 'editor/block' ),
 		};
 	} ),
 	withPreferredColorScheme,

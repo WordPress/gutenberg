@@ -7,13 +7,13 @@ describe( 'convertComplementaryAreas', () => {
 	it( 'converts the `complementaryArea` property in each scope to an `isComplementaryAreaVisible` boolean', () => {
 		const input = {
 			'core/customize-widgets': {
-				complementaryArea: 'edit-post/block',
+				complementaryArea: 'editor/block',
 			},
 			'core/edit-site': {
-				complementaryArea: 'edit-site/template',
+				complementaryArea: 'editor/document',
 			},
 			'core/edit-post': {
-				complementaryArea: 'edit-post/block',
+				complementaryArea: 'editor/block',
 			},
 			'core/edit-widgets': {},
 		};

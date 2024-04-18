@@ -8,7 +8,7 @@ const legacyData = {
 		enableItems: {
 			singleEnableItems: {
 				complementaryArea: {
-					'core/edit-post': 'edit-post/document',
+					'core/edit-post': 'editor/document',
 					'core/edit-site': 'edit-site/global-styles',
 					'core/edit-widgets': 'edit-widgets/block-areas',
 				},
@@ -115,7 +115,7 @@ const alreadyConvertedData = {
 				editorMode: 'visual',
 				inactivePanels: [],
 				openPanels: [ 'post-status' ],
-				complementaryArea: 'edit-post/block',
+				complementaryArea: 'editor/block',
 				pinnedItems: {
 					'my-sidebar-plugin/title-sidebar': false,
 				},
@@ -140,7 +140,7 @@ describe( 'convertLegacyData', () => {
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-post": {
-		    "complementaryArea": "edit-post/document",
+		    "complementaryArea": "editor/document",
 		    "editorMode": "text",
 		    "fixedToolbar": true,
 		    "hiddenBlockTypes": [
@@ -184,7 +184,7 @@ describe( 'convertLegacyData', () => {
 			.toMatchInlineSnapshot( `
 		{
 		  "core/edit-post": {
-		    "complementaryArea": "edit-post/block",
+		    "complementaryArea": "editor/block",
 		    "editorMode": "visual",
 		    "fixedToolbar": true,
 		    "fullscreenMode": false,

@@ -203,10 +203,10 @@ function useEditUICommands() {
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'edit-site/template' ) {
+			if ( activeSidebar === 'editor/document' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'edit-site/template' );
+				openGeneralSidebar( 'editor/document' );
 			}
 		},
 	} );
@@ -217,10 +217,10 @@ function useEditUICommands() {
 		icon: blockDefault,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'edit-site/block-inspector' ) {
+			if ( activeSidebar === 'edit-site/block' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'edit-site/block-inspector' );
+				openGeneralSidebar( 'edit-site/block' );
 			}
 		},
 	} );

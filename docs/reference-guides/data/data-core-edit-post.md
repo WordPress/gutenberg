@@ -24,7 +24,7 @@ Returns the current active general sidebar name, or null if there is no general 
 
 Examples:
 
--   `edit-post/document`
+-   `editor/document`
 -   `my-plugin/insert-image-sidebar`
 
 _Parameters_
