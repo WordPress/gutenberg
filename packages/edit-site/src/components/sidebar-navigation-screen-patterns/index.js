@@ -101,6 +101,7 @@ function CategoriesGroup( {
 	);
 }
 
+const EMPTY_ARRAY = [];
 export default function SidebarNavigationScreenPatterns() {
 	const { categoryType, categoryId } = getQueryArgs( window.location.href );
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
@@ -142,7 +143,11 @@ export default function SidebarNavigationScreenPatterns() {
 							) }
 							<CategoriesGroup
 								templatePartAreas={ templatePartAreas }
-								patternCategories={ patternCategories }
+								patternCategories={
+									isBlockBasedTheme
+										? patternCategories
+										: EMPTY_ARRAY
+								}
 								currentCategory={ currentCategory }
 								currentType={ currentType }
 							/>
