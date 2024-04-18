@@ -9,16 +9,15 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
-import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
@@ -27,17 +26,13 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
-
+const { interfaceStore } = unlock( editorPrivateApis );
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
 export const SidebarInspectorFill = InspectorFill;
 
-const FillContents = ( {
-	sidebarName,
-	isEditingPage,
-	supportsGlobalStyles,
-} ) => {
+const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 	const tabListRef = useRef( null );
 	// Because `DefaultSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
@@ -56,7 +51,7 @@ const FillContents = ( {
 			// We are purposefully using a custom `data-tab-id` attribute here
 			// because we don't want rely on any assumptions about `Tabs`
 			// component internals.
-			( element ) => element.getAttribute( 'data-tab-id' ) === sidebarName
+			( element ) => element.getAttribute( 'data-tab-id' ) === tabName
 		);
 		const activeElement = selectedTabElement?.ownerDocument.activeElement;
 		const tabsHasFocus = tabsElements.some( ( element ) => {
@@ -69,12 +64,12 @@ const FillContents = ( {
 		) {
 			selectedTabElement?.focus();
 		}
-	}, [ sidebarName ] );
+	}, [ tabName ] );
 
 	return (
 		<>
 			<DefaultSidebar
-				identifier={ sidebarName }
+				identifier={ tabName }
 				title={ __( 'Settings' ) }
 				icon={ isRTL() ? drawerLeft : drawerRight }
 				closeLabel={ __( 'Close Settings' ) }
@@ -88,6 +83,7 @@ const FillContents = ( {
 				// margin to the panel.
 				// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 				className="edit-site-sidebar__panel"
+				isActiveByDefault
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabPanel
@@ -108,31 +104,34 @@ const FillContents = ( {
 
 export function SidebarComplementaryAreaFills() {
 	const {
-		sidebar,
+		tabName,
 		isEditorSidebarOpened,
 		hasBlockSelection,
 		supportsGlobalStyles,
 		isEditingPage,
-		isEditorOpen,
 	} = useSelect( ( select ) => {
-		const _sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+		const sidebar =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
 			SIDEBAR_TEMPLATE,
-		].includes( _sidebar );
-		const { getCanvasMode } = unlock( select( editSiteStore ) );
+		].includes( sidebar );
+		let _tabName = sidebar;
+		if ( ! _isEditorSidebarOpened ) {
+			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
+				? SIDEBAR_BLOCK
+				: SIDEBAR_TEMPLATE;
+		}
 
 		return {
-			sidebar: _sidebar,
+			tabName: _tabName,
 			isEditorSidebarOpened: _isEditorSidebarOpened,
 			hasBlockSelection:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			supportsGlobalStyles:
 				select( coreStore ).getCurrentTheme()?.is_block_theme,
 			isEditingPage: select( editSiteStore ).isPage(),
-			isEditorOpen: getCanvasMode() === 'edit',
 		};
 	}, [] );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -145,10 +144,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+				enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 			}
 		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+			enableComplementaryArea( 'core', SIDEBAR_TEMPLATE );
 		}
 	}, [
 		hasBlockSelection,
@@ -157,11 +156,6 @@ export function SidebarComplementaryAreaFills() {
 		enableComplementaryArea,
 	] );
 
-	let sidebarName = sidebar;
-	if ( ! isEditorSidebarOpened ) {
-		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
-	}
-
 	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
 	// the initial render) or when we don't want a tab displayed (i.e. the
 	// sidebar is closed). These cases should both be covered by the `!!` check
@@ -169,7 +163,7 @@ export function SidebarComplementaryAreaFills() {
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( STORE_NAME, newSelectedTabId );
+				enableComplementaryArea( 'core', newSelectedTabId );
 			}
 		},
 		[ enableComplementaryArea ]
@@ -177,19 +171,12 @@ export function SidebarComplementaryAreaFills() {
 
 	return (
 		<Tabs
-			// Due to how this component is controlled (via a value from the
-			// edit-site store), when the sidebar closes the currently selected
-			// tab can't be found. This causes the component to continuously reset
-			// the selection to `null` in an infinite loop. Proactively setting
-			// the selected tab to `null` avoids that.
-			selectedTabId={
-				isEditorOpen && isEditorSidebarOpened ? sidebarName : null
-			}
+			selectedTabId={ tabName }
 			onSelect={ onTabSelect }
 			selectOnMove={ false }
 		>
 			<FillContents
-				sidebarName={ sidebarName }
+				tabName={ tabName }
 				isEditingPage={ isEditingPage }
 				supportsGlobalStyles={ supportsGlobalStyles }
 			/>

@@ -32,7 +32,7 @@ export default function SingleSelectionCheckbox( {
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
-			label={ selectionLabel }
+			aria-label={ selectionLabel }
 			aria-disabled={ disabled }
 			checked={ isSelected }
 			onChange={ () => {

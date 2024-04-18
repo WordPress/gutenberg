@@ -19,6 +19,9 @@ import type { NavigationGroupProps } from '../types';
 
 let uniqueId = 0;
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export function NavigationGroup( {
 	children,
 	className,

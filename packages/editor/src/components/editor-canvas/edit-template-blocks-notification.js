@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useState, useRef } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 
@@ -38,73 +38,35 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 	}, [] );
 
-	const { getNotices } = useSelect( noticesStore );
-
-	const { createInfoNotice, removeNotice } = useDispatch( noticesStore );
+	const canEditTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
 
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
-	const lastNoticeId = useRef( 0 );
-
 	useEffect( () => {
-		const handleClick = async ( event ) => {
-			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
-				return;
-			}
-
-			const isNoticeAlreadyShowing = getNotices().some(
-				( notice ) => notice.id === lastNoticeId.current
-			);
-			if ( isNoticeAlreadyShowing ) {
-				return;
-			}
-
-			const { notice } = await createInfoNotice(
-				__( 'Edit your template to edit this block.' ),
-				{
-					isDismissible: true,
-					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Edit template' ),
-							onClick: () =>
-								onNavigateToEntityRecord( {
-									postId: templateId,
-									postType: 'wp_template',
-								} ),
-						},
-					],
-				}
-			);
-			lastNoticeId.current = notice.id;
-		};
-
 		const handleDblClick = ( event ) => {
-			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+			if ( ! canEditTemplate ) {
 				return;
 			}
-			if ( lastNoticeId.current ) {
-				removeNotice( lastNoticeId.current );
+
+			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
+				return;
 			}
 			setIsDialogOpen( true );
 		};
 
 		const canvas = contentRef.current;
-		canvas?.addEventListener( 'click', handleClick );
 		canvas?.addEventListener( 'dblclick', handleDblClick );
 		return () => {
-			canvas?.removeEventListener( 'click', handleClick );
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [
-		lastNoticeId,
-		contentRef,
-		getNotices,
-		createInfoNotice,
-		onNavigateToEntityRecord,
-		templateId,
-		removeNotice,
-	] );
+	}, [ contentRef, canEditTemplate ] );
+
+	if ( ! canEditTemplate ) {
+		return null;
+	}
 
 	return (
 		<ConfirmDialog
@@ -119,7 +81,9 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 			} }
 			onCancel={ () => setIsDialogOpen( false ) }
 		>
-			{ __( 'Edit your template to edit this block.' ) }
+			{ __(
+				'You’ve tried to select a block that is part of a template, which may be used on other posts and pages. Would you like to edit the template?.'
+			) }
 		</ConfirmDialog>
 	);
 }

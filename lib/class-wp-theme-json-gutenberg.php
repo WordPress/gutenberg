@@ -244,6 +244,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-left-width'                 => array( 'border', 'left', 'width' ),
 		'border-left-style'                 => array( 'border', 'left', 'style' ),
 		'color'                             => array( 'color', 'text' ),
+		'text-align'                        => array( 'typography', 'textAlign' ),
 		'column-count'                      => array( 'typography', 'textColumns' ),
 		'font-family'                       => array( 'typography', 'fontFamily' ),
 		'font-size'                         => array( 'typography', 'fontSize' ),
@@ -436,6 +437,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
@@ -531,6 +533,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
@@ -695,7 +698,6 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
 		array( 'typography', 'lineHeight' ),
-		array( 'shadow', 'defaultPresets' ),
 	);
 
 	/**
@@ -1615,6 +1617,16 @@ class WP_Theme_JSON_Gutenberg {
 							! empty( $base_style_rule['rules'] )
 						) {
 							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
+								// Skip rules that reference content size or wide size if they are not defined in the theme.json.
+								if (
+									is_string( $css_value ) &&
+									( str_contains( $css_value, '--global--content-size' ) || str_contains( $css_value, '--global--wide-size' ) ) &&
+									! isset( $this->theme_json['settings']['layout']['contentSize'] ) &&
+									! isset( $this->theme_json['settings']['layout']['wideSize'] )
+								) {
+									continue;
+								}
+
 								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
 									$declarations[] = array(
 										'name'  => $css_property,

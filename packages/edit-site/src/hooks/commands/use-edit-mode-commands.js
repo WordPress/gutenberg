@@ -19,8 +19,10 @@ import {
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -36,6 +38,7 @@ import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
+const { interfaceStore } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
@@ -154,9 +157,7 @@ function useManipulateDocumentCommands() {
 						decodeEntities( template.title )
 				  );
 		const path =
-			template.type === TEMPLATE_POST_TYPE
-				? '/wp_template'
-				: '/wp_template_part/all';
+			template.type === TEMPLATE_POST_TYPE ? '/wp_template' : '/patterns';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
@@ -184,9 +185,8 @@ function useEditUICommands() {
 	const { canvasMode, activeSidebar } = useSelect( ( select ) => {
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			activeSidebar:
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );

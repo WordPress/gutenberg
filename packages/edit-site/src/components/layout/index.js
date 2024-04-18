@@ -19,7 +19,6 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -31,14 +30,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
-import Header from '../header-edit-mode';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
 import SiteHub from '../site-hub';
 import ResizableFrame from '../resizable-frame';
@@ -51,12 +49,16 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
+import useMovingAnimation from './animation';
+import SidebarContent from '../sidebar';
+import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { NavigableRegion } = unlock( editorPrivateApis );
 
-const ANIMATION_DURATION = 0.5;
+const ANIMATION_DURATION = 0.3;
 
 export default function Layout() {
 	// This ensures the edited entity id and type are initialized properly.
@@ -114,7 +116,10 @@ export default function Layout() {
 	const isEditorLoading = useIsSiteEditorLoading();
 	const [ isResizableFrameOversized, setIsResizableFrameOversized ] =
 		useState( false );
-	const { areas, widths } = useLayoutAreas();
+	const { key: routeKey, areas, widths } = useLayoutAreas();
+	const animationRef = useMovingAnimation( {
+		triggerAnimationOnChange: canvasMode + '__' + routeKey,
+	} );
 
 	// This determines which animation variant should apply to the header.
 	// There is also a `isDistractionFreeHovering` state that gets priority
@@ -213,40 +218,6 @@ export default function Layout() {
 						isTransparent={ isResizableFrameOversized }
 						className="edit-site-layout__hub"
 					/>
-
-					<AnimatePresence initial={ false }>
-						{ canvasMode === 'edit' && (
-							<NavigableRegion
-								key="header"
-								className="edit-site-layout__header"
-								ariaLabel={ __( 'Editor top bar' ) }
-								as={ motion.div }
-								variants={ {
-									isDistractionFree: { opacity: 0, y: 0 },
-									isDistractionFreeHovering: {
-										opacity: 1,
-										y: 0,
-									},
-									view: { opacity: 1, y: '-100%' },
-									edit: { opacity: 1, y: 0 },
-								} }
-								exit={ {
-									y: '-100%',
-								} }
-								initial={ {
-									opacity: isDistractionFree ? 1 : 0,
-									y: isDistractionFree ? 0 : '-100%',
-								} }
-								transition={ {
-									type: 'tween',
-									duration: disableMotion ? 0 : 0.2,
-									ease: 'easeOut',
-								} }
-							>
-								<Header />
-							</NavigableRegion>
-						) }
-					</AnimatePresence>
 				</motion.div>
 
 				<div className="edit-site-layout__content">
@@ -254,8 +225,7 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					{ ( ! isMobileViewport ||
-						( isMobileViewport && ! areas.mobile ) ) && (
+					{ ( ! isMobileViewport || ! areas.mobile ) && (
 						<NavigableRegion
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
@@ -278,22 +248,18 @@ export default function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<Sidebar />
+										<SidebarContent routeKey={ routeKey }>
+											{ areas.sidebar }
+										</SidebarContent>
+										<SaveHub />
 									</motion.div>
 								) }
 							</AnimatePresence>
 						</NavigableRegion>
 					) }
 
-					<SavePanel />
-
 					{ isMobileViewport && areas.mobile && (
-						<div
-							className="edit-site-layout__mobile"
-							style={ {
-								maxWidth: widths?.content,
-							} }
-						>
+						<div className="edit-site-layout__mobile">
 							{ areas.mobile }
 						</div>
 					) }
@@ -315,22 +281,7 @@ export default function Layout() {
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (
-								<motion.div
-									whileHover={
-										canvasMode === 'view'
-											? {
-													scale: 1.005,
-													transition: {
-														duration: disableMotion
-															? 0
-															: 0.5,
-														ease: 'easeOut',
-													},
-											  }
-											: {}
-									}
-									initial={ false }
-									layout="position"
+								<div
 									className={ classnames(
 										'edit-site-layout__canvas',
 										{
@@ -338,13 +289,7 @@ export default function Layout() {
 												isResizableFrameOversized,
 										}
 									) }
-									transition={ {
-										type: 'tween',
-										duration: disableMotion
-											? 0
-											: ANIMATION_DURATION,
-										ease: 'easeOut',
-									} }
+									ref={ animationRef }
 								>
 									<ErrorBoundary>
 										<ResizableFrame
@@ -373,11 +318,13 @@ export default function Layout() {
 											{ areas.preview }
 										</ResizableFrame>
 									</ErrorBoundary>
-								</motion.div>
+								</div>
 							) }
 						</div>
 					) }
 				</div>
+
+				<SavePanel />
 			</div>
 		</>
 	);

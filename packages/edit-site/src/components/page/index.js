@@ -6,13 +6,18 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { NavigableRegion } from '@wordpress/interface';
-import { EditorSnackbars } from '@wordpress/editor';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import Header from './header';
+import { unlock } from '../../lock-unlock';
+
+const { NavigableRegion } = unlock( editorPrivateApis );
 
 export default function Page( {
 	title,

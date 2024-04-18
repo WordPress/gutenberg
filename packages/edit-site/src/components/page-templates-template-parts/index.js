@@ -23,32 +23,30 @@ import {
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-import {
-	resetTemplateAction,
-	deleteTemplateAction,
-	renameTemplateAction,
-} from './actions';
-import { postRevisionsAction, useEditPostAction } from '../actions';
+
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -64,6 +62,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		columnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -72,7 +71,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -83,7 +82,7 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
+	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
 
@@ -98,11 +97,6 @@ function Title( { item, viewType } ) {
 			canvas: 'edit',
 		},
 	};
-	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
-		linkProps.state = {
-			backPath: '/wp_template_part/all',
-		};
-	}
 	return (
 		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
@@ -138,7 +132,7 @@ function AuthorField( { item, viewType } ) {
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span>{ text }</span>
+			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
 }
@@ -170,7 +164,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button
@@ -183,13 +179,25 @@ function Preview( { item, viewType } ) {
 							( item.type === TEMPLATE_POST_TYPE
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
-						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+						{ ! isEmpty && (
+							<Async>
+								<BlockPreview blocks={ blocks } />
+							</Async>
+						) }
 					</button>
 				) }
 			</div>
 		</ExperimentalBlockEditorProvider>
 	);
 }
+
+const TEMPLATE_ACTIONS = [
+	'edit-post',
+	'reset-template',
+	'rename-template',
+	'view-post-revisions',
+	'delete-template',
+];
 
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
@@ -338,17 +346,21 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const editTemplateAction = useEditPostAction();
-	const actions = useMemo(
-		() => [
-			editTemplateAction,
-			resetTemplateAction,
-			renameTemplateAction,
-			postRevisionsAction,
-			deleteTemplateAction,
-		],
-		[ editTemplateAction ]
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
 	);
+
+	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
 
 	const onChangeView = useCallback(
 		( newView ) => {
@@ -381,11 +393,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			}
 			actions={
 				postType === TEMPLATE_POST_TYPE ? (
-					<AddNewTemplate
-						templateType={ postType }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
+					<AddNewTemplate />
 				) : (
 					<AddNewTemplatePart />
 				)
@@ -400,7 +408,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
 			/>
 		</Page>
 	);
