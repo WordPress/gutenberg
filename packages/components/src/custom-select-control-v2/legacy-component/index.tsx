@@ -30,15 +30,12 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			console.debug('nextValue: ', nextValue);
 			if ( ! onChange ) return;
 
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
 			await Promise.resolve();
 			const state = store.getState();
-
-			console.debug(state);
 
 			const changeObject = {
 				highlightedIndex: state.renderedItems.findIndex(
@@ -48,9 +45,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				isOpen: state.open,
 				selectedItem: {
 					name: nextValue as string,
-					key: nextValue as string, // @todo Why key and name have the same value?
-					// @todo this structure is not compatible with the one from FontAppearanceControl, which
-					// expects an `style` attribute. Probably something to be fixed in FontAppearanceControl? Or am I missing something here?
+					key: nextValue as string,
 				},
 				type: '',
 			};
@@ -134,14 +129,3 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 }
 
 export default CustomSelectControl;
-
-// for backwards compatibility
-export function StableCustomSelectControl( props: LegacyCustomSelectProps ) {
-	console.debug(props);
-	return (
-		<CustomSelectControl
-			{ ...props }
-			__experimentalShowSelectedHint={ false }
-		/>
-	);
-}
