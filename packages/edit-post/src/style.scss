@@ -42,7 +42,7 @@ body.js.block-editor-page {
 // Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
 .edit-post-header,
 .edit-post-text-editor,
-.edit-post-sidebar,
+.editor-sidebar,
 .editor-post-publish-panel {
 	@include reset;
 }

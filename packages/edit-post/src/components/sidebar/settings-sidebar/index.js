@@ -20,6 +20,7 @@ import {
 	store as editorStore,
 	PageAttributesPanel,
 	PluginDocumentSettingPanel,
+	PluginSidebar,
 	PostDiscussionPanel,
 	PostExcerptPanel,
 	PostLastRevisionPanel,
@@ -34,7 +35,6 @@ import { addQueryArgs } from '@wordpress/url';
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
-import PluginSidebarEditPost from '../plugin-sidebar';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
@@ -64,7 +64,7 @@ function onActionPerformed( actionId, items ) {
 
 const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	const tabListRef = useRef( null );
-	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
@@ -97,7 +97,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	}, [ tabName ] );
 
 	return (
-		<PluginSidebarEditPost
+		<PluginSidebar
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
@@ -143,7 +143,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 					<BlockInspector />
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
-		</PluginSidebarEditPost>
+		</PluginSidebar>
 	);
 };
 

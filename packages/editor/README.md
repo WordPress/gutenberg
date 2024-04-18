@@ -686,6 +686,66 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
+### PluginSidebar
+
+Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar. It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`. If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
+
+```js
+wp.data
+	.dispatch( 'core/edit-post' )
+	.openGeneralSidebar( 'plugin-name/sidebar-name' );
+```
+
+_Related_
+
+-   PluginSidebarMoreMenuItem
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var el = React.createElement;
+var PanelBody = wp.components.PanelBody;
+var PluginSidebar = wp.editor.PluginSidebar;
+var moreIcon = React.createElement( 'svg' ); //... svg element.
+
+function MyPluginSidebar() {
+	return el(
+		PluginSidebar,
+		{
+			name: 'my-sidebar',
+			title: 'My sidebar title',
+			icon: moreIcon,
+		},
+		el( PanelBody, {}, __( 'My sidebar content' ) )
+	);
+}
+```
+
+```jsx
+// Using ESNext syntax
+import { __ } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
+import { PluginSidebar } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
+
+const MyPluginSidebar = () => (
+	<PluginSidebar name="my-sidebar" title="My sidebar title" icon={ more }>
+		<PanelBody>{ __( 'My sidebar content' ) }</PanelBody>
+	</PluginSidebar>
+);
+```
+
+_Parameters_
+
+-   _props_ `Object`: Element props.
+-   _props.name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
+-   _props.className_ `[string]`: An optional class name added to the sidebar body.
+-   _props.title_ `string`: Title displayed at the top of the sidebar.
+-   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
+
 ### PostAuthor
 
 Undocumented declaration.

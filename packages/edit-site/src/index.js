@@ -12,6 +12,7 @@ import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
 import {
 	PluginMoreMenuItem,
+	PluginSidebar,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -110,7 +111,7 @@ export function reinitializeEditor() {
 }
 
 export { PluginMoreMenuItem };
-export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
+export { PluginSidebar };
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
