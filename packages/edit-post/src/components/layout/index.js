@@ -41,7 +41,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
@@ -360,7 +359,6 @@ function Layout( { initialPost } ) {
 				} }
 			/>
 			<EditPostPreferencesModal />
-			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
