@@ -134,7 +134,7 @@ const UnconnectedBorderControl = (
  * a "shape" abstraction.
  *
  * ```jsx
- * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
+ * import { BorderControl } from '@wordpress/components';
  * import { __ } from '@wordpress/i18n';
  *
  * const colors = [

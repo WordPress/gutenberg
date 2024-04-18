@@ -1,9 +1,5 @@
 #  BorderControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-<br />
 This component provides control over a border's color, style, and width.
 
 ## Development guidelines
@@ -21,7 +17,7 @@ a "shape" abstraction.
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
+import { BorderControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const colors = [
