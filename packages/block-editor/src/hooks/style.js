@@ -388,7 +388,7 @@ function useBlockProps( { name, style } ) {
 	const { themeDirURI } = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
-			themeDirURI: _settings?.currentTheme?.stylesheetURI,
+			themeDirURI: _settings?.__experimentalCurrentTheme?.stylesheetURI,
 		};
 	} );
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(

@@ -50,7 +50,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
-	'currentTheme',
 	'disableCustomColors',
 	'disableCustomFontSizes',
 	'disableCustomSpacingSizes',
@@ -159,9 +158,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
-				currentTheme: {
-					stylesheetURI: _currentTheme?.stylesheet_uri,
-				},
+				currentTheme: _currentTheme,
 				focusMode: get( 'core', 'focusMode' ),
 				hasFixedToolbar:
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
@@ -268,7 +265,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			allowedBlockTypes,
 			allowRightClickOverrides,
-			currentTheme,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
@@ -298,6 +294,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
+			__experimentalCurrentTheme: {
+				stylesheetURI: currentTheme?.stylesheet_uri,
+			},
 			pageOnFront,
 			pageForPosts,
 			__experimentalPreferPatternsOnRoot: postType === 'wp_template',
@@ -316,6 +315,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [
 		allowedBlockTypes,
 		allowRightClickOverrides,
+		currentTheme,
 		focusMode,
 		forceDisableFocusMode,
 		hasFixedToolbar,
