@@ -83,6 +83,7 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 				// margin to the panel.
 				// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 				className="edit-site-sidebar__panel"
+				isActiveByDefault
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabPanel

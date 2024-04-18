@@ -117,12 +117,18 @@ test.describe( 'Site Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
 			// Go to the test draft.
 			await admin.visitSiteEditor( {
 				postId: draftId,
 				postType: 'page',
 			} );
+
+			// Run the test with the sidebar closed
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Close Settings' } )
+				.click();
 
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
