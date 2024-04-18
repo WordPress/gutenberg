@@ -12,7 +12,13 @@ export {
 } from '@wordpress/primitives';
 
 // Components.
-export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
+export {
+	/**
+	 * @deprecated Import `AlignmentMatrixControl` instead.
+	 */
+	default as __experimentalAlignmentMatrixControl,
+	AlignmentMatrixControl,
+} from './alignment-matrix-control';
 export {
 	default as Animate,
 	getAnimateClassName as __unstableGetAnimateClassName,
