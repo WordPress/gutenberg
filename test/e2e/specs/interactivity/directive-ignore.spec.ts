@@ -18,7 +18,9 @@ test.describe( 'data-wp-ignore', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'ignored directives should be stable', async ( { page } ) => {
+	test( 'ignored directives should never update the DOM', async ( {
+		page,
+	} ) => {
 		const block = page.getByTestId( 'block' );
 
 		const ignoredElement = await block
