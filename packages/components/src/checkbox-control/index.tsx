@@ -11,6 +11,7 @@ import { useState } from '@wordpress/element';
 import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 import { Icon, check, reset } from '@wordpress/icons';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -98,41 +99,43 @@ export function CheckboxControl(
 			help={ help }
 			className={ classnames( 'components-checkbox-control', className ) }
 		>
-			<span className="components-checkbox-control__input-container">
-				<input
-					ref={ ref }
-					id={ id }
-					className="components-checkbox-control__input"
-					type="checkbox"
-					value="1"
-					onChange={ onChangeValue }
-					checked={ checked }
-					aria-describedby={ !! help ? id + '__help' : undefined }
-					{ ...additionalProps }
-				/>
-				{ showIndeterminateIcon ? (
-					<Icon
-						icon={ reset }
-						className="components-checkbox-control__indeterminate"
-						role="presentation"
+			<HStack spacing={ 0 } justify="start" alignment="top">
+				<span className="components-checkbox-control__input-container">
+					<input
+						ref={ ref }
+						id={ id }
+						className="components-checkbox-control__input"
+						type="checkbox"
+						value="1"
+						onChange={ onChangeValue }
+						checked={ checked }
+						aria-describedby={ !! help ? id + '__help' : undefined }
+						{ ...additionalProps }
 					/>
-				) : null }
-				{ showCheckedIcon ? (
-					<Icon
-						icon={ check }
-						className="components-checkbox-control__checked"
-						role="presentation"
-					/>
-				) : null }
-			</span>
-			{ label && (
-				<label
-					className="components-checkbox-control__label"
-					htmlFor={ id }
-				>
-					{ label }
-				</label>
-			) }
+					{ showIndeterminateIcon ? (
+						<Icon
+							icon={ reset }
+							className="components-checkbox-control__indeterminate"
+							role="presentation"
+						/>
+					) : null }
+					{ showCheckedIcon ? (
+						<Icon
+							icon={ check }
+							className="components-checkbox-control__checked"
+							role="presentation"
+						/>
+					) : null }
+				</span>
+				{ label && (
+					<label
+						className="components-checkbox-control__label"
+						htmlFor={ id }
+					>
+						{ label }
+					</label>
+				) }
+			</HStack>
 		</BaseControl>
 	);
 }
