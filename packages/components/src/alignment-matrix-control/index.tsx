@@ -25,7 +25,7 @@ import type { AlignmentMatrixControlProps } from './types';
  * AlignmentMatrixControl components enable adjustments to horizontal and vertical alignments for UI.
  *
  * ```jsx
- * import { __experimentalAlignmentMatrixControl as AlignmentMatrixControl } from '@wordpress/components';
+ * import { AlignmentMatrixControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
  * const Example = () => {
