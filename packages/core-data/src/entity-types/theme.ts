@@ -13,9 +13,17 @@ declare module './base-entity-records' {
 			 */
 			stylesheet: string;
 			/**
+			 * The uri for the theme's stylesheet directory
+			 */
+			stylesheet_uri: string;
+			/**
 			 * The theme's template. If this is a child theme, this refers to the parent theme, otherwise this is the same as the theme's stylesheet.
 			 */
 			template: string;
+			/**
+			 * The uri for the theme's template directory. If this is a child theme, this refers to the parent theme, otherwise this is the same as the theme's stylesheet directory.
+			 */
+			temnplate_uri: string;
 			/**
 			 * The theme author.
 			 */

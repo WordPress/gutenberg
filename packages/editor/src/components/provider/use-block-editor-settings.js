@@ -102,6 +102,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const {
 		allowRightClickOverrides,
 		blockTypes,
+		currentTheme,
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
@@ -123,7 +124,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getEntityRecord,
 				getUserPatternCategories,
 				getBlockPatternCategories,
+				getCurrentTheme,
 			} = select( coreStore );
+			const _currentTheme = getCurrentTheme();
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
@@ -156,6 +159,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					postType,
 					postId
 				)?._links?.hasOwnProperty( 'wp:action-unfiltered-html' ),
+				currentTheme: {
+					stylesheetURI: _currentTheme?.stylesheet_uri,
+				},
 				focusMode: get( 'core', 'focusMode' ),
 				hasFixedToolbar:
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
@@ -262,6 +268,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			allowedBlockTypes,
 			allowRightClickOverrides,
+			currentTheme,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
