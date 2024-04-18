@@ -124,15 +124,25 @@ test.describe( 'Site Editor Performance', () => {
 				postType: 'page',
 			} );
 
-			// Run the test with the sidebar closed
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Settings' } )
-				.click();
-
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
 			await canvas.locator( 'body' ).click();
+
+			// Run the test with the sidebar closed
+			const toggleSidebarButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', {
+					name: 'Settings',
+					disabled: false,
+				} );
+			const isClosed =
+				( await toggleSidebarButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+			if ( ! isClosed ) {
+				await toggleSidebarButton.click();
+			}
+
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 				.click();
