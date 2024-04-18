@@ -42,7 +42,8 @@ import { unlock } from '../../../lock-unlock';
 const { PostCardPanel, PostActions, interfaceStore } =
 	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-const { PatternOverridesPanel } = unlock( editorPrivateApis );
+const { PatternOverridesPanel, useAutoSwitchEditorSidebars } =
+	unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -148,6 +149,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 };
 
 const SettingsSidebar = () => {
+	useAutoSwitchEditorSidebars();
 	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
 		( select ) => {
 			const shortcut = select(

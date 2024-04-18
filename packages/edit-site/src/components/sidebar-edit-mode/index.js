@@ -25,7 +25,8 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
-const { interfaceStore } = unlock( editorPrivateApis );
+const { interfaceStore, useAutoSwitchEditorSidebars } =
+	unlock( editorPrivateApis );
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
@@ -102,58 +103,35 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 };
 
 export function SidebarComplementaryAreaFills() {
-	const {
-		tabName,
-		isEditorSidebarOpened,
-		hasBlockSelection,
-		supportsGlobalStyles,
-		isEditingPage,
-	} = useSelect( ( select ) => {
-		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+	useAutoSwitchEditorSidebars();
+	const { tabName, supportsGlobalStyles, isEditingPage } = useSelect(
+		( select ) => {
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
-		const _isEditorSidebarOpened = [
-			'edit-post/block',
-			'edit-post/document',
-		].includes( sidebar );
-		let _tabName = sidebar;
-		if ( ! _isEditorSidebarOpened ) {
-			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? 'edit-post/block'
-				: 'edit-post/document';
-		}
-
-		return {
-			tabName: _tabName,
-			isEditorSidebarOpened: _isEditorSidebarOpened,
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
-			supportsGlobalStyles:
-				select( coreStore ).getCurrentTheme()?.is_block_theme,
-			isEditingPage: select( editSiteStore ).isPage(),
-		};
-	}, [] );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	useEffect( () => {
-		// Don't automatically switch tab when the sidebar is closed or when we
-		// are focused on page content.
-		if ( ! isEditorSidebarOpened ) {
-			return;
-		}
-		if ( hasBlockSelection ) {
-			if ( ! isEditingPage ) {
-				enableComplementaryArea( 'core', 'edit-post/block' );
+			const _isEditorSidebarOpened = [
+				'edit-post/block',
+				'edit-post/document',
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = !! select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? 'edit-post/block'
+					: 'edit-post/document';
 			}
-		} else {
-			enableComplementaryArea( 'core', 'edit-post/document' );
-		}
-	}, [
-		hasBlockSelection,
-		isEditorSidebarOpened,
-		isEditingPage,
-		enableComplementaryArea,
-	] );
+
+			return {
+				tabName: _tabName,
+				supportsGlobalStyles:
+					select( coreStore ).getCurrentTheme()?.is_block_theme,
+				isEditingPage: select( editSiteStore ).isPage(),
+			};
+		},
+		[]
+	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
 	// the initial render) or when we don't want a tab displayed (i.e. the
