@@ -1,16 +1,12 @@
 # DimensionControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `DimensionControl` is a component designed to provide a UI to control spacing and/or dimensions.
 
 ## Usage
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalDimensionControl as DimensionControl } from '@wordpress/components';
+import { DimensionControl } from '@wordpress/components';
 
 export default function MyCustomDimensionControl() {
 	const [ paddingSize, setPaddingSize ] = useState( '' );
