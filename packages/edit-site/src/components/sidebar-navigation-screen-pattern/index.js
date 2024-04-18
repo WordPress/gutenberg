@@ -30,7 +30,7 @@ export default function SidebarNavigationScreenPattern() {
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
-	const backPath = '/patterns';
+	const backPath = { path: '/patterns' };
 
 	return (
 		<SidebarNavigationScreen
