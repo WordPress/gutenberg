@@ -26,6 +26,7 @@ import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -381,6 +382,7 @@ export const viewPostAction = {
 				TEMPLATE_POST_TYPE,
 				TEMPLATE_PART_POST_TYPE,
 				PATTERN_POST_TYPE,
+				NAVIGATION_POST_TYPE,
 			].includes( post.type ) && post.status !== 'trash'
 		);
 	},

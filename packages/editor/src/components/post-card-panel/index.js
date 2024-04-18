@@ -34,18 +34,18 @@ import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
 import { viewPostAction } from '../post-actions/actions';
 
-function ActionTrigger( { action, item } ) {
-	if ( ! action.isEligible( item ) ) {
+function ViewPostLink( { post } ) {
+	if ( ! viewPostAction.isEligible( post ) ) {
 		return null;
 	}
 	return (
 		<Button
-			label={ action.label }
-			icon={ action.icon }
-			isDestructive={ action.isDestructive }
-			size="compact"
-			onClick={ async () => {
-				await action.callback( [ item ] );
+			label={ viewPostAction.label }
+			icon={ viewPostAction.icon }
+			isDestructive={ viewPostAction.isDestructive }
+			size="small"
+			onClick={ () => {
+				viewPostAction.callback( [ post ] );
 			} }
 		/>
 	);
@@ -116,7 +116,7 @@ export default function PostCardPanel( { className, actions } ) {
 					>
 						{ title ? decodeEntities( title ) : __( 'No Title' ) }
 					</Text>
-					<ActionTrigger item={ post } action={ viewPostAction } />
+					<ViewPostLink post={ post } />
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
