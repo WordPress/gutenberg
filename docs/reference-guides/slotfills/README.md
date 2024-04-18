@@ -10,7 +10,7 @@ In order to use them, we must leverage the [@wordpress/plugins](/packages/plugin
 In order to access the SlotFills, we need to do four things:
 
 1. Import the `registerPlugin` method from `wp.plugins`.
-2. Import the SlotFill we want from `wp.editPost`.
+2. Import the SlotFill we want from `wp.editor`.
 3. Define a method to render our changes. Our changes/additions will be wrapped in the SlotFill component we imported.
 4. Register the plugin.
 
@@ -18,7 +18,7 @@ Here is an example using the `PluginPostStatusInfo` slotFill:
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginPostStatusInfo } from '@wordpress/edit-post';
+import { PluginPostStatusInfo } from '@wordpress/editor';
 
 const PluginPostStatusInfoTest = () => (
 	<PluginPostStatusInfo>
@@ -93,7 +93,7 @@ const PostStatus = ( { isOpened, onTogglePanel } ) => (
 
 ## Currently available SlotFills and examples
 
-The following SlotFills are available in the `edit-post` package. Please refer to the individual items below for usage and example details:
+The following SlotFills are available in the `edit-post` or `editor` packages. Please refer to the individual items below for usage and example details:
 
 -   [MainDashboardButton](/docs/reference-guides/slotfills/main-dashboard-button.md)
 -   [PluginBlockSettingsMenuItem](/docs/reference-guides/slotfills/plugin-block-settings-menu-item.md)

@@ -25,10 +25,16 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { Icon, chevronDownSmall } from '@wordpress/icons';
 
-function PostStatusLabel() {
+function PostStatusLabel( { canEdit } ) {
 	const status = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
 		[]
@@ -56,10 +62,11 @@ function PostStatusLabel() {
 		<Text
 			className={ classnames( 'editor-post-status-label', {
 				[ ` has-status-${ status }` ]: !! status,
+				'has-icon': canEdit,
 			} ) }
 		>
 			{ statusLabel }
-			<Icon icon={ chevronDownSmall } />
+			{ canEdit && <Icon icon={ chevronDownSmall } /> }
 		</Text>
 	);
 }
@@ -122,6 +129,13 @@ const STATUS_OPTIONS = [
 	},
 ];
 
+const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+];
+
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
 		( select ) => {
@@ -165,6 +179,18 @@ export default function PostStatus() {
 		[ popoverAnchor ]
 	);
 
+	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+		return null;
+	}
+
+	if ( ! canEdit ) {
+		return (
+			<div className="editor-post-status">
+				<PostStatusLabel />
+			</div>
+		);
+	}
+
 	const updatePost = ( {
 		status: newStatus = status,
 		password: newPassword = password,
@@ -205,10 +231,6 @@ export default function PostStatus() {
 		} );
 	};
 
-	if ( ! canEdit ) {
-		return <PostStatusLabel />;
-	}
-
 	return (
 		<Dropdown
 			className="editor-post-status"
@@ -221,7 +243,7 @@ export default function PostStatus() {
 					className="editor-post-status-trigger"
 					onClick={ onToggle }
 				>
-					<PostStatusLabel />
+					<PostStatusLabel canEdit={ canEdit } />
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (

@@ -11,14 +11,18 @@
 	.editor-post-status-label {
 		border-radius: $grid-unit-20;
 		display: inline-flex;
-		padding: 0 $grid-unit-10 0 $grid-unit-15;
+		padding: 0 $grid-unit-15 0 $grid-unit-15;
 		background: rgba($gray-900, 0.04);
 		height: $button-size-compact;
 		align-items: center;
 		color: $gray-900;
 
-		&:hover {
-			background: rgba($gray-900, 0.08);
+		&.has-icon {
+			padding: 0 $grid-unit-10 0 $grid-unit-15;
+
+			&:hover {
+				background: rgba($gray-900, 0.08);
+			}
 		}
 
 		&.has-status-publish,

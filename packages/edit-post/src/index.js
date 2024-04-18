@@ -18,6 +18,9 @@ import {
 	PluginBlockSettingsMenuItem,
 	PluginDocumentSettingPanel,
 	PluginMoreMenuItem,
+	PluginPostStatusInfo,
+	PluginSidebar,
+	PluginSidebarMoreMenuItem,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -166,11 +169,11 @@ export function reinitializeEditor() {
 export { PluginBlockSettingsMenuItem };
 export { PluginDocumentSettingPanel };
 export { PluginMoreMenuItem };
+export { PluginPostStatusInfo };
+export { PluginSidebar };
+export { PluginSidebarMoreMenuItem };
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
 export { __experimentalPluginPostExcerpt };

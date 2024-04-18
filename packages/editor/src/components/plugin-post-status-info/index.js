@@ -22,7 +22,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
+ * var PluginPostStatusInfo = wp.editor.PluginPostStatusInfo;
  *
  * function MyPluginPostStatusInfo() {
  * 	return React.createElement(
@@ -39,7 +39,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginPostStatusInfo } from '@wordpress/edit-post';
+ * import { PluginPostStatusInfo } from '@wordpress/editor';
  *
  * const MyPluginPostStatusInfo = () => (
  * 	<PluginPostStatusInfo

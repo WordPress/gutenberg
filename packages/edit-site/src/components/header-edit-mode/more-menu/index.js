@@ -25,10 +25,6 @@ import {
  * Internal dependencies
  */
 import {
-	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
-	default as KeyboardShortcutHelpModal,
-} from '../../keyboard-shortcut-help-modal';
-import {
 	PREFERENCES_MODAL_NAME,
 	default as EditSitePreferencesModal,
 } from '../../preferences-modal';
@@ -129,9 +125,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
-									openModal(
-										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-									)
+									openModal( 'editor/keyboard-shortcut-help' )
 								}
 								shortcut={ displayShortcut.access( 'h' ) }
 							>
@@ -172,7 +166,6 @@ export default function MoreMenu( { showIconLabels } ) {
 					</>
 				) }
 			</DropdownMenu>
-			<KeyboardShortcutHelpModal />
 			<EditSitePreferencesModal />
 		</>
 	);
