@@ -77,7 +77,13 @@ export { default as Dropdown } from './dropdown';
 export { default as __experimentalDropdownContentWrapper } from './dropdown/dropdown-content-wrapper';
 export { default as DropdownMenu } from './dropdown-menu';
 export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
-export { Elevation as __experimentalElevation } from './elevation';
+export {
+	/**
+	 * @deprecated Import `Elevation` instead.
+	 */
+	Elevation as __experimentalElevation,
+	Elevation,
+} from './elevation';
 export { default as ExternalLink } from './external-link';
 export { Flex, FlexBlock, FlexItem } from './flex';
 export { default as FocalPointPicker } from './focal-point-picker';
