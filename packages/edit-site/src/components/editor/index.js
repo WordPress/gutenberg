@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, AsyncModeProvider } from '@wordpress/data';
 import {
 	Notice,
 	__unstableAnimatePresence as AnimatePresence,
@@ -193,7 +193,7 @@ export default function Editor( { isLoading, onClick } ) {
 			( ! postWithTemplate && !! editedPost ) );
 
 	return (
-		<>
+		<AsyncModeProvider value={ isViewMode } overrideChildren={ isViewMode }>
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
@@ -312,6 +312,6 @@ export default function Editor( { isLoading, onClick } ) {
 					/>
 				</EditorProvider>
 			) }
-		</>
+		</AsyncModeProvider>
 	);
 }
