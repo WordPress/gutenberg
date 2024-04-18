@@ -186,6 +186,28 @@ function apiFetch( options ) {
 	} );
 }
 
+if ( typeof document !== 'undefined' ) {
+	const el = document.getElementById( 'wp-apifetch-config-data' );
+	if ( el?.textContent ) {
+		try {
+			const config = JSON.parse( el.textContent );
+
+			if ( config.rootURL ) {
+				registerMiddleware( createRootURLMiddleware( config.rootURL ) );
+			}
+			if ( config.nonce ) {
+				registerMiddleware( createNonceMiddleware( config.nonce ) );
+			}
+			if ( config.shouldRegisterMediaUploadMiddleware ) {
+				registerMiddleware( mediaUploadMiddleware );
+			}
+			if ( config.nonceEndpoint ) {
+				apiFetch.nonceEndpoint = config.nonceEndpoint;
+			}
+		} catch {}
+	}
+}
+
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
