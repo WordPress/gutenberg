@@ -14,7 +14,6 @@ import {
 	PluginMoreMenuItem,
 	PluginSidebar,
 	store as editorStore,
-	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -28,9 +27,6 @@ import {
 import './hooks';
 import { store as editSiteStore } from './store';
 import App from './components/app';
-import { unlock } from './lock-unlock';
-
-const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -77,11 +73,6 @@ export function initializeEditor( id, settings ) {
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
 	} );
-
-	dispatch( interfaceStore ).setDefaultComplementaryArea(
-		'core',
-		'edit-site/template'
-	);
 
 	dispatch( editSiteStore ).updateSettings( settings );
 
