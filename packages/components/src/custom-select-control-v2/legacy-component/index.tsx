@@ -36,16 +36,15 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			await Promise.resolve();
 			const state = store.getState();
 
+			const option = options.find( ( item ) => item.name === nextValue );
+
 			const changeObject = {
 				highlightedIndex: state.renderedItems.findIndex(
 					( item ) => item.value === nextValue
 				),
 				inputValue: '',
 				isOpen: state.open,
-				selectedItem: {
-					name: nextValue as string,
-					key: nextValue as string,
-				},
+				selectedItem: option!,
 				type: '',
 			};
 			onChange( changeObject );
@@ -121,4 +120,15 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export default CustomSelectControl;
+export function ClassicCustomSelectControlV2Adapter(
+	props: LegacyCustomSelectProps
+) {
+	return (
+		<CustomSelectControl
+			__experimentalShowSelectedHint={ false }
+			{ ...props }
+		/>
+	);
+}
+
+export default ClassicCustomSelectControlV2Adapter;

@@ -54,6 +54,7 @@ const ControlledCustomSelectControl = ( {
 	onChange: onChangeProp,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
+	const { value: overrideValue } = restProps;
 	const [ value, setValue ] = useState( options[ 0 ] );
 
 	const onChange: typeof onChangeProp = ( changeObject ) => {
@@ -67,7 +68,7 @@ const ControlledCustomSelectControl = ( {
 			options={ options }
 			onChange={ onChange }
 			value={ options.find(
-				( option: any ) => option.key === value.key
+				( option: any ) => option.key === initialValue.key
 			) }
 		/>
 	);
@@ -306,6 +307,7 @@ describe.each( [
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
+
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
 				} ),
@@ -536,5 +538,58 @@ describe.each( [
 			expect( currentSelectedItem ).not.toHaveFocus();
 			expect( onBlurMock ).toHaveBeenCalledTimes( 1 );
 		} );
+	} );
+
+	// V1 styles items via a `style` or `className` metadata property in the option item object. Some consumers still expect it, e.g:
+	//
+	// - https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/font-appearance-control/index.js#L216
+	//
+	// Returning these properties as part of the item object was not tested as part of the V1 test. Possibly this was an accidental API?
+	// or was it intentional? If intentional, we might need to implement something similar in V2, too? The alternative is to rely on the
+	// `key` attriute for the item and get the actual data from some dictionary in a store somewhere, which would require refactoring
+	// consumers that rely on the self-contained `style` and `className` attributes.
+	it( 'Should return style metadata as part of the selected option from onChange', async () => {
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+
+		await click(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		);
+
+		await click(
+			screen.getByRole( 'option', {
+				name: 'aquarela',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					className: customClassName,
+					style: customStyles,
+				} ),
+			} )
+		);
+	} );
+
+	it( 'Should display the initial value passed as the selected value', async () => {
+		const initialSelectedItem = legacyProps.options[ 5 ];
+
+		const testProps = {
+			...legacyProps,
+			value: initialSelectedItem,
+		};
+
+		render( <Component { ...testProps } /> );
+
+		const currentSelectedItem = await screen.findByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		// Verify the initial selected value
+		expect( currentSelectedItem ).toHaveTextContent( 'aquarela' );
 	} );
 } );
