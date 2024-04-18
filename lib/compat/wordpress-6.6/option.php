@@ -26,9 +26,9 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 		$args['label'] = $settings_label_map[ $option_name ];
 	}
 
-	// Don't update schema when label isn't provided.
-	if ( ! isset( $args['label'] ) ) {
-		return $args;
+	// Don't update schema when label or show_in_rest isn't provided.
+	if ( ! isset( $args['label']) || ! isset( $args['show_in_rest'] ) )  {
+		//return $args;
 	}
 
 	$schema = array( 'title' => $args['label'] );
