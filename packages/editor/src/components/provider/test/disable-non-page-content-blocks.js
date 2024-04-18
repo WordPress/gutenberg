@@ -40,34 +40,44 @@ describe( 'DisableNonPageContentBlocks', () => {
 			type: 'UNSET_BLOCK_EDITING_MODE',
 		} ) );
 
-		const registry = createRegistry( {
-			'core/block-editor': {
-				reducer: () => {},
-				selectors: {
-					getBlocksByName( state, blockNames ) {
-						return Object.keys( testBlocks ).filter( ( clientId ) =>
-							blockNames.includes( testBlocks[ clientId ] )
-						);
-					},
-					getBlockParents( state, clientId ) {
-						return clientId.slice( 0, -1 ).split( '' );
-					},
-					getBlockName( state, clientId ) {
-						return testBlocks[ clientId ];
-					},
-					getBlockOrder( state, rootClientId ) {
-						return Object.keys( testBlocks ).filter(
-							( clientId ) =>
-								clientId.startsWith( rootClientId ) &&
-								clientId !== rootClientId
-						);
-					},
+		const registry = createRegistry();
+
+		registry.registerStore( 'core/block-editor', {
+			reducer: () => {},
+			selectors: {
+				getBlocksByName( state, blockNames ) {
+					return Object.keys( testBlocks ).filter( ( clientId ) =>
+						blockNames.includes( testBlocks[ clientId ] )
+					);
 				},
-				actions: {
-					setBlockEditingMode,
-					unsetBlockEditingMode,
+				getBlockParents( state, clientId ) {
+					return clientId.slice( 0, -1 ).split( '' );
+				},
+				getBlockName( state, clientId ) {
+					return testBlocks[ clientId ];
+				},
+				getBlockOrder( state, rootClientId ) {
+					return Object.keys( testBlocks ).filter(
+						( clientId ) =>
+							clientId.startsWith( rootClientId ) &&
+							clientId !== rootClientId
+					);
 				},
 			},
+			actions: {
+				setBlockEditingMode,
+				unsetBlockEditingMode,
+			},
+		} );
+
+		registry.registerStore( 'core', {
+			reducer: () => {},
+			selectors: {
+				canUser() {
+					return true;
+				},
+			},
+			actions: {},
 		} );
 
 		const { unmount } = render(
