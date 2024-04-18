@@ -402,13 +402,19 @@ describe( 'blocks', () => {
 			const blockName = 'core/test-block-with-merged-settings';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					variations: [ { name: 'foo', label: 'Foo' } ],
+					variations: [
+						{ name: 'foo', label: 'Foo' },
+						{ name: 'baz', label: 'Baz', description: 'Testing' },
+					],
 				},
 			} );
 
 			const blockType = {
 				title: 'block settings merge',
-				variations: [ { name: 'bar', label: 'Bar' } ],
+				variations: [
+					{ name: 'bar', label: 'Bar' },
+					{ name: 'baz', label: 'Baz', icon: 'layout' },
+				],
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
@@ -425,6 +431,12 @@ describe( 'blocks', () => {
 				styles: [],
 				variations: [
 					{ name: 'foo', label: 'Foo' },
+					{
+						description: 'Testing',
+						name: 'baz',
+						label: 'Baz',
+						icon: 'layout',
+					},
 					{ name: 'bar', label: 'Bar' },
 				],
 				blockHooks: {},
