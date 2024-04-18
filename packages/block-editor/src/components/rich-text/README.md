@@ -23,7 +23,7 @@ _Optional._ Placeholder text to show when the field is empty, similar to the
 
 ### `disableLineBreaks: Boolean`
 
-_Optional._ `Text` won't insert line breaks on `Enter` if set to `true`.
+_Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
 
 ### `multiline: Boolean | String`
 
