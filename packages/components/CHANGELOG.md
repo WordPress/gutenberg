@@ -10,15 +10,16 @@
 
 -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
 -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
--   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
--   `Navigator`: Navigation to the active path doesn't create a new location history. ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
--   `FormToggle`: Forwards ref to input. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
--   `ToggleControl`: Forwards ref to FormToggle. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
--   `CheckboxControl`: Update help text alignment. ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
+-   `Text`: Add `text-wrap: pretty;` to improve wrapping ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
+-   `Navigator`: Navigation to the active path doesn't create a new location history ([#60561](https://github.com/WordPress/gutenberg/pull/60561)).
+-   `FormToggle`: Forwards ref to input ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+-   `ToggleControl`: Forwards ref to FormToggle ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+-   `CheckboxControl`: Update help text alignment ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
 
 ### Bug Fix
 
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
+-   `CheckboxControl`: Fix label text wrap ([#60787](https://github.com/WordPress/gutenberg/pull/60787)).
 
 ### Experimental
 
