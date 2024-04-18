@@ -42,5 +42,5 @@ export function useZoomOut( zoomOut = true ) {
 		} else if ( ! zoomOut && originalEditingMode.current !== mode ) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
-	}, [ zoomOut, mode ] );
+	}, [ __unstableSetEditorMode, zoomOut, mode ] );
 }
