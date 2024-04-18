@@ -69,7 +69,6 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-
 	const { showPatterns } = useSelect(
 		( select ) => {
 			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
@@ -127,6 +126,11 @@ function InserterMenu(
 		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
+	const showPatternPanel =
+		selectedTab === 'patterns' &&
+		! delayedFilterValue &&
+		selectedPatternCategory;
+
 	const blocksTab = useMemo(
 		() => (
 			<>
@@ -157,51 +161,6 @@ function InserterMenu(
 		]
 	);
 
-	const mediaTab = useMemo(
-		() => (
-			<MediaTab
-				rootClientId={ destinationRootClientId }
-				selectedCategory={ selectedMediaCategory }
-				onSelectCategory={ setSelectedMediaCategory }
-				onInsert={ onInsert }
-			/>
-		),
-		[
-			destinationRootClientId,
-			onInsert,
-			selectedMediaCategory,
-			setSelectedMediaCategory,
-		]
-	);
-
-	const searchRef = useRef();
-	useImperativeHandle( ref, () => ( {
-		focusSearch: () => {
-			searchRef.current.focus();
-		},
-	} ) );
-
-	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		selectedPatternCategory;
-	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
-	const showMediaPanel =
-		selectedTab === 'media' &&
-		! delayedFilterValue &&
-		selectedMediaCategory;
-
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
-
-	const handleSetSelectedTab = ( value ) => {
-		// If no longer on patterns tab remove the category setting.
-		if ( value !== 'patterns' ) {
-			setSelectedPatternCategory( null );
-		}
-		setSelectedTab( value );
-	};
-
 	const patternsTab = useMemo(
 		() => (
 			<BlockPatternsTab
@@ -231,6 +190,23 @@ function InserterMenu(
 		]
 	);
 
+	const mediaTab = useMemo(
+		() => (
+			<MediaTab
+				rootClientId={ destinationRootClientId }
+				selectedCategory={ selectedMediaCategory }
+				onSelectCategory={ setSelectedMediaCategory }
+				onInsert={ onInsert }
+			/>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			selectedMediaCategory,
+			setSelectedMediaCategory,
+		]
+	);
+
 	const inserterTabsContents = useMemo(
 		() => ( {
 			blocks: blocksTab,
@@ -239,6 +215,30 @@ function InserterMenu(
 		} ),
 		[ blocksTab, mediaTab, patternsTab ]
 	);
+
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
+
+	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
+	const showMediaPanel =
+		selectedTab === 'media' &&
+		! delayedFilterValue &&
+		selectedMediaCategory;
+
+	// When the pattern panel is showing, we want to use zoom out mode
+	useZoomOut( showPatternPanel );
+
+	const handleSetSelectedTab = ( value ) => {
+		// If no longer on patterns tab remove the category setting.
+		if ( value !== 'patterns' ) {
+			setSelectedPatternCategory( null );
+		}
+		setSelectedTab( value );
+	};
 
 	return (
 		<div
