@@ -19,7 +19,6 @@ import BlockToolbarPopover from './block-toolbar-popover';
 import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
-import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
 
@@ -208,11 +207,6 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ isZoomOutMode && (
-					<ZoomOutModeInserters
-						__unstableContentRef={ __unstableContentRef }
-					/>
-				) }
 			</InsertionPointOpenRef.Provider>
 		</div>
 	);

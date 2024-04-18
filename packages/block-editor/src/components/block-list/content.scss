@@ -436,6 +436,16 @@ body.is-zoomed-out {
 	@include reduce-motion("animation");
 }
 
+.has-drag-spacing-bottom {
+	position: relative;
+	top: -40px;
+}
+
+.has-drag-spacing-top {
+	position: relative;
+	bottom: -40px;
+}
+
 .block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
 	display: none;
 
