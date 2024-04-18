@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	MenuItem,
-	__experimentalConfirmDialog as ConfirmDialog,
-} from '@wordpress/components';
+import { MenuItem, ConfirmDialog } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';

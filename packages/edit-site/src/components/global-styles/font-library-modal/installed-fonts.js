@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	__experimentalConfirmDialog as ConfirmDialog,
+	ConfirmDialog,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalNavigatorProvider as NavigatorProvider,

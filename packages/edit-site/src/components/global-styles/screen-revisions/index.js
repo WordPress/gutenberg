@@ -4,7 +4,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalUseNavigator as useNavigator,
-	__experimentalConfirmDialog as ConfirmDialog,
+	ConfirmDialog,
 	Spinner,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';

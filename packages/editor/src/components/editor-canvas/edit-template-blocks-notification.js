@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { ConfirmDialog } from '@wordpress/components';
 
 /**
  * Internal dependencies

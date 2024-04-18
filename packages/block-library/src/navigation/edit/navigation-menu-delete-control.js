@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	__experimentalConfirmDialog as ConfirmDialog,
-} from '@wordpress/components';
+import { Button, ConfirmDialog } from '@wordpress/components';
 import { store as coreStore, useEntityId } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';

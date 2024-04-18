@@ -9,7 +9,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	__experimentalConfirmDialog as ConfirmDialog,
+	ConfirmDialog,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
