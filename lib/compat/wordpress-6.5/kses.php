@@ -13,6 +13,7 @@
  */
 function gutenberg_safe_style_attrs_6_5( $attrs ) {
 	$attrs[] = 'background-repeat';
+	$attrs[] = 'opacity';
 	return $attrs;
 }
 add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs_6_5' );
