@@ -461,8 +461,8 @@ export default () => {
 	} );
 
 	// data-wp-ignore
-	directive( 'ignore', ( { element } ) => {
-		return <IgnoredComponent element={ element } />;
+	directive( 'ignore', ( props ) => {
+		return <IgnoredComponent { ...props } />;
 	} );
 
 	// data-wp-text
