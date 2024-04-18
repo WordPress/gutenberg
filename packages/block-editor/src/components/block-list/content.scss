@@ -385,18 +385,24 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }
 
-body.is-zoomed-out {
-	display: flex;
-	flex-direction: column;
+iframe[name="editor-canvas"].edit-site-visual-editor__editor-canvas.is-zoomed-out {
+	background: #ddd;
+}
 
-	> .is-root-container {
-		flex: 1;
+.edit-site-visual-editor__editor-canvas.is-zoomed-out {
+	body {
 		display: flex;
 		flex-direction: column;
-		height: 100%;
 
-		> main {
+		> .is-root-container {
 			flex: 1;
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+
+			> main {
+				flex: 1;
+			}
 		}
 	}
 }

@@ -164,6 +164,7 @@ function EditorCanvas( {
 					'edit-site-visual-editor__editor-canvas',
 					{
 						'is-focused': isFocused && canvasMode === 'view',
+						'is-zoomed-out': isZoomOutMode,
 					}
 				),
 				...props,
