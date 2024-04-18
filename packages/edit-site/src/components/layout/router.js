@@ -108,9 +108,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
-				sidebar: postId ? (
-					<SidebarNavigationScreenTemplate />
-				) : (
+				sidebar: (
 					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
 				),
 				content: (
