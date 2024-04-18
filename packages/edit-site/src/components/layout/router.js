@@ -13,7 +13,6 @@ import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
-import PageTemplatesTemplateParts from '../page-templates-template-parts';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
@@ -108,9 +107,7 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
 				),
-				content: (
-					<PageTemplates />
-				),
+				content: <PageTemplates />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
