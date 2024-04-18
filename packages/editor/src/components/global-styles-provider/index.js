@@ -54,11 +54,11 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 
 		Object.entries( sharedVariations ).forEach(
 			( [ variationName, variation ] ) => {
-				if ( ! variation?.supportedBlockTypes ) {
+				if ( ! variation?.blockTypes ) {
 					return;
 				}
 
-				variation.supportedBlockTypes.forEach( ( blockName ) => {
+				variation.blockTypes.forEach( ( blockName ) => {
 					const blockStyles = getBlockStyles( blockName );
 					const registeredBlockStyle = blockStyles.find(
 						( { name } ) => name === variationName
@@ -86,11 +86,11 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 
 		Object.entries( sharedVariations ).forEach(
 			( [ variationName, variation ] ) => {
-				if ( ! variation?.supportedBlockTypes ) {
+				if ( ! variation?.blockTypes ) {
 					return;
 				}
 
-				variation.supportedBlockTypes.forEach( ( blockName ) => {
+				variation.blockTypes.forEach( ( blockName ) => {
 					const path = [
 						'styles',
 						'blocks',

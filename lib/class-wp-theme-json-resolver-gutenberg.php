@@ -720,8 +720,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Determines if a supplied style variation matches the provided scope.
 	 *
 	 * For backwards compatibility, if a variation does not define any scope
-	 * related property, e.g. `supportedBlockTypes`, it is assumed to be a
-	 * theme style variation.
+	 * related property, e.g. `blockTypes`, it is assumed to be a theme style
+	 * variation.
 	 *
 	 * @param array  $variation Theme.json shaped style variation object.
 	 * @param string $scope     Scope to check e.g. theme, block etc.
@@ -730,11 +730,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 */
 	private static function style_variation_has_scope( $variation, $scope ) {
 		if ( 'block' === $scope ) {
-			return isset( $variation['supportedBlockTypes'] );
+			return isset( $variation['blockTypes'] );
 		}
 
 		if ( 'theme' === $scope ) {
-			return ! isset( $variation['supportedBlockTypes'] );
+			return ! isset( $variation['blockTypes'] );
 		}
 
 		return false;

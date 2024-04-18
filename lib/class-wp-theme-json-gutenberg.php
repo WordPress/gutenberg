@@ -348,12 +348,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var string[]
 	 */
 	const VALID_TOP_LEVEL_KEYS = array(
+		'blockTypes',
 		'customTemplates',
 		'description',
 		'patterns',
 		'settings',
 		'styles',
-		'supportedBlockTypes',
 		'templateParts',
 		'title',
 		'version',

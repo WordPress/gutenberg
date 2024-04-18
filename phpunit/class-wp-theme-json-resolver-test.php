@@ -1093,10 +1093,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'scope'               => 'block',
 				'expected_variations' => array(
 					array(
-						'supportedBlockTypes' => array( 'core/group', 'core/columns', 'core/media-text' ),
-						'version'             => 2,
-						'title'               => 'block-style-variation-a',
-						'styles'              => array(
+						'blockTypes' => array( 'core/group', 'core/columns', 'core/media-text' ),
+						'version'    => 2,
+						'title'      => 'block-style-variation-a',
+						'styles'     => array(
 							'color' => array(
 								'background' => 'darkcyan',
 								'text'       => 'aliceblue',
@@ -1104,10 +1104,10 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 						),
 					),
 					array(
-						'supportedBlockTypes' => array( 'core/group', 'core/columns' ),
-						'version'             => 2,
-						'title'               => 'block-style-variation-b',
-						'styles'              => array(
+						'blockTypes' => array( 'core/group', 'core/columns' ),
+						'version'    => 2,
+						'title'      => 'block-style-variation-b',
+						'styles'     => array(
 							'color' => array(
 								'background' => 'midnightblue',
 								'text'       => 'lightblue',

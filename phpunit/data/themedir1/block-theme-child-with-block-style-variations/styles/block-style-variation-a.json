@@ -1,6 +1,6 @@
 {
 	"version": 2,
-	"supportedBlockTypes": [ "core/group", "core/columns", "core/media-text" ],
+	"blockTypes": [ "core/group", "core/columns", "core/media-text" ],
 	"styles": {
 		"color": {
 			"background": "darkcyan",

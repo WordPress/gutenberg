@@ -2276,7 +2276,7 @@
 				},
 				{
 					"properties": {
-						"supportedBlockTypes": {
+						"blockTypes": {
 							"type": "array",
 							"items": {
 								"type": "string"
@@ -2688,7 +2688,7 @@
 			"type": "string",
 			"description": "Description of the global styles variation."
 		},
-		"supportedBlockTypes": {
+		"blockTypes": {
 			"type": "array",
 			"description": "List of block types that can use the block style variation this theme.json file represents.",
 			"items": {

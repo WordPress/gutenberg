@@ -173,7 +173,7 @@ function gutenberg_resolve_and_register_block_style_variations( $variations ) {
 	$have_named_variations = ! wp_is_numeric_array( $variations );
 
 	foreach ( $variations as $key => $variation ) {
-		$supported_blocks = $variation['supportedBlockTypes'] ?? array();
+		$supported_blocks = $variation['blockTypes'] ?? array();
 
 		/*
 		 * Standalone theme.json partial files for block style variations
