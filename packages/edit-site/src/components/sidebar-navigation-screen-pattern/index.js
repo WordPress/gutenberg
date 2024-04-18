@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -30,7 +31,13 @@ export default function SidebarNavigationScreenPattern() {
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
-	const backPath = { path: '/patterns' };
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
+	const backPath = isBlockBasedTheme
+		? { path: '/patterns' }
+		: { path: '/wp_template_part/all' };
 
 	return (
 		<SidebarNavigationScreen
