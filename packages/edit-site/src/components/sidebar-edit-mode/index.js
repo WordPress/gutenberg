@@ -9,16 +9,15 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import DefaultSidebar from './default-sidebar';
 import GlobalStylesSidebar from './global-styles-sidebar';
-import { STORE_NAME } from '../../store/constants';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
@@ -27,7 +26,7 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
-
+const { interfaceStore } = unlock( editorPrivateApis );
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
@@ -111,7 +110,7 @@ export function SidebarComplementaryAreaFills() {
 		isEditingPage,
 	} = useSelect( ( select ) => {
 		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( STORE_NAME );
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		const _isEditorSidebarOpened = [
 			SIDEBAR_BLOCK,
@@ -144,10 +143,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+				enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 			}
 		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+			enableComplementaryArea( 'core', SIDEBAR_TEMPLATE );
 		}
 	}, [
 		hasBlockSelection,
@@ -163,7 +162,7 @@ export function SidebarComplementaryAreaFills() {
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
-				enableComplementaryArea( STORE_NAME, newSelectedTabId );
+				enableComplementaryArea( 'core', newSelectedTabId );
 			}
 		},
 		[ enableComplementaryArea ]

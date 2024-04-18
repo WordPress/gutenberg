@@ -19,6 +19,7 @@ import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
 import { count as wordCount } from '@wordpress/wordcount';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,40 +33,34 @@ import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
 
 export default function PostCardPanel( { className, actions } ) {
-	const {
-		modified,
-		title,
-		templateInfo,
-		icon,
-		postType,
-		postContent,
-		isPostsPage,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getCurrentPostType,
-			getCurrentPostId,
-			__experimentalGetTemplateInfo,
-		} = select( editorStore );
-		const { getEditedEntityRecord, getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		const _type = getCurrentPostType();
-		const _id = getCurrentPostId();
-		const _record = getEditedEntityRecord( 'postType', _type, _id );
-		const _templateInfo = __experimentalGetTemplateInfo( _record );
-		return {
-			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
-			modified: getEditedPostAttribute( 'modified' ),
-			id: _id,
-			postType: _type,
-			templateInfo: _templateInfo,
-			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
-				area: _record?.area,
-			} ),
-			isPostsPage: +_id === siteSettings?.page_for_posts,
-			postContent: getEditedPostAttribute( 'content' ),
-		};
-	}, [] );
+	const { modified, title, templateInfo, icon, postType, isPostsPage } =
+		useSelect( ( select ) => {
+			const {
+				getEditedPostAttribute,
+				getCurrentPostType,
+				getCurrentPostId,
+				__experimentalGetTemplateInfo,
+			} = select( editorStore );
+			const { getEditedEntityRecord, getEntityRecord } =
+				select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			const _type = getCurrentPostType();
+			const _id = getCurrentPostId();
+			const _record = getEditedEntityRecord( 'postType', _type, _id );
+			const _templateInfo = __experimentalGetTemplateInfo( _record );
+			return {
+				title:
+					_templateInfo?.title || getEditedPostAttribute( 'title' ),
+				modified: getEditedPostAttribute( 'modified' ),
+				id: _id,
+				postType: _type,
+				templateInfo: _templateInfo,
+				icon: unlock( select( editorStore ) ).getPostIcon( _type, {
+					area: _record?.area,
+				} ),
+				isPostsPage: +_id === siteSettings?.page_for_posts,
+			};
+		}, [] );
 	const description = templateInfo?.description;
 	const lastEditedText =
 		modified &&
@@ -111,9 +106,7 @@ export default function PostCardPanel( { className, actions } ) {
 							spacing={ 2 }
 						>
 							{ description && <Text>{ description }</Text> }
-							{ showPostContentInfo && (
-								<PostContentInfo postContent={ postContent } />
-							) }
+							{ showPostContentInfo && <PostContentInfo /> }
 							{ lastEditedText && (
 								<Text>{ lastEditedText }</Text>
 							) }
@@ -130,16 +123,21 @@ export default function PostCardPanel( { className, actions } ) {
 const AVERAGE_READING_RATE = 189;
 
 // This component renders the wordcount and reading time for the post.
-function PostContentInfo( { postContent } ) {
+function PostContentInfo() {
+	const postContent = useSelect(
+		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
+		[]
+	);
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
 	 * Do not translate into your own language.
 	 */
 	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
-	const wordsCounted = postContent
-		? wordCount( postContent, wordCountType )
-		: 0;
+	const wordsCounted = useMemo(
+		() => ( postContent ? wordCount( postContent, wordCountType ) : 0 ),
+		[ postContent, wordCountType ]
+	);
 	if ( ! wordsCounted ) {
 		return null;
 	}

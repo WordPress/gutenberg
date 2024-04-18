@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { ComplementaryAreaMoreMenuItem } = unlock( editorPrivateApis );
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down,
@@ -57,7 +64,7 @@ export default function PluginSidebarMoreMenuItem( props ) {
 			// Menu item is marked with unstable prop for backward compatibility.
 			// @see https://github.com/WordPress/gutenberg/issues/14457
 			__unstableExplicitMenuItem
-			scope="core/edit-post"
+			scope="core"
 			{ ...props }
 		/>
 	);

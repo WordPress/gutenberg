@@ -15,7 +15,6 @@ import {
 } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
@@ -40,8 +39,8 @@ import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
-const { PostCardPanel, PostActions } = unlock( editorPrivateApis );
-
+const { PostCardPanel, PostActions, interfaceStore } =
+	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PatternOverridesPanel } = unlock( editorPrivateApis );
 
@@ -155,9 +154,8 @@ const SettingsSidebar = () => {
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 
-			const sidebar = select( interfaceStore ).getActiveComplementaryArea(
-				editPostStore.name
-			);
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
 			const _isEditorSidebarOpened = [
 				sidebars.block,
 				sidebars.document,

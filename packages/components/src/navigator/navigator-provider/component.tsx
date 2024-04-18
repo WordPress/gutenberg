@@ -80,6 +80,13 @@ function goTo(
 		...restOptions
 	} = options;
 
+	const isNavigatingToSamePath =
+		locationHistory.length > 0 &&
+		locationHistory[ locationHistory.length - 1 ].path === path;
+	if ( isNavigatingToSamePath ) {
+		return locationHistory;
+	}
+
 	const isNavigatingToPreviousPath =
 		isBack &&
 		locationHistory.length > 1 &&
@@ -157,13 +164,6 @@ function routerReducer(
 			locationHistory = goBack( state );
 			break;
 		case 'goto':
-			if (
-				locationHistory.length &&
-				action.path ===
-					locationHistory[ locationHistory.length - 1 ].path
-			) {
-				break;
-			}
 			locationHistory = goTo( state, action.path, action.options );
 			break;
 		case 'gotoparent':

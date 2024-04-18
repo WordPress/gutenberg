@@ -300,7 +300,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot
 						group="background"
-						label={ __( 'Background' ) }
+						label={ __( 'Background image' ) }
 					/>
 					<PositionControls />
 					<div>

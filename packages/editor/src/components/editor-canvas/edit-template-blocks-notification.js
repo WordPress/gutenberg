@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
@@ -37,10 +38,19 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		};
 	}, [] );
 
+	const canEditTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
+
 	const [ isDialogOpen, setIsDialogOpen ] = useState( false );
 
 	useEffect( () => {
 		const handleDblClick = ( event ) => {
+			if ( ! canEditTemplate ) {
+				return;
+			}
+
 			if ( ! event.target.classList.contains( 'is-root-container' ) ) {
 				return;
 			}
@@ -52,7 +62,11 @@ export default function EditTemplateBlocksNotification( { contentRef } ) {
 		return () => {
 			canvas?.removeEventListener( 'dblclick', handleDblClick );
 		};
-	}, [ contentRef ] );
+	}, [ contentRef, canEditTemplate ] );
+
+	if ( ! canEditTemplate ) {
+		return null;
+	}
 
 	return (
 		<ConfirmDialog

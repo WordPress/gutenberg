@@ -263,7 +263,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {

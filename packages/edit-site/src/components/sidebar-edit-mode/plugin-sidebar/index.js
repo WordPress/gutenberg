@@ -1,7 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { ComplementaryArea } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { ComplementaryArea } = unlock( editorPrivateApis );
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -73,7 +80,7 @@ export default function PluginSidebarEditSite( { className, ...props } ) {
 		<ComplementaryArea
 			panelClassName={ className }
 			className="edit-site-sidebar-edit-mode"
-			scope="core/edit-site"
+			scope="core"
 			{ ...props }
 		/>
 	);

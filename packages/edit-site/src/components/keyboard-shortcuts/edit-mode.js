@@ -4,22 +4,22 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
 import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
-import { STORE_NAME } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 function KeyboardShortcutsEditMode() {
 	const isBlockInspectorOpen = useSelect(
 		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			) === SIDEBAR_BLOCK,
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			SIDEBAR_BLOCK,
 		[]
 	);
 	const { enableComplementaryArea, disableComplementaryArea } =
@@ -62,9 +62,9 @@ function KeyboardShortcutsEditMode() {
 		event.preventDefault();
 
 		if ( isBlockInspectorOpen ) {
-			disableComplementaryArea( STORE_NAME );
+			disableComplementaryArea( 'core' );
 		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+			enableComplementaryArea( 'core', SIDEBAR_BLOCK );
 		}
 	} );
 

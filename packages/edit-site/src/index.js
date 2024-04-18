@@ -10,8 +10,11 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import {
+	PluginMoreMenuItem,
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -24,6 +27,9 @@ import {
 import './hooks';
 import { store as editSiteStore } from './store';
 import App from './components/app';
+import { unlock } from './lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -72,7 +78,7 @@ export function initializeEditor( id, settings ) {
 	} );
 
 	dispatch( interfaceStore ).setDefaultComplementaryArea(
-		'core/edit-site',
+		'core',
 		'edit-site/template'
 	);
 
@@ -103,8 +109,8 @@ export function reinitializeEditor() {
 	} );
 }
 
+export { PluginMoreMenuItem };
 export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
 export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';

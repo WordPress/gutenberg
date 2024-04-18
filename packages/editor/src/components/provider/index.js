@@ -26,6 +26,7 @@ import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
 import BlockRemovalWarnings from '../block-removal-warnings';
+import StartPageOptions from '../start-page-options';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -267,6 +268,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<NavigationBlockEditingMode />
 							) }
 							<BlockRemovalWarnings />
+							<StartPageOptions />
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>
