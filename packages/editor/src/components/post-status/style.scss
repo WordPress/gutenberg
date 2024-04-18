@@ -17,12 +17,12 @@
 		align-items: center;
 		color: $gray-900;
 
-		&:hover {
-			background: rgba($gray-900, 0.08);
-		}
-
 		&.has-icon {
 			padding: 0 $grid-unit-10 0 $grid-unit-15;
+
+			&:hover {
+				background: rgba($gray-900, 0.08);
+			}
 		}
 
 		&.has-status-publish,
