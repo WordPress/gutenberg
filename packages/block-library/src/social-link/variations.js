@@ -8,6 +8,7 @@ import {
 	ChainIcon,
 	CodepenIcon,
 	DeviantArtIcon,
+	DiscordIcon,
 	DribbbleIcon,
 	DropboxIcon,
 	EtsyIcon,
@@ -100,6 +101,12 @@ const variations = [
 		attributes: { service: 'deviantart' },
 		title: 'DeviantArt',
 		icon: DeviantArtIcon,
+	},
+	{
+		name: 'discord',
+		attributes: { service: 'discord' },
+		title: 'Discord',
+		icon: DiscordIcon,
 	},
 	{
 		name: 'dribbble',
