@@ -36,8 +36,12 @@ export {
 } from './border-box-control';
 export { BorderControl as __experimentalBorderControl } from './border-control';
 export {
+	/**
+	 * @deprecated Import `BoxControl` instead.
+	 */
 	default as __experimentalBoxControl,
 	applyValueToSides as __experimentalApplyValueToSides,
+	default as BoxControl,
 } from './box-control';
 export { default as Button } from './button';
 export { default as ButtonGroup } from './button-group';
