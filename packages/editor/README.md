@@ -746,6 +746,53 @@ _Parameters_
 -   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
 
+### PluginSidebarMoreMenuItem
+
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to activate the corresponding `PluginSidebar` component. The text within the component appears as the menu item label.
+
+_Usage_
+
+```js
+// Using ES5 syntax
+var __ = wp.i18n.__;
+var PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
+var moreIcon = React.createElement( 'svg' ); //... svg element.
+
+function MySidebarMoreMenuItem() {
+	return React.createElement(
+		PluginSidebarMoreMenuItem,
+		{
+			target: 'my-sidebar',
+			icon: moreIcon,
+		},
+		__( 'My sidebar title' )
+	);
+}
+```
+
+```jsx
+// Using ESNext syntax
+import { __ } from '@wordpress/i18n';
+import { PluginSidebarMoreMenuItem } from '@wordpress/editor';
+import { more } from '@wordpress/icons';
+
+const MySidebarMoreMenuItem = () => (
+	<PluginSidebarMoreMenuItem target="my-sidebar" icon={ more }>
+		{ __( 'My sidebar title' ) }
+	</PluginSidebarMoreMenuItem>
+);
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.target_ `string`: A string identifying the target sidebar you wish to be activated by this menu item. Must be the same as the `name` prop you have given to that sidebar.
+-   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### PostAuthor
 
 Undocumented declaration.
