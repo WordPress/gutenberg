@@ -28,7 +28,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { store as editorStore } from '../../store';
 import { Icon, chevronDownSmall } from '@wordpress/icons';
 
-function PostStatusLabel() {
+function PostStatusLabel( { canEdit } ) {
 	const status = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
 		[]
@@ -56,10 +56,11 @@ function PostStatusLabel() {
 		<Text
 			className={ classnames( 'editor-post-status-label', {
 				[ ` has-status-${ status }` ]: !! status,
+				'has-icon': canEdit,
 			} ) }
 		>
 			{ statusLabel }
-			<Icon icon={ chevronDownSmall } />
+			{ canEdit && <Icon icon={ chevronDownSmall } /> }
 		</Text>
 	);
 }
@@ -206,7 +207,11 @@ export default function PostStatus() {
 	};
 
 	if ( ! canEdit ) {
-		return <PostStatusLabel />;
+		return (
+			<div className="editor-post-status">
+				<PostStatusLabel />
+			</div>
+		);
 	}
 
 	return (
@@ -221,7 +226,7 @@ export default function PostStatus() {
 					className="editor-post-status-trigger"
 					onClick={ onToggle }
 				>
-					<PostStatusLabel />
+					<PostStatusLabel canEdit={ canEdit } />
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (
