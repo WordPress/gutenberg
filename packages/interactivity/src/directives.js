@@ -221,6 +221,9 @@ const getGlobalEventDirective =
 			} );
 	};
 
+/**
+ * @augments {Component<import('./hooks').DirectiveArgs>}
+ */
 class IgnoredComponent extends Component {
 	shouldComponentUpdate() {
 		return false;
@@ -461,8 +464,8 @@ export default () => {
 	} );
 
 	// data-wp-ignore
-	directive( 'ignore', ( props ) => {
-		return <IgnoredComponent { ...props } />;
+	directive( 'ignore', ( args ) => {
+		return <IgnoredComponent { ...args } />;
 	} );
 
 	// data-wp-text
