@@ -132,7 +132,7 @@ export default function SidebarNavigationScreenPatterns() {
 			actions={ <AddNewPattern /> }
 			content={
 				<>
-					{ isLoading && __( 'Loading patterns…' ) }
+					{ isLoading && __( 'Loading items…' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
