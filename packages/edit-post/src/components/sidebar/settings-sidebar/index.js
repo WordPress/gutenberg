@@ -152,7 +152,7 @@ const SettingsSidebar = () => {
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
 			const sidebar =
 				select( interfaceStore ).getActiveComplementaryArea( 'core' );

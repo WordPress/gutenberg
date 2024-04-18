@@ -7,7 +7,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { normalizeComplementaryAreaScope } from './deprecated';
+import {
+	normalizeComplementaryAreaScope,
+	normalizeComplementaryAreaName,
+} from './deprecated';
 
 /**
  * Set a default complementary area.
@@ -17,11 +20,15 @@ import { normalizeComplementaryAreaScope } from './deprecated';
  *
  * @return {Object} Action object.
  */
-export const setDefaultComplementaryArea = ( scope, area ) => ( {
-	type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
-	scope: normalizeComplementaryAreaScope( scope ),
-	area,
-} );
+export const setDefaultComplementaryArea = ( scope, area ) => {
+	scope = normalizeComplementaryAreaScope( scope );
+	area = normalizeComplementaryAreaName( scope, area );
+	return {
+		type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+		scope,
+		area,
+	};
+};
 
 /**
  * Enable the complementary area.
@@ -37,6 +44,7 @@ export const enableComplementaryArea =
 			return;
 		}
 		scope = normalizeComplementaryAreaScope( scope );
+		area = normalizeComplementaryAreaName( scope, area );
 
 		const isComplementaryAreaVisible = registry
 			.select( preferencesStore )
@@ -92,6 +100,7 @@ export const pinItem =
 		}
 
 		scope = normalizeComplementaryAreaScope( scope );
+		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = registry
 			.select( preferencesStore )
 			.get( scope, 'pinnedItems' );
@@ -122,6 +131,7 @@ export const unpinItem =
 		}
 
 		scope = normalizeComplementaryAreaScope( scope );
+		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = registry
 			.select( preferencesStore )
 			.get( scope, 'pinnedItems' );
