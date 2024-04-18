@@ -88,7 +88,13 @@ export { default as FormToggle } from './form-toggle';
 export { default as FormTokenField } from './form-token-field';
 export { default as GradientPicker } from './gradient-picker';
 export { default as CustomGradientPicker } from './custom-gradient-picker';
-export { Grid as __experimentalGrid } from './grid';
+export {
+	/**
+	 * @deprecated Import `Grid` instead.
+	 */
+	Grid as __experimentalGrid,
+	Grid,
+} from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';

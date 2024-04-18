@@ -11,7 +11,7 @@ import { Grid } from '..';
 
 const meta: Meta< typeof Grid > = {
 	component: Grid,
-	title: 'Components (Experimental)/Grid',
+	title: 'Components/Grid',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		align: { control: { type: 'text' } },
