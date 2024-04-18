@@ -85,10 +85,13 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 				isActiveByDefault
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<Tabs.TabPanel tabId="editor/document" focusable={ false }>
+					<Tabs.TabPanel
+						tabId="edit-post/document"
+						focusable={ false }
+					>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 					</Tabs.TabPanel>
-					<Tabs.TabPanel tabId="editor/block" focusable={ false }>
+					<Tabs.TabPanel tabId="edit-post/block" focusable={ false }>
 						<InspectorSlot bubblesVirtually />
 					</Tabs.TabPanel>
 				</Tabs.Context.Provider>
@@ -110,14 +113,14 @@ export function SidebarComplementaryAreaFills() {
 			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
 		const _isEditorSidebarOpened = [
-			'editor/block',
-			'editor/document',
+			'edit-post/block',
+			'edit-post/document',
 		].includes( sidebar );
 		let _tabName = sidebar;
 		if ( ! _isEditorSidebarOpened ) {
 			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? 'editor/block'
-				: 'editor/document';
+				? 'edit-post/block'
+				: 'edit-post/document';
 		}
 
 		return {
@@ -140,10 +143,10 @@ export function SidebarComplementaryAreaFills() {
 		}
 		if ( hasBlockSelection ) {
 			if ( ! isEditingPage ) {
-				enableComplementaryArea( 'core', 'editor/block' );
+				enableComplementaryArea( 'core', 'edit-post/block' );
 			}
 		} else {
-			enableComplementaryArea( 'core', 'editor/document' );
+			enableComplementaryArea( 'core', 'edit-post/document' );
 		}
 	}, [
 		hasBlockSelection,

@@ -58,10 +58,10 @@ export default function useCommonCommands() {
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'editor/document' ) {
+			if ( activeSidebar === 'edit-post/document' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'editor/document' );
+				openGeneralSidebar( 'edit-post/document' );
 			}
 		},
 	} );
@@ -72,10 +72,10 @@ export default function useCommonCommands() {
 		icon: blockDefault,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'editor/block' ) {
+			if ( activeSidebar === 'edit-post/block' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'editor/block' );
+				openGeneralSidebar( 'edit-post/block' );
 			}
 		},
 	} );

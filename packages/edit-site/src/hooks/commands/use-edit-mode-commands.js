@@ -203,10 +203,10 @@ function useEditUICommands() {
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'editor/document' ) {
+			if ( activeSidebar === 'edit-post/document' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'editor/document' );
+				openGeneralSidebar( 'edit-post/document' );
 			}
 		},
 	} );

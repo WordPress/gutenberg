@@ -32,7 +32,7 @@ const SettingsToolbarButton = withDispatch( ( dispatch ) => {
 	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 	return {
-		openGeneralSidebar: () => openGeneralSidebar( 'editor/block' ),
+		openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 	};
 } )( SettingsButtonFill );
 

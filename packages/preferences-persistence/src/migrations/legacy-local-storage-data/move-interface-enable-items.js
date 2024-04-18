@@ -7,7 +7,7 @@
  *     enableItems: {
  *         singleEnableItems: {
  * 	           complementaryArea: {
- *                 'core/edit-post': 'editor/document',
+ *                 'core/edit-post': 'edit-post/document',
  *                 'core/edit-site': 'edit-site/global-styles',
  *             }
  *         },
@@ -29,7 +29,7 @@
  * ```js
  * {
  *     'core/edit-post': {
- *         complementaryArea: 'editor/document',
+ *         complementaryArea: 'edit-post/document',
  *         pinnedItems: {
  *             'plugin-1': true,
  *         },

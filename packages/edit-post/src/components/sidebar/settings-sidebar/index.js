@@ -49,8 +49,8 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	native: false,
 } );
 export const sidebars = {
-	document: 'editor/document',
-	block: 'editor/block',
+	document: 'edit-post/document',
+	block: 'edit-post/block',
 };
 
 function onActionPerformed( actionId, items ) {

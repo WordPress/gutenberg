@@ -23,16 +23,16 @@ const SettingsHeader = ( _, ref ) => {
 	return (
 		<Tabs.TabList ref={ ref }>
 			<Tabs.Tab
-				tabId="editor/document"
+				tabId="edit-post/document"
 				// Used for focus management in the SettingsSidebar component.
-				data-tab-id="editor/document"
+				data-tab-id="edit-post/document"
 			>
 				{ postTypeLabel }
 			</Tabs.Tab>
 			<Tabs.Tab
-				tabId="editor/block"
+				tabId="edit-post/block"
 				// Used for focus management in the SettingsSidebar component.
-				data-tab-id="editor/block"
+				data-tab-id="edit-post/block"
 			>
 				{ __( 'Block' ) }
 			</Tabs.Tab>

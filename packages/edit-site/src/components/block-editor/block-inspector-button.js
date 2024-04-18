@@ -24,7 +24,7 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 			isBlockInspectorOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
 					'core'
-				) === 'editor/block',
+				) === 'edit-post/block',
 		} ),
 		[]
 	);
@@ -42,7 +42,7 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 					disableComplementaryArea( 'core' );
 					speak( __( 'Block settings closed' ) );
 				} else {
-					enableComplementaryArea( 'core', 'editor/block' );
+					enableComplementaryArea( 'core', 'edit-post/block' );
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'

@@ -22,7 +22,7 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 			areAdvancedSettingsOpened:
 				select( editPostStore ).getActiveGeneralSidebarName() ===
-				'editor/block',
+				'edit-post/block',
 		} ),
 		[]
 	);
@@ -40,7 +40,7 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 					closeGeneralSidebar();
 					speak( __( 'Block settings closed' ) );
 				} else {
-					openGeneralSidebar( 'editor/block' );
+					openGeneralSidebar( 'edit-post/block' );
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'

@@ -97,16 +97,16 @@ export default function EditorKeyboardShortcuts() {
 		// obscure shortcuts from triggering.
 		event.preventDefault();
 		const isEditorSidebarOpened = [
-			'editor/document',
-			'editor/block',
+			'edit-post/document',
+			'edit-post/block',
 		].includes( getActiveComplementaryArea( 'core' ) );
 
 		if ( isEditorSidebarOpened ) {
 			disableComplementaryArea( 'core' );
 		} else {
 			const sidebarToOpen = getBlockSelectionStart()
-				? 'editor/block'
-				: 'editor/document';
+				? 'edit-post/block'
+				: 'edit-post/document';
 			enableComplementaryArea( 'core', sidebarToOpen );
 		}
 	} );

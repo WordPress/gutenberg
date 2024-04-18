@@ -676,7 +676,7 @@ export default compose( [
 		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
-			openGeneralSidebar: () => openGeneralSidebar( 'editor/block' ),
+			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
 				dispatch( editPostStore ).closeGeneralSidebar();
 			},

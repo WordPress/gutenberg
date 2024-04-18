@@ -28,16 +28,16 @@ Below are some examples of how to control the active complementary area using th
 wp.data
 	.select( 'core/interface' )
 	.getActiveComplementaryArea( 'core' );
-// -> "editor/document"
+// -> "edit-post/document"
 
 wp.data
 	.dispatch( 'core/interface' )
-	.enableComplementaryArea( 'core', 'editor/block' );
+	.enableComplementaryArea( 'core', 'edit-post/block' );
 
 wp.data
 	.select( 'core/interface' )
 	.getActiveComplementaryArea( 'core' );
-// -> "editor/block"
+// -> "edit-post/block"
 
 wp.data
 	.dispatch( 'core/interface' )
