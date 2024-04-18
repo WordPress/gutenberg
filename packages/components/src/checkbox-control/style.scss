@@ -5,10 +5,6 @@
 	@include break-small() {
 		--checkbox-input-size: 20px;
 	}
-
-	.components-base-control__help {
-		margin-left: calc(var(--checkbox-input-size) + #{$grid-unit-15});
-	}
 }
 
 .components-checkbox-control__label {
@@ -84,4 +80,9 @@ svg.components-checkbox-control__indeterminate {
 	@include break-small() {
 		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
 	}
+}
+
+.components-checkbox-control__help {
+	display: inline-block;
+	margin-inline-start: calc(var(--checkbox-input-size) + #{$grid-unit-15});
 }

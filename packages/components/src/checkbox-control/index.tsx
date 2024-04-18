@@ -96,7 +96,11 @@ export function CheckboxControl(
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ heading }
 			id={ id }
-			help={ help }
+			help={
+				<span className="components-checkbox-control__help">
+					{ help }
+				</span>
+			}
 			className={ classnames( 'components-checkbox-control', className ) }
 		>
 			<HStack spacing={ 0 } justify="start" alignment="top">
