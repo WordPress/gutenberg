@@ -18,7 +18,7 @@ test.describe( 'data-wp-each', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'should use `item` as the defaul item name in the context', async ( {
+	test( 'should use `item` as the default item name in the context', async ( {
 		page,
 	} ) => {
 		const elements = page.getByTestId( 'letters' ).getByTestId( 'item' );
