@@ -1,9 +1,5 @@
 # `ConfirmDialog`
 
-<div class="callout callout-alert">
-This feature is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `ConfirmDialog` is built of top of [`Modal`](/packages/components/src/modal/README.md) and displays a confirmation dialog, with _confirm_ and _cancel_ buttons.
 
 The dialog is confirmed by clicking the _confirm_ button or by pressing the `Enter` key. It is cancelled (closed) by clicking the _cancel_ button, by pressing the `ESC` key, or by clicking outside the dialog focus (i.e, the overlay).
@@ -23,7 +19,7 @@ Allows the component to be used standalone, just by declaring it as part of anot
 Activating this mode is as simple as omitting the `isOpen` prop. The only mandatory prop, in this case, is the `onConfirm` callback. The message is passed as the `children`. You can pass any JSX you'd like, which allows to further format the message or include sub-component if you'd like:
 
 ```jsx
-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { ConfirmDialog } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -44,7 +40,7 @@ Let the parent component control when the dialog is open/closed. It's activated 
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
+import { ConfirmDialog } from '@wordpress/components';
 
 function Example() {
 	const [ isOpen, setIsOpen ] = useState( true );
