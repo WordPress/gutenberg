@@ -398,43 +398,6 @@ describe( 'blocks', () => {
 			} );
 		} );
 
-		// This can be removed once polyfill adding selectors has been removed.
-		it( 'should apply selectors on the client when not set on the server', () => {
-			const blockName = 'core/test-block-with-selectors';
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					selectors: { root: '.wp-block-custom-selector' },
-					category: 'ignored',
-				},
-			} );
-
-			const blockType = {
-				title: 'block title',
-			};
-			registerBlockType( blockName, blockType );
-			expect( getBlockType( blockName ) ).toEqual( {
-				name: blockName,
-				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
-				icon: { src: BLOCK_ICON_DEFAULT },
-				attributes: {},
-				providesContext: {},
-				usesContext: [],
-				keywords: [],
-				selectors: { root: '.wp-block-custom-selector' },
-				supports: {},
-				styles: [],
-				variations: [],
-				blockHooks: {},
-			} );
-		} );
-
 		// This test can be removed once the polyfill for blockHooks gets removed.
 		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
 			const blockName = 'tests/hooked-block';
