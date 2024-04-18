@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
@@ -31,8 +30,6 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
-import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -109,40 +106,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		templateLock,
 	} = useContext( PrivateBlockContext );
 
-	const {
-		isZoomOutMode,
-		getBlockInsertionPoint,
-		getBlockOrder,
-		isDraggingAnything,
-		isCurrentBlockSection,
-	} = useSelect(
-		( select ) => {
-			const {
-				__unstableGetEditorMode,
-				getBlockOrder: _getBlockOrder,
-				getSettings,
-				getBlockInsertionPoint: _getBlockInsertionPoint,
-				isDragging: _isDragging,
-			} = unlock( select( blockEditorStore ) );
-
-			const { sectionRootClientId } = unlock( getSettings() );
-			const sectionClientIds = _getBlockOrder( sectionRootClientId );
-			const _isCurrentBlockSection =
-				sectionClientIds.includes( clientId );
-
-			return {
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-				isDraggingAnything: _isDragging(),
-				isCurrentBlockSection: _isCurrentBlockSection,
-				getBlockInsertionPoint: _getBlockInsertionPoint,
-				getBlockOrder: _getBlockOrder,
-			};
-		},
-		[ clientId ]
-	);
-
-	const insertionPoint = getBlockInsertionPoint();
-
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
@@ -181,26 +144,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
-	// if zoom out mode is enabled, then we want to enable
-	// the spacing out of sections when insertion point is between them
-	let hasDragSpacingTop = false;
-	let hasDragSpacingBottom = false;
-	if ( isZoomOutMode && isCurrentBlockSection && isDraggingAnything ) {
-		const order = getBlockOrder( insertionPoint.rootClientId );
-		if ( order.length ) {
-			const previousClientId = order[ insertionPoint.index - 1 ];
-			const nextClientId = order[ insertionPoint.index ];
-			if ( previousClientId && nextClientId ) {
-				if ( previousClientId === clientId ) {
-					hasDragSpacingBottom = true;
-				}
-				if ( nextClientId === clientId ) {
-					hasDragSpacingTop = true;
-				}
-			}
-		}
-	}
-
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
@@ -219,8 +162,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				// The wp-block className is important for editor styles.
 				'wp-block': ! isAligned,
 				'has-block-overlay': hasOverlay,
-				'has-drag-spacing-top': hasDragSpacingTop,
-				'has-drag-spacing-bottom': hasDragSpacingBottom,
 				'is-selected': isSelected,
 				'is-highlighted': isHighlighted,
 				'is-multi-selected': isMultiSelected,

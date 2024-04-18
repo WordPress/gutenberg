@@ -22,6 +22,7 @@ import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import { unlock } from '../../lock-unlock';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -70,6 +71,67 @@ function BlockPopoverInbetween( {
 	const previousElement = useBlockElement( previousClientId );
 	const nextElement = useBlockElement( nextClientId );
 	const isVertical = orientation === 'vertical';
+
+	const {
+		isZoomOutMode,
+		isDraggingAnything,
+		isPreviousBlockSection,
+		isNextBlockSection,
+	} = useSelect( ( select ) => {
+		const {
+			__unstableGetEditorMode,
+			getBlockOrder: _getBlockOrder,
+			getSettings,
+			getBlockInsertionPoint: _getBlockInsertionPoint,
+			isDragging: _isDragging,
+		} = unlock( select( blockEditorStore ) );
+
+		const { sectionRootClientId } = unlock( getSettings() );
+		const sectionClientIds = _getBlockOrder( sectionRootClientId );
+		const _isPreviousBlockSection =
+			sectionClientIds.includes( previousClientId );
+		const _isNextBlockSection = sectionClientIds.includes( nextClientId );
+
+		return {
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isDraggingAnything: _isDragging(),
+			isPreviousBlockSection: _isPreviousBlockSection,
+			isNextBlockSection: _isNextBlockSection,
+			getBlockInsertionPoint: _getBlockInsertionPoint,
+			getBlockOrder: _getBlockOrder,
+		};
+	} );
+
+	// visually alter adjacent sections
+	useLayoutEffect( () => {
+		if (
+			! isZoomOutMode ||
+			! isDraggingAnything ||
+			! previousElement ||
+			! nextElement ||
+			! isPreviousBlockSection ||
+			! isNextBlockSection
+		) {
+			return;
+		}
+		previousElement.classList.add( 'has-drag-spacing-bottom' );
+		nextElement.classList.add( 'has-drag-spacing-top' );
+		return () => {
+			if ( previousElement ) {
+				previousElement.classList.remove( 'has-drag-spacing-bottom' );
+			}
+			if ( nextElement ) {
+				nextElement.classList.remove( 'has-drag-spacing-top' );
+			}
+		};
+	}, [
+		previousElement,
+		nextElement,
+		isDraggingAnything,
+		isNextBlockSection,
+		isPreviousBlockSection,
+		isZoomOutMode,
+	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
