@@ -50,6 +50,7 @@ import {
 	LAYOUT_LIST,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	ENUMERATION_TYPE,
@@ -310,9 +311,21 @@ function Title( { item, categoryId } ) {
 }
 
 export default function DataviewsPatterns() {
-	const { categoryType, categoryId = PATTERN_DEFAULT_CATEGORY } =
-		getQueryArgs( window.location.href );
-	const type = categoryType || PATTERN_TYPES.theme;
+	const {
+		categoryType,
+		categoryId: categoryIdFromURL,
+		path,
+	} = getQueryArgs( window.location.href );
+	const type =
+		categoryType ||
+		( path === '/wp_template_part/all'
+			? TEMPLATE_PART_POST_TYPE
+			: PATTERN_TYPES.theme );
+	const categoryId =
+		categoryIdFromURL ||
+		( path === '/wp_template_part/all'
+			? TEMPLATE_PART_ALL_AREAS_CATEGORY
+			: PATTERN_DEFAULT_CATEGORY );
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
