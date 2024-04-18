@@ -556,9 +556,14 @@ export default function useListViewDropZone( {
 	const ref = useDropZone( {
 		dropZoneElement,
 		onDrop( event ) {
+			throttled.cancel();
 			if ( target ) {
 				onBlockDrop( event );
 			}
+			// Use `undefined` value to indicate that the drag has concluded.
+			// This allows styling rules that are active only when a user is
+			// dragging to be removed.
+			setTarget( undefined );
 		},
 		onDragLeave() {
 			throttled.cancel();
