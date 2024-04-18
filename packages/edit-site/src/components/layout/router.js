@@ -119,6 +119,24 @@ export default function useLayoutAreas() {
 		};
 	}
 
+	// Template parts
+	/*
+	 * This is for legacy reasons, as the template parts are now part of the patterns screen.
+	 * However, hybrid themes (classic themes that support template parts) still access this URL.
+	 * While there are plans to make them use the patterns screen instead, we cannot do it for now.
+	 * See discussion at https://github.com/WordPress/gutenberg/pull/60689
+	 */
+	if ( path === '/wp_template_part/all' ) {
+		return {
+			key: 'template-parts',
+			areas: {
+				sidebar: <SidebarNavigationScreenPatterns />,
+				content: <PagePatterns />,
+				mobile: <PagePatterns />,
+			},
+		};
+	}
+
 	// Patterns
 	if ( path === '/patterns' ) {
 		return {
