@@ -1445,12 +1445,18 @@ export const __unstableSetEditorMode =
 				const sectionClientIds =
 					select.getBlockOrder( sectionRootClientId );
 				if ( sectionClientIds ) {
-					const parents = select.getBlockParents(
-						firstSelectedClientId
-					);
-					const firstSectionClientId = parents.find( ( parent ) =>
-						sectionClientIds.includes( parent )
-					);
+					let firstSectionClientId =
+						sectionClientIds[ sectionClientIds.length - 1 ];
+
+					if ( firstSelectedClientId ) {
+						const parents = select.getBlockParents(
+							firstSelectedClientId
+						);
+						firstSectionClientId = parents.find( ( parent ) =>
+							sectionClientIds.includes( parent )
+						);
+					}
+
 					dispatch.selectBlock( firstSectionClientId );
 				}
 			} else if ( firstSelectedClientId ) {
