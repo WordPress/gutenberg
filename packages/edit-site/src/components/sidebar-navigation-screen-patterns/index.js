@@ -28,6 +28,7 @@ import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
 
 function CategoriesGroup( {
+	path,
 	templatePartAreas,
 	patternCategories,
 	currentCategory,
@@ -39,6 +40,7 @@ function CategoriesGroup( {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 			<CategoryItem
 				key="all"
+				path={ path }
 				count={ Object.values( templatePartAreas )
 					.map( ( { templateParts } ) => templateParts?.length || 0 )
 					.reduce( ( acc, val ) => acc + val, 0 ) }
@@ -55,6 +57,7 @@ function CategoriesGroup( {
 				( [ area, { label, templateParts } ] ) => (
 					<CategoryItem
 						key={ area }
+						path={ path }
 						count={ templateParts?.length }
 						icon={ getTemplatePartIcon( area ) }
 						label={ label }
@@ -71,6 +74,7 @@ function CategoriesGroup( {
 			{ allPatterns && (
 				<CategoryItem
 					key={ allPatterns.name }
+					path={ path }
 					count={ allPatterns.count }
 					label={ allPatterns.label }
 					icon={ file }
@@ -86,6 +90,7 @@ function CategoriesGroup( {
 			{ otherPatterns.map( ( category ) => (
 				<CategoryItem
 					key={ category.name }
+					path={ path }
 					count={ category.count }
 					label={ category.label }
 					icon={ file }
@@ -153,6 +158,7 @@ export default function SidebarNavigationScreenPatterns() {
 								</ItemGroup>
 							) }
 							<CategoriesGroup
+								path={ path }
 								templatePartAreas={ templatePartAreas }
 								patternCategories={
 									isBlockBasedTheme
