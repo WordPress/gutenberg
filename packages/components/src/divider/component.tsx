@@ -34,7 +34,7 @@ function UnconnectedDivider(
  * ```js
  * import {
  * 		__experimentalDivider as Divider,
- * 		__experimentalText as Text,
+ * 		Text,
  * 		__experimentalVStack as VStack,
  * } from `@wordpress/components`;
  *

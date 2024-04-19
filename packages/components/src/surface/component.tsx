@@ -29,7 +29,7 @@ function UnconnectedSurface(
  * ```jsx
  * import {
  *	__experimentalSurface as Surface,
- *	__experimentalText as Text,
+ *	Text,
  * } from '@wordpress/components';
  *
  * function Example() {

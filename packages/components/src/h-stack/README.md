@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {
@@ -87,7 +87,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {
@@ -109,7 +109,7 @@ function Example() {
 import {
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {

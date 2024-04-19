@@ -27,7 +27,7 @@ function UnconnectedGrid(
  * ```jsx
  * import {
  * 	__experimentalGrid as Grid,
- * 	__experimentalText as Text
+ * 	Text
  * } from `@wordpress/components`;
  *
  * function Example() {

@@ -13,7 +13,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
 ```jsx
 import {
 	__experimentalSurface as Surface,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {
