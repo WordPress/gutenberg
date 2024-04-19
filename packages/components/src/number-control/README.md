@@ -1,15 +1,11 @@
 # NumberControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 NumberControl is an enhanced HTML [`input[type="number]`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/number) element.
 
 ## Usage
 
 ```jsx
-import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
+import { NumberControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ value, setValue ] = useState( 10 );
