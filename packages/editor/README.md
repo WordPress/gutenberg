@@ -128,7 +128,20 @@ Example:
 
 ### AutosaveMonitor
 
-Undocumented declaration.
+AutosaveMonitor invokes `props.autosave()` within at most `interval` seconds after an unsaved change is detected.
+
+A check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called. The time between the change and the autosave varies but is no larger than `props.interval` seconds.
+
+_Parameters_
+
+	_props_ `Object`: The props for the component.
+	_props_.editsReference `string`: A reference to the edits made in the component.
+	_props_.disableIntervalChecks `boolean`: Indicates if timer is disabled or not.
+	_props_.isDirty `boolean`: Indicates if the component is dirty (has unsaved changes).
+	_props_.isAutosaveable `boolean`: Indicates if autosave functionality is enabled.
+	_props_.interval `number`: The interval (in seconds) for autosave.
+	_props_.isAutosaving `boolean`: Indicates if autosaving is currently in progress.
+	_props_.autosave `Function`: The function to trigger autosave.
 
 ### BlockAlignmentToolbar
 
