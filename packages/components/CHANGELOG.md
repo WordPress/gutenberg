@@ -17,6 +17,8 @@
 
 ### Bug Fix
 
+-   `Truncate`: Fix link control link preview when it displays long URLs ([#60576](https://github.com/WordPress/gutenberg/pull/60890)).
+
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
 
 ### Experimental
