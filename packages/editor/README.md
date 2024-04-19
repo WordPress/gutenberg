@@ -128,7 +128,13 @@ Example:
 
 ### AutosaveMonitor
 
-Undocumented declaration.
+AutosaveMonitor component. Monitors the changes made to the edited post and triggers autosave if necessary.
+
+_Usage_
+
+```jsx
+<AutosaveMonitor interval={ 30000 } />
+```
 
 ### BlockAlignmentToolbar
 
