@@ -35,7 +35,7 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
  *
  * @param {Object}   props           Component props.
  * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected text align.
+ * @param {string}   props.value     Currently selected text alignment.
  * @param {Function} props.onChange  Handles change in text alignment selection.
  * @param {Array}    props.controls  Array of text align controls to display.
  *
