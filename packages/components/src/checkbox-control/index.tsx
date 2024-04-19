@@ -97,9 +97,11 @@ export function CheckboxControl(
 			label={ heading }
 			id={ id }
 			help={
-				<span className="components-checkbox-control__help">
-					{ help }
-				</span>
+				help && (
+					<span className="components-checkbox-control__help">
+						{ help }
+					</span>
+				)
 			}
 			className={ classnames( 'components-checkbox-control', className ) }
 		>
