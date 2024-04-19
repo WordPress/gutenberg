@@ -18,7 +18,7 @@ import {
 	useResizeObserver,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -49,10 +49,12 @@ import { useCommonCommands } from '../../hooks/commands/use-common-commands';
 import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands';
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
-import useMovingAnimation from './animation';
+import {
+	default as useMovingAnimation,
+	PrivateHeaderAnimationContext,
+} from './animation';
 import SidebarContent from '../sidebar';
 import SaveHub from '../save-hub';
-
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
@@ -121,26 +123,20 @@ export default function Layout() {
 		triggerAnimationOnChange: canvasMode + '__' + routeKey,
 	} );
 
-	// This determines which animation variant should apply to the header.
-	// There is also a `isDistractionFreeHovering` state that gets priority
-	// when hovering the `edit-site-layout__header-container` in distraction
-	// free mode. It's set via framer and trickles down to all the children
-	// so they can use this variant state too.
-	//
-	// TODO: The issue with this is we want to have the hover state stick when hovering
-	// a popover opened via the header. We'll probably need to lift this state to
-	// handle it ourselves. Also, focusWithin the header needs to be handled.
-	let headerAnimationState;
+	const [ headerAnimationState, setHeaderAnimationState ] =
+		useState( canvasMode );
 
-	if ( canvasMode === 'view' ) {
-		// We need 'view' to always take priority so 'isDistractionFree'
-		// doesn't bleed over into the view (sidebar) state
-		headerAnimationState = 'view';
-	} else if ( isDistractionFree ) {
-		headerAnimationState = 'isDistractionFree';
-	} else {
-		headerAnimationState = canvasMode; // edit, view, init
-	}
+	useEffect( () => {
+		if ( canvasMode === 'view' ) {
+			// We need 'view' to always take priority so 'isDistractionFree'
+			// doesn't bleed over into the view (sidebar) state
+			setHeaderAnimationState( 'view' );
+		} else if ( isDistractionFree ) {
+			setHeaderAnimationState( 'isDistractionFree' );
+		} else {
+			setHeaderAnimationState( canvasMode ); // edit, view, init
+		}
+	}, [ canvasMode, isDistractionFree ] );
 
 	// Sets the right context for the command palette
 	let commandContext = 'site-editor';
@@ -207,11 +203,20 @@ export default function Layout() {
 						view: { opacity: 1 },
 						edit: { opacity: 1 },
 					} }
-					whileHover={
-						isDistractionFree
-							? 'isDistractionFreeHovering'
-							: undefined
-					}
+					onHoverStart={ () => {
+						if ( ! isDistractionFree ) {
+							return;
+						}
+
+						setHeaderAnimationState( 'isDistractionFreeHovering' );
+					} }
+					onHoverEnd={ () => {
+						if ( ! isDistractionFree ) {
+							return;
+						}
+
+						setHeaderAnimationState( 'isDistractionFree' );
+					} }
 					animate={ headerAnimationState }
 				>
 					<SiteHub
@@ -292,31 +297,35 @@ export default function Layout() {
 									ref={ animationRef }
 								>
 									<ErrorBoundary>
-										<ResizableFrame
-											isReady={ ! isEditorLoading }
-											isFullWidth={
-												canvasMode === 'edit'
-											}
-											defaultSize={ {
-												width:
-													canvasSize.width -
-													24 /* $canvas-padding */,
-												height: canvasSize.height,
-											} }
-											isOversized={
-												isResizableFrameOversized
-											}
-											setIsOversized={
-												setIsResizableFrameOversized
-											}
-											innerContentStyle={ {
-												background:
-													gradientValue ??
-													backgroundColor,
-											} }
+										<PrivateHeaderAnimationContext.Provider
+											value={ headerAnimationState }
 										>
-											{ areas.preview }
-										</ResizableFrame>
+											<ResizableFrame
+												isReady={ ! isEditorLoading }
+												isFullWidth={
+													canvasMode === 'edit'
+												}
+												defaultSize={ {
+													width:
+														canvasSize.width -
+														24 /* $canvas-padding */,
+													height: canvasSize.height,
+												} }
+												isOversized={
+													isResizableFrameOversized
+												}
+												setIsOversized={
+													setIsResizableFrameOversized
+												}
+												innerContentStyle={ {
+													background:
+														gradientValue ??
+														backgroundColor,
+												} }
+											>
+												{ areas.preview }
+											</ResizableFrame>
+										</PrivateHeaderAnimationContext.Provider>
 									</ErrorBoundary>
 								</div>
 							) }

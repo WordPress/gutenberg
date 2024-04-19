@@ -6,7 +6,14 @@ import { Controller, easings } from '@react-spring/web';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	createContext,
+} from '@wordpress/element';
+
+export const PrivateHeaderAnimationContext = createContext( 'view' );
 
 function getAbsolutePosition( element ) {
 	return {

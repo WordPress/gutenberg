@@ -41,15 +41,6 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-const headerVariants = {
-	hidden: { opacity: 0 },
-	hover: {
-		opacity: 1,
-		transition: { type: 'tween', delay: 0.2, delayChildren: 0.2 },
-	},
-	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
-};
-
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
@@ -67,6 +58,7 @@ function InterfaceSkeleton(
 		// Todo: does this need to be a prop.
 		// Can we use a dependency to keyboard-shortcuts directly?
 		shortcuts,
+		headerAnimationVariant,
 	},
 	ref
 ) {
@@ -119,22 +111,19 @@ function InterfaceSkeleton(
 						as={ motion.div }
 						className="interface-interface-skeleton__header"
 						aria-label={ mergedLabels.header }
-						initial={
-							isDistractionFree
-								? 'hidden'
-								: 'distractionFreeInactive'
-						}
-						whileHover={
-							isDistractionFree
-								? 'hover'
-								: 'distractionFreeInactive'
-						}
-						animate={
-							isDistractionFree
-								? 'hidden'
-								: 'distractionFreeInactive'
-						}
-						variants={ headerVariants }
+						variants={ {
+							isDistractionFree: { opacity: 0 },
+							isDistractionFreeHovering: {
+								opacity: 1,
+								transition: {
+									type: 'tween',
+									delay: 0.2,
+									delayChildren: 0.2,
+								},
+							},
+							view: { opacity: 1, transition: { delay: 0 } },
+						} }
+						animate={ headerAnimationVariant }
 						transition={
 							isDistractionFree
 								? { type: 'tween', delay: 0.8 }

@@ -34,6 +34,7 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -58,6 +59,7 @@ import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
+import { PrivateHeaderAnimationContext } from '../layout/animation';
 
 const {
 	ExperimentalEditorProvider: EditorProvider,
@@ -147,7 +149,7 @@ export default function Editor( { isLoading, onClick } ) {
 			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
-
+	const headerAnimationVariant = useContext( PrivateHeaderAnimationContext );
 	const isViewMode = canvasMode === 'view';
 	const isEditMode = canvasMode === 'edit';
 	const showVisualEditor = isViewMode || editorMode === 'visual';
@@ -192,6 +194,8 @@ export default function Editor( { isLoading, onClick } ) {
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
 			( ! postWithTemplate && !! editedPost ) );
 
+	// const headerAnimationControls = useAnimateHeader( { variant: false } );
+
 	return (
 		<>
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
@@ -223,6 +227,7 @@ export default function Editor( { isLoading, onClick } ) {
 								'show-icon-labels': showIconLabels,
 							}
 						) }
+						headerAnimationVariant={ headerAnimationVariant }
 						header={
 							<AnimatePresence initial={ false }>
 								{ canvasMode === 'edit' && (
@@ -230,11 +235,29 @@ export default function Editor( { isLoading, onClick } ) {
 										initial={ {
 											marginTop: -60,
 										} }
-										animate={ {
-											marginTop: 0,
-										} }
 										exit={ {
 											marginTop: -60,
+										} }
+										variants={ {
+											isDistractionFree: {
+												marginTop: -60,
+												opacity: 0,
+												transition: {
+													type: 'tween',
+													delay: 0.8,
+													delayChildren: 0.8,
+												}, // How long to wait before the header exits
+											},
+											isDistractionFreeHovering: {
+												marginTop: 0,
+												opacity: 1,
+												transition: {
+													type: 'tween',
+													delay: 0.2,
+													delayChildren: 0.2,
+												}, // How long to wait before the header shows
+											},
+											edit: { marginTop: 0 },
 										} }
 										transition={ {
 											type: 'tween',
@@ -246,6 +269,7 @@ export default function Editor( { isLoading, onClick } ) {
 													: ANIMATION_DURATION,
 											ease: [ 0.6, 0, 0.4, 1 ],
 										} }
+										animate={ headerAnimationVariant }
 									>
 										<Header />
 									</motion.div>
