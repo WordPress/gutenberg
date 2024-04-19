@@ -1,9 +1,5 @@
 # `Item`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `Item` is used in combination with `ItemGroup` to display a list of items grouped and styled together.
 
 ## Usage
@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import {
-	__experimentalItemGroup as ItemGroup,
+	ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
 
@@ -50,7 +46,7 @@ In the following example, the `<Item />` will render with a size of `small`:
 
 ```jsx
 import {
-	__experimentalItemGroup as ItemGroup,
+	ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
 

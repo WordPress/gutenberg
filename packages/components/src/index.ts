@@ -97,8 +97,12 @@ export { default as Icon } from './icon';
 export type { IconType } from './icon';
 export { default as IconButton } from './button/deprecated';
 export {
+	/**
+	 * @deprecated Import `ItemGroup` instead.
+	 */
 	ItemGroup as __experimentalItemGroup,
 	Item as __experimentalItem,
+	ItemGroup,
 } from './item-group';
 export { default as __experimentalInputControl } from './input-control';
 export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
