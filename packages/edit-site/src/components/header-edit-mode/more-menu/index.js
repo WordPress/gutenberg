@@ -24,17 +24,13 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	PREFERENCES_MODAL_NAME,
-	default as EditSitePreferencesModal,
-} from '../../preferences-modal';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher, ActionItem, interfaceStore } =
+const { ModeSwitcher, ActionItem, interfaceStore, PreferencesModal } =
 	unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
@@ -157,7 +153,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						<MenuGroup>
 							<MenuItem
 								onClick={ () =>
-									openModal( PREFERENCES_MODAL_NAME )
+									openModal( 'editor/preferences' )
 								}
 							>
 								{ __( 'Preferences' ) }
@@ -166,7 +162,7 @@ export default function MoreMenu( { showIconLabels } ) {
 					</>
 				) }
 			</DropdownMenu>
-			<EditSitePreferencesModal />
+			<PreferencesModal />
 		</>
 	);
 }

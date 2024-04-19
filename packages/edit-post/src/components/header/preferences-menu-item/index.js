@@ -16,14 +16,13 @@ const { interfaceStore } = unlock( editorPrivateApis );
 /**
  * Internal dependencies
  */
-import { PREFERENCES_MODAL_NAME } from '../../../components/preferences-modal';
 
 export default function PreferencesMenuItem() {
 	const { openModal } = useDispatch( interfaceStore );
 	return (
 		<MenuItem
 			onClick={ () => {
-				openModal( PREFERENCES_MODAL_NAME );
+				openModal( 'editor/preferences' );
 			} }
 		>
 			{ __( 'Preferences' ) }

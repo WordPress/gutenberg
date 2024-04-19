@@ -30,7 +30,6 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
@@ -187,7 +186,6 @@ function useEditUICommands() {
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
-	const { openModal } = useDispatch( interfaceStore );
 
 	if ( canvasMode !== 'edit' ) {
 		return { isLoading: false, commands: [] };
@@ -220,14 +218,6 @@ function useEditUICommands() {
 			} else {
 				openGeneralSidebar( 'edit-site/block' );
 			}
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-preferences',
-		label: __( 'Editor preferences' ),
-		callback: () => {
-			openModal( PREFERENCES_MODAL_NAME );
 		},
 	} );
 
