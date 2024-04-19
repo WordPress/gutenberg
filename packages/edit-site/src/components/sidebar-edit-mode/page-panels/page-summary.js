@@ -9,12 +9,16 @@ import {
 	PostSchedulePanel,
 	PostTemplatePanel,
 	PostFeaturedImagePanel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PageStatus from './page-status';
+import { unlock } from '../../../lock-unlock';
+
+const { PrivatePostExcerptPanel } = unlock( editorPrivateApis );
 
 export default function PageSummary( {
 	status,
@@ -29,6 +33,7 @@ export default function PageSummary( {
 				{ ( fills ) => (
 					<>
 						<PostFeaturedImagePanel withPanelBody={ false } />
+						<PrivatePostExcerptPanel />
 						<PageStatus
 							status={ status }
 							date={ date }

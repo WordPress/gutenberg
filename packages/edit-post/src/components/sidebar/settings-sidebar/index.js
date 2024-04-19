@@ -22,7 +22,6 @@ import {
 	PluginDocumentSettingPanel,
 	PluginSidebar,
 	PostDiscussionPanel,
-	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	privateApis as editorPrivateApis,
@@ -130,7 +129,6 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 					<PluginDocumentSettingPanel.Slot />
 					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
-					<PostExcerptPanel />
 					<PostDiscussionPanel />
 					<PageAttributesPanel />
 					<PatternOverridesPanel />

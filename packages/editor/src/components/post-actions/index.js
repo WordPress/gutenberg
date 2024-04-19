@@ -35,6 +35,7 @@ const POST_ACTIONS_WHILE_EDITING = [
 	'view-post',
 	'view-post-revisions',
 	'rename-post',
+	'edit-post-excerpt',
 	'move-to-trash',
 ];
 

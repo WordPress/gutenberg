@@ -9,11 +9,16 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	Modal,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
+import {
+	PostExcerpt,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,6 +28,9 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenamePostMenuItem from '../rename-post-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 export default function TemplateActions( {
 	postType,
@@ -39,10 +47,6 @@ export default function TemplateActions( {
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
-
-	if ( ! isRemovable && ! isRevertable ) {
-		return null;
-	}
 
 	return (
 		<DropdownMenu
@@ -69,6 +73,7 @@ export default function TemplateActions( {
 							/>
 						</>
 					) }
+					<EditDescriptionMenuItem />
 					{ isRevertable && (
 						<ResetMenuItem
 							template={ template }
@@ -160,6 +165,35 @@ function DeleteMenuItem( { onRemove, title } ) {
 					decodeEntities( title )
 				) }
 			</ConfirmDialog>
+		</>
+	);
+}
+
+function EditDescriptionMenuItem() {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	return (
+		<>
+			<MenuItem onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Edit description' ) }
+			</MenuItem>
+			{ isModalOpen && (
+				<Modal
+					title={ __( 'Edit description' ) }
+					onRequestClose={ () => {
+						setIsModalOpen( false );
+					} }
+					overlayClassName="editor-action-modal"
+				>
+					<PluginPostExcerpt.Slot>
+						{ ( fills ) => (
+							<>
+								<PostExcerpt hideLabelFromVision />
+								{ fills }
+							</>
+						) }
+					</PluginPostExcerpt.Slot>
+				</Modal>
+			) }
 		</>
 	);
 }

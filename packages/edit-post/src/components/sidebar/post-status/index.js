@@ -28,7 +28,8 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import { unlock } from '../../../lock-unlock';
 
-const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
+const { PostStatus: PostStatusPanel, PrivatePostExcerptPanel } =
+	unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -36,16 +37,30 @@ const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
 const PANEL_NAME = 'post-status';
 
 export default function PostStatus() {
-	const { isOpened, isRemoved } = useSelect( ( select ) => {
-		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
-		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } =
-			select( editorStore );
-		return {
-			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
-		};
-	}, [] );
+	const { isOpened, isRemoved, showPostExcerptPanel } = useSelect(
+		( select ) => {
+			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+			const {
+				isEditorPanelRemoved,
+				isEditorPanelOpened,
+				getCurrentPostType,
+			} = select( editorStore );
+			const postType = getCurrentPostType();
+			return {
+				isRemoved: isEditorPanelRemoved( PANEL_NAME ),
+				isOpened: isEditorPanelOpened( PANEL_NAME ),
+				// Post excerpt panel is rendered in different place depending on the post type.
+				// So we cannot make this check inside the PostExcerpt component based on the current edited entity.
+				showPostExcerptPanel: ! [
+					'wp_template',
+					'wp_template_part',
+					'wp_block',
+				].includes( postType ),
+			};
+		},
+		[]
+	);
 	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( isRemoved ) {
@@ -64,6 +79,7 @@ export default function PostStatus() {
 					<>
 						<PostStatusPanel />
 						<PostFeaturedImagePanel withPanelBody={ false } />
+						{ showPostExcerptPanel && <PrivatePostExcerptPanel /> }
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />

@@ -25,6 +25,7 @@ import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
+import { useEditExcerptAction } from './private-actions';
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {
@@ -771,6 +772,7 @@ const renameTemplateAction = {
 export function usePostActions( onActionPerformed, actionIds = null ) {
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
+	const editPostExcerptAction = useEditExcerptAction();
 	return useMemo(
 		() => {
 			// By default, return all actions...
@@ -784,6 +786,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 				postRevisionsAction,
 				renamePostAction,
 				renameTemplateAction,
+				editPostExcerptAction,
 				trashPostAction,
 			];
 
@@ -856,6 +859,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 			...( actionIds || [] ),
 			permanentlyDeletePostAction,
 			restorePostAction,
+			editPostExcerptAction,
 			onActionPerformed,
 		]
 	);
