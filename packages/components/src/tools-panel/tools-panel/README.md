@@ -58,7 +58,7 @@ import {
 	BoxControl,
 	ToolsPanel,
 	ToolsPanelItem,
-	__experimentalUnitControl as UnitControl,
+	UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
