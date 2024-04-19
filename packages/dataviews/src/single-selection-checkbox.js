@@ -11,6 +11,7 @@ export default function SingleSelectionCheckbox( {
 	data,
 	getItemId,
 	primaryField,
+	disabled,
 } ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -31,9 +32,14 @@ export default function SingleSelectionCheckbox( {
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
+			aria-label={ selectionLabel }
+			aria-disabled={ disabled }
 			checked={ isSelected }
-			label={ selectionLabel }
 			onChange={ () => {
+				if ( disabled ) {
+					return;
+				}
+
 				if ( ! isSelected ) {
 					onSelectionChange(
 						data.filter( ( _item ) => {

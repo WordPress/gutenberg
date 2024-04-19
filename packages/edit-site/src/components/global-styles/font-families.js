@@ -33,11 +33,11 @@ function FontFamilies() {
 			{ !! modalTabOpen && (
 				<FontLibraryModal
 					onRequestClose={ () => toggleModal() }
-					initialTabId={ modalTabOpen }
+					defaultTabId={ modalTabOpen }
 				/>
 			) }
 
-			<VStack spacing={ 3 }>
+			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
 					<Subtitle level={ 3 }>{ __( 'Fonts' ) }</Subtitle>
 					<HStack justify="flex-end">

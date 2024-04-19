@@ -10,17 +10,19 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	Tooltip,
+	Spinner,
+	Flex,
+	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
+
+import { useHasAPossibleBulkAction } from './bulk-actions';
 
 function GridItem( {
 	selection,
@@ -32,8 +34,10 @@ function GridItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
+	badgeFields,
+	columnFields,
 } ) {
-	const [ hasNoPointerEvents, setHasNoPointerEvents ] = useState( false );
+	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	return (
@@ -41,12 +45,15 @@ function GridItem( {
 			spacing={ 0 }
 			key={ id }
 			className={ classnames( 'dataviews-view-grid__card', {
-				'is-selected': isSelected,
-				'has-no-pointer-events': hasNoPointerEvents,
+				'is-selected': hasBulkAction && isSelected,
 			} ) }
-			onMouseDown={ ( event ) => {
+			onClickCapture={ ( event ) => {
 				if ( event.ctrlKey || event.metaKey ) {
-					setHasNoPointerEvents( true );
+					event.stopPropagation();
+					event.preventDefault();
+					if ( ! hasBulkAction ) {
+						return;
+					}
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
@@ -70,11 +77,6 @@ function GridItem( {
 					}
 				}
 			} }
-			onClick={ () => {
-				if ( hasNoPointerEvents ) {
-					setHasNoPointerEvents( false );
-				}
-			} }
 		>
 			<div className="dataviews-view-grid__media">
 				{ mediaField?.render( { item } ) }
@@ -91,35 +93,83 @@ function GridItem( {
 					getItemId={ getItemId }
 					data={ data }
 					primaryField={ primaryField }
+					disabled={ ! hasBulkAction }
 				/>
 				<HStack className="dataviews-view-grid__primary-field">
 					{ primaryField?.render( { item } ) }
 				</HStack>
 				<ItemActions item={ item } actions={ actions } isCompact />
 			</HStack>
-			<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
-				{ visibleFields.map( ( field ) => {
-					const renderedValue = field.render( {
-						item,
-					} );
-					if ( ! renderedValue ) {
-						return null;
-					}
-					return (
-						<VStack
-							className="dataviews-view-grid__field"
-							key={ field.id }
-							spacing={ 1 }
-						>
-							<Tooltip text={ field.header } placement="left">
-								<div className="dataviews-view-grid__field-value">
-									{ renderedValue }
-								</div>
-							</Tooltip>
-						</VStack>
-					);
-				} ) }
-			</VStack>
+			{ !! badgeFields?.length && (
+				<HStack
+					className="dataviews-view-grid__badge-fields"
+					spacing={ 2 }
+					wrap
+					align="top"
+					justify="flex-start"
+				>
+					{ badgeFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
+							<FlexItem
+								key={ field.id }
+								className={ 'dataviews-view-grid__field-value' }
+							>
+								{ renderedValue }
+							</FlexItem>
+						);
+					} ) }
+				</HStack>
+			) }
+			{ !! visibleFields?.length && (
+				<VStack className="dataviews-view-grid__fields" spacing={ 3 }>
+					{ visibleFields.map( ( field ) => {
+						const renderedValue = field.render( {
+							item,
+						} );
+						if ( ! renderedValue ) {
+							return null;
+						}
+						return (
+							<Flex
+								className={ classnames(
+									'dataviews-view-grid__field',
+									columnFields?.includes( field.id )
+										? 'is-column'
+										: 'is-row'
+								) }
+								key={ field.id }
+								gap={ 1 }
+								justify="flex-start"
+								expanded
+								style={ { height: 'auto' } }
+								direction={
+									columnFields?.includes( field.id )
+										? 'column'
+										: 'row'
+								}
+							>
+								<>
+									<FlexItem className="dataviews-view-grid__field-name">
+										{ field.header }
+									</FlexItem>
+									<FlexItem
+										className="dataviews-view-grid__field-value"
+										style={ { maxHeight: 'none' } }
+									>
+										{ renderedValue }
+									</FlexItem>
+								</>
+							</Flex>
+						);
+					} ) }
+				</VStack>
+			) }
 		</VStack>
 	);
 }
@@ -131,7 +181,6 @@ export default function ViewGrid( {
 	actions,
 	isLoading,
 	getItemId,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 } ) {
@@ -141,16 +190,27 @@ export default function ViewGrid( {
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
 	);
-	const visibleFields = fields.filter(
-		( field ) =>
-			! view.hiddenFields.includes( field.id ) &&
-			! [ view.layout.mediaField, view.layout.primaryField ].includes(
-				field.id
-			)
+	const { visibleFields, badgeFields } = fields.reduce(
+		( accumulator, field ) => {
+			if (
+				view.hiddenFields.includes( field.id ) ||
+				[ view.layout.mediaField, view.layout.primaryField ].includes(
+					field.id
+				)
+			) {
+				return accumulator;
+			}
+			// If the field is a badge field, add it to the badgeFields array
+			// otherwise add it to the rest visibleFields array.
+			const key = view.layout.badgeFields?.includes( field.id )
+				? 'badgeFields'
+				: 'visibleFields';
+			accumulator[ key ].push( field );
+			return accumulator;
+		},
+		{ visibleFields: [], badgeFields: [] }
 	);
-	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = deferredRendering ? shownData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	return (
 		<>
 			{ hasData && (
@@ -161,7 +221,7 @@ export default function ViewGrid( {
 					className="dataviews-view-grid"
 					aria-busy={ isLoading }
 				>
-					{ usedData.map( ( item ) => {
+					{ data.map( ( item ) => {
 						return (
 							<GridItem
 								key={ getItemId( item ) }
@@ -174,6 +234,8 @@ export default function ViewGrid( {
 								mediaField={ mediaField }
 								primaryField={ primaryField }
 								visibleFields={ visibleFields }
+								badgeFields={ badgeFields }
+								columnFields={ view.layout.columnFields }
 							/>
 						);
 					} ) }
@@ -186,7 +248,7 @@ export default function ViewGrid( {
 						'dataviews-no-results': ! isLoading,
 					} ) }
 				>
-					<p>{ isLoading ? __( 'Loading…' ) : __( 'No results' ) }</p>
+					<p>{ isLoading ? <Spinner /> : __( 'No results' ) }</p>
 				</div>
 			) }
 		</>

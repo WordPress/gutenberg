@@ -24,16 +24,14 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 	const { templateLock, isLockedByParent, isEditingAsBlocks } = useSelect(
 		( select ) => {
 			const {
-				__unstableGetContentLockingParent,
+				getContentLockingParent,
 				getTemplateLock,
-				__unstableGetTemporarilyEditingAsBlocks,
-			} = select( blockEditorStore );
+				getTemporarilyEditingAsBlocks,
+			} = unlock( select( blockEditorStore ) );
 			return {
 				templateLock: getTemplateLock( clientId ),
-				isLockedByParent:
-					!! __unstableGetContentLockingParent( clientId ),
-				isEditingAsBlocks:
-					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+				isLockedByParent: !! getContentLockingParent( clientId ),
+				isEditingAsBlocks: getTemporarilyEditingAsBlocks() === clientId,
 			};
 		},
 		[ clientId ]

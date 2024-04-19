@@ -15,6 +15,12 @@ import {
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import {
+	PluginBlockSettingsMenuItem,
+	PluginDocumentSettingPanel,
+	PluginMoreMenuItem,
+	PluginPostStatusInfo,
+	PluginSidebar,
+	PluginSidebarMoreMenuItem,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -54,7 +60,6 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
-		isPublishSidebarEnabled: true,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
@@ -70,6 +75,7 @@ export function initializeEditor(
 		showBlockBreadcrumbs: true,
 		showIconLabels: false,
 		showListViewByDefault: false,
+		isPublishSidebarEnabled: true,
 	} );
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
@@ -160,14 +166,14 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
-export { default as PluginDocumentSettingPanel } from './components/sidebar/plugin-document-setting-panel';
-export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
+export { PluginBlockSettingsMenuItem };
+export { PluginDocumentSettingPanel };
+export { PluginMoreMenuItem };
+export { PluginPostStatusInfo };
+export { PluginSidebar };
+export { PluginSidebarMoreMenuItem };
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
-export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';
-export { default as PluginSidebar } from './components/sidebar/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header/plugin-sidebar-more-menu-item';
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
 export { __experimentalPluginPostExcerpt };

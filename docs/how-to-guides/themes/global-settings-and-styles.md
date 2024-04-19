@@ -265,6 +265,7 @@ The settings section has the following structure:
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true
@@ -294,10 +295,10 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 There's one special setting property, `appearanceTools`, which is a boolean and its default value is false. Themes can use this setting to enable the following ones:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: minHeight
+- dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight

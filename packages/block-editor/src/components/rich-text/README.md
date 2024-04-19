@@ -12,6 +12,10 @@ _Required._ HTML string to make editable. The HTML should be valid, and valid in
 
 _Required._ Called when the value changes.
 
+### `identifier: String`
+
+_Optional._ If the editable field is bound to a block attribute (through the `value` and `onChange` props) then this prop should specify the attribute name. The field will use this value to set the block editor selection correctly, specifying in which attribute and at what offset does the selection start or end.
+
 ### `tagName: String`
 
 _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element.
@@ -20,6 +24,10 @@ _Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-na
 
 _Optional._ Placeholder text to show when the field is empty, similar to the
 [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+
+### `disableLineBreaks: Boolean`
+
+_Optional._  Disables inserting line breaks on `Enter` when it is set to `true`
 
 ### `multiline: Boolean | String`
 
@@ -50,6 +58,7 @@ _Optional._ By default, all registered formats are allowed. This setting can be 
 ```js
 <RichText
 	tagName="h2"
+	identifier="content"
 	value={ attributes.content }
 	allowedFormats={ [ 'core/bold', 'core/italic' ] } // Allow the content to be made bold or italic, but do not allow othe formatting options
 	onChange={ ( content ) => setAttributes( { content } ) }
@@ -99,6 +108,7 @@ registerBlockType( /* ... */, {
 			<RichText
 				tagName="h2"
 				className={ className }
+				identifier="content"
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
 			/>

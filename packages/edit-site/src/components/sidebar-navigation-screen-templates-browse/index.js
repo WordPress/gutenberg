@@ -3,8 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-
-import { __experimentalUseNavigator as useNavigator } from '@wordpress/components';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -21,26 +19,25 @@ import DataviewsTemplatesSidebarContent from './content';
 
 const config = {
 	[ TEMPLATE_POST_TYPE ]: {
-		title: __( 'All templates' ),
+		title: __( 'Manage templates' ),
 		description: __(
 			'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 		),
+		contentTitle: __( 'All templates' ),
 	},
 	[ TEMPLATE_PART_POST_TYPE ]: {
-		title: __( 'All template parts' ),
+		title: __( 'Manage template parts' ),
 		description: __(
 			'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 		),
-		backPath: '/patterns',
+		backPath: { path: '/patterns' },
+		contentTitle: __( 'All template parts' ),
 	},
 };
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenTemplatesBrowse() {
-	const {
-		params: { postType },
-	} = useNavigator();
+export default function SidebarNavigationScreenTemplatesBrowse( { postType } ) {
 	const {
 		params: { didAccessPatternsPage, activeView = 'all' },
 	} = useLocation();
@@ -62,7 +59,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }
 					postType={ postType }
-					config={ config }
+					title={ config[ postType ].contentTitle }
 				/>
 			}
 		/>

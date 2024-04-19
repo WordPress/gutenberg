@@ -4,13 +4,13 @@
 import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { external } from '@wordpress/icons';
-import { MenuGroup, MenuItem, VisuallyHidden } from '@wordpress/components';
+import { external, moreVertical } from '@wordpress/icons';
 import {
-	ActionItem,
-	MoreMenuDropdown,
-	store as interfaceStore,
-} from '@wordpress/interface';
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+	DropdownMenu,
+} from '@wordpress/components';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
@@ -25,10 +25,6 @@ import {
  * Internal dependencies
  */
 import {
-	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
-	default as KeyboardShortcutHelpModal,
-} from '../../keyboard-shortcut-help-modal';
-import {
 	PREFERENCES_MODAL_NAME,
 	default as EditSitePreferencesModal,
 } from '../../preferences-modal';
@@ -38,7 +34,8 @@ import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher } = unlock( editorPrivateApis );
+const { ModeSwitcher, ActionItem, interfaceStore } =
+	unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -55,10 +52,18 @@ export default function MoreMenu( { showIconLabels } ) {
 
 	return (
 		<>
-			<MoreMenuDropdown
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'Options' ) }
+				popoverProps={ {
+					placement: 'bottom-end',
+					className: 'more-menu-dropdown__content',
+				} }
 				toggleProps={ {
 					showTooltip: ! showIconLabels,
 					...( showIconLabels && { variant: 'tertiary' } ),
+					tooltipPosition: 'bottom',
+					size: 'compact',
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -111,7 +116,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 						<ModeSwitcher />
 						<ActionItem.Slot
-							name="core/edit-site/plugin-more-menu"
+							name="core/plugin-more-menu"
 							label={ __( 'Plugins' ) }
 							as={ MenuGroup }
 							fillProps={ { onClick: onClose } }
@@ -120,9 +125,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
-									openModal(
-										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-									)
+									openModal( 'editor/keyboard-shortcut-help' )
 								}
 								shortcut={ displayShortcut.access( 'h' ) }
 							>
@@ -162,8 +165,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 					</>
 				) }
-			</MoreMenuDropdown>
-			<KeyboardShortcutHelpModal />
+			</DropdownMenu>
 			<EditSitePreferencesModal />
 		</>
 	);

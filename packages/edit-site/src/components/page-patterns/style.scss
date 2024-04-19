@@ -43,12 +43,6 @@
 }
 
 .edit-site-page-patterns-dataviews {
-	margin-top: 60px;
-
-	@include break-medium {
-		margin-top: 0;
-	}
-
 	.page-patterns-preview-field {
 		display: flex;
 		flex-direction: column;
@@ -110,6 +104,13 @@
 
 	.dataviews-pagination {
 		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
+	}
+
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+			color: var(--wp-block-synced-color);
+		}
 	}
 }
 

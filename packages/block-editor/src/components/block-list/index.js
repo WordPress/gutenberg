@@ -55,15 +55,14 @@ function Root( { className, ...settings } ) {
 		const {
 			getSettings,
 			__unstableGetEditorMode,
-			__unstableGetTemporarilyEditingAsBlocks,
-		} = select( blockEditorStore );
+			getTemporarilyEditingAsBlocks,
+		} = unlock( select( blockEditorStore ) );
 		const { outlineMode, focusMode } = getSettings();
 		return {
 			isOutlineMode: outlineMode,
 			isFocusMode: focusMode,
 			editorMode: __unstableGetEditorMode(),
-			temporarilyEditingAsBlocks:
-				__unstableGetTemporarilyEditingAsBlocks(),
+			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
 		};
 	}, [] );
 	const registry = useRegistry();
@@ -160,6 +159,9 @@ export default function BlockList( settings ) {
 	);
 }
 
+const EMPTY_ARRAY = [];
+const EMPTY_SET = new Set();
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -175,6 +177,7 @@ function Items( {
 		useSelect(
 			( select ) => {
 				const {
+					getSettings,
 					getBlockOrder,
 					getSelectedBlockClientId,
 					getSelectedBlockClientIds,
@@ -183,9 +186,20 @@ function Items( {
 					getBlockEditingMode,
 					__unstableGetEditorMode,
 				} = select( blockEditorStore );
+
+				const _order = getBlockOrder( rootClientId );
+
+				if ( getSettings().__unstableIsPreviewMode ) {
+					return {
+						order: _order,
+						selectedBlocks: EMPTY_ARRAY,
+						visibleBlocks: EMPTY_SET,
+					};
+				}
+
 				const selectedBlockClientId = getSelectedBlockClientId();
 				return {
-					order: getBlockOrder( rootClientId ),
+					order: _order,
 					selectedBlocks: getSelectedBlockClientIds(),
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:
@@ -196,7 +210,9 @@ function Items( {
 									'disabled' &&
 							  __unstableGetEditorMode() !== 'zoom-out'
 							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId && ! selectedBlockClientId ) ),
+							  ( ! rootClientId &&
+									! selectedBlockClientId &&
+									! _order.length ) ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]

@@ -20,7 +20,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		} );
 
 		// Restore the Publish sidebar.
-		await editor.setPreferences( 'core/edit-post', {
+		await editor.setPreferences( 'core', {
 			isPublishSidebarEnabled: true,
 		} );
 	} );
@@ -38,10 +38,13 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		const publishButton = topBar.getByRole( 'button', { name: 'Publish' } );
+		const saveButton = topBar.getByRole( 'button', {
+			name: 'Save',
+			exact: true,
+		} );
 
 		// Should not trigger multi-entity save button with only post edited.
 		await expect( publishButton ).toBeEnabled();
-		await expect( publishButton ).not.toHaveClass( /has-changes-dot/ );
 
 		const openPublishPanel = page.getByRole( 'button', {
 			name: 'Open publish panel',
@@ -73,7 +76,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		await siteTitleField.fill( `${ originalSiteTitle }...` );
 
 		// Should trigger multi-entity save button once template part edited.
-		await expect( publishButton ).toHaveClass( /has-changes-dot/ );
+		await expect( saveButton ).toBeVisible();
 
 		// Should only have save panel a11y button active after child entities edited.
 		await expect( openPublishPanel ).toBeHidden();
@@ -86,7 +89,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		);
 
 		// Opening panel has boxes checked by default.
-		await publishButton.click();
+		await saveButton.click();
 		await expect( publishPanel ).toContainText( 'Are you ready to save?' );
 		const allCheckboxes = await publishPanel
 			.getByRole( 'checkbox' )
@@ -122,7 +125,6 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		await expect(
 			topBar.getByRole( 'button', { name: 'Saved' } )
 		).toBeDisabled();
-		await expect( publishButton ).not.toHaveClass( /has-changes-dot/ );
 		await expect( openSavePanel ).toBeHidden();
 
 		await editor.publishPost();
@@ -132,19 +134,15 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Updated post title' );
 
-		const updateButton = topBar.getByRole( 'button', { name: 'Update' } );
-
 		// Verify update button is enabled.
-		await expect( updateButton ).toBeEnabled();
+		await expect( saveButton ).toBeEnabled();
 
 		// Verify multi-entity saving not enabled.
-		await expect( updateButton ).not.toHaveClass( /has-changes-dot/ );
 		await expect( openSavePanel ).toBeHidden();
 
 		await siteTitleField.fill( `${ originalSiteTitle }!` );
 
 		// Multi-entity saving should be enabled.
-		await expect( updateButton ).toHaveClass( /has-changes-dot/ );
 		await expect( openSavePanel ).toBeVisible();
 	} );
 
@@ -154,7 +152,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		page,
 	} ) => {
 		await admin.createNewPost();
-		await editor.setPreferences( 'core/edit-post', {
+		await editor.setPreferences( 'core', {
 			isPublishSidebarEnabled: false,
 		} );
 
@@ -185,7 +183,9 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 			name: 'Editor publish',
 		} );
 
-		await topBar.getByRole( 'button', { name: 'Publish' } ).click();
+		await topBar
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
 		await expect( publishPanel.getByRole( 'checkbox' ) ).toHaveCount( 3 );
 
 		// Skip site title saving.
@@ -203,7 +203,7 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 			.filter( { hasText: 'published' } )
 			.waitFor();
 
-		await topBar.getByRole( 'button', { name: 'Update' } ).click();
+		await topBar.getByRole( 'button', { name: 'Save' } ).click();
 
 		await expect( publishPanel.getByRole( 'checkbox' ) ).toHaveCount( 1 );
 	} );

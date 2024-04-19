@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v1.9.0'
+        aztecVersion = 'v2.1.1'
         wordpressUtilsVersion = '3.3.0'
 
         // main
@@ -57,8 +57,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     sourceSets {

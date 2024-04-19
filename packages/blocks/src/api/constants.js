@@ -36,6 +36,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		requiresOptOut: true,
 		useEngine: true,
 	},
+	backgroundImage: {
+		value: [ 'background', 'backgroundImage' ],
+		support: [ 'background', 'backgroundImage' ],
+		useEngine: true,
+	},
 	backgroundRepeat: {
 		value: [ 'background', 'backgroundRepeat' ],
 		support: [ 'background', 'backgroundRepeat' ],
@@ -223,6 +228,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	textAlign: {
+		value: [ 'typography', 'textAlign' ],
+		support: [ 'typography', 'textAlign' ],
+		useEngine: false,
+	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],
@@ -257,7 +267,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {
-	link: 'a',
+	link: 'a:where(:not(.wp-element-button))',
 	heading: 'h1, h2, h3, h4, h5, h6',
 	h1: 'h1',
 	h2: 'h2',

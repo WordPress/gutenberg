@@ -31,9 +31,9 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
@@ -97,6 +97,7 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 
@@ -107,6 +108,7 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---       | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -183,6 +185,7 @@ Settings related to typography.
 | fluid | undefined | false |  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | writingMode | boolean | false |  |
@@ -266,6 +269,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textAlign | string |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |

@@ -122,8 +122,15 @@ if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 }
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
-require __DIR__ . '/compat/wordpress-6.5/block-bindings/pattern-overrides.php';
 require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
+
+// WordPress 6.6 compat.
+require __DIR__ . '/compat/wordpress-6.6/resolve-patterns.php';
+require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
+require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
+require __DIR__ . '/compat/wordpress-6.6/option.php';
+require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
+require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -133,7 +140,6 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
-require __DIR__ . '/experimental/interactivity-api.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
@@ -192,6 +198,7 @@ require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/interactivity-api.php';
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {

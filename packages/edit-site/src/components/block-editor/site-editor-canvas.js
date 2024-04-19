@@ -7,6 +7,7 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -26,24 +27,23 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export default function SiteEditorCanvas() {
+export default function SiteEditorCanvas( { onClick } ) {
 	const location = useLocation();
-	const { templateType, isFocusableEntity, isViewMode } = useSelect(
-		( select ) => {
+	const { templateType, isFocusableEntity, isViewMode, isZoomOutMode } =
+		useSelect( ( select ) => {
 			const { getEditedPostType, getCanvasMode } = unlock(
 				select( editSiteStore )
 			);
-
+			const { __unstableGetEditorMode } = select( blockEditorStore );
 			const _templateType = getEditedPostType();
 
 			return {
 				templateType: _templateType,
 				isFocusableEntity: FOCUSABLE_ENTITIES.includes( _templateType ),
 				isViewMode: getCanvasMode() === 'view',
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 			};
-		},
-		[]
-	);
+		}, [] );
 	const isFocusMode = location.params.focusMode || isFocusableEntity;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
@@ -55,6 +55,8 @@ export default function SiteEditorCanvas() {
 		! isViewMode &&
 		// Disable resizing in mobile viewport.
 		! isMobileViewport &&
+		// Dsiable resizing in zoomed-out mode.
+		! isZoomOutMode &&
 		// Disable resizing when editing a template in focus mode.
 		templateType !== TEMPLATE_POST_TYPE;
 
@@ -87,8 +89,14 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
+								onClick={ onClick }
 							>
-								{ resizeObserver }
+								{
+									// Avoid resize listeners when not needed,
+									// these will trigger unnecessary re-renders
+									// when animating the iframe width.
+									enableResizing && resizeObserver
+								}
 							</EditorCanvas>
 						</ResizableEditor>
 					</div>

@@ -152,7 +152,7 @@ export function hasPositionValue( props ) {
  * @return {boolean} Whether or not the block is set to a sticky or fixed position.
  */
 export function hasStickyOrFixedPositionValue( attributes ) {
-	const positionType = attributes.style?.position?.type;
+	const positionType = attributes?.style?.position?.type;
 	return positionType === 'sticky' || positionType === 'fixed';
 }
 

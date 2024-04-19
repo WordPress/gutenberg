@@ -2,10 +2,10 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { getQueryArgs } from '@wordpress/url';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 
 const { DuplicatePatternModal } = unlock( patternsPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function PatternDuplicateModal() {
 	const { record } = useEditedEntityRecord();

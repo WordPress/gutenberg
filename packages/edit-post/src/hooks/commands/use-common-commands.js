@@ -7,22 +7,25 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboard,
 	fullscreen,
 	formatListBullets,
 } from '@wordpress/icons';
 import { useCommand } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function useCommonCommands() {
 	const { openGeneralSidebar, closeGeneralSidebar } =
@@ -33,9 +36,10 @@ export default function useCommonCommands() {
 			const { get } = select( preferencesStore );
 
 			return {
-				activeSidebar: select(
-					interfaceStore
-				).getActiveComplementaryArea( editPostStore.name ),
+				activeSidebar:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					),
 				isPublishSidebarEnabled:
 					select( editorStore ).isPublishSidebarEnabled(),
 				isFullscreen: get( 'core/edit-post', 'fullscreenMode' ),
@@ -110,15 +114,6 @@ export default function useCommonCommands() {
 	} );
 
 	useCommand( {
-		name: 'core/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
-		icon: keyboard,
-		callback: () => {
-			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
-		},
-	} );
-
-	useCommand( {
 		name: 'core/toggle-publish-sidebar',
 		label: isPublishSidebarEnabled
 			? __( 'Disable pre-publish checks' )
@@ -126,13 +121,13 @@ export default function useCommonCommands() {
 		icon: formatListBullets,
 		callback: ( { close } ) => {
 			close();
-			toggle( 'core/edit-post', 'isPublishSidebarEnabled' );
+			toggle( 'core', 'isPublishSidebarEnabled' );
 			createInfoNotice(
 				isPublishSidebarEnabled
 					? __( 'Pre-publish checks disabled.' )
 					: __( 'Pre-publish checks enabled.' ),
 				{
-					id: 'core/edit-post/publish-sidebar/notice',
+					id: 'core/editor/publish-sidebar/notice',
 					type: 'snackbar',
 				}
 			);

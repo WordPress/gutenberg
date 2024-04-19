@@ -1,13 +1,97 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useContext, useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-styles-provider';
 import cloneDeep from '../../utils/clone-deep';
+import { unlock } from '../../lock-unlock';
+
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+
+/**
+ * Removes all instances of a property from an object.
+ *
+ * @param {Object} object   The object to remove the property from.
+ * @param {string} property The property to remove.
+ * @return {Object} The modified object.
+ */
+export function removePropertyFromObject( object, property ) {
+	if ( ! property || typeof property !== 'string' ) {
+		return object;
+	}
+
+	if (
+		typeof object !== 'object' ||
+		! object ||
+		! Object.keys( object ).length
+	) {
+		return object;
+	}
+
+	for ( const key in object ) {
+		if ( key === property ) {
+			delete object[ key ];
+		} else if ( typeof object[ key ] === 'object' ) {
+			removePropertyFromObject( object[ key ], property );
+		}
+	}
+	return object;
+}
+
+/**
+ * A convenience wrapper for `useThemeStyleVariationsByProperty()` that fetches the current theme style variations,
+ * and user-defined global style/settings object.
+ *
+ * @param {Object}   props          Object of hook args.
+ * @param {string}   props.property The property to filter by.
+ * @param {Function} props.filter   Optional. The filter function to apply to the variations.
+ * @return {Object[]|*} The merged object.
+ */
+export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
+	property,
+	filter,
+} ) {
+	const { variationsFromTheme } = useSelect( ( select ) => {
+		const _variationsFromTheme =
+			select(
+				coreStore
+			).__experimentalGetCurrentThemeGlobalStylesVariations();
+
+		return {
+			variationsFromTheme: _variationsFromTheme || [],
+		};
+	}, [] );
+	const { user: baseVariation } = useContext( GlobalStylesContext );
+
+	const variations = useMemo( () => {
+		return [
+			{
+				title: __( 'Default' ),
+				settings: {},
+				styles: {},
+			},
+			...variationsFromTheme,
+		];
+	}, [ variationsFromTheme ] );
+
+	return useThemeStyleVariationsByProperty( {
+		variations,
+		property,
+		filter,
+		baseVariation: removePropertyFromObject(
+			cloneDeep( baseVariation ),
+			property
+		),
+	} );
+}
 
 /**
  * Returns a new object, with properties specified in `property`,
@@ -40,6 +124,10 @@ export const filterObjectByProperty = ( object, property ) => {
 
 /**
  * Returns a new object with only the properties specified in `property`.
+ * Optional merges the baseVariation object with the variation object.
+ * Note: this function will only overwrite the specified property in baseVariation if it exists.
+ * The baseVariation will not be otherwise modified. To strip a property from the baseVariation object, use `removePropertyFromObject`.
+ * See useCurrentMergeThemeStyleVariationsWithUserConfig for an example of how to use this function.
  *
  * @param {Object}   props               Object of hook args.
  * @param {Object[]} props.variations    The theme style variations to filter.

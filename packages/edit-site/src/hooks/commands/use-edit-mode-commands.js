@@ -13,14 +13,15 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	keyboard,
 	symbol,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as interfaceStore } from '@wordpress/interface';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,13 +30,13 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
 import { PREFERENCES_MODAL_NAME } from '../../components/preferences-modal';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
+const { interfaceStore } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 function usePageContentFocusCommands() {
@@ -73,9 +74,9 @@ function usePageContentFocusCommands() {
 	if ( currentPostType !== 'wp_template' ) {
 		commands.push( {
 			name: 'core/switch-to-template-focus',
-			/* translators: %1$s: template title */
 			label: sprintf(
-				'Edit template: %s',
+				/* translators: %s: template title */
+				__( 'Edit template: %s' ),
 				decodeEntities( template.title )
 			),
 			icon: layout,
@@ -119,14 +120,14 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRevertable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				? /* translators: %1$s: template title */
-				  sprintf(
-						'Reset template: %s',
+				? sprintf(
+						/* translators: %s: template title */
+						__( 'Reset template: %s' ),
 						decodeEntities( template.title )
 				  )
-				: /* translators: %1$s: template part title */
-				  sprintf(
-						'Reset template part: %s',
+				: sprintf(
+						/* translators: %s: template part title */
+						__( 'Reset template part: %s' ),
 						decodeEntities( template.title )
 				  );
 		commands.push( {
@@ -143,20 +144,18 @@ function useManipulateDocumentCommands() {
 	if ( isTemplateRemovable( template ) && ! isEditingPage ) {
 		const label =
 			template.type === TEMPLATE_POST_TYPE
-				? /* translators: %1$s: template title */
-				  sprintf(
-						'Delete template: %s',
+				? sprintf(
+						/* translators: %s: template title */
+						__( 'Delete template: %s' ),
 						decodeEntities( template.title )
 				  )
-				: /* translators: %1$s: template part title */
-				  sprintf(
-						'Delete template part: %s',
+				: sprintf(
+						/* translators: %s: template part title */
+						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
 				  );
 		const path =
-			template.type === TEMPLATE_POST_TYPE
-				? '/wp_template'
-				: '/wp_template_part/all';
+			template.type === TEMPLATE_POST_TYPE ? '/wp_template' : '/patterns';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
@@ -184,9 +183,8 @@ function useEditUICommands() {
 	const { canvasMode, activeSidebar } = useSelect( ( select ) => {
 		return {
 			canvasMode: unlock( select( editSiteStore ) ).getCanvasMode(),
-			activeSidebar: select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			activeSidebar:
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
 		};
 	}, [] );
 	const { openModal } = useDispatch( interfaceStore );
@@ -203,10 +201,10 @@ function useEditUICommands() {
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'edit-site/template' ) {
+			if ( activeSidebar === 'edit-post/document' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'edit-site/template' );
+				openGeneralSidebar( 'edit-post/document' );
 			}
 		},
 	} );
@@ -217,10 +215,10 @@ function useEditUICommands() {
 		icon: blockDefault,
 		callback: ( { close } ) => {
 			close();
-			if ( activeSidebar === 'edit-site/block-inspector' ) {
+			if ( activeSidebar === 'edit-site/block' ) {
 				closeGeneralSidebar();
 			} else {
-				openGeneralSidebar( 'edit-site/block-inspector' );
+				openGeneralSidebar( 'edit-site/block' );
 			}
 		},
 	} );
@@ -230,15 +228,6 @@ function useEditUICommands() {
 		label: __( 'Editor preferences' ),
 		callback: () => {
 			openModal( PREFERENCES_MODAL_NAME );
-		},
-	} );
-
-	commands.push( {
-		name: 'core/open-shortcut-help',
-		label: __( 'Keyboard shortcuts' ),
-		icon: keyboard,
-		callback: () => {
-			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
 		},
 	} );
 

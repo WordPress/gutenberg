@@ -8,8 +8,6 @@
 $plugin_url   = plugin_dir_url( __DIR__ );
 $src_proc_ins = $plugin_url . 'tovdom/processing-instructions.js';
 $src_cdata    = $plugin_url . 'tovdom/cdata.js';
-
-wp_enqueue_script_module( 'tovdom-view' );
 ?>
 
 <div data-wp-interactive="tovdom">

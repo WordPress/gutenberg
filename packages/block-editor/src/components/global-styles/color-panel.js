@@ -123,10 +123,11 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
@@ -259,7 +260,7 @@ function ColorPanelDropdown( {
 								/>
 							) }
 							{ tabs.length > 1 && (
-								<Tabs initialTabId={ currentTab?.key }>
+								<Tabs defaultTabId={ currentTab?.key }>
 									<Tabs.TabList>
 										{ tabs.map( ( tab ) => (
 											<Tabs.Tab

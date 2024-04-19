@@ -51,6 +51,7 @@ describe( 'useEntityRecord', () => {
 			record: undefined,
 			save: expect.any( Function ),
 			hasResolved: false,
+			hasStarted: false,
 			isResolving: false,
 			status: 'IDLE',
 		} );
@@ -70,6 +71,7 @@ describe( 'useEntityRecord', () => {
 			record: { hello: 'world', id: 1 },
 			save: expect.any( Function ),
 			hasResolved: true,
+			hasStarted: true,
 			isResolving: false,
 			status: 'SUCCESS',
 		} );
@@ -99,6 +101,7 @@ describe( 'useEntityRecord', () => {
 				record: { hello: 'world', id: 1 },
 				save: expect.any( Function ),
 				hasResolved: true,
+				hasStarted: true,
 				isResolving: false,
 				status: 'SUCCESS',
 			} )
@@ -129,7 +132,7 @@ describe( 'useEntityRecord', () => {
 			</RegistryProvider>
 		);
 
-		const { rerender } = render( <UI enabled={ true } /> );
+		const { rerender } = render( <UI enabled /> );
 
 		// A minimum delay for a fetch request. The same delay is used again as a control.
 		await act(
