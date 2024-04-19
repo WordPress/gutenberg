@@ -8,7 +8,6 @@ import { useCallback } from '@wordpress/element';
  */
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import Button from '../../button';
 import useNavigator from '../use-navigator';
 import type { NavigatorBackButtonHookProps } from '../types';
 
@@ -17,7 +16,6 @@ export function useNavigatorBackButton(
 ) {
 	const {
 		onClick,
-		as = Button,
 		goToParent: goToParentProp = false,
 		...otherProps
 	} = useContextSystem( props, 'NavigatorBackButton' );
@@ -38,7 +36,6 @@ export function useNavigatorBackButton(
 		);
 
 	return {
-		as,
 		onClick: handleClick,
 		...otherProps,
 	};
