@@ -31,7 +31,7 @@ function UnconnectedElevation(
  * import {
  *	Elevation,
  *	Surface,
- *	__experimentalText as Text,
+ *	Text,
  * } from '@wordpress/components';
  *
  * function Example() {

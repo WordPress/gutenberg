@@ -24,7 +24,7 @@ function UnconnectedHStack(
  * ```jsx
  * import {
  * 	HStack,
- * 	__experimentalText as Text,
+ * 	Text,
  * } from `@wordpress/components`;
  *
  * function Example() {

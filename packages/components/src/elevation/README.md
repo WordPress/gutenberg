@@ -10,7 +10,7 @@ The shadow effect is generated using the `value` prop.
 import {
 	Elevation,
 	Surface,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {

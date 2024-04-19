@@ -7,7 +7,7 @@
 ```jsx
 import {
 	Grid,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {

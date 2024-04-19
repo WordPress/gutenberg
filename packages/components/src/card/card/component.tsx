@@ -85,7 +85,7 @@ function UnconnectedCard(
  *   CardHeader,
  *   CardBody,
  *   CardFooter,
- *   __experimentalText as Text,
+ *   Text,
  *   Heading,
  * } from `@wordpress/components`;
  *

@@ -10,7 +10,7 @@ import { Text } from '../component';
 
 const meta: Meta< typeof Text > = {
 	component: Text,
-	title: 'Components (Experimental)/Text',
+	title: 'Components/Text',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		color: { control: { type: 'color' } },

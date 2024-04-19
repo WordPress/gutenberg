@@ -7,7 +7,7 @@
 ```jsx
 import {
 	Divider,
-	__experimentalText as Text,
+	Text,
 	__experimentalVStack as VStack,
 } from `@wordpress/components`;
 
