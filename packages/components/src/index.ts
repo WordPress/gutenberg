@@ -189,7 +189,13 @@ export {
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
-export { VStack as __experimentalVStack } from './v-stack';
+export {
+	/**
+	 * @deprecated Import `VStack` instead.
+	 */
+	VStack as __experimentalVStack,
+	VStack,
+} from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,

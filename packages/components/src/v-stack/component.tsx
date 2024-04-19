@@ -30,7 +30,7 @@ function UnconnectedVStack(
  * ```jsx
  * import {
  * 	__experimentalText as Text,
- * 	__experimentalVStack as VStack,
+ * 	VStack,
  * } from `@wordpress/components`;
  *
  * function Example() {
