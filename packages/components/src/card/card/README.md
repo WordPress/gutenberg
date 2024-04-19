@@ -13,7 +13,7 @@ import {
 	CardBody,
 	CardFooter,
 	__experimentalText as Text,
-	__experimentalHeading as Heading,
+	Heading,
 } from '@wordpress/components';
 
 function Example() {
