@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.56.0 (2024-04-19)
+
 ## 3.55.0 (2024-04-03)
 
 - fix return types of `focus.tabbable` methods to be `HTMLElement` instead of `Element`.
