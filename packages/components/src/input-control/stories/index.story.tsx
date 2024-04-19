@@ -9,6 +9,12 @@ import type { Meta, StoryFn } from '@storybook/react';
 import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
+import Icon from '../../icon';
+/**
+ * WordPress dependencies
+ */
+import { seen } from '@wordpress/icons';
+import { useReducer } from '@wordpress/element';
 
 const meta: Meta< typeof InputControl > = {
 	title: 'Components (Experimental)/InputControl',
@@ -81,4 +87,28 @@ WithEdgeLabel.args = {
 	...Default.args,
 	__unstableInputWidth: '20em',
 	labelPosition: 'edge',
+};
+
+export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
+	const [ visible, toggleVisible ] = useReducer(
+		( value ) => ! value,
+		false
+	);
+	return (
+		<InputControl
+			type={ visible ? 'text' : 'password' }
+			suffix={
+				<InputControlSuffixWrapper>
+					<button
+						style={ { all: 'unset', cursor: 'pointer' } }
+						onClick={ toggleVisible }
+						aria-label="Toggle password visibility"
+					>
+						<Icon icon={ seen } />
+					</button>
+				</InputControlSuffixWrapper>
+			}
+			{ ...args }
+		/>
+	);
 };
