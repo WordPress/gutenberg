@@ -26,6 +26,11 @@ function gutenberg_update_initial_settings( $args, $defaults, $option_group, $op
 		$args['label'] = $settings_label_map[ $option_name ];
 	}
 
+	// Don't update schema when a setting isn't exposed via REST API.
+	if ( ! isset( $args['show_in_rest'] ) ) {
+		return $args;
+	}
+
 	// Don't update schema when label isn't provided.
 	if ( ! isset( $args['label'] ) ) {
 		return $args;

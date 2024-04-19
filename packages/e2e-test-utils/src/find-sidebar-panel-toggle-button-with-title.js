@@ -9,7 +9,7 @@
  */
 export async function findSidebarPanelToggleButtonWithTitle( panelTitle ) {
 	const buttons = await page.$x(
-		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ panelTitle }")]`
+		`//div[contains(@class,"editor-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ panelTitle }")]`
 	);
 	return buttons[ 0 ];
 }

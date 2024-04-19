@@ -11,7 +11,6 @@ import {
 	VisuallyHidden,
 	DropdownMenu,
 } from '@wordpress/components';
-import { ActionItem, store as interfaceStore } from '@wordpress/interface';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
@@ -26,10 +25,6 @@ import {
  * Internal dependencies
  */
 import {
-	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
-	default as KeyboardShortcutHelpModal,
-} from '../../keyboard-shortcut-help-modal';
-import {
 	PREFERENCES_MODAL_NAME,
 	default as EditSitePreferencesModal,
 } from '../../preferences-modal';
@@ -39,7 +34,8 @@ import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher } = unlock( editorPrivateApis );
+const { ModeSwitcher, ActionItem, interfaceStore } =
+	unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -120,7 +116,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 						<ModeSwitcher />
 						<ActionItem.Slot
-							name="core/edit-site/plugin-more-menu"
+							name="core/plugin-more-menu"
 							label={ __( 'Plugins' ) }
 							as={ MenuGroup }
 							fillProps={ { onClick: onClose } }
@@ -129,9 +125,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
-									openModal(
-										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-									)
+									openModal( 'editor/keyboard-shortcut-help' )
 								}
 								shortcut={ displayShortcut.access( 'h' ) }
 							>
@@ -172,7 +166,6 @@ export default function MoreMenu( { showIconLabels } ) {
 					</>
 				) }
 			</DropdownMenu>
-			<KeyboardShortcutHelpModal />
 			<EditSitePreferencesModal />
 		</>
 	);

@@ -433,7 +433,7 @@ export default function DataviewsPatterns() {
 				} );
 			}
 		},
-		[ history ]
+		[ history, categoryId, type ]
 	);
 	const [ editAction, viewRevisionsAction ] = usePostActions(
 		onActionPerformed,

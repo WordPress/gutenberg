@@ -117,7 +117,7 @@ test.describe( 'Site Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
 			// Go to the test draft.
 			await admin.visitSiteEditor( {
 				postId: draftId,
@@ -127,6 +127,22 @@ test.describe( 'Site Editor Performance', () => {
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
 			await canvas.locator( 'body' ).click();
+
+			// Run the test with the sidebar closed
+			const toggleSidebarButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', {
+					name: 'Settings',
+					disabled: false,
+				} );
+			const isClosed =
+				( await toggleSidebarButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+			if ( ! isClosed ) {
+				await toggleSidebarButton.click();
+			}
+
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 				.click();
