@@ -10,7 +10,7 @@
 import {
 	Spacer,
 	Heading,
-	__experimentalView as View,
+	View,
 } from '@wordpress/components';
 
 function Example() {

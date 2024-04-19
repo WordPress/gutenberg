@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	Text,
-	__experimentalView as View,
+	View,
 } from '@wordpress/components';
 
 function Example() {

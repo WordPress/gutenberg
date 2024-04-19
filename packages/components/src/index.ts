@@ -363,7 +363,13 @@ export {
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 	UnitControl,
 } from './unit-control';
-export { View as __experimentalView } from './view';
+export {
+	/**
+	 * @deprecated Import `View` instead.
+	 */
+	View as __experimentalView,
+	View,
+} from './view';
 export { VisuallyHidden } from './visually-hidden';
 export {
 	/**
