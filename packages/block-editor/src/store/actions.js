@@ -1454,9 +1454,9 @@ export const __unstableSetEditorMode =
 						);
 						dispatch.selectBlock( firstSectionClientId );
 					} else {
-						const lastChildSectionClientId =
+						const lastSectionClientId =
 							sectionClientIds[ sectionClientIds.length - 1 ];
-						dispatch.selectBlock( lastChildSectionClientId );
+						dispatch.selectBlock( lastSectionClientId );
 					}
 				}
 			} else if ( firstSelectedClientId ) {
