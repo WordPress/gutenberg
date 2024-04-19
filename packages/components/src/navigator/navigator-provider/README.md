@@ -1,19 +1,15 @@
 # `NavigatorProvider`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 The `NavigatorProvider` component allows rendering nested views/panels/menus (via the [`NavigatorScreen` component](/packages/components/src/navigator/navigator-screen/README.md)) and navigate between these different states (via the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md), [`NavigatorToParentButton`](/packages/components/src/navigator/navigator-to-parent-button/README.md) and [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components or the `useNavigator` hook). The Global Styles sidebar is an example of this.
 
 ## Usage
 
 ```jsx
 import {
-  __experimentalNavigatorProvider as NavigatorProvider,
-  __experimentalNavigatorScreen as NavigatorScreen,
-  __experimentalNavigatorButton as NavigatorButton,
-  __experimentalNavigatorToParentButton as NavigatorToParentButton,
+  NavigatorProvider,
+  NavigatorScreen,
+  NavigatorButton,
+  NavigatorToParentButton,
 } from '@wordpress/components';
 
 const MyNavigation = () => (
