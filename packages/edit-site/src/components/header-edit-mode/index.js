@@ -14,7 +14,6 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { PinnedItems } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import {
@@ -44,7 +43,8 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const { PostViewLink, PreviewDropdown, PinnedItems } =
+	unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
 	const {
@@ -201,9 +201,7 @@ export default function HeaderEditMode() {
 					) }
 					<PostViewLink />
 					<SaveButton size="compact" />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
-					) }
+					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
 					<MoreMenu showIconLabels={ showIconLabels } />
 				</motion.div>
 			</div>

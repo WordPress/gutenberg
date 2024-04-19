@@ -68,14 +68,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-dataviews',
-		__( 'New admin views', 'gutenberg' ),
+		'gutenberg-custom-dataviews',
+		__( 'Custom dataviews', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the new views for different entities like pages.', 'gutenberg' ),
-			'id'    => 'gutenberg-dataviews',
+			'label' => __( 'Test the custom dataviews in the pages page.', 'gutenberg' ),
+			'id'    => 'gutenberg-custom-dataviews',
 		)
 	);
 

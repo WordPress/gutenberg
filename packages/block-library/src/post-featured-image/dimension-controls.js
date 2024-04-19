@@ -10,7 +10,11 @@ import {
 	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { InspectorControls, useSettings } from '@wordpress/block-editor';
+import {
+	useSettings,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 const SCALE_OPTIONS = (
 	<>
@@ -51,12 +55,25 @@ const DimensionControls = ( {
 	clientId,
 	attributes: { aspectRatio, width, height, scale, sizeSlug },
 	setAttributes,
-	imageSizeOptions = [],
+	media,
 } ) => {
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
 		availableUnits: availableUnits || [ 'px', '%', 'vw', 'em', 'rem' ],
 	} );
+	const imageSizes = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().imageSizes,
+		[]
+	);
+	const imageSizeOptions = imageSizes
+		.filter( ( { slug } ) => {
+			return media?.media_details?.sizes?.[ slug ]?.source_url;
+		} )
+		.map( ( { name, slug } ) => ( {
+			value: slug,
+			label: name,
+		} ) );
+
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
 		/**
@@ -75,7 +92,7 @@ const DimensionControls = ( {
 		height || ( aspectRatio && aspectRatio !== 'auto' );
 
 	return (
-		<InspectorControls group="dimensions">
+		<>
 			<ToolsPanelItem
 				hasValue={ () => !! aspectRatio }
 				label={ __( 'Aspect ratio' ) }
@@ -230,7 +247,7 @@ const DimensionControls = ( {
 					/>
 				</ToolsPanelItem>
 			) }
-		</InspectorControls>
+		</>
 	);
 };
 

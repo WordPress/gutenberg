@@ -5,6 +5,14 @@ import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
+ * Internal dependencies
+ */
+import {
+	normalizeComplementaryAreaScope,
+	normalizeComplementaryAreaName,
+} from './deprecated';
+
+/**
  * Set a default complementary area.
  *
  * @param {string} scope Complementary area scope.
@@ -12,11 +20,15 @@ import { store as preferencesStore } from '@wordpress/preferences';
  *
  * @return {Object} Action object.
  */
-export const setDefaultComplementaryArea = ( scope, area ) => ( {
-	type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
-	scope,
-	area,
-} );
+export const setDefaultComplementaryArea = ( scope, area ) => {
+	scope = normalizeComplementaryAreaScope( scope );
+	area = normalizeComplementaryAreaName( scope, area );
+	return {
+		type: 'SET_DEFAULT_COMPLEMENTARY_AREA',
+		scope,
+		area,
+	};
+};
 
 /**
  * Enable the complementary area.
@@ -31,6 +43,8 @@ export const enableComplementaryArea =
 		if ( ! area ) {
 			return;
 		}
+		scope = normalizeComplementaryAreaScope( scope );
+		area = normalizeComplementaryAreaName( scope, area );
 
 		const isComplementaryAreaVisible = registry
 			.select( preferencesStore )
@@ -57,6 +71,7 @@ export const enableComplementaryArea =
 export const disableComplementaryArea =
 	( scope ) =>
 	( { registry } ) => {
+		scope = normalizeComplementaryAreaScope( scope );
 		const isComplementaryAreaVisible = registry
 			.select( preferencesStore )
 			.get( scope, 'isComplementaryAreaVisible' );
@@ -84,6 +99,8 @@ export const pinItem =
 			return;
 		}
 
+		scope = normalizeComplementaryAreaScope( scope );
+		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = registry
 			.select( preferencesStore )
 			.get( scope, 'pinnedItems' );
@@ -113,6 +130,8 @@ export const unpinItem =
 			return;
 		}
 
+		scope = normalizeComplementaryAreaScope( scope );
+		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = registry
 			.select( preferencesStore )
 			.get( scope, 'pinnedItems' );

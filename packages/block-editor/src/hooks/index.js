@@ -21,6 +21,7 @@ import dimensions from './dimensions';
 import duotone from './duotone';
 import fontFamily from './font-family';
 import fontSize from './font-size';
+import textAlign from './text-align';
 import border from './border';
 import position from './position';
 import layout from './layout';
@@ -34,6 +35,7 @@ import './use-bindings-attributes';
 createBlockEditFilter(
 	[
 		align,
+		textAlign,
 		anchor,
 		customClassName,
 		style,
@@ -47,6 +49,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	textAlign,
 	background,
 	style,
 	color,
@@ -60,6 +63,7 @@ createBlockListBlockFilter( [
 ] );
 createBlockSaveFilter( [
 	align,
+	textAlign,
 	anchor,
 	ariaLabel,
 	customClassName,

@@ -21,26 +21,6 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-site/toggle-block-settings-sidebar',
-			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: ',',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/keyboard-shortcuts',
-			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'h',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-site/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),

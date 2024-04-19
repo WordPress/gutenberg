@@ -15,12 +15,12 @@ import {
 } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
 	PageAttributesPanel,
 	PluginDocumentSettingPanel,
+	PluginSidebar,
 	PostDiscussionPanel,
 	PostExcerptPanel,
 	PostLastRevisionPanel,
@@ -35,15 +35,15 @@ import { addQueryArgs } from '@wordpress/url';
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
-import PluginSidebarEditPost from '../plugin-sidebar';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
-const { PostCardPanel, PostActions } = unlock( editorPrivateApis );
-
+const { PostCardPanel, PostActions, interfaceStore } =
+	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-const { PatternOverridesPanel } = unlock( editorPrivateApis );
+const { PatternOverridesPanel, useAutoSwitchEditorSidebars } =
+	unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -65,7 +65,7 @@ function onActionPerformed( actionId, items ) {
 
 const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	const tabListRef = useRef( null );
-	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
@@ -98,7 +98,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	}, [ tabName ] );
 
 	return (
-		<PluginSidebarEditPost
+		<PluginSidebar
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
@@ -144,20 +144,20 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 					<BlockInspector />
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
-		</PluginSidebarEditPost>
+		</PluginSidebar>
 	);
 };
 
 const SettingsSidebar = () => {
+	useAutoSwitchEditorSidebars();
 	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
 
-			const sidebar = select( interfaceStore ).getActiveComplementaryArea(
-				editPostStore.name
-			);
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
 			const _isEditorSidebarOpened = [
 				sidebars.block,
 				sidebars.document,
