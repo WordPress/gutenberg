@@ -137,3 +137,14 @@ export function setEditingPattern( clientId, isEditing ) {
 		isEditing,
 	};
 }
+
+/**
+ * Set the renaming block to open the rename modal.
+ * @param {string|null} clientId The client ID of the block to rename, or `null` to close the modal.
+ */
+export function setRenamingBlock( clientId ) {
+	return {
+		type: 'SET_RENAMING_BLOCK',
+		clientId,
+	};
+}

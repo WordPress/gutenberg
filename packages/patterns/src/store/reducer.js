@@ -14,6 +14,15 @@ export function isEditingPattern( state = {}, action ) {
 	return state;
 }
 
+export function renamingBlock( state = null, action ) {
+	if ( action?.type === 'SET_RENAMING_BLOCK' ) {
+		return action.clientId;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	isEditingPattern,
+	renamingBlock,
 } );

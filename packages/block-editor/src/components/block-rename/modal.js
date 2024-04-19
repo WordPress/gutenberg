@@ -7,6 +7,7 @@ import {
 	Button,
 	TextControl,
 	Modal,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useId } from '@wordpress/element';
@@ -17,14 +18,13 @@ import { speak } from '@wordpress/a11y';
  */
 import isEmptyString from './is-empty-string';
 
+// This component is only used in a non-WP environment.
+// Changes here should likely be duplicated in the `patterns` package as well.
 export default function BlockRenameModal( {
 	blockName,
 	originalBlockName,
 	onClose,
 	onSave,
-	// Pattern Overrides is a WordPress-only feature but it also uses the Block Binding API.
-	// Ideally this should not be inside the block editor package, but we keep it here for simplicity.
-	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
 	const descriptionId = useId();
@@ -79,23 +79,16 @@ export default function BlockRenameModal( {
 					handleSubmit();
 				} }
 			>
-				<p id={ descriptionId }>
-					{ __( 'Enter a custom name for this block.' ) }
-				</p>
 				<VStack spacing="3">
+					<Text id={ descriptionId }>
+						{ __( 'Enter a custom name for this block.' ) }
+					</Text>
 					<TextControl
 						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision
-						help={
-							hasOverridesWarning
-								? __(
-										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
-								  )
-								: undefined
-						}
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }

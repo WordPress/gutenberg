@@ -30,7 +30,9 @@ import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
-const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+const { PatternsMenuItems, RenameBlockModalControl } = unlock(
+	editPatternsPrivateApis
+);
 
 const noop = () => {};
 
@@ -264,6 +266,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							{ ! settings.__unstableIsPreviewMode && (
 								<>
 									<PatternsMenuItems />
+									<RenameBlockModalControl />
 									{ mode === 'template-locked' && (
 										<DisableNonPageContentBlocks />
 									) }
