@@ -14,7 +14,7 @@ This feature is still experimental. “Experimental” means this is an early im
 import {
 	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
-	__experimentalView as View,
+	View,
 } from '@wordpress/components';
 
 function Example() {
