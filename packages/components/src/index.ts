@@ -169,9 +169,21 @@ export {
 	ToolbarItem,
 } from './toolbar';
 export {
+	/**
+	 * @deprecated Import `ToolsPanel` instead.
+	 */
 	ToolsPanel as __experimentalToolsPanel,
+	/**
+	 * @deprecated Import `ToolsPanelItem` instead.
+	 */
 	ToolsPanelItem as __experimentalToolsPanelItem,
+	/**
+	 * @deprecated Import `ToolsPanelContext` instead.
+	 */
 	ToolsPanelContext as __experimentalToolsPanelContext,
+	ToolsPanel,
+	ToolsPanelItem,
+	ToolsPanelContext,
 } from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
