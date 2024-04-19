@@ -261,7 +261,13 @@ export {
 	Scrollable,
 } from './scrollable';
 export { default as Spinner } from './spinner';
-export { Surface as __experimentalSurface } from './surface';
+export {
+	/**
+	 * @deprecated Import `Surface` instead.
+	 */
+	Surface as __experimentalSurface,
+	Surface,
+} from './surface';
 export { default as TabPanel } from './tab-panel';
 export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';

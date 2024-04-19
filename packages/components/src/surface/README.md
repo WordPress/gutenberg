@@ -1,9 +1,5 @@
 # Surface
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `Surface` is a core component that renders a primary background color.
 
 ## Usage
@@ -12,7 +8,7 @@ In the example below, notice how the `Surface` renders in white (or dark gray if
 
 ```jsx
 import {
-	__experimentalSurface as Surface,
+	Surface,
 	__experimentalText as Text,
 } from '@wordpress/components';
 

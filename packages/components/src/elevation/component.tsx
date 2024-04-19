@@ -30,7 +30,7 @@ function UnconnectedElevation(
  * ```jsx
  * import {
  *	Elevation,
- *	__experimentalSurface as Surface,
+ *	Surface,
  *	__experimentalText as Text,
  * } from '@wordpress/components';
  *
