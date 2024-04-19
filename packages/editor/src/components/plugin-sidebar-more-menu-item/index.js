@@ -16,7 +16,7 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+ * var PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
  * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function MySidebarMoreMenuItem() {
@@ -35,7 +35,7 @@ import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+ * import { PluginSidebarMoreMenuItem } from '@wordpress/editor';
  * import { more } from '@wordpress/icons';
  *
  * const MySidebarMoreMenuItem = () => (
@@ -57,7 +57,7 @@ export default function PluginSidebarMoreMenuItem( props ) {
 			// Menu item is marked with unstable prop for backward compatibility.
 			// @see https://github.com/WordPress/gutenberg/issues/14457
 			__unstableExplicitMenuItem
-			scope="core/edit-post"
+			scope="core"
 			{ ...props }
 		/>
 	);

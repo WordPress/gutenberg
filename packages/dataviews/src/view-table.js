@@ -218,7 +218,9 @@ function BulkSelectionCheckbox( {
 					onSelectionChange( selectableItems );
 				}
 			} }
-			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
 		/>
 	);
 }
@@ -298,8 +300,7 @@ function TableRow( {
 				<td
 					className="dataviews-view-table__checkbox-column"
 					style={ {
-						width: 20,
-						minWidth: 20,
+						width: '1%',
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
@@ -426,8 +427,7 @@ function ViewTable( {
 							<th
 								className="dataviews-view-table__checkbox-column"
 								style={ {
-									width: 20,
-									minWidth: 20,
+									width: '1%',
 								} }
 								data-field-id="selection"
 								scope="col"

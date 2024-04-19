@@ -527,10 +527,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(${ selector } .${ className })${
+										? `:where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -575,7 +575,7 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `${ selector } .${ className }${
+							const combinedSelector = `.${ className }${
 								baseStyle?.selector || ''
 							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
@@ -1000,10 +1000,10 @@ export const toStyles = (
 			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+			':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
+			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {

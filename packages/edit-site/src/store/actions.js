@@ -4,21 +4,24 @@
 import { parse } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
 import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Dispatches an action that toggles a feature flag.
@@ -218,7 +221,7 @@ export function setEditedPostContext( context ) {
  *
  * @deprecated
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setPage() {
 	deprecated( "dispatch( 'core/edit-site' ).setPage", {
@@ -362,7 +365,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editSiteStoreName, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -371,9 +374,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editSiteStoreName );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 	};
 
 /**

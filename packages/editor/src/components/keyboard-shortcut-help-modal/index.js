@@ -12,8 +12,7 @@ import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
-import { withSelect, withDispatch, useSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -23,8 +22,7 @@ import { textFormattingShortcuts } from './config';
 import Shortcut from './shortcut';
 import DynamicShortcut from './dynamic-shortcut';
 
-export const KEYBOARD_SHORTCUT_HELP_MODAL_NAME =
-	'edit-post/keyboard-shortcut-help';
+const KEYBOARD_SHORTCUT_HELP_MODAL_NAME = 'editor/keyboard-shortcut-help';
 
 const ShortcutList = ( { shortcuts } ) => (
 	/*
@@ -33,12 +31,12 @@ const ShortcutList = ( { shortcuts } ) => (
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	<ul
-		className="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+		className="editor-keyboard-shortcut-help-modal__shortcut-list"
 		role="list"
 	>
 		{ shortcuts.map( ( shortcut, index ) => (
 			<li
-				className="edit-post-keyboard-shortcut-help-modal__shortcut"
+				className="editor-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
 				{ typeof shortcut === 'string' ? (
@@ -55,12 +53,12 @@ const ShortcutList = ( { shortcuts } ) => (
 const ShortcutSection = ( { title, shortcuts, className } ) => (
 	<section
 		className={ classnames(
-			'edit-post-keyboard-shortcut-help-modal__section',
+			'editor-keyboard-shortcut-help-modal__section',
 			className
 		) }
 	>
 		{ !! title && (
-			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
+			<h2 className="editor-keyboard-shortcut-help-modal__section-title">
 				{ title }
 			</h2>
 		) }
@@ -90,8 +88,23 @@ const ShortcutCategorySection = ( {
 	);
 };
 
-export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
-	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal );
+function KeyboardShortcutHelpModal() {
+	const isModalActive = useSelect(
+		( select ) =>
+			select( interfaceStore ).isModalActive(
+				KEYBOARD_SHORTCUT_HELP_MODAL_NAME
+			),
+		[]
+	);
+	const { openModal, closeModal } = useDispatch( interfaceStore );
+	const toggleModal = () => {
+		if ( isModalActive ) {
+			closeModal();
+		} else {
+			openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+		}
+	};
+	useShortcut( 'core/editor/keyboard-shortcuts', toggleModal );
 
 	if ( ! isModalActive ) {
 		return null;
@@ -99,14 +112,14 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 
 	return (
 		<Modal
-			className="edit-post-keyboard-shortcut-help-modal"
+			className="editor-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
 			closeButtonLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection
-				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
-				shortcuts={ [ 'core/edit-post/keyboard-shortcuts' ] }
+				className="editor-keyboard-shortcut-help-modal__main-shortcuts"
+				shortcuts={ [ 'core/editor/keyboard-shortcuts' ] }
 			/>
 			<ShortcutCategorySection
 				title={ __( 'Global shortcuts' ) }
@@ -144,20 +157,4 @@ export function KeyboardShortcutHelpModal( { isModalActive, toggleModal } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		isModalActive: select( interfaceStore ).isModalActive(
-			KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-		),
-	} ) ),
-	withDispatch( ( dispatch, { isModalActive } ) => {
-		const { openModal, closeModal } = dispatch( interfaceStore );
-
-		return {
-			toggleModal: () =>
-				isModalActive
-					? closeModal()
-					: openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME ),
-		};
-	} ),
-] )( KeyboardShortcutHelpModal );
+export default KeyboardShortcutHelpModal;

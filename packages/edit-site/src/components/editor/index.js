@@ -25,11 +25,6 @@ import {
 	BlockInspector,
 } from '@wordpress/block-editor';
 import {
-	InterfaceSkeleton,
-	ComplementaryArea,
-	store as interfaceStore,
-} from '@wordpress/interface';
-import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
 	EditorNotices,
@@ -68,6 +63,9 @@ const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
 	ListViewSidebar,
+	InterfaceSkeleton,
+	ComplementaryArea,
+	interfaceStore,
 } = unlock( editorPrivateApis );
 
 const interfaceLabels = {
@@ -142,9 +140,7 @@ export default function Editor( { isLoading, onClick } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -299,7 +295,7 @@ export default function Editor( { isLoading, onClick } ) {
 						sidebar={
 							isEditMode &&
 							! isDistractionFree && (
-								<ComplementaryArea.Slot scope="core/edit-site" />
+								<ComplementaryArea.Slot scope="core" />
 							)
 						}
 						footer={

@@ -1,0 +1,75 @@
+.editor-post-status {
+	max-width: 100%;
+	margin-bottom: $grid-unit-20;
+
+	.editor-post-status-trigger {
+		padding: 1px;
+		height: auto;
+		border-radius: $grid-unit-20;
+	}
+
+	.editor-post-status-label {
+		border-radius: $grid-unit-20;
+		display: inline-flex;
+		padding: 0 $grid-unit-15 0 $grid-unit-15;
+		background: rgba($gray-900, 0.04);
+		height: $button-size-compact;
+		align-items: center;
+		color: $gray-900;
+
+		&.has-icon {
+			padding: 0 $grid-unit-10 0 $grid-unit-15;
+
+			&:hover {
+				background: rgba($gray-900, 0.08);
+			}
+		}
+
+		&.has-status-publish,
+		&.has-status-private,
+		&.has-status-future {
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: var(--wp-admin-theme-color);
+
+			&:hover {
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			}
+		}
+	}
+}
+
+.editor-change-status__password-fieldset {
+	border-top: $border-width solid $gray-200;
+	padding-top: $grid-unit-20;
+}
+
+.editor-change-status__content {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+
+	.editor-change-status__options {
+		.components-base-control__field > .components-v-stack {
+			gap: $grid-unit-15;
+		}
+
+		// TODO: it's not great to override component styles.. This might be resolved
+		// by the new radio control component.
+		.components-radio-control__option {
+			align-items: flex-start;
+		}
+
+		label {
+			.components-text {
+				display: block;
+				margin-top: $grid-unit-05;
+			}
+		}
+	}
+
+	.editor-change-status__password-legend {
+		padding: 0;
+		margin-bottom: $grid-unit-10;
+	}
+}

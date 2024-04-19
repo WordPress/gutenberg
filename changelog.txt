@@ -1,5 +1,33 @@
 == Changelog ==
 
+= 18.1.2 =
+
+## Bug Fixes
+
+- Restore classic auto margin rule to its previous specificity ([60802](https://github.com/WordPress/gutenberg/pull/60802))
+- Fix the removePropertyFromObject function throws an error if the object is null ([60831](https://github.com/WordPress/gutenberg/pull/60831))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@tellthemachines @arthur791004 
+
+
+= 18.1.1 =
+
+## Bug Fixes
+
+- Add null check to prevent errors in `get_block_template` filter ([60491](https://github.com/WordPress/gutenberg/pull/60491))
+- Fix activating a theme in site editor when previewing ([60699](https://github.com/WordPress/gutenberg/pull/60699))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@okmttdhr @ntsekouras 
+
+
 = 18.1.0 =
 
 ## Changelog

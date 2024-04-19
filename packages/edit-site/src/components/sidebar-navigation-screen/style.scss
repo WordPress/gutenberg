@@ -33,9 +33,8 @@
 }
 
 .edit-site-sidebar-navigation-screen__meta {
-	margin: 0 0 $grid-unit-20 0;
+	margin: 0 0 $grid-unit-20 $grid-unit-20;
 	color: $gray-400;
-	margin-left: $grid-unit-20;
 	.components-text {
 		color: $gray-400;
 	}
@@ -125,25 +124,6 @@
 	padding: $grid-unit-20 0;
 	margin: $grid-unit-20 0 0;
 	border-top: 1px solid $gray-800;
-}
-
-.edit-site-sidebar__notice {
-	background: $gray-800;
-	color: $gray-300;
-	margin: $grid-unit-30 0;
-	&.is-dismissible {
-		padding-right: $grid-unit-10;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]) {
-		color: $gray-400;
-	}
-
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):focus,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	.components-notice__dismiss:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-		color: $white;
-	}
 }
 
 /* In general style overrides are discouraged.
