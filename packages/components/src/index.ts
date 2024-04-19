@@ -175,10 +175,26 @@ export {
 } from './tools-panel';
 export { default as Tooltip } from './tooltip';
 export {
+	/**
+	 * @deprecated Import `TreeGrid` instead.
+	 */
 	default as __experimentalTreeGrid,
+	/**
+	 * @deprecated Import `TreeGridRow` instead.
+	 */
 	TreeGridRow as __experimentalTreeGridRow,
+	/**
+	 * @deprecated Import `TreeGridCell` instead.
+	 */
 	TreeGridCell as __experimentalTreeGridCell,
+	/**
+	 * @deprecated Import `TreeGridItem` instead.
+	 */
 	TreeGridItem as __experimentalTreeGridItem,
+	default as TreeGrid,
+	TreeGridRow,
+	TreeGridCell,
+	TreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
