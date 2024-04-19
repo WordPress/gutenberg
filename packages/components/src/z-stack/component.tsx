@@ -68,7 +68,7 @@ function UnconnectedZStack(
  * `ZStack` allows you to stack things along the Z-axis.
  *
  * ```jsx
- * import { __experimentalZStack as ZStack } from '@wordpress/components';
+ * import { ZStack } from '@wordpress/components';
  *
  * function Example() {
  *   return (
