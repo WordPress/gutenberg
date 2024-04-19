@@ -82,7 +82,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
 ```jsx
 import {
 	HStack,
-	__experimentalSpacer as Spacer,
+	Spacer,
 	__experimentalText as Text,
 } from '@wordpress/components';
 
@@ -104,7 +104,7 @@ function Example() {
 ```jsx
 import {
 	HStack,
-	__experimentalSpacer as Spacer,
+	Spacer,
 	__experimentalText as Text,
 } from '@wordpress/components';
 

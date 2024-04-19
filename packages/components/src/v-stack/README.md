@@ -73,7 +73,7 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
 
 ```jsx
 import {
-	__experimentalSpacer as Spacer,
+	Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -95,7 +95,7 @@ function Example() {
 
 ```jsx
 import {
-	__experimentalSpacer as Spacer,
+	Spacer,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
