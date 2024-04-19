@@ -32,6 +32,9 @@
 		width: 100%;
 		height: 100%;
 		background: $white;
+		&.is-zoomed-out {
+			background: #ddd;
+		}
 	}
 
 	.edit-site-visual-editor__editor-canvas {

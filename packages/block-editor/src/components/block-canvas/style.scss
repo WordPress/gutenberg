@@ -4,7 +4,7 @@ iframe[name="editor-canvas"] {
 	display: block;
 }
 
-iframe[name="editor-canvas"]:not(.has-editor-padding) {
+iframe[name="editor-canvas"]:not(.has-editor-padding):not(.is-zoomed-out) {
 	background-color: $white;
 }
 

@@ -286,6 +286,8 @@ function Iframe( {
 			// Hack to get proper margins when scaling the iframe document.
 			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
+			iframeDocument.body.classList.add( 'is-zoomed-out' );
+
 			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
 			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
@@ -297,6 +299,7 @@ function Iframe( {
 			}
 
 			return () => {
+				iframeDocument.body.classList.remove( 'is-zoomed-out' );
 				iframeDocument.documentElement.style.transform = '';
 				iframeDocument.documentElement.style.marginTop = '';
 				iframeDocument.documentElement.style.marginBottom = '';

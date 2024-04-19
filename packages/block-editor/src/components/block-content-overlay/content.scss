@@ -37,7 +37,7 @@
 		pointer-events: none;
 	}
 
-	.edit-site-visual-editor__editor-canvas.is-zoomed-out &::before {
+	.block-editor-iframe__body.is-zoomed-out &::before {
 		// Unfortunately because of the vw unit, this is not always going to be exact
 		// When the scrollbar is visible, the frame exceeds the canvas by a few pixels.
 		width: calc(100vw);
