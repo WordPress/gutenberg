@@ -104,7 +104,7 @@ const trashPostAction = {
 								}
 								createSuccessNotice( successMessage, {
 									type: 'snackbar',
-									id: 'edit-site-page-trashed',
+									id: 'trash-post-action',
 								} );
 							} else {
 								// If there was at lease one failure.
@@ -217,7 +217,7 @@ function usePermanentlyDeletePostAction() {
 					}
 					createSuccessNotice( successMessage, {
 						type: 'snackbar',
-						id: 'edit-site-post-permanently-deleted',
+						id: 'permanently-delete-post-action',
 					} );
 					if ( onActionPerformed ) {
 						onActionPerformed( posts );
@@ -328,7 +328,7 @@ function useRestorePostAction() {
 							  ),
 						{
 							type: 'snackbar',
-							id: 'edit-site-post-restored',
+							id: 'restore-post-action',
 						}
 					);
 					if ( onActionPerformed ) {
@@ -538,7 +538,7 @@ const resetTemplateAction = {
 						  ),
 					{
 						type: 'snackbar',
-						id: 'edit-site-template-reverted',
+						id: 'revert-template-action',
 					}
 				);
 			} catch ( error ) {
