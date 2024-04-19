@@ -200,7 +200,13 @@ export {
 	useSlotFills as __experimentalUseSlotFills,
 } from './slot-fill';
 export { default as __experimentalStyleProvider } from './style-provider';
-export { ZStack as __experimentalZStack } from './z-stack';
+export {
+	/**
+	 * @deprecated Import `ZStack` instead.
+	 */
+	ZStack as __experimentalZStack,
+	ZStack,
+} from './z-stack';
 
 // Higher-Order Components.
 export {
