@@ -71,7 +71,7 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  *     const {character, modifier} = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getShortcutKeyCombination(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );
@@ -117,9 +117,9 @@ export function getShortcutKeyCombination( state, name ) {
  *     const {display, raw, ariaLabel} = useSelect(
  *         ( select ) =>{
  *             return {
- *                 display: select( keyboardShortcutsStore ).getShortcutRepresentation('core/edit-post/next-region' ),
- *                 raw: select( keyboardShortcutsStore ).getShortcutRepresentation('core/edit-post/next-region','raw' ),
- *                 ariaLabel: select( keyboardShortcutsStore ).getShortcutRepresentation('core/edit-post/next-region', 'ariaLabel')
+ *                 display: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region' ),
+ *                 raw: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region','raw' ),
+ *                 ariaLabel: select( keyboardShortcutsStore ).getShortcutRepresentation('core/editor/next-region', 'ariaLabel')
  *             }
  *         },
  *         []
@@ -161,7 +161,7 @@ export function getShortcutRepresentation(
  * const ExampleComponent = () => {
  *     const shortcutDescription = useSelect(
  *         ( select ) =>
- *             select( keyboardShortcutsStore ).getShortcutDescription( 'core/edit-post/next-region' ),
+ *             select( keyboardShortcutsStore ).getShortcutDescription( 'core/editor/next-region' ),
  *         []
  *     );
  *
@@ -194,7 +194,7 @@ export function getShortcutDescription( state, name ) {
  *     const shortcutAliases = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getShortcutAliases(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );
@@ -247,7 +247,7 @@ export function getShortcutAliases( state, name ) {
  *     const allShortcutKeyCombinations = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getAllShortcutKeyCombinations(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );
@@ -307,7 +307,7 @@ export const getAllShortcutKeyCombinations = createSelector(
  *     const allShortcutRawKeyCombinations = useSelect(
  *         ( select ) =>
  *             select( keyboardShortcutsStore ).getAllShortcutRawKeyCombinations(
- *                 'core/edit-post/next-region'
+ *                 'core/editor/next-region'
  *             ),
  *         []
  *     );

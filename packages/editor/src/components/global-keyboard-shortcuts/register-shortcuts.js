@@ -103,6 +103,42 @@ function EditorKeyboardShortcutsRegister() {
 				character: 'h',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/editor/next-region',
+			category: 'global',
+			description: __( 'Navigate to the next part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrl',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'n',
+				},
+			],
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/previous-region',
+			category: 'global',
+			description: __( 'Navigate to the previous part of the editor.' ),
+			keyCombination: {
+				modifier: 'ctrlShift',
+				character: '`',
+			},
+			aliases: [
+				{
+					modifier: 'access',
+					character: 'p',
+				},
+				{
+					modifier: 'ctrlShift',
+					character: '~',
+				},
+			],
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;

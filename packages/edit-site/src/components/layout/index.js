@@ -86,10 +86,10 @@ export default function Layout() {
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
+				'core/editor/previous-region'
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
+				'core/editor/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
 				'core',
