@@ -1438,6 +1438,8 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
+			const allBlocks = select.getBlocks();
+
 			const { sectionRootClientId } = unlock(
 				registry.select( STORE_NAME ).getSettings()
 			);
@@ -1464,6 +1466,10 @@ export const __unstableSetEditorMode =
 					firstSelectedClientId
 				);
 				dispatch.selectBlock( rootClientId );
+			} else {
+				// If there's no block selected and no sectionRootClientId, select the last root block.
+				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
+				dispatch.selectBlock( lastRootBlock?.clientId );
 			}
 		}
 
