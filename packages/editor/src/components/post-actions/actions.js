@@ -518,7 +518,8 @@ export const duplicatePostAction = {
 		);
 
 		const { saveEntityRecord } = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
 
 		async function createPage( event ) {
 			event.preventDefault();
