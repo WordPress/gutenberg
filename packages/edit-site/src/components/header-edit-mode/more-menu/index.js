@@ -24,21 +24,13 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
-	default as KeyboardShortcutHelpModal,
-} from '../../keyboard-shortcut-help-modal';
-import {
-	PREFERENCES_MODAL_NAME,
-	default as EditSitePreferencesModal,
-} from '../../preferences-modal';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
 import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher, ActionItem, interfaceStore } =
+const { ModeSwitcher, ActionItem, interfaceStore, PreferencesModal } =
 	unlock( editorPrivateApis );
 
 export default function MoreMenu( { showIconLabels } ) {
@@ -120,7 +112,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						</MenuGroup>
 						<ModeSwitcher />
 						<ActionItem.Slot
-							name="core/edit-site/plugin-more-menu"
+							name="core/plugin-more-menu"
 							label={ __( 'Plugins' ) }
 							as={ MenuGroup }
 							fillProps={ { onClick: onClose } }
@@ -129,9 +121,7 @@ export default function MoreMenu( { showIconLabels } ) {
 							{ isBlockBasedTheme && <SiteExport /> }
 							<MenuItem
 								onClick={ () =>
-									openModal(
-										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-									)
+									openModal( 'editor/keyboard-shortcut-help' )
 								}
 								shortcut={ displayShortcut.access( 'h' ) }
 							>
@@ -163,7 +153,7 @@ export default function MoreMenu( { showIconLabels } ) {
 						<MenuGroup>
 							<MenuItem
 								onClick={ () =>
-									openModal( PREFERENCES_MODAL_NAME )
+									openModal( 'editor/preferences' )
 								}
 							>
 								{ __( 'Preferences' ) }
@@ -172,8 +162,7 @@ export default function MoreMenu( { showIconLabels } ) {
 					</>
 				) }
 			</DropdownMenu>
-			<KeyboardShortcutHelpModal />
-			<EditSitePreferencesModal />
+			<PreferencesModal />
 		</>
 	);
 }

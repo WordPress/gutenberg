@@ -1,14 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../../lock-unlock';
-
-const { ComplementaryAreaMoreMenuItem } = unlock( editorPrivateApis );
+import { ComplementaryAreaMoreMenuItem } from '@wordpress/interface';
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down,
@@ -23,11 +16,11 @@ const { ComplementaryAreaMoreMenuItem } = unlock( editorPrivateApis );
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var PluginSidebarMoreMenuItem = wp.editSite.PluginSidebarMoreMenuItem;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function MySidebarMoreMenuItem() {
- * 	return wp.element.createElement(
+ * 	return React.createElement(
  * 		PluginSidebarMoreMenuItem,
  * 		{
  * 			target: 'my-sidebar',
@@ -42,7 +35,7 @@ const { ComplementaryAreaMoreMenuItem } = unlock( editorPrivateApis );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginSidebarMoreMenuItem } from '@wordpress/edit-site';
+ * import { PluginSidebarMoreMenuItem } from '@wordpress/editor';
  * import { more } from '@wordpress/icons';
  *
  * const MySidebarMoreMenuItem = () => (
@@ -64,7 +57,7 @@ export default function PluginSidebarMoreMenuItem( props ) {
 			// Menu item is marked with unstable prop for backward compatibility.
 			// @see https://github.com/WordPress/gutenberg/issues/14457
 			__unstableExplicitMenuItem
-			scope="core/edit-site"
+			scope="core"
 			{ ...props }
 		/>
 	);

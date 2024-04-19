@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
@@ -29,7 +28,7 @@ import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { PostActions } = unlock( editorPrivateApis );
 
 export default function SidebarNavigationScreenPage( { backPath } ) {
@@ -37,7 +36,7 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 	const history = useHistory();
 	const {
 		params: { postId },
-	} = useNavigator();
+	} = useLocation();
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'page',
@@ -80,7 +79,7 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 				canvas: 'view',
 			} );
 		}
-	}, [ hasResolved, history ] );
+	}, [ hasResolved, record, history ] );
 
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {

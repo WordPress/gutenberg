@@ -3,6 +3,8 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,6 +17,10 @@ export default function EditorKeyboardShortcuts() {
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const {
 		redo,
 		undo,
@@ -83,6 +89,25 @@ export default function EditorKeyboardShortcuts() {
 		if ( ! isListViewOpened() ) {
 			event.preventDefault();
 			setIsListViewOpened( true );
+		}
+	} );
+
+	useShortcut( 'core/editor/toggle-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+		const isEditorSidebarOpened = [
+			'edit-post/document',
+			'edit-post/block',
+		].includes( getActiveComplementaryArea( 'core' ) );
+
+		if ( isEditorSidebarOpened ) {
+			disableComplementaryArea( 'core' );
+		} else {
+			const sidebarToOpen = getBlockSelectionStart()
+				? 'edit-post/block'
+				: 'edit-post/document';
+			enableComplementaryArea( 'core', sidebarToOpen );
 		}
 	} );
 

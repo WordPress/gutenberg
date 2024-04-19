@@ -41,7 +41,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
@@ -169,9 +168,8 @@ function Layout( { initialPost } ) {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
-				) || select( editorStore ).isPublishSidebarOpened()
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ) ||
+				select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
@@ -308,7 +306,7 @@ function Layout( { initialPost } ) {
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					! isDistractionFree && (
-						<ComplementaryArea.Slot scope="core/edit-post" />
+						<ComplementaryArea.Slot scope="core" />
 					)
 				}
 				notices={ <EditorSnackbars /> }
@@ -361,7 +359,6 @@ function Layout( { initialPost } ) {
 				} }
 			/>
 			<EditPostPreferencesModal />
-			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />

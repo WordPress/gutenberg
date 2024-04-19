@@ -35,7 +35,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -51,6 +50,8 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
+import SidebarContent from '../sidebar';
+import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
@@ -224,8 +225,7 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					{ ( ! isMobileViewport ||
-						( isMobileViewport && ! areas.mobile ) ) && (
+					{ ( ! isMobileViewport || ! areas.mobile ) && (
 						<NavigableRegion
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
@@ -248,7 +248,10 @@ export default function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<Sidebar />
+										<SidebarContent routeKey={ routeKey }>
+											{ areas.sidebar }
+										</SidebarContent>
+										<SaveHub />
 									</motion.div>
 								) }
 							</AnimatePresence>
