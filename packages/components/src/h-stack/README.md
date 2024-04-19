@@ -1,9 +1,5 @@
 # HStack
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
 
 ## Usage
@@ -12,7 +8,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import {
-	__experimentalHStack as HStack,
+	HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
 
@@ -85,7 +81,7 @@ When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to t
 
 ```jsx
 import {
-	__experimentalHStack as HStack,
+	HStack,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 } from '@wordpress/components';
@@ -107,7 +103,7 @@ function Example() {
 
 ```jsx
 import {
-	__experimentalHStack as HStack,
+	HStack,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 } from '@wordpress/components';
