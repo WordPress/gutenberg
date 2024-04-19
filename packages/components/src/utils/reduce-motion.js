@@ -3,6 +3,10 @@
  *
  * @param {'transition' | 'animation' | string} [prop='transition'] CSS Property name
  * @return {string} Generated CSS code for the reduced style
+ *
+ * @deprecated Write your own media query instead,
+ * e.g. `@media not ( prefers-reduced-motion ) { ...some animation... }` or
+ * `@media ( prefers-reduced-motion ) { ...reduced animation... }`.
  */
 export function reduceMotion( prop = 'transition' ) {
 	let style;

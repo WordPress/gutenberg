@@ -17,17 +17,11 @@ import { createBlock } from '@wordpress/blocks';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { isEditorSidebarOpened } = useSelect( editPostStore );
-	const { openGeneralSidebar, closeGeneralSidebar, toggleFeature } =
-		useDispatch( editPostStore );
+	const { toggleFeature } = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
-	const {
-		getBlockName,
-		getSelectedBlockClientId,
-		getBlockAttributes,
-		getBlockSelectionStart,
-	} = useSelect( blockEditorStore );
+	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
+		useSelect( blockEditorStore );
 
 	const handleTextLevelShortcut = ( event, level ) => {
 		event.preventDefault();
@@ -69,16 +63,6 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/toggle-sidebar',
-			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: ',',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-post/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),
@@ -115,16 +99,6 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/keyboard-shortcuts',
-			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'h',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-post/transform-heading-to-paragraph',
 			category: 'block-library',
 			description: __( 'Transform heading to paragraph.' ),
@@ -149,21 +123,6 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
-	} );
-
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
-
-		if ( isEditorSidebarOpened() ) {
-			closeGeneralSidebar();
-		} else {
-			const sidebarToOpen = getBlockSelectionStart()
-				? 'edit-post/block'
-				: 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
-		}
 	} );
 
 	useShortcut( 'core/edit-post/transform-heading-to-paragraph', ( event ) =>

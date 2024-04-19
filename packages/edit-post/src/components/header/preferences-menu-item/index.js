@@ -4,19 +4,25 @@
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
-import { store as interfaceStore } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { PREFERENCES_MODAL_NAME } from '../../../components/preferences-modal';
+import { unlock } from '../../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
+
+/**
+ * Internal dependencies
+ */
 
 export default function PreferencesMenuItem() {
 	const { openModal } = useDispatch( interfaceStore );
 	return (
 		<MenuItem
 			onClick={ () => {
-				openModal( PREFERENCES_MODAL_NAME );
+				openModal( 'editor/preferences' );
 			} }
 		>
 			{ __( 'Preferences' ) }

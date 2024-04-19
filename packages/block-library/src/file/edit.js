@@ -84,7 +84,8 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	);
 
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { toggleSelection } = useDispatch( blockEditorStore );
+	const { toggleSelection, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	useUploadMediaFromBlobURL( {
 		url: href,
@@ -92,12 +93,17 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		onError: onUploadError,
 	} );
 
+	// Note: Handle setting a default value for `downloadButtonText` via HTML API
+	// when it supports replacing text content for HTML tags.
 	useEffect( () => {
 		if ( RichText.isEmpty( downloadButtonText ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
 		}
+		// Reason: This effect should only run on mount.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	function onSelectFile( newMedia ) {

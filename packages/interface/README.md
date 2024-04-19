@@ -27,25 +27,25 @@ Below are some examples of how to control the active complementary area using th
 ```js
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> "edit-post/document"
 
 wp.data
 	.dispatch( 'core/interface' )
-	.enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
+	.enableComplementaryArea( 'core', 'edit-post/block' );
 
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> "edit-post/block"
 
 wp.data
 	.dispatch( 'core/interface' )
-	.disableComplementaryArea( 'core/edit-post' );
+	.disableComplementaryArea( 'core' );
 
 wp.data
 	.select( 'core/interface' )
-	.getActiveComplementaryArea( 'core/edit-post' );
+	.getActiveComplementaryArea( 'core' );
 // -> null
 ```
 
@@ -56,17 +56,17 @@ wp.data
 Example usage: `ComplementaryArea` component makes use of `PinnedItems` and automatically adds a pinned item for the complementary areas marked as a favorite.
 
 ```js
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 // -> false
 
-wp.data.dispatch( 'core/interface' ).pinItem( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.dispatch( 'core/interface' ).pinItem( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 // -> true
 
-wp.data.dispatch( 'core/interface' ).unpinItem( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+wp.data.dispatch( 'core/interface' ).unpinItem( 'core', 'edit-post-block-patterns/block-patterns-sidebar' );
 
-wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
+wp.data.select( 'core/interface' ).isItemPinned( 'core', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
 ```
 
 ### Preferences

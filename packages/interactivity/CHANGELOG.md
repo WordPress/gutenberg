@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
+
 ## 5.4.0 (2024-04-03)
 
 ## 5.3.0 (2024-03-21)

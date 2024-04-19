@@ -23,23 +23,76 @@ type ContainerProps = {
 	labelPosition?: LabelPosition;
 };
 
-type RootProps = {
-	isFocused?: boolean;
-	labelPosition?: LabelPosition;
+export const Prefix = styled.span`
+	box-sizing: border-box;
+	display: block;
+`;
+
+export const Suffix = styled.span`
+	align-items: center;
+	align-self: stretch;
+	box-sizing: border-box;
+	display: flex;
+`;
+
+type BackdropProps = {
+	disabled?: boolean;
+	isBorderless?: boolean;
 };
 
-const rootFocusedStyles = ( { isFocused }: RootProps ) => {
-	if ( ! isFocused ) return '';
+const backdropBorderColor = ( {
+	disabled,
+	isBorderless,
+}: BackdropProps ): CSSProperties[ 'borderColor' ] => {
+	if ( isBorderless ) {
+		return 'transparent';
+	}
 
-	return css( { zIndex: 1 } );
+	if ( disabled ) {
+		return COLORS.ui.borderDisabled;
+	}
+
+	return COLORS.ui.border;
 };
 
-export const Root = styled( Flex )< RootProps >`
+export const BackdropUI = styled.div< BackdropProps >`
+	&&& {
+		box-sizing: border-box;
+		border-color: ${ backdropBorderColor };
+		border-radius: inherit;
+		border-style: solid;
+		border-width: 1px;
+		bottom: 0;
+		left: 0;
+		margin: 0;
+		padding: 0;
+		pointer-events: none;
+		position: absolute;
+		right: 0;
+		top: 0;
+
+		${ rtl( { paddingLeft: 2 } ) }
+	}
+`;
+
+export const Root = styled( Flex )`
 	box-sizing: border-box;
 	position: relative;
 	border-radius: 2px;
 	padding-top: 0;
-	${ rootFocusedStyles }
+
+	// Focus within, excluding cases where auxiliary controls in prefix or suffix have focus.
+	&:focus-within:not( :has( :is( ${ Prefix }, ${ Suffix } ):focus-within ) ) {
+		z-index: 1;
+
+		${ BackdropUI } {
+			border-color: ${ COLORS.ui.borderFocus };
+			box-shadow: ${ CONFIG.controlBoxShadowFocus };
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+		}
+	}
 `;
 
 const containerDisabledStyles = ( { disabled }: ContainerProps ) => {
@@ -259,73 +312,4 @@ export const Label = (
 
 export const LabelWrapper = styled( FlexItem )`
 	max-width: calc( 100% - 10px );
-`;
-
-type BackdropProps = {
-	disabled?: boolean;
-	isBorderless?: boolean;
-	isFocused?: boolean;
-};
-
-const backdropFocusedStyles = ( {
-	disabled,
-	isBorderless,
-	isFocused,
-}: BackdropProps ): SerializedStyles => {
-	let borderColor = isBorderless ? 'transparent' : COLORS.ui.border;
-
-	let boxShadow;
-	let outline;
-	let outlineOffset;
-
-	if ( isFocused ) {
-		borderColor = COLORS.ui.borderFocus;
-		boxShadow = CONFIG.controlBoxShadowFocus;
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline = `2px solid transparent`;
-		outlineOffset = `-2px`;
-	}
-
-	if ( disabled ) {
-		borderColor = isBorderless ? 'transparent' : COLORS.ui.borderDisabled;
-	}
-
-	return css( {
-		boxShadow,
-		borderColor,
-		borderStyle: 'solid',
-		borderWidth: 1,
-		outline,
-		outlineOffset,
-	} );
-};
-
-export const BackdropUI = styled.div< BackdropProps >`
-	&&& {
-		box-sizing: border-box;
-		border-radius: inherit;
-		bottom: 0;
-		left: 0;
-		margin: 0;
-		padding: 0;
-		pointer-events: none;
-		position: absolute;
-		right: 0;
-		top: 0;
-
-		${ backdropFocusedStyles }
-		${ rtl( { paddingLeft: 2 } ) }
-	}
-`;
-
-export const Prefix = styled.span`
-	box-sizing: border-box;
-	display: block;
-`;
-
-export const Suffix = styled.span`
-	align-items: center;
-	align-self: stretch;
-	box-sizing: border-box;
-	display: flex;
 `;

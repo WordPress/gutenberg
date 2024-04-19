@@ -4,7 +4,7 @@
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useState, memo } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
 /**
@@ -17,7 +17,7 @@ import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const { useHistory } = unlock( routerPrivateApis );
 
-export default function AddNewTemplatePart() {
+function AddNewTemplatePart() {
 	const { canCreate, postType } = useSelect( ( select ) => {
 		const { supportsTemplatePartsMode } =
 			select( editSiteStore ).getSettings();
@@ -58,3 +58,5 @@ export default function AddNewTemplatePart() {
 		</>
 	);
 }
+
+export default memo( AddNewTemplatePart );

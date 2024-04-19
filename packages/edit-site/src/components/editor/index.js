@@ -7,8 +7,16 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
-import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+import {
+	Notice,
+	__unstableAnimatePresence as AnimatePresence,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import {
+	useInstanceId,
+	useViewportMatch,
+	useReducedMotion,
+} from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
@@ -16,11 +24,6 @@ import {
 	store as blockEditorStore,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import {
-	InterfaceSkeleton,
-	ComplementaryArea,
-	store as interfaceStore,
-} from '@wordpress/interface';
 import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
@@ -40,6 +43,7 @@ import {
 	SidebarInspectorFill,
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
+import Header from '../header-edit-mode';
 import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
@@ -59,6 +63,9 @@ const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
 	ListViewSidebar,
+	InterfaceSkeleton,
+	ComplementaryArea,
+	interfaceStore,
 } = unlock( editorPrivateApis );
 
 const interfaceLabels = {
@@ -70,7 +77,11 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the editor header landmark region. */
+	header: __( 'Editor top bar' ),
 };
+
+const ANIMATION_DURATION = 0.25;
 
 export default function Editor( { isLoading, onClick } ) {
 	const {
@@ -82,6 +93,7 @@ export default function Editor( { isLoading, onClick } ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const disableMotion = useReducedMotion();
 
 	const {
 		context,
@@ -128,9 +140,7 @@ export default function Editor( { isLoading, onClick } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -213,6 +223,35 @@ export default function Editor( { isLoading, onClick } ) {
 								'show-icon-labels': showIconLabels,
 							}
 						) }
+						header={
+							<AnimatePresence initial={ false }>
+								{ canvasMode === 'edit' && (
+									<motion.div
+										initial={ {
+											marginTop: -60,
+										} }
+										animate={ {
+											marginTop: 0,
+										} }
+										exit={ {
+											marginTop: -60,
+										} }
+										transition={ {
+											type: 'tween',
+											duration:
+												// Disable transition in mobile to emulate a full page transition.
+												disableMotion ||
+												! isLargeViewport
+													? 0
+													: ANIMATION_DURATION,
+											ease: [ 0.6, 0, 0.4, 1 ],
+										} }
+									>
+										<Header />
+									</motion.div>
+								) }
+							</AnimatePresence>
+						}
 						notices={ <EditorSnackbars /> }
 						content={
 							<>
@@ -254,11 +293,9 @@ export default function Editor( { isLoading, onClick } ) {
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
-							! isDistractionFree &&
 							isEditMode &&
-							isRightSidebarOpen &&
 							! isDistractionFree && (
-								<ComplementaryArea.Slot scope="core/edit-site" />
+								<ComplementaryArea.Slot scope="core" />
 							)
 						}
 						footer={
