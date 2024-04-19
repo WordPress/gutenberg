@@ -2,11 +2,16 @@
 
 ## Unreleased
 
+### Deprecation
+
+-   `BoxControl`: Remove "experimental" designation ([#60921](https://github.com/WordPress/gutenberg/pull/60921)).
+
 ## 27.4.0 (2024-04-19)
 
 ### Deprecation
 
 -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
+-   `BoxControl`: Remove "experimental" designation ([#60921](https://github.com/WordPress/gutenberg/pull/60921)).
 
 ### Enhancements
 
