@@ -4,7 +4,6 @@
 
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
@@ -18,21 +17,10 @@ import EnablePublishSidebarOption from './enable-publish-sidebar';
 const { PreferencesModalSection, PreferenceToggleControl } = unlock(
 	preferencesPrivateApis
 );
-const { PreferencesModal, interfaceStore } = unlock( editorPrivateApis );
-
-export const PREFERENCES_MODAL_NAME = 'edit-post/preferences';
+const { PreferencesModal } = unlock( editorPrivateApis );
 
 export default function EditPostPreferencesModal() {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { closeModal } = useDispatch( interfaceStore );
-	const { isModalActive } = useSelect( ( select ) => {
-		const modalActive = select( interfaceStore ).isModalActive(
-			PREFERENCES_MODAL_NAME
-		);
-		return {
-			isModalActive: modalActive,
-		};
-	}, [] );
 
 	const extraSections = {
 		general: (
@@ -60,15 +48,5 @@ export default function EditPostPreferencesModal() {
 		),
 	};
 
-	if ( ! isModalActive ) {
-		return null;
-	}
-
-	return (
-		<PreferencesModal
-			extraSections={ extraSections }
-			isActive={ isModalActive }
-			onClose={ closeModal }
-		/>
-	);
+	return <PreferencesModal extraSections={ extraSections } />;
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState, Fragment, Children } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -28,7 +28,6 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
@@ -52,22 +51,6 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		POST_ACTIONS_WHILE_EDITING
 	);
 
-	const { primaryActions, secondaryActions } = useMemo( () => {
-		return actions.reduce(
-			( accumulator, action ) => {
-				if ( action.isEligible && ! action.isEligible( item ) ) {
-					return accumulator;
-				}
-				if ( action.isPrimary ) {
-					accumulator.primaryActions.push( action );
-				} else {
-					accumulator.secondaryActions.push( action );
-				}
-				return accumulator;
-			},
-			{ primaryActions: [], secondaryActions: [] }
-		);
-	}, [ actions, item ] );
 	if (
 		[
 			TEMPLATE_POST_TYPE,
@@ -84,29 +67,14 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					disabled={
-						! primaryActions.length && ! secondaryActions.length
-					}
+					disabled={ ! actions.length }
 					className="editor-all-actions-button"
 					{ ...buttonProps }
 				/>
 			}
 			placement="bottom-end"
 		>
-			<WithDropDownMenuSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithDropDownMenuSeparators>
+			<ActionsDropdownMenuGroup actions={ actions } item={ item } />
 		</DropdownMenu>
 	);
 }
@@ -158,18 +126,6 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			) }
 		</>
 	);
-}
-
-// Copied as is from packages/dataviews/src/view-table.js
-function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
 }
 
 // Copied as is from packages/dataviews/src/item-actions.js

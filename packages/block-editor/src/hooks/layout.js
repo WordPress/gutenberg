@@ -374,7 +374,7 @@ function BlockWithLayoutStyles( {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
-	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
+	const selector = `.${ selectorPrefix }${ id }`;
 	const hasBlockGapSupport = blockGapSupport !== null;
 
 	// Get CSS string for the current layout type.

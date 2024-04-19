@@ -1,4 +1,4 @@
-.edit-site-keyboard-shortcut-help-modal {
+.editor-keyboard-shortcut-help-modal {
 	&__section {
 		margin: 0 0 2rem 0;
 	}
@@ -44,7 +44,7 @@
 		margin: 0;
 		padding: 0;
 
-		& + .edit-site-keyboard-shortcut-help-modal__shortcut-key-combination {
+		& + .editor-keyboard-shortcut-help-modal__shortcut-key-combination {
 			margin-top: 10px;
 		}
 	}

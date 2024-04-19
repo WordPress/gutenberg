@@ -101,13 +101,15 @@ const usePublicTaxonomies = () => {
 };
 
 function usePostTypeNeedsUniqueIdentifier( publicPostTypes ) {
-	const postTypeLabels = useMemo( () =>
-		publicPostTypes?.reduce( ( accumulator, { labels } ) => {
-			const singularName = labels.singular_name.toLowerCase();
-			accumulator[ singularName ] =
-				( accumulator[ singularName ] || 0 ) + 1;
-			return accumulator;
-		}, {} )
+	const postTypeLabels = useMemo(
+		() =>
+			publicPostTypes?.reduce( ( accumulator, { labels } ) => {
+				const singularName = labels.singular_name.toLowerCase();
+				accumulator[ singularName ] =
+					( accumulator[ singularName ] || 0 ) + 1;
+				return accumulator;
+			}, {} ),
+		[ publicPostTypes ]
 	);
 	return useCallback(
 		( { labels, slug } ) => {

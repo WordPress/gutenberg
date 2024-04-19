@@ -526,7 +526,7 @@ function BlockListBlockProvider( props ) {
 				canMoveBlock,
 
 				getSettings,
-				__unstableGetTemporarilyEditingAsBlocks,
+				getTemporarilyEditingAsBlocks,
 				getBlockEditingMode,
 				getBlockName,
 				isFirstMultiSelectedBlock,
@@ -620,7 +620,7 @@ function BlockListBlockProvider( props ) {
 				canMove,
 				isSelected: _isSelected,
 				isTemporarilyEditingAsBlocks:
-					__unstableGetTemporarilyEditingAsBlocks() === clientId,
+					getTemporarilyEditingAsBlocks() === clientId,
 				blockEditingMode,
 				mayDisplayControls:
 					_isSelected ||
