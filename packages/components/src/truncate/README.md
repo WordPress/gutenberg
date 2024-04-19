@@ -1,15 +1,11 @@
 # Truncate
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
 
 ## Usage
 
 ```jsx
-import { __experimentalTruncate as Truncate } from '@wordpress/components';
+import { Truncate } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -66,7 +62,7 @@ Clamps the text content to the specified `numberOfLines`, adding an ellipsis at 
 -   Default: `0`
 
 ```jsx
-import { __experimentalTruncate as Truncate } from '@wordpress/components';
+import { Truncate } from '@wordpress/components';
 
 function Example() {
 	return (

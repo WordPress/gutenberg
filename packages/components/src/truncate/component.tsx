@@ -28,7 +28,7 @@ function UnconnectedTruncate(
  * available for custom implementations.
  *
  * ```jsx
- * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
+ * import { Truncate } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

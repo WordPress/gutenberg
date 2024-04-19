@@ -347,7 +347,13 @@ export {
 	TreeGridItem,
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
-export { Truncate as __experimentalTruncate } from './truncate';
+export {
+	/**
+	 * @deprecated Import `Truncate` instead.
+	 */
+	Truncate as __experimentalTruncate,
+	Truncate,
+} from './truncate';
 export {
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
