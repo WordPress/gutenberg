@@ -18,11 +18,10 @@ import { speak } from '@wordpress/a11y';
  */
 import isEmptyString from './is-empty-string';
 
-// This component is only used in a non-WP environment.
-// Changes here should likely be duplicated in the `patterns` package as well.
 export default function BlockRenameModal( {
 	blockName,
 	originalBlockName,
+	helpText,
 	onClose,
 	onSave,
 } ) {
@@ -88,6 +87,7 @@ export default function BlockRenameModal( {
 						__next40pxDefaultSize
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
+						help={ helpText }
 						hideLabelFromVision
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }

@@ -23,7 +23,13 @@ export default function BlockRenameControl( { clientId } ) {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const settings = getSettings();
-			const { renameBlock } = unlock( settings );
+			// Try unlocking the settings if it has been locked, otherwise renameBlock is not set.
+			let renameBlock;
+			try {
+				renameBlock = unlock( settings ).renameBlock;
+			} catch ( err ) {
+				renameBlock = undefined;
+			}
 
 			const _metadata = getBlockAttributes( clientId )?.metadata;
 			return {
@@ -60,7 +66,6 @@ export default function BlockRenameControl( { clientId } ) {
 						setRenamingBlock( true );
 					}
 				} }
-				aria-expanded={ renamingBlock }
 				aria-haspopup="dialog"
 			>
 				{ __( 'Rename' ) }
