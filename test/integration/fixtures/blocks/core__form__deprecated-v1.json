@@ -1,0 +1,84 @@
+[
+	{
+		"name": "core/form",
+		"isValid": false,
+		"attributes": {
+			"submissionMethod": "email",
+			"method": "post",
+			"style": {
+				"color": {
+					"text": "#913636",
+					"background": "#d1c6c6"
+				},
+				"typography": {
+					"fontSize": "18px"
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/form-input",
+				"isValid": true,
+				"attributes": {
+					"type": "text",
+					"label": "Name",
+					"inlineLabel": false,
+					"required": true,
+					"value": "",
+					"visibilityPermissions": "all"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/form-input",
+				"isValid": true,
+				"attributes": {
+					"type": "email",
+					"label": "Email",
+					"inlineLabel": false,
+					"required": true,
+					"value": "",
+					"visibilityPermissions": "all"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/form-input",
+				"isValid": true,
+				"attributes": {
+					"type": "textarea",
+					"label": "Comment",
+					"inlineLabel": false,
+					"required": true,
+					"value": "",
+					"visibilityPermissions": "all"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/form-submit-button",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/buttons",
+						"isValid": true,
+						"attributes": {},
+						"innerBlocks": [
+							{
+								"name": "core/button",
+								"isValid": true,
+								"attributes": {
+									"tagName": "button",
+									"type": "submit",
+									"text": "Submit"
+								},
+								"innerBlocks": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]
