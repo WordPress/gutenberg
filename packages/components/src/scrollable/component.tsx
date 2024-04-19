@@ -25,7 +25,7 @@ function UnconnectedScrollable(
  * `Scrollable` is a layout component that content in a scrollable container.
  *
  * ```jsx
- * import { __experimentalScrollable as Scrollable } from `@wordpress/components`;
+ * import { Scrollable } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
