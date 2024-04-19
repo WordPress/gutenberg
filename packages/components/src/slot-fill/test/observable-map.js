@@ -14,42 +14,39 @@ import {
 describe( 'ObservableMap', () => {
 	test( 'should observe individual values', () => {
 		const map = observableMap();
-		let notifsFromA = 0;
-		let notifsFromB = 0;
 
-		const unsubA = map.subscribe( 'a', () => {
-			notifsFromA++;
-		} );
-		const unsubB = map.subscribe( 'b', () => {
-			notifsFromB++;
-		} );
+		const listenerA = jest.fn();
+		const listenerB = jest.fn();
+
+		const unsubA = map.subscribe( 'a', listenerA );
+		const unsubB = map.subscribe( 'b', listenerB );
 
 		// check that setting `a` doesn't notify the `b` listener
 		map.set( 'a', 1 );
-		expect( notifsFromA ).toBe( 1 );
-		expect( notifsFromB ).toBe( 0 );
+		expect( listenerA ).toHaveBeenCalledTimes( 1 );
+		expect( listenerB ).toHaveBeenCalledTimes( 0 );
 
 		// check that setting `b` doesn't notify the `a` listener
 		map.set( 'b', 2 );
-		expect( notifsFromA ).toBe( 1 );
-		expect( notifsFromB ).toBe( 1 );
+		expect( listenerA ).toHaveBeenCalledTimes( 1 );
+		expect( listenerB ).toHaveBeenCalledTimes( 1 );
 
 		// check that `delete` triggers notifications, too
 		map.delete( 'a' );
-		expect( notifsFromA ).toBe( 2 );
-		expect( notifsFromB ).toBe( 1 );
+		expect( listenerA ).toHaveBeenCalledTimes( 2 );
+		expect( listenerB ).toHaveBeenCalledTimes( 1 );
 
 		// check that the subscription survived the `delete`
 		map.set( 'a', 2 );
-		expect( notifsFromA ).toBe( 3 );
-		expect( notifsFromB ).toBe( 1 );
+		expect( listenerA ).toHaveBeenCalledTimes( 3 );
+		expect( listenerB ).toHaveBeenCalledTimes( 1 );
 
-		// check that unsubscription really works.
+		// check that unsubscription really works
 		unsubA();
 		unsubB();
 		map.set( 'a', 3 );
-		expect( notifsFromA ).toBe( 3 );
-		expect( notifsFromB ).toBe( 1 );
+		expect( listenerA ).toHaveBeenCalledTimes( 3 );
+		expect( listenerB ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 
@@ -58,18 +55,16 @@ describe( 'useObservableValue', () => {
 		const map = observableMap();
 		map.set( 'a', 1 );
 
-		let renders = 0;
-		function MapUI() {
+		const MapUI = jest.fn( () => {
 			const value = useObservableValue( map, 'a' );
-			renders++;
 			return <div>value is { value }</div>;
-		}
+		} );
 
 		render( <MapUI /> );
 		expect( screen.getByText( /^value is/ ) ).toHaveTextContent(
 			'value is 1'
 		);
-		expect( renders ).toBe( 1 );
+		expect( MapUI ).toHaveBeenCalledTimes( 1 );
 
 		act( () => {
 			map.set( 'a', 2 );
@@ -77,11 +72,12 @@ describe( 'useObservableValue', () => {
 		expect( screen.getByText( /^value is/ ) ).toHaveTextContent(
 			'value is 2'
 		);
-		expect( renders ).toBe( 2 );
+		expect( MapUI ).toHaveBeenCalledTimes( 2 );
 
+		// check that setting unobserved map key doesn't trigger a render at all
 		act( () => {
 			map.set( 'b', 1 );
 		} );
-		expect( renders ).toBe( 2 );
+		expect( MapUI ).toHaveBeenCalledTimes( 2 );
 	} );
 } );
