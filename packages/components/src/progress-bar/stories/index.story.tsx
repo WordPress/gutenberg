@@ -10,7 +10,7 @@ import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components (Experimental)/ProgressBar',
+	title: 'Components/ProgressBar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
 	},
