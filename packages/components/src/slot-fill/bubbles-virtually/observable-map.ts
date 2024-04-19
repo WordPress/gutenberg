@@ -12,7 +12,7 @@ export type ObservableMap< K, V > = {
 
 export function observableMap< K, V >(): ObservableMap< K, V > {
 	const map = new Map< K, V >();
-	const listeners = new Map< K, ( () => void )[] >();
+	const listeners = new Map< K, Set< () => void > >();
 
 	function callListeners( name: K ) {
 		const list = listeners.get( name );
@@ -26,15 +26,13 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 
 	function unsubscribe( name: K, listener: () => void ) {
 		return () => {
-			const ulist = listeners.get( name );
-			if ( ! ulist ) {
+			const list = listeners.get( name );
+			if ( ! list ) {
 				return;
 			}
 
-			const newlist = ulist.filter( ( l ) => l !== listener );
-			if ( newlist.length > 0 ) {
-				listeners.set( name, newlist );
-			} else {
+			list.delete( listener );
+			if ( list.size === 0 ) {
 				listeners.delete( name );
 			}
 		};
@@ -53,8 +51,12 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 			callListeners( name );
 		},
 		subscribe( name, listener ) {
-			const list = listeners.get( name ) || [];
-			listeners.set( name, [ ...list, listener ] );
+			let list = listeners.get( name );
+			if ( ! list ) {
+				list = new Set();
+				listeners.set( name, list );
+			}
+			list.add( listener );
 
 			return unsubscribe( name, listener );
 		},
