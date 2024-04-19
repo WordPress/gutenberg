@@ -8,7 +8,7 @@
 import {
 	Divider,
 	Text,
-	__experimentalVStack as VStack,
+	VStack,
 } from `@wordpress/components`;
 
 function Example() {

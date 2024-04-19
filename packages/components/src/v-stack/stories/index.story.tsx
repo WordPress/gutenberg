@@ -25,7 +25,7 @@ const ALIGNMENTS = {
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components (Experimental)/VStack',
+	title: 'Components/VStack',
 	argTypes: {
 		alignment: {
 			control: { type: 'select' },
