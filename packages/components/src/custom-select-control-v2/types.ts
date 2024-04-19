@@ -187,4 +187,10 @@ export type CustomSelectItemProps = {
 	 * used if left `undefined`.
 	 */
 	children?: React.ReactNode;
+	/**
+	 * If true, the item will be disabled.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
 };
