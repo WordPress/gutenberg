@@ -92,6 +92,7 @@ function ComplementaryAreaFill( {
 						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
 						exit="closed"
 						transition={ transition }
+						className="interface-complementary-area__fill"
 					>
 						<div
 							id={ id }
