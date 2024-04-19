@@ -24,7 +24,7 @@ test.describe( 'List (@firefox)', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 
 		const copied = `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>one</li>
 <!-- /wp:list-item -->
 
