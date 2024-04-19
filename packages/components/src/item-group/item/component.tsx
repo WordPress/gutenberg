@@ -31,7 +31,7 @@ function UnconnectedItem(
  *
  * ```jsx
  * import {
- *   __experimentalItemGroup as ItemGroup,
+ *   ItemGroup,
  *   __experimentalItem as Item,
  * } from '@wordpress/components';
  *
