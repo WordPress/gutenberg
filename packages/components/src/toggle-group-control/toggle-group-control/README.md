@@ -1,9 +1,5 @@
 # `ToggleGroupControl`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `ToggleGroupControl` is a form component that lets users choose options represented in horizontal segments. To render options for this control use [`ToggleGroupControlOption`](/packages/components/src/toggle-group-control/toggle-group-control-option/README.md) component.
 
 This component is intended for selecting a single persistent value from a set of options, similar to a how a radio button group would work. If you simply want a toggle to switch between views, use a [`TabPanel`](/packages/components/src/tab-panel/README.md) instead.
@@ -14,8 +10,8 @@ Only use this control when you know for sure the labels of items inside won't wr
 
 ```js
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToggleGroupControl,
+	ToggleGroupControlOption,
 } from '@wordpress/components';
 
 function Example() {

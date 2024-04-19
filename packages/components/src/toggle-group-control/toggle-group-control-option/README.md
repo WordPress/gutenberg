@@ -1,9 +1,5 @@
 # `ToggleGroupControlOption`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `ToggleGroupControlOption` is a form component and is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md).
 
 
@@ -11,8 +7,8 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```js
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	ToggleGroupControl,
+	ToggleGroupControlOption,
 } from '@wordpress/components';
 
 function Example() {

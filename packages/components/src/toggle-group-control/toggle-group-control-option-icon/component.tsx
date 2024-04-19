@@ -45,8 +45,8 @@ function UnforwardedToggleGroupControlOptionIcon(
  * ```jsx
  *
  * import {
- *	__experimentalToggleGroupControl as ToggleGroupControl,
- *	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+ *	ToggleGroupControl,
+ *	ToggleGroupControlOptionIcon,
  * from '@wordpress/components';
  * import { formatLowercase, formatUppercase } from '@wordpress/icons';
  *
