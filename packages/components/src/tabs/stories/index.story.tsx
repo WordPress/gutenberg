@@ -18,7 +18,7 @@ import DropdownMenu from '../../dropdown-menu';
 import Button from '../../button';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components (Experimental)/Tabs',
+	title: 'Components/Tabs',
 	component: Tabs,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
