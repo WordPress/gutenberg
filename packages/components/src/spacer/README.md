@@ -13,7 +13,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalHeading as Heading,
+	Heading,
 	__experimentalView as View,
 } from '@wordpress/components';
 
