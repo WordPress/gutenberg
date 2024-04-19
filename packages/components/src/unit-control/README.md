@@ -10,7 +10,7 @@ This feature is still experimental. “Experimental” means this is an early im
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { UnitControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
@@ -116,7 +116,7 @@ Example:
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { UnitControl } from '@wordpress/components';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );

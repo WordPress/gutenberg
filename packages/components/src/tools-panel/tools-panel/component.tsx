@@ -55,7 +55,7 @@ const UnconnectedToolsPanel = (
  * import {
  *   __experimentalToolsPanel as ToolsPanel,
  *   __experimentalToolsPanelItem as ToolsPanelItem,
- *   __experimentalUnitControl as UnitControl
+ *   UnitControl
  * } from '@wordpress/components';
  *
  * function Example() {
