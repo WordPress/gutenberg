@@ -9,6 +9,11 @@ import { count as characterCount } from '@wordpress/wordcount';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Calculates the character count of the content.
+ *
+ * @return {number} The character count including spaces.
+ */
 export default function CharacterCount() {
 	const content = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'content' ),
