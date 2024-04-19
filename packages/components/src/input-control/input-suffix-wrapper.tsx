@@ -28,7 +28,7 @@ function UnconnectedInputControlSuffixWrapper(
  *
  * ```jsx
  * import {
- *   __experimentalInputControl as InputControl,
+ *   InputControl,
  *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
  * } from '@wordpress/components';
  *

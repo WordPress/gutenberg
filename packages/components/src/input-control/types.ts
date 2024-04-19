@@ -130,7 +130,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 *
 	 * @example
 	 * import {
-	 *   __experimentalInputControl as InputControl,
+	 *   InputControl,
 	 *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 	 * } from '@wordpress/components';
 	 *
@@ -148,7 +148,7 @@ export interface InputBaseProps extends BaseProps, FlexProps {
 	 *
 	 * @example
 	 * import {
-	 *   __experimentalInputControl as InputControl,
+	 *   InputControl,
 	 *   __experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	 * } from '@wordpress/components';
 	 *

@@ -120,7 +120,7 @@ export function UnforwardedInputControl(
  * intended to (in time) merge with or replace `TextControl`.
  *
  * ```jsx
- * import { __experimentalInputControl as InputControl } from '@wordpress/components';
+ * import { InputControl } from '@wordpress/components';
  * import { useState } from 'react';
  *
  * const Example = () => {

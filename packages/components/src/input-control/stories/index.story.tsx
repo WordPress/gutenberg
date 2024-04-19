@@ -11,7 +11,7 @@ import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Components (Experimental)/InputControl',
+	title: 'Components/InputControl',
 	component: InputControl,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
