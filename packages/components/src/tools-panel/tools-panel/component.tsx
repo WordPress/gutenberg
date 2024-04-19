@@ -53,8 +53,8 @@ const UnconnectedToolsPanel = (
  * ```jsx
  * import { __ } from '@wordpress/i18n';
  * import {
- *   __experimentalToolsPanel as ToolsPanel,
- *   __experimentalToolsPanelItem as ToolsPanelItem,
+ *   ToolsPanel,
+ *   ToolsPanelItem,
  *   __experimentalUnitControl as UnitControl
  * } from '@wordpress/components';
  *

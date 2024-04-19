@@ -26,7 +26,7 @@ import UnitControl from '../../unit-control';
 import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ToolsPanel > = {
-	title: 'Components (Experimental)/ToolsPanel',
+	title: 'Components/ToolsPanel',
 	component: ToolsPanel,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToolsPanelItem },

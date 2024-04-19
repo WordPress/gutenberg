@@ -1,10 +1,5 @@
 # ToolsPanel
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early
-implementation subject to drastic and breaking changes.
-</div>
-<br />
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
 
@@ -61,8 +56,8 @@ import styled from '@emotion/styled';
  */
 import {
 	BoxControl,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToolsPanel,
+	ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
