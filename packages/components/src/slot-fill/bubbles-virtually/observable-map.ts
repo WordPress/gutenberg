@@ -28,16 +28,6 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 		}
 	}
 
-	function getListeners( name: K ) {
-		let list = listeners.get( name );
-		if ( ! list ) {
-			list = new Set();
-			listeners.set( name, list );
-		}
-
-		return list;
-	}
-
 	return {
 		get( name ) {
 			return map.get( name );
@@ -51,7 +41,11 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 			callListeners( name );
 		},
 		subscribe( name, listener ) {
-			const list = getListeners( name );
+			let list = listeners.get( name );
+			if ( ! list ) {
+				list = new Set();
+				listeners.set( name, list );
+			}
 			list.add( listener );
 
 			return () => {
