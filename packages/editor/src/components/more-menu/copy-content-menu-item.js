@@ -12,18 +12,18 @@ import { __unstableSerializeAndClean } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
+import { store as editorStore } from '../../store';
 
 export default function CopyContentMenuItem() {
 	const { createNotice } = useDispatch( noticesStore );
-	const { getEditedPostId, getEditedPostType } = useSelect( editSiteStore );
+	const { getCurrentPostId, getCurrentPostType } = useSelect( editorStore );
 	const { getEditedEntityRecord } = useSelect( coreStore );
 
 	function getText() {
 		const record = getEditedEntityRecord(
 			'postType',
-			getEditedPostType(),
-			getEditedPostId()
+			getCurrentPostType(),
+			getCurrentPostId()
 		);
 		if ( ! record ) {
 			return '';
