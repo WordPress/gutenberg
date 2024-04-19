@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
 
@@ -65,25 +70,29 @@ export default function TextAlignmentControl( {
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Text alignment' ) }
 			</BaseControl.VisualLabel>
-			<div className="block-editor-text-alignment-control__buttons">
-				{ validControls.map( ( textAlign ) => {
-					return (
-						<Button
-							key={ textAlign.align }
-							icon={ textAlign.icon }
-							label={ textAlign.label }
-							isPressed={ textAlign.align === value }
-							onClick={ () => {
-								onChange(
-									textAlign.align === value
-										? undefined
-										: textAlign.align
-								);
-							} }
-						/>
-					);
-				} ) }
-			</div>
+			{ /* // 4px of padding makes the row 40px high, same as an input. */ }
+			<Spacer marginBottom={ 0 } paddingY={ 1 }>
+				<HStack justify="flex-start" spacing={ 1 }>
+					{ validControls.map( ( textAlign ) => {
+						return (
+							<Button
+								key={ textAlign.align }
+								icon={ textAlign.icon }
+								label={ textAlign.label }
+								size="compact"
+								isPressed={ textAlign.align === value }
+								onClick={ () => {
+									onChange(
+										textAlign.align === value
+											? undefined
+											: textAlign.align
+									);
+								} }
+							/>
+						);
+					} ) }
+				</HStack>
+			</Spacer>
 		</fieldset>
 	);
 }
