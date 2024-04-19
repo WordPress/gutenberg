@@ -144,8 +144,20 @@ export { default as SearchControl } from './search-control';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
-export { Spacer as __experimentalSpacer } from './spacer';
-export { Scrollable as __experimentalScrollable } from './scrollable';
+export {
+	/**
+	 * @deprecated Import `Spacer` instead.
+	 */
+	Spacer as __experimentalSpacer,
+	Spacer,
+} from './spacer';
+export {
+	/**
+	 * @deprecated Import `Scrollable` instead.
+	 */
+	Scrollable as __experimentalScrollable,
+	Scrollable,
+} from './scrollable';
 export { default as Spinner } from './spinner';
 export { Surface as __experimentalSurface } from './surface';
 export { default as TabPanel } from './tab-panel';
