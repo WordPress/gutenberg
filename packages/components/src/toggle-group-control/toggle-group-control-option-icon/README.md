@@ -1,17 +1,13 @@
 # `ToggleGroupControlOptionIcon`
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `ToggleGroupControlOptionIcon` is a form component which is meant to be used as a child of [`ToggleGroupControl`](/packages/components/src/toggle-group-control/toggle-group-control/README.md) and displays an icon.
 
 ## Usage
 
 ```js
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	ToggleGroupControl,
+	ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
 
