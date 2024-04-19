@@ -32,7 +32,7 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 import { ContextSystemProvider } from '../../context';
 
 const meta: Meta< typeof DropdownMenu > = {
-	title: 'Components (Experimental)/DropdownMenu V2',
+	title: 'Components/DropdownMenu V2',
 	component: DropdownMenu,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
