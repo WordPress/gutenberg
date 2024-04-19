@@ -270,13 +270,22 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
+		const events = new Map();
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
-				element.props[ `on${ entry.suffix }` ] = ( event ) => {
-					evaluate( entry, event );
-				};
+				const event = entry.suffix.split( '--' )[ 0 ];
+				if ( ! events.has( event ) ) events.set( event, new Set() );
+				events.get( event ).add( entry );
 			}
 		);
+
+		events.forEach( ( entries, eventType ) => {
+			element.props[ `on${ eventType }` ] = ( event ) => {
+				entries.forEach( ( entry ) => {
+					evaluate( entry, event );
+				} );
+			};
+		} );
 	} );
 
 	// data-wp-on-window--[event]

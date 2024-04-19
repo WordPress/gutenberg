@@ -17,6 +17,7 @@ import {
 	useMergeRefs,
 	useReducedMotion,
 	useViewportMatch,
+	useResizeObserver,
 } from '@wordpress/compose';
 
 /**
@@ -24,7 +25,6 @@ import {
  */
 import NavigableRegion from '../navigable-region';
 
-const SECONDARY_SIDEBAR_WIDTH = 350;
 const ANIMATION_DURATION = 0.25;
 
 function useHTMLClass( className ) {
@@ -50,12 +50,6 @@ const headerVariants = {
 	distractionFreeInactive: { opacity: 1, transition: { delay: 0 } },
 };
 
-const secondarySidebarVariants = {
-	open: { width: SECONDARY_SIDEBAR_WIDTH },
-	closed: { width: 0 },
-	mobileOpen: { width: '100vw' },
-};
-
 function InterfaceSkeleton(
 	{
 		isDistractionFree,
@@ -76,12 +70,14 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
+	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
+		useResizeObserver();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const disableMotion = useReducedMotion();
 	const defaultTransition = {
 		type: 'tween',
 		duration: disableMotion ? 0 : ANIMATION_DURATION,
-		ease: 'easeOut',
+		ease: [ 0.6, 0, 0.4, 1 ],
 	};
 	const navigateRegionsProps = useNavigateRegions( shortcuts );
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
@@ -165,19 +161,22 @@ function InterfaceSkeleton(
 									isMobileViewport ? 'mobileOpen' : 'open'
 								}
 								exit="closed"
-								variants={ secondarySidebarVariants }
+								variants={ {
+									open: { width: secondarySidebarSize.width },
+									closed: { width: 0 },
+									mobileOpen: { width: '100vw' },
+								} }
 								transition={ defaultTransition }
 							>
 								<div
 									style={ {
 										position: 'absolute',
-										width: isMobileViewport
-											? '100vw'
-											: SECONDARY_SIDEBAR_WIDTH,
+										width: 'fit-content',
 										height: '100%',
 										right: 0,
 									} }
 								>
+									{ secondarySidebarResizeListener }
 									{ secondarySidebar }
 								</div>
 							</NavigableRegion>

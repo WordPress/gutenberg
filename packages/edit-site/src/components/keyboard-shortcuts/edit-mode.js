@@ -4,26 +4,9 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
-import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
-import { STORE_NAME } from '../../store/constants';
-
 function KeyboardShortcutsEditMode() {
-	const isBlockInspectorOpen = useSelect(
-		( select ) =>
-			select( interfaceStore ).getActiveComplementaryArea(
-				editSiteStore.name
-			) === SIDEBAR_BLOCK,
-		[]
-	);
-	const { enableComplementaryArea, disableComplementaryArea } =
-		useDispatch( interfaceStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { getBlockName, getSelectedBlockClientId, getBlockAttributes } =
 		useSelect( blockEditorStore );
@@ -55,18 +38,6 @@ function KeyboardShortcutsEditMode() {
 			} )
 		);
 	};
-
-	useShortcut( 'core/edit-site/toggle-block-settings-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
-
-		if ( isBlockInspectorOpen ) {
-			disableComplementaryArea( STORE_NAME );
-		} else {
-			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-		}
-	} );
 
 	useShortcut( 'core/edit-site/transform-heading-to-paragraph', ( event ) =>
 		handleTextLevelShortcut( event, 0 )

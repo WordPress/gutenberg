@@ -228,7 +228,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		windowResizeRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards

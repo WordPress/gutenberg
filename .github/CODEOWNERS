@@ -47,7 +47,7 @@
 /packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
-/packages/edit-widgets                          @draganescu @talldan @adamziel @kevin940726
+/packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
 

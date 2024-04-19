@@ -1,10 +1,15 @@
 /**
  * WordPress dependencies
  */
-import {
-	ComplementaryArea,
-	ComplementaryAreaMoreMenuItem,
-} from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { ComplementaryArea, ComplementaryAreaMoreMenuItem } =
+	unlock( editorPrivateApis );
 
 export default function DefaultSidebar( {
 	className,
@@ -16,12 +21,13 @@ export default function DefaultSidebar( {
 	header,
 	headerClassName,
 	panelClassName,
+	isActiveByDefault,
 } ) {
 	return (
 		<>
 			<ComplementaryArea
 				className={ className }
-				scope="core/edit-site"
+				scope="core"
 				identifier={ identifier }
 				title={ title }
 				smallScreenTitle={ title }
@@ -30,11 +36,12 @@ export default function DefaultSidebar( {
 				header={ header }
 				headerClassName={ headerClassName }
 				panelClassName={ panelClassName }
+				isActiveByDefault={ isActiveByDefault }
 			>
 				{ children }
 			</ComplementaryArea>
 			<ComplementaryAreaMoreMenuItem
-				scope="core/edit-site"
+				scope="core"
 				identifier={ identifier }
 				icon={ icon }
 			>

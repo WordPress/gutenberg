@@ -728,7 +728,7 @@ const { state, actions } = store("myPlugin", {
       const context = getContext();
       // `id` is optional here, so this action can be used in a directive.
       state.selected = id || context.id;
-    }
+    },
     otherAction: () => {
       // but it can also be called from other actions.
       actions.selectItem(123); // it works and type is correct
@@ -1120,7 +1120,7 @@ will output:
 ### wp_interactivity_data_wp_context
 
 `wp_interactivity_data_wp_context` returns a stringified JSON of a context directive.
-This function is the recommended way to print the `data-wp-context` attribute in the server side rendedered markup.
+This function is the recommended way to print the `data-wp-context` attribute in the server side rendered markup.
 
 ```php
 
