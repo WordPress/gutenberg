@@ -24,7 +24,10 @@ export function GridVisualizer( { clientId } ) {
 		return null;
 	}
 	return (
-		<GridVisualizerGrid clientId={ clientId } gridElement={ gridElement } />
+		<GridVisualizerGrid
+			gridClientId={ clientId }
+			gridElement={ gridElement }
+		/>
 	);
 }
 
@@ -53,15 +56,90 @@ function getGridInfo( gridElement ) {
 	};
 }
 
-function GridVisualizerGrid( { clientId, gridElement } ) {
+// TODO: clean up these two funcs
+// TODO: these two funcs don't properly handle the case where an item only has a row or a column set
+// what we're supposed to do in that case is quite complicated: https://www.w3.org/TR/css-grid-1/#auto-placement-algo
+
+function getNaturalPosition( {
+	rects,
+	numColumns,
+	numRows,
+	columnStart, // if specified, constrain to this column
+	rowStart, // if specified, constrain to this row
+	columnSpan = 1,
+	rowSpan = 1,
+} ) {
+	for ( let row = 1; row <= numRows; row++ ) {
+		for ( let column = 1; column <= numColumns; column++ ) {
+			const rect = new GridRect( {
+				columnStart: columnStart ?? column,
+				rowStart: rowStart ?? row,
+				columnSpan,
+				rowSpan,
+			} );
+			if (
+				! rects.some( ( otherRect ) =>
+					rect.intersectsRect( otherRect )
+				)
+			) {
+				return { column, row };
+			}
+		}
+	}
+	return null;
+}
+
+function getRects( { innerBlocks, numColumns, numRows } ) {
+	const rects = [];
+
+	for ( const block of innerBlocks ) {
+		const layout = block.attributes.style?.layout;
+		if ( layout.columnStart && layout.rowStart ) {
+			const rect = new GridRect( {
+				columnStart: layout.columnStart,
+				rowStart: layout.rowStart,
+				columnSpan: layout.columnSpan ?? 1,
+				rowSpan: layout.rowSpan ?? 1,
+			} );
+			rects.push( rect );
+		}
+	}
+
+	for ( const block of innerBlocks ) {
+		const layout = block.attributes.style?.layout;
+		if ( ! layout.columnStart || ! layout.rowStart ) {
+			const naturalPosition = getNaturalPosition( {
+				rects,
+				numColumns,
+				numRows,
+				columnStart: layout.columnStart,
+				rowStart: layout.rowStart,
+				columnSpan: layout.columnSpan ?? 1,
+				rowSpan: layout.rowSpan ?? 1,
+			} );
+			const rect = new GridRect( {
+				columnStart: naturalPosition.column,
+				rowStart: naturalPosition.row,
+				columnSpan: layout.columnSpan ?? 1,
+				rowSpan: layout.rowSpan ?? 1,
+			} );
+			rects.push( rect );
+		}
+	}
+
+	return rects;
+}
+
+function GridVisualizerGrid( { gridClientId, gridElement } ) {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( gridElement )
 	);
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
 
-	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { getBlockAttributes, getBlocks } = useSelect( blockEditorStore );
+	const { updateBlockAttributes, moveBlockToPosition } =
+		useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		const observers = [];
@@ -99,7 +177,7 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 			className={ classnames( 'block-editor-grid-visualizer', {
 				'is-dropping-allowed': isDroppingAllowed,
 			} ) }
-			clientId={ clientId }
+			clientId={ gridClientId }
 			__unstablePopoverSlot="block-toolbar"
 		>
 			<div
@@ -176,18 +254,81 @@ function GridVisualizerGrid( { clientId, gridElement } ) {
 								);
 							} }
 							onDrop={ ( srcClientId ) => {
+								// TODO: this is messy
+
 								const attributes =
 									getBlockAttributes( srcClientId );
-								updateBlockAttributes( srcClientId, {
-									style: {
-										...attributes.style,
-										layout: {
-											...attributes.style?.layout,
-											columnStart: column,
-											rowStart: row,
-										},
-									},
+
+								const blocks = getBlocks( gridClientId ).filter(
+									( { clientId } ) => clientId !== srcClientId
+								);
+								const rects = getRects( {
+									innerBlocks: blocks,
+									numColumns: gridInfo.numColumns,
+									numRows: gridInfo.numRows,
 								} );
+								console.log( 'rects', rects );
+								const naturalPosition = getNaturalPosition( {
+									rects,
+									numColumns: gridInfo.numColumns,
+									numRows: gridInfo.numRows,
+									columnSpan:
+										attributes.style?.layout?.columnSpan,
+									rowSpan: attributes.style?.layout?.rowSpan,
+								} );
+								console.log(
+									'naturalPosition',
+									naturalPosition
+								);
+
+								if (
+									column === naturalPosition?.column &&
+									row === naturalPosition?.row
+								) {
+									console.log(
+										'moveBlockToPosition',
+										blocks.length
+									);
+									moveBlockToPosition(
+										srcClientId,
+										gridClientId,
+										gridClientId,
+										blocks.length
+									);
+									if (
+										attributes.style?.layout?.columnStart ||
+										attributes.style?.layout?.rowStart
+									) {
+										const {
+											columnStart,
+											rowStart,
+											...layout
+										} = attributes.style.layout;
+										updateBlockAttributes( srcClientId, {
+											style: {
+												...attributes.style,
+												layout,
+											},
+										} );
+									}
+								} else {
+									console.log(
+										'updateBlockAttributes',
+										column,
+										row
+									);
+									updateBlockAttributes( srcClientId, {
+										style: {
+											...attributes.style,
+											layout: {
+												...attributes.style?.layout,
+												columnStart: column,
+												rowStart: row,
+											},
+										},
+									} );
+								}
+
 								setHighlightedRect( null );
 							} }
 						/>
