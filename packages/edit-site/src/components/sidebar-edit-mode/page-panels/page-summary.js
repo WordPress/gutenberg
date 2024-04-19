@@ -3,10 +3,12 @@
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import {
+	PluginPostStatusInfo,
 	PostAuthorPanel,
 	PostURLPanel,
 	PostSchedulePanel,
 	PostTemplatePanel,
+	PostFeaturedImagePanel,
 } from '@wordpress/editor';
 
 /**
@@ -23,17 +25,25 @@ export default function PageSummary( {
 } ) {
 	return (
 		<VStack spacing={ 0 }>
-			<PageStatus
-				status={ status }
-				date={ date }
-				password={ password }
-				postId={ postId }
-				postType={ postType }
-			/>
-			<PostSchedulePanel />
-			<PostTemplatePanel />
-			<PostURLPanel />
-			<PostAuthorPanel />
+			<PluginPostStatusInfo.Slot>
+				{ ( fills ) => (
+					<>
+						<PostFeaturedImagePanel withPanelBody={ false } />
+						<PageStatus
+							status={ status }
+							date={ date }
+							password={ password }
+							postId={ postId }
+							postType={ postType }
+						/>
+						<PostSchedulePanel />
+						<PostTemplatePanel />
+						<PostURLPanel />
+						<PostAuthorPanel />
+						{ fills }
+					</>
+				) }
+			</PluginPostStatusInfo.Slot>
 		</VStack>
 	);
 }

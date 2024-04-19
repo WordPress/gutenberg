@@ -1,4 +1,3 @@
-@import "../../interface/src/style.scss";
 @import "../../dataviews/src/style.scss";
 
 @import "./components/add-new-template/style.scss";
@@ -16,13 +15,11 @@
 @import "./components/sidebar-edit-mode/style.scss";
 @import "./components/sidebar-edit-mode/page-panels/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/sidebar-card/style.scss";
 @import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
 @import "./components/start-template-options/style.scss";
-@import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/save-hub/style.scss";
 @import "./components/save-panel/style.scss";
@@ -33,7 +30,6 @@
 @import "./components/sidebar-navigation-screen-details-footer/style.scss";
 @import "./components/sidebar-navigation-screen-navigation-menu/style.scss";
 @import "./components/sidebar-navigation-screen-page/style.scss";
-@import "./components/sidebar-navigation-screen-templates/style.scss";
 @import "components/sidebar-navigation-screen-details-panel/style.scss";
 @import "./components/sidebar-navigation-screen-pattern/style.scss";
 @import "./components/sidebar-navigation-screen-patterns/style.scss";

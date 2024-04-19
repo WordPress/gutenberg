@@ -19,6 +19,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePaddingAppender } from './use-padding-appender';
 
 const { EditorCanvas } = unlock( editorPrivateApis );
 
@@ -52,6 +53,8 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
+
+	const paddingAppenderRef = usePaddingAppender();
 
 	let paddingBottom;
 
@@ -91,6 +94,7 @@ export default function VisualEditor( { styles } ) {
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
+				contentRef={ paddingAppenderRef }
 			/>
 		</div>
 	);

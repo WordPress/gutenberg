@@ -341,6 +341,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestConnectionStatus() -> Bool {
         return true
     }
+
+    func gutenbergDidRequestLogException(_ exception: GutenbergJSException, with callback: @escaping () -> Void) {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {

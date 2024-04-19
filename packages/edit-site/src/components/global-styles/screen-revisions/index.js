@@ -215,7 +215,7 @@ function ScreenRevisions() {
 					}
 				>
 					{ __(
-						'Any unsaved changes will be lost when you apply this revision.'
+						'Are you sure you want to apply this revision? Any unsaved changes will be lost.'
 					) }
 				</ConfirmDialog>
 			) }

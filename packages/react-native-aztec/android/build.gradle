@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'v1.9.0'
+        aztecVersion = 'v2.1.1'
         wordpressUtilsVersion = '3.3.0'
 
         // main

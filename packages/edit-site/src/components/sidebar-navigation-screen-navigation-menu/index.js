@@ -2,13 +2,11 @@
  * WordPress dependencies
  */
 import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalUseNavigator as useNavigator,
-	Spinner,
-} from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -18,13 +16,16 @@ import ScreenNavigationMoreMenu from './more-menu';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
 import buildNavigationLabel from '../sidebar-navigation-screen-navigation-menus/build-navigation-label';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 export const postType = `wp_navigation`;
 
 export default function SidebarNavigationScreenNavigationMenu() {
 	const {
 		params: { postId },
-	} = useNavigator();
+	} = useLocation();
 
 	const { record: navigationMenu, isResolving } = useEntityRecord(
 		'postType',
@@ -64,7 +65,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __(
-					'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+					'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 				) }
 			>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />

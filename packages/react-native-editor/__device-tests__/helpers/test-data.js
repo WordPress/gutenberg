@@ -186,29 +186,29 @@ exports.spacerBlock = `<!-- wp:spacer -->
 
 exports.galleryBlock = `<!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
 <figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/njpygC0aF7.png"" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
 <!-- /wp:image -->
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/HOeupVqCwe.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
 <!-- /wp:image -->
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Subheading.png" alt=""/><figcaption class="wp-element-caption">Subheading</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/s-OlAVlGJS.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
 <!-- /wp:image -->
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Quote.png" alt=""/><figcaption class="wp-element-caption">Quote</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/aBnr4SymR1.png" alt=""/><figcaption class="wp-element-caption">Cover</figcaption></figure>
 <!-- /wp:image -->
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Image.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/aDIyKHI6Up.png" alt=""/><figcaption class="wp-element-caption">Video</figcaption></figure>
 <!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->`;
 
 exports.galleryBlockTwoImages = `<!-- wp:gallery {"columns":8,"linkTo":"none","className":"alignfull"} -->
 <figure class="wp-block-gallery has-nested-images columns-8 is-cropped alignfull"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/njpygC0aF7.png" alt=""/><figcaption class="wp-element-caption">Paragraph</figcaption></figure>
 <!-- /wp:image -->
 <!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
-<figure class="wp-block-image size-large"><img src="https://wordpress.org/gutenberg/files/2018/07/Block-Icon-Heading.png" alt=""/><figcaption class="wp-element-caption">Heading</figcaption></figure>
+<figure class="wp-block-image size-large"><img src="https://cldup.com/s-OlAVlGJS.png" alt=""/><figcaption class="wp-element-caption">Image</figcaption></figure>
 <!-- /wp:image -->
 </figure>
 <!-- /wp:gallery -->`;

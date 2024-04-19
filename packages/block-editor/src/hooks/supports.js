@@ -22,6 +22,11 @@ const FONT_STYLE_SUPPORT_KEY = 'typography.__experimentalFontStyle';
 const FONT_WEIGHT_SUPPORT_KEY = 'typography.__experimentalFontWeight';
 /**
  * Key within block settings' supports array indicating support for text
+ * align e.g. settings found in `block.json`.
+ */
+const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
+/**
+ * Key within block settings' supports array indicating support for text
  * columns e.g. settings found in `block.json`.
  */
 const TEXT_COLUMNS_SUPPORT_KEY = 'typography.textColumns';
@@ -58,6 +63,7 @@ const TYPOGRAPHY_SUPPORT_KEYS = [
 	FONT_STYLE_SUPPORT_KEY,
 	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_ALIGN_SUPPORT_KEY,
 	TEXT_COLUMNS_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
@@ -217,6 +223,24 @@ export const hasBackgroundColorSupport = ( nameOrType ) => {
 
 	return colorSupport && colorSupport.background !== false;
 };
+
+/**
+ * Returns true if the block defines support for text-align.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {boolean} Whether the block supports the feature.
+ */
+export const hasTextAlignSupport = ( nameOrType ) =>
+	hasBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
+
+/**
+ * Returns the block support value for text-align, if defined.
+ *
+ * @param {string|Object} nameOrType Block name or type object.
+ * @return {unknown} The block support value.
+ */
+export const getTextAlignSupport = ( nameOrType ) =>
+	getBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
 
 /**
  * Returns true if the block defines support for background color.

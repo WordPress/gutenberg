@@ -8,9 +8,8 @@ import {
 	TextControl,
 	Modal,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 
 /**
@@ -23,8 +22,12 @@ export default function BlockRenameModal( {
 	originalBlockName,
 	onClose,
 	onSave,
+	// Pattern Overrides is a WordPress-only feature but it also uses the Block Binding API.
+	// Ideally this should not be inside the block editor package, but we keep it here for simplicity.
+	hasOverridesWarning,
 } ) {
 	const [ editedBlockName, setEditedBlockName ] = useState( blockName );
+	const descriptionId = useId();
 
 	const nameHasChanged = editedBlockName !== blockName;
 	const nameIsOriginal = editedBlockName === originalBlockName;
@@ -33,11 +36,6 @@ export default function BlockRenameModal( {
 	const isNameValid = nameHasChanged || nameIsOriginal;
 
 	const autoSelectInputText = ( event ) => event.target.select();
-
-	const dialogDescription = useInstanceId(
-		BlockRenameModal,
-		`block-editor-rename-modal__description`
-	);
 
 	const handleSubmit = () => {
 		const message =
@@ -66,14 +64,10 @@ export default function BlockRenameModal( {
 			title={ __( 'Rename' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-rename-modal"
-			aria={ {
-				describedby: dialogDescription,
-			} }
 			focusOnMount="firstContentElement"
+			aria={ { describedby: descriptionId } }
+			size="small"
 		>
-			<p id={ dialogDescription }>
-				{ __( 'Enter a custom name for this block.' ) }
-			</p>
 			<form
 				onSubmit={ ( e ) => {
 					e.preventDefault();
@@ -85,6 +79,9 @@ export default function BlockRenameModal( {
 					handleSubmit();
 				} }
 			>
+				<p id={ descriptionId }>
+					{ __( 'Enter a custom name for this block.' ) }
+				</p>
 				<VStack spacing="3">
 					<TextControl
 						__nextHasNoMarginBottom
@@ -92,6 +89,13 @@ export default function BlockRenameModal( {
 						value={ editedBlockName }
 						label={ __( 'Block name' ) }
 						hideLabelFromVision
+						help={
+							hasOverridesWarning
+								? __(
+										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
+								  )
+								: undefined
+						}
 						placeholder={ originalBlockName }
 						onChange={ setEditedBlockName }
 						onFocus={ autoSelectInputText }

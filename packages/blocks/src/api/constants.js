@@ -228,6 +228,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		},
 		useEngine: true,
 	},
+	textAlign: {
+		value: [ 'typography', 'textAlign' ],
+		support: [ 'typography', 'textAlign' ],
+		useEngine: false,
+	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ 'typography', '__experimentalTextDecoration' ],

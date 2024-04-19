@@ -1079,6 +1079,10 @@ describe( 'removePropertyFromObject', () => {
 		expect( removePropertyFromObject( object, 'color' ) ).toEqual( object );
 	} );
 
+	it( 'should return with null', () => {
+		expect( removePropertyFromObject( null, 'color' ) ).toEqual( null );
+	} );
+
 	it( 'should remove the specified property from the object', () => {
 		expect(
 			removePropertyFromObject(

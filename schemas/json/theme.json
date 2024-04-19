@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight\n- shadow: defaultPresets",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -77,7 +77,7 @@
 						"defaultPresets": {
 							"description": "Allow users to choose shadows from the default shadow presets.",
 							"type": "boolean",
-							"default": false
+							"default": true
 						},
 						"presets": {
 							"description": "Shadow presets for the shadow picker.\nGenerates a single custom property (`--wp--preset--shadow--{slug}`) per preset value.",
@@ -239,6 +239,11 @@
 						},
 						"button": {
 							"description": "Allow users to set button colors in a block.",
+							"type": "boolean",
+							"default": true
+						},
+						"caption": {
+							"description": "Allow users to set caption colors in a block.",
 							"type": "boolean",
 							"default": true
 						}
@@ -545,6 +550,11 @@
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
+						},
+						"textAlign": {
+							"description": "Allow users to set the text align.",
+							"type": "boolean",
+							"default": true
 						},
 						"textColumns": {
 							"description": "Allow users to set the number of text columns.",
@@ -1628,6 +1638,10 @@
 									"$ref": "#/definitions/refComplete"
 								}
 							]
+						},
+						"textAlign": {
+							"description": "Sets the `text-align` CSS property.",
+							"type": "string"
 						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",

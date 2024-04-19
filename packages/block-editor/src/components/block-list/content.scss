@@ -300,30 +300,47 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-@keyframes block-editor-has-editable-outline__fade-out-animation {
+// Add fade in/out background for editable blocks in synced patterns.
+@keyframes block-editor-is-editable__animation {
 	from {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 1);
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 	}
 	to {
-		border-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
 	}
 }
 
-.is-root-container:not([inert]) .block-editor-block-list__block.has-editable-outline {
-	&::after {
-		content: "";
-		position: absolute;
-		pointer-events: none;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		border: 1px dotted rgba(var(--wp-admin-theme-color--rgb), 1);
-		border-radius: $radius-block-ui;
-		animation: block-editor-has-editable-outline__fade-out-animation 0.3s ease-out;
-		animation-delay: 1s;
-		animation-fill-mode: forwards;
-		@include reduce-motion("animation");
+@keyframes block-editor-is-editable__animation_reduce-motion {
+	0% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	}
+	99% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	}
+	100% {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0);
+	}
+}
+
+.is-root-container:not([inert]) .block-editor-block-list__block.is-reusable.is-selected .block-editor-block-list__block.has-editable-outline::after {
+	animation-name: block-editor-is-editable__animation;
+	animation-duration: 0.8s;
+	animation-timing-function: ease-out;
+	animation-delay: 0.1s;
+	animation-fill-mode: backwards;
+	border-radius: $radius-block-ui;
+	bottom: 0;
+	content: "";
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0;
+
+	// Unique reduced-motion affordance to ensure the effect is still visible when reduce motion is enabled.
+	@media (prefers-reduced-motion: reduce) {
+		animation-name: block-editor-is-editable__animation_reduce-motion;
+		animation-delay: 0s;
 	}
 }
 
@@ -358,6 +375,22 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 .wp-block.alignright {
 	// Without z-index, won't be clickable as "above" adjacent content.
 	z-index: z-index("{core/image aligned left or right} .wp-block");
+}
+
+body.is-zoomed-out {
+	display: flex;
+	flex-direction: column;
+
+	> .is-root-container {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+
+		> main {
+			flex: 1;
+		}
+	}
 }
 
 .wp-site-blocks > [data-align="left"] {
@@ -454,8 +487,9 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 .block-editor-iframe__html {
-	transition: all 0.3s;
 	transform-origin: top center;
+	transition: all 0.3s;
+	@include reduce-motion("transition");
 }
 
 .block-editor-iframe__html[style*="scale"] {

@@ -1,6 +1,6 @@
 # API Reference
 
-<div class="callout callout-warning">
+<div class="callout callout-alert">
 Interactivity API is only available for WordPress 6.5 and above.
 </div>
 
@@ -33,7 +33,7 @@ Interactivity API directives use the `data-` prefix. Here's an example of direct
     Toggle
   </button>
 
-  <p id="p-1" data-bind--hidden="!context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
@@ -652,10 +652,10 @@ const { state } = store( "myPlugin", {
 } );
 ```
 
-And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-bind--hidden`.
+And then, the string value `"state.isPlaying"` is used to assign the result of this selector to `data-wp-bind--hidden`.
 
 ```html
-<div data-bind--hidden="!state.isPlaying" ... >
+<div data-wp-bind--hidden="!state.isPlaying" ... >
   <iframe ...></iframe>
 </div>
 ```
@@ -668,7 +668,7 @@ The example below is getting `state.isPlaying` from `otherPlugin` instead of `my
 
 ```html
 <div data-wp-interactive="myPlugin">
-  <div data-bind--hidden="otherPlugin::!state.isPlaying" ... >
+  <div data-wp-bind--hidden="otherPlugin::!state.isPlaying" ... >
 		<iframe ...></iframe>
 	</div>
 </div>
@@ -728,7 +728,7 @@ const { state, actions } = store("myPlugin", {
       const context = getContext();
       // `id` is optional here, so this action can be used in a directive.
       state.selected = id || context.id;
-    }
+    },
     otherAction: () => {
       // but it can also be called from other actions.
       actions.selectItem(123); // it works and type is correct
@@ -1011,11 +1011,11 @@ It returns an object with two keys:
 
 ##### ref
 
-`ref` is the reference to the DOM element as an (HTMLElement)[https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement]
+`ref` is the reference to the DOM element as an [HTMLElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement). It is equivalent to `useRef` in Preact or React, so it can be `null` when `ref` has not been attached to the actual DOM element yet, i.e., when it is being hydrated or mounted.
 
 ##### attributes
 
-`attributes` contains a (Proxy)[https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy], which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
+`attributes` contains a [Proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy), which adds a getter that allows to reference other store namespaces. Feel free to check the getter in the code. [Link](https://github.com/WordPress/gutenberg/blob/8cb23964d58f3ce5cf6ae1b6f967a4b8d4939a8e/packages/interactivity/src/store.ts#L70)
 
 Those attributes will contain the directives of that element. In the button example:
 
@@ -1107,7 +1107,7 @@ This code
 
 ```php
 wp_interactivity_state( 'myPlugin', array( 'greeting' => 'Hello, World!' ) );
-$html = '<div data-wp-text="myPlugin::state.greeting"></div>';
+$html_content = '<div data-wp-text="myPlugin::state.greeting"></div>';
 $processed_html = wp_interactivity_process_directives( $html_content );
 echo $processed_html;
 ```
@@ -1120,7 +1120,7 @@ will output:
 ### wp_interactivity_data_wp_context
 
 `wp_interactivity_data_wp_context` returns a stringified JSON of a context directive.
-This function is the recommended way to print the `data-wp-context` attribute in the server side rendedered markup.
+This function is the recommended way to print the `data-wp-context` attribute in the server side rendered markup.
 
 ```php
 
@@ -1128,8 +1128,9 @@ $my_context = array(
 	'counter' => 0,
 	'isOpen'  => true,
 );
+?>
 <div
- echo wp_interactivity_data_wp_context($my_context)
+ <?php echo wp_interactivity_data_wp_context( $my_context ); ?>
 >
 </div>
 ```

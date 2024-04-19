@@ -450,6 +450,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				foreach ( $style_definition['classnames'] as $classname => $property_key ) {
 					if ( true === $property_key ) {
 						$classnames[] = $classname;
+						continue;
 					}
 
 					$slug = static::get_slug_from_preset_value( $style_value, $property_key );

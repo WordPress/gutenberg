@@ -14,12 +14,7 @@ import {
 	Tooltip,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	connection,
-	lockSmall as lock,
-	pinSmall,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -37,12 +32,11 @@ import { useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import useListViewImages from './use-list-view-images';
 import { useListViewContext } from './context';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId, name: blockName },
+		block: { clientId },
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -53,7 +47,6 @@ function ListViewBlockSelectButton(
 		onDragEnd,
 		draggable,
 		isExpanded,
-		ariaLabel,
 		ariaDescribedBy,
 		updateFocusAndSelection,
 	},
@@ -71,18 +64,21 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlockParents,
 		getBlocksByClientId,
-		getBlockAttributes,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { duplicateBlocks, multiSelect, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		duplicateBlocks,
+		multiSelect,
+		removeBlocks,
+		insertAfterBlock,
+		insertBeforeBlock,
+	} = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-	const { rootClientId } = useListViewContext();
-
-	const isConnected = getBlockAttributes( clientId )?.metadata?.bindings;
+	const { collapseAll, expand, rootClientId } = useListViewContext();
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -198,6 +194,30 @@ function ListViewBlockSelectButton(
 					updateFocusAndSelection( updatedBlocks[ 0 ], false );
 				}
 			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertBeforeBlock( blocksToUpdate[ 0 ] );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertAfterBlock( blocksToUpdate.at( -1 ) );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			if ( event.defaultPrevented ) {
 				return;
@@ -237,6 +257,17 @@ function ListViewBlockSelectButton(
 				blockClientIds[ blockClientIds.length - 1 ],
 				null
 			);
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+			const { firstBlockClientId } = getBlocksToUpdate();
+			const blockParents = getBlockParents( firstBlockClientId, false );
+			// Collapse all blocks.
+			collapseAll();
+			// Expand all parents of the current block.
+			expand( blockParents );
 		}
 	}
 
@@ -258,7 +289,6 @@ function ListViewBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 				href={ `#block-${ clientId }` }
-				aria-label={ ariaLabel }
 				aria-describedby={ ariaDescribedBy }
 				aria-expanded={ isExpanded }
 			>
@@ -285,11 +315,6 @@ function ListViewBlockSelectButton(
 							>
 								{ blockInformation.anchor }
 							</Truncate>
-						</span>
-					) }
-					{ isConnected && canBindBlock( blockName ) && (
-						<span className="block-editor-list-view-block-select-button__bindings">
-							<Icon icon={ connection } />
 						</span>
 					) }
 					{ positionLabel && isSticky && (

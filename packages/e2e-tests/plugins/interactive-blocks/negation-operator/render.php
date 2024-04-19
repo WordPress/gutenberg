@@ -4,8 +4,6 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-wp_enqueue_script_module( 'negation-operator-view' );
 ?>
 
 <div data-wp-interactive="negation-operator">

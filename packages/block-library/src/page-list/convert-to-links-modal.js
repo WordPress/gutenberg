@@ -5,7 +5,7 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export const convertDescription = __(
-	"This navigation menu displays your website's pages. Editing it will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
+	"This Navigation Menu displays your website's pages. Editing it will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
 );
 
 export function ConvertToLinksModal( { onClick, onClose, disabled } ) {

@@ -67,6 +67,7 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 				onChange( media );
 			},
 			onError: ( message ) => {
+				revokeBlobURL( url );
 				onError( message );
 			},
 		} );

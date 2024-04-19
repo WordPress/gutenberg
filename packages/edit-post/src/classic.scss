@@ -1,7 +1,8 @@
 // Provide baseline auto margin for centering blocks.
 // Specificity is kept at this level as many classic themes output
 // rules like figure { margin: 0; } which would break centering.
-.editor-styles-wrapper .wp-block {
+// These rules should also not apply to direct children of flex layout blocks.
+.editor-styles-wrapper :where(:not(.is-layout-flex, .is-layout-grid)) > .wp-block {
 	margin-left: auto;
 	margin-right: auto;
 }

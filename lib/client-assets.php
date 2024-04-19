@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Retrieves the root plugin path.
  *
- * @return string Root path to the gutenberg plugin.
- *
  * @since 0.1.0
+ *
+ * @return string Root path to the gutenberg plugin.
  */
 function gutenberg_dir_path() {
 	return plugin_dir_path( __DIR__ );
@@ -24,11 +24,11 @@ function gutenberg_dir_path() {
 /**
  * Retrieves a URL to a file in the gutenberg plugin.
  *
+ * @since 0.1.0
+ *
  * @param  string $path Relative path of the desired file.
  *
  * @return string       Fully qualified URL pointing to the desired file.
- *
- * @since 0.1.0
  */
 function gutenberg_url( $path ) {
 	return plugins_url( $path, __DIR__ );
@@ -244,7 +244,9 @@ add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
  * `build/` location.
  *
  * @since 6.7.0
-
+ *
+ * @global array $editor_styles
+ *
  * @param WP_Styles $styles WP_Styles instance.
  */
 function gutenberg_register_packages_styles( $styles ) {

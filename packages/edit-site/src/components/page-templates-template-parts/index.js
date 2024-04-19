@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
@@ -22,39 +21,32 @@ import {
 	BlockPreview,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import {
-	DataViews,
-	sortByTextFields,
-	getPaginationResults,
-} from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
+import { Async } from '../async';
 import Page from '../page';
 import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
 	ENUMERATION_TYPE,
-	OPERATOR_IN,
-	OPERATOR_NOT_IN,
+	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
 } from '../../utils/constants';
-import {
-	useResetTemplateAction,
-	deleteTemplateAction,
-	renameTemplateAction,
-} from './actions';
-import { postRevisionsAction } from '../actions';
+
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 import AddNewTemplatePart from './add-new-template-part';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -63,10 +55,6 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 
-const SUPPORTED_LAYOUTS = window?.__experimentalAdminViews
-	? [ LAYOUT_TABLE, LAYOUT_GRID, LAYOUT_LIST ]
-	: [ LAYOUT_TABLE, LAYOUT_GRID ];
-
 const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {
 		primaryField: 'title',
@@ -74,6 +62,7 @@ const defaultConfigPerViewType = {
 	[ LAYOUT_GRID ]: {
 		mediaField: 'preview',
 		primaryField: 'title',
+		columnFields: [ 'description' ],
 	},
 	[ LAYOUT_LIST ]: {
 		primaryField: 'title',
@@ -82,7 +71,7 @@ const defaultConfigPerViewType = {
 };
 
 const DEFAULT_VIEW = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_GRID,
 	search: '',
 	page: 1,
 	perPage: 20,
@@ -93,13 +82,9 @@ const DEFAULT_VIEW = {
 	// All fields are visible by default, so it's
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_TABLE ],
+	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
 	filters: [],
 };
-
-function normalizeSearchInput( input = '' ) {
-	return removeAccents( input.trim().toLowerCase() );
-}
 
 function Title( { item, viewType } ) {
 	if ( viewType === LAYOUT_LIST ) {
@@ -112,11 +97,6 @@ function Title( { item, viewType } ) {
 			canvas: 'edit',
 		},
 	};
-	if ( item.type === TEMPLATE_PART_POST_TYPE ) {
-		linkProps.state = {
-			backPath: '/wp_template_part/all',
-		};
-	}
 	return (
 		<Link { ...linkProps }>
 			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
@@ -152,7 +132,7 @@ function AuthorField( { item, viewType } ) {
 					<Icon icon={ icon } />
 				</div>
 			) }
-			<span>{ text }</span>
+			<span className="page-templates-author-field__name">{ text }</span>
 		</HStack>
 	);
 }
@@ -184,7 +164,9 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<BlockPreview blocks={ blocks } />
+					<Async>
+						<BlockPreview blocks={ blocks } />
+					</Async>
 				) }
 				{ viewType !== LAYOUT_LIST && (
 					<button
@@ -197,7 +179,11 @@ function Preview( { item, viewType } ) {
 							( item.type === TEMPLATE_POST_TYPE
 								? __( 'Empty template' )
 								: __( 'Empty template part' ) ) }
-						{ ! isEmpty && <BlockPreview blocks={ blocks } /> }
+						{ ! isEmpty && (
+							<Async>
+								<BlockPreview blocks={ blocks } />
+							</Async>
+						) }
 					</button>
 				) }
 			</div>
@@ -205,13 +191,19 @@ function Preview( { item, viewType } ) {
 	);
 }
 
+const TEMPLATE_ACTIONS = [
+	'edit-post',
+	'reset-template',
+	'rename-template',
+	'view-post-revisions',
+	'delete-template',
+];
+
 export default function PageTemplatesTemplateParts( { postType } ) {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
-		const usedType = window?.__experimentalAdminViews
-			? layout ?? DEFAULT_VIEW.type
-			: DEFAULT_VIEW.type;
+		const usedType = layout ?? DEFAULT_VIEW.type;
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
@@ -221,8 +213,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: 'isAny',
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -237,8 +229,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 					? [
 							{
 								field: 'author',
-								operator: 'in',
-								value: activeView,
+								operator: OPERATOR_IS_ANY,
+								value: [ activeView ],
 							},
 					  ]
 					: [],
@@ -303,13 +295,13 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				),
 				maxWidth: 400,
 				enableHiding: false,
+				enableGlobalSearch: true,
 			},
 		];
 		if ( postType === TEMPLATE_POST_TYPE ) {
 			_fields.push( {
 				header: __( 'Description' ),
 				id: 'description',
-				getValue: ( { item } ) => item.description,
 				render: ( { item } ) => {
 					return item.description ? (
 						<span className="page-templates-description">
@@ -331,6 +323,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				maxWidth: 400,
 				minWidth: 320,
 				enableSorting: false,
+				enableGlobalSearch: true,
 			} );
 		}
 		// TODO: The plan is to support fields reordering, which would require an API like `order` or something
@@ -350,78 +343,24 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 	}, [ postType, authors, view.type ] );
 
 	const { data, paginationInfo } = useMemo( () => {
-		if ( ! records ) {
-			return {
-				data: EMPTY_ARRAY,
-				paginationInfo: { totalItems: 0, totalPages: 0 },
-			};
-		}
-		let filteredData = [ ...records ];
-		// Handle global search.
-		if ( view.search ) {
-			const normalizedSearch = normalizeSearchInput( view.search );
-			filteredData = filteredData.filter( ( item ) => {
-				const title = item.title?.rendered || item.slug;
-				return (
-					normalizeSearchInput( title ).includes(
-						normalizedSearch
-					) ||
-					normalizeSearchInput( item.description ).includes(
-						normalizedSearch
-					)
-				);
-			} );
-		}
-
-		// Handle filters.
-		if ( view.filters.length > 0 ) {
-			view.filters.forEach( ( filter ) => {
-				if (
-					filter.field === 'author' &&
-					filter.operator === OPERATOR_IN &&
-					!! filter.value
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text === filter.value;
-					} );
-				} else if (
-					filter.field === 'author' &&
-					filter.operator === OPERATOR_NOT_IN &&
-					!! filter.value
-				) {
-					filteredData = filteredData.filter( ( item ) => {
-						return item.author_text !== filter.value;
-					} );
-				}
-			} );
-		}
-
-		// Handle sorting.
-		if ( view.sort ) {
-			filteredData = sortByTextFields( {
-				data: filteredData,
-				view,
-				fields,
-				textFields: [ 'title', 'author' ],
-			} );
-		}
-		// Handle pagination.
-		return getPaginationResults( {
-			data: filteredData,
-			view,
-		} );
+		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const resetTemplateAction = useResetTemplateAction();
-	const actions = useMemo(
-		() => [
-			resetTemplateAction,
-			deleteTemplateAction,
-			renameTemplateAction,
-			postRevisionsAction,
-		],
-		[ resetTemplateAction ]
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
 	);
+
+	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
 
 	const onChangeView = useCallback(
 		( newView ) => {
@@ -454,11 +393,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 			}
 			actions={
 				postType === TEMPLATE_POST_TYPE ? (
-					<AddNewTemplate
-						templateType={ postType }
-						showIcon={ false }
-						toggleProps={ { variant: 'primary' } }
-					/>
+					<AddNewTemplate />
 				) : (
 					<AddNewTemplatePart />
 				)
@@ -473,8 +408,6 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				view={ view }
 				onChangeView={ onChangeView }
 				onSelectionChange={ onSelectionChange }
-				deferredRendering={ ! view.hiddenFields?.includes( 'preview' ) }
-				supportedLayouts={ SUPPORTED_LAYOUTS }
 			/>
 		</Page>
 	);

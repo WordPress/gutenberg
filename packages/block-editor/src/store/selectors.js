@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -21,7 +16,7 @@ import { applyFilters } from '@wordpress/hooks';
 import { symbol } from '@wordpress/icons';
 import { create, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -30,10 +25,17 @@ import {
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
+	getInsertBlockTypeDependants,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+
+import {
+	getContentLockingParent,
+	getTemporarilyEditingAsBlocks,
+	getTemporarilyEditingFocusModeToRevert,
+} from './private-selectors';
 
 /**
  * A block selection object.
@@ -1235,11 +1237,22 @@ export function isBlockSelected( state, clientId ) {
  * @return {boolean} Whether the block has an inner block selected
  */
 export function hasSelectedInnerBlock( state, clientId, deep = false ) {
-	return getBlockOrder( state, clientId ).some(
-		( innerClientId ) =>
-			isBlockSelected( state, innerClientId ) ||
-			isBlockMultiSelected( state, innerClientId ) ||
-			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+	const selectedBlockClientIds = getSelectedBlockClientIds( state );
+
+	if ( ! selectedBlockClientIds.length ) {
+		return false;
+	}
+
+	if ( deep ) {
+		return selectedBlockClientIds.some( ( id ) =>
+			// Pass true because we don't care about order and it's more
+			// performant.
+			getBlockParents( state, id, true ).includes( clientId )
+		);
+	}
+
+	return selectedBlockClientIds.some(
+		( id ) => getBlockRootClientId( state, id ) === clientId
 	);
 }
 
@@ -1666,13 +1679,8 @@ const canInsertBlockTypeUnmemoized = (
  */
 export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
-	( state, blockName, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		state.blockEditingModes,
-	]
+	( state, blockName, rootClientId ) =>
+		getInsertBlockTypeDependants( state, rootClientId )
 );
 
 /**
@@ -1977,95 +1985,108 @@ const buildBlockTypeItem =
  *                                        this item.
  * @property {number}   frecency          Heuristic that combines frequency and recency.
  */
-export const getInserterItems = createSelector(
-	( state, rootClientId = null ) => {
-		const buildReusableBlockInserterItem = ( reusableBlock ) => {
-			const icon = ! reusableBlock.wp_pattern_sync_status
-				? {
-						src: symbol,
-						foreground: 'var(--wp-block-synced-color)',
-				  }
-				: symbol;
-			const id = `core/block/${ reusableBlock.id }`;
-			const { time, count = 0 } = getInsertUsage( state, id ) || {};
-			const frecency = calculateFrecency( time, count );
+export const getInserterItems = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			const buildReusableBlockInserterItem = ( reusableBlock ) => {
+				const icon = ! reusableBlock.wp_pattern_sync_status
+					? {
+							src: symbol,
+							foreground: 'var(--wp-block-synced-color)',
+					  }
+					: symbol;
+				const id = `core/block/${ reusableBlock.id }`;
+				const { time, count = 0 } = getInsertUsage( state, id ) || {};
+				const frecency = calculateFrecency( time, count );
 
-			return {
-				id,
-				name: 'core/block',
-				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title?.raw,
-				icon,
-				category: 'reusable',
-				keywords: [ 'reusable' ],
-				isDisabled: false,
-				utility: 1, // Deprecated.
-				frecency,
-				content: reusableBlock.content?.raw,
-				syncStatus: reusableBlock.wp_pattern_sync_status,
+				return {
+					id,
+					name: 'core/block',
+					initialAttributes: { ref: reusableBlock.id },
+					title: reusableBlock.title?.raw,
+					icon,
+					category: 'reusable',
+					keywords: [ 'reusable' ],
+					isDisabled: false,
+					utility: 1, // Deprecated.
+					frecency,
+					content: reusableBlock.content?.raw,
+					syncStatus: reusableBlock.wp_pattern_sync_status,
+				};
 			};
-		};
 
-		const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
-			state,
-			'core/block',
-			rootClientId
-		)
-			? getReusableBlocks( state ).map( buildReusableBlockInserterItem )
-			: [];
-
-		const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
-			buildScope: 'inserter',
-		} );
-
-		const blockTypeInserterItems = getBlockTypes()
-			.filter( ( blockType ) =>
-				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			const syncedPatternInserterItems = canInsertBlockTypeUnmemoized(
+				state,
+				'core/block',
+				rootClientId
 			)
-			.map( buildBlockTypeInserterItem );
+				? unlock( select( STORE_NAME ) )
+						.getReusableBlocks()
+						.map( buildReusableBlockInserterItem )
+				: [];
 
-		const items = blockTypeInserterItems.reduce( ( accumulator, item ) => {
-			const { variations = [] } = item;
-			// Exclude any block type item that is to be replaced by a default variation.
-			if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
-				accumulator.push( item );
-			}
-			if ( variations.length ) {
-				const variationMapper = getItemFromVariation( state, item );
-				accumulator.push( ...variations.map( variationMapper ) );
-			}
-			return accumulator;
-		}, [] );
+			const buildBlockTypeInserterItem = buildBlockTypeItem( state, {
+				buildScope: 'inserter',
+			} );
 
-		// Ensure core blocks are prioritized in the returned results,
-		// because third party blocks can be registered earlier than
-		// the core blocks (usually by using the `init` action),
-		// thus affecting the display order.
-		// We don't sort reusable blocks as they are handled differently.
-		const groupByType = ( blocks, block ) => {
-			const { core, noncore } = blocks;
-			const type = block.name.startsWith( 'core/' ) ? core : noncore;
+			const blockTypeInserterItems = getBlockTypes()
+				.filter( ( blockType ) =>
+					canIncludeBlockTypeInInserter(
+						state,
+						blockType,
+						rootClientId
+					)
+				)
+				.map( buildBlockTypeInserterItem );
 
-			type.push( block );
-			return blocks;
-		};
-		const { core: coreItems, noncore: nonCoreItems } = items.reduce(
-			groupByType,
-			{ core: [], noncore: [] }
-		);
-		const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
-		return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.blocks.order,
-		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
+			const items = blockTypeInserterItems.reduce(
+				( accumulator, item ) => {
+					const { variations = [] } = item;
+					// Exclude any block type item that is to be replaced by a default variation.
+					if ( ! variations.some( ( { isDefault } ) => isDefault ) ) {
+						accumulator.push( item );
+					}
+					if ( variations.length ) {
+						const variationMapper = getItemFromVariation(
+							state,
+							item
+						);
+						accumulator.push(
+							...variations.map( variationMapper )
+						);
+					}
+					return accumulator;
+				},
+				[]
+			);
+
+			// Ensure core blocks are prioritized in the returned results,
+			// because third party blocks can be registered earlier than
+			// the core blocks (usually by using the `init` action),
+			// thus affecting the display order.
+			// We don't sort reusable blocks as they are handled differently.
+			const groupByType = ( blocks, block ) => {
+				const { core, noncore } = blocks;
+				const type = block.name.startsWith( 'core/' ) ? core : noncore;
+
+				type.push( block );
+				return blocks;
+			};
+			const { core: coreItems, noncore: nonCoreItems } = items.reduce(
+				groupByType,
+				{ core: [], noncore: [] }
+			);
+			const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
+			return [ ...sortedBlockTypes, ...syncedPatternInserterItems ];
+		},
+		( state, rootClientId ) => [
+			getBlockTypes(),
+			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+			state.blocks.order,
+			state.preferences.insertUsage,
+			...getInsertBlockTypeDependants( state, rootClientId ),
+		]
+	)
 );
 
 /**
@@ -2128,12 +2149,9 @@ export const getBlockTransformItems = createSelector(
 		);
 	},
 	( state, blocks, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.preferences.insertUsage,
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
 		getBlockTypes(),
+		state.preferences.insertUsage,
+		...getInsertBlockTypeDependants( state, rootClientId ),
 	]
 );
 
@@ -2145,28 +2163,25 @@ export const getBlockTransformItems = createSelector(
  *
  * @return {boolean} Items that appear in inserter.
  */
-export const hasInserterItems = createSelector(
-	( state, rootClientId = null ) => {
-		const hasBlockType = getBlockTypes().some( ( blockType ) =>
-			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-		);
-		if ( hasBlockType ) {
-			return true;
-		}
-		const hasReusableBlock =
-			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
-			getReusableBlocks( state ).length > 0;
+export const hasInserterItems = createRegistrySelector(
+	( select ) =>
+		( state, rootClientId = null ) => {
+			const hasBlockType = getBlockTypes().some( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			);
+			if ( hasBlockType ) {
+				return true;
+			}
+			const hasReusableBlock =
+				canInsertBlockTypeUnmemoized(
+					state,
+					'core/block',
+					rootClientId
+				) &&
+				unlock( select( STORE_NAME ) ).getReusableBlocks().length > 0;
 
-		return hasReusableBlock;
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
+			return hasReusableBlock;
+		}
 );
 
 /**
@@ -2177,34 +2192,37 @@ export const hasInserterItems = createSelector(
  *
  * @return {Array?} The list of allowed block types.
  */
-export const getAllowedBlocks = createSelector(
-	( state, rootClientId = null ) => {
-		if ( ! rootClientId ) {
-			return;
-		}
+export const getAllowedBlocks = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, rootClientId = null ) => {
+			if ( ! rootClientId ) {
+				return;
+			}
 
-		const blockTypes = getBlockTypes().filter( ( blockType ) =>
-			canIncludeBlockTypeInInserter( state, blockType, rootClientId )
-		);
+			const blockTypes = getBlockTypes().filter( ( blockType ) =>
+				canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+			);
 
-		const hasReusableBlock =
-			canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) &&
-			getReusableBlocks( state ).length > 0;
+			const hasReusableBlock =
+				canInsertBlockTypeUnmemoized(
+					state,
+					'core/block',
+					rootClientId
+				) &&
+				unlock( select( STORE_NAME ) ).getReusableBlocks().length > 0;
 
-		if ( hasReusableBlock ) {
-			blockTypes.push( 'core/block' );
-		}
+			if ( hasReusableBlock ) {
+				blockTypes.push( 'core/block' );
+			}
 
-		return blockTypes;
-	},
-	( state, rootClientId ) => [
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getReusableBlocks( state ),
-		getBlockTypes(),
-	]
+			return blockTypes;
+		},
+		( state, rootClientId ) => [
+			getBlockTypes(),
+			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+			...getInsertBlockTypeDependants( state, rootClientId ),
+		]
+	)
 );
 
 export const __experimentalGetAllowedBlocks = createSelector(
@@ -2220,9 +2238,8 @@ export const __experimentalGetAllowedBlocks = createSelector(
 		);
 		return getAllowedBlocks( state, rootClientId );
 	},
-	( state, rootClientId ) => [
-		...getAllowedBlocks.getDependants( state, rootClientId ),
-	]
+	( state, rootClientId ) =>
+		getAllowedBlocks.getDependants( state, rootClientId )
 );
 
 /**
@@ -2269,43 +2286,45 @@ export function __experimentalGetDirectInsertBlock(
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
-		createSelector( ( state, patternName ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const pattern = patterns.find(
-				( { name } ) => name === patternName
-			);
-			if ( ! pattern ) {
-				return null;
-			}
-			const blocks = parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} );
-			if ( blocks.length === 1 ) {
-				blocks[ 0 ].attributes = {
-					...blocks[ 0 ].attributes,
-					metadata: {
-						...( blocks[ 0 ].attributes.metadata || {} ),
-						categories: pattern.categories,
-					},
+		createSelector(
+			( state, patternName ) => {
+				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+					patternName
+				);
+				if ( ! pattern ) {
+					return null;
+				}
+				const blocks = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} );
+				if ( blocks.length === 1 ) {
+					blocks[ 0 ].attributes = {
+						...blocks[ 0 ].attributes,
+						metadata: {
+							...( blocks[ 0 ].attributes.metadata || {} ),
+							categories: pattern.categories,
+							patternName: pattern.name,
+							name:
+								blocks[ 0 ].attributes.metadata?.name ||
+								pattern.title,
+						},
+					};
+				}
+				return {
+					...pattern,
+					blocks,
 				};
-			}
-			return {
-				...pattern,
-				blocks,
-			};
-		}, getAllPatternsDependants( select ) )
+			},
+			( state, patternName ) => [
+				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
+			]
+		)
 );
 
-const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => {
-	return [
-		...getAllPatternsDependants( select )( state ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		state.blockListSettings[ rootClientId ],
-		state.blocks.byClientId.get( rootClientId ),
-	];
-};
+const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
+	...getAllPatternsDependants( select )( state ),
+	...getInsertBlockTypeDependants( state, rootClientId ),
+];
 
 /**
  * Returns the list of allowed patterns for inner blocks children.
@@ -2526,18 +2545,29 @@ export const __experimentalGetBlockListSettingsForBlocks = createSelector(
  *
  * @return {string} The reusable block saved title.
  */
-export const __experimentalGetReusableBlockTitle = createSelector(
-	( state, ref ) => {
-		const reusableBlock = getReusableBlocks( state ).find(
-			( block ) => block.id === ref
-		);
-		if ( ! reusableBlock ) {
-			return null;
-		}
+export const __experimentalGetReusableBlockTitle = createRegistrySelector(
+	( select ) =>
+		createSelector(
+			( state, ref ) => {
+				deprecated(
+					"wp.data.select( 'core/block-editor' ).__experimentalGetReusableBlockTitle",
+					{
+						since: '6.6',
+						version: '6.8',
+					}
+				);
 
-		return reusableBlock.title?.raw;
-	},
-	( state ) => [ getReusableBlocks( state ) ]
+				const reusableBlock = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( block ) => block.id === ref );
+				if ( ! reusableBlock ) {
+					return null;
+				}
+
+				return reusableBlock.title?.raw;
+			},
+			() => [ unlock( select( STORE_NAME ) ).getReusableBlocks() ]
+		)
 );
 
 /**
@@ -2569,17 +2599,6 @@ export function __unstableIsLastBlockChangeIgnored( state ) {
  */
 export function __experimentalGetLastBlockAttributeChanges( state ) {
 	return state.lastBlockAttributesChange;
-}
-
-/**
- * Returns the available reusable blocks
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} Reusable blocks
- */
-function getReusableBlocks( state ) {
-	return state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 
 /**
@@ -2743,50 +2762,6 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- */
-export const __unstableGetContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if (
-				getBlockName( state, current ) === 'core/block' ||
-				getTemplateLock( state, current ) === 'contentOnly'
-			) {
-				result = current;
-			}
-		}
-		return result;
-	},
-	( state ) => [ state.blocks.parents, state.blockListSettings ]
-);
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
-}
-
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
 	// 'disabled' then the overlay is redundant since the block can't be
@@ -2803,13 +2778,20 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	const editorMode = __unstableGetEditorMode( state );
 
-	// In zoom-out mode, the block overlay is always active for top level blocks.
-	if (
-		editorMode === 'zoom-out' &&
-		clientId &&
-		! getBlockRootClientId( state, clientId )
-	) {
-		return true;
+	// In zoom-out mode, the block overlay is always active for section level blocks.
+	if ( editorMode === 'zoom-out' ) {
+		const { sectionRootClientId } = unlock( getSettings( state ) );
+		if ( sectionRootClientId ) {
+			const sectionClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
+			if ( sectionClientIds?.includes( clientId ) ) {
+				return true;
+			}
+		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
+			return true;
+		}
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
@@ -2881,6 +2863,32 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
+			// Some selectors that call this provide `null` as the default
+			// rootClientId, but the default rootClientId is actually `''`.
+			if ( clientId === null ) {
+				clientId = '';
+			}
+			// In zoom-out mode, override the behavior set by
+			// __unstableSetBlockEditingMode to only allow editing the top-level
+			// sections.
+			const editorMode = __unstableGetEditorMode( state );
+			if ( editorMode === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings( state ) );
+				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
+					return sectionRootClientId ? 'disabled' : 'contentOnly';
+				}
+				if ( clientId === sectionRootClientId ) {
+					return 'contentOnly';
+				}
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( ! sectionsClientIds?.includes( clientId ) ) {
+					return 'disabled';
+				}
+			}
+
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
@@ -2967,3 +2975,66 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const __unstableGetContentLockingParent = ( state, clientId ) => {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetContentLockingParent",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getContentLockingParent( state, clientId );
+};
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingAsBlocks",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingAsBlocks( state );
+}
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
+		{
+			since: '6.5',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingFocusModeToRevert( state );
+}
