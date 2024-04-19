@@ -43,7 +43,13 @@ const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items: posts,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -67,12 +73,20 @@ const trashPostAction = {
 						  ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						isDisabled={ isBusy }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( posts );
+							}
 							const promiseResult = await Promise.allSettled(
 								posts.map( ( post ) => {
 									return deleteEntityRecord(
@@ -161,8 +175,10 @@ const trashPostAction = {
 							if ( onActionPerformed ) {
 								onActionPerformed( posts );
 							}
+							setIsBusy( false );
 							closeModal();
 						} }
+						isBusy={ isBusy }
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -296,9 +312,9 @@ function useRestorePostAction() {
 				return status === 'trash';
 			},
 			async callback( posts, onActionPerformed ) {
-				try {
-					for ( const post of posts ) {
-						await editEntityRecord(
+				await Promise.allSettled(
+					posts.map( ( post ) => {
+						return editEntityRecord(
 							'postType',
 							post.type,
 							post.id,
@@ -306,14 +322,24 @@ function useRestorePostAction() {
 								status: 'draft',
 							}
 						);
-						await saveEditedEntityRecord(
+					} )
+				);
+				const promiseResult = await Promise.allSettled(
+					posts.map( ( post ) => {
+						return saveEditedEntityRecord(
 							'postType',
 							post.type,
 							post.id,
 							{ throwOnError: true }
 						);
-					}
+					} )
+				);
 
+				if (
+					promiseResult.every(
+						( { status } ) => status === 'fulfilled'
+					)
+				) {
 					createSuccessNotice(
 						posts.length > 1
 							? sprintf(
@@ -334,25 +360,56 @@ function useRestorePostAction() {
 					if ( onActionPerformed ) {
 						onActionPerformed( posts );
 					}
-				} catch ( error ) {
+				} else {
+					// If there was at lease one failure.
 					let errorMessage;
-					if (
-						error.message &&
-						error.code !== 'unknown_error' &&
-						error.message
-					) {
-						errorMessage = error.message;
-					} else if ( posts.length > 1 ) {
-						errorMessage = __(
-							'An error occurred while restoring the posts.'
-						);
+					// If we were trying to move a single post to the trash.
+					if ( promiseResult.length === 1 ) {
+						if ( promiseResult[ 0 ].reason?.message ) {
+							errorMessage = promiseResult[ 0 ].reason.message;
 					} else {
 						errorMessage = __(
 							'An error occurred while restoring the post.'
 						);
 					}
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
+						// If we were trying to move multiple posts to the trash
+					} else {
+						const errorMessages = new Set();
+						const failedPromises = promiseResult.filter(
+							( { status } ) => status === 'rejected'
+						);
+						for ( const failedPromise of failedPromises ) {
+							if ( failedPromise.reason?.message ) {
+								errorMessages.add(
+									failedPromise.reason.message
+								);
+							}
+						}
+						if ( errorMessages.size === 0 ) {
+							errorMessage = __(
+								'An error occurred while restoring the posts.'
+							);
+						} else if ( errorMessages.size === 1 ) {
+							errorMessage = sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while restoring the posts: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+							);
+						} else {
+							errorMessage = sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while restoring the posts: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+							);
+						}
+					}
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
 				}
 			},
 		} ),
@@ -618,9 +675,16 @@ const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: isTemplateRevertable,
+	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -690,16 +754,26 @@ const resetTemplateAction = {
 					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						isDisabled={ isBusy }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( items );
+							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
 							closeModal();
+							isBusy( false );
 						} }
+						isBusy={ isBusy }
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -730,9 +804,16 @@ const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
 	isEligible: isTemplateRemovable,
+	icon: trash,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items: templates,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
 			<VStack spacing="5">
@@ -756,18 +837,28 @@ const deleteTemplateAction = {
 						  ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						isDisabled={ isBusy }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( templates );
+							}
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
 							onActionPerformed?.( templates );
+							setIsBusy( false );
 							closeModal();
 						} }
+						isBusy={ isBusy }
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -936,8 +1027,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 							RenderModal: ( props ) => {
 								return (
 									<ExistingRenderModal
-										items={ props.items }
-										closeModal={ props.closeModal }
+										{ ...props }
 										onActionPerformed={ ( _items ) => {
 											if ( props.onActionPerformed ) {
 												props.onActionPerformed(

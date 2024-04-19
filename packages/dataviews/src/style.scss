@@ -783,3 +783,40 @@
 		}
 	}
 }
+
+
+.dataviews-bulk-actions-toolbar-wrapper {
+	display: flex;
+	flex-grow: 1;
+	width: 100%;
+}
+
+.dataviews-bulk-actions {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-content: center;
+	flex-wrap: wrap;
+	width: 100%;
+	bottom: $grid-unit-30;
+
+	.components-accessible-toolbar {
+		border-color: $gray-300;
+		box-shadow: $shadow-popover;
+
+		.components-toolbar-group {
+			border-color: $gray-200;
+
+			&:last-child {
+				border: 0;
+			}
+		}
+	}
+
+	.dataviews-bulk-actions__selection-count {
+		display: flex;
+		align-items: center;
+		margin: 0 $grid-unit-10 0 $grid-unit-15;
+		color: $gray-700;
+	}
+}
