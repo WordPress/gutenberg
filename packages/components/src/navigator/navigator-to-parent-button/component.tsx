@@ -33,10 +33,10 @@ function UnconnectedNavigatorToParentButton(
  * @example
  * ```jsx
  * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorToParentButton as NavigatorToParentButton,
+ *   NavigatorProvider,
+ *   NavigatorScreen,
+ *   NavigatorButton,
+ *   NavigatorToParentButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (

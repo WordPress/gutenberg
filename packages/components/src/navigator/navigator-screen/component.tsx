@@ -147,10 +147,10 @@ function UnconnectedNavigatorScreen(
  * @example
  * ```jsx
  * import {
- *   __experimentalNavigatorProvider as NavigatorProvider,
- *   __experimentalNavigatorScreen as NavigatorScreen,
- *   __experimentalNavigatorButton as NavigatorButton,
- *   __experimentalNavigatorBackButton as NavigatorBackButton,
+ *   NavigatorProvider,
+ *   NavigatorScreen,
+ *   NavigatorButton,
+ *   NavigatorBackButton,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
