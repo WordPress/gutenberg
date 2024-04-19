@@ -518,8 +518,7 @@ export const duplicatePostAction = {
 		);
 
 		const { saveEntityRecord } = useDispatch( coreStore );
-		const { createErrorNotice, createSuccessNotice } =
-			useDispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } = useDispatch( noticesStore );
 
 		async function createPage( event ) {
 			event.preventDefault();
@@ -558,11 +557,13 @@ export const duplicatePostAction = {
 						newItem.title?.rendered || title
 					),
 					{
+						id: 'duplicate-post-action',
 						type: 'snackbar',
 					}
 				);
+
 				if ( onActionPerformed ) {
-					onActionPerformed( items );
+					onActionPerformed( [ newItem ] );
 				}
 			} catch ( error ) {
 				const errorMessage =
