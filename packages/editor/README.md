@@ -819,7 +819,16 @@ Undocumented declaration.
 
 ### PostExcerptCheck
 
-Undocumented declaration.
+Component for checking if the post type supports the excerpt field.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostExcerptPanel
 
