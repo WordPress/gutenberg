@@ -1,6 +1,6 @@
-# TextAlignControl
+# TextAlignmentControl
 
-The `TextAlignControl` component is responsible for rendering a control element that allows users to select and apply text align options to blocks or elements in the Gutenberg editor. It provides an intuitive interface for changing the text alignment by applying different alignments such as `left`, `center`, `right`.
+The `TextAlignmentControl` component is responsible for rendering a control element that allows users to select and apply text align options to blocks or elements in the Gutenberg editor. It provides an intuitive interface for changing the text alignment by applying different alignments such as `left`, `center`, `right`.
 
 ## Development guidelines
 
@@ -9,10 +9,10 @@ The `TextAlignControl` component is responsible for rendering a control element 
 Renders the Text Align Component with `left`, `center`, `right` options.
 
 ```jsx
-import { TextAlignControl } from '@wordpress/block-editor';
+import { TextAlignmentControl } from '@wordpress/block-editor';
 
-const MyTextAlignControlComponent = () => (
-	<TextAlignControl
+const MyTextAlignmentControlComponent = () => (
+	<TextAlignmentControl
 		value={ textTransform }
 		onChange={ ( value ) => {
 			setAttributes( { textTransform: value } );

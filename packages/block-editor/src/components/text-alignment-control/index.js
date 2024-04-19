@@ -41,7 +41,7 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
  *
  * @return {Element} Text align control.
  */
-export default function TextAlignControl( {
+export default function TextAlignmentControl( {
 	className,
 	value,
 	onChange,
@@ -58,14 +58,14 @@ export default function TextAlignControl( {
 	return (
 		<fieldset
 			className={ classnames(
-				'block-editor-text-align-control',
+				'block-editor-text-alignment-control',
 				className
 			) }
 		>
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Text alignment' ) }
 			</BaseControl.VisualLabel>
-			<div className="block-editor-text-align-control__buttons">
+			<div className="block-editor-text-alignment-control__buttons">
 				{ validControls.map( ( textAlign ) => {
 					return (
 						<Button

@@ -798,7 +798,7 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore>
 
-### TextAlignControl
+### TextAlignmentControl
 
 Control to facilitate text alignment selections.
 

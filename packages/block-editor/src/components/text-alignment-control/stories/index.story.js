@@ -6,11 +6,11 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import TextAlignControl from '../';
+import TextAlignmentControl from '../';
 
 export default {
-	title: 'BlockEditor/TextAlignControl',
-	component: TextAlignControl,
+	title: 'BlockEditor/TextAlignmentControl',
+	component: TextAlignmentControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
 		className: { control: 'text' },
@@ -22,7 +22,7 @@ export default {
 const Template = ( { onChange, ...args } ) => {
 	const [ value, setValue ] = useState();
 	return (
-		<TextAlignControl
+		<TextAlignmentControl
 			{ ...args }
 			onChange={ ( ...changeArgs ) => {
 				onChange( ...changeArgs );
