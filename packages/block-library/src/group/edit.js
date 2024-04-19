@@ -109,7 +109,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 
 	// Default to the regular appender being rendered.
 	let renderAppender;
-	if ( showPlaceholder ) {
+	if ( showPlaceholder || type === 'grid' ) {
 		// In the placeholder state, ensure the appender is not rendered.
 		// This is needed because `...innerBlocksProps` is used in the placeholder
 		// state so that blocks can dragged onto the placeholder area

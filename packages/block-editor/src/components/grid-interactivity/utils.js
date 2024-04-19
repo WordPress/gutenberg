@@ -71,7 +71,8 @@ function getGridTracks( template, gap ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
 		const start = previousTrack ? previousTrack.end + gap : 0;
 		const end = start + parseFloat( size );
-		tracks.push( { start, end } );
+		const center = ( start + end ) / 2;
+		tracks.push( { start, end, center } );
 	}
 	return tracks;
 }
@@ -85,6 +86,46 @@ function getClosestTrack( tracks, position, edge = 'start' ) {
 				: closest,
 		0
 	);
+}
+
+export function getGridCell( gridElement, x, y ) {
+	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
+	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
+	const gridColumnTracks = getGridTracks(
+		getComputedCSS( gridElement, 'grid-template-columns' ),
+		columnGap
+	);
+	const gridRowTracks = getGridTracks(
+		getComputedCSS( gridElement, 'grid-template-rows' ),
+		rowGap
+	);
+	const columnIndex = gridColumnTracks.findIndex(
+		( track ) => x >= track.start && x < track.end
+	);
+	const rowIndex = gridRowTracks.findIndex(
+		( track ) => y >= track.start && y < track.end
+	);
+	const column = columnIndex === -1 ? null : columnIndex + 1;
+	const row = rowIndex === -1 ? null : rowIndex + 1;
+	return { column, row };
+}
+
+export function getClosestGridCell( gridElement, x, y ) {
+	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
+	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
+	const gridColumnTracks = getGridTracks(
+		getComputedCSS( gridElement, 'grid-template-columns' ),
+		columnGap
+	);
+	const gridRowTracks = getGridTracks(
+		getComputedCSS( gridElement, 'grid-template-rows' ),
+		rowGap
+	);
+	const columnIndex = getClosestTrack( gridColumnTracks, x, 'center' );
+	const rowIndex = getClosestTrack( gridRowTracks, y, 'center' );
+	const column = columnIndex === -1 ? null : columnIndex + 1;
+	const row = rowIndex === -1 ? null : rowIndex + 1;
+	return { column, row };
 }
 
 export function getGridRect( gridElement, rect ) {

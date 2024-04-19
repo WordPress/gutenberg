@@ -9,14 +9,23 @@ import classnames from 'classnames';
 import { useState, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
+import { Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getComputedCSS, range, GridRect, getGridItemRect } from './utils';
+import {
+	getComputedCSS,
+	range,
+	GridRect,
+	getGridItemRect,
+	getGridCell,
+	getClosestGridCell,
+} from './utils';
 import { store as blockEditorStore } from '../../store';
+import QuickInserter from '../inserter/quick-inserter';
 
 export function GridVisualizer( { clientId } ) {
 	const gridElement = useBlockElement( clientId );
@@ -136,6 +145,7 @@ function GridVisualizerGrid( { gridClientId, gridElement } ) {
 	);
 	const [ isDroppingAllowed, setIsDroppingAllowed ] = useState( false );
 	const [ highlightedRect, setHighlightedRect ] = useState( null );
+	const [ insertion, setInsertion ] = useState( false );
 
 	const { getBlockAttributes, getBlocks } = useSelect( blockEditorStore );
 	const { updateBlockAttributes, moveBlockToPosition } =
@@ -150,10 +160,113 @@ function GridVisualizerGrid( { gridClientId, gridElement } ) {
 			observer.observe( element );
 			observers.push( observer );
 		}
+
+		let dragStartCell = null;
+
+		function onMouseDown( event ) {
+			if ( event.target !== gridElement ) {
+				return;
+			}
+			const { column, row } = getGridCell(
+				gridElement,
+				event.offsetX,
+				event.offsetY
+			);
+			if ( column && row ) {
+				dragStartCell = {
+					column,
+					row,
+				};
+			}
+		}
+		function onMouseUp( event ) {
+			if ( event.target !== gridElement ) {
+				return;
+			}
+			const { column, row } = getGridCell(
+				gridElement,
+				event.offsetX,
+				event.offsetY
+			);
+			if ( dragStartCell && column && row ) {
+				const rect = new GridRect( {
+					columnStart: Math.min( dragStartCell.column, column ),
+					rowStart: Math.min( dragStartCell.row, row ),
+					columnSpan: Math.abs( dragStartCell.column - column ) + 1,
+					rowSpan: Math.abs( dragStartCell.row - row ) + 1,
+				} );
+				const anchor = {
+					getBoundingClientRect() {
+						return new window.DOMRect(
+							event.clientX,
+							event.clientY,
+							0,
+							0
+						);
+					},
+					ownerDocument: event.target.ownerDocument,
+				};
+				setInsertion( { rect, anchor } );
+			}
+			dragStartCell = null;
+		}
+		function onMouseMove( event ) {
+			if ( event.target !== gridElement ) {
+				return;
+			}
+			if ( dragStartCell ) {
+				const { column, row } = getClosestGridCell(
+					gridElement,
+					event.offsetX,
+					event.offsetY
+				);
+				setHighlightedRect(
+					column && row
+						? new GridRect( {
+								columnStart: Math.min(
+									dragStartCell.column,
+									column
+								),
+								rowStart: Math.min( dragStartCell.row, row ),
+								columnSpan:
+									Math.abs( dragStartCell.column - column ) +
+									1,
+								rowSpan:
+									Math.abs( dragStartCell.row - row ) + 1,
+						  } )
+						: new GridRect( {
+								columnStart: dragStartCell.column,
+								rowStart: dragStartCell.row,
+						  } )
+				);
+			} else {
+				const { column, row } = getGridCell(
+					gridElement,
+					event.offsetX,
+					event.offsetY
+				);
+				setHighlightedRect(
+					column && row
+						? new GridRect( {
+								columnStart: column,
+								rowStart: row,
+						  } )
+						: null
+				);
+			}
+		}
+		gridElement.addEventListener( 'mousedown', onMouseDown );
+		gridElement.addEventListener( 'mouseup', onMouseUp );
+		gridElement.addEventListener( 'mousemove', onMouseMove );
+
 		return () => {
 			for ( const observer of observers ) {
 				observer.disconnect();
 			}
+
+			gridElement.removeEventListener( 'mousedown', onMouseDown );
+			gridElement.removeEventListener( 'mouseup', onMouseUp );
+			gridElement.removeEventListener( 'mousemove', onMouseMove );
 		};
 	}, [ gridElement ] );
 
@@ -173,64 +286,57 @@ function GridVisualizerGrid( { gridClientId, gridElement } ) {
 	}, [] );
 
 	return (
-		<BlockPopoverCover
-			className={ classnames( 'block-editor-grid-visualizer', {
-				'is-dropping-allowed': isDroppingAllowed,
-			} ) }
-			clientId={ gridClientId }
-			__unstablePopoverSlot="block-toolbar"
-		>
-			<div
-				className="block-editor-grid-visualizer__grid"
-				style={ gridInfo.style }
+		<>
+			{ insertion && (
+				<Popover
+					className="block-editor-inserter__popover is-quick"
+					anchor={ insertion.anchor }
+				>
+					<QuickInserter
+						rootClientId={ gridClientId }
+						isAppender
+						// selectBlockOnInsert={ false }
+						onSelect={ ( block ) => {
+							updateBlockAttributes( block.clientId, {
+								style: {
+									...block.attributes.style,
+									layout: {
+										...block.attributes.style?.layout,
+										columnStart: insertion.rect.columnStart,
+										rowStart: insertion.rect.rowStart,
+										columnSpan: insertion.rect.columnSpan,
+										rowSpan: insertion.rect.rowSpan,
+									},
+								},
+							} );
+							setInsertion( null );
+						} }
+					/>
+				</Popover>
+			) }
+			<BlockPopoverCover
+				className={ classnames( 'block-editor-grid-visualizer', {
+					'is-dropping-allowed': isDroppingAllowed,
+				} ) }
+				clientId={ gridClientId }
+				__unstablePopoverSlot="block-toolbar"
 			>
-				{ range( 1, gridInfo.numRows ).map( ( row ) =>
-					range( 1, gridInfo.numColumns ).map( ( column ) => (
-						<GridVisualizerCell
-							key={ `${ row }-${ column }` }
-							isHighlighted={
-								highlightedRect?.contains( column, row ) ??
-								false
-							}
-							validateDrag={ ( srcClientId ) => {
-								const attributes =
-									getBlockAttributes( srcClientId );
-								const rect = new GridRect( {
-									columnStart: column,
-									rowStart: row,
-									columnSpan:
-										attributes.style?.layout?.columnSpan,
-									rowSpan: attributes.style?.layout?.rowSpan,
-								} );
-
-								const isInBounds = new GridRect( {
-									columnSpan: gridInfo.numColumns,
-									rowSpan: gridInfo.numRows,
-								} ).containsRect( rect );
-								if ( ! isInBounds ) {
-									return false;
+				<div
+					className="block-editor-grid-visualizer__grid"
+					style={ gridInfo.style }
+				>
+					{ range( 1, gridInfo.numRows ).map( ( row ) =>
+						range( 1, gridInfo.numColumns ).map( ( column ) => (
+							<GridVisualizerCell
+								key={ `${ row }-${ column }` }
+								isHighlighted={
+									highlightedRect?.contains( column, row ) ??
+									false
 								}
-
-								const isOverlapping = Array.from(
-									gridElement.children
-								).some(
-									( child ) =>
-										child.dataset.block !== srcClientId &&
-										rect.intersectsRect(
-											getGridItemRect( child )
-										)
-								);
-								if ( isOverlapping ) {
-									return false;
-								}
-
-								return true;
-							} }
-							onDragEnter={ ( srcClientId ) => {
-								const attributes =
-									getBlockAttributes( srcClientId );
-								setHighlightedRect(
-									new GridRect( {
+								validateDrag={ ( srcClientId ) => {
+									const attributes =
+										getBlockAttributes( srcClientId );
+									const rect = new GridRect( {
 										columnStart: column,
 										rowStart: row,
 										columnSpan:
@@ -238,104 +344,144 @@ function GridVisualizerGrid( { gridClientId, gridElement } ) {
 												?.columnSpan,
 										rowSpan:
 											attributes.style?.layout?.rowSpan,
-									} )
-								);
-							} }
-							onDragLeave={ () => {
-								// onDragEnter can be called before onDragLeave if the user moves
-								// their mouse quickly, so only clear the highlight if it was set
-								// by this cell.
-								setHighlightedRect( ( prevHighlightedRect ) =>
-									prevHighlightedRect?.columnStart ===
-										column &&
-									prevHighlightedRect?.rowStart === row
-										? null
-										: prevHighlightedRect
-								);
-							} }
-							onDrop={ ( srcClientId ) => {
-								// TODO: this is messy
+									} );
 
-								const attributes =
-									getBlockAttributes( srcClientId );
+									const isInBounds = new GridRect( {
+										columnSpan: gridInfo.numColumns,
+										rowSpan: gridInfo.numRows,
+									} ).containsRect( rect );
+									if ( ! isInBounds ) {
+										return false;
+									}
 
-								const blocks = getBlocks( gridClientId ).filter(
-									( { clientId } ) => clientId !== srcClientId
-								);
-								const rects = getRects( {
-									innerBlocks: blocks,
-									numColumns: gridInfo.numColumns,
-									numRows: gridInfo.numRows,
-								} );
-								console.log( 'rects', rects );
-								const naturalPosition = getNaturalPosition( {
-									rects,
-									numColumns: gridInfo.numColumns,
-									numRows: gridInfo.numRows,
-									columnSpan:
-										attributes.style?.layout?.columnSpan,
-									rowSpan: attributes.style?.layout?.rowSpan,
-								} );
-								console.log(
-									'naturalPosition',
-									naturalPosition
-								);
-
-								if (
-									column === naturalPosition?.column &&
-									row === naturalPosition?.row
-								) {
-									console.log(
-										'moveBlockToPosition',
-										blocks.length
+									const isOverlapping = Array.from(
+										gridElement.children
+									).some(
+										( child ) =>
+											child.dataset.block !==
+												srcClientId &&
+											rect.intersectsRect(
+												getGridItemRect( child )
+											)
 									);
-									moveBlockToPosition(
-										srcClientId,
-										gridClientId,
-										gridClientId,
-										blocks.length
+									if ( isOverlapping ) {
+										return false;
+									}
+
+									return true;
+								} }
+								onDragEnter={ ( srcClientId ) => {
+									const attributes =
+										getBlockAttributes( srcClientId );
+									setHighlightedRect(
+										new GridRect( {
+											columnStart: column,
+											rowStart: row,
+											columnSpan:
+												attributes.style?.layout
+													?.columnSpan,
+											rowSpan:
+												attributes.style?.layout
+													?.rowSpan,
+										} )
 									);
+								} }
+								onDragLeave={ () => {
+									// onDragEnter can be called before onDragLeave if the user moves
+									// their mouse quickly, so only clear the highlight if it was set
+									// by this cell.
+									setHighlightedRect(
+										( prevHighlightedRect ) =>
+											prevHighlightedRect?.columnStart ===
+												column &&
+											prevHighlightedRect?.rowStart ===
+												row
+												? null
+												: prevHighlightedRect
+									);
+								} }
+								onDrop={ ( srcClientId ) => {
+									// TODO: this is messy
+
+									const attributes =
+										getBlockAttributes( srcClientId );
+
+									const blocks = getBlocks(
+										gridClientId
+									).filter(
+										( { clientId } ) =>
+											clientId !== srcClientId
+									);
+									const rects = getRects( {
+										innerBlocks: blocks,
+										numColumns: gridInfo.numColumns,
+										numRows: gridInfo.numRows,
+									} );
+									const naturalPosition = getNaturalPosition(
+										{
+											rects,
+											numColumns: gridInfo.numColumns,
+											numRows: gridInfo.numRows,
+											columnSpan:
+												attributes.style?.layout
+													?.columnSpan,
+											rowSpan:
+												attributes.style?.layout
+													?.rowSpan,
+										}
+									);
+
 									if (
-										attributes.style?.layout?.columnStart ||
-										attributes.style?.layout?.rowStart
+										column === naturalPosition?.column &&
+										row === naturalPosition?.row
 									) {
-										const {
-											columnStart,
-											rowStart,
-											...layout
-										} = attributes.style.layout;
+										moveBlockToPosition(
+											srcClientId,
+											gridClientId,
+											gridClientId,
+											blocks.length
+										);
+										if (
+											attributes.style?.layout
+												?.columnStart ||
+											attributes.style?.layout?.rowStart
+										) {
+											const {
+												columnStart,
+												rowStart,
+												...layout
+											} = attributes.style.layout;
+											updateBlockAttributes(
+												srcClientId,
+												{
+													style: {
+														...attributes.style,
+														layout,
+													},
+												}
+											);
+										}
+									} else {
 										updateBlockAttributes( srcClientId, {
 											style: {
 												...attributes.style,
-												layout,
+												layout: {
+													...attributes.style?.layout,
+													columnStart: column,
+													rowStart: row,
+												},
 											},
 										} );
 									}
-								} else {
-									console.log(
-										'updateBlockAttributes',
-										column,
-										row
-									);
-									updateBlockAttributes( srcClientId, {
-										style: {
-											...attributes.style,
-											layout: {
-												...attributes.style?.layout,
-												columnStart: column,
-												rowStart: row,
-											},
-										},
-									} );
-								}
 
-								setHighlightedRect( null );
-							} }
-						/>
-					) )
-				) }
-			</div>
-		</BlockPopoverCover>
+									setHighlightedRect( null );
+								} }
+							/>
+						) )
+					) }
+				</div>
+			</BlockPopoverCover>
+		</>
 	);
 }
 
