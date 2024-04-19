@@ -10,6 +10,10 @@ export type ObservableMap< K, V > = {
 	subscribe( name: K, listener: () => void ): () => void;
 };
 
+/**
+ * A key/value map where the individual entries are observable by subscribing to them
+ * with the `subscribe` methods.
+ */
 export function observableMap< K, V >(): ObservableMap< K, V > {
 	const map = new Map< K, V >();
 	const listeners = new Map< K, Set< () => void > >();
@@ -22,20 +26,6 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 		for ( const listener of list ) {
 			listener();
 		}
-	}
-
-	function unsubscribe( name: K, listener: () => void ) {
-		return () => {
-			const list = listeners.get( name );
-			if ( ! list ) {
-				return;
-			}
-
-			list.delete( listener );
-			if ( list.size === 0 ) {
-				listeners.delete( name );
-			}
-		};
 	}
 
 	return {
@@ -58,11 +48,22 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 			}
 			list.add( listener );
 
-			return unsubscribe( name, listener );
+			return () => {
+				list.delete( listener );
+				if ( list.size === 0 ) {
+					listeners.delete( name );
+				}
+			};
 		},
 	};
 }
 
+/**
+ * React hook that lets you observe an individual entry in an `ObservableMap`.
+ *
+ * @param map  The `ObservableMap` to observe.
+ * @param name The map key to observe.
+ */
 export function useObservableValue< K, V >(
 	map: ObservableMap< K, V >,
 	name: K
