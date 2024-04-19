@@ -5,6 +5,7 @@
 ### Deprecation
 
 -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
+-   `BorderControl`: Remove "experimental" designation ([#60920](https://github.com/WordPress/gutenberg/pull/60920)).
 
 ### Enhancements
 
