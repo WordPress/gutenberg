@@ -17,7 +17,6 @@ import { useEffect, useMemo, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import cloneDeep from '../../utils/clone-deep';
 import setNestedValue from '../../utils/set-nested-value';
 
 const { GlobalStylesContext, cleanEmptyObject } = unlock(
@@ -82,7 +81,7 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 			return userConfig;
 		}
 
-		const variationsConfig = cloneDeep( userConfig );
+		const variationsConfig = {};
 
 		Object.entries( sharedVariations ).forEach(
 			( [ variationName, variation ] ) => {
