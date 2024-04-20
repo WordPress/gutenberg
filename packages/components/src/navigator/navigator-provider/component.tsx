@@ -27,6 +27,10 @@ import type {
 	Screen,
 	NavigateToParentOptions,
 } from '../types';
+import { NavigatorBackButton } from '../navigator-back-button';
+import { NavigatorScreen } from '../navigator-screen';
+import { NavigatorButton } from '../navigator-button';
+import { NavigatorToParentButton } from '../navigator-to-parent-button';
 
 type MatchedPath = ReturnType< typeof patternMatch >;
 
@@ -299,9 +303,28 @@ function UnconnectedNavigatorProvider(
  * );
  * ```
  */
-export const NavigatorProvider = contextConnect(
+
+type NavigatorProviderComponent< C > = C & {
+	// Define the function signature with props and a ref
+	Screen: typeof NavigatorScreen;
+	Button: typeof NavigatorButton;
+	BackButton: typeof NavigatorBackButton;
+	ToParentButton: typeof NavigatorToParentButton;
+};
+
+const Provider = contextConnect(
 	UnconnectedNavigatorProvider,
 	'NavigatorProvider'
 );
 
+const NavigatorProvider = Provider as NavigatorProviderComponent<
+	typeof Provider
+>;
+
+NavigatorProvider.Screen = NavigatorScreen;
+NavigatorProvider.Button = NavigatorButton;
+NavigatorProvider.BackButton = NavigatorBackButton;
+NavigatorProvider.ToParentButton = NavigatorToParentButton;
+
+export { NavigatorProvider };
 export default NavigatorProvider;
