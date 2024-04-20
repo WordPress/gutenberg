@@ -1,14 +1,13 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { textHorizontal, textVertical } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import SegmentedTextControl from '../segmented-text-control';
 
 const WRITING_MODES = [
 	{
@@ -35,34 +34,14 @@ const WRITING_MODES = [
  */
 export default function WritingModeControl( { className, value, onChange } ) {
 	return (
-		<fieldset
-			className={ classnames(
-				'block-editor-writing-mode-control',
-				className
-			) }
-		>
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Orientation' ) }
-			</BaseControl.VisualLabel>
-			<div className="block-editor-writing-mode-control__buttons">
-				{ WRITING_MODES.map( ( writingMode ) => {
-					return (
-						<Button
-							key={ writingMode.value }
-							icon={ writingMode.icon }
-							label={ writingMode.name }
-							isPressed={ writingMode.value === value }
-							onClick={ () => {
-								onChange(
-									writingMode.value === value
-										? undefined
-										: writingMode.value
-								);
-							} }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<SegmentedTextControl
+			label={ __( 'Orientation' ) }
+			controls={ WRITING_MODES }
+			className={ className }
+			value={ value }
+			onChange={ ( newValue ) => {
+				onChange( newValue === value ? undefined : newValue );
+			} }
+		/>
 	);
 }

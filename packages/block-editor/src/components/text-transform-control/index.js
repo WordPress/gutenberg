@@ -1,12 +1,6 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	reset,
@@ -15,24 +9,29 @@ import {
 	formatUppercase,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import SegmentedTextControl from '../segmented-text-control';
+
 const TEXT_TRANSFORMS = [
 	{
-		name: __( 'None' ),
+		label: __( 'None' ),
 		value: 'none',
 		icon: reset,
 	},
 	{
-		name: __( 'Uppercase' ),
+		label: __( 'Uppercase' ),
 		value: 'uppercase',
 		icon: formatUppercase,
 	},
 	{
-		name: __( 'Lowercase' ),
+		label: __( 'Lowercase' ),
 		value: 'lowercase',
 		icon: formatLowercase,
 	},
 	{
-		name: __( 'Capitalize' ),
+		label: __( 'Capitalize' ),
 		value: 'capitalize',
 		icon: formatCapitalize,
 	},
@@ -50,34 +49,14 @@ const TEXT_TRANSFORMS = [
  */
 export default function TextTransformControl( { className, value, onChange } ) {
 	return (
-		<fieldset
-			className={ classnames(
-				'block-editor-text-transform-control',
-				className
-			) }
-		>
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Letter case' ) }
-			</BaseControl.VisualLabel>
-			<div className="block-editor-text-transform-control__buttons">
-				{ TEXT_TRANSFORMS.map( ( textTransform ) => {
-					return (
-						<Button
-							key={ textTransform.value }
-							icon={ textTransform.icon }
-							label={ textTransform.name }
-							isPressed={ textTransform.value === value }
-							onClick={ () => {
-								onChange(
-									textTransform.value === value
-										? undefined
-										: textTransform.value
-								);
-							} }
-						/>
-					);
-				} ) }
-			</div>
-		</fieldset>
+		<SegmentedTextControl
+			label={ __( 'Letter case' ) }
+			controls={ TEXT_TRANSFORMS }
+			className={ className }
+			value={ value }
+			onChange={ ( newValue ) => {
+				onChange( newValue === value ? undefined : newValue );
+			} }
+		/>
 	);
 }

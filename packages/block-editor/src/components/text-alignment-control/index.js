@@ -1,35 +1,29 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	BaseControl,
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
-} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import SegmentedTextControl from '../segmented-text-control';
+
 const TEXT_ALIGNMENT_CONTROLS = [
 	{
-		icon: alignLeft,
 		label: __( 'Align text left' ),
-		align: 'left',
+		value: 'left',
+		icon: alignLeft,
 	},
 	{
+		label: __( 'Align text center' ),
+		value: 'center',
 		icon: alignCenter,
-		title: __( 'Align text center' ),
-		align: 'center',
 	},
 	{
+		label: __( 'Align text right' ),
+		value: 'right',
 		icon: alignRight,
-		title: __( 'Align text right' ),
-		align: 'right',
 	},
 ];
 
@@ -44,7 +38,7 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
  * @param {Function} props.onChange  Handles change in text alignment selection.
  * @param {Array}    props.controls  Array of text align controls to display.
  *
- * @return {Element} Text align control.
+ * @return {Element} Text alignment control.
  */
 export default function TextAlignmentControl( {
 	className,
@@ -53,7 +47,7 @@ export default function TextAlignmentControl( {
 	controls = DEFAULT_CONTROLS,
 } ) {
 	const validControls = TEXT_ALIGNMENT_CONTROLS.filter( ( control ) =>
-		controls.includes( control.align )
+		controls.includes( control.value )
 	);
 
 	if ( ! validControls.length ) {
@@ -61,38 +55,14 @@ export default function TextAlignmentControl( {
 	}
 
 	return (
-		<fieldset
-			className={ classnames(
-				'block-editor-text-alignment-control',
-				className
-			) }
-		>
-			<BaseControl.VisualLabel as="legend">
-				{ __( 'Text alignment' ) }
-			</BaseControl.VisualLabel>
-			{ /* // 4px of padding makes the row 40px high, same as an input. */ }
-			<Spacer marginBottom={ 0 } paddingY={ 1 }>
-				<HStack justify="flex-start" spacing={ 1 }>
-					{ validControls.map( ( textAlign ) => {
-						return (
-							<Button
-								key={ textAlign.align }
-								icon={ textAlign.icon }
-								label={ textAlign.label }
-								size="compact"
-								isPressed={ textAlign.align === value }
-								onClick={ () => {
-									onChange(
-										textAlign.align === value
-											? undefined
-											: textAlign.align
-									);
-								} }
-							/>
-						);
-					} ) }
-				</HStack>
-			</Spacer>
-		</fieldset>
+		<SegmentedTextControl
+			label={ __( 'Text alignment' ) }
+			controls={ validControls }
+			className={ className }
+			value={ value }
+			onChange={ ( newValue ) => {
+				onChange( newValue === value ? undefined : newValue );
+			} }
+		/>
 	);
 }

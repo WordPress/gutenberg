@@ -812,7 +812,7 @@ _Parameters_
 
 _Returns_
 
--   `Element`: Text align control.
+-   `Element`: Text alignment control.
 
 ### ToolSelector
 
