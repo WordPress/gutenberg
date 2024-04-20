@@ -48,7 +48,7 @@ export default function DataViewsSidebarContent() {
 					);
 				} ) }
 			</ItemGroup>
-			{ window?.__experimentalAdminViews && (
+			{ window?.__experimentalCustomViews && (
 				<CustomDataViewsList
 					activeView={ activeView }
 					type={ type }

@@ -146,6 +146,14 @@
 			}
 		}
 
+		@media (hover: none) {
+			// Show checkboxes and quick-actions on devices that do not support hover.
+			.components-checkbox-control__input.components-checkbox-control__input,
+			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+				opacity: 1;
+			}
+		}
+
 		&.is-selected {
 			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 			color: $gray-700;
@@ -536,17 +544,6 @@
 	}
 
 	line-height: 0;
-	label {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		white-space: nowrap;
-		border: 0;
-	}
 }
 
 .dataviews-filters__custom-menu-radio-item-prefix {

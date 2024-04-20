@@ -90,8 +90,12 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'button', { name: 'Advanced' } )
 				.click();
 			await editorSettings
-				.getByRole( 'checkbox', { name: 'Allow overrides' } )
-				.setChecked( true );
+				.getByRole( 'button', { name: 'Enable overrides' } )
+				.click();
+			await page
+				.getByRole( 'dialog', { name: 'Enable overrides' } )
+				.getByRole( 'button', { name: 'Enable' } )
+				.click();
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
@@ -308,10 +312,10 @@ test.describe( 'Pattern Overrides', () => {
 			name: 'Edit link',
 			exact: true,
 		} );
-		const saveLinkButton = page.getByRole( 'button', {
-			name: 'Save',
-			exact: true,
-		} );
+
+		const saveLinkButton = page.locator(
+			'.block-editor-link-control__search-submit'
+		);
 
 		await editLinkButton.click();
 		if (
@@ -353,7 +357,7 @@ test.describe( 'Pattern Overrides', () => {
 		// Update the post.
 		const updateButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Update' } );
+			.getByRole( 'button', { name: 'Save' } );
 		await updateButton.click();
 		await expect( updateButton ).toBeDisabled();
 

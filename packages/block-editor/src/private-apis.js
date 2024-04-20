@@ -15,7 +15,7 @@ import {
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import { useShowBlockTools } from './components/block-tools/use-show-block-tools';
+import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -56,7 +56,7 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	useShowBlockTools,
+	useHasBlockToolbar,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,

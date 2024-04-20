@@ -2,20 +2,25 @@
 
 ## Unreleased
 
+## 27.4.0 (2024-04-19)
+
 ### Deprecation
 
 -   `Navigation`: Soft deprecate component ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
 
 ### Enhancements
 
+-   `Tooltip`: Make tests faster ([#60897](https://github.com/WordPress/gutenberg/pull/60897)).
 -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
 -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
--   `Text`: Add `text-wrap: pretty;` to improve wrapping. ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
--   `Navigator`: Navigation to the active path doesn't create a new location history. ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
--   `FormToggle`: Forwards ref to input. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
--   `ToggleControl`: Forwards ref to FormToggle. ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+-   `Text`: Add `text-wrap: pretty;` to improve wrapping ([#60164](https://github.com/WordPress/gutenberg/pull/60164)).
+-   `Navigator`: Navigation to the active path doesn't create a new location history ([#60561](https://github.com/WordPress/gutenberg/pull/60561))
+-   `FormToggle`: Forwards ref to input ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
+-   `ToggleControl`: Forwards ref to FormToggle ([#60234](https://github.com/WordPress/gutenberg/pull/60234)).
 
 ### Bug Fix
+
+-   `Truncate`: Fix link control link preview when it displays long URLs ([#60890](https://github.com/WordPress/gutenberg/pull/60890)).
 
 -   `ProgressBar`: Fix CSS variable with invalid value ([#60576](https://github.com/WordPress/gutenberg/pull/60576)).
 
@@ -27,6 +32,10 @@
 
 -   Remove CSS hack for Internet Explorer 11 ([#60727](https://github.com/WordPress/gutenberg/pull/60727)).
 -   `CheckboxControl`: Streamline size styles ([#60475](https://github.com/WordPress/gutenberg/pull/60475)).
+-   Deprecate `reduceMotion` util ([#60839](https://github.com/WordPress/gutenberg/pull/60839)).
+-   `InputBase`: Simplify management of focus styles. Affects all components based on `InputControl` (e.g. `SearchControl`, `NumberControl`, `UnitControl`), as well as `SelectControl`, `CustomSelectControl`, and `TreeSelect` ([#60226](https://github.com/WordPress/gutenberg/pull/60226)).
+-   Removed dependency on `valtio`, replaced its usage in `SlotFill` with a custom object [#60879](https://github.com/WordPress/gutenberg/pull/60879)).
+-   `CustomSelectControlV2`: Support disabled in item types ([#60896](https://github.com/WordPress/gutenberg/pull/60896)).
 
 ## 27.3.0 (2024-04-03)
 

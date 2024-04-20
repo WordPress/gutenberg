@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { ComplementaryArea } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-
-const { ComplementaryArea } = unlock( editorPrivateApis );
+import { store as editorStore } from '../../store';
 
 /**
  * Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
@@ -16,7 +17,7 @@ const { ComplementaryArea } = unlock( editorPrivateApis );
  * If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
  *
  * ```js
- * wp.data.dispatch( 'core/edit-site' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
+ * wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
  * ```
  *
  * @see PluginSidebarMoreMenuItem
@@ -32,10 +33,10 @@ const { ComplementaryArea } = unlock( editorPrivateApis );
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
- * var el = wp.element.createElement;
+ * var el = React.createElement;
  * var PanelBody = wp.components.PanelBody;
- * var PluginSidebar = wp.editSite.PluginSidebar;
- * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
+ * var PluginSidebar = wp.editor.PluginSidebar;
+ * var moreIcon = React.createElement( 'svg' ); //... svg element.
  *
  * function MyPluginSidebar() {
  * 	return el(
@@ -59,7 +60,7 @@ const { ComplementaryArea } = unlock( editorPrivateApis );
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
  * import { PanelBody } from '@wordpress/components';
- * import { PluginSidebar } from '@wordpress/edit-site';
+ * import { PluginSidebar } from '@wordpress/edit-post';
  * import { more } from '@wordpress/icons';
  *
  * const MyPluginSidebar = () => (
@@ -75,12 +76,22 @@ const { ComplementaryArea } = unlock( editorPrivateApis );
  * );
  * ```
  */
-export default function PluginSidebarEditSite( { className, ...props } ) {
+export default function PluginSidebar( { className, ...props } ) {
+	const { postTitle, shortcut } = useSelect( ( select ) => {
+		return {
+			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
+		};
+	}, [] );
 	return (
 		<ComplementaryArea
 			panelClassName={ className }
-			className="edit-site-sidebar-edit-mode"
-			scope="core/edit-site"
+			className="editor-sidebar"
+			smallScreenTitle={ postTitle || __( '(no title)' ) }
+			scope="core"
+			toggleShortcut={ shortcut }
 			{ ...props }
 		/>
 	);
