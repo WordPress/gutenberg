@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecation
+
+-   `Navigator`: Remove "experimental" designation ([#60927](https://github.com/WordPress/gutenberg/pull/60927)).
+
 ## 27.4.0 (2024-04-19)
 
 ### Deprecation
