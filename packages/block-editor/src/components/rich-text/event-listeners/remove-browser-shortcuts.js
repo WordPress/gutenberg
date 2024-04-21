@@ -1,17 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Hook to prevent default behaviors for key combinations otherwise handled
  * internally by RichText.
- *
- * @return {import('react').RefObject} The component to be rendered.
  */
-export function useRemoveBrowserShortcuts() {
-	return useRefEffect( ( node ) => {
+export default () => {
+	return ( node ) => {
 		function onKeydown( event ) {
 			if (
 				isKeyboardEvent.primary( event, 'z' ) ||
@@ -25,5 +22,5 @@ export function useRemoveBrowserShortcuts() {
 		return () => {
 			node.removeEventListener( 'keydown', onKeydown );
 		};
-	}, [] );
-}
+	};
+};

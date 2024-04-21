@@ -1,10 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { useRefEffect } from '@wordpress/compose';
-
-export function useInputEvents( inputEvents ) {
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	const { inputEvents } = props.current;
+	return ( element ) => {
 		function onInput( event ) {
 			for ( const keyboardShortcut of inputEvents.current ) {
 				keyboardShortcut( event );
@@ -15,5 +11,5 @@ export function useInputEvents( inputEvents ) {
 		return () => {
 			element.removeEventListener( 'input', onInput );
 		};
-	}, [] );
-}
+	};
+};

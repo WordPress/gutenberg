@@ -1,15 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import { DELETE, BACKSPACE } from '@wordpress/keycodes';
 import { isCollapsed, isEmpty } from '@wordpress/rich-text';
 
-export function useDelete( props ) {
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
 
@@ -17,7 +13,7 @@ export function useDelete( props ) {
 				return;
 			}
 
-			const { value, onMerge, onRemove } = propsRef.current;
+			const { value, onMerge, onRemove } = props.current;
 
 			if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 				const { start, end, text } = value;
@@ -55,5 +51,5 @@ export function useDelete( props ) {
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [] );
-}
+	};
+};

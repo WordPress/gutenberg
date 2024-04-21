@@ -1,25 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import { ENTER } from '@wordpress/keycodes';
 import { insert, remove } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { useDispatch, useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-import { splitValue } from './split-value';
+import { store as blockEditorStore } from '../../../store';
+import { splitValue } from '../split-value';
 
-export function useEnter( props ) {
-	const registry = useRegistry();
-	const { __unstableMarkAutomaticChange } = useDispatch( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function onKeyDown( event ) {
 			if ( event.target.contentEditable !== 'true' ) {
 				return;
@@ -42,7 +35,8 @@ export function useEnter( props ) {
 				disableLineBreaks,
 				onSplitAtEnd,
 				onSplitAtDoubleLineEnd,
-			} = propsRef.current;
+				registry,
+			} = props.current;
 
 			event.preventDefault();
 
@@ -64,7 +58,9 @@ export function useEnter( props ) {
 							content: _value.text,
 						} ),
 					] );
-					__unstableMarkAutomaticChange();
+					registry
+						.dispatch( blockEditorStore )
+						.__unstableMarkAutomaticChange();
 					return;
 				}
 			}
@@ -106,5 +102,5 @@ export function useEnter( props ) {
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [] );
-}
+	};
+};

@@ -1,21 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import { insert, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
-import { preventEventDiscovery } from './prevent-event-discovery';
+import { store as blockEditorStore } from '../../../store';
+import { preventEventDiscovery } from '../prevent-event-discovery';
 import {
 	retrieveSelectedAttribute,
 	START_OF_SELECTED_AREA,
-} from '../../utils/selection';
+} from '../../../utils/selection';
 
 function findSelection( blocks ) {
 	let i = blocks.length;
@@ -47,16 +44,11 @@ function findSelection( blocks ) {
 	return [];
 }
 
-export function useInputRules( props ) {
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function inputRule() {
-			const { getValue, onReplace, selectionChange } = propsRef.current;
+			const { getValue, onReplace, selectionChange, registry } =
+				props.current;
 
 			if ( ! onReplace ) {
 				return;
@@ -95,7 +87,9 @@ export function useInputRules( props ) {
 
 			selectionChange( ...findSelection( [ block ] ) );
 			onReplace( [ block ] );
-			__unstableMarkAutomaticChange();
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkAutomaticChange();
 
 			return true;
 		}
@@ -107,7 +101,8 @@ export function useInputRules( props ) {
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
-			} = propsRef.current;
+				registry,
+			} = props.current;
 
 			// Only run input rules when inserting text.
 			if ( inputType !== 'insertText' && type !== 'compositionend' ) {
@@ -130,6 +125,11 @@ export function useInputRules( props ) {
 				preventEventDiscovery( value )
 			);
 
+			const {
+				__unstableMarkLastChangeAsPersistent,
+				__unstableMarkAutomaticChange,
+			} = registry.dispatch( blockEditorStore );
+
 			if ( transformed !== value ) {
 				__unstableMarkLastChangeAsPersistent();
 				onChange( {
@@ -146,5 +146,5 @@ export function useInputRules( props ) {
 			element.removeEventListener( 'input', onInput );
 			element.removeEventListener( 'compositionend', onInput );
 		};
-	}, [] );
-}
+	};
+};

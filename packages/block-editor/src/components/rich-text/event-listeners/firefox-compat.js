@@ -1,19 +1,13 @@
 /**
- * WordPress dependencies
- */
-import { useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '../../../store';
 
-export function useFirefoxCompat() {
-	const { isMultiSelecting } = useSelect( blockEditorStore );
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function onFocus() {
-			if ( ! isMultiSelecting() ) {
+			const { registry } = props.current;
+			if ( ! registry.select( blockEditorStore ).isMultiSelecting() ) {
 				return;
 			}
 
@@ -35,5 +29,5 @@ export function useFirefoxCompat() {
 		return () => {
 			element.removeEventListener( 'focus', onFocus );
 		};
-	}, [] );
-}
+	};
+};

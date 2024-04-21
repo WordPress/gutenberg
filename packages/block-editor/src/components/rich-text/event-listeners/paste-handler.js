@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import {
 	pasteHandler,
 	findTransform,
@@ -14,16 +12,14 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { addActiveFormats } from './utils';
-import { splitValue } from './split-value';
-import { getPasteEventData } from '../../utils/pasting';
+import { addActiveFormats } from '../utils';
+import { splitValue } from '../split-value';
+import { getPasteEventData } from '../../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
-export function usePasteHandler( props ) {
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function _onPaste( event ) {
 			const {
 				isSelected,
@@ -36,7 +32,7 @@ export function usePasteHandler( props ) {
 				onSplit,
 				__unstableEmbedURLOnPaste,
 				pastePlainText,
-			} = propsRef.current;
+			} = props.current;
 
 			if ( ! isSelected ) {
 				return;
@@ -176,5 +172,5 @@ export function usePasteHandler( props ) {
 		return () => {
 			element.removeEventListener( 'paste', _onPaste );
 		};
-	}, [] );
-}
+	};
+};

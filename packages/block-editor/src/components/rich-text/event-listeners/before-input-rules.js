@@ -1,16 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import { insert, isCollapsed } from '@wordpress/rich-text';
-import { useDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '../../../store';
 
 /**
  * When typing over a selection, the selection will we wrapped by a matching
@@ -21,17 +18,11 @@ import { store as blockEditorStore } from '../../store';
  */
 const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
 
-export function useBeforeInputRules( props ) {
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
-	const propsRef = useRef( props );
-	propsRef.current = props;
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function onInput( event ) {
 			const { inputType, data } = event;
-			const { value, onChange } = propsRef.current;
+			const { value, onChange, registry } = props.current;
 
 			// Only run the rules when inserting text.
 			if ( inputType !== 'insertText' ) {
@@ -60,6 +51,11 @@ export function useBeforeInputRules( props ) {
 
 			let newValue = insert( value, startChar, start, start );
 			newValue = insert( newValue, endChar, end, end );
+
+			const {
+				__unstableMarkLastChangeAsPersistent,
+				__unstableMarkAutomaticChange,
+			} = registry.dispatch( blockEditorStore );
 
 			__unstableMarkLastChangeAsPersistent();
 			onChange( newValue );
@@ -95,5 +91,5 @@ export function useBeforeInputRules( props ) {
 		return () => {
 			element.removeEventListener( 'beforeinput', onInput );
 		};
-	}, [] );
-}
+	};
+};

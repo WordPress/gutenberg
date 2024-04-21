@@ -1,10 +1,6 @@
-/**
- * WordPress dependencies
- */
-import { useRefEffect } from '@wordpress/compose';
-
-export function useShortcuts( keyboardShortcuts ) {
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
+		const { keyboardShortcuts } = props.current;
 		function onKeyDown( event ) {
 			for ( const keyboardShortcut of keyboardShortcuts.current ) {
 				keyboardShortcut( event );
@@ -15,5 +11,5 @@ export function useShortcuts( keyboardShortcuts ) {
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [] );
-}
+	};
+};

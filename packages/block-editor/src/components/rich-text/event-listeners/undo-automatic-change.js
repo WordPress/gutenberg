@@ -1,18 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
 import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
+import { store as blockEditorStore } from '../../../store';
 
-export function useUndoAutomaticChange() {
-	const { didAutomaticChange, getSettings } = useSelect( blockEditorStore );
-	return useRefEffect( ( element ) => {
+export default ( props ) => {
+	return ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
 
@@ -23,6 +20,10 @@ export function useUndoAutomaticChange() {
 			if ( keyCode !== BACKSPACE && keyCode !== ESCAPE ) {
 				return;
 			}
+
+			const { registry } = props.current;
+			const { didAutomaticChange, getSettings } =
+				registry.select( blockEditorStore );
 
 			const { __experimentalUndo } = getSettings();
 
@@ -42,5 +43,5 @@ export function useUndoAutomaticChange() {
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [] );
-}
+	};
+};
