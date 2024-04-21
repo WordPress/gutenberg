@@ -650,7 +650,7 @@ function mapSelectorWithResolver(
 
 		queue.push( [ startResolution, fulfillResolution ] );
 
-		window.queueMicrotask( () => {
+		setTimeout( () => {
 			if ( queue.length ) {
 				// Many resolvers can be called at once. The point of this is to
 				// at least batch `startResolution` actions all together.
@@ -666,7 +666,7 @@ function mapSelectorWithResolver(
 
 				queue.length = 0;
 			}
-		} );
+		}, 0 );
 	}
 
 	const selectorResolver = ( ...args ) => {
