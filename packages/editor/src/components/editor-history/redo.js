@@ -13,6 +13,16 @@ import { forwardRef } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
+/** @typedef {import('react').Ref<HTMLElement>} Ref */
+
+/**
+ * Component to Renders the redo button for the editor history.
+ *
+ * @param {Object} props - Props.
+ * @param {Ref}    ref   - Reference with the element.
+ *
+ * @return {Element} The component to be rendered.
+ */
 function EditorHistoryRedo( props, ref ) {
 	const shortcut = isAppleOS()
 		? displayShortcut.primaryShift( 'z' )
