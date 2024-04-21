@@ -198,7 +198,7 @@ Component return the character count of the content.
 
 _Returns_
 
--   `number`: Count that represent number of character in content.
+-   `number`: The character count.
 
 ### cleanForSlug
 
