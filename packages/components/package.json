@@ -84,5 +84,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"devDependencies": {
+		"@types/jest": "^29.5.12"
 	}
 }
