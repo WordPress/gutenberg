@@ -19,34 +19,38 @@ import _delete from './delete';
 import enter from './enter';
 import firefoxCompat from './firefox-compat';
 
+const allEventListeners = [
+	beforeInputRules,
+	inputRules,
+	insertReplacementText,
+	removeBrowserShortcuts,
+	shortcuts,
+	inputEvents,
+	undoAutomaticChange,
+	pasteHandler,
+	_delete,
+	enter,
+	firefoxCompat,
+];
+
 export function useEventListeners( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	const refEffects = useMemo(
-		() =>
-			[
-				beforeInputRules,
-				inputRules,
-				insertReplacementText,
-				removeBrowserShortcuts,
-				shortcuts,
-				inputEvents,
-				undoAutomaticChange,
-				pasteHandler,
-				_delete,
-				enter,
-				firefoxCompat,
-			].map( ( refEffect ) => refEffect( propsRef ) ),
+		() => allEventListeners.map( ( refEffect ) => refEffect( propsRef ) ),
 		[ propsRef ]
 	);
 
 	return useRefEffect(
 		( element ) => {
+			if ( ! props.isSelected ) {
+				return;
+			}
 			const cleanups = refEffects.map( ( effect ) => effect( element ) );
 			return () => {
 				cleanups.forEach( ( cleanup ) => cleanup() );
 			};
 		},
-		[ refEffects ]
+		[ refEffects, props.isSelected ]
 	);
 }

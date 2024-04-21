@@ -44,107 +44,103 @@ function findSelection( blocks ) {
 	return [];
 }
 
-export default ( props ) => {
-	return ( element ) => {
-		function inputRule() {
-			const { getValue, onReplace, selectionChange, registry } =
-				props.current;
+export default ( props ) => ( element ) => {
+	function inputRule() {
+		const { getValue, onReplace, selectionChange, registry } =
+			props.current;
 
-			if ( ! onReplace ) {
-				return;
+		if ( ! onReplace ) {
+			return;
+		}
+
+		// We must use getValue() here because value may be update
+		// asynchronously.
+		const value = getValue();
+		const { start, text } = value;
+		const characterBefore = text.slice( start - 1, start );
+
+		// The character right before the caret must be a plain space.
+		if ( characterBefore !== ' ' ) {
+			return;
+		}
+
+		const trimmedTextBefore = text.slice( 0, start ).trim();
+		const prefixTransforms = getBlockTransforms( 'from' ).filter(
+			( { type } ) => type === 'prefix'
+		);
+		const transformation = findTransform(
+			prefixTransforms,
+			( { prefix } ) => {
+				return trimmedTextBefore === prefix;
 			}
+		);
 
-			// We must use getValue() here because value may be update
-			// asynchronously.
-			const value = getValue();
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
+		if ( ! transformation ) {
+			return;
+		}
 
-			// The character right before the caret must be a plain space.
-			if ( characterBefore !== ' ' ) {
-				return;
-			}
+		const content = toHTMLString( {
+			value: insert( value, START_OF_SELECTED_AREA, 0, start ),
+		} );
+		const block = transformation.transform( content );
 
-			const trimmedTextBefore = text.slice( 0, start ).trim();
-			const prefixTransforms = getBlockTransforms( 'from' ).filter(
-				( { type } ) => type === 'prefix'
-			);
-			const transformation = findTransform(
-				prefixTransforms,
-				( { prefix } ) => {
-					return trimmedTextBefore === prefix;
+		selectionChange( ...findSelection( [ block ] ) );
+		onReplace( [ block ] );
+		registry.dispatch( blockEditorStore ).__unstableMarkAutomaticChange();
+
+		return true;
+	}
+
+	function onInput( event ) {
+		const { inputType, type } = event;
+		const {
+			getValue,
+			onChange,
+			__unstableAllowPrefixTransformations,
+			formatTypes,
+			registry,
+		} = props.current;
+
+		// Only run input rules when inserting text.
+		if ( inputType !== 'insertText' && type !== 'compositionend' ) {
+			return;
+		}
+
+		if ( __unstableAllowPrefixTransformations && inputRule() ) {
+			return;
+		}
+
+		const value = getValue();
+		const transformed = formatTypes.reduce(
+			( accumlator, { __unstableInputRule } ) => {
+				if ( __unstableInputRule ) {
+					accumlator = __unstableInputRule( accumlator );
 				}
-			);
 
-			if ( ! transformation ) {
-				return;
-			}
+				return accumlator;
+			},
+			preventEventDiscovery( value )
+		);
 
-			const content = toHTMLString( {
-				value: insert( value, START_OF_SELECTED_AREA, 0, start ),
+		const {
+			__unstableMarkLastChangeAsPersistent,
+			__unstableMarkAutomaticChange,
+		} = registry.dispatch( blockEditorStore );
+
+		if ( transformed !== value ) {
+			__unstableMarkLastChangeAsPersistent();
+			onChange( {
+				...transformed,
+				activeFormats: value.activeFormats,
 			} );
-			const block = transformation.transform( content );
-
-			selectionChange( ...findSelection( [ block ] ) );
-			onReplace( [ block ] );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkAutomaticChange();
-
-			return true;
+			__unstableMarkAutomaticChange();
 		}
+	}
 
-		function onInput( event ) {
-			const { inputType, type } = event;
-			const {
-				getValue,
-				onChange,
-				__unstableAllowPrefixTransformations,
-				formatTypes,
-				registry,
-			} = props.current;
-
-			// Only run input rules when inserting text.
-			if ( inputType !== 'insertText' && type !== 'compositionend' ) {
-				return;
-			}
-
-			if ( __unstableAllowPrefixTransformations && inputRule() ) {
-				return;
-			}
-
-			const value = getValue();
-			const transformed = formatTypes.reduce(
-				( accumlator, { __unstableInputRule } ) => {
-					if ( __unstableInputRule ) {
-						accumlator = __unstableInputRule( accumlator );
-					}
-
-					return accumlator;
-				},
-				preventEventDiscovery( value )
-			);
-
-			const {
-				__unstableMarkLastChangeAsPersistent,
-				__unstableMarkAutomaticChange,
-			} = registry.dispatch( blockEditorStore );
-
-			if ( transformed !== value ) {
-				__unstableMarkLastChangeAsPersistent();
-				onChange( {
-					...transformed,
-					activeFormats: value.activeFormats,
-				} );
-				__unstableMarkAutomaticChange();
-			}
-		}
-
-		element.addEventListener( 'input', onInput );
-		element.addEventListener( 'compositionend', onInput );
-		return () => {
-			element.removeEventListener( 'input', onInput );
-			element.removeEventListener( 'compositionend', onInput );
-		};
+	element.addEventListener( 'input', onInput );
+	element.addEventListener( 'compositionend', onInput );
+	return () => {
+		element.removeEventListener( 'input', onInput );
+		element.removeEventListener( 'compositionend', onInput );
 	};
 };
