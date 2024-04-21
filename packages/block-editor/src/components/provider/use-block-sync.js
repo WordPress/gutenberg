@@ -3,7 +3,6 @@
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
