@@ -8,13 +8,13 @@
 /**
  * Update the block content with elements class names.
  *
- * @deprecated 6.6.0 Use WP_Duotone_Gutenberg::register_duotone_support() instead.
+ * @deprecated 6.6.0 Use `gutenberg_render_elements_class_name` instead.
  *
  * @param  string $block_content Rendered block content.
  * @return string                Filtered block content.
  */
 function gutenberg_render_elements_support( $block_content ) {
-	_deprecated_function( __FUNCTION__, '6.6.0', 'gutenberg_render_elements_support' );
+	_deprecated_function( __FUNCTION__, '6.6.0', 'gutenberg_render_elements_class_name' );
 	return $block_content;
 }
 
