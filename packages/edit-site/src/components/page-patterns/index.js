@@ -331,6 +331,7 @@ export default function DataviewsPatterns() {
 				),
 				enableSorting: false,
 				enableHiding: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
