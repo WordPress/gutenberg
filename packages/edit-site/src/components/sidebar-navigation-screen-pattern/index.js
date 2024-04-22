@@ -35,9 +35,10 @@ export default function SidebarNavigationScreenPattern() {
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
 		[]
 	);
-	const backPath = isBlockBasedTheme
-		? { path: '/patterns' }
-		: { path: '/wp_template_part/all' };
+	const backPath =
+		! isBlockBasedTheme && postType === 'wp_template_part'
+			? { path: '/wp_template_part/all' }
+			: { path: '/patterns' };
 
 	return (
 		<SidebarNavigationScreen
