@@ -15,7 +15,7 @@
  *
  * @return string Returns the Media & Text block markup, if useFeaturedImage is true.
  */
-function render_block_core_media_text( $attributes, $content ) {
+function render_block_core_media_text( $attributes, $content, $block ) {
 	if ( false === $attributes['useFeaturedImage'] ) {
 		return $content;
 	}
@@ -29,16 +29,29 @@ function render_block_core_media_text( $attributes, $content ) {
 		return $content;
 	}
 
-	/*
-	 * If the block is linked, insert the image inside the `a` tag.
-	 * Otherwise, insert the image inside the `figure` tag.
-	 */
-	$find_link = new WP_HTML_Tag_Processor( $content );
-	if ( $find_link->next_tag( 'a' ) ) {
-		$content = preg_replace( '/(<\/a>)/', '<img></a>', $content );
-	} else {
-		$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', '<figure class="wp-block-media-text__media"><img>', $content );
+	$image_tag         = '<figure class="wp-block-media-text__media"><img>';
+	$alt               = trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) );
+	$featuredImageLink = isset( $attributes['featuredImageLink'] ) && $attributes['featuredImageLink'];
+
+	if ( $featuredImageLink ) {
+		$post_ID = $block->context['postId'];
+		if ( get_the_title( $post_ID ) ) {
+			$alt = trim( strip_tags( get_the_title( $post_ID ) ) );
+		} else {
+			$alt = sprintf(
+				// translators: %d is the post ID.
+				__( 'Untitled post %d' ),
+				$post_ID
+			);
+		}
+
+		$image_tag = sprintf(
+			'<figure class="wp-block-media-text__media"><a href="%1$s"><img></a>',
+			get_the_permalink( $post_ID ),
+		);
 	}
+
+	$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
@@ -56,7 +69,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
-	$processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
+	$processor->set_attribute( 'alt', $alt );
 
 	$content = $processor->get_updated_html();
 

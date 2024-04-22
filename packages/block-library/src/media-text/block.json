@@ -38,6 +38,10 @@
 		"mediaLink": {
 			"type": "string"
 		},
+		"featuredImageLink": {
+			"type": "boolean",
+			"default": false
+		},
 		"linkDestination": {
 			"type": "string"
 		},
