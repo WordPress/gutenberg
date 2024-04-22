@@ -12,7 +12,11 @@ import useNavigator from '../use-navigator';
 import type { NavigatorBackButtonHookProps } from '../types';
 
 export function useNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonHookProps, 'button' >
+	props: WordPressComponentProps<
+		NavigatorBackButtonHookProps,
+		'button',
+		false
+	>
 ) {
 	const {
 		onClick,

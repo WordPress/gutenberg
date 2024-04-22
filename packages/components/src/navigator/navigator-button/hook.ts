@@ -16,7 +16,7 @@ const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
 	`[${ attrName }="${ attrValue }"]`;
 
 export function useNavigatorButton(
-	props: WordPressComponentProps< NavigatorButtonProps, 'button' >
+	props: WordPressComponentProps< NavigatorButtonProps, 'button', false >
 ) {
 	const {
 		path,
