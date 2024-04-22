@@ -730,8 +730,8 @@ test.describe( 'insert media from inserter', () => {
 		await page.getByLabel( uploadedMedia.title.raw ).click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
-		<figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
-		<!-- /wp:image -->`
+<figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
+<!-- /wp:image -->`
 		);
 	} );
 } );
