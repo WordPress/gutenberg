@@ -27,7 +27,7 @@ The component accepts the following props.
 
 #### value
 
-The current value of the Text Alignment setting. Available options are `left|center|right`.
+The current value of the Text Alignment setting. Available options are `left|center|right|justify`.
 
 -   Type: `String`
 -   Required: No
