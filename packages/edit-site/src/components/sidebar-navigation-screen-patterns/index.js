@@ -146,12 +146,14 @@ export default function SidebarNavigationScreenPatterns() {
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
 			title={
-				isTemplatePartsPath ? __( 'Template Parts' ) : __( 'Patterns' )
+				isTemplatePartsPath
+					? __( 'Manage template parts' )
+					: __( 'Patterns' )
 			}
 			description={
 				isTemplatePartsPath
 					? __(
-							'Manage what template parts are available when editing the site.'
+							'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
 					  )
 					: __(
 							'Manage what patterns are available when editing the site.'

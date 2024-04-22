@@ -40,10 +40,8 @@ export default function PatternsHeader( {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === categoryId
 		);
-		title = templatePartArea?.label || __( 'All Template Parts' );
-		description =
-			templatePartArea?.description ||
-			__( 'Includes every template part defined for any area.' );
+		title = templatePartArea?.label || __( 'Template Parts' );
+		description = templatePartArea?.description;
 	} else if ( type === PATTERN_TYPES.theme ) {
 		patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
