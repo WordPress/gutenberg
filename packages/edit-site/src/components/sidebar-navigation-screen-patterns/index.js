@@ -160,10 +160,12 @@ export default function SidebarNavigationScreenPatterns() {
 					  )
 			}
 			actions={
-				<AddNewPattern
-					canCreateParts={ isBlockBasedTheme }
-					canCreatePatterns={ ! isTemplatePartsPath }
-				/>
+				( isBlockBasedTheme || ! isTemplatePartsPath ) && (
+					<AddNewPattern
+						canCreateParts={ isBlockBasedTheme }
+						canCreatePatterns={ ! isTemplatePartsPath }
+					/>
+				)
 			}
 			content={
 				<>
