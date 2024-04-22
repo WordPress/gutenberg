@@ -8,9 +8,9 @@ import type { ForwardedRef } from 'react';
  */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
+import { View } from '../../view';
 import { useNavigatorButton } from './hook';
 import type { NavigatorButtonProps } from '../types';
-import { View } from '../../view';
 
 function UnconnectedNavigatorButton(
 	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
