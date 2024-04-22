@@ -157,7 +157,7 @@ export default function SidebarNavigationScreenPatterns() {
 							'Manage what patterns are available when editing the site.'
 					  )
 			}
-			actions={ ! isTemplatePartsPath && <AddNewPattern /> }
+			actions={ <AddNewPattern /> }
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }

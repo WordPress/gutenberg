@@ -5,12 +5,13 @@ import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	privateApis as editPatternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -36,6 +37,9 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
+	const isBlockBasedTheme = useSelect( ( select ) => {
+		return select( coreStore ).getCurrentTheme()?.is_block_theme;
+	}, [] );
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -77,11 +81,13 @@ export default function AddNewPattern() {
 		},
 	];
 
-	controls.push( {
-		icon: symbolFilled,
-		onClick: () => setShowTemplatePartModal( true ),
-		title: __( 'Create template part' ),
-	} );
+	if ( isBlockBasedTheme ) {
+		controls.push( {
+			icon: symbolFilled,
+			onClick: () => setShowTemplatePartModal( true ),
+			title: __( 'Create template part' ),
+		} );
+	}
 
 	controls.push( {
 		icon: upload,
