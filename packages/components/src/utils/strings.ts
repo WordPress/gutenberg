@@ -5,23 +5,7 @@ import removeAccents from 'remove-accents';
 import { paramCase } from 'change-case';
 
 const ALL_UNICODE_DASH_CHARACTERS = new RegExp(
-	`[${ [
-		// ~ (tilde)
-		'\u007e',
-		// ­ (soft hyphen)
-		'\u00ad',
-		// ⁓ (swung dash)
-		'\u2053',
-		// ⁻ (superscript minus)
-		'\u207b',
-		// ₋ (subscript minus)
-		'\u208b',
-		// − (minus sign)
-		'\u2212',
-		// any other Unicode dash character
-		'\\p{Pd}',
-	].join( '' ) }]`,
-	'gu'
+	/[\u007e\u00ad\u2053\u207b\u208b\u2212\p{Pd}]/gu
 );
 
 export const normalizeTextString = ( value: string ): string => {
