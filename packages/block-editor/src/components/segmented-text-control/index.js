@@ -9,14 +9,21 @@ import classnames from 'classnames';
 import { BaseControl, Button } from '@wordpress/components';
 
 /**
+ * @typedef {Object} Control
+ * @property {string} label The label of the control.
+ * @property {string} value The value of the control.
+ * @property {string} icon  The icon of the control.
+ */
+
+/**
  * Control to facilitate segmented text selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.label     A label for the control.
- * @param {string}   props.value     Currently selected value.
- * @param {Function} props.onChange  Callback to handle onChange.
- * @param {Array}    props.controls  Array of controls to display.
- * @param {string}   props.className Additional class name to apply.
+ * @param {Object}    props           Component props.
+ * @param {string}    props.label     A label for the control.
+ * @param {string}    props.value     Currently selected value.
+ * @param {Function}  props.onChange  Callback to handle onChange.
+ * @param {Control[]} props.controls  Array of controls to display.
+ * @param {string}    props.className Additional class name to apply.
  *
  * @return {Element} Element to render.
  */
