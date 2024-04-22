@@ -448,7 +448,7 @@ test.describe( 'Image', () => {
 
 			await blockLibrary
 				.getByRole( 'tabpanel', { name: 'Media' } )
-				.getByRole( 'button', { name: 'Openverse' } )
+				.getByRole( 'tab', { name: 'Openverse' } )
 				.click();
 		}
 
