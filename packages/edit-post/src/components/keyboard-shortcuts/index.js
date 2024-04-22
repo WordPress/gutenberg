@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -16,11 +15,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { isEditorSidebarOpened } = useSelect( editPostStore );
-	const { openGeneralSidebar, closeGeneralSidebar, toggleFeature } =
-		useDispatch( editPostStore );
+	const { toggleFeature } = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	const { getBlockSelectionStart } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -72,21 +68,6 @@ function KeyboardShortcuts() {
 
 	useShortcut( 'core/edit-post/toggle-fullscreen', () => {
 		toggleFeature( 'fullscreenMode' );
-	} );
-
-	useShortcut( 'core/edit-post/toggle-sidebar', ( event ) => {
-		// This shortcut has no known clashes, but use preventDefault to prevent any
-		// obscure shortcuts from triggering.
-		event.preventDefault();
-
-		if ( isEditorSidebarOpened() ) {
-			closeGeneralSidebar();
-		} else {
-			const sidebarToOpen = getBlockSelectionStart()
-				? 'edit-post/block'
-				: 'edit-post/document';
-			openGeneralSidebar( sidebarToOpen );
-		}
 	} );
 
 	return null;
