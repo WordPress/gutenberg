@@ -102,16 +102,15 @@ html.interface-interface-skeleton__html-container {
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
 	top: 0;
-	right: 0;
-	bottom: 0;
 	left: 0;
+	bottom: 0;
 	background: $white;
 	color: $gray-900;
+	width: auto; // Keep the sidebar width flexible.
 
 	// On Mobile the header is fixed to keep HTML as scrollable.
 	@include break-medium() {
 		position: relative !important;
-		width: auto; // Keep the sidebar width flexible.
 
 		// Set this z-index only when the sidebar is opened. When it's closed, the
 		// button to open the sidebar that is shown when navigating regions needs to
@@ -123,7 +122,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
-	overflow: auto;
+	overflow: hidden;
 
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;
@@ -131,6 +130,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__secondary-sidebar {
+	right: 0;
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 	}

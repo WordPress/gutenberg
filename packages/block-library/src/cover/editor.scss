@@ -30,9 +30,18 @@
 	}
 
 	// Applied while media is being uploaded
-	&.is-transient::before {
-		background-color: #fff;
-		opacity: 0.3;
+	&.is-transient {
+		position: relative;
+
+		&::before {
+			background-color: #fff;
+			content: "";
+			height: 100%;
+			opacity: 0.3;
+			position: absolute;
+			width: 100%;
+			z-index: 1;
+		}
 	}
 
 	// Shown while media is being uploaded

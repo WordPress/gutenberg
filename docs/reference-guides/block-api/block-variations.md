@@ -1,6 +1,6 @@
 # Variations
 
-The Block Variations API  allows you to define multiple versions (variations) of a block. A block variation differs from the original block by a set of initial attributes or inner blocks. When you insert the block variation into the Editor, these attributes and/or inner blocks are applied. 
+The Block Variations API  allows you to define multiple versions (variations) of a block. A block variation differs from the original block by a set of initial attributes or inner blocks. When you insert the block variation into the Editor, these attributes and/or inner blocks are applied.
 
 Variations are an excellent way to create iterations of existing blocks without building entirely new blocks from scratch.
 
@@ -55,8 +55,8 @@ Block variations can be declared during a block's registration by providing the 
 To create a variation for an existing block, such as a Core block, use `wp.blocks.registerBlockVariation()`. This function accepts the name of the block and the object defining the variation.
 
 ```js
-wp.blocks.registerBlockVariation( 
-	'core/embed', 
+wp.blocks.registerBlockVariation(
+	'core/embed',
 	{
 		name: 'custom-embed',
 		attributes: { providerNameSlug: 'custom' },
@@ -66,7 +66,7 @@ wp.blocks.registerBlockVariation(
 
 ## Removing a block variation
 
-Block variations can also be easily removed. To do so, use `wp.blocks.unregisterBlockVariation()`. This function accepts the name of the block and the `name` of the variation that should be unregistered. 
+Block variations can also be easily removed. To do so, use `wp.blocks.unregisterBlockVariation()`. This function accepts the name of the block and the `name` of the variation that should be unregistered.
 
 ```js
 wp.blocks.unregisterBlockVariation( 'core/embed', 'youtube' );
@@ -84,9 +84,9 @@ variations: [
 		name: 'blue',
 		title: __( 'Blue Quote' ),
 		isDefault: true,
-		attributes: { 
-			color: 'blue', 
-			className: 'is-style-blue-quote' 
+		attributes: {
+			color: 'blue',
+			className: 'is-style-blue-quote'
 		},
 		icon: 'format-quote',
 		isActive: ( blockAttributes, variationAttributes ) =>
@@ -99,16 +99,16 @@ variations: [
 
 By default, all variations will show up in the Inserter in addition to the original block type item. However, setting the `isDefault` flag for any variations listed will override the regular block type in the Inserter. This is a great tool for curating the Editor experience to your specific needs.
 
-For example, if you want Media & Text block to display the image on the right by default, you could create a variation like this: 
+For example, if you want Media & Text block to display the image on the right by default, you could create a variation like this:
 
 ```js
  wp.blocks.registerBlockVariation(
-	'core/media-text', 
+	'core/media-text',
 	{
 		name: 'media-text-media-right',
 		title: __( 'Media & Text' ),
 		isDefault: true,
-		attributes: { 
+		attributes: {
 			mediaPosition: 'right'
 		}
 	}
@@ -125,20 +125,53 @@ The solution is to unregister the other variation before registering your variat
 
 ## Using `isActive`
 
-While the `isActive` property is optional, you will often want to use it to display information about the block variation after the block has been inserted. For example, this API is used in `useBlockDisplayInformation` hook to fetch and display proper information in places like the `BlockCard` or `Breadcrumbs` components.
+While the `isActive` property is optional, it's recommended. This API is used by the block editor to check which variation is active, and display the correct variation's title, icon and description when an instance of the variation is selected in the editor.
 
-If `isActive` is not set, the Editor cannot distinguish between the original block and your variation, so the original block information will be displayed. 
+If `isActive` is not set, the Editor cannot distinguish between an instance of the original block and your variation, so the original block information will be displayed.
 
-The property can use either a function or an array of strings (`string[]`). The function accepts `blockAttributes` and `variationAttributes`, which can be used to determine if a variation is active. In the Embed block, the primary differentiator is the `providerNameSlug` attribute, so if you wanted to determine if the YouTube Embed variation was active, you could do something like this: 
+The property can be set to either a function or an array of strings (`string[]`).
 
+The function version of this property accepts a block instance's `blockAttributes` as the first argument, and the `variationAttributes` declared for a variation as the second argument. These arguments can be used to determine if a variation is active by comparing them and returning a `true` or `false` (indicating whether this variation is inactive for this block instance).
+
+As an example, in the core Embed block, the `providerNameSlug` attribute is used to determine the embed provider (e.g. 'youtube' or 'twitter'). The variations may be declared like this:
+
+```js
+const variations = [
+	{
+		name: 'twitter',
+		title: 'Twitter',
+		icon: embedTwitterIcon,
+		keywords: [ 'tweet', __( 'social' ) ],
+		description: __( 'Embed a tweet.' ),
+		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
+		attributes: { providerNameSlug: 'twitter', responsive: true },
+	},
+	{
+		name: 'youtube',
+		title: 'YouTube',
+		icon: embedYouTubeIcon,
+		keywords: [ __( 'music' ), __( 'video' ) ],
+		description: __( 'Embed a YouTube video.' ),
+		patterns: [
+			/^https?:\/\/((m|www)\.)?youtube\.com\/.+/i,
+			/^https?:\/\/youtu\.be\/.+/i,
+		],
+		attributes: { providerNameSlug: 'youtube', responsive: true },
+	},
+	// ...
+]
 ```
+
+ The `isActive` function can compare the block instance value for `providerNameSlug` to the value declared in the variation's declaration (the values in the code snippet above) to determine which embed variation is active:
+
+```js
 isActive: ( blockAttributes, variationAttributes ) =>
 	blockAttributes.providerNameSlug === variationAttributes.providerNameSlug,
 ```
 
-You can also use a `string[]` to tell which attributes should be compared as a shorthand. Each attribute will be checked and the variation will be active if all of them match. Using the same example of the YouTube Embed variation, the string version would look like this:
+The `string[]` version is used to declare which attributes should be compared as a shorthand. Each attribute will be checked and the variation will be active if all of them match. Using the same example for the embed block, the string version would look like this:
 
-```
+```js
 isActive: [ 'providerNameSlug' ]
 ```
 

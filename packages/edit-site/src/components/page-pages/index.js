@@ -189,6 +189,16 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
+const PAGE_ACTIONS = [
+	'edit-post',
+	'view-post',
+	'restore',
+	'permanently-delete',
+	'view-post-revisions',
+	'rename-post',
+	'move-to-trash',
+];
+
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -253,7 +263,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -353,7 +363,7 @@ export default function PagePages() {
 		},
 		[ history ]
 	);
-	const actions = usePostActions( onActionPerformed );
+	const actions = usePostActions( onActionPerformed, PAGE_ACTIONS );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

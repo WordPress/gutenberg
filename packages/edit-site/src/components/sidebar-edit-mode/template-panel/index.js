@@ -52,7 +52,7 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 
 const POST_TYPE_PATH = {
 	wp_template: '/wp_template',
-	wp_template_part: '/wp_template_part/all',
+	wp_template_part: '/patterns',
 };
 
 export default function TemplatePanel() {

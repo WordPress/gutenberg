@@ -39,6 +39,7 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
+const EMPTY_ARRAY = [];
 const getCurrentValue = ( filterDefinition, currentFilter ) => {
 	if ( filterDefinition.singleSelection ) {
 		return currentFilter?.value;
@@ -52,7 +53,7 @@ const getCurrentValue = ( filterDefinition, currentFilter ) => {
 		return [ currentFilter.value ];
 	}
 
-	return [];
+	return EMPTY_ARRAY;
 };
 
 const getNewValue = ( filterDefinition, currentFilter, value ) => {
@@ -73,7 +74,7 @@ function ListBox( { view, filter, onChangeView } ) {
 	const compositeStore = useCompositeStore( {
 		virtualFocus: true,
 		focusLoop: true,
-		// When we have no or just one operators, we can set the first item as active.
+		// When we have no or just one operator, we can set the first item as active.
 		// We do that by passing `undefined` to `defaultActiveId`. Otherwise, we set it to `null`,
 		// so the first item is not selected, since the focus is on the operators control.
 		defaultActiveId: filter.operators?.length === 1 ? undefined : null,
@@ -198,7 +199,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
-			value={ searchValue }
+			resetValueOnSelect={ false }
 			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter

@@ -27,7 +27,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
 } ) {
-	const TagName = 'h' + level;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useSelect(
 		( select ) => {

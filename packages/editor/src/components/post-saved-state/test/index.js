@@ -47,6 +47,7 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: true,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -62,6 +63,7 @@ describe( 'PostSavedState', () => {
 			isNew: true,
 			isSaveable: false,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -75,6 +77,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		render( <PostSavedState /> );
@@ -93,6 +96,7 @@ describe( 'PostSavedState', () => {
 			isNew: false,
 			isSaveable: true,
 			isSaving: false,
+			postStatus: 'draft',
 		} ) );
 
 		// Simulate the viewport being considered large.
