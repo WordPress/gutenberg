@@ -29,11 +29,11 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 		return $content;
 	}
 
-	$image_tag         = '<figure class="wp-block-media-text__media"><img>';
-	$alt               = trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) );
-	$featuredImageLink = isset( $attributes['featuredImageLink'] ) && $attributes['featuredImageLink'];
+	$image_tag           = '<figure class="wp-block-media-text__media"><img>';
+	$alt                 = trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) );
+	$featured_image_link = isset( $attributes['featuredImageLink'] ) && $attributes['featuredImageLink'];
 
-	if ( $featuredImageLink ) {
+	if ( $featured_image_link ) {
 		$post_ID = $block->context['postId'];
 		if ( get_the_title( $post_ID ) ) {
 			$alt = trim( strip_tags( get_the_title( $post_ID ) ) );
@@ -47,7 +47,7 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 
 		$image_tag = sprintf(
 			'<figure class="wp-block-media-text__media"><a href="%1$s"><img></a>',
-			get_the_permalink( $post_ID ),
+			get_the_permalink( $post_ID )
 		);
 	}
 
@@ -59,9 +59,13 @@ function render_block_core_media_text( $attributes, $content, $block ) {
 		if ( isset( $attributes['focalPoint'] ) ) {
 			$position = round( $attributes['focalPoint']['x'] * 100 ) . '% ' . round( $attributes['focalPoint']['y'] * 100 ) . '%';
 		}
-		$processor->next_tag( 'figure' );
+		// Select the figure with the class `class wp-block-media-text__media`.
+		$processor->next_tag( array( 'class_name' => 'wp-block-media-text__media' ) );
 		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
 	}
+	// Select the figure with the class `class wp-block-media-text__media`.
+	$processor->next_tag( array( 'class_name' => 'wp-block-media-text__media' ) );
+	// Select the img tag inside the figure
 	$processor->next_tag( 'img' );
 	$media_size_slug = 'full';
 	if ( isset( $attributes['mediaSizeSlug'] ) ) {
