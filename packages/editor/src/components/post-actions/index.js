@@ -17,11 +17,7 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-} from '../../store/constants';
+import { PATTERN_POST_TYPE } from '../../store/constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,

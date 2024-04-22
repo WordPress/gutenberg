@@ -112,14 +112,15 @@ export default function SidebarNavigationScreenTemplate() {
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
 			if ( actionId === 'delete-template' ) {
-				navigator.goTo(
-					items[ 0 ].type === TEMPLATE_PART_POST_TYPE
-						? '/' + TEMPLATE_PART_POST_TYPE + '/all'
-						: '/' + items[ 0 ].type
-				);
+				history.push( {
+					path:
+						items[ 0 ].type === TEMPLATE_PART_POST_TYPE
+							? '/' + TEMPLATE_PART_POST_TYPE + '/all'
+							: '/' + items[ 0 ],
+				} );
 			}
 		},
-		[ navigator ]
+		[ history ]
 	);
 
 	return (
