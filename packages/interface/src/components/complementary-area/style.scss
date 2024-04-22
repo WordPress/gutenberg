@@ -1,6 +1,8 @@
 .interface-complementary-area {
 	background: $white;
 	color: $gray-900;
+	height: 100%;
+	overflow: auto;
 
 	@include break-small() {
 		-webkit-overflow-scrolling: touch;
@@ -71,4 +73,8 @@
 		bottom: 10px;
 		left: auto;
 	}
+}
+
+.interface-complementary-area__fill {
+	height: 100%;
 }

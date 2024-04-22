@@ -34,6 +34,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -64,6 +65,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -286,6 +288,7 @@ function Layout( { initialPost } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
+			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isWideViewport }
