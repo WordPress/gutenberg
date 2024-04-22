@@ -116,6 +116,7 @@ function UnforwardedResizableBox(
 			handleStyles={ HANDLE_STYLES }
 			ref={ ref }
 			{ ...props }
+			enable={ showHandle ? props.enable : false }
 		>
 			{ children }
 			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
