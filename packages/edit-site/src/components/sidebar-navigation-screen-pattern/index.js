@@ -5,7 +5,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -31,12 +30,13 @@ export default function SidebarNavigationScreenPattern() {
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
-	const isBlockBasedTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-		[]
-	);
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		return !! select( editSiteStore ).getSettings()
+			.supportsTemplatePartsMode;
+	}, [] );
+
 	const backPath =
-		! isBlockBasedTheme && postType === 'wp_template_part'
+		isTemplatePartsMode && postType === 'wp_template_part'
 			? { path: '/wp_template_part/all' }
 			: { path: '/patterns' };
 
