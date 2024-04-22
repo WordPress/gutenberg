@@ -167,14 +167,14 @@ export default function CategoriesEdit( {
 						checked={ displayAsDropdown }
 						onChange={ toggleAttribute( 'displayAsDropdown' ) }
 					/>
-					{ displayAsDropdown && (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Show label' ) }
-							checked={ showLabel }
-							onChange={ toggleAttribute( 'showLabel' ) }
-						/>
-					) }
+					<ToggleControl
+						__nextHasNoMarginBottom
+						className={ 'wp-block-categories__indentation' }
+						label={ __( 'Show label' ) }
+						checked={ showLabel }
+						onChange={ toggleAttribute( 'showLabel' ) }
+						disabled={ ! displayAsDropdown }
+					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Show post counts' ) }
