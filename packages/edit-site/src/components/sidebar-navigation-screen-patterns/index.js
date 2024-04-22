@@ -131,17 +131,16 @@ export default function SidebarNavigationScreenPatterns() {
 	);
 
 	/**
-	 * This sidebar needs to temporarily accomodate 3 different "screens":
+	 * This sidebar needs to temporarily accomodate two different "URLs":
 	 *
-	 * 1. Block based themes: list Patterns + Template Parts.
+	 * 1. path = /patterns
+	 *    Block based themes. Also classic themes can access this URL, though it's not linked anywhere.
 	 *
-	 * 2. Classic themes: list Patterns.
-	 *    The URL is accessible though not linked anywhere.
-	 *
-	 * 3. Hybrid themes (classic themes with support for block-template-parts): list Template Parts.
+	 * 2. path = /wp_template_part/all
+	 *    Classic themes with support for block-template-parts). We need to list only] Template Parts in this case.
 	 *    The URL is accessible from the Appearance > Template Parts menu.
 	 *
-	 * This is temporary. We aim to list Patterns & Template Parts in all 3 scenarios.
+	 * This is temporary. We aim to consolidate to /patterns.
 	 */
 	return (
 		<SidebarNavigationScreen
@@ -158,7 +157,7 @@ export default function SidebarNavigationScreenPatterns() {
 							'Manage what patterns are available when editing the site.'
 					  )
 			}
-			actions={ isBlockBasedTheme && <AddNewPattern /> }
+			actions={ isTemplatePartsPath && <AddNewPattern /> }
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }
@@ -171,11 +170,7 @@ export default function SidebarNavigationScreenPatterns() {
 							) }
 							<CategoriesGroup
 								path={ path }
-								templatePartAreas={
-									isBlockBasedTheme || isTemplatePartsPath
-										? templatePartAreas
-										: EMPTY_ARRAY
-								}
+								templatePartAreas={ templatePartAreas }
 								patternCategories={
 									isTemplatePartsPath
 										? EMPTY_ARRAY
