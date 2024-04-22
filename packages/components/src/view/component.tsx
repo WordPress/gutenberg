@@ -11,15 +11,11 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { ViewProps } from './types';
 
 const PolymorphicDiv = styled.div``;
 
-function UnforwardedView(
-	props: WordPressComponentProps< ViewProps, 'div', true >,
-	ref: React.ForwardedRef< any >
-) {
+function UnforwardedView( props: ViewProps, ref: React.ForwardedRef< any > ) {
 	return <PolymorphicDiv ref={ ref } { ...props } />;
 }
 
