@@ -1,21 +1,10 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	__experimentalHStack as HStack,
-	FlexBlock,
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,11 +15,9 @@ import MediaUpload from '../../media-upload';
 import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
-import { unlock } from '../../../lock-unlock';
+import CategoryTabs from '../category-tabs';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
-
-const { Tabs } = unlock( componentsPrivateApis );
 
 function MediaTab( {
 	rootClientId,
@@ -52,7 +39,7 @@ function MediaTab( {
 		},
 		[ onInsert ]
 	);
-	const mobileMediaCategories = useMemo(
+	const categories = useMemo(
 		() =>
 			mediaCategories.map( ( mediaCategory ) => ( {
 				...mediaCategory,
@@ -65,63 +52,13 @@ function MediaTab( {
 		<>
 			{ ! isMobile && (
 				<div className={ `${ baseCssClass }-container` }>
-					<Tabs
-						selectOnMove={ false }
-						selectedTabId={
-							selectedCategory ? selectedCategory.name : null
-						}
-						orientation={ 'vertical' }
-						onSelect={ ( mediaCategoryId ) => {
-							// Pass the full category object
-							onSelectCategory(
-								mediaCategories.find(
-									( mediaCategory ) =>
-										mediaCategory.name === mediaCategoryId
-								)
-							);
-						} }
+					<CategoryTabs
+						categories={ categories }
+						selectedCategory={ selectedCategory }
+						onSelectCategory={ onSelectCategory }
 					>
-						<Tabs.TabList className={ `${ baseCssClass }-tablist` }>
-							{ mediaCategories.map( ( mediaCategory ) => (
-								<Tabs.Tab
-									key={ mediaCategory.name }
-									tabId={ mediaCategory.name }
-									className={ classNames(
-										`${ baseCssClass }__media-category-tab`
-									) }
-									aria-label={ mediaCategory.name }
-									aria-current={
-										mediaCategory === selectedCategory
-											? 'true'
-											: undefined
-									}
-								>
-									<HStack>
-										<FlexBlock>
-											{ mediaCategory.labels.name }
-										</FlexBlock>
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ mediaCategories.map( ( mediaCategory ) => (
-							<Tabs.TabPanel
-								key={ mediaCategory.name }
-								tabId={ mediaCategory.name }
-								focusable={ false }
-								className={ `${ baseCssClass }__category-panel` }
-							>
-								{ children }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+						{ children }
+					</CategoryTabs>
 					<MediaUploadCheck>
 						<MediaUpload
 							multiple={ false }
@@ -151,7 +88,7 @@ function MediaTab( {
 				</div>
 			) }
 			{ isMobile && (
-				<MobileTabNavigation categories={ mobileMediaCategories }>
+				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
 						<MediaCategoryPanel
 							onInsert={ onInsert }
