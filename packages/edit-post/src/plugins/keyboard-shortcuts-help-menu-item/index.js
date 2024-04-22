@@ -5,18 +5,20 @@ import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
-import { store as interfaceStore } from '@wordpress/interface';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { KEYBOARD_SHORTCUT_HELP_MODAL_NAME } from '../../components/keyboard-shortcut-help-modal';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 	return (
 		<MenuItem
 			onClick={ () => {
-				openModal( KEYBOARD_SHORTCUT_HELP_MODAL_NAME );
+				openModal( 'editor/keyboard-shortcut-help' );
 			} }
 			shortcut={ displayShortcut.access( 'h' ) }
 		>

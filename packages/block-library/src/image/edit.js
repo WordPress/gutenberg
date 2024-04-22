@@ -146,7 +146,6 @@ export function ImageEdit( {
 		}
 	}, [ align ] );
 
-	const ref = useRef();
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
@@ -301,10 +300,7 @@ export function ImageEdit( {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const blockProps = useBlockProps( {
-		ref,
-		className: classes,
-	} );
+	const blockProps = useBlockProps( { className: classes } );
 
 	// Much of this description is duplicated from MediaPlaceholder.
 	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
@@ -386,7 +382,6 @@ export function ImageEdit( {
 				onSelectImage={ onSelectImage }
 				onSelectURL={ onSelectURL }
 				onUploadError={ onUploadError }
-				containerRef={ ref }
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }

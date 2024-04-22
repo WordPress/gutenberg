@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { useMemo, useState, Fragment, Children } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -29,7 +28,6 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
@@ -40,42 +38,19 @@ const POST_ACTIONS_WHILE_EDITING = [
 	'move-to-trash',
 ];
 
-export default function PostActions( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+export default function PostActions( { onActionPerformed, buttonProps } ) {
+	const { postType, item } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPost } = select( editorStore );
 		return {
 			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
+			item: getCurrentPost(),
 		};
 	} );
 	const actions = usePostActions(
 		onActionPerformed,
 		POST_ACTIONS_WHILE_EDITING
 	);
-	const item = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord( 'postType', postType, postId );
-		},
-		[ postType, postId ]
-	);
 
-	const { primaryActions, secondaryActions } = useMemo( () => {
-		return actions.reduce(
-			( accumulator, action ) => {
-				if ( action.isEligible && ! action.isEligible( item ) ) {
-					return accumulator;
-				}
-				if ( action.isPrimary ) {
-					accumulator.primaryActions.push( action );
-				} else {
-					accumulator.secondaryActions.push( action );
-				}
-				return accumulator;
-			},
-			{ primaryActions: [], secondaryActions: [] }
-		);
-	}, [ actions, item ] );
 	if (
 		[
 			TEMPLATE_POST_TYPE,
@@ -89,31 +64,17 @@ export default function PostActions( { onActionPerformed } ) {
 		<DropdownMenu
 			trigger={
 				<Button
-					size="compact"
+					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					disabled={
-						! primaryActions.length && ! secondaryActions.length
-					}
+					disabled={ ! actions.length }
 					className="editor-all-actions-button"
+					{ ...buttonProps }
 				/>
 			}
 			placement="bottom-end"
 		>
-			<WithDropDownMenuSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithDropDownMenuSeparators>
+			<ActionsDropdownMenuGroup actions={ actions } item={ item } />
 		</DropdownMenu>
 	);
 }
@@ -165,18 +126,6 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 			) }
 		</>
 	);
-}
-
-// Copied as is from packages/dataviews/src/view-table.js
-function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
 }
 
 // Copied as is from packages/dataviews/src/item-actions.js

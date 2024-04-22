@@ -80,6 +80,13 @@ function goTo(
 		...restOptions
 	} = options;
 
+	const isNavigatingToSamePath =
+		locationHistory.length > 0 &&
+		locationHistory[ locationHistory.length - 1 ].path === path;
+	if ( isNavigatingToSamePath ) {
+		return locationHistory;
+	}
+
 	const isNavigatingToPreviousPath =
 		isBack &&
 		locationHistory.length > 1 &&
@@ -146,7 +153,6 @@ function routerReducer(
 	action: RouterAction
 ): RouterState {
 	let { screens, locationHistory, matchedPath } = state;
-
 	switch ( action.type ) {
 		case 'add':
 			screens = addScreen( state, action.screen );

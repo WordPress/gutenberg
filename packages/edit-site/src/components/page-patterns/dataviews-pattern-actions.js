@@ -23,6 +23,7 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -198,7 +199,7 @@ export const deleteAction = {
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
 			const promiseResult = await Promise.allSettled(

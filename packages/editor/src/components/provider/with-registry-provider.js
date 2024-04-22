@@ -35,6 +35,7 @@ const withRegistryProvider = createHigherOrderComponent(
 					},
 					registry
 				);
+				// Todo: The interface store should also be created per instance.
 				newRegistry.registerStore( 'core/editor', storeConfig );
 				setSubRegistry( newRegistry );
 			}, [ registry ] );

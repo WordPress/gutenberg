@@ -64,9 +64,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -85,9 +83,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );

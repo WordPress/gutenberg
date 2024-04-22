@@ -31,6 +31,12 @@ import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
+import {
+	getContentLockingParent,
+	getTemporarilyEditingAsBlocks,
+	getTemporarilyEditingFocusModeToRevert,
+} from './private-selectors';
+
 /**
  * A block selection object.
  *
@@ -2280,36 +2286,39 @@ export function __experimentalGetDirectInsertBlock(
 
 export const __experimentalGetParsedPattern = createRegistrySelector(
 	( select ) =>
-		createSelector( ( state, patternName ) => {
-			const { getAllPatterns } = unlock( select( STORE_NAME ) );
-			const patterns = getAllPatterns();
-			const pattern = patterns.find(
-				( { name } ) => name === patternName
-			);
-			if ( ! pattern ) {
-				return null;
-			}
-			const blocks = parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} );
-			if ( blocks.length === 1 ) {
-				blocks[ 0 ].attributes = {
-					...blocks[ 0 ].attributes,
-					metadata: {
-						...( blocks[ 0 ].attributes.metadata || {} ),
-						categories: pattern.categories,
-						patternName: pattern.name,
-						name:
-							blocks[ 0 ].attributes.metadata?.name ||
-							pattern.title,
-					},
+		createSelector(
+			( state, patternName ) => {
+				const pattern = unlock( select( STORE_NAME ) ).getPatternBySlug(
+					patternName
+				);
+				if ( ! pattern ) {
+					return null;
+				}
+				const blocks = parse( pattern.content, {
+					__unstableSkipMigrationLogs: true,
+				} );
+				if ( blocks.length === 1 ) {
+					blocks[ 0 ].attributes = {
+						...blocks[ 0 ].attributes,
+						metadata: {
+							...( blocks[ 0 ].attributes.metadata || {} ),
+							categories: pattern.categories,
+							patternName: pattern.name,
+							name:
+								blocks[ 0 ].attributes.metadata?.name ||
+								pattern.title,
+						},
+					};
+				}
+				return {
+					...pattern,
+					blocks,
 				};
-			}
-			return {
-				...pattern,
-				blocks,
-			};
-		}, getAllPatternsDependants( select ) )
+			},
+			( state, patternName ) => [
+				unlock( select( STORE_NAME ) ).getPatternBySlug( patternName ),
+			]
+		)
 );
 
 const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
@@ -2753,50 +2762,6 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- */
-export const __unstableGetContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if (
-				getBlockName( state, current ) === 'core/block' ||
-				getTemplateLock( state, current ) === 'contentOnly'
-			) {
-				result = current;
-			}
-		}
-		return result;
-	},
-	( state ) => [ state.blocks.parents, state.blockListSettings ]
-);
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
-}
-
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
 	// 'disabled' then the overlay is redundant since the block can't be
@@ -2813,13 +2778,20 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 
 	const editorMode = __unstableGetEditorMode( state );
 
-	// In zoom-out mode, the block overlay is always active for top level blocks.
-	if (
-		editorMode === 'zoom-out' &&
-		clientId &&
-		! getBlockRootClientId( state, clientId )
-	) {
-		return true;
+	// In zoom-out mode, the block overlay is always active for section level blocks.
+	if ( editorMode === 'zoom-out' ) {
+		const { sectionRootClientId } = unlock( getSettings( state ) );
+		if ( sectionRootClientId ) {
+			const sectionClientIds = getBlockOrder(
+				state,
+				sectionRootClientId
+			);
+			if ( sectionClientIds?.includes( clientId ) ) {
+				return true;
+			}
+		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
+			return true;
+		}
 	}
 
 	// In navigation mode, the block overlay is active when the block is not
@@ -2891,6 +2863,32 @@ export function __unstableIsWithinBlockOverlay( state, clientId ) {
 export const getBlockEditingMode = createRegistrySelector(
 	( select ) =>
 		( state, clientId = '' ) => {
+			// Some selectors that call this provide `null` as the default
+			// rootClientId, but the default rootClientId is actually `''`.
+			if ( clientId === null ) {
+				clientId = '';
+			}
+			// In zoom-out mode, override the behavior set by
+			// __unstableSetBlockEditingMode to only allow editing the top-level
+			// sections.
+			const editorMode = __unstableGetEditorMode( state );
+			if ( editorMode === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings( state ) );
+				if ( clientId === '' /* ROOT_CONTAINER_CLIENT_ID */ ) {
+					return sectionRootClientId ? 'disabled' : 'contentOnly';
+				}
+				if ( clientId === sectionRootClientId ) {
+					return 'contentOnly';
+				}
+				const sectionsClientIds = getBlockOrder(
+					state,
+					sectionRootClientId
+				);
+				if ( ! sectionsClientIds?.includes( clientId ) ) {
+					return 'disabled';
+				}
+			}
+
 			const blockEditingMode = state.blockEditingModes.get( clientId );
 			if ( blockEditingMode ) {
 				return blockEditingMode;
@@ -2977,3 +2975,66 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const __unstableGetContentLockingParent = ( state, clientId ) => {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetContentLockingParent",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getContentLockingParent( state, clientId );
+};
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingAsBlocks",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingAsBlocks( state );
+}
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
+		{
+			since: '6.5',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingFocusModeToRevert( state );
+}
