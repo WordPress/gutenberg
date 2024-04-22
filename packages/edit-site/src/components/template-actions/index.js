@@ -17,6 +17,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	PostExcerpt,
+	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
@@ -39,14 +40,39 @@ export default function TemplateActions( {
 	toggleProps,
 	onRemove,
 } ) {
-	const template = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
+	const { template, eligibleToEditExcerpt } = useSelect(
+		( select ) => {
+			const { getCurrentPostType, isEditorPanelEnabled } =
+				select( editorStore );
+			const { getPostType } = select( coreStore );
+			const _postType = getPostType( getCurrentPostType() );
+			return {
+				eligibleToEditExcerpt:
+					isEditorPanelEnabled( 'post-excerpt' ) &&
+					_postType?.supports?.excerpt,
+				template: select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
 		[ postType, postId ]
 	);
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
+	// Until we consolidate these actions we need to make different checks for `wp_block`
+	// type and template/template parts. The reason for this is that we want to allow
+	// editing excerpt/description for templates/template parts that are
+	// user generated and this shouldn't abide by the isPanelEnabled flag.
+	const canEditExcerpt =
+		isRemovable ||
+		( eligibleToEditExcerpt && template?.type === 'wp_block' );
+
+	if ( ! isRemovable && ! isRevertable && ! canEditExcerpt ) {
+		return null;
+	}
 
 	return (
 		<DropdownMenu
@@ -58,22 +84,22 @@ export default function TemplateActions( {
 			{ ( { onClose } ) => (
 				<MenuGroup>
 					{ isRemovable && (
-						<>
-							<RenamePostMenuItem
-								post={ template }
-								onClose={ onClose }
-							/>
-							<DeleteMenuItem
-								onRemove={ () => {
-									removeTemplate( template );
-									onRemove?.();
-									onClose();
-								} }
-								title={ template.title.rendered }
-							/>
-						</>
+						<RenamePostMenuItem
+							post={ template }
+							onClose={ onClose }
+						/>
 					) }
-					<EditDescriptionMenuItem />
+					{ canEditExcerpt && <EditDescriptionMenuItem /> }
+					{ isRemovable && (
+						<DeleteMenuItem
+							onRemove={ () => {
+								removeTemplate( template );
+								onRemove?.();
+								onClose();
+							} }
+							title={ template.title.rendered }
+						/>
+					) }
 					{ isRevertable && (
 						<ResetMenuItem
 							template={ template }
