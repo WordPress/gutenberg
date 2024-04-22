@@ -67,6 +67,7 @@ export default function HeaderEditMode() {
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
 			blockSelectionStart: getBlockSelectionStart(),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
