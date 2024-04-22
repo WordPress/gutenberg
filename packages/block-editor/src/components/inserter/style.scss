@@ -249,7 +249,7 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20;
 }
 
-.block-editor-inserter__block-patterns-tablist {
+.block-editor-inserter__category-tablist {
 	display: flex;
 	flex-direction: column;
 	border: none;
@@ -259,7 +259,7 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	.block-editor-inserter__patterns-tab {
+	.block-editor-inserter__category-tab {
 		// Account for the icon on the right so that it's visually balanced.
 		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
 		text-align: left;
@@ -314,7 +314,7 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-category-panel {
+.block-editor-inserter__category-panel {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
@@ -332,20 +332,20 @@ $block-inserter-tabs-height: 44px;
 		left: 100%;
 		width: 300px;
 	}
+}
 
-	.block-editor-inserter__patterns-category-panel-header {
-		padding: 16px $grid-unit-30;
-	}
-	.block-editor-inserter__patterns-category-no-results {
-		margin-top: $grid-unit-30;
-	}
+.block-editor-inserter__patterns-category-panel-header {
+	padding: 16px $grid-unit-30;
+}
+.block-editor-inserter__patterns-category-no-results {
+	margin-top: $grid-unit-30;
+}
 
-	.block-editor-block-patterns-list {
-		overflow-y: auto;
-		flex-grow: 1;
-		height: 100%;
-		padding: $grid-unit-20 $grid-unit-30;
-	}
+.block-editor-block-patterns-list {
+	overflow-y: auto;
+	flex-grow: 1;
+	height: 100%;
+	padding: $grid-unit-20 $grid-unit-30;
 }
 
 .block-editor-inserter__preview-content {
@@ -511,11 +511,6 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__media-tabs-container {
-	height: 100%;
-
-	nav {
-		height: 100%;
-	}
 
 	.block-editor-inserter__media-library-button {
 		padding: $grid-unit-20;
@@ -537,7 +532,7 @@ $block-inserter-tabs-height: 44px;
 		margin-top: auto;
 	}
 
-	.block-editor-inserter__media-tabs__media-category {
+	.block-editor-inserter__media-tabs__media-category-tab {
 		// Account for the icon on the right so that it's visually balanced.
 		padding-right: $grid-unit-05;
 

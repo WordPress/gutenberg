@@ -2,15 +2,9 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	__experimentalHStack as HStack,
-	FlexBlock,
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,9 +13,7 @@ import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
-import { unlock } from '../../../lock-unlock';
-
-const { Tabs } = unlock( componentsPrivateApis );
+import CategoryTabs from '../category-tabs';
 
 function BlockPatternsTab( {
 	onSelectCategory,
@@ -40,60 +32,13 @@ function BlockPatternsTab( {
 		<>
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<Tabs
-						selectOnMove={ false }
-						selectedTabId={
-							selectedCategory ? selectedCategory.name : null
-						}
-						orientation={ 'vertical' }
-						onSelect={ ( categoryId ) => {
-							// Pass the full category object
-							onSelectCategory(
-								categories.find(
-									( category ) => category.name === categoryId
-								)
-							);
-						} }
+					<CategoryTabs
+						categories={ categories }
+						selectedCategory={ selectedCategory }
+						onSelectCategory={ onSelectCategory }
 					>
-						<Tabs.TabList className="block-editor-inserter__block-patterns-tablist">
-							{ categories.map( ( category ) => (
-								<Tabs.Tab
-									key={ category.name }
-									tabId={ category.name }
-									className="block-editor-inserter__patterns-tab"
-									aria-label={ category.label }
-									aria-current={
-										category === selectedCategory
-											? 'true'
-											: undefined
-									}
-								>
-									<HStack>
-										<FlexBlock>
-											{ category.label }
-										</FlexBlock>
-										<Icon
-											icon={
-												isRTL()
-													? chevronLeft
-													: chevronRight
-											}
-										/>
-									</HStack>
-								</Tabs.Tab>
-							) ) }
-						</Tabs.TabList>
-						{ categories.map( ( category ) => (
-							<Tabs.TabPanel
-								key={ category.name }
-								tabId={ category.name }
-								focusable={ false }
-								className="block-editor-inserter__patterns-category-panel"
-							>
-								{ children }
-							</Tabs.TabPanel>
-						) ) }
-					</Tabs>
+						{ children }
+					</CategoryTabs>
 					<Button
 						className="block-editor-inserter__patterns-explore-button"
 						onClick={ () => setShowPatternsExplorer( true ) }
@@ -106,7 +51,7 @@ function BlockPatternsTab( {
 			{ isMobile && (
 				<MobileTabNavigation categories={ categories }>
 					{ ( category ) => (
-						<div className="block-editor-inserter__patterns-category-panel">
+						<div className="block-editor-inserter__category-panel">
 							<PatternCategoryPreviews
 								key={ category.name }
 								onInsert={ onInsert }
