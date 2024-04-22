@@ -14,6 +14,7 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -27,6 +28,8 @@ import { unlock } from '../../lock-unlock';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
+
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	children,
@@ -111,6 +114,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	return (
 		<SlotFillProvider>
 			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
 			<ExperimentalBlockEditorProvider
 				value={ blocks }
 				onInput={ onInput }
