@@ -117,7 +117,7 @@ test.describe( 'Site Editor Performance', () => {
 			draftId = await perfUtils.saveDraft();
 		} );
 
-		test( 'Run the test', async ( { admin, perfUtils, metrics } ) => {
+		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
 			// Go to the test draft.
 			await admin.visitSiteEditor( {
 				postId: draftId,
@@ -127,6 +127,22 @@ test.describe( 'Site Editor Performance', () => {
 			// Enter edit mode (second click is needed for the legacy edit mode).
 			const canvas = await perfUtils.getCanvas();
 			await canvas.locator( 'body' ).click();
+
+			// Run the test with the sidebar closed
+			const toggleSidebarButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', {
+					name: 'Settings',
+					disabled: false,
+				} );
+			const isClosed =
+				( await toggleSidebarButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+			if ( ! isClosed ) {
+				await toggleSidebarButton.click();
+			}
+
 			await canvas
 				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
 				.click();
@@ -189,14 +205,29 @@ test.describe( 'Site Editor Performance', () => {
 					path: '/wp_template',
 				} );
 
-				// Start tracing.
+				// The Templates index page has changed, so we need to know which UI is in use in the branch.
+				// We do so by checking the presence of the dataviews component.
+				// If it's there, switch to the list layout before running the test.
+				// See https://github.com/WordPress/gutenberg/pull/59792
+				const isDataViewsUI = await page
+					.getByRole( 'button', { name: 'View options' } )
+					.isVisible();
+				if ( isDataViewsUI ) {
+					await page
+						.getByRole( 'button', { name: 'View options' } )
+						.click();
+					await page
+						.getByRole( 'menuitem' )
+						.filter( { has: page.getByText( 'Layout' ) } )
+						.click();
+					await page
+						.getByRole( 'menuitemradio' )
+						.filter( { has: page.getByText( 'List' ) } )
+						.click();
+				}
+
 				await metrics.startTracing();
-
-				await page
-					.getByRole( 'button', { name: 'Single Posts' } )
-					.click();
-
-				// Stop tracing.
+				await page.getByText( 'Single Posts', { exact: true } ).click();
 				await metrics.stopTracing();
 
 				// Get the durations.
@@ -217,7 +248,31 @@ test.describe( 'Site Editor Performance', () => {
 			await requestUtils.activateTheme( 'twentytwentyfour' );
 		} );
 
-		test( 'Run the test', async ( { page, admin, perfUtils, editor } ) => {
+		test( 'Run the test', async ( {
+			page,
+			admin,
+			perfUtils,
+			editor,
+			requestUtils,
+		} ) => {
+			await Promise.all(
+				Array.from( { length: 10 }, async () => {
+					const { id } = await requestUtils.createPost( {
+						status: 'publish',
+						title: 'A post',
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
 			const samples = 10;
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without

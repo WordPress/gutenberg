@@ -22,3 +22,5 @@ export const PARTIAL_SYNCING_SUPPORTED_BLOCKS = {
 	'core/button': [ 'text', 'url', 'linkTarget', 'rel' ],
 	'core/image': [ 'id', 'url', 'title', 'alt' ],
 };
+
+export const PATTERN_OVERRIDES_BINDING_SOURCE = 'core/pattern-overrides';

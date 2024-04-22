@@ -1,4 +1,4 @@
-figure.wp-block-gallery {
+:where(figure.wp-block-gallery) {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
@@ -27,7 +27,7 @@ figure.wp-block-gallery {
 		}
 	}
 
-	// @todo: this deserves a refactor, by being moved to the toolbar.
+	// @todo this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {
 			display: none;

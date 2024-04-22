@@ -101,7 +101,7 @@ test.describe( 'Style Revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Any unsaved changes will be lost when you apply this revision./
+			/^Are you sure you want to apply this revision\? Any unsaved changes will be lost./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
@@ -212,7 +212,7 @@ test.describe( 'Style Revisions', () => {
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeVisible();
 
-		await page.click( 'role=button[name="Navigate to the previous view"]' );
+		await page.click( 'role=button[name="Back"]' );
 
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )

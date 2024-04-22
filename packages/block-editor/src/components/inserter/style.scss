@@ -22,7 +22,6 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	height: 100%;
 	gap: $grid-unit-20;
-	overflow-y: hidden;
 
 	&.show-as-tabs {
 		gap: 0;
@@ -63,7 +62,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs div[role="tablist"] {
+	.block-editor-inserter__tablist {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -116,7 +115,7 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	div[role="tablist"] {
+	.block-editor-inserter__tablist {
 		border-bottom: $border-width solid $gray-300;
 
 		button[role="tab"] {
@@ -131,7 +130,7 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	div[role="tabpanel"] {
+	.block-editor-inserter__tabpanel {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -142,6 +141,8 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__no-tab-container {
 	overflow-y: auto;
 	flex-grow: 1;
+	// Fixes the editor canvas scrolling on search results https://github.com/WordPress/gutenberg/issues/56811
+	position: relative;
 }
 
 .block-editor-inserter__panel-header {
@@ -241,60 +242,79 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__patterns-explore-button.components-button {
 	padding: $grid-unit-20;
 	justify-content: center;
-	margin-top: $grid-unit-20;
 	width: 100%;
 }
 
-.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
-	color: var(--wp-admin-theme-color);
-	position: relative;
-
-	.components-flex-item {
-		filter: brightness(0.95);
-	}
-
-	svg {
-		fill: var(--wp-admin-theme-color);
-	}
-
-	&::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		border-radius: $radius-block-ui;
-		opacity: 0.04;
-		background: var(--wp-admin-theme-color);
-	}
-}
-
 .block-editor-inserter__block-patterns-tabs-container {
-	height: 100%;
-	nav {
-		height: 100%;
-	}
+	padding: $grid-unit-20;
 }
 
-.block-editor-inserter__block-patterns-tabs {
+.block-editor-inserter__block-patterns-tablist {
 	display: flex;
 	flex-direction: column;
-	padding: $grid-unit-20;
-	overflow-y: auto;
-	height: 100%;
+	border: none;
+	margin-bottom: $grid-unit-10;
 	// Push the listitem wrapping the "explore" button to the bottom of the panel.
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
 
-	.block-editor-inserter__patterns-category {
+	.block-editor-inserter__patterns-tab {
 		// Account for the icon on the right so that it's visually balanced.
-		padding-right: $grid-unit-05;
+		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
+		text-align: left;
+		font-weight: inherit;
+		display: block;
+		position: relative;
+		height: auto;
+
+		&[aria-selected="true"] {
+			color: var(--wp-admin-theme-color);
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				display: block;
+				outline: none;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				height: 100%;
+			}
+		}
+
+		&:focus-visible,
+		&:focus:not(:disabled) {
+			border-radius: 2px;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+
+		&::before {
+			display: none;
+		}
+
+		&::after {
+			display: none;
+		}
 	}
 }
 
-.block-editor-inserter__patterns-category-dialog {
+.block-editor-inserter__patterns-category-panel {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
@@ -303,11 +323,21 @@ $block-inserter-tabs-height: 44px;
 	left: 0;
 	height: 100%;
 	width: 100%;
+	padding: 0 $grid-unit-20;
+	display: flex;
+	flex-direction: column;
 
 	@include break-medium {
+		padding: 0;
 		left: 100%;
-		display: block;
 		width: 300px;
+	}
+
+	.block-editor-inserter__patterns-category-panel-header {
+		padding: 16px $grid-unit-30;
+	}
+	.block-editor-inserter__patterns-category-no-results {
+		margin-top: $grid-unit-30;
 	}
 
 	.block-editor-block-patterns-list {
@@ -315,33 +345,6 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 		height: 100%;
 		padding: $grid-unit-20 $grid-unit-30;
-	}
-}
-
-.block-editor-block-patterns-list__list-item {
-	.block-editor-block-preview__container {
-		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-	}
-	&:hover {
-		.block-editor-block-preview__container {
-			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
-		}
-	}
-}
-
-.block-editor-inserter__patterns-category-panel {
-	padding: 0 $grid-unit-20;
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	@include break-medium {
-		padding: 0;
-	}
-	.block-editor-inserter__patterns-category-panel-header {
-		padding: 16px $grid-unit-30;
-	}
-	.block-editor-inserter__patterns-category-no-results {
-		margin-top: $grid-unit-30;
 	}
 }
 
@@ -768,12 +771,27 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
+
 .is-zoom-out {
 	.block-editor-inserter__menu {
 		display: flex;
 	}
 
-	.block-editor-inserter__patterns-category-dialog {
+	.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
+	}
+
+	.block-editor-inserter__media-dialog {
 		position: static;
 	}
 }

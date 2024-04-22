@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "12.30.0",
+	"version": "12.33.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -51,7 +51,6 @@
 		"is-plain-object": "^5.0.0",
 		"memize": "^2.1.0",
 		"react-is": "^18.2.0",
-		"rememo": "^4.0.2",
 		"remove-accents": "^0.5.0",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",

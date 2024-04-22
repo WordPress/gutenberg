@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "5.30.0",
+	"version": "5.33.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,8 +53,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.3.1",
-		"rememo": "^4.0.2"
+		"classnames": "^2.3.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

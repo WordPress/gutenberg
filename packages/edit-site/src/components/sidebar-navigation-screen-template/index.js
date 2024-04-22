@@ -4,11 +4,10 @@
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { pencil } from '@wordpress/icons';
-import {
-	__experimentalUseNavigator as useNavigator,
-	Icon,
-} from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+
 /**
  * Internal dependencies
  */
@@ -22,6 +21,8 @@ import { useAddedBy } from '../page-templates-template-parts/hooks';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
+
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function useTemplateDetails( postType, postId ) {
 	const { getDescription, getTitle, record } = useEditedEntityRecord(
@@ -94,10 +95,10 @@ function useTemplateDetails( postType, postId ) {
 }
 
 export default function SidebarNavigationScreenTemplate() {
-	const navigator = useNavigator();
+	const history = useHistory();
 	const {
 		params: { postType, postId },
-	} = navigator;
+	} = useLocation();
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const { title, content, description, footer } = useTemplateDetails(
 		postType,
@@ -114,7 +115,7 @@ export default function SidebarNavigationScreenTemplate() {
 						postId={ postId }
 						toggleProps={ { as: SidebarButton } }
 						onRemove={ () => {
-							navigator.goTo( `/${ postType }/all` );
+							history.push( { path: '/' + postType } );
 						} }
 					/>
 					<SidebarButton

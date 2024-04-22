@@ -6,13 +6,25 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Panel, Slot, Fill } from '@wordpress/components';
+import {
+	Button,
+	Panel,
+	Slot,
+	Fill,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as viewportStore } from '@wordpress/viewport';
 import { store as preferencesStore } from '@wordpress/preferences';
+import {
+	useReducedMotion,
+	useViewportMatch,
+	usePrevious,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,16 +36,78 @@ import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
 import { store as interfaceStore } from '../../store';
 
+const ANIMATION_DURATION = 0.3;
+
 function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
 }
 
-function ComplementaryAreaFill( { scope, children, className, id } ) {
+const SIDEBAR_WIDTH = 280;
+const variants = {
+	open: { width: SIDEBAR_WIDTH },
+	closed: { width: 0 },
+	mobileOpen: { width: '100vw' },
+};
+
+function ComplementaryAreaFill( {
+	activeArea,
+	isActive,
+	scope,
+	children,
+	className,
+	id,
+} ) {
+	const disableMotion = useReducedMotion();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	// This is used to delay the exit animation to the next tick.
+	// The reason this is done is to allow us to apply the right transition properties
+	// When we switch from an open sidebar to another open sidebar.
+	// we don't want to animate in this case.
+	const previousActiveArea = usePrevious( activeArea );
+	const previousIsActive = usePrevious( isActive );
+	const [ , setState ] = useState( {} );
+	useEffect( () => {
+		setState( {} );
+	}, [ isActive ] );
+	const transition = {
+		type: 'tween',
+		duration:
+			disableMotion ||
+			isMobileViewport ||
+			( !! previousActiveArea &&
+				!! activeArea &&
+				activeArea !== previousActiveArea )
+				? 0
+				: ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
+
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<div id={ id } className={ className }>
-				{ children }
-			</div>
+			<AnimatePresence initial={ false }>
+				{ ( previousIsActive || isActive ) && (
+					<motion.div
+						variants={ variants }
+						initial="closed"
+						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
+						exit="closed"
+						transition={ transition }
+						className="interface-complementary-area__fill"
+					>
+						<div
+							id={ id }
+							className={ className }
+							style={ {
+								width: isMobileViewport
+									? '100vw'
+									: SIDEBAR_WIDTH,
+							} }
+						>
+							{ children }
+						</div>
+					</motion.div>
+				) }
+			</AnimatePresence>
 		</Fill>
 	);
 }
@@ -110,6 +184,11 @@ function ComplementaryArea( {
 	toggleShortcut,
 	isActiveByDefault,
 } ) {
+	// This state is used to delay the rendering of the Fill
+	// until the initial effect runs.
+	// This prevents the animation from running on mount if
+	// the complementary area is active by default.
+	const [ isReady, setIsReady ] = useState( false );
 	const {
 		isLoading,
 		isActive,
@@ -163,6 +242,7 @@ function ComplementaryArea( {
 		} else if ( activeArea === undefined && isSmall ) {
 			disableComplementaryArea( scope, identifier );
 		}
+		setIsReady( true );
 	}, [
 		activeArea,
 		isActiveByDefault,
@@ -172,6 +252,10 @@ function ComplementaryArea( {
 		enableComplementaryArea,
 		disableComplementaryArea,
 	] );
+
+	if ( ! isReady ) {
+		return;
+	}
 
 	return (
 		<>
@@ -204,59 +288,57 @@ function ComplementaryArea( {
 					{ title }
 				</ComplementaryAreaMoreMenuItem>
 			) }
-			{ isActive && (
-				<ComplementaryAreaFill
-					className={ classnames(
-						'interface-complementary-area',
-						className
-					) }
-					scope={ scope }
-					id={ identifier.replace( '/', ':' ) }
+			<ComplementaryAreaFill
+				activeArea={ activeArea }
+				isActive={ isActive }
+				className={ classnames(
+					'interface-complementary-area',
+					className
+				) }
+				scope={ scope }
+				id={ identifier.replace( '/', ':' ) }
+			>
+				<ComplementaryAreaHeader
+					className={ headerClassName }
+					closeLabel={ closeLabel }
+					onClose={ () => disableComplementaryArea( scope ) }
+					smallScreenTitle={ smallScreenTitle }
+					toggleButtonProps={ {
+						label: closeLabel,
+						shortcut: toggleShortcut,
+						scope,
+						identifier,
+					} }
 				>
-					<ComplementaryAreaHeader
-						className={ headerClassName }
-						closeLabel={ closeLabel }
-						onClose={ () => disableComplementaryArea( scope ) }
-						smallScreenTitle={ smallScreenTitle }
-						toggleButtonProps={ {
-							label: closeLabel,
-							shortcut: toggleShortcut,
-							scope,
-							identifier,
-						} }
-					>
-						{ header || (
-							<>
-								<h2 className="interface-complementary-area-header__title">
-									{ title }
-								</h2>
-								{ isPinnable && (
-									<Button
-										className="interface-complementary-area__pin-unpin-item"
-										icon={
-											isPinned ? starFilled : starEmpty
-										}
-										label={
-											isPinned
-												? __( 'Unpin from toolbar' )
-												: __( 'Pin to toolbar' )
-										}
-										onClick={ () =>
-											( isPinned ? unpinItem : pinItem )(
-												scope,
-												identifier
-											)
-										}
-										isPressed={ isPinned }
-										aria-expanded={ isPinned }
-									/>
-								) }
-							</>
-						) }
-					</ComplementaryAreaHeader>
-					<Panel className={ panelClassName }>{ children }</Panel>
-				</ComplementaryAreaFill>
-			) }
+					{ header || (
+						<>
+							<h2 className="interface-complementary-area-header__title">
+								{ title }
+							</h2>
+							{ isPinnable && (
+								<Button
+									className="interface-complementary-area__pin-unpin-item"
+									icon={ isPinned ? starFilled : starEmpty }
+									label={
+										isPinned
+											? __( 'Unpin from toolbar' )
+											: __( 'Pin to toolbar' )
+									}
+									onClick={ () =>
+										( isPinned ? unpinItem : pinItem )(
+											scope,
+											identifier
+										)
+									}
+									isPressed={ isPinned }
+									aria-expanded={ isPinned }
+								/>
+							) }
+						</>
+					) }
+				</ComplementaryAreaHeader>
+				<Panel className={ panelClassName }>{ children }</Panel>
+			</ComplementaryAreaFill>
 		</>
 	);
 }

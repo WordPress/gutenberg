@@ -29,10 +29,10 @@ export default {
 				mobile,
 			},
 		},
-		parameters: {
-			controls: { expanded: true },
-			docs: { canvas: { sourceState: 'shown' } },
-		},
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: { canvas: { sourceState: 'shown' } },
 	},
 } as Meta< typeof DimensionControl >;
 

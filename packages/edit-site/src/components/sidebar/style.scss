@@ -3,20 +3,55 @@
 	overflow-y: auto;
 }
 
+@keyframes slide-from-right {
+	from {
+		transform: translateX(50px);
+		opacity: 0;
+	}
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
+
+@keyframes slide-from-left {
+	from {
+		transform: translateX(-50px);
+		opacity: 0;
+	}
+	to {
+		transform: none;
+		opacity: 1;
+	}
+}
+
 .edit-site-sidebar__screen-wrapper {
+	overflow-x: auto;
 	@include custom-scrollbars-on-hover(transparent, $gray-700);
 	scrollbar-gutter: stable;
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+	max-height: 100%;
 
 	// This matches the logo padding
 	padding: 0 $grid-unit-15;
-}
 
-.edit-site-sidebar__footer {
-	border-top: 1px solid $gray-800;
-	flex-shrink: 0;
-	margin: 0 $canvas-padding;
-	padding: $canvas-padding 0;
+	// Animation
+	animation-duration: 0.14s;
+	animation-timing-function: ease-in-out;
+	will-change: transform, opacity;
+
+	@media ( prefers-reduced-motion: reduce ) {
+		animation-duration: 0s;
+	}
+
+	&.slide-from-left {
+		animation-name: slide-from-left;
+	}
+
+	&.slide-from-right {
+		animation-name: slide-from-right;
+	}
+
 }

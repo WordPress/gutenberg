@@ -8,9 +8,14 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { ComposedPrivateInserter as PrivateInserter } from './components/inserter';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
+import {
+	extractWords,
+	getNormalizedSearchTerms,
+	normalizeString,
+} from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import { useShowBlockTools } from './components/block-tools/use-show-block-tools';
+import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -26,7 +31,10 @@ import { usesContextKey } from './components/rich-text/format-edit';
 import { ExperimentalBlockCanvas } from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
-import { selectBlockPatternsKey } from './store/private-keys';
+import {
+	selectBlockPatternsKey,
+	reusableBlocksSelectKey,
+} from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
 
@@ -42,10 +50,13 @@ lock( privateApis, {
 	getRichTextValues,
 	PrivateInserter,
 	PrivateQuickInserter,
+	extractWords,
+	getNormalizedSearchTerms,
+	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	useShowBlockTools,
+	useHasBlockToolbar,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,
@@ -62,4 +73,5 @@ lock( privateApis, {
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
+	reusableBlocksSelectKey,
 } );

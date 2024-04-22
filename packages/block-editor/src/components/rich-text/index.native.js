@@ -94,14 +94,13 @@ export function RichTextWrapper(
 		minWidth,
 		maxWidth,
 		onBlur,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		containerWidth,
 		onEnter: onCustomEnter,
 		...props
 	},
-	forwardedRef
+	providedRef
 ) {
 	const instanceId = useInstanceId( RichTextWrapper );
 
@@ -463,7 +462,9 @@ export function RichTextWrapper(
 						}
 						return;
 					}
-					onReplace( content, content.length - 1, -1 );
+					onReplace( content, content.length - 1, -1, {
+						source: 'clipboard',
+					} );
 				} else {
 					if ( canPasteEmbed ) {
 						onChange(
@@ -529,13 +530,13 @@ export function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
-	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
+	const mergedRef = useMergeRefs( [ providedRef, fallbackRef ] );
 
 	return (
 		<RichText
 			clientId={ clientId }
 			identifier={ identifier }
-			ref={ mergedRef }
+			nativeEditorRef={ mergedRef }
 			value={ adjustedValue }
 			onChange={ adjustedOnChange }
 			selectionStart={ selectionStart }
@@ -586,7 +587,6 @@ export function RichTextWrapper(
 			minWidth={ minWidth }
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
-			setRef={ setRef }
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
@@ -657,27 +657,32 @@ export function RichTextWrapper(
 	);
 }
 
-const ForwardedRichTextContainer = withDeprecations(
+// This export does not actually implement a private API, but was exported
+// under this name for interoperability with the web version of the RichText
+// component.
+export const PrivateRichText = withDeprecations(
 	forwardRef( RichTextWrapper )
 );
 
-ForwardedRichTextContainer.Content = Content;
+PrivateRichText.Content = Content;
 
-ForwardedRichTextContainer.isEmpty = ( value ) => {
+PrivateRichText.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
 };
 
-ForwardedRichTextContainer.Content.defaultProps = {
+PrivateRichText.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
 
-ForwardedRichTextContainer.Raw = RichText;
+PrivateRichText.Raw = forwardRef( ( props, ref ) => (
+	<RichText { ...props } nativeEditorRef={ ref } />
+) );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-export default ForwardedRichTextContainer;
+export default PrivateRichText;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { __unstableRichTextInputEvent } from './input-event';

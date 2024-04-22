@@ -59,17 +59,23 @@ The fields describe the visible items for each record in the dataset.
 Example:
 
 ```js
+const STATUSES = [
+	{ value: 'draft', label: __( 'Draft' ) },
+	{ value: 'future', label: __( 'Scheduled' ) },
+	{ value: 'pending', label: __( 'Pending Review' ) },
+	{ value: 'private', label: __( 'Private' ) },
+	{ value: 'publish', label: __( 'Published' ) },
+	{ value: 'trash', label: __( 'Trash' ) },
+];
 const fields = [
 	{
 		id: 'title',
 		header: 'Title',
-		getValue: ({ item }) => item.title,
 		enableHiding: false,
 	},
 	{
 		id: 'date',
 		header: 'Date',
-		getValue: ( { item } ) => item.date,
 		render: ( { item } ) => {
 			return (
 				<time>{ getFormattedDate( item.date ) }</time>
@@ -79,19 +85,32 @@ const fields = [
 	{
 		id: 'author',
 		header: __( 'Author' ),
-		getValue: ( { item } ) => item.author,
 		render: ( { item } ) => {
 			return (
 				<a href="...">{ item.author }</a>
 			);
 		},
-		type: 'enumeration',
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
-		]
+		],
+		filterBy: {
+			operators: [ 'is', 'isNot' ]
+		},
 		enableSorting: false
-	}
+	},
+	{
+		header: __( 'Status' ),
+		id: 'status',
+		getValue: ( { item } ) =>
+			STATUSES.find( ( { value } ) => value === item.status )
+				?.label ?? item.status,
+		elements: STATUSES,
+		filterBy: {
+			operators: [ 'isAny' ],
+		},
+		enableSorting: false,
+	},
 ]
 ```
 
@@ -99,10 +118,10 @@ Each field is an object with the following properties:
 
 -   `id`: identifier for the field. Unique.
 -   `header`: the field's name to be shown in the UI.
--   `getValue`: function that returns the value of the field.
+-   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
--   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
+-   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
@@ -120,8 +139,8 @@ const view = {
 	type: 'table',
 	search: '',
 	filters: [
-		{ field: 'author', operator: 'in', value: 2 },
-		{ field: 'status', operator: 'in', value: 'publish,draft' }
+		{ field: 'author', operator: 'is', value: 2 },
+		{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft'] }
 	],
 	page: 1,
 	perPage: 5,
@@ -140,7 +159,7 @@ Properties:
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
-    -   `operator`: which type of filter it is. One of `in`, `notIn`. See "Operator types".
+    -   `operator`: which type of filter it is. See "Operator types".
     -   `value`: the actual value selected by the user.
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
@@ -172,8 +191,8 @@ function MyCustomPageTable() {
 		},
 		search: '',
 		filters: [
-			{ field: 'author', operator: 'in', value: 2 },
-			{ field: 'status', operator: 'in', value: 'publish,draft' }
+			{ field: 'author', operator: 'is', value: 2 },
+			{ field: 'status', operator: 'isAny', value: [ 'publish', 'draft' ] }
 		],
 		hiddenFields: [ 'date', 'featured-image' ],
 		layout: {},
@@ -182,10 +201,10 @@ function MyCustomPageTable() {
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters.forEach( ( filter ) => {
-			if ( filter.field === 'status' && filter.operator === 'in' ) {
+			if ( filter.field === 'status' && filter.operator === 'isAny' ) {
 				filters.status = filter.value;
 			}
-			if ( filter.field === 'author' && filter.operator === 'in' ) {
+			if ( filter.field === 'author' && filter.operator === 'is' ) {
 				filters.author = filter.value;
 			}
 		} );
@@ -256,17 +275,9 @@ Whether the data is loading. `false` by default.
 
 Array of layouts supported. By default, all are: `table`, `grid`, `list`.
 
-### `deferredRendering`: `boolean`
-
-Whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
-
 ### `onSelectionChange`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
-
-### `onDetailsChange`: `function`
-
-Callback that signals the user triggered the details for one of more items, and takes them as paremeter. So far, only the `list` view implements it.
 
 ## Types
 
@@ -278,12 +289,24 @@ Callback that signals the user triggered the details for one of more items, and 
 
 ### Fields
 
-- `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
+> The `enumeration` type was removed as it was deemed redundant with the field.elements metadata. New types will be introduced soon.
 
 ### Operators
 
-- `in`: operator to be used in filters for fields of type `enumeration`.
-- `notIn`: operator to be used in filters for fields of type `enumeration`.
+Allowed operators:
+
+| Operator | Selection | Description | Example |
+| --- | ---  | --- | --- |
+| `is` | Single item | `EQUAL TO`. The item's field is equal to a single value. | Author is Admin |
+| `isNot` | Single item | `NOT EQUAL TO`. The item's field is not equal to a single value. | Author is not Admin |
+| `isAny` | Multiple items | `OR`. The item's field is present in a list of values. | Author is any: Admin, Editor |
+| `isNone` | Multiple items | `NOT OR`. The item's field is not present in a list of values. | Author is none: Admin, Editor |
+| `isAll` | Multiple items | `AND`. The item's field has all of the values in the list. | Category is all: Book, Review, Science Fiction |
+| `isNotAll` | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list. | Category is not all: Book, Review, Science Fiction |
+
+`is` and `isNot` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotALl` are multi-selection. By default, a filter with no operators declared will support the `isAny` and `isNone` multi-selection operators. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
+
+> The legacy operators `in` and `notIn` have been deprecated and will be removed soon. In the meantime, they work as `is` and `isNot` operators, respectively.
 
 ## Contributing to this package
 

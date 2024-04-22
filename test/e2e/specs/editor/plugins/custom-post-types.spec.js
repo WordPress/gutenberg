@@ -72,9 +72,7 @@ test.describe( 'Test Custom Post Types', () => {
 		page,
 	} ) => {
 		await admin.createNewPost( { postType: 'leg_block_in_tpl' } );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Hello there' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

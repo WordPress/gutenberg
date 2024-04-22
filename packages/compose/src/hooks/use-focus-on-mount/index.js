@@ -72,7 +72,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 				const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 				if ( firstTabbable ) {
-					setFocus( /** @type {HTMLElement} */ ( firstTabbable ) );
+					setFocus( firstTabbable );
 				}
 			}, 0 );
 

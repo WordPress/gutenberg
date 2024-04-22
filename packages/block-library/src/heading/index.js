@@ -30,15 +30,16 @@ export const settings = {
 		const { content, level } = attributes;
 
 		const customName = attributes?.metadata?.name;
+		const hasContent = content?.trim().length > 0;
 
 		// In the list view, use the block's content as the label.
 		// If the content is empty, fall back to the default label.
-		if ( context === 'list-view' && ( customName || content ) ) {
-			return attributes?.metadata?.name || content;
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || content;
 		}
 
 		if ( context === 'accessibility' ) {
-			return ! content || content.length === 0
+			return ! hasContent
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),

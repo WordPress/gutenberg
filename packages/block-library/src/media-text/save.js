@@ -42,13 +42,13 @@ export default function save( { attributes } ) {
 		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
 	} );
 
-	let image = (
+	let image = mediaUrl ? (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
 			className={ imageClasses || null }
 		/>
-	);
+	) : null;
 
 	if ( href ) {
 		image = (

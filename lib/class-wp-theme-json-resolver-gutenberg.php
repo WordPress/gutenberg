@@ -319,6 +319,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
+			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
+				$theme_support_data['settings']['shadow'] = array();
+			}
+			/*
+			 * Shadow presets are explicitly disabled for classic themes until a
+			 * decision is made for whether the default presets should match the
+			 * other presets or if they should be disabled by default in classic
+			 * themes. See https://github.com/WordPress/gutenberg/issues/59989.
+			 */
+			$theme_support_data['settings']['shadow']['defaultPresets'] = false;
+
 			// Allow themes to enable all border settings via theme_support.
 			if ( current_theme_supports( 'border' ) ) {
 				$theme_support_data['settings']['border']['color']  = true;
@@ -339,15 +350,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				);
 			}
 
-			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
-			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
-			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );

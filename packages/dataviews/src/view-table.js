@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -22,9 +21,9 @@ import {
 	useId,
 	useRef,
 	useState,
+	useMemo,
 	Children,
 	Fragment,
-	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -34,7 +33,7 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
-import { ENUMERATION_TYPE, SORTING_DIRECTIONS } from './constants';
+import { SORTING_DIRECTIONS } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -49,7 +48,7 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-function WithSeparators( { children } ) {
+function WithDropDownMenuSeparators( { children } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
 		.map( ( child, i ) => (
@@ -76,7 +75,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	// 3. If it's not primary. If it is, it should be already visible.
 	const canAddFilter =
 		! view.filters?.some( ( _filter ) => field.id === _filter.field ) &&
-		field.type === ENUMERATION_TYPE &&
+		!! field.elements?.length &&
 		!! operators.length &&
 		! field.filterBy?.isPrimary;
 	if ( ! isSortable && ! isHidable && ! canAddFilter ) {
@@ -102,7 +101,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 			}
 			style={ { minWidth: '240px' } }
 		>
-			<WithSeparators>
+			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(
@@ -187,7 +186,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						</DropdownMenuItemLabel>
 					</DropdownMenuItem>
 				) }
-			</WithSeparators>
+			</WithDropDownMenuSeparators>
 		</DropdownMenu>
 	);
 } );
@@ -219,7 +218,9 @@ function BulkSelectionCheckbox( {
 					onSelectionChange( selectableItems );
 				}
 			} }
-			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
 		/>
 	);
 }
@@ -238,18 +239,39 @@ function TableRow( {
 } ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = selection.includes( id );
+
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
+
+	// Will be set to true if `onTouchStart` fires. This happens before
+	// `onClick` and can be used to exclude touchscreen devices from certain
+	// behaviours.
+	const isTouchDevice = useRef( false );
+
 	return (
 		<tr
 			className={ classnames( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
+				'is-hovered': isHovered,
+				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
-			onClickCapture={ ( event ) => {
-				if ( event.ctrlKey || event.metaKey ) {
-					event.stopPropagation();
-					event.preventDefault();
-					if ( ! hasPossibleBulkAction ) {
-						return;
-					}
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
+			onTouchStart={ () => {
+				isTouchDevice.current = true;
+			} }
+			onClick={ () => {
+				if (
+					! isTouchDevice.current &&
+					document.getSelection().type !== 'Range'
+				) {
 					if ( ! isSelected ) {
 						onSelectionChange(
 							data.filter( ( _item ) => {
@@ -278,8 +300,7 @@ function TableRow( {
 				<td
 					className="dataviews-view-table__checkbox-column"
 					style={ {
-						width: 20,
-						minWidth: 20,
+						width: '1%',
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
@@ -321,9 +342,20 @@ function TableRow( {
 				</td>
 			) ) }
 			{ !! actions?.length && (
-				<td className="dataviews-view-table__actions-column">
+				// Disable reason: we are not making the element interactive,
+				// but preventing any click events from bubbling up to the
+				// table row. This allows us to add a click handler to the row
+				// itself (to toggle row selection) without erroneously
+				// intercepting click events from ItemActions.
+
+				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+				<td
+					className="dataviews-view-table__actions-column"
+					onClick={ ( e ) => e.stopPropagation() }
+				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
+				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			) }
 		</tr>
 	);
@@ -337,7 +369,6 @@ function ViewTable( {
 	data,
 	getItemId,
 	isLoading = false,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 	setOpenedFilter,
@@ -354,7 +385,6 @@ function ViewTable( {
 		}
 	} );
 
-	const asyncData = useAsyncList( data );
 	const tableNoticeId = useId();
 
 	if ( nextHeaderMenuToFocus ) {
@@ -377,8 +407,7 @@ function ViewTable( {
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField ].includes( field.id )
 	);
-	const usedData = deferredRendering ? asyncData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 
 	const primaryField = fields.find(
@@ -398,8 +427,7 @@ function ViewTable( {
 							<th
 								className="dataviews-view-table__checkbox-column"
 								style={ {
-									width: 20,
-									minWidth: 20,
+									width: '1%',
 								} }
 								data-field-id="selection"
 								scope="col"
@@ -470,7 +498,7 @@ function ViewTable( {
 				</thead>
 				<tbody>
 					{ hasData &&
-						usedData.map( ( item, index ) => (
+						data.map( ( item, index ) => (
 							<TableRow
 								key={ getItemId( item ) }
 								item={ item }
