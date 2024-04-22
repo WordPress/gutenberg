@@ -59,6 +59,13 @@ document.addEventListener( 'DOMContentLoaded', async () => {
 	await init();
 } );
 
+function storeStore() {
+	window.sessionStorage.setItem(
+		'interactivity-api-store',
+		serializeStore()
+	);
+}
+
 if (
 	// @ts-ignore
 	document.prerendering
@@ -68,12 +75,13 @@ if (
 			'interactivity-api-store'
 		);
 		populateInitialData( JSON.parse( store ) );
+
+		// remove the store from session storage
+		window.sessionStorage.removeItem( 'interactivity-api-store' );
+
+		// add the listener for when the user leaves the page
+		window.addEventListener( 'beforeunload', storeStore );
 	} );
 } else {
-	window.addEventListener( 'beforeunload', () => {
-		window.sessionStorage.setItem(
-			'interactivity-api-store',
-			serializeStore()
-		);
-	} );
+	window.addEventListener( 'beforeunload', storeStore );
 }

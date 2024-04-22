@@ -368,10 +368,7 @@ const deepClone = ( source: any ) => {
 export const serializeStore = () => {
 	const stateData = { state: {} };
 	for ( const [ namespace, value ] of stores.entries() ) {
-		stateData.state[ namespace ] = JSON.stringify(
-			deepClone( value.state )
-		);
+		stateData.state[ namespace ] = deepClone( value.state );
 	}
-
 	return JSON.stringify( stateData );
 };
