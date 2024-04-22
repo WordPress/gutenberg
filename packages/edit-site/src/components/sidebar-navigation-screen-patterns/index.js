@@ -137,7 +137,7 @@ export default function SidebarNavigationScreenPatterns() {
 	 *    Block based themes. Also classic themes can access this URL, though it's not linked anywhere.
 	 *
 	 * 2. path = /wp_template_part/all
-	 *    Classic themes with support for block-template-parts). We need to list only] Template Parts in this case.
+	 *    Classic themes with support for block-template-parts. We need to list only Template Parts in this case.
 	 *    The URL is accessible from the Appearance > Template Parts menu.
 	 *
 	 * This is temporary. We aim to consolidate to /patterns.
