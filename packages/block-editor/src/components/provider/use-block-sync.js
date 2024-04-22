@@ -95,7 +95,7 @@ export default function useBlockSync( {
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
 
-	const setControlledBlocks = () => {
+	const setControlledBlocks = ( selection ) => {
 		if ( ! controlledBlocks ) {
 			return;
 		}
@@ -127,11 +127,11 @@ export default function useBlockSync( {
 				resetBlocks( controlledBlocks );
 			}
 
-			if ( controlledSelection ) {
+			if ( selection ) {
 				resetSelection(
-					controlledSelection.selectionStart,
-					controlledSelection.selectionEnd,
-					controlledSelection.initialPosition
+					selection.selectionStart,
+					selection.selectionEnd,
+					selection.initialPosition
 				);
 			}
 		} );
@@ -170,7 +170,7 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
-			setControlledBlocks();
+			setControlledBlocks( controlledSelection );
 		}
 	}, [ controlledBlocks, clientId ] );
 
