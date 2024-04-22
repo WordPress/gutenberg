@@ -41,19 +41,21 @@ export function mergeBaseAndUserConfigs( base, user ) {
  */
 function useResolvedBlockStyleVariationsConfig( userConfig ) {
 	const { getBlockStyles } = useSelect( blocksStore );
+	const sharedVariations = userConfig?.styles?.blocks?.variations;
 
-	// Register any block style variations that have been added
-	// by a theme style variation and are not already registered.
-	useEffect( () => {
-		const sharedVariations = userConfig?.styles?.blocks?.variations;
-
+	// Collect block style variation definitions to merge and unregistered
+	// block styles for automatic registration.
+	const [ userConfigToMerge, unregisteredStyles ] = useMemo( () => {
 		if ( ! sharedVariations ) {
-			return;
+			return [];
 		}
+
+		const variationsConfigToMerge = {};
+		const unregisteredBlockStyles = [];
 
 		Object.entries( sharedVariations ).forEach(
 			( [ variationName, variation ] ) => {
-				if ( ! variation?.blockTypes ) {
+				if ( ! variation?.blockTypes?.length ) {
 					return;
 				}
 
@@ -64,32 +66,15 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 					);
 
 					if ( ! registeredBlockStyle ) {
-						registerBlockStyle( blockName, {
-							name: variationName,
-							label: variationName,
-						} );
+						unregisteredBlockStyles.push( [
+							blockName,
+							{
+								name: variationName,
+								label: variationName,
+							},
+						] );
 					}
-				} );
-			}
-		);
-	}, [ userConfig?.styles?.blocks?.variations, getBlockStyles ] );
 
-	const updatedConfig = useMemo( () => {
-		const sharedVariations = userConfig?.styles?.blocks?.variations;
-
-		if ( ! sharedVariations ) {
-			return userConfig;
-		}
-
-		const variationsConfig = {};
-
-		Object.entries( sharedVariations ).forEach(
-			( [ variationName, variation ] ) => {
-				if ( ! variation?.blockTypes ) {
-					return;
-				}
-
-				variation.blockTypes.forEach( ( blockName ) => {
 					const path = [
 						'styles',
 						'blocks',
@@ -97,13 +82,31 @@ function useResolvedBlockStyleVariationsConfig( userConfig ) {
 						'variations',
 						variationName,
 					];
-					setNestedValue( variationsConfig, path, variation );
+					setNestedValue( variationsConfigToMerge, path, variation );
 				} );
 			}
 		);
 
-		return deepmerge( variationsConfig, userConfig );
-	}, [ userConfig ] );
+		return [ variationsConfigToMerge, unregisteredBlockStyles ];
+	}, [ sharedVariations, getBlockStyles ] );
+
+	// Automatically register missing block styles from variations.
+	useEffect(
+		() =>
+			unregisteredStyles?.forEach( ( unregisteredStyle ) =>
+				registerBlockStyle( ...unregisteredStyle )
+			),
+		[ unregisteredStyles ]
+	);
+
+	// Merge shared block style variation definitions into overall user config.
+	const updatedConfig = useMemo( () => {
+		if ( ! userConfigToMerge ) {
+			return userConfig;
+		}
+
+		return deepmerge( userConfigToMerge, userConfig );
+	}, [ userConfigToMerge, userConfig ] );
 
 	return updatedConfig;
 }
