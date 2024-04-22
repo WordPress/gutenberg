@@ -28,7 +28,7 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
 import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
-import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
+import { MediaTab, MediaCategoryPanel, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
@@ -210,7 +210,7 @@ function InserterMenu(
 				onInsert={ onInsert }
 			>
 				{ showMediaPanel && (
-					<MediaCategoryDialog
+					<MediaCategoryPanel
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsert }
 						category={ selectedMediaCategory }

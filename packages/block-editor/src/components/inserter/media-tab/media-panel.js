@@ -14,16 +14,6 @@ import InserterNoResults from '../no-results';
 
 const INITIAL_MEDIA_ITEMS_PER_PAGE = 10;
 
-export function MediaCategoryDialog( { rootClientId, onInsert, category } ) {
-	return (
-		<MediaCategoryPanel
-			rootClientId={ rootClientId }
-			onInsert={ onInsert }
-			category={ category }
-		/>
-	);
-}
-
 export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
 	const { mediaList, isLoading } = useMediaResults( category, {
