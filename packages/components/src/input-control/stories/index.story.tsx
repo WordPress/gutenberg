@@ -2,19 +2,17 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
-
+/**
+ * WordPress dependencies
+ */
+import { seen, unseen } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import InputControl from '..';
 import { InputControlPrefixWrapper } from '../input-prefix-wrapper';
 import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
-/**
- * WordPress dependencies
- */
-import { seen, unseen } from '@wordpress/icons';
-import { useReducer } from '@wordpress/element';
-import Tooltip from '../../tooltip';
 import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
@@ -91,27 +89,23 @@ WithEdgeLabel.args = {
 };
 
 export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
-	const [ visible, toggleVisible ] = useReducer(
-		( value ) => ! value,
-		false
-	);
+	const [ visible, setVisible ] = useState( false );
 	return (
 		<InputControl
 			type={ visible ? 'text' : 'password' }
 			label="Password"
 			suffix={
 				<InputControlSuffixWrapper>
-					<Tooltip
-						text={ visible ? 'Hide password' : 'Show password' }
-					>
+					<div style={ { display: 'flex' } }>
 						<Button
+							size="small"
 							icon={ visible ? unseen : seen }
-							onClick={ toggleVisible }
-							aria-label={
+							onClick={ () => setVisible( ( value ) => ! value ) }
+							label={
 								visible ? 'Hide password' : 'Show password'
 							}
 						/>
-					</Tooltip>
+					</div>
 				</InputControlSuffixWrapper>
 			}
 			{ ...args }
