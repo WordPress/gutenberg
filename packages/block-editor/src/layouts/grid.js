@@ -78,16 +78,22 @@ export default {
 					layout={ layout }
 					onChange={ onChange }
 				/>
-				{ layout?.columnCount ? (
+				{ layout?.minimumColumnWidth ? (
+					<>
+						<GridLayoutMinimumWidthControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+						<GridLayoutMaxColumnsControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					</>
+				) : (
 					<GridLayoutColumnsAndRowsControl
 						layout={ layout }
 						onChange={ onChange }
 						allowSizingOnChildren={ allowSizingOnChildren }
-					/>
-				) : (
-					<GridLayoutMinimumWidthControl
-						layout={ layout }
-						onChange={ onChange }
 					/>
 				) }
 				{ window.__experimentalEnableGridInteractivity && (
@@ -123,8 +129,17 @@ export default {
 
 		let output = '';
 		const rules = [];
-
-		if ( columnCount ) {
+		if ( minimumColumnWidth ) {
+			const maxValue = !! columnCount
+				? `max(${ minimumColumnWidth }, ( 100% - (${
+						blockGapValue || '1.2rem'
+				  }*${ ( columnCount || 4 ) - 1 }) ) / ${ columnCount || 4 })`
+				: `min(${ minimumColumnWidth }, 100%)`;
+			rules.push(
+				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
+				`container-type: inline-size`
+			);
+		} else if ( columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
@@ -133,11 +148,6 @@ export default {
 					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
 				);
 			}
-		} else if ( minimumColumnWidth ) {
-			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
-				`container-type: inline-size`
-			);
 		}
 
 		if ( rules.length ) {
@@ -235,6 +245,38 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 			</Flex>
 		</fieldset>
+	);
+}
+
+// Enables setting number of grid columns
+function GridLayoutMaxColumnsControl( { layout, onChange } ) {
+	const { columnCount = 3 } = layout;
+
+	return (
+		<>
+			<fieldset>
+				<BaseControl.VisualLabel as="legend">
+					{ __( 'Max Columns' ) }
+				</BaseControl.VisualLabel>
+				<Flex gap={ 4 }>
+					<FlexItem isBlock>
+						<NumberControl
+							size={ '__unstable-large' }
+							onChange={ ( value ) => {
+								onChange( {
+									...layout,
+									columnCount: value,
+								} );
+							} }
+							value={ columnCount }
+							min={ 1 }
+							label={ __( 'Columns' ) }
+							hideLabelFromVision
+						/>
+					</FlexItem>
+				</Flex>
+			</fieldset>
+		</>
 	);
 }
 
@@ -351,7 +393,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		minimumColumnWidth || '12rem'
 	);
 
-	const isManual = !! columnCount ? 'manual' : 'auto';
+	const isManual = !! minimumColumnWidth ? 'auto' : 'manual';
 
 	const onChangeType = ( value ) => {
 		if ( value === 'manual' ) {
@@ -361,7 +403,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 		}
 		onChange( {
 			...layout,
-			columnCount: value === 'manual' ? tempColumnCount : null,
+			columnCount: tempColumnCount,
 			minimumColumnWidth:
 				value === 'auto' ? tempMinimumColumnWidth : null,
 		} );
