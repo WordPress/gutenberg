@@ -153,6 +153,82 @@ function getMissingText( type ) {
 	return missingText;
 }
 
+/*
+ * Warning, this duplicated in
+ * packages/block-library/src/navigation-submenu/edit.js
+ * Consider reuseing this components for both blocks.
+ */
+function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
+	const { label, url, description, title, rel } = attributes;
+	return (
+		<PanelBody title={ __( 'Settings' ) }>
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				value={ label ? stripHTML( label ) : '' }
+				onChange={ ( labelValue ) => {
+					setAttributes( { label: labelValue } );
+				} }
+				label={ __( 'Text' ) }
+				autoComplete="off"
+				onFocus={ () => setIsLabelFieldFocused( true ) }
+				onBlur={ () => setIsLabelFieldFocused( false ) }
+			/>
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				value={ url ? safeDecodeURI( url ) : '' }
+				onChange={ ( urlValue ) => {
+					updateAttributes(
+						{ url: urlValue },
+						setAttributes,
+						attributes
+					);
+				} }
+				label={ __( 'Link' ) }
+				autoComplete="off"
+			/>
+			<TextareaControl
+				__nextHasNoMarginBottom
+				value={ description || '' }
+				onChange={ ( descriptionValue ) => {
+					setAttributes( { description: descriptionValue } );
+				} }
+				label={ __( 'Description' ) }
+				help={ __(
+					'The description will be displayed in the menu if the current theme supports it.'
+				) }
+			/>
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				value={ title || '' }
+				onChange={ ( titleValue ) => {
+					setAttributes( { title: titleValue } );
+				} }
+				label={ __( 'Title attribute' ) }
+				autoComplete="off"
+				help={ __(
+					'Additional information to help clarify the purpose of the link.'
+				) }
+			/>
+			<TextControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				value={ rel || '' }
+				onChange={ ( relValue ) => {
+					setAttributes( { rel: relValue } );
+				} }
+				label={ __( 'Rel attribute' ) }
+				autoComplete="off"
+				help={ __(
+					'The relationship of the linked URL as space-separated link types.'
+				) }
+			/>
+		</PanelBody>
+	);
+}
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -163,7 +239,7 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, rel, title, kind } = attributes;
+	const { id, label, type, url, description, kind } = attributes;
 
 	const [ isInvalid, isDraft ] = useIsInvalidLink( kind, type, id );
 	const { maxNestingLevel } = context;
@@ -420,71 +496,11 @@ export default function NavigationLinkEdit( {
 			</BlockControls>
 			{ /* Warning, this duplicated in packages/block-library/src/navigation-submenu/edit.js */ }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ label ? stripHTML( label ) : '' }
-						onChange={ ( labelValue ) => {
-							setAttributes( { label: labelValue } );
-						} }
-						label={ __( 'Text' ) }
-						autoComplete="off"
-						onFocus={ () => setIsLabelFieldFocused( true ) }
-						onBlur={ () => setIsLabelFieldFocused( false ) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ url ? safeDecodeURI( url ) : '' }
-						onChange={ ( urlValue ) => {
-							updateAttributes(
-								{ url: urlValue },
-								setAttributes,
-								attributes
-							);
-						} }
-						label={ __( 'Link' ) }
-						autoComplete="off"
-					/>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						value={ description || '' }
-						onChange={ ( descriptionValue ) => {
-							setAttributes( { description: descriptionValue } );
-						} }
-						label={ __( 'Description' ) }
-						help={ __(
-							'The description will be displayed in the menu if the current theme supports it.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Title attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'Additional information to help clarify the purpose of the link.'
-						) }
-					/>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Rel attribute' ) }
-						autoComplete="off"
-						help={ __(
-							'The relationship of the linked URL as space-separated link types.'
-						) }
-					/>
-				</PanelBody>
+				<Controls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					setIsLabelFieldFocused={ setIsLabelFieldFocused }
+				/>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
