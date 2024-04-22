@@ -390,17 +390,13 @@ function MediaTextEdit( {
 					</>
 				) }
 
-				{ mediaType === 'image' && (
+				{ mediaType === 'image' && ! useFeaturedImage && (
 					<ImageURLInputUI
 						url={ href || '' }
 						onChangeUrl={ onSetHref }
 						linkDestination={ linkDestination }
 						mediaType={ mediaType }
-						mediaUrl={
-							useFeaturedImage && featuredImageURL
-								? featuredImageURL
-								: image && image.source_url
-						}
+						mediaUrl={ image && image.source_url }
 						mediaLink={ image && image.link }
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
