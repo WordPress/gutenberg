@@ -123,21 +123,10 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 		<button
 			className="page-patterns-preview-field__button"
 			type="button"
-			onClick={ ( event ) => {
-				if ( item.type === PATTERN_TYPES.theme ) {
-					event.preventDefault();
-				} else {
-					onClick( event );
-				}
-			} }
+			onClick={ item.type !== PATTERN_TYPES.theme ? onClick : undefined }
 			aria-label={ item.title }
 			aria-describedby={ ariaDescribedBy }
 			aria-disabled={ item.type === PATTERN_TYPES.theme }
-			title={
-				item.type === PATTERN_TYPES.theme
-					? __( 'This pattern cannot be edited.' )
-					: undefined
-			}
 		>
 			{ children }
 		</button>
