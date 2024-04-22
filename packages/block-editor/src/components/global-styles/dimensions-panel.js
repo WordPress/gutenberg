@@ -18,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
 import { useCallback, Platform } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -29,6 +30,7 @@ import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
+import { store as blockEditorStore } from '../../store';
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -84,19 +86,35 @@ function useHasAspectRatio( settings ) {
 }
 
 function useHasChildLayout( settings ) {
-	const {
-		type: parentLayoutType = 'default',
-		default: { type: defaultParentLayoutType = 'default' } = {},
-		allowSizingOnChildren = false,
-	} = settings?.parentLayout ?? {};
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			themeSupportsLayout: getSettings().supportsLayout,
+		};
+	}, [] );
 
-	const support =
-		( defaultParentLayoutType === 'flex' ||
-			parentLayoutType === 'flex' ||
-			defaultParentLayoutType === 'grid' ||
-			parentLayoutType === 'grid' ) &&
-		allowSizingOnChildren;
-	return !! settings?.layout && support;
+	const {
+		allowSizingOnChildren = false,
+		type,
+		default: { type: defaultType = 'default' } = {},
+	} = settings?.parentLayout ?? {};
+	const layoutType = type || defaultType;
+	const isFlowOrConstrained =
+		layoutType === 'default' || layoutType === 'constrained';
+
+	const support = allowSizingOnChildren;
+
+	/*
+	 * If the theme supports layout and parent block supports sizing on children,
+	 * the child layout control is always shown.
+	 * If the theme does not support layout, the child layout control is shown
+	 * only if the parent layout is not flow or constrained.
+	 */
+	return (
+		!! settings?.layout &&
+		support &&
+		( themeSupportsLayout || ! isFlowOrConstrained )
+	);
 }
 
 function useHasSpacingPresets( settings ) {
@@ -207,6 +225,7 @@ const DEFAULT_CONTROLS = {
 export default function DimensionsPanel( {
 	as: Wrapper = DimensionsToolsPanel,
 	value,
+	alignments = null,
 	onChange,
 	inheritedValue = value,
 	settings,
@@ -397,12 +416,7 @@ export default function DimensionsPanel( {
 	const childLayout = inheritedValue?.layout;
 
 	const setChildLayout = ( newChildLayout ) => {
-		onChange( {
-			...value,
-			layout: {
-				...newChildLayout,
-			},
-		} );
+		onChange( setImmutably( value, [ 'layout' ], newChildLayout ) );
 	};
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
@@ -414,6 +428,9 @@ export default function DimensionsPanel( {
 				wideSize: undefined,
 				selfStretch: undefined,
 				flexSize: undefined,
+				selfAlign: undefined,
+				width: undefined,
+				height: undefined,
 				columnStart: undefined,
 				rowStart: undefined,
 				columnSpan: undefined,
@@ -637,11 +654,12 @@ export default function DimensionsPanel( {
 					value={ childLayout }
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
-					panelId={ panelId }
+					alignments={ alignments }
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout
 					}
+					panelId={ panelId }
 				/>
 			) }
 			{ showMinHeightControl && (

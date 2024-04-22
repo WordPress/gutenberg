@@ -2,32 +2,17 @@
  * WordPress dependencies
  */
 import {
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	CustomSelectControl,
+	FlexBlock,
 	__experimentalUnitControl as UnitControl,
 	__experimentalInputControl as InputControl,
 	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
-
-function helpText( selfStretch, parentLayout ) {
-	const { orientation = 'horizontal' } = parentLayout;
-
-	if ( selfStretch === 'fill' ) {
-		return __( 'Stretch to fill available space.' );
-	}
-	if ( selfStretch === 'fixed' && orientation === 'horizontal' ) {
-		return __( 'Specify a fixed width.' );
-	} else if ( selfStretch === 'fixed' ) {
-		return __( 'Specify a fixed height.' );
-	}
-	return __( 'Fit contents.' );
-}
 
 /**
  * Form to edit the child layout value.
@@ -36,6 +21,7 @@ function helpText( selfStretch, parentLayout ) {
  * @param {Object}   props.value            The child layout value.
  * @param {Function} props.onChange         Function to update the child layout value.
  * @param {Object}   props.parentLayout     The parent layout value.
+ * @param {Object}   props.alignments
  *
  * @param {boolean}  props.isShownByDefault
  * @param {string}   props.panelId
@@ -45,6 +31,7 @@ export default function ChildLayoutControl( {
 	value: childLayout = {},
 	onChange,
 	parentLayout,
+	alignments,
 	isShownByDefault,
 	panelId,
 } ) {
@@ -55,26 +42,82 @@ export default function ChildLayoutControl( {
 		rowStart,
 		columnSpan,
 		rowSpan,
-	} = childLayout;
+		selfAlign,
+		height,
+		width,
+	} = childLayout || {};
+
 	const {
+		current: currentAlignment,
+		supported,
+		onChangeAlignment,
+	} = alignments || {};
+	/**
+	 * If supported alignments is true, it means that the block supports
+	 * both wide and full alignments. If false, it supports neither.
+	 */
+	let supportedAlignments;
+	switch ( supported ) {
+		case true:
+			supportedAlignments = [ 'wide', 'full' ];
+			break;
+		case false:
+			supportedAlignments = [];
+			break;
+		default:
+			supportedAlignments = supported;
+	}
+
+	const {
+		orientation = 'horizontal',
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
-		orientation = 'horizontal',
+		justifyContent = 'left',
+		verticalAlignment = 'center',
+		alignWidth: parentAlignment = 'none',
+		contentSize,
+		wideSize,
 	} = parentLayout ?? {};
 	const parentLayoutType = parentType || defaultParentType;
 
-	const hasFlexValue = () => !! selfStretch;
-	const flexResetLabel =
-		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
-	const resetFlex = () => {
+	const isFlowOrConstrained =
+		parentLayoutType === 'default' ||
+		parentLayoutType === 'constrained' ||
+		parentLayoutType === undefined;
+
+	const widthProp =
+		isFlowOrConstrained || orientation === 'vertical'
+			? 'selfAlign'
+			: 'selfStretch';
+	const heightProp =
+		isFlowOrConstrained || orientation === 'vertical'
+			? 'selfStretch'
+			: 'selfAlign';
+
+	//ToolsPanelItem-specific functions.
+	const resetWidthValue = () => {
+		// If alignment has been set via the width control, unset it.
+		if (
+			( selfAlign === 'wide' && currentAlignment === 'wide' ) ||
+			( selfAlign === 'fill' && currentAlignment === 'full' )
+		) {
+			onChangeAlignment( undefined );
+		}
 		onChange( {
 			selfStretch: undefined,
 			flexSize: undefined,
+			selfAlign: undefined,
+			width: undefined,
 		} );
 	};
-
-	const hasStartValue = () => !! columnStart || !! rowStart;
-	const hasSpanValue = () => !! columnSpan || !! rowSpan;
+	const resetHeightValue = () => {
+		onChange( {
+			selfStretch: undefined,
+			flexSize: undefined,
+			selfAlign: undefined,
+			height: undefined,
+		} );
+	};
 	const resetGridStarts = () => {
 		onChange( {
 			columnStart: undefined,
@@ -87,73 +130,360 @@ export default function ChildLayoutControl( {
 			rowSpan: undefined,
 		} );
 	};
+	const hasStartValue = () => !! columnStart || !! rowStart;
+	const hasSpanValue = () => !! columnSpan || !! rowSpan;
+	const hasWidthValue = () => !! childLayout[ widthProp ];
+	const hasHeightValue = () => !! childLayout[ heightProp ];
 
-	useEffect( () => {
-		if ( selfStretch === 'fixed' && ! flexSize ) {
+	const widthOptions = [];
+
+	if ( parentLayoutType === 'constrained' ) {
+		if ( contentSize ) {
+			widthOptions.push( {
+				key: 'content',
+				value: 'content',
+				name: __( 'Default' ),
+			} );
+		}
+		if (
+			wideSize &&
+			supportedAlignments?.includes( 'wide' ) &&
+			( parentAlignment === 'wide' || parentAlignment === 'full' )
+		) {
+			widthOptions.push( {
+				key: 'wide',
+				value: 'wide',
+				name: __( 'Wide' ),
+			} );
+		}
+		// If no contentSize is defined, fill should be the default.
+		if (
+			( supportedAlignments?.includes( 'full' ) &&
+				parentAlignment === 'full' ) ||
+			! contentSize
+		) {
+			widthOptions.push( {
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			} );
+		}
+		widthOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Width' ),
+			}
+		);
+	} else if (
+		parentLayoutType === 'default' ||
+		( parentLayoutType === 'flex' && orientation === 'vertical' )
+	) {
+		widthOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Width' ),
+			}
+		);
+	} else if ( parentLayoutType === 'flex' && orientation === 'horizontal' ) {
+		widthOptions.push(
+			{
+				key: 'fit',
+				value: 'fit',
+				name: __( 'Fit' ),
+			},
+			{
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			},
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Width' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
+			}
+		);
+	}
+
+	const heightOptions = [
+		{
+			key: 'fit',
+			value: 'fit',
+			name: __( 'Fit' ),
+		},
+	];
+
+	if ( parentLayoutType === 'flex' ) {
+		heightOptions.push(
+			{
+				key: 'fixed',
+				value: 'fixed',
+				name: __( 'Max Height' ),
+			},
+			{
+				key: 'fixedNoShrink',
+				value: 'fixedNoShrink',
+				name: __( 'Fixed' ),
+			},
+			{
+				key: 'fill',
+				value: 'fill',
+				name: __( 'Fill' ),
+			}
+		);
+	} else {
+		heightOptions.push( {
+			key: 'fixedNoShrink',
+			value: 'fixedNoShrink',
+			name: __( 'Fixed' ),
+		} );
+	}
+
+	const selectedWidth = () => {
+		let selectedValue;
+		if ( isFlowOrConstrained ) {
+			// Replace "full" with "fill" for full width alignments.
+			if (
+				currentAlignment === 'full' &&
+				parentLayoutType === 'constrained'
+			) {
+				selectedValue = 'fill';
+			} else if (
+				wideSize &&
+				currentAlignment === 'wide' &&
+				parentLayoutType === 'constrained'
+			) {
+				selectedValue = 'wide';
+			} else if ( selfAlign === 'fixedNoShrink' ) {
+				selectedValue = 'fixedNoShrink';
+			} else if ( selfAlign === 'fixed' ) {
+				selectedValue = 'fixed';
+			} else if ( selfAlign === 'fit' ) {
+				selectedValue = 'fit';
+			} else if ( parentLayoutType === 'constrained' ) {
+				selectedValue = 'content';
+			} else {
+				selectedValue = 'fill';
+			}
+		} else if (
+			parentLayoutType === 'flex' &&
+			orientation === 'vertical'
+		) {
+			// If the parent layout is justified stretch, children should be fill by default.
+			const defaultSelfAlign =
+				justifyContent === 'stretch' ? 'fill' : 'fit';
+			selectedValue = selfAlign || defaultSelfAlign;
+		} else if (
+			parentLayoutType === 'flex' &&
+			orientation === 'horizontal'
+		) {
+			selectedValue = selfStretch || 'fit';
+		} else {
+			selectedValue = 'fill';
+		}
+
+		return widthOptions.find( ( _value ) => _value?.key === selectedValue );
+	};
+
+	const selectedHeight = () => {
+		let selectedValue;
+		if (
+			isFlowOrConstrained ||
+			( parentLayoutType === 'flex' && orientation === 'vertical' )
+		) {
+			selectedValue = childLayout[ heightProp ] || 'fit';
+		} else if ( parentLayoutType === 'flex' ) {
+			const defaultSelfAlign =
+				verticalAlignment === 'stretch' ? 'fill' : 'fit';
+			selectedValue = childLayout[ heightProp ] || defaultSelfAlign;
+		} else {
+			selectedValue = 'fit';
+		}
+		return heightOptions.find(
+			( _value ) => _value?.key === selectedValue
+		);
+	};
+
+	const onChangeWidth = ( newWidth ) => {
+		const { selectedItem } = newWidth;
+		const { key } = selectedItem;
+		if ( isFlowOrConstrained ) {
+			if ( key === 'fill' ) {
+				onChange( { ...childLayout, [ widthProp ]: key } );
+				/**
+				 * Fill exists for both flow and constrained layouts but
+				 * should only change alignment for constrained layouts.
+				 * "fill" in flow layout is the default state of its children.
+				 */
+				if ( parentLayoutType === 'constrained' ) {
+					onChangeAlignment( 'full' );
+				}
+			} else if ( key === 'wide' ) {
+				onChange( { ...childLayout, [ widthProp ]: key } );
+				onChangeAlignment( 'wide' );
+			} else if ( key === 'fixedNoShrink' ) {
+				onChange( {
+					...childLayout,
+					[ widthProp ]: key,
+				} );
+				onChangeAlignment( undefined );
+			} else {
+				onChange( { ...childLayout, [ widthProp ]: key } );
+				onChangeAlignment( undefined );
+			}
+		} else if ( parentLayoutType === 'flex' ) {
+			// if the layout is horizontal, reset any flexSize when changing width.
+			const resetFlexSize =
+				orientation !== 'vertical' ? undefined : flexSize;
 			onChange( {
 				...childLayout,
-				selfStretch: 'fit',
+				[ widthProp ]: key,
+				flexSize: resetFlexSize,
+			} );
+		}
+	};
+
+	const onChangeHeight = ( newHeight ) => {
+		// If the layout is vertical, reset any flexSize when changing height.
+		const resetFlexSize = orientation === 'vertical' ? undefined : flexSize;
+		onChange( {
+			...childLayout,
+			[ heightProp ]: newHeight.selectedItem.key,
+			flexSize: resetFlexSize,
+		} );
+	};
+
+	useEffect( () => {
+		if (
+			( childLayout[ heightProp ] === 'fixed' ||
+				childLayout[ heightProp ] === 'fixedNoShrink' ) &&
+			! height
+		) {
+			onChange( {
+				...childLayout,
+				[ heightProp ]: undefined,
+			} );
+		}
+		if (
+			( childLayout[ widthProp ] === 'fixed' ||
+				childLayout[ widthProp ] === 'fixedNoShrink' ) &&
+			! width
+		) {
+			onChange( {
+				...childLayout,
+				[ widthProp ]: undefined,
 			} );
 		}
 	}, [] );
 
 	return (
 		<>
-			{ parentLayoutType === 'flex' && (
-				<VStack
-					as={ ToolsPanelItem }
-					spacing={ 2 }
-					hasValue={ hasFlexValue }
-					label={ flexResetLabel }
-					onDeselect={ resetFlex }
-					isShownByDefault={ isShownByDefault }
-					panelId={ panelId }
-				>
-					<ToggleGroupControl
-						__nextHasNoMarginBottom
-						size={ '__unstable-large' }
-						label={ childLayoutOrientation( parentLayout ) }
-						value={ selfStretch || 'fit' }
-						help={ helpText( selfStretch, parentLayout ) }
-						onChange={ ( value ) => {
-							const newFlexSize =
-								value !== 'fixed' ? null : flexSize;
-							onChange( {
-								selfStretch: value,
-								flexSize: newFlexSize,
-							} );
-						} }
-						isBlock
+			{ parentLayoutType !== 'grid' && (
+				<>
+					<HStack
+						style={ { alignItems: 'flex-end' } }
+						as={ ToolsPanelItem }
+						hasValue={ hasWidthValue }
+						label={ __( 'Width' ) }
+						onDeselect={ resetWidthValue }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
 					>
-						<ToggleGroupControlOption
-							key={ 'fit' }
-							value={ 'fit' }
-							label={ __( 'Fit' ) }
-						/>
-						<ToggleGroupControlOption
-							key={ 'fill' }
-							value={ 'fill' }
-							label={ __( 'Fill' ) }
-						/>
-						<ToggleGroupControlOption
-							key={ 'fixed' }
-							value={ 'fixed' }
-							label={ __( 'Fixed' ) }
-						/>
-					</ToggleGroupControl>
-					{ selfStretch === 'fixed' && (
-						<UnitControl
-							size={ '__unstable-large' }
-							onChange={ ( value ) => {
-								onChange( {
-									selfStretch,
-									flexSize: value,
-								} );
-							} }
-							value={ flexSize }
-						/>
-					) }
-				</VStack>
+						<FlexBlock>
+							<CustomSelectControl
+								label={ __( 'Width' ) }
+								value={ selectedWidth() }
+								options={ widthOptions }
+								onChange={ onChangeWidth }
+								__nextUnconstrainedWidth
+								__next40pxDefaultSize
+							/>
+						</FlexBlock>
+
+						{ ( childLayout[ widthProp ] === 'fixed' ||
+							childLayout[ widthProp ] === 'fixedNoShrink' ) && (
+							<FlexBlock>
+								<UnitControl
+									__next40pxDefaultSize
+									onChange={ ( _value ) => {
+										onChange( {
+											...childLayout,
+											width: _value,
+										} );
+									} }
+									value={ width }
+								/>
+							</FlexBlock>
+						) }
+					</HStack>
+					<HStack
+						style={ { alignItems: 'flex-end' } }
+						as={ ToolsPanelItem }
+						hasValue={ hasHeightValue }
+						label={ __( 'Height' ) }
+						onDeselect={ resetHeightValue }
+						isShownByDefault={ isShownByDefault }
+						panelId={ panelId }
+					>
+						<FlexBlock>
+							<CustomSelectControl
+								label={ __( 'Height' ) }
+								value={ selectedHeight() }
+								options={ heightOptions }
+								onChange={ onChangeHeight }
+								__nextUnconstrainedWidth
+								__next40pxDefaultSize
+							/>
+						</FlexBlock>
+
+						{ ( childLayout[ heightProp ] === 'fixed' ||
+							childLayout[ heightProp ] === 'fixedNoShrink' ) && (
+							<FlexBlock>
+								<UnitControl
+									__next40pxDefaultSize
+									onChange={ ( _value ) => {
+										onChange( {
+											...childLayout,
+											height: _value,
+										} );
+									} }
+									value={ height }
+								/>
+							</FlexBlock>
+						) }
+					</HStack>
+				</>
 			) }
 			{ parentLayoutType === 'grid' && (
 				<>

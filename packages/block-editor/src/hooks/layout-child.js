@@ -19,28 +19,42 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	const layout = style?.layout ?? {};
 	const {
 		selfStretch,
+		selfAlign,
 		flexSize,
 		columnStart,
 		rowStart,
 		columnSpan,
 		rowSpan,
+		height,
+		width,
 	} = layout;
 	const parentLayout = useLayout() || {};
-	const { columnCount, minimumColumnWidth } = parentLayout;
+	const {
+		columnCount,
+		minimumColumnWidth,
+		orientation,
+		type: parentType,
+		default: { type: defaultParentType = 'default' } = {},
+	} = parentLayout;
+	const parentLayoutType = parentType || defaultParentType;
 	const id = useInstanceId( useBlockPropsChildLayoutStyles );
 	const selector = `.wp-container-content-${ id }`;
 
+	const isVerticalLayout =
+		parentLayoutType === 'constrained' ||
+		parentLayoutType === 'default' ||
+		parentLayoutType === undefined ||
+		orientation === 'vertical';
+
 	let css = '';
 	if ( shouldRenderChildLayoutStyles ) {
+		// Flex size should still be output for back compat.
 		if ( selfStretch === 'fixed' && flexSize ) {
 			css = `${ selector } {
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
 			}`;
-		} else if ( selfStretch === 'fill' ) {
-			css = `${ selector } {
-				flex-grow: 1;
-			}`;
+			// Grid type styles.
 		} else if ( columnStart && columnSpan ) {
 			css = `${ selector } {
 				grid-column: ${ columnStart } / span ${ columnSpan };
@@ -53,6 +67,94 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			css = `${ selector } {
 				grid-column: span ${ columnSpan };
 			}`;
+		}
+		// All vertical layout types have the same styles.
+		if ( isVerticalLayout ) {
+			if ( selfAlign === 'fixed' && width ) {
+				/**
+				 * Once layout rule specificity is lowered,
+				 * the !important can be removed.
+				 */
+				css += `${ selector } {
+					max-width: ${ width } !important;
+				}`;
+			} else if ( selfAlign === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					width: ${ width };
+				}`;
+				/**
+				 * A max-width reset is needed to override constrained
+				 * layout styles.
+				 */
+				if ( parentLayoutType === 'constrained' ) {
+					css += `${ selector } {
+						max-width: none !important;
+					}`;
+				}
+			} else if ( selfAlign === 'fill' ) {
+				/**
+				 * This style is only needed for flex layouts because
+				 * constrained children have alignment set and flow
+				 * children are 100% width by default.
+				 */
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( selfAlign === 'fit' ) {
+				css += `${ selector } {
+					width: fit-content;
+				}`;
+			}
+
+			if ( selfStretch === 'fixed' && height ) {
+				// Max-height is needed for flow and constrained children.
+				css += `${ selector } {
+					max-height: ${ height };
+					flex-basis: ${ height };
+				}`;
+			} else if ( selfStretch === 'fixedNoShrink' && height ) {
+				// Height is needed for flow and constrained children.
+				css += `${ selector } {
+					height: ${ height };
+					flex-shrink: 0;
+					flex-basis: ${ height };
+				}`;
+			} else if ( selfStretch === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+				}`;
+			}
+			// Everything else that isn't a grid is a horizontal layout.
+		} else if ( parentLayoutType !== 'grid' ) {
+			if ( selfStretch === 'fixed' && width ) {
+				css += `${ selector } {
+					flex-basis: ${ width };
+					
+				}`;
+			} else if ( selfStretch === 'fixedNoShrink' && width ) {
+				css += `${ selector } {
+					flex-shrink: 0;
+					flex-basis: ${ width };
+				}`;
+			} else if ( selfStretch === 'fill' ) {
+				css += `${ selector } {
+					flex-grow: 1;
+				}`;
+			}
+
+			if ( selfAlign === 'fill' ) {
+				css += `${ selector } {
+					align-self: stretch;
+				}`;
+			} else if ( selfAlign === 'fixedNoShrink' && height ) {
+				css += `${ selector } {
+						height: ${ height };
+					}`;
+			} else if ( selfAlign === 'fixed' && height ) {
+				css += `${ selector } {
+						max-height: ${ height };
+					}`;
+			}
 		}
 		/**
 		 * If minimumColumnWidth is set on the parent, or if no

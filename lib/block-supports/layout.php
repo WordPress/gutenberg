@@ -578,17 +578,85 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$child_layout_declarations = array();
 	$child_layout_styles       = array();
 
-	$self_stretch = isset( $block['attrs']['style']['layout']['selfStretch'] ) ? $block['attrs']['style']['layout']['selfStretch'] : null;
+	$self_stretch = isset( $child_layout['selfStretch'] ) ? $child_layout['selfStretch'] : null;
+	$self_align   = isset( $child_layout['selfAlign'] ) ? $child_layout['selfAlign'] : null;
+	$height       = isset( $child_layout['height'] ) ? $child_layout['height'] : null;
+	$width        = isset( $child_layout['width'] ) ? $child_layout['width'] : null;
 
-	if ( 'fixed' === $self_stretch && isset( $block['attrs']['style']['layout']['flexSize'] ) ) {
-		$child_layout_declarations['flex-basis'] = $block['attrs']['style']['layout']['flexSize'];
+	$parent_layout_type = 'default';
+	if ( isset( $block['parentLayout']['type'] ) ) {
+		$parent_layout_type = $block['parentLayout']['type'];
+	} elseif ( isset( $block['parentLayout']['default']['type'] ) ) {
+		$parent_layout_type = $block['parentLayout']['default']['type'];
+	}
+
+	// Orientation is only used for flex layouts so its default is horizontal.
+	$parent_orientation         = isset( $block['parentLayout']['orientation'] ) ? $block['parentLayout']['orientation'] : 'horizontal';
+	$has_vertical_parent_layout = in_array( $parent_layout_type, array( 'constrained', 'default' ), true ) || ( 'flex' === $parent_layout_type && 'vertical' === $parent_orientation );
+
+	// Support for legacy flexSize value.
+	if ( 'fixed' === $self_stretch && isset( $child_layout['flexSize'] ) ) {
+		$child_layout_declarations['flex-basis'] = $child_layout['flexSize'];
 		$child_layout_declarations['box-sizing'] = 'border-box';
 	} elseif ( 'fill' === $self_stretch ) {
 		$child_layout_declarations['flex-grow'] = '1';
 	}
 
-	$column_start = isset( $block['attrs']['style']['layout']['columnStart'] ) ? $block['attrs']['style']['layout']['columnStart'] : null;
-	$column_span  = isset( $block['attrs']['style']['layout']['columnSpan'] ) ? $block['attrs']['style']['layout']['columnSpan'] : null;
+	if ( $has_vertical_parent_layout ) {
+		// Width styles.
+		if ( 'fixed' === $self_align && $width ) {
+			/**
+			 * !important is a (hopefully) temporary override for
+			 * the constrained layout styles, the specificity of
+			 * which should be lowered soon.
+			 */
+			$child_layout_declarations['max-width'] = "$width !important";
+		} elseif ( 'fixedNoShrink' === $self_align && $width ) {
+			$child_layout_declarations['width'] = $width;
+			if ( 'constrained' === $parent_layout_type ) {
+				$child_layout_declarations['max-width'] = 'none !important';
+			}
+		} elseif ( 'fill' === $self_align ) {
+			$child_layout_declarations['align-self'] = 'stretch';
+		} elseif ( 'fit' === $self_align ) {
+			$child_layout_declarations['width'] = 'fit-content';
+		}
+		// Height styles.
+		if ( 'fixed' === $self_stretch && $height ) {
+			$child_layout_declarations['max-height'] = $height;
+			$child_layout_declarations['flex-basis'] = $height;
+		} elseif ( 'fixedNoShrink' === $self_stretch && $height ) {
+			$child_layout_declarations['height']      = $height;
+			$child_layout_declarations['flex-shrink'] = '0';
+			$child_layout_declarations['flex-basis']  = $height;
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
+	} elseif ( 'grid' !== $parent_layout_type ) {
+		// Width styles.
+		if ( 'fixed' === $self_stretch && $width ) {
+			$child_layout_declarations['flex-basis'] = $width;
+		} elseif ( 'fixedNoShrink' === $self_stretch && $width ) {
+			$child_layout_declarations['flex-shrink'] = '0';
+			$child_layout_declarations['flex-basis']  = $width;
+		} elseif ( 'fill' === $self_stretch ) {
+			$child_layout_declarations['flex-grow'] = '1';
+		}
+		// Height styles.
+		if ( 'fixed' === $self_align && $height ) {
+			$child_layout_declarations['max-height'] = $height;
+		} elseif ( 'fixedNoShrink' === $self_align && $height ) {
+			$child_layout_declarations['height'] = $height;
+		} elseif ( 'fill' === $self_align ) {
+			$child_layout_declarations['align-self'] = 'stretch';
+		}
+	}
+
+	// Grid specific styles.
+
+	$column_start = isset( $child_layout['columnStart'] ) ? $child_layout['columnStart'] : null;
+	$column_span  = isset( $child_layout['columnSpan'] ) ? $child_layout['columnSpan'] : null;
+
 	if ( $column_start && $column_span ) {
 		$child_layout_declarations['grid-column'] = "$column_start / span $column_span";
 	} elseif ( $column_start ) {
@@ -597,8 +665,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$child_layout_declarations['grid-column'] = "span $column_span";
 	}
 
-	$row_start = isset( $block['attrs']['style']['layout']['rowStart'] ) ? $block['attrs']['style']['layout']['rowStart'] : null;
-	$row_span  = isset( $block['attrs']['style']['layout']['rowSpan'] ) ? $block['attrs']['style']['layout']['rowSpan'] : null;
+	$row_start = isset( $child_layout['rowStart'] ) ? $child_layout['rowStart'] : null;
+	$row_span  = isset( $child_layout['rowSpan'] ) ? $child_layout['rowSpan'] : null;
 	if ( $row_start && $row_span ) {
 		$child_layout_declarations['grid-row'] = "$row_start / span $row_span";
 	} elseif ( $row_start ) {
@@ -612,8 +680,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
-	$minimum_column_width = isset( $block['attrs']['style']['layout']['minimumColumnWidth'] ) ? $block['attrs']['style']['layout']['minimumColumnWidth'] : null;
-	$column_count         = isset( $block['attrs']['style']['layout']['columnCount'] ) ? $block['attrs']['style']['layout']['columnCount'] : null;
+	$minimum_column_width = isset( $child_layout['minimumColumnWidth'] ) ? $child_layout['minimumColumnWidth'] : null;
+	$column_count         = isset( $child_layout['columnCount'] ) ? $child_layout['columnCount'] : null;
 
 	/*
 	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
@@ -928,6 +996,8 @@ add_filter(
 		 */
 		if ( $parent_block && isset( $parent_block->parsed_block['attrs']['layout'] ) ) {
 			$parsed_block['parentLayout'] = $parent_block->parsed_block['attrs']['layout'];
+		} elseif ( $parent_block && isset( $parent_block->block_type->supports['layout'] ) ) {
+			$parsed_block['parentLayout'] = $parent_block->block_type->supports['layout'];
 		}
 		return $parsed_block;
 	},
