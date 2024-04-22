@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map.
+
 ## 27.4.0 (2024-04-19)
 
 ### Deprecation
