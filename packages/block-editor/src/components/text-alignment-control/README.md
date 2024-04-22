@@ -34,7 +34,7 @@ The current value of the Text Alignment setting. Available options are `left|cen
 
 #### controls
 
-An array of strings for what controls to show, by default it shows all. Available options are `left|center|right`.
+An array of strings for what controls to show, by default it shows all. Available options are `left|center|right|justify`.
 
 -   Type: `Array`
 -   Required: No

@@ -17,7 +17,10 @@ export default {
 	argTypes: {
 		onChange: { action: 'onChange' },
 		className: { control: 'text' },
-		controls: { control: 'check', options: [ 'left', 'center', 'right' ] },
+		controls: {
+			control: 'check',
+			options: [ 'left', 'center', 'right', 'justify' ],
+		},
 		value: { control: { type: null } },
 	},
 };

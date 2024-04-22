@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
+import {
+	alignLeft,
+	alignCenter,
+	alignRight,
+	alignJustify,
+} from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -25,6 +30,11 @@ const TEXT_ALIGNMENT_CONTROLS = [
 		label: __( 'Align text right' ),
 		value: 'right',
 		icon: alignRight,
+	},
+	{
+		label: __( 'Justify text' ),
+		value: 'justify',
+		icon: alignJustify,
 	},
 ];
 
