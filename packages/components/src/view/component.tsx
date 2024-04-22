@@ -38,6 +38,8 @@ function UnforwardedView< T extends React.ElementType = 'div' >(
  * }
  * ```
  */
-export const View = forwardRef( UnforwardedView );
+export const View = Object.assign( forwardRef( UnforwardedView ), {
+	selector: '.components-view',
+} );
 
 export default View;
