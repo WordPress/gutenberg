@@ -136,9 +136,9 @@ describe( 'normalizeTextString', () => {
 			'\u2015',
 			// ⁓ (swung dash)
 			'\u2053',
-			// superscript minus)
+			// ⁻ (superscript minus)
 			'\u207b',
-			// subscript minus)
+			// ₋ (subscript minus)
 			'\u208b',
 			// − (minus sign)
 			'\u2212',
