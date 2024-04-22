@@ -11,12 +11,12 @@ import SegmentedTextControl from '../segmented-text-control';
 
 const WRITING_MODES = [
 	{
-		name: __( 'Horizontal' ),
+		label: __( 'Horizontal' ),
 		value: 'horizontal-tb',
 		icon: textHorizontal,
 	},
 	{
-		name: __( 'Vertical' ),
+		label: __( 'Vertical' ),
 		value: isRTL() ? 'vertical-lr' : 'vertical-rl',
 		icon: textVertical,
 	},
