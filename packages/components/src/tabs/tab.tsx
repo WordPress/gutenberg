@@ -10,7 +10,7 @@ import { forwardRef } from '@wordpress/element';
 import type { TabProps } from './types';
 import warning from '@wordpress/warning';
 import { useTabsContext } from './context';
-import { Tab as StyledTab, TabIndicator } from './styles';
+import { Tab as StyledTab } from './styles';
 import type { WordPressComponentProps } from '../context';
 
 export const Tab = forwardRef<
@@ -18,8 +18,6 @@ export const Tab = forwardRef<
 	Omit< WordPressComponentProps< TabProps, 'button', false >, 'id' >
 >( function Tab( { children, tabId, disabled, render, ...otherProps }, ref ) {
 	const context = useTabsContext();
-	const activeId = context?.store.useState( 'activeId' );
-	const orientation = context?.store.useState( 'orientation' );
 	if ( ! context ) {
 		warning( '`Tabs.Tab` must be wrapped in a `Tabs` component.' );
 		return null;
@@ -36,14 +34,6 @@ export const Tab = forwardRef<
 			{ ...otherProps }
 		>
 			{ children }
-			{ activeId === instancedTabId && (
-				<TabIndicator
-					layoutId={ instanceId }
-					className={
-						orientation === 'vertical' ? 'is-vertical' : ''
-					}
-				/>
-			) }
 		</StyledTab>
 	);
 } );
