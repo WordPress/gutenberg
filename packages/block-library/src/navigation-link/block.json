@@ -14,7 +14,7 @@
 	"textdomain": "default",
 	"attributes": {
 		"label": {
-			"type": "rich-text"
+			"type": "string"
 		},
 		"type": {
 			"type": "string"
