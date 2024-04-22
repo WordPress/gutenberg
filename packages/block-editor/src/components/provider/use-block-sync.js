@@ -123,7 +123,6 @@ export default function useBlockSync( {
 				if ( subscribed.current ) {
 					pendingChanges.current.incoming = controlledBlocks;
 				}
-				__unstableMarkNextChangeAsNotPersistent();
 				resetBlocks( controlledBlocks );
 			}
 
