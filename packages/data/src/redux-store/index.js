@@ -625,14 +625,12 @@ function mapSelectorWithResolver(
 			queuesByRegistry.set( registry, queue );
 		}
 
-		function startResolution() {
+		async function fulfillResolution() {
 			resolversCache.clear( selectorName, args );
 			store.dispatch(
 				metadataActions.startResolution( selectorName, args )
 			);
-		}
 
-		async function fulfillResolution() {
 			try {
 				const action = resolver.fulfill( ...args );
 				if ( action ) {
@@ -648,21 +646,17 @@ function mapSelectorWithResolver(
 			}
 		}
 
-		queue.push( [ startResolution, fulfillResolution ] );
+		queue.push( fulfillResolution );
 
 		setTimeout( () => {
 			if ( queue.length ) {
 				// Many resolvers can be called at once. The point of this is to
 				// at least batch `startResolution` actions all together.
 				registry.batch( () => {
-					for ( const [ start ] of queue ) {
-						start();
+					for ( const fulfill of queue ) {
+						fulfill();
 					}
 				} );
-
-				for ( const [ , fulfill ] of queue ) {
-					fulfill();
-				}
 
 				queue.length = 0;
 			}
