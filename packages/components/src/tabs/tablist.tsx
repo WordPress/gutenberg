@@ -41,7 +41,7 @@ export const TabList = forwardRef<
 		function updateIndicator( element: HTMLElement ) {
 			setIndicatorPosition( {
 				left: element.offsetLeft,
-				width: element.getBoundingClientRect().width,
+				width: element.offsetWidth,
 			} );
 		}
 
