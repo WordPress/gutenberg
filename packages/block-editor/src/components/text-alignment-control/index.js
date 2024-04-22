@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { alignLeft, alignCenter, alignRight } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,8 +47,12 @@ export default function TextAlignmentControl( {
 	onChange,
 	controls = DEFAULT_CONTROLS,
 } ) {
-	const validControls = TEXT_ALIGNMENT_CONTROLS.filter( ( control ) =>
-		controls.includes( control.value )
+	const validControls = useMemo(
+		() =>
+			TEXT_ALIGNMENT_CONTROLS.filter( ( control ) =>
+				controls.includes( control.value )
+			),
+		[ controls ]
 	);
 
 	if ( ! validControls.length ) {
