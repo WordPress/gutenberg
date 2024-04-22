@@ -8,17 +8,17 @@ import type { ForwardedRef } from 'react';
  */
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
+import { View } from '../../view';
 import { useNavigatorBackButton } from './hook';
 import type { NavigatorBackButtonProps } from '../types';
-import Button from '../../button';
 
 function UnconnectedNavigatorBackButton(
-	props: WordPressComponentProps< NavigatorBackButtonProps, 'button', false >,
+	props: WordPressComponentProps< NavigatorBackButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorBackButtonProps = useNavigatorBackButton( props );
 
-	return <Button ref={ forwardedRef } { ...navigatorBackButtonProps } />;
+	return <View ref={ forwardedRef } { ...navigatorBackButtonProps } />;
 }
 
 /**

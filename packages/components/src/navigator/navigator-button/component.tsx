@@ -10,15 +10,15 @@ import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useNavigatorButton } from './hook';
 import type { NavigatorButtonProps } from '../types';
-import Button from '../../button';
+import { View } from '../../view';
 
 function UnconnectedNavigatorButton(
-	props: WordPressComponentProps< NavigatorButtonProps, 'button', false >,
+	props: WordPressComponentProps< NavigatorButtonProps, 'button' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const navigatorButtonProps = useNavigatorButton( props );
 
-	return <Button ref={ forwardedRef } { ...navigatorButtonProps } />;
+	return <View ref={ forwardedRef } { ...navigatorButtonProps } />;
 }
 
 /**
