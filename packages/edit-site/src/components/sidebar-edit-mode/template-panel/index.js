@@ -9,6 +9,7 @@ import {
 	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	PluginDocumentSettingPanel,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -114,6 +115,7 @@ export default function TemplatePanel() {
 				}
 			/>
 			<PluginTemplateSettingPanel.Slot />
+			<PluginDocumentSettingPanel.Slot />
 			{ availablePatterns?.length > 0 && (
 				<PanelBody
 					title={ __( 'Transform into:' ) }
