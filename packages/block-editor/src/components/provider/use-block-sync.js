@@ -100,16 +100,16 @@ export default function useBlockSync( {
 			return;
 		}
 
-		// We don't need to persist this change because we only replace
-		// controlled inner blocks when the change was caused by an entity,
-		// and so it would already be persisted.
-		__unstableMarkNextChangeAsNotPersistent();
-		if ( clientId ) {
-			// It is important to batch here because otherwise,
-			// as soon as `setHasControlledInnerBlocks` is called
-			// the effect to restore might be triggered
-			// before the actual blocks get set properly in state.
-			registry.batch( () => {
+		registry.batch( () => {
+			// We don't need to persist this change because we only replace
+			// controlled inner blocks when the change was caused by an entity,
+			// and so it would already be persisted.
+			__unstableMarkNextChangeAsNotPersistent();
+			if ( clientId ) {
+				// It is important to batch here because otherwise, as soon as
+				// `setHasControlledInnerBlocks` is called the effect to restore
+				// might be triggered before the actual blocks get set properly
+				// in state.
 				setHasControlledInnerBlocks( clientId, true );
 				const storeBlocks = controlledBlocks.map( ( block ) =>
 					cloneBlock( block )
@@ -119,26 +119,22 @@ export default function useBlockSync( {
 				}
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks( clientId, storeBlocks );
-			} );
-		} else {
-			if ( subscribed.current ) {
-				pendingChanges.current.incoming = controlledBlocks;
+			} else {
+				if ( subscribed.current ) {
+					pendingChanges.current.incoming = controlledBlocks;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				resetBlocks( controlledBlocks );
 			}
-			resetBlocks( controlledBlocks );
-		}
-	};
 
-	// Clean up the changes made by setControlledBlocks() when the component
-	// containing useBlockSync() unmounts.
-	const unsetControlledBlocks = () => {
-		__unstableMarkNextChangeAsNotPersistent();
-		if ( clientId ) {
-			setHasControlledInnerBlocks( clientId, false );
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, [] );
-		} else {
-			resetBlocks( [] );
-		}
+			if ( controlledSelection ) {
+				resetSelection(
+					controlledSelection.selectionStart,
+					controlledSelection.selectionEnd,
+					controlledSelection.initialPosition
+				);
+			}
+		} );
 	};
 
 	// Add a subscription to the block-editor registry to detect when changes
@@ -175,14 +171,6 @@ export default function useBlockSync( {
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
 			setControlledBlocks();
-
-			if ( controlledSelection ) {
-				resetSelection(
-					controlledSelection.selectionStart,
-					controlledSelection.selectionEnd,
-					controlledSelection.initialPosition
-				);
-			}
 		}
 	}, [ controlledBlocks, clientId ] );
 
@@ -288,9 +276,21 @@ export default function useBlockSync( {
 		};
 	}, [ registry, clientId ] );
 
-	useEffect( () => {
-		return () => {
-			unsetControlledBlocks();
-		};
-	}, [] );
+	// Clean up the changes made by setControlledBlocks() when the component
+	// containing useBlockSync() unmounts.
+	useEffect(
+		() => () => {
+			registry.batch( () => {
+				__unstableMarkNextChangeAsNotPersistent();
+				if ( clientId ) {
+					setHasControlledInnerBlocks( clientId, false );
+					__unstableMarkNextChangeAsNotPersistent();
+					replaceInnerBlocks( clientId, [] );
+				} else {
+					resetBlocks( [] );
+				}
+			} );
+		},
+		[]
+	);
 }
