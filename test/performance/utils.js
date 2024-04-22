@@ -19,6 +19,15 @@ export function average( array ) {
 	return sum( array ) / array.length;
 }
 
+export function variance( array ) {
+	if ( ! array || ! array.length ) return undefined;
+
+	return Math.sqrt(
+		sum( array.map( ( x ) => x ** 2 ) ) / array.length -
+			( sum( array ) / array.length ) ** 2
+	);
+}
+
 export function median( array ) {
 	if ( ! array || ! array.length ) {
 		return undefined;
