@@ -38,6 +38,6 @@ export function useEventListeners( props ) {
 				cleanups.forEach( ( cleanup ) => cleanup() );
 			};
 		},
-		[ refEffects, props.isSelected ]
+		[ refEffects ]
 	);
 }
