@@ -159,7 +159,12 @@ export default function SidebarNavigationScreenPatterns() {
 							'Manage what patterns are available when editing the site.'
 					  )
 			}
-			actions={ <AddNewPattern /> }
+			actions={
+				<AddNewPattern
+					canCreateParts={ isBlockBasedTheme }
+					canCreatePatterns={ ! isTemplatePartsPath }
+				/>
+			}
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }
