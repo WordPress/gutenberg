@@ -42,7 +42,7 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
+const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 const { PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
@@ -54,6 +54,7 @@ export default function HeaderEditMode() {
 		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
+		isFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
@@ -71,12 +72,15 @@ export default function HeaderEditMode() {
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
+			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showFixedToolbar } = useShowBlockTools();
-	const showTopToolbar = isLargeViewport && showFixedToolbar;
+	const hasBlockToolbar = useHasBlockToolbar();
+	const hasFixedToolbar = hasBlockToolbar && isFixedToolbar;
+	const showTopToolbar =
+		isLargeViewport && hasFixedToolbar && blockEditorMode !== 'zoom-out';
 	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 

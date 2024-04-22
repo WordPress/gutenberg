@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
-import { getQueryArgs } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -17,7 +16,6 @@ import usePatternDetails from './use-pattern-details';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateActions from '../template-actions';
-import { TEMPLATE_PART_POST_TYPE } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -27,18 +25,31 @@ export default function SidebarNavigationScreenPattern() {
 	const {
 		params: { postType, postId },
 	} = location;
-	const { categoryType } = getQueryArgs( window.location.href );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
+	const isTemplatePartsMode = useSelect( ( select ) => {
+		return !! select( editSiteStore ).getSettings()
+			.supportsTemplatePartsMode;
+	}, [] );
 
-	// The absence of a category type in the query params for template parts
-	// indicates the user has arrived at the template part via the "manage all"
-	// page and the back button should return them to that list page.
+	/**
+	 * This sidebar needs to temporarily accomodate two different "URLs" backpaths:
+	 *
+	 * 1. path = /patterns
+	 *    Block based themes. Also classic themes can access this URL, though it's not linked anywhere.
+	 *
+	 * 2. path = /wp_template_part/all
+	 *    Classic themes with support for block-template-parts. We need to list only Template Parts in this case.
+	 *    The URL is accessible from the Appearance > Template Parts menu.
+	 *
+	 * Depending on whether the theme supports block-template-parts, we go back to Patterns or Template screens.
+	 * This is temporary. We aim to consolidate to /patterns.
+	 */
 	const backPath =
-		! categoryType && postType === TEMPLATE_PART_POST_TYPE
+		isTemplatePartsMode && postType === 'wp_template_part'
 			? { path: '/wp_template_part/all' }
 			: { path: '/patterns' };
 

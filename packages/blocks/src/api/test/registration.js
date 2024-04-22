@@ -398,6 +398,51 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( 'should merge settings provided by server and client', () => {
+			const blockName = 'core/test-block-with-merged-settings';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					variations: [
+						{ name: 'foo', label: 'Foo' },
+						{ name: 'baz', label: 'Baz', description: 'Testing' },
+					],
+				},
+			} );
+
+			const blockType = {
+				title: 'block settings merge',
+				variations: [
+					{ name: 'bar', label: 'Bar' },
+					{ name: 'baz', label: 'Baz', icon: 'layout' },
+				],
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block settings merge',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [
+					{ name: 'foo', label: 'Foo' },
+					{
+						description: 'Testing',
+						name: 'baz',
+						label: 'Baz',
+						icon: 'layout',
+					},
+					{ name: 'bar', label: 'Bar' },
+				],
+				blockHooks: {},
+			} );
+		} );
+
 		// This test can be removed once the polyfill for blockHooks gets removed.
 		it( 'should polyfill blockHooks using metadata on the client when not set on the server', () => {
 			const blockName = 'tests/hooked-block';

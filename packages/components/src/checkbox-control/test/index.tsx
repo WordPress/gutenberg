@@ -86,6 +86,11 @@ describe( 'CheckboxControl', () => {
 				containerIndeterminate
 			);
 		} );
+
+		it( 'should associate the `help` text accessibly', () => {
+			render( <CheckboxControl help="Help text" /> );
+			expect( getInput() ).toHaveAccessibleDescription( 'Help text' );
+		} );
 	} );
 
 	describe( 'Value', () => {

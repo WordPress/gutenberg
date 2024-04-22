@@ -1032,6 +1032,10 @@ _Returns_
 
 A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
 
+_Parameters_
+
+-   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
+
 ### Warning
 
 _Related_

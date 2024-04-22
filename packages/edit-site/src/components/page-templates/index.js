@@ -44,7 +44,6 @@ import {
 
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import AddNewTemplatePart from './add-new-template-part';
 
 const { usePostActions } = unlock( editorPrivateApis );
 
@@ -175,10 +174,7 @@ function Preview( { item, viewType } ) {
 						onClick={ onClick }
 						aria-label={ item.title?.rendered || item.title }
 					>
-						{ isEmpty &&
-							( item.type === TEMPLATE_POST_TYPE
-								? __( 'Empty template' )
-								: __( 'Empty template part' ) ) }
+						{ isEmpty && __( 'Empty template' ) }
 						{ ! isEmpty && (
 							<Async>
 								<BlockPreview blocks={ blocks } />
@@ -199,7 +195,7 @@ const TEMPLATE_ACTIONS = [
 	'delete-template',
 ];
 
-export default function PageTemplatesTemplateParts( { postType } ) {
+export default function PageTemplates() {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
 	const defaultView = useMemo( () => {
@@ -239,7 +235,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	const { records, isResolving: isLoadingData } = useEntityRecords(
 		'postType',
-		postType,
+		TEMPLATE_POST_TYPE,
 		{
 			per_page: -1,
 		}
@@ -271,8 +267,8 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 		} ) );
 	}, [ records ] );
 
-	const fields = useMemo( () => {
-		const _fields = [
+	const fields = useMemo(
+		() => [
 			{
 				header: __( 'Preview' ),
 				id: 'preview',
@@ -284,10 +280,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				enableSorting: false,
 			},
 			{
-				header:
-					postType === TEMPLATE_POST_TYPE
-						? __( 'Template' )
-						: __( 'Template Part' ),
+				header: __( 'Template' ),
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => (
@@ -297,9 +290,7 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				enableHiding: false,
 				enableGlobalSearch: true,
 			},
-		];
-		if ( postType === TEMPLATE_POST_TYPE ) {
-			_fields.push( {
+			{
 				header: __( 'Description' ),
 				id: 'description',
 				render: ( { item } ) => {
@@ -324,23 +315,21 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 				minWidth: 320,
 				enableSorting: false,
 				enableGlobalSearch: true,
-			} );
-		}
-		// TODO: The plan is to support fields reordering, which would require an API like `order` or something
-		// similar. With the aforementioned API we wouldn't need to construct the fields array like this.
-		_fields.push( {
-			header: __( 'Author' ),
-			id: 'author',
-			getValue: ( { item } ) => item.author_text,
-			render: ( { item } ) => {
-				return <AuthorField viewType={ view.type } item={ item } />;
 			},
-			type: ENUMERATION_TYPE,
-			elements: authors,
-			width: '1%',
-		} );
-		return _fields;
-	}, [ postType, authors, view.type ] );
+			{
+				header: __( 'Author' ),
+				id: 'author',
+				getValue: ( { item } ) => item.author_text,
+				render: ( { item } ) => {
+					return <AuthorField viewType={ view.type } item={ item } />;
+				},
+				type: ENUMERATION_TYPE,
+				elements: authors,
+				width: '1%',
+			},
+		],
+		[ authors, view.type ]
+	);
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
@@ -385,19 +374,9 @@ export default function PageTemplatesTemplateParts( { postType } ) {
 
 	return (
 		<Page
-			className="edit-site-page-template-template-parts-dataviews"
-			title={
-				postType === TEMPLATE_POST_TYPE
-					? __( 'Templates' )
-					: __( 'Template Parts' )
-			}
-			actions={
-				postType === TEMPLATE_POST_TYPE ? (
-					<AddNewTemplate />
-				) : (
-					<AddNewTemplatePart />
-				)
-			}
+			className="edit-site-page-templates"
+			title={ __( 'Templates' ) }
+			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
 				paginationInfo={ paginationInfo }
