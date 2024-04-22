@@ -204,11 +204,10 @@ function Items( {
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:
 						hasAppender &&
+						__unstableGetEditorMode() !== 'zoom-out' &&
 						( hasCustomAppender
 							? ! getTemplateLock( rootClientId ) &&
-							  getBlockEditingMode( rootClientId ) !==
-									'disabled' &&
-							  __unstableGetEditorMode() !== 'zoom-out'
+							  getBlockEditingMode( rootClientId ) !== 'disabled'
 							: rootClientId === selectedBlockClientId ||
 							  ( ! rootClientId &&
 									! selectedBlockClientId &&
