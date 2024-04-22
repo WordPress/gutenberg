@@ -8,7 +8,13 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import warning from '@wordpress/warning';
-import { forwardRef, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,30 +25,37 @@ import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import type { CSSProperties } from 'react';
 
-export const TabList = forwardRef<
-	HTMLDivElement,
-	WordPressComponentProps< TabListProps, 'div', false >
->( function TabList( { children, ...otherProps }, ref ) {
-	const context = useTabsContext();
-
+function useTrackElementOffset(
+	targetElement?: HTMLElement | null,
+	onUpdate?: () => void
+) {
 	const [ indicatorPosition, setIndicatorPosition ] = useState( {
 		left: 0,
+		top: 0,
 		width: 0,
+		height: 0,
 	} );
-	const selectedId = context?.store.useState( 'selectedId' );
-	const selectedTabEl = context?.store.item( selectedId )?.element;
-	const resizeObserverRef = useRef< ResizeObserver >();
-	const observedElementRef = useRef< HTMLElement >();
 
+	// TODO: replace with useEventCallback or similar when officially available.
+	const updateCallbackRef = useRef( onUpdate );
+	useLayoutEffect( () => {
+		updateCallbackRef.current = onUpdate;
+	} );
+
+	const observedElementRef = useRef< HTMLElement >();
+	const resizeObserverRef = useRef< ResizeObserver >();
 	useEffect( () => {
-		if ( selectedTabEl === observedElementRef.current ) return;
-		observedElementRef.current = selectedTabEl ?? undefined;
+		if ( targetElement === observedElementRef.current ) return;
+		observedElementRef.current = targetElement ?? undefined;
 
 		function updateIndicator( element: HTMLElement ) {
 			setIndicatorPosition( {
 				left: element.offsetLeft,
+				top: element.offsetTop,
 				width: element.offsetWidth,
+				height: element.offsetHeight,
 			} );
+			updateCallbackRef.current?.();
 		}
 
 		// Set up a ResizeObserver.
@@ -59,11 +72,49 @@ export const TabList = forwardRef<
 		if ( observedElement ) resizeObserver.unobserve( observedElement );
 
 		// Observe new element.
-		if ( selectedTabEl ) {
-			updateIndicator( selectedTabEl );
-			resizeObserver.observe( selectedTabEl );
+		if ( targetElement ) {
+			updateIndicator( targetElement );
+			resizeObserver.observe( targetElement );
 		}
-	}, [ selectedTabEl ] );
+	}, [ targetElement ] );
+
+	return indicatorPosition;
+}
+
+type ValueUpdateContext = {
+	previousValue: unknown;
+};
+
+function useOnValueUpdate(
+	value: unknown,
+	onUpdate: ( context: ValueUpdateContext ) => void
+) {
+	const [ previousValue, setPreviousValue ] = useState( value );
+
+	useEffect( () => {
+		if ( previousValue !== value ) {
+			onUpdate( { previousValue } );
+			setPreviousValue( value );
+		}
+	}, [ previousValue, value, onUpdate ] );
+}
+
+export const TabList = forwardRef<
+	HTMLDivElement,
+	WordPressComponentProps< TabListProps, 'div', false >
+>( function TabList( { children, ...otherProps }, ref ) {
+	const context = useTabsContext();
+
+	const selectedId = context?.store.useState( 'selectedId' );
+	const indicatorPosition = useTrackElementOffset(
+		context?.store.item( selectedId )?.element
+	);
+
+	const [ animationEnabled, setAnimationEnabled ] = useState( false );
+	useOnValueUpdate(
+		selectedId,
+		( { previousValue } ) => previousValue && setAnimationEnabled( true )
+	);
 
 	if ( ! context ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
@@ -92,13 +143,21 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
+			className={ animationEnabled ? 'isAnimationEnabled' : '' }
 			style={
 				{
 					'--indicator-left': `${ indicatorPosition.left }px`,
 					'--indicator-width': `${ indicatorPosition.width }px`,
 				} as CSSProperties
 			}
-			render={ <TabListWrapper /> }
+			render={
+				<TabListWrapper
+					onTransitionEnd={ ( event ) => {
+						if ( event.pseudoElement === '::after' )
+							setAnimationEnabled( false );
+					} }
+				/>
+			}
 			onBlur={ onBlur }
 			{ ...otherProps }
 		>

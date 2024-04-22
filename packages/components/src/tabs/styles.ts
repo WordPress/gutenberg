@@ -20,6 +20,13 @@ export const TabListWrapper = styled.div`
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 	}
+	&.isAnimationEnabled::after {
+		@media not ( prefers-reduced-motion: reduce ) {
+			transition-property: left width;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
+		}
+	}
 	&::after {
 		content: '';
 		position: absolute;
@@ -30,11 +37,6 @@ export const TabListWrapper = styled.div`
 		border-bottom: var( --wp-admin-border-width-focus ) solid
 			${ COLORS.theme.accent };
 		pointer-events: none;
-		@media not ( prefers-reduced-motion: reduce ) {
-			transition-property: left width;
-			transition-duration: 0.2s;
-			transition-timing-function: ease-out;
-		}
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
