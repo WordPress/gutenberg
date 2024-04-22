@@ -112,16 +112,15 @@ export default function SidebarNavigationScreenPatterns() {
 	const { categoryType, categoryId, path } = getQueryArgs(
 		window.location.href
 	);
+	const isTemplatePartsPath = path === '/wp_template_part/all';
 	const currentCategory =
 		categoryId ||
-		( path === '/wp_template_part/all'
+		( isTemplatePartsPath
 			? TEMPLATE_PART_ALL_AREAS_CATEGORY
 			: PATTERN_DEFAULT_CATEGORY );
 	const currentType =
 		categoryType ||
-		( path === '/wp_template_part/all'
-			? TEMPLATE_PART_POST_TYPE
-			: PATTERN_TYPES.theme );
+		( isTemplatePartsPath ? TEMPLATE_PART_POST_TYPE : PATTERN_TYPES.theme );
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
@@ -131,19 +130,32 @@ export default function SidebarNavigationScreenPatterns() {
 		[]
 	);
 
+	/**
+	 * This sidebar needs to temporarily accomodate 3 different "screens":
+	 *
+	 * 1. Block based themes: list Patterns + Template Parts.
+	 *
+	 * 2. Classic themes: list Patterns.
+	 *    The URL is accessible though not linked anywhere.
+	 *
+	 * 3. Hybrid themes (classic themes with support for block-template-parts): list Template Parts.
+	 *    The URL is accessible from the Appearance > Template Parts menu.
+	 *
+	 * This is temporary. We aim to list Patterns & Template Parts in all 3 scenarios.
+	 */
 	return (
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
 			title={
-				isBlockBasedTheme ? __( 'Patterns' ) : __( 'Template Parts' )
+				isTemplatePartsPath ? __( 'Template Parts' ) : __( 'Patterns' )
 			}
 			description={
-				isBlockBasedTheme
+				isTemplatePartsPath
 					? __(
-							'Manage what patterns are available when editing the site.'
+							'Manage what template parts are available when editing the site.'
 					  )
 					: __(
-							'Manage what template parts are available when editing the site.'
+							'Manage what patterns are available when editing the site.'
 					  )
 			}
 			actions={ isBlockBasedTheme && <AddNewPattern /> }
@@ -159,11 +171,15 @@ export default function SidebarNavigationScreenPatterns() {
 							) }
 							<CategoriesGroup
 								path={ path }
-								templatePartAreas={ templatePartAreas }
-								patternCategories={
-									isBlockBasedTheme
-										? patternCategories
+								templatePartAreas={
+									isBlockBasedTheme || isTemplatePartsPath
+										? templatePartAreas
 										: EMPTY_ARRAY
+								}
+								patternCategories={
+									isTemplatePartsPath
+										? EMPTY_ARRAY
+										: patternCategories
 								}
 								currentCategory={ currentCategory }
 								currentType={ currentType }
