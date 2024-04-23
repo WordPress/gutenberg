@@ -182,7 +182,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | undefined | false |  |
+| fluid | boolean, object | false | minFontSize, maxViewportWidth, minViewportWidth |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textAlign | boolean | true |  |
