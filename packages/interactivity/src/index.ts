@@ -3,11 +3,11 @@
  */
 import { h, cloneElement, render } from 'preact';
 import { batch } from '@preact/signals';
-import { deepSignal } from 'deepsignal';
 
 /**
  * Internal dependencies
  */
+import { deepSignal } from './deepsignal';
 import registerDirectives from './directives';
 import { init, getRegionRootFragment, initialVdom } from './init';
 import { directivePrefix } from './constants';

@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { deepSignal } from 'deepsignal';
 import { computed } from '@preact/signals';
 
 /**
  * Internal dependencies
  */
+import { deepSignal } from './deepsignal';
 import {
 	getScope,
 	setScope,

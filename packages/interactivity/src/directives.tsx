@@ -6,7 +6,6 @@
  */
 import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
-import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 
 /**
  * Internal dependencies
@@ -20,6 +19,7 @@ import {
 } from './utils';
 import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
+import { deepSignal, peek, type DeepSignal } from './deepsignal';
 
 // Assigned objects should be ignored during proxification.
 const contextAssignedObjects = new WeakMap();
