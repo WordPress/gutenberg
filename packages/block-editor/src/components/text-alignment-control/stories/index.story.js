@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-
-const { TextAlignmentControl } = unlock( blockEditorPrivateApis );
+import TextAlignmentControl from '../';
 
 export default {
 	title: 'BlockEditor/TextAlignmentControl',
