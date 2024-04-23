@@ -126,19 +126,15 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 							/>
 						}
 					/>
-					{ ! isEditingTemplate && (
-						<>
-							<PostStatus />
-							<PluginDocumentSettingPanel.Slot />
-							<PostLastRevisionPanel />
-							<PostTaxonomiesPanel />
-							<PostExcerptPanel />
-							<PostDiscussionPanel />
-							<PageAttributesPanel />
-							<PatternOverridesPanel />
-							<MetaBoxes location="side" />
-						</>
-					) }
+					{ ! isEditingTemplate && <PostStatus /> }
+					<PluginDocumentSettingPanel.Slot />
+					<PostLastRevisionPanel />
+					<PostTaxonomiesPanel />
+					<PostExcerptPanel />
+					<PostDiscussionPanel />
+					<PageAttributesPanel />
+					<PatternOverridesPanel />
+					{ ! isEditingTemplate && <MetaBoxes location="side" /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
