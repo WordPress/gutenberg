@@ -26,14 +26,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import {
-	Icon,
-	header,
-	footer,
-	symbolFilled as uncategorized,
-	symbol,
-	lockSmall,
-} from '@wordpress/icons';
+import { Icon, lockSmall } from '@wordpress/icons';
 import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -77,7 +70,6 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 const { usePostActions } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
-const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {
@@ -94,7 +86,7 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [ 'sync-status' ],
+	hiddenFields: [],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
@@ -243,9 +235,7 @@ function Author( { item, viewType } ) {
 
 function Title( { item, categoryId } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	let itemIcon;
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
@@ -253,12 +243,6 @@ function Title( { item, categoryId } ) {
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
-	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
-		itemIcon = templatePartIcons[ categoryId ];
-	} else {
-		itemIcon =
-			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
-	}
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			<Flex
@@ -281,19 +265,6 @@ function Title( { item, categoryId } ) {
 					</Button>
 				) }
 			</Flex>
-			{ itemIcon && ! isNonUserPattern && (
-				<Tooltip
-					placement="top"
-					text={ __(
-						'Editing this pattern will also update anywhere it is used'
-					) }
-				>
-					<Icon
-						className="edit-site-patterns__pattern-icon"
-						icon={ itemIcon }
-					/>
-				</Tooltip>
-			) }
 			{ item.type === PATTERN_TYPES.theme && (
 				<Tooltip
 					placement="top"
