@@ -152,6 +152,7 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 			<GridVisualizer clientId={ rootClientId } />
 			<GridItemResizer
 				clientId={ clientId }
+				rootClientId={ rootClientId }
 				onChange={ ( { columnSpan, rowSpan } ) => {
 					setAttributes( {
 						style: {

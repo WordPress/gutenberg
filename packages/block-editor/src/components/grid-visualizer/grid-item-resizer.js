@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,8 +11,34 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
-export function GridItemResizer( { clientId, onChange } ) {
+export function GridItemResizer( { clientId, rootClientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
+	const rootBlockElement = useBlockElement( rootClientId );
+
+	const [ resizeDirection, setResizeDirection ] = useState( null );
+
+	const justification = {
+		right: 'flex-start',
+		left: 'flex-end',
+	};
+
+	const alignment = {
+		top: 'flex-end',
+		bottom: 'flex-start',
+	};
+
+	const styles = {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		...( justification[ resizeDirection ] && {
+			justifyContent: justification[ resizeDirection ],
+		} ),
+		...( alignment[ resizeDirection ] && {
+			alignItems: alignment[ resizeDirection ],
+		} ),
+	};
+
 	if ( ! blockElement ) {
 		return null;
 	}
@@ -20,6 +47,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
+			additionalStyles={ styles }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"
@@ -31,11 +59,16 @@ export function GridItemResizer( { clientId, onChange } ) {
 					bottom: true,
 					bottomLeft: false,
 					bottomRight: false,
-					left: false,
+					left: true,
 					right: true,
-					top: false,
+					top: true,
 					topLeft: false,
 					topRight: false,
+				} }
+				bounds={ rootBlockElement }
+				boundsByDirection
+				onResizeStart={ ( event, direction ) => {
+					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
 					const gridElement = blockElement.parentElement;
