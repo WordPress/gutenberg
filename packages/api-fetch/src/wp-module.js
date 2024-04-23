@@ -1,16 +1,19 @@
 /**
  * Internal dependencies
  */
-import createNonceMiddleware from './middlewares/nonce';
-import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
-import fetchAllMiddleware from './middlewares/fetch-all-middleware';
-import mediaUploadMiddleware from './middlewares/media-upload';
-import createThemePreviewMiddleware from './middlewares/theme-preview';
-import { apiFetch, registerMiddleware, setFetchHandler } from './core';
+import { createNonceMiddleware } from './middlewares/nonce';
+import { createRootURLMiddleware } from './middlewares/root-url';
+import { createPreloadingMiddleware } from './middlewares/preloading';
+import { fetchAllMiddleware } from './middlewares/fetch-all-middleware';
+import { mediaUploadMiddleware } from './middlewares/media-upload';
+import { createThemePreviewMiddleware } from './middlewares/theme-preview';
+import { apiFetch, setFetchHandler } from './core';
+import { registerMiddleware } from './middlewares/singleton';
 
 if ( typeof document !== 'undefined' ) {
-	const el = document.getElementById( 'scriptmoduledata_@wordpress/api-fetch' );
+	const el = document.getElementById(
+		'wp-scriptmodule-data_@wordpress/api-fetch'
+	);
 	if ( el?.textContent ) {
 		console.group( 'api-fetch init' );
 		try {
@@ -34,15 +37,18 @@ if ( typeof document !== 'undefined' ) {
 				apiFetch.nonceEndpoint = config.nonceEndpoint;
 			}
 			if ( config.themePreviewPath ) {
-				// @ts-expect-error This is wrong, done for testing.
-				registerMiddleware( createThemePreviewMiddleware( config.themePreviewPath ) );
+				registerMiddleware(
+					// @ts-expect-error This is wrong, done for testing.
+					createThemePreviewMiddleware( config.themePreviewPath )
+				);
 			}
 			if ( config.preloadData ) {
-				registerMiddleware( createPreloadingMiddleware( config.preloadData ) );
+				registerMiddleware(
+					createPreloadingMiddleware( config.preloadData )
+				);
 			}
-
-		} catch {
-			console.error( 'error' );
+		} catch ( err ) {
+			console.error( err );
 		} finally {
 			console.groupEnd();
 		}

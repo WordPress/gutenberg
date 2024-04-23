@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import apiFetch from '..';
+import { apiFetch } from '../core';
 
 /**
  * Apply query arguments to both URL and Path, whichever is present.
@@ -11,7 +11,7 @@ import apiFetch from '..';
  * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => {
-	/** @type {import('../core').APIFetchOptions} */
+	/** @type {import('../types').APIFetchOptions} */
 	const result = {
 		...options,
 	};
@@ -98,7 +98,7 @@ const requestContainsUnboundedQuery = ( options ) => {
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-const fetchAllMiddleware = async ( options, next ) => {
+export const fetchAllMiddleware = async ( options, next ) => {
 	if ( options.parse === false ) {
 		// If a consumer has opted out of parsing, do not apply middleware.
 		return next( options );
@@ -148,5 +148,3 @@ const fetchAllMiddleware = async ( options, next ) => {
 	}
 	return mergedResults;
 };
-
-export default fetchAllMiddleware;

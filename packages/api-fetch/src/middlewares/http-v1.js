@@ -23,7 +23,7 @@ const DEFAULT_METHOD = 'GET';
  *
  * @type {import('../types').APIFetchMiddleware}
  */
-const httpV1Middleware = ( options, next ) => {
+export const httpV1Middleware = ( options, next ) => {
 	const { method = DEFAULT_METHOD } = options;
 	if ( OVERRIDE_METHODS.has( method.toUpperCase() ) ) {
 		options = {
@@ -39,5 +39,3 @@ const httpV1Middleware = ( options, next ) => {
 
 	return next( options );
 };
-
-export default httpV1Middleware;

@@ -6,10 +6,6 @@
 /**
  * Internal dependencies
  */
-import fetchAllMiddleware from './middlewares/fetch-all-middleware';
-import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
-import httpV1Middleware from './middlewares/http-v1';
-import userLocaleMiddleware from './middlewares/user-locale';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -38,28 +34,6 @@ const DEFAULT_HEADERS = {
 const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
-
-/** @typedef {import('./types').APIFetchMiddleware} APIFetchMiddleware */
-/** @typedef {import('./types').APIFetchOptions} APIFetchOptions */
-
-/**
- * @type {import('./types').APIFetchMiddleware[]}
- */
-const middlewares = [
-	userLocaleMiddleware,
-	namespaceEndpointMiddleware,
-	httpV1Middleware,
-	fetchAllMiddleware,
-];
-
-/**
- * Register a middleware
- *
- * @param {import('./types').APIFetchMiddleware} middleware
- */
-export function registerMiddleware( middleware ) {
-	middlewares.unshift( middleware );
-}
 
 /**
  * Checks the status of a response, throwing the Response as an error if
@@ -142,12 +116,19 @@ export function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
+/** @type { typeof import('./middlewares/singleton').middlewares } */
+let middlewares;
+
 /**
  * @template T
  * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
-export function apiFetch( options ) {
+export async function apiFetch( options ) {
+	if ( ! middlewares ) {
+		middlewares = ( await import( './middlewares/singleton' ) ).middlewares;
+	}
+
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```

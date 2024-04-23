@@ -11,8 +11,6 @@
  *
  * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
-const createThemePreviewMiddleware = () => ( options, next ) => {
+export const createThemePreviewMiddleware = () => ( options, next ) => {
 	return next( options );
 };
-
-export default createThemePreviewMiddleware;
