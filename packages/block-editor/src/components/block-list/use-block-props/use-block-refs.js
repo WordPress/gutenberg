@@ -1,14 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	useCallback,
-	useContext,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	useSyncExternalStore,
-} from '@wordpress/element';
+import { useContext, useMemo, useRef } from '@wordpress/element';
+import { useRefEffect, useObservableValue } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,50 +12,6 @@ import { BlockRefs } from '../../provider/block-refs-provider';
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
-function addToMap( map, id, value ) {
-	let setForId = map.get( id );
-	if ( ! setForId ) {
-		setForId = new Set();
-		map.set( id, setForId );
-	}
-	setForId.add( value );
-}
-
-function deleteFromMap( map, id, value ) {
-	const setForId = map.get( id );
-	if ( ! setForId ) {
-		return;
-	}
-	setForId.delete( value );
-	if ( setForId.size === 0 ) {
-		map.delete( id );
-	}
-}
-
-function getRefElement( refs, clientId ) {
-	// Multiple refs may be created for a single block. Find the
-	// first that has an element set.
-	const refsForId = refs.get( clientId );
-	if ( refsForId ) {
-		for ( const ref of refsForId ) {
-			if ( ref.current ) {
-				return ref.current;
-			}
-		}
-	}
-	return null;
-}
-
-function callListeners( callbacks, clientId ) {
-	const list = callbacks.get( clientId );
-	if ( ! list ) {
-		return;
-	}
-	for ( const listener of list ) {
-		listener();
-	}
-}
-
 /**
  * Provides a ref to the BlockRefs context.
  *
@@ -70,26 +20,13 @@ function callListeners( callbacks, clientId ) {
  * @return {RefCallback} Ref callback.
  */
 export function useBlockRefProvider( clientId ) {
-	const { refs, callbacks } = useContext( BlockRefs );
-	const ref = useRef();
-	useLayoutEffect( () => {
-		addToMap( refs, clientId, ref );
-		return () => deleteFromMap( refs, clientId, ref );
-	}, [ refs, clientId ] );
-
-	return useCallback(
+	const { refsMap } = useContext( BlockRefs );
+	return useRefEffect(
 		( element ) => {
-			if ( ! element ) {
-				return;
-			}
-
-			// Update the ref in the provider.
-			ref.current = element;
-
-			// Notify the `useBlockElement` hooks that are observing this `clientId`
-			callListeners( callbacks, clientId );
+			refsMap.set( clientId, element );
+			return () => refsMap.delete( clientId );
 		},
-		[ callbacks, clientId ]
+		[ clientId ]
 	);
 }
 
@@ -104,7 +41,7 @@ export function useBlockRefProvider( clientId ) {
  * @return {RefObject} A ref containing the element.
  */
 function useBlockRef( clientId ) {
-	const { refs } = useContext( BlockRefs );
+	const { refsMap } = useContext( BlockRefs );
 	const latestClientId = useRef();
 	latestClientId.current = clientId;
 
@@ -113,10 +50,10 @@ function useBlockRef( clientId ) {
 	return useMemo(
 		() => ( {
 			get current() {
-				return getRefElement( refs, latestClientId.current );
+				return refsMap.get( latestClientId.current ) ?? null;
 			},
 		} ),
-		[ refs ]
+		[ refsMap ]
 	);
 }
 
@@ -129,21 +66,8 @@ function useBlockRef( clientId ) {
  * @return {Element|null} The block's wrapper element.
  */
 function useBlockElement( clientId ) {
-	const { refs, callbacks } = useContext( BlockRefs );
-	const [ subscribe, getValue ] = useMemo(
-		() => [
-			( listener ) => {
-				addToMap( callbacks, clientId, listener );
-				return () => {
-					deleteFromMap( callbacks, clientId, listener );
-				};
-			},
-			() => getRefElement( refs, clientId ),
-		],
-		[ refs, callbacks, clientId ]
-	);
-
-	return useSyncExternalStore( subscribe, getValue, getValue );
+	const { refsMap } = useContext( BlockRefs );
+	return useObservableValue( refsMap, clientId ) ?? null;
 }
 
 export { useBlockRef as __unstableUseBlockRef };

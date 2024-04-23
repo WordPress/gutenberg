@@ -129,6 +129,10 @@ _Returns_
 
 -   Higher-order component.
 
+### observableMap
+
+A key/value map where the individual entries are observable by subscribing to them with the `subscribe` methods.
+
 ### pipe
 
 Composes multiple higher-order components into a single higher-order component. Performs left-to-right function composition, where each successive invocation is supplied the return value of the previous.
@@ -441,6 +445,15 @@ _Parameters_
 _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+
+### useObservableValue
+
+React hook that lets you observe an individual entry in an `ObservableMap`.
+
+_Parameters_
+
+-   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+-   _name_ `K`: The map key to observe.
 
 ### usePrevious
 

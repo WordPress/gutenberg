@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { useMemo, useSyncExternalStore } from '@wordpress/element';
-
 export type ObservableMap< K, V > = {
 	get( name: K ): V | undefined;
 	set( name: K, value: V ): void;
@@ -56,24 +51,4 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 			};
 		},
 	};
-}
-
-/**
- * React hook that lets you observe an individual entry in an `ObservableMap`.
- *
- * @param map  The `ObservableMap` to observe.
- * @param name The map key to observe.
- */
-export function useObservableValue< K, V >(
-	map: ObservableMap< K, V >,
-	name: K
-): V | undefined {
-	const [ subscribe, getValue ] = useMemo(
-		() => [
-			( listener: () => void ) => map.subscribe( name, listener ),
-			() => map.get( name ),
-		],
-		[ map, name ]
-	);
-	return useSyncExternalStore( subscribe, getValue, getValue );
 }
