@@ -15,7 +15,12 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { usePostActions } from './actions';
+import {
+	viewPostAction,
+	postRevisionsAction,
+	renamePostAction,
+	trashPostAction,
+} from './actions';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_POST_TYPE,
@@ -31,13 +36,6 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-const POST_ACTIONS_WHILE_EDITING = [
-	'view-post',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const { postType, item } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPost } = select( editorStore );
@@ -46,16 +44,23 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 			item: getCurrentPost(),
 		};
 	} );
-	const allActions = usePostActions(
-		onActionPerformed,
-		POST_ACTIONS_WHILE_EDITING
-	);
 
 	const actions = useMemo( () => {
-		return allActions.filter( ( action ) => {
+		const eligibleActions = [
+			viewPostAction,
+			postRevisionsAction,
+			renamePostAction,
+			trashPostAction,
+		].filter( ( action ) => {
 			return ! action.isEligible || action.isEligible( item );
 		} );
-	}, [ allActions, item ] );
+		eligibleActions.forEach( ( action ) => {
+			action.onActionPerformed = ( _item ) => {
+				onActionPerformed( action.id, _item );
+				action.onActionPerformed?.( _item );
+			};
+		} );
+	}, [ item, onActionPerformed ] );
 
 	if (
 		[

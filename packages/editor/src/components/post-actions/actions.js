@@ -8,7 +8,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 import {
 	Button,
@@ -33,7 +33,7 @@ function getItemTitle( item ) {
 	return decodeEntities( item.title?.rendered || '' );
 }
 
-const trashPostAction = {
+export const trashPostAction = {
 	id: 'move-to-trash',
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
@@ -172,200 +172,180 @@ const trashPostAction = {
 	},
 };
 
-function usePermanentlyDeletePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { deleteEntityRecord } = useDispatch( coreStore );
-
-	return useMemo(
-		() => ( {
-			id: 'permanently-delete',
-			label: __( 'Permanently delete' ),
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				const promiseResult = await Promise.allSettled(
-					posts.map( ( post ) => {
-						return deleteEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ force: true },
-							{ throwOnError: true }
-						);
-					} )
-				);
-				// If all the promises were fulfilled with success.
-				if (
-					promiseResult.every(
-						( { status } ) => status === 'fulfilled'
-					)
-				) {
-					let successMessage;
-					if ( promiseResult.length === 1 ) {
-						successMessage = sprintf(
-							/* translators: The posts's title. */
-							__( '"%s" permanently deleted.' ),
-							getItemTitle( posts[ 0 ] )
-						);
-					} else {
-						successMessage = __(
-							'The posts were permanently deleted.'
-						);
-					}
-					createSuccessNotice( successMessage, {
-						type: 'snackbar',
-						id: 'permanently-delete-post-action',
-					} );
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
+export const permanentlyDeletePostAction = {
+	id: 'permanently-delete',
+	label: __( 'Permanently delete' ),
+	supportsBulk: true,
+	isEligible( { status } ) {
+		return status === 'trash';
+	},
+	callback( posts, onActionPerformed ) {
+		return async ( { dispatch } ) => {
+			const { createSuccessNotice, createErrorNotice } =
+				dispatch( noticesStore );
+			const { deleteEntityRecord } = dispatch( coreStore );
+			const promiseResult = await Promise.allSettled(
+				posts.map( ( post ) => {
+					return deleteEntityRecord(
+						'postType',
+						post.type,
+						post.id,
+						{ force: true },
+						{ throwOnError: true }
+					);
+				} )
+			);
+			// If all the promises were fulfilled with success.
+			if (
+				promiseResult.every( ( { status } ) => status === 'fulfilled' )
+			) {
+				let successMessage;
+				if ( promiseResult.length === 1 ) {
+					successMessage = sprintf(
+						/* translators: The posts's title. */
+						__( '"%s" permanently deleted.' ),
+						getItemTitle( posts[ 0 ] )
+					);
 				} else {
-					// If there was at lease one failure.
-					let errorMessage;
-					// If we were trying to permanently delete a single post.
-					if ( promiseResult.length === 1 ) {
-						if ( promiseResult[ 0 ].reason?.message ) {
-							errorMessage = promiseResult[ 0 ].reason.message;
-						} else {
-							errorMessage = __(
-								'An error occurred while permanently deleting the post.'
-							);
-						}
-						// If we were trying to permanently delete multiple posts
-					} else {
-						const errorMessages = new Set();
-						const failedPromises = promiseResult.filter(
-							( { status } ) => status === 'rejected'
-						);
-						for ( const failedPromise of failedPromises ) {
-							if ( failedPromise.reason?.message ) {
-								errorMessages.add(
-									failedPromise.reason.message
-								);
-							}
-						}
-						if ( errorMessages.size === 0 ) {
-							errorMessage = __(
-								'An error occurred while permanently deleting the posts.'
-							);
-						} else if ( errorMessages.size === 1 ) {
-							errorMessage = sprintf(
-								/* translators: %s: an error message */
-								__(
-									'An error occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ][ 0 ]
-							);
-						} else {
-							errorMessage = sprintf(
-								/* translators: %s: a list of comma separated error messages */
-								__(
-									'Some errors occurred while permanently deleting the posts: %s'
-								),
-								[ ...errorMessages ].join( ',' )
-							);
-						}
-					}
-					createErrorNotice( errorMessage, {
-						type: 'snackbar',
-					} );
+					successMessage = __(
+						'The posts were permanently deleted.'
+					);
 				}
-			},
-		} ),
-		[ createSuccessNotice, createErrorNotice, deleteEntityRecord ]
-	);
-}
-
-function useRestorePostAction() {
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
-
-	return useMemo(
-		() => ( {
-			id: 'restore',
-			label: __( 'Restore' ),
-			isPrimary: true,
-			icon: backup,
-			supportsBulk: true,
-			isEligible( { status } ) {
-				return status === 'trash';
-			},
-			async callback( posts, onActionPerformed ) {
-				try {
-					for ( const post of posts ) {
-						await editEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{
-								status: 'draft',
-							}
-						);
-						await saveEditedEntityRecord(
-							'postType',
-							post.type,
-							post.id,
-							{ throwOnError: true }
+				createSuccessNotice( successMessage, {
+					type: 'snackbar',
+					id: 'permanently-delete-post-action',
+				} );
+				if ( onActionPerformed ) {
+					onActionPerformed( posts );
+				}
+			} else {
+				// If there was at lease one failure.
+				let errorMessage;
+				// If we were trying to permanently delete a single post.
+				if ( promiseResult.length === 1 ) {
+					if ( promiseResult[ 0 ].reason?.message ) {
+						errorMessage = promiseResult[ 0 ].reason.message;
+					} else {
+						errorMessage = __(
+							'An error occurred while permanently deleting the post.'
 						);
 					}
+					// If we were trying to permanently delete multiple posts
+				} else {
+					const errorMessages = new Set();
+					const failedPromises = promiseResult.filter(
+						( { status } ) => status === 'rejected'
+					);
+					for ( const failedPromise of failedPromises ) {
+						if ( failedPromise.reason?.message ) {
+							errorMessages.add( failedPromise.reason.message );
+						}
+					}
+					if ( errorMessages.size === 0 ) {
+						errorMessage = __(
+							'An error occurred while permanently deleting the posts.'
+						);
+					} else if ( errorMessages.size === 1 ) {
+						errorMessage = sprintf(
+							/* translators: %s: an error message */
+							__(
+								'An error occurred while permanently deleting the posts: %s'
+							),
+							[ ...errorMessages ][ 0 ]
+						);
+					} else {
+						errorMessage = sprintf(
+							/* translators: %s: a list of comma separated error messages */
+							__(
+								'Some errors occurred while permanently deleting the posts: %s'
+							),
+							[ ...errorMessages ].join( ',' )
+						);
+					}
+				}
+				createErrorNotice( errorMessage, {
+					type: 'snackbar',
+				} );
+			}
+		};
+	},
+};
 
-					createSuccessNotice(
-						posts.length > 1
-							? sprintf(
-									/* translators: The number of posts. */
-									__( '%d posts have been restored.' ),
-									posts.length
-							  )
-							: sprintf(
-									/* translators: The number of posts. */
-									__( '"%s" has been restored.' ),
-									getItemTitle( posts[ 0 ] )
-							  ),
+export const restorePostAction = {
+	id: 'restore',
+	label: __( 'Restore' ),
+	isPrimary: true,
+	icon: backup,
+	supportsBulk: true,
+	isEligible( { status } ) {
+		return status === 'trash';
+	},
+	callback( posts, onActionPerformed ) {
+		return async ( { dispatch } ) => {
+			const { createSuccessNotice, createErrorNotice } =
+				dispatch( noticesStore );
+			const { editEntityRecord, saveEditedEntityRecord } =
+				dispatch( coreStore );
+			try {
+				for ( const post of posts ) {
+					await editEntityRecord( 'postType', post.type, post.id, {
+						status: 'draft',
+					} );
+					await saveEditedEntityRecord(
+						'postType',
+						post.type,
+						post.id,
 						{
-							type: 'snackbar',
-							id: 'restore-post-action',
+							throwOnError: true,
 						}
 					);
-					if ( onActionPerformed ) {
-						onActionPerformed( posts );
-					}
-				} catch ( error ) {
-					let errorMessage;
-					if (
-						error.message &&
-						error.code !== 'unknown_error' &&
-						error.message
-					) {
-						errorMessage = error.message;
-					} else if ( posts.length > 1 ) {
-						errorMessage = __(
-							'An error occurred while restoring the posts.'
-						);
-					} else {
-						errorMessage = __(
-							'An error occurred while restoring the post.'
-						);
-					}
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
 				}
-			},
-		} ),
-		[
-			createSuccessNotice,
-			createErrorNotice,
-			editEntityRecord,
-			saveEditedEntityRecord,
-		]
-	);
-}
 
-const viewPostAction = {
+				createSuccessNotice(
+					posts.length > 1
+						? sprintf(
+								/* translators: The number of posts. */
+								__( '%d posts have been restored.' ),
+								posts.length
+						  )
+						: sprintf(
+								/* translators: The number of posts. */
+								__( '"%s" has been restored.' ),
+								getItemTitle( posts[ 0 ] )
+						  ),
+					{
+						type: 'snackbar',
+						id: 'restore-post-action',
+					}
+				);
+				if ( onActionPerformed ) {
+					onActionPerformed( posts );
+				}
+			} catch ( error ) {
+				let errorMessage;
+				if (
+					error.message &&
+					error.code !== 'unknown_error' &&
+					error.message
+				) {
+					errorMessage = error.message;
+				} else if ( posts.length > 1 ) {
+					errorMessage = __(
+						'An error occurred while restoring the posts.'
+					);
+				} else {
+					errorMessage = __(
+						'An error occurred while restoring the post.'
+					);
+				}
+
+				createErrorNotice( errorMessage, { type: 'snackbar' } );
+			}
+		};
+	},
+};
+
+export const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
 	isPrimary: true,
@@ -382,7 +362,7 @@ const viewPostAction = {
 	},
 };
 
-const editPostAction = {
+export const editPostAction = {
 	id: 'edit-post',
 	label: __( 'Edit' ),
 	isPrimary: true,
@@ -396,7 +376,7 @@ const editPostAction = {
 		}
 	},
 };
-const postRevisionsAction = {
+export const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
 	isPrimary: false,
@@ -422,7 +402,7 @@ const postRevisionsAction = {
 	},
 };
 
-const renamePostAction = {
+export const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
@@ -500,7 +480,7 @@ const renamePostAction = {
 	},
 };
 
-const resetTemplateAction = {
+export const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: isTemplateRevertable,
@@ -612,7 +592,7 @@ function isTemplateRemovable( template ) {
 	);
 }
 
-const deleteTemplateAction = {
+export const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
 	isEligible: isTemplateRemovable,
@@ -663,7 +643,7 @@ const deleteTemplateAction = {
 	},
 };
 
-const renameTemplateAction = {
+export const renameTemplateAction = {
 	id: 'rename-template',
 	label: __( 'Rename' ),
 	isEligible: ( template ) => {
@@ -767,96 +747,3 @@ const renameTemplateAction = {
 		);
 	},
 };
-
-export function usePostActions( onActionPerformed, actionIds = null ) {
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
-	return useMemo(
-		() => {
-			// By default, return all actions...
-			const defaultActions = [
-				editPostAction,
-				resetTemplateAction,
-				viewPostAction,
-				restorePostAction,
-				deleteTemplateAction,
-				permanentlyDeletePostAction,
-				postRevisionsAction,
-				renamePostAction,
-				renameTemplateAction,
-				trashPostAction,
-			];
-
-			// ... unless `actionIds` was specified, in which case we find the
-			// actions matching the given IDs.
-			const actions = actionIds
-				? actionIds.map( ( actionId ) =>
-						defaultActions.find( ( { id } ) => actionId === id )
-				  )
-				: defaultActions;
-
-			if ( onActionPerformed ) {
-				for ( let i = 0; i < actions.length; ++i ) {
-					if ( actions[ i ].callback ) {
-						const existingCallback = actions[ i ].callback;
-						actions[ i ] = {
-							...actions[ i ],
-							callback: ( items, _onActionPerformed ) => {
-								existingCallback( items, ( _items ) => {
-									if ( _onActionPerformed ) {
-										_onActionPerformed( _items );
-									}
-									onActionPerformed(
-										actions[ i ].id,
-										_items
-									);
-								} );
-							},
-						};
-					}
-					if ( actions[ i ].RenderModal ) {
-						const ExistingRenderModal = actions[ i ].RenderModal;
-						actions[ i ] = {
-							...actions[ i ],
-							RenderModal: ( props ) => {
-								return (
-									<ExistingRenderModal
-										items={ props.items }
-										closeModal={ props.closeModal }
-										onActionPerformed={ ( _items ) => {
-											if ( props.onActionPerformed ) {
-												props.onActionPerformed(
-													_items
-												);
-											}
-											onActionPerformed(
-												actions[ i ].id,
-												_items
-											);
-										} }
-									/>
-								);
-							},
-						};
-					}
-				}
-			}
-			return actions;
-		},
-
-		// Disable reason: if provided, `actionIds` is a shallow array of
-		// strings, and the strings themselves should be part of the useMemo
-		// dependencies. Two different disable statements are needed, as the
-		// first flags what it thinks are missing dependencies, and the second
-		// flags the array spread operation.
-		//
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			...( actionIds || [] ),
-			permanentlyDeletePostAction,
-			restorePostAction,
-			onActionPerformed,
-		]
-	);
-}

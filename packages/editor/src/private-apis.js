@@ -23,7 +23,7 @@ import PostViewLink from './components/post-view-link';
 import PreviewDropdown from './components/preview-dropdown';
 import PreferencesModal from './components/preferences-modal';
 import PostActions from './components/post-actions';
-import { usePostActions } from './components/post-actions/actions';
+import postActions from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
 import PostStatus from './components/post-status';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
@@ -47,7 +47,7 @@ lock( privateApis, {
 	PostViewLink,
 	PreviewDropdown,
 	PreferencesModal,
-	usePostActions,
+	postActions,
 	PostCardPanel,
 	PostStatus,
 	ToolsMoreMenuGroup,
