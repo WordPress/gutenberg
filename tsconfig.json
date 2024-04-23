@@ -10,6 +10,7 @@
 		{ "path": "packages/block-library" },
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/components" },
+		{ "path": "packages/components/tsconfig.stories.json" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/core-data" },
 		{ "path": "packages/data" },

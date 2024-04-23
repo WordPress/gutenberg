@@ -1,0 +1,29 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noEmit": true,
+		"emitDeclarationOnly": false,
+		"checkJs": false,
+
+		"types": [ "gutenberg-env" ],
+		// TODO: Remove `skipLibCheck` after resolving duplicate declaration of the `process` variable
+		// between `@types/webpack-env` (from @storybook packages) and `gutenberg-env`.
+		"skipLibCheck": true,
+		"strictNullChecks": true
+	},
+	"references": [
+		{ "path": "./tsconfig.json" },
+
+		{ "path": "../block-editor" },
+		{ "path": "../compose" },
+		{ "path": "../element" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../keycodes" },
+		{ "path": "../primitives" }
+	],
+	"include": [ "src/**/stories" ]
+}
