@@ -157,7 +157,7 @@ jobs:
                 wordpress: [''] # Latest WordPress version.
                 include:
                     # Test with the previous WP version.
-                    - php: '7.0'
+                    - php: '7.2'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
                     - php: '7.4'
                       wordpress: ${{ needs.compute-previous-wordpress-version.outputs.previous-wordpress-version }}
