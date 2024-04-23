@@ -143,7 +143,7 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
-			className={ animationEnabled ? 'isAnimationEnabled' : '' }
+			className={ animationEnabled ? 'is-animation-enabled' : '' }
 			style={
 				{
 					'--indicator-left': `${ indicatorPosition.left }px`,

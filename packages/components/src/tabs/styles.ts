@@ -20,7 +20,7 @@ export const TabListWrapper = styled.div`
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 	}
-	&.isAnimationEnabled::after {
+	&.is-animation-enabled::after {
 		@media not ( prefers-reduced-motion: reduce ) {
 			transition-property: left width;
 			transition-duration: 0.2s;
