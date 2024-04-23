@@ -16,7 +16,7 @@ import { BaseControl, Button } from '@wordpress/components';
  */
 
 /**
- * Control to facilitate segmented text selections.
+ * Control to facilitate selecting a text style from a set of options.
  *
  * @param {Object}    props           Component props.
  * @param {string}    props.label     A label for the control.
