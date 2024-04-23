@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { BaseControl, Button } from '@wordpress/components';
 
 /**
- * @typedef {Object} Control
+ * @typedef {Object} Option
  * @property {string} label The label of the control.
  * @property {string} value The value of the control.
  * @property {string} icon  The icon of the control.
@@ -18,12 +18,12 @@ import { BaseControl, Button } from '@wordpress/components';
 /**
  * Control to facilitate selecting a text style from a set of options.
  *
- * @param {Object}    props           Component props.
- * @param {string}    props.label     A label for the control.
- * @param {string}    props.value     Currently selected value.
- * @param {Function}  props.onChange  Callback to handle onChange.
- * @param {Control[]} props.controls  Array of controls to display.
- * @param {string}    props.className Additional class name to apply.
+ * @param {Object}   props           Component props.
+ * @param {string}   props.label     A label for the control.
+ * @param {string}   props.value     Currently selected value.
+ * @param {Function} props.onChange  Callback to handle onChange.
+ * @param {Option[]} props.controls  Array of controls to display.
+ * @param {string}   props.className Additional class name to apply.
  *
  * @return {Element} Element to render.
  */
