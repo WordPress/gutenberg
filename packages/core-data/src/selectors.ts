@@ -846,12 +846,12 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => {
+	): ET.Updatable< EntityRecord > | false => {
 		const raw = getRawEntityRecord( state, kind, name, recordId );
 		const edited = getEntityRecordEdits( state, kind, name, recordId );
 		// Never return an empty object.
 		if ( ! raw && ! edited ) {
-			return;
+			return false;
 		}
 		return {
 			...raw,
@@ -1272,7 +1272,7 @@ export function getReferenceByDistinctEdits( state ) {
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): Optional< ET.Updatable< ET.WpTemplate > > | null {
+): Optional< ET.Updatable< ET.WpTemplate > > | null | false {
 	const records = getEntityRecords< ET.WpTemplate >(
 		state,
 		'postType',
