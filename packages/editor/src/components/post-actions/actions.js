@@ -538,7 +538,10 @@ export const duplicatePostAction = {
 						slug: title || __( 'No title' ),
 						author: item.author,
 						comment_status: item.comment_status,
-						content: item.content.raw,
+						content:
+							typeof item.content === 'string'
+								? item.content
+								: item.content.raw,
 						excerpt: item.excerpt.raw,
 						meta: item.meta,
 						parent: item.parent,
