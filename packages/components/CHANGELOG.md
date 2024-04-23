@@ -12,7 +12,9 @@
 
 ### Enhancements
 
+-   `DropZone`: Avoid a media query on mount [#60546](https://github.com/WordPress/gutenberg/pull/60546)).
 -   `ComboboxControl`: Simplify string normalization ([#60893](https://github.com/WordPress/gutenberg/pull/60893)).
+### Internal
 
 ## 27.4.0 (2024-04-19)
 
