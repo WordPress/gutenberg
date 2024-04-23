@@ -846,10 +846,18 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
+	): ET.Updatable< EntityRecord > | undefined => {
+		const raw = getRawEntityRecord( state, kind, name, recordId );
+		const edited = getEntityRecordEdits( state, kind, name, recordId );
+		// Never return an empty object.
+		if ( ! raw && ! edited ) {
+			return;
+		}
+		return {
+			...raw,
+			...edited,
+		};
+	},
 	(
 		state: State,
 		kind: string,

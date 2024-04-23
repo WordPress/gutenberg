@@ -85,13 +85,34 @@ const interfaceLabels = {
 
 const ANIMATION_DURATION = 0.25;
 
-export default function Editor( { isLoading, onClick } ) {
+export default function Editor( props ) {
 	const {
 		record: editedPost,
 		getTitle,
 		isLoaded: hasLoadedPost,
 	} = useEditedEntityRecord();
 
+	if ( ! editedPost ) {
+		return null;
+	}
+
+	return (
+		<EditorWithEntity
+			{ ...props }
+			editedPost={ editedPost }
+			getTitle={ getTitle }
+			hasLoadedPost={ hasLoadedPost }
+		/>
+	);
+}
+
+function EditorWithEntity( {
+	isLoading,
+	onClick,
+	editedPost,
+	getTitle,
+	hasLoadedPost,
+} ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
