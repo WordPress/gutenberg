@@ -72,16 +72,22 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
 					<TextControl
+						__next40pxDefaultSize
 						label={ __( 'Page title' ) }
 						onChange={ setTitle }
 						placeholder={ __( 'No title' ) }
 						value={ title }
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button variant="tertiary" onClick={ onClose }>
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onClose }
+						>
 							{ __( 'Cancel' ) }
 						</Button>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							type="submit"
 							isBusy={ isCreatingPage }

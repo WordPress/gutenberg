@@ -127,6 +127,7 @@ export function CreateTemplatePartModalContents( {
 		>
 			<VStack spacing="4">
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -174,6 +175,7 @@ export function CreateTemplatePartModalContents( {
 				</BaseControl>
 				<HStack justify="right">
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => {
 							closeModal();
@@ -182,6 +184,7 @@ export function CreateTemplatePartModalContents( {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						aria-disabled={ ! title || isSubmitting }
