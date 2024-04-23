@@ -85,35 +85,12 @@ const interfaceLabels = {
 
 const ANIMATION_DURATION = 0.25;
 
-export default function Editor( props ) {
+export default function Editor( { isLoading, onClick } ) {
 	const {
 		record: editedPost,
 		getTitle,
 		isLoaded: hasLoadedPost,
 	} = useEditedEntityRecord();
-
-	if ( ! editedPost ) {
-		return null;
-	}
-
-	return (
-		<EditorWithEntity
-			{ ...props }
-			editedPost={ editedPost }
-			getTitle={ getTitle }
-			hasLoadedPost={ hasLoadedPost }
-		/>
-	);
-}
-
-function EditorWithEntity( {
-	isLoading,
-	onClick,
-	editedPost,
-	getTitle,
-	hasLoadedPost,
-} ) {
-	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const disableMotion = useReducedMotion();
@@ -193,7 +170,7 @@ function EditorWithEntity( {
 			// translators: A breadcrumb trail for the Admin document title. %1$s: title of template being edited, %2$s: type of template (Template or Template Part).
 			__( '%1$s ‹ %2$s' ),
 			getTitle(),
-			POST_TYPE_LABELS[ editedPostType ] ??
+			POST_TYPE_LABELS[ editedPost.type ] ??
 				POST_TYPE_LABELS[ TEMPLATE_POST_TYPE ]
 		);
 	}
