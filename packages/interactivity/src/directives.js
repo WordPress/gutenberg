@@ -205,21 +205,28 @@ const cssStringToObject = ( val ) => {
  * @param {string} type 'window' or 'document'
  * @return {void}
  */
-const getGlobalEventDirective =
-	( type ) =>
-	( { directives, evaluate } ) => {
+const getGlobalEventDirective = ( type ) => {
+	return ( { directives, evaluate } ) => {
+		const events = new Map();
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
+				const event = entry.suffix.split( '--' )[ 0 ];
+				if ( ! events.has( event ) ) events.set( event, new Set() );
+				events.get( event ).add( entry );
+			} );
+		events.forEach( ( entries, eventType ) => {
+			entries.forEach( ( entry ) => {
 				useInit( () => {
 					const cb = ( event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
-					globalVar.addEventListener( entry.suffix, cb );
-					return () =>
-						globalVar.removeEventListener( entry.suffix, cb );
+					globalVar.addEventListener( eventType, cb );
+					return () => globalVar.removeEventListener( eventType, cb );
 				}, [] );
 			} );
+		} );
 	};
+};
 
 export default () => {
 	// data-wp-context
