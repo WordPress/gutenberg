@@ -1454,7 +1454,13 @@ export const __unstableSetEditorMode =
 						const firstSectionClientId = parents.find( ( parent ) =>
 							sectionClientIds.includes( parent )
 						);
-						dispatch.selectBlock( firstSectionClientId );
+						if ( firstSectionClientId ) {
+							dispatch.selectBlock( firstSectionClientId );
+						} else {
+							const lastSectionClientId =
+								sectionClientIds[ sectionClientIds.length - 1 ];
+							dispatch.selectBlock( lastSectionClientId );
+						}
 					} else {
 						const lastSectionClientId =
 							sectionClientIds[ sectionClientIds.length - 1 ];
