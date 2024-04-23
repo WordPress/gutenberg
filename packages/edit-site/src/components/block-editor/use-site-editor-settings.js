@@ -133,7 +133,7 @@ export function useSpecificEditorSettings() {
 			);
 			const _context = getEditedPostContext();
 			return {
-				templateSlug: _record.slug,
+				templateSlug: _record?.slug,
 				canvasMode: getCanvasMode(),
 				settings: getSettings(),
 				postWithTemplate: _context?.postId,
