@@ -112,16 +112,14 @@ const SYNC_FILTERS = [
 ];
 
 function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
-	if ( item.type === PATTERN_TYPES.theme ) {
-		return children;
-	}
 	return (
 		<button
 			className="page-patterns-preview-field__button"
 			type="button"
-			onClick={ onClick }
+			onClick={ item.type !== PATTERN_TYPES.theme ? onClick : undefined }
 			aria-label={ item.title }
 			aria-describedby={ ariaDescribedBy }
+			aria-disabled={ item.type === PATTERN_TYPES.theme }
 		>
 			{ children }
 		</button>
@@ -131,21 +129,8 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 function Preview( { item, categoryId, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isEmpty = ! item.blocks?.length;
-	// Only custom patterns or custom template parts can be renamed or deleted.
-	const isCustomPattern =
-		isUserPattern || ( isTemplatePart && item.isCustom );
-	const ariaDescriptions = [];
-	if ( isCustomPattern ) {
-		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
-		ariaDescriptions.push(
-			__( 'Press Enter to edit, or Delete to delete the pattern.' )
-		);
-	} else if ( item.description ) {
-		ariaDescriptions.push( item.description );
-	}
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
@@ -164,16 +149,7 @@ function Preview( { item, categoryId, viewType } ) {
 			<PreviewWrapper
 				item={ item }
 				onClick={ onClick }
-				ariaDescribedBy={
-					ariaDescriptions.length
-						? ariaDescriptions
-								.map(
-									( _, index ) =>
-										`${ descriptionId }-${ index }`
-								)
-								.join( ' ' )
-						: undefined
-				}
+				ariaDescribedBy={ item.description ? descriptionId : undefined }
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
@@ -186,16 +162,11 @@ function Preview( { item, categoryId, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ ! isNonUserPattern &&
-				ariaDescriptions.map( ( ariaDescription, index ) => (
-					<div
-						key={ index }
-						hidden
-						id={ `${ descriptionId }-${ index }` }
-					>
-						{ ariaDescription }
-					</div>
-				) ) }
+			{ item.description && (
+				<div hidden id={ descriptionId }>
+					{ item.description }
+				</div>
+			) }
 		</div>
 	);
 }
@@ -344,6 +315,7 @@ export default function DataviewsPatterns() {
 				),
 				enableSorting: false,
 				enableHiding: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),

@@ -131,6 +131,7 @@ require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';
 require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
+require __DIR__ . '/compat/wordpress-6.6/post.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
