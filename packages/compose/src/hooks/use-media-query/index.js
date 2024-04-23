@@ -16,15 +16,17 @@ function getMediaQueryList( query ) {
 		return null;
 	}
 
-	if ( matchMediaCache.has( query ) ) {
-		return matchMediaCache.get( query );
+	let match = matchMediaCache.get( query );
+
+	if ( match ) {
+		return match;
 	}
 
 	if (
 		typeof window !== 'undefined' &&
 		typeof window.matchMedia === 'function'
 	) {
-		const match = window.matchMedia( query );
+		match = window.matchMedia( query );
 		matchMediaCache.set( query, match );
 		return match;
 	}
