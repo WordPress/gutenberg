@@ -18,7 +18,7 @@ import { store as editorStore } from '../../store';
  */
 const PANEL_NAME = 'post-excerpt';
 
-export default function PostExcerptPanel() {
+function ExcerptPanel() {
 	const { isOpened, isEnabled } = useSelect( ( select ) => {
 		const { isEditorPanelOpened, isEditorPanelEnabled } =
 			select( editorStore );
@@ -37,21 +37,27 @@ export default function PostExcerptPanel() {
 	}
 
 	return (
+		<PanelBody
+			title={ __( 'Excerpt' ) }
+			opened={ isOpened }
+			onToggle={ toggleExcerptPanel }
+		>
+			<PluginPostExcerpt.Slot>
+				{ ( fills ) => (
+					<>
+						<PostExcerptForm />
+						{ fills }
+					</>
+				) }
+			</PluginPostExcerpt.Slot>
+		</PanelBody>
+	);
+}
+
+export default function PostExcerptPanel() {
+	return (
 		<PostExcerptCheck>
-			<PanelBody
-				title={ __( 'Excerpt' ) }
-				opened={ isOpened }
-				onToggle={ toggleExcerptPanel }
-			>
-				<PluginPostExcerpt.Slot>
-					{ ( fills ) => (
-						<>
-							<PostExcerptForm />
-							{ fills }
-						</>
-					) }
-				</PluginPostExcerpt.Slot>
-			</PanelBody>
+			<ExcerptPanel />
 		</PostExcerptCheck>
 	);
 }

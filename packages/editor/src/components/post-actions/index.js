@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -46,10 +46,16 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 			item: getCurrentPost(),
 		};
 	} );
-	const actions = usePostActions(
+	const allActions = usePostActions(
 		onActionPerformed,
 		POST_ACTIONS_WHILE_EDITING
 	);
+
+	const actions = useMemo( () => {
+		return allActions.filter( ( action ) => {
+			return ! action.isEligible || action.isEligible( item );
+		} );
+	}, [ allActions, item ] );
 
 	if (
 		[
