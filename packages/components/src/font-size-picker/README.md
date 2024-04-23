@@ -92,6 +92,7 @@ Size of the control.
 Available units for custom font size selection.
 
 -   Required: No
+-   Default: `[ 'px', 'em', 'rem' ]`
 
 ### `value`: `number | string`
 
