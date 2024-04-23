@@ -389,7 +389,11 @@ _Returns_
 
 ### PageAttributesOrder
 
-Undocumented declaration.
+Renders the page attributes order component.
+
+_Returns_
+
+-   `Element`: The rendered page attributes order component.
 
 ### PageAttributesPanel
 
