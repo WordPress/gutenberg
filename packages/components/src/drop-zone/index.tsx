@@ -25,40 +25,40 @@ import {
 import type { DropType, DropZoneProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+const backdrop = {
+	hidden: { opacity: 0 },
+	show: {
+		opacity: 1,
+		transition: {
+			type: 'tween',
+			duration: 0.2,
+			delay: 0,
+			delayChildren: 0.1,
+		},
+	},
+	exit: {
+		opacity: 0,
+		transition: {
+			duration: 0.2,
+			delayChildren: 0,
+		},
+	},
+};
+
+const foreground = {
+	hidden: { opacity: 0, scale: 0.9 },
+	show: {
+		opacity: 1,
+		scale: 1,
+		transition: {
+			duration: 0.1,
+		},
+	},
+	exit: { opacity: 0, scale: 0.9 },
+};
+
 function DropIndicator( { label }: { label?: string } ) {
 	const disableMotion = useReducedMotion();
-	const backdrop = {
-		hidden: { opacity: 0 },
-		show: {
-			opacity: 1,
-			transition: {
-				type: 'tween',
-				duration: 0.2,
-				delay: 0,
-				delayChildren: 0.1,
-			},
-		},
-		exit: {
-			opacity: 0,
-			transition: {
-				duration: 0.2,
-				delayChildren: 0,
-			},
-		},
-	};
-
-	const foreground = {
-		hidden: { opacity: 0, scale: 0.9 },
-		show: {
-			opacity: 1,
-			scale: 1,
-			transition: {
-				duration: 0.1,
-			},
-		},
-		exit: { opacity: 0, scale: 0.9 },
-	};
-
 	const children = (
 		<motion.div
 			variants={ backdrop }
