@@ -3,6 +3,8 @@
  */
 import { useMemo, useSyncExternalStore } from '@wordpress/element';
 
+const matchMediaCache = new Map();
+
 /**
  * A new MediaQueryList object for the media query
  *
@@ -10,12 +12,21 @@ import { useMemo, useSyncExternalStore } from '@wordpress/element';
  * @return {MediaQueryList|null} A new object for the media query
  */
 function getMediaQueryList( query ) {
+	if ( ! query ) {
+		return null;
+	}
+
+	if ( matchMediaCache.has( query ) ) {
+		return matchMediaCache.get( query );
+	}
+
 	if (
-		query &&
 		typeof window !== 'undefined' &&
 		typeof window.matchMedia === 'function'
 	) {
-		return window.matchMedia( query );
+		const match = window.matchMedia( query );
+		matchMediaCache.set( query, match );
+		return match;
 	}
 
 	return null;
