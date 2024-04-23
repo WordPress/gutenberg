@@ -38,13 +38,13 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'fontSizes'      => array(
 						array(
 							'name' => 'Small',
-							'slug'  => 'small',
-							'size'  => 12,
+							'slug' => 'small',
+							'size' => 12,
 						),
 						array(
 							'name' => 'Normal',
-							'slug'  => 'normal',
-							'size'  => 16,
+							'slug' => 'normal',
+							'size' => 16,
 						),
 					),
 					'fontStyle'      => false,
@@ -133,16 +133,16 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'typography' => array(
 					'defaultFontSizes' => false,
-					'fontSizes'      => array(
+					'fontSizes'        => array(
 						array(
 							'name' => 'Small',
-							'slug'  => 'small',
-							'size'  => 12,
+							'slug' => 'small',
+							'size' => 12,
 						),
 						array(
 							'name' => 'Normal',
-							'slug'  => 'normal',
-							'size'  => 16,
+							'slug' => 'normal',
+							'size' => 16,
 						),
 					),
 					'fontStyle'        => false,
@@ -213,13 +213,13 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'fontSizes' => array(
 						array(
 							'name' => 'Small',
-							'slug'  => 'small',
-							'size'  => 12,
+							'slug' => 'small',
+							'size' => 12,
 						),
 						array(
 							'name' => 'Normal',
-							'slug'  => 'normal',
-							'size'  => 16,
+							'slug' => 'normal',
+							'size' => 16,
 						),
 					),
 				),
@@ -233,16 +233,16 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 			'settings' => array(
 				'typography' => array(
 					'defaultFontSizes' => false,
-					'fontSizes' => array(
+					'fontSizes'        => array(
 						array(
 							'name' => 'Small',
-							'slug'  => 'small',
-							'size'  => 12,
+							'slug' => 'small',
+							'size' => 12,
 						),
 						array(
 							'name' => 'Normal',
-							'slug'  => 'normal',
-							'size'  => 16,
+							'slug' => 'normal',
+							'size' => 16,
 						),
 					),
 				),
