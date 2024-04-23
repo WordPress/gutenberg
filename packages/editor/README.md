@@ -376,7 +376,16 @@ _Parameters_
 
 ### PageAttributesCheck
 
-Undocumented declaration.
+Component for checking if the post type supports page attributes.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Element|null`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
@@ -384,11 +393,19 @@ Undocumented declaration.
 
 ### PageAttributesPanel
 
-Undocumented declaration.
+Renders the Page Attributes panel.
+
+_Returns_
+
+-   `Element|null`: The rendered Page Attributes panel. Return null if the panel is not enabled or the post type does not support page attributes.
 
 ### PageAttributesParent
 
-Undocumented declaration.
+Renders the parent page attributes component.A dropdown menu in an editor interface for selecting the parent page of a given post.
+
+_Returns_
+
+-   `Element|null`: The parent page attributes component.
 
 ### PageTemplate
 

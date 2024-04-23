@@ -17,6 +17,12 @@ import PageAttributesParent from './parent';
 
 const PANEL_NAME = 'page-attributes';
 
+/**
+ * Renders the Page Attributes panel.
+ *
+ * @return {Element|null} The rendered Page Attributes panel.
+ * Return null if the panel is not enabled or the post type does not support page attributes.
+ */
 export function PageAttributesPanel() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
 		const {

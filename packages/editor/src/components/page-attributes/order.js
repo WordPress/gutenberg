@@ -16,6 +16,11 @@ import { useState } from '@wordpress/element';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the page attributes order component.
+ *
+ * @return {Element} The rendered page attributes order component.
+ */
 function PageAttributesOrder() {
 	const order = useSelect(
 		( select ) =>

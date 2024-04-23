@@ -40,6 +40,12 @@ export const getItemPriority = ( name, searchValue ) => {
 	return Infinity;
 };
 
+/**
+ * Renders the parent page attributes component.A dropdown menu in an editor interface
+ * for selecting the parent page of a given post.
+ *
+ * @return {Element|null} The parent page attributes component.
+ */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
 	const [ fieldValue, setFieldValue ] = useState( false );
