@@ -1,6 +1,6 @@
 # TextAlignmentControl
 
-The `TextAlignmentControl` component is responsible for rendering a control element that allows users to select and apply text align options to blocks or elements in the Gutenberg editor. It provides an intuitive interface for changing the text alignment by applying different alignments such as `left`, `center`, `right`.
+The `TextAlignmentControl` component is responsible for rendering a control that allows users to select and apply text alignment options to blocks or elements in the Gutenberg editor.
 
 ## Development guidelines
 
