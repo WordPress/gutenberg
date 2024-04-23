@@ -250,8 +250,8 @@ Component to Renders the redo button for the editor history.
 
 _Parameters_
 
--   _props_ `Object`: Props.
--   _ref_ `Ref`: Reference with the element.
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Reference with the element.
 
 _Returns_
 
@@ -263,8 +263,8 @@ Component to Renders the undo button for the editor history.
 
 _Parameters_
 
--   _props_ `Object`: Props.
--   _ref_ `Ref`: Reference with the element.
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Reference with the element.
 
 _Returns_
 

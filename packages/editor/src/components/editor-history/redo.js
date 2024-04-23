@@ -21,7 +21,7 @@ import { store as editorStore } from '../../store';
  * @param {Object} props - Props.
  * @param {Ref}    ref   - Reference with the element.
  *
- * @return {Element} The component to be rendered.
+ * @return {Component} The component to be rendered.
  */
 function EditorHistoryRedo( props, ref ) {
 	const shortcut = isAppleOS()
