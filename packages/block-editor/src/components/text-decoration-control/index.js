@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { reset, formatStrikethrough, formatUnderline } from '@wordpress/icons';
@@ -46,7 +51,10 @@ export default function TextDecorationControl( {
 		<SegmentedTextControl
 			label={ __( 'Decoration' ) }
 			controls={ TEXT_DECORATIONS }
-			className={ className }
+			className={ classnames(
+				'block-editor-text-decoration-control',
+				className
+			) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );

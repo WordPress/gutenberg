@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -52,7 +57,10 @@ export default function TextTransformControl( { className, value, onChange } ) {
 		<SegmentedTextControl
 			label={ __( 'Letter case' ) }
 			controls={ TEXT_TRANSFORMS }
-			className={ className }
+			className={ classnames(
+				'block-editor-text-transform-control',
+				className
+			) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );

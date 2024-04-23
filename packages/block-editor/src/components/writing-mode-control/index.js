@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -37,7 +42,10 @@ export default function WritingModeControl( { className, value, onChange } ) {
 		<SegmentedTextControl
 			label={ __( 'Orientation' ) }
 			controls={ WRITING_MODES }
-			className={ className }
+			className={ classnames(
+				'block-editor-writing-mode-control',
+				className
+			) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );

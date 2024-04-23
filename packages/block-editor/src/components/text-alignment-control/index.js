@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -73,7 +78,10 @@ export default function TextAlignmentControl( {
 		<SegmentedTextControl
 			label={ __( 'Text alignment' ) }
 			controls={ validControls }
-			className={ className }
+			className={ classnames(
+				'block-editor-text-alignment-control',
+				className
+			) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
