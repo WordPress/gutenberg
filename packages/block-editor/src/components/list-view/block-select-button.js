@@ -58,6 +58,15 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { isContentOnly } = useSelect(
+		( select ) => ( {
+			isContentOnly:
+				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+				'contentOnly',
+		} ),
+		[ clientId ]
+	);
+	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const {
 		canInsertBlockType,
 		getSelectedBlockClientIds,
@@ -339,7 +348,7 @@ function ListViewBlockSelectButton(
 							) ) }
 						</span>
 					) : null }
-					{ isLocked && (
+					{ shouldShowLockIcon && (
 						<span className="block-editor-list-view-block-select-button__lock">
 							<Icon icon={ lock } />
 						</span>
