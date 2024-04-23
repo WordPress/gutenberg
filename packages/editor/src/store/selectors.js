@@ -527,6 +527,11 @@ export const isEditedPostEmpty = createRegistrySelector(
 			postType,
 			postId
 		);
+
+		if ( ! record ) {
+			return true;
+		}
+
 		if ( typeof record.content !== 'function' ) {
 			return ! record.content;
 		}
