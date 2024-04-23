@@ -174,7 +174,7 @@ function UnconnectedNavigatorScreen(
  */
 export const NavigatorScreen = contextConnect(
 	UnconnectedNavigatorScreen,
-	'NavigatorScreen'
+	'Navigator.Screen'
 );
 
 export default NavigatorScreen;

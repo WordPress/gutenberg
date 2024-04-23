@@ -60,7 +60,7 @@ function UnconnectedNavigatorToParentButton(
  */
 export const NavigatorToParentButton = contextConnect(
 	UnconnectedNavigatorToParentButton,
-	'NavigatorToParentButton'
+	'Navigator.ToParentButton'
 );
 
 export default NavigatorToParentButton;

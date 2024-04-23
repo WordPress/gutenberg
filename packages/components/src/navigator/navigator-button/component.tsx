@@ -56,7 +56,7 @@ function UnconnectedNavigatorButton(
  */
 export const NavigatorButton = contextConnect(
 	UnconnectedNavigatorButton,
-	'NavigatorButton'
+	'Navigator.Button'
 );
 
 export default NavigatorButton;
