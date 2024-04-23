@@ -6,7 +6,7 @@ The `TextAlignmentControl` component is responsible for rendering a control that
 
 ### Usage
 
-Renders the Text Align Component with `left`, `center`, `right` options.
+Render the Text Alignment Component with its default `left`, `center`, and `right` options.
 
 ```jsx
 import { TextAlignmentControl } from '@wordpress/block-editor';
