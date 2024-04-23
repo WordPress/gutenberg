@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+//import { __ } from '@wordpress/i18n';
 
 /**
  * Parses the apiFetch response.
@@ -33,7 +33,7 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
 const parseJsonAndNormalizeError = ( response ) => {
 	const invalidJsonError = {
 		code: 'invalid_json',
-		message: __( 'The response is not a valid JSON response.' ),
+		message: 'The response is not a valid JSON response.',
 	};
 
 	if ( ! response || ! response.json ) {
@@ -77,7 +77,7 @@ export function parseAndThrowError( response, shouldParseResponse = true ) {
 	return parseJsonAndNormalizeError( response ).then( ( error ) => {
 		const unknownError = {
 			code: 'unknown_error',
-			message: __( 'An unknown error occurred.' ),
+			message: 'An unknown error occurred.',
 		};
 
 		throw error || unknownError;

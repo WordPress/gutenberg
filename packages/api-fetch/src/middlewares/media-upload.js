@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+//import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -80,9 +80,8 @@ const mediaUploadMiddleware = ( options, next ) => {
 					if ( options.parse !== false ) {
 						return Promise.reject( {
 							code: 'post_process',
-							message: __(
-								'Media upload failed. If this is a photo or a large image, please scale it down and try again.'
-							),
+							message:
+								'Media upload failed. If this is a photo or a large image, please scale it down and try again.',
 						} );
 					}
 

@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { addQueryArgs } from '@wordpress/url';
-
-/**
  * Internal dependencies
  */
 import apiFetch from '..';
@@ -15,11 +10,40 @@ import apiFetch from '..';
  * @param {Record<string, string | number>}    queryArgs
  * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
-const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
-	...options,
-	url: url && addQueryArgs( url, queryArgs ),
-	path: path && addQueryArgs( path, queryArgs ),
-} );
+const modifyQuery = ( { path, url, ...options }, queryArgs ) => {
+	/** @type {import('../core').APIFetchOptions} */
+	const result = {
+		...options,
+	};
+
+	if ( url ) {
+		try {
+			const u = new URL( url );
+			for ( const [ key, value ] of Object.entries( queryArgs ) ) {
+				u.searchParams.set( key, String( value ) );
+			}
+			console.log( { url, href: u.href } );
+			result.url = u.href;
+		} catch {
+			const u = new URL( url, 'invalid://__placeholder__' );
+			for ( const [ key, value ] of Object.entries( queryArgs ) ) {
+				u.searchParams.set( key, String( value ) );
+			}
+			console.log( { url, pathname: u.pathname } );
+			result.url = u.pathname;
+		}
+	}
+
+	if ( path ) {
+		const u = new URL( path, 'invalid://__placeholder__' );
+		for ( const [ key, value ] of Object.entries( queryArgs ) ) {
+			u.searchParams.set( key, String( value ) );
+		}
+		result.path = u.pathname;
+	}
+
+	return result;
+};
 
 /**
  * Duplicates parsing functionality from apiFetch.

@@ -1,20 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+//import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import createNonceMiddleware from './middlewares/nonce';
-import createRootURLMiddleware from './middlewares/root-url';
-import createPreloadingMiddleware from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
-import mediaUploadMiddleware from './middlewares/media-upload';
-import createThemePreviewMiddleware from './middlewares/theme-preview';
 import {
 	parseResponseAndNormalizeError,
 	parseAndThrowError,
@@ -62,7 +57,7 @@ const middlewares = [
  *
  * @param {import('./types').APIFetchMiddleware} middleware
  */
-function registerMiddleware( middleware ) {
+export function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
@@ -128,7 +123,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 			// Unfortunately the message might depend on the browser.
 			throw {
 				code: 'fetch_error',
-				message: __( 'You are probably offline.' ),
+				message: 'You are probably offline.',
 			};
 		}
 	);
@@ -143,7 +138,7 @@ let fetchHandler = defaultFetchHandler;
  *
  * @param {FetchHandler} newFetchHandler The new fetch handler
  */
-function setFetchHandler( newFetchHandler ) {
+export function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
@@ -152,7 +147,7 @@ function setFetchHandler( newFetchHandler ) {
  * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
-function apiFetch( options ) {
+export function apiFetch( options ) {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
@@ -185,37 +180,3 @@ function apiFetch( options ) {
 		);
 	} );
 }
-
-if ( typeof document !== 'undefined' ) {
-	const el = document.getElementById( 'wp-apifetch-config-data' );
-	if ( el?.textContent ) {
-		try {
-			const config = JSON.parse( el.textContent );
-
-			if ( config.rootURL ) {
-				registerMiddleware( createRootURLMiddleware( config.rootURL ) );
-			}
-			if ( config.nonce ) {
-				registerMiddleware( createNonceMiddleware( config.nonce ) );
-			}
-			if ( config.shouldRegisterMediaUploadMiddleware ) {
-				registerMiddleware( mediaUploadMiddleware );
-			}
-			if ( config.nonceEndpoint ) {
-				apiFetch.nonceEndpoint = config.nonceEndpoint;
-			}
-		} catch {}
-	}
-}
-
-apiFetch.use = registerMiddleware;
-apiFetch.setFetchHandler = setFetchHandler;
-
-apiFetch.createNonceMiddleware = createNonceMiddleware;
-apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
-apiFetch.createRootURLMiddleware = createRootURLMiddleware;
-apiFetch.fetchAllMiddleware = fetchAllMiddleware;
-apiFetch.mediaUploadMiddleware = mediaUploadMiddleware;
-apiFetch.createThemePreviewMiddleware = createThemePreviewMiddleware;
-
-export default apiFetch;
