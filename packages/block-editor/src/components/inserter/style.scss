@@ -242,6 +242,10 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	padding: $grid-unit-20;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 }
 
 .block-editor-inserter__category-tablist {
