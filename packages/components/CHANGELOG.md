@@ -96,6 +96,7 @@
 ### Deprecation
 
 -   `Navigator`: Remove "experimental" designation ([#60927](https://github.com/WordPress/gutenberg/pull/60927)).
+-   `Navigator`: Rename the root provider to `Navigator` and grouped all related components under this namespace ([#59182](https://github.com/WordPress/gutenberg/pull/59182)).
 
 ## 27.4.0 (2024-04-19)
 
