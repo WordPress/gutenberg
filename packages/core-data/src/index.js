@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import {
+	createReduxStore,
+	register,
+	createRegistrySelector,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,27 +35,17 @@ const entitiesConfig = [
 
 const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name, plural } = entity;
-	result[ getMethodName( kind, name ) ] = ( state, key, query ) =>
-		selectors.getEntityRecord( state, kind, name, key, query );
-
-	if ( plural ) {
-		result[ getMethodName( kind, plural, 'get' ) ] = ( state, query ) =>
-			selectors.getEntityRecords( state, kind, name, query );
-	}
-	return result;
-}, {} );
-
-const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
-	const { kind, name, plural } = entity;
-	result[ getMethodName( kind, name ) ] = ( key, query ) =>
-		resolvers.getEntityRecord( kind, name, key, query );
+	result[ getMethodName( kind, name ) ] = createRegistrySelector(
+		( select ) => ( state, key, query ) =>
+			select( STORE_NAME ).getEntityRecord( kind, name, key, query )
+	);
 
 	if ( plural ) {
 		const pluralMethodName = getMethodName( kind, plural, 'get' );
-		result[ pluralMethodName ] = ( ...args ) =>
-			resolvers.getEntityRecords( kind, name, ...args );
-		result[ pluralMethodName ].shouldInvalidate = ( action ) =>
-			resolvers.getEntityRecords.shouldInvalidate( action, kind, name );
+		result[ pluralMethodName ] = createRegistrySelector(
+			( select ) => ( state, query ) =>
+				select( STORE_NAME ).getEntityRecords( kind, name, query )
+		);
 	}
 	return result;
 }, {} );
@@ -69,7 +63,7 @@ const storeConfig = () => ( {
 	reducer,
 	actions: { ...actions, ...entityActions, ...createLocksActions() },
 	selectors: { ...selectors, ...entitySelectors },
-	resolvers: { ...resolvers, ...entityResolvers },
+	resolvers,
 } );
 
 /**
