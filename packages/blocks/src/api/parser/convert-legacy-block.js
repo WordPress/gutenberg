@@ -111,6 +111,10 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 					'core/pattern-overrides'
 				) {
 					hasPatternOverrides = true;
+					newAttributes.metadata = {
+						...newAttributes.metadata,
+						bindings: { ...newAttributes.metadata.bindings },
+					};
 					delete newAttributes.metadata.bindings[ binding ];
 				}
 			} );
