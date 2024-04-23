@@ -612,8 +612,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
-	$minimum_column_width = isset( $block['attrs']['style']['layout']['minimumColumnWidth'] ) ? $block['attrs']['style']['layout']['minimumColumnWidth'] : null;
-	$column_count         = isset( $block['attrs']['style']['layout']['columnCount'] ) ? $block['attrs']['style']['layout']['columnCount'] : null;
+	$minimum_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : null;
+	$column_count         = isset( $block['parentLayout']['columnCount'] ) ? $block['parentLayout']['columnCount'] : null;
 
 	/*
 	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
