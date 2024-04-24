@@ -415,7 +415,7 @@ Create a bulleted or numbered list. ([Source](https://github.com/WordPress/guten
 -	**Name:** core/list
 -	**Category:** text
 -	**Allowed Blocks:** core/list-item
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~, ~~html~~
 -	**Attributes:** ordered, placeholder, reversed, start, type, values
 
 ## List item
@@ -642,7 +642,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 -	**Name:** core/post-featured-image
 -	**Category:** theme
--	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, full, left, right, wide), color (~~background~~, ~~text~~), filter (duotone), interactivity (clientNavigation), shadow (), spacing (margin, padding), ~~html~~
 -	**Attributes:** aspectRatio, customGradient, customOverlayColor, dimRatio, gradient, height, isLink, linkTarget, overlayColor, rel, scale, sizeSlug, useFirstImageFromPost, width
 
 ## Post Navigation Link
@@ -847,7 +847,7 @@ Describe in a few words what the site is about. The tagline can be used in searc
 -	**Name:** core/site-tagline
 -	**Category:** theme
 -	**Supports:** align (full, wide), color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Attributes:** level, textAlign
 
 ## Site Title
 
@@ -860,7 +860,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social media profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
+Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
 
 -	**Name:** core/social-link
 -	**Category:** widgets
@@ -870,7 +870,7 @@ Display an icon linking to a social media profile or site. ([Source](https://git
 
 ## Social Icons
 
-Display icons linking to your social media profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
+Display icons linking to your social profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
 
 -	**Name:** core/social-links
 -	**Category:** widgets

@@ -1173,7 +1173,7 @@ class WritingFlowUtils {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 		await this.editor.canvas
-			.locator( 'role=button[name="Add block"i]' )
+			.locator( '.is-selected >> role=button[name="Add block"i]' )
 			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'

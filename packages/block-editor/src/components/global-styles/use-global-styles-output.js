@@ -19,6 +19,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import {
 	PRESET_METADATA,
 	ROOT_BLOCK_SELECTOR,
+	ROOT_CSS_PROPERTIES_SELECTOR,
 	scopeSelector,
 	appendToSelector,
 	getBlockStyleVariationSelector,
@@ -526,10 +527,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(${ selector } .${ className })${
+										? `:where(.${ className })${
 												spacingStyle?.selector || ''
 										  }`
-										: `${ selector }-${ className }${
+										: `:where(${ selector }-${ className })${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -543,7 +544,7 @@ export function getLayoutStyles( {
 		);
 		// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
 		if ( selector === ROOT_BLOCK_SELECTOR && hasBlockGapSupport ) {
-			ruleset += `${ selector } { --wp--style--block-gap: ${ gapValue }; }`;
+			ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } { --wp--style--block-gap: ${ gapValue }; }`;
 		}
 	}
 
@@ -574,7 +575,7 @@ export function getLayoutStyles( {
 						}
 
 						if ( declarations.length ) {
-							const combinedSelector = `${ selector } .${ className }${
+							const combinedSelector = `.${ className }${
 								baseStyle?.selector || ''
 							}`;
 							ruleset += `${ combinedSelector } { ${ declarations.join(
@@ -729,7 +730,7 @@ export const getNodesWithSettings = ( tree, blockSelectors ) => {
 		nodes.push( {
 			presets,
 			custom,
-			selector: ROOT_BLOCK_SELECTOR,
+			selector: ROOT_CSS_PROPERTIES_SELECTOR,
 		} );
 	}
 
@@ -781,24 +782,28 @@ export const toStyles = (
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 	const { contentSize, wideSize } = tree?.settings?.layout || {};
+	let ruleset = '';
+
+	if ( contentSize || wideSize ) {
+		ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } {`;
+		ruleset = contentSize
+			? ruleset + ` --wp--style--global--content-size: ${ contentSize };`
+			: ruleset;
+		ruleset = wideSize
+			? ruleset + ` --wp--style--global--wide-size: ${ wideSize };`
+			: ruleset;
+		ruleset += '}';
+	}
 
 	/*
-	 * Reset default browser margin on the root body element.
-	 * This is set on the root selector **before** generating the ruleset
+	 * Reset default browser margin on the body element.
+	 * This is set on the body selector **before** generating the ruleset
 	 * from the `theme.json`. This is to ensure that if the `theme.json` declares
 	 * `margin` in its `spacing` declaration for the `body` element then these
 	 * user-generated values take precedence in the CSS cascade.
 	 * @link https://github.com/WordPress/gutenberg/issues/36147.
 	 */
-	let ruleset = 'body {margin: 0;';
-
-	if ( contentSize ) {
-		ruleset += ` --wp--style--global--content-size: ${ contentSize };`;
-	}
-
-	if ( wideSize ) {
-		ruleset += ` --wp--style--global--wide-size: ${ wideSize };`;
-	}
+	ruleset += 'body {margin: 0;';
 
 	// Root padding styles should only be output for full templates, not patterns or template parts.
 	if ( useRootPaddingAlign && isTemplate ) {
@@ -839,7 +844,7 @@ export const toStyles = (
 					( [ cssSelector, declarations ] ) => {
 						if ( declarations.length ) {
 							const rules = declarations.join( ';' );
-							ruleset += `${ cssSelector }{${ rules };}`;
+							ruleset += `:where(${ cssSelector }){${ rules };}`;
 						}
 					}
 				);
@@ -932,7 +937,9 @@ export const toStyles = (
 				isTemplate
 			);
 			if ( declarations?.length ) {
-				ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+				ruleset += `:where(${ selector }){${ declarations.join(
+					';'
+				) };}`;
 			}
 
 			// Check for pseudo selector in `styles` and handle separately.
@@ -993,14 +1000,17 @@ export const toStyles = (
 			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
+			':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
+			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
 	nodesWithSettings.forEach( ( { selector, presets } ) => {
-		if ( ROOT_BLOCK_SELECTOR === selector ) {
+		if (
+			ROOT_BLOCK_SELECTOR === selector ||
+			ROOT_CSS_PROPERTIES_SELECTOR === selector
+		) {
 			// Do not add extra specificity for top-level classes.
 			selector = '';
 		}
@@ -1211,6 +1221,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			updatedConfig,
 			blockSelectors
 		);
+
 		const globalStyles = toStyles(
 			updatedConfig,
 			blockSelectors,

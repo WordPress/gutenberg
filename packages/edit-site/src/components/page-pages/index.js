@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classNames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -15,6 +10,7 @@ import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -34,17 +30,11 @@ import {
 	OPERATOR_IS_NONE,
 } from '../../utils/constants';
 
-import {
-	trashPostAction,
-	usePermanentlyDeletePostAction,
-	useRestorePostAction,
-	postRevisionsAction,
-	viewPostAction,
-	useEditPostAction,
-} from '../actions';
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+
+const { usePostActions } = unlock( editorPrivateApis );
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -160,6 +150,7 @@ const STATUSES = [
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
 
 function FeaturedImage( { item, viewType } ) {
+	const isDisabled = item.status === 'trash';
 	const { onClick } = useLink( {
 		postId: item.id,
 		postType: item.type,
@@ -177,23 +168,36 @@ function FeaturedImage( { item, viewType } ) {
 			size={ size }
 		/>
 	) : null;
-	if ( viewType === LAYOUT_LIST ) {
-		return media;
-	}
+	const renderButton = viewType !== LAYOUT_LIST && ! isDisabled;
 	return (
-		<button
-			className={ classNames( 'page-pages-preview-field__button', {
-				'edit-site-page-pages__media-wrapper':
-					viewType === LAYOUT_TABLE,
-			} ) }
-			type="button"
-			onClick={ onClick }
-			aria-label={ item.title?.rendered || __( '(no title)' ) }
+		<div
+			className={ `edit-site-page-pages__featured-image-wrapper is-layout-${ viewType }` }
 		>
-			{ media }
-		</button>
+			{ renderButton ? (
+				<button
+					className="page-pages-preview-field__button"
+					type="button"
+					onClick={ onClick }
+					aria-label={ item.title?.rendered || __( '(no title)' ) }
+				>
+					{ media }
+				</button>
+			) : (
+				media
+			) }
+		</div>
 	);
 }
+
+const PAGE_ACTIONS = [
+	'edit-post',
+	'view-post',
+	'restore',
+	'permanently-delete',
+	'view-post-revisions',
+	'rename-post',
+	'move-to-trash',
+];
 
 export default function PagePages() {
 	const postType = 'page';
@@ -259,7 +263,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -286,9 +290,10 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					return [ LAYOUT_TABLE, LAYOUT_GRID ].includes(
-						view.type
-					) ? (
+					const addLink =
+						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+						item.status !== 'trash';
+					return addLink ? (
 						<Link
 							params={ {
 								postId: item.id,
@@ -345,21 +350,20 @@ export default function PagePages() {
 		],
 		[ authors, view.type ]
 	);
-
-	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
-	const restorePostAction = useRestorePostAction();
-	const editPostAction = useEditPostAction();
-	const actions = useMemo(
-		() => [
-			editPostAction,
-			viewPostAction,
-			restorePostAction,
-			permanentlyDeletePostAction,
-			postRevisionsAction,
-			trashPostAction,
-		],
-		[ permanentlyDeletePostAction, restorePostAction, editPostAction ]
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'edit-post' ) {
+				const post = items[ 0 ];
+				history.push( {
+					postId: post.id,
+					postType: post.type,
+					canvas: 'edit',
+				} );
+			}
+		},
+		[ history ]
 	);
+	const actions = usePostActions( onActionPerformed, PAGE_ACTIONS );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
@@ -377,27 +381,17 @@ export default function PagePages() {
 	);
 
 	const [ showAddPageModal, setShowAddPageModal ] = useState( false );
-	const openModal = useCallback( () => {
-		if ( ! showAddPageModal ) {
-			setShowAddPageModal( true );
-		}
-	}, [ showAddPageModal ] );
-	const closeModal = useCallback( () => {
-		if ( showAddPageModal ) {
-			setShowAddPageModal( false );
-		}
-	}, [ showAddPageModal ] );
-	const handleNewPage = useCallback(
-		( { type, id } ) => {
-			history.push( {
-				postId: id,
-				postType: type,
-				canvas: 'edit',
-			} );
-			closeModal();
-		},
-		[ history ]
-	);
+
+	const openModal = () => setShowAddPageModal( true );
+	const closeModal = () => setShowAddPageModal( false );
+	const handleNewPage = ( { type, id } ) => {
+		history.push( {
+			postId: id,
+			postType: type,
+			canvas: 'edit',
+		} );
+		closeModal();
+	};
 
 	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (

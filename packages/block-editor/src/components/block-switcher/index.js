@@ -182,7 +182,9 @@ export const BlockSwitcher = ( { clientIds, disabled } ) => {
 			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
 				return { invalidBlocks: true };
 			}
-			const rootClientId = getBlockRootClientId( clientIds );
+			const rootClientId = getBlockRootClientId(
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
+			);
 			const [ { name: firstBlockName } ] = _blocks;
 			const _isSingleBlockSelected = _blocks.length === 1;
 			const blockType = getBlockType( firstBlockName );

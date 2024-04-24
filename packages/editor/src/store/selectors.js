@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -14,7 +9,7 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs, cleanForSlug } from '@wordpress/url';
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';
@@ -105,16 +100,11 @@ export const isEditedPostDirty = createRegistrySelector(
 		// inferred to contain unsaved values.
 		const postType = getCurrentPostType( state );
 		const postId = getCurrentPostId( state );
-		if (
-			select( coreStore ).hasEditsForEntityRecord(
-				'postType',
-				postType,
-				postId
-			)
-		) {
-			return true;
-		}
-		return false;
+		return select( coreStore ).hasEditsForEntityRecord(
+			'postType',
+			postType,
+			postId
+		);
 	}
 );
 
@@ -1112,10 +1102,7 @@ export function canUserUseUnfilteredHTML( state ) {
  */
 export const isPublishSidebarEnabled = createRegistrySelector(
 	( select ) => () =>
-		!! select( preferencesStore ).get(
-			'core/edit-post',
-			'isPublishSidebarEnabled'
-		)
+		!! select( preferencesStore ).get( 'core', 'isPublishSidebarEnabled' )
 );
 
 /**
@@ -1706,8 +1693,8 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
 		const areas =
-			getEditorSettings( state )?.defaultTemplatePartAreas || [];
-		return areas?.map( ( item ) => {
+			getEditorSettings( state )?.defaultTemplatePartAreas ?? [];
+		return areas.map( ( item ) => {
 			return { ...item, icon: getTemplatePartIcon( item.icon ) };
 		} );
 	},
@@ -1735,7 +1722,7 @@ export const __experimentalGetDefaultTemplateType = createSelector(
 			) ?? EMPTY_OBJECT
 		);
 	},
-	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
+	( state ) => [ __experimentalGetDefaultTemplateTypes( state ) ]
 );
 
 /**
@@ -1746,32 +1733,39 @@ export const __experimentalGetDefaultTemplateType = createSelector(
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title, description, and icon.
  */
-export function __experimentalGetTemplateInfo( state, template ) {
-	if ( ! template ) {
-		return EMPTY_OBJECT;
-	}
+export const __experimentalGetTemplateInfo = createSelector(
+	( state, template ) => {
+		if ( ! template ) {
+			return EMPTY_OBJECT;
+		}
 
-	const { description, slug, title, area } = template;
-	const { title: defaultTitle, description: defaultDescription } =
-		__experimentalGetDefaultTemplateType( state, slug );
+		const { description, slug, title, area } = template;
+		const { title: defaultTitle, description: defaultDescription } =
+			__experimentalGetDefaultTemplateType( state, slug );
 
-	const templateTitle = typeof title === 'string' ? title : title?.rendered;
-	const templateDescription =
-		typeof description === 'string' ? description : description?.raw;
-	const templateIcon =
-		__experimentalGetDefaultTemplatePartAreas( state ).find(
-			( item ) => area === item.area
-		)?.icon || layout;
+		const templateTitle =
+			typeof title === 'string' ? title : title?.rendered;
+		const templateDescription =
+			typeof description === 'string' ? description : description?.raw;
+		const templateIcon =
+			__experimentalGetDefaultTemplatePartAreas( state ).find(
+				( item ) => area === item.area
+			)?.icon || layout;
 
-	return {
-		title:
-			templateTitle && templateTitle !== slug
-				? templateTitle
-				: defaultTitle || slug,
-		description: templateDescription || defaultDescription,
-		icon: templateIcon,
-	};
-}
+		return {
+			title:
+				templateTitle && templateTitle !== slug
+					? templateTitle
+					: defaultTitle || slug,
+			description: templateDescription || defaultDescription,
+			icon: templateIcon,
+		};
+	},
+	( state ) => [
+		__experimentalGetDefaultTemplateTypes( state ),
+		__experimentalGetDefaultTemplatePartAreas( state ),
+	]
+);
 
 /**
  * Returns a post type label depending on the current post.
@@ -1789,3 +1783,14 @@ export const getPostTypeLabel = createRegistrySelector(
 		return postType?.labels?.singular_name;
 	}
 );
+
+/**
+ * Returns true if the publish sidebar is opened.
+ *
+ * @param {Object} state Global application state
+ *
+ * @return {boolean} Whether the publish sidebar is open.
+ */
+export function isPublishSidebarOpened( state ) {
+	return state.publishSidebarActive;
+}

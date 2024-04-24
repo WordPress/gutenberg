@@ -81,6 +81,7 @@ jest.mock( '@wordpress/api-fetch', () => {
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		logException: jest.fn(),
 		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
 		requestBlockTypeImpressions: jest.fn( ( callback ) => {

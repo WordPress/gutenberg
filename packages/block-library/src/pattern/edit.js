@@ -108,6 +108,10 @@ const PatternEdit = ( { attributes, clientId } ) => {
 						metadata: {
 							...clonedBlocks[ 0 ].attributes.metadata,
 							categories: selectedPattern.categories,
+							patternName: selectedPattern.name,
+							name:
+								clonedBlocks[ 0 ].attributes.metadata.name ||
+								selectedPattern.title,
 						},
 					};
 				}

@@ -31,5 +31,9 @@ export {
 	useHasImageSettingsPanel,
 } from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
+export {
+	default as BackgroundPanel,
+	useHasBackgroundPanel,
+} from './background-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
 export { default as getGlobalStylesChanges } from './get-global-styles-changes';

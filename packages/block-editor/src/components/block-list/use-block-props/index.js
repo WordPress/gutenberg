@@ -130,7 +130,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
 	const bindingsStyle =
 		hasBlockBindings && canBindBlock( name )
-			? { '--wp-admin-theme-color': 'var(--wp-bound-block-color)' }
+			? {
+					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
+					'--wp-admin-theme-color--rgb':
+						'var(--wp-block-synced-color--rgb)',
+			  }
 			: {};
 
 	// Ensures it warns only inside the `edit` implementation for the block.
@@ -138,6 +142,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
+	}
+
+	let hasNegativeMargin = false;
+	if (
+		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
+	) {
+		hasNegativeMargin = true;
 	}
 
 	return {
@@ -170,6 +184,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
+				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

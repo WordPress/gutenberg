@@ -1890,6 +1890,27 @@ export function highlightedBlock( state, action ) {
 }
 
 /**
+ * Reducer returning current expanded block in the list view.
+ *
+ * @param {string|null} state  Current expanded block.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function expandedBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EXPANDED_IN_LIST_VIEW':
+			return action.clientId;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the block insertion event list state.
  *
  * @param {Object} state  Current state.
@@ -2064,6 +2085,7 @@ const combinedReducers = combineReducers( {
 	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
+	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,

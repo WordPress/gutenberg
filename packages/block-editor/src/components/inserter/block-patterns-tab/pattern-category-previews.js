@@ -128,7 +128,7 @@ export function PatternCategoryPreviews( {
 	);
 
 	return (
-		<div className="block-editor-inserter__patterns-category-panel">
+		<>
 			<VStack
 				spacing={ 2 }
 				className="block-editor-inserter__patterns-category-panel-header"
@@ -174,6 +174,6 @@ export function PatternCategoryPreviews( {
 					pagingProps={ pagingProps }
 				/>
 			) }
-		</div>
+		</>
 	);
 }

@@ -49,6 +49,20 @@
 			"padding": true,
 			"blockGap": true
 		},
+		"shadow": {
+			"presets": [
+				{
+					"name": "Natural",
+					"slug": "natural",
+					"shadow": "2px 2px 3px #000"
+				},
+				{
+					"name": "Test",
+					"slug": "test",
+					"shadow": "2px 2px 3px #000"
+				}
+			]
+		},
 		"blocks": {
 			"core/paragraph": {
 				"color": {

@@ -82,10 +82,6 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
-		await page
-			.getByRole( 'region', { name: 'Save panel' } )
-			.getByRole( 'button', { name: 'Save', exact: true } )
-			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
 		).toContainText( 'Site updated' );

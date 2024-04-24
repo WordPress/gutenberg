@@ -13,7 +13,7 @@ import {
 	createContext,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	removeFormat,
@@ -26,7 +26,7 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey } from '../block-edit/context';
+import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
@@ -44,13 +44,15 @@ import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
-import { Content } from './content';
+import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
 
 export const keyboardShortcutContext = createContext();
 export const inputEventContext = createContext();
+
+const instanceIdKey = Symbol( 'instanceId' );
 
 /**
  * Removes props used for the native version of RichText so that they are not
@@ -75,7 +77,6 @@ function removeNativeProps( props ) {
 		fontStyle,
 		minWidth,
 		maxWidth,
-		setRef,
 		disableSuggestions,
 		disableAutocorrection,
 		...restProps
@@ -110,12 +111,14 @@ export function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
 		__unstableAllowPrefixTransformations,
-		disableEditing,
+		readOnly,
 		...props
 	},
 	forwardedRef
 ) {
 	props = removeNativeProps( props );
+
+	const instanceId = useInstanceId( RichTextWrapper );
 
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
@@ -139,7 +142,9 @@ export function RichTextWrapper(
 			isSelected =
 				selectionStart.clientId === clientId &&
 				selectionEnd.clientId === clientId &&
-				selectionStart.attributeKey === identifier;
+				( identifier
+					? selectionStart.attributeKey === identifier
+					: selectionStart[ instanceIdKey ] === instanceId );
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
@@ -153,6 +158,7 @@ export function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
 		clientId,
 		identifier,
+		instanceId,
 		originalIsSelected,
 		isBlockSelected,
 	] );
@@ -196,7 +202,7 @@ export function RichTextWrapper(
 		[ blockBindings, blockName ]
 	);
 
-	const shouldDisableEditing = disableEditing || disableBoundBlocks;
+	const shouldDisableEditing = readOnly || disableBoundBlocks;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -213,6 +219,13 @@ export function RichTextWrapper(
 			const selection = {};
 			const unset = start === undefined && end === undefined;
 
+			const baseSelection = {
+				clientId,
+				[ identifier ? 'attributeKey' : instanceIdKey ]: identifier
+					? identifier
+					: instanceId,
+			};
+
 			if ( typeof start === 'number' || unset ) {
 				// If we are only setting the start (or the end below), which
 				// means a partial selection, and we're not updating a selection
@@ -227,8 +240,7 @@ export function RichTextWrapper(
 				}
 
 				selection.start = {
-					clientId,
-					attributeKey: identifier,
+					...baseSelection,
 					offset: start,
 				};
 			}
@@ -243,15 +255,22 @@ export function RichTextWrapper(
 				}
 
 				selection.end = {
-					clientId,
-					attributeKey: identifier,
+					...baseSelection,
 					offset: end,
 				};
 			}
 
 			selectionChange( selection );
 		},
-		[ clientId, identifier ]
+		[
+			clientId,
+			getBlockRootClientId,
+			getSelectionEnd,
+			getSelectionStart,
+			identifier,
+			instanceId,
+			selectionChange,
+		]
 	);
 
 	const {
@@ -466,9 +485,51 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
-	return (
-		<PrivateRichText ref={ ref } { ...props } disableEditing={ false } />
-	);
+	const context = useBlockEditContext();
+	const isPreviewMode = context[ isPreviewModeKey ];
+
+	if ( isPreviewMode ) {
+		// Remove all non-content props.
+		const {
+			children,
+			tagName: Tag = 'div',
+			value,
+			onChange,
+			isSelected,
+			multiline,
+			inlineToolbar,
+			wrapperClassName,
+			autocompleters,
+			onReplace,
+			placeholder,
+			allowedFormats,
+			withoutInteractiveFormatting,
+			onRemove,
+			onMerge,
+			onSplit,
+			__unstableOnSplitAtEnd,
+			__unstableOnSplitAtDoubleLineEnd,
+			identifier,
+			preserveWhiteSpace,
+			__unstablePastePlainText,
+			__unstableEmbedURLOnPaste,
+			__unstableDisableFormats,
+			disableLineBreaks,
+			__unstableAllowPrefixTransformations,
+			readOnly,
+			...contentProps
+		} = removeNativeProps( props );
+		return (
+			<Tag
+				{ ...contentProps }
+				dangerouslySetInnerHTML={ {
+					__html: valueToHTMLString( value, multiline ),
+				} }
+			/>
+		);
+	}
+
+	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
 } );
 
 PublicForwardedRichTextContainer.Content = Content;

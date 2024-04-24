@@ -28,12 +28,14 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
 import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
-import { MediaTab, MediaCategoryDialog, useMediaCategories } from './media-tab';
+import { MediaTab, MediaCategoryPanel, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import { useZoomOut } from '../../hooks/use-zoom-out';
 
+const NOOP = () => {};
 function InserterMenu(
 	{
 		rootClientId,
@@ -45,6 +47,7 @@ function InserterMenu(
 		showMostUsedBlocks,
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
+		__experimentalOnPatternCategorySelection = NOOP,
 	},
 	ref
 ) {
@@ -110,13 +113,32 @@ function InserterMenu(
 		[ onToggleInsertionPoint ]
 	);
 
+	const isZoomedOutViewExperimentEnabled =
+		window?.__experimentalEnableZoomedOutView;
 	const onClickPatternCategory = useCallback(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
+			if ( isZoomedOutViewExperimentEnabled ) {
+				__experimentalOnPatternCategorySelection();
+			}
 		},
-		[ setSelectedPatternCategory ]
+		[
+			setSelectedPatternCategory,
+			__experimentalOnPatternCategorySelection,
+			isZoomedOutViewExperimentEnabled,
+		]
 	);
+
+	const showPatternPanel =
+		selectedTab === 'patterns' &&
+		! delayedFilterValue &&
+		selectedPatternCategory;
+
+	const showMediaPanel =
+		selectedTab === 'media' &&
+		! delayedFilterValue &&
+		selectedMediaCategory;
 
 	const blocksTab = useMemo(
 		() => (
@@ -155,13 +177,27 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
-			/>
+			>
+				{ showPatternPanel && (
+					<PatternCategoryPreviewPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onHover={ onHoverPattern }
+						category={ selectedPatternCategory }
+						patternFilter={ patternFilter }
+						showTitlesAsTooltip
+					/>
+				) }
+			</BlockPatternsTab>
 		),
 		[
 			destinationRootClientId,
+			onHoverPattern,
 			onInsertPattern,
 			onClickPatternCategory,
+			patternFilter,
 			selectedPatternCategory,
+			showPatternPanel,
 		]
 	);
 
@@ -172,13 +208,22 @@ function InserterMenu(
 				selectedCategory={ selectedMediaCategory }
 				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
-			/>
+			>
+				{ showMediaPanel && (
+					<MediaCategoryPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						category={ selectedMediaCategory }
+					/>
+				) }
+			</MediaTab>
 		),
 		[
 			destinationRootClientId,
 			onInsert,
 			selectedMediaCategory,
 			setSelectedMediaCategory,
+			showMediaPanel,
 		]
 	);
 
@@ -198,15 +243,10 @@ function InserterMenu(
 		},
 	} ) );
 
-	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		selectedPatternCategory;
 	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
-	const showMediaPanel =
-		selectedTab === 'media' &&
-		! delayedFilterValue &&
-		selectedMediaCategory;
+
+	// When the pattern panel is showing, we want to use zoom out mode
+	useZoomOut( showPatternPanel );
 
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
@@ -217,7 +257,11 @@ function InserterMenu(
 	};
 
 	return (
-		<div className="block-editor-inserter__menu">
+		<div
+			className={ classnames( 'block-editor-inserter__menu', {
+				'show-panel': showPatternPanel || showMediaPanel,
+			} ) }
+		>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
@@ -267,13 +311,6 @@ function InserterMenu(
 					</div>
 				) }
 			</div>
-			{ showMediaPanel && (
-				<MediaCategoryDialog
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					category={ selectedMediaCategory }
-				/>
-			) }
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover
 					className="block-editor-inserter__preview-container__popover"
@@ -284,16 +321,6 @@ function InserterMenu(
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
 				</Popover>
-			) }
-			{ showPatternPanel && (
-				<PatternCategoryPreviewPanel
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsertPattern }
-					onHover={ onHoverPattern }
-					category={ selectedPatternCategory }
-					patternFilter={ patternFilter }
-					showTitlesAsTooltip
-				/>
 			) }
 		</div>
 	);

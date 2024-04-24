@@ -64,15 +64,21 @@ function ListViewBlockSelectButton(
 		getPreviousBlockClientId,
 		getBlockRootClientId,
 		getBlockOrder,
+		getBlockParents,
 		getBlocksByClientId,
 		canRemoveBlocks,
 	} = useSelect( blockEditorStore );
-	const { duplicateBlocks, multiSelect, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		duplicateBlocks,
+		multiSelect,
+		removeBlocks,
+		insertAfterBlock,
+		insertBeforeBlock,
+	} = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-	const { rootClientId } = useListViewContext();
+	const { collapseAll, expand, rootClientId } = useListViewContext();
 
 	const positionLabel = blockInformation?.positionLabel
 		? sprintf(
@@ -188,6 +194,30 @@ function ListViewBlockSelectButton(
 					updateFocusAndSelection( updatedBlocks[ 0 ], false );
 				}
 			}
+		} else if ( isMatch( 'core/block-editor/insert-before', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertBeforeBlock( blocksToUpdate[ 0 ] );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+
+			const { blocksToUpdate } = getBlocksToUpdate();
+			await insertAfterBlock( blocksToUpdate.at( -1 ) );
+			const newlySelectedBlocks = getSelectedBlockClientIds();
+
+			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			if ( event.defaultPrevented ) {
 				return;
@@ -227,6 +257,17 @@ function ListViewBlockSelectButton(
 				blockClientIds[ blockClientIds.length - 1 ],
 				null
 			);
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+			event.preventDefault();
+			const { firstBlockClientId } = getBlocksToUpdate();
+			const blockParents = getBlockParents( firstBlockClientId, false );
+			// Collapse all blocks.
+			collapseAll();
+			// Expand all parents of the current block.
+			expand( blockParents );
 		}
 	}
 

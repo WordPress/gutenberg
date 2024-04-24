@@ -122,4 +122,39 @@ class Block_Navigation_Block_Hooks_Test extends WP_UnitTestCase {
 			'Post content did not match the original markup.'
 		);
 	}
+
+	/**
+	 * @covers ::gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta
+	 */
+	public function test_block_core_navigation_retains_content_if_not_set() {
+		if ( ! function_exists( 'set_ignored_hooked_blocks_metadata' ) ) {
+			$this->markTestSkipped( 'Test skipped on WordPress versions that do not included required Block Hooks functionality.' );
+		}
+
+		register_block_type(
+			'tests/my-block',
+			array(
+				'block_hooks' => array(
+					'core/navigation' => 'last_child',
+				),
+			)
+		);
+
+		$post             = new stdClass();
+		$post->ID         = self::$navigation_post->ID;
+		$post->post_title = 'Navigation Menu with changes';
+
+		$post = gutenberg_block_core_navigation_update_ignore_hooked_blocks_meta( $post );
+
+		$this->assertSame(
+			'Navigation Menu with changes',
+			$post->post_title,
+			'Post title was changed.'
+		);
+
+		$this->assertFalse(
+			isset( $post->post_content ),
+			'Post content should not be set.'
+		);
+	}
 }

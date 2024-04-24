@@ -17,10 +17,6 @@
 		&:focus {
 			box-shadow: none;
 		}
-
-		&.is-transient img {
-			opacity: 0.3;
-		}
 	}
 
 	img {
@@ -28,10 +24,27 @@
 		height: auto;
 		max-width: 100%;
 	}
+
+	&.is-transient {
+		position: relative;
+
+		img {
+			opacity: 0.3;
+		}
+
+		// Shown while image is being uploaded.
+		.components-spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			margin: 0;
+		}
+	}
 }
 
 // Provide special styling for the placeholder.
-// @todo: this particular minimal style of placeholder could be componentized further.
+// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-site-logo.wp-block-site-logo {
 
 	&.is-default-size .components-placeholder {
@@ -54,7 +67,7 @@
 		border-radius: inherit;
 
 		// Provide a minimum size for the placeholder, for when the logo is resized.
-		// @todo: resizing is currently only possible by adding an image, resizing,
+		// @todo resizing is currently only possible by adding an image, resizing,
 		// and then removing the image again. We might want to enable resizing on the
 		// placeholder itself.
 		min-height: $grid-unit-60;

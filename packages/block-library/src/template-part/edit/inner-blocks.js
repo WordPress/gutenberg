@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useEntityBlockEditor, store as coreStore } from '@wordpress/core-data';
 import {
 	InnerBlocks,
 	useInnerBlocksProps,
@@ -10,6 +10,8 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { parse } from '@wordpress/blocks';
 
 function useRenderAppender( hasInnerBlocks ) {
 	const blockEditingMode = useBlockEditingMode();
@@ -36,7 +38,62 @@ function useLayout( layout ) {
 	}
 }
 
-export default function TemplatePartInnerBlocks( {
+function NonEditableTemplatePartPreview( {
+	postId: id,
+	layout,
+	tagName: TagName,
+	blockProps,
+} ) {
+	useBlockEditingMode( 'disabled' );
+
+	const { content, editedBlocks } = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return {};
+			}
+			const { getEditedEntityRecord } = select( coreStore );
+			const editedRecord = getEditedEntityRecord(
+				'postType',
+				'wp_template_part',
+				id,
+				{ context: 'view' }
+			);
+			return {
+				editedBlocks: editedRecord.blocks,
+				content: editedRecord.content,
+			};
+		},
+		[ id ]
+	);
+
+	const blocks = useMemo( () => {
+		if ( ! id ) {
+			return undefined;
+		}
+
+		if ( editedBlocks ) {
+			return editedBlocks;
+		}
+
+		if ( ! content || typeof content !== 'string' ) {
+			return [];
+		}
+
+		return parse( content );
+	}, [ id, editedBlocks, content ] );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput: () => {},
+		onChange: () => {},
+		renderAppender: false,
+		layout: useLayout( layout ),
+	} );
+
+	return <TagName { ...innerBlocksProps } />;
+}
+
+function EditableTemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
 	layout,
@@ -58,4 +115,43 @@ export default function TemplatePartInnerBlocks( {
 	} );
 
 	return <TagName { ...innerBlocksProps } />;
+}
+
+export default function TemplatePartInnerBlocks( {
+	postId: id,
+	hasInnerBlocks,
+	layout,
+	tagName: TagName,
+	blockProps,
+} ) {
+	const { canViewTemplatePart, canEditTemplatePart } = useSelect(
+		( select ) => {
+			return {
+				canViewTemplatePart:
+					select( coreStore ).canUser( 'read', 'templates' ) ?? false,
+				canEditTemplatePart:
+					select( coreStore ).canUser( 'create', 'templates' ) ??
+					false,
+			};
+		},
+		[]
+	);
+
+	if ( ! canViewTemplatePart ) {
+		return null;
+	}
+
+	const TemplatePartInnerBlocksComponent = canEditTemplatePart
+		? EditableTemplatePartInnerBlocks
+		: NonEditableTemplatePartPreview;
+
+	return (
+		<TemplatePartInnerBlocksComponent
+			postId={ id }
+			hasInnerBlocks={ hasInnerBlocks }
+			layout={ layout }
+			tagName={ TagName }
+			blockProps={ blockProps }
+		/>
+	);
 }

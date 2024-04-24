@@ -4,13 +4,9 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PanelBody, PanelRow } from '@wordpress/components';
 import {
-	PageAttributesPanel,
-	PostDiscussionPanel,
-	PostExcerptPanel,
-	PostLastRevisionPanel,
-	PostTaxonomiesPanel,
-	store as editorStore,
+	PluginDocumentSettingPanel,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -24,13 +20,12 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
  */
 import { store as editSiteStore } from '../../../store';
 import TemplateActions from '../../template-actions';
-import TemplateAreas from './template-areas';
+import PluginTemplateSettingPanel from '../../plugin-template-setting-panel';
 import { useAvailablePatterns } from './hooks';
 import { TEMPLATE_PART_POST_TYPE } from '../../../utils/constants';
 import { unlock } from '../../../lock-unlock';
 
 const { PostCardPanel } = unlock( editorPrivateApis );
-
 const { useHistory } = unlock( routerPrivateApis );
 
 function TemplatesList( { availableTemplates, onSelect } ) {
@@ -52,7 +47,7 @@ function TemplatesList( { availableTemplates, onSelect } ) {
 
 const POST_TYPE_PATH = {
 	wp_template: '/wp_template',
-	wp_template_part: '/wp_template_part/all',
+	wp_template_part: '/patterns',
 };
 
 export default function TemplatePanel() {
@@ -112,9 +107,9 @@ export default function TemplatePanel() {
 						} }
 					/>
 				}
-			>
-				<TemplateAreas />
-			</PostCardPanel>
+			/>
+			<PluginTemplateSettingPanel.Slot />
+			<PluginDocumentSettingPanel.Slot />
 			{ availablePatterns?.length > 0 && (
 				<PanelBody
 					title={ __( 'Transform into:' ) }
@@ -134,11 +129,6 @@ export default function TemplatePanel() {
 					/>
 				</PanelBody>
 			) }
-			<PostLastRevisionPanel />
-			<PostTaxonomiesPanel />
-			<PostExcerptPanel />
-			<PostDiscussionPanel />
-			<PageAttributesPanel />
 		</>
 	);
 }

@@ -62,11 +62,20 @@ const { state, actions } = store(
 					// Only open on hover if the overlay is closed.
 					Object.values( overlayOpenedBy || {} ).filter( Boolean )
 						.length === 0
-				)
+				) {
 					actions.openMenu( 'hover' );
+				}
 			},
 			closeMenuOnHover() {
-				actions.closeMenu( 'hover' );
+				const { type, overlayOpenedBy } = getContext();
+				if (
+					type === 'submenu' &&
+					// Only close on hover if the overlay is closed.
+					Object.values( overlayOpenedBy || {} ).filter( Boolean )
+						.length === 0
+				) {
+					actions.closeMenu( 'hover' );
+				}
 			},
 			openMenuOnClick() {
 				const ctx = getContext();
@@ -128,7 +137,7 @@ const { state, actions } = store(
 				}
 			},
 			handleMenuFocusout( event ) {
-				const { modal } = getContext();
+				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
@@ -139,7 +148,8 @@ const { state, actions } = store(
 				if (
 					event.relatedTarget === null ||
 					( ! modal?.contains( event.relatedTarget ) &&
-						event.target !== window.document.activeElement )
+						event.target !== window.document.activeElement &&
+						type === 'submenu' )
 				) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );

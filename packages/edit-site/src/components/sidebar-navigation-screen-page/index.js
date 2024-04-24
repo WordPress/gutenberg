@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
@@ -15,8 +14,9 @@ import { pencil } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { escapeAttribute } from '@wordpress/escape-html';
 import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -26,18 +26,17 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
 import PageDetails from './page-details';
-import PageActions from '../page-actions';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
+const { PostActions } = unlock( editorPrivateApis );
 
 export default function SidebarNavigationScreenPage( { backPath } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const history = useHistory();
 	const {
 		params: { postId },
-		goTo,
-	} = useNavigator();
+	} = useLocation();
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'page',
@@ -80,7 +79,21 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 				canvas: 'view',
 			} );
 		}
-	}, [ hasResolved, history ] );
+	}, [ hasResolved, record, history ] );
+
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			if ( actionId === 'move-to-trash' ) {
+				history.push( {
+					path: '/' + items[ 0 ].type,
+					postId: undefined,
+					postType: undefined,
+					canvas: 'view',
+				} );
+			}
+		},
+		[ history ]
+	);
 
 	const featureImageAltText = featuredMediaAltText
 		? decodeEntities( featuredMediaAltText )
@@ -94,12 +107,9 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 			) }
 			actions={
 				<>
-					<PageActions
-						postId={ postId }
-						toggleProps={ { as: SidebarButton } }
-						onRemove={ () => {
-							goTo( '/page' );
-						} }
+					<PostActions
+						onActionPerformed={ onActionPerformed }
+						buttonProps={ { size: 'default' } }
 					/>
 					<SidebarButton
 						onClick={ () => setCanvasMode( 'edit' ) }

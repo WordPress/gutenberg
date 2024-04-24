@@ -8,18 +8,14 @@
 	text-align: left;
 	margin: 0;
 	color: $gray-900;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
 
 	// Some editor styles unset this.
 	-moz-font-smoothing: subpixel-antialiased;
 	-webkit-font-smoothing: subpixel-antialiased;
 
-	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-	@supports (position: sticky) {
-		display: flex;
-		flex-direction: column;
-		justify-content: top;
-		align-items: flex-start;
-	}
 
 	// Block UI appearance.
 	border-radius: $radius-block-ui;

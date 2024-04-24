@@ -1,7 +1,7 @@
 .block-editor-block-switcher {
 	position: relative;
 
-	// @todo: override toolbar group inherited paddings from components/block-tools/style.scss.
+	// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 	// This is best fixed by making the mover control area a proper single toolbar group.
 	// It needs specificity due to style inherited from .components-accessible-toolbar .components-button.has-icon.has-icon.
 	.components-button.components-dropdown-menu__toggle.has-icon.has-icon {

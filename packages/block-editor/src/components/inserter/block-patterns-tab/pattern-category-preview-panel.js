@@ -1,11 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useRef, useEffect } from '@wordpress/element';
-
-import { focus } from '@wordpress/dom';
-
-/**
  * Internal dependencies
  */
 
@@ -19,30 +12,15 @@ export function PatternCategoryPreviewPanel( {
 	showTitlesAsTooltip,
 	patternFilter,
 } ) {
-	const container = useRef();
-
-	useEffect( () => {
-		const timeout = setTimeout( () => {
-			const [ firstTabbable ] = focus.tabbable.find( container.current );
-			firstTabbable?.focus();
-		} );
-		return () => clearTimeout( timeout );
-	}, [ category ] );
-
 	return (
-		<div
-			ref={ container }
-			className="block-editor-inserter__patterns-category-dialog"
-		>
-			<PatternCategoryPreviews
-				key={ category.name }
-				rootClientId={ rootClientId }
-				onInsert={ onInsert }
-				onHover={ onHover }
-				category={ category }
-				showTitlesAsTooltip={ showTitlesAsTooltip }
-				patternFilter={ patternFilter }
-			/>
-		</div>
+		<PatternCategoryPreviews
+			key={ category.name }
+			rootClientId={ rootClientId }
+			onInsert={ onInsert }
+			onHover={ onHover }
+			category={ category }
+			showTitlesAsTooltip={ showTitlesAsTooltip }
+			patternFilter={ patternFilter }
+		/>
 	);
 }

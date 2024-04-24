@@ -1,22 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
-const CONTENT_ONLY_BLOCKS = [
-	'core/post-content',
-	'core/post-featured-image',
+const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
 	'core/post-title',
+	'core/post-featured-image',
+	'core/post-content',
 	'core/template-part',
-];
+] );
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
+	// Note that there are two separate subscription because the result for each
+	// returns a new array.
 	const contentOnlyIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockParents, getBlockName } =
 			select( blockEditorStore );
@@ -32,7 +35,6 @@ export default function DisableNonPageContentBlocks() {
 			} )
 		);
 	}, [] );
-
 	const disabledIds = useSelect( ( select ) => {
 		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
 		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
@@ -40,33 +42,34 @@ export default function DisableNonPageContentBlocks() {
 		);
 	}, [] );
 
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
+	const registry = useRegistry();
 
 	useEffect( () => {
-		setBlockEditingMode( '', 'disabled' );
-		for ( const clientId of contentOnlyIds ) {
-			setBlockEditingMode( clientId, 'contentOnly' );
-		}
-		for ( const clientId of disabledIds ) {
-			setBlockEditingMode( clientId, 'disabled' );
-		}
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
 
-		return () => {
-			unsetBlockEditingMode( '' );
+		registry.batch( () => {
+			setBlockEditingMode( '', 'disabled' );
 			for ( const clientId of contentOnlyIds ) {
-				unsetBlockEditingMode( clientId );
+				setBlockEditingMode( clientId, 'contentOnly' );
 			}
 			for ( const clientId of disabledIds ) {
-				unsetBlockEditingMode( clientId );
+				setBlockEditingMode( clientId, 'disabled' );
 			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				unsetBlockEditingMode( '' );
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of disabledIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
 		};
-	}, [
-		contentOnlyIds,
-		disabledIds,
-		setBlockEditingMode,
-		unsetBlockEditingMode,
-	] );
+	}, [ contentOnlyIds, disabledIds, registry ] );
 
 	return null;
 }
