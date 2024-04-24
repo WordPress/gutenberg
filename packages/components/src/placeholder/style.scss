@@ -68,7 +68,7 @@
 	width: 100%;
 	flex-wrap: wrap;
 	gap: $grid-unit-15;
-	justify-content: center;
+	justify-content: flex-start;
 
 	p {
 		font-family: $default-font;
