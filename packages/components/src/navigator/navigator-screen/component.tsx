@@ -139,36 +139,33 @@ function UnconnectedNavigatorScreen(
 }
 
 /**
- * The `NavigatorScreen` component represents a single view/screen/panel and
- * should be used in combination with the `NavigatorProvider`, the
- * `NavigatorButton` and the `NavigatorBackButton` components (or the `useNavigator`
+ * The `Navigator.Screen` component represents a single view/screen/panel and
+ * should be used in combination with the `NavigatorProvider` (alias `Navigator`), the
+ * `Navigator.Button` and the `Navigator.BackButton` components (or the `useNavigator`
  * hook).
  *
  * @example
  * ```jsx
  * import {
- *   NavigatorProvider,
- *   NavigatorScreen,
- *   NavigatorButton,
- *   NavigatorBackButton,
+ *   Navigator,
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <NavigatorProvider initialPath="/">
- *     <NavigatorScreen path="/">
+ *   <Navigator initialPath="/">
+ *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
- *        <NavigatorButton path="/child">
+ *        <Navigator.Button path="/child">
  *          Navigate to child screen.
- *       </NavigatorButton>
- *     </NavigatorScreen>
+ *       </Navigator.Button>
+ *     </Navigator.Screen>
  *
- *     <NavigatorScreen path="/child">
+ *     <Navigator.Screen path="/child">
  *       <p>This is the child screen.</p>
- *       <NavigatorBackButton>
+ *       <Navigator.BackButton>
  *         Go back
- *       </NavigatorBackButton>
- *     </NavigatorScreen>
- *   </NavigatorProvider>
+ *       </Navigator.BackButton>
+ *     </Navigator.Screen>
+ *   </Navigator>
  * );
  * ```
  */
