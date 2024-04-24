@@ -18,7 +18,9 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { ENTER, SPACE } from '@wordpress/keycodes';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 /**
  * Internal dependencies
@@ -229,9 +231,7 @@ export default function FilterSummary( {
 							tabIndex={ 0 }
 							onClick={ onToggle }
 							onKeyDown={ ( event ) => {
-								if (
-									[ ENTER, SPACE ].includes( event.keyCode )
-								) {
+								if ( [ ENTER, SPACE ].includes( event.key ) ) {
 									onToggle();
 									event.preventDefault();
 								}

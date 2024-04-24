@@ -100,9 +100,9 @@ function FontLibraryProvider( { children } ) {
 	 * This function is called when the user activates or deactivates a font family.
 	 * It only updates the global styles post content in the database for new font families.
 	 * This avoids saving other styles/settings changed by the user using other parts of the editor.
-	 * 
+	 *
 	 * It uses the font families from the param to avoid using the font families from an outdated state.
-	 * 
+	 *
 	 * @param {Array} fonts - The font families that will be saved to the database.
 	 */
 	const saveFontFamilies = async ( fonts ) => {
@@ -137,7 +137,7 @@ function FontLibraryProvider( { children } ) {
 	 * Base Theme Fonts are the fonts defined in the theme.json *file*.
 	 *
 	 * Uses the fonts from global styles + the ones from the theme.json file that hasn't repeated slugs.
-	 * Avoids incosistencies with the fonts listed in the font library modal as base (unactivated).
+	 * Avoids inconsistencies with the fonts listed in the font library modal as base (inactivated).
 	 * These inconsistencies can happen when the active theme fonts in global styles aren't defined in theme.json file as when a theme style variation is applied.
 	 */
 	const baseThemeFonts = baseFontFamilies?.theme
@@ -283,27 +283,27 @@ function FontLibraryProvider( { children } ) {
 				}
 
 				// Install the fonts (upload the font files to the server and create the post in the database).
-				let sucessfullyInstalledFontFaces = [];
-				let unsucessfullyInstalledFontFaces = [];
+				let successfullyInstalledFontFaces = [];
+				let unsuccessfullyInstalledFontFaces = [];
 				if ( fontFamilyToInstall?.fontFace?.length > 0 ) {
 					const response = await batchInstallFontFaces(
 						installedFontFamily.id,
 						makeFontFacesFormData( fontFamilyToInstall )
 					);
-					sucessfullyInstalledFontFaces = response?.successes;
-					unsucessfullyInstalledFontFaces = response?.errors;
+					successfullyInstalledFontFaces = response?.successes;
+					unsuccessfullyInstalledFontFaces = response?.errors;
 				}
 
-				// Use the sucessfully installed font faces
+				// Use the successfully installed font faces
 				// As well as any font faces that were already installed (those will be activated)
 				if (
-					sucessfullyInstalledFontFaces?.length > 0 ||
+					successfullyInstalledFontFaces?.length > 0 ||
 					alreadyInstalledFontFaces?.length > 0
 				) {
 					// Use font data from REST API not from client to ensure
 					// correct font information is used.
 					installedFontFamily.fontFace = [
-						...sucessfullyInstalledFontFaces,
+						...successfullyInstalledFontFaces,
 					];
 
 					fontFamiliesToActivate.push( installedFontFamily );
@@ -321,13 +321,13 @@ function FontLibraryProvider( { children } ) {
 				if (
 					isANewFontFamily &&
 					fontFamilyToInstall?.fontFace?.length > 0 &&
-					sucessfullyInstalledFontFaces?.length === 0
+					successfullyInstalledFontFaces?.length === 0
 				) {
 					await fetchUninstallFontFamily( installedFontFamily.id );
 				}
 
 				installationErrors = installationErrors.concat(
-					unsucessfullyInstalledFontFaces
+					unsuccessfullyInstalledFontFaces
 				);
 			}
 

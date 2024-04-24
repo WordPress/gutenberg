@@ -45,6 +45,7 @@ export default function Pagination( {
 							onClick={ () => changePage( 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'First page' ) }
+							__experimentalIsFocusable
 						>
 							<span>«</span>
 						</Button>
@@ -53,6 +54,7 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage - 1 ) }
 							disabled={ currentPage === 1 }
 							aria-label={ __( 'Previous page' ) }
+							__experimentalIsFocusable
 						>
 							<span>‹</span>
 						</Button>
@@ -75,6 +77,7 @@ export default function Pagination( {
 							onClick={ () => changePage( currentPage + 1 ) }
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Next page' ) }
+							__experimentalIsFocusable
 						>
 							<span>›</span>
 						</Button>
@@ -84,6 +87,7 @@ export default function Pagination( {
 							disabled={ currentPage === numPages }
 							aria-label={ __( 'Last page' ) }
 							size="default"
+							__experimentalIsFocusable
 						>
 							<span>»</span>
 						</Button>

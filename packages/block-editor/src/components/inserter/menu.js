@@ -33,6 +33,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { store as blockEditorStore } from '../../store';
+import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -125,6 +126,11 @@ function InserterMenu(
 		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
+	const showPatternPanel =
+		selectedTab === 'patterns' &&
+		! delayedFilterValue &&
+		selectedPatternCategory;
+
 	const blocksTab = useMemo(
 		() => (
 			<>
@@ -162,13 +168,25 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
-			/>
+			>
+				{ showPatternPanel && (
+					<PatternCategoryPreviewPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onHover={ onHoverPattern }
+						category={ selectedPatternCategory }
+						patternFilter={ patternFilter }
+						showTitlesAsTooltip
+					/>
+				) }
+			</BlockPatternsTab>
 		),
 		[
 			destinationRootClientId,
 			onInsertPattern,
 			onClickPatternCategory,
 			selectedPatternCategory,
+			showPatternPanel,
 		]
 	);
 
@@ -205,15 +223,14 @@ function InserterMenu(
 		},
 	} ) );
 
-	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		selectedPatternCategory;
 	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
 	const showMediaPanel =
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
 		selectedMediaCategory;
+
+	// When the pattern panel is showing, we want to use zoom out mode
+	useZoomOut( showPatternPanel );
 
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
@@ -224,7 +241,11 @@ function InserterMenu(
 	};
 
 	return (
-		<div className="block-editor-inserter__menu">
+		<div
+			className={ classnames( 'block-editor-inserter__menu', {
+				'show-panel': showPatternPanel,
+			} ) }
+		>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
@@ -291,16 +312,6 @@ function InserterMenu(
 				>
 					<InserterPreviewPanel item={ hoveredItem } />
 				</Popover>
-			) }
-			{ showPatternPanel && (
-				<PatternCategoryPreviewPanel
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsertPattern }
-					onHover={ onHoverPattern }
-					category={ selectedPatternCategory }
-					patternFilter={ patternFilter }
-					showTitlesAsTooltip
-				/>
 			) }
 		</div>
 	);

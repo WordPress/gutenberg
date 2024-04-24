@@ -83,6 +83,26 @@ function EditorKeyboardShortcutsRegister() {
 				character: '\\',
 			},
 		} );
+
+		registerShortcut( {
+			name: 'core/editor/toggle-sidebar',
+			category: 'global',
+			description: __( 'Show or hide the Settings sidebar.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: ',',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;

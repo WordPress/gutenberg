@@ -19,7 +19,7 @@ test.describe( 'Hybrid theme', () => {
 		);
 
 		await expect(
-			page.getByRole( 'link', { name: 'header' } )
+			page.getByText( 'header', { exact: true } )
 		).toBeVisible();
 	} );
 
@@ -29,7 +29,7 @@ test.describe( 'Hybrid theme', () => {
 			'postType=wp_template_part&path=/wp_template_part/all'
 		);
 
-		const templatePart = page.getByRole( 'link', { name: 'header' } );
+		const templatePart = page.getByText( 'header', { exact: true } );
 
 		await expect( templatePart ).toBeVisible();
 		await templatePart.click();
@@ -53,7 +53,7 @@ test.describe( 'Hybrid theme', () => {
 
 	test( 'can not export Site Editor Templates', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( {
-			postId: 'emptyhybrid//header',
+			postId: 'gutenberg-test-themes/emptyhybrid//header',
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );

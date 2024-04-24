@@ -21,6 +21,7 @@ export const TEMPLATE_ORIGINS = {
 	plugin: 'plugin',
 };
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
+export const TEMPLATE_PART_ALL_AREAS_CATEGORY = 'all-parts';
 
 // Patterns.
 export const {

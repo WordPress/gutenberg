@@ -30,6 +30,8 @@ import BlockInfo from '../block-info-slot-fill';
 import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
+import { unlock } from '../../lock-unlock';
+
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
 		( select ) => {
@@ -76,9 +78,9 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getSelectedBlockClientId,
 			getSelectedBlockCount,
 			getBlockName,
-			__unstableGetContentLockingParent,
+			getContentLockingParent,
 			getTemplateLock,
-		} = select( blockEditorStore );
+		} = unlock( select( blockEditorStore ) );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
 		const _selectedBlockName =
@@ -92,7 +94,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			selectedBlockName: _selectedBlockName,
 			blockType: _blockType,
 			topLevelLockedBlock:
-				__unstableGetContentLockingParent( _selectedBlockClientId ) ||
+				getContentLockingParent( _selectedBlockClientId ) ||
 				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
 				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
@@ -300,7 +302,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					<InspectorControls.Slot group="styles" />
 					<InspectorControls.Slot
 						group="background"
-						label={ __( 'Background' ) }
+						label={ __( 'Background image' ) }
 					/>
 					<PositionControls />
 					<div>

@@ -398,39 +398,47 @@ describe( 'blocks', () => {
 			} );
 		} );
 
-		// This can be removed once polyfill adding selectors has been removed.
-		it( 'should apply selectors on the client when not set on the server', () => {
-			const blockName = 'core/test-block-with-selectors';
+		it( 'should merge settings provided by server and client', () => {
+			const blockName = 'core/test-block-with-merged-settings';
 			unstable__bootstrapServerSideBlockDefinitions( {
 				[ blockName ]: {
-					category: 'widgets',
-				},
-			} );
-			unstable__bootstrapServerSideBlockDefinitions( {
-				[ blockName ]: {
-					selectors: { root: '.wp-block-custom-selector' },
-					category: 'ignored',
+					variations: [
+						{ name: 'foo', label: 'Foo' },
+						{ name: 'baz', label: 'Baz', description: 'Testing' },
+					],
 				},
 			} );
 
 			const blockType = {
-				title: 'block title',
+				title: 'block settings merge',
+				variations: [
+					{ name: 'bar', label: 'Bar' },
+					{ name: 'baz', label: 'Baz', icon: 'layout' },
+				],
 			};
 			registerBlockType( blockName, blockType );
 			expect( getBlockType( blockName ) ).toEqual( {
 				name: blockName,
 				save: expect.any( Function ),
-				title: 'block title',
-				category: 'widgets',
+				title: 'block settings merge',
 				icon: { src: BLOCK_ICON_DEFAULT },
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
 				keywords: [],
-				selectors: { root: '.wp-block-custom-selector' },
+				selectors: {},
 				supports: {},
 				styles: [],
-				variations: [],
+				variations: [
+					{ name: 'foo', label: 'Foo' },
+					{
+						description: 'Testing',
+						name: 'baz',
+						label: 'Baz',
+						icon: 'layout',
+					},
+					{ name: 'bar', label: 'Bar' },
+				],
 				blockHooks: {},
 			} );
 		} );

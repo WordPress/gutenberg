@@ -7,6 +7,8 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { undoIgnoreBlocks } from './undo-ignore';
+import { store as blockEditorStore } from './index';
+import { unlock } from '../lock-unlock';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -339,9 +341,10 @@ export function setLastFocus( lastFocus = null ) {
  * @param {string} clientId The block's clientId.
  */
 export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch } ) => {
-		const focusModeToRevert =
-			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+	return ( { select, dispatch, registry } ) => {
+		const focusModeToRevert = unlock(
+			registry.select( blockEditorStore )
+		).getTemporarilyEditingFocusModeToRevert();
 		dispatch.__unstableMarkNextChangeAsNotPersistent();
 		dispatch.updateBlockAttributes( clientId, {
 			templateLock: 'contentOnly',

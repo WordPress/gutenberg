@@ -551,6 +551,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textAlign": {
+							"description": "Allow users to set the text align.",
+							"type": "boolean",
+							"default": true
+						},
 						"textColumns": {
 							"description": "Allow users to set the number of text columns.",
 							"type": "boolean",
@@ -1628,6 +1633,10 @@
 									"$ref": "#/definitions/refComplete"
 								}
 							]
+						},
+						"textAlign": {
+							"description": "Sets the `text-align` CSS property.",
+							"type": "string"
 						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",

@@ -1,8 +1,17 @@
 <script>
 	( function redirectIfStoryMoved() {
+		const PREVIOUSLY_EXPERIMENTAL_COMPONENTS = [ 'navigation' ];
 		const REDIRECTS = [
 			{
 				from: /\/components-deprecated-/,
+				to: '/components-',
+			},
+			{
+				from: new RegExp(
+					`\/components-experimental-(?=${ PREVIOUSLY_EXPERIMENTAL_COMPONENTS.map(
+						( str ) => `${ str }\\b`
+					).join( '|' ) })`
+				),
 				to: '/components-',
 			},
 		];

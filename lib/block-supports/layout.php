@@ -47,13 +47,13 @@ function gutenberg_get_layout_definitions() {
 			),
 			'spacingStyles' => array(
 				array(
-					'selector' => ' > :first-child:first-child',
+					'selector' => ' > :first-child',
 					'rules'    => array(
 						'margin-block-start' => '0',
 					),
 				),
 				array(
-					'selector' => ' > :last-child:last-child',
+					'selector' => ' > :last-child',
 					'rules'    => array(
 						'margin-block-end' => '0',
 					),
@@ -112,13 +112,13 @@ function gutenberg_get_layout_definitions() {
 			),
 			'spacingStyles' => array(
 				array(
-					'selector' => ' > :first-child:first-child',
+					'selector' => ' > :first-child',
 					'rules'    => array(
 						'margin-block-start' => '0',
 					),
 				),
 				array(
-					'selector' => ' > :last-child:last-child',
+					'selector' => ' > :last-child',
 					'rules'    => array(
 						'margin-block-end' => '0',
 					),
@@ -146,7 +146,7 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 				array(
-					'selector' => ' > *',
+					'selector' => ' > :is(*, div)', // :is(*, div) instead of just * increases the specificity by 001.
 					'rules'    => array(
 						'margin' => '0',
 					),
@@ -168,7 +168,7 @@ function gutenberg_get_layout_definitions() {
 			'displayMode'   => 'grid',
 			'baseStyles'    => array(
 				array(
-					'selector' => ' > *',
+					'selector' => ' > :is(*, div)',  // :is(*, div) instead of just * increases the specificity by 001.
 					'rules'    => array(
 						'margin' => '0',
 					),
@@ -248,7 +248,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						),
 					),
 					array(
-						'selector'     => "$selector$selector > * + *",
+						'selector'     => "$selector > * + *",
 						'declarations' => array(
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
@@ -292,32 +292,32 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'declarations' => array( 'max-width' => 'none' ),
 				)
 			);
+		}
 
-			if ( isset( $block_spacing ) ) {
-				$block_spacing_values = gutenberg_style_engine_get_styles(
-					array(
-						'spacing' => $block_spacing,
-					)
+		if ( isset( $block_spacing ) ) {
+			$block_spacing_values = gutenberg_style_engine_get_styles(
+				array(
+					'spacing' => $block_spacing,
+				)
+			);
+
+			/*
+			 * Handle negative margins for alignfull children of blocks with custom padding set.
+			 * They're added separately because padding might only be set on one side.
+			 */
+			if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
+				$padding_right   = $block_spacing_values['declarations']['padding-right'];
+				$layout_styles[] = array(
+					'selector'     => "$selector > .alignfull",
+					'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
 				);
-
-				/*
-				 * Handle negative margins for alignfull children of blocks with custom padding set.
-				 * They're added separately because padding might only be set on one side.
-				 */
-				if ( isset( $block_spacing_values['declarations']['padding-right'] ) ) {
-					$padding_right   = $block_spacing_values['declarations']['padding-right'];
-					$layout_styles[] = array(
-						'selector'     => "$selector > .alignfull",
-						'declarations' => array( 'margin-right' => "calc($padding_right * -1)" ),
-					);
-				}
-				if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
-					$padding_left    = $block_spacing_values['declarations']['padding-left'];
-					$layout_styles[] = array(
-						'selector'     => "$selector > .alignfull",
-						'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
-					);
-				}
+			}
+			if ( isset( $block_spacing_values['declarations']['padding-left'] ) ) {
+				$padding_left    = $block_spacing_values['declarations']['padding-left'];
+				$layout_styles[] = array(
+					'selector'     => "$selector > .alignfull",
+					'declarations' => array( 'margin-left' => "calc($padding_left * -1)" ),
+				);
 			}
 		}
 
@@ -357,7 +357,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 						),
 					),
 					array(
-						'selector'     => "$selector$selector > * + *",
+						'selector'     => "$selector > * + *",
 						'declarations' => array(
 							'margin-block-start' => $gap_value,
 							'margin-block-end'   => '0',
@@ -471,6 +471,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'selector'     => $selector,
 				'declarations' => array( 'grid-template-columns' => 'repeat(' . $layout['columnCount'] . ', minmax(0, 1fr))' ),
 			);
+			if ( ! empty( $layout['rowCount'] ) ) {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
+				);
+			}
 		} else {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
 
@@ -606,8 +612,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		'declarations' => $child_layout_declarations,
 	);
 
-	$minimum_column_width = isset( $block['attrs']['style']['layout']['minimumColumnWidth'] ) ? $block['attrs']['style']['layout']['minimumColumnWidth'] : null;
-	$column_count         = isset( $block['attrs']['style']['layout']['columnCount'] ) ? $block['attrs']['style']['layout']['columnCount'] : null;
+	$minimum_column_width = isset( $block['parentLayout']['minimumColumnWidth'] ) ? $block['parentLayout']['minimumColumnWidth'] : null;
+	$column_count         = isset( $block['parentLayout']['columnCount'] ) ? $block['parentLayout']['columnCount'] : null;
 
 	/*
 	 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
@@ -793,7 +799,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$has_block_gap_support = isset( $block_gap );
 
 		$style = gutenberg_get_layout_style(
-			".$container_class.$container_class",
+			".$container_class",
 			$used_layout,
 			$has_block_gap_support,
 			$gap_value,

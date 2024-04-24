@@ -43,9 +43,13 @@ function InserterTabs( {
 	return (
 		<div className="block-editor-inserter__tabs">
 			<Tabs onSelect={ onSelect }>
-				<Tabs.TabList>
+				<Tabs.TabList className="block-editor-inserter__tablist">
 					{ tabs.map( ( tab ) => (
-						<Tabs.Tab key={ tab.name } tabId={ tab.name }>
+						<Tabs.Tab
+							key={ tab.name }
+							tabId={ tab.name }
+							className="block-editor-inserter__tab"
+						>
 							{ tab.title }
 						</Tabs.Tab>
 					) ) }
@@ -55,6 +59,7 @@ function InserterTabs( {
 						key={ tab.name }
 						tabId={ tab.name }
 						focusable={ false }
+						className="block-editor-inserter__tabpanel"
 					>
 						{ tabsContents[ tab.name ] }
 					</Tabs.TabPanel>
