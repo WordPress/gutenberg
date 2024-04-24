@@ -140,8 +140,8 @@ function UnconnectedNavigatorScreen(
 
 /**
  * The `Navigator.Screen` component represents a single view/screen/panel and
- * should be used in combination with the `NavigatorProvider` (alias `Navigator`), the
- * `Navigator.Button` and the `Navigator.BackButton` components (or the `useNavigator`
+ * should be used in combination with the `NavigatorProvider` (also aliased as `Navigator`),
+ * the `Navigator.Button` and the `Navigator.BackButton` components (or the `useNavigator`
  * hook).
  *
  * @example

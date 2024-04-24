@@ -23,7 +23,7 @@ function UnconnectedNavigatorButton(
 
 /**
  * The `Navigator.Button` component can be used to navigate to a screen and should
- * be used in combination with the `NavigatorProvider` (alias `Navigator`), the
+ * be used in combination with the `NavigatorProvider` (also aliased as `Navigator`), the
  * `Navigator.Screen` and the `Navigator.BackButton` components (or the `useNavigator` hook).
  *
  * @example

@@ -271,9 +271,9 @@ function UnconnectedNavigatorProvider(
 }
 
 /**
- * The `NavigatorProvider` component (alias `Navigator`) allows rendering nested
- * views/panels/menus (via the `Navigator.Screen` component and navigate between
- * these different view (via the `Navigator.Button` and `Navigator.BackButton`
+ * The `NavigatorProvider` component (also aliased as `Navigator`) allows rendering
+ * nested views/panels/menus (via the `Navigator.Screen` component and navigate
+ * between these different view (via the `Navigator.Button` and `Navigator.BackButton`
  * components or the `useNavigator` hook).
  *
  * ```jsx

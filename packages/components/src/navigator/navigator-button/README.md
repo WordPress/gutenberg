@@ -1,6 +1,6 @@
-# `NavigatorButton`
+# `Navigator.Button`
 
-The `NavigatorButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorBackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
+The `Navigator.Button` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md) (also aliased as `Navigator`), the [`Navigator.Screen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`Navigator.BackButton`](/packages/components/src/navigator/navigator-back-button/README.md) components (or the `useNavigator` hook).
 
 ## Usage
 
@@ -31,4 +31,4 @@ The path of the screen to navigate to. The value of this prop needs to be [a val
 
 ### Inherited props
 
-`NavigatorButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+`Navigator.Button` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.

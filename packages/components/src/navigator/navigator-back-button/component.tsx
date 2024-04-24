@@ -23,8 +23,8 @@ function UnconnectedNavigatorBackButton(
 
 /**
  * The `Navigator.BackButton` component can be used to navigate to a screen and
- * should be used in combination with the `NavigatorProvider` (alias `Navigator`), the
- * `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
+ * should be used in combination with the `NavigatorProvider` (also aliased as `Navigator`),
+ * the `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
  * hook).
  *
  * @example
@@ -34,7 +34,7 @@ function UnconnectedNavigatorBackButton(
  * } from '@wordpress/components';
  *
  * const MyNavigation = () => (
- *   <Navigator.Provider initialPath="/">
+ *   <Navigator initialPath="/">
  *     <Navigator.Screen path="/">
  *       <p>This is the home screen.</p>
  *        <Navigator.Button path="/child">

@@ -1,6 +1,6 @@
-# `NavigatorToParentButton`
+# `Navigator.ToParentButton`
 
-The `NavigatorToParentButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md), the [`NavigatorScreen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`NavigatorButton`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
+The `Navigator.ToParentButton` component can be used to navigate to a screen and should be used in combination with the [`NavigatorProvider`](/packages/components/src/navigator/navigator-provider/README.md) (also aliased as `Navigator`), the [`Navigator.Screen`](/packages/components/src/navigator/navigator-screen/README.md) and the [`Navigator.Button`](/packages/components/src/navigator/navigator-button/README.md) components (or the `useNavigator` hook).
 
 ## Usage
 
@@ -8,4 +8,4 @@ Refer to [the `NavigatorProvider` component](/packages/components/src/navigator/
 
 ### Inherited props
 
-`NavigatorToParentButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.
+`Navigator.ToParentButton` also inherits all of the [`Button` props](/packages/components/src/button/README.md#props), except for `href` and `target`.

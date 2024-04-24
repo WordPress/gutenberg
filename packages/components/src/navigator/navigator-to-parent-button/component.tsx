@@ -26,8 +26,8 @@ function UnconnectedNavigatorToParentButton(
 
 /*
  * The `Navigator.ToParentButton` component can be used to navigate to a screen and
- * should be used in combination with the `NavigatorProvider` (alias `Navigator`), the
- * `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
+ * should be used in combination with the `NavigatorProvider` (also aliased as `Navigator`),
+ * the `Navigator.Screen` and the `Navigator.Button` components (or the `useNavigator`
  * hook).
  *
  * @example
