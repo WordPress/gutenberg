@@ -12,13 +12,16 @@ const rg = /^\$/;
 const descriptor = Object.getOwnPropertyDescriptor;
 let peeking = false;
 
-export const deepSignal = < T extends object >( obj: T ): DeepSignal< T > => {
+export const deepSignal = < T extends object >(
+	obj: T,
+	handlers = null
+): DeepSignal< T > => {
 	if ( ! shouldProxy( obj ) )
 		throw new Error( "This object can't be observed." );
 	if ( ! objToProxy.has( obj ) )
 		objToProxy.set(
 			obj,
-			createProxy( obj, objectHandlers ) as DeepSignal< T >
+			createProxy( obj, handlers || objectHandlers ) as DeepSignal< T >
 		);
 	return objToProxy.get( obj );
 };
@@ -102,7 +105,7 @@ const get =
 		return returnSignal ? signals.get( key ) : signals.get( key ).value;
 	};
 
-const objectHandlers = {
+export const objectHandlers = {
 	get: get( false ),
 	set(
 		target: object,
@@ -155,7 +158,7 @@ const objectHandlers = {
 	},
 };
 
-const arrayHandlers = {
+export const arrayHandlers = {
 	get: get( true ),
 	set: throwOnMutation,
 	deleteProperty: throwOnMutation,
