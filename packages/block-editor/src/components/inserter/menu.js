@@ -132,40 +132,34 @@ function InserterMenu(
 		! delayedFilterValue &&
 		selectedMediaCategory;
 
-	const SearchPanel = ( { searchType } ) => (
-		<>
-			<SearchControl
-				__nextHasNoMarginBottom
-				className="block-editor-inserter__search"
-				onChange={ ( value ) => {
-					if ( hoveredItem ) setHoveredItem( null );
-					setFilterValue( value );
-				} }
-				value={ filterValue }
-				label={ __( 'Search for blocks and patterns' ) }
-				placeholder={ __( 'Search' ) }
-			/>
-			{ !! delayedFilterValue && (
-				<InserterSearchResults
-					filterValue={ delayedFilterValue }
-					onSelect={ onSelect }
-					onHover={ onHover }
-					onHoverPattern={ onHoverPattern }
-					rootClientId={ rootClientId }
-					clientId={ clientId }
-					isAppender={ isAppender }
-					__experimentalInsertionIndex={
-						__experimentalInsertionIndex
-					}
-					showBlockDirectory
-					shouldFocusBlock={ shouldFocusBlock }
-					maxBlockPatterns={
-						searchType !== 'patterns' ? 0 : undefined
-					}
-					maxBlockTypes={ searchType !== 'blocks' ? 0 : undefined }
-				/>
-			) }
-		</>
+	const BlocksTabContents = useMemo(
+		() => (
+			<>
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
+				</div>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+		]
 	);
 
 	const blocksTab = useMemo(
@@ -199,35 +193,41 @@ function InserterMenu(
 						maxBlockPatterns={ 0 }
 					/>
 				) }
-				{ ! delayedFilterValue && (
-					<>
-						<div className="block-editor-inserter__block-list">
-							<BlockTypesTab
-								rootClientId={ destinationRootClientId }
-								onInsert={ onInsert }
-								onHover={ onHover }
-								showMostUsedBlocks={ showMostUsedBlocks }
-							/>
-						</div>
-						{ showInserterHelpPanel && (
-							<div className="block-editor-inserter__tips">
-								<VisuallyHidden as="h2">
-									{ __( 'A tip for using the block editor' ) }
-								</VisuallyHidden>
-								<Tips />
-							</div>
-						) }
-					</>
-				) }
+				{ ! delayedFilterValue && BlocksTabContents }
 			</>
+		),
+		[ delayedFilterValue ]
+	);
+
+	const PatternsTabContents = useMemo(
+		() => (
+			<BlockPatternsTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsertPattern }
+				onSelectCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			>
+				{ showPatternPanel && (
+					<PatternCategoryPreviewPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onHover={ onHoverPattern }
+						category={ selectedPatternCategory }
+						patternFilter={ patternFilter }
+						showTitlesAsTooltip
+					/>
+				) }
+			</BlockPatternsTab>
 		),
 		[
 			delayedFilterValue,
 			destinationRootClientId,
-			onInsert,
-			onHover,
-			showMostUsedBlocks,
-			showInserterHelpPanel,
+			onHoverPattern,
+			onInsertPattern,
+			onClickPatternCategory,
+			patternFilter,
+			selectedPatternCategory,
+			showPatternPanel,
 		]
 	);
 
@@ -262,37 +262,10 @@ function InserterMenu(
 						maxBlockTypes={ 0 }
 					/>
 				) }
-				{ ! delayedFilterValue && (
-					<BlockPatternsTab
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onSelectCategory={ onClickPatternCategory }
-						selectedCategory={ selectedPatternCategory }
-					>
-						{ showPatternPanel && (
-							<PatternCategoryPreviewPanel
-								rootClientId={ destinationRootClientId }
-								onInsert={ onInsertPattern }
-								onHover={ onHoverPattern }
-								category={ selectedPatternCategory }
-								patternFilter={ patternFilter }
-								showTitlesAsTooltip
-							/>
-						) }
-					</BlockPatternsTab>
-				) }
+				{ ! delayedFilterValue && PatternsTabContents }
 			</>
 		),
-		[
-			delayedFilterValue,
-			destinationRootClientId,
-			onHoverPattern,
-			onInsertPattern,
-			onClickPatternCategory,
-			patternFilter,
-			selectedPatternCategory,
-			showPatternPanel,
-		]
+		[ delayedFilterValue ]
 	);
 
 	const mediaTab = useMemo(
