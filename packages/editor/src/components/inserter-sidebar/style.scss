@@ -7,10 +7,12 @@
 }
 
 .editor-inserter-sidebar__header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
+
+	button {
+		position: absolute;
+		top: $grid-unit-10;
+		right: $grid-unit-10;
+	}
 }
 
 .editor-inserter-sidebar__content {

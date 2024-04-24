@@ -2,15 +2,13 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
-import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -33,11 +31,8 @@ export default function InserterSidebar( {
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 
 	const libraryRef = useRefEffect( ( element ) => {
-		focus.focusable.find( element )[ 0 ]?.focus() || element.focus();
-
 		function onKeyDown( event ) {
 			const { keyCode } = event;
 
@@ -59,13 +54,14 @@ export default function InserterSidebar( {
 
 	return (
 		<div ref={ libraryRef } className="editor-inserter-sidebar">
-			<TagName className="editor-inserter-sidebar__header">
+			<div className="editor-inserter-sidebar__header">
 				<Button
-					icon={ close }
+					icon={ closeSmall }
 					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
+					size="compact"
 				/>
-			</TagName>
+			</div>
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
