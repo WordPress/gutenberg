@@ -17,7 +17,7 @@ import {
 	__experimentalView as View,
 } from '@wordpress/components';
 import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
-import { useCallback, Platform } from '@wordpress/element';
+import { useCallback, useState, Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -248,6 +248,10 @@ export default function DimensionsPanel( {
 		],
 	} );
 
+	//Minimum Margin Value
+	const minimumMargin = -Infinity;
+	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
+
 	// Content Size
 	const showContentSizeControl =
 		useHasContentSize( settings ) && includeLayoutControls;
@@ -435,6 +439,25 @@ export default function DimensionsPanel( {
 
 	const onMouseLeaveControls = () => onVisualize( false );
 
+	const inputProps = {
+		min: minMarginValue,
+		onDragStart: ( dragProps ) => {
+			const { target } = dragProps;
+			if ( target.value < 0 ) {
+				setMinMarginValue( 0 );
+			}
+		},
+		onDrag: ( dragProps ) => {
+			const { target } = dragProps;
+			if ( target.value < 0 ) {
+				setMinMarginValue( 0 );
+			}
+		},
+		onDragEnd: () => {
+			setMinMarginValue( minimumMargin );
+		},
+	};
+
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -561,7 +584,7 @@ export default function DimensionsPanel( {
 						<BoxControl
 							values={ marginValues }
 							onChange={ setMarginValues }
-							inputProps={ { min: -Infinity } }
+							inputProps={ inputProps }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
