@@ -72,7 +72,6 @@ function EditorStyles( { styles, scope } ) {
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		[]
 	);
-
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
 		const _styles = Object.values( styles ?? [] );
 
