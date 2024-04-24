@@ -12,6 +12,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import PostExcerptForm from './index';
 import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
+import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
 
 /**
@@ -94,39 +96,55 @@ export function PrivatePostExcerptPanel() {
 }
 
 function PrivateExcerpt() {
-	const { isEnabled, excerpt, shouldBeUsedAsDescription } = useSelect(
-		( select ) => {
+	const { shouldRender, excerpt, shouldBeUsedAsDescription, allowEditing } =
+		useSelect( ( select ) => {
 			const {
 				getCurrentPostType,
+				getCurrentPostId,
 				getEditedPostAttribute,
 				isEditorPanelEnabled,
 			} = select( editorStore );
 			const postType = getCurrentPostType();
-			const _shouldBeUsedAsDescription = [
+			const isTemplateOrTemplatePart = [
 				'wp_template',
 				'wp_template_part',
-				'wp_block',
 			].includes( postType );
-			// This special case is unfortunate, but the REST API of wp_template and wp_template_part
-			// support the excerpt field throught the "description" field rather than "excerpt".
-			const _usedAttribute = [
-				'wp_template',
-				'wp_template_part',
-			].includes( postType )
+			const isPattern = postType === 'wp_block';
+			// These post types use the `excerpt` field as a description semantically, so we need to
+			// handle proper labeling and some flows where we should always render them as text.
+			const _shouldBeUsedAsDescription =
+				isTemplateOrTemplatePart || isPattern;
+			const _usedAttribute = isTemplateOrTemplatePart
 				? 'description'
 				: 'excerpt';
+			// We need to fetch the entity in this case to check if we'll allow editing.
+			const template =
+				isTemplateOrTemplatePart &&
+				select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					getCurrentPostId()
+				);
+			// For post types that use excerpt as description, we do not abide
+			// by the `isEnabled` panel flag in order to render them as text.
+			const _shouldRender =
+				isEditorPanelEnabled( PANEL_NAME ) ||
+				_shouldBeUsedAsDescription;
 			return {
 				excerpt: getEditedPostAttribute( _usedAttribute ),
-				// When we are rendering the excerpt/description for templates, template parts
-				// and patterns, do not abide by the `isEnabled` panel flag.
-				isEnabled:
-					isEditorPanelEnabled( PANEL_NAME ) ||
-					_shouldBeUsedAsDescription,
+				shouldRender: _shouldRender,
 				shouldBeUsedAsDescription: _shouldBeUsedAsDescription,
+				// If we should render, allow editing for all post types that are not used as description.
+				// For the rest allow editing only for user generated entities.
+				allowEditing:
+					_shouldRender &&
+					( ! _shouldBeUsedAsDescription ||
+						isPattern ||
+						( template &&
+							template.source === TEMPLATE_ORIGINS.custom &&
+							! template.has_theme_file ) ),
 			};
-		},
-		[]
-	);
+		}, [] );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const label = shouldBeUsedAsDescription
 		? __( 'Description' )
@@ -145,22 +163,23 @@ function PrivateExcerpt() {
 		} ),
 		[ popoverAnchor, label ]
 	);
-
-	if ( ! isEnabled ) {
-		return null;
+	if ( ! shouldRender ) {
+		return false;
 	}
-
-	// TODO: if not editable show just text..
-
-	// TODO: if empty should have placeholder...
-	// we need to make different checks for `wp_block`
-	// type and template/template parts. The reason for this is that we want to allow
-	// editing excerpt/description for templates/template parts that are
-	// user generated and this shouldn't abide by the isPanelEnabled flag.
-	// const canEditExcerpt =
-	// 	isRemovable ||
-	// 	( eligibleToEditExcerpt && template?.type === 'wp_block' );
-
+	const excerptText = !! excerpt && (
+		<Text align="left" numberOfLines={ 4 } truncate>
+			{ excerpt }
+		</Text>
+	);
+	if ( ! allowEditing ) {
+		return excerptText;
+	}
+	const excerptPlaceholder = shouldBeUsedAsDescription
+		? __( 'Add a description..' )
+		: __( 'Add an excerpt..' );
+	const triggerEditLabel = shouldBeUsedAsDescription
+		? __( 'Edit description' )
+		: __( 'Edit excerpt' );
 	return (
 		<Dropdown
 			contentClassName="editor-post-excerpt__dropdown__content"
@@ -171,8 +190,10 @@ function PrivateExcerpt() {
 				<Button
 					className="editor-post-excerpt__dropdown__trigger"
 					onClick={ onToggle }
+					label={ excerptText && triggerEditLabel }
+					showTooltip
 				>
-					<Text align="left">{ excerpt }</Text>
+					{ excerptText || excerptPlaceholder }
 				</Button>
 			) }
 			renderContent={ ( { onClose } ) => (
@@ -186,7 +207,7 @@ function PrivateExcerpt() {
 						<PluginPostExcerpt.Slot>
 							{ ( fills ) => (
 								<>
-									<PostExcerptForm />
+									<PostExcerptForm hideLabelFromVision />
 									{ fills }
 								</>
 							) }
