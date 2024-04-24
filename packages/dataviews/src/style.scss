@@ -7,22 +7,19 @@
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: $grid-unit-15 $grid-unit-40 0;
-	margin-bottom: $grid-unit-15;
+	padding: $grid-unit-20 var(--page-horizontal-padding);
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
 
 	.components-search-control {
 		.components-base-control__field {
-			max-width: 240px;
+			max-width: 128px;
 		}
 	}
 }
 
 .dataviews-filters__container {
-	padding-right: $grid-unit-40;
-
 	.dataviews-filters__reset-button[aria-disabled="true"] {
 		&,
 		&:hover {
@@ -44,7 +41,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding: $grid-unit-15 $grid-unit-40;
+	padding: $grid-unit-15 var(--page-horizontal-padding);
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
@@ -102,7 +99,7 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-40;
+			padding-left: var(--page-horizontal-padding);
 
 			.dataviews-view-table-header-button,
 			.dataviews-view-table-header {
@@ -112,7 +109,7 @@
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-40;
+			padding-right: var(--page-horizontal-padding);
 		}
 
 		&:last-child {
@@ -281,7 +278,7 @@
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 $grid-unit-40;
+	padding: 0 var(--page-horizontal-padding);
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -385,7 +382,6 @@
 
 .dataviews-view-list {
 	margin: 0;
-	padding: $grid-unit-10;
 
 	li {
 		margin: 0;
@@ -393,18 +389,7 @@
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
-			padding-right: $grid-unit-30;
 			border-radius: $grid-unit-05;
-
-			&::after {
-				position: absolute;
-				content: "";
-				top: 100%;
-				left: $grid-unit-30;
-				right: $grid-unit-30;
-				background: $gray-100;
-				height: 1px;
-			}
 
 			> * {
 				width: 100%;
@@ -418,6 +403,7 @@
 			&:hover,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
+				background-color: #f8f8f8;
 
 				.dataviews-view-list__primary-field,
 				.dataviews-view-list__fields {
@@ -430,37 +416,33 @@
 	li.is-selected,
 	li.is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: var(--wp-admin-theme-color);
-			color: $white;
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: $gray-900;
 
 			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
-				color: $white;
-			}
-
-			&::after {
-				background: transparent;
+				color: var(--wp-admin-theme-color);
 			}
 		}
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-20 $grid-unit-30;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
+		border-top: 1px solid $gray-100;
 
 		&:focus-visible {
 			&::before {
 				position: absolute;
 				content: "";
-				top: -1px;
-				right: -1px;
-				bottom: -1px;
-				left: -1px;
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				z-index: -1;
-				border-radius: $grid-unit-05;
+				top: calc(var(--wp-admin-border-width-focus) + 1px);
+				right: var(--wp-admin-border-width-focus);
+				bottom: var(--wp-admin-border-width-focus);
+				left: var(--wp-admin-border-width-focus);
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				border-radius: $radius-block-ui;
 			}
 		}
 		.dataviews-view-list__primary-field {
@@ -472,11 +454,11 @@
 	.dataviews-view-list__media-wrapper {
 		width: $grid-unit-50;
 		height: $grid-unit-50;
-		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
 		background-color: $gray-100;
+		border-radius: $grid-unit-05;
 
 		img {
 			width: 100%;
@@ -529,7 +511,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-40;
+	padding: 0 var(--page-horizontal-padding);
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
