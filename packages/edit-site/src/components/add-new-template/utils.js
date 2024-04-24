@@ -196,9 +196,6 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 	);
 	const needsUniqueIdentifier = useCallback(
 		( { labels, slug } ) => {
-			if ( [ 'post', 'page' ].includes( slug ) ) {
-				return false;
-			}
 			const templateName = (
 				labels.template_name || labels.singular_name
 			).toLowerCase();
