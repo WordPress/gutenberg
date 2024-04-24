@@ -1,0 +1,63 @@
+.block-editor-grid-visualizer {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+
+		&.is-dropping-allowed {
+			.block-editor-grid-visualizer__drop-zone {
+				pointer-events: all;
+			}
+		}
+	}
+}
+
+.block-editor-grid-visualizer__grid {
+	display: grid;
+}
+
+.block-editor-grid-visualizer__cell {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+}
+
+.block-editor-grid-visualizer__drop-zone {
+	background: rgba($gray-400, 0.1);
+	border: $border-width dotted $gray-300;
+	width: 100%;
+	height: 100%;
+
+	// Make drop zone 8x8 at minimum so that it's easier to drag into. This will overflow the parent.
+	min-width: $grid-unit-10;
+	min-height: $grid-unit-10;
+
+	&.is-highlighted {
+		background: var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-grid-item-resizer {
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
+		z-index: z-index(".block-editor-grid-visualizer");
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
+}
+
+.block-editor-grid-item-resizer__box {
+	border: $border-width solid var(--wp-admin-theme-color);
+
+	.components-resizable-box__handle {
+		// Specificity to override the pointer-events set by .components-popover.
+		&.components-resizable-box__handle.components-resizable-box__handle {
+			pointer-events: all;
+		}
+	}
+}

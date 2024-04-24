@@ -96,6 +96,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const { type = 'default' } = layout;
 	const layoutSupportEnabled =
 		themeSupportsLayout || type === 'flex' || type === 'grid';
+	const isManualGrid = type === 'grid' && !! layout.columnCount;
 
 	// Hooks.
 	const ref = useRef();
@@ -109,7 +110,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 
 	// Default to the regular appender being rendered.
 	let renderAppender;
-	if ( showPlaceholder ) {
+	if ( showPlaceholder || isManualGrid ) {
 		// In the placeholder state, ensure the appender is not rendered.
 		// This is needed because `...innerBlocksProps` is used in the placeholder
 		// state so that blocks can dragged onto the placeholder area
