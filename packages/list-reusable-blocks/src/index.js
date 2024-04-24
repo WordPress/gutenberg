@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -43,7 +43,5 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const container = document.createElement( 'div' );
 	container.className = 'list-reusable-blocks__container';
 	button.parentNode.insertBefore( container, button );
-	createRoot( container ).render(
-		<ImportDropdown onUpload={ showNotice } />
-	);
+	render( <ImportDropdown onUpload={ showNotice } />, container );
 } );

@@ -7,7 +7,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
-import { createRoot } from '@wordpress/element';
+import { render } from '@wordpress/element';
 import { dispatch, select } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -55,7 +55,6 @@ export function initializeEditor(
 ) {
 	const isMediumOrBigger = window.matchMedia( '(min-width: 782px)' ).matches;
 	const target = document.getElementById( id );
-	const root = createRoot( target );
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
@@ -143,16 +142,15 @@ export function initializeEditor(
 	window.addEventListener( 'dragover', ( e ) => e.preventDefault(), false );
 	window.addEventListener( 'drop', ( e ) => e.preventDefault(), false );
 
-	root.render(
+	render(
 		<Editor
 			settings={ settings }
 			postId={ postId }
 			postType={ postType }
 			initialEdits={ initialEdits }
-		/>
+		/>,
+		target
 	);
-
-	return root;
 }
 
 /**
