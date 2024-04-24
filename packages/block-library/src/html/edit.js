@@ -3,11 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useContext, useState } from '@wordpress/element';
-import {
-	BlockControls,
-	PlainText,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { BlockControls, useBlockProps, EditorView } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
 	Disabled,
@@ -39,6 +35,10 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		className: 'block-library-html__edit',
 		'aria-describedby': isPreview ? instanceId : undefined,
 	} );
+
+	function onChange( newContent ) {
+		setAttributes( { content: newContent } );
+	}
 
 	return (
 		<div { ...blockProps }>
@@ -73,11 +73,16 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</VisuallyHidden>
 				</>
 			) : (
-				<PlainText
-					value={ attributes.content }
-					onChange={ ( content ) => setAttributes( { content } ) }
-					placeholder={ __( 'Write HTML…' ) }
-					aria-label={ __( 'HTML' ) }
+				<EditorView
+					editorId={'block-library-html__editor'}
+					editorInstructionsText={__(
+						`This editor allows you to input your custom HTML.`
+					)}
+					initialConfig={{
+						content: attributes.content,
+						onChange,
+						mode: 'html',
+					}}
 				/>
 			) }
 		</div>
