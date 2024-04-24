@@ -140,14 +140,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-allow-any-block-to-use-block-bindings',
-		__( 'Allow block bindings in any block', 'gutenberg' ),
+		'gutenberg-expose-block-bindings-editor-apis',
+		__( 'Expose block bindings editor APIs', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Allow any block to use block bindings API in the editor', 'gutenberg' ),
-			'id'    => 'gutenberg-allow-any-block-to-use-block-bindings',
+			'label' => __( 'Expose block bindings editor APIs, including supporting any block. Server support should be handled independtenly of this experiment', 'gutenberg' ),
+			'id'    => 'gutenberg-expose-block-bindings-editor-apis',
 		)
 	);
 
