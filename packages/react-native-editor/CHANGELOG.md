@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Fix a crash when pasting file images and special comment markup [#60476]
 -   [*] Update Aztec to v2.1.2 [#61007]
 
 ## 1.117.0

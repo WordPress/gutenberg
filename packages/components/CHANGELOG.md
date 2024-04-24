@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `BoxControl`: Allow negative values for margin controls ([#60347](https://github.com/WordPress/gutenberg/pull/60347)).
 
 ### Bug Fix
@@ -14,7 +15,10 @@
 
 -   `DropZone`: Avoid a media query on mount [#60546](https://github.com/WordPress/gutenberg/pull/60546)).
 -   `ComboboxControl`: Simplify string normalization ([#60893](https://github.com/WordPress/gutenberg/pull/60893)).
+
 ### Internal
+
+-   `FontSizerPicker`: Improve docs for default units ([#60996](https://github.com/WordPress/gutenberg/pull/60996)).
 
 ## 27.4.0 (2024-04-19)
 
