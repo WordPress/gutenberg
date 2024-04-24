@@ -158,6 +158,7 @@ function GroupPlaceHolder( { name, onSelect } ) {
 					{ variations.map( ( variation ) => (
 						<li key={ variation.name }>
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								icon={ getGroupPlaceholderIcons(
 									variation.name

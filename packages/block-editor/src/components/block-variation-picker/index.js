@@ -42,6 +42,7 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
+							__next40pxDefaultSize
 							variant="tertiary"
 							icon={
 								variation.icon && variation.icon.src

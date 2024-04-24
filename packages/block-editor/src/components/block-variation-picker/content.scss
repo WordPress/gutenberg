@@ -31,3 +31,7 @@
 		align-items: center;
 	}
 }
+
+.block-editor-block-variation-picker__variations {
+	margin: 0 -6px; // Horizontally offset button padding to make icons line up.
+}
