@@ -11,11 +11,14 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
-export function GridItemResizer( { clientId, rootClientId, onChange } ) {
+export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
-	const rootBlockElement = useBlockElement( rootClientId );
-
+	const rootBlockElement = blockElement.parentElement;
 	const [ resizeDirection, setResizeDirection ] = useState( null );
+
+	if ( ! blockElement ) {
+		return null;
+	}
 
 	const justification = {
 		right: 'flex-start',
@@ -39,9 +42,9 @@ export function GridItemResizer( { clientId, rootClientId, onChange } ) {
 		} ),
 	};
 
-	if ( ! blockElement ) {
-		return null;
-	}
+	const gridHeight = rootBlockElement.offsetHeight;
+	const blockMinHeight = blockElement.offsetHeight;
+
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
@@ -67,6 +70,8 @@ export function GridItemResizer( { clientId, rootClientId, onChange } ) {
 				} }
 				bounds={ rootBlockElement }
 				boundsByDirection
+				maxHeight={ gridHeight }
+				minHeight={ blockMinHeight }
 				onResizeStart={ ( event, direction ) => {
 					setResizeDirection( direction );
 				} }
