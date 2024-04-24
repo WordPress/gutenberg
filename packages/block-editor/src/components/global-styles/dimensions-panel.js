@@ -442,6 +442,7 @@ export default function DimensionsPanel( {
 	const inputProps = {
 		min: minMarginValue,
 		onDragStart: () => {
+			//Reset to 0 in case the value was negative.
 			setMinMarginValue( 0 );
 		},
 		onDragEnd: () => {
