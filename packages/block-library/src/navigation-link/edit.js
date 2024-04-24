@@ -335,16 +335,6 @@ export default function NavigationLinkEdit( {
 		}
 	}, [ hasChildren ] );
 
-	/**
-	 * The hook shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
-
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
 		// We only want to do this when the URL has gone from nothing to a new URL AND the label looks like a URL
