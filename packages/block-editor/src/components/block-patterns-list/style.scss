@@ -50,9 +50,7 @@
 		&:hover,
 		&:focus {
 			.block-editor-block-preview__container {
-				box-shadow:
-					0 0 0 2px var(--wp-block-synced-color),
-					0 15px 25px rgb(0 0 0 / 7%);
+				box-shadow: 0 0 0 2px var(--wp-block-synced-color);
 			}
 		}
 	}

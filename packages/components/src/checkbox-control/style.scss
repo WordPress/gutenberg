@@ -7,6 +7,11 @@
 	}
 }
 
+.components-checkbox-control__label {
+	// Ensure label is aligned with checkbox along X axis
+	line-height: var(--checkbox-input-size);
+}
+
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
 	background: $white;
@@ -50,10 +55,11 @@
 .components-checkbox-control__input-container {
 	position: relative;
 	display: inline-block;
-	margin-right: 12px;
+	margin-right: $grid-unit-15;
 	vertical-align: middle;
 	width: var(--checkbox-input-size);
 	aspect-ratio: 1;
+	flex-shrink: 0;
 }
 
 svg.components-checkbox-control__checked,
@@ -74,4 +80,9 @@ svg.components-checkbox-control__indeterminate {
 	@include break-small() {
 		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
 	}
+}
+
+.components-checkbox-control__help {
+	display: inline-block;
+	margin-inline-start: calc(var(--checkbox-input-size) + #{$grid-unit-15});
 }

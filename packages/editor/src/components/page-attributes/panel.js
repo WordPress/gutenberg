@@ -17,7 +17,7 @@ import PageAttributesParent from './parent';
 
 const PANEL_NAME = 'page-attributes';
 
-export function PageAttributesPanel() {
+function AttributesPanel() {
 	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
@@ -38,25 +38,24 @@ export function PageAttributesPanel() {
 		return null;
 	}
 
-	const onTogglePanel = ( ...args ) =>
-		toggleEditorPanelOpened( PANEL_NAME, ...args );
-
 	return (
-		<PageAttributesCheck>
-			<PanelBody
-				title={
-					postType?.labels?.attributes ?? __( 'Page attributes' )
-				}
-				opened={ isOpened }
-				onToggle={ onTogglePanel }
-			>
-				<PageAttributesParent />
-				<PanelRow>
-					<PageAttributesOrder />
-				</PanelRow>
-			</PanelBody>
-		</PageAttributesCheck>
+		<PanelBody
+			title={ postType?.labels?.attributes ?? __( 'Page attributes' ) }
+			opened={ isOpened }
+			onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
+		>
+			<PageAttributesParent />
+			<PanelRow>
+				<PageAttributesOrder />
+			</PanelRow>
+		</PanelBody>
 	);
 }
 
-export default PageAttributesPanel;
+export default function PageAttributesPanel() {
+	return (
+		<PageAttributesCheck>
+			<AttributesPanel />
+		</PageAttributesCheck>
+	);
+}

@@ -42,7 +42,6 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -361,7 +360,6 @@ function Layout( { initialPost } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<EditPostPreferencesModal />
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
