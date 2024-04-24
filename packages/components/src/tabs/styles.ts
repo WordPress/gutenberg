@@ -20,8 +20,8 @@ export const TabListWrapper = styled.div`
 	&[aria-orientation='vertical'] {
 		flex-direction: column;
 	}
-	&.is-animation-enabled::after {
-		@media not ( prefers-reduced-motion: reduce ) {
+	@media not ( prefers-reduced-motion: reduce ) {
+		&.is-animation-enabled::after {
 			transition-property: left, top, width, height;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
@@ -94,17 +94,18 @@ export const Tab = styled( Ariakit.Tab )`
 			pointer-events: none;
 
 			// Draw the indicator.
-			box-shadow: 0 0 0 0 transparent;
+			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
+				${ COLORS.theme.accent };
 			border-radius: 2px;
 
 			// Animation
-			transition: all 0.1s linear;
+			transition: opacity 0.1s linear;
 			${ reduceMotion( 'transition' ) };
+			opacity: 0;
 		}
 
 		&:focus-visible::before {
-			box-shadow: 0 0 0 var( --wp-admin-border-width-focus )
-				${ COLORS.theme.accent };
+			opacity: 1;
 
 			// Windows high contrast mode.
 			outline: 2px solid transparent;
