@@ -132,7 +132,7 @@ function UnforwardedModal(
 	}, [ contentRef ] );
 
 	// Accessibly isolates/unisolates the modal.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		ariaHelper.modalize( ref.current );
 		return () => ariaHelper.unmodalize();
 	}, [] );
