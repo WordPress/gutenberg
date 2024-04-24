@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -28,6 +29,8 @@ export default function BoxInputControls( {
 	sides,
 	...props
 }: BoxControlInputControlProps ) {
+	const minimumCustomValue = props.min;
+	const [ minValue, setMinValue ] = useState( minimumCustomValue );
 	const generatedId = useInstanceId( BoxInputControls, 'box-control-input' );
 
 	const createHandleOnFocus =
@@ -100,6 +103,9 @@ export default function BoxInputControls( {
 					? parsedUnit
 					: selectedUnits[ side ];
 
+				const isNegativeValue =
+					parsedQuantity !== undefined && parsedQuantity < 0;
+
 				const inputId = [ generatedId, side ].join( '-' );
 
 				return (
@@ -115,6 +121,7 @@ export default function BoxInputControls( {
 								value={ [ parsedQuantity, computedUnit ].join(
 									''
 								) }
+								min={ minValue }
 								onChange={ ( nextValue, extra ) =>
 									handleOnValueChange(
 										side,
@@ -126,6 +133,19 @@ export default function BoxInputControls( {
 									side
 								) }
 								onFocus={ createHandleOnFocus( side ) }
+								onDragStart={ () => {
+									if ( isNegativeValue ) {
+										setMinValue( 0 );
+									}
+								} }
+								onDrag={ () => {
+									if ( isNegativeValue ) {
+										setMinValue( 0 );
+									}
+								} }
+								onDragEnd={ () => {
+									setMinValue( minimumCustomValue );
+								} }
 								label={ LABELS[ side ] }
 								hideLabelFromVision
 							/>

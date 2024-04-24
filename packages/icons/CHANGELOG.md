@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.47.0 (2024-04-19)
+
 ## 9.46.0 (2024-04-03)
 
 - Add new `chevronDownSmall` icon.

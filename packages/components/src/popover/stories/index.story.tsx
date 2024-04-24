@@ -7,8 +7,6 @@ import type { StoryFn, Meta } from '@storybook/react';
  * WordPress dependencies
  */
 import { useState, useRef, useEffect } from '@wordpress/element';
-// @ts-expect-error The `@wordpress/block-editor` is not typed
-import { __unstableIframe as Iframe } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies

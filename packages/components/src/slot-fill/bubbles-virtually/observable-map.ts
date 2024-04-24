@@ -75,5 +75,5 @@ export function useObservableValue< K, V >(
 		],
 		[ map, name ]
 	);
-	return useSyncExternalStore( subscribe, getValue );
+	return useSyncExternalStore( subscribe, getValue, getValue );
 }

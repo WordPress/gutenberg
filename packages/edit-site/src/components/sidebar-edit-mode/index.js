@@ -11,7 +11,14 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	PageAttributesPanel,
+	PostDiscussionPanel,
+	PostExcerptPanel,
+	PostLastRevisionPanel,
+	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,7 +32,7 @@ import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
-const { interfaceStore, useAutoSwitchEditorSidebars } =
+const { interfaceStore, useAutoSwitchEditorSidebars, PatternOverridesPanel } =
 	unlock( editorPrivateApis );
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
@@ -91,6 +98,12 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 						focusable={ false }
 					>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
+						<PostLastRevisionPanel />
+						<PostTaxonomiesPanel />
+						<PostExcerptPanel />
+						<PostDiscussionPanel />
+						<PageAttributesPanel />
+						<PatternOverridesPanel />
 					</Tabs.TabPanel>
 					<Tabs.TabPanel tabId="edit-post/block" focusable={ false }>
 						<InspectorSlot bubblesVirtually />

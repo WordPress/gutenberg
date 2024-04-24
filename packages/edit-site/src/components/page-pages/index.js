@@ -195,6 +195,7 @@ const PAGE_ACTIONS = [
 	'restore',
 	'permanently-delete',
 	'view-post-revisions',
+	'duplicate-post',
 	'rename-post',
 	'move-to-trash',
 ];

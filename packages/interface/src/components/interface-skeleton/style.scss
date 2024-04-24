@@ -122,7 +122,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__sidebar {
-	overflow: auto;
+	overflow: hidden;
 
 	@include break-medium() {
 		border-left: $border-width solid $gray-200;

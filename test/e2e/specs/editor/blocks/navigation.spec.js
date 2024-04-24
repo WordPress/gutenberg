@@ -309,7 +309,7 @@ test.describe( 'Navigation block', () => {
 		// Find the warning message
 		const warningMessage = editor.canvas
 			.getByRole( 'document', { name: 'Block: Navigation' } )
-			.getByText( 'Navigation menu has been deleted or is unavailable.' );
+			.getByText( 'Navigation Menu has been deleted or is unavailable.' );
 		await expect( warningMessage ).toBeVisible();
 	} );
 

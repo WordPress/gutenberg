@@ -64,7 +64,7 @@ const expanded = ( state, action ) => {
 	return state;
 };
 
-export const BLOCK_LIST_ITEM_HEIGHT = 36;
+export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
 /** @typedef {import('react').ComponentType} ComponentType */
 /** @typedef {import('react').Ref<HTMLElement>} Ref */

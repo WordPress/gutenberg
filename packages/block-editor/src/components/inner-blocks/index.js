@@ -204,6 +204,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				getBlockEditingMode,
 				getBlockSettings,
 				isDragging,
+				getSettings,
+				getBlockOrder,
 			} = unlock( select( blockEditorStore ) );
 			const { hasBlockSupport, getBlockType } = select( blocksStore );
 			const blockName = getBlockName( clientId );
@@ -212,6 +214,17 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			const blockEditingMode = getBlockEditingMode( clientId );
 			const parentClientId = getBlockRootClientId( clientId );
 			const [ defaultLayout ] = getBlockSettings( clientId, 'layout' );
+
+			// In zoom out mode, we want to disable the drop zone for the sections.
+			// The inner blocks belonging to the section drop zone is
+			// already disabled by the blocks themselves being disabled.
+			let _isDropZoneDisabled = blockEditingMode === 'disabled';
+			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings() );
+				const sectionsClientIds = getBlockOrder( sectionRootClientId );
+				_isDropZoneDisabled = sectionsClientIds?.includes( clientId );
+			}
+
 			return {
 				__experimentalCaptureToolbars: hasBlockSupport(
 					blockName,
@@ -228,7 +241,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				blockType: getBlockType( blockName ),
 				parentLock: getTemplateLock( parentClientId ),
 				parentClientId,
-				isDropZoneDisabled: blockEditingMode === 'disabled',
+				isDropZoneDisabled: _isDropZoneDisabled,
 				defaultLayout,
 			};
 		},
