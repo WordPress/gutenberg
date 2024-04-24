@@ -441,17 +441,8 @@ export default function DimensionsPanel( {
 
 	const inputProps = {
 		min: minMarginValue,
-		onDragStart: ( dragProps ) => {
-			const { target } = dragProps;
-			if ( target.value < 0 ) {
-				setMinMarginValue( 0 );
-			}
-		},
-		onDrag: ( dragProps ) => {
-			const { target } = dragProps;
-			if ( target.value < 0 ) {
-				setMinMarginValue( 0 );
-			}
+		onDragStart: () => {
+			setMinMarginValue( 0 );
 		},
 		onDragEnd: () => {
 			setMinMarginValue( minimumMargin );
