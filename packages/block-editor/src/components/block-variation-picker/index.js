@@ -53,6 +53,9 @@ function BlockVariationPicker( {
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
+						<span className="block-editor-block-variation-picker__variation-label">
+							{ variation.title }
+						</span>
 					</li>
 				) ) }
 			</ul>
