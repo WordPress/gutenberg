@@ -56,13 +56,13 @@ export default function PagePanels() {
 			switch ( actionId ) {
 				case 'move-to-trash':
 					{
-				history.push( {
-					path: '/' + items[ 0 ].type,
-					postId: undefined,
-					postType: undefined,
-					canvas: 'view',
-				} );
-			}
+						history.push( {
+							path: '/' + items[ 0 ].type,
+							postId: undefined,
+							postType: undefined,
+							canvas: 'view',
+						} );
+					}
 					break;
 				case 'duplicate-post':
 					{
@@ -90,7 +90,7 @@ export default function PagePanels() {
 												postType: newItem.type,
 												canvas: 'edit',
 											} );
-		},
+										},
 									},
 								],
 							}
