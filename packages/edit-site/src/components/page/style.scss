@@ -1,5 +1,6 @@
 .edit-site-page {
-	--page-horizontal-padding: #{$grid-unit-60};
+	--page-horizontal-spacing-unit: #{$grid-unit-10};
+	--page-vertical-spacing-unit: #{$grid-unit-10};
 
 	color: $gray-800;
 	background: $white;
@@ -8,7 +9,7 @@
 }
 
 .edit-site-page-header {
-	padding: $grid-unit-20 var(--page-horizontal-padding);
+	padding: calc(var(--page-vertical-spacing-unit) * 3) calc(var(--page-horizontal-spacing-unit) * 5);
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;
@@ -28,7 +29,8 @@
 
 @container (max-width: 430px) {
 	.edit-site-page-content {
-		--page-horizontal-padding: #{$grid-unit-30};
+		--page-horizontal-spacing-unit: #{$grid-unit-05};
+		--page-vertical-spacing-unit: #{$grid-unit-05};
 	}
 }
 

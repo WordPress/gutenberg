@@ -101,7 +101,7 @@
 	.edit-site-patterns__section-header {
 		border-bottom: 1px solid #f0f0f0;
 		min-height: 72px;
-		padding: $grid-unit-20 $grid-unit-40;
+		padding: calc(var(--page-vertical-spacing-unit) * 3) calc(var(--page-horizontal-spacing-unit) * 5);
 		position: sticky;
 		top: 0;
 		z-index: 2;

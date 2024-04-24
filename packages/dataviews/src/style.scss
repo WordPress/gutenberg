@@ -7,7 +7,7 @@
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: $grid-unit-20 var(--page-horizontal-padding);
+	padding: calc(var(--page-horizontal-spacing-unit) * 3) calc(var(--page-horizontal-spacing-unit) * 5);
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -41,7 +41,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding: $grid-unit-15 var(--page-horizontal-padding);
+	padding: calc(var(--page-horizontal-spacing-unit) * 2) calc(var(--page-horizontal-spacing-unit) * 5);
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
@@ -99,7 +99,7 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: var(--page-horizontal-padding);
+			padding-left: calc(var(--page-horizontal-spacing-unit) * 5);
 
 			.dataviews-view-table-header-button,
 			.dataviews-view-table-header {
@@ -109,7 +109,7 @@
 
 		td:last-child,
 		th:last-child {
-			padding-right: var(--page-horizontal-padding);
+			padding-right: calc(var(--page-horizontal-spacing-unit) * 5);
 		}
 
 		&:last-child {
@@ -278,7 +278,7 @@
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 var(--page-horizontal-padding);
+	padding: 0 calc(var(--page-horizontal-spacing-unit) * 5);
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -511,7 +511,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 var(--page-horizontal-padding);
+	padding: 0 calc(var(--page-horizontal-spacing-unit) * 5);
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
