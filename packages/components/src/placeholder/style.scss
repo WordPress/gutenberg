@@ -119,15 +119,8 @@
 			flex-direction: column;
 		}
 
-		.components-placeholder__fieldset .components-button {
-			margin-right: auto;
-		}
-	}
-
-	// Small sizes.
-	&.is-small {
 		.components-button {
-			padding: 0 $grid-unit-10 2px;
+			width: 100%;
 		}
 	}
 }
@@ -159,8 +152,6 @@
 	}
 
 	.components-placeholder__fieldset {
-		width: auto;
-
 		// Unset intrinsic margins.
 		margin-left: 0;
 		margin-right: 0;
