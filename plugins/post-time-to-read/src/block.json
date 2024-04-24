@@ -45,5 +45,7 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
-	}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css"
 }
