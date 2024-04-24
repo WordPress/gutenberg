@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `Divider`: Remove "experimental" designation ([#61016](https://github.com/WordPress/gutenberg/pull/61016)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
