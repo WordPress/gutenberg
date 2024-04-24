@@ -7,7 +7,7 @@
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: calc(var(--page-horizontal-spacing-unit) * 3) calc(var(--page-horizontal-spacing-unit) * 5);
+	padding: $grid-unit-20 $grid-unit-60;
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -41,7 +41,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding: calc(var(--page-horizontal-spacing-unit) * 2) calc(var(--page-horizontal-spacing-unit) * 5);
+	padding: $grid-unit-30 $grid-unit-60;
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
@@ -99,7 +99,7 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: calc(var(--page-horizontal-spacing-unit) * 5);
+			padding-left: $grid-unit-60;
 
 			.dataviews-view-table-header-button,
 			.dataviews-view-table-header {
@@ -109,7 +109,7 @@
 
 		td:last-child,
 		th:last-child {
-			padding-right: calc(var(--page-horizontal-spacing-unit) * 5);
+			padding-right: $grid-unit-60;
 		}
 
 		&:last-child {
@@ -278,7 +278,7 @@
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 calc(var(--page-horizontal-spacing-unit) * 5);
+	padding: 0 $grid-unit-60;
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -511,7 +511,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 calc(var(--page-horizontal-spacing-unit) * 5);
+	padding: 0 $grid-unit-60;
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -770,5 +770,12 @@
 			outline: none;
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
+	}
+}
+
+@container (max-width: 430px) {
+	.dataviews-pagination,
+	.dataviews-filters__view-actions {
+		padding: $grid-unit-20 $grid-unit-30;
 	}
 }
