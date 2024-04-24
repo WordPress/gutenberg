@@ -64,7 +64,7 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 							{ __( 'Learn more about manual excerpts' ) }
 						</ExternalLink>
 					) : (
-						__( 'Give the template a description' )
+						__( 'Write a description' )
 					)
 				}
 			/>
