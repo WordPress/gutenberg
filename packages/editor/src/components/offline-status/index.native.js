@@ -6,11 +6,8 @@ import { AccessibilityInfo, Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	usePreferredColorSchemeStyle,
-	useNetworkConnectivity,
-	usePrevious,
-} from '@wordpress/compose';
+import { usePreferredColorSchemeStyle, usePrevious } from '@wordpress/compose';
+import { useNetworkConnectivity } from '@wordpress/react-native-editor';
 import { Icon } from '@wordpress/components';
 import { offline as offlineIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';

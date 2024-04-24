@@ -10,6 +10,8 @@ import { Component, cloneElement, registerComponent } from '@wordpress/element';
 import './globals';
 import initialHtml from './initial-html';
 import setupLocale from './setup-locale';
+import useNetworkConnectivity from './hooks/use-network-connectivity';
+import withNetworkConnectivity from './hooks/with-network-connectivity';
 import { getTranslation as getGutenbergTranslation } from '../i18n-cache';
 
 /**
@@ -77,4 +79,10 @@ const registerGutenberg = ( {
 	registerComponent( 'gutenberg', () => Gutenberg );
 };
 
-export { initialHtml as initialHtmlGutenberg, registerGutenberg, setupLocale };
+export {
+	initialHtml as initialHtmlGutenberg,
+	registerGutenberg,
+	useNetworkConnectivity,
+	setupLocale,
+	withNetworkConnectivity,
+};
