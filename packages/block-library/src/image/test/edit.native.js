@@ -70,8 +70,9 @@ beforeEach( () => {
 	// Mock media fetch requests
 	setupApiFetch( [ FETCH_MEDIA ] );
 
-	// Invalidate `getMedia` resolutions to allow requesting to the API the same media id
-	dispatch( coreStore ).invalidateResolutionForStoreSelector( 'getMedia' );
+	// Invalidate `getMedia` resolutions to allow requesting to the API the same
+	// media id
+	dispatch( coreStore ).invalidateResolutionForStore();
 } );
 
 afterEach( () => {
