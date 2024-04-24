@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -54,10 +54,13 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		].filter( ( action ) => {
 			return ! action.isEligible || action.isEligible( item );
 		} );
-		eligibleActions.forEach( ( action ) => {
-			action.onActionPerformed = ( _item ) => {
-				onActionPerformed( action.id, _item );
-				action.onActionPerformed?.( _item );
+		return eligibleActions.map( ( action ) => {
+			return {
+				...action,
+				onActionPerformed: ( args ) => {
+					onActionPerformed?.( action.id, ...args );
+					action.onActionPerformed?.( ...args );
+				},
 			};
 		} );
 	}, [ item, onActionPerformed ] );
@@ -141,6 +144,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 
 // Copied as is from packages/dataviews/src/item-actions.js
 function ActionsDropdownMenuGroup( { actions, item } ) {
+	const registry = useRegistry();
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -158,7 +162,18 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
+						onClick={ async () => {
+							const returnResult = await action.callback( [
+								item,
+							] );
+							if ( typeof returnResult === 'function' ) {
+								await returnResult( {
+									registry,
+									select: registry.select,
+									dispatch: registry.dispatch,
+								} );
+							}
+						} }
 					/>
 				);
 			} ) }

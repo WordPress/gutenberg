@@ -45,7 +45,7 @@ import {
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { usePostActions } = unlock( editorPrivateApis );
+const { postActions } = unlock( editorPrivateApis );
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
@@ -187,13 +187,13 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-const TEMPLATE_ACTIONS = [
-	'edit-post',
-	'reset-template',
-	'rename-template',
-	'view-post-revisions',
-	'delete-template',
-];
+const {
+	editPostAction,
+	resetTemplateAction,
+	renameTemplateAction,
+	postRevisionsAction,
+	deleteTemplateAction,
+} = postActions;
 
 export default function PageTemplates() {
 	const { params } = useLocation();
@@ -335,21 +335,29 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
-	);
-
-	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
+	const actions = useMemo( () => {
+		const onEditPostActionPerformed = ( items ) => {
+			const post = items[ 0 ];
+			history.push( {
+				postId: post.id,
+				postType: post.type,
+				canvas: 'edit',
+			} );
+		};
+		return [
+			{
+				...editPostAction,
+				onActionPerformed: ( ...args ) => {
+					onEditPostActionPerformed( ...args );
+					editPostAction.onActionPerformed?.( ...args );
+				},
+			},
+			resetTemplateAction,
+			renameTemplateAction,
+			postRevisionsAction,
+			deleteTemplateAction,
+		];
+	}, [ history ] );
 
 	const onChangeView = useCallback(
 		( newView ) => {

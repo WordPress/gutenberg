@@ -34,7 +34,7 @@ import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
 
-const { usePostActions } = unlock( editorPrivateApis );
+const { postActions } = unlock( editorPrivateApis );
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -189,15 +189,15 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-const PAGE_ACTIONS = [
-	'edit-post',
-	'view-post',
-	'restore',
-	'permanently-delete',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
+const {
+	editPostAction,
+	viewPostAction,
+	restorePostAction,
+	permanentlyDeletePostAction,
+	postRevisionsAction,
+	renamePostAction,
+	trashPostAction,
+} = postActions;
 
 export default function PagePages() {
 	const postType = 'page';
@@ -350,20 +350,33 @@ export default function PagePages() {
 		],
 		[ authors, view.type ]
 	);
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
-	);
-	const actions = usePostActions( onActionPerformed, PAGE_ACTIONS );
+
+	const actions = useMemo( () => {
+		const onEditPostActionPerformed = ( items ) => {
+			const post = items[ 0 ];
+			history.push( {
+				postId: post.id,
+				postType: post.type,
+				canvas: 'edit',
+			} );
+		};
+		return [
+			{
+				...editPostAction,
+				onActionPerformed: ( ...args ) => {
+					onEditPostActionPerformed( ...args );
+					editPostAction.onActionPerformed?.( ...args );
+				},
+			},
+			viewPostAction,
+			restorePostAction,
+			permanentlyDeletePostAction,
+			postRevisionsAction,
+			renamePostAction,
+			trashPostAction,
+		];
+	}, [ history ] );
+
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

@@ -67,7 +67,7 @@ import { useAddedBy } from '../page-templates/hooks';
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
-const { usePostActions } = unlock( editorPrivateApis );
+const { postActions } = unlock( editorPrivateApis );
 const { useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
@@ -252,6 +252,8 @@ function Title( { item, categoryId } ) {
 	);
 }
 
+const { editPostAction, postRevisionsAction } = postActions;
+
 export default function DataviewsPatterns() {
 	const {
 		categoryType,
@@ -394,9 +396,9 @@ export default function DataviewsPatterns() {
 	}, [ patterns, view, fields, type ] );
 
 	const history = useHistory();
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
+	const actions = useMemo( () => {
+		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			const onEditPostActionPerformed = ( items ) => {
 				const post = items[ 0 ];
 				history.push( {
 					postId: post.id,
@@ -405,21 +407,18 @@ export default function DataviewsPatterns() {
 					categoryType: type,
 					canvas: 'edit',
 				} );
-			}
-		},
-		[ history, categoryId, type ]
-	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
-	const actions = useMemo( () => {
-		if ( type === TEMPLATE_PART_POST_TYPE ) {
+			};
 			return [
-				editAction,
+				{
+					...editPostAction,
+					onActionPerformed: ( ...args ) => {
+						onEditPostActionPerformed( ...args );
+						editPostAction.onActionPerformed?.( ...args );
+					},
+				},
 				renameAction,
 				duplicateTemplatePartAction,
-				viewRevisionsAction,
+				postRevisionsAction,
 				resetAction,
 				deleteAction,
 			];
@@ -431,7 +430,7 @@ export default function DataviewsPatterns() {
 			resetAction,
 			deleteAction,
 		];
-	}, [ type, editAction, viewRevisionsAction ] );
+	}, [ type, history, categoryId ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

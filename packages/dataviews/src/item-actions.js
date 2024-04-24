@@ -10,6 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -79,6 +80,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 }
 
 function ActionsDropdownMenuGroup( { actions, item } ) {
+	const registry = useRegistry();
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -96,7 +98,18 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
+						onClick={ async () => {
+							const returnResult = await action.callback( [
+								item,
+							] );
+							if ( typeof returnResult === 'function' ) {
+								await returnResult( {
+									registry,
+									select: registry.select,
+									dispatch: registry.dispatch,
+								} );
+							}
+						} }
 					/>
 				);
 			} ) }
@@ -105,6 +118,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 }
 
 export default function ItemActions( { item, actions, isCompact } ) {
+	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
@@ -148,7 +162,18 @@ export default function ItemActions( { item, actions, isCompact } ) {
 						<ButtonTrigger
 							key={ action.id }
 							action={ action }
-							onClick={ () => action.callback( [ item ] ) }
+							onClick={ async () => {
+								const returnResult = await action.callback( [
+									item,
+								] );
+								if ( typeof returnResult === 'function' ) {
+									await returnResult( {
+										registry,
+										select: registry.select,
+										dispatch: registry.dispatch,
+									} );
+								}
+							} }
 						/>
 					);
 				} ) }

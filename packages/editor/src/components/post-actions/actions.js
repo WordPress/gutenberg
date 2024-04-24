@@ -43,7 +43,7 @@ export const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal, onActionPerformed } ) => {
+	RenderModal: ( { items: posts, closeModal } ) => {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -158,9 +158,7 @@ export const trashPostAction = {
 									type: 'snackbar',
 								} );
 							}
-							if ( onActionPerformed ) {
-								onActionPerformed( posts );
-							}
+							this?.onActionPerformed?.( posts );
 							closeModal();
 						} }
 					>
@@ -179,7 +177,7 @@ export const permanentlyDeletePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts ) {
 		return async ( { dispatch } ) => {
 			const { createSuccessNotice, createErrorNotice } =
 				dispatch( noticesStore );
@@ -215,9 +213,7 @@ export const permanentlyDeletePostAction = {
 					type: 'snackbar',
 					id: 'permanently-delete-post-action',
 				} );
-				if ( onActionPerformed ) {
-					onActionPerformed( posts );
-				}
+				this?.onActionPerformed?.( posts );
 			} else {
 				// If there was at lease one failure.
 				let errorMessage;
@@ -280,7 +276,7 @@ export const restorePostAction = {
 	isEligible( { status } ) {
 		return status === 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts ) {
 		return async ( { dispatch } ) => {
 			const { createSuccessNotice, createErrorNotice } =
 				dispatch( noticesStore );
@@ -318,9 +314,7 @@ export const restorePostAction = {
 						id: 'restore-post-action',
 					}
 				);
-				if ( onActionPerformed ) {
-					onActionPerformed( posts );
-				}
+				this?.onActionPerformed?.( posts );
 			} catch ( error ) {
 				let errorMessage;
 				if (
@@ -353,12 +347,10 @@ export const viewPostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts ) {
 		const post = posts[ 0 ];
 		window.open( post.link, '_blank' );
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
+		this?.onActionPerformed?.( posts );
 	},
 };
 
@@ -370,10 +362,8 @@ export const editPostAction = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
-	callback( posts, onActionPerformed ) {
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
+	callback( posts ) {
+		this?.onActionPerformed?.( posts );
 	},
 };
 export const postRevisionsAction = {
@@ -390,15 +380,13 @@ export const postRevisionsAction = {
 			post?._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;
 		return lastRevisionId && revisionsCount > 1;
 	},
-	callback( posts, onActionPerformed ) {
+	callback( posts ) {
 		const post = posts[ 0 ];
 		const href = addQueryArgs( 'revision.php', {
 			revision: post?._links?.[ 'predecessor-version' ]?.[ 0 ]?.id,
 		} );
 		document.location.href = href;
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
+		this?.onActionPerformed?.( posts );
 	},
 };
 
@@ -408,7 +396,7 @@ export const renamePostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const originalTitle = decodeEntities(
 			typeof item.title === 'string' ? item.title : item.title.rendered
@@ -435,7 +423,7 @@ export const renamePostAction = {
 				createSuccessNotice( __( 'Name updated' ), {
 					type: 'snackbar',
 				} );
-				onActionPerformed?.( items );
+				this?.onActionPerformed?.( items );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
@@ -486,7 +474,7 @@ export const resetTemplateAction = {
 	isEligible: isTemplateRevertable,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+	RenderModal: ( { items, closeModal } ) => {
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -563,7 +551,7 @@ export const resetTemplateAction = {
 						variant="primary"
 						onClick={ async () => {
 							await onConfirm( items );
-							onActionPerformed?.( items );
+							this?.onActionPerformed?.( items );
 							closeModal();
 						} }
 					>
@@ -598,7 +586,7 @@ export const deleteTemplateAction = {
 	isEligible: isTemplateRemovable,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
+	RenderModal: ( { items: templates, closeModal } ) => {
 		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
 			<VStack spacing="5">
@@ -631,7 +619,7 @@ export const deleteTemplateAction = {
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
-							onActionPerformed?.( templates );
+							this?.onActionPerformed?.( templates );
 							closeModal();
 						} }
 					>
@@ -657,7 +645,7 @@ export const renameTemplateAction = {
 		}
 		return true;
 	},
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
+	RenderModal: ( { items: templates, closeModal } ) => {
 		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
 		const [ editedTitle, setEditedTitle ] = useState( title );
@@ -699,7 +687,7 @@ export const renameTemplateAction = {
 						type: 'snackbar',
 					}
 				);
-				onActionPerformed?.( templates );
+				this?.onActionPerformed?.( templates );
 			} catch ( error ) {
 				const fallbackErrorMessage =
 					template.type === TEMPLATE_POST_TYPE
