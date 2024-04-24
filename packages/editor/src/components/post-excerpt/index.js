@@ -55,7 +55,7 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 				}
 				value={ excerpt }
 				help={
-					! shouldUseDescriptionLabel && (
+					! shouldUseDescriptionLabel ? (
 						<ExternalLink
 							href={ __(
 								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#excerpt'
@@ -63,6 +63,8 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 						>
 							{ __( 'Learn more about manual excerpts' ) }
 						</ExternalLink>
+					) : (
+						__( 'Give the template a description' )
 					)
 				}
 			/>
