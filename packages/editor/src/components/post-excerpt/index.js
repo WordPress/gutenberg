@@ -4,13 +4,27 @@
 import { __ } from '@wordpress/i18n';
 import { ExternalLink, TextareaControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
-function PostExcerpt( { hideLabelFromVision = false } ) {
+/**
+ * Renders an editable textarea for the post excerpt.
+ * Templates, template parts and patterns use the `excerpt` field as a description semantically.
+ * Additionally templates and template parts override the `excerpt` field as `description` in
+ * REST API. So this component handles proper labeling and updating the edited entity.
+ *
+ * @param {Object}  props                             - Component props.
+ * @param {boolean} [props.hideLabelFromVision=false] - Whether to visually hide the textarea's label.
+ * @param {boolean} [props.updateOnBlur=false]        - Whether to update the post on change or use local state and update on blur.
+ */
+export default function PostExcerpt( {
+	hideLabelFromVision = false,
+	updateOnBlur = false,
+} ) {
 	const { excerpt, shouldUseDescriptionLabel, usedAttribute } = useSelect(
 		( select ) => {
 			const { getCurrentPostType, getEditedPostAttribute } =
@@ -38,7 +52,10 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 		[]
 	);
 	const { editPost } = useDispatch( editorStore );
-
+	const [ localExcerpt, setLocalExcerpt ] = useState( excerpt );
+	const updatePost = ( value ) => {
+		editPost( { [ usedAttribute ]: value } );
+	};
 	const label = shouldUseDescriptionLabel
 		? __( 'Write a description (optional)' )
 		: __( 'Write an excerpt (optional)' );
@@ -50,10 +67,11 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"
-				onChange={ ( value ) =>
-					editPost( { [ usedAttribute ]: value } )
+				onChange={ updateOnBlur ? setLocalExcerpt : updatePost }
+				onBlur={
+					updateOnBlur ? () => updatePost( localExcerpt ) : undefined
 				}
-				value={ excerpt }
+				value={ updateOnBlur ? localExcerpt : excerpt }
 				help={
 					! shouldUseDescriptionLabel ? (
 						<ExternalLink
@@ -71,5 +89,3 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 		</div>
 	);
 }
-
-export default PostExcerpt;

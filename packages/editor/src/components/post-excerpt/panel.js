@@ -195,7 +195,7 @@ function PrivateExcerpt() {
 				<Button
 					className={ classnames(
 						'editor-post-excerpt__dropdown__trigger',
-						excerpt && 'has-excerpt'
+						{ 'has-excerpt': !! excerpt }
 					) }
 					onClick={ onToggle }
 					label={ excerptText && triggerEditLabel }
@@ -215,7 +215,10 @@ function PrivateExcerpt() {
 						<PluginPostExcerpt.Slot>
 							{ ( fills ) => (
 								<>
-									<PostExcerptForm hideLabelFromVision />
+									<PostExcerptForm
+										hideLabelFromVision
+										updateOnBlur
+									/>
 									{ fills }
 								</>
 							) }
