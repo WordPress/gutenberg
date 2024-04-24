@@ -208,10 +208,7 @@ function InserterMenu(
 	const showPatternPanel =
 		selectedTab === 'patterns' && selectedPatternCategory;
 
-	const showMediaPanel =
-		selectedTab === 'media' &&
-		! delayedFilterValue &&
-		selectedMediaCategory;
+	const showMediaPanel = selectedTab === 'media' && selectedMediaCategory;
 
 	const showAsTabs = showPatterns || showMedia;
 
