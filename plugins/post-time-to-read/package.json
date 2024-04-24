@@ -1,0 +1,29 @@
+{
+	"name": "post-time-to-read",
+	"version": "0.1.0",
+	"description": "Example block scaffolded with Create Block tool.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "27.7.0"
+	},
+	"dependencies": {
+		"@wordpress/block-editor": "^12.24.0",
+		"@wordpress/blocks": "^12.33.0",
+		"@wordpress/components": "^27.4.0",
+		"@wordpress/core-data": "^6.33.0",
+		"@wordpress/element": "^5.33.0",
+		"@wordpress/i18n": "^4.56.0",
+		"@wordpress/wordcount": "^3.56.0"
+	}
+}
