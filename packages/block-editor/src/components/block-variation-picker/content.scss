@@ -32,6 +32,7 @@
 	}
 }
 
-.block-editor-block-variation-picker__variations {
+.block-editor-block-variation-picker__variations,
+.wp-block-group-placeholder__variations {
 	margin: 0 -6px; // Horizontally offset button padding to make icons line up.
 }
