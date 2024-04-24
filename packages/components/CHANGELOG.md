@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `DimensionControl`: Remove "experimental" designation ([#61015](https://github.com/WordPress/gutenberg/pull/61015)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
