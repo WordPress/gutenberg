@@ -59,6 +59,59 @@ function BlocksTab( {
 	);
 }
 
+function SearchByType( {
+	searchType,
+	hoveredItem,
+	setHoveredItem,
+	setFilterValue,
+	filterValue,
+	delayedFilterValue,
+	onSelect,
+	onHover,
+	onHoverPattern,
+	shouldFocusBlock,
+	clientId,
+	rootClientId,
+	__experimentalInsertionIndex,
+	isAppender,
+} ) {
+	return (
+		<>
+			<SearchControl
+				__nextHasNoMarginBottom
+				className="block-editor-inserter__search"
+				onChange={ ( value ) => {
+					if ( hoveredItem ) setHoveredItem( null );
+					setFilterValue( value );
+				} }
+				value={ filterValue }
+				label={ __( 'Search for blocks and patterns' ) }
+				placeholder={ __( 'Search' ) }
+			/>
+			{ !! delayedFilterValue && (
+				<InserterSearchResults
+					filterValue={ delayedFilterValue }
+					onSelect={ onSelect }
+					onHover={ onHover }
+					onHoverPattern={ onHoverPattern }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					__experimentalInsertionIndex={
+						__experimentalInsertionIndex
+					}
+					showBlockDirectory
+					shouldFocusBlock={ shouldFocusBlock }
+					maxBlockPatterns={
+						searchType !== 'patterns' ? 0 : undefined
+					}
+					maxBlockTypes={ searchType !== 'blocks' ? 0 : undefined }
+				/>
+			) }
+		</>
+	);
+}
+
 function InserterMenu(
 	{
 		rootClientId,
@@ -194,48 +247,24 @@ function InserterMenu(
 					>
 						{ ( selectedTab === 'blocks' ||
 							selectedTab === 'patterns' ) && (
-							<>
-								<SearchControl
-									__nextHasNoMarginBottom
-									className="block-editor-inserter__search"
-									onChange={ ( value ) => {
-										if ( hoveredItem )
-											setHoveredItem( null );
-										setFilterValue( value );
-									} }
-									value={ filterValue }
-									label={ __(
-										'Search for blocks and patterns'
-									) }
-									placeholder={ __( 'Search' ) }
-								/>
-								{ !! delayedFilterValue && (
-									<InserterSearchResults
-										filterValue={ delayedFilterValue }
-										onSelect={ onSelect }
-										onHover={ onHover }
-										onHoverPattern={ onHoverPattern }
-										rootClientId={ rootClientId }
-										clientId={ clientId }
-										isAppender={ isAppender }
-										__experimentalInsertionIndex={
-											__experimentalInsertionIndex
-										}
-										showBlockDirectory
-										shouldFocusBlock={ shouldFocusBlock }
-										maxBlockPatterns={
-											selectedTab !== 'patterns'
-												? 0
-												: undefined
-										}
-										maxBlockTypes={
-											selectedTab !== 'blocks'
-												? 0
-												: undefined
-										}
-									/>
-								) }
-							</>
+							<SearchByType
+								clientId={ clientId }
+								searchType={ selectedTab }
+								hoveredItem={ hoveredItem }
+								setHoveredItem={ setHoveredItem }
+								setFilterValue={ setFilterValue }
+								filterValue={ filterValue }
+								delayedFilterValue={ delayedFilterValue }
+								onSelect={ onSelect }
+								onHover={ onHover }
+								onHoverPattern={ onHoverPattern }
+								shouldFocusBlock={ shouldFocusBlock }
+								rootClientId={ destinationRootClientId }
+								__experimentalInsertionIndex={
+									__experimentalInsertionIndex
+								}
+								isAppender={ isAppender }
+							/>
 						) }
 						{ selectedTab === 'blocks' && ! delayedFilterValue && (
 							<BlocksTab
