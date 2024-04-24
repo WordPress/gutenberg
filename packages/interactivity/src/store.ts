@@ -6,7 +6,7 @@ import { computed } from '@preact/signals';
 /**
  * Internal dependencies
  */
-import { deepSignal } from './deepsignal';
+import { deepSignal, objectHandlers } from './deepsignal';
 import {
 	getScope,
 	setScope,
@@ -52,15 +52,16 @@ const scopeToGetters = new WeakMap();
 
 const proxify = ( obj: any, ns: string ) => {
 	if ( ! objToProxy.has( obj ) ) {
-		const proxy = new Proxy( obj, handlers );
+		const proxy = new Proxy( obj, storeHandlers );
 		objToProxy.set( obj, proxy );
 		proxyToNs.set( proxy, ns );
 	}
 	return objToProxy.get( obj );
 };
 
-const handlers = {
-	get: ( target: any, key: string | symbol, receiver: any ) => {
+const stateHandlers = {
+	...objectHandlers,
+	get: ( target: any, key: string, receiver: any ) => {
 		const ns = proxyToNs.get( receiver );
 
 		// Check if the property is a getter and we are inside an scope. If that is
@@ -92,6 +93,18 @@ const handlers = {
 			}
 		}
 
+		const result = objectHandlers.get( target, key, receiver );
+
+		if ( isObject( result ) ) proxyToNs.set( result, ns );
+
+		return result;
+	},
+};
+
+const storeHandlers = {
+	get: ( target: any, key: string | symbol, receiver: any ) => {
+		const ns = proxyToNs.get( receiver );
+
 		const result = Reflect.get( target, key );
 
 		// Check if the proxy is the store root and no key with that name exist. In
@@ -100,6 +113,12 @@ const handlers = {
 			const obj = {};
 			Reflect.set( target, key, obj );
 			return proxify( obj, ns );
+		}
+
+		// Do not proxify the state.
+		if ( key === 'state' && receiver === stores.get( ns ) ) {
+			proxyToNs.set( result, ns );
+			return result;
 		}
 
 		// Check if the property is a generator. If it is, we turn it into an
@@ -280,10 +299,10 @@ export function store(
 			storeLocks.set( namespace, lock );
 		}
 		const rawStore = {
-			state: deepSignal( isObject( state ) ? state : {} ),
+			state: deepSignal( isObject( state ) ? state : {}, stateHandlers ),
 			...block,
 		};
-		const proxiedStore = new Proxy( rawStore, handlers );
+		const proxiedStore = new Proxy( rawStore, storeHandlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
 		proxyToNs.set( proxiedStore, namespace );
