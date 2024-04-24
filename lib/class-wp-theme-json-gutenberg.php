@@ -601,6 +601,7 @@ class WP_Theme_JSON_Gutenberg {
 		'color'                => 'color',
 		'spacing'              => 'spacing',
 		'typography'           => 'typography',
+		'@currentItem'         => 'currentItem',
 	);
 
 	/**
@@ -867,6 +868,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$schema_styles_blocks   = array();
 		$schema_settings_blocks = array();
+
 		foreach ( $valid_block_names as $block ) {
 			// Build the schema for each block style variation.
 			$style_variation_names = array();
@@ -886,10 +888,12 @@ class WP_Theme_JSON_Gutenberg {
 				$schema_styles_variations = array_fill_keys( $style_variation_names, $styles_non_top_level );
 			}
 
-			$schema_settings_blocks[ $block ]             = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]               = $styles_non_top_level;
-			$schema_styles_blocks[ $block ]['elements']   = $schema_styles_elements;
-			$schema_styles_blocks[ $block ]['variations'] = $schema_styles_variations;
+			$schema_settings_blocks[ $block ]               = static::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]                 = $styles_non_top_level;
+			$schema_styles_blocks[ $block ]['elements']     = $schema_styles_elements;
+			$schema_styles_blocks[ $block ]['variations']   = $schema_styles_variations;
+			$schema_styles_blocks[ $block ]['@currentItem'] = $styles_non_top_level;
+
 		}
 
 		$schema['styles']                                 = static::VALID_STYLES;
@@ -2485,6 +2489,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
+
 			$selector = null;
 			if ( isset( $selectors[ $name ]['selector'] ) ) {
 				$selector = $selectors[ $name ]['selector'];
@@ -3786,6 +3791,7 @@ class WP_Theme_JSON_Gutenberg {
 		return $element_selectors;
 	}
 
+
 	/**
 	 * Generates style declarations for a node's features e.g. color, border,
 	 * typography etc, that have custom selectors in their related block's
@@ -3807,6 +3813,7 @@ class WP_Theme_JSON_Gutenberg {
 		$settings = $this->theme_json['settings'] ?? null;
 
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
+
 			// Skip if this is the block's root selector or the block doesn't
 			// have any styles for the feature.
 			if ( 'root' === $feature || empty( $node[ $feature ] ) ) {
@@ -3857,6 +3864,14 @@ class WP_Theme_JSON_Gutenberg {
 				// Create temporary node containing only the feature data
 				// to leverage existing `compute_style_properties` function.
 				$feature_node = array( $feature => $node[ $feature ] );
+
+				// If the feature is a state selector (e.g. `@currentItem`)
+				// then get the node declarations are nested.
+				// TODO: if we end up dropping the `@` prefix for state selectors
+				// then we can utilise a const of whitelisted state selectors.
+				if ( strpos( $feature, '@' ) === 0 ) {
+					$feature_node = $feature_node[ $feature ];
+				}
 
 				// Generate the style declarations.
 				$new_declarations = static::compute_style_properties( $feature_node, $settings, null, $this->theme_json );
