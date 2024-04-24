@@ -163,7 +163,7 @@ Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
-| blockGap | boolean, null | null | , |
+| blockGap | boolean, null | null |   |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
@@ -182,7 +182,7 @@ Settings related to typography.
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | object, boolean | false | maxViewportWidth, minFontSize, minViewportWidth, |
+| fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textAlign | boolean | true |  |

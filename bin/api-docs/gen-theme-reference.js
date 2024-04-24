@@ -150,13 +150,17 @@ const getSettingsPropertiesMarkup = ( struct ) => {
 			}
 
 			if ( ! ps ) {
-				ps = props[ key ].oneOf.map( ( item ) =>
-					item?.type === 'object' && item?.properties
-						? keys( getPropertiesFromArray( item ) )
-								.sort()
-								.join( ', ' )
-						: ''
-				);
+				ps = props[ key ].oneOf
+					.map( ( item ) =>
+						item?.type === 'object' && item?.properties
+							? '_{' +
+							  keys( getPropertiesFromArray( item ) )
+									.sort()
+									.join( ', ' ) +
+							  '}_'
+							: ''
+					)
+					.join( ' ' );
 			}
 		}
 
