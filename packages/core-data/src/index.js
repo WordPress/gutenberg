@@ -43,6 +43,10 @@ const entitySelectors = entitiesConfig.reduce( ( result, entity ) => {
 
 const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
 	const { kind, name, plural } = entity;
+	// We forward the resolver using resolveSelect, which will first check if
+	// the destination resolver is already resolved, thus avoiding duplicate
+	// requests. See `mapResolveSelectors` in
+	// packages/data/src/redux-store/index.js.
 	result[ getMethodName( kind, name ) ] =
 		( key, query ) =>
 		async ( { resolveSelect } ) => {
@@ -50,8 +54,7 @@ const entityResolvers = entitiesConfig.reduce( ( result, entity ) => {
 		};
 
 	if ( plural ) {
-		const pluralMethodName = getMethodName( kind, plural, 'get' );
-		result[ pluralMethodName ] =
+		result[ getMethodName( kind, plural, 'get' ) ] =
 			( query ) =>
 			async ( { resolveSelect } ) => {
 				await resolveSelect.getEntityRecords( kind, name, query );
