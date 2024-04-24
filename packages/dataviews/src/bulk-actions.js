@@ -58,7 +58,7 @@ function ActionWithModal( {
 			...action,
 			onActionPerformed: ( ...args ) => {
 				onMenuOpenChange( false );
-				action.onActionPerformed( ...args );
+				action.onActionPerformed?.( ...args );
 			},
 		};
 	}, [ action, onMenuOpenChange ] );
