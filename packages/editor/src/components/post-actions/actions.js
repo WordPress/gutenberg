@@ -43,7 +43,7 @@ export const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal } ) => {
+	RenderModal( { items: posts, closeModal, action } ) {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -158,7 +158,7 @@ export const trashPostAction = {
 									type: 'snackbar',
 								} );
 							}
-							this?.onActionPerformed?.( posts );
+							action.onActionPerformed?.( posts );
 							closeModal();
 						} }
 					>
@@ -396,7 +396,7 @@ export const renamePostAction = {
 	isEligible( post ) {
 		return post.status !== 'trash';
 	},
-	RenderModal: ( { items, closeModal } ) => {
+	RenderModal: ( { items, closeModal, action } ) => {
 		const [ item ] = items;
 		const originalTitle = decodeEntities(
 			typeof item.title === 'string' ? item.title : item.title.rendered
@@ -423,7 +423,7 @@ export const renamePostAction = {
 				createSuccessNotice( __( 'Name updated' ), {
 					type: 'snackbar',
 				} );
-				this?.onActionPerformed?.( items );
+				action.onActionPerformed?.( items );
 			} catch ( error ) {
 				const errorMessage =
 					error.message && error.code !== 'unknown_error'
@@ -474,7 +474,7 @@ export const resetTemplateAction = {
 	isEligible: isTemplateRevertable,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items, closeModal } ) => {
+	RenderModal: ( { items, closeModal, action } ) => {
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -509,6 +509,7 @@ export const resetTemplateAction = {
 						id: 'revert-template-action',
 					}
 				);
+				action.onActionPerformed?.( items );
 			} catch ( error ) {
 				let fallbackErrorMessage;
 				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
@@ -586,7 +587,7 @@ export const deleteTemplateAction = {
 	isEligible: isTemplateRemovable,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal, action } ) => {
 		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
 			<VStack spacing="5">
@@ -619,7 +620,7 @@ export const deleteTemplateAction = {
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
-							this?.onActionPerformed?.( templates );
+							action.onActionPerformed?.( templates );
 							closeModal();
 						} }
 					>
@@ -645,7 +646,7 @@ export const renameTemplateAction = {
 		}
 		return true;
 	},
-	RenderModal: ( { items: templates, closeModal } ) => {
+	RenderModal: ( { items: templates, closeModal, action } ) => {
 		const template = templates[ 0 ];
 		const title = decodeEntities( template.title.rendered );
 		const [ editedTitle, setEditedTitle ] = useState( title );
@@ -687,7 +688,7 @@ export const renameTemplateAction = {
 						type: 'snackbar',
 					}
 				);
-				this?.onActionPerformed?.( templates );
+				action.onActionPerformed?.( templates );
 			} catch ( error ) {
 				const fallbackErrorMessage =
 					template.type === TEMPLATE_POST_TYPE

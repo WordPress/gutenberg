@@ -72,6 +72,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					<RenderModal
 						items={ [ item ] }
 						closeModal={ () => setIsModalOpen( false ) }
+						action={ action }
 					/>
 				</Modal>
 			) }

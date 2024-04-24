@@ -53,6 +53,15 @@ function ActionWithModal( {
 	const onCloseModal = useCallback( () => {
 		setActionWithModal( undefined );
 	}, [ setActionWithModal ] );
+	const actionWithCallbacks = useMemo( () => {
+		return {
+			...action,
+			onActionPerformed: ( ...args ) => {
+				onMenuOpenChange( false );
+				action.onActionPerformed( ...args );
+			},
+		};
+	}, [ action, onMenuOpenChange ] );
 	return (
 		<Modal
 			title={ ! hideModalHeader && action.label }
@@ -63,7 +72,7 @@ function ActionWithModal( {
 			<RenderModal
 				items={ eligibleItems }
 				closeModal={ onCloseModal }
-				onPerform={ () => onMenuOpenChange( false ) }
+				action={ actionWithCallbacks }
 			/>
 		</Modal>
 	);

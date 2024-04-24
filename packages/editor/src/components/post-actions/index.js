@@ -57,7 +57,7 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		return eligibleActions.map( ( action ) => {
 			return {
 				...action,
-				onActionPerformed: ( args ) => {
+				onActionPerformed: ( ...args ) => {
 					onActionPerformed?.( action.id, ...args );
 					action.onActionPerformed?.( ...args );
 				},
@@ -135,6 +135,7 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					<RenderModal
 						items={ [ item ] }
 						closeModal={ () => setIsModalOpen( false ) }
+						action={ action }
 					/>
 				</Modal>
 			) }
