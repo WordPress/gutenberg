@@ -22,7 +22,7 @@ export const TabListWrapper = styled.div`
 	}
 	&.is-animation-enabled::after {
 		@media not ( prefers-reduced-motion: reduce ) {
-			transition-property: left width;
+			transition-property: left, top, width, height;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -41,6 +41,17 @@ export const TabListWrapper = styled.div`
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
+	}
+	&[aria-orientation='vertical']::after {
+		left: unset;
+		right: 0;
+		bottom: unset;
+		top: var( --indicator-top );
+		width: unset;
+		height: var( --indicator-height );
+		border-bottom: unset;
+		border-right: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
 	}
 `;
 

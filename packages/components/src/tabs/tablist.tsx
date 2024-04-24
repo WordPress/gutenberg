@@ -24,6 +24,7 @@ import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import type { CSSProperties } from 'react';
+import classNames from 'classnames';
 
 function useTrackElementOffset(
 	targetElement?: HTMLElement | null,
@@ -81,22 +82,30 @@ function useTrackElementOffset(
 	return indicatorPosition;
 }
 
-type ValueUpdateContext = {
-	previousValue: unknown;
+type ValueUpdateContext< T > = {
+	previousValue: T;
 };
 
-function useOnValueUpdate(
-	value: unknown,
-	onUpdate: ( context: ValueUpdateContext ) => void
+function useOnValueUpdate< T >(
+	value: T,
+	onUpdate: ( context: ValueUpdateContext< T > ) => void
 ) {
-	const [ previousValue, setPreviousValue ] = useState( value );
+	const previousValueRef = useRef( value );
+
+	// TODO: replace with useEventCallback or similar when officially available.
+	const updateCallbackRef = useRef( onUpdate );
+	useLayoutEffect( () => {
+		updateCallbackRef.current = onUpdate;
+	} );
 
 	useEffect( () => {
-		if ( previousValue !== value ) {
-			onUpdate( { previousValue } );
-			setPreviousValue( value );
+		if ( previousValueRef.current !== value ) {
+			updateCallbackRef.current( {
+				previousValue: previousValueRef.current,
+			} );
+			previousValueRef.current = value;
 		}
-	}, [ previousValue, value, onUpdate ] );
+	}, [ value ] );
 }
 
 export const TabList = forwardRef<
@@ -143,11 +152,12 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
-			className={ animationEnabled ? 'is-animation-enabled' : '' }
 			style={
 				{
 					'--indicator-left': `${ indicatorPosition.left }px`,
+					'--indicator-top': `${ indicatorPosition.top }px`,
 					'--indicator-width': `${ indicatorPosition.width }px`,
+					'--indicator-height': `${ indicatorPosition.height }px`,
 				} as CSSProperties
 			}
 			render={
@@ -160,6 +170,10 @@ export const TabList = forwardRef<
 			}
 			onBlur={ onBlur }
 			{ ...otherProps }
+			className={ classNames(
+				animationEnabled ? 'is-animation-enabled' : '',
+				otherProps.className
+			) }
 		>
 			{ children }
 		</Ariakit.TabList>
