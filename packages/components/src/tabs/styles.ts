@@ -30,26 +30,24 @@ export const TabListWrapper = styled.div`
 	&::after {
 		content: '';
 		position: absolute;
-		left: var( --indicator-left );
-		bottom: 0;
-		width: var( --indicator-width );
-		height: 0;
-		border-bottom: var( --wp-admin-border-width-focus ) solid
-			${ COLORS.theme.accent };
 		pointer-events: none;
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
 		outline-offset: -1px;
 	}
+	&:not( [aria-orientation='vertical'] )::after {
+		left: var( --indicator-left );
+		bottom: 0;
+		width: var( --indicator-width );
+		height: 0;
+		border-bottom: var( --wp-admin-border-width-focus ) solid
+			${ COLORS.theme.accent };
+	}
 	&[aria-orientation='vertical']::after {
-		left: unset;
 		right: 0;
-		bottom: unset;
 		top: var( --indicator-top );
-		width: unset;
 		height: var( --indicator-height );
-		border-bottom: unset;
 		border-right: var( --wp-admin-border-width-focus ) solid
 			${ COLORS.theme.accent };
 	}
