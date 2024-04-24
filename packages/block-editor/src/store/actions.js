@@ -1438,6 +1438,8 @@ export const __unstableSetEditorMode =
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
+			const allBlocks = select.getBlocks();
+
 			const { sectionRootClientId } = unlock(
 				registry.select( STORE_NAME ).getSettings()
 			);
@@ -1445,19 +1447,29 @@ export const __unstableSetEditorMode =
 				const sectionClientIds =
 					select.getBlockOrder( sectionRootClientId );
 				if ( sectionClientIds ) {
-					const parents = select.getBlockParents(
-						firstSelectedClientId
-					);
-					const firstSectionClientId = parents.find( ( parent ) =>
-						sectionClientIds.includes( parent )
-					);
-					dispatch.selectBlock( firstSectionClientId );
+					if ( firstSelectedClientId ) {
+						const parents = select.getBlockParents(
+							firstSelectedClientId
+						);
+						const firstSectionClientId = parents.find( ( parent ) =>
+							sectionClientIds.includes( parent )
+						);
+						dispatch.selectBlock( firstSectionClientId );
+					} else {
+						const lastSectionClientId =
+							sectionClientIds[ sectionClientIds.length - 1 ];
+						dispatch.selectBlock( lastSectionClientId );
+					}
 				}
 			} else if ( firstSelectedClientId ) {
 				const rootClientId = select.getBlockHierarchyRootClientId(
 					firstSelectedClientId
 				);
 				dispatch.selectBlock( rootClientId );
+			} else {
+				// If there's no block selected and no sectionRootClientId, select the last root block.
+				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
+				dispatch.selectBlock( lastRootBlock?.clientId );
 			}
 		}
 

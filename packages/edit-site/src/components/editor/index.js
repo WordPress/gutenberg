@@ -34,6 +34,7 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -44,7 +45,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
-import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -67,6 +67,8 @@ const {
 	ComplementaryArea,
 	interfaceStore,
 } = unlock( editorPrivateApis );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -275,9 +277,9 @@ export default function Editor( { isLoading, onClick } ) {
 								) }
 								{ isEditMode && (
 									<>
-										<KeyboardShortcutsEditMode />
 										<EditorKeyboardShortcutsRegister />
 										<EditorKeyboardShortcuts />
+										<BlockKeyboardShortcuts />
 									</>
 								) }
 							</>

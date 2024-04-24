@@ -15,7 +15,7 @@ import useBlockEditorSettings from './components/provider/use-block-editor-setti
 import DocumentTools from './components/document-tools';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
-import ModeSwitcher from './components/mode-switcher';
+import MoreMenu from './components/more-menu';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
 import PostPanelRow from './components/post-panel-row';
@@ -26,6 +26,8 @@ import PostActions from './components/post-actions';
 import { usePostActions } from './components/post-actions/actions';
 import PostCardPanel from './components/post-card-panel';
 import PostStatus from './components/post-status';
+import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
+import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -37,7 +39,7 @@ lock( privateApis, {
 	EntitiesSavedStatesExtensible,
 	InserterSidebar,
 	ListViewSidebar,
-	ModeSwitcher,
+	MoreMenu,
 	PatternOverridesPanel,
 	PluginPostExcerpt,
 	PostActions,
@@ -48,6 +50,8 @@ lock( privateApis, {
 	usePostActions,
 	PostCardPanel,
 	PostStatus,
+	ToolsMoreMenuGroup,
+	ViewMoreMenuGroup,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

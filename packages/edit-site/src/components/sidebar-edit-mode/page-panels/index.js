@@ -6,12 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	PageAttributesPanel,
 	PluginDocumentSettingPanel,
-	PostDiscussionPanel,
-	PostExcerptPanel,
-	PostLastRevisionPanel,
-	PostTaxonomiesPanel,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -95,11 +90,6 @@ export default function PagePanels() {
 					<PageContent />
 				</PanelBody>
 			) }
-			<PostLastRevisionPanel />
-			<PostTaxonomiesPanel />
-			<PostExcerptPanel />
-			<PostDiscussionPanel />
-			<PageAttributesPanel />
 		</>
 	);
 }

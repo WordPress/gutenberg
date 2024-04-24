@@ -499,7 +499,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
+-   `undefined< EntityRecord > | false`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 

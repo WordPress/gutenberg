@@ -657,7 +657,7 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByRole( 'button', { name: 'Test' } ).click();
+				await page.getByText( 'Test' ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {
