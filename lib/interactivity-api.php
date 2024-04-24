@@ -27,6 +27,10 @@ function gutenberg_reregister_interactivity_script_modules() {
 		array( '@wordpress/interactivity' ),
 		$default_version
 	);
+	if ( SCRIPT_DEBUG ) {
+		wp_enqueue_script( 'wp-i18n' );
+		wp_enqueue_script( 'wp-warning' );
+	}
 }
 
 add_action( 'init', 'gutenberg_reregister_interactivity_script_modules' );
