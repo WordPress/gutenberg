@@ -6,35 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHStack as HStack,
-	__experimentalTruncate as Truncate,
-	Popover,
-} from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useMemo } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import BlockIcon from '../block-icon';
-import useBlockDisplayInformation from '../use-block-display-information';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
-import ListViewExpander from './expander';
-
 export default function ListViewDropIndicatorPreview( {
-	draggedBlockClientId,
 	listViewRef,
 	blockDropTarget,
 } ) {
-	const blockInformation = useBlockDisplayInformation( draggedBlockClientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId: draggedBlockClientId,
-		context: 'list-view',
-	} );
-
 	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 
 	const [ rootBlockElement, blockElement ] = useMemo( () => {
@@ -153,56 +134,6 @@ export default function ListViewDropIndicatorPreview( {
 		};
 	}, [ getDropIndicatorWidth, targetElement ] );
 
-	const horizontalScrollOffsetStyle = useMemo( () => {
-		if ( ! targetElement ) {
-			return {};
-		}
-
-		const scrollContainer = getScrollContainer( targetElement );
-		const ownerDocument = targetElement.ownerDocument;
-		const windowScroll =
-			scrollContainer === ownerDocument.body ||
-			scrollContainer === ownerDocument.documentElement;
-
-		if ( scrollContainer && ! windowScroll ) {
-			const scrollContainerRect = scrollContainer.getBoundingClientRect();
-			const targetElementRect = targetElement.getBoundingClientRect();
-
-			const distanceBetweenContainerAndTarget = rtl
-				? scrollContainerRect.right - targetElementRect.right
-				: targetElementRect.left - scrollContainerRect.left;
-
-			if ( ! rtl && scrollContainerRect.left > targetElementRect.left ) {
-				return {
-					transform: `translateX( ${ distanceBetweenContainerAndTarget }px )`,
-				};
-			}
-
-			if ( rtl && scrollContainerRect.right < targetElementRect.right ) {
-				return {
-					transform: `translateX( ${
-						distanceBetweenContainerAndTarget * -1
-					}px )`,
-				};
-			}
-		}
-
-		return {};
-	}, [ rtl, targetElement ] );
-
-	const ariaLevel = useMemo( () => {
-		if ( ! rootBlockElement ) {
-			return 1;
-		}
-
-		const _ariaLevel = parseInt(
-			rootBlockElement.getAttribute( 'aria-level' ),
-			10
-		);
-
-		return _ariaLevel ? _ariaLevel + 1 : 1;
-	}, [ rootBlockElement ] );
-
 	const hasAdjacentSelectedBranch = useMemo( () => {
 		if ( ! targetElement ) {
 			return false;
@@ -309,40 +240,7 @@ export default function ListViewDropIndicatorPreview( {
 							hasAdjacentSelectedBranch,
 					}
 				) }
-			>
-				<div
-					className="block-editor-list-view-leaf"
-					aria-level={ ariaLevel }
-				>
-					<div
-						className={ classnames(
-							'block-editor-list-view-block-select-button',
-							'block-editor-list-view-block-contents'
-						) }
-						style={ horizontalScrollOffsetStyle }
-					>
-						<ListViewExpander onClick={ () => {} } />
-						<BlockIcon
-							icon={ blockInformation?.icon }
-							showColors
-							context="list-view"
-						/>
-						<HStack
-							alignment="center"
-							className="block-editor-list-view-block-select-button__label-wrapper"
-							justify="flex-start"
-							spacing={ 1 }
-						>
-							<span className="block-editor-list-view-block-select-button__title">
-								<Truncate ellipsizeMode="auto">
-									{ blockTitle }
-								</Truncate>
-							</span>
-						</HStack>
-					</div>
-					<div className="block-editor-list-view-block__menu-cell"></div>
-				</div>
-			</div>
+			></div>
 		</Popover>
 	);
 }

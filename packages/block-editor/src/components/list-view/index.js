@@ -290,6 +290,7 @@ function ListViewComponent(
 	const contextValue = useMemo(
 		() => ( {
 			blockDropPosition,
+			blockDropTarget,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
@@ -308,6 +309,7 @@ function ListViewComponent(
 		} ),
 		[
 			blockDropPosition,
+			blockDropTarget,
 			blockDropTargetIndex,
 			blockIndexes,
 			draggedClientIds,
