@@ -112,6 +112,20 @@
 	border-radius: $radius-block-ui;
 }
 
+.edit-site-global-styles__shadow-preview-panel {
+	height: 150px;
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	overflow: auto;
+}
+
+.edit-site-global-styles__shadow-preview-block {
+	border: $gray-200 $border-width solid;
+	border-radius: $radius-block-ui;
+	width: 60%;
+	height: 60px;
+}
+
 .edit-site-global-styles-screen-css {
 	flex: 1 1 auto;
 	display: flex;

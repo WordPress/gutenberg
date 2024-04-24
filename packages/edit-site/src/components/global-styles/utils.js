@@ -47,3 +47,65 @@ export function getFontFamilies( themeJson ) {
 
 	return [ bodyFontFamily, headingFontFamily ];
 }
+
+export function getShadowParts( shadow ) {
+	const colorStart = shadow.indexOf( 'rgb' );
+	const pattern = /(?<=\)),?\s*/;
+	return shadow
+		.split( colorStart !== -1 ? pattern : ',' )
+		.map( ( part ) => part.trim() );
+}
+
+export function shadowStringToObject( shadow ) {
+	const colorStart = shadow.indexOf( 'rgb' );
+	const inset = shadow.indexOf( 'inset' ) !== -1;
+	let parts = [];
+	const defaultColor = '#000';
+	let { x, y, blur, spread, color } = {
+		x: 0,
+		y: 0,
+		blur: 0,
+		spread: 0,
+		color: defaultColor,
+	};
+
+	if ( colorStart !== -1 ) {
+		color = shadow.substring( colorStart );
+		parts = shadow.substring( 0, colorStart ).trim().split( ' ' );
+	} else {
+		parts = shadow.split( ' ' );
+		color = parts.pop();
+	}
+
+	if ( parts.length === 4 ) {
+		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
+		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
+		blur = parseInt( parts[ 2 ].replace( 'px', '' ) );
+		spread = parseInt( parts[ 3 ].replace( 'px', '' ) );
+	} else if ( parts.length === 3 ) {
+		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
+		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
+		blur = parseInt( parts[ 2 ].replace( 'px', '' ) );
+	} else if ( parts.length === 2 ) {
+		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
+		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
+	} else {
+		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
+		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
+	}
+
+	return { x, y, blur, spread, color, inset };
+}
+
+export function shadowObjectToString( shadowObj ) {
+	const shadowString = `${ shadowObj.x || 0 }px ${ shadowObj.y || 0 }px ${
+		shadowObj.blur || 0
+	}px ${ shadowObj.spread || 0 }px`;
+	if ( shadowObj.color ) {
+		return `${ shadowString } ${ shadowObj.color }`;
+	}
+	if ( shadowObj.inset ) {
+		return `inset ${ shadowString }`;
+	}
+	return shadowString;
+}
