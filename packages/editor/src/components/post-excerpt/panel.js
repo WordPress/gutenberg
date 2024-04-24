@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -175,8 +180,8 @@ function PrivateExcerpt() {
 		return excerptText;
 	}
 	const excerptPlaceholder = shouldBeUsedAsDescription
-		? __( 'Add a description..' )
-		: __( 'Add an excerpt..' );
+		? __( 'Add a description…' )
+		: __( 'Add an excerpt…' );
 	const triggerEditLabel = shouldBeUsedAsDescription
 		? __( 'Edit description' )
 		: __( 'Edit excerpt' );
@@ -188,7 +193,10 @@ function PrivateExcerpt() {
 			ref={ setPopoverAnchor }
 			renderToggle={ ( { onToggle } ) => (
 				<Button
-					className="editor-post-excerpt__dropdown__trigger"
+					className={ classnames(
+						'editor-post-excerpt__dropdown__trigger',
+						excerpt && 'has-excerpt'
+					) }
 					onClick={ onToggle }
 					label={ excerptText && triggerEditLabel }
 					showTooltip

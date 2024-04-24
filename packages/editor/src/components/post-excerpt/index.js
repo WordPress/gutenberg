@@ -54,16 +54,18 @@ function PostExcerpt( { hideLabelFromVision = false } ) {
 					editPost( { [ usedAttribute ]: value } )
 				}
 				value={ excerpt }
+				help={
+					! shouldUseDescriptionLabel && (
+						<ExternalLink
+							href={ __(
+								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#excerpt'
+							) }
+						>
+							{ __( 'Learn more about manual excerpts' ) }
+						</ExternalLink>
+					)
+				}
 			/>
-			{ ! shouldUseDescriptionLabel && (
-				<ExternalLink
-					href={ __(
-						'https://wordpress.org/documentation/article/page-post-settings-sidebar/#excerpt'
-					) }
-				>
-					{ __( 'Learn more about manual excerpts' ) }
-				</ExternalLink>
-			) }
 		</div>
 	);
 }
