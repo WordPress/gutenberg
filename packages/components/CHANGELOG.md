@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `Grid`: Remove "experimental" designation ([#61018](https://github.com/WordPress/gutenberg/pull/61018)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
