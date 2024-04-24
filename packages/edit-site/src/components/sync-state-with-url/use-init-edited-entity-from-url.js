@@ -34,42 +34,62 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		postsPageId,
 		url,
 		frontPageTemplateId,
-	} = useSelect( ( select ) => {
-		const { getSite, getUnstableBase, getEntityRecords } =
-			select( coreDataStore );
-		const siteData = getSite();
-		const base = getUnstableBase();
-		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-			per_page: -1,
-		} );
-		const _homepageId =
-			siteData?.show_on_front === 'page' &&
-			[ 'number', 'string' ].includes( typeof siteData.page_on_front ) &&
-			!! +siteData.page_on_front // We also need to check if it's not zero(`0`).
-				? siteData.page_on_front.toString()
-				: null;
-		const _postsPageId =
-			siteData?.show_on_front === 'page' &&
-			[ 'number', 'string' ].includes( typeof siteData.page_for_posts )
-				? siteData.page_for_posts.toString()
-				: null;
-		let _frontPageTemplateId;
-		if ( templates ) {
-			const frontPageTemplate = templates.find(
-				( t ) => t.slug === 'front-page'
+		editedEntity,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSite,
+				getUnstableBase,
+				getEditedEntityRecord,
+				getEntityRecords,
+			} = select( coreDataStore );
+			const siteData = getSite();
+			const base = getUnstableBase();
+			const templates = getEntityRecords(
+				'postType',
+				TEMPLATE_POST_TYPE,
+				{
+					per_page: -1,
+				}
 			);
-			_frontPageTemplateId = frontPageTemplate
-				? frontPageTemplate.id
-				: false;
-		}
-		return {
-			hasLoadedAllDependencies: !! base && !! siteData,
-			homepageId: _homepageId,
-			postsPageId: _postsPageId,
-			url: base?.home,
-			frontPageTemplateId: _frontPageTemplateId,
-		};
-	}, [] );
+			const _homepageId =
+				siteData?.show_on_front === 'page' &&
+				[ 'number', 'string' ].includes(
+					typeof siteData.page_on_front
+				) &&
+				!! +siteData.page_on_front // We also need to check if it's not zero(`0`).
+					? siteData.page_on_front.toString()
+					: null;
+			const _postsPageId =
+				siteData?.show_on_front === 'page' &&
+				[ 'number', 'string' ].includes(
+					typeof siteData.page_for_posts
+				)
+					? siteData.page_for_posts.toString()
+					: null;
+			let _frontPageTemplateId;
+			if ( templates ) {
+				const frontPageTemplate = templates.find(
+					( t ) => t.slug === 'front-page'
+				);
+				_frontPageTemplateId = frontPageTemplate
+					? frontPageTemplate.id
+					: false;
+			}
+			return {
+				hasLoadedAllDependencies: !! base && !! siteData,
+				homepageId: _homepageId,
+				postsPageId: _postsPageId,
+				url: base?.home,
+				frontPageTemplateId: _frontPageTemplateId,
+				editedEntity:
+					postType && postId
+						? getEditedEntityRecord( 'postType', postType, postId )
+						: undefined,
+			};
+		},
+		[ postType, postId ]
+	);
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -86,7 +106,6 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			}
 
 			const {
-				getEditedEntityRecord,
 				getEntityRecords,
 				getDefaultTemplateId,
 				__experimentalGetTemplateForLink,
@@ -112,11 +131,6 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 					}
 				}
 
-				const editedEntity = getEditedEntityRecord(
-					'postType',
-					postTypeToResolve,
-					postIdToResolve
-				);
 				if ( ! editedEntity ) {
 					return undefined;
 				}
@@ -198,6 +212,7 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 			postType,
 			path,
 			frontPageTemplateId,
+			editedEntity,
 		]
 	);
 
