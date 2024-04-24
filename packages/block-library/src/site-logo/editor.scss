@@ -12,10 +12,6 @@
 		&:focus {
 			box-shadow: none;
 		}
-
-		&.is-transient img {
-			opacity: 0.3;
-		}
 	}
 
 	img {
@@ -24,6 +20,23 @@
 
 	.wp-block-image__crop-area {
 		pointer-events: auto;
+	}
+
+	&.is-transient {
+		position: relative;
+
+		img {
+			opacity: 0.3;
+		}
+
+		// Shown while image is being uploaded.
+		.components-spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			margin: 0;
+		}
 	}
 }
 

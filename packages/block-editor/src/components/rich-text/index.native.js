@@ -462,7 +462,9 @@ export function RichTextWrapper(
 						}
 						return;
 					}
-					onReplace( content, content.length - 1, -1 );
+					onReplace( content, content.length - 1, -1, {
+						source: 'clipboard',
+					} );
 				} else {
 					if ( canPasteEmbed ) {
 						onChange(

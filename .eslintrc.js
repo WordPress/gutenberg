@@ -408,6 +408,24 @@ module.exports = {
 			},
 		},
 		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
+							},
+						],
+					},
+				],
+			},
+		},
+		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
 				'react/react-in-jsx-scope': 'error',

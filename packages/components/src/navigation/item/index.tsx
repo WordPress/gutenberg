@@ -22,6 +22,9 @@ import type { NavigationItemProps } from '../types';
 
 const noop = () => {};
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export function NavigationItem( props: NavigationItemProps ) {
 	const {
 		badge,

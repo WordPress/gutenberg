@@ -143,7 +143,7 @@ export function SidebarNavigationScreenWrapper( {
 		<SidebarNavigationScreen
 			title={ title || __( 'Navigation' ) }
 			actions={ actions }
-			description={ description || __( 'Manage your Navigation menus.' ) }
+			description={ description || __( 'Manage your Navigation Menus.' ) }
 			content={ children }
 		/>
 	);

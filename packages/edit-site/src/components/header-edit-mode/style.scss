@@ -21,9 +21,9 @@
 		height: 100%;
 		// Allow focus ring to be fully visible on furthest right button.
 		@include break-medium() {
+			padding-right: var(--wp-admin-border-width-focus);
 			// Account for the site hub, which is 60x60px.
 			flex-basis: calc(37.5% - 60px);
-			padding-right: 2px;
 			// We need this to be overflow hidden so the block toolbar can
 			// overflow scroll. If the overflow is visible, flexbox allows
 			// the toolbar to grow outside of the allowed container space.

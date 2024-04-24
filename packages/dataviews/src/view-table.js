@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useAsyncList } from '@wordpress/compose';
 import { unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -219,7 +218,9 @@ function BulkSelectionCheckbox( {
 					onSelectionChange( selectableItems );
 				}
 			} }
-			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
 		/>
 	);
 }
@@ -299,8 +300,7 @@ function TableRow( {
 				<td
 					className="dataviews-view-table__checkbox-column"
 					style={ {
-						width: 20,
-						minWidth: 20,
+						width: '1%',
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
@@ -369,7 +369,6 @@ function ViewTable( {
 	data,
 	getItemId,
 	isLoading = false,
-	deferredRendering,
 	selection,
 	onSelectionChange,
 	setOpenedFilter,
@@ -386,7 +385,6 @@ function ViewTable( {
 		}
 	} );
 
-	const asyncData = useAsyncList( data );
 	const tableNoticeId = useId();
 
 	if ( nextHeaderMenuToFocus ) {
@@ -409,8 +407,7 @@ function ViewTable( {
 			! view.hiddenFields.includes( field.id ) &&
 			! [ view.layout.mediaField ].includes( field.id )
 	);
-	const usedData = deferredRendering ? asyncData : data;
-	const hasData = !! usedData?.length;
+	const hasData = !! data?.length;
 	const sortValues = { asc: 'ascending', desc: 'descending' };
 
 	const primaryField = fields.find(
@@ -430,8 +427,7 @@ function ViewTable( {
 							<th
 								className="dataviews-view-table__checkbox-column"
 								style={ {
-									width: 20,
-									minWidth: 20,
+									width: '1%',
 								} }
 								data-field-id="selection"
 								scope="col"
@@ -502,7 +498,7 @@ function ViewTable( {
 				</thead>
 				<tbody>
 					{ hasData &&
-						usedData.map( ( item, index ) => (
+						data.map( ( item, index ) => (
 							<TableRow
 								key={ getItemId( item ) }
 								item={ item }

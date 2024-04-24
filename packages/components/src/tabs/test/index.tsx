@@ -242,6 +242,44 @@ describe( 'Tabs', () => {
 			await press.Tab();
 			expect( alphaButton ).toHaveFocus();
 		} );
+
+		it( 'should focus on the first enabled tab when pressing the Tab key if no tab is selected', async () => {
+			const TABS_WITH_ALPHA_DISABLED = TABS.map( ( tabObj ) =>
+				tabObj.tabId === 'alpha'
+					? {
+							...tabObj,
+							tab: {
+								...tabObj.tab,
+								disabled: true,
+							},
+					  }
+					: tabObj
+			);
+
+			render(
+				<ControlledTabs
+					tabs={ TABS_WITH_ALPHA_DISABLED }
+					selectedTabId={ null }
+				/>
+			);
+
+			await sleep();
+			await press.Tab();
+			expect(
+				await screen.findByRole( 'tab', { name: 'Beta' } )
+			).toHaveFocus();
+
+			await press.ArrowRight();
+			expect(
+				await screen.findByRole( 'tab', { name: 'Gamma' } )
+			).toHaveFocus();
+
+			await press.Tab();
+			await press.ShiftTab();
+			expect(
+				await screen.findByRole( 'tab', { name: 'Gamma' } )
+			).toHaveFocus();
+		} );
 	} );
 
 	describe( 'Tab Attributes', () => {

@@ -1,179 +1,31 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { displayShortcut } from '@wordpress/keycodes';
-import { external, moreVertical } from '@wordpress/icons';
-import {
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-	DropdownMenu,
-} from '@wordpress/components';
-import { ActionItem, store as interfaceStore } from '@wordpress/interface';
-import {
-	PreferenceToggleMenuItem,
-	store as preferencesStore,
-} from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import {
-	KEYBOARD_SHORTCUT_HELP_MODAL_NAME,
-	default as KeyboardShortcutHelpModal,
-} from '../../keyboard-shortcut-help-modal';
-import {
-	PREFERENCES_MODAL_NAME,
-	default as EditSitePreferencesModal,
-} from '../../preferences-modal';
-import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import SiteExport from './site-export';
 import WelcomeGuideMenuItem from './welcome-guide-menu-item';
-import CopyContentMenuItem from './copy-content-menu-item';
 import { unlock } from '../../../lock-unlock';
 
-const { ModeSwitcher } = unlock( editorPrivateApis );
+const { ToolsMoreMenuGroup, PreferencesModal } = unlock( editorPrivateApis );
 
-export default function MoreMenu( { showIconLabels } ) {
-	const { openModal } = useDispatch( interfaceStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
+export default function MoreMenu() {
 	const isBlockBasedTheme = useSelect( ( select ) => {
 		return select( coreStore ).getCurrentTheme().is_block_theme;
 	}, [] );
 
-	const { toggleDistractionFree } = useDispatch( editorStore );
-
-	const turnOffDistractionFree = () => {
-		setPreference( 'core', 'distractionFree', false );
-	};
-
 	return (
 		<>
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Options' ) }
-				popoverProps={ {
-					placement: 'bottom-end',
-					className: 'more-menu-dropdown__content',
-				} }
-				toggleProps={ {
-					showTooltip: ! showIconLabels,
-					...( showIconLabels && { variant: 'tertiary' } ),
-					tooltipPosition: 'bottom',
-					size: 'compact',
-				} }
-			>
-				{ ( { onClose } ) => (
-					<>
-						<MenuGroup label={ _x( 'View', 'noun' ) }>
-							<PreferenceToggleMenuItem
-								scope="core"
-								name="fixedToolbar"
-								onToggle={ turnOffDistractionFree }
-								label={ __( 'Top toolbar' ) }
-								info={ __(
-									'Access all block and document tools in a single place'
-								) }
-								messageActivated={ __(
-									'Top toolbar activated'
-								) }
-								messageDeactivated={ __(
-									'Top toolbar deactivated'
-								) }
-							/>
-							<PreferenceToggleMenuItem
-								scope="core"
-								name="distractionFree"
-								label={ __( 'Distraction free' ) }
-								info={ __( 'Write with calmness' ) }
-								handleToggling={ false }
-								onToggle={ toggleDistractionFree }
-								messageActivated={ __(
-									'Distraction free mode activated'
-								) }
-								messageDeactivated={ __(
-									'Distraction free mode deactivated'
-								) }
-								shortcut={ displayShortcut.primaryShift(
-									'\\'
-								) }
-							/>
-							<PreferenceToggleMenuItem
-								scope="core"
-								name="focusMode"
-								label={ __( 'Spotlight mode' ) }
-								info={ __( 'Focus on one block at a time' ) }
-								messageActivated={ __(
-									'Spotlight mode activated'
-								) }
-								messageDeactivated={ __(
-									'Spotlight mode deactivated'
-								) }
-							/>
-						</MenuGroup>
-						<ModeSwitcher />
-						<ActionItem.Slot
-							name="core/edit-site/plugin-more-menu"
-							label={ __( 'Plugins' ) }
-							as={ MenuGroup }
-							fillProps={ { onClick: onClose } }
-						/>
-						<MenuGroup label={ __( 'Tools' ) }>
-							{ isBlockBasedTheme && <SiteExport /> }
-							<MenuItem
-								onClick={ () =>
-									openModal(
-										KEYBOARD_SHORTCUT_HELP_MODAL_NAME
-									)
-								}
-								shortcut={ displayShortcut.access( 'h' ) }
-							>
-								{ __( 'Keyboard shortcuts' ) }
-							</MenuItem>
-							<WelcomeGuideMenuItem />
-							<CopyContentMenuItem />
-							<MenuItem
-								icon={ external }
-								role="menuitem"
-								href={ __(
-									'https://wordpress.org/documentation/article/site-editor/'
-								) }
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
-									{
-										/* translators: accessibility text */
-										__( '(opens in a new tab)' )
-									}
-								</VisuallyHidden>
-							</MenuItem>
-							<ToolsMoreMenuGroup.Slot
-								fillProps={ { onClose } }
-							/>
-						</MenuGroup>
-						<MenuGroup>
-							<MenuItem
-								onClick={ () =>
-									openModal( PREFERENCES_MODAL_NAME )
-								}
-							>
-								{ __( 'Preferences' ) }
-							</MenuItem>
-						</MenuGroup>
-					</>
-				) }
-			</DropdownMenu>
-			<KeyboardShortcutHelpModal />
-			<EditSitePreferencesModal />
+			<ToolsMoreMenuGroup>
+				{ isBlockBasedTheme && <SiteExport /> }
+				<WelcomeGuideMenuItem />
+			</ToolsMoreMenuGroup>
+			<PreferencesModal />
 		</>
 	);
 }

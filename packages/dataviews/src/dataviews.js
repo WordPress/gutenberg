@@ -41,7 +41,6 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
-	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 	const [ openedFilter, setOpenedFilter ] = useState( null );
@@ -136,7 +135,6 @@ export default function DataViews( {
 				isLoading={ isLoading }
 				onSelectionChange={ onSetSelection }
 				selection={ selection }
-				deferredRendering={ deferredRendering }
 				setOpenedFilter={ setOpenedFilter }
 			/>
 			<Pagination

@@ -248,6 +248,12 @@ const Cover = ( {
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
 
+	const onAddMediaButtonPress = useCallback( () => {
+		if ( openMediaOptionsRef?.current ) {
+			openMediaOptionsRef.current();
+		}
+	}, [] );
+
 	function setColor( color ) {
 		const colorValue = getColorObjectByColorValue( colorsDefault, color );
 
@@ -352,7 +358,7 @@ const Cover = ( {
 			accessibilityHint={ accessibilityHint }
 			accessibilityLabel={ __( 'Add image or video' ) }
 			accessibilityRole="button"
-			onPress={ openMediaOptionsRef.current }
+			onPress={ onAddMediaButtonPress }
 		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>

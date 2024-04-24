@@ -194,7 +194,8 @@ test.describe( 'Embedding content', () => {
 		embedUtils,
 	} ) => {
 		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki/': MOCK_CANT_EMBED_RESPONSE,
+			'https://twitter.com/notnownikki/':
+				MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 		} );
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki/' );

@@ -17,27 +17,6 @@
  * @return string Returns the block content.
  */
 function render_block_core_file( $attributes, $content ) {
-	// Update object's aria-label attribute if present in block HTML.
-	// Match an aria-label attribute from an object tag.
-	$pattern = '@<object.+(?<attribute>aria-label="(?<filename>[^"]+)?")@i';
-	$content = preg_replace_callback(
-		$pattern,
-		static function ( $matches ) {
-			$filename     = ! empty( $matches['filename'] ) ? $matches['filename'] : '';
-			$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
-			$label        = $has_filename ?
-				sprintf(
-					/* translators: %s: filename. */
-					__( 'Embed of %s.' ),
-					$filename
-				)
-				: __( 'PDF embed' );
-
-			return str_replace( $matches['attribute'], sprintf( 'aria-label="%s"', $label ), $matches[0] );
-		},
-		$content
-	);
-
 	// If it's interactive, enqueue the script module and add the directives.
 	if ( ! empty( $attributes['displayPreview'] ) ) {
 		$suffix = wp_scripts_get_suffix();
@@ -59,6 +38,19 @@ function render_block_core_file( $attributes, $content ) {
 		$processor->next_tag( 'object' );
 		$processor->set_attribute( 'data-wp-bind--hidden', '!state.hasPdfPreview' );
 		$processor->set_attribute( 'hidden', true );
+
+		$filename     = $processor->get_attribute( 'aria-label' );
+		$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
+		$label        = $has_filename ? sprintf(
+			/* translators: %s: filename. */
+			__( 'Embed of %s.' ),
+			$filename
+		) : __( 'PDF embed' );
+
+		// Update object's aria-label attribute if present in block HTML.
+		// Match an aria-label attribute from an object tag.
+		$processor->set_attribute( 'aria-label', $label );
+
 		return $processor->get_updated_html();
 	}
 

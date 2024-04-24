@@ -8,26 +8,27 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
+	PluginPostStatusInfo,
 	PostAuthorPanel,
 	PostSchedulePanel,
-	PostSwitchToDraftButton,
 	PostSyncStatus,
 	PostURLPanel,
 	PostTemplatePanel,
 	PostFeaturedImagePanel,
 	store as editorStore,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
 import PostSticky from '../post-sticky';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
-import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo from '../plugin-post-status-info';
+import { unlock } from '../../../lock-unlock';
+
+const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -61,14 +62,13 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PostStatusPanel />
 						<PostFeaturedImagePanel withPanelBody={ false } />
-						<PostVisibility />
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />
 						<PostSyncStatus />
 						<PostSticky />
-						<PostPendingStatus />
 						<PostFormat />
 						<PostSlug />
 						<PostAuthorPanel />
@@ -77,10 +77,7 @@ export default function PostStatus() {
 							style={ {
 								marginTop: '16px',
 							} }
-							spacing={ 4 }
-							wrap
 						>
-							<PostSwitchToDraftButton />
 							<PostTrash />
 						</HStack>
 					</>

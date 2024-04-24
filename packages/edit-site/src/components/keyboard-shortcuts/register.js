@@ -21,26 +21,6 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-site/toggle-block-settings-sidebar',
-			category: 'global',
-			description: __( 'Show or hide the Settings sidebar.' ),
-			keyCombination: {
-				modifier: 'primaryShift',
-				character: ',',
-			},
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/keyboard-shortcuts',
-			category: 'main',
-			description: __( 'Display these keyboard shortcuts.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: 'h',
-			},
-		} );
-
-		registerShortcut( {
 			name: 'core/edit-site/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),
@@ -74,28 +54,6 @@ function KeyboardShortcutsRegister() {
 					character: '~',
 				},
 			],
-		} );
-
-		registerShortcut( {
-			name: 'core/edit-site/transform-heading-to-paragraph',
-			category: 'block-library',
-			description: __( 'Transform heading to paragraph.' ),
-			keyCombination: {
-				modifier: 'access',
-				character: `0`,
-			},
-		} );
-
-		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
-			registerShortcut( {
-				name: `core/edit-site/transform-paragraph-to-heading-${ level }`,
-				category: 'block-library',
-				description: __( 'Transform paragraph to heading.' ),
-				keyCombination: {
-					modifier: 'access',
-					character: `${ level }`,
-				},
-			} );
 		} );
 	}, [ registerShortcut ] );
 

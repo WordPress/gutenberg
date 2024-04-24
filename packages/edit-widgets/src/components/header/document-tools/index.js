@@ -7,7 +7,6 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback, useRef } from '@wordpress/element';
@@ -21,8 +20,6 @@ import RedoButton from '../undo-redo/redo';
 import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 
 function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -75,14 +72,10 @@ function DocumentTools() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	const { showFixedToolbar } = useShowBlockTools();
-
 	return (
 		<NavigableToolbar
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
-			shouldUseKeyboardFocusShortcut={ ! showFixedToolbar }
 			variant="unstyled"
 		>
 			<ToolbarItem
