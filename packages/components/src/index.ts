@@ -139,9 +139,10 @@ export {
 	/**
 	 * @deprecated Import `useNavigator` instead.
 	 */
-	NavigatorProvider,
-	Navigator,
 	useNavigator as __experimentalUseNavigator,
+	NavigatorProvider,
+	Navigator, // alias for `NavigatorProvider`
+	useNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
