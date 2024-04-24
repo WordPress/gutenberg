@@ -10,7 +10,8 @@ import { forwardRef, useState, useCallback } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useDebouncedInput, useRefEffect } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -223,13 +224,18 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
+	const inserterTabsRef = useRefEffect( ( element ) => {
+		// focus the first tab of the inserter, or the wrapper if nothing else
+		// eslint-disable-next-line no-unused-expressions
+		focus.focusable.find( element )[ 0 ]?.focus() || element.focus();
+	}, [] );
+
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
 			} ) }
 			ref={ ref }
-			tabIndex={ -1 } // Fallback if there are no focusables
 		>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
@@ -238,6 +244,7 @@ function InserterMenu(
 			>
 				{ showAsTabs && (
 					<InserterTabs
+						ref={ inserterTabsRef }
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
