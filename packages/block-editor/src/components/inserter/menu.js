@@ -6,14 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useState,
-	useCallback,
-	useMemo,
-	useImperativeHandle,
-	useRef,
-} from '@wordpress/element';
+import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -36,6 +29,7 @@ import { store as blockEditorStore } from '../../store';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
+
 function InserterMenu(
 	{
 		rootClientId,
@@ -131,37 +125,104 @@ function InserterMenu(
 	);
 
 	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		selectedPatternCategory;
+		selectedTab === 'patterns' && selectedPatternCategory;
 
 	const showMediaPanel =
 		selectedTab === 'media' &&
 		! delayedFilterValue &&
 		selectedMediaCategory;
 
+	const SearchPanel = ( { searchType } ) => (
+		<>
+			<SearchControl
+				__nextHasNoMarginBottom
+				className="block-editor-inserter__search"
+				onChange={ ( value ) => {
+					if ( hoveredItem ) setHoveredItem( null );
+					setFilterValue( value );
+				} }
+				value={ filterValue }
+				label={ __( 'Search for blocks and patterns' ) }
+				placeholder={ __( 'Search' ) }
+			/>
+			{ !! delayedFilterValue && (
+				<InserterSearchResults
+					filterValue={ delayedFilterValue }
+					onSelect={ onSelect }
+					onHover={ onHover }
+					onHoverPattern={ onHoverPattern }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					__experimentalInsertionIndex={
+						__experimentalInsertionIndex
+					}
+					showBlockDirectory
+					shouldFocusBlock={ shouldFocusBlock }
+					maxBlockPatterns={
+						searchType !== 'patterns' ? 0 : undefined
+					}
+					maxBlockTypes={ searchType !== 'blocks' ? 0 : undefined }
+				/>
+			) }
+		</>
+	);
+
 	const blocksTab = useMemo(
 		() => (
 			<>
-				<div className="block-editor-inserter__block-list">
-					<BlockTypesTab
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
+				<SearchControl
+					__nextHasNoMarginBottom
+					className="block-editor-inserter__search"
+					onChange={ ( value ) => {
+						if ( hoveredItem ) setHoveredItem( null );
+						setFilterValue( value );
+					} }
+					value={ filterValue }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
+				/>
+				{ !! delayedFilterValue && (
+					<InserterSearchResults
+						filterValue={ delayedFilterValue }
+						onSelect={ onSelect }
 						onHover={ onHover }
-						showMostUsedBlocks={ showMostUsedBlocks }
+						onHoverPattern={ onHoverPattern }
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						isAppender={ isAppender }
+						__experimentalInsertionIndex={
+							__experimentalInsertionIndex
+						}
+						showBlockDirectory
+						shouldFocusBlock={ shouldFocusBlock }
+						maxBlockPatterns={ 0 }
 					/>
-				</div>
-				{ showInserterHelpPanel && (
-					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
-							{ __( 'A tip for using the block editor' ) }
-						</VisuallyHidden>
-						<Tips />
-					</div>
+				) }
+				{ ! delayedFilterValue && (
+					<>
+						<div className="block-editor-inserter__block-list">
+							<BlockTypesTab
+								rootClientId={ destinationRootClientId }
+								onInsert={ onInsert }
+								onHover={ onHover }
+								showMostUsedBlocks={ showMostUsedBlocks }
+							/>
+						</div>
+						{ showInserterHelpPanel && (
+							<div className="block-editor-inserter__tips">
+								<VisuallyHidden as="h2">
+									{ __( 'A tip for using the block editor' ) }
+								</VisuallyHidden>
+								<Tips />
+							</div>
+						) }
+					</>
 				) }
 			</>
 		),
 		[
+			delayedFilterValue,
 			destinationRootClientId,
 			onInsert,
 			onHover,
@@ -172,25 +233,58 @@ function InserterMenu(
 
 	const patternsTab = useMemo(
 		() => (
-			<BlockPatternsTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsertPattern }
-				onSelectCategory={ onClickPatternCategory }
-				selectedCategory={ selectedPatternCategory }
-			>
-				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onHover={ onHoverPattern }
-						category={ selectedPatternCategory }
-						patternFilter={ patternFilter }
-						showTitlesAsTooltip
+			<>
+				<SearchControl
+					__nextHasNoMarginBottom
+					className="block-editor-inserter__search"
+					onChange={ ( value ) => {
+						if ( hoveredItem ) setHoveredItem( null );
+						setFilterValue( value );
+					} }
+					value={ filterValue }
+					label={ __( 'Search for blocks and patterns' ) }
+					placeholder={ __( 'Search' ) }
+				/>
+				{ !! delayedFilterValue && (
+					<InserterSearchResults
+						filterValue={ delayedFilterValue }
+						onSelect={ onSelect }
+						onHover={ onHover }
+						onHoverPattern={ onHoverPattern }
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						isAppender={ isAppender }
+						__experimentalInsertionIndex={
+							__experimentalInsertionIndex
+						}
+						showBlockDirectory
+						shouldFocusBlock={ shouldFocusBlock }
+						maxBlockTypes={ 0 }
 					/>
 				) }
-			</BlockPatternsTab>
+				{ ! delayedFilterValue && (
+					<BlockPatternsTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onSelectCategory={ onClickPatternCategory }
+						selectedCategory={ selectedPatternCategory }
+					>
+						{ showPatternPanel && (
+							<PatternCategoryPreviewPanel
+								rootClientId={ destinationRootClientId }
+								onInsert={ onInsertPattern }
+								onHover={ onHoverPattern }
+								category={ selectedPatternCategory }
+								patternFilter={ patternFilter }
+								showTitlesAsTooltip
+							/>
+						) }
+					</BlockPatternsTab>
+				) }
+			</>
 		),
 		[
+			delayedFilterValue,
 			destinationRootClientId,
 			onHoverPattern,
 			onInsertPattern,
@@ -236,14 +330,7 @@ function InserterMenu(
 		[ blocksTab, mediaTab, patternsTab ]
 	);
 
-	const searchRef = useRef();
-	useImperativeHandle( ref, () => ( {
-		focusSearch: () => {
-			searchRef.current.focus();
-		},
-	} ) );
-
-	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
+	const showAsTabs = showPatterns || showMedia;
 
 	// When the pattern panel is showing, we want to use zoom out mode
 	useZoomOut( showPatternPanel );
@@ -261,42 +348,14 @@ function InserterMenu(
 			className={ classnames( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
 			} ) }
+			ref={ ref }
+			tabIndex={ -1 } // Fallback if there are no focusables
 		>
 			<div
 				className={ classnames( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
 				} ) }
 			>
-				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
-					onChange={ ( value ) => {
-						if ( hoveredItem ) setHoveredItem( null );
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
-					placeholder={ __( 'Search' ) }
-					ref={ searchRef }
-				/>
-				{ !! delayedFilterValue && (
-					<div className="block-editor-inserter__no-tab-container">
-						<InserterSearchResults
-							filterValue={ delayedFilterValue }
-							onSelect={ onSelect }
-							onHover={ onHover }
-							onHoverPattern={ onHoverPattern }
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							isAppender={ isAppender }
-							__experimentalInsertionIndex={
-								__experimentalInsertionIndex
-							}
-							showBlockDirectory
-							shouldFocusBlock={ shouldFocusBlock }
-						/>
-					</div>
-				) }
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
@@ -305,7 +364,7 @@ function InserterMenu(
 						tabsContents={ inserterTabsContents }
 					/>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
 						{ blocksTab }
 					</div>

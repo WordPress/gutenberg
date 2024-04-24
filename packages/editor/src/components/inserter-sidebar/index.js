@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -34,12 +35,9 @@ export default function InserterSidebar( {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 
-	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
+	const libraryRef = useRefEffect( ( element ) => {
+		focus.focusable.find( element )[ 0 ]?.focus() || element.focus();
 
-	const useEscape = useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
 
@@ -60,7 +58,7 @@ export default function InserterSidebar( {
 	}, [] );
 
 	return (
-		<div ref={ useEscape } className="editor-inserter-sidebar">
+		<div ref={ libraryRef } className="editor-inserter-sidebar">
 			<TagName className="editor-inserter-sidebar__header">
 				<Button
 					icon={ close }
