@@ -724,18 +724,10 @@ test.describe( 'insert media from inserter', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
-		);
-		await page.click(
-			'role=region[name="Block Library"i] >> role=tab[name="Media"i]'
-		);
-		await page.click(
-			'[aria-label="Media categories"i] >> role=button[name="Images"i]'
-		);
-		await page.click(
-			`role=listbox[name="Media List"i] >> role=option[name="${ uploadedMedia.title.raw }"]`
-		);
+		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Images' } ).click();
+		await page.getByLabel( uploadedMedia.title.raw ).click();
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:image {"id":${ uploadedMedia.id }} -->
 <figure class="wp-block-image"><img src="${ uploadedMedia.source_url }" alt="${ uploadedMedia.alt_text }" class="wp-image-${ uploadedMedia.id }"/></figure>
