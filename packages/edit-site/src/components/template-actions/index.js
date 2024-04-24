@@ -9,17 +9,11 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	Modal,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
-import {
-	PostExcerpt,
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -29,9 +23,6 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import RenamePostMenuItem from '../rename-post-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
-import { unlock } from '../../lock-unlock';
-
-const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 export default function TemplateActions( {
 	postType,
@@ -40,37 +31,16 @@ export default function TemplateActions( {
 	toggleProps,
 	onRemove,
 } ) {
-	const { template, eligibleToEditExcerpt } = useSelect(
-		( select ) => {
-			const { getCurrentPostType, isEditorPanelEnabled } =
-				select( editorStore );
-			const { getPostType } = select( coreStore );
-			const _postType = getPostType( getCurrentPostType() );
-			return {
-				eligibleToEditExcerpt:
-					isEditorPanelEnabled( 'post-excerpt' ) &&
-					_postType?.supports?.excerpt,
-				template: select( coreStore ).getEntityRecord(
-					'postType',
-					postType,
-					postId
-				),
-			};
-		},
+	const template = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
 	);
 	const { removeTemplate } = useDispatch( editSiteStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
-	// Until we consolidate these actions we need to make different checks for `wp_block`
-	// type and template/template parts. The reason for this is that we want to allow
-	// editing excerpt/description for templates/template parts that are
-	// user generated and this shouldn't abide by the isPanelEnabled flag.
-	const canEditExcerpt =
-		isRemovable ||
-		( eligibleToEditExcerpt && template?.type === 'wp_block' );
 
-	if ( ! isRemovable && ! isRevertable && ! canEditExcerpt ) {
+	if ( ! isRemovable && ! isRevertable ) {
 		return null;
 	}
 
@@ -84,21 +54,20 @@ export default function TemplateActions( {
 			{ ( { onClose } ) => (
 				<MenuGroup>
 					{ isRemovable && (
-						<RenamePostMenuItem
-							post={ template }
-							onClose={ onClose }
-						/>
-					) }
-					{ canEditExcerpt && <EditDescriptionMenuItem /> }
-					{ isRemovable && (
-						<DeleteMenuItem
-							onRemove={ () => {
-								removeTemplate( template );
-								onRemove?.();
-								onClose();
-							} }
-							title={ template.title.rendered }
-						/>
+						<>
+							<RenamePostMenuItem
+								post={ template }
+								onClose={ onClose }
+							/>
+							<DeleteMenuItem
+								onRemove={ () => {
+									removeTemplate( template );
+									onRemove?.();
+									onClose();
+								} }
+								title={ template.title.rendered }
+							/>
+						</>
 					) }
 					{ isRevertable && (
 						<ResetMenuItem
@@ -191,35 +160,6 @@ function DeleteMenuItem( { onRemove, title } ) {
 					decodeEntities( title )
 				) }
 			</ConfirmDialog>
-		</>
-	);
-}
-
-function EditDescriptionMenuItem() {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	return (
-		<>
-			<MenuItem onClick={ () => setIsModalOpen( true ) }>
-				{ __( 'Edit description' ) }
-			</MenuItem>
-			{ isModalOpen && (
-				<Modal
-					title={ __( 'Edit description' ) }
-					onRequestClose={ () => {
-						setIsModalOpen( false );
-					} }
-					overlayClassName="editor-action-modal"
-				>
-					<PluginPostExcerpt.Slot>
-						{ ( fills ) => (
-							<>
-								<PostExcerpt hideLabelFromVision />
-								{ fills }
-							</>
-						) }
-					</PluginPostExcerpt.Slot>
-				</Modal>
-			) }
 		</>
 	);
 }
