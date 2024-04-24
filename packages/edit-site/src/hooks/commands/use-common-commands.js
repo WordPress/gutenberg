@@ -12,6 +12,7 @@ import {
 	styles,
 	external,
 	brush,
+	seen,
 } from '@wordpress/icons';
 import { useCommandLoader, useCommand } from '@wordpress/commands';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -237,21 +238,32 @@ function useGlobalStylesOpenCssCommands() {
 }
 
 function useGlobalStylesOpenRevisionsCommands() {
-	const { openGeneralSidebar, setEditorCanvasContainerView, setCanvasMode } =
-		unlock( useDispatch( editSiteStore ) );
-	const { getCanvasMode } = unlock( useSelect( editSiteStore ) );
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setEditorCanvasContainerView,
+		setCanvasMode,
+	} = unlock( useDispatch( editSiteStore ) );
+	const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+		useSelect( editSiteStore )
+	);
 	const { params } = useLocation();
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isEditorPage = ! getIsListPage( params, isMobileViewport );
 	const history = useHistory();
-	const hasRevisions = useSelect( ( select ) => {
+	const { hasRevisions, isStyleRevisionsOpened } = useSelect( ( select ) => {
 		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
 			select( coreStore );
 		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
 		const globalStyles = globalStylesId
 			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
 			: undefined;
-		return !! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count;
+		return {
+			hasRevisions:
+				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
+			isStyleRevisionsOpened:
+				'global-styles-revisions' === getEditorCanvasContainerView(),
+		};
 	}, [] );
 
 	const commands = useMemo( () => {
@@ -262,7 +274,9 @@ function useGlobalStylesOpenRevisionsCommands() {
 		return [
 			{
 				name: 'core/edit-site/open-global-styles-revisions',
-				label: __( 'Style revisions' ),
+				label: isStyleRevisionsOpened
+					? __( 'Close Style Revisions' )
+					: __( 'Open Style Revisions' ),
 				icon: backup,
 				callback: ( { close } ) => {
 					close();
@@ -275,8 +289,16 @@ function useGlobalStylesOpenRevisionsCommands() {
 					if ( isEditorPage && getCanvasMode() !== 'edit' ) {
 						setCanvasMode( 'edit' );
 					}
-					openGeneralSidebar( 'edit-site/global-styles' );
-					setEditorCanvasContainerView( 'global-styles-revisions' );
+					if ( isStyleRevisionsOpened ) {
+						closeGeneralSidebar( 'edit-site/global-styles' );
+					} else {
+						openGeneralSidebar( 'edit-site/global-styles' );
+					}
+					setEditorCanvasContainerView(
+						isStyleRevisionsOpened
+							? undefined
+							: 'global-styles-revisions'
+					);
 				},
 			},
 		];
@@ -284,6 +306,91 @@ function useGlobalStylesOpenRevisionsCommands() {
 		hasRevisions,
 		history,
 		openGeneralSidebar,
+		setEditorCanvasContainerView,
+		isEditorPage,
+		getCanvasMode,
+		setCanvasMode,
+		closeGeneralSidebar,
+	] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
+}
+
+function useGlobalStylesStyleBookCommands() {
+	const {
+		openGeneralSidebar,
+		closeGeneralSidebar,
+		setEditorCanvasContainerView,
+		setCanvasMode,
+	} = unlock( useDispatch( editSiteStore ) );
+	const { getCanvasMode, getEditorCanvasContainerView } = unlock(
+		useSelect( editSiteStore )
+	);
+	const canvasContainerView = getEditorCanvasContainerView();
+	const { params } = useLocation();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const isEditorPage = ! getIsListPage( params, isMobileViewport );
+	const history = useHistory();
+	const { isStyleBookOpened, isRevisionsStyleBookOpened, isRevisionsOpened } =
+		useSelect( () => {
+			return {
+				isStyleBookOpened: 'style-book' === canvasContainerView,
+				isRevisionsStyleBookOpened:
+					'global-styles-revisions:style-book' ===
+					canvasContainerView,
+				isRevisionsOpened:
+					'global-styles-revisions' === canvasContainerView,
+			};
+		}, [] );
+	const toggleStyleBook = () => {
+		if ( isRevisionsOpened ) {
+			setEditorCanvasContainerView(
+				'global-styles-revisions:style-book'
+			);
+			return;
+		}
+		if ( isRevisionsStyleBookOpened ) {
+			setEditorCanvasContainerView( 'global-styles-revisions' );
+			return;
+		}
+		if ( isStyleBookOpened ) {
+			closeGeneralSidebar( 'edit-site/global-styles' );
+		} else {
+			openGeneralSidebar( 'edit-site/global-styles' );
+		}
+		setEditorCanvasContainerView(
+			isStyleBookOpened ? undefined : 'style-book'
+		);
+	};
+
+	const commands = useMemo( () => {
+		return [
+			{
+				name: 'core/edit-site/open-global-styles-style-book',
+				label:
+					isStyleBookOpened || isRevisionsStyleBookOpened
+						? __( 'Close Style Book' )
+						: __( 'Open Style Book' ),
+				icon: seen,
+				callback: ( { close } ) => {
+					close();
+					if ( ! isEditorPage ) {
+						history.push( {
+							path: '/wp_global_styles',
+							canvas: 'edit',
+						} );
+					}
+					toggleStyleBook();
+				},
+			},
+		];
+	}, [
+		history,
+		openGeneralSidebar,
+		closeGeneralSidebar,
 		setEditorCanvasContainerView,
 		isEditorPage,
 		getCanvasMode,
@@ -321,6 +428,12 @@ export function useCommonCommands() {
 	} );
 
 	useCommandLoader( {
+		name: 'core/edit-site/style-book',
+		hook: useGlobalStylesStyleBookCommands,
+		context: 'site-editor-edit',
+	} );
+
+	useCommandLoader( {
 		name: 'core/edit-site/toggle-styles-welcome-guide',
 		hook: useGlobalStylesToggleWelcomeGuideCommands,
 	} );
@@ -338,5 +451,6 @@ export function useCommonCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/open-styles-revisions',
 		hook: useGlobalStylesOpenRevisionsCommands,
+		context: 'site-editor-edit',
 	} );
 }
