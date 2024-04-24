@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ConfirmDialog`: Remove "experimental" designation ([#61014](https://github.com/WordPress/gutenberg/pull/61014)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
