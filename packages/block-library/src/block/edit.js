@@ -261,8 +261,9 @@ function ReusableBlockEdit( {
 	);
 	const isMissing = hasResolved && ! record;
 
-	// The initial value of the `content` attribute.
-	const initialContent = useRef( content );
+	// The value of the `content` attribute, stored in a `ref` to avoid triggering the effect
+	// that runs `applyInitialContentValuesToInnerBlocks` unnecessarily.
+	const contentRef = useRef( content );
 
 	// The default content values from the original pattern for overridable attributes.
 	// Set by the `applyInitialContentValuesToInnerBlocks` function.
@@ -349,7 +350,7 @@ function ReusableBlockEdit( {
 		// Build a map of clientIds to the old nano id system to provide back compat.
 		legacyIdMap.current = getLegacyIdMap(
 			initialBlocks,
-			initialContent.current
+			contentRef.current
 		);
 		defaultContent.current = {};
 		const originalEditingMode = getBlockEditingMode( patternClientId );
@@ -360,7 +361,7 @@ function ReusableBlockEdit( {
 				const blocks = hasPatternOverridesSource
 					? applyInitialContentValuesToInnerBlocks(
 							initialBlocks,
-							initialContent.current,
+							contentRef.current,
 							defaultContent.current,
 							legacyIdMap.current
 					  )
@@ -417,13 +418,15 @@ function ReusableBlockEdit( {
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
+					const updatedContent = getContentValuesFromInnerBlocks(
+						blocks,
+						defaultContent.current,
+						legacyIdMap.current
+					);
 					setAttributes( {
-						content: getContentValuesFromInnerBlocks(
-							blocks,
-							defaultContent.current,
-							legacyIdMap.current
-						),
+						content: updatedContent,
 					} );
+					contentRef.current = updatedContent;
 				} );
 			}
 		}, blockEditorStore );
