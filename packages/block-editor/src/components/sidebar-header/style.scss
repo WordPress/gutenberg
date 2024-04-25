@@ -1,0 +1,22 @@
+.block-editor-sidebar__header {
+	display: flex;
+	border-bottom: $border-width solid $gray-300;
+}
+
+.block-editor-sidebar__close-button {
+	background: $white;
+	order: 1;
+	align-self: center;
+	margin-right: $grid-unit-15;
+}
+
+.block-editor-sidebar__tabs-tablist {
+	box-sizing: border-box;
+	flex-grow: 1;
+
+}
+
+.block-editor-sidebar__tabs-tab {
+	flex-grow: 1;
+	margin-bottom: -$border-width;
+}

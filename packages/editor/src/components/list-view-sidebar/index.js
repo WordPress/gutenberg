@@ -1,17 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+	__experimentalListView as ListView,
+	SidebarHeader,
+} from '@wordpress/block-editor';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { useCallback, useRef, useState } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
+import { _x } from '@wordpress/i18n';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -113,6 +112,11 @@ export default function ListViewSidebar() {
 	// It is the same shortcut to open but that is defined as a global shortcut and only fires when the sidebar is closed.
 	useShortcut( 'core/editor/toggle-list-view', handleToggleListViewShortcut );
 
+	const tabs = [
+		{ name: 'list-view', title: _x( 'List View', 'Post overview' ) },
+		{ name: 'outline', title: _x( 'Outline', 'Post overview' ) },
+	];
+
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
@@ -129,33 +133,7 @@ export default function ListViewSidebar() {
 				// can be rendered internally.
 				defaultTabId="list-view"
 			>
-				<div className="block-editor-sidebar__header">
-					<Button
-						className="block-editor-sidebar__close-button"
-						icon={ closeSmall }
-						label={ __( 'Close' ) }
-						onClick={ closeListView }
-						size="small"
-					/>
-					<Tabs.TabList
-						className="block-editor-sidebar__tabs-tablist"
-						ref={ tabsRef }
-					>
-						<Tabs.Tab
-							className="block-editor-sidebar__tabs-tab"
-							tabId="list-view"
-						>
-							{ _x( 'List View', 'Post overview' ) }
-						</Tabs.Tab>
-						<Tabs.Tab
-							className="block-editor-sidebar__tabs-tab"
-							tabId="outline"
-						>
-							{ _x( 'Outline', 'Post overview' ) }
-						</Tabs.Tab>
-					</Tabs.TabList>
-				</div>
-
+				<SidebarHeader onClose={ closeListView } tabs={ tabs } />
 				<Tabs.TabPanel
 					ref={ listViewContainerRef }
 					className="editor-list-view-sidebar__tabs-tabpanel"

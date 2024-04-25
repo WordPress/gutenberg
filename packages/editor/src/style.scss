@@ -1,26 +1,3 @@
-.block-editor-sidebar__header {
-	display: flex;
-	border-bottom: $border-width solid $gray-300;
-}
-
-.block-editor-sidebar__close-button {
-	background: $white;
-	order: 1;
-	align-self: center;
-	margin-right: $grid-unit-15;
-}
-
-.block-editor-sidebar__tabs-tablist {
-	box-sizing: border-box;
-	flex-grow: 1;
-
-}
-
-.block-editor-sidebar__tabs-tab {
-	flex-grow: 1;
-	margin-bottom: -$border-width;
-}
-
 @import "../../interface/src/style.scss";
 
 @import "./components/autocompleters/style.scss";
@@ -56,6 +33,7 @@
 @import "./components/post-visibility/style.scss";
 @import "./components/post-trash/style.scss";
 @import "./components/preview-dropdown/style.scss";
+@import "./components/sidebar-header/style.scss";
 @import "./components/start-page-options/style.scss";
 @import "./components/table-of-contents/style.scss";
 @import "./components/template-areas/style.scss";

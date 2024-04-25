@@ -776,6 +776,10 @@ _Properties_
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 -   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
+### SidebarHeader
+
+Undocumented declaration.
+
 ### SkipToSelectedBlock
 
 _Related_
