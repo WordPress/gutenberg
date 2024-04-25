@@ -389,11 +389,11 @@ _Returns_
 
 ### PageAttributesOrder
 
-Renders the page attributes order component.
+Renders order section of the page attributes panel.
 
 _Returns_
 
--   `Element`: The rendered page attributes order component.
+-   `Element`: The rendered JSX element.
 
 ### PageAttributesPanel
 
