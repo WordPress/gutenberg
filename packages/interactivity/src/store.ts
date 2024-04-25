@@ -14,6 +14,8 @@ import {
 	getNamespace,
 	setNamespace,
 	resetNamespace,
+	getContext,
+	getElement,
 } from './hooks';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
@@ -147,7 +149,45 @@ const handlers = {
 			return ( ...args: unknown[] ) => {
 				setNamespace( ns );
 				try {
-					return result( ...args );
+					const scope = getScope();
+					const _this = {};
+					Object.defineProperty( _this, 'state', {
+						configurable: false,
+						enumerable: true,
+						get() {
+							setNamespace( ns );
+							setScope( scope );
+							const val = stores.get( ns );
+							resetScope();
+							resetNamespace();
+							return val;
+						},
+					} );
+					Object.defineProperty( _this, 'context', {
+						configurable: false,
+						enumerable: true,
+						get() {
+							setNamespace( ns );
+							setScope( scope );
+							const val = getContext();
+							resetScope();
+							resetNamespace();
+							return val;
+						},
+					} );
+					Object.defineProperty( _this, 'element', {
+						configurable: false,
+						enumerable: true,
+						get() {
+							setNamespace( ns );
+							setScope( scope );
+							const val = getElement();
+							resetScope();
+							resetNamespace();
+							return val;
+						},
+					} );
+					return result.apply( _this, ...args );
 				} finally {
 					resetNamespace();
 				}
