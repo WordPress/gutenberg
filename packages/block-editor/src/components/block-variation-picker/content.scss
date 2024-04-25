@@ -16,6 +16,10 @@
 		fill: $gray-400 !important;
 	}
 
+	.components-button {
+		padding: 4px;
+	}
+
 	.components-button:hover {
 		background: none !important; // !important to simplify the selector.
 	}
@@ -34,5 +38,5 @@
 
 .block-editor-block-variation-picker__variations,
 .wp-block-group-placeholder__variations {
-	margin: 0 -6px; // Horizontally offset button padding to make icons line up.
+	margin: 0 -4px; // Horizontally offset button padding to make icons line up.
 }
