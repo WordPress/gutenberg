@@ -27,8 +27,6 @@ export const rootEntitiesConfig = [
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
-			// This resource is preloaded. Please ensure the preload is
-			// updated when this list changes.
 			_fields: [
 				'description',
 				'gmt_offset',
