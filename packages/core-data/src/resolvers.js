@@ -14,7 +14,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { DEFAULT_ENTITY_KEY, additionalEntityConfigLoaders } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
@@ -58,11 +58,8 @@ export const getCurrentUser =
  */
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
-	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+	async ( { select, dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -193,11 +190,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch, registry } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+	async ( { dispatch, registry, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -432,11 +426,8 @@ export const canUser =
  */
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
+	async ( { dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -729,12 +720,8 @@ export const getDefaultTemplateId =
  */
 export const getRevisions =
 	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-
+	async ( { dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -854,12 +841,8 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
  */
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
-		);
-
+	async ( { dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -894,5 +877,30 @@ export const getRevision =
 
 		if ( record ) {
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
+		}
+	};
+
+export const getEntityConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const loader = additionalEntityConfigLoaders.find( ( l ) => {
+			if ( ! name || ! l.name ) {
+				return l.kind === kind;
+			}
+
+			return l.kind === kind && l.name === name;
+		} );
+
+		if ( ! loader ) {
+			return;
+		}
+
+		// @todo: Prevent resolving the same resource twice.
+		// See `canUser` resolver for an example.
+
+		const configs = await loader.loadEntities();
+
+		if ( configs.length > 0 ) {
+			dispatch.addEntities( configs );
 		}
 	};

@@ -16,7 +16,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
-import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { getSyncProvider } from './sync';
@@ -285,11 +285,8 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+	async ( { dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		let error;
 		let deletedRecord = false;
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
@@ -503,10 +500,7 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
 			return;
 		}
@@ -776,14 +770,11 @@ export const __experimentalBatch =
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -809,7 +800,7 @@ export const saveEditedEntityRecord =
  */
 export const __experimentalSaveSpecifiedEntityEdits =
 	( kind, name, recordId, itemsToSave, options ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -824,11 +815,7 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
-
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		const entityIdKey = entityConfig?.key || DEFAULT_ENTITY_KEY;
 
 		// If a record key is provided then update the existing record.
@@ -947,11 +934,8 @@ export function receiveDefaultTemplateId( query, templateId ) {
  */
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
-		const entityConfig = configs.find(
-			( config ) => config.kind === kind && config.name === name
-		);
+	async ( { dispatch, resolveSelect } ) => {
+		const entityConfig = await resolveSelect.getEntityConfig( kind, name );
 		const key =
 			entityConfig && entityConfig?.revisionKey
 				? entityConfig.revisionKey
