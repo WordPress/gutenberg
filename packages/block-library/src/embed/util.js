@@ -189,7 +189,7 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	for ( const className of aspectRatioClassNames ) {
 		outputClassNames = outputClassNames.replace( className, '' );
 	}
-	return outputClassNames;
+	return outputClassNames.trim();
 };
 
 /**
