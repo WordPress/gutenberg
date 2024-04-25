@@ -232,6 +232,37 @@ function InserterMenu(
 		]
 	);
 
+	const patternsTab = useMemo(
+		() => (
+			<BlockPatternsTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsertPattern }
+				onSelectCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			>
+				{ showPatternPanel && (
+					<PatternCategoryPreviewPanel
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsertPattern }
+						onHover={ onHoverPattern }
+						category={ selectedPatternCategory }
+						patternFilter={ patternFilter }
+						showTitlesAsTooltip
+					/>
+				) }
+			</BlockPatternsTab>
+		),
+		[
+			destinationRootClientId,
+			onInsertPattern,
+			onClickPatternCategory,
+			onHoverPattern,
+			selectedPatternCategory,
+			showPatternPanel,
+			patternFilter,
+		]
+	);
+
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__menu', {
@@ -277,27 +308,8 @@ function InserterMenu(
 							! delayedFilterValue &&
 							blocksTab }
 						{ selectedTab === 'patterns' &&
-							! delayedFilterValue && (
-								<BlockPatternsTab
-									rootClientId={ destinationRootClientId }
-									onInsert={ onInsertPattern }
-									onSelectCategory={ onClickPatternCategory }
-									selectedCategory={ selectedPatternCategory }
-								>
-									{ showPatternPanel && (
-										<PatternCategoryPreviewPanel
-											rootClientId={
-												destinationRootClientId
-											}
-											onInsert={ onInsertPattern }
-											onHover={ onHoverPattern }
-											category={ selectedPatternCategory }
-											patternFilter={ patternFilter }
-											showTitlesAsTooltip
-										/>
-									) }
-								</BlockPatternsTab>
-							) }
+							! delayedFilterValue &&
+							patternsTab }
 						{ selectedTab === 'media' && (
 							<MediaTab
 								rootClientId={ destinationRootClientId }
