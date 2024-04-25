@@ -246,11 +246,29 @@ Undocumented declaration.
 
 ### EditorHistoryRedo
 
-Undocumented declaration.
+Renders the redo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorHistoryUndo
 
-Undocumented declaration.
+Renders the undo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorKeyboardShortcuts
 
