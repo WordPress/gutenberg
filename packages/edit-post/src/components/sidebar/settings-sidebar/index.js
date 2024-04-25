@@ -13,6 +13,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -112,7 +113,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								title
+								decodeEntities( title )
 							),
 							{
 								type: 'snackbar',
