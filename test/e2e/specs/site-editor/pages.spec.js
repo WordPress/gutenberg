@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Draft a new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add new page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft a new page"i]' )
 		.locator( 'role=textbox[name="Page title"i]' )
@@ -97,29 +97,17 @@ test.describe( 'Pages', () => {
 		// Set up
 		await draftNewPage( page );
 		await addPageContent( editor, page );
-
-		/*
-		 * Test create page.Test creating a new page and editing the template.
-		 */
-		// Selecting a block in the template should display a notice.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Site Title',
-			} )
-			.click( { force: true } );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Edit your template to edit this block."'
-			)
-		).toBeVisible();
+		await editor.openDocumentSettingsSidebar();
 
 		// Switch to template editing focus.
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings.getByRole( 'tab', { name: 'Page' } ).click();
+		await editorSettings
 			.getByRole( 'button', { name: 'Template options' } )
 			.click();
-		await page.getByRole( 'button', { name: 'Edit template' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Edit template' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Content',
@@ -129,7 +117,7 @@ test.describe( 'Pages', () => {
 		);
 		await expect(
 			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="You are editing a template."'
+				'role=button[name="Dismiss this notice"i] >> text="Editing template. Changes made here affect all posts and pages that use the template."'
 			)
 		).toBeVisible();
 
@@ -141,6 +129,9 @@ test.describe( 'Pages', () => {
 			.getByRole( 'button', { name: 'Move down', exact: true } )
 			.click();
 
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Site title text' } )
+			.click( { force: true } );
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Site title text' } )
 			.fill( 'New Site Title' );
@@ -196,15 +187,15 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const templatePreviewButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByRole( 'menuitem', { name: 'Template preview' } );
+			.getByRole( 'menuitemcheckbox', { name: 'Template preview' } );
 
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'false'
 		);
 
@@ -215,23 +206,12 @@ test.describe( 'Pages', () => {
 			} )
 		).toBeHidden();
 
-		// Content blocks are wrapped in a Group block by default.
+		// Ensure post title component to be visible.
 		await expect(
-			editor.canvas
-				.getByRole( 'document', {
-					name: 'Block: Group',
-				} )
-				.getByRole( 'document', {
-					name: 'Block: Content',
-				} )
+			editor.canvas.getByRole( 'textbox', {
+				name: 'Add Title',
+			} )
 		).toBeVisible();
-
-		// Ensure order is preserved between toggling.
-		await page
-			.locator(
-				'[aria-label="Block: Content"] + [aria-label="Block: Title"]'
-			)
-			.isVisible();
 
 		// Remove focus from templateOptionsButton button.
 		await editor.canvas.locator( 'body' ).click();
@@ -240,7 +220,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		await templatePreviewButton.click();
 		await expect( templatePreviewButton ).toHaveAttribute(
-			'aria-pressed',
+			'aria-checked',
 			'true'
 		);
 
@@ -283,7 +263,9 @@ test.describe( 'Pages', () => {
 		await page
 			.locator( '.block-editor-block-patterns-list__list-item' )
 			.click();
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 		await admin.visitSiteEditor();
 
 		// Create new page that has the default template so as to swap it.
@@ -305,7 +287,9 @@ test.describe( 'Pages', () => {
 		await expect( templateItem ).toHaveCount( 1 );
 		await templateItem.click();
 		await expect( templateOptionsButton ).toHaveText( 'demo' );
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Now reset, and apply the default template back.
 		await templateOptionsButton.click();

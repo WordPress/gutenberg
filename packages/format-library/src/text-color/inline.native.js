@@ -36,7 +36,7 @@ function parseCSS( css = '' ) {
 	}, {} );
 }
 
-function getActiveColors( value, name, colorSettings ) {
+export function getActiveColors( value, name, colorSettings ) {
 	const activeColorFormat = getActiveFormat( value, name );
 
 	if ( ! activeColorFormat ) {
@@ -49,13 +49,14 @@ function getActiveColors( value, name, colorSettings ) {
 	};
 }
 
-function setColors( value, name, colorSettings, colors ) {
+function setColors( value, name, colorSettings, colors, contentRef ) {
 	const { color, backgroundColor } = {
 		...getActiveColors( value, name, colorSettings ),
 		...colors,
 	};
 
-	if ( ! color && ! backgroundColor ) {
+	if ( ! color ) {
+		contentRef?.onRemoveMarkFormatting();
 		return removeFormat( value, name );
 	}
 
@@ -86,62 +87,31 @@ function setColors( value, name, colorSettings, colors ) {
 
 	const format = { type: name, attributes };
 	const hasNoSelection = value.start === value.end;
-	const isAtTheEnd = value.end === value.text.length;
-	const previousCharacter = value.text.charAt( value.end - 1 );
 
-	// Force formatting due to limitations in the native implementation
-	if (
-		hasNoSelection &&
-		( value.text.length === 0 ||
-			( previousCharacter === ' ' && isAtTheEnd ) )
-	) {
-		// For cases where there's no text selected, there's a space before
-		// the current caret position and it's at the end of the text.
-		return applyFormat( value, format, value.start - 1, value.end + 1 );
-	} else if ( hasNoSelection && isAtTheEnd ) {
-		// If there's no selection and is at the end of the text
-		// manually add the format within the current caret position.
-		const newFormat = applyFormat( value, format );
-		const { activeFormats } = newFormat;
-		newFormat.formats[ value.start ] = [
-			...( activeFormats?.filter(
-				( { type } ) => type !== format.type
-			) || [] ),
-			format,
-		];
-		return newFormat;
-	} else if ( hasNoSelection ) {
-		return removeFormat( value, format );
+	if ( hasNoSelection ) {
+		contentRef?.onMarkFormatting( color );
 	}
-
 	return applyFormat( value, format );
 }
 
-function ColorPicker( { name, value, onChange } ) {
+function ColorPicker( { name, value, onChange, contentRef } ) {
 	const property = 'color';
 	const colors = useMobileGlobalStylesColors();
 	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	const onColorChange = useCallback(
 		( color ) => {
-			if ( color !== '' ) {
-				onChange(
-					setColors( value, name, colors, { [ property ]: color } )
-				);
-				// Remove formatting if the color was reset, there's no
-				// current selection and the previous character is a space
-			} else if (
-				value?.start === value?.end &&
-				value.text?.charAt( value?.end - 1 ) === ' '
-			) {
-				onChange(
-					removeFormat( value, name, value.end - 1, value.end )
-				);
-			} else {
-				onChange( removeFormat( value, name ) );
-			}
+			onChange(
+				setColors(
+					value,
+					name,
+					colors,
+					{ [ property ]: color },
+					contentRef
+				)
+			);
 		},
-		[ colors, onChange, property ]
+		[ colors, contentRef, name, onChange, value ]
 	);
 	const activeColors = useMemo(
 		() => getActiveColors( value, name, colors ),
@@ -152,13 +122,20 @@ function ColorPicker( { name, value, onChange } ) {
 		<ColorSettings
 			colorValue={ activeColors[ property ] }
 			onColorChange={ onColorChange }
+			onColorCleared={ onColorChange }
 			defaultSettings={ colorSettings }
 			hideNavigation
 		/>
 	);
 }
 
-export default function InlineColorUI( { name, value, onChange, onClose } ) {
+export default function InlineColorUI( {
+	name,
+	value,
+	onChange,
+	onClose,
+	contentRef,
+} ) {
 	return (
 		<BottomSheet
 			isVisible
@@ -175,6 +152,7 @@ export default function InlineColorUI( { name, value, onChange, onClose } ) {
 						name={ name }
 						value={ value }
 						onChange={ onChange }
+						contentRef={ contentRef }
 					/>
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>

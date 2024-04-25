@@ -91,6 +91,15 @@ export class AutosaveMonitor extends Component {
 	}
 }
 
+/**
+ * AutosaveMonitor component.
+ * Monitors the changes made to the edited post and triggers autosave if necessary.
+ *
+ * @example
+ * ```jsx
+ * <AutosaveMonitor interval={30000} />
+ * ```
+ */
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const { getReferenceByDistinctEdits } = select( coreStore );

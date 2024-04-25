@@ -2,11 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
+import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -16,17 +15,18 @@ import {
 	InsertionPointOpenRef,
 	default as InsertionPoint,
 } from './insertion-point';
-import SelectedBlockTools from './selected-block-tools';
+import BlockToolbarPopover from './block-toolbar-popover';
+import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
-import BlockContextualToolbar from './block-contextual-toolbar';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
+import { useShowBlockTools } from './use-show-block-tools';
+import { unlock } from '../../lock-unlock';
 
 function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
-		getBlock,
 		getSettings,
 		__unstableGetEditorMode,
 		isTyping,
@@ -35,19 +35,13 @@ function selector( select ) {
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
 
-	const { name = '', attributes = {} } = getBlock( clientId ) || {};
+	const editorMode = __unstableGetEditorMode();
 
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
-		hasSelectedBlock: clientId && name,
 		isTyping: isTyping(),
-		isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-		showEmptyBlockSideInserter:
-			clientId &&
-			! isTyping() &&
-			__unstableGetEditorMode() === 'edit' &&
-			isUnmodifiedDefaultBlock( { name, attributes } ),
+		isZoomOutMode: editorMode === 'zoom-out',
 	};
 }
 
@@ -65,28 +59,30 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		clientId,
-		hasFixedToolbar,
-		hasSelectedBlock,
-		isTyping,
-		isZoomOutMode,
-		showEmptyBlockSideInserter,
-	} = useSelect( selector, [] );
+	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
+		selector,
+		[]
+	);
 	const isMatch = useShortcutEventMatch();
 	const { getSelectedBlockClientIds, getBlockRootClientId } =
 		useSelect( blockEditorStore );
+
+	const {
+		showEmptyBlockSideInserter,
+		showBreadcrumb,
+		showBlockToolbarPopover,
+	} = useShowBlockTools();
+
 	const {
 		duplicateBlocks,
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		clearSelectedBlock,
 		selectBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-	} = useDispatch( blockEditorStore );
+		expandBlock,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
 		if ( event.defaultPrevented ) return;
@@ -140,33 +136,32 @@ export default function BlockTools( {
 			}
 
 			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
+			if ( clientIds.length > 1 ) {
 				event.preventDefault();
-
 				// If there is more than one block selected, select the first
 				// block so that focus is directed back to the beginning of the selection.
 				// In effect, to the user this feels like deselecting the multi-selection.
-				if ( clientIds.length > 1 ) {
-					selectBlock( clientIds[ 0 ] );
-				} else {
-					clearSelectedBlock();
-				}
-				event.target.ownerDocument.defaultView
-					.getSelection()
-					.removeAllRanges();
-				__unstableContentRef?.current.focus();
+				selectBlock( clientIds[ 0 ] );
 			}
+		} else if ( isMatch( 'core/block-editor/collapse-list-view', event ) ) {
+			// If focus is currently within a text field, such as a rich text block or other editable field,
+			// skip collapsing the list view, and allow the keyboard shortcut to be handled by the text field.
+			// This condition checks for both the active element and the active element within an iframed editor.
+			if (
+				isTextField( event.target ) ||
+				isTextField(
+					event.target?.contentWindow?.document?.activeElement
+				)
+			) {
+				return;
+			}
+			event.preventDefault();
+			expandBlock( clientId );
 		}
 	}
 
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
-
-	// Conditions for fixed toolbar
-	// 1. Not zoom out mode
-	// 2. It's a large viewport. If it's a smaller viewport, let the floating toolbar handle it as it already has styles attached to make it render that way.
-	// 3. Fixed toolbar is enabled
-	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
@@ -177,11 +172,6 @@ export default function BlockTools( {
 						__unstableContentRef={ __unstableContentRef }
 					/>
 				) }
-				{ /* If there is no slot available, such as in the standalone block editor, render within the editor */ }
-
-				{ ! isLargeViewport && ( // Small viewports always get a fixed toolbar
-					<BlockContextualToolbar isFixed />
-				) }
 
 				{ showEmptyBlockSideInserter && (
 					<EmptyBlockInserter
@@ -189,17 +179,24 @@ export default function BlockTools( {
 						clientId={ clientId }
 					/>
 				) }
-				{ /* Even if the toolbar is fixed, the block popover is still
-					needed for navigation and zoom-out mode. */ }
-				{ ! showEmptyBlockSideInserter && hasSelectedBlock && (
-					<SelectedBlockTools
+
+				{ showBlockToolbarPopover && (
+					<BlockToolbarPopover
+						__unstableContentRef={ __unstableContentRef }
+						clientId={ clientId }
+						isTyping={ isTyping }
+					/>
+				) }
+
+				{ showBreadcrumb && (
+					<BlockToolbarBreadcrumb
 						__unstableContentRef={ __unstableContentRef }
 						clientId={ clientId }
 					/>
 				) }
 
-				{ /* Used for the inline rich text toolbar. */ }
-				{ ! isTopToolbar && (
+				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
+				{ ! isZoomOutMode && ! hasFixedToolbar && (
 					<Popover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }

@@ -134,12 +134,6 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	/**
 	 * Classes should be wrapped with !function_exists() to avoid fatal errors.
 	 * E.g.:
-	 * if ( class_exists( 'WP_Navigation' ) ) {
-	 *     return;
-	 * }
-	 *
-	 * Alternatively:
-	 *
 	 * if ( ! class_exists( 'WP_Navigation' ) ) {
 	 *    class WP_Navigation { ... }
 	 * }
@@ -188,10 +182,14 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$result               = preg_match( $regexp, $content );
 
 		if ( 1 === $result ) {
-			$returnToken = $phpcsFile->findNext( T_RETURN, $previousIfToken, $endOfPreviousIfToken );
-			if ( false !== $returnToken ) {
-				return;
-			}
+			$notProperlyGuardedErrorMessage = sprintf(
+				'The class "%s" is not properly guarded against redeclaration. Please ensure the entire class body is wrapped within an "if ( ! class_exists( \'%s\' ) ) {" statement.',
+				$className,
+				$className
+			);
+
+			$phpcsFile->addError( $notProperlyGuardedErrorMessage, $classToken, 'ClassNotProperlyGuardedAgainstRedeclaration' );
+			return;
 		}
 
 		$phpcsFile->addError( $errorMessage, $classToken, 'ClassNotGuardedAgainstRedeclaration' );

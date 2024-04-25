@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
+import { createSelector } from '@wordpress/data';
 import {
 	displayShortcut,
 	shortcutAriaLabel,

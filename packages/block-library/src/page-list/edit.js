@@ -286,7 +286,6 @@ export default function PageListEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: [ 'core/page-list-item' ],
 		renderAppender: false,
 		__unstableDisableDropZone: true,
 		templateLock: isChildOfNavigation ? false : 'all',

@@ -7,7 +7,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { create, insert } from '@wordpress/rich-text';
+import { create, toHTMLString, insert } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore, RichText } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -57,7 +58,7 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, onChange, plainText, html } ) {
+	onPaste( { value, plainText, html } ) {
 		const { title, onInsertBlockAfter, onUpdate } = this.props;
 
 		const content = pasteHandler( {
@@ -65,23 +66,37 @@ class PostTitle extends Component {
 			plainText,
 		} );
 
-		if ( content.length ) {
-			if ( typeof content === 'string' ) {
-				const valueToInsert = create( { html: content } );
-				onChange( insert( value, valueToInsert ) );
+		if ( ! content.length ) {
+			return;
+		}
+
+		if ( typeof content !== 'string' ) {
+			const [ firstBlock ] = content;
+
+			if (
+				! title &&
+				( firstBlock.name === 'core/heading' ||
+					firstBlock.name === 'core/paragraph' )
+			) {
+				// Strip HTML to avoid unwanted HTML being added to the title.
+				// In the majority of cases it is assumed that HTML in the title
+				// is undesirable.
+				const contentNoHTML = stripHTML(
+					firstBlock.attributes.content
+				);
+				onUpdate( contentNoHTML );
+				onInsertBlockAfter( content.slice( 1 ) );
 			} else {
-				const [ firstBlock ] = content;
-				if (
-					! title &&
-					( firstBlock.name === 'core/heading' ||
-						firstBlock.name === 'core/paragraph' )
-				) {
-					onUpdate( firstBlock.attributes.content );
-					onInsertBlockAfter( content.slice( 1 ) );
-				} else {
-					onInsertBlockAfter( content );
-				}
+				onInsertBlockAfter( content );
 			}
+		} else {
+			// Strip HTML to avoid unwanted HTML being added to the title.
+			// In the majority of cases it is assumed that HTML in the title
+			// is undesirable.
+			const contentNoHTML = stripHTML( content );
+
+			const newValue = insert( value, create( { html: contentNoHTML } ) );
+			onUpdate( toHTMLString( { value: newValue } ) );
 		}
 	}
 
@@ -149,19 +164,18 @@ class PostTitle extends Component {
 				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText.Raw
-					setRef={ this.setRef }
+					ref={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
 					onBlur={ this.props.onBlur } // Always assign onBlur as a props.
-					multiline={ false }
 					style={ titleStyles }
 					styles={ styles }
 					fontSize={ 24 }
 					lineHeight={ 1 }
 					fontWeight={ 'bold' }
-					deleteEnter={ true }
+					deleteEnter
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
@@ -170,7 +184,7 @@ class PostTitle extends Component {
 					value={ title }
 					onSelectionChange={ () => {} }
 					onEnter={ this.props.onEnterPress }
-					disableEditingMenu={ true }
+					disableEditingMenu
 					__unstableIsSelected={ this.props.isSelected }
 					__unstableOnCreateUndoLevel={ () => {} }
 				/>

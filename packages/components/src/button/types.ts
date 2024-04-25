@@ -61,15 +61,6 @@ type BaseButtonProps = {
 	 * Renders a pressed button style.
 	 */
 	isPressed?: boolean;
-	// TODO: Deprecate officially (add console warning and move to DeprecatedButtonProps).
-	/**
-	 * Decreases the size of the button.
-	 *
-	 * Deprecated in favor of the `size` prop. If both props are defined, the `size` prop will take precedence.
-	 *
-	 * @deprecated Use the `'small'` value on the `size` prop instead.
-	 */
-	isSmall?: boolean;
 	/**
 	 * Sets the `aria-label` of the component, if none is provided.
 	 * Sets the Tooltip content if `showTooltip` is provided.
@@ -115,7 +106,9 @@ type BaseButtonProps = {
 	 */
 	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 	/**
-	 * Whether this is focusable.
+	 * Whether to keep the button focusable when disabled.
+	 *
+	 * @default false
 	 */
 	__experimentalIsFocusable?: boolean;
 };
@@ -123,7 +116,8 @@ type BaseButtonProps = {
 type _ButtonProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: boolean;
 };
@@ -131,7 +125,8 @@ type _ButtonProps = {
 type AnchorProps = {
 	/**
 	 * Whether the button is disabled.
-	 * If `true`, this will force a `button` element to be rendered.
+	 *
+	 * If `true`, this will force a `button` element to be rendered, even when an `href` is given.
 	 */
 	disabled?: false;
 	/**
@@ -145,11 +140,48 @@ type AnchorProps = {
 };
 
 export type DeprecatedButtonProps = {
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isDefault?: boolean;
+	/**
+	 * Gives the button a link style.
+	 *
+	 * @deprecated Use the `'link'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isLink?: boolean;
+	/**
+	 * Gives the button a primary style.
+	 *
+	 * @deprecated Use the `'primary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isPrimary?: boolean;
+	/**
+	 * Gives the button a default style.
+	 *
+	 * @deprecated Use the `'secondary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isSecondary?: boolean;
+	/**
+	 * Gives the button a text-based style.
+	 *
+	 * @deprecated Use the `'tertiary'` value on the `variant` prop instead.
+	 * @ignore
+	 */
 	isTertiary?: boolean;
+	/**
+	 * Decreases the size of the button.
+	 *
+	 * @deprecated Use the `'small'` value on the `size` prop instead.
+	 * @ignore
+	 */
+	isSmall?: boolean;
 };
 
 export type DeprecatedIconButtonProps = {

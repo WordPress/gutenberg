@@ -203,7 +203,7 @@ export default function PageStatus( {
 											size="11"
 											lineHeight={ 1.4 }
 											weight={ 500 }
-											upperCase={ true }
+											upperCase
 										>
 											{ __( 'Password' ) }
 										</Text>

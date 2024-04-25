@@ -27,8 +27,12 @@ function setContentEditableWrapper( node, value ) {
 export default function useDragSelection() {
 	const { startMultiSelect, stopMultiSelect } =
 		useDispatch( blockEditorStore );
-	const { isSelectionEnabled, hasMultiSelection, isDraggingBlocks } =
-		useSelect( blockEditorStore );
+	const {
+		isSelectionEnabled,
+		hasSelectedBlock,
+		isDraggingBlocks,
+		isMultiSelecting,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -45,7 +49,7 @@ export default function useDragSelection() {
 				// so wait until the next animation frame to get the browser
 				// selection.
 				rafId = defaultView.requestAnimationFrame( () => {
-					if ( hasMultiSelection() ) {
+					if ( ! hasSelectedBlock() ) {
 						return;
 					}
 
@@ -59,19 +63,28 @@ export default function useDragSelection() {
 					const selection = defaultView.getSelection();
 
 					if ( selection.rangeCount ) {
-						const { commonAncestorContainer } =
-							selection.getRangeAt( 0 );
+						const range = selection.getRangeAt( 0 );
+						const { commonAncestorContainer } = range;
+						const clonedRange = range.cloneRange();
 
 						if (
 							anchorElement.contains( commonAncestorContainer )
 						) {
 							anchorElement.focus();
+							selection.removeAllRanges();
+							selection.addRange( clonedRange );
 						}
 					}
 				} );
 			}
 
-			function onMouseLeave( { buttons, target } ) {
+			function onMouseLeave( { buttons, target, relatedTarget } ) {
+				// If we're moving into a child element, ignore. We're tracking
+				// the mouse leaving the element to a parent, no a child.
+				if ( target.contains( relatedTarget ) ) {
+					return;
+				}
+
 				// Avoid triggering a multi-selection if the user is already
 				// dragging blocks.
 				if ( isDraggingBlocks() ) {
@@ -81,6 +94,16 @@ export default function useDragSelection() {
 				// The primary button must be pressed to initiate selection.
 				// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 				if ( buttons !== 1 ) {
+					return;
+				}
+
+				// Abort if we are already multi-selecting.
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
+				// Abort if selection is leaving writing flow.
+				if ( node === target ) {
 					return;
 				}
 
@@ -127,7 +150,7 @@ export default function useDragSelection() {
 			startMultiSelect,
 			stopMultiSelect,
 			isSelectionEnabled,
-			hasMultiSelection,
+			hasSelectedBlock,
 		]
 	);
 }

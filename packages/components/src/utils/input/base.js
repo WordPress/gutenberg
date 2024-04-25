@@ -14,7 +14,7 @@ export const inputStyleNeutral = css`
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: ${ CONFIG.radiusBlockUi };
-	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border } };
+	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
 	${ reduceMotion( 'transition' ) }
 `;
 

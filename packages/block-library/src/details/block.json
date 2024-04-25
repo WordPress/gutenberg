@@ -13,12 +13,13 @@
 			"default": false
 		},
 		"summary": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "summary"
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"align": [ "wide", "full" ],
 		"color": {
 			"gradients": true,
@@ -58,6 +59,9 @@
 		},
 		"layout": {
 			"allowEditing": false
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-details-editor",

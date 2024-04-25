@@ -4,11 +4,6 @@ The `BlockAlignmentToolbar` component is used to render block alignment options 
 
 ![Image block alignment options](https://make.wordpress.org/core/files/2020/09/image-block-alignment-options.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

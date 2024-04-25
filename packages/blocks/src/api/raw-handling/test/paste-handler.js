@@ -6,6 +6,7 @@ import { pasteHandler } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
+import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -63,6 +64,7 @@ const tableWithHeaderFooterAndBodyUsingRowspan = `
 describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
+		initAndRegisterVideoBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -73,9 +75,9 @@ describe( 'pasteHandler', () => {
 
 		expect( console ).toHaveLogged();
 
+		delete result.attributes.caption;
 		expect( result.attributes ).toEqual( {
-			hasFixedLayout: false,
-			caption: '',
+			hasFixedLayout: true,
 			head: [
 				{
 					cells: [
@@ -113,9 +115,9 @@ describe( 'pasteHandler', () => {
 
 		expect( console ).toHaveLogged();
 
+		delete result.attributes.caption;
 		expect( result.attributes ).toEqual( {
-			hasFixedLayout: false,
-			caption: '',
+			hasFixedLayout: true,
 			head: [
 				{
 					cells: [
@@ -151,6 +153,31 @@ describe( 'pasteHandler', () => {
 			],
 		} );
 		expect( result.name ).toEqual( 'core/table' );
+		expect( result.isValid ).toBeTruthy();
+	} );
+
+	it( 'can handle a video', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',
+			tagName: 'p',
+			preserveWhiteSpace: false,
+		} );
+
+		expect( console ).toHaveLogged();
+
+		delete result.attributes.caption;
+		expect( result.attributes ).toEqual( {
+			autoplay: true,
+			loop: true,
+			muted: true,
+			controls: true,
+			playsInline: true,
+			preload: 'auto',
+			poster: 'https://example.com/media.jpg',
+			src: 'https://example.com/media.mp4',
+			tracks: [],
+		} );
+		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
 	} );
 } );

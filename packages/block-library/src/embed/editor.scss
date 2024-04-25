@@ -16,9 +16,15 @@
 	.components-placeholder__error {
 		word-break: break-word;
 	}
+}
 
-	.components-placeholder__learn-more {
-		margin-top: 1em;
+.wp-block-embed__learn-more {
+	margin-top: 1em;
+
+	@at-root .wp-block-post-content & {
+		a {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 

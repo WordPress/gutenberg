@@ -4,7 +4,7 @@
 import { __experimentalListView as ListView } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
@@ -14,9 +14,11 @@ import { ESCAPE } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import { store as editWidgetsStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-export default function ListViewSidebar( { listViewToggleElement } ) {
+export default function ListViewSidebar() {
 	const { setIsListViewOpened } = useDispatch( editWidgetsStore );
+	const { getListViewToggleRef } = unlock( useSelect( editWidgetsStore ) );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the dropZoneElement updates.
@@ -27,8 +29,8 @@ export default function ListViewSidebar( { listViewToggleElement } ) {
 	// When closing the list view, focus should return to the toggle button.
 	const closeListView = useCallback( () => {
 		setIsListViewOpened( false );
-		listViewToggleElement?.focus();
-	}, [ listViewToggleElement, setIsListViewOpened ] );
+		getListViewToggleRef().current?.focus();
+	}, [ getListViewToggleRef, setIsListViewOpened ] );
 
 	const closeOnEscape = useCallback(
 		( event ) => {

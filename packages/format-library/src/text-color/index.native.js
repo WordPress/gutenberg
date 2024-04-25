@@ -25,7 +25,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getActiveColors } from './inline.js';
+import { getActiveColors } from './inline.native.js';
 import { default as InlineColorUI } from './inline';
 import styles from './style.scss';
 
@@ -33,9 +33,7 @@ const name = 'core/text-color';
 const title = __( 'Text color' );
 
 function getComputedStyleProperty( element, property ) {
-	const {
-		props: { style = {} },
-	} = element;
+	const style = element?.props?.style ?? {};
 
 	if ( property === 'background-color' ) {
 		const { backgroundColor, baseColors } = style;

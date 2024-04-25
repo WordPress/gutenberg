@@ -27,8 +27,8 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import {
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	Warning,
 	store as blockEditorStore,

@@ -24,11 +24,16 @@ const WORDPRESS_NAMESPACE = '@wordpress/';
 // Experimental or other packages that should be private are bundled when used.
 // That way, we can iterate on these package without making them part of the public API.
 // See: https://github.com/WordPress/gutenberg/pull/19809
+//
+// !!
+// This list must be kept in sync with the matching list in packages/dependency-extraction-webpack-plugin/lib/util.js
+// !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/dataviews',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/undo-manager',
 	'@wordpress/sync',
+	'@wordpress/undo-manager',
 ];
 
 // PHP files in packages that have to be copied during build.
@@ -128,10 +133,10 @@ const vendorsCopyConfig = Object.entries( vendors ).flatMap(
 module.exports = {
 	...baseConfig,
 	name: 'packages',
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		return {
-			...memo,
-			[ packageName ]: {
+	entry: Object.fromEntries(
+		gutenbergPackages.map( ( packageName ) => [
+			packageName,
+			{
 				import: `./packages/${ packageName }`,
 				library: {
 					name: [ 'wp', camelCaseDash( packageName ) ],
@@ -141,8 +146,8 @@ module.exports = {
 						: undefined,
 				},
 			},
-		};
-	}, {} ),
+		] )
+	),
 	output: {
 		devtoolNamespace: 'wp',
 		filename: './build/[name]/index.min.js',
@@ -155,6 +160,9 @@ module.exports = {
 			}
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
+	},
+	performance: {
+		hints: false, // disable warnings about package sizes
 	},
 	plugins: [
 		...plugins,

@@ -8,17 +8,13 @@ const { minify } = require( 'uglify-js' );
 const { writeFile } = require( 'fs' ).promises;
 
 builder( {
-	modules: [ 'es', 'web' ],
+	modules: [ 'es.', 'web.' ],
 	exclude: [
-		// core-js is extremely conservative in which polyfills to include.
-		// Since we don't care about the tiny browser implementation bugs behind its decision
-		// to polyfill these features, we forcefully prevent them from being included.
-		// @see https://github.com/WordPress/gutenberg/pull/31279
-		'es.promise',
 		// This is an IE-only feature which we don't use, and don't want to polyfill.
 		// @see https://github.com/WordPress/gutenberg/pull/49234
 		'web.immediate',
 	],
+	summary: { console: { size: true, modules: true } },
 	targets: require( '@wordpress/browserslist-config' ),
 	filename: './build/polyfill.js',
 } )

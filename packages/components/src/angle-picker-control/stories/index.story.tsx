@@ -52,6 +52,3 @@ const AnglePickerWithState: StoryFn< typeof AnglePickerControl > = ( {
 };
 
 export const Default = AnglePickerWithState.bind( {} );
-Default.args = {
-	__nextHasNoMarginBottom: true,
-};

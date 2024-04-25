@@ -46,8 +46,8 @@ function ResizableEditor( { enableResizing, height, children } ) {
 			maxWidth="100%"
 			maxHeight="100%"
 			enable={ {
-				right: enableResizing,
 				left: enableResizing,
+				right: enableResizing,
 			} }
 			showHandle={ enableResizing }
 			// The editor is centered horizontally, resizing it only

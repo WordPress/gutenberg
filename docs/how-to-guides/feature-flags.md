@@ -8,7 +8,7 @@ The `process.env.IS_GUTENBERG_PLUGIN` is an environment variable whose value 'fl
 
 When the codebase is built for the plugin, this variable will be set to `true`. When building for WordPress core, it will be set to `false` or `undefined`.
 
-## Basic Use
+## Basic usage
 
 ### Exporting features
 
@@ -69,7 +69,7 @@ if ( undefined ) { // Wepack has replaced `process.env.IS_GUTENBERG_PLUGIN` with
 
 `undefined` evaluates to `false` so the plugin-only feature will not be executed.
 
-### Dead Code Elimination
+### Dead code elimination
 
 For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
 
@@ -97,8 +97,8 @@ if ( undefined ) {
 
 In this case, the minification process will remove the entire `if` statement including the body, ensuring plugin-only code is not included in WordPress core build.
 
-## FAQ
+## Frequently asked questions
 
-#### Why shouldn't I assign the result of an expression involving `IS_GUTENBERG_PLUGIN` to a variable, e.g. `const isMyFeatureActive = process.env.IS_GUTENBERG_PLUGIN === 2`?
+### Why shouldn't I assign the result of an expression involving `IS_GUTENBERG_PLUGIN` to a variable, e.g. `const isMyFeatureActive = process.env.IS_GUTENBERG_PLUGIN === 2`?
 
 Introducing complexity may prevent webpack's minifier from identifying and therefore eliminating dead code. Therefore it is recommended to use the examples in this document to ensure your feature flag functions as intended. For further details, see the [Dead Code Elimination](#dead-code-elimination) section.

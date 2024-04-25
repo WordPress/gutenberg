@@ -7,6 +7,7 @@ exports[`LinksUI LinksUI renders 1`] = `
   backdropOpacity={0.2}
   backdropTransitionInTiming={50}
   backdropTransitionOutTiming={50}
+  hardwareAccelerated={true}
   isVisible={true}
   onAccessibilityEscape={[Function]}
   onBackButtonPress={[Function]}
@@ -18,6 +19,7 @@ exports[`LinksUI LinksUI renders 1`] = `
   preferredColorScheme="light"
   swipeDirection="down"
   testID="link-settings-modal"
+  useNativeDriverForBackdrop={true}
 >
   <View
     behavior={false}
@@ -86,7 +88,6 @@ exports[`LinksUI LinksUI renders 1`] = `
             >
               <View
                 collapsable={false}
-                forwardedRef={[Function]}
                 pointerEvents="box-none"
                 style={
                   {
@@ -176,7 +177,6 @@ exports[`LinksUI LinksUI renders 1`] = `
                   >
                     <View
                       collapsable={false}
-                      forwardedRef={[Function]}
                       handlerTag={1}
                       handlerType="PanGestureHandler"
                       needsOffscreenAlphaCompositing={true}

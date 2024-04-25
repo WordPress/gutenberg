@@ -65,7 +65,6 @@
 		margin: 0;
 	}
 	.components-placeholder__instructions {
-		text-align: center;
 		margin-bottom: 18px;
 	}
 	.wp-block-group-placeholder__variations svg {
@@ -92,6 +91,7 @@
 	.components-placeholder {
 		min-height: auto;
 		padding: $grid-unit-30;
+		align-items: center;
 	}
 	.is-small,
 	.is-medium {

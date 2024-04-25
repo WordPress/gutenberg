@@ -116,7 +116,7 @@
  *
  * Example:
  *
- *     if ( $tags->next_tag( array( 'class' => 'wp-group-block' ) ) ) {
+ *     if ( $tags->next_tag( array( 'class_name' => 'wp-group-block' ) ) ) {
  *         $tags->set_attribute( 'title', 'This groups the contained content.' );
  *         $tags->remove_attribute( 'data-test-id' );
  *     }
@@ -2031,8 +2031,8 @@ class Gutenberg_HTML_Tag_Processor_6_4 {
 		 *
 		 * @see https://html.spec.whatwg.org/#attributes-2
 		 *
-		 * @TODO as the only regex pattern maybe we should take it out? are
-		 *       Unicode patterns available broadly in Core?
+		 * @todo As the only regex pattern maybe we should take it out?
+		 *       Are Unicode patterns available broadly in Core?
 		 */
 		if ( preg_match(
 			'~[' .

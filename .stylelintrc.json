@@ -4,6 +4,14 @@
 		"at-rule-empty-line-before": null,
 		"at-rule-no-unknown": null,
 		"comment-empty-line-before": null,
+		"declaration-property-value-disallowed-list": [
+			{
+				"/.*/": [ "/--wp-components-color-/" ]
+			},
+			{
+				"message": "--wp-components-color-* variables are not ready to be used outside of the components package."
+			}
+		],
 		"font-weight-notation": null,
 		"max-line-length": null,
 		"no-descending-specificity": null,

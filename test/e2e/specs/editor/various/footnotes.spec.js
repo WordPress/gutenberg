@@ -60,6 +60,9 @@ test.describe( 'Footnotes', () => {
 			},
 		] );
 
+		// Check if the numbers in the editor content updated.
+		await expect( editor.canvas.locator( '.fn' ) ).toHaveText( '1' );
+
 		await editor.canvas.locator( 'p:text("first paragraph")' ).click();
 
 		await editor.showBlockToolbar();
@@ -362,9 +365,9 @@ test.describe( 'Footnotes', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Post' } )
+			.getByRole( 'tab', { name: 'Post' } )
 			.click();
-		await page.locator( 'a:text("2 Revisions")' ).click();
+		await page.locator( 'a:text("Revisions (2)")' ).click();
 		await page.locator( '.revisions-controls .ui-slider-handle' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.locator( 'input:text("Restore This Revision")' ).click();
@@ -440,7 +443,7 @@ test.describe( 'Footnotes', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Post' } )
+			.getByRole( 'tab', { name: 'Post' } )
 			.click();
 
 		// Visit the published post.

@@ -1,0 +1,24 @@
+{
+	"version": 2,
+	"title": "Block theme variation",
+	"settings": {
+		"color": {
+			"palette": [
+				{
+					"slug": "foreground",
+					"color": "#3F67C6",
+					"name": "Foreground"
+				}
+			]
+		}
+	},
+	"styles": {
+		"blocks": {
+			"core/post-title": {
+				"typography": {
+					"fontWeight": "700"
+				}
+			}
+		}
+	}
+}

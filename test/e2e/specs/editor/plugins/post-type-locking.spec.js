@@ -21,14 +21,6 @@ test.describe( 'Post-type locking', () => {
 			await admin.createNewPost( { postType: 'locked-all-post' } );
 		} );
 
-		test( 'should disable the inserter', async ( { page } ) => {
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Document tools' } )
-					.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeDisabled();
-		} );
-
 		test( 'should not allow blocks to be removed', async ( {
 			editor,
 			page,
@@ -147,44 +139,11 @@ test.describe( 'Post-type locking', () => {
 				'The content of your post doesn’t match the template assigned to your post type.'
 			);
 		} );
-
-		test( 'should not allow blocks to be inserted in inner blocks', async ( {
-			editor,
-			page,
-		} ) => {
-			await editor.canvas
-				.getByRole( 'button', {
-					name: 'Two columns; equal split',
-				} )
-				.click();
-
-			await expect(
-				page
-					.getByRole( 'document', {
-						name: 'Block: Column (1 of 2)',
-					} )
-					.getByRole( 'button', { name: 'Add block' } )
-			).toBeHidden();
-
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Document tools' } )
-					.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeDisabled();
-		} );
 	} );
 
 	test.describe( 'template_lock insert', () => {
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost( { postType: 'locked-insert-post' } );
-		} );
-
-		test( 'should disable the inserter', async ( { page } ) => {
-			await expect(
-				page
-					.getByRole( 'toolbar', { name: 'Document tools' } )
-					.getByRole( 'button', { name: 'Toggle block inserter' } )
-			).toBeDisabled();
 		} );
 
 		test( 'should not allow blocks to be removed', async ( {
@@ -367,6 +326,47 @@ test.describe( 'Post-type locking', () => {
 						},
 					],
 				},
+			] );
+		} );
+
+		test( 'should allow blocks to be switched to other types', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.canvas
+				.getByRole( 'document', {
+					name: 'Empty block',
+				} )
+				.first()
+				.fill( 'p1' );
+
+			const blockSwitcher = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Paragraph' } );
+
+			// Verify the block switcher exists.
+			await expect( blockSwitcher ).toHaveAttribute(
+				'aria-haspopup',
+				'true'
+			);
+
+			// Verify the correct block transforms appear.
+			await blockSwitcher.click();
+			await expect(
+				page
+					.getByRole( 'menu', { name: 'Paragraph' } )
+					.getByRole( 'menuitem' )
+			).toHaveText( [
+				'Heading',
+				'List',
+				'Quote',
+				'Buttons',
+				'Code',
+				'Columns',
+				'Group',
+				'Preformatted',
+				'Pullquote',
+				'Verse',
 			] );
 		} );
 	} );

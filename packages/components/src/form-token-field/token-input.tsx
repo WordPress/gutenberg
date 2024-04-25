@@ -48,9 +48,7 @@ export function UnForwardedTokenInput(
 		onFocus?.( e );
 	};
 
-	const onBlurHandler: React.FocusEventHandler< HTMLInputElement > = (
-		e
-	) => {
+	const onBlurHandler: FocusEventHandler< HTMLInputElement > = ( e ) => {
 		setHasFocus( false );
 		onBlur?.( e );
 	};

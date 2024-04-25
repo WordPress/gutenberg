@@ -72,6 +72,7 @@ function PostVisibilityToggle( { isOpen, onClick } ) {
 	const label = usePostVisibilityLabel();
 	return (
 		<Button
+			__next40pxDefaultSize
 			className="edit-post-post-visibility__toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }

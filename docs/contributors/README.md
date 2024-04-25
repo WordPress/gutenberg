@@ -18,7 +18,7 @@ Find the section below based on what you are looking to contribute:
 
 -   **Internationalization?** See the [localizing and translating section](/docs/contributors/localizing.md)
 
-### Repository Management
+### Repository management
 
 The Gutenberg project uses GitHub for managing code and tracking issues. Please see the following sections for the project methodologies using GitHub.
 

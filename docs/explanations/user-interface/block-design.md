@@ -64,7 +64,7 @@ Group toolbar controls in logical segments. Don't add a segment for each.
 
 ![A screenshot comparing a block toolbar with good vs. bad toolbar segment groupings.](https://make.wordpress.org/design/files/2021/03/docs__block-toolbar-do-dont.png)
 
-### Block Identification
+### Block identification
 
 A block should have a straightforward, short name so users can easily find it in the block library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the block library.
 
@@ -74,7 +74,7 @@ When referring to a block in documentation or UI, use title case for the block t
 -   Latest Posts block
 -   Media & Text block
 
-Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
+Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://fonts.google.com/icons). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
 ![A screenshot of the block library with concise block names](https://developer.wordpress.org/files/2022/01/blocks-do.png)
 **Do:**
@@ -84,7 +84,7 @@ Use concise block names.
 **Don't:**
 Avoid long, multi-line block names.
 
-### Block Description
+### Block description
 
 Every block should include a description that clearly explains the block's function. The description will display in the Settings Sidebar.
 
@@ -116,7 +116,7 @@ Provide an instructive placeholder state.
 **Don't:**
 Avoid branding and relying on the title alone to convey instructions.
 
-### Selected and Unselected States
+### Selected and unselected states
 
 When unselected, your block should preview its content as closely to the front-end output as possible.
 
@@ -130,7 +130,7 @@ For controls that are essential for the operation of the block, provide them dir
 **Don't:**
 Do not put controls that are essential to the block in the sidebar, otherwise the block will appear non-functional to mobile users or desktop users who have dismissed the sidebar.
 
-### Advanced Block Settings
+### Advanced block settings
 
 The “Block” tab of the Settings Sidebar can contain additional block options and configuration. Keep in mind that a user can dismiss the sidebar and never use it. You should not put critical options in the Sidebar.
 
@@ -156,11 +156,11 @@ The most basic unit of the editor. The Paragraph block is a simple input field.
 
 ![Paragraph block](https://cldup.com/HVJe5bGZ8H-3000x3000.png)
 
-### Placeholder:
+#### Placeholder
 
 -   Simple placeholder text that reads “Type / to choose a block”. The placeholder disappears when the block is selected.
 
-### Selected state:
+#### Selected state
 
 -   Block Toolbar: Has a switcher to perform transformations to headings, etc.
 -   Block Toolbar: Has basic text alignments
@@ -172,11 +172,11 @@ Basic image block.
 
 ![Image block placeholder](https://cldup.com/w6FNywNsj1-3000x3000.png)
 
-### Placeholder:
+#### Placeholder
 
 -   A generic gray placeholder block with options to upload an image, drag and drop an image directly on it, or pick an image from the media library.
 
-### Selected state:
+#### Selected state
 
 -   Block Toolbar: Alignments, including wide and full-width if the theme supports it.
 -   Block Toolbar: Edit Image, to open the Media Library
@@ -185,7 +185,7 @@ Basic image block.
 
 ![Image Block](https://cldup.com/6YYXstl_xX-3000x3000.png)
 
-### Block settings:
+#### Block settings
 
 -   Has description: “They're worth 1,000 words! Insert a single image.”
 -   Has options for changing or adding alt text and adding additional custom CSS classes.
@@ -196,18 +196,18 @@ _Future improvements to the Image block could include getting rid of the media m
 
 ![Latest Post Block](https://cldup.com/8lyAByDpy_-3000x3000.png)
 
-### Placeholder:
+#### Placeholder
 
 Has no placeholder as it works immediately upon insertion. The default inserted state shows the last 5 posts.
 
-### Selected state:
+#### Selected state
 
 -   Block Toolbar: Alignments
 -   Block Toolbar: Options for picking list view or grid view
 
 _Note that the Block Toolbar does not include the Block Chip in this case, since there are no similar blocks to switch to._
 
-### Block settings:
+#### Block settings
 
 -   Has description: “Display a list of your most recent posts.”
 -   Has options for post order, narrowing the list by category, changing the default number of posts to show, and showing the post date.

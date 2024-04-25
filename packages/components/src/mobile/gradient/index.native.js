@@ -135,7 +135,7 @@ function Gradient( {
 		return (
 			<RNLinearGradient
 				colors={ colors }
-				useAngle={ true }
+				useAngle
 				angle={ getGradientAngle( gradientValue ) }
 				locations={ locations }
 				angleCenter={ angleCenter }

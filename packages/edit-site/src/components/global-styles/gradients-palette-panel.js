@@ -114,8 +114,8 @@ export default function GradientPalettePanel( { name } ) {
 					<Spacer margin={ 3 } />
 					<DuotonePicker
 						duotonePalette={ duotonePalette }
-						disableCustomDuotone={ true }
-						disableCustomColors={ true }
+						disableCustomDuotone
+						disableCustomColors
 						clearable={ false }
 						onChange={ noop }
 					/>

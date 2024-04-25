@@ -8,7 +8,8 @@
     display: none;
 }
 
-.edit-post-visual-editor__post-title-wrapper {
+.edit-post-visual-editor__post-title-wrapper,
+.editor-editor-canvas__post-title-wrapper {
     display: none;
 }
 

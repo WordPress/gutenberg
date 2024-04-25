@@ -60,17 +60,6 @@ import {
 import ColumnsPreview from '../column/column-preview';
 
 /**
- * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
- * The contents of the array should never change.
- * The array should contain the name of each block that is allowed.
- * In columns block, the only block we allow is 'core/column'.
- *
- * @constant
- * @type {string[]}
- */
-const ALLOWED_BLOCKS = [ 'core/column' ];
-
-/**
  * Number of columns to assume for template in case the user opts to skip
  * template option selection.
  *
@@ -275,7 +264,6 @@ function ColumnsEditContainer( {
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
 						horizontal={ columnsInRow > 1 }
-						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={

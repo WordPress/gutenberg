@@ -20,11 +20,13 @@ import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 
+const EMPTY_ADDITIONAL_STYLES = [];
+
 export function BlockPreview( {
 	blocks,
 	viewportWidth = 1200,
 	minHeight,
-	additionalStyles = [],
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 	// Deprecated props:
 	__experimentalMinHeight,
 	__experimentalPadding,
@@ -54,7 +56,11 @@ export function BlockPreview( {
 		[]
 	);
 	const settings = useMemo(
-		() => ( { ...originalSettings, __unstableIsPreviewMode: true } ),
+		() => ( {
+			...originalSettings,
+			focusMode: false, // Disable "Spotlight mode".
+			__unstableIsPreviewMode: true,
+		} ),
 		[ originalSettings ]
 	);
 	const renderedBlocks = useMemo(
@@ -117,6 +123,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		() => ( {
 			...originalSettings,
 			styles: undefined, // Clear styles included by the parent settings, as they are already output by the parent's EditorStyles.
+			focusMode: false, // Disable "Spotlight mode".
 			__unstableIsPreviewMode: true,
 		} ),
 		[ originalSettings ]

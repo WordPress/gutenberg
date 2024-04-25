@@ -20,7 +20,6 @@ import {
 	PanelBody,
 	BottomSheet,
 	FooterMessageControl,
-	InserterButton,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 
@@ -29,6 +28,7 @@ import { Icon, close } from '@wordpress/icons';
  */
 import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
+import InserterButton from '../inserter-button';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 

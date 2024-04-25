@@ -283,6 +283,8 @@ describe( 'getFilename', () => {
 		);
 		expect( getFilename( 'a/path/' ) ).toBe( undefined );
 		expect( getFilename( '/' ) ).toBe( undefined );
+		expect( getFilename( undefined ) ).toBe( undefined );
+		expect( getFilename( null ) ).toBe( undefined );
 	} );
 } );
 

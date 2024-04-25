@@ -14,6 +14,9 @@ export function useHeading(
 	const {
 		as: asProp,
 		level = 2,
+		color = COLORS.gray[ 900 ],
+		isBlock = true,
+		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 
@@ -31,10 +34,10 @@ export function useHeading(
 	}
 
 	const textProps = useText( {
-		color: COLORS.gray[ 900 ],
+		color,
+		isBlock,
+		weight,
 		size: getHeadingFontSize( level ),
-		isBlock: true,
-		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
 		...otherProps,
 	} );
 

@@ -23,6 +23,9 @@ import { MenuUI } from '../styles/navigation-styles';
 
 import type { NavigationMenuProps } from '../types';
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export function NavigationMenu( props: NavigationMenuProps ) {
 	const {
 		backButtonLabel,

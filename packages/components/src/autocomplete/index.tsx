@@ -30,6 +30,7 @@ import { isAppleOS } from '@wordpress/keycodes';
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
 import { escapeRegExp } from '../utils/strings';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
 	AutocompleteProps,
 	AutocompleterUIProps,
@@ -183,15 +184,7 @@ export function useAutocomplete( {
 			return;
 		}
 
-		if (
-			event.defaultPrevented ||
-			// Ignore keydowns from IMEs
-			event.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 
@@ -390,7 +383,7 @@ export function useAutocomplete( {
 	return {
 		listBoxId,
 		activeId,
-		onKeyDown: handleKeyDown,
+		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: hasSelection && AutocompleterUI && (
 			<AutocompleterUI
 				className={ className }

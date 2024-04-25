@@ -11,7 +11,7 @@ const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -141,6 +141,8 @@ _Related_
 
 ### pure
 
+> **Deprecated** Use `memo` or `PureComponent` instead.
+
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
 ### throttle
@@ -248,6 +250,18 @@ _Parameters_
 _Returns_
 
 -   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
+
+### useDebouncedInput
+
+Helper hook for input fields that need to debounce the value before using it.
+
+_Parameters_
+
+-   _defaultValue_ `any`: The default value to use.
+
+_Returns_
+
+-   `[string, Function, string]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 

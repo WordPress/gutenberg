@@ -23,6 +23,7 @@ import {
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -211,13 +212,13 @@ function AudioEdit( {
 									label: _x( 'None', '"Preload" value' ),
 								},
 							] }
-							hideCancelButton={ true }
+							hideCancelButton
 						/>
 					</PanelBody>
 				</InspectorControls>
 				<MediaUpload
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					isReplacingMedia={ true }
+					isReplacingMedia
 					onSelect={ onSelectAudio }
 					onSelectURL={ onSelectURL }
 					render={ ( { open, getMediaOptions } ) => {
@@ -225,9 +226,9 @@ function AudioEdit( {
 					} }
 				/>
 				<BlockCaption
-					accessible={ true }
+					accessible
 					accessibilityLabelCreator={ ( caption ) =>
-						! caption
+						RichText.isEmpty( caption )
 							? /* translators: accessibility text. Empty Audio caption. */
 							  __( 'Audio caption. Empty' )
 							: sprintf(

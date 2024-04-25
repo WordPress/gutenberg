@@ -10,7 +10,7 @@ In WordPress lingo, a _format_ is a [HTML tag with text-level semantics](https:/
 
 ## Before you start
 
-This guide assumes you are already familiar with WordPress plugins and loading JavaScript with them, see the [Plugin Handbook](https://developer.wordpress.org/plugins/) or [JavaScript Tutorial](/docs/how-to-guides/javascript/README.md) to brush up.
+This guide assumes you are already familiar with WordPress plugins and loading JavaScript with them, see the [Plugin Handbook](https://developer.wordpress.org/plugins/) or [JavaScript Tutorial](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) to brush up.
 
 You will need:
 
@@ -173,7 +173,7 @@ registerFormatType( 'my-custom-format/sample-output', {
 } );
 ```
 
-### Step5: Add a button outside of the dropdown (Optional)
+### Step 5: Add a button outside of the dropdown (Optional)
 
 Using the `RichTextToolbarButton` component, the button is added to the default dropdown menu. You can add the button directly to the toolbar by using the `BlockControls` component.
 
@@ -220,7 +220,7 @@ If you run into errors:
 -   Confirm the JavaScript is loading in the editor.
 -   Check for any console error messages.
 
-## Additional Resources
+## Additional resources
 
 Reference documentation used in this guide:
 

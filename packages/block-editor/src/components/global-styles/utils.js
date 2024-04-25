@@ -6,32 +6,12 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * Internal dependencies
  */
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -77,10 +57,7 @@ export const PRESET_METADATA = [
 	{
 		path: [ 'typography', 'fontSizes' ],
 		valueFunc: ( preset, settings ) =>
-			getTypographyFontSizeValue(
-				preset,
-				getFluidTypographyOptionsFromSettings( settings )
-			),
+			getTypographyFontSizeValue( preset, settings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -157,6 +134,13 @@ export const STYLE_PATH_TO_PRESET_BLOCK_ATTRIBUTE = {
 	'color.gradient': 'gradient',
 	'typography.fontSize': 'fontSize',
 	'typography.fontFamily': 'fontFamily',
+};
+
+export const TOOLSPANEL_DROPDOWNMENU_PROPS = {
+	popoverProps: {
+		placement: 'left-start',
+		offset: 259, // Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+	},
 };
 
 function findInPresetsBy(
@@ -438,4 +422,40 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 		fastDeepEqual( original?.styles, variation?.styles ) &&
 		fastDeepEqual( original?.settings, variation?.settings )
 	);
+}
+
+/**
+ * Generates the selector for a block style variation by creating the
+ * appropriate CSS class and adding it to the ancestor portion of the block's
+ * selector.
+ *
+ * For example, take the Button block which has a compound selector:
+ * `.wp-block-button .wp-block-button__link`. With a variation named 'custom',
+ * the class `.is-style-custom` should be added to the `.wp-block-button`
+ * ancestor only.
+ *
+ * This function will take into account comma separated and complex selectors.
+ *
+ * @param {string} variation     Name for the variation.
+ * @param {string} blockSelector CSS selector for the block.
+ *
+ * @return {string} CSS selector for the block style variation.
+ */
+export function getBlockStyleVariationSelector( variation, blockSelector ) {
+	const variationClass = `.is-style-${ variation }`;
+
+	if ( ! blockSelector ) {
+		return variationClass;
+	}
+
+	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
+	const addVariationClass = ( _match, group1, group2 ) => {
+		return group1 + group2 + variationClass;
+	};
+
+	const result = blockSelector
+		.split( ',' )
+		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+
+	return result.join( ',' );
 }

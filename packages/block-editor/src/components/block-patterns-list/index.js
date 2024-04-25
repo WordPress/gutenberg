@@ -24,7 +24,7 @@ import { unlock } from '../../lock-unlock';
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
-import { PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 
 const {
 	CompositeV2: Composite,
@@ -45,6 +45,7 @@ function BlockPattern( {
 	pattern,
 	onClick,
 	onHover,
+	showTitle = true,
 	showTooltip,
 } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
@@ -56,7 +57,7 @@ function BlockPattern( {
 		<InserterDraggableBlocks
 			isEnabled={ isDraggable }
 			blocks={ blocks }
-			isPattern={ !! pattern }
+			pattern={ pattern }
 		>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
@@ -78,7 +79,8 @@ function BlockPattern( {
 				>
 					<WithToolTip
 						showTooltip={
-							showTooltip && ! pattern.type !== PATTERN_TYPES.user
+							showTooltip &&
+							! pattern.type !== INSERTER_PATTERN_TYPES.user
 						}
 						title={ pattern.title }
 					>
@@ -97,7 +99,7 @@ function BlockPattern( {
 										{
 											'block-editor-block-patterns-list__list-item-synced':
 												pattern.type ===
-													PATTERN_TYPES.user &&
+													INSERTER_PATTERN_TYPES.user &&
 												! pattern.syncStatus,
 										}
 									) }
@@ -121,23 +123,27 @@ function BlockPattern( {
 								viewportWidth={ viewportWidth }
 							/>
 
-							<HStack className="block-editor-patterns__pattern-details">
-								{ pattern.type === PATTERN_TYPES.user &&
-									! pattern.syncStatus && (
-										<div className="block-editor-patterns__pattern-icon-wrapper">
-											<Icon
-												className="block-editor-patterns__pattern-icon"
-												icon={ symbol }
-											/>
+							{ showTitle && (
+								<HStack className="block-editor-patterns__pattern-details">
+									{ pattern.type ===
+										INSERTER_PATTERN_TYPES.user &&
+										! pattern.syncStatus && (
+											<div className="block-editor-patterns__pattern-icon-wrapper">
+												<Icon
+													className="block-editor-patterns__pattern-icon"
+													icon={ symbol }
+												/>
+											</div>
+										) }
+									{ ( ! showTooltip ||
+										pattern.type ===
+											INSERTER_PATTERN_TYPES.user ) && (
+										<div className="block-editor-block-patterns-list__item-title">
+											{ pattern.title }
 										</div>
 									) }
-								{ ( ! showTooltip ||
-									pattern.type === PATTERN_TYPES.user ) && (
-									<div className="block-editor-block-patterns-list__item-title">
-										{ pattern.title }
-									</div>
-								) }
-							</HStack>
+								</HStack>
+							) }
 
 							{ !! pattern.description && (
 								<VisuallyHidden id={ descriptionId }>
@@ -167,6 +173,7 @@ function BlockPatternsList(
 		onClickPattern,
 		orientation,
 		label = __( 'Block patterns' ),
+		showTitle = true,
 		showTitlesAsTooltip,
 		pagingProps,
 	},
@@ -200,6 +207,7 @@ function BlockPatternsList(
 						onClick={ onClickPattern }
 						onHover={ onHover }
 						isDraggable={ isDraggable }
+						showTitle={ showTitle }
 						showTooltip={ showTitlesAsTooltip }
 					/>
 				) : (

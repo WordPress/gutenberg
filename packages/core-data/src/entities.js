@@ -8,6 +8,7 @@ import { capitalCase, pascalCase } from 'change-case';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -18,10 +19,6 @@ import { getSyncProvider } from './sync';
 export const DEFAULT_ENTITY_KEY = 'id';
 
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
-
-// A hardcoded list of post types that support revisions.
-// @TODO: Ideally this should be fetched from the  `/types` REST API's view context.
-const POST_TYPES_WITH_REVISIONS_SUPPORT = [ 'post', 'page' ];
 
 export const rootEntitiesConfig = [
 	{
@@ -42,6 +39,9 @@ export const rootEntitiesConfig = [
 				'url',
 			].join( ',' ),
 		},
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
+		plural: '__unstableBases',
 		syncConfig: {
 			fetch: async () => {
 				return apiFetch( { path: '/' } );
@@ -62,39 +62,13 @@ export const rootEntitiesConfig = [
 		getSyncObjectId: () => 'index',
 	},
 	{
-		label: __( 'Site' ),
-		name: 'site',
-		kind: 'root',
-		baseURL: '/wp/v2/settings',
-		getTitle: ( record ) => {
-			return record?.title ?? __( 'Site Title' );
-		},
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
-	},
-	{
 		label: __( 'Post Type' ),
 		name: 'postType',
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
+		plural: 'postTypes',
 		syncConfig: {
 			fetch: async ( id ) => {
 				return apiFetch( {
@@ -215,9 +189,6 @@ export const rootEntitiesConfig = [
 			`/wp/v2/global-styles/${ parentId }/revisions${
 				revisionId ? '/' + revisionId : ''
 			}`,
-		supports: {
-			revisions: true,
-		},
 		supportsPagination: true,
 	},
 	{
@@ -226,6 +197,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
 		baseURLParams: { context: 'edit' },
+		plural: 'themes',
 		key: 'stylesheet',
 	},
 	{
@@ -234,6 +206,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
+		plural: 'plugins',
 		key: 'plugin',
 	},
 	{
@@ -250,6 +223,12 @@ export const rootEntitiesConfig = [
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
+	{
+		kind: 'root',
+		name: 'site',
+		plural: 'sites',
+		loadEntities: loadSiteEntity,
+	},
 ];
 
 /**
@@ -282,6 +261,29 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 	return newEdits;
 };
 
+const serialisableBlocksCache = new WeakMap();
+
+function makeBlockAttributesSerializable( attributes ) {
+	const newAttributes = { ...attributes };
+	for ( const [ key, value ] of Object.entries( attributes ) ) {
+		if ( value instanceof RichTextData ) {
+			newAttributes[ key ] = value.valueOf();
+		}
+	}
+	return newAttributes;
+}
+
+function makeBlocksSerializable( blocks ) {
+	return blocks.map( ( block ) => {
+		const { innerBlocks, attributes, ...rest } = block;
+		return {
+			...rest,
+			attributes: makeBlockAttributesSerializable( attributes ),
+			innerBlocks: makeBlocksSerializable( innerBlocks ),
+		};
+	} );
+}
+
 /**
  * Returns the list of post type entities.
  *
@@ -307,11 +309,6 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
-			supports: {
-				revisions: POST_TYPES_WITH_REVISIONS_SUPPORT.includes(
-					postType?.slug
-				),
-			},
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||
@@ -329,12 +326,23 @@ async function loadPostTypeEntities() {
 				},
 				applyChangesToDoc: ( doc, changes ) => {
 					const document = doc.getMap( 'document' );
+
 					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							document.get( key ) !== value &&
-							typeof value !== 'function'
-						) {
-							document.set( key, value );
+						if ( typeof value !== 'function' ) {
+							if ( key === 'blocks' ) {
+								if ( ! serialisableBlocksCache.has( value ) ) {
+									serialisableBlocksCache.set(
+										value,
+										makeBlocksSerializable( value )
+									);
+								}
+
+								value = serialisableBlocksCache.get( value );
+							}
+
+							if ( document.get( key ) !== value ) {
+								document.set( key, value );
+							}
 						}
 					} );
 				},
@@ -351,6 +359,7 @@ async function loadPostTypeEntities() {
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
 	} );
 }
@@ -377,39 +386,76 @@ async function loadTaxonomyEntities() {
 }
 
 /**
- * Returns the entity's getter method name given its kind and name.
+ * Returns the Site entity.
+ *
+ * @return {Promise} Entity promise
+ */
+async function loadSiteEntity() {
+	const entity = {
+		label: __( 'Site' ),
+		name: 'site',
+		kind: 'root',
+		baseURL: '/wp/v2/settings',
+		syncConfig: {
+			fetch: async () => {
+				return apiFetch( { path: '/wp/v2/settings' } );
+			},
+			applyChangesToDoc: ( doc, changes ) => {
+				const document = doc.getMap( 'document' );
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( document.get( key ) !== value ) {
+						document.set( key, value );
+					}
+				} );
+			},
+			fromCRDTDoc: ( doc ) => {
+				return doc.getMap( 'document' ).toJSON();
+			},
+		},
+		syncObjectType: 'root/site',
+		getSyncObjectId: () => 'index',
+		meta: {},
+	};
+
+	const site = await apiFetch( {
+		path: entity.baseURL,
+		method: 'OPTIONS',
+	} );
+
+	const labels = {};
+	Object.entries( site?.schema?.properties ?? {} ).forEach(
+		( [ key, value ] ) => {
+			// Ignore properties `title` and `type` keys.
+			if ( typeof value === 'object' && value.title ) {
+				labels[ key ] = value.title;
+			}
+		}
+	);
+
+	return [ { ...entity, meta: { labels } } ];
+}
+
+/**
+ * Returns the entity's getter method name given its kind and name or plural name.
  *
  * @example
  * ```js
  * const nameSingular = getMethodName( 'root', 'theme', 'get' );
  * // nameSingular is getRootTheme
  *
- * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * const namePlural = getMethodName( 'root', 'themes', 'set' );
  * // namePlural is setRootThemes
  * ```
  *
- * @param {string}  kind      Entity kind.
- * @param {string}  name      Entity name.
- * @param {string}  prefix    Function prefix.
- * @param {boolean} usePlural Whether to use the plural form or not.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name or plural name.
+ * @param {string} prefix Function prefix.
  *
  * @return {string} Method name
  */
-export const getMethodName = (
-	kind,
-	name,
-	prefix = 'get',
-	usePlural = false
-) => {
-	const entityConfig = rootEntitiesConfig.find(
-		( config ) => config.kind === kind && config.name === name
-	);
+export const getMethodName = ( kind, name, prefix = 'get' ) => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
-	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
-	const suffix =
-		usePlural && 'plural' in entityConfig && entityConfig?.plural
-			? pascalCase( entityConfig.plural )
-			: nameSuffix;
+	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
 
@@ -423,17 +469,21 @@ function registerSyncConfigs( configs ) {
 }
 
 /**
- * Loads the kind entities into the store.
+ * Loads the entities into the store.
+ *
+ * Note: The `name` argument is used for `root` entities requiring additional server data.
  *
  * @param {string} kind Kind
- *
+ * @param {string} name Name
  * @return {(thunkArgs: object) => Promise<Array>} Entities
  */
 export const getOrLoadEntitiesConfig =
-	( kind ) =>
+	( kind, name ) =>
 	async ( { select, dispatch } ) => {
 		let configs = select.getEntitiesConfig( kind );
-		if ( configs && configs.length !== 0 ) {
+		const hasConfig = !! select.getEntityConfig( kind, name );
+
+		if ( configs?.length > 0 && hasConfig ) {
 			if ( window.__experimentalEnableSync ) {
 				if ( process.env.IS_GUTENBERG_PLUGIN ) {
 					registerSyncConfigs( configs );
@@ -443,9 +493,13 @@ export const getOrLoadEntitiesConfig =
 			return configs;
 		}
 
-		const loader = additionalEntityConfigLoaders.find(
-			( l ) => l.kind === kind
-		);
+		const loader = additionalEntityConfigLoaders.find( ( l ) => {
+			if ( ! name || ! l.name ) {
+				return l.kind === kind;
+			}
+
+			return l.kind === kind && l.name === name;
+		} );
 		if ( ! loader ) {
 			return [];
 		}

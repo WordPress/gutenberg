@@ -13,10 +13,9 @@
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "p",
-			"default": "",
 			"__experimentalRole": "content"
 		},
 		"dropCap": {
@@ -42,7 +41,6 @@
 				"text": true
 			}
 		},
-		"__experimentalConnections": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -66,7 +64,10 @@
 			}
 		},
 		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true
+		"__unstablePasteTextInline": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",
 	"style": "wp-block-paragraph"

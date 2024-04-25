@@ -79,9 +79,7 @@ test.describe( 'Global styles variations', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
@@ -96,9 +94,7 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(74, 7, 74\)/ );
 
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography styles"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
@@ -120,9 +116,7 @@ test.describe( 'Global styles variations', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="yellow"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
 
 		await expect(
@@ -137,9 +131,7 @@ test.describe( 'Global styles variations', () => {
 			)
 		).toHaveCSS( 'background', /rgb\(25, 25, 17\)/ );
 
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Typography styles"i]' );
 		await page.click( 'role=button[name="Typography Text styles"i]' );
 
@@ -167,9 +159,7 @@ test.describe( 'Global styles variations', () => {
 		await editor.canvas.locator( 'body' ).click();
 		await siteEditorStyleVariations.browseStyles();
 		await page.click( 'role=button[name="pink"i]' );
-		await page.click(
-			'role=button[name="Navigate to the previous view"i]'
-		);
+		await page.click( 'role=button[name="Back"i]' );
 		await page.click( 'role=button[name="Colors styles"i]' );
 		await page.click( 'role=button[name="Color palettes"i]' );
 

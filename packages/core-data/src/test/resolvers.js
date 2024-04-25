@@ -143,6 +143,7 @@ describe( 'getEntityRecords', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
+	const registry = { batch: ( callback ) => callback() };
 
 	beforeEach( async () => {
 		triggerFetch.mockReset();
@@ -160,7 +161,7 @@ describe( 'getEntityRecords', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch } );
+		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -191,7 +192,7 @@ describe( 'getEntityRecords', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch } );
+		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -221,7 +222,7 @@ describe( 'getEntityRecords', () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch } );
+		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {

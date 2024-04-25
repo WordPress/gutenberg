@@ -133,7 +133,7 @@ export const BlockMover = ( {
 				options={ blockPageMoverOptions }
 				onChange={ onPickerSelect }
 				title={ __( 'Change block position' ) }
-				leftAlign={ true }
+				leftAlign
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
 		</ToolbarGroup>

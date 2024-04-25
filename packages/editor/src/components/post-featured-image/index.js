@@ -7,7 +7,6 @@ import {
 	DropZone,
 	Button,
 	Spinner,
-	ResponsiveWrapper,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
@@ -98,17 +97,12 @@ function PostFeaturedImage( {
 } ) {
 	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
-	const mediaUpload = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().mediaUpload;
-	}, [] );
-	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
-		media,
-		currentPostId
-	);
+	const { getSettings } = useSelect( blockEditorStore );
+	const { mediaSourceUrl } = getMediaDetails( media, currentPostId );
 
 	function onDropFiles( filesList ) {
-		mediaUpload( {
-			allowedTypes: [ 'image' ],
+		getSettings().mediaUpload( {
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
@@ -185,16 +179,11 @@ function PostFeaturedImage( {
 									}
 								>
 									{ !! featuredImageId && media && (
-										<ResponsiveWrapper
-											naturalWidth={ mediaWidth }
-											naturalHeight={ mediaHeight }
-											isInline
-										>
-											<img
-												src={ mediaSourceUrl }
-												alt=""
-											/>
-										</ResponsiveWrapper>
+										<img
+											className="editor-post-featured-image__preview-image"
+											src={ mediaSourceUrl }
+											alt=""
+										/>
 									) }
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&
@@ -208,8 +197,6 @@ function PostFeaturedImage( {
 										<Button
 											className="editor-post-featured-image__action"
 											onClick={ open }
-											// Prefer that screen readers use the .editor-post-featured-image__preview button.
-											aria-hidden="true"
 										>
 											{ __( 'Replace' ) }
 										</Button>

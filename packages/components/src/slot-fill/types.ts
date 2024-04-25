@@ -3,6 +3,11 @@
  */
 import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
+/**
+ * Internal dependencies
+ */
+import type { ObservableMap } from './bubbles-virtually/observable-map';
+
 export type DistributiveOmit< T, K extends keyof any > = T extends any
 	? Omit< T, K >
 	: never;
@@ -96,6 +101,11 @@ export type SlotFillProviderProps = {
 	 * The children elements.
 	 */
 	children: ReactNode;
+
+	/**
+	 * Whether to pass slots to the parent provider if existent.
+	 */
+	passthrough?: boolean;
 };
 
 export type SlotFillBubblesVirtuallySlotRef = RefObject< HTMLElement >;
@@ -104,14 +114,14 @@ export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
 } >;
 
 export type SlotFillBubblesVirtuallyContext = {
-	slots: Map<
+	slots: ObservableMap<
 		SlotKey,
 		{
 			ref: SlotFillBubblesVirtuallySlotRef;
 			fillProps: FillProps;
 		}
 	>;
-	fills: Map< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
+	fills: ObservableMap< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
 	registerSlot: (
 		name: SlotKey,
 		ref: SlotFillBubblesVirtuallySlotRef,

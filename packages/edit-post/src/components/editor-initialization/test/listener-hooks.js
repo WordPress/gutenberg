@@ -11,10 +11,7 @@ import { RegistryProvider, createRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	useBlockSelectionListener,
-	useUpdatePostLinkListener,
-} from '../listener-hooks';
+import { useUpdatePostLinkListener } from '../listener-hooks';
 import { STORE_NAME } from '../../../store/constants';
 
 describe( 'listener hook tests', () => {
@@ -44,6 +41,12 @@ describe( 'listener hook tests', () => {
 				isViewportMatch: jest.fn(),
 			},
 		},
+		'core/preferences': {
+			...storeConfig,
+			selectors: {
+				get: jest.fn(),
+			},
+		},
 		[ STORE_NAME ]: {
 			...storeConfig,
 			actions: {
@@ -65,10 +68,6 @@ describe( 'listener hook tests', () => {
 	const setMockReturnValue = ( store, functionName, value ) => {
 		mockStores[ store ].selectors[ functionName ].mockReturnValue( value );
 	};
-	const getSpyedFunction = ( store, functionName ) =>
-		mockStores[ store ].selectors[ functionName ];
-	const getSpyedAction = ( store, actionName ) =>
-		mockStores[ store ].actions[ actionName ];
 
 	afterEach( () => {
 		Object.values( mockStores ).forEach( ( storeMocks ) => {
@@ -80,71 +79,17 @@ describe( 'listener hook tests', () => {
 			} );
 		} );
 	} );
-	describe( 'useBlockSelectionListener', () => {
+
+	describe( 'useUpdatePostLinkListener', () => {
 		const registry = createRegistry( mockStores );
-		const TestComponent = ( { postId } ) => {
-			useBlockSelectionListener( postId );
+		const TestComponent = () => {
+			useUpdatePostLinkListener();
 			return null;
 		};
 		const TestedOutput = () => {
 			return (
 				<RegistryProvider value={ registry }>
-					<TestComponent postId={ 10 } />
-				</RegistryProvider>
-			);
-		};
-
-		it( 'does nothing when editor sidebar is not open', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', false );
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedFunction( STORE_NAME, 'isEditorSidebarOpened' )
-			).toHaveBeenCalled();
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).not.toHaveBeenCalled();
-		} );
-		it( 'opens block sidebar if block is selected', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				true
-			);
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/block' );
-		} );
-		it( 'opens document sidebar if block is not selected', () => {
-			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
-			setMockReturnValue(
-				'core/block-editor',
-				'getBlockSelectionStart',
-				false
-			);
-
-			render( <TestedOutput /> );
-
-			expect(
-				getSpyedAction( STORE_NAME, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/document' );
-		} );
-	} );
-
-	describe( 'useUpdatePostLinkListener', () => {
-		const registry = createRegistry( mockStores );
-		const TestComponent = ( { postId } ) => {
-			useUpdatePostLinkListener( postId );
-			return null;
-		};
-		const TestedOutput = ( { postId = 10 } ) => {
-			return (
-				<RegistryProvider value={ registry }>
-					<TestComponent postId={ postId } />
+					<TestComponent />
 				</RegistryProvider>
 			);
 		};
@@ -182,7 +127,7 @@ describe( 'listener hook tests', () => {
 			} );
 			const { rerender } = render( <TestedOutput /> );
 
-			rerender( <TestedOutput id={ 20 } /> );
+			rerender( <TestedOutput /> );
 
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 			act( () => {

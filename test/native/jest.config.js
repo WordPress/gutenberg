@@ -24,9 +24,7 @@ const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts}' ).map(
 const RAW_HANDLING_UNSUPPORTED_UNIT_TESTS = [
 	'html-formatting-remover',
 	'phrasing-content-reducer',
-	'ms-list-converter',
 	'figure-content-reducer',
-	'special-comment-converter',
 	'normalise-blocks',
 	'image-corrector',
 ];
@@ -59,7 +57,7 @@ module.exports = {
 		'node_modules',
 	],
 	moduleNameMapper: {
-		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
+		// Mock the CSS modules. See https://jestjs.io/docs/webpack#handling-static-assets
 		'\\.(scss)$': '<rootDir>/test/native/__mocks__/styleMock.js',
 		'\\.(eot|otf|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
 			'<rootDir>/test/native/__mocks__/fileMock.js',

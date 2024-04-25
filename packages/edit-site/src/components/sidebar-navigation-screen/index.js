@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalUseNavigator as useNavigator,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
@@ -17,6 +16,7 @@ import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,8 +28,28 @@ import {
 	isPreviewingTheme,
 	currentlyPreviewingTheme,
 } from '../../utils/is-previewing-theme';
+import { SidebarNavigationContext } from '../sidebar';
 
-const { useLocation } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
+
+function getBackPath( params ) {
+	// From a data view path we navigate back to root
+	if ( params.path ) {
+		return {};
+	}
+
+	// From edit screen for a post we navigate back to post-type specific data view
+	if ( params.postType === 'page' ) {
+		return { path: '/page', postId: params.postId };
+	} else if ( params.postType === 'wp_template' ) {
+		return { path: '/wp_template', postId: params.postId };
+	} else if ( params.postType === 'wp_navigation' ) {
+		return { path: '/navigation', postId: params.postId };
+	}
+
+	// Go back to root by default
+	return {};
+}
 
 export default function SidebarNavigationScreen( {
 	isRoot,
@@ -41,19 +61,28 @@ export default function SidebarNavigationScreen( {
 	description,
 	backPath: backPathProp,
 } ) {
-	const { dashboardLink, dashboardLinkText } = useSelect( ( select ) => {
-		const { getSettings } = unlock( select( editSiteStore ) );
-		return {
-			dashboardLink: getSettings().__experimentalDashboardLink,
-			dashboardLinkText: getSettings().__experimentalDashboardLinkText,
-		};
-	}, [] );
-	const { getTheme } = useSelect( coreStore );
+	const { dashboardLink, dashboardLinkText, previewingThemeName } = useSelect(
+		( select ) => {
+			const { getSettings } = unlock( select( editSiteStore ) );
+			const currentlyPreviewingThemeId = currentlyPreviewingTheme();
+			return {
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				dashboardLinkText:
+					getSettings().__experimentalDashboardLinkText,
+				// Do not call `getTheme` with null, it will cause a request to
+				// the server.
+				previewingThemeName: currentlyPreviewingThemeId
+					? select( coreStore ).getTheme( currentlyPreviewingThemeId )
+							?.name?.rendered
+					: undefined,
+			};
+		},
+		[]
+	);
 	const location = useLocation();
-	const navigator = useNavigator();
-	const theme = getTheme( currentlyPreviewingTheme() );
+	const history = useHistory();
+	const navigate = useContext( SidebarNavigationContext );
 	const icon = isRTL() ? chevronRight : chevronLeft;
-
 	return (
 		<>
 			<VStack
@@ -75,14 +104,11 @@ export default function SidebarNavigationScreen( {
 						<SidebarButton
 							onClick={ () => {
 								const backPath =
-									backPathProp ?? location.state?.backPath;
-								if ( backPath ) {
-									navigator.goTo( backPath, {
-										isBack: true,
-									} );
-								} else {
-									navigator.goToParent();
-								}
+									backPathProp ??
+									location.state?.backPath ??
+									getBackPath( location.params );
+								history.push( backPath );
+								navigate( 'back' );
 							} }
 							icon={ icon }
 							label={ __( 'Back' ) }
@@ -108,7 +134,7 @@ export default function SidebarNavigationScreen( {
 							? title
 							: sprintf(
 									'Previewing %1$s: %2$s',
-									theme?.name?.rendered,
+									previewingThemeName,
 									title
 							  ) }
 					</Heading>

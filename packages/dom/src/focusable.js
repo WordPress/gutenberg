@@ -98,9 +98,7 @@ function isValidFocusableArea( element ) {
  * @return {HTMLElement[]} Focusable elements.
  */
 export function find( context, { sequential = false } = {} ) {
-	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {NodeListOf<HTMLElement>} */
-	/* eslint-enable jsdoc/no-undefined-types */
 	const elements = context.querySelectorAll( buildSelector( sequential ) );
 
 	return Array.from( elements ).filter( ( element ) => {

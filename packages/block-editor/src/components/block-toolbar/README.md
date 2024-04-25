@@ -6,11 +6,6 @@ The `BlockToolbar` component is used to render a toolbar that serves as a wrappe
 
 ![Image block toolbar](https://make.wordpress.org/core/files/2020/09/image-block-toolbar.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
