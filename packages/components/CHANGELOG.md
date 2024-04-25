@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `NumberControl`: Remove "experimental" designation ([#61061](https://github.com/WordPress/gutenberg/pull/61061)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
