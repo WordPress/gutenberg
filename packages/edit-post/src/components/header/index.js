@@ -17,7 +17,8 @@ import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
@@ -81,13 +82,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
 
-	const handleToggleCollapse = useCallback(
-		( isCollapsed ) => {
-			setIsBlockToolsCollapsed( isCollapsed );
-		},
-		[ setIsBlockToolsCollapsed ]
-	);
-
 	return (
 		<div className="edit-post-header">
 			<MainDashboardButton.Slot>
@@ -110,7 +104,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				{ hasTopToolbar && (
 					<BlockContextualToolbar
 						isCollapsed={ isBlockToolsCollapsed }
-						onToggle={ handleToggleCollapse }
+						onToggle={ setIsBlockToolsCollapsed }
 					/>
 				) }
 				<div
