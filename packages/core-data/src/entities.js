@@ -27,6 +27,8 @@ export const rootEntitiesConfig = [
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
+			// This resource is preloaded. Please ensure the preload is
+			// updated when this list changes.
 			_fields: [
 				'description',
 				'gmt_offset',
@@ -291,7 +293,7 @@ function makeBlocksSerializable( blocks ) {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
+		path: '/wp/v2/types?context=edit',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(

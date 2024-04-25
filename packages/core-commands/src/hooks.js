@@ -5,6 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
 export function useIsTemplatesAccessible() {
+	// This resource is preloaded.
 	return useSelect(
 		( select ) => select( coreStore ).canUser( 'read', 'templates' ),
 		[]

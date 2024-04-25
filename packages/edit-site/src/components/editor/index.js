@@ -146,6 +146,7 @@ export default function Editor( { isLoading, onClick } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
+			// This resourse is preloaded.
 			postTypeLabel: getPostTypeLabel(),
 		};
 	}, [] );
