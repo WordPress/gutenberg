@@ -23,14 +23,14 @@ import { useState, useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
-import MoreMenu from './more-menu';
+import PostEditorMoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
 import ContextualToolbar from './contextual-toolbar';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems } =
+const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems, MoreMenu } =
 	unlock( editorPrivateApis );
 
 const slideY = {
@@ -152,7 +152,8 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<PinnedItems.Slot scope="core" />
 				) }
-				<MoreMenu showIconLabels={ showIconLabels } />
+				<MoreMenu />
+				<PostEditorMoreMenu />
 			</motion.div>
 		</div>
 	);

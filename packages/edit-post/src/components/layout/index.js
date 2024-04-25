@@ -42,7 +42,6 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -182,10 +181,10 @@ function Layout( { initialPost } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
@@ -361,7 +360,6 @@ function Layout( { initialPost } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<EditPostPreferencesModal />
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />

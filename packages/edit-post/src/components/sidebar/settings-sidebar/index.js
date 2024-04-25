@@ -13,7 +13,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
@@ -28,6 +28,7 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -53,15 +54,6 @@ export const sidebars = {
 	document: 'edit-post/document',
 	block: 'edit-post/block',
 };
-
-function onActionPerformed( actionId, items ) {
-	if ( actionId === 'move-to-trash' ) {
-		const postType = items[ 0 ].type;
-		document.location.href = addQueryArgs( 'edit.php', {
-			post_type: postType,
-		} );
-	}
-}
 
 const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	const tabListRef = useRef( null );
@@ -96,6 +88,56 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 			selectedTabElement?.focus();
 		}
 	}, [ tabName ] );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						const postType = items[ 0 ].type;
+						document.location.href = addQueryArgs( 'edit.php', {
+							post_type: postType,
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											const postId = newItem.id;
+											document.location.href =
+												addQueryArgs( 'post.php', {
+													post: postId,
+													action: 'edit',
+												} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ createSuccessNotice ]
+	);
 
 	return (
 		<PluginSidebar
@@ -126,19 +168,15 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 							/>
 						}
 					/>
-					{ ! isEditingTemplate && (
-						<>
-							<PostStatus />
-							<PluginDocumentSettingPanel.Slot />
-							<PostLastRevisionPanel />
-							<PostTaxonomiesPanel />
-							<PostExcerptPanel />
-							<PostDiscussionPanel />
-							<PageAttributesPanel />
-							<PatternOverridesPanel />
-							<MetaBoxes location="side" />
-						</>
-					) }
+					{ ! isEditingTemplate && <PostStatus /> }
+					<PluginDocumentSettingPanel.Slot />
+					<PostLastRevisionPanel />
+					<PostTaxonomiesPanel />
+					<PostExcerptPanel />
+					<PostDiscussionPanel />
+					<PageAttributesPanel />
+					<PatternOverridesPanel />
+					{ ! isEditingTemplate && <MetaBoxes location="side" /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />

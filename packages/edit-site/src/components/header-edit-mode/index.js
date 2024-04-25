@@ -31,7 +31,7 @@ import {
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import SiteEditorMoreMenuItems from './more-menu';
 import SaveButton from '../save-button';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
@@ -43,7 +43,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown, PinnedItems } =
+const { MoreMenu, PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
@@ -206,7 +206,8 @@ export default function HeaderEditMode() {
 					<PostViewLink />
 					<SaveButton size="compact" />
 					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					<MoreMenu />
+					<SiteEditorMoreMenuItems />
 				</motion.div>
 			</div>
 		</div>
