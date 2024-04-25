@@ -10,6 +10,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -47,7 +48,7 @@ export default function AddNewPageModal( { onSave, onClose } ) {
 				sprintf(
 					// translators: %s: Title of the created template e.g: "Category".
 					__( '"%s" successfully created.' ),
-					newPage.title?.rendered || title
+					decodeEntities( newPage.title?.rendered || title )
 				),
 				{
 					type: 'snackbar',
