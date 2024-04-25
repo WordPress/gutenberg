@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -74,9 +74,7 @@ export default function PostCardPanel( { className, actions } ) {
 		! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes( postType );
 	return (
 		<PanelBody>
-			<div
-				className={ classnames( 'editor-post-card-panel', className ) }
-			>
+			<div className={ clsx( 'editor-post-card-panel', className ) }>
 				<HStack
 					spacing={ 2 }
 					className="editor-post-card-panel__header"

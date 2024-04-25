@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -68,10 +68,7 @@ export function AlignmentMatrixControl( {
 
 	const activeId = compositeStore.useState( 'activeId' );
 
-	const classes = classnames(
-		'component-alignment-matrix-control',
-		className
-	);
+	const classes = clsx( 'component-alignment-matrix-control', className );
 
 	return (
 		<Composite

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -84,7 +84,7 @@ export default function VisualEditor( { styles } ) {
 
 	return (
 		<div
-			className={ classnames( 'edit-post-visual-editor', {
+			className={ clsx( 'edit-post-visual-editor', {
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>

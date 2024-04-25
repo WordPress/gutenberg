@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -115,7 +115,7 @@ export default function HeaderEditMode() {
 
 	return (
 		<div
-			className={ classnames( 'edit-site-header-edit-mode', {
+			className={ clsx( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 			} ) }
 		>
@@ -132,7 +132,7 @@ export default function HeaderEditMode() {
 					{ showTopToolbar && (
 						<>
 							<div
-								className={ classnames(
+								className={ clsx(
 									'selected-block-tools-wrapper',
 									{
 										'is-collapsed': isBlockToolsCollapsed,
@@ -167,13 +167,10 @@ export default function HeaderEditMode() {
 
 			{ ! isDistractionFree && (
 				<div
-					className={ classnames(
-						'edit-site-header-edit-mode__center',
-						{
-							'is-collapsed':
-								! isBlockToolsCollapsed && showTopToolbar,
-						}
-					) }
+					className={ clsx( 'edit-site-header-edit-mode__center', {
+						'is-collapsed':
+							! isBlockToolsCollapsed && showTopToolbar,
+					} ) }
 				>
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
@@ -191,7 +188,7 @@ export default function HeaderEditMode() {
 				>
 					{ isLargeViewport && (
 						<div
-							className={ classnames(
+							className={ clsx(
 								'edit-site-header-edit-mode__preview-options',
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }

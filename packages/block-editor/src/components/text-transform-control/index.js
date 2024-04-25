@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -51,7 +51,7 @@ const TEXT_TRANSFORMS = [
 export default function TextTransformControl( { className, value, onChange } ) {
 	return (
 		<fieldset
-			className={ classnames(
+			className={ clsx(
 				'block-editor-text-transform-control',
 				className
 			) }

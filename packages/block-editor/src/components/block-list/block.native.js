@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -73,7 +73,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (

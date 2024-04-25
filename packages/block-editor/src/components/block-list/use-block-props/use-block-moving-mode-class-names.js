@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -43,7 +43,7 @@ export function useBlockMovingModeClassNames( clientId ) {
 				return;
 			}
 
-			return classnames( 'is-block-moving-mode', {
+			return clsx( 'is-block-moving-mode', {
 				'can-insert-moving-block': canInsertBlockType(
 					getBlockName( movingClientId ),
 					getBlockRootClientId( clientId )

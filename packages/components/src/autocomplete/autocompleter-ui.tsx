@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -139,7 +139,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 						role="option"
 						aria-selected={ index === selectedIndex }
 						disabled={ option.isDisabled }
-						className={ classnames(
+						className={ clsx(
 							'components-autocomplete__result',
 							className,
 							{

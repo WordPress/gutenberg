@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -419,7 +419,7 @@ export default function NavigationLinkEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -456,7 +456,7 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const classes = classnames( 'wp-block-navigation-item__content', {
+	const classes = clsx( 'wp-block-navigation-item__content', {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 

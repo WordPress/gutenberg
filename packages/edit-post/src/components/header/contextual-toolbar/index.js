@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ function ContextualToolbar( {
 	return (
 		<>
 			<div
-				className={ classnames( 'selected-block-tools-wrapper', {
+				className={ clsx( 'selected-block-tools-wrapper', {
 					'is-collapsed': isCollapsed || ! hasBlockSelection,
 				} ) }
 			>

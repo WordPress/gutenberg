@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ export function NavigationGroup( {
 	}
 
 	const groupTitleId = `components-navigation__group-title-${ groupId }`;
-	const classes = classnames( 'components-navigation__group', className );
+	const classes = clsx( 'components-navigation__group', className );
 
 	return (
 		<NavigationGroupContext.Provider value={ context }>

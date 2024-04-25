@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -258,12 +258,12 @@ function InserterMenu(
 
 	return (
 		<div
-			className={ classnames( 'block-editor-inserter__menu', {
+			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
 			} ) }
 		>
 			<div
-				className={ classnames( 'block-editor-inserter__main-area', {
+				className={ clsx( 'block-editor-inserter__main-area', {
 					'show-as-tabs': showAsTabs,
 				} ) }
 			>

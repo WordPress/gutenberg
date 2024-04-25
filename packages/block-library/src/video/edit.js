@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -134,7 +134,7 @@ function VideoEdit( {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-transient': isTemporaryVideo,
 	} );
 

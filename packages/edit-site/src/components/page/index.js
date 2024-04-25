@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ export default function Page( {
 	className,
 	hideTitleFromUI = false,
 } ) {
-	const classes = classnames( 'edit-site-page', className );
+	const classes = clsx( 'edit-site-page', className );
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>

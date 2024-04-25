@@ -23,7 +23,7 @@ ruleTester.run( 'dependency-group', rule, {
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 
 /**
  * WordPress dependencies
@@ -58,7 +58,7 @@ const edit = require( './edit' );`,
 		{
 			code: `
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 /*
  * wordpress dependencies.
  */
@@ -83,7 +83,7 @@ import edit from './edit';`,
  * External dependencies
  */
 import { camelCase } from 'change-case';
-import classnames from 'classnames';
+import clsx from 'clsx';;
 /**
  * WordPress dependencies
  */

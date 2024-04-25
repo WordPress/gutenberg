@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					/>
 				) }
 				<div
-					className={ classnames( 'edit-post-header__center', {
+					className={ clsx( 'edit-post-header__center', {
 						'is-collapsed':
 							hasHistory &&
 							! isBlockToolsCollapsed &&

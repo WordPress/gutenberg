@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -36,10 +36,7 @@ const WRITING_MODES = [
 export default function WritingModeControl( { className, value, onChange } ) {
 	return (
 		<fieldset
-			className={ classnames(
-				'block-editor-writing-mode-control',
-				className
-			) }
+			className={ clsx( 'block-editor-writing-mode-control', className ) }
 		>
 			<BaseControl.VisualLabel as="legend">
 				{ __( 'Orientation' ) }

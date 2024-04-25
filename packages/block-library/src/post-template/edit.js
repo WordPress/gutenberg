@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -218,7 +218,7 @@ export default function PostTemplateEdit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
+		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
 		} ),

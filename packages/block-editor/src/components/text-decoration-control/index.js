@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -45,7 +45,7 @@ export default function TextDecorationControl( {
 } ) {
 	return (
 		<fieldset
-			className={ classnames(
+			className={ clsx(
 				'block-editor-text-decoration-control',
 				className
 			) }

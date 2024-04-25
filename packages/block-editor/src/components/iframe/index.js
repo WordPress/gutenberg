@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -368,7 +368,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses

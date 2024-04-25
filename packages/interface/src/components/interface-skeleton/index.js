@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -106,7 +106,7 @@ function InterfaceSkeleton(
 				ref,
 				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
 			] ) }
-			className={ classnames(
+			className={ clsx(
 				className,
 				'interface-interface-skeleton',
 				navigateRegionsProps.className,
