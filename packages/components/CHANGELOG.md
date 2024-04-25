@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `Truncate`: Remove "experimental" designation ([#61070](https://github.com/WordPress/gutenberg/pull/61070)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
