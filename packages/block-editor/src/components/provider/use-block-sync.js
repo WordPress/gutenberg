@@ -186,7 +186,15 @@ export default function useBlockSync( {
 		}
 	}, [ controlledBlocks, clientId ] );
 
+	const isMounted = useRef( false );
+
 	useEffect( () => {
+		// On mount, controlled blocks are already set in the effect above.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+
 		// When the block becomes uncontrolled, it means its inner state has been reset
 		// we need to take the blocks again from the external value property.
 		if ( ! isControlled ) {
