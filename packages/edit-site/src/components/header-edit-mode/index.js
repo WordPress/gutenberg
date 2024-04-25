@@ -31,7 +31,7 @@ import {
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import SiteEditorMoreMenuItems from './more-menu';
 import SaveButton from '../save-button';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
@@ -42,8 +42,8 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown, PinnedItems } =
+const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
+const { MoreMenu, PostViewLink, PreviewDropdown, PinnedItems } =
 	unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
@@ -54,6 +54,7 @@ export default function HeaderEditMode() {
 		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
+		isFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { getBlockSelectionStart, __unstableGetEditorMode } =
@@ -71,12 +72,15 @@ export default function HeaderEditMode() {
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
+			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showFixedToolbar } = useShowBlockTools();
-	const showTopToolbar = isLargeViewport && showFixedToolbar;
+	const hasBlockToolbar = useHasBlockToolbar();
+	const hasFixedToolbar = hasBlockToolbar && isFixedToolbar;
+	const showTopToolbar =
+		isLargeViewport && hasFixedToolbar && blockEditorMode !== 'zoom-out';
 	const blockToolbarRef = useRef();
 	const disableMotion = useReducedMotion();
 
@@ -201,10 +205,9 @@ export default function HeaderEditMode() {
 					) }
 					<PostViewLink />
 					<SaveButton size="compact" />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
-					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
+					<MoreMenu />
+					<SiteEditorMoreMenuItems />
 				</motion.div>
 			</div>
 		</div>

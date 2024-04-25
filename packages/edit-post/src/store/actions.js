@@ -14,7 +14,6 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { store as editPostStore } from '.';
 import { unlock } from '../lock-unlock';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -29,7 +28,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editPostStore.name, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -38,9 +37,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editPostStore.name );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -223,14 +220,11 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/edit-post', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ](
-				'core/edit-post',
-				pluginName
-			);
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**

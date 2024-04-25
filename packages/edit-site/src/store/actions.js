@@ -14,7 +14,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
@@ -222,7 +221,7 @@ export function setEditedPostContext( context ) {
  *
  * @deprecated
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
 export function setPage() {
 	deprecated( "dispatch( 'core/edit-site' ).setPage", {
@@ -366,7 +365,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editSiteStoreName, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -375,9 +374,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editSiteStoreName );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 	};
 
 /**

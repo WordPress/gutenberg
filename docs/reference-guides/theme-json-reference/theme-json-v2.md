@@ -28,9 +28,9 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link
+- color: link, heading, button, caption
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
@@ -53,7 +53,7 @@ Please note that when using this setting, `styles.spacing.padding` should always
 Settings related to borders.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | color | boolean | false |  |
 | radius | boolean | false |  |
 | style | boolean | false |  |
@@ -66,7 +66,7 @@ Settings related to borders.
 Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
@@ -77,7 +77,7 @@ Settings related to shadows.
 Settings related to colors.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | background | boolean | true |  |
 | custom | boolean | true |  |
 | customDuotone | boolean | true |  |
@@ -92,6 +92,7 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
+| caption | boolean | true |  |
 
 ---
 
@@ -100,8 +101,9 @@ Settings related to colors.
 Settings related to background.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
+| backgroundSize | boolean | false |  |
 
 ---
 
@@ -110,7 +112,7 @@ Settings related to background.
 Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
 | minHeight | boolean | false |  |
 
@@ -121,7 +123,7 @@ Settings related to dimensions.
 Settings related to layout.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
@@ -134,7 +136,7 @@ Settings related to layout.
 Settings related to the lightbox.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | enabled | boolean |  |  |
 | allowEditing | boolean |  |  |
 
@@ -145,7 +147,7 @@ Settings related to the lightbox.
 Settings related to position.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | sticky | boolean | false |  |
 
 ---
@@ -155,8 +157,8 @@ Settings related to position.
 Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| blockGap | undefined | null |  |
+| ---    | ---    | ---    |---   |
+| blockGap | boolean, null | null |   |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
@@ -171,11 +173,11 @@ Settings related to spacing.
 Settings related to typography.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | undefined | false |  |
+| fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
 | textAlign | boolean | true |  |
@@ -261,6 +263,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textAlign | string |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |

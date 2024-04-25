@@ -12,6 +12,8 @@ import {
 	getBlockEditingMode,
 	getSettings,
 	canInsertBlockType,
+	getBlockName,
+	getTemplateLock,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -419,4 +421,54 @@ export function isDragging( state ) {
  */
 export function getExpandedBlock( state ) {
 	return state.expandedBlock;
+}
+
+/**
+ * Retrieves the client ID of the ancestor block that is content locking the block
+ * with the provided client ID.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const getContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
+			if (
+				getBlockName( state, current ) === 'core/block' ||
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
+
+/**
+ * Retrieves the client ID of the block that is content locked but is
+ * currently being temporarily edited as a non-locked block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
+ */
+export function getTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
+
+/**
+ * Returns the focus mode that should be reapplied when the user stops editing
+ * a content locked blocks as a block without locking.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
+ */
+export function getTemporarilyEditingFocusModeToRevert( state ) {
+	return state.temporarilyEditingFocusModeRevert;
 }

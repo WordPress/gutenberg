@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { useState, useId, useRef, flushSync } from '@wordpress/element';
+import { useState, useId } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
-import { ToggleControl, BaseControl, Button } from '@wordpress/components';
+import { BaseControl, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -13,7 +13,10 @@ import {
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
 	PATTERN_OVERRIDES_BINDING_SOURCE,
 } from '../constants';
-import AllowOverridesModal from './allow-overrides-modal';
+import {
+	AllowOverridesModal,
+	DisallowOverridesModal,
+} from './allow-overrides-modal';
 
 function removeBindings( bindings, syncedAttributes ) {
 	let updatedBindings = {};
@@ -47,8 +50,9 @@ function addBindings( bindings, syncedAttributes ) {
 
 function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	const controlId = useId();
-	const toggleRef = useRef();
 	const [ showAllowOverridesModal, setShowAllowOverridesModal ] =
+		useState( false );
+	const [ showDisallowOverridesModal, setShowDisallowOverridesModal ] =
 		useState( false );
 
 	const syncedAttributes = PARTIAL_SYNCING_SUPPORTED_BLOCKS[ name ];
@@ -83,7 +87,12 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	// Avoid overwriting other (e.g. meta) bindings.
 	if ( isConnectedToOtherSources ) return null;
 
-	const hasName = attributes.metadata?.name;
+	const hasName = !! attributes.metadata?.name;
+	const allowOverrides =
+		hasName &&
+		attributeSources.some(
+			( source ) => source === PATTERN_OVERRIDES_BINDING_SOURCE
+		);
 
 	return (
 		<>
@@ -92,43 +101,41 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 					id={ controlId }
 					label={ __( 'Overrides' ) }
 					help={ __(
-						'Allow attributes within this block to be overridden by pattern instances.'
+						'Allow changes to this block throughout instances of this pattern.'
 					) }
 				>
-					{ hasName ? (
-						<ToggleControl
-							__nextHasNoMarginBottom
-							label={ __( 'Allow overrides' ) }
-							checked={ attributeSources.some(
-								( source ) =>
-									source === PATTERN_OVERRIDES_BINDING_SOURCE
-							) }
-							onChange={ ( isChecked ) => {
-								updateBindings( isChecked );
-							} }
-							ref={ toggleRef }
-						/>
-					) : (
-						<Button
-							className="pattern-overrides-control__allow-overrides-button"
-							variant="secondary"
-							onClick={ () => setShowAllowOverridesModal( true ) }
-						>
-							{ __( 'Allow overrides' ) }
-						</Button>
-					) }
+					<Button
+						__next40pxDefaultSize
+						className="pattern-overrides-control__allow-overrides-button"
+						variant="secondary"
+						onClick={ () => {
+							if ( allowOverrides ) {
+								setShowDisallowOverridesModal( true );
+							} else {
+								setShowAllowOverridesModal( true );
+							}
+						} }
+					>
+						{ allowOverrides
+							? __( 'Disable overrides' )
+							: __( 'Enable overrides' ) }
+					</Button>
 				</BaseControl>
 			</InspectorControls>
 
 			{ showAllowOverridesModal && (
 				<AllowOverridesModal
+					initialName={ attributes.metadata?.name }
 					onClose={ () => setShowAllowOverridesModal( false ) }
 					onSave={ ( newName ) => {
-						flushSync( () => {
-							updateBindings( true, newName );
-						} );
-						toggleRef.current?.focus();
+						updateBindings( true, newName );
 					} }
+				/>
+			) }
+			{ showDisallowOverridesModal && (
+				<DisallowOverridesModal
+					onClose={ () => setShowDisallowOverridesModal( false ) }
+					onSave={ () => updateBindings( false ) }
 				/>
 			) }
 		</>

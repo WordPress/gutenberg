@@ -41,9 +41,7 @@ export const getEditorMode = createRegistrySelector(
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/edit-post'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
@@ -60,9 +58,7 @@ export const isEditorSidebarOpened = createRegistrySelector(
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/edit-post'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return (
 			!! activeGeneralSidebar &&
 			! [ 'edit-post/document', 'edit-post/block' ].includes(
@@ -88,9 +84,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
 	( select ) => () => {
-		return select( interfaceStore ).getActiveComplementaryArea(
-			'core/edit-post'
-		);
+		return select( interfaceStore ).getActiveComplementaryArea( 'core' );
 	}
 );
 
@@ -350,10 +344,7 @@ export const isFeatureActive = createRegistrySelector(
  */
 export const isPluginItemPinned = createRegistrySelector(
 	( select ) => ( state, pluginName ) => {
-		return select( interfaceStore ).isItemPinned(
-			'core/edit-post',
-			pluginName
-		);
+		return select( interfaceStore ).isItemPinned( 'core', pluginName );
 	}
 );
 

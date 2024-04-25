@@ -195,6 +195,7 @@ const PAGE_ACTIONS = [
 	'restore',
 	'permanently-delete',
 	'view-post-revisions',
+	'duplicate-post',
 	'rename-post',
 	'move-to-trash',
 ];
@@ -263,7 +264,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {

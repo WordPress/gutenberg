@@ -28,7 +28,11 @@ export function removePropertyFromObject( object, property ) {
 		return object;
 	}
 
-	if ( typeof object !== 'object' || ! Object.keys( object ).length ) {
+	if (
+		typeof object !== 'object' ||
+		! object ||
+		! Object.keys( object ).length
+	) {
 		return object;
 	}
 

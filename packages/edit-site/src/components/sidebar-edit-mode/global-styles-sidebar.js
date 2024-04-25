@@ -63,7 +63,7 @@ export default function GlobalStylesSidebar() {
 			isStyleBookOpened: 'style-book' === canvasContainerView,
 			shouldClearCanvasContainerView:
 				'edit-site/global-styles' !==
-					getActiveComplementaryArea( 'core/edit-site' ) ||
+					getActiveComplementaryArea( 'core' ) ||
 				! _isVisualEditorMode ||
 				! _isEditCanvasMode,
 			showListViewByDefault: _showListViewByDefault,

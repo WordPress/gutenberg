@@ -350,7 +350,7 @@ export default function TypographyPanel( {
 		>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
-					label={ __( 'Font family' ) }
+					label={ __( 'Font' ) }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
 					isShownByDefault={ defaultControls.fontFamily }
@@ -367,7 +367,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasFontSizeEnabled && (
 				<ToolsPanelItem
-					label={ __( 'Font size' ) }
+					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
 					onDeselect={ resetFontSize }
 					isShownByDefault={ defaultControls.fontSize }
@@ -444,14 +444,14 @@ export default function TypographyPanel( {
 			{ hasTextColumnsControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text columns' ) }
+					label={ __( 'Columns' ) }
 					hasValue={ hasTextColumns }
 					onDeselect={ resetTextColumns }
 					isShownByDefault={ defaultControls.textColumns }
 					panelId={ panelId }
 				>
 					<NumberControl
-						label={ __( 'Text columns' ) }
+						label={ __( 'Columns' ) }
 						max={ MAX_TEXT_COLUMNS }
 						min={ MIN_TEXT_COLUMNS }
 						onChange={ setTextColumns }
@@ -465,7 +465,7 @@ export default function TypographyPanel( {
 			{ hasTextDecorationControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text decoration' ) }
+					label={ __( 'Decoration' ) }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
 					isShownByDefault={ defaultControls.textDecoration }
@@ -482,7 +482,7 @@ export default function TypographyPanel( {
 			{ hasWritingModeControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text orientation' ) }
+					label={ __( 'Orientation' ) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }

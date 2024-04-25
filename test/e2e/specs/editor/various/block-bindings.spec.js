@@ -1934,7 +1934,7 @@ class BlockBindingsUtils {
 	async updatePost() {
 		await this.page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Update' } )
+			.getByRole( 'button', { name: 'Save' } )
 			.click();
 		await this.page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )

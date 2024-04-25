@@ -37,7 +37,7 @@ export default function SingleNavigationMenu( {
 				navigationMenu?.status
 			) }
 			description={ __(
-				'Navigation menus are a curated collection of blocks that allow visitors to get around your site.'
+				'Navigation Menus are a curated collection of blocks that allow visitors to get around your site.'
 			) }
 		>
 			<NavigationMenuEditor navigationMenuId={ navigationMenu?.id } />

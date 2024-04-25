@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -112,13 +106,14 @@ export class PostPublishButton extends Component {
 			isSaving,
 			isAutoSaving,
 			isToggle,
-			onSave,
-			onStatusChange,
+			savePostStatus,
 			onSubmit = noop,
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
+			postStatus,
+			postStatusHasChanged,
 		} = this.props;
 
 		const isButtonDisabled =
@@ -135,15 +130,19 @@ export class PostPublishButton extends Component {
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
-		let publishStatus;
-		if ( ! hasPublishAction ) {
+		// If the new status has not changed explicitely, we derive it from
+		// other factors, like having a publish action, etc.. We need to preserve
+		// this because it affects when to show the pre and post publish panels.
+		// If it has changed though explicitely, we need to respect that.
+		let publishStatus = 'publish';
+		if ( postStatusHasChanged ) {
+			publishStatus = postStatus;
+		} else if ( ! hasPublishAction ) {
 			publishStatus = 'pending';
 		} else if ( visibility === 'private' ) {
 			publishStatus = 'private';
 		} else if ( isBeingScheduled ) {
 			publishStatus = 'future';
-		} else {
-			publishStatus = 'publish';
 		}
 
 		const onClickButton = () => {
@@ -151,10 +150,10 @@ export class PostPublishButton extends Component {
 				return;
 			}
 			onSubmit();
-			onStatusChange( publishStatus );
-			onSave();
+			savePostStatus( publishStatus );
 		};
 
+		// Callback to open the publish panel.
 		const onClickToggle = () => {
 			if ( isToggleDisabled ) {
 				return;
@@ -179,33 +178,16 @@ export class PostPublishButton extends Component {
 			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
 		};
-
-		const toggleChildren = isBeingScheduled
-			? __( 'Schedule…' )
-			: __( 'Publish' );
-		const buttonChildren = (
-			<PublishButtonLabel
-				hasNonPostEntityChanges={ hasNonPostEntityChanges }
-			/>
-		);
-
 		const componentProps = isToggle ? toggleProps : buttonProps;
-		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }
-					className={ classnames(
-						componentProps.className,
-						'editor-post-publish-button__button',
-						{
-							'has-changes-dot': hasNonPostEntityChanges,
-						}
-					) }
+					className={ `${ componentProps.className } editor-post-publish-button__button` }
 					size="compact"
 				>
-					{ componentChildren }
+					<PublishButtonLabel />
 				</Button>
 			</>
 		);
@@ -228,6 +210,8 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 			isSavingNonPostEntityChanges,
+			getEditedPostAttribute,
+			getPostEdits,
 		} = select( editorStore );
 		return {
 			isSaving: isSavingPost(),
@@ -242,6 +226,8 @@ export default compose( [
 				getCurrentPost()._links?.[ 'wp:action-publish' ] ?? false,
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
+			postStatus: getEditedPostAttribute( 'status' ),
+			postStatusHasChanged: getPostEdits()?.status,
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
 			isSavingNonPostEntityChanges: isSavingNonPostEntityChanges(),
 		};
@@ -249,9 +235,10 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost, savePost } = dispatch( editorStore );
 		return {
-			onStatusChange: ( status ) =>
-				editPost( { status }, { undoIgnore: true } ),
-			onSave: savePost,
+			savePostStatus: ( status ) => {
+				editPost( { status }, { undoIgnore: true } );
+				savePost();
+			},
 		};
 	} ),
 ] )( PostPublishButton );
