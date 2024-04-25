@@ -385,31 +385,31 @@ _Parameters_
 
 _Returns_
 
--   `Element|null`: The rendered child components or null if page attributes are not supported.
+-   `Component|null`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
-Renders order section of the page attributes panel.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
 
 _Returns_
 
--   `Element`: The rendered JSX element.
+-   `Component`: The component to be rendered.
 
 ### PageAttributesPanel
 
-Renders the Page Attributes panel.
+Renders the Page Attributes Panel component.
 
 _Returns_
 
--   `Element|null`: The rendered Page Attributes panel. Return null if the panel is not enabled or the post type does not support page attributes.
+-   `Component`: The component to be rendered.
 
 ### PageAttributesParent
 
-Renders the parent page attributes component.A dropdown menu in an editor interface for selecting the parent page of a given post.
+Renders the Page Attributes Parent component. A dropdown menu in an editor interface for selecting the parent page of a given page.
 
 _Returns_
 
--   `Element|null`: The parent page attributes component.
+-   `Component|null`: The component to be rendered. Return null if post type is not hierarchical.
 
 ### PageTemplate
 

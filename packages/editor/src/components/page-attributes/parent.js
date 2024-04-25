@@ -41,10 +41,10 @@ export const getItemPriority = ( name, searchValue ) => {
 };
 
 /**
- * Renders the parent page attributes component.A dropdown menu in an editor interface
- * for selecting the parent page of a given post.
+ * Renders the Page Attributes Parent component. A dropdown menu in an editor interface
+ * for selecting the parent page of a given page.
  *
- * @return {Element|null} The parent page attributes component.
+ * @return {Component|null} The component to be rendered. Return null if post type is not hierarchical.
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );

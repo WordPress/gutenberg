@@ -15,7 +15,7 @@ import { store as editorStore } from '../../store';
  * @param {Object}  props          - The component props.
  * @param {Element} props.children - The child components to render.
  *
- * @return {Element|null} The rendered child components or null if page attributes are not supported.
+ * @return {Component|null} The rendered child components or null if page attributes are not supported.
  */
 export function PageAttributesCheck( { children } ) {
 	const supportsPageAttributes = useSelect( ( select ) => {

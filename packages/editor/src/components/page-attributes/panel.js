@@ -53,10 +53,9 @@ function AttributesPanel() {
 }
 
 /**
- * Renders the Page Attributes panel.
+ * Renders the Page Attributes Panel component.
  *
- * @return {Element|null} The rendered Page Attributes panel.
- * Return null if the panel is not enabled or the post type does not support page attributes.
+ * @return {Component} The component to be rendered.
  */
 export default function PageAttributesPanel() {
 	return (

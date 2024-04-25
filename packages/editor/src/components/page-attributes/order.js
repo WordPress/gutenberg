@@ -54,9 +54,10 @@ function PageAttributesOrder() {
 }
 
 /**
- * Renders order section of the page attributes panel.
+ * Renders the Page Attributes Order component. A number input in an editor interface
+ * for setting the order of a given page.
  *
- * @return {Element} The rendered JSX element.
+ * @return {Component} The component to be rendered.
  */
 export default function PageAttributesOrderWithChecks() {
 	return (
