@@ -33,7 +33,7 @@ import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const {
-	BlockContextualToolbar,
+	CollapsableBlockToolbar,
 	MoreMenu,
 	PostViewLink,
 	PreviewDropdown,
@@ -111,7 +111,7 @@ export default function HeaderEditMode() {
 						isDistractionFree={ isDistractionFree }
 					/>
 					{ showTopToolbar && (
-						<BlockContextualToolbar
+						<CollapsableBlockToolbar
 							isCollapsed={ isBlockToolsCollapsed }
 							onToggle={ setIsBlockToolsCollapsed }
 						/>

@@ -30,7 +30,7 @@ import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const {
-	BlockContextualToolbar,
+	CollapsableBlockToolbar,
 	DocumentTools,
 	PostViewLink,
 	PreviewDropdown,
@@ -102,7 +102,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<BlockContextualToolbar
+					<CollapsableBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
 						onToggle={ setIsBlockToolsCollapsed }
 					/>

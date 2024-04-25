@@ -1,4 +1,4 @@
-.editor-block-contextual-toolbar {
+.editor-collapsible-block-toolbar {
 	overflow: hidden;
 	display: flex;
 	align-items: center;
@@ -73,6 +73,6 @@
 	}
 }
 
-.editor-block-contextual-toolbar__toggle {
+.editor-collapsible-block-toolbar__toggle {
 	margin-left: 2px; // Allow focus ring to be fully visible
 }

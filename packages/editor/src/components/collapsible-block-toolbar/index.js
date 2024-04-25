@@ -24,7 +24,7 @@ import { unlock } from '../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
-function BlockContextualToolbar( { isCollapsed, onToggle } ) {
+function CollapsableBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
 		return {
 			blockSelectionStart:
@@ -49,7 +49,7 @@ function BlockContextualToolbar( { isCollapsed, onToggle } ) {
 	return (
 		<>
 			<div
-				className={ classnames( 'editor-block-contextual-toolbar', {
+				className={ classnames( 'editor-collapsible-block-toolbar', {
 					'is-collapsed': isCollapsed || ! hasBlockSelection,
 				} ) }
 			>
@@ -58,7 +58,7 @@ function BlockContextualToolbar( { isCollapsed, onToggle } ) {
 			<Popover.Slot name="block-toolbar" />
 
 			<Button
-				className="editor-block-contextual-toolbar__toggle"
+				className="editor-collapsible-block-toolbar__toggle"
 				icon={ isCollapsed ? next : previous }
 				onClick={ () => {
 					onToggle( ! isCollapsed );
@@ -74,4 +74,4 @@ function BlockContextualToolbar( { isCollapsed, onToggle } ) {
 	);
 }
 
-export default BlockContextualToolbar;
+export default CollapsableBlockToolbar;

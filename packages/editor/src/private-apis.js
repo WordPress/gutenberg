@@ -6,7 +6,7 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import BlockContextualToolbar from './components/block-contextual-toolbar';
+import CollapsableBlockToolbar from './components/collapsible-block-toolbar';
 import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
@@ -35,7 +35,7 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	BlockContextualToolbar,
+	CollapsableBlockToolbar,
 	DocumentTools,
 	EditorCanvas,
 	ExperimentalEditorProvider,
