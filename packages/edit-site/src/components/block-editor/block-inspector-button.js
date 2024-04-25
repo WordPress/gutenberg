@@ -11,7 +11,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import { SIDEBAR_BLOCK } from '../sidebar-edit-mode/constants';
 import { unlock } from '../../lock-unlock';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -21,13 +20,11 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		( select ) => ( {
 			shortcut: select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation(
-				'core/edit-site/toggle-block-settings-sidebar'
-			),
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 			isBlockInspectorOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
 					'core'
-				) === SIDEBAR_BLOCK,
+				) === 'edit-post/block',
 		} ),
 		[]
 	);
@@ -45,7 +42,7 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 					disableComplementaryArea( 'core' );
 					speak( __( 'Block settings closed' ) );
 				} else {
-					enableComplementaryArea( 'core', SIDEBAR_BLOCK );
+					enableComplementaryArea( 'core', 'edit-post/block' );
 					speak(
 						__(
 							'Additional settings are now available in the Editor block settings sidebar'

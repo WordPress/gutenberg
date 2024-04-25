@@ -82,7 +82,7 @@ export default function PluginSidebar( { className, ...props } ) {
 			postTitle: select( editorStore ).getEditedPostAttribute( 'title' ),
 			shortcut: select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 		};
 	}, [] );
 	return (

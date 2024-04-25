@@ -23,6 +23,7 @@ import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -44,13 +45,16 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 				getSite,
 				getUnstableBase, // Site index.
 			} = select( coreStore );
-
+			const _site = getSite();
 			return {
 				canvasMode: getCanvasMode(),
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
 				homeUrl: getUnstableBase()?.home,
-				siteTitle: getSite()?.title,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
 			};
 		},
 		[]

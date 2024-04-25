@@ -13,6 +13,7 @@ import { createRoot } from '@wordpress/element';
 import {
 	PluginMoreMenuItem,
 	PluginSidebar,
+	PluginSidebarMoreMenuItem,
 	store as editorStore,
 } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -103,6 +104,6 @@ export function reinitializeEditor() {
 
 export { PluginMoreMenuItem };
 export { PluginSidebar };
-export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
+export { PluginSidebarMoreMenuItem };
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';

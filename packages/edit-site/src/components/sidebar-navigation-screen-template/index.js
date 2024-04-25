@@ -17,7 +17,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { useAddedBy } from '../page-templates-template-parts/hooks';
+import { useAddedBy } from '../page-templates/hooks';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';

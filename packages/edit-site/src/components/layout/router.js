@@ -12,7 +12,7 @@ import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
-import PageTemplatesTemplateParts from '../page-templates-template-parts';
+import PageTemplates from '../page-templates';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
@@ -24,10 +24,6 @@ import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -108,22 +104,12 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
-				),
-				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
-				),
+				sidebar: <SidebarNavigationScreenTemplatesBrowse />,
+				content: <PageTemplates />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
-				),
+				mobile: <PageTemplates />,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -132,30 +118,19 @@ export default function useLayoutAreas() {
 	}
 
 	// Template parts
+	/*
+	 * This is for legacy reasons, as the template parts are now part of the patterns screen.
+	 * However, hybrid themes (classic themes that support template parts) still access this URL.
+	 * While there are plans to make them use the patterns screen instead, we cannot do it for now.
+	 * See discussion at https://github.com/WordPress/gutenberg/pull/60689
+	 */
 	if ( path === '/wp_template_part/all' ) {
-		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			key: 'template-parts',
 			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
-				),
-				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
-			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
+				sidebar: <SidebarNavigationScreenPatterns />,
+				content: <PagePatterns />,
+				mobile: <PagePatterns />,
 			},
 		};
 	}

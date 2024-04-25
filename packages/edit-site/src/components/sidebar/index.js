@@ -1,8 +1,11 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { __unstableMotion as motion } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
 import {
 	useCallback,
 	createContext,
@@ -13,23 +16,6 @@ import {
 import { focus } from '@wordpress/dom';
 
 export const SidebarNavigationContext = createContext( () => {} );
-
-function getAnim( direction ) {
-	switch ( direction ) {
-		case 'back':
-			return {
-				initial: { opacity: 0, x: '-50px' },
-				animate: { opacity: 1, x: '0' },
-			};
-		case 'forward':
-			return {
-				initial: { opacity: 0, x: '50px' },
-				animate: { opacity: 1, x: '0' },
-			};
-		default:
-			return { initial: false, animate: false };
-	}
-}
 
 export default function SidebarContent( { routeKey, children } ) {
 	const [ navState, setNavState ] = useState( {
@@ -62,22 +48,21 @@ export default function SidebarContent( { routeKey, children } ) {
 		elementToFocus?.focus();
 	}, [ navState ] );
 
-	const disableMotion = useReducedMotion();
-	const { initial, animate } = getAnim( navState.direction );
+	const wrapperCls = classnames( 'edit-site-sidebar__screen-wrapper', {
+		'slide-from-left': navState.direction === 'back',
+		'slide-from-right': navState.direction === 'forward',
+	} );
 
 	return (
 		<SidebarNavigationContext.Provider value={ navigate }>
 			<div className="edit-site-sidebar__content">
-				<motion.div
+				<div
 					ref={ wrapperRef }
 					key={ routeKey }
-					className="edit-site-sidebar__screen-wrapper"
-					initial={ ! disableMotion && initial }
-					animate={ ! disableMotion && animate }
-					transition={ { duration: 0.14 } }
+					className={ wrapperCls }
 				>
 					{ children }
-				</motion.div>
+				</div>
 			</div>
 		</SidebarNavigationContext.Provider>
 	);

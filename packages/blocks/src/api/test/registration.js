@@ -13,6 +13,7 @@ import { select, dispatch } from '@wordpress/data';
 import {
 	registerBlockType,
 	registerBlockCollection,
+	registerBlockVariation,
 	unregisterBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -26,6 +27,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockSupport,
+	getBlockVariations,
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
@@ -395,6 +397,51 @@ describe( 'blocks', () => {
 				blockHooks: {
 					'tests/my-block': 'after',
 				},
+			} );
+		} );
+
+		it( 'should merge settings provided by server and client', () => {
+			const blockName = 'core/test-block-with-merged-settings';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					variations: [
+						{ name: 'foo', label: 'Foo' },
+						{ name: 'baz', label: 'Baz', description: 'Testing' },
+					],
+				},
+			} );
+
+			const blockType = {
+				title: 'block settings merge',
+				variations: [
+					{ name: 'bar', label: 'Bar' },
+					{ name: 'baz', label: 'Baz', icon: 'layout' },
+				],
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block settings merge',
+				icon: { src: BLOCK_ICON_DEFAULT },
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				selectors: {},
+				supports: {},
+				styles: [],
+				variations: [
+					{ name: 'foo', label: 'Foo' },
+					{
+						description: 'Testing',
+						name: 'baz',
+						label: 'Baz',
+						icon: 'layout',
+					},
+					{ name: 'bar', label: 'Bar' },
+				],
+				blockHooks: {},
 			} );
 		} );
 
@@ -1363,6 +1410,26 @@ describe( 'blocks', () => {
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
 			expect( isReusableBlock( block ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'registerBlockVariation', () => {
+		it( 'should warn when registering block variation without a name', () => {
+			registerBlockType( 'core/variation-block', defaultBlockSettings );
+			registerBlockVariation( 'core/variation-block', {
+				title: 'Variation Title',
+				description: 'Variation description',
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Variation names must be unique strings.'
+			);
+			expect( getBlockVariations( 'core/variation-block' ) ).toEqual( [
+				{
+					title: 'Variation Title',
+					description: 'Variation description',
+				},
+			] );
 		} );
 	} );
 } );

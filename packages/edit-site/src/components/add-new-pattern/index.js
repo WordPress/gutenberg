@@ -5,13 +5,12 @@ import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	privateApis as editPatternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -31,15 +30,12 @@ const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
-export default function AddNewPattern() {
+export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 	const history = useHistory();
 	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
-	const isBlockBasedTheme = useSelect( ( select ) => {
-		return select( coreStore ).getCurrentTheme()?.is_block_theme;
-	}, [] );
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -73,15 +69,17 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
+	const controls = [];
+
+	if ( canCreatePatterns ) {
+		controls.push( {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
 			title: __( 'Create pattern' ),
-		},
-	];
+		} );
+	}
 
-	if ( isBlockBasedTheme ) {
+	if ( canCreateParts ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -89,13 +87,15 @@ export default function AddNewPattern() {
 		} );
 	}
 
-	controls.push( {
-		icon: upload,
-		onClick: () => {
-			patternUploadInputRef.current.click();
-		},
-		title: __( 'Import pattern from JSON' ),
-	} );
+	if ( canCreatePatterns ) {
+		controls.push( {
+			icon: upload,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
+		} );
+	}
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (

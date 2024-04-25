@@ -846,10 +846,21 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
+	): ET.Updatable< EntityRecord > | false => {
+		const raw = getRawEntityRecord( state, kind, name, recordId );
+		const edited = getEntityRecordEdits( state, kind, name, recordId );
+		// Never return a non-falsy empty object. Unfortunately we can't return
+		// undefined or null because we were previously returning an empty
+		// object, so trying to read properties from the result would throw.
+		// Using false here is a workaround to avoid breaking changes.
+		if ( ! raw && ! edited ) {
+			return false;
+		}
+		return {
+			...raw,
+			...edited,
+		};
+	},
 	(
 		state: State,
 		kind: string,
@@ -1264,7 +1275,7 @@ export function getReferenceByDistinctEdits( state ) {
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): Optional< ET.Updatable< ET.WpTemplate > > | null {
+): Optional< ET.Updatable< ET.WpTemplate > > | null | false {
 	const records = getEntityRecords< ET.WpTemplate >(
 		state,
 		'postType',
