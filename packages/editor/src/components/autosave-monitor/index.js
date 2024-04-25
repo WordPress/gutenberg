@@ -12,17 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 export class AutosaveMonitor extends Component {
-	/**
-	 * Creates an instance of `AutosaveMonitor`.
-	 *
-	 * @constructor
-	 * @param {Object} props - The properties passed to the component.
-	 * @param {Function} props.autosave - The function to call when changes need to be saved.
-	 * @param {number} props.interval - The maximum time in seconds between an unsaved change and an autosave.
-	 * @param {boolean} props.isAutosaveable - If false, the check for changes is retried every second.
-	 * @param {boolean} props.disableIntervalChecks - If true, disables the timer and any change will immediately trigger `props.autosave()`.
-	 * @param {boolean} props.isDirty - Indicates if there are unsaved changes.
-	 */
 	constructor( props ) {
 		super( props );
 		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
