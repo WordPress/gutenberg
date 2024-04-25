@@ -62,10 +62,6 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tablist {
-		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
-	}
-
 	.block-editor-inserter__main-area {
 		overflow: visible;
 		height: auto;
@@ -116,9 +112,6 @@ $block-inserter-tabs-height: 44px;
 	overflow: hidden;
 
 	.block-editor-inserter__tablist {
-		border-bottom: $border-width solid $gray-300;
-		padding-right: $grid-unit-60;
-
 		button[role="tab"] {
 			flex-grow: 1;
 			margin-bottom: -$border-width;

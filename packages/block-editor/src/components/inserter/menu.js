@@ -125,6 +125,7 @@ function InserterMenu(
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
+		setIsInserterOpened,
 	},
 	ref
 ) {
@@ -248,6 +249,7 @@ function InserterMenu(
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
+						setIsInserterOpened={ setIsInserterOpened }
 					>
 						{ ( selectedTab === 'blocks' ||
 							selectedTab === 'patterns' ) && (
