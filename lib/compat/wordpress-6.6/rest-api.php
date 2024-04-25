@@ -37,9 +37,9 @@ function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
 		$paths_to_remove = array(
 			'/wp/v2/global-styles/' . WP_Theme_JSON_Resolver::get_user_global_styles_post_id(),
 		);
-		$paths = array_filter(
+		$paths           = array_filter(
 			$paths,
-			function( $path ) use ( $paths_to_remove ) {
+			function ( $path ) use ( $paths_to_remove ) {
 				return ! in_array( $path, $paths_to_remove, true );
 			}
 		);
