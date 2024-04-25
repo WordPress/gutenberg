@@ -37,8 +37,11 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 	} = useSelect( ( select ) => {
 		const { getSite, getUnstableBase, getEntityRecords } =
 			select( coreDataStore );
+		// This resource is preloaded.
 		const siteData = getSite();
+		// This resource is preloaded.
 		const base = getUnstableBase();
+		// This resource is preloaded.
 		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );

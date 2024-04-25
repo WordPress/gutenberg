@@ -293,7 +293,7 @@ function makeBlocksSerializable( blocks ) {
  */
 async function loadPostTypeEntities() {
 	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=edit',
+		path: '/wp/v2/types?context=view',
 	} );
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
