@@ -10,6 +10,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
@@ -75,7 +76,7 @@ export default function PagePanels() {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								title
+								decodeEntities( title )
 							),
 							{
 								type: 'snackbar',
