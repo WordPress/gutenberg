@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState, useCallback } from '@wordpress/element';
+import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -30,35 +30,6 @@ import { store as blockEditorStore } from '../../store';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
-
-function BlocksTab( {
-	destinationRootClientId,
-	onInsert,
-	onHover,
-	showMostUsedBlocks,
-	showInserterHelpPanel,
-} ) {
-	return (
-		<>
-			<div className="block-editor-inserter__block-list">
-				<BlockTypesTab
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					onHover={ onHover }
-					showMostUsedBlocks={ showMostUsedBlocks }
-				/>
-			</div>
-			{ showInserterHelpPanel && (
-				<div className="block-editor-inserter__tips">
-					<VisuallyHidden as="h2">
-						{ __( 'A tip for using the block editor' ) }
-					</VisuallyHidden>
-					<Tips />
-				</div>
-			) }
-		</>
-	);
-}
 
 function SearchByType( {
 	searchType,
@@ -231,6 +202,36 @@ function InserterMenu(
 		focus.focusable.find( element )[ 0 ]?.focus() || element.focus();
 	}, [] );
 
+	const blocksTab = useMemo(
+		() => (
+			<>
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
+				</div>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+		]
+	);
+
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__menu', {
@@ -272,17 +273,9 @@ function InserterMenu(
 								isAppender={ isAppender }
 							/>
 						) }
-						{ selectedTab === 'blocks' && ! delayedFilterValue && (
-							<BlocksTab
-								destinationRootClientId={
-									destinationRootClientId
-								}
-								onInsert={ onInsert }
-								onHover={ onHover }
-								showMostUsedBlocks={ showMostUsedBlocks }
-								showInserterHelpPanel={ showInserterHelpPanel }
-							/>
-						) }
+						{ selectedTab === 'blocks' &&
+							! delayedFilterValue &&
+							blocksTab }
 						{ selectedTab === 'patterns' &&
 							! delayedFilterValue && (
 								<BlockPatternsTab
@@ -325,13 +318,7 @@ function InserterMenu(
 				) }
 				{ ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
-						<BlocksTab
-							destinationRootClientId={ destinationRootClientId }
-							onInsert={ onInsert }
-							onHover={ onHover }
-							showMostUsedBlocks={ showMostUsedBlocks }
-							showInserterHelpPanel={ showInserterHelpPanel }
-						/>
+						{ blocksTab }
 					</div>
 				) }
 			</div>
