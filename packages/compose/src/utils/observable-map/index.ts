@@ -6,8 +6,15 @@ export type ObservableMap< K, V > = {
 };
 
 /**
- * A key/value map where the individual entries are observable by subscribing to them
- * with the `subscribe` methods.
+ * A constructor (factory) for `ObservableMap`, a map-like key/value data structure
+ * where the individual entries are observable: using the `subscribe` method, you can
+ * subscribe to updates for a particular keys. Each subscriber always observes one
+ * specific key and is not notified about any unrelated changes (for different keys)
+ * in the `ObservableMap`.
+ *
+ * @template K The type of the keys in the map.
+ * @template V The type of the values in the map.
+ * @return   A new instance of the `ObservableMap` type.
  */
 export function observableMap< K, V >(): ObservableMap< K, V > {
 	const map = new Map< K, V >();
