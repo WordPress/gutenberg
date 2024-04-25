@@ -13,7 +13,6 @@ import {
 	ColorControl,
 	PanelBody,
 	BottomSheetContext,
-	useMobileGlobalStylesColors,
 } from '@wordpress/components';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
@@ -55,7 +54,7 @@ const PaletteScreen = () => {
 	const currentSegmentColors = ! isGradientSegment
 		? defaultSettings.colors
 		: defaultSettings.gradients;
-	const allAvailableColors = useMobileGlobalStylesColors();
+	const allAvailableColors = defaultSettings?.allAvailableColors || [];
 	const allAvailableGradients = currentSegmentColors
 		.flatMap( ( { gradients } ) => gradients )
 		.filter( Boolean );
