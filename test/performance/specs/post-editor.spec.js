@@ -421,6 +421,7 @@ test.describe( 'Post Editor Performance', () => {
 
 			// Open Inserter.
 			await globalInserterToggle.click();
+			await page.getByPlaceholder( 'Search' ).click();
 			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
 			const samples = 10;
