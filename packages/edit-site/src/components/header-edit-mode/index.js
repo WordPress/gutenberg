@@ -98,17 +98,12 @@ export default function HeaderEditMode() {
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
+				'show-block-toolbar': ! isBlockToolsCollapsed && showTopToolbar,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
 				<motion.div
-					className={ classnames(
-						'edit-site-header-edit-mode__start',
-						{
-							'is-opened':
-								! isBlockToolsCollapsed && showTopToolbar,
-						}
-					) }
+					className="edit-site-header-edit-mode__start"
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>
@@ -126,15 +121,7 @@ export default function HeaderEditMode() {
 			) }
 
 			{ ! isDistractionFree && (
-				<div
-					className={ classnames(
-						'edit-site-header-edit-mode__center',
-						{
-							'is-collapsed':
-								! isBlockToolsCollapsed && showTopToolbar,
-						}
-					) }
-				>
+				<div className="edit-site-header-edit-mode__center">
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
