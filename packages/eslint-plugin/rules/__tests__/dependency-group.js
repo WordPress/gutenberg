@@ -41,7 +41,7 @@ import edit from './edit';`,
  * External dependencies
  */
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 
 /**
  * WordPress dependencies
@@ -96,7 +96,7 @@ import edit from './edit';`,
 		{
 			code: `
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 /*
  * wordpress dependencies.
  */
@@ -121,7 +121,7 @@ const edit = require( './edit' );`,
  * External dependencies
  */
 const { camelCase } = require( 'change-case' );
-const classnames = require( 'classnames' );
+const clsx = require( 'clsx' );
 /**
  * WordPress dependencies
  */
