@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, reduceMotion, rtl } from '../../utils';
+import { COLORS, rtl } from '../../utils';
 import { space } from '../../utils/space';
 
 import type {
@@ -291,9 +291,12 @@ export const Tooltip = styled.span< TooltipProps >`
 	user-select: none;
 	line-height: 1.4;
 
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 120ms ease;
+	}
+
 	${ tooltipShow };
 	${ tooltipPosition };
-	${ reduceMotion( 'transition' ) };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }
