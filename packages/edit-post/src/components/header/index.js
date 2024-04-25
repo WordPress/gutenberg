@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	DocumentBar,
 	PostSavedState,
@@ -26,12 +25,17 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import PostEditorMoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
-import ContextualToolbar from './contextual-toolbar';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems, MoreMenu } =
-	unlock( editorPrivateApis );
+const {
+	BlockContextualToolbar,
+	DocumentTools,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+	MoreMenu,
+} = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -50,7 +54,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTextEditor,
-		blockSelectionStart,
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		showIconLabels,
@@ -62,8 +65,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
-			blockSelectionStart:
-				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory:
 				!! select( editorStore ).getEditorSettings()
@@ -107,10 +108,9 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<ContextualToolbar
+					<BlockContextualToolbar
 						isCollapsed={ isBlockToolsCollapsed }
-						blockSelectionStart={ blockSelectionStart }
-						toggleCollapse={ handleToggleCollapse }
+						onToggle={ handleToggleCollapse }
 					/>
 				) }
 				<div

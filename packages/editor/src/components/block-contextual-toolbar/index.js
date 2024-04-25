@@ -8,26 +8,29 @@ import classnames from 'classnames';
  */
 import {
 	BlockToolbar,
+	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { Button, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
-function ContextualToolbar( {
-	blockSelectionStart,
-	isCollapsed,
-	toggleCollapse,
-} ) {
-	const blockToolbarRef = useRef();
+function BlockContextualToolbar( { isCollapsed, onToggle } ) {
+	const { blockSelectionStart } = useSelect( ( select ) => {
+		return {
+			blockSelectionStart:
+				select( blockEditorStore ).getBlockSelectionStart(),
+		};
+	}, [] );
 	const hasBlockToolbar = useHasBlockToolbar();
 
 	const hasBlockSelection = !! blockSelectionStart;
@@ -35,9 +38,9 @@ function ContextualToolbar( {
 	useEffect( () => {
 		// If we have a new block selection, show the block tools
 		if ( blockSelectionStart ) {
-			toggleCollapse( false );
+			onToggle( false );
 		}
-	}, [ blockSelectionStart, toggleCollapse ] );
+	}, [ blockSelectionStart, onToggle ] );
 
 	if ( ! hasBlockToolbar ) {
 		return null;
@@ -46,19 +49,19 @@ function ContextualToolbar( {
 	return (
 		<>
 			<div
-				className={ classnames( 'selected-block-tools-wrapper', {
+				className={ classnames( 'editor-block-contextual-toolbar', {
 					'is-collapsed': isCollapsed || ! hasBlockSelection,
 				} ) }
 			>
 				<BlockToolbar hideDragHandle />
 			</div>
-			<Popover.Slot ref={ blockToolbarRef } name="block-toolbar" />
+			<Popover.Slot name="block-toolbar" />
 
 			<Button
-				className="edit-post-header__block-tools-toggle"
+				className="editor-block-contextual-toolbar__toggle"
 				icon={ isCollapsed ? next : previous }
 				onClick={ () => {
-					toggleCollapse( ! isCollapsed );
+					onToggle( ! isCollapsed );
 				} }
 				label={
 					isCollapsed
@@ -71,4 +74,4 @@ function ContextualToolbar( {
 	);
 }
 
-export default ContextualToolbar;
+export default BlockContextualToolbar;
