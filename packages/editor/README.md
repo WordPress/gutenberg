@@ -251,7 +251,7 @@ Renders the redo button for the editor history.
 _Parameters_
 
 -   _props_ `Object`: - Props.
--   _ref_ `Ref`: - Reference with the element.
+-   _ref_ `Ref`: - Forwarded ref.
 
 _Returns_
 
@@ -264,7 +264,7 @@ Renders the undo button for the editor history.
 _Parameters_
 
 -   _props_ `Object`: - Props.
--   _ref_ `Ref`: - Reference with the element.
+-   _ref_ `Ref`: - Forwarded ref.
 
 _Returns_
 

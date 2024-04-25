@@ -47,7 +47,7 @@ function EditorHistoryRedo( props, ref ) {
  * Renders the redo button for the editor history.
  *
  * @param {Object} props - Props.
- * @param {Ref}    ref   - Reference with the element.
+ * @param {Ref}    ref   - Forwarded ref.
  *
  * @return {Component} The component to be rendered.
  */
