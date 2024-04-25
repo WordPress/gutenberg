@@ -102,7 +102,13 @@ export default function HeaderEditMode() {
 		>
 			{ hasDefaultEditorCanvasView && (
 				<motion.div
-					className="edit-site-header-edit-mode__start"
+					className={ classnames(
+						'edit-site-header-edit-mode__start',
+						{
+							'is-opened':
+								! isBlockToolsCollapsed && showTopToolbar,
+						}
+					) }
 					variants={ toolbarVariants }
 					transition={ toolbarTransition }
 				>

@@ -29,6 +29,11 @@
 			// the toolbar to grow outside of the allowed container space.
 			overflow: hidden;
 		}
+
+		&.is-opened {
+			// When top toolbar is engaged and should expand fully.
+			flex-basis: 100%;
+		}
 	}
 
 	.edit-site-header-edit-mode__end {
