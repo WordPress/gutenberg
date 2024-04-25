@@ -42,7 +42,8 @@ export default function InserterSidebar( {
 
 	const libraryRef = useRef();
 	useEffect( () => {
-		libraryRef.current.focusSearch();
+		// TODO: Fix focus search
+		// libraryRef.current.focusSearch();
 	}, [] );
 
 	return (

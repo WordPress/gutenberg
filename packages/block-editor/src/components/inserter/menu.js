@@ -135,10 +135,16 @@ function InserterMenu(
 		! delayedFilterValue &&
 		selectedPatternCategory;
 
-	const showMediaPanel =
-		selectedTab === 'media' &&
-		! delayedFilterValue &&
-		selectedMediaCategory;
+	const showMediaPanel = selectedTab === 'media' && selectedMediaCategory;
+
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
+
+	const showAsTabs = showPatterns || showMedia;
 
 	const blocksTab = useMemo(
 		() => (
@@ -227,24 +233,6 @@ function InserterMenu(
 		]
 	);
 
-	const inserterTabsContents = useMemo(
-		() => ( {
-			blocks: blocksTab,
-			patterns: patternsTab,
-			media: mediaTab,
-		} ),
-		[ blocksTab, mediaTab, patternsTab ]
-	);
-
-	const searchRef = useRef();
-	useImperativeHandle( ref, () => ( {
-		focusSearch: () => {
-			searchRef.current.focus();
-		},
-	} ) );
-
-	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
-
 	// When the pattern panel is showing, we want to use zoom out mode
 	useZoomOut( showPatternPanel );
 
@@ -267,49 +255,103 @@ function InserterMenu(
 					'show-as-tabs': showAsTabs,
 				} ) }
 			>
-				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
-					onChange={ ( value ) => {
-						if ( hoveredItem ) {
-							setHoveredItem( null );
-						}
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
-					placeholder={ __( 'Search' ) }
-					ref={ searchRef }
-				/>
-				{ !! delayedFilterValue && (
-					<div className="block-editor-inserter__no-tab-container">
-						<InserterSearchResults
-							filterValue={ delayedFilterValue }
-							onSelect={ onSelect }
-							onHover={ onHover }
-							onHoverPattern={ onHoverPattern }
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							isAppender={ isAppender }
-							__experimentalInsertionIndex={
-								__experimentalInsertionIndex
-							}
-							showBlockDirectory
-							shouldFocusBlock={ shouldFocusBlock }
-						/>
-					</div>
-				) }
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
-						tabsContents={ inserterTabsContents }
-					/>
+					>
+						{ ( selectedTab === 'blocks' ||
+							selectedTab === 'patterns' ) && (
+							<>
+								{ /* TODO: Make this into a component */ }
+								<SearchControl
+									__nextHasNoMarginBottom
+									className="block-editor-inserter__search"
+									onChange={ ( value ) => {
+										if ( hoveredItem )
+											setHoveredItem( null );
+										setFilterValue( value );
+									} }
+									value={ filterValue }
+									label={ __(
+										'Search for blocks and patterns'
+									) }
+									placeholder={ __( 'Search' ) }
+									ref={ searchRef }
+								/>
+								{ !! delayedFilterValue && (
+									<div className="block-editor-inserter__no-tab-container">
+										<InserterSearchResults
+											filterValue={ delayedFilterValue }
+											onSelect={ onSelect }
+											onHover={ onHover }
+											onHoverPattern={ onHoverPattern }
+											rootClientId={ rootClientId }
+											clientId={ clientId }
+											isAppender={ isAppender }
+											__experimentalInsertionIndex={
+												__experimentalInsertionIndex
+											}
+											showBlockDirectory
+											shouldFocusBlock={
+												shouldFocusBlock
+											}
+											prioritizePatterns={
+												selectedTab === 'patterns'
+											}
+										/>
+									</div>
+								) }
+							</>
+						) }
+						{ selectedTab === 'blocks' &&
+							! delayedFilterValue &&
+							blocksTab }
+						{ selectedTab === 'patterns' &&
+							! delayedFilterValue &&
+							patternsTab }
+						{ selectedTab === 'media' && mediaTab }
+					</InserterTabs>
 				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
+				{ ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">
-						{ blocksTab }
+						<>
+							<SearchControl
+								__nextHasNoMarginBottom
+								className="block-editor-inserter__search"
+								onChange={ ( value ) => {
+									if ( hoveredItem ) setHoveredItem( null );
+									setFilterValue( value );
+								} }
+								value={ filterValue }
+								label={ __( 'Search for blocks and patterns' ) }
+								placeholder={ __( 'Search' ) }
+								ref={ searchRef }
+							/>
+							{ !! delayedFilterValue && (
+								<div className="block-editor-inserter__no-tab-container">
+									<InserterSearchResults
+										filterValue={ delayedFilterValue }
+										onSelect={ onSelect }
+										onHover={ onHover }
+										onHoverPattern={ onHoverPattern }
+										rootClientId={ rootClientId }
+										clientId={ clientId }
+										isAppender={ isAppender }
+										__experimentalInsertionIndex={
+											__experimentalInsertionIndex
+										}
+										showBlockDirectory
+										shouldFocusBlock={ shouldFocusBlock }
+										prioritizePatterns={
+											selectedTab === 'patterns'
+										}
+									/>
+								</div>
+							) }
+						</>
+						{ ! delayedFilterValue && { blocksTab } }
 					</div>
 				) }
 			</div>
