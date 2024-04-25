@@ -71,15 +71,19 @@ Upgrading to v3 adjusts preset defaults to be more consistent with one another.
 ### How to migrate from v1 to v2:
 
 1. Update `version` to `3`.
-2. Configure the changed defaults if you'd like.
+2. Configure the changed defaults.
 
 ### Changed defaults
 
 #### `settings.typography.defaultFontSizes`
 
-In theme.json v2, the default font sizes were always merged with the theme ones.
+In theme.json v2, the default font sizes were only shown when theme sizes were not defined. A theme providing font sizes with the same slugs as the defaults would always override them.
 
-The new `defaultFontSizes` option differs from that behavior.
+The new `defaultFontSizes` option gives control over showing default font sizes and preventing those defaults from being overridden.
 
 - When set to `true` it will show the default font sizes and prevent them from being overridden by the theme.
 - When set to `false` it will hide the default font sizes and allow the theme to use the default slugs.
+
+It is `true` by default when switching to v3. This is to be consistent with how other `default*` options work such as `settings.color.defaultPalette`.
+
+To keep behavior similar to v2, set this value to `false`.
