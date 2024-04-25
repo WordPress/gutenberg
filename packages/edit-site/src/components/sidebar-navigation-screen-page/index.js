@@ -107,7 +107,7 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 							sprintf(
 								// translators: %s: Title of the created post e.g: "Post 1".
 								__( '"%s" successfully created.' ),
-								title
+								decodeEntities( title )
 							),
 							{
 								type: 'snackbar',
