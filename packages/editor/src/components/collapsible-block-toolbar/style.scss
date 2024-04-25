@@ -28,21 +28,23 @@
 		width: $border-width;
 		height: $grid-unit-30;
 		background-color: $gray-300;
-		margin-left: $grid-unit;
+		margin-right: $grid-unit - $border-width;
 	}
 
 	// Modified group borders.
 	.components-toolbar-group,
 	.components-toolbar {
 		border-right: none;
+		position: relative;
 
 		&::after {
 			content: "";
 			width: $border-width;
 			height: $grid-unit-30;
 			background-color: $gray-300;
-			margin-top: $grid-unit-05;
-			margin-left: $grid-unit;
+			top: $grid-unit-05;
+			position: absolute;
+			right: - $border-width;
 		}
 
 		& .components-toolbar-group.components-toolbar-group {
@@ -63,7 +65,7 @@
 		@include break-small() {
 			&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
 				position: relative;
-				top: -10px;
+				top: - $grid-unit;
 			}
 		}
 	}
