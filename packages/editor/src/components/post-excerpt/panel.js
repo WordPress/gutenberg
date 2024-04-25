@@ -198,8 +198,10 @@ function PrivateExcerpt() {
 						{ 'has-excerpt': !! excerpt }
 					) }
 					onClick={ onToggle }
-					label={ excerptText && triggerEditLabel }
-					showTooltip
+					label={
+						!! excerptText ? triggerEditLabel : excerptPlaceholder
+					}
+					showTooltip={ !! excerptText }
 				>
 					{ excerptText || excerptPlaceholder }
 				</Button>
