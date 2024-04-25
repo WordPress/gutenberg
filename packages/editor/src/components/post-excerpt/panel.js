@@ -187,6 +187,7 @@ function PrivateExcerpt() {
 		: __( 'Edit excerpt' );
 	return (
 		<Dropdown
+			className="editor-post-excerpt__dropdown"
 			contentClassName="editor-post-excerpt__dropdown__content"
 			popoverProps={ popoverProps }
 			focusOnMount
