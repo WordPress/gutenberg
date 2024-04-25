@@ -9,11 +9,6 @@ import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { useState, useContext } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import {
-	ColorControl,
-	PanelBody,
-	BottomSheetContext,
-} from '@wordpress/components';
 import { useRoute, useNavigation } from '@react-navigation/native';
 
 /**
@@ -24,6 +19,9 @@ import ColorIndicator from '../../color-indicator';
 import NavBar from '../bottom-sheet/nav-bar';
 import SegmentedControls from '../segmented-control';
 import { colorsUtils } from './utils';
+import PanelBody from '../../panel/body';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
+import ColorControl from '../../color-control';
 
 import styles from './style.scss';
 
