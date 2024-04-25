@@ -187,7 +187,9 @@ export default function Layout() {
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 						'is-zoom-out': isZoomOutMode,
-						'has-block-breadcrumbs': hasBlockBreadcrumbs,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							( ! isDistractionFree || canvasMode !== 'edit' ),
 					}
 				) }
 			>

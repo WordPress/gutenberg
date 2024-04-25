@@ -23,7 +23,7 @@
 }
 
 // Adjust the position of the notices when breadcrumbs are present
-.edit-site .has-block-breadcrumbs.is-full-canvas:not(.is-distraction-free) .components-editor-notices__snackbar {
+.edit-site .has-block-breadcrumbs.is-full-canvas .components-editor-notices__snackbar {
 	bottom: 40px;
 }
 

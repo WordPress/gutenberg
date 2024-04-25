@@ -19,7 +19,7 @@
 }
 
 // Adjust the position of the notices when breadcrumbs are present
-.has-block-breadcrumbs:not(.is-distraction-free) {
+.has-block-breadcrumbs {
 	.components-editor-notices__snackbar {
 		bottom: 40px;
 	}

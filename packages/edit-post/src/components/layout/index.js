@@ -244,7 +244,8 @@ function Layout( { initialPost } ) {
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
-		'has-block-breadcrumbs': hasBlockBreadcrumbs,
+		'has-block-breadcrumbs':
+			hasBlockBreadcrumbs && ( ! isDistractionFree || ! isWideViewport ),
 	} );
 
 	const secondarySidebarLabel = isListViewOpened
