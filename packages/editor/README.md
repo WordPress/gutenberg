@@ -246,7 +246,7 @@ Undocumented declaration.
 
 ### EditorHistoryRedo
 
-Component to Renders the redo button for the editor history.
+Renders the redo button for the editor history.
 
 _Parameters_
 
@@ -259,7 +259,7 @@ _Returns_
 
 ### EditorHistoryUndo
 
-Component to Renders the undo button for the editor history.
+Renders the undo button for the editor history.
 
 _Parameters_
 

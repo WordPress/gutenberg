@@ -13,16 +13,6 @@ import { forwardRef } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
-
-/**
- * Component to Renders the undo button for the editor history.
- *
- * @param {Object} props - Props.
- * @param {Ref}    ref   - Reference with the element.
- *
- * @return {Component} The component to be rendered.
- */
 function EditorHistoryUndo( props, ref ) {
 	const hasUndo = useSelect(
 		( select ) => select( editorStore ).hasEditorUndo(),
@@ -47,4 +37,14 @@ function EditorHistoryUndo( props, ref ) {
 	);
 }
 
+/** @typedef {import('react').Ref<HTMLElement>} Ref */
+
+/**
+ * Renders the undo button for the editor history.
+ *
+ * @param {Object} props - Props.
+ * @param {Ref}    ref   - Reference with the element.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default forwardRef( EditorHistoryUndo );
