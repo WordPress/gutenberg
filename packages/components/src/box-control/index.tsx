@@ -34,6 +34,10 @@ import type {
 	BoxControlValue,
 } from './types';
 
+const defaultInputProps = {
+	min: 0,
+};
+
 const noop = () => {};
 
 function useUniqueId( idProp?: string ) {
@@ -70,6 +74,7 @@ function useUniqueId( idProp?: string ) {
 function BoxControl( {
 	__next40pxDefaultSize = false,
 	id: idProp,
+	inputProps = defaultInputProps,
 	onChange = noop,
 	label = __( 'Box Control' ),
 	values: valuesProp,
@@ -80,7 +85,6 @@ function BoxControl( {
 	resetValues = DEFAULT_VALUES,
 	onMouseOver,
 	onMouseOut,
-	...inputProps
 }: BoxControlProps ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -136,11 +140,8 @@ function BoxControl( {
 		setIsDirty( false );
 	};
 
-	const min = 'min' in inputProps ? inputProps.min : 0;
-	const newInputProps = { ...inputProps, min };
-
 	const inputControlProps = {
-		newInputProps,
+		...inputProps,
 		onChange: handleOnChange,
 		onFocus: handleOnFocus,
 		isLinked,

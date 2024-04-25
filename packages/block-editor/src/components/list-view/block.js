@@ -82,25 +82,26 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { block, blockName, blockEditingMode } = useSelect(
-		( select ) => {
-			const { getBlock, getBlockName, getBlockEditingMode } =
-				select( blockEditorStore );
+	const { block, blockName, blockEditingMode, allowRightClickOverrides } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlock,
+					getBlockName,
+					getBlockEditingMode,
+					getSettings,
+				} = select( blockEditorStore );
 
-			return {
-				block: getBlock( clientId ),
-				blockName: getBlockName( clientId ),
-				blockEditingMode: getBlockEditingMode( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
-	const allowRightClickOverrides = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getSettings().allowRightClickOverrides,
-		[]
-	);
+				return {
+					block: getBlock( clientId ),
+					blockName: getBlockName( clientId ),
+					blockEditingMode: getBlockEditingMode( clientId ),
+					allowRightClickOverrides:
+						getSettings().allowRightClickOverrides,
+				};
+			},
+			[ clientId ]
+		);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,

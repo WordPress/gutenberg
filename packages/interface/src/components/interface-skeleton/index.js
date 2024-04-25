@@ -171,7 +171,9 @@ function InterfaceSkeleton(
 								<div
 									style={ {
 										position: 'absolute',
-										width: 'fit-content',
+										width: isMobileViewport
+											? '100vw'
+											: 'fit-content',
 										height: '100%',
 										right: 0,
 									} }
