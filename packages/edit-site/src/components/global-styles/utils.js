@@ -49,6 +49,7 @@ export function getFontFamilies( themeJson ) {
 }
 
 export function getShadowParts( shadow ) {
+	// TODO: this function should work with all unite tests
 	const colorStart = shadow.indexOf( 'rgb' );
 	const pattern = /(?<=\)),?\s*/;
 	return shadow
@@ -57,6 +58,7 @@ export function getShadowParts( shadow ) {
 }
 
 export function shadowStringToObject( shadow ) {
+	// TODO: this function should work with all unite tests
 	const colorStart = shadow.indexOf( 'rgb' );
 	const inset = shadow.indexOf( 'inset' ) !== -1;
 	let parts = [];
