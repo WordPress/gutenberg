@@ -31,7 +31,7 @@ if ( ! function_exists( 'wp_api_template_access_controller' ) ) {
 add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 2 );
 
 function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
-	if ( $context->name === 'core/edit-site' ) {
+	if ( 'core/edit-site' === $context->name ) {
 		// When merging back to core, these should be added here:
 		// https://github.com/WordPress/wordpress-develop/blob/7159243c090e429a7d2a1fd2a9509e323f67a39d/src/wp-admin/site-editor.php#L90-L117
 		$paths[] = array( '/wp/v2/settings', 'OPTIONS' );
