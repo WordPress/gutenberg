@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `DropdownMenuV2`: Remove "experimental" designation ([#61076](https://github.com/WordPress/gutenberg/pull/61076)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
