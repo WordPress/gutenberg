@@ -12,6 +12,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 	PanelBody,
+	Button,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
@@ -31,15 +32,34 @@ import {
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
+import { viewPostAction } from '../post-actions/actions';
+
+function ViewPostLink( { post } ) {
+	if ( ! viewPostAction.isEligible( post ) ) {
+		return null;
+	}
+	return (
+		<Button
+			label={ viewPostAction.label }
+			icon={ viewPostAction.icon }
+			isDestructive={ viewPostAction.isDestructive }
+			size="small"
+			onClick={ () => {
+				viewPostAction.callback( [ post ] );
+			} }
+		/>
+	);
+}
 
 export default function PostCardPanel( { className, actions } ) {
-	const { modified, title, templateInfo, icon, postType, isPostsPage } =
+	const { modified, title, templateInfo, icon, postType, isPostsPage, post } =
 		useSelect( ( select ) => {
 			const {
 				getEditedPostAttribute,
 				getCurrentPostType,
 				getCurrentPostId,
 				__experimentalGetTemplateInfo,
+				getCurrentPost,
 			} = select( editorStore );
 			const { getEditedEntityRecord, getEntityRecord } =
 				select( coreStore );
@@ -59,6 +79,7 @@ export default function PostCardPanel( { className, actions } ) {
 					area: _record?.area,
 				} ),
 				isPostsPage: +_id === siteSettings?.page_for_posts,
+				post: getCurrentPost(),
 			};
 		}, [] );
 	const description = templateInfo?.description;
@@ -95,6 +116,7 @@ export default function PostCardPanel( { className, actions } ) {
 					>
 						{ title ? decodeEntities( title ) : __( 'No Title' ) }
 					</Text>
+					<ViewPostLink post={ post } />
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">

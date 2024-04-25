@@ -29,4 +29,8 @@
 			color: inherit;
 		}
 	}
+
+	&__header > button {
+		margin-top: -$grid-unit-05;
+	}
 }

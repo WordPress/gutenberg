@@ -21,7 +21,13 @@ import {
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
@@ -365,13 +371,20 @@ function useRestorePostAction() {
 	);
 }
 
-const viewPostAction = {
+export const viewPostAction = {
 	id: 'view-post',
 	label: __( 'View' ),
 	isPrimary: true,
 	icon: external,
 	isEligible( post ) {
-		return post.status !== 'trash';
+		return (
+			! [
+				TEMPLATE_POST_TYPE,
+				TEMPLATE_PART_POST_TYPE,
+				PATTERN_POST_TYPE,
+				NAVIGATION_POST_TYPE,
+			].includes( post.type ) && post.status !== 'trash'
+		);
 	},
 	callback( posts, onActionPerformed ) {
 		const post = posts[ 0 ];
