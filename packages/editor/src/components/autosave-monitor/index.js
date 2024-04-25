@@ -91,12 +91,12 @@ export class AutosaveMonitor extends Component {
  * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
  * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
  *
- * @param {Object} props - The properties passed to the component.
- * @param {Function} props.autosave - The function to call when changes need to be saved.
- * @param {number} props.interval - The maximum time in seconds between an unsaved change and an autosave.
- * @param {boolean} props.isAutosaveable - If false, the check for changes is retried every second.
- * @param {boolean} props.disableIntervalChecks - If true, disables the timer and any change will immediately trigger `props.autosave()`.
- * @param {boolean} props.isDirty - Indicates if there are unsaved changes.
+ * @param {Object}   props                       - The properties passed to the component.
+ * @param {Function} props.autosave              - The function to call when changes need to be saved.
+ * @param {number}   props.interval              - The maximum time in seconds between an unsaved change and an autosave.
+ * @param {boolean}  props.isAutosaveable        - If false, the check for changes is retried every second.
+ * @param {boolean}  props.disableIntervalChecks - If true, disables the timer and any change will immediately trigger `props.autosave()`.
+ * @param {boolean}  props.isDirty               - Indicates if there are unsaved changes.
  *
  * @example
  * ```jsx
