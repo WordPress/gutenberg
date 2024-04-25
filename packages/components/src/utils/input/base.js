@@ -6,7 +6,6 @@ import { css } from '@emotion/react';
 /**
  * Internal dependencies
  */
-import { reduceMotion } from '../reduce-motion';
 import { COLORS } from '../colors-values';
 import { CONFIG } from '../';
 
@@ -15,7 +14,10 @@ export const inputStyleNeutral = css`
 	transition: box-shadow 0.1s linear;
 	border-radius: ${ CONFIG.radiusBlockUi };
 	border: ${ CONFIG.borderWidth } solid ${ COLORS.ui.border };
-	${ reduceMotion( 'transition' ) }
+
+	@media not ( prefers-reduced-motion ) {
+		transition: box-shadow 0.1s linear;
+	}
 `;
 
 export const inputStyleFocus = css`
