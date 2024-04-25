@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ProgressBar`: Remove "experimental" designation for `ProgressBar`, add optional custom `width` prop ([#61062](https://github.com/WordPress/gutenberg/pull/61062)).
+
 ### Enhancements
 
 -   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).

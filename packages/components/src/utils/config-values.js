@@ -47,6 +47,7 @@ export default Object.assign( {}, CONTROL_PROPS, TOGGLE_GROUP_CONTROL_PROPS, {
 	borderWidthFocus: '1.5px',
 	borderWidthTab: '4px',
 	spinnerSize: 16,
+	progressBarWidth: 160,
 	fontSize: '13px',
 	fontSizeH1: 'calc(2.44 * 13px)',
 	fontSizeH2: 'calc(1.95 * 13px)',

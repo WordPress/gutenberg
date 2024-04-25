@@ -13,6 +13,7 @@ const meta: Meta< typeof ProgressBar > = {
 	title: 'Components/ProgressBar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
+		width: { control: { type: 'number', min: 0, step: 10 } },
 	},
 	tags: [ 'status-private' ],
 	parameters: {
@@ -30,3 +31,9 @@ const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
 
 export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
 Default.args = {};
+
+// The ProgressBar width can be overriden (in pixels) and it will expand to that size if
+// the parent has enough horizontal space. It is interpolated into the `width` property
+// of the `Track` component using the `px` unit.
+export const CustomWidth: StoryFn< typeof ProgressBar > = Template.bind( {} );
+CustomWidth.args = { width: 400 };

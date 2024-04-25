@@ -8,6 +8,7 @@ import { render, screen } from '@testing-library/react';
  */
 import { ProgressBar } from '..';
 import { INDETERMINATE_TRACK_WIDTH } from '../styles';
+import { CONFIG } from '../../utils';
 
 describe( 'ProgressBar', () => {
 	it( 'should render an indeterminate semantic progress bar element', () => {
@@ -78,5 +79,28 @@ describe( 'ProgressBar', () => {
 			ariaLabel
 		);
 		expect( screen.getByRole( 'progressbar' ) ).toHaveStyle( style );
+	} );
+
+	it( 'should use default width if width for the track if the `width` prop is not passed', () => {
+		const { container } = render( <ProgressBar /> );
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const track = container.firstChild;
+
+		expect( track ).toHaveStyle( {
+			'max-width': `${ CONFIG.progressBarWidth }px`,
+		} );
+	} );
+
+	it( 'should apply custom width to tthe track if the `width` prop is passed', () => {
+		const customWidth = 400;
+		const { container } = render( <ProgressBar width={ customWidth } /> );
+
+		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+		const track = container.firstChild;
+
+		expect( track ).toHaveStyle( {
+			'max-width': `${ customWidth }px`,
+		} );
 	} );
 } );
