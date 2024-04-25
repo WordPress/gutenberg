@@ -157,7 +157,7 @@ const handlers = {
 						get() {
 							setNamespace( ns );
 							setScope( scope );
-							const val = stores.get( ns );
+							const val = stores.get( ns ).state;
 							resetScope();
 							resetNamespace();
 							return val;
