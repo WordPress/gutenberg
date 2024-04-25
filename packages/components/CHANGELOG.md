@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `VStack`: Remove "experimental" designation ([#61073](https://github.com/WordPress/gutenberg/pull/61073)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
