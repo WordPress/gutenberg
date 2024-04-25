@@ -44,23 +44,27 @@ const DEFAULT_BLOCK = {
 	name: 'core/column',
 };
 
-function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
-	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
+function ColumnInspectorControls( {
+	clientId,
+	setAttributes,
+	isStackedOnMobile,
+	updateColumns,
+} ) {
 	const { count, canInsertColumnBlock, minCount } = useSelect(
 		( select ) => {
 			const {
 				canInsertBlockType,
 				canRemoveBlock,
-				getBlocks,
+				getBlockOrder,
 				getBlockCount,
 			} = select( blockEditorStore );
-			const innerBlocks = getBlocks( clientId );
+			const order = getBlockOrder( clientId );
 
 			// Get the indexes of columns for which removal is prevented.
 			// The highest index will be used to determine the minimum column count.
-			const preventRemovalBlockIndexes = innerBlocks.reduce(
-				( acc, block, index ) => {
-					if ( ! canRemoveBlock( block.clientId ) ) {
+			const preventRemovalBlockIndexes = order.reduce(
+				( acc, id, index ) => {
+					if ( ! canRemoveBlock( id ) ) {
 						acc.push( index );
 					}
 					return acc;
@@ -79,6 +83,46 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+	return (
+		<PanelBody title={ __( 'Settings' ) }>
+			{ canInsertColumnBlock && (
+				<>
+					<RangeControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Columns' ) }
+						value={ count }
+						onChange={ ( value ) =>
+							updateColumns( count, Math.max( minCount, value ) )
+						}
+						min={ Math.max( 1, minCount ) }
+						max={ Math.max( 6, count ) }
+					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+				</>
+			) }
+			<ToggleControl
+				__nextHasNoMarginBottom
+				label={ __( 'Stack on mobile' ) }
+				checked={ isStackedOnMobile }
+				onChange={ () =>
+					setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} )
+				}
+			/>
+		</PanelBody>
+	);
+}
+
+function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
+	const { isStackedOnMobile, verticalAlignment, templateLock } = attributes;
 
 	const registry = useRegistry();
 	const { getBlocks, getBlockOrder } = useSelect( blockEditorStore );
@@ -193,46 +237,12 @@ function ColumnsEditContainer( { attributes, setAttributes, clientId } ) {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					{ canInsertColumnBlock && (
-						<>
-							<RangeControl
-								__nextHasNoMarginBottom
-								__next40pxDefaultSize
-								label={ __( 'Columns' ) }
-								value={ count }
-								onChange={ ( value ) =>
-									updateColumns(
-										count,
-										Math.max( minCount, value )
-									)
-								}
-								min={ Math.max( 1, minCount ) }
-								max={ Math.max( 6, count ) }
-							/>
-							{ count > 6 && (
-								<Notice
-									status="warning"
-									isDismissible={ false }
-								>
-									{ __(
-										'This column count exceeds the recommended amount and may cause visual breakage.'
-									) }
-								</Notice>
-							) }
-						</>
-					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Stack on mobile' ) }
-						checked={ isStackedOnMobile }
-						onChange={ () =>
-							setAttributes( {
-								isStackedOnMobile: ! isStackedOnMobile,
-							} )
-						}
-					/>
-				</PanelBody>
+				<ColumnInspectorControls
+					clientId={ clientId }
+					setAttributes={ setAttributes }
+					isStackedOnMobile={ isStackedOnMobile }
+					updateColumns={ updateColumns }
+				/>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>
@@ -288,8 +298,7 @@ function Placeholder( { clientId, name, setAttributes } ) {
 const ColumnsEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlocks( clientId ).length > 0,
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ) > 0,
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? ColumnsEditContainer : Placeholder;
