@@ -869,15 +869,32 @@ _Returns_
 
 ### PostAuthor
 
-Undocumented declaration.
+Renders the component for selecting the post author.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostAuthorCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the author.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return `null` if the post type doesn't supports the author or if there are no authors available.
 
 ### PostAuthorPanel
 
-Undocumented declaration.
+Renders the Post Author Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostComments
 
