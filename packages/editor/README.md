@@ -242,8 +242,8 @@ Renders a document outline component.
 
 _Parameters_
 
--   _props_ `Object`: The component props.
--   _props.onSelect_ `Function`: The function to be called when an outline item is selected.
+-   _props_ `Object`: Props.
+-   _props.onSelect_ `Function`: Function to be called when an outline item is selected.
 -   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
 -   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
 
@@ -258,11 +258,11 @@ Component check if there are any headings (core/heading blocks) present in the d
 _Parameters_
 
 -   _props_ `Object`: Props.
--   _props.children_ `Element`: The child elements to render.
+-   _props.children_ `Element`: Children to be rendered.
 
 _Returns_
 
--   `Component|null`: The rendered child elements or null if there are headings.
+-   `Component|null`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
