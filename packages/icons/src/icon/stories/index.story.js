@@ -7,7 +7,9 @@ import { useState, Fragment } from '@wordpress/element';
  * Internal dependencies
  */
 import Icon from '../';
+// @ts-ignore
 import check from '../../library/check';
+// @ts-ignore
 import * as icons from '../../';
 
 const { Icon: _Icon, ...availableIcons } = icons;
