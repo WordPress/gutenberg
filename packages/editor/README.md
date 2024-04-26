@@ -330,7 +330,11 @@ Undocumented declaration.
 
 ### EditorSnackbars
 
-Undocumented declaration.
+Renders the editor snackbars component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### EntitiesSavedStates
 
