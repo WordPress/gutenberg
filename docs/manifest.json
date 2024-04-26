@@ -492,6 +492,24 @@
 		"parent": "filters"
 	},
 	{
+		"title": "Interactivity API Reference",
+		"slug": "interactivity-api",
+		"markdown_source": "../docs/reference-guides/interactivity-api/README.md",
+		"parent": "reference-guides"
+	},
+	{
+		"title": "Quick start guide",
+		"slug": "quick-start-guide",
+		"markdown_source": "../docs/reference-guides/interactivity-api/quick-start-guide.md",
+		"parent": "interactivity-api"
+	},
+	{
+		"title": "API Reference",
+		"slug": "api-reference",
+		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"parent": "interactivity-api"
+	},
+	{
 		"title": "SlotFills Reference",
 		"slug": "slotfills",
 		"markdown_source": "../docs/reference-guides/slotfills/README.md",
@@ -1666,12 +1684,6 @@
 		"slug": "packages-interactivity",
 		"markdown_source": "../packages/interactivity/README.md",
 		"parent": "packages"
-	},
-	{
-		"title": "API Reference",
-		"slug": "packages-interactivity-api-reference",
-		"markdown_source": "../packages/interactivity/docs/api-reference.md",
-		"parent": "packages-interactivity"
 	},
 	{
 		"title": "@wordpress/interface",
