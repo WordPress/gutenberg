@@ -262,34 +262,41 @@ function Iframe( {
 			return;
 		}
 
-		const iframeWindowInnerHeight = iframeDocument.defaultView.innerHeight;
-		const scaledFrameSize = frameSize / scale;
-
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		// Unfortunately because of the vw unit, the block overlay is not always
-		// going to be exact. When the scrollbar is visible, the frame exceeds
-		// the canvas by a few pixels.
-		const styleElement = iframeDocument.createElement( 'style' );
-		iframeDocument.head.appendChild( styleElement ).textContent = `
-			html {
-				--wp-zoom-out-scale: ${ scale };
-				transform: scale( ${ scale } );
-				border-width: ${ scaledFrameSize }px;
-				margin-bottom: ${ -Math.floor(
-					scaledFrameSize + contentHeight * ( 1 - scale )
-				) }px;
-			}
-			body {
-				min-height: ${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
-				) }px
-			}
-		`;
+		// Needed for calculations in block-list content.scss.
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-zoom-out-scale',
+			`${ scale }`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-zoom-out-frame-size',
+			`${ frameSize }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-zoom-out-inner-height',
+			`${ iframeDocument.defaultView.innerHeight }px`
+		);
 
 		return () => {
 			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
-			iframeDocument.head.removeChild( styleElement );
+
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-zoom-out-scale'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-zoom-out-frame-size'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-zoom-out-content-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-zoom-out-inner-height'
+			);
 		};
 	}, [ scale, frameSize, iframeDocument, contentHeight, isZoomedOut ] );
 
