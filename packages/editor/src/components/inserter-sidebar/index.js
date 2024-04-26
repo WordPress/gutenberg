@@ -10,7 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -41,10 +41,6 @@ export default function InserterSidebar( {
 	} );
 
 	const libraryRef = useRef();
-	useEffect( () => {
-		// TODO: Fix focus search
-		// libraryRef.current.focusSearch();
-	}, [] );
 
 	return (
 		<div
