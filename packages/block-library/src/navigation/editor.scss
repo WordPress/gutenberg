@@ -515,6 +515,14 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin: 0;
 }
 
+.wp-block-navigation-off-canvas-editor__list-view {
+	.block-editor-list-view-leaf {
+		.block-editor-list-view-block-contents {
+			height: $grid-unit-50;
+		}
+	}
+}
+
 .wp-block-navigation-off-canvas-editor__header {
 	margin-bottom: $grid-unit-10;
 }

@@ -64,12 +64,15 @@
 		}
 	}
 
-	.block-editor-list-view-leaf .block-editor-list-view-block__contents-cell {
-		width: 100%;
-	}
+	.block-editor-list-view-leaf {
+		.block-editor-list-view-block__contents-cell {
+			width: 100%;
+		}
 
-	.block-editor-list-view-leaf .block-editor-list-view-block-contents {
-		white-space: normal;
+		.block-editor-list-view-block-contents {
+			white-space: normal;
+			height: $grid-unit-50;
+		}
 	}
 
 	.block-editor-list-view-block__title {
