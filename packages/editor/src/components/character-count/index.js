@@ -10,7 +10,7 @@ import { count as characterCount } from '@wordpress/wordcount';
 import { store as editorStore } from '../../store';
 
 /**
- * Component return the character count of the content.
+ * Renders the character count of the post content.
  *
  * @return {number} The character count.
  */

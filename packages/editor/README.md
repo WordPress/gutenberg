@@ -194,7 +194,7 @@ _Usage_
 
 ### CharacterCount
 
-Component return the character count of the content.
+Renders the character count of the post content.
 
 _Returns_
 
