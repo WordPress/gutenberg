@@ -270,7 +270,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.is-outline-mode .block-editor-block-list__block:not(.remove-outline) {
+.is-outline-mode .block-editor-block-list__block {
 	&.is-hovered {
 		cursor: default;
 
