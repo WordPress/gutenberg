@@ -128,13 +128,29 @@ Example:
 
 ### AutosaveMonitor
 
-AutosaveMonitor component. Monitors the changes made to the edited post and triggers autosave if necessary.
+Monitors the changes made to the edited post and triggers autosave if necessary.
+
+The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called. The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as the specific way of detecting changes.
+
+There are two caveats:
+
+-   If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+-   The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
 
 _Usage_
 
 ```jsx
 <AutosaveMonitor interval={ 30000 } />
 ```
+
+_Parameters_
+
+-   _props_ `Object`: - The properties passed to the component.
+-   _props.autosave_ `Function`: - The function to call when changes need to be saved.
+-   _props.interval_ `number`: - The maximum time in seconds between an unsaved change and an autosave.
+-   _props.isAutosaveable_ `boolean`: - If false, the check for changes is retried every second.
+-   _props.disableIntervalChecks_ `boolean`: - If true, disables the timer and any change will immediately trigger `props.autosave()`.
+-   _props.isDirty_ `boolean`: - Indicates if there are unsaved changes.
 
 ### BlockAlignmentToolbar
 
