@@ -292,11 +292,17 @@ _Returns_
 
 ### EditorKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### EditorKeyboardShortcutsRegister
 
-Undocumented declaration.
+Component for registering editor keyboard shortcuts.
+
+_Returns_
+
+-   `Element`: The component to be rendered.
 
 ### EditorNotices
 
