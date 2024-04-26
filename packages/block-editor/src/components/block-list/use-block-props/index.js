@@ -11,6 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -105,17 +106,17 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		defaultClassName,
 		templateLock,
 	} = useContext( PrivateBlockContext );
-
+	const registry = useRegistry();
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
 		props.ref,
-		useFocusFirstElement( { clientId, initialPosition } ),
+		useFocusFirstElement( { clientId, initialPosition, registry } ),
 		useBlockRefProvider( clientId ),
-		useFocusHandler( clientId ),
-		useEventHandlers( { clientId, isSelected } ),
-		useNavModeExit( clientId ),
+		useFocusHandler( { clientId, registry } ),
+		useEventHandlers( { clientId, isSelected, registry } ),
+		useNavModeExit( { clientId, registry } ),
 		useIsHovered( { isEnabled: isOutlineEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),

@@ -8,7 +8,7 @@ import { Controller } from '@react-spring/web';
  */
 import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
-import { useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,15 +45,7 @@ function getAbsolutePosition( element ) {
  */
 function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	const ref = useRef();
-	const {
-		isTyping,
-		getGlobalBlockCount,
-		isBlockSelected,
-		isFirstMultiSelectedBlock,
-		isBlockMultiSelected,
-		isAncestorMultiSelected,
-	} = useSelect( blockEditorStore );
-
+	const registry = useRegistry();
 	// Whenever the trigger changes, we need to take a snapshot of the current
 	// position of the block to use it as a destination point for the animation.
 	const { previous, prevRect } = useMemo(
@@ -70,6 +62,14 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			return;
 		}
 
+		const {
+			isTyping,
+			getGlobalBlockCount,
+			isBlockSelected,
+			isFirstMultiSelectedBlock,
+			isBlockMultiSelected,
+			isAncestorMultiSelected,
+		} = registry.select( blockEditorStore );
 		const scrollContainer = getScrollContainer( ref.current );
 		const isSelected = isBlockSelected( clientId );
 		const adjustScrolling =
@@ -144,17 +144,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			controller.stop();
 			controller.set( { x: 0, y: 0 } );
 		};
-	}, [
-		previous,
-		prevRect,
-		clientId,
-		isTyping,
-		getGlobalBlockCount,
-		isBlockSelected,
-		isFirstMultiSelectedBlock,
-		isBlockMultiSelected,
-		isAncestorMultiSelected,
-	] );
+	}, [ previous, prevRect, clientId, registry ] );
 
 	return ref;
 }

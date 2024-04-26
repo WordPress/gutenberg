@@ -3,7 +3,6 @@
  */
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -19,11 +18,7 @@ import { store as blockEditorStore } from '../../../store';
  *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( { clientId, isSelected } ) {
-	const { getBlockRootClientId, getBlockIndex } =
-		useSelect( blockEditorStore );
-	const { insertAfterBlock, removeBlock } = useDispatch( blockEditorStore );
-
+export function useEventHandlers( { clientId, isSelected, registry } ) {
 	return useRefEffect(
 		( node ) => {
 			if ( ! isSelected ) {
@@ -56,6 +51,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				event.preventDefault();
 
+				const { insertAfterBlock, removeBlock } =
+					registry.select( blockEditorStore );
+
 				if ( keyCode === ENTER ) {
 					insertAfterBlock( clientId );
 				} else {
@@ -81,13 +79,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				node.removeEventListener( 'dragstart', onDragStart );
 			};
 		},
-		[
-			clientId,
-			isSelected,
-			getBlockRootClientId,
-			getBlockIndex,
-			insertAfterBlock,
-			removeBlock,
-		]
+		[ clientId, isSelected, registry ]
 	);
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -14,8 +14,7 @@ export function useFlashEditableBlocks( {
 	clientId = '',
 	isEnabled = true,
 } = {} ) {
-	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
-
+	const registry = useRegistry();
 	return useRefEffect(
 		( element ) => {
 			if ( ! isEnabled ) {
@@ -23,6 +22,9 @@ export function useFlashEditableBlocks( {
 			}
 
 			const flashEditableBlocks = () => {
+				const { getEnabledClientIdsTree } = unlock(
+					registry.select( blockEditorStore )
+				);
 				getEnabledClientIdsTree( clientId ).forEach(
 					( { clientId: id } ) => {
 						const block = element.querySelector(

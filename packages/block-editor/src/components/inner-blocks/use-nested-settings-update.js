@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
-import { useDispatch, useRegistry } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -69,7 +69,6 @@ export default function useNestedSettingsUpdate(
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
 
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
 	// Implementors often pass a new array on every render,
@@ -163,6 +162,8 @@ export default function useNestedSettingsUpdate(
 		window.queueMicrotask( () => {
 			if ( pendingSettingsUpdates.get( registry )?.length ) {
 				registry.batch( () => {
+					const { updateBlockListSettings } =
+						registry.dispatch( blockEditorStore );
 					pendingSettingsUpdates
 						.get( registry )
 						.forEach( ( args ) => {
@@ -183,7 +184,6 @@ export default function useNestedSettingsUpdate(
 		__experimentalDirectInsert,
 		captureToolbars,
 		orientation,
-		updateBlockListSettings,
 		layout,
 		registry,
 	] );

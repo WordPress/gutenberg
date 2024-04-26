@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -13,12 +12,11 @@ import { store as blockEditorStore } from '../../../store';
 /**
  * Selects the block if it receives focus.
  *
- * @param {string} clientId Block client ID.
+ * @param {Object} options
+ * @param {string} options.clientId Block client ID.
+ * @param {Object} options.registry
  */
-export function useFocusHandler( clientId ) {
-	const { isBlockSelected } = useSelect( blockEditorStore );
-	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
-
+export function useFocusHandler( { clientId, registry } ) {
 	return useRefEffect(
 		( node ) => {
 			/**
@@ -37,6 +35,10 @@ export function useFocusHandler( clientId ) {
 				) {
 					return;
 				}
+
+				const { isBlockSelected } = registry.select( blockEditorStore );
+				const { selectBlock, selectionChange } =
+					registry.dispatch( blockEditorStore );
 
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
@@ -63,6 +65,6 @@ export function useFocusHandler( clientId ) {
 				node.removeEventListener( 'focusin', onFocus );
 			};
 		},
-		[ isBlockSelected, selectBlock ]
+		[ registry ]
 	);
 }
