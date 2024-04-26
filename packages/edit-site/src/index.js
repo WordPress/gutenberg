@@ -10,12 +10,7 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
-import {
-	PluginMoreMenuItem,
-	PluginSidebar,
-	PluginSidebarMoreMenuItem,
-	store as editorStore,
-} from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -102,8 +97,6 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { PluginMoreMenuItem };
-export { PluginSidebar };
-export { PluginSidebarMoreMenuItem };
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
+export * from './deprecated';
