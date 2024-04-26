@@ -107,8 +107,8 @@ function ListViewBlock( {
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
 		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
-		// Don't show the settings menu if block is disabled.
-		blockEditingMode !== 'disabled';
+		// Don't show the settings menu if block is disabled or content only.
+		blockEditingMode === 'default';
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 

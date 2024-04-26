@@ -27,20 +27,15 @@ import { BlockRenameControl, useBlockRename } from '../block-rename';
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
-	const { selectedBlocks, selectedClientIds, isContentOnly } = useSelect(
+	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
-			const {
-				getBlockNamesByClientId,
-				getSelectedBlockClientIds,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
+			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
-				isContentOnly:
-					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
 			};
 		},
 		[ clientIds ]
@@ -48,10 +43,8 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
-	const showLockButton =
-		selectedClientIds.length === 1 && canLock && ! isContentOnly;
-	const showRenameButton =
-		selectedClientIds.length === 1 && canRename && ! isContentOnly;
+	const showLockButton = selectedClientIds.length === 1 && canLock;
+	const showRenameButton = selectedClientIds.length === 1 && canRename;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
