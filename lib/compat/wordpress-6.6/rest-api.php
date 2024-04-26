@@ -29,3 +29,21 @@ if ( ! function_exists( 'wp_api_template_access_controller' ) ) {
 	}
 }
 add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 2 );
+
+function gutenberg_block_editor_preload_paths_6_6( $paths, $context ) {
+	if ( 'core/edit-site' === $context->name ) {
+		// When merging back to core, these should be removed here:
+		// https://github.com/WordPress/wordpress-develop/blob/7159243c090e429a7d2a1fd2a9509e323f67a39d/src/wp-admin/site-editor.php#L99
+		$paths_to_remove = array(
+			'/wp/v2/global-styles/' . WP_Theme_JSON_Resolver::get_user_global_styles_post_id(),
+		);
+		$paths           = array_filter(
+			$paths,
+			function ( $path ) use ( $paths_to_remove ) {
+				return ! in_array( $path, $paths_to_remove, true );
+			}
+		);
+	}
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_block_editor_preload_paths_6_6', 10, 2 );
