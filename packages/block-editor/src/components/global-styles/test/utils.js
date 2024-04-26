@@ -6,6 +6,7 @@ import {
 	getBlockStyleVariationSelector,
 	getPresetVariableFromValue,
 	getValueFromVariable,
+	scopeFeatureSelectors,
 } from '../utils';
 
 describe( 'editor utils', () => {
@@ -344,5 +345,25 @@ describe( 'editor utils', () => {
 				).toBe( expected );
 			}
 		);
+	} );
+
+	describe( 'scopeFeatureSelectors', () => {
+		it( 'correctly scopes selectors while maintaining selectors object structure', () => {
+			const actual = scopeFeatureSelectors( '.custom, .secondary', {
+				color: '.my-block h1',
+				typography: {
+					root: '.my-block',
+					lineHeight: '.my-block h1',
+				},
+			} );
+
+			expect( actual ).toEqual( {
+				color: '.custom .my-block h1, .secondary .my-block h1',
+				typography: {
+					root: '.custom .my-block, .secondary .my-block',
+					lineHeight: '.custom .my-block h1, .secondary .my-block h1',
+				},
+			} );
+		} );
 	} );
 } );
