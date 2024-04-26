@@ -120,10 +120,15 @@
 			flex-direction: column;
 		}
 
+		.components-placeholder__fieldset > *,
 		.components-button {
 			width: 100%;
 			justify-content: center;
 		}
+	}
+
+	&.is-small {
+		padding: $grid-unit-20;
 	}
 }
 
