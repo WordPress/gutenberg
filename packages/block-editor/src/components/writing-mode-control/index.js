@@ -41,7 +41,7 @@ export default function WritingModeControl( { className, value, onChange } ) {
 	return (
 		<SegmentedTextControl
 			label={ __( 'Orientation' ) }
-			controls={ WRITING_MODES }
+			options={ WRITING_MODES }
 			className={ classnames(
 				'block-editor-writing-mode-control',
 				className

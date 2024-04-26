@@ -10,19 +10,19 @@ import { BaseControl, Button } from '@wordpress/components';
 
 /**
  * @typedef {Object} Option
- * @property {string} label The label of the control.
- * @property {string} value The value of the control.
- * @property {string} icon  The icon of the control.
+ * @property {string} label The label of the option.
+ * @property {string} value The value of the option.
+ * @property {string} icon  The icon of the option.
  */
 
 /**
  * Control to facilitate selecting a text style from a set of options.
  *
  * @param {Object}   props           Component props.
- * @param {string}   props.label     A label for the control.
+ * @param {string}   props.label     A label for the option.
  * @param {string}   props.value     Currently selected value.
  * @param {Function} props.onChange  Callback to handle onChange.
- * @param {Option[]} props.controls  Array of controls to display.
+ * @param {Option[]} props.options   Array of options to display.
  * @param {string}   props.className Additional class name to apply.
  *
  * @return {Element} Element to render.
@@ -30,7 +30,7 @@ import { BaseControl, Button } from '@wordpress/components';
 export default function SegmentedTextControl( {
 	label,
 	value,
-	controls,
+	options,
 	onChange,
 	className,
 } ) {
@@ -45,15 +45,15 @@ export default function SegmentedTextControl( {
 				{ label }
 			</BaseControl.VisualLabel>
 			<div className="block-editor-segmented-text-control__buttons">
-				{ controls.map( ( control ) => {
+				{ options.map( ( option ) => {
 					return (
 						<Button
 							size="compact"
-							key={ control.value }
-							icon={ control.icon }
-							label={ control.label }
-							isPressed={ control.value === value }
-							onClick={ () => onChange( control.value ) }
+							key={ option.value }
+							icon={ option.icon }
+							label={ option.label }
+							isPressed={ option.value === value }
+							onClick={ () => onChange( option.value ) }
 						/>
 					);
 				} ) }

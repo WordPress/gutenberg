@@ -56,7 +56,7 @@ export default function TextTransformControl( { className, value, onChange } ) {
 	return (
 		<SegmentedTextControl
 			label={ __( 'Letter case' ) }
-			controls={ TEXT_TRANSFORMS }
+			options={ TEXT_TRANSFORMS }
 			className={ classnames(
 				'block-editor-text-transform-control',
 				className

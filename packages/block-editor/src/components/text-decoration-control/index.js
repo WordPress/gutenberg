@@ -50,7 +50,7 @@ export default function TextDecorationControl( {
 	return (
 		<SegmentedTextControl
 			label={ __( 'Decoration' ) }
-			controls={ TEXT_DECORATIONS }
+			options={ TEXT_DECORATIONS }
 			className={ classnames(
 				'block-editor-text-decoration-control',
 				className

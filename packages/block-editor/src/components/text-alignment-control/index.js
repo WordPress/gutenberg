@@ -20,7 +20,7 @@ import { useMemo } from '@wordpress/element';
  */
 import SegmentedTextControl from '../segmented-text-control';
 
-const TEXT_ALIGNMENT_CONTROLS = [
+const TEXT_ALIGNMENT_OPTIONS = [
 	{
 		label: __( 'Align text left' ),
 		value: 'left',
@@ -43,7 +43,7 @@ const TEXT_ALIGNMENT_CONTROLS = [
 	},
 ];
 
-const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
+const DEFAULT_OPTIONS = [ 'left', 'center', 'right' ];
 
 /**
  * Control to facilitate text alignment selections.
@@ -52,7 +52,7 @@ const DEFAULT_CONTROLS = [ 'left', 'center', 'right' ];
  * @param {string}   props.className Class name to add to the control.
  * @param {string}   props.value     Currently selected text alignment.
  * @param {Function} props.onChange  Handles change in text alignment selection.
- * @param {string[]} props.controls  Array of text alignment controls to display.
+ * @param {string[]} props.options   Array of text alignment options to display.
  *
  * @return {Element} Text alignment control.
  */
@@ -60,24 +60,24 @@ export default function TextAlignmentControl( {
 	className,
 	value,
 	onChange,
-	controls = DEFAULT_CONTROLS,
+	options = DEFAULT_OPTIONS,
 } ) {
-	const validControls = useMemo(
+	const validOptions = useMemo(
 		() =>
-			TEXT_ALIGNMENT_CONTROLS.filter( ( control ) =>
-				controls.includes( control.value )
+			TEXT_ALIGNMENT_OPTIONS.filter( ( option ) =>
+				options.includes( option.value )
 			),
-		[ controls ]
+		[ options ]
 	);
 
-	if ( ! validControls.length ) {
+	if ( ! validOptions.length ) {
 		return null;
 	}
 
 	return (
 		<SegmentedTextControl
 			label={ __( 'Text alignment' ) }
-			controls={ validControls }
+			options={ validOptions }
 			className={ classnames(
 				'block-editor-text-alignment-control',
 				className
