@@ -14,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import { SPACE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -70,6 +71,15 @@ function ListViewBlockSelectButton(
 		onDragStart?.( event );
 	};
 
+	/**
+	 * @param {KeyboardEvent} event
+	 */
+	function onKeyDown( event ) {
+		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
+			onClick( event );
+		}
+	}
+
 	return (
 		<>
 			<Button
@@ -79,6 +89,7 @@ function ListViewBlockSelectButton(
 				) }
 				onClick={ onClick }
 				onContextMenu={ onContextMenu }
+				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 				ref={ ref }
 				tabIndex={ tabIndex }

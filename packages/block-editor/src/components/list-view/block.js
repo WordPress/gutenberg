@@ -22,7 +22,7 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, ESCAPE, ENTER, SPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 
@@ -174,7 +174,7 @@ function ListViewBlock( {
 	/**
 	 * @param {KeyboardEvent} event
 	 */
-	async function onKeyDownHandler( event ) {
+	async function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
@@ -185,8 +185,6 @@ function ListViewBlock( {
 			event.stopPropagation();
 			event.preventDefault();
 			selectBlock( event, undefined );
-		} else if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
-			selectEditorBlock( event );
 		} else if (
 			event.keyCode === BACKSPACE ||
 			event.keyCode === DELETE ||
@@ -491,7 +489,7 @@ function ListViewBlock( {
 		<ListViewLeaf
 			className={ classes }
 			isDragged={ isDragged }
-			onKeyDown={ onKeyDownHandler }
+			onKeyDown={ onKeyDown }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }
