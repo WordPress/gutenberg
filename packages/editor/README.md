@@ -444,19 +444,40 @@ _Parameters_
 
 ### PageAttributesCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports page attributes.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
-Undocumented declaration.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesPanel
 
-Undocumented declaration.
+Renders the Page Attributes Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesParent
 
-Undocumented declaration.
+Renders the Page Attributes Parent component. A dropdown menu in an editor interface for selecting the parent page of a given page.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return null if post type is not hierarchical.
 
 ### PageTemplate
 
