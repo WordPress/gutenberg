@@ -382,6 +382,7 @@
 
 .dataviews-view-list {
 	margin: 0;
+	padding: 0 $grid-unit-10;
 
 	li {
 		margin: 0;
@@ -389,7 +390,18 @@
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
+			padding-right: $grid-unit-20;
 			border-radius: $grid-unit-05;
+
+			&::after {
+				position: absolute;
+				content: "";
+				top: 100%;
+				left: $grid-unit-20;
+				right: $grid-unit-20;
+				background: $gray-100;
+				height: 1px;
+			}
 
 			> * {
 				width: 100%;
@@ -403,7 +415,6 @@
 			&:hover,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
-				background-color: #f8f8f8;
 
 				.dataviews-view-list__primary-field,
 				.dataviews-view-list__fields {
@@ -416,33 +427,37 @@
 	li.is-selected,
 	li.is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-			color: $gray-900;
+			background-color: var(--wp-admin-theme-color);
+			color: $white;
 
 			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
-				color: var(--wp-admin-theme-color);
+				color: $white;
+			}
+
+			&::after {
+				background: transparent;
 			}
 		}
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-20 $grid-unit-30;
+		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-20;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
-		border-top: 1px solid $gray-100;
 
 		&:focus-visible {
 			&::before {
 				position: absolute;
 				content: "";
-				top: calc(var(--wp-admin-border-width-focus) + 1px);
-				right: var(--wp-admin-border-width-focus);
-				bottom: var(--wp-admin-border-width-focus);
-				left: var(--wp-admin-border-width-focus);
-				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				border-radius: $radius-block-ui;
+				top: -1px;
+				right: -1px;
+				bottom: -1px;
+				left: -1px;
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				z-index: -1;
+				border-radius: $grid-unit-05;
 			}
 		}
 		.dataviews-view-list__primary-field {
@@ -454,11 +469,11 @@
 	.dataviews-view-list__media-wrapper {
 		width: $grid-unit-50;
 		height: $grid-unit-50;
+		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
 		background-color: $gray-100;
-		border-radius: $grid-unit-05;
 
 		img {
 			width: 100%;
