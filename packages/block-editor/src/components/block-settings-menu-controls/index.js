@@ -106,7 +106,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 								{ __( 'Move to' ) }
 							</MenuItem>
 						) }
-						{ fillProps?.count === 1 && (
+						{ fillProps?.count === 1 && ! isContentOnly && (
 							<BlockModeToggle
 								clientId={ fillProps?.firstBlockClientId }
 								onToggle={ fillProps?.onClose }
