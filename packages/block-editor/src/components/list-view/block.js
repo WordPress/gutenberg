@@ -46,6 +46,7 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
+import { unlock } from '../../lock-unlock';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -87,7 +88,8 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-	} = useDispatch( blockEditorStore );
+		setOpenedBlockSettingsMenu,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const {
 		canInsertBlockType,
@@ -263,6 +265,7 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			event.preventDefault();
@@ -272,6 +275,7 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			event.preventDefault();
