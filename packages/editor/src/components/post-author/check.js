@@ -12,7 +12,7 @@ import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY } from './constants';
 
 /**
- * Component to render its children only if the post type supports the author.
+ * Wrapper component that renders its children only if the post type supports the author.
  *
  * @param {Object}  props          The component props.
  * @param {Element} props.children Children to be rendered.

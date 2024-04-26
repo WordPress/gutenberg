@@ -809,7 +809,7 @@ _Returns_
 
 ### PostAuthorCheck
 
-Component to render its children only if the post type supports the author.
+Wrapper component that renders its children only if the post type supports the author.
 
 _Parameters_
 
