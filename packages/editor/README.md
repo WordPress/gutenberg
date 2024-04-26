@@ -238,27 +238,71 @@ Undocumented declaration.
 
 ### DocumentOutline
 
-Undocumented declaration.
+Renders a document outline component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onSelect_ `Function`: Function to be called when an outline item is selected.
+-   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### DocumentOutlineCheck
 
-Undocumented declaration.
+Component check if there are any headings (core/heading blocks) present in the document.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
-Undocumented declaration.
+Renders the redo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorHistoryUndo
 
-Undocumented declaration.
+Renders the undo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### EditorKeyboardShortcutsRegister
 
-Undocumented declaration.
+Component for registering editor keyboard shortcuts.
+
+_Returns_
+
+-   `Element`: The component to be rendered.
 
 ### EditorNotices
 
@@ -821,7 +865,13 @@ Undocumented declaration.
 
 ### PostExcerpt
 
-Undocumented declaration.
+Renders an editable textarea for the post excerpt. Templates, template parts and patterns use the `excerpt` field as a description semantically. Additionally templates and template parts override the `excerpt` field as `description` in REST API. So this component handles proper labeling and updating the edited entity.
+
+_Parameters_
+
+-   _props_ `Object`: - Component props.
+-   _props.hideLabelFromVision_ `[boolean]`: - Whether to visually hide the textarea's label.
+-   _props.updateOnBlur_ `[boolean]`: - Whether to update the post on change or use local state and update on blur.
 
 ### PostExcerptCheck
 

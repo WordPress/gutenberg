@@ -29,7 +29,6 @@ import {
  * Internal dependencies
  */
 import './hooks';
-import './plugins';
 import Editor from './editor';
 import { unlock } from './lock-unlock';
 

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-
-import { ScrollView, FlatList } from 'react-native';
+import { FlatList, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 /**
@@ -22,9 +21,12 @@ import { useThrottle } from '@wordpress/compose';
 import useScroll from './use-scroll';
 import useTextInputOffset from './use-text-input-offset';
 import useTextInputCaretPosition from './use-text-input-caret-position';
+import { OPTIMIZATION_ITEMS_THRESHOLD, OPTIMIZATION_PROPS } from './shared';
+import styles from './styles.scss';
 
 const DEFAULT_FONT_SIZE = 16;
-const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
+const AnimatedFlatList = Animated.createAnimatedComponent( FlatList );
+const EMPTY_OBJECT = {};
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 /**
@@ -35,7 +37,6 @@ const AnimatedScrollView = Animated.createAnimatedComponent( ScrollView );
  * @param {number}    props.extraScrollHeight            Extra scroll height for the content.
  * @param {Function}  props.onScroll                     Function to be called when the list is scrolled.
  * @param {boolean}   props.scrollEnabled                Whether the list can be scrolled.
- * @param {Object}    props.scrollViewStyle              Additional style for the ScrollView component.
  * @param {boolean}   props.shouldPreventAutomaticScroll Whether to prevent scrolling when there's a Keyboard offset set.
  * @param {Object}    props...                           Other props to pass to the FlatList component.
  * @param {RefObject} ref
@@ -46,7 +47,6 @@ export const KeyboardAwareFlatList = (
 		extraScrollHeight,
 		onScroll,
 		scrollEnabled,
-		scrollViewStyle,
 		shouldPreventAutomaticScroll,
 		...props
 	},
@@ -105,7 +105,12 @@ export const KeyboardAwareFlatList = (
 	// extra padding at the bottom.
 	const contentInset = { bottom: keyboardOffset };
 
-	const style = [ { flex: 1 }, scrollViewStyle ];
+	const getFlatListRef = useCallback(
+		( flatListRef ) => {
+			scrollViewRef.current = flatListRef?.getNativeScrollRef();
+		},
+		[ scrollViewRef ]
+	);
 
 	useImperativeHandle( ref, () => {
 		return {
@@ -116,20 +121,26 @@ export const KeyboardAwareFlatList = (
 		};
 	} );
 
+	const optimizationProps =
+		props.data?.length > OPTIMIZATION_ITEMS_THRESHOLD
+			? OPTIMIZATION_PROPS
+			: EMPTY_OBJECT;
+
 	return (
-		<AnimatedScrollView
-			automaticallyAdjustContentInsets={ false }
-			contentInset={ contentInset }
-			keyboardShouldPersistTaps="handled"
-			onContentSizeChange={ onContentSizeChange }
-			onScroll={ scrollHandler }
-			ref={ scrollViewRef }
-			scrollEnabled={ scrollEnabled }
-			scrollEventThrottle={ 16 }
-			style={ style }
-		>
-			<FlatList { ...props } scrollEnabled={ false } />
-		</AnimatedScrollView>
+		<View style={ styles.list__container }>
+			<AnimatedFlatList
+				ref={ getFlatListRef }
+				automaticallyAdjustContentInsets={ false }
+				contentInset={ contentInset }
+				keyboardShouldPersistTaps="handled"
+				onContentSizeChange={ onContentSizeChange }
+				onScroll={ scrollHandler }
+				scrollEventThrottle={ 16 }
+				style={ styles.list__content }
+				{ ...optimizationProps }
+				{ ...props }
+			/>
+		</View>
 	);
 };
 

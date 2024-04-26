@@ -19,17 +19,34 @@ function BlockKeyboardShortcuts() {
 
 	const handleTransformHeadingAndParagraph = ( event, level ) => {
 		event.preventDefault();
-		const destinationBlockName =
-			level === 0 ? 'core/paragraph' : 'core/heading';
+
 		const currentClientId = getSelectedBlockClientId();
 		if ( currentClientId === null ) {
 			return;
 		}
+
 		const blockName = getBlockName( currentClientId );
-		if ( blockName !== 'core/paragraph' && blockName !== 'core/heading' ) {
+		const isParagraph = blockName === 'core/paragraph';
+		const isHeading = blockName === 'core/heading';
+
+		if ( ! isParagraph && ! isHeading ) {
 			return;
 		}
+
+		const destinationBlockName =
+			level === 0 ? 'core/paragraph' : 'core/heading';
+
 		const attributes = getBlockAttributes( currentClientId );
+
+		// Avoid unnecessary block transform when attempting to transform to
+		// the same block type and/or same level.
+		if (
+			( isParagraph && level === 0 ) ||
+			( isHeading && attributes.level === level )
+		) {
+			return;
+		}
+
 		const textAlign =
 			blockName === 'core/paragraph' ? 'align' : 'textAlign';
 		const destinationTextAlign =

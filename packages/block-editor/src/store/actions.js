@@ -1446,6 +1446,8 @@ export const __unstableSetEditorMode =
 			if ( sectionRootClientId ) {
 				const sectionClientIds =
 					select.getBlockOrder( sectionRootClientId );
+				const lastSectionClientId =
+					sectionClientIds[ sectionClientIds.length - 1 ];
 				if ( sectionClientIds ) {
 					if ( firstSelectedClientId ) {
 						const parents = select.getBlockParents(
@@ -1454,10 +1456,12 @@ export const __unstableSetEditorMode =
 						const firstSectionClientId = parents.find( ( parent ) =>
 							sectionClientIds.includes( parent )
 						);
-						dispatch.selectBlock( firstSectionClientId );
+						if ( firstSectionClientId ) {
+							dispatch.selectBlock( firstSectionClientId );
+						} else {
+							dispatch.selectBlock( lastSectionClientId );
+						}
 					} else {
-						const lastSectionClientId =
-							sectionClientIds[ sectionClientIds.length - 1 ];
 						dispatch.selectBlock( lastSectionClientId );
 					}
 				}
