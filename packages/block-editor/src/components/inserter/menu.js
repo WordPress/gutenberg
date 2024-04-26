@@ -240,6 +240,8 @@ function InserterMenu(
 
 	const searchRef = useRef();
 	useEffect( () => {
+		// We need to wait for the next frame to focus the search input
+		// becase the tabs component will try to focus the selected tab
 		window.requestAnimationFrame( () => {
 			searchRef?.current?.focus();
 		} );
