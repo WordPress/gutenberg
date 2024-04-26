@@ -204,20 +204,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const windowResizeRef = useRefEffect( ( node ) => {
-		const nodeWindow = node.ownerDocument.defaultView;
-
-		const onResize = () => {
-			setIframeWindowInnerHeight( nodeWindow.innerHeight );
-		};
-		nodeWindow.addEventListener( 'resize', onResize );
-		return () => {
-			nodeWindow.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
-	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
-
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -225,10 +211,6 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		// Avoid resize listeners when not needed, these will trigger
-		// unnecessary re-renders when animating the iframe width, or when
-		// expanding preview iframes.
-		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -239,7 +221,7 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<style>
-			html{
+			html {
 				height: auto !important;
 				min-height: 100%;
 			}
@@ -276,37 +258,44 @@ function Iframe( {
 	const isZoomedOut = scale !== 1;
 
 	useEffect( () => {
-		if ( ! iframeDocument ) {
+		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
 
-		if ( isZoomedOut ) {
-			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
+		const iframeWindowInnerHeight = iframeDocument.defaultView.innerHeight;
+		const scaledFrameSize = frameSize / scale;
 
-			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
-			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
-			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
-			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
+		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-			return () => {
-				iframeDocument.documentElement.style.transform = '';
-				iframeDocument.documentElement.style.marginTop = '';
-				iframeDocument.documentElement.style.marginBottom = '';
-			};
-		}
+		// Unfortunately because of the vw unit, the block overlay is not always
+		// going to be exact. When the scrollbar is visible, the frame exceeds
+		// the canvas by a few pixels.
+		const styleElement = iframeDocument.createElement( 'style' );
+		iframeDocument.head.appendChild( styleElement ).textContent = `
+			html {
+				--wp-zoom-out-scale: ${ scale };
+				transform: scale( ${ scale } );
+				border-width: ${ scaledFrameSize }px;
+				margin-bottom: ${ -Math.floor(
+					scaledFrameSize + contentHeight * ( 1 - scale )
+				) }px;
+			}
+			body {
+				min-height: ${ Math.floor(
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
+				) }px
+			}
+		`;
+
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+			iframeDocument.head.removeChild( styleElement );
+		};
 	}, [ scale, frameSize, iframeDocument, contentHeight, isZoomedOut ] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
-
-	const scaleMinHeight =
-		isZoomedOut && iframeWindowInnerHeight > contentHeight * scale
-			? `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
-			  ) }px`
-			: undefined;
 
 	return (
 		<>
@@ -357,14 +346,10 @@ function Iframe( {
 						<body
 							ref={ bodyRef }
 							className={ classnames(
-								isZoomedOut && 'is-zoomed-out',
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
 							) }
-							style={ {
-								minHeight: scaleMinHeight,
-							} }
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>

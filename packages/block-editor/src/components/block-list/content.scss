@@ -385,22 +385,6 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	z-index: z-index("{core/image aligned left or right} .wp-block");
 }
 
-body.is-zoomed-out {
-	display: flex;
-	flex-direction: column;
-
-	> .is-root-container {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		height: 100%;
-
-		> main {
-			flex: 1;
-		}
-	}
-}
-
 .wp-site-blocks > [data-align="left"] {
 	float: left;
 	margin-right: 2em;
@@ -494,12 +478,29 @@ body.is-zoomed-out {
 	}
 }
 
-.block-editor-iframe__html {
-	transform-origin: top center;
+:where(.block-editor-iframe__html) {
 	transition: all 0.3s;
+	transform-origin: top center;
 	@include reduce-motion("transition");
+	border: 0 solid $gray-300; // Hack for margin-bottom in Firefox.
 }
 
-.block-editor-iframe__html[style*="scale"] {
+:where(.block-editor-iframe__html.is-zoomed-out) {
 	background-color: $gray-300;
+
+	body {
+		display: flex;
+		flex-direction: column;
+
+		> .is-root-container {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			height: 100%;
+
+			> main {
+				flex: 1;
+			}
+		}
+	}
 }
