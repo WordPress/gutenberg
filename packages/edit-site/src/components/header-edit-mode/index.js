@@ -14,6 +14,7 @@ import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
+	PostSavedState,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -31,6 +32,7 @@ import {
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const {
 	CollapsableBlockToolbar,
@@ -38,9 +40,10 @@ const {
 	PostViewLink,
 	PreviewDropdown,
 	PinnedItems,
+	PostPublishButtonOrToggle,
 } = unlock( editorPrivateApis );
 
-export default function HeaderEditMode() {
+export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 	const {
 		templateType,
 		isDistractionFree,
@@ -48,6 +51,7 @@ export default function HeaderEditMode() {
 		showIconLabels,
 		editorCanvasView,
 		isFixedToolbar,
+		isPublishSidebarOpened,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
@@ -64,6 +68,8 @@ export default function HeaderEditMode() {
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
 			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isPublishSidebarOpened:
+				select( editorStore ).isPublishSidebarOpened(),
 		};
 	}, [] );
 
@@ -94,6 +100,7 @@ export default function HeaderEditMode() {
 		ease: 'easeOut',
 	};
 
+	const _isPreviewingTheme = isPreviewingTheme();
 	return (
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
@@ -158,7 +165,28 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<PostViewLink />
-					<SaveButton size="compact" />
+					{
+						// TODO: For now we conditionally render the Save/Publish buttons based on
+						// some specific site editor extra handling. Examples are when we're previewing
+						// a theme, handling of global styles changes or when we're in 'view' mode,
+						// which opens the save panel in a Modal.
+					 }
+					{ ! _isPreviewingTheme && ! isPublishSidebarOpened && (
+						// This button isn't completely hidden by the publish sidebar.
+						// We can't hide the whole toolbar when the publish sidebar is open because
+						// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+						// We track that DOM node to return focus to the PostPublishButtonOrToggle
+						// when the publish sidebar has been closed.
+						<PostSavedState />
+					) }
+					{ ! _isPreviewingTheme && (
+						<PostPublishButtonOrToggle
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					) }
+					{ _isPreviewingTheme && <SaveButton size="compact" /> }
 					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
 					<MoreMenu />
 					<SiteEditorMoreMenuItems />

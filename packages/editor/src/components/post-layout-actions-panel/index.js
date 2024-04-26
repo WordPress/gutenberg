@@ -1,13 +1,6 @@
 /**
  * WordPress dependencies
  */
-import {
-	EntitiesSavedStates,
-	PostPublishPanel,
-	PluginPrePublishPanel,
-	PluginPostPublishPanel,
-	store as editorStore,
-} from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -16,28 +9,28 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { store as editPostStore } from '../../store';
+import EntitiesSavedStates from '../entities-saved-states';
+import PostPublishPanel from '../post-publish-panel';
+import PluginPrePublishPanel from '../plugin-pre-publish-panel';
+import PluginPostPublishPanel from '../plugin-post-publish-panel';
+import { store as editorStore } from '../../store';
 
 const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
 export const ActionsPanelFill = Fill;
 
-export default function ActionsPanel( {
+export default function PostLayoutActionsPanel( {
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
+	hasActiveMetaboxes,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const {
-		publishSidebarOpened,
-		hasActiveMetaboxes,
-		hasNonPostEntityChanges,
-	} = useSelect(
+	const { publishSidebarOpened, hasNonPostEntityChanges } = useSelect(
 		( select ) => ( {
 			publishSidebarOpened:
 				select( editorStore ).isPublishSidebarOpened(),
-			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasNonPostEntityChanges:
 				select( editorStore ).hasNonPostEntityChanges(),
 		} ),
@@ -63,10 +56,10 @@ export default function ActionsPanel( {
 		);
 	} else if ( hasNonPostEntityChanges ) {
 		unmountableContent = (
-			<div className="edit-post-layout__toggle-entities-saved-states-panel">
+			<div className="editor-layout__toggle-entities-saved-states-panel">
 				<Button
 					variant="secondary"
-					className="edit-post-layout__toggle-entities-saved-states-panel-button"
+					className="editor-layout__toggle-entities-saved-states-panel-button"
 					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
 				>
@@ -76,10 +69,10 @@ export default function ActionsPanel( {
 		);
 	} else {
 		unmountableContent = (
-			<div className="edit-post-layout__toggle-publish-panel">
+			<div className="editor-layout__toggle-publish-panel">
 				<Button
 					variant="secondary"
-					className="edit-post-layout__toggle-publish-panel-button"
+					className="editor-layout__toggle-publish-panel-button"
 					onClick={ togglePublishSidebar }
 					aria-expanded={ false }
 				>

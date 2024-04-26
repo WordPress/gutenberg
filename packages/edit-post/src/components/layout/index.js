@@ -48,7 +48,6 @@ import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
-import ActionsPanel from './actions-panel';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -61,6 +60,7 @@ const {
 	ListViewSidebar,
 	ComplementaryArea,
 	FullscreenMode,
+	PostLayoutActionsPanel,
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
@@ -345,7 +345,7 @@ function Layout( { initialPost } ) {
 					)
 				}
 				actions={
-					<ActionsPanel
+					<PostLayoutActionsPanel
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
 							entitiesSavedStatesCallback
@@ -353,6 +353,7 @@ function Layout( { initialPost } ) {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						hasActiveMetaboxes={ hasActiveMetaboxes }
 					/>
 				}
 				shortcuts={ {
