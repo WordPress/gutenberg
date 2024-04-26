@@ -954,15 +954,49 @@ Undocumented declaration.
 
 ### PostFeaturedImage
 
-Undocumented declaration.
+Renders the component for managing the featured image of a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.currentPostId_ `number`: ID of the current post.
+-   _props.featuredImageId_ `number`: ID of the featured image.
+-   _props.onUpdateImage_ `Function`: Function to call when the image is updated.
+-   _props.onRemoveImage_ `Function`: Function to call when the image is removed.
+-   _props.media_ `Object`: The media object representing the featured image.
+-   _props.postType_ `string`: Post type.
+-   _props.noticeUI_ `Element`: UI for displaying notices.
+-   _props.noticeOperations_ `Object`: Operations for managing notices.
+
+_Returns_
+
+-   `Element`: Component to be rendered .
 
 ### PostFeaturedImageCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports a featured image and the theme supports post thumbnails.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostFeaturedImagePanel
 
-Undocumented declaration.
+Renders the panel for the post featured image.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.withPanelBody_ `boolean`: Whether to include the panel body. Default true.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return Null if the editor panel is disabled for featured image.
 
 ### PostFormat
 
