@@ -33,25 +33,40 @@ add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 
 /**
  * Adds the post classes to the REST API response.
  *
- * @param WP_REST_Response $response    Response object.
- * @param WP_Post          $post    Post object.
+ * @param  array  $post  The response object data.
  *
- * @return WP_REST_Response Response object.
+ * @return array
  */
-function gutenberg_add_class_list_to_api_response( $response, $post ) {
-	$response->data['class_list'] = get_post_class( '', $post->ID );
+function gutenberg_add_class_list_to_api_response( $post ) {
 
-	return $response;
+	if ( ! isset( $post['id'] ) ) {
+		return $post;
+	}
+
+	return get_post_class( array(), $post['id'] );
 }
 
 /**
- * Adds the post classes to all post types in the REST API.
+ * Adds the post classes to public post types in the REST API.
  */
-function gutenberg_add_class_list_to_all_post_types() {
+function gutenberg_add_class_list_to_public_post_types() {
 	$post_types = get_post_types( array( 'public' => true ), 'names' );
 
-	foreach ( $post_types as $post_type ) {
-		add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_class_list_to_api_response', 10, 3 );
+	if ( ! empty( $post_types ) ) {
+		register_rest_field(
+			$post_types,
+			'class_list',
+			array(
+				'get_callback' => 'gutenberg_add_class_list_to_api_response',
+				'schema'       => array(
+					'description' => __( 'An array of the class names for the post container element.', 'gutenberg' ),
+					'type'        => 'array',
+					'items'       => array(
+						'type' => 'string',
+					),
+				),
+			)
+		);
 	}
 }
-add_action( 'rest_api_init', 'gutenberg_add_class_list_to_all_post_types' );
+add_action( 'rest_api_init', 'gutenberg_add_class_list_to_public_post_types' );
