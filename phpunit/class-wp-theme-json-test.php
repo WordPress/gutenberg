@@ -5357,4 +5357,49 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Tests the correct scoping of selectors for a style node.
+	 */
+	public function test_scope_style_node_selectors() {
+		$theme_json = new ReflectionClass( 'WP_Theme_JSON_Gutenberg' );
+
+		$func = $theme_json->getMethod( 'scope_style_node_selectors' );
+		$func->setAccessible( true );
+
+		$node = array(
+			'name'      => 'core/image',
+			'path'      => array( 'styles', 'blocks', 'core/image' ),
+			'selector'  => '.wp-block-image',
+			'selectors' => array(
+				'root'       => '.wp-block-image',
+				'border'     => '.wp-block-image img, .wp-block-image .wp-block-image__crop-area, .wp-block-image .components-placeholder',
+				'typography' => array(
+					'textDecoration' => '.wp-block-image caption',
+				),
+				'filter'     => array(
+					'duotone' => '.wp-block-image img, .wp-block-image .components-placeholder',
+				),
+			),
+		);
+
+		$actual   = $func->invoke( null, '.custom-scope', $node );
+		$expected = array(
+			'name'      => 'core/image',
+			'path'      => array( 'styles', 'blocks', 'core/image' ),
+			'selector'  => '.custom-scope .wp-block-image',
+			'selectors' => array(
+				'root'       => '.custom-scope .wp-block-image',
+				'border'     => '.custom-scope .wp-block-image img, .custom-scope .wp-block-image .wp-block-image__crop-area, .custom-scope .wp-block-image .components-placeholder',
+				'typography' => array(
+					'textDecoration' => '.custom-scope .wp-block-image caption',
+				),
+				'filter'     => array(
+					'duotone' => '.custom-scope .wp-block-image img, .custom-scope .wp-block-image .components-placeholder',
+				),
+			),
+		);
+
+		$this->assertEquals( $expected, $actual );
+	}
 }
