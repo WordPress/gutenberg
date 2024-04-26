@@ -238,11 +238,31 @@ Undocumented declaration.
 
 ### DocumentOutline
 
-Undocumented declaration.
+Renders a document outline component.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.onSelect_ `Function`: The function to be called when an outline item is selected.
+-   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### DocumentOutlineCheck
 
-Undocumented declaration.
+Component check if there are any headings (core/heading blocks) present in the document.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: The child elements to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child elements or null if there are headings.
 
 ### EditorHistoryRedo
 
