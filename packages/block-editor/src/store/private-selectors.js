@@ -181,7 +181,7 @@ export function getOpenedBlockSettingsMenu( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Map} A map of style IDs to style overrides.
+ * @return {Array} An array of style ID to style override pairs.
  */
 export const getStyleOverrides = createSelector(
 	( state ) => {
@@ -191,9 +191,16 @@ export const getStyleOverrides = createSelector(
 			return acc;
 		}, {} );
 
-		return [ ...state.styleOverrides ].sort( ( a, b ) => {
-			const aIndex = clientIdMap[ a[ 1 ].clientId ] ?? -1;
-			const bIndex = clientIdMap[ b[ 1 ].clientId ] ?? -1;
+		return [ ...state.styleOverrides ].sort( ( overrideA, overrideB ) => {
+			// Once the overrides Map is spread to an array, the first element
+			// is the key, while the second is the override itself including
+			// the clientId to sort by.
+			const [ , { clientId: clientIdA } ] = overrideA;
+			const [ , { clientId: clientIdB } ] = overrideB;
+
+			const aIndex = clientIdMap[ clientIdA ] ?? -1;
+			const bIndex = clientIdMap[ clientIdB ] ?? -1;
+
 			return aIndex - bIndex;
 		} );
 	},
