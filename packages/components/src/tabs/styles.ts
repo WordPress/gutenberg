@@ -10,7 +10,6 @@ import * as Ariakit from '@ariakit/react';
  */
 import { COLORS } from '../utils';
 import { space } from '../utils/space';
-import { reduceMotion } from '../utils/reduce-motion';
 
 export const TabListWrapper = styled.div`
 	position: relative;
@@ -99,9 +98,11 @@ export const Tab = styled( Ariakit.Tab )`
 			border-radius: 2px;
 
 			// Animation
-			transition: opacity 0.1s linear;
-			${ reduceMotion( 'transition' ) };
 			opacity: 0;
+
+			@media not ( prefers-reduced-motion ) {
+				transition: opacity 0.1s linear;
+			}
 		}
 
 		&:focus-visible::before {
