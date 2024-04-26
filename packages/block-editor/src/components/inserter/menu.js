@@ -240,10 +240,9 @@ function InserterMenu(
 
 	const searchRef = useRef();
 	useEffect( () => {
-		const focusTimeout = setTimeout( () => {
+		window.requestAnimationFrame( () => {
 			searchRef?.current?.focus();
 		} );
-		return () => clearTimeout( focusTimeout );
 	}, [ selectedTab ] );
 
 	const inserterSearch = useMemo( () => {
