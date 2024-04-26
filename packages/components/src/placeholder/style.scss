@@ -41,7 +41,7 @@
 .components-placeholder__label {
 	font-weight: 600;
 	align-items: center;
-	display: inline-flex;
+	display: flex;
 
 	> svg,
 	.dashicon,
@@ -89,6 +89,7 @@
 
 .components-placeholder__error {
 	width: 100%;
+	gap: $grid-unit-10;
 }
 
 
@@ -156,7 +157,6 @@
 		// Unset intrinsic margins.
 		margin-left: 0;
 		margin-right: 0;
-		justify-content: center;
 	}
 
 	// Show placeholder buttons on block selection.
