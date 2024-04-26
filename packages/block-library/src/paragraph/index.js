@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { paragraph as icon } from '@wordpress/icons';
+import { __, _x, isRTL } from '@wordpress/i18n';
+import { paragraph as icon, formatLtr } from '@wordpress/icons';
+import { AlignmentControl, useSettings } from '@wordpress/block-editor';
+import {
+	ToolbarButton,
+	ToggleControl,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,6 +23,10 @@ import transforms from './transforms';
 const { name } = metadata;
 
 export { metadata, name };
+
+function hasDropCapDisabled( align ) {
+	return align === ( isRTL() ? 'left' : 'right' ) || align === 'center';
+}
 
 export const settings = {
 	icon,
@@ -54,6 +64,101 @@ export const settings = {
 	},
 	edit,
 	save,
+	attributeControls: [
+		{
+			key: 'align',
+			type: 'toolbar',
+			group: 'block',
+			Control( { attributes, setAttributes } ) {
+				const { align, dropCap } = attributes;
+				return (
+					<AlignmentControl
+						value={ align }
+						onChange={ ( newAlign ) =>
+							setAttributes( {
+								align: newAlign,
+								dropCap: hasDropCapDisabled( newAlign )
+									? false
+									: dropCap,
+							} )
+						}
+					/>
+				);
+			},
+		},
+		{
+			key: 'direction',
+			type: 'toolbar',
+			group: 'block',
+			Control( { attributes, setAttributes } ) {
+				const { direction } = attributes;
+				return (
+					isRTL() && (
+						<ToolbarButton
+							icon={ formatLtr }
+							title={ _x( 'Left to right', 'editor button' ) }
+							isActive={ direction === 'ltr' }
+							onClick={ () => {
+								setAttributes( {
+									direction:
+										direction === 'ltr' ? undefined : 'ltr',
+								} );
+							} }
+						/>
+					)
+				);
+			},
+		},
+		{
+			key: 'dropCap',
+			type: 'inspector',
+			group: 'typography',
+			Control( { attributes, setAttributes, clientId } ) {
+				const [ isDropCapFeatureEnabled ] =
+					useSettings( 'typography.dropCap' );
+
+				if ( ! isDropCapFeatureEnabled ) {
+					return null;
+				}
+
+				const { align, dropCap } = attributes;
+
+				let helpText;
+				if ( hasDropCapDisabled( align ) ) {
+					helpText = __( 'Not available for aligned text.' );
+				} else if ( dropCap ) {
+					helpText = __( 'Showing large initial letter.' );
+				} else {
+					helpText = __( 'Toggle to show a large initial letter.' );
+				}
+
+				return (
+					<ToolsPanelItem
+						hasValue={ () => !! dropCap }
+						label={ __( 'Drop cap' ) }
+						onDeselect={ () =>
+							setAttributes( { dropCap: undefined } )
+						}
+						resetAllFilter={ () => ( { dropCap: undefined } ) }
+						panelId={ clientId }
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Drop cap' ) }
+							checked={ !! dropCap }
+							onChange={ () =>
+								setAttributes( { dropCap: ! dropCap } )
+							}
+							help={ helpText }
+							disabled={
+								hasDropCapDisabled( align ) ? true : false
+							}
+						/>
+					</ToolsPanelItem>
+				);
+			},
+		},
+	],
 };
 
 export const init = () => initBlock( { name, metadata, settings } );
