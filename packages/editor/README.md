@@ -210,7 +210,11 @@ _Parameters_
 
 ### CharacterCount
 
-Undocumented declaration.
+Renders the character count of the post content.
+
+_Returns_
+
+-   `number`: The character count.
 
 ### cleanForSlug
 
