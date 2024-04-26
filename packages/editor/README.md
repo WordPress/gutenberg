@@ -376,7 +376,7 @@ _Parameters_
 
 ### PageAttributesCheck
 
-Component for checking if the post type supports page attributes.
+Wrapper component that renders its children only if the post type supports page attributes.
 
 _Parameters_
 

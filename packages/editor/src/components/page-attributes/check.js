@@ -10,7 +10,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 /**
- * Component for checking if the post type supports page attributes.
+ * Wrapper component that renders its children only if the post type supports page attributes.
  *
  * @param {Object}  props          - The component props.
  * @param {Element} props.children - The child components to render.
