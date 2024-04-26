@@ -41,65 +41,51 @@ _Parameters_
 
 ### PluginBlockSettingsMenuItem
 
-Undocumented declaration.
+_Related_
+
+-   PluginBlockSettingsMenuItem in @wordpress/editor package.
 
 ### PluginDocumentSettingPanel
 
-Undocumented declaration.
+_Related_
+
+-   PluginDocumentSettingPanel in @wordpress/editor package.
 
 ### PluginMoreMenuItem
 
-Undocumented declaration.
+_Related_
+
+-   PluginMoreMenuItem in @wordpress/editor package.
 
 ### PluginPostPublishPanel
 
-> **Deprecated** since 6.6, use `wp.editor.PluginPostPublishPanel` instead.
+_Related_
 
-Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
-
-_Parameters_
-
--   _props_ `Object`: Component properties.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+-   PluginPostPublishPanel in @wordpress/editor package.
 
 ### PluginPostStatusInfo
 
-Undocumented declaration.
+_Related_
+
+-   PluginPostStatusInfo in @wordpress/editor package.
 
 ### PluginPrePublishPanel
 
-> **Deprecated** since 6.6, use `wp.editor.PluginPrePublishPanel` instead.
+_Related_
 
-Renders provided content to the pre-publish side panel in the publish flow (side panel that opens when a user first pushes "Publish" from the main editor).
-
-_Parameters_
-
--   _props_ `Object`: Component props.
--   _props.className_ `[string]`: An optional class name added to the panel.
--   _props.title_ `[string]`: Title displayed at the top of the panel.
--   _props.initialOpen_ `[boolean]`: Whether to have the panel initially opened. When no title is provided it is always opened.
--   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
--   _props.children_ `Element`: Children to be rendered
-
-_Returns_
-
--   `Component`: The component to be rendered.
+-   PluginPrePublishPanel in @wordpress/editor package.
 
 ### PluginSidebar
 
-Undocumented declaration.
+_Related_
+
+-   PluginSidebar in @wordpress/editor package.
 
 ### PluginSidebarMoreMenuItem
 
-Undocumented declaration.
+_Related_
+
+-   PluginSidebarMoreMenuItem in @wordpress/editor package.
 
 ### reinitializeEditor
 
