@@ -244,16 +244,8 @@ export default () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
-					if ( SCRIPT_DEBUG && typeof value !== 'object' ) {
-						warning(
-							sprintf(
-								// translators: %s: store namespace.
-								__(
-									'The value of data-wp-context in "%s" store must be a valid stringified JSON object.'
-								),
-								namespace
-							)
-						);
+					if ( SCRIPT_DEBUG && isPlainObject(value) ) {
+						console.warn('The value of data-wp-context in "%s" store must be a valid stringified JSON object.')
 					}
 					updateSignals( currentValue.current, {
 						[ namespace ]: deepClone( value ),
