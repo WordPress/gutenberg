@@ -38,12 +38,12 @@ function useClassNameFromBlockContext( postId, postType ) {
 		[ postType, postId ]
 	);
 
-	const { post_class: postClass } = post;
+	const { class_list: classList } = post;
 
 	let classes = 'wp-block-post';
 
-	if ( postClass ) {
-		classes = classnames( classes, postClass );
+	if ( classList ) {
+		classes = classnames( classes, classList );
 	}
 	return classes;
 }
