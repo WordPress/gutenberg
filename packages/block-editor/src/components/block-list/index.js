@@ -198,20 +198,22 @@ function Items( {
 				}
 
 				const selectedBlockClientId = getSelectedBlockClientId();
+				const isParentSelected = rootClientId === selectedBlockClientId;
+				const isEmpty = ! _order.length;
+				const shouldShowAppender = isParentSelected || isEmpty;
+
 				return {
 					order: _order,
 					selectedBlocks: getSelectedBlockClientIds(),
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:
 						hasAppender &&
+						shouldShowAppender &&
 						__unstableGetEditorMode() !== 'zoom-out' &&
 						( hasCustomAppender
 							? ! getTemplateLock( rootClientId ) &&
 							  getBlockEditingMode( rootClientId ) !== 'disabled'
-							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId &&
-									! selectedBlockClientId &&
-									! _order.length ) ),
+							: true ),
 				};
 			},
 			[ rootClientId, hasAppender, hasCustomAppender ]
