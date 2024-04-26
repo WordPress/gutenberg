@@ -601,11 +601,6 @@ function BlockListBlockProvider( props ) {
 			const canMove = canMoveBlock( clientId, rootClientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isMultiSelected = isBlockMultiSelected( clientId );
-			const checkDeep = true;
-			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
-				clientId,
-				checkDeep
-			);
 			const typing = isTyping();
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
@@ -656,7 +651,6 @@ function BlockListBlockProvider( props ) {
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),
-				hasChildSelected: isAncestorOfSelectedBlock,
 				removeOutline: _isSelected && outlineMode && typing,
 				isBlockMovingMode: !! movingClientId,
 				canInsertMovingBlock:
@@ -705,7 +699,6 @@ function BlockListBlockProvider( props ) {
 		isPartiallySelected,
 		isReusable,
 		isDragging,
-		hasChildSelected,
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
@@ -752,7 +745,6 @@ function BlockListBlockProvider( props ) {
 		isPartiallySelected,
 		isReusable,
 		isDragging,
-		hasChildSelected,
 		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,

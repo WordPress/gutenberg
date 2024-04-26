@@ -185,7 +185,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 
 	&.has-negative-margin {
 		&.is-selected,
-		&.has-child-selected {
+		&:has(.is-selected) {
 			// Bring the selected block forward so we can see it.
 			z-index: z-index(".block-editor-block-list__block.is-selected");
 		}
@@ -260,7 +260,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 
 	// Reusable blocks parent border.
-	&.is-reusable.has-child-selected::after {
+	&.is-reusable:has(.is-selected)::after {
 		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
 
@@ -353,7 +353,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 }
 
 // Spotlight mode. Fade out blocks unless they contain a selected block.
-.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
+.is-focus-mode .block-editor-block-list__block:not(:has(.is-selected)) {
 	opacity: 0.2;
 	transition: opacity 0.1s linear;
 	@include reduce-motion("transition");
@@ -369,8 +369,8 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	}
 }
 
-.is-focus-mode .block-editor-block-list__block.is-content-locked.has-child-selected,
-.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks.has-child-selected {
+.is-focus-mode .block-editor-block-list__block.is-content-locked:has(.is-selected),
+.is-focus-mode .block-editor-block-list__block.is-content-locked-temporarily-editing-as-blocks:has(.is-selected) {
 	&,
 	& .block-editor-block-list__block {
 		opacity: 1;
@@ -444,7 +444,7 @@ body.is-zoomed-out {
 	@include reduce-motion("animation");
 }
 
-.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+.block-editor-block-list__block:not(.is-selected):not(:has(.is-selected)) .block-editor-default-block-appender {
 	display: none;
 
 	.block-editor-inserter__toggle {
