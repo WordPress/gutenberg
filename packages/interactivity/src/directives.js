@@ -271,7 +271,7 @@ export default () => {
 									dataType: 'track-entry',
 								},
 								color: 'primary',
-								track: 'Interactivity api events',
+								track: entry.suffix,
 							},
 						},
 					}
@@ -300,7 +300,7 @@ export default () => {
 									dataType: 'track-entry',
 								},
 								color: 'primary',
-								track: 'Interactivity api events',
+								track: entry.suffix,
 							},
 						},
 					}
@@ -312,11 +312,20 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
+		const events = new Map();
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
-				element.props[ `on${ entry.suffix }` ] = ( event ) => {
+				const event = entry.suffix.split( '--' )[ 0 ];
+				if ( ! events.has( event ) ) events.set( event, new Set() );
+				events.get( event ).add( entry );
+			}
+		);
+
+		events.forEach( ( entries, eventType ) => {
+			element.props[ `on${ eventType }` ] = ( event ) => {
+				entries.forEach( ( entry ) => {
 					const start = performance.now();
-					const result = evaluate( entry, event );
+					evaluate( entry, event );
 					performance.measure(
 						`interactivity api on ${ entry.suffix }`,
 						{
@@ -329,15 +338,14 @@ export default () => {
 										dataType: 'track-entry',
 									},
 									color: 'primary',
-									track: 'Interactivity api events',
+									track: entry.suffix,
 								},
 							},
 						}
 					);
-					return result;
-				};
-			}
-		);
+				} );
+			};
+		} );
 	} );
 
 	// data-wp-on-window--[event]
