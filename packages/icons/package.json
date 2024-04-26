@@ -32,7 +32,8 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/primitives": "file:../primitives",
 		"glob": "^10.3.12",
-		"svgo": "^3.2.0"
+		"svgo": "^3.2.0",
+		"xml2js": "^0.6.2"
 	},
 	"publishConfig": {
 		"access": "public"
