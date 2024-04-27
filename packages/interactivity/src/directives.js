@@ -236,8 +236,8 @@ export default () => {
 			const defaultEntry = context.find(
 				( { suffix } ) => suffix === 'default'
 			);
-			// No change should be made if `defaultEntry` does not exist.
 
+			// No change should be made if `defaultEntry` does not exist.
 			const contextStack = useMemo( () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
