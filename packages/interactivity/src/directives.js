@@ -14,9 +14,6 @@ import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
 
-const { sprintf, __ } = window.wp.i18n;
-const { warning } = window.wp;
-
 // Assigned objects should be ignore during proxification.
 const contextAssignedObjects = new WeakMap();
 
@@ -244,8 +241,11 @@ export default () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
-					if ( SCRIPT_DEBUG && isPlainObject(value) ) {
-						console.warn('The value of data-wp-context in "%s" store must be a valid stringified JSON object.')
+					if ( SCRIPT_DEBUG && ! isPlainObject( value ) ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+						);
 					}
 					updateSignals( currentValue.current, {
 						[ namespace ]: deepClone( value ),
