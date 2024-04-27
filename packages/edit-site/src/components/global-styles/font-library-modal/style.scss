@@ -66,12 +66,29 @@ $footer-height: 70px;
 	margin-bottom: 0;
 }
 
+.font-library-modal__fonts-title {
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 600;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library-modal__fonts-list {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
+.font-library-modal__fonts-list-item {
+	margin-top: -1px; /* To collapse the margin with the previous element */
+	margin-bottom: 0;
+}
+
 .font-library-modal__font-card {
 	border: 1px solid $gray-200;
 	width: 100%;
 	height: auto;
 	padding: $grid-unit-20;
-	margin-top: -1px; /* To collapse the margin with the previous element */
 
 	&:hover {
 		background-color: $gray-100;
