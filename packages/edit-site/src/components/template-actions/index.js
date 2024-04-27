@@ -135,7 +135,7 @@ function ResetMenuItem( { template, onClose } ) {
 				onCancel={ () => setIsModalOpen( false ) }
 				confirmButtonText={ __( 'Reset' ) }
 			>
-				{ __( 'Rese to default and clear all customizations?' ) }
+				{ __( 'Reset to default and clear all customizations?' ) }
 			</ConfirmDialog>
 		</>
 	);

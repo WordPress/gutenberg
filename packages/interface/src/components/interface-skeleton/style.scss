@@ -43,6 +43,7 @@ html.interface-interface-skeleton__html-container {
 @include editor-left(".interface-interface-skeleton");
 
 .interface-interface-skeleton__body {
+	position: relative;
 	flex-grow: 1;
 	display: flex;
 
