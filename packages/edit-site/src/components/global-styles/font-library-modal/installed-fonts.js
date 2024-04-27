@@ -126,97 +126,94 @@ function InstalledFonts() {
 						}
 					>
 						<NavigatorScreen path="/">
-							{ notice && (
-								<>
-									<Spacer margin={ 1 } />
+							<VStack spacing="8">
+								{ notice && (
 									<Notice
 										status={ notice.type }
 										onRemove={ () => setNotice( null ) }
 									>
 										{ notice.message }
 									</Notice>
-									<Spacer margin={ 1 } />
-								</>
-							) }
-							{ baseCustomFonts.length > 0 && (
-								<VStack>
-									<h2 className="font-library-modal__fonts-title">
-										{ __( 'Installed Fonts' ) }
-									</h2>
-									{ /*
-									 * Disable reason: The `list` ARIA role is redundant but
-									 * Safari+VoiceOver won't announce the list otherwise.
-									 */
-									/* eslint-disable jsx-a11y/no-redundant-roles */ }
-									<ul
-										role="list"
-										className="font-library-modal__fonts-list"
-									>
-										{ baseCustomFonts.map( ( font ) => (
-											<li
-												key={ font.slug }
-												className="font-library-modal__fonts-list-item"
-											>
-												<FontCard
-													font={ font }
-													navigatorPath={
-														'/fontFamily'
-													}
-													variantsText={ getFontCardVariantsText(
-														font
-													) }
-													onClick={ () => {
-														handleSetLibraryFontSelected(
+								) }
+								{ baseCustomFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Installed Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseCustomFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
 															font
-														);
-													} }
-												/>
-											</li>
-										) ) }
-									</ul>
-									{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								</VStack>
-							) }
-
-							{ baseThemeFonts.length > 0 && (
-								<VStack>
-									<h2 className="font-library-modal__fonts-title">
-										{ __( 'Theme Fonts' ) }
-									</h2>
-									{ /*
-									 * Disable reason: The `list` ARIA role is redundant but
-									 * Safari+VoiceOver won't announce the list otherwise.
-									 */
-									/* eslint-disable jsx-a11y/no-redundant-roles */ }
-									<ul
-										role="list"
-										className="font-library-modal__fonts-list"
-									>
-										{ baseThemeFonts.map( ( font ) => (
-											<li
-												key={ font.slug }
-												className="font-library-modal__fonts-list-item"
-											>
-												<FontCard
-													font={ font }
-													navigatorPath={
-														'/fontFamily'
-													}
-													variantsText={ getFontCardVariantsText(
-														font
-													) }
-													onClick={ () => {
-														handleSetLibraryFontSelected(
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+								{ baseThemeFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Theme Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseThemeFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
 															font
-														);
-													} }
-												/>
-											</li>
-										) ) }
-									</ul>
-									{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								</VStack>
-							) }
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+							</VStack>
 						</NavigatorScreen>
 
 						<NavigatorScreen path="/fontFamily">

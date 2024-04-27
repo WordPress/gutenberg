@@ -80,7 +80,6 @@ $footer-height: 70px;
 }
 
 .font-library-modal__fonts-list-item {
-	margin-top: -1px; /* To collapse the margin with the previous element */
 	margin-bottom: 0;
 }
 
@@ -89,6 +88,7 @@ $footer-height: 70px;
 	width: 100%;
 	height: auto;
 	padding: $grid-unit-20;
+	margin-top: -1px; /* To collapse the margin with the previous element */
 
 	&:hover {
 		background-color: $gray-100;
