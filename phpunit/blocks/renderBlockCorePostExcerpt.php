@@ -5,14 +5,9 @@
  * @package WordPress
  * @subpackage Blocks
  * @covers ::gutenberg_render_block_core_post_excerpt
- */
-
-/**
- * Tests for the  Post Excerpt block.
- *
  * @group blocks
  */
-class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
+class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 
 	/**
 	 * Post object with data.
@@ -71,8 +66,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method
 	 * with empty data.
-	 *
-	 * @covers ::gutenberg_render_block_core_post_excerpt
 	 */
 	public function test_gutenberg_render_block_core_post_excerpt_empty() {
 		$block = new stdClass();
@@ -84,8 +77,6 @@ class Tests_Blocks_GutenbergRenderBlockCorePostExcerpt extends WP_UnitTestCase {
 
 	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method.
-	 *
-	 * @covers ::gutenberg_render_block_core_post_excerpt
 	 */
 	public function test_gutenberg_render_block_core_post_excerpt() {
 
