@@ -7,7 +7,7 @@
  * @covers ::gutenberg_render_block_core_post_title
  * @group blocks
  */
-class Tests_Blocks_GutenbergRenderBlockCorePostTitle extends WP_UnitTestCase {
+class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	/**
 	 * Post object.
 	 *
