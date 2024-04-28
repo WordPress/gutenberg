@@ -720,7 +720,7 @@ function getConfigurationValue( key ) {
 }
 ```
 
-When documenting a [function type](https://github.com/WordPress/gutenberg/blob/add/typescript-jsdoc-guidelines/docs/contributors/coding-guidelines.md#record-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
+When documenting a [function type](#generic-types), you must always include the `void` return value type, as otherwise the function is inferred to return a mixed ("any") value, not a void result.
 
 ```js
 /**

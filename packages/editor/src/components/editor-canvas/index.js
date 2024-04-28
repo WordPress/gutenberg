@@ -29,6 +29,7 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
+import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
 
 const {
 	LayoutStyle,
@@ -37,8 +38,6 @@ const {
 	ExperimentalBlockCanvas: BlockCanvas,
 	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
-
-const noop = () => {};
 
 /**
  * These post types have a special editor where they don't allow you to fill the title
@@ -94,6 +93,7 @@ function EditorCanvas( {
 	styles,
 	disableIframe = false,
 	iframeProps,
+	contentRef,
 	children,
 } ) {
 	const {
@@ -307,10 +307,14 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const contentRef = useMergeRefs( [
+	contentRef = useMergeRefs( [
 		localRef,
-		renderingMode === 'post-only' ? typewriterRef : noop,
+		contentRef,
+		renderingMode === 'post-only' ? typewriterRef : null,
 		useFlashEditableBlocks( {
+			isEnabled: renderingMode === 'template-locked',
+		} ),
+		useSelectNearestEditableBlock( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 	] );

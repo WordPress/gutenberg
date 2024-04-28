@@ -19,7 +19,12 @@ import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
 
-function BlockMover( { clientIds, hideDragHandle } ) {
+function BlockMover( {
+	clientIds,
+	hideDragHandle,
+	isBlockMoverUpButtonDisabled,
+	isBlockMoverDownButtonDisabled,
+} ) {
 	const { canMove, rootClientId, isFirst, isLast, orientation } = useSelect(
 		( select ) => {
 			const {
@@ -83,6 +88,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverUpButton
+							disabled={ isBlockMoverUpButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>
@@ -91,6 +97,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				<ToolbarItem>
 					{ ( itemProps ) => (
 						<BlockMoverDownButton
+							disabled={ isBlockMoverDownButtonDisabled }
 							clientIds={ clientIds }
 							{ ...itemProps }
 						/>

@@ -15,7 +15,7 @@ import type { VNode, Context, RefObject } from 'preact';
 /**
  * Internal dependencies
  */
-import { stores } from './store';
+import { store, stores, universalUnlock } from './store';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -259,8 +259,14 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	let resolvedStore = stores.get( namespace );
+	if ( typeof resolvedStore === 'undefined' ) {
+		resolvedStore = store( namespace, undefined, {
+			lock: universalUnlock,
+		} );
+	}
 	let current = {
-		...stores.get( namespace ),
+		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
 	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );

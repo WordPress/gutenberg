@@ -11,11 +11,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import CustomSelect from '../legacy-component';
+import CustomSelectControl from '../legacy-component';
+import * as V1Story from '../../custom-select-control/stories/index.story';
 
-const meta: Meta< typeof CustomSelect > = {
+const meta: Meta< typeof CustomSelectControl > = {
 	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
-	component: CustomSelect,
+	component: CustomSelectControl,
 	argTypes: {
 		onChange: { control: { type: null } },
 		value: { control: { type: null } },
@@ -42,46 +43,30 @@ const meta: Meta< typeof CustomSelect > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof CustomSelect > = ( props ) => {
-	const [ fontSize, setFontSize ] = useState( props.options[ 0 ] );
+const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
+	const [ value, setValue ] = useState( props.options[ 0 ] );
 
 	const onChange: React.ComponentProps<
-		typeof CustomSelect
+		typeof CustomSelectControl
 	>[ 'onChange' ] = ( changeObject ) => {
-		setFontSize( changeObject.selectedItem );
+		setValue( changeObject.selectedItem );
 		props.onChange?.( changeObject );
 	};
 
 	return (
-		<CustomSelect { ...props } onChange={ onChange } value={ fontSize } />
+		<CustomSelectControl
+			{ ...props }
+			onChange={ onChange }
+			value={ value }
+		/>
 	);
 };
 
 export const Default = Template.bind( {} );
-Default.args = {
-	label: 'Label text',
-	options: [
-		{
-			key: 'small',
-			name: 'Small',
-			style: { fontSize: '50%' },
-			__experimentalHint: '50%',
-		},
-		{
-			key: 'normal',
-			name: 'Normal',
-			style: { fontSize: '100%' },
-			className: 'can-apply-custom-class-to-option',
-		},
-		{
-			key: 'large',
-			name: 'Large',
-			style: { fontSize: '200%' },
-		},
-		{
-			key: 'huge',
-			name: 'Huge',
-			style: { fontSize: '300%' },
-		},
-	],
-};
+Default.args = V1Story.Default.args;
+
+export const WithLongLabels = Template.bind( {} );
+WithLongLabels.args = V1Story.WithLongLabels.args;
+
+export const WithHints = Template.bind( {} );
+WithHints.args = V1Story.WithHints.args;

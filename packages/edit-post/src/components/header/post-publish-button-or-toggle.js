@@ -5,11 +5,6 @@ import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PostPublishButton, store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { store as editPostStore } from '../../store';
-
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
 	hasPublishAction,
@@ -21,6 +16,8 @@ export function PostPublishButtonOrToggle( {
 	isScheduled,
 	togglePublishSidebar,
 	setEntitiesSavedStatesCallback,
+	postStatusHasChanged,
+	postStatus,
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
@@ -34,6 +31,7 @@ export function PostPublishButtonOrToggle( {
 	 * for a particular role (see https://wordpress.org/documentation/article/post-status/):
 	 *
 	 * - is published
+	 * - post status has changed explicitely to something different than 'future' or 'publish'
 	 * - is scheduled to be published
 	 * - is pending and can't be published (but only for viewports >= medium).
 	 * 	 Originally, we considered showing a button for pending posts that couldn't be published
@@ -51,13 +49,13 @@ export function PostPublishButtonOrToggle( {
 	 */
 	if (
 		isPublished ||
+		( postStatusHasChanged &&
+			! [ 'future', 'publish' ].includes( postStatus ) ) ||
 		( isScheduled && isBeingScheduled ) ||
 		( isPending && ! hasPublishAction && ! isSmallerThanMediumViewport )
 	) {
 		component = IS_BUTTON;
-	} else if ( isSmallerThanMediumViewport ) {
-		component = IS_TOGGLE;
-	} else if ( isPublishSidebarEnabled ) {
+	} else if ( isSmallerThanMediumViewport || isPublishSidebarEnabled ) {
 		component = IS_TOGGLE;
 	} else {
 		component = IS_BUTTON;
@@ -85,12 +83,13 @@ export default compose(
 		isPublished: select( editorStore ).isCurrentPostPublished(),
 		isPublishSidebarEnabled:
 			select( editorStore ).isPublishSidebarEnabled(),
-		isPublishSidebarOpened:
-			select( editPostStore ).isPublishSidebarOpened(),
+		isPublishSidebarOpened: select( editorStore ).isPublishSidebarOpened(),
 		isScheduled: select( editorStore ).isCurrentPostScheduled(),
+		postStatus: select( editorStore ).getEditedPostAttribute( 'status' ),
+		postStatusHasChanged: select( editorStore ).getPostEdits()?.status,
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { togglePublishSidebar } = dispatch( editPostStore );
+		const { togglePublishSidebar } = dispatch( editorStore );
 		return {
 			togglePublishSidebar,
 		};

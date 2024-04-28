@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 
-export default function StyleVariationsContainer() {
+export default function StyleVariationsContainer( { gap = 2 } ) {
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -39,6 +39,7 @@ export default function StyleVariationsContainer() {
 		<Grid
 			columns={ 2 }
 			className="edit-site-global-styles-style-variations-container"
+			gap={ gap }
 		>
 			{ withEmptyVariation.map( ( variation, index ) => (
 				<Variation key={ index } variation={ variation }>

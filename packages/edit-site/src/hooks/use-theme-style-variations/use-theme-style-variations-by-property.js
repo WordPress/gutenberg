@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -27,7 +28,11 @@ export function removePropertyFromObject( object, property ) {
 		return object;
 	}
 
-	if ( typeof object !== 'object' || ! Object.keys( object ).length ) {
+	if (
+		typeof object !== 'object' ||
+		! object ||
+		! Object.keys( object ).length
+	) {
 		return object;
 	}
 
@@ -54,12 +59,28 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig( {
 	property,
 	filter,
 } ) {
-	const variations = useSelect( ( select ) => {
-		return select(
-			coreStore
-		).__experimentalGetCurrentThemeGlobalStylesVariations();
+	const { variationsFromTheme } = useSelect( ( select ) => {
+		const _variationsFromTheme =
+			select(
+				coreStore
+			).__experimentalGetCurrentThemeGlobalStylesVariations();
+
+		return {
+			variationsFromTheme: _variationsFromTheme || [],
+		};
 	}, [] );
 	const { user: baseVariation } = useContext( GlobalStylesContext );
+
+	const variations = useMemo( () => {
+		return [
+			{
+				title: __( 'Default' ),
+				settings: {},
+				styles: {},
+			},
+			...variationsFromTheme,
+		];
+	}, [ variationsFromTheme ] );
 
 	return useThemeStyleVariationsByProperty( {
 		variations,

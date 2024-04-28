@@ -13,6 +13,6 @@ export async function openDocumentSettingsSidebar() {
 
 	if ( isClosed ) {
 		await toggleButton.click();
-		await page.waitForSelector( '.edit-post-sidebar' );
+		await page.waitForSelector( '.editor-sidebar' );
 	}
 }

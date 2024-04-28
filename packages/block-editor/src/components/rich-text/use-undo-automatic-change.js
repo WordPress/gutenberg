@@ -3,7 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
+import { BACKSPACE, ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -20,11 +20,7 @@ export function useUndoAutomaticChange() {
 				return;
 			}
 
-			if (
-				keyCode !== DELETE &&
-				keyCode !== BACKSPACE &&
-				keyCode !== ESCAPE
-			) {
+			if ( keyCode !== BACKSPACE && keyCode !== ESCAPE ) {
 				return;
 			}
 

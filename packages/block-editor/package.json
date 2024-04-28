@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "12.21.0",
+	"version": "12.24.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -75,8 +75,7 @@
 		"postcss-prefixwrap": "^1.41.0",
 		"postcss-urlrebase": "^1.0.0",
 		"react-autosize-textarea": "^7.1.0",
-		"react-easy-crop": "^4.5.1",
-		"rememo": "^4.0.2",
+		"react-easy-crop": "^5.0.6",
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {

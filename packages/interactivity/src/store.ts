@@ -109,7 +109,7 @@ const handlers = {
 				const scope = getScope();
 				const gen: Generator< any > = result( ...args );
 
-				let value: any;
+				let value: unknown;
 				let it: IteratorResult< any >;
 
 				while ( true ) {
@@ -125,7 +125,12 @@ const handlers = {
 					try {
 						value = await it.value;
 					} catch ( e ) {
+						setNamespace( ns );
+						setScope( scope );
 						gen.throw( e );
+					} finally {
+						resetScope();
+						resetNamespace();
 					}
 
 					if ( it.done ) break;
@@ -197,7 +202,7 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
-const universalUnlock =
+export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
 /**
@@ -269,7 +274,10 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		const rawStore = { state: deepSignal( state ), ...block };
+		const rawStore = {
+			state: deepSignal( isObject( state ) ? state : {} ),
+			...block,
+		};
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );

@@ -53,10 +53,10 @@ test.describe( 'Settings sidebar', () => {
 				name: 'Editor settings',
 			} );
 			const templateTitle = settingsSideber.locator(
-				'.edit-site-sidebar-card__title'
+				'.editor-post-card-panel__title'
 			);
 			const templateDescription = settingsSideber.locator(
-				'.edit-site-sidebar-card__description'
+				'.editor-post-card-panel__description'
 			);
 
 			await expect( templateTitle ).toHaveText( 'Index' );

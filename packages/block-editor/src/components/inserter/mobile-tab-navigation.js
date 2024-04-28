@@ -32,7 +32,7 @@ function ScreenHeader( { title } ) {
 							}
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							size="small"
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 						/>
 						<Spacer>
 							<Heading level={ 5 }>{ title }</Heading>

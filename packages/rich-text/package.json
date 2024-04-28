@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "6.30.0",
+	"version": "6.33.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -39,8 +39,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"memize": "^2.1.0",
-		"rememo": "^4.0.2"
+		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

@@ -107,6 +107,16 @@ class EditorPage {
 		await typeString( this.driver, block, text, clear );
 	}
 
+	async typeKeyString( inputString ) {
+		const actions = this.driver.action( 'key' );
+
+		for ( const char of inputString ) {
+			await actions.down( char ).up( char );
+		}
+
+		await actions.perform();
+	}
+
 	async pasteClipboardToTextBlock( element, { timeout = 1000 } = {} ) {
 		if ( this.driver.isAndroid ) {
 			await longPressMiddleOfElement( this.driver, element );
@@ -722,6 +732,22 @@ class EditorPage {
 		);
 
 		await element.click();
+	}
+
+	async toggleHighlightColor( color ) {
+		await this.toggleFormatting( 'Text color' );
+		let element = `~${ color }`;
+
+		if ( ! color ) {
+			element = isAndroid()
+				? '~Clear selected color'
+				: '(//XCUIElementTypeOther[@name="Clear selected color"])[2]';
+		}
+
+		await this.driver.waitUntil( this.driver.$( element ).isDisplayed );
+		const button = await this.driver.$( element );
+		await button.click();
+		await this.dismissBottomSheet();
 	}
 
 	// =========================

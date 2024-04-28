@@ -7,21 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
-import {
-	BlockToolbar,
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { PinnedItems } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
-import {
-	Button,
-	__unstableMotion as motion,
-	Popover,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
@@ -32,7 +21,7 @@ import {
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import SiteEditorMoreMenuItems from './more-menu';
 import SaveButton from '../save-button';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
@@ -43,21 +32,25 @@ import {
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const {
+	CollapsableBlockToolbar,
+	MoreMenu,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+} = unlock( editorPrivateApis );
 
 export default function HeaderEditMode() {
 	const {
 		templateType,
 		isDistractionFree,
 		blockEditorMode,
-		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
+		isFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
-		const { getBlockSelectionStart, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { get: getPreference } = select( preferencesStore );
 		const { getDeviceType } = select( editorStore );
 
@@ -65,19 +58,18 @@ export default function HeaderEditMode() {
 			deviceType: getDeviceType(),
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
-			blockSelectionStart: getBlockSelectionStart(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
+			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showFixedToolbar } = useShowBlockTools();
-	const showTopToolbar = isLargeViewport && showFixedToolbar;
-	const blockToolbarRef = useRef();
+	const showTopToolbar =
+		isLargeViewport && isFixedToolbar && blockEditorMode !== 'zoom-out';
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -88,13 +80,6 @@ export default function HeaderEditMode() {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ blockSelectionStart ] );
 
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
@@ -126,37 +111,10 @@ export default function HeaderEditMode() {
 						isDistractionFree={ isDistractionFree }
 					/>
 					{ showTopToolbar && (
-						<>
-							<div
-								className={ classnames(
-									'selected-block-tools-wrapper',
-									{
-										'is-collapsed': isBlockToolsCollapsed,
-									}
-								) }
-							>
-								<BlockToolbar hideDragHandle />
-							</div>
-							<Popover.Slot
-								ref={ blockToolbarRef }
-								name="block-toolbar"
-							/>
-							<Button
-								className="edit-site-header-edit-mode__block-tools-toggle"
-								icon={ isBlockToolsCollapsed ? next : previous }
-								onClick={ () => {
-									setIsBlockToolsCollapsed(
-										( collapsed ) => ! collapsed
-									);
-								} }
-								label={
-									isBlockToolsCollapsed
-										? __( 'Show block tools' )
-										: __( 'Hide block tools' )
-								}
-								size="compact"
-							/>
-						</>
+						<CollapsableBlockToolbar
+							isCollapsed={ isBlockToolsCollapsed }
+							onToggle={ setIsBlockToolsCollapsed }
+						/>
 					) }
 				</motion.div>
 			) }
@@ -201,10 +159,9 @@ export default function HeaderEditMode() {
 					) }
 					<PostViewLink />
 					<SaveButton size="compact" />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
-					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
+					<MoreMenu />
+					<SiteEditorMoreMenuItems />
 				</motion.div>
 			</div>
 		</div>

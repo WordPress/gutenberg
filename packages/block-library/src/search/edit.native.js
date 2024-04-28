@@ -395,7 +395,7 @@ export default function SearchEdit( {
 					>
 						<RichText
 							className="wp-block-search__button"
-							identifier="text"
+							identifier="buttonText"
 							tagName="p"
 							style={ richTextButtonStyle }
 							placeholder={ buttonPlaceholderText }
@@ -449,7 +449,7 @@ export default function SearchEdit( {
 				>
 					<RichText
 						className="wp-block-search__label"
-						identifier="text"
+						identifier="label"
 						tagName="p"
 						style={ styles.richTextLabel }
 						placeholder={ __( 'Add label…' ) }

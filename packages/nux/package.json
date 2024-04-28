@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "8.15.0",
+	"version": "8.18.0",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -37,8 +37,7 @@
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"rememo": "^4.0.2"
+		"@wordpress/icons": "file:../icons"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

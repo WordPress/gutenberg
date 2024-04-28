@@ -7,7 +7,7 @@ import { click, type, press } from '@ariakit/test';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameForPosition } from '..';
+import PaletteEdit, { getNameAndSlugForPosition } from '..';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
@@ -21,17 +21,18 @@ async function clearInput( input: HTMLInputElement ) {
 	}
 }
 
-describe( 'getNameForPosition', () => {
+describe( 'getNameAndSlugForPosition', () => {
 	test( 'should return 1 by default', () => {
 		const slugPrefix = 'test-';
 		const elements: PaletteElement[] = [];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 1',
+			slug: 'test-color-1',
+		} );
 	} );
 
-	test( 'should return a new color name with an incremented slug id', () => {
+	test( 'should return a new color name and slug with an incremented slug id', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
@@ -41,12 +42,13 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 2'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 2',
+			slug: 'test-color-2',
+		} );
 	} );
 
-	test( 'should ignore user-defined color names', () => {
+	test( 'should ignore user-defined color name and slug', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
@@ -56,12 +58,13 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 1'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 1',
+			slug: 'test-color-1',
+		} );
 	} );
 
-	test( 'should return a new color name with an incremented slug id one higher than the current highest', () => {
+	test( 'should return a new color name and slug with an incremented slug id one higher than the current highest', () => {
 		const slugPrefix = 'test-';
 		const elements = [
 			{
@@ -86,9 +89,10 @@ describe( 'getNameForPosition', () => {
 			},
 		];
 
-		expect( getNameForPosition( elements, slugPrefix ) ).toEqual(
-			'Color 151'
-		);
+		expect( getNameAndSlugForPosition( elements, slugPrefix ) ).toEqual( {
+			name: 'Color 151',
+			slug: 'test-color-151',
+		} );
 	} );
 } );
 

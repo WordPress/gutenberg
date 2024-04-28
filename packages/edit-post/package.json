@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "7.30.0",
+	"version": "7.33.0",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,7 +45,6 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
@@ -58,8 +57,7 @@
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.3.1",
-		"memize": "^2.1.0",
-		"rememo": "^4.0.2"
+		"memize": "^2.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

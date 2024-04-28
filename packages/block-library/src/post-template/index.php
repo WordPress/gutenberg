@@ -8,6 +8,8 @@
 /**
  * Determines whether a block list contains a block that uses the featured image.
  *
+ * @since 6.0.0
+ *
  * @param WP_Block_List $inner_blocks Inner block instance.
  *
  * @return bool Whether the block list contains a block that uses the featured image.
@@ -145,6 +147,8 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/post-template` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_post_template() {
 	register_block_type_from_metadata(

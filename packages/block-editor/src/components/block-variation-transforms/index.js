@@ -116,7 +116,9 @@ function VariationsToggleGroupControl( {
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
 						key={ variation.name }
-						icon={ variation.icon }
+						icon={
+							<BlockIcon icon={ variation.icon } showColors />
+						}
 						value={ variation.name }
 						label={
 							selectedValue === variation.name

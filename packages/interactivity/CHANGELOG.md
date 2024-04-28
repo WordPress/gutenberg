@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 5.5.0 (2024-04-19)
+
+### Bug Fixes
+
+-   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
+
+## 5.4.0 (2024-04-03)
+
+## 5.3.0 (2024-03-21)
+
+### Bug Fixes
+
+-   Prevent non-objects from being set in store state. ([#59886](https://github.com/WordPress/gutenberg/pull/59886))
+-   Ensure that stores are available for subscription before hydration. ([#59842](https://github.com/WordPress/gutenberg/pull/59842))
+-   Ensure scope is restored when catching exceptions thrown in async generator actions. ([#59708](https://github.com/WordPress/gutenberg/pull/59708))
+
 ## 5.2.0 (2024-03-06)
 
 ### Bug Fixes

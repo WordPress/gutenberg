@@ -13,6 +13,7 @@ import Filters from './filters';
 import Search from './search';
 import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
 import BulkActions from './bulk-actions';
+import { normalizeFields } from './normalize-fields';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
@@ -33,15 +34,13 @@ export default function DataViews( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions,
+	actions = [],
 	data,
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
-	onDetailsChange = null,
-	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 	const [ openedFilter, setOpenedFilter ] = useState( null );
@@ -76,12 +75,7 @@ export default function DataViews( {
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
 	).component;
-	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
-	}, [ fields ] );
+	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
 		actions,
@@ -140,9 +134,7 @@ export default function DataViews( {
 				getItemId={ getItemId }
 				isLoading={ isLoading }
 				onSelectionChange={ onSetSelection }
-				onDetailsChange={ onDetailsChange }
 				selection={ selection }
-				deferredRendering={ deferredRendering }
 				setOpenedFilter={ setOpenedFilter }
 			/>
 			<Pagination

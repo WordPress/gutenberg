@@ -5,12 +5,12 @@ import type { ForwardedRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 // eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
+import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
 /**

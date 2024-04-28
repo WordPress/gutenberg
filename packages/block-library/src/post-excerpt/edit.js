@@ -127,6 +127,7 @@ export default function PostExcerptEditor( {
 	}
 	const readMoreLink = (
 		<RichText
+			identifier="moreText"
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
