@@ -67,7 +67,6 @@ add_filter( 'gutenberg_template_output_buffer', '_gutenberg_add_client_side_navi
  *              include $template;
  *          } elseif ( current_user_can( 'switch_themes' ) ) {
  *
- * @since 0.1.0
  * @link https://core.trac.wordpress.org/ticket/43258
  *
  * @param string $passthrough Value for the template_include filter which is passed through.
