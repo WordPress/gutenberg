@@ -15,6 +15,7 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
  */
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { useSettings } from '../components/use-settings';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
@@ -70,11 +71,17 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	name: blockName,
 	setAttributes,
 } ) {
+	const isDisabled = useIsTextAlignDisabled( blockName );
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( isDisabled || blockEditingMode !== 'default' ) {
+		return null;
+	}
+
 	const validTextAlignments = getValidTextAlignments(
 		getBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY )
 	);
-	const blockEditingMode = useBlockEditingMode();
-	if ( ! validTextAlignments.length || blockEditingMode !== 'default' ) {
+	if ( ! validTextAlignments.length ) {
 		return null;
 	}
 
@@ -175,4 +182,18 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 		);
 	}
 	return props;
+}
+
+/**
+ * Custom hook that checks if text-align settings have been disabled.
+ *
+ * @param {string} name The name of the block.
+ * @return {boolean} Whether setting is disabled.
+ */
+export function useIsTextAlignDisabled( { name: blockName } = {} ) {
+	const [ isEnabled ] = useSettings( TEXT_ALIGN_SUPPORT_KEY );
+	return (
+		! isEnabled ||
+		! hasBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY, true )
+	);
 }
