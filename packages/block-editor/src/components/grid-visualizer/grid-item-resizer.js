@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +15,14 @@ export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement.parentElement;
 	const [ resizeDirection, setResizeDirection ] = useState( null );
+
+	/*
+	 * Resizer dummy is an empty div that exists only so we can
+	 * get the bounding client rect of the resizer element. This is
+	 * necessary because the resizer exists outside of the iframe, so
+	 * its bounding client rect isn't the same as the block element's.
+	 */
+	const resizerDummyRef = useRef( null );
 
 	if ( ! blockElement ) {
 		return null;
@@ -42,8 +50,35 @@ export function GridItemResizer( { clientId, onChange } ) {
 		} ),
 	};
 
-	const gridHeight = rootBlockElement.offsetHeight;
-	const blockMinHeight = blockElement.offsetHeight;
+	/*
+	 * The bounding element is equivalent to the root block element, but
+	 * its bounding client rect is modified to account for the resizer
+	 * being outside of the editor iframe.
+	 */
+	const boundingElement = {
+		offsetWidth: rootBlockElement.offsetWidth,
+		offsetHeight: rootBlockElement.offsetHeight,
+		getBoundingClientRect: () => {
+			const rootBlockClientRect =
+				rootBlockElement.getBoundingClientRect();
+			const resizerTop =
+				resizerDummyRef.current?.getBoundingClientRect()?.top;
+			// Fallback value of 60 to account for editor top bar height.
+			const heightDifference = resizerTop
+				? resizerTop - blockElement.getBoundingClientRect().top
+				: 60;
+			return {
+				bottom: rootBlockClientRect.bottom + heightDifference,
+				height: rootBlockElement.offsetHeight,
+				left: rootBlockClientRect.left,
+				right: rootBlockClientRect.right,
+				top: rootBlockClientRect.top + heightDifference,
+				width: rootBlockClientRect.width,
+				x: rootBlockClientRect.x,
+				y: rootBlockClientRect.y + heightDifference,
+			};
+		},
+	};
 
 	return (
 		<BlockPopoverCover
@@ -68,10 +103,8 @@ export function GridItemResizer( { clientId, onChange } ) {
 					topLeft: false,
 					topRight: false,
 				} }
-				bounds={ rootBlockElement }
+				bounds={ boundingElement }
 				boundsByDirection
-				maxHeight={ gridHeight }
-				minHeight={ blockMinHeight }
 				onResizeStart={ ( event, direction ) => {
 					setResizeDirection( direction );
 				} }
@@ -119,6 +152,10 @@ export function GridItemResizer( { clientId, onChange } ) {
 					} );
 				} }
 			/>
+			<div
+				className="block-editor-grid-item-resizer__dummy"
+				ref={ resizerDummyRef }
+			></div>
 		</BlockPopoverCover>
 	);
 }
