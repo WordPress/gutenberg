@@ -1,4 +1,4 @@
-# Migrating to Newer Versions
+# Migrating Theme.json to Newer Versions
 
 This guide documents the changes between different `theme.json` versions and how to upgrade. Using older versions will continue to be supported. Upgrading is recommended because new development will continue in the newer versions.
 
