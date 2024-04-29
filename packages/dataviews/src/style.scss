@@ -330,7 +330,7 @@
 			height: 100%;
 		}
 
-		.page-pages-preview-field__button::after {
+		&::after {
 			content: "";
 			position: absolute;
 			top: 0;
