@@ -67,7 +67,7 @@ const {
 	InterfaceSkeleton,
 	ComplementaryArea,
 	interfaceStore,
-	PostLayoutActionsPanel,
+	SavePublishPanels,
 } = unlock( editorPrivateApis );
 
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -279,7 +279,7 @@ export default function Editor( { isLoading, onClick } ) {
 							</AnimatePresence>
 						}
 						actions={
-							<PostLayoutActionsPanel
+							<SavePublishPanels
 								closeEntitiesSavedStates={
 									closeEntitiesSavedStates
 								}

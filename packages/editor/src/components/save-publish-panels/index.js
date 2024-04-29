@@ -19,11 +19,11 @@ const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
 
 export const ActionsPanelFill = Fill;
 
-export default function PostLayoutActionsPanel( {
+export default function SavePublishPanels( {
 	setEntitiesSavedStatesCallback,
 	closeEntitiesSavedStates,
 	isEntitiesSavedStatesOpen,
-	hasActiveMetaboxes,
+	forceIsDirtyPublishPanel,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
@@ -49,7 +49,7 @@ export default function PostLayoutActionsPanel( {
 		unmountableContent = (
 			<PostPublishPanel
 				onClose={ closePublishSidebar }
-				forceIsDirty={ hasActiveMetaboxes }
+				forceIsDirty={ forceIsDirtyPublishPanel }
 				PrePublishExtension={ PluginPrePublishPanel.Slot }
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>

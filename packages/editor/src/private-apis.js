@@ -31,7 +31,7 @@ import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 import PostPublishButtonOrToggle from './components/post-publish-button/post-publish-button-or-toggle';
-import PostLayoutActionsPanel from './components/post-layout-actions-panel';
+import SavePublishPanels from './components/save-publish-panels';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -59,7 +59,7 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	PrivatePostExcerptPanel,
 	PostPublishButtonOrToggle,
-	PostLayoutActionsPanel,
+	SavePublishPanels,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

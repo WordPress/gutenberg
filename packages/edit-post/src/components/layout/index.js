@@ -60,7 +60,7 @@ const {
 	ListViewSidebar,
 	ComplementaryArea,
 	FullscreenMode,
-	PostLayoutActionsPanel,
+	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
@@ -345,7 +345,7 @@ function Layout( { initialPost } ) {
 					)
 				}
 				actions={
-					<PostLayoutActionsPanel
+					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
 							entitiesSavedStatesCallback
@@ -353,7 +353,7 @@ function Layout( { initialPost } ) {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
-						hasActiveMetaboxes={ hasActiveMetaboxes }
+						forceIsDirtyPublishPanel={ hasActiveMetaboxes }
 					/>
 				}
 				shortcuts={ {
