@@ -68,7 +68,7 @@ The default font sizes provided by core (`settings.typography.fontSizes`) have b
 
 Upgrading to v3 adjusts preset defaults to be more consistent with one another.
 
-### How to migrate from v1 to v2:
+### How to migrate from v2 to v3:
 
 1. Update `version` to `3`.
 2. Configure the changed defaults.
