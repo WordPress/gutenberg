@@ -22,7 +22,6 @@ import {
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
 } from '../sidebar-dataviews/default-views';
 import {
-	ENUMERATION_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -317,7 +316,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -330,7 +328,6 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
-				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {
