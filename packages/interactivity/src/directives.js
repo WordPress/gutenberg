@@ -242,7 +242,11 @@ export default () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
-					if ( SCRIPT_DEBUG && ! isPlainObject( value ) ) {
+					if (
+						typeof SCRIPT_DEBUG !== 'undefined' &&
+						SCRIPT_DEBUG === true &&
+						! isPlainObject( value )
+					) {
 						// eslint-disable-next-line no-console
 						console.warn(
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
