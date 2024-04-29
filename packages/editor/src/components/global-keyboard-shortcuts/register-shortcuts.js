@@ -8,6 +8,11 @@ import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
 
+/**
+ * Component for registering editor keyboard shortcuts.
+ *
+ * @return {Element} The component to be rendered.
+ */
 function EditorKeyboardShortcutsRegister() {
 	// Registering the shortcuts.
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
