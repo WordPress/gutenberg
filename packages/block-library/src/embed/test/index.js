@@ -18,6 +18,7 @@ import {
 	getEmbedInfoByProvider,
 	removeAspectRatioClasses,
 	hasAspectRatioClass,
+	calculateEmbedRatio,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -56,47 +57,47 @@ describe( 'utils', () => {
 			expect( findMoreSuitableBlock( unknownURL ) ).toBeUndefined();
 		} );
 	} );
-	describe( 'getClassNames', () => {
-		it( 'should return aspect ratio class names for iframes with width and height', () => {
+	describe( 'calculateEmbedRatio', () => {
+		it( 'should return aspect ratio for iframes with width and height', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
+			const expected = '1.78';
+			expect( calculateEmbedRatio( html ) ).toEqual( expected );
+		} );
+	} );
+	describe( 'getClassNames', () => {
+		it( 'should return aspect ratio class names', () => {
 			const expected = 'wp-embed-aspect-16-9 wp-has-aspect-ratio';
-			expect( getClassNames( html ) ).toEqual( expected );
+			expect( getClassNames( '', '1.78', true ) ).toEqual( expected );
 		} );
 
 		it( 'should not return aspect ratio class names if we do not allow responsive', () => {
-			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = '';
-			expect( getClassNames( html, '', false ) ).toEqual( expected );
+			expect( getClassNames( '', '1.78', false ) ).toEqual( expected );
 		} );
 
-		it( 'should preserve exsiting class names when removing responsive classes', () => {
-			const html = '<iframe height="9" width="16"></iframe>';
+		it( 'should preserve existing class names when removing responsive classes', () => {
 			const expected = 'lovely';
 			expect(
 				getClassNames(
-					html,
 					'lovely wp-embed-aspect-16-9 wp-has-aspect-ratio',
+					'1.78',
 					false
 				)
 			).toEqual( expected );
 		} );
 
 		it( 'should return the same falsy value as passed for existing classes when no new classes are added', () => {
-			const html = '<iframe></iframe>';
 			const expected = undefined;
-			expect( getClassNames( html, undefined, false ) ).toEqual(
-				expected
-			);
+			expect( getClassNames( undefined, false ) ).toEqual( expected );
 		} );
 
 		it( 'should preserve existing classes and replace aspect ratio related classes with the current embed preview', () => {
-			const html = '<iframe height="3" width="4"></iframe>';
 			const expected =
 				'wp-block-embed wp-embed-aspect-4-3 wp-has-aspect-ratio';
 			expect(
 				getClassNames(
-					html,
 					'wp-block-embed wp-embed-aspect-16-9 wp-has-aspect-ratio',
+					'1.33',
 					true
 				)
 			).toEqual( expected );

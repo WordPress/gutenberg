@@ -3,11 +3,11 @@
  */
 import {
 	createUpgradedEmbedBlock,
-	getClassNames,
-	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
 	getMergedAttributesWithPreview,
+	calculateEmbedRatio,
+	getClassNames,
 } from './util';
 import EmbedControls from './embed-controls';
 import { embedContentIcon } from './icons';
@@ -118,17 +118,13 @@ const EmbedEdit = ( props ) => {
 		);
 
 	const toggleResponsive = () => {
-		const { allowResponsive, className } = attributes;
+		const { allowResponsive } = attributes;
 		const { html } = preview;
 		const newAllowResponsive = ! allowResponsive;
 
 		setAttributes( {
 			allowResponsive: newAllowResponsive,
-			className: getClassNames(
-				html,
-				className,
-				responsive && newAllowResponsive
-			),
+			aspectRatio: newAllowResponsive ? calculateEmbedRatio( html ) : '',
 		} );
 	};
 
@@ -214,14 +210,8 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
-						// If the embed URL was changed, we need to reset the aspect ratio class.
-						// To do this we have to remove the existing ratio class so it can be recalculated.
-						const blockClass = removeAspectRatioClasses(
-							attributes.className
-						);
-
 						setIsEditingURL( false );
-						setAttributes( { url, className: blockClass } );
+						setAttributes( { url, aspectRatio: '' } );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
@@ -248,8 +238,13 @@ const EmbedEdit = ( props ) => {
 		type,
 		allowResponsive,
 		className: classFromPreview,
+		aspectRatio,
 	} = getMergedAttributes();
-	const className = classnames( classFromPreview, props.className );
+	const className = getClassNames(
+		classnames( classFromPreview, props.className ),
+		aspectRatio,
+		allowResponsive
+	);
 
 	return (
 		<>

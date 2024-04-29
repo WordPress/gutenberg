@@ -191,53 +191,32 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 /**
  * Returns class names with any relevant responsive aspect ratio names.
  *
- * @param {string}  html               The preview HTML that possibly contains an iframe with width and height set.
  * @param {string}  existingClassNames Any existing class names.
+ * @param {string}  aspectRatio        Calculated aspect ratio
  * @param {boolean} allowResponsive    If the responsive class names should be added, or removed.
  * @return {string} Deduped class names.
  */
 export function getClassNames(
-	html,
 	existingClassNames,
+	aspectRatio,
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
 		return removeAspectRatioClasses( existingClassNames );
 	}
 
-	const previewDocument = document.implementation.createHTMLDocument( '' );
-	previewDocument.body.innerHTML = html;
-	const iframe = previewDocument.body.querySelector( 'iframe' );
-
-	// If we have a fixed aspect iframe, and it's a responsive embed block.
-	if ( iframe && iframe.height && iframe.width ) {
-		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-		// Given the actual aspect ratio, find the widest ratio to support it.
-		for (
-			let ratioIndex = 0;
-			ratioIndex < ASPECT_RATIOS.length;
-			ratioIndex++
-		) {
-			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
-			if ( aspectRatio >= potentialRatio.ratio ) {
-				// Evaluate the difference between actual aspect ratio and closest match.
-				// If the difference is too big, do not scale the embed according to aspect ratio.
-				const ratioDiff = aspectRatio - potentialRatio.ratio;
-				if ( ratioDiff > 0.1 ) {
-					// No close aspect ratio match found.
-					return removeAspectRatioClasses( existingClassNames );
-				}
-				// Close aspect ratio match found.
-				return classnames(
-					removeAspectRatioClasses( existingClassNames ),
-					potentialRatio.className,
-					'wp-has-aspect-ratio'
-				);
-			}
-		}
+	const ratioData = ASPECT_RATIOS.find(
+		( element ) => element.ratio === aspectRatio
+	);
+	if ( ! ratioData ) {
+		return existingClassNames;
 	}
 
-	return existingClassNames;
+	return classnames(
+		removeAspectRatioClasses( existingClassNames ),
+		ratioData.className,
+		'wp-has-aspect-ratio'
+	);
 }
 
 /**
@@ -265,13 +244,7 @@ export function fallback( url, onReplace ) {
  * @return {Object} Attributes and values.
  */
 export const getAttributesFromPreview = memoize(
-	(
-		preview,
-		title,
-		currentClassNames,
-		isResponsive,
-		allowResponsive = true
-	) => {
+	( preview, title, isResponsive, aspectRatio, allowResponsive = true ) => {
 		if ( ! preview ) {
 			return {};
 		}
@@ -298,16 +271,11 @@ export const getAttributesFromPreview = memoize(
 
 		// Aspect ratio classes are removed when the embed URL is updated.
 		// If the embed already has an aspect ratio class, that means the URL has not changed.
-		// Which also means no need to regenerate it with getClassNames.
-		if ( hasAspectRatioClass( currentClassNames ) ) {
+		if ( '' !== aspectRatio || ! ( isResponsive && allowResponsive ) ) {
 			return attributes;
 		}
 
-		attributes.className = getClassNames(
-			html,
-			currentClassNames,
-			isResponsive && allowResponsive
-		);
+		attributes.aspectRatio = calculateEmbedRatio( html );
 
 		return attributes;
 	}
@@ -328,16 +296,52 @@ export const getMergedAttributesWithPreview = (
 	title,
 	isResponsive
 ) => {
-	const { allowResponsive, className } = currentAttributes;
+	const { aspectRatio, allowResponsive } = currentAttributes;
 
 	return {
 		...currentAttributes,
 		...getAttributesFromPreview(
 			preview,
 			title,
-			className,
 			isResponsive,
+			aspectRatio,
 			allowResponsive
 		),
 	};
 };
+
+/**
+ * Return the aspect ratio
+ *
+ * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+ * @return {string} the aspect ratio value
+ */
+export function calculateEmbedRatio( html ) {
+	const previewDocument = document.implementation.createHTMLDocument( '' );
+	previewDocument.body.innerHTML = html;
+	const iframe = previewDocument.body.querySelector( 'iframe' );
+
+	// If we have a fixed aspect iframe, and it's a responsive embed block.
+	if ( iframe && iframe.height && iframe.width ) {
+		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+		// Given the actual aspect ratio, find the widest ratio to support it.
+		for (
+			let ratioIndex = 0;
+			ratioIndex < ASPECT_RATIOS.length;
+			ratioIndex++
+		) {
+			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
+			if ( aspectRatio >= potentialRatio.ratio ) {
+				// Evaluate the difference between actual aspect ratio and closest match.
+				// If the difference is too big, do not scale the embed according to aspect ratio.
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				if ( ratioDiff >= 0 && ratioDiff <= 0.1 ) {
+					// Matching aspect ratio found.
+					return potentialRatio.ratio;
+				}
+			}
+		}
+	}
+
+	return '';
+}

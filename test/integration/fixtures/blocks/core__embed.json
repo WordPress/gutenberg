@@ -7,7 +7,8 @@
 			"caption": "Embedded content from an example URL",
 			"allowResponsive": true,
 			"responsive": false,
-			"previewable": true
+			"previewable": true,
+			"aspectRatio": ""
 		},
 		"innerBlocks": []
 	}

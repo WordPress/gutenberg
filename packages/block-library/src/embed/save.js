@@ -12,17 +12,29 @@ import {
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { ASPECT_RATIOS } from './constants';
+
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug } = attributes;
+	const { url, caption, type, providerNameSlug, aspectRatio } = attributes;
 
 	if ( ! url ) {
 		return null;
 	}
 
+	const ratioData = ASPECT_RATIOS.find(
+		( element ) => element.ratio === aspectRatio
+	);
+	const aspectRatioClassname = ratioData ? ratioData.className : false;
+
 	const className = classnames( 'wp-block-embed', {
 		[ `is-type-${ type }` ]: type,
 		[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,
+		[ `${ aspectRatioClassname }` ]: aspectRatioClassname,
+		'wp-has-aspect-ratio': aspectRatioClassname,
 	} );
 
 	return (
