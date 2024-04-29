@@ -6,7 +6,7 @@ This guide documents the changes between different `theme.json` versions and how
 
 Upgrading to v2 enables some new features and adjusts the naming of some old features to be more consistent with one another.
 
-How to migrate from v1 to v2:
+### How to migrate from v1 to v2:
 
 1. Update `version` to `2`.
 2. Rename the properties that were updated (see below) if you're using them.
@@ -71,7 +71,7 @@ Upgrading to v3 adjusts preset defaults to be more consistent with one another.
 ### How to migrate from v2 to v3:
 
 1. Update `version` to `3`.
-2. Configure the changed defaults.
+2. Configure the changed defaults (see below).
 
 ### Changed defaults
 
