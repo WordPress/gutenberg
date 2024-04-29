@@ -11,7 +11,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 
