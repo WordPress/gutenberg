@@ -37,15 +37,15 @@ add_filter( 'render_block_data', '_gutenberg_add_enhanced_pagination_to_query_bl
  *
  * Note: This should probably be done per site, not by default when this option is enabled.
  *
- * @param array $content The block content.
+ * @param string $content The block content.
  *
- * @return array The same block content with the directives needed.
+ * @return string The same block content with the directives needed.
  */
 function _gutenberg_add_client_side_navigation_directives( $content ) {
 	static $body_interactive_added;
 	if ( ! $body_interactive_added ) {
 		$body_interactive_added = true;
-		add_filter( 'gutenberg_template_output_buffer', static function ( $html ) {
+		add_filter( 'gutenberg_template_output_buffer', static function ( string $html ): string {
 			$p = new WP_HTML_Tag_Processor( $html );
 			if ( $p->next_tag( array( 'tag_name' => 'BODY' ) ) ) {
 				$p->set_attribute( 'data-wp-interactive', 'core/experimental' );
