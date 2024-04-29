@@ -588,15 +588,15 @@
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Theme.json Version 2 Reference",
-		"slug": "theme-json-v2",
-		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v2.md",
-		"parent": "theme-json-reference"
-	},
-	{
 		"title": "Theme.json Version 1 Reference",
 		"slug": "theme-json-v1",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v1.md",
+		"parent": "theme-json-reference"
+	},
+	{
+		"title": "Theme.json Version 2 Reference",
+		"slug": "theme-json-v2",
+		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-v2.md",
 		"parent": "theme-json-reference"
 	},
 	{
