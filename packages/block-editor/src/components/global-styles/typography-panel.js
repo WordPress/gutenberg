@@ -13,11 +13,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	mergeOrigins,
-	overrideOrigins,
-	hasOriginValue,
-} from '../../store/get-block-settings';
+import { mergeOrigins, hasOriginValue } from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -57,7 +53,10 @@ export function useHasTypographyPanel( settings ) {
 
 function useHasFontSizeControl( settings ) {
 	return (
-		hasOriginValue( settings?.typography?.fontSizes ) ||
+		( settings?.typography?.defaultFontSizes !== false &&
+			settings?.typography?.fontSizes?.default?.length ) ||
+		settings?.typography?.fontSizes?.theme?.length ||
+		settings?.typography?.fontSizes?.custom?.length ||
 		settings?.typography?.customFontSize
 	);
 }
@@ -104,16 +103,21 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
-function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes ?? {};
-	const overriddenFontSizes = overrideOrigins( fontSizes ) ?? [];
-	const uniqueSizes = [];
-	for ( const currentSize of overriddenFontSizes ) {
-		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			uniqueSizes.push( currentSize );
-		}
-	}
-	return uniqueSizes;
+/**
+ * Concatenate all the font sizes into a single list for the font size picker.
+ *
+ * @param {Object} settings The global styles settings.
+ *
+ * @return {Array} The merged font sizes.
+ */
+function getMergedFontSizes( settings ) {
+	const fontSizes = settings?.typography?.fontSizes;
+	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
+	return [
+		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+	];
 }
 
 function TypographyToolsPanel( {
@@ -189,7 +193,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
+	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {

@@ -35,7 +35,6 @@ import AddNewTemplate from '../add-new-template';
 import { useAddedBy } from './hooks';
 import {
 	TEMPLATE_POST_TYPE,
-	ENUMERATION_TYPE,
 	OPERATOR_IS_ANY,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
@@ -323,7 +322,6 @@ export default function PageTemplates() {
 				render: ( { item } ) => {
 					return <AuthorField viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				width: '1%',
 			},
