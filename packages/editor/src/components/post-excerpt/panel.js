@@ -145,34 +145,34 @@ function PrivateExcerpt() {
 							! template.has_theme_file ) ),
 			};
 		}, [] );
-	const [ setPopoverAnchor ] = useState( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const label = shouldBeUsedAsDescription
 		? __( 'Description' )
 		: __( 'Excerpt' );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
 		() => ( {
+			// move around when the label changes.
+			anchor: popoverAnchor,
 			'aria-label': label,
 			headerTitle: label,
 			placement: 'left-start',
 			offset: 36,
 			shift: true,
 		} ),
-		[ label ]
+		[ popoverAnchor, label ]
 	);
 	if ( ! shouldRender ) {
 		return false;
 	}
+	const truncate = ( str, max, len ) => {
+		return str.length > max ? str.substring( 0, len ) + '…' : str;
+	};
 	const excerptText = !! excerpt && (
-		<Text
-			align="left"
-			numberOfLines={ 2 }
-			ellipsizeMode="middle"
-			limit={ 120 }
-			truncate={ shouldBeUsedAsDescription ? false : true }
-			style={ { marginRight: '1ch' } }
-		>
-			{ excerpt }
+		<Text align="left" style={ { marginRight: '1ch' } }>
+			{ shouldBeUsedAsDescription
+				? excerpt
+				: truncate( excerpt, 128, 127 ) }
 		</Text>
 	);
 	if ( ! allowEditing ) {
