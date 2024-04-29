@@ -600,7 +600,7 @@
 		"parent": "theme-json-reference"
 	},
 	{
-		"title": "Migrating to Newer Versions",
+		"title": "Migrating Theme.json to Newer Versions",
 		"slug": "theme-json-migrations",
 		"markdown_source": "../docs/reference-guides/theme-json-reference/theme-json-migrations.md",
 		"parent": "theme-json-reference"
