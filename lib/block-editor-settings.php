@@ -5,6 +5,8 @@
  * @package gutenberg
  */
 
+// Update!
+
 /**
  * Replaces core 'styles' and '__experimentalFeatures' block editor settings from
  * wordpress-develop/block-editor.php with the Gutenberg versions. Much of the
