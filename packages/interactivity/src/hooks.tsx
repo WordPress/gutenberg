@@ -11,6 +11,7 @@ import {
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
 import type { VNode, Context, RefObject } from 'preact';
+import { deepSignal } from 'deepsignal';
 
 /**
  * Internal dependencies
@@ -173,7 +174,9 @@ export const resetNamespace = () => {
 };
 
 // WordPress Directives.
-const directiveCallbacks: Record< string, DirectiveCallback > = {};
+const directiveCallbacks: Record< string, DirectiveCallback > = deepSignal(
+	{}
+);
 const directivePriorities: Record< string, number > = {};
 
 /**
@@ -312,11 +315,15 @@ const getPriorityLevels: GetPriorityLevels = ( directives ) => {
 // Component that wraps each priority level of directives of an element.
 const Directives = ( {
 	directives,
-	priorityLevels: [ currentPriorityLevel, ...nextPriorityLevels ],
+	priorityLevels,
 	element,
 	originalProps,
 	previousScope,
 }: DirectivesProps ) => {
+	// Initialize the priority levels in the first Directives component.
+	const [ currentPriorityLevel = [], ...nextPriorityLevels ] =
+		priorityLevels ?? getPriorityLevels( directives );
+
 	// Initialize the scope of this element. These scopes are different per each
 	// level because each level has a different context, but they share the same
 	// element ref, state and props.
@@ -373,16 +380,20 @@ options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key )
+		if ( directives.key ) {
 			vnode.key = directives.key.find(
 				( { suffix } ) => suffix === 'default'
 			).value;
+		}
+		// Remove known directives withouth callback.
+		[ 'interactive', 'key' ].forEach( ( d ) => {
+			delete directives[ d ];
+		} );
 		delete props.__directives;
-		const priorityLevels = getPriorityLevels( directives );
-		if ( priorityLevels.length > 0 ) {
+
+		if ( Object.keys( directives ).length > 0 ) {
 			vnode.props = {
 				directives,
-				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
 				element: createElement( vnode.type as any, props ),
