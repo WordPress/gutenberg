@@ -50,7 +50,7 @@ export const POST_TYPE_LABELS = {
 export const LAYOUT_GRID = 'grid';
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_LIST = 'list';
-export const ENUMERATION_TYPE = 'enumeration';
+
 export const OPERATOR_IS = 'is';
 export const OPERATOR_IS_NOT = 'isNot';
 export const OPERATOR_IS_ANY = 'isAny';
