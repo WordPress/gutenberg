@@ -216,7 +216,7 @@ function PrivateExcerpt() {
 									<>
 										<PostExcerptForm
 											hideLabelFromVision
-											//updateOnBlur
+											updateOnBlur
 										/>
 										{ fills }
 									</>
