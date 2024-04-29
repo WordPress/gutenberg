@@ -6,6 +6,7 @@
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
+-   `Toolbar`: Adjust top toolbar to use same metrics as block toolbar ([#61126](https://github.com/WordPress/gutenberg/pull/61126)).
 
 ### Bug Fix
 
