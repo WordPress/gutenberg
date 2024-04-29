@@ -499,8 +499,8 @@
 	},
 	{
 		"title": "Quick start guide",
-		"slug": "quick-start-guide",
-		"markdown_source": "../docs/reference-guides/interactivity-api/quick-start-guide.md",
+		"slug": "iapi-quick-start-guide",
+		"markdown_source": "../docs/reference-guides/interactivity-api/iapi-quick-start-guide.md",
 		"parent": "interactivity-api"
 	},
 	{
