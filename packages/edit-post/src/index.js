@@ -14,19 +14,13 @@ import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
-import {
-	privateApis as editorPrivateApis,
-	store as editorStore,
-} from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import Editor from './editor';
-import { unlock } from './lock-unlock';
-
-const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -160,8 +154,6 @@ export function reinitializeEditor() {
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-
-export { PluginPostExcerpt };
 
 export { store } from './store';
 export * from './deprecated';

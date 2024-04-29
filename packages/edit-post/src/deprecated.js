@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	privateApis as editorPrivateApis,
 	PluginBlockSettingsMenuItem as EditorPluginBlockSettingsMenuItem,
 	PluginDocumentSettingPanel as EditorPluginDocumentSettingPanel,
 	PluginMoreMenuItem as EditorPluginMoreMenuItem,
@@ -16,7 +17,8 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { PluginPostExcerpt } from '.';
+import { unlock } from './lock-unlock';
+const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 const deprecateSlot = ( name ) => {
 	deprecated( `wp.editPost.${ name }`, {
@@ -96,7 +98,7 @@ export function PluginSidebarMoreMenuItem( props ) {
 export function __experimentalPluginPostExcerpt() {
 	deprecated( 'wp.editPost.__experimentalPluginPostExcerpt', {
 		since: '6.6',
-		alternative: 'wp.editPost.PluginPostExcerpt',
+		alternative: 'wp.editor.PluginPostExcerpt',
 	} );
 	return PluginPostExcerpt;
 }
