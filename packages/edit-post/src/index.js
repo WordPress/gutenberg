@@ -160,6 +160,16 @@ export function reinitializeEditor() {
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
+
 export { PluginPostExcerpt };
+
+export function __experimentalPluginPostExcerpt() {
+	deprecated( 'wp.editPost.__experimentalPluginPostExcerpt', {
+		since: '6.6',
+		alternative: 'wp.editPost.PluginPostExcerpt',
+	} );
+	return PluginPostExcerpt;
+}
+
 export { store } from './store';
 export * from './deprecated';
