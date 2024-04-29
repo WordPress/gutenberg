@@ -40,7 +40,7 @@ add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 
 function gutenberg_add_class_list_to_api_response( $post ) {
 
 	if ( ! isset( $post['id'] ) ) {
-		return $post;
+		return array();
 	}
 
 	return get_post_class( array(), $post['id'] );
