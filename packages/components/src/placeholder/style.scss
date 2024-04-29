@@ -134,7 +134,7 @@
 
 
 /**
- * Dashed style placeholders
+ * Blurred BG style placeholders
  */
 
 // @todo
@@ -143,7 +143,6 @@
 .components-placeholder.has-illustration {
 	color: inherit;
 	display: flex;
-	box-shadow: none;
 
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
@@ -164,6 +163,20 @@
 		margin-right: 0;
 	}
 
+	// Fix issue with flickering on subpixel scaling in Blink.
+	// We add left/right-margin to the blurred placeholder, and unset it on-select.
+	// https://github.com/WordPress/gutenberg/issues/52313
+	width: auto;
+	$edge-buffer: 1px;
+	margin-left: $edge-buffer;
+	margin-right: $edge-buffer;
+
+	// Draw a matching border left and right to make the placeholder optically
+	// line up in a column. Uses color-mix to combine currentColor with opacity.
+	box-shadow:
+		-$edge-buffer 0 0 0 color-mix(in srgb, currentColor 10%, transparent),
+		$edge-buffer 0 0 0 color-mix(in srgb, currentColor 10%, transparent);
+
 	// Show placeholder buttons on block selection.
 	// Note that these can't be display: none; or visibility: hidden;, as that breaks the writing flow.
 	.components-placeholder__label,
@@ -176,6 +189,11 @@
 	}
 
 	.is-selected > & {
+		// Unset blur-flickering margin.
+		margin-left: 0;
+		margin-right: 0;
+
+		// Show contents.
 		.components-placeholder__label,
 		.components-placeholder__instructions,
 		.components-button {
