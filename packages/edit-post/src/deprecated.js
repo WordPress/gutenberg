@@ -13,6 +13,11 @@ import {
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 
+/**
+ * Internal dependencies
+ */
+import { PluginPostExcerpt } from '.';
+
 const deprecateSlot = ( name ) => {
 	deprecated( `wp.editPost.${ name }`, {
 		since: '6.6',
@@ -84,4 +89,16 @@ export function PluginSidebarMoreMenuItem( props ) {
 	deprecateSlot( 'PluginSidebarMoreMenuItem' );
 	return <EditorPluginSidebarMoreMenuItem { ...props } />;
 }
+
+/**
+ * @see PluginPostExcerpt in @wordpress/editor package.
+ */
+export function __experimentalPluginPostExcerpt() {
+	deprecated( 'wp.editPost.__experimentalPluginPostExcerpt', {
+		since: '6.6',
+		alternative: 'wp.editPost.PluginPostExcerpt',
+	} );
+	return PluginPostExcerpt;
+}
+
 /* eslint-enable jsdoc/require-param */
