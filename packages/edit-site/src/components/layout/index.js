@@ -189,7 +189,8 @@ export default function Layout() {
 						'is-zoom-out': isZoomOutMode,
 						'has-block-breadcrumbs':
 							hasBlockBreadcrumbs &&
-							( ! isDistractionFree || canvasMode !== 'edit' ),
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>

@@ -245,7 +245,7 @@ function Layout( { initialPost } ) {
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
 		'has-block-breadcrumbs':
-			hasBlockBreadcrumbs && ( ! isDistractionFree || ! isWideViewport ),
+			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	const secondarySidebarLabel = isListViewOpened
