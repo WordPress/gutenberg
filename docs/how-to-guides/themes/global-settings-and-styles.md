@@ -1161,9 +1161,15 @@ Within this field themes can list patterns to register from [Pattern Directory](
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+It can be difficult to remember the theme.json settings and properties and which versions of WordPress support which settings while you develop, so it can be helpful to use the provided JSON schema for theme.json.
 
-Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
+Many code editors support JSON schema and can provide help like tooltips, autocomplete, or schema validation right in your editor.
+
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`. To ensure that you're only using features available to your users, it's best to use the oldest version that your theme supports.
+
+The latest schema including all the latest changes from the Gutenberg plugin is available at `https://schemas.wp.org/trunk/theme.json`.
+
+Check your editor's documentation for JSON schema support. In Visual Studio Code, for example, you need to add `"$schema": "https://schemas.wp.org/wp/x.x/theme.json"` as a top-level property of your theme.json file, but other editors may be configured differently.
 
 ![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
