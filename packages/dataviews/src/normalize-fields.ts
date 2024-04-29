@@ -1,10 +1,15 @@
 /**
+ * Internal dependencies
+ */
+import type { Field } from './types';
+
+/**
  * Apply default values and normalize the fields config.
  *
- * @param {Object[]} fields Raw Fields.
- * @return {Object[]} Normalized fields.
+ * @param fields Fields config.
+ * @return Normalized fields config.
  */
-export function normalizeFields( fields ) {
+export function normalizeFields( fields: Field[] ): Field[] {
 	return fields.map( ( field ) => {
 		const getValue = field.getValue || ( ( { item } ) => item[ field.id ] );
 
