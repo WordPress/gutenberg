@@ -76,14 +76,14 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 						? sprintf(
 								// translators: %s: pattern's title.
 								__(
-									'This block is part of the synced pattern: "%s". To move, delete, or edit other properties, you must edit the pattern.'
+									'This block belongs to "%s". Edit the pattern to move or delete it.'
 								),
 								entity.title.raw
 						  )
 						: sprintf(
 								// translators: %s: template's title.
 								__(
-									'This block is part of the template: "%s". To move, delete, or edit other properties, you must edit the template.'
+									'This block belongs to "%s". Edit the template to move or delete it.'
 								),
 								entity.title.rendered
 						  ) }
