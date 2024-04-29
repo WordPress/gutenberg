@@ -13,7 +13,7 @@ import { getComputedCSS } from './utils';
 
 export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
-	const rootBlockElement = blockElement.parentElement;
+	const rootBlockElement = blockElement?.parentElement;
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 
 	/*
@@ -106,6 +106,11 @@ export function GridItemResizer( { clientId, onChange } ) {
 				bounds={ boundingElement }
 				boundsByDirection
 				onResizeStart={ ( event, direction ) => {
+					/*
+					 * The container justification and alignment need to be set
+					 * according to the direction the resizer is being dragged in,
+					 * so that it resizes in the right direction.
+					 */
 					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
