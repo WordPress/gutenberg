@@ -26,17 +26,17 @@ const EMPTY_ARRAY: Data = [];
 /**
  * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
  *
- * @param {any[]}    data   Raw data.
- * @param {Object}   view   View config.
- * @param {Object[]} fields Fields config.
+ * @param data   Raw data.
+ * @param view   View config.
+ * @param fields Fields config.
  *
- * @return {Object} { data: any[], paginationInfo: { totalItems: number, totalPages: number } }
+ * @return Filtered, sorted and paginated data.
  */
 export function filterSortAndPaginate(
 	data: Data,
 	view: View,
 	fields: Field[]
-) {
+): { data: Data; paginationInfo: { totalItems: number; totalPages: number } } {
 	if ( ! data ) {
 		return {
 			data: EMPTY_ARRAY,
