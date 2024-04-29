@@ -125,10 +125,13 @@ This specification is the same for the three different origins that use this for
 
 ### Version
 
-This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
+This field describes the format of the `theme.json` file. The latest version is [version 3](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) introduced in WordPress 6.6.
 
-If you have used [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) previously, you don’t need to update the version in the v1 file to v2, as it’ll be [migrated](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) into v2 at runtime for you.
+New versions are introduced when a breaking change needs to be made. This allows theme authors to choose when to opt-in to the breaking changes and migrate their theme.json files to the new format.
 
+Older versions of `theme.json` are backwards-compatible and will continue to work with newer versions of WordPress and the Gutenberg plugin. However new features will be developed on the latest version.
+
+Follow the instructions in [migrating to newer versions](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) for details on updating to the latest version.
 
 ### Settings
 
