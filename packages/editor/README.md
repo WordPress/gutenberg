@@ -667,16 +667,6 @@ _Returns_
 
 -   `Component`: The component to be rendered.
 
-### PluginPostExcerpt
-
-Renders an editable textarea for the post excerpt. Templates, template parts and patterns use the `excerpt` field as a description semantically. Additionally templates and template parts override the `excerpt` field as `description` in REST API. So this component handles proper labeling and updating the edited entity.
-
-_Parameters_
-
--   _props_ `Object`: - Component props.
--   _props.hideLabelFromVision_ `[boolean]`: - Whether to visually hide the textarea's label.
--   _props.updateOnBlur_ `[boolean]`: - Whether to update the post on change or use local state and update on blur.
-
 ### PluginPostPublishPanel
 
 Renders provided content to the post-publish panel in the publish flow (side panel that opens after a user publishes the post).
