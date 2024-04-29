@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -150,29 +145,33 @@ function PrivateExcerpt() {
 							! template.has_theme_file ) ),
 			};
 		}, [] );
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ setPopoverAnchor ] = useState( null );
 	const label = shouldBeUsedAsDescription
 		? __( 'Description' )
 		: __( 'Excerpt' );
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
 		() => ( {
-			// Anchor the popover to the middle of the entire row so that it doesn't
-			// move around when the label changes.
-			anchor: popoverAnchor,
 			'aria-label': label,
 			headerTitle: label,
 			placement: 'left-start',
 			offset: 36,
 			shift: true,
 		} ),
-		[ popoverAnchor, label ]
+		[ label ]
 	);
 	if ( ! shouldRender ) {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate>
+		<Text
+			align="left"
+			numberOfLines={ 2 }
+			ellipsizeMode="middle"
+			limit={ 120 }
+			truncate={ shouldBeUsedAsDescription ? false : true }
+			style={ { marginRight: '1ch' } }
+		>
 			{ excerpt }
 		</Text>
 	);
@@ -186,49 +185,47 @@ function PrivateExcerpt() {
 		? __( 'Edit description' )
 		: __( 'Edit excerpt' );
 	return (
-		<Dropdown
-			className="editor-post-excerpt__dropdown"
-			contentClassName="editor-post-excerpt__dropdown__content"
-			popoverProps={ popoverProps }
-			focusOnMount
-			ref={ setPopoverAnchor }
-			renderToggle={ ( { onToggle } ) => (
-				<Button
-					className={ classnames(
-						'editor-post-excerpt__dropdown__trigger',
-						{ 'has-excerpt': !! excerpt }
-					) }
-					onClick={ onToggle }
-					label={
-						!! excerptText ? triggerEditLabel : excerptPlaceholder
-					}
-					showTooltip={ !! excerptText }
-				>
-					{ excerptText || excerptPlaceholder }
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<>
-					<InspectorPopoverHeader
-						title={ label }
-						onClose={ onClose }
-					/>
+		<>
+			{ excerptText }
+			<Dropdown
+				className="editor-post-excerpt__dropdown"
+				contentClassName="editor-post-excerpt__dropdown__content"
+				popoverProps={ popoverProps }
+				focusOnMount
+				ref={ setPopoverAnchor }
+				renderToggle={ ( { onToggle } ) => (
+					<Button
+						className="editor-post-excerpt__dropdown__trigger"
+						onClick={ onToggle }
+						label={ triggerEditLabel }
+						variant="link"
+					>
+						{ excerpt ? __( 'Edit' ) : excerptPlaceholder }
+					</Button>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<>
+						<InspectorPopoverHeader
+							title={ label }
+							onClose={ onClose }
+						/>
 
-					<VStack spacing={ 4 }>
-						<PluginPostExcerpt.Slot>
-							{ ( fills ) => (
-								<>
-									<PostExcerptForm
-										hideLabelFromVision
-										updateOnBlur
-									/>
-									{ fills }
-								</>
-							) }
-						</PluginPostExcerpt.Slot>
-					</VStack>
-				</>
-			) }
-		/>
+						<VStack spacing={ 4 }>
+							<PluginPostExcerpt.Slot>
+								{ ( fills ) => (
+									<>
+										<PostExcerptForm
+											hideLabelFromVision
+											//updateOnBlur
+										/>
+										{ fills }
+									</>
+								) }
+							</PluginPostExcerpt.Slot>
+						</VStack>
+					</>
+				) }
+			/>
+		</>
 	);
 }

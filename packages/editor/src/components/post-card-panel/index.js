@@ -111,14 +111,13 @@ export default function PostCardPanel( { className, actions } ) {
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
-					<VStack
-						className="editor-post-card-panel__description"
-						spacing={ 2 }
-					>
+					<div className="editor-post-card-panel__description">
 						{ showPostExcerptPanel && <PrivatePostExcerptPanel /> }
 						{ showPostContentInfo && <PostContentInfo /> }
-						{ lastEditedText && <Text>{ lastEditedText }</Text> }
-					</VStack>
+					</div>
+					{ lastEditedText && (
+						<Text variant="muted">{ lastEditedText }</Text>
+					) }
 					{ postType === TEMPLATE_POST_TYPE && <TemplateAreas /> }
 				</VStack>
 			</div>
