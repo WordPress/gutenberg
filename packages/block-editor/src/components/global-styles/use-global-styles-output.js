@@ -408,7 +408,10 @@ export function getStylesDeclarations(
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( blockStyles );
+	const extraRules = getCSSRules( blockStyles, {
+		...editorSettings,
+		isRoot,
+	} );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
@@ -1238,13 +1241,17 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 
-	const { themeDirURI, disableLayoutStyles } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			themeDirURI: _settings?.__experimentalCurrentTheme?.stylesheetURI,
-			disableLayoutStyles: !! _settings.disableLayoutStyles,
-		};
-	} );
+	const { stylesheetURI, templateURI, disableLayoutStyles } = useSelect(
+		( select ) => {
+			const _settings = select( blockEditorStore ).getSettings();
+			return {
+				stylesheetURI:
+					_settings?.__experimentalCurrentTheme?.stylesheetURI,
+				templateURI: _settings?.__experimentalCurrentTheme?.templateURI,
+				disableLayoutStyles: !! _settings.disableLayoutStyles,
+			};
+		}
+	);
 
 	const blockContext = useContext( BlockContext );
 
@@ -1276,7 +1283,8 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			disableLayoutStyles,
 			isTemplate,
 			{
-				themeDirURI,
+				stylesheetURI,
+				templateURI,
 			}
 		);
 		const svgs = toSvgFilters( updatedConfig, blockSelectors );
@@ -1326,7 +1334,8 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		disableLayoutStyles,
 		isTemplate,
 		getBlockStyles,
-		themeDirURI,
+		stylesheetURI,
+		templateURI,
 	] );
 }
 

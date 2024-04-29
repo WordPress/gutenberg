@@ -48,7 +48,7 @@ function gutenberg_get_background_support_styles( $background_styles = array() )
 		if ( ! str_starts_with( $background_styles['backgroundImage']['url'], '/' ) ) {
 			$background_styles['backgroundImage']['url'] = '/' . $background_styles['backgroundImage']['url'];
 		}
-		$background_styles['backgroundImage']['url'] = esc_url( get_stylesheet_directory_uri() . $background_styles['backgroundImage']['url'] );
+		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
 	}
 	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
 }

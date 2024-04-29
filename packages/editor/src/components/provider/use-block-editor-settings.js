@@ -296,6 +296,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			__experimentalUserCanCreatePages: userCanCreatePages,
 			__experimentalCurrentTheme: {
 				stylesheetURI: currentTheme?.stylesheet_uri,
+				templateURI: currentTheme?.template_uri,
 			},
 			pageOnFront,
 			pageForPosts,

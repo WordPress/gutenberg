@@ -61,11 +61,11 @@ const hasStyleSupport = ( nameOrType ) =>
  *
  * @return {Object} Flattened CSS variables declaration.
  */
-export function getInlineStyles( styles = {} ) {
+export function getInlineStyles( styles = {}, options ) {
 	const output = {};
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	getCSSRules( styles ).forEach( ( rule ) => {
+	getCSSRules( styles, options ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
@@ -329,7 +329,9 @@ export function addSaveProps(
 	}
 
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles( style, {
+			...editorSettings,
+		} ),
 		...props.style,
 	};
 
@@ -385,10 +387,11 @@ const elementTypes = [
 ];
 
 function useBlockProps( { name, style } ) {
-	const { themeDirURI } = useSelect( ( select ) => {
+	const { stylesheetURI, templateURI } = useSelect( ( select ) => {
 		const _settings = select( blockEditorStore ).getSettings();
 		return {
-			themeDirURI: _settings?.__experimentalCurrentTheme?.stylesheetURI,
+			stylesheetURI: _settings?.__experimentalCurrentTheme?.stylesheetURI,
+			templateURI: _settings?.__experimentalCurrentTheme?.templateURI,
 		};
 	} );
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
@@ -479,7 +482,8 @@ function useBlockProps( { name, style } ) {
 		{ style },
 		skipSerializationPathsEdit,
 		{
-			themeDirURI,
+			stylesheetURI,
+			templateURI,
 		}
 	);
 }
