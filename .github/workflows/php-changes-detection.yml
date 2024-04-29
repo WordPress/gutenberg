@@ -20,7 +20,7 @@ jobs:
               uses: tj-actions/changed-files@0874344d6ebbaa00a27da73276ae7162fadcaf69 # v44.3.0
               with:
                   files: |
-                      **.{php}
+                      **.php
 
             - name: List all changed files
               if: steps.changed-files-php.outputs.any_changed == 'true'
