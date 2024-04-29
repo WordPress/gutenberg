@@ -65,7 +65,7 @@
 		@include break-small() {
 			&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
 				position: relative;
-				top: - $grid-unit;
+				top: -10px;
 			}
 		}
 	}
