@@ -18,7 +18,9 @@ This documentation was generated from the JSON schema for theme.json.
 
 The last schema for version 2 is available at `https://schemas.wp.org/wp/6.5/theme.json`.
 
-Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.9 is available at `https://schemas.wp.org/wp/5.9/theme.json`. To ensure that you're only using features available to your users, it's best to use the oldest version that your theme supports.
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.9 is available at `https://schemas.wp.org/wp/5.9/theme.json`.
+
+See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
 
 ## Settings
 
