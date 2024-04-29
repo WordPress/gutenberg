@@ -37,18 +37,29 @@ add_filter( 'render_block_data', '_gutenberg_add_enhanced_pagination_to_query_bl
  *
  * Note: This should probably be done per site, not by default when this option is enabled.
  *
- * @param string $html The rendered template.
+ * @param string $response_body The response body.
  *
  * @return string The rendered template with modified BODY attributes.
  */
-function _gutenberg_add_client_side_navigation_directives( $html ) {
-	$p = new WP_HTML_Tag_Processor( $html );
+function _gutenberg_add_client_side_navigation_directives( $response_body ) {
+	$is_html_content_type = false;
+	foreach ( headers_list() as $header ) {
+		$header_parts = preg_split( '/\s*[:;]\s*/', strtolower( $header ) );
+		if ( count( $header_parts ) >= 2 && 'content-type' === $header_parts[0] ) {
+			$is_html_content_type = in_array( $header_parts[1], array( 'text/html', 'application/xhtml+xml' ), true );
+		}
+	}
+	if ( ! $is_html_content_type ) {
+		return $response_body;
+	}
+
+	$p = new WP_HTML_Tag_Processor( $response_body );
 	if ( $p->next_tag( array( 'tag_name' => 'BODY' ) ) ) {
 		$p->set_attribute( 'data-wp-interactive', 'core/experimental' );
 		$p->set_attribute( 'data-wp-context', '{}' );
-		$html = $p->get_updated_html();
+		$response_body = $p->get_updated_html();
 	}
-	return $html;
+	return $response_body;
 }
 
 // TODO: Explore moving this to the server directive processing.
