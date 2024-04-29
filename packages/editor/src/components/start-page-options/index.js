@@ -11,6 +11,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { __unstableSerializeAndClean } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -71,7 +72,11 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 			blockPatterns={ blockPatterns }
 			shownPatterns={ shownBlockPatterns }
 			onClickPattern={ ( _pattern, blocks ) => {
-				editEntityRecord( 'postType', postType, postId, { blocks } );
+				editEntityRecord( 'postType', postType, postId, {
+					blocks,
+					content: ( { blocks: blocksForSerialization = [] } ) =>
+						__unstableSerializeAndClean( blocksForSerialization ),
+				} );
 				onChoosePattern();
 			} }
 		/>

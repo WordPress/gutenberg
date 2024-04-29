@@ -1,8 +1,3 @@
-/**
- * WordPress dependencies
- */
-import { useMemo, useSyncExternalStore } from '@wordpress/element';
-
 export type ObservableMap< K, V > = {
 	get( name: K ): V | undefined;
 	set( name: K, value: V ): void;
@@ -11,8 +6,15 @@ export type ObservableMap< K, V > = {
 };
 
 /**
- * A key/value map where the individual entries are observable by subscribing to them
- * with the `subscribe` methods.
+ * A constructor (factory) for `ObservableMap`, a map-like key/value data structure
+ * where the individual entries are observable: using the `subscribe` method, you can
+ * subscribe to updates for a particular keys. Each subscriber always observes one
+ * specific key and is not notified about any unrelated changes (for different keys)
+ * in the `ObservableMap`.
+ *
+ * @template K The type of the keys in the map.
+ * @template V The type of the values in the map.
+ * @return   A new instance of the `ObservableMap` type.
  */
 export function observableMap< K, V >(): ObservableMap< K, V > {
 	const map = new Map< K, V >();
@@ -56,24 +58,4 @@ export function observableMap< K, V >(): ObservableMap< K, V > {
 			};
 		},
 	};
-}
-
-/**
- * React hook that lets you observe an individual entry in an `ObservableMap`.
- *
- * @param map  The `ObservableMap` to observe.
- * @param name The map key to observe.
- */
-export function useObservableValue< K, V >(
-	map: ObservableMap< K, V >,
-	name: K
-): V | undefined {
-	const [ subscribe, getValue ] = useMemo(
-		() => [
-			( listener: () => void ) => map.subscribe( name, listener ),
-			() => map.get( name ),
-		],
-		[ map, name ]
-	);
-	return useSyncExternalStore( subscribe, getValue, getValue );
 }

@@ -6,6 +6,7 @@ import * as interfaceApis from '@wordpress/interface';
 /**
  * Internal dependencies
  */
+import CollapsableBlockToolbar from './components/collapsible-block-toolbar';
 import EditorCanvas from './components/editor-canvas';
 import { ExperimentalEditorProvider } from './components/provider';
 import { lock } from './lock-unlock';
@@ -28,11 +29,13 @@ import PostCardPanel from './components/post-card-panel';
 import PostStatus from './components/post-status';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
+import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
+	CollapsableBlockToolbar,
 	DocumentTools,
 	EditorCanvas,
 	ExperimentalEditorProvider,
@@ -52,6 +55,7 @@ lock( privateApis, {
 	PostStatus,
 	ToolsMoreMenuGroup,
 	ViewMoreMenuGroup,
+	PrivatePostExcerptPanel,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

@@ -14,7 +14,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import {
 	PageAttributesPanel,
 	PostDiscussionPanel,
-	PostExcerptPanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
 	privateApis as editorPrivateApis,
@@ -100,7 +99,6 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
 						<PostLastRevisionPanel />
 						<PostTaxonomiesPanel />
-						<PostExcerptPanel />
 						<PostDiscussionPanel />
 						<PageAttributesPanel />
 						<PatternOverridesPanel />

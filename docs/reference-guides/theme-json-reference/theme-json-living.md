@@ -1,10 +1,11 @@
-# Theme.json Version 2
+# Theme.json Version 3
 
-> This is the living specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
+> This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
 >
 > There are some related documents that you may be interested in: 
-> - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification, and 
-> - the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
+> - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
+> - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
+> - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
 This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/global-settings-and-styles.md) for examples and guidance on how to use the `theme.json` file in your theme.
 
@@ -17,7 +18,7 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 ```
 {
   "$schema": "https://schemas.wp.org/trunk/theme.json",
-  "version": 2,
+  "version": 3,
   ...
 }
 ```
@@ -179,6 +180,7 @@ Settings related to typography.
 
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
+| defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
