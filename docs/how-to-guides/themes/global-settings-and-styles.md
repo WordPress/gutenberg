@@ -1284,7 +1284,7 @@ body {
 
 ### Specificity for link colors provided by the user
 
-In v1, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
+In WordPress 5.8, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
 
 ```css
 .wp-element-<ID> a { color: <USER_COLOR_VALUE> !important; }
