@@ -68,14 +68,18 @@ function getPositionTypeLabel( attributes ) {
 export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
-			if ( ! clientId ) return null;
+			if ( ! clientId ) {
+				return null;
+			}
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
-			if ( ! blockType ) return null;
+			if ( ! blockType ) {
+				return null;
+			}
 			const attributes = getBlockAttributes( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
@@ -95,7 +99,9 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
 			};
-			if ( ! match ) return blockTypeInfo;
+			if ( ! match ) {
+				return blockTypeInfo;
+			}
 
 			return {
 				isSynced,

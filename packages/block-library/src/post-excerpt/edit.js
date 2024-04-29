@@ -89,7 +89,9 @@ export default function PostExcerptEditor( {
 	 * excerpt has been produced from the content.
 	 */
 	const strippedRenderedExcerpt = useMemo( () => {
-		if ( ! renderedExcerpt ) return '';
+		if ( ! renderedExcerpt ) {
+			return '';
+		}
 		const document = new window.DOMParser().parseFromString(
 			renderedExcerpt,
 			'text/html'

@@ -154,7 +154,9 @@ function UnforwardedModal(
 	useEffect( () => {
 		dismissers.push( refOnRequestClose );
 		const [ first, second ] = dismissers;
-		if ( second ) first?.current?.();
+		if ( second ) {
+			first?.current?.();
+		}
 
 		const nested = nestedDismissers.current;
 		return () => {
@@ -243,7 +245,9 @@ function UnforwardedModal(
 		onPointerUp: ( { target, button } ) => {
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
-			if ( button === 0 && isSameTarget ) onRequestClose();
+			if ( button === 0 && isSameTarget ) {
+				onRequestClose();
+			}
 		},
 	};
 

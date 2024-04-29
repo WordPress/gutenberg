@@ -226,8 +226,9 @@ function ResizableFrame( {
 			variants={ frameAnimationVariants }
 			animate={ isFullWidth ? 'fullWidth' : 'default' }
 			onAnimationComplete={ ( definition ) => {
-				if ( definition === 'fullWidth' )
+				if ( definition === 'fullWidth' ) {
 					setFrameSize( { width: '100%', height: '100%' } );
+				}
 			} }
 			transition={ FRAME_TRANSITION }
 			size={ frameSize }

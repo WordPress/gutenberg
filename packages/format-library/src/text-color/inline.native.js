@@ -28,9 +28,15 @@ function parseCSS( css = '' ) {
 	return css.split( ';' ).reduce( ( accumulator, rule ) => {
 		if ( rule ) {
 			const [ property, value ] = rule.replace( / /g, '' ).split( ':' );
-			if ( property === 'color' ) accumulator.color = value;
-			if ( property === 'background-color' && value !== transparentValue )
+			if ( property === 'color' ) {
+				accumulator.color = value;
+			}
+			if (
+				property === 'background-color' &&
+				value !== transparentValue
+			) {
 				accumulator.backgroundColor = value;
+			}
 		}
 		return accumulator;
 	}, {} );
@@ -82,8 +88,12 @@ function setColors( value, name, colorSettings, colors, contentRef ) {
 		}
 	}
 
-	if ( styles.length ) attributes.style = styles.join( ';' );
-	if ( classNames.length ) attributes.class = classNames.join( ' ' );
+	if ( styles.length ) {
+		attributes.style = styles.join( ';' );
+	}
+	if ( classNames.length ) {
+		attributes.class = classNames.join( ' ' );
+	}
 
 	const format = { type: name, attributes };
 	const hasNoSelection = value.start === value.end;

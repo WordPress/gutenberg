@@ -198,8 +198,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate
