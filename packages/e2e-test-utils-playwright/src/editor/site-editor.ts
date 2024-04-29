@@ -39,7 +39,7 @@ export async function saveSiteEditorEntities(
 		// Second Save button in the entities panel.
 		await this.page
 			.getByRole( 'region', {
-				name: publishButtonIsVisible ? 'Editor publish' : 'Save panel',
+				name: /(Editor publish|Save panel)/,
 			} )
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
