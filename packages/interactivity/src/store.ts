@@ -26,7 +26,9 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) target[ key ] = {};
+				if ( ! target[ key ] ) {
+					target[ key ] = {};
+				}
 				deepMerge( target[ key ], source[ key ] );
 			} else {
 				try {
@@ -133,7 +135,9 @@ const handlers = {
 						resetNamespace();
 					}
 
-					if ( it.done ) break;
+					if ( it.done ) {
+						break;
+					}
 				}
 
 				return value;
@@ -155,7 +159,9 @@ const handlers = {
 		}
 
 		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) ) return proxify( result, ns );
+		if ( isObject( result ) ) {
+			return proxify( result, ns );
+		}
 
 		return result;
 	},

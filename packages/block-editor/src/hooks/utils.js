@@ -149,7 +149,9 @@ export function useStyleOverride( {
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
 
 		const _id = id || fallbackId;
 		const override = {

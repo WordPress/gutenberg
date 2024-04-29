@@ -1030,7 +1030,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const selectionFocus = getSelectionEnd( state );
 
 	// It's not mergeable if the start and end are within the same block.
-	if ( selectionAnchor.clientId === selectionFocus.clientId ) return false;
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+		return false;
+	}
 
 	// It's not mergeable if there's no rich text selection.
 	if (
@@ -1038,8 +1040,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		! selectionFocus.attributeKey ||
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
-	)
+	) {
 		return false;
+	}
 
 	const anchorRootClientId = getBlockRootClientId(
 		state,
@@ -1081,12 +1084,16 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const targetBlockName = getBlockName( state, targetBlockClientId );
 	const targetBlockType = getBlockType( targetBlockName );
 
-	if ( ! targetBlockType.merge ) return false;
+	if ( ! targetBlockType.merge ) {
+		return false;
+	}
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlockName ) return true;
+	if ( blockToMerge.name === targetBlockName ) {
+		return true;
+	}
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
@@ -1938,7 +1945,9 @@ const buildBlockTypeItem =
 			isDisabled,
 			frecency: calculateFrecency( time, count ),
 		};
-		if ( buildScope === 'transform' ) return blockItemBase;
+		if ( buildScope === 'transform' ) {
+			return blockItemBase;
+		}
 
 		const inserterVariations = getBlockVariations(
 			blockType.name,
@@ -2379,7 +2388,9 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, blockNames, rootClientId = null ) => {
-			if ( ! blockNames ) return EMPTY_ARRAY;
+			if ( ! blockNames ) {
+				return EMPTY_ARRAY;
+			}
 			const patterns =
 				select( STORE_NAME ).__experimentalGetAllowedPatterns(
 					rootClientId
@@ -2438,7 +2449,9 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, blocks, rootClientId = null ) => {
-				if ( ! blocks ) return EMPTY_ARRAY;
+				if ( ! blocks ) {
+					return EMPTY_ARRAY;
+				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
 				 * the `__experimentalRole` property of blocks' attributes for the transformation.

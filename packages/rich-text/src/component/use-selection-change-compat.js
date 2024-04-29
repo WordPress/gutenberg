@@ -43,7 +43,9 @@ export function useSelectionChangeCompat() {
 
 			function onUp() {
 				onCancel();
-				if ( isRangeEqual( range, getRange() ) ) return;
+				if ( isRangeEqual( range, getRange() ) ) {
+					return;
+				}
 				ownerDocument.dispatchEvent( new Event( 'selectionchange' ) );
 			}
 
