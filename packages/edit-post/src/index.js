@@ -26,8 +26,7 @@ import './hooks';
 import Editor from './editor';
 import { unlock } from './lock-unlock';
 
-const { PluginPostExcerpt: __experimentalPluginPostExcerpt } =
-	unlock( editorPrivateApis );
+const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -161,6 +160,6 @@ export function reinitializeEditor() {
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
 export { default as __experimentalMainDashboardButton } from './components/header/main-dashboard-button';
-export { __experimentalPluginPostExcerpt };
+export { PluginPostExcerpt };
 export { store } from './store';
 export * from './deprecated';

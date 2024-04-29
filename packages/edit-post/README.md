@@ -57,6 +57,10 @@ _Related_
 
 -   PluginMoreMenuItem in @wordpress/editor package.
 
+### PluginPostExcerpt
+
+Undocumented declaration.
+
 ### PluginPostPublishPanel
 
 _Related_
