@@ -103,7 +103,7 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 	);
 }
 
-export default function TemplateContentOnlySettingsMenu() {
+export default function ContentOnlySettingsMenu() {
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { selectedClientIds } ) =>
