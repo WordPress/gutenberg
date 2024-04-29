@@ -4,6 +4,10 @@
 
 ## 5.5.0 (2024-04-19)
 
+### Enhancements
+
+-	Improve data-wp-context debugging by validating it as a stringified JSON Object. ([#61045](https://github.com/WordPress/gutenberg/pull/61045))
+
 ### Bug Fixes
 
 -   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
