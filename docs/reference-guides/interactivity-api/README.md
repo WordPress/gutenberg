@@ -17,7 +17,7 @@ For more information about the genesis of the Interactivity API, check out the [
 Use the following links to locate the topic you're interested in. If you have never worked with the Interactivity API before, consider reading through the following resources in the order listed.
 
 - **[Requirements](#requirements-of-the-interactivity-api):** Check this section before you start creating your interactive blocks with the Interactivity API.
-- **[Quick Start Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/quick-start-guide/):** Get a custom block using the Interactivity API up and running in less than one minute.
+- **[Quick Start Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/):** Get a custom block using the Interactivity API up and running in less than one minute.
 - **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/)** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
 - **[API Reference](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/):** To take a deep dive into how the API works internally, the list of Directives, and how Store works.
 - **[Docs and Examples](#docs--examples):** Additional resources to learn/read more about the Interactivity API.
