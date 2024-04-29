@@ -79,7 +79,6 @@ With WordPress 6.0 themes can register patterns from [Pattern Directory](https:/
 
 ```json
 {
-    "version": 2,
     "patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```

@@ -48,7 +48,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -86,7 +86,7 @@ body {
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line-height": {
@@ -115,7 +115,7 @@ This specification is the same for the three different origins that use this for
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {},
 	"styles": {},
 	"customTemplates": {},
@@ -145,7 +145,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"border": {
 			"radius": false,
@@ -209,7 +209,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"border": {
@@ -357,7 +357,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"duotone": [
@@ -532,7 +532,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"baseFont": 16,
@@ -577,7 +577,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": false
@@ -597,7 +597,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"blocks": {
 			"core/button": {
@@ -614,7 +614,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -682,7 +682,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"radius": "value",
@@ -761,7 +761,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"color": "value",
@@ -856,7 +856,7 @@ Styles found at the top-level will be enqueued using the `body` selector.
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -885,7 +885,7 @@ By default, the block selector is generated based on its name such as `.wp-block
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -972,7 +972,7 @@ If they're found in the top-level the element selector will be used. If they're 
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"typography": {
 			"fontSize": "var(--wp--preset--font-size--normal)"
@@ -1066,7 +1066,7 @@ For example, this is how to provide styles for the existing `plain` variation fo
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles":{
 		"blocks": {
 			"core/quote": {
@@ -1103,7 +1103,7 @@ Within this field themes can list the custom templates present in the `templates
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"customTemplates": [
 		{
 			"name": "my-custom-template",
@@ -1132,7 +1132,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"templateParts": [
 		{
 			"name": "my-template-part",
@@ -1151,7 +1151,7 @@ Within this field themes can list patterns to register from [Pattern Directory](
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
@@ -1210,7 +1210,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"lineHeight": {
@@ -1240,7 +1240,7 @@ A few notes about this process:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line--height": { // DO NOT DO THIS
@@ -1304,7 +1304,7 @@ For blocks that contain inner blocks, such as Group, Columns, Buttons, and Socia
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"spacing": {
 			"blockGap": true,
