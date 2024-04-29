@@ -33,33 +33,26 @@ function _gutenberg_add_enhanced_pagination_to_query_block( $parsed_block ) {
 add_filter( 'render_block_data', '_gutenberg_add_enhanced_pagination_to_query_block' );
 
 /**
- * Add directives to all links.
+ * Adds client-side navigation directives to BODY tag.
  *
  * Note: This should probably be done per site, not by default when this option is enabled.
  *
- * @param string $content The block content.
+ * @param string $html The rendered template.
  *
- * @return string The same block content with the directives needed.
+ * @return string The rendered template with modified BODY attributes.
  */
-function _gutenberg_add_client_side_navigation_directives( $content ) {
-	static $body_interactive_added;
-	if ( ! $body_interactive_added ) {
-		$body_interactive_added = true;
-		add_filter( 'gutenberg_template_output_buffer', static function ( string $html ): string {
-			$p = new WP_HTML_Tag_Processor( $html );
-			if ( $p->next_tag( array( 'tag_name' => 'BODY' ) ) ) {
-				$p->set_attribute( 'data-wp-interactive', 'core/experimental' );
-				$p->set_attribute( 'data-wp-context', '{}' );
-				$html = $p->get_updated_html();
-			}
-			return $html;
-		} );
+function _gutenberg_add_client_side_navigation_directives( $html ) {
+	$p = new WP_HTML_Tag_Processor( $html );
+	if ( $p->next_tag( array( 'tag_name' => 'BODY' ) ) ) {
+		$p->set_attribute( 'data-wp-interactive', 'core/experimental' );
+		$p->set_attribute( 'data-wp-context', '{}' );
+		$html = $p->get_updated_html();
 	}
-	return $content;
+	return $html;
 }
 
 // TODO: Explore moving this to the server directive processing.
-add_filter( 'render_block', '_gutenberg_add_client_side_navigation_directives' );
+add_filter( 'gutenberg_template_output_buffer', '_gutenberg_add_client_side_navigation_directives' );
 
 /**
  * Starts output buffering at the end of the 'template_include' filter.
