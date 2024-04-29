@@ -8,15 +8,38 @@ const backgroundImage = {
 	name: 'backgroundImage',
 	generate: ( style: Style, options: StyleOptions ) => {
 		const _backgroundImage = style?.background?.backgroundImage;
+
 		if ( typeof _backgroundImage === 'object' && _backgroundImage?.url ) {
+			let url = _backgroundImage.url;
+			if (
+				_backgroundImage?.source === 'theme' &&
+				!! options?.stylesheetURI &&
+				!! options?.templateURI
+			) {
+				const activeThemeImageResource = `${ options.stylesheetURI }${
+					url.startsWith( '/' ) ? url : `/${ url }`
+				}`;
+
+				const parentThemeImageResource = `${ options.templateURI }${
+					url.startsWith( '/' ) ? url : `/${ url }`
+				}`;
+
+				url = `url('${ encodeURI(
+					safeDecodeURI( activeThemeImageResource )
+				) }'), url('${ encodeURI(
+					safeDecodeURI( parentThemeImageResource )
+				) }')`;
+			} else {
+				url = `url( '${ encodeURI(
+					safeDecodeURI( _backgroundImage.url )
+				) }' )`;
+			}
 			return [
 				{
 					selector: options.selector,
 					key: 'backgroundImage',
 					// Passed `url` may already be encoded. To prevent double encoding, decodeURI is executed to revert to the original string.
-					value: `url( '${ encodeURI(
-						safeDecodeURI( _backgroundImage.url )
-					) }' )`,
+					value: url,
 				},
 			];
 		}

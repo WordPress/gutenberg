@@ -55,10 +55,10 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 /**
  * Updates a styles object with default background values.
  *
- * @param {Object} blockStyles         A styles object.
- * @param {Object} options             Optional settings.
- * @param {string} options.themeDirURI The URI of the current theme directory.
- * @param {string} options.selector    The block selector.
+ * @param {Object} blockStyles           A styles object.
+ * @param {Object} options               Optional settings.
+ * @param {string} options.stylesheetURI The URI of the current theme directory.
+ * @param {string} options.selector      The block selector.
  * @return {Object}                     Updated styles.
  */
 export function setBackgroundStyleDefaults( blockStyles, options ) {
@@ -72,12 +72,19 @@ export function setBackgroundStyleDefaults( blockStyles, options ) {
 	const backgroundImage = blockStyles?.background?.backgroundImage;
 	const newBackgroundStyles = {};
 
-	if (
+/*	if (
 		backgroundImage?.source === 'theme' &&
 		!! backgroundImage?.url &&
-		!! options?.themeDirURI
+		!! options?.stylesheetURI &&
+		!! options?.templateURI
 	) {
-		const url = `${ options.themeDirURI }${
+		const activeThemeImageResource = `${ options.stylesheetURI }${
+			backgroundImage.url.startsWith( '/' )
+				? backgroundImage.url
+				: `/${ backgroundImage.url }`
+		}`;
+
+		const parentThemeImageResource = `${ options.templateURI }${
 			backgroundImage.url.startsWith( '/' )
 				? backgroundImage.url
 				: `/${ backgroundImage.url }`
@@ -85,9 +92,11 @@ export function setBackgroundStyleDefaults( blockStyles, options ) {
 
 		newBackgroundStyles.backgroundImage = {
 			...backgroundImage,
-			url: encodeURI( safeDecodeURI( url ) ),
+			url: `${ encodeURI(
+				safeDecodeURI( activeThemeImageResource )
+			) }, ${ encodeURI( safeDecodeURI( parentThemeImageResource ) ) }`,
 		};
-	}
+	}*/
 
 	// Set block background defaults.
 	if ( options?.selector !== ROOT_BLOCK_SELECTOR && !! backgroundImage ) {
