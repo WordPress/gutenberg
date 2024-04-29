@@ -68,11 +68,6 @@ export interface Field {
 	enableHiding?: boolean;
 
 	/**
-	 * The type of the field.
-	 */
-	type?: string;
-
-	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
 	elements?: Option[];
