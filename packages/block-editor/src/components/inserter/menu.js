@@ -6,18 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useEffect,
-	useState,
-	useCallback,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useDebouncedInput } from '@wordpress/compose';
+import { useDebouncedInput, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -238,14 +231,11 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
-	const searchRef = useRef();
-	useEffect( () => {
-		// We need to wait for the next frame to focus the search input
-		// becase the tabs component will try to focus the selected tab
-		window.requestAnimationFrame( () => {
-			searchRef?.current?.focus();
-		} );
-	}, [ selectedTab ] );
+	const searchRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			element.focus();
+		}
+	} );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
