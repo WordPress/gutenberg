@@ -4,6 +4,7 @@
 import { computed, signal, Signal } from '@preact/signals-core';
 
 const proxyToSignals = new WeakMap();
+const proxyToHandlers = new WeakMap();
 const objToProxy = new WeakMap();
 const arrayToArrayOfSignals = new WeakMap();
 const ignore = new WeakSet();
@@ -49,6 +50,7 @@ export function shallow< T extends object >( obj: T ): Shallow< T > {
 
 const createProxy = ( target: object, handlers: ProxyHandler< object > ) => {
 	const proxy = new Proxy( target, handlers );
+	proxyToHandlers.set( proxy, handlers );
 	ignore.add( proxy );
 	return proxy;
 };
@@ -95,7 +97,10 @@ const get =
 					if ( ! objToProxy.has( value ) )
 						objToProxy.set(
 							value,
-							createProxy( value, objectHandlers )
+							createProxy(
+								value,
+								proxyToHandlers.get( receiver )
+							)
 						);
 					value = objToProxy.get( value );
 				}
@@ -127,7 +132,10 @@ export const objectHandlers = {
 		let internal = val;
 		if ( shouldProxy( val ) ) {
 			if ( ! objToProxy.has( val ) )
-				objToProxy.set( val, createProxy( val, objectHandlers ) );
+				objToProxy.set(
+					val,
+					createProxy( val, proxyToHandlers.get( receiver ) )
+				);
 			internal = objToProxy.get( val );
 		}
 		const isNew = ! ( fullKey in target );
