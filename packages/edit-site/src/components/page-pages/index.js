@@ -188,16 +188,28 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-const PAGE_ACTIONS = [
+let PAGE_ACTIONS = [
 	'edit-post',
 	'view-post',
 	'restore',
 	'permanently-delete',
 	'view-post-revisions',
-	'duplicate-post',
 	'rename-post',
 	'move-to-trash',
 ];
+
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	PAGE_ACTIONS = [
+		'edit-post',
+		'view-post',
+		'restore',
+		'permanently-delete',
+		'view-post-revisions',
+		'duplicate-post',
+		'rename-post',
+		'move-to-trash',
+	];
+}
 
 export default function PagePages() {
 	const postType = 'page';
