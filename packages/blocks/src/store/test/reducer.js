@@ -108,12 +108,12 @@ describe( 'blockStyles', () => {
 		expect( blockStyles( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add a new block styles', () => {
+	it( 'should add new block styles for a single block type', () => {
 		const original = deepFreeze( {} );
 
 		let state = blockStyles( original, {
 			type: 'ADD_BLOCK_STYLES',
-			blockName,
+			blockNames: [ blockName ],
 			styles: [ { name: 'fancy' } ],
 		} );
 
@@ -123,12 +123,38 @@ describe( 'blockStyles', () => {
 
 		state = blockStyles( state, {
 			type: 'ADD_BLOCK_STYLES',
-			blockName,
+			blockNames: [ blockName ],
 			styles: [ { name: 'lightbox' } ],
 		} );
 
 		expect( state ).toEqual( {
 			[ blockName ]: [ { name: 'fancy' }, { name: 'lightbox' } ],
+		} );
+	} );
+
+	it( 'should add block styles for array of block types', () => {
+		const original = deepFreeze( {} );
+
+		let state = blockStyles( original, {
+			type: 'ADD_BLOCK_STYLES',
+			blockNames: [ 'core/group', 'core/columns' ],
+			styles: [ { name: 'dark' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/group': [ { name: 'dark' } ],
+			'core/columns': [ { name: 'dark' } ],
+		} );
+
+		state = blockStyles( state, {
+			type: 'ADD_BLOCK_STYLES',
+			blockNames: [ 'core/group' ],
+			styles: [ { name: 'light' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/group': [ { name: 'dark' }, { name: 'light' } ],
+			'core/columns': [ { name: 'dark' } ],
 		} );
 	} );
 
