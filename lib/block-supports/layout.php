@@ -737,7 +737,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 	$root_padding_aware_alignments = $global_settings['useRootPaddingAwareAlignments'] ?? false;
 
-	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) || 'full' === $used_alignment ) {
+	if ( $root_padding_aware_alignments && isset( $used_layout['type'] ) && 'constrained' === $used_layout['type'] || 'full' === $used_alignment ) {
 		$class_names[] = 'has-global-padding';
 	}
 
