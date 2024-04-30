@@ -1,26 +1,26 @@
-# Theme.json Version 2
+# Theme.json Version 2 Reference
 
-> This is the living specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
->
-> There are some related documents that you may be interested in: 
-> - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification, and
-> - the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
+> This is the specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later.
+
+<div class="callout callout-alert">
+
+Theme.json version 3 has been released with WordPress 6.6. WordPress will continue to support theme.json version 2. However new features will only be added to [new versions](/docs/reference-guides/theme-json-reference/theme-json-living.md).
+
+When you are ready to upgrade, see the [theme.json migration guide](/docs/reference-guides/theme-json-reference/theme-json-migrations.md#migrating-from-v2-to-v3) for details on updating to the latest version.
+
+</div>
 
 This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/global-settings-and-styles.md) for examples and guidance on how to use the `theme.json` file in your theme.
 
-## Schema
+## JSON Schema
 
-Remembering the `theme.json` settings and properties while you develop can be difficult, so a [JSON schema](https://schemas.wp.org/trunk/theme.json) was created to help.
+This documentation was generated from the JSON schema for theme.json.
 
-Code editors can pick up the schema and can provide helpful hints and suggestions such as tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `$schema`: "https://schemas.wp.org/trunk/theme.json" to the beginning of your theme.json file together with a `version` corresponding to the version you wish to use, e.g.:
+The last schema for version 2 is available at `https://schemas.wp.org/wp/6.5/theme.json`.
 
-```
-{
-  "$schema": "https://schemas.wp.org/trunk/theme.json",
-  "version": 2,
-  ...
-}
-```
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.9 is available at `https://schemas.wp.org/wp/5.9/theme.json`.
+
+See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
 
 ## Settings
 
@@ -30,7 +30,7 @@ Setting that enables the following UI tools:
 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
-- color: link, heading, button, caption
+- color: link
 - dimensions: aspectRatio, minHeight
 - position: sticky
 - spacing: blockGap, margin, padding
@@ -39,8 +39,6 @@ Setting that enables the following UI tools:
 ---
 
 ### useRootPaddingAwareAlignments
-
-_**Note:** Since WordPress 6.1._
 
 Enables root padding (the values from `styles.spacing.padding`) to be applied to the contents of full-width blocks instead of the root block.
 
@@ -92,7 +90,6 @@ Settings related to colors.
 | text | boolean | true |  |
 | heading | boolean | true |  |
 | button | boolean | true |  |
-| caption | boolean | true |  |
 
 ---
 
@@ -103,7 +100,6 @@ Settings related to background.
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
-| backgroundSize | boolean | false |  |
 
 ---
 
@@ -180,7 +176,6 @@ Settings related to typography.
 | fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
-| textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | writingMode | boolean | false |  |
@@ -263,7 +258,6 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
-| textAlign | string |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |

@@ -10,7 +10,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ```json
 {
-"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"customDuotone": true,
@@ -25,7 +25,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"duotone": [
@@ -54,8 +54,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ```json
 {
-	"schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": true,
@@ -89,8 +88,7 @@ Since theme.json acts as a configuration tool, there are numerous ways to define
 
 ```json
 {
-	"schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": true,
@@ -132,8 +130,7 @@ Continuing the examples with duotone, this means you could allow full access to 
 
 ```json
 {
-	"schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": true,
@@ -178,8 +175,7 @@ When using theme.json in a block or classic theme, these settings will stop the 
 
 ```json
 {
-	"$schema": "http://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"layout": {
 			"contentSize": "750px"
