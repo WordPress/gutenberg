@@ -1,6 +1,6 @@
 # Theme.json Version 3 Reference (latest)
 
-> This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later.
+> This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 6.6 or later, and the latest Gutenberg plugin.
 >
 > There are some related documents that you may be interested in: 
 > - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
