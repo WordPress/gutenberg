@@ -3,11 +3,12 @@
  */
 import { createContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
+import { observableMap } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import type { SlotFillBubblesVirtuallyContext } from '../types';
-import { observableMap } from './observable-map';
 
 const initialContextValue: SlotFillBubblesVirtuallyContext = {
 	slots: observableMap(),

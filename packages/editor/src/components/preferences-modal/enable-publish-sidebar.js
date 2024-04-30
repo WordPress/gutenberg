@@ -3,14 +3,13 @@
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { ifViewportMatches } from '@wordpress/viewport';
-import { store as editorStore } from '@wordpress/editor';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const { PreferenceBaseOption } = unlock( preferencesPrivateApis );
 
@@ -25,8 +24,5 @@ export default compose(
 			onChange: ( isEnabled ) =>
 				isEnabled ? enablePublishSidebar() : disablePublishSidebar(),
 		};
-	} ),
-	// In < medium viewports we override this option and always show the publish sidebar.
-	// See the edit-post's header component for the specific logic.
-	ifViewportMatches( 'medium' )
+	} )
 )( PreferenceBaseOption );

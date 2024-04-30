@@ -21,11 +21,13 @@ export const updateHead = async ( newHead ) => {
 	for ( const child of document.head.children ) {
 		const id = getTagId( child );
 		// Always remove styles and links as they might change.
-		if ( child.nodeName === 'LINK' || child.nodeName === 'STYLE' )
+		if ( child.nodeName === 'LINK' || child.nodeName === 'STYLE' ) {
 			toRemove.push( child );
-		else if ( newHeadMap.has( id ) ) newHeadMap.delete( id );
-		else if ( child.nodeName !== 'SCRIPT' && child.nodeName !== 'META' )
+		} else if ( newHeadMap.has( id ) ) {
+			newHeadMap.delete( id );
+		} else if ( child.nodeName !== 'SCRIPT' && child.nodeName !== 'META' ) {
 			toRemove.push( child );
+		}
 	}
 
 	// Prepare new assets.

@@ -112,10 +112,13 @@ describe( 'InputControl', () => {
 				const onKeyDown = ( { key } ) => {
 					heldKeySet.add( key );
 					if ( key === 'Escape' ) {
-						if ( heldKeySet.has( 'Meta' ) ) setState( 'qux' );
-						else if ( heldKeySet.has( 'Alt' ) )
+						if ( heldKeySet.has( 'Meta' ) ) {
+							setState( 'qux' );
+						} else if ( heldKeySet.has( 'Alt' ) ) {
 							setState( undefined );
-						else setState( '' );
+						} else {
+							setState( '' );
+						}
 					}
 				};
 				const onKeyUp = ( { key } ) => heldKeySet.delete( key );
@@ -204,8 +207,9 @@ describe( 'InputControl', () => {
 						if (
 							action.type === 'COMMIT' &&
 							action.payload.event.type === 'blur'
-						)
+						) {
 							value = value.replace( /\bnow\b/, 'meow' );
+						}
 
 						return { ...state, value };
 					} }

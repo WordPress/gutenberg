@@ -15,32 +15,19 @@ import {
 /**
  * Internal dependencies
  */
-import PageStatus from './page-status';
 import { unlock } from '../../../lock-unlock';
 
-const { PrivatePostExcerptPanel } = unlock( editorPrivateApis );
+const { PrivatePostExcerptPanel, PostStatus } = unlock( editorPrivateApis );
 
-export default function PageSummary( {
-	status,
-	date,
-	password,
-	postId,
-	postType,
-} ) {
+export default function PageSummary() {
 	return (
 		<VStack spacing={ 0 }>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
+						<PostStatus />
 						<PostFeaturedImagePanel withPanelBody={ false } />
 						<PrivatePostExcerptPanel />
-						<PageStatus
-							status={ status }
-							date={ date }
-							password={ password }
-							postId={ postId }
-							postType={ postType }
-						/>
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />

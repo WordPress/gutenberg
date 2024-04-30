@@ -180,7 +180,9 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	};
 
 	// Skip rendering if there are no variations
-	if ( ! variations?.length ) return null;
+	if ( ! variations?.length ) {
+		return null;
+	}
 
 	const baseClass = 'block-editor-block-variation-transforms';
 

@@ -729,15 +729,9 @@ class WP_Theme_JSON_Gutenberg {
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
-		}
-		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
+		$valid_variations    = static::get_valid_block_style_variations();
+		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -1202,7 +1196,7 @@ class WP_Theme_JSON_Gutenberg {
 				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
 			}
 			foreach ( $style_nodes as &$node ) {
-				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
+				$node = static::scope_style_node_selectors( $options['scope'], $node );
 			}
 			unset( $node );
 		}
@@ -1836,6 +1830,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Scoped selector.
 	 */
 	public static function scope_selector( $scope, $selector ) {
+		if ( ! $scope || ! $selector ) {
+			return $selector;
+		}
+
 		$scopes    = explode( ',', $scope );
 		$selectors = explode( ',', $selector );
 
@@ -1856,6 +1854,39 @@ class WP_Theme_JSON_Gutenberg {
 
 		$result = implode( ', ', $selectors_scoped );
 		return $result;
+	}
+
+	/**
+	 * Scopes the selectors for a given style node. This includes the primary
+	 * selector, i.e. `$node['selector']`, as well as any custom selectors for
+	 * features and subfeatures, e.g. `$node['selectors']['border']` etc.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param string $scope Selector to scope to.
+	 * @param array  $node  Style node with selectors to scope.
+	 *
+	 * @return array Node with updated selectors.
+	 */
+	protected static function scope_style_node_selectors( $scope, $node ) {
+		$node['selector'] = static::scope_selector( $scope, $node['selector'] );
+
+		if ( empty( $node['selectors'] ) ) {
+			return $node;
+		}
+
+		foreach ( $node['selectors'] as $feature => $selector ) {
+			if ( is_string( $selector ) ) {
+				$node['selectors'][ $feature ] = static::scope_selector( $scope, $selector );
+			}
+			if ( is_array( $selector ) ) {
+				foreach ( $selector as $subfeature => $subfeature_selector ) {
+					$node['selectors'][ $feature ][ $subfeature ] = static::scope_selector( $scope, $subfeature_selector );
+				}
+			}
+		}
+
+		return $node;
 	}
 
 	/**
@@ -3130,13 +3161,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
-		}
+		$valid_variations    = static::get_valid_block_style_variations();
 
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
@@ -4042,5 +4067,22 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return implode( ',', $result );
+	}
+
+	/**
+	 * Collects valid block style variations keyed by block type.
+	 *
+	 * @return array Valid block style variations by block type.
+	 */
+	protected static function get_valid_block_style_variations() {
+		$valid_variations = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
+
+		return $valid_variations;
 	}
 }

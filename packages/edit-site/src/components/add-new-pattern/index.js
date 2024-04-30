@@ -131,7 +131,9 @@ export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 				ref={ patternUploadInputRef }
 				onChange={ async ( event ) => {
 					const file = event.target.files?.[ 0 ];
-					if ( ! file ) return;
+					if ( ! file ) {
+						return;
+					}
 					try {
 						let currentCategoryId;
 						// When we're not handling template parts, we should
