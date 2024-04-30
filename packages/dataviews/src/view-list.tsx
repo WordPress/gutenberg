@@ -147,21 +147,23 @@ function ListItem( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				<div role="gridcell">
-					<CompositeItem
-						// To be able to pass ItemActions directly, it should pass the incoming props to the underlying element:
-						// https://ariakit.org/guide/composition#custom-components-must-be-open-for-extension
-						render={ ( props ) => (
-							<ItemActions
-								actions={ props.actions }
-								item={ props.item }
-								isCompact
-							/>
-						) }
-						item={ item }
-						actions={ actions }
-					/>
-				</div>
+				{ actions && (
+					<div role="gridcell">
+						<CompositeItem
+							// To be able to pass ItemActions directly, it should pass the incoming props to the underlying element:
+							// https://ariakit.org/guide/composition#custom-components-must-be-open-for-extension
+							render={ ( props ) => (
+								<ItemActions
+									actions={ props.actions }
+									item={ props.item }
+									isCompact
+								/>
+							) }
+							item={ item }
+							actions={ actions }
+						/>
+					</div>
+				) }
 			</HStack>
 		</CompositeRow>
 	);
