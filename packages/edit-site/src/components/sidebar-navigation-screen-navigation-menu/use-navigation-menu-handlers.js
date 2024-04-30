@@ -162,7 +162,7 @@ function useDuplicateNavigationMenu() {
 				createSuccessNotice( __( 'Duplicated Navigation menu' ), {
 					type: 'snackbar',
 				} );
-				goTo( `/navigation/${ postType }/${ savedRecord.id }` );
+				goTo( `/navigation/${ savedRecord.id }` );
 			}
 		} catch ( error ) {
 			createErrorNotice(
