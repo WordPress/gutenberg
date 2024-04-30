@@ -140,9 +140,52 @@ function InserterMenu(
 		! delayedFilterValue &&
 		selectedMediaCategory;
 
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			searchRef.current.focus();
+		},
+	} ) );
+
+	const inserterSearch = (
+		<>
+			<SearchControl
+				__nextHasNoMarginBottom
+				className="block-editor-inserter__search"
+				onChange={ ( value ) => {
+					if ( hoveredItem ) setHoveredItem( null );
+					setFilterValue( value );
+				} }
+				value={ filterValue }
+				label={ __( 'Search for blocks and patterns' ) }
+				placeholder={ __( 'Search' ) }
+				ref={ searchRef }
+			/>
+			{ !! delayedFilterValue && (
+				<div className="block-editor-inserter__no-tab-container">
+					<InserterSearchResults
+						filterValue={ delayedFilterValue }
+						onSelect={ onSelect }
+						onHover={ onHover }
+						onHoverPattern={ onHoverPattern }
+						rootClientId={ rootClientId }
+						clientId={ clientId }
+						isAppender={ isAppender }
+						__experimentalInsertionIndex={
+							__experimentalInsertionIndex
+						}
+						showBlockDirectory
+						shouldFocusBlock={ shouldFocusBlock }
+					/>
+				</div>
+			) }
+		</>
+	);
+
 	const blocksTab = useMemo(
 		() => (
 			<>
+				{ inserterSearch }
 				<div className="block-editor-inserter__block-list">
 					<BlockTypesTab
 						rootClientId={ destinationRootClientId }
@@ -167,28 +210,32 @@ function InserterMenu(
 			onHover,
 			showMostUsedBlocks,
 			showInserterHelpPanel,
+			inserterSearch,
 		]
 	);
 
 	const patternsTab = useMemo(
 		() => (
-			<BlockPatternsTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsertPattern }
-				onSelectCategory={ onClickPatternCategory }
-				selectedCategory={ selectedPatternCategory }
-			>
-				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onHover={ onHoverPattern }
-						category={ selectedPatternCategory }
-						patternFilter={ patternFilter }
-						showTitlesAsTooltip
-					/>
-				) }
-			</BlockPatternsTab>
+			<>
+				{ inserterSearch }
+				<BlockPatternsTab
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsertPattern }
+					onSelectCategory={ onClickPatternCategory }
+					selectedCategory={ selectedPatternCategory }
+				>
+					{ showPatternPanel && (
+						<PatternCategoryPreviewPanel
+							rootClientId={ destinationRootClientId }
+							onInsert={ onInsertPattern }
+							onHover={ onHoverPattern }
+							category={ selectedPatternCategory }
+							patternFilter={ patternFilter }
+							showTitlesAsTooltip
+						/>
+					) }
+				</BlockPatternsTab>
+			</>
 		),
 		[
 			destinationRootClientId,
@@ -198,6 +245,7 @@ function InserterMenu(
 			patternFilter,
 			selectedPatternCategory,
 			showPatternPanel,
+			inserterSearch,
 		]
 	);
 
@@ -236,13 +284,6 @@ function InserterMenu(
 		[ blocksTab, mediaTab, patternsTab ]
 	);
 
-	const searchRef = useRef();
-	useImperativeHandle( ref, () => ( {
-		focusSearch: () => {
-			searchRef.current.focus();
-		},
-	} ) );
-
 	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
 
 	// When the pattern panel is showing, we want to use zoom out mode
@@ -267,36 +308,6 @@ function InserterMenu(
 					'show-as-tabs': showAsTabs,
 				} ) }
 			>
-				<SearchControl
-					__nextHasNoMarginBottom
-					className="block-editor-inserter__search"
-					onChange={ ( value ) => {
-						if ( hoveredItem ) setHoveredItem( null );
-						setFilterValue( value );
-					} }
-					value={ filterValue }
-					label={ __( 'Search for blocks and patterns' ) }
-					placeholder={ __( 'Search' ) }
-					ref={ searchRef }
-				/>
-				{ !! delayedFilterValue && (
-					<div className="block-editor-inserter__no-tab-container">
-						<InserterSearchResults
-							filterValue={ delayedFilterValue }
-							onSelect={ onSelect }
-							onHover={ onHover }
-							onHoverPattern={ onHoverPattern }
-							rootClientId={ rootClientId }
-							clientId={ clientId }
-							isAppender={ isAppender }
-							__experimentalInsertionIndex={
-								__experimentalInsertionIndex
-							}
-							showBlockDirectory
-							shouldFocusBlock={ shouldFocusBlock }
-						/>
-					</div>
-				) }
 				{ showAsTabs && (
 					<InserterTabs
 						showPatterns={ showPatterns }
