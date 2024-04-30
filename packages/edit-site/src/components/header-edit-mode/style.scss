@@ -10,6 +10,19 @@
 	border-bottom: $border-width solid $gray-200;
 	padding-left: $header-height;
 
+	// When top toolbar is engaged and should expand fully.
+	&.show-block-toolbar {
+
+		.edit-site-header-edit-mode__start,
+		.edit-site-header-edit-mode__end {
+			flex-basis: auto;
+		}
+
+		.edit-site-header-edit-mode__center {
+			display: none;
+		}
+	}
+
 	.edit-site-header-edit-mode__start {
 		display: flex;
 		border: none;
@@ -180,12 +193,6 @@
 				left: calc(50% + 1px);
 			}
 		}
-	}
-}
-
-.has-fixed-toolbar {
-	.edit-site-header-edit-mode__center.is-collapsed {
-		display: none;
 	}
 }
 

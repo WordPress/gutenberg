@@ -98,6 +98,7 @@ export default function HeaderEditMode() {
 		<div
 			className={ classnames( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
+				'show-block-toolbar': ! isBlockToolsCollapsed && showTopToolbar,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
@@ -120,15 +121,7 @@ export default function HeaderEditMode() {
 			) }
 
 			{ ! isDistractionFree && (
-				<div
-					className={ classnames(
-						'edit-site-header-edit-mode__center',
-						{
-							'is-collapsed':
-								! isBlockToolsCollapsed && showTopToolbar,
-						}
-					) }
-				>
+				<div className="edit-site-header-edit-mode__center">
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
