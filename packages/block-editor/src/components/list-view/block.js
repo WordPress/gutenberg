@@ -22,7 +22,7 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 
@@ -183,7 +183,10 @@ function ListViewBlock( {
 
 		// If multiple blocks are selected, deselect all blocks when the user
 		// presses the escape key.
-		if ( event.keyCode === ESCAPE && selectedClientIds.length > 0 ) {
+		if (
+			isMatch( 'core/block-editor/unselect', event ) &&
+			selectedClientIds.length > 0
+		) {
 			event.stopPropagation();
 			event.preventDefault();
 			selectBlock( event, undefined );
