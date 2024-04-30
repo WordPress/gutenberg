@@ -27,35 +27,9 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function useClassNameFromBlockContext( postId, postType ) {
-	const post = useSelect(
-		( select ) =>
-			select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				postId
-			),
-		[ postType, postId ]
-	);
-
-	const { class_list: classList } = post;
-
-	let classes = 'wp-block-post';
-
-	if ( classList ) {
-		classes = classnames( classes, classList );
-	}
-	return classes;
-}
-
-function PostTemplateInnerBlocks( { blockContextId, blockContextPostType } ) {
-	const classes = useClassNameFromBlockContext(
-		blockContextId,
-		blockContextPostType
-	);
-
+function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: classes },
+		{ className: classnames( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -64,19 +38,14 @@ function PostTemplateInnerBlocks( { blockContextId, blockContextPostType } ) {
 function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
-	blockContextPostType,
+	classList,
 	isHidden,
 	setActiveBlockContextId,
 } ) {
-	const classes = useClassNameFromBlockContext(
-		blockContextId,
-		blockContextPostType
-	);
-
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: classes,
+			className: classnames( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -245,6 +214,7 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
+				classList: post.class_list ?? '',
 			} ) ),
 		[ posts ]
 	);
@@ -313,16 +283,13 @@ export default function PostTemplateEdit( {
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
 								<PostTemplateInnerBlocks
-									blockContextId={ blockContext.postId }
-									blockContextPostType={
-										blockContext.postType
-									}
+									classList={ blockContext.classList }
 								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
-								blockContextPostType={ blockContext.postType }
+								classList={ blockContext.classList }
 								setActiveBlockContextId={
 									setActiveBlockContextId
 								}
