@@ -17,7 +17,12 @@ import {
  */
 import { unlock } from '../../../lock-unlock';
 
-const { PrivatePostExcerptPanel, PostStatus } = unlock( editorPrivateApis );
+const {
+	PrivatePostExcerptPanel,
+	PostStatus,
+	PostContentInformation,
+	PostLastEditedPanel,
+} = unlock( editorPrivateApis );
 
 export default function PageSummary() {
 	return (
@@ -25,9 +30,13 @@ export default function PageSummary() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostStatus />
-						<PostFeaturedImagePanel withPanelBody={ false } />
-						<PrivatePostExcerptPanel />
+						<VStack spacing={ 2 }>
+							<PostStatus />
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							<PrivatePostExcerptPanel />
+							<PostContentInformation />
+							<PostLastEditedPanel />
+						</VStack>
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />

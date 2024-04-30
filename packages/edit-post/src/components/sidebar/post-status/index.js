@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	PanelBody,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -28,8 +29,12 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import { unlock } from '../../../lock-unlock';
 
-const { PostStatus: PostStatusPanel, PrivatePostExcerptPanel } =
-	unlock( editorPrivateApis );
+const {
+	PostStatus: PostStatusPanel,
+	PrivatePostExcerptPanel,
+	PostContentInformation,
+	PostLastEditedPanel,
+} = unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -77,9 +82,15 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostStatusPanel />
-						<PostFeaturedImagePanel withPanelBody={ false } />
-						{ showPostExcerptPanel && <PrivatePostExcerptPanel /> }
+						<VStack spacing={ 2 }>
+							<PostStatusPanel />
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							{ showPostExcerptPanel && (
+								<PrivatePostExcerptPanel />
+							) }
+							<PostContentInformation />
+							<PostLastEditedPanel />
+						</VStack>
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />

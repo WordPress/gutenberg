@@ -22,11 +22,4 @@
 		justify-content: space-between;
 		margin: 0 0 $grid-unit-10;
 	}
-
-	&__description {
-		color: $gray-700;
-		& .components-text {
-			color: inherit;
-		}
-	}
 }
