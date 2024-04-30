@@ -11,9 +11,11 @@ interface Option {
 }
 
 interface filterByConfig {
-	operators?: string[];
+	operators?: Operator[];
 	isPrimary?: boolean;
 }
+
+type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
 
 export interface Field {
 	/**
@@ -91,7 +93,7 @@ export interface Filter {
 	/**
 	 * The operator to use.
 	 */
-	operator: string;
+	operator: Operator;
 
 	/**
 	 * The value to filter by.
