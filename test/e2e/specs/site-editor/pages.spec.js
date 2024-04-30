@@ -187,7 +187,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		const templatePreviewButton = page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByRole( 'menuitemcheckbox', { name: 'Template preview' } );
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } );
 
 		await expect( templatePreviewButton ).toHaveAttribute(
 			'aria-checked',
