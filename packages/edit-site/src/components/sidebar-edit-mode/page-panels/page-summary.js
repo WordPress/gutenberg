@@ -30,13 +30,19 @@ export default function PageSummary() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<VStack spacing={ 2 }>
-							<PostStatus />
+						<VStack
+							spacing={ 2 }
+							//  TODO: this needs to be consolidated with the panel in post editor, when we unify them.
+							style={ { marginBlockEnd: '12px' } }
+						>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PrivatePostExcerptPanel />
-							<PostContentInformation />
-							<PostLastEditedPanel />
+							<div>
+								<PostContentInformation />
+								<PostLastEditedPanel />
+							</div>
 						</VStack>
+						<PostStatus />
 						<PostSchedulePanel />
 						<PostTemplatePanel />
 						<PostURLPanel />

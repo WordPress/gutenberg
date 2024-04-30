@@ -71,7 +71,9 @@ export default function PostCardPanel( { className, actions } ) {
 	return (
 		<PanelBody>
 			<div
-				className={ classnames( 'editor-post-card-panel', className ) }
+				className={ classnames( 'editor-post-card-panel', className, {
+					'has-description': showExcerptAndLastEditedPanels,
+				} ) }
 			>
 				<HStack
 					spacing={ 2 }

@@ -32,7 +32,6 @@
 	overflow: hidden; // Ensure the focus style properly encapsulates the image.
 	outline-offset: -#{$border-width};
 	min-height: $grid-unit-50;
-	margin-bottom: $grid-unit-20;
 
 	display: flex;
 	justify-content: center;
