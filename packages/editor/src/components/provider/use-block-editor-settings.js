@@ -277,6 +277,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				),
 			[ unlock( privateApis ).reusableBlocksSelectKey ]:
 				__experimentalReusableBlocksSelect,
+			[ unlock( privateApis ).getThemeFileURIKey ]: ( select, file ) =>
+				unlock( select( coreStore ) ).getThemeFileURI( file ),
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>

@@ -35,6 +35,7 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	getThemeFileURIKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -76,4 +77,5 @@ lock( privateApis, {
 	requiresWrapperOnCopy,
 	PrivateRichText,
 	reusableBlocksSelectKey,
+	getThemeFileURIKey,
 } );

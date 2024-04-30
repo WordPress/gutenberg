@@ -896,3 +896,34 @@ export const getRevision =
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};
+
+export const getThemeFileURI =
+	( file ) =>
+	async ( { resolveSelect, dispatch } ) => {
+		if ( typeof file !== 'string' ) {
+			return;
+		}
+
+		let trimmedFile = file.trim();
+		trimmedFile = trimmedFile.startsWith( '/' ) ? trimmedFile : `/${ trimmedFile }`;
+
+		const { stylesheet_uri, template_uri } =
+			await resolveSelect.getCurrentTheme();
+		const url = `${ stylesheet_uri }${ trimmedFile }`;
+
+		apiFetch( { url, method: 'HEAD', parse: false } )
+			.then( () => {
+				dispatch( {
+					type: 'RECEIVE_THEME_FILE_URI',
+					file,
+					url,
+				} );
+			} )
+			.catch( () => {
+				dispatch( {
+					type: 'RECEIVE_THEME_FILE_URI',
+					file,
+					url: `${ template_uri }${ trimmedFile }`,
+				} );
+			} );
+	};
