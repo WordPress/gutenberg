@@ -116,12 +116,36 @@ export { default as __experimentalNavigationGroup } from './navigation/group';
 export { default as __experimentalNavigationItem } from './navigation/item';
 export { default as __experimentalNavigationMenu } from './navigation/menu';
 export {
+	/**
+	 * @deprecated Import `NavigatorProvider` instead.
+	 */
 	NavigatorProvider as __experimentalNavigatorProvider,
+	/**
+	 * @deprecated Import `NavigatorScreen` instead.
+	 */
 	NavigatorScreen as __experimentalNavigatorScreen,
+	/**
+	 * @deprecated Import `NavigatorButton` instead.
+	 */
 	NavigatorButton as __experimentalNavigatorButton,
+	/**
+	 * @deprecated Import `NavigatorBackButton` instead.
+	 */
 	NavigatorBackButton as __experimentalNavigatorBackButton,
+	/**
+	 * @deprecated Import `NavigatorToParentButton` instead.
+	 */
 	NavigatorToParentButton as __experimentalNavigatorToParentButton,
+	/**
+	 * @deprecated Import `useNavigator` instead.
+	 */
 	useNavigator as __experimentalUseNavigator,
+	NavigatorProvider,
+	NavigatorScreen,
+	NavigatorButton,
+	NavigatorBackButton,
+	NavigatorToParentButton,
+	useNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
