@@ -135,7 +135,13 @@ export function shouldSkipSerialization(
 
 const pendingStyleOverrides = new WeakMap();
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	clientId,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -151,6 +157,7 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 			css,
 			assets,
 			__unstableType,
+			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders
 		// for each style override block included in a tree and optimize initial render.
@@ -187,6 +194,7 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	}, [
 		id,
 		css,
+		clientId,
 		assets,
 		__unstableType,
 		fallbackId,

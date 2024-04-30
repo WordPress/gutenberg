@@ -90,11 +90,6 @@
 		}
 	}
 
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-right-color: $gray-200;
-	}
-
 	& > .block-editor-block-toolbar {
 		flex-grow: initial;
 		width: initial;
@@ -109,14 +104,16 @@
 
 		// Parent selector dot divider
 		&::after {
-			content: "\00B7";
-			position: absolute;
-			font-size: 16px;
-			right: 0;
-			height: $button-size-compact;
-			top: 0;
-			display: inline-flex;
 			align-items: center;
+			background-color: $gray-900;
+			border-radius: 100%;
+			content: "";
+			display: inline-flex;
+			height: 2px;
+			position: absolute;
+			right: 0;
+			top: $grid-unit-20 - $border-width;
+			width: 2px;
 		}
 	}
 }
