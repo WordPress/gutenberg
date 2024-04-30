@@ -118,15 +118,16 @@ export function toVdom( root ) {
 		if ( directives.length ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
-					let [ prefix, suffix ] = [ '', 'default' ];
-
 					const directiveMatch = directiveParser.exec( name );
-					if ( directiveMatch ) {
-						const [ , _prefix, _suffix ] = directiveMatch;
-						prefix = _prefix;
-						suffix = _suffix ?? 'default';
-					} else if (
-						// @ts-expect-error
+					const prefix = directiveMatch ? directiveMatch[ 1 ] : '';
+					const suffix =
+						directiveMatch && directiveMatch[ 2 ]
+							? directiveMatch[ 2 ]
+							: 'default';
+
+					if (
+						! directiveMatch &&
+						// @ts-expect-error This is a debug-only warning.
 						typeof SCRIPT_DEBUG !== 'undefined' &&
 						// @ts-expect-error
 						SCRIPT_DEBUG === true
@@ -134,14 +135,14 @@ export function toVdom( root ) {
 						// eslint-disable-next-line no-console
 						console.warn( `Invalid directive: ${ name }.` );
 					}
-					if ( ! obj[ prefix ] ) {
-						obj[ prefix ] = [];
-					}
+
+					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
 						value,
 						suffix,
 					} );
+
 					return obj;
 				},
 				{}

@@ -18,6 +18,8 @@
 
 -   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
 
+-	Prevent wrong written directives from killing the runtime ([#61249](https://github.com/WordPress/gutenberg/pull/61249))
+
 ## 5.4.0 (2024-04-03)
 
 ## 5.3.0 (2024-03-21)
