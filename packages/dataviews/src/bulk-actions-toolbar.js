@@ -91,7 +91,6 @@ function renderToolbarContent(
 								action={ action }
 								items={ selectedItems }
 								ActionTrigger={ ActionTrigger }
-								isBusy={ actionInProgress === action.id }
 								onActionStart={ () => {
 									setActionInProgress( action.id );
 								} }
