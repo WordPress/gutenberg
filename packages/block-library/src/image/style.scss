@@ -84,6 +84,8 @@
 
 	// The following variation is deprecated.
 	// The CSS is kept here for the time being, to support blocks using the old variation.
+	// The selector is also not scoped in `:where()` like global styles are to keep it
+	// the same specificity as it was when it was deprecated.
 	&.is-style-circle-mask img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
