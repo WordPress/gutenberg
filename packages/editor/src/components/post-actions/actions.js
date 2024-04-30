@@ -367,11 +367,11 @@ function useRestorePostAction() {
 					if ( promiseResult.length === 1 ) {
 						if ( promiseResult[ 0 ].reason?.message ) {
 							errorMessage = promiseResult[ 0 ].reason.message;
-					} else {
-						errorMessage = __(
-							'An error occurred while restoring the post.'
-						);
-					}
+						} else {
+							errorMessage = __(
+								'An error occurred while restoring the post.'
+							);
+						}
 						// If we were trying to move multiple posts to the trash
 					} else {
 						const errorMessages = new Set();
