@@ -156,9 +156,21 @@ export { default as TextHighlight } from './text-highlight';
 export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export {
+	/**
+	 * @deprecated Import `ToggleGroupControl` instead.
+	 */
 	ToggleGroupControl as __experimentalToggleGroupControl,
+	/**
+	 * @deprecated Import `ToggleGroupControlOption` instead.
+	 */
 	ToggleGroupControlOption as __experimentalToggleGroupControlOption,
+	/**
+	 * @deprecated Import `ToggleGroupControlOptionIcon` instead.
+	 */
 	ToggleGroupControlOptionIcon as __experimentalToggleGroupControlOptionIcon,
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+	ToggleGroupControlOptionIcon,
 } from './toggle-group-control';
 export {
 	Toolbar,

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ToggleGroupControl`: Remove "experimental" designation ([#61067](https://github.com/WordPress/gutenberg/pull/61067)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).

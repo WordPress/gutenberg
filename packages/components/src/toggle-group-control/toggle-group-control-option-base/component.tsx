@@ -184,8 +184,8 @@ function ToggleGroupControlOptionBase(
  * @example
  * ```jsx
  * import {
- *   __experimentalToggleGroupControl as ToggleGroupControl,
- *   __experimentalToggleGroupControlOptionBase as ToggleGroupControlOptionBase,
+ *   ToggleGroupControl,
+ *   ToggleGroupControlOptionBase,
  * } from '@wordpress/components';
  *
  * function Example() {

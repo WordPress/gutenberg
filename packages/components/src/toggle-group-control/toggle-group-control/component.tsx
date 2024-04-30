@@ -111,8 +111,8 @@ function UnconnectedToggleGroupControl(
  *
  * ```jsx
  * import {
- *   __experimentalToggleGroupControl as ToggleGroupControl,
- *   __experimentalToggleGroupControlOption as ToggleGroupControlOption,
+ *   ToggleGroupControl,
+ *   ToggleGroupControlOption,
  * } from '@wordpress/components';
  *
  * function Example() {
