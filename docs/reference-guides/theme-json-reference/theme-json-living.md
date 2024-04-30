@@ -1,10 +1,11 @@
-# Theme.json Version 2
+# Theme.json Version 3
 
-> This is the living specification for  **version 2** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
+> This is the living specification for  **version 3** of `theme.json`. This version works with WordPress 5.9 or later, and the latest Gutenberg plugin.
 >
 > There are some related documents that you may be interested in: 
-> - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification, and 
-> - the [reference to migrate from theme.json v1 to v2](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
+> - the [theme.json v1](/docs/reference-guides/theme-json-reference/theme-json-v1.md) specification,
+> - the [theme.json v2](/docs/reference-guides/theme-json-reference/theme-json-v2.md) specification, and
+> - the [reference to migrate from older theme.json versions](/docs/reference-guides/theme-json-reference/theme-json-migrations.md).
 
 This reference guide lists the settings and style properties defined in the `theme.json` schema. See the [theme.json how to guide](/docs/how-to-guides/themes/global-settings-and-styles.md) for examples and guidance on how to use the `theme.json` file in your theme.
 
@@ -17,7 +18,7 @@ Code editors can pick up the schema and can provide helpful hints and suggestion
 ```
 {
   "$schema": "https://schemas.wp.org/trunk/theme.json",
-  "version": 2,
+  "version": 3,
   ...
 }
 ```
@@ -58,7 +59,7 @@ Please note that when using this setting, `styles.spacing.padding` should always
 Settings related to borders.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | color | boolean | false |  |
 | radius | boolean | false |  |
 | style | boolean | false |  |
@@ -71,7 +72,7 @@ Settings related to borders.
 Settings related to shadows.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | defaultPresets | boolean | true |  |
 | presets | array |  | name, shadow, slug |
 
@@ -82,7 +83,7 @@ Settings related to shadows.
 Settings related to colors.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | background | boolean | true |  |
 | custom | boolean | true |  |
 | customDuotone | boolean | true |  |
@@ -106,7 +107,7 @@ Settings related to colors.
 Settings related to background.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | backgroundImage | boolean | false |  |
 | backgroundSize | boolean | false |  |
 
@@ -117,7 +118,7 @@ Settings related to background.
 Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
 | minHeight | boolean | false |  |
 
@@ -128,7 +129,7 @@ Settings related to dimensions.
 Settings related to layout.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | contentSize | string |  |  |
 | wideSize | string |  |  |
 | allowEditing | boolean | true |  |
@@ -141,7 +142,7 @@ Settings related to layout.
 Settings related to the lightbox.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | enabled | boolean |  |  |
 | allowEditing | boolean |  |  |
 
@@ -152,7 +153,7 @@ Settings related to the lightbox.
 Settings related to position.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
 | sticky | boolean | false |  |
 
 ---
@@ -162,8 +163,8 @@ Settings related to position.
 Settings related to spacing.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
-| blockGap | undefined | null |  |
+| ---    | ---    | ---    |---   |
+| blockGap | boolean, null | null |   |
 | margin | boolean | false |  |
 | padding | boolean | false |  |
 | units | array | px,em,rem,vh,vw,% |  |
@@ -178,13 +179,15 @@ Settings related to spacing.
 Settings related to typography.
 
 | Property  | Type   | Default | Props  |
-| ---       | ---    | ---    |---   |
+| ---    | ---    | ---    |---   |
+| defaultFontSizes | boolean | true |  |
 | customFontSize | boolean | true |  |
 | fontStyle | boolean | true |  |
 | fontWeight | boolean | true |  |
-| fluid | undefined | false |  |
+| fluid | object, boolean | false | _{maxViewportWidth, minFontSize, minViewportWidth}_  |
 | letterSpacing | boolean | true |  |
 | lineHeight | boolean | false |  |
+| textAlign | boolean | true |  |
 | textColumns | boolean | false |  |
 | textDecoration | boolean | true |  |
 | writingMode | boolean | false |  |
@@ -268,6 +271,7 @@ Typography styles.
 | fontWeight | string, object |  |
 | letterSpacing | string, object |  |
 | lineHeight | string, object |  |
+| textAlign | string |  |
 | textColumns | string |  |
 | textDecoration | string, object |  |
 | writingMode | string, object |  |

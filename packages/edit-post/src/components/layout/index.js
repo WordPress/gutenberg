@@ -24,22 +24,17 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Button, ScrollLock } from '@wordpress/components';
+import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import {
-	ComplementaryArea,
-	FullscreenMode,
-	InterfaceSkeleton,
-	store as interfaceStore,
-} from '@wordpress/interface';
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -47,8 +42,6 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
@@ -56,7 +49,6 @@ import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
-import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -64,7 +56,15 @@ import useCommonCommands from '../../hooks/commands/use-common-commands';
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { InserterSidebar, ListViewSidebar } = unlock( editorPrivateApis );
+const {
+	InserterSidebar,
+	ListViewSidebar,
+	ComplementaryArea,
+	FullscreenMode,
+	InterfaceSkeleton,
+	interfaceStore,
+} = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -139,8 +139,7 @@ function Layout( { initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
-	const { openGeneralSidebar, closeGeneralSidebar } =
-		useDispatch( editPostStore );
+	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
@@ -170,9 +169,8 @@ function Layout( { initialPost } ) {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
-				) || select( editorStore ).isPublishSidebarOpened()
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ) ||
+				select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
@@ -183,10 +181,10 @@ function Layout( { initialPost } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
@@ -205,11 +203,6 @@ function Layout( { initialPost } ) {
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	const openSidebarPanel = () =>
-		openGeneralSidebar(
-			hasBlockSelected ? 'edit-post/block' : 'edit-post/document'
-		);
 
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
@@ -294,6 +287,7 @@ function Layout( { initialPost } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
+			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isWideViewport }
@@ -313,25 +307,8 @@ function Layout( { initialPost } ) {
 				editorNotices={ <EditorNotices /> }
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
-					( ( isMobileViewport && sidebarIsOpened ) ||
-						( ! isMobileViewport && ! isDistractionFree ) ) && (
-						<>
-							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toggle-sidebar-panel">
-									<Button
-										variant="secondary"
-										className="edit-post-layout__toggle-sidebar-panel-button"
-										onClick={ openSidebarPanel }
-										aria-expanded={ false }
-									>
-										{ hasBlockSelected
-											? __( 'Open block settings' )
-											: __( 'Open document settings' ) }
-									</Button>
-								</div>
-							) }
-							<ComplementaryArea.Slot scope="core/edit-post" />
-						</>
+					! isDistractionFree && (
+						<ComplementaryArea.Slot scope="core" />
 					)
 				}
 				notices={ <EditorSnackbars /> }
@@ -383,11 +360,8 @@ function Layout( { initialPost } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<EditPostPreferencesModal />
-			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
-			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>

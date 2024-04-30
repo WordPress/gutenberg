@@ -6,17 +6,15 @@ import classNames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useAsyncList, useInstanceId } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
-	Button,
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { info } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -36,7 +34,6 @@ function ListItem( {
 	item,
 	isSelected,
 	onSelect,
-	onDetailsChange,
 	mediaField,
 	primaryField,
 	visibleFields,
@@ -118,18 +115,6 @@ function ListItem( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				{ onDetailsChange && (
-					<div role="gridcell">
-						<CompositeItem
-							render={ <Button /> }
-							className="dataviews-view-list__details-button"
-							onClick={ () => onDetailsChange( [ item ] ) }
-							icon={ info }
-							label={ __( 'View details' ) }
-							size="compact"
-						/>
-					</div>
-				) }
 			</HStack>
 		</CompositeRow>
 	);
@@ -142,15 +127,11 @@ export default function ViewList( {
 	isLoading,
 	getItemId,
 	onSelectionChange,
-	onDetailsChange,
 	selection,
-	deferredRendering,
 	id: preferredId,
 } ) {
 	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
-	const shownData = useAsyncList( data, { step: 3 } );
-	const usedData = deferredRendering ? shownData : data;
-	const selectedItem = usedData?.findLast( ( item ) =>
+	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( item.id )
 	);
 
@@ -182,7 +163,7 @@ export default function ViewList( {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
 
-	const hasData = usedData?.length;
+	const hasData = data?.length;
 	if ( ! hasData ) {
 		return (
 			<div
@@ -206,7 +187,7 @@ export default function ViewList( {
 			role="grid"
 			store={ store }
 		>
-			{ usedData.map( ( item ) => {
+			{ data.map( ( item ) => {
 				const id = getItemDomId( item );
 				return (
 					<ListItem
@@ -215,7 +196,6 @@ export default function ViewList( {
 						item={ item }
 						isSelected={ item === selectedItem }
 						onSelect={ onSelect }
-						onDetailsChange={ onDetailsChange }
 						mediaField={ mediaField }
 						primaryField={ primaryField }
 						visibleFields={ visibleFields }

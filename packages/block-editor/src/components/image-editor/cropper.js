@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ export default function ImageCropper( {
 	url,
 	width,
 	height,
-	clientWidth,
 	naturalHeight,
 	naturalWidth,
 	borderProps,
@@ -36,6 +36,8 @@ export default function ImageCropper( {
 		setZoom,
 		rotation,
 	} = useImageEditingContext();
+	const [ contentResizeListener, { width: clientWidth } ] =
+		useResizeObserver();
 
 	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
 
@@ -43,7 +45,7 @@ export default function ImageCropper( {
 		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
 	}
 
-	return (
+	const area = (
 		<div
 			className={ classnames(
 				'wp-block-image__crop-area',
@@ -78,5 +80,12 @@ export default function ImageCropper( {
 			/>
 			{ isInProgress && <Spinner /> }
 		</div>
+	);
+
+	return (
+		<>
+			{ contentResizeListener }
+			{ area }
+		</>
 	);
 }

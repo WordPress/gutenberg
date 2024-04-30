@@ -23,6 +23,7 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -198,7 +199,7 @@ export const deleteAction = {
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
 			const promiseResult = await Promise.allSettled(
@@ -326,7 +327,7 @@ export const deleteAction = {
 
 export const resetAction = {
 	id: 'reset-action',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
@@ -339,9 +340,7 @@ export const resetAction = {
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
+					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -351,7 +350,7 @@ export const resetAction = {
 						variant="primary"
 						onClick={ () => removeTemplate( item ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>

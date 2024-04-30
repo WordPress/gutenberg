@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,6 +12,8 @@ import {
 	getBlockEditingMode,
 	getSettings,
 	canInsertBlockType,
+	getBlockName,
+	getTemplateLock,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -295,38 +292,83 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 	)
 );
 
+function mapUserPattern(
+	userPattern,
+	__experimentalUserPatternCategories = []
+) {
+	return {
+		name: `core/block/${ userPattern.id }`,
+		id: userPattern.id,
+		type: INSERTER_PATTERN_TYPES.user,
+		title: userPattern.title.raw,
+		categories: userPattern.wp_pattern_category.map( ( catId ) => {
+			const category = __experimentalUserPatternCategories.find(
+				( { id } ) => id === catId
+			);
+			return category ? category.slug : catId;
+		} ),
+		content: userPattern.content.raw,
+		syncStatus: userPattern.wp_pattern_sync_status,
+	};
+}
+
+export const getPatternBySlug = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state, patternName ) => {
+			// Only fetch reusable blocks if we know we need them. To do: maybe
+			// use the entity record API to retrieve the block by slug.
+			if ( patternName?.startsWith( 'core/block/' ) ) {
+				const _id = parseInt(
+					patternName.slice( 'core/block/'.length ),
+					10
+				);
+				const block = unlock( select( STORE_NAME ) )
+					.getReusableBlocks()
+					.find( ( { id } ) => id === _id );
+
+				if ( ! block ) {
+					return null;
+				}
+
+				return mapUserPattern(
+					block,
+					state.settings.__experimentalUserPatternCategories
+				);
+			}
+
+			return [
+				// This setting is left for back compat.
+				...( state.settings.__experimentalBlockPatterns ?? [] ),
+				...( state.settings[ selectBlockPatternsKey ]?.( select ) ??
+					[] ),
+			].find( ( { name } ) => name === patternName );
+		},
+		( state, patternName ) =>
+			patternName?.startsWith( 'core/block/' )
+				? [
+						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						state.settings.__experimentalReusableBlocks,
+				  ]
+				: [
+						state.settings.__experimentalBlockPatterns,
+						state.settings[ selectBlockPatternsKey ]?.( select ),
+				  ]
+	)
+);
+
 export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state ) => {
-		// This setting is left for back compat.
-		const {
-			__experimentalBlockPatterns = [],
-			__experimentalUserPatternCategories = [],
-			__experimentalReusableBlocks = [],
-		} = state.settings;
-		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		const userPatterns = (
-			reusableBlocksSelect
-				? reusableBlocksSelect( select )
-				: __experimentalReusableBlocks ?? []
-		).map( ( userPattern ) => {
-			return {
-				name: `core/block/${ userPattern.id }`,
-				id: userPattern.id,
-				type: INSERTER_PATTERN_TYPES.user,
-				title: userPattern.title.raw,
-				categories: userPattern.wp_pattern_category.map( ( catId ) => {
-					const category = (
-						__experimentalUserPatternCategories ?? []
-					).find( ( { id } ) => id === catId );
-					return category ? category.slug : catId;
-				} ),
-				content: userPattern.content.raw,
-				syncStatus: userPattern.wp_pattern_sync_status,
-			};
-		} );
 		return [
-			...userPatterns,
-			...__experimentalBlockPatterns,
+			...unlock( select( STORE_NAME ) )
+				.getReusableBlocks()
+				.map( ( userPattern ) =>
+					mapUserPattern(
+						userPattern,
+						state.settings.__experimentalUserPatternCategories
+					)
+				),
+			// This setting is left for back compat.
+			...( state.settings.__experimentalBlockPatterns ?? [] ),
 			...( state.settings[ selectBlockPatternsKey ]?.( select ) ?? [] ),
 		].filter(
 			( x, index, arr ) =>
@@ -379,4 +421,54 @@ export function isDragging( state ) {
  */
 export function getExpandedBlock( state ) {
 	return state.expandedBlock;
+}
+
+/**
+ * Retrieves the client ID of the ancestor block that is content locking the block
+ * with the provided client ID.
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const getContentLockingParent = createSelector(
+	( state, clientId ) => {
+		let current = clientId;
+		let result;
+		while ( ( current = state.blocks.parents.get( current ) ) ) {
+			if (
+				getBlockName( state, current ) === 'core/block' ||
+				getTemplateLock( state, current ) === 'contentOnly'
+			) {
+				result = current;
+			}
+		}
+		return result;
+	},
+	( state ) => [ state.blocks.parents, state.blockListSettings ]
+);
+
+/**
+ * Retrieves the client ID of the block that is content locked but is
+ * currently being temporarily edited as a non-locked block.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The client ID of the block being temporarily edited as a non-locked block.
+ */
+export function getTemporarilyEditingAsBlocks( state ) {
+	return state.temporarilyEditingAsBlocks;
+}
+
+/**
+ * Returns the focus mode that should be reapplied when the user stops editing
+ * a content locked blocks as a block without locking.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?string} The focus mode that should be re-set when temporarily editing as blocks stops.
+ */
+export function getTemporarilyEditingFocusModeToRevert( state ) {
+	return state.temporarilyEditingFocusModeRevert;
 }

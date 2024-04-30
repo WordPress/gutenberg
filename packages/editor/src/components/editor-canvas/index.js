@@ -39,8 +39,6 @@ const {
 	useFlashEditableBlocks,
 } = unlock( blockEditorPrivateApis );
 
-const noop = () => {};
-
 /**
  * These post types have a special editor where they don't allow you to fill the title
  * and they don't apply the layout styles.
@@ -95,6 +93,7 @@ function EditorCanvas( {
 	styles,
 	disableIframe = false,
 	iframeProps,
+	contentRef,
 	children,
 } ) {
 	const {
@@ -308,9 +307,10 @@ function EditorCanvas( {
 
 	const localRef = useRef();
 	const typewriterRef = useTypewriter();
-	const contentRef = useMergeRefs( [
+	contentRef = useMergeRefs( [
 		localRef,
-		renderingMode === 'post-only' ? typewriterRef : noop,
+		contentRef,
+		renderingMode === 'post-only' ? typewriterRef : null,
 		useFlashEditableBlocks( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),

@@ -26,7 +26,7 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey } from '../block-edit/context';
+import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
@@ -44,7 +44,7 @@ import { useInsertReplacementText } from './use-insert-replacement-text';
 import { useFirefoxCompat } from './use-firefox-compat';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
-import { Content } from './content';
+import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
@@ -485,6 +485,50 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	const context = useBlockEditContext();
+	const isPreviewMode = context[ isPreviewModeKey ];
+
+	if ( isPreviewMode ) {
+		// Remove all non-content props.
+		const {
+			children,
+			tagName: Tag = 'div',
+			value,
+			onChange,
+			isSelected,
+			multiline,
+			inlineToolbar,
+			wrapperClassName,
+			autocompleters,
+			onReplace,
+			placeholder,
+			allowedFormats,
+			withoutInteractiveFormatting,
+			onRemove,
+			onMerge,
+			onSplit,
+			__unstableOnSplitAtEnd,
+			__unstableOnSplitAtDoubleLineEnd,
+			identifier,
+			preserveWhiteSpace,
+			__unstablePastePlainText,
+			__unstableEmbedURLOnPaste,
+			__unstableDisableFormats,
+			disableLineBreaks,
+			__unstableAllowPrefixTransformations,
+			readOnly,
+			...contentProps
+		} = removeNativeProps( props );
+		return (
+			<Tag
+				{ ...contentProps }
+				dangerouslySetInnerHTML={ {
+					__html: valueToHTMLString( value, multiline ),
+				} }
+			/>
+		);
+	}
+
 	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
 } );
 

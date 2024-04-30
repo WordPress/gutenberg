@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import { parse } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -45,6 +40,7 @@ const templatePartToPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: decodeEntities( templatePart.title.rendered ),
 	type: templatePart.type,
+	_links: templatePart._links,
 	templatePart,
 } );
 
@@ -227,6 +223,7 @@ const convertPatternPostToItem = ( patternPost, categories ) => ( {
 	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 	title: patternPost.title.raw,
 	type: patternPost.type,
+	description: patternPost.excerpt.raw,
 	patternPost,
 } );
 

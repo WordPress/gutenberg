@@ -241,6 +241,17 @@ export default () => {
 			const contextStack = useMemo( () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
+					// Check that the value is a JSON object. Send a console warning if not.
+					if (
+						typeof SCRIPT_DEBUG !== 'undefined' &&
+						SCRIPT_DEBUG === true &&
+						! isPlainObject( value )
+					) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+						);
+					}
 					updateSignals( currentValue.current, {
 						[ namespace ]: deepClone( value ),
 					} );
@@ -270,13 +281,22 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
+		const events = new Map();
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
-				element.props[ `on${ entry.suffix }` ] = ( event ) => {
-					evaluate( entry, event );
-				};
+				const event = entry.suffix.split( '--' )[ 0 ];
+				if ( ! events.has( event ) ) events.set( event, new Set() );
+				events.get( event ).add( entry );
 			}
 		);
+
+		events.forEach( ( entries, eventType ) => {
+			element.props[ `on${ eventType }` ] = ( event ) => {
+				entries.forEach( ( entry ) => {
+					evaluate( entry, event );
+				} );
+			};
+		} );
 	} );
 
 	// data-wp-on-window--[event]

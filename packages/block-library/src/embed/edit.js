@@ -58,45 +58,51 @@ const EmbedEdit = ( props ) => {
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
 
-	const { preview, fetching, themeSupportsResponsive, cannotEmbed } =
-		useSelect(
-			( select ) => {
-				const {
-					getEmbedPreview,
-					isPreviewEmbedFallback,
-					isRequestingEmbedPreview,
-					getThemeSupports,
-				} = select( coreStore );
-				if ( ! attributesUrl ) {
-					return { fetching: false, cannotEmbed: false };
-				}
+	const {
+		preview,
+		fetching,
+		themeSupportsResponsive,
+		cannotEmbed,
+		hasResolved,
+	} = useSelect(
+		( select ) => {
+			const {
+				getEmbedPreview,
+				isPreviewEmbedFallback,
+				isRequestingEmbedPreview,
+				getThemeSupports,
+				hasFinishedResolution,
+			} = select( coreStore );
+			if ( ! attributesUrl ) {
+				return { fetching: false, cannotEmbed: false };
+			}
 
-				const embedPreview = getEmbedPreview( attributesUrl );
-				const previewIsFallback =
-					isPreviewEmbedFallback( attributesUrl );
+			const embedPreview = getEmbedPreview( attributesUrl );
+			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
-				// The external oEmbed provider does not exist. We got no type info and no html.
-				const badEmbedProvider =
-					embedPreview?.html === false &&
-					embedPreview?.type === undefined;
-				// Some WordPress URLs that can't be embedded will cause the API to return
-				// a valid JSON response with no HTML and `data.status` set to 404, rather
-				// than generating a fallback response as other embeds do.
-				const wordpressCantEmbed = embedPreview?.data?.status === 404;
-				const validPreview =
-					!! embedPreview &&
-					! badEmbedProvider &&
-					! wordpressCantEmbed;
-				return {
-					preview: validPreview ? embedPreview : undefined,
-					fetching: isRequestingEmbedPreview( attributesUrl ),
-					themeSupportsResponsive:
-						getThemeSupports()[ 'responsive-embeds' ],
-					cannotEmbed: ! validPreview || previewIsFallback,
-				};
-			},
-			[ attributesUrl ]
-		);
+			// The external oEmbed provider does not exist. We got no type info and no html.
+			const badEmbedProvider =
+				embedPreview?.html === false &&
+				embedPreview?.type === undefined;
+			// Some WordPress URLs that can't be embedded will cause the API to return
+			// a valid JSON response with no HTML and `data.status` set to 404, rather
+			// than generating a fallback response as other embeds do.
+			const wordpressCantEmbed = embedPreview?.data?.status === 404;
+			const validPreview =
+				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
+			return {
+				preview: validPreview ? embedPreview : undefined,
+				fetching: isRequestingEmbedPreview( attributesUrl ),
+				themeSupportsResponsive:
+					getThemeSupports()[ 'responsive-embeds' ],
+				cannotEmbed: ! validPreview || previewIsFallback,
+				hasResolved: hasFinishedResolution( 'getEmbedPreview', [
+					attributesUrl,
+				] ),
+			};
+		},
+		[ attributesUrl ]
+	);
 
 	/**
 	 * Returns the attributes derived from the preview, merged with the current attributes.
@@ -127,7 +133,7 @@ const EmbedEdit = ( props ) => {
 	};
 
 	useEffect( () => {
-		if ( preview?.html || ! cannotEmbed || fetching ) {
+		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {
 			return;
 		}
 
@@ -137,7 +143,13 @@ const EmbedEdit = ( props ) => {
 		setURL( newURL );
 		setIsEditingURL( false );
 		setAttributes( { url: newURL } );
-	}, [ preview?.html, attributesUrl, cannotEmbed, fetching, setAttributes ] );
+	}, [
+		preview?.html,
+		attributesUrl,
+		cannotEmbed,
+		hasResolved,
+		setAttributes,
+	] );
 
 	// Try a different provider in case the embed url is not supported.
 	useEffect( () => {

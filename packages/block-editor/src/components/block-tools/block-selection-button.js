@@ -63,6 +63,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
+				canMoveBlock,
 			} = select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockType } =
 				select( blocksStore );
@@ -107,6 +108,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
 				canRemove: canRemoveBlock( clientId, rootClientId ),
+				canMove: canMoveBlock( clientId, rootClientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -120,6 +122,7 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 		isNextBlockTemplatePart,
 		isPrevBlockTemplatePart,
 		canRemove,
+		canMove,
 	} = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
@@ -278,6 +281,9 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 	);
 
 	const dragHandleLabel = __( 'Drag' );
+	const showBlockDraggable =
+		( canMove && editorMode === 'navigation' ) ||
+		( editorMode === 'zoom-out' && canMove && ! isBlockTemplatePart );
 
 	return (
 		<div className={ classNames }>
@@ -288,20 +294,8 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 				<FlexItem>
 					<BlockIcon icon={ icon } showColors />
 				</FlexItem>
-				<FlexItem>
-					{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
-						<BlockMover
-							clientIds={ [ clientId ] }
-							hideDragHandle
-							isBlockMoverUpButtonDisabled={
-								isPrevBlockTemplatePart
-							}
-							isBlockMoverDownButtonDisabled={
-								isNextBlockTemplatePart
-							}
-						/>
-					) }
-					{ editorMode === 'navigation' && (
+				{ showBlockDraggable && (
+					<FlexItem>
 						<BlockDraggable clientIds={ [ clientId ] }>
 							{ ( draggableProps ) => (
 								<Button
@@ -316,41 +310,59 @@ function BlockSelectionButton( { clientId, rootClientId } ) {
 								/>
 							) }
 						</BlockDraggable>
-					) }
-				</FlexItem>
-				{ editorMode === 'zoom-out' && (
+					</FlexItem>
+				) }
+				{ editorMode === 'zoom-out' && ! isBlockTemplatePart && (
+					<FlexItem>
+						<BlockMover
+							clientIds={ [ clientId ] }
+							hideDragHandle
+							isBlockMoverUpButtonDisabled={
+								isPrevBlockTemplatePart
+							}
+							isBlockMoverDownButtonDisabled={
+								isNextBlockTemplatePart
+							}
+						/>
+					</FlexItem>
+				) }
+				{ canMove && canRemove && editorMode === 'zoom-out' && (
 					<Shuffle clientId={ clientId } as={ Button } />
 				) }
 				{ canRemove &&
 					editorMode === 'zoom-out' &&
 					! isBlockTemplatePart && (
-						<ToolbarButton
-							icon={ trash }
-							label="Delete"
-							onClick={ () => {
-								removeBlock( clientId );
-							} }
-						/>
+						<FlexItem>
+							<ToolbarButton
+								icon={ trash }
+								label="Delete"
+								onClick={ () => {
+									removeBlock( clientId );
+								} }
+							/>
+						</FlexItem>
 					) }
-				<FlexItem>
-					<Button
-						ref={ ref }
-						onClick={
-							editorMode === 'navigation'
-								? () => setNavigationMode( false )
-								: undefined
-						}
-						onKeyDown={ onKeyDown }
-						label={ label }
-						showTooltip={ false }
-						className="block-selection-button_select-button"
-					>
-						<BlockTitle
-							clientId={ clientId }
-							maximumLength={ 35 }
-						/>
-					</Button>
-				</FlexItem>
+				{ editorMode === 'navigation' && (
+					<FlexItem>
+						<Button
+							ref={ ref }
+							onClick={
+								editorMode === 'navigation'
+									? () => setNavigationMode( false )
+									: undefined
+							}
+							onKeyDown={ onKeyDown }
+							label={ label }
+							showTooltip={ false }
+							className="block-selection-button_select-button"
+						>
+							<BlockTitle
+								clientId={ clientId }
+								maximumLength={ 35 }
+							/>
+						</Button>
+					</FlexItem>
+				) }
 			</Flex>
 		</div>
 	);

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -11,6 +6,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
+import { createSelector } from '../../create-selector';
 import { selectorArgsToStateKey } from './utils';
 
 /** @typedef {Record<string, import('./reducer').State>} State */

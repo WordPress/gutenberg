@@ -359,31 +359,22 @@ function MediaTextEdit( {
 						/>
 					</ToolsPanelItem>
 				) }
-			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
-				<ToolsPanelItem
+			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
+				<TextareaControl
+					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
-					isShownByDefault
-					hasValue={ () => !! mediaAlt }
-					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
-				>
-					<TextareaControl
-						__nextHasNoMarginBottom
-						label={ __( 'Alternative text' ) }
-						value={ mediaAlt || featuredImageAlt }
-						onChange={ onMediaAltChange }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-									{ __(
-										'Describe the purpose of the image.'
-									) }
-								</ExternalLink>
-								<br />
-								{ __( 'Leave empty if decorative.' ) }
-							</>
-						}
-					/>
-				</ToolsPanelItem>
+					value={ mediaAlt }
+					onChange={ onMediaAltChange }
+					help={
+						<>
+							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+								{ __( 'Describe the purpose of the image.' ) }
+							</ExternalLink>
+							<br />
+							{ __( 'Leave empty if decorative.' ) }
+						</>
+					}
+				/>
 			) }
 			{ mediaType === 'image' && (
 				<ResolutionTool

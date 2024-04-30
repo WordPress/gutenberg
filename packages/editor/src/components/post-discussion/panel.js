@@ -15,7 +15,7 @@ import PostPingbacks from '../post-pingbacks';
 
 const PANEL_NAME = 'discussion-panel';
 
-function PostDiscussionPanel() {
+function DiscussionPanel() {
 	const { isEnabled, isOpened } = useSelect( ( select ) => {
 		const { isEditorPanelEnabled, isEditorPanelOpened } =
 			select( editorStore );
@@ -32,26 +32,30 @@ function PostDiscussionPanel() {
 	}
 
 	return (
-		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
-			<PanelBody
-				title={ __( 'Discussion' ) }
-				opened={ isOpened }
-				onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
-			>
-				<PostTypeSupportCheck supportKeys="comments">
-					<PanelRow>
-						<PostComments />
-					</PanelRow>
-				</PostTypeSupportCheck>
+		<PanelBody
+			title={ __( 'Discussion' ) }
+			opened={ isOpened }
+			onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
+		>
+			<PostTypeSupportCheck supportKeys="comments">
+				<PanelRow>
+					<PostComments />
+				</PanelRow>
+			</PostTypeSupportCheck>
 
-				<PostTypeSupportCheck supportKeys="trackbacks">
-					<PanelRow>
-						<PostPingbacks />
-					</PanelRow>
-				</PostTypeSupportCheck>
-			</PanelBody>
-		</PostTypeSupportCheck>
+			<PostTypeSupportCheck supportKeys="trackbacks">
+				<PanelRow>
+					<PostPingbacks />
+				</PanelRow>
+			</PostTypeSupportCheck>
+		</PanelBody>
 	);
 }
 
-export default PostDiscussionPanel;
+export default function PostDiscussionPanel() {
+	return (
+		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
+			<DiscussionPanel />
+		</PostTypeSupportCheck>
+	);
+}

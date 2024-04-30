@@ -187,4 +187,11 @@ export type CustomSelectItemProps = {
 	 * used if left `undefined`.
 	 */
 	children?: React.ReactNode;
+	/**
+	 * If true, the item will be disabled.
+	 *
+	 * You will need to add your own styles (e.g. reduced opacity) to visually show that they are disabled.
+	 * @default false
+	 */
+	disabled?: boolean;
 };

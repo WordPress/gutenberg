@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "13.31.0",
+	"version": "13.33.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,6 +49,7 @@
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
@@ -67,7 +68,6 @@
 		"date-fns": "^3.6.0",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
-		"rememo": "^4.0.2",
 		"remove-accents": "^0.5.0"
 	},
 	"peerDependencies": {

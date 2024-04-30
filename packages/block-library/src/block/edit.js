@@ -217,7 +217,36 @@ function setBlockEditMode( setEditMode, blocks, mode ) {
 	} );
 }
 
-export default function ReusableBlockEdit( {
+function RecursionWarning() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
+}
+
+// Wrap the main Edit function for the pattern block with a recursion wrapper
+// that allows short-circuiting rendering as early as possible, before any
+// of the other effects in the block edit have run.
+export default function ReusableBlockEditRecursionWrapper( props ) {
+	const { ref } = props.attributes;
+	const hasAlreadyRendered = useHasRecursion( ref );
+
+	if ( hasAlreadyRendered ) {
+		return <RecursionWarning />;
+	}
+
+	return (
+		<RecursionProvider uniqueId={ ref }>
+			<ReusableBlockEdit { ...props } />
+		</RecursionProvider>
+	);
+}
+
+function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
@@ -225,7 +254,6 @@ export default function ReusableBlockEdit( {
 	setAttributes,
 } ) {
 	const registry = useRegistry();
-	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
@@ -233,8 +261,9 @@ export default function ReusableBlockEdit( {
 	);
 	const isMissing = hasResolved && ! record;
 
-	// The initial value of the `content` attribute.
-	const initialContent = useRef( content );
+	// The value of the `content` attribute, stored in a `ref` to avoid triggering the effect
+	// that runs `applyInitialContentValuesToInnerBlocks` unnecessarily.
+	const contentRef = useRef( content );
 
 	// The default content values from the original pattern for overridable attributes.
 	// Set by the `applyInitialContentValuesToInnerBlocks` function.
@@ -321,7 +350,7 @@ export default function ReusableBlockEdit( {
 		// Build a map of clientIds to the old nano id system to provide back compat.
 		legacyIdMap.current = getLegacyIdMap(
 			initialBlocks,
-			initialContent.current
+			contentRef.current
 		);
 		defaultContent.current = {};
 		const originalEditingMode = getBlockEditingMode( patternClientId );
@@ -332,7 +361,7 @@ export default function ReusableBlockEdit( {
 				const blocks = hasPatternOverridesSource
 					? applyInitialContentValuesToInnerBlocks(
 							initialBlocks,
-							initialContent.current,
+							contentRef.current,
 							defaultContent.current,
 							legacyIdMap.current
 					  )
@@ -389,13 +418,15 @@ export default function ReusableBlockEdit( {
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
+					const updatedContent = getContentValuesFromInnerBlocks(
+						blocks,
+						defaultContent.current,
+						legacyIdMap.current
+					);
 					setAttributes( {
-						content: getContentValuesFromInnerBlocks(
-							blocks,
-							defaultContent.current,
-							legacyIdMap.current
-						),
+						content: updatedContent,
 					} );
+					contentRef.current = updatedContent;
 				} );
 			}
 		}, blockEditorStore );
@@ -422,14 +453,6 @@ export default function ReusableBlockEdit( {
 
 	let children = null;
 
-	if ( hasAlreadyRendered ) {
-		children = (
-			<Warning>
-				{ __( 'Block cannot be rendered inside itself.' ) }
-			</Warning>
-		);
-	}
-
 	if ( isMissing ) {
 		children = (
 			<Warning>
@@ -447,7 +470,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
+		<>
 			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
@@ -477,6 +500,6 @@ export default function ReusableBlockEdit( {
 			) : (
 				<div { ...blockProps }>{ children }</div>
 			) }
-		</RecursionProvider>
+		</>
 	);
 }
