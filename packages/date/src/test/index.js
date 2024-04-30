@@ -663,8 +663,7 @@ describe( 'Moment.js Localization', () => {
 } );
 
 describe( 'Function createMomentDate', () => {
-	it( 'should create a moment date with the given date and timezone', () => {
-		// Check.
+	it( 'should create a moment date using the provided date format', () => {
 		const momentDate = createMomentDate(
 			'2024 年 4 月 24 日 09:48',
 			'Y 年 n 月 j 日 H:i'
