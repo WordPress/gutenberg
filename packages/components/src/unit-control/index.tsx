@@ -235,7 +235,7 @@ function UnforwardedUnitControl(
  *
  *
  * ```jsx
- * import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+ * import { UnitControl } from '@wordpress/components';
  * import { useState } from '@wordpress/element';
  *
  * const Example = () => {

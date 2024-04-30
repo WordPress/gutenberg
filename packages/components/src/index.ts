@@ -183,9 +183,13 @@ export {
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
 export {
+	/**
+	 * @deprecated Import `UnitControl` instead.
+	 */
 	default as __experimentalUnitControl,
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
+	UnitControl,
 } from './unit-control';
 export { View as __experimentalView } from './view';
 export { VisuallyHidden } from './visually-hidden';
