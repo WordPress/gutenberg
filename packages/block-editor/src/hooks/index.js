@@ -8,6 +8,7 @@ import {
 } from './utils';
 import './compat';
 import align from './align';
+import background from './background';
 import './lock';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
@@ -48,6 +49,7 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
+	background,
 	textAlign,
 	style,
 	color,

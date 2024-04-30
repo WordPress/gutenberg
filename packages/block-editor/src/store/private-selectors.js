@@ -27,6 +27,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	getThemeFileURIKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -409,6 +410,15 @@ export const getReusableBlocks = createRegistrySelector(
 		return reusableBlocksSelect
 			? reusableBlocksSelect( select )
 			: state.settings.__experimentalReusableBlocks ?? EMPTY_ARRAY;
+	}
+);
+
+export const getThemeFileURI = createRegistrySelector(
+	( select ) => ( state, file ) => {
+		const getThemeFileURISelect = state.settings[ getThemeFileURIKey ];
+		return getThemeFileURISelect
+			? getThemeFileURISelect( select, file )
+			: '';
 	}
 );
 

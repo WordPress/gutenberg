@@ -323,8 +323,7 @@ export function getStylesDeclarations(
 	selector = '',
 	useRootPaddingAlign,
 	tree = {},
-	isTemplate = true,
-	editorSettings
+	isTemplate = true
 ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
@@ -401,17 +400,13 @@ export function getStylesDeclarations(
 	 */
 	if ( !! blockStyles?.background ) {
 		blockStyles = setBackgroundStyleDefaults( blockStyles, {
-			...editorSettings,
 			selector,
 		} );
 	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	const extraRules = getCSSRules( blockStyles, {
-		...editorSettings,
-		isRoot,
-	} );
+	const extraRules = getCSSRules( blockStyles );
 	extraRules.forEach( ( rule ) => {
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
@@ -795,8 +790,7 @@ export const toStyles = (
 	hasFallbackGapSupport,
 	disableLayoutStyles = false,
 	isTemplate = true,
-	styleOptions = undefined,
-	editorSettings = {}
+	styleOptions = undefined
 ) => {
 	// These allow opting out of certain sets of styles.
 	const options = {
@@ -924,8 +918,7 @@ export const toStyles = (
 										styleVariations,
 										styleVariationSelector,
 										useRootPaddingAlign,
-										tree,
-										settings
+										tree
 									);
 								if ( styleVariationDeclarations.length ) {
 									ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
@@ -973,8 +966,7 @@ export const toStyles = (
 				selector,
 				useRootPaddingAlign,
 				tree,
-				isTemplate,
-				editorSettings
+				isTemplate
 			);
 			if ( declarations?.length ) {
 				ruleset += `:where(${ selector }){${ declarations.join(
@@ -1241,17 +1233,12 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 
-	const { stylesheetURI, templateURI, disableLayoutStyles } = useSelect(
-		( select ) => {
-			const _settings = select( blockEditorStore ).getSettings();
-			return {
-				stylesheetURI:
-					_settings?.__experimentalCurrentTheme?.stylesheetURI,
-				templateURI: _settings?.__experimentalCurrentTheme?.templateURI,
-				disableLayoutStyles: !! _settings.disableLayoutStyles,
-			};
-		}
-	);
+	const { disableLayoutStyles } = useSelect( ( select ) => {
+		const _settings = select( blockEditorStore ).getSettings();
+		return {
+			disableLayoutStyles: !! _settings.disableLayoutStyles,
+		};
+	} );
 
 	const blockContext = useContext( BlockContext );
 
@@ -1281,11 +1268,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
-			isTemplate,
-			{
-				stylesheetURI,
-				templateURI,
-			}
+			isTemplate
 		);
 		const svgs = toSvgFilters( updatedConfig, blockSelectors );
 
@@ -1334,8 +1317,6 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		disableLayoutStyles,
 		isTemplate,
 		getBlockStyles,
-		stylesheetURI,
-		templateURI,
 	] );
 }
 

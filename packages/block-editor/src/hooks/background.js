@@ -18,6 +18,7 @@ import {
 	hasBackgroundImageValue,
 } from '../components/global-styles/background-panel';
 import { ROOT_BLOCK_SELECTOR } from '../components/global-styles/utils';
+import { unlock } from '../lock-unlock';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -71,32 +72,6 @@ export function setBackgroundStyleDefaults( blockStyles, options ) {
 
 	const backgroundImage = blockStyles?.background?.backgroundImage;
 	const newBackgroundStyles = {};
-
-/*	if (
-		backgroundImage?.source === 'theme' &&
-		!! backgroundImage?.url &&
-		!! options?.stylesheetURI &&
-		!! options?.templateURI
-	) {
-		const activeThemeImageResource = `${ options.stylesheetURI }${
-			backgroundImage.url.startsWith( '/' )
-				? backgroundImage.url
-				: `/${ backgroundImage.url }`
-		}`;
-
-		const parentThemeImageResource = `${ options.templateURI }${
-			backgroundImage.url.startsWith( '/' )
-				? backgroundImage.url
-				: `/${ backgroundImage.url }`
-		}`;
-
-		newBackgroundStyles.backgroundImage = {
-			...backgroundImage,
-			url: `${ encodeURI(
-				safeDecodeURI( activeThemeImageResource )
-			) }, ${ encodeURI( safeDecodeURI( parentThemeImageResource ) ) }`,
-		};
-	}*/
 
 	// Set block background defaults.
 	if ( options?.selector !== ROOT_BLOCK_SELECTOR && !! backgroundImage ) {
@@ -202,7 +177,44 @@ export function BackgroundImagePanel( {
 	);
 }
 
+function useBlockProps( { name, style } ) {
+	const { backgroundImageURL } = useSelect(
+		( select ) => {
+			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
+			let file;
+			if (
+				!! style?.background?.backgroundImage?.url &&
+				style?.background?.backgroundImage?.source === 'theme'
+			) {
+				file = getThemeFileURI( style.background.backgroundImage.url );
+			}
+			return {
+				backgroundImageURL: file,
+			};
+		},
+		[ style?.background?.backgroundImage ]
+	);
+
+	if (
+		! hasBackgroundSupport( name, 'backgroundImage' ) ||
+		! backgroundImageURL
+	) {
+		return;
+	}
+
+	return {
+		style: {
+			// @TODO this should be backgroundImage. How to do that?
+			// Also, maybe consider reinstating https://github.com/WordPress/gutenberg/blob/fc98542a7dbba194bb4096d49cd0bd093b63f43e/packages/block-editor/src/hooks/background.js#L82
+			background: `url( '${ encodeURI(
+				safeDecodeURI( backgroundImageURL )
+			) }' )`,
+		},
+	};
+}
+
 export default {
 	attributeKeys: [ 'style' ],
 	hasSupport: hasBackgroundSupport,
+	useBlockProps,
 };

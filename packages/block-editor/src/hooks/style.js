@@ -61,11 +61,11 @@ const hasStyleSupport = ( nameOrType ) =>
  *
  * @return {Object} Flattened CSS variables declaration.
  */
-export function getInlineStyles( styles = {}, options ) {
+export function getInlineStyles( styles = {} ) {
 	const output = {};
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	getCSSRules( styles, options ).forEach( ( rule ) => {
+	getCSSRules( styles ).forEach( ( rule ) => {
 		output[ rule.key ] = rule.value;
 	} );
 
@@ -287,7 +287,6 @@ export function omitStyle( style, paths, preserveReference = false ) {
  * @param {Object|string}             blockNameOrType Block type.
  * @param {Object}                    attributes      Block attributes.
  * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
- * @param {Object}                    editorSettings  Current editor settings.
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
@@ -295,7 +294,6 @@ export function addSaveProps(
 	blockNameOrType,
 	attributes,
 	skipPaths = skipSerializationPathsSave,
-	editorSettings
 ) {
 	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
@@ -325,13 +323,11 @@ export function addSaveProps(
 	 * Only applies to background styles for now.
 	 */
 	if ( !! style.background ) {
-		style = setBackgroundStyleDefaults( style, editorSettings );
+		style = setBackgroundStyleDefaults( style );
 	}
 
 	props.style = {
-		...getInlineStyles( style, {
-			...editorSettings,
-		} ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 
@@ -481,10 +477,6 @@ function useBlockProps( { name, style } ) {
 		name,
 		{ style },
 		skipSerializationPathsEdit,
-		{
-			stylesheetURI,
-			templateURI,
-		}
 	);
 }
 

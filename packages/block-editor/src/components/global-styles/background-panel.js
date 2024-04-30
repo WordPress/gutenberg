@@ -38,6 +38,7 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -201,6 +202,23 @@ function BackgroundImageToolsPanelItem( {
 		...inheritedValue?.background?.backgroundImage,
 	};
 
+	const { backgroundImageURL } = useSelect(
+		( select ) => {
+			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
+			let file = url;
+			if (
+				!! style?.background?.backgroundImage?.url &&
+				style?.background?.backgroundImage?.source === 'theme'
+			) {
+				file = getThemeFileURI( style.background.backgroundImage.url );
+			}
+			return {
+				backgroundImageURL: file,
+			};
+		},
+		[ url ]
+	);
+
 	const replaceContainerRef = useRef();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -293,7 +311,7 @@ function BackgroundImageToolsPanelItem( {
 			>
 				<MediaReplaceFlow
 					mediaId={ id }
-					mediaURL={ url }
+					mediaURL={ backgroundImageURL }
 					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 					accept="image/*"
 					onSelect={ onSelectMedia }
@@ -301,7 +319,7 @@ function BackgroundImageToolsPanelItem( {
 						<InspectorImagePreview
 							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ url }
+							url={ backgroundImageURL }
 						/>
 					}
 					variant="secondary"
