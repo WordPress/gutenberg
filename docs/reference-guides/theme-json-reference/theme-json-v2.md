@@ -28,7 +28,7 @@ See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-
 
 Setting that enables the following UI tools:
 
-- background: backgroundImage
+- background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
 - dimensions: aspectRatio, minHeight
