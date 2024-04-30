@@ -6,7 +6,7 @@ import { PanelBody, ToggleControl } from '@wordpress/components';
 import {
 	InspectorControls,
 	useBlockProps,
-	RichText,
+	PlainText,
 } from '@wordpress/block-editor';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
@@ -40,7 +40,8 @@ export default function MoreEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div { ...useBlockProps() }>
-				<RichText
+				<PlainText
+					__experimentalVersion={ 2 }
 					tagName="a"
 					aria-label={ __( '“more” link text' ) }
 					value={ customText || DEFAULT_TEXT }
@@ -48,8 +49,6 @@ export default function MoreEdit( {
 					onChange={ ( value ) =>
 						setAttributes( { customText: value } )
 					}
-					allowedFormats={ [] }
-					withoutInteractiveFormatting
 					disableLineBreaks
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter(
