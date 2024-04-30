@@ -50,7 +50,13 @@ function gutenberg_add_class_list_to_api_response( $post ) {
  * Adds the post classes to public post types in the REST API.
  */
 function gutenberg_add_class_list_to_public_post_types() {
-	$post_types = get_post_types( array( 'public' => true ), 'names' );
+	$post_types = get_post_types(
+		array(
+			'public'       => true,
+			'show_in_rest' => true,
+		),
+		'names'
+	);
 
 	if ( ! empty( $post_types ) ) {
 		register_rest_field(
