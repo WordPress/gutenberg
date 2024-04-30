@@ -1,16 +1,12 @@
 # Grid
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 `Grid` is a primitive layout component that can arrange content in a grid configuration.
 
 ## Usage
 
 ```jsx
 import {
-	__experimentalGrid as Grid,
+	Grid,
 	__experimentalText as Text,
 } from '@wordpress/components';
 
