@@ -146,12 +146,12 @@ test.describe( 'Pages', () => {
 		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
 		await expect(
 			page.locator(
-				'role=region[name="Save panel"] >> role=checkbox[name="Title"]'
+				'role=region[name="Editor publish"] >> role=checkbox[name="Title"]'
 			)
 		).toBeVisible();
 		await expect(
 			page.locator(
-				'role=region[name="Save panel"] >> role=checkbox[name="Test Page"]'
+				'role=region[name="Editor publish"] >> role=checkbox[name="Test Page"]'
 			)
 		).toBeVisible();
 		await page

@@ -3,7 +3,12 @@
  */
 import { useViewportMatch, compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PostPublishButton, store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import PostPublishButton from './index';
+import { store as editorStore } from '../../store';
 
 export function PostPublishButtonOrToggle( {
 	forceIsDirty,
