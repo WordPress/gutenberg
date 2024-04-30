@@ -14,6 +14,7 @@
 	}
 	.editor-list-view-sidebar__close-button {
 		background: $white;
+		/* stylelint-disable-next-line property-disallowed-list */
 		order: 1;
 		align-self: center;
 		margin-right: $grid-unit-15;

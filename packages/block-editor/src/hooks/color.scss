@@ -5,6 +5,7 @@
 		 * injected color controls can appear as a single item group without
 		 * the contrast checkers suddenly appearing between items.
 		 */
+		/* stylelint-disable-next-line property-disallowed-list */
 		order: 9999;
 		grid-column: span 2;
 		margin-top: $grid-unit-20;
