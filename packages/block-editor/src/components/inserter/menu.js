@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -53,7 +59,7 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( null );
+	const [ selectedTab, setSelectedTab ] = useState( 'blocks' );
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -231,17 +237,18 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
+	const hasAutoFocused = useRef( false );
 	const searchRef = useRefEffect( ( element ) => {
-		if ( element ) {
-			element.focus();
+		if ( element && hasAutoFocused.current === false ) {
+			hasAutoFocused.current = true;
+			window.requestAnimationFrame( () => element.focus() );
 		}
-	} );
+	}, [] );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
 		}
-
 		return (
 			<>
 				<SearchControl
