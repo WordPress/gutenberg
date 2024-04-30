@@ -93,6 +93,9 @@
 ### Internal
 
 -   `FontSizerPicker`: Improve docs for default units ([#60996](https://github.com/WordPress/gutenberg/pull/60996)).
+### Deprecation
+
+-   `Navigator`: Remove "experimental" designation ([#60927](https://github.com/WordPress/gutenberg/pull/60927)).
 
 ## 27.4.0 (2024-04-19)
 
