@@ -11,7 +11,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalDivider as Divider,
-	__experimentalText as Text,
+	Text,
 	__experimentalVStack as VStack,
 } from `@wordpress/components`;
 

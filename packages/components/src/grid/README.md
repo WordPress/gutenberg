@@ -11,7 +11,7 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalGrid as Grid,
-	__experimentalText as Text,
+	Text,
 } from '@wordpress/components';
 
 function Example() {
