@@ -92,7 +92,13 @@ export { Grid as __experimentalGrid } from './grid';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';
-export { HStack as __experimentalHStack } from './h-stack';
+export {
+	/**
+	 * @deprecated Import `HStack` instead.
+	 */
+	HStack as __experimentalHStack,
+	HStack,
+} from './h-stack';
 export { default as Icon } from './icon';
 export type { IconType } from './icon';
 export { default as IconButton } from './button/deprecated';

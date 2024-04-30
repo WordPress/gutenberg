@@ -23,7 +23,7 @@ function UnconnectedHStack(
  *
  * ```jsx
  * import {
- * 	__experimentalHStack as HStack,
+ * 	HStack,
  * 	__experimentalText as Text,
  * } from `@wordpress/components`;
  *
