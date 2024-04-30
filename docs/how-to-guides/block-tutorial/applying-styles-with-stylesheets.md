@@ -138,6 +138,14 @@ And a `style.css` file to load on the frontend:
 
 The files will automatically be enqueued when specified in the block.json.
 
+You will still need to import your stylesheet within your corresponding JavaSript file in order for `@wordpress/scripts` to process the stylesheet.
+
+Example:
+
+- In `edit.js` you would place `import './editor.scss';`
+- In `index.js` you would place `import './style.scss';`
+- In `view.js` you would place `import './view.scss';` (interactive block template)
+
 **Note:** If you have multiple files to include, you can use standard `wp_enqueue_style` functions like any other plugin or theme. You will want to use the following hooks for the block editor:
 
 -   `enqueue_block_editor_assets` - to load only in editor view
