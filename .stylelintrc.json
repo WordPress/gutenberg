@@ -35,5 +35,6 @@
 		"scss/at-else-empty-line-before": null,
 		"scss/at-if-closing-brace-space-after": null,
 		"no-invalid-position-at-import-rule": null
-	}
+	},
+	"reportDescriptionlessDisables": true
 }
