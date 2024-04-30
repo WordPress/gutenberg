@@ -31,7 +31,7 @@ const controls = [
 
 const meta: Meta< typeof Spacer > = {
 	component: Spacer,
-	title: 'Components (Experimental)/Spacer',
+	title: 'Components/Spacer',
 	argTypes: {
 		as: { control: { type: 'text' } },
 		children: {
