@@ -52,6 +52,8 @@
 }
 
 // .is-style-solid-color is deprecated.
+// This selector has not been scoped with `:where` as global styles
+// now does to keep its specificity as it was at the time of deprecation.
 .wp-block-pullquote.is-style-solid-color {
 	border: none;
 	blockquote {
