@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `ItemGroup`: Remove "experimental" designation ([#61060](https://github.com/WordPress/gutenberg/pull/61060)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
