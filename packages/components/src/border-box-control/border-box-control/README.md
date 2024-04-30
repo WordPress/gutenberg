@@ -1,10 +1,5 @@
 # BorderBoxControl
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-<br />
-
 This component provides users with the ability to configure a single "flat"
 border or separate borders per side.
 
@@ -28,7 +23,7 @@ show "Mixed" placeholder text.
 
 ```jsx
 import { useState } from 'react';
-import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
+import { BorderBoxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const colors = [
