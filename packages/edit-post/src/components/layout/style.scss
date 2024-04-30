@@ -7,14 +7,21 @@
 .edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 40px;
+	bottom: 16px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
 
 .is-distraction-free {
 	.components-editor-notices__snackbar {
-		bottom: 20px;
+		bottom: 16px;
+	}
+}
+
+// Adjust the position of the notices when breadcrumbs are present
+.has-block-breadcrumbs {
+	.components-editor-notices__snackbar {
+		bottom: 40px;
 	}
 }
 
