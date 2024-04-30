@@ -187,7 +187,13 @@ export {
 	useCustomUnits as __experimentalUseCustomUnits,
 	parseQuantityAndUnitFromRawValue as __experimentalParseQuantityAndUnitFromRawValue,
 } from './unit-control';
-export { View as __experimentalView } from './view';
+export {
+	/**
+	 * @deprecated Import `View` instead.
+	 */
+	View as __experimentalView,
+	View,
+} from './view';
 export { VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
