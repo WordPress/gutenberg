@@ -124,7 +124,13 @@ export {
 	useNavigator as __experimentalUseNavigator,
 } from './navigator';
 export { default as Notice } from './notice';
-export { default as __experimentalNumberControl } from './number-control';
+export {
+	/**
+	 * @deprecated Import `NumberControl` instead.
+	 */
+	default as __experimentalNumberControl,
+	NumberControl,
+} from './number-control';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
