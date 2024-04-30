@@ -84,4 +84,17 @@ export function PluginSidebarMoreMenuItem( props ) {
 	deprecateSlot( 'PluginSidebarMoreMenuItem' );
 	return <EditorPluginSidebarMoreMenuItem { ...props } />;
 }
+
+/**
+ * @see PluginPostExcerpt in @wordpress/editor package.
+ */
+export function __experimentalPluginPostExcerpt() {
+	deprecated( 'wp.editPost.__experimentalPluginPostExcerpt', {
+		since: '6.6',
+		hint: 'Core and custom panels can be access programmatically using their panel name.',
+		link: 'https://developer.wordpress.org/block-editor/reference-guides/slotfills/plugin-document-setting-panel/#accessing-a-panel-programmatically',
+	} );
+	return null;
+}
+
 /* eslint-enable jsdoc/require-param */

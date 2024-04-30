@@ -31,13 +31,22 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-const POST_ACTIONS_WHILE_EDITING = [
+let POST_ACTIONS_WHILE_EDITING = [
 	'view-post',
 	'view-post-revisions',
-	'duplicate-post',
 	'rename-post',
 	'move-to-trash',
 ];
+
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	POST_ACTIONS_WHILE_EDITING = [
+		'view-post',
+		'view-post-revisions',
+		'duplicate-post',
+		'rename-post',
+		'move-to-trash',
+	];
+}
 
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );

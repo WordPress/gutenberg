@@ -159,6 +159,7 @@ function Layout( { initialPost } ) {
 		showMetaBoxes,
 		documentLabel,
 		hasHistory,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -193,6 +194,7 @@ function Layout( { initialPost } ) {
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
+			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 		};
 	}, [] );
 
@@ -243,6 +245,8 @@ function Layout( { initialPost } ) {
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+		'has-block-breadcrumbs':
+			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	const secondarySidebarLabel = isListViewOpened

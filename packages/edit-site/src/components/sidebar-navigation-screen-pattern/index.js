@@ -23,7 +23,7 @@ export default function SidebarNavigationScreenPattern() {
 	const history = useHistory();
 	const location = useLocation();
 	const {
-		params: { postType, postId },
+		params: { postType, postId, categoryId, categoryType },
 	} = location;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
@@ -31,7 +31,11 @@ export default function SidebarNavigationScreenPattern() {
 
 	const patternDetails = usePatternDetails( postType, postId );
 
-	const backPath = { path: '/patterns' };
+	const backPath = {
+		categoryId,
+		categoryType,
+		path: '/patterns',
+	};
 
 	return (
 		<SidebarNavigationScreen

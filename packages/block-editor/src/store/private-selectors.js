@@ -14,6 +14,7 @@ import {
 	canInsertBlockType,
 	getBlockName,
 	getTemplateLock,
+	getClientIdsWithDescendants,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -175,13 +176,36 @@ export function getOpenedBlockSettingsMenu( state ) {
 /**
  * Returns all style overrides, intended to be merged with global editor styles.
  *
+ * Overrides are sorted to match the order of the blocks they relate to. This
+ * is useful to maintain correct CSS cascade order.
+ *
  * @param {Object} state Global application state.
  *
- * @return {Map} A map of style IDs to style overrides.
+ * @return {Array} An array of style ID to style override pairs.
  */
-export function getStyleOverrides( state ) {
-	return state.styleOverrides;
-}
+export const getStyleOverrides = createSelector(
+	( state ) => {
+		const clientIds = getClientIdsWithDescendants( state );
+		const clientIdMap = clientIds.reduce( ( acc, clientId, index ) => {
+			acc[ clientId ] = index;
+			return acc;
+		}, {} );
+
+		return [ ...state.styleOverrides ].sort( ( overrideA, overrideB ) => {
+			// Once the overrides Map is spread to an array, the first element
+			// is the key, while the second is the override itself including
+			// the clientId to sort by.
+			const [ , { clientId: clientIdA } ] = overrideA;
+			const [ , { clientId: clientIdB } ] = overrideB;
+
+			const aIndex = clientIdMap[ clientIdA ] ?? -1;
+			const bIndex = clientIdMap[ clientIdB ] ?? -1;
+
+			return aIndex - bIndex;
+		} );
+	},
+	( state ) => [ state.blocks.order, state.styleOverrides ]
+);
 
 /** @typedef {import('./actions').InserterMediaCategory} InserterMediaCategory */
 /**

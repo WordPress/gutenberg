@@ -45,7 +45,6 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
-	ENUMERATION_TYPE,
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
@@ -337,7 +336,6 @@ export default function DataviewsPatterns() {
 						</span>
 					);
 				},
-				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IS ],
@@ -353,7 +351,6 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => {
 					return <Author viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				filterBy: {
 					isPrimary: true,
