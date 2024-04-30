@@ -45,8 +45,9 @@ export function useAdminNavigationCommands() {
 		icon: symbol,
 		callback: ( { close } ) => {
 			// The site editor and templates both check whether the user
-			// has edit_theme_options capabilities. We can leverage that here
-			// and omit the manage patterns link if the user can't access it.
+			// can read templates. We can leverage that here and this
+			// command links to the classic dashboard manage patterns page
+			// if the user can't access it.
 			if ( isTemplatesAccessible ) {
 				const args = {
 					path: '/patterns',
