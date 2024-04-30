@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-- `CustomSelectControlV2`: Remove "experimental" designation ([#61078](https://github.com/WordPress/gutenberg/pull/61078)).
-
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
