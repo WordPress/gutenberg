@@ -86,13 +86,13 @@ $blocks-block__margin: 0.5em;
 	}
 }
 
-// the first selector is required for old buttons markup
+// The following block style selectors are required for old buttons markup and
+// are not wrapped in `:where` as global styles are to match the specificity
+// at the time they were deprecated.
 .wp-block-button.is-style-squared,
 .wp-block-button__link.wp-block-button.is-style-squared {
 	border-radius: 0;
 }
-
-// the first selector is required for old buttons markup
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;
