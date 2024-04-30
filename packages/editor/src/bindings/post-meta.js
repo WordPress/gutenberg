@@ -12,6 +12,7 @@ import { store as editorStore } from '../store';
 export default {
 	name: 'core/post-meta',
 	label: _x( 'Post Meta', 'block bindings source' ),
+	usesContext: [ 'postId', 'postType' ],
 	getPlaceholder( { args } ) {
 		return args.key;
 	},

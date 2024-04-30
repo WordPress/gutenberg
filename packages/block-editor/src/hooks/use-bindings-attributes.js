@@ -4,13 +4,14 @@
 import { store as blocksStore } from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import BlockContext from '../components/block-context';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -58,11 +59,12 @@ export function canBindAttribute( blockName, attributeName ) {
 export const withBlockBindingSupport = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const registry = useRegistry();
+		const blockContext = useContext( BlockContext );
 		const sources = useSelect( ( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 		);
 		const bindings = props.attributes.metadata?.bindings;
-		const { name, clientId, context } = props;
+		const { name, clientId } = props;
 		const boundAttributes = useSelect( () => {
 			if ( ! bindings ) {
 				return;
@@ -79,6 +81,14 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					! canBindAttribute( name, attributeName )
 				) {
 					continue;
+				}
+
+				const context = {};
+
+				if ( source.usesContext?.length ) {
+					for ( const key of source.usesContext ) {
+						context[ key ] = blockContext[ key ];
+					}
 				}
 
 				const args = {
@@ -102,7 +112,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			}
 
 			return attributes;
-		}, [ bindings, name, clientId, context, registry, sources ] );
+		}, [ bindings, name, clientId, registry, sources, blockContext ] );
 
 		const { setAttributes } = props;
 
@@ -127,6 +137,14 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 							continue;
 						}
 
+						const context = {};
+
+						if ( source.usesContext?.length ) {
+							for ( const key of source.usesContext ) {
+								context[ key ] = blockContext[ key ];
+							}
+						}
+
 						source.setValue( {
 							registry,
 							context,
@@ -148,7 +166,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 				bindings,
 				name,
 				clientId,
-				context,
+				blockContext,
 				setAttributes,
 				sources,
 			]
