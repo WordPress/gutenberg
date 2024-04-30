@@ -142,7 +142,6 @@ export function toVdom( root ) {
 						value,
 						suffix,
 					} );
-
 					return obj;
 				},
 				{}
