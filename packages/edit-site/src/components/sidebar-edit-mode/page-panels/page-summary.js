@@ -31,21 +31,26 @@ export default function PageSummary() {
 				{ ( fills ) => (
 					<>
 						<VStack
-							spacing={ 2 }
+							spacing={ 3 }
 							//  TODO: this needs to be consolidated with the panel in post editor, when we unify them.
-							style={ { marginBlockEnd: '12px' } }
+							style={ { marginBlockEnd: '24px' } }
 						>
 							<PostFeaturedImagePanel withPanelBody={ false } />
 							<PrivatePostExcerptPanel />
-							<div>
+							<VStack spacing={ 1 }>
 								<PostContentInformation />
 								<PostLastEditedPanel />
-							</div>
+							</VStack>
 						</VStack>
-						<PostStatus />
-						<PostSchedulePanel />
-						<PostTemplatePanel />
-						<PostURLPanel />
+						<VStack
+							spacing={ 1 }
+							style={ { marginBlockEnd: '12px' } }
+						>
+							<PostStatus />
+							<PostSchedulePanel />
+							<PostTemplatePanel />
+							<PostURLPanel />
+						</VStack>
 						<PostAuthorPanel />
 						{ fills }
 					</>

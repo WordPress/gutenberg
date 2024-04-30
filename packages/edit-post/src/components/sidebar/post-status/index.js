@@ -84,9 +84,9 @@ export default function PostStatus() {
 					<>
 						{ showExcerptAndLastEditedPanels && (
 							<VStack
-								spacing={ 2 }
+								spacing={ 3 }
 								//  TODO: this needs to be consolidated with the panel in site editor, when we unify them.
-								style={ { marginBlockEnd: '12px' } }
+								style={ { marginBlockEnd: '24px' } }
 							>
 								<PostFeaturedImagePanel
 									withPanelBody={ false }
@@ -94,18 +94,23 @@ export default function PostStatus() {
 
 								<>
 									<PrivatePostExcerptPanel />
-									<div>
+									<VStack spacing={ 1 }>
 										<PostContentInformation />
 										<PostLastEditedPanel />
-									</div>
+									</VStack>
 								</>
 							</VStack>
 						) }
-						<PostStatusPanel />
-						<PostSchedulePanel />
-						<PostTemplatePanel />
-						<PostURLPanel />
-						<PostSyncStatus />
+						<VStack
+							spacing={ 1 }
+							style={ { marginBlockEnd: '12px' } }
+						>
+							<PostStatusPanel />
+							<PostSchedulePanel />
+							<PostTemplatePanel />
+							<PostURLPanel />
+							<PostSyncStatus />
+						</VStack>
 						<PostSticky />
 						<PostFormat />
 						<PostSlug />
