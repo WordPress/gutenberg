@@ -173,8 +173,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
 		$theme_json   = apply_filters( 'wp_theme_json_data_default', new WP_Theme_JSON_Data_Gutenberg( $config, 'default' ) );
-		$config       = $theme_json->get_data();
-		static::$core = new WP_Theme_JSON_Gutenberg( $config, 'default' );
+		static::$core = $theme_json->get_theme_json();
 
 		return static::$core;
 	}
@@ -254,9 +253,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			 *
 			 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 			 */
-			$theme_json      = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
-			$theme_json_data = $theme_json->get_data();
-			static::$theme   = new WP_Theme_JSON_Gutenberg( $theme_json_data );
+			$theme_json    = apply_filters( 'wp_theme_json_data_theme', new WP_Theme_JSON_Data_Gutenberg( $theme_json_data, 'theme' ) );
+			static::$theme = $theme_json->get_theme_json();
 
 			if ( $wp_theme->parent() ) {
 				// Get parent theme.json.
@@ -398,10 +396,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		 *
 		 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 		 */
-		$theme_json = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
-		$config     = $theme_json->get_data();
+		$theme_json     = apply_filters( 'wp_theme_json_data_blocks', new WP_Theme_JSON_Data_Gutenberg( $config, 'blocks' ) );
+		static::$blocks = $theme_json->get_theme_json();
 
-		static::$blocks = new WP_Theme_JSON_Gutenberg( $config, 'blocks' );
 		return static::$blocks;
 	}
 
@@ -533,8 +530,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				 * @param WP_Theme_JSON_Data_Gutenberg Class to access and update the underlying data.
 				 */
 				$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-				$config     = $theme_json->get_data();
-				return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+
+				return $theme_json->get_theme_json();
 			}
 
 			// Very important to verify that the flag isGlobalStylesUserThemeJSON is true.
