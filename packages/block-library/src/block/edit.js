@@ -92,7 +92,9 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 
 function hasOverridableBlocks( blocks ) {
 	return blocks.some( ( block ) => {
-		if ( isOverridableBlock( block ) ) return true;
+		if ( isOverridableBlock( block ) ) {
+			return true;
+		}
 		return hasOverridableBlocks( block.innerBlocks );
 	} );
 }
@@ -159,7 +161,9 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
-		if ( block.name === patternBlockName ) continue;
+		if ( block.name === patternBlockName ) {
+			continue;
+		}
 		if ( block.innerBlocks.length ) {
 			Object.assign(
 				content,

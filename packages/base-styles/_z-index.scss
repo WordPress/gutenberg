@@ -88,6 +88,7 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".edit-post-layout__toggle-sidebar-panel": 100000,
+	".editor-layout__toggle-sidebar-panel": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of

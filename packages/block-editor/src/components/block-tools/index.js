@@ -85,7 +85,9 @@ export default function BlockTools( {
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
-		if ( event.defaultPrevented ) return;
+		if ( event.defaultPrevented ) {
+			return;
+		}
 
 		if ( isMatch( 'core/block-editor/move-up', event ) ) {
 			const clientIds = getSelectedBlockClientIds();

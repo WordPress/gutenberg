@@ -22,7 +22,9 @@ export function useSelectObject() {
 
 			// If it's already selected, do nothing and let default behavior
 			// happen. This means it's "click-through".
-			if ( selection.containsNode( target ) ) return;
+			if ( selection.containsNode( target ) ) {
+				return;
+			}
 
 			const range = ownerDocument.createRange();
 			// If the target is within a non editable element, select the non

@@ -7,10 +7,10 @@ import {
 } from '@wordpress/components';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { getQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { file } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
@@ -26,6 +26,9 @@ import {
 } from '../../utils/constants';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function CategoriesGroup( {
 	path,
@@ -108,9 +111,9 @@ function CategoriesGroup( {
 }
 
 export default function SidebarNavigationScreenPatterns() {
-	const { categoryType, categoryId, path } = getQueryArgs(
-		window.location.href
-	);
+	const {
+		params: { categoryType, categoryId, path },
+	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
 	const currentType = categoryType || PATTERN_TYPES.theme;
 

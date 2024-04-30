@@ -24,7 +24,6 @@ import { useState } from '@wordpress/element';
  */
 import FullscreenModeClose from './fullscreen-mode-close';
 import PostEditorMoreMenu from './more-menu';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -36,6 +35,7 @@ const {
 	PreviewDropdown,
 	PinnedItems,
 	MoreMenu,
+	PostPublishButtonOrToggle,
 } = unlock( editorPrivateApis );
 
 const slideY = {

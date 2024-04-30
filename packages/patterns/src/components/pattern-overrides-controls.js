@@ -85,7 +85,9 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	}
 
 	// Avoid overwriting other (e.g. meta) bindings.
-	if ( isConnectedToOtherSources ) return null;
+	if ( isConnectedToOtherSources ) {
+		return null;
+	}
 
 	const hasName = !! attributes.metadata?.name;
 	const allowOverrides =

@@ -174,7 +174,9 @@ const { state, actions, callbacks } = store(
 		},
 		callbacks: {
 			setOverlayStyles() {
-				if ( ! imageRef ) return;
+				if ( ! imageRef ) {
+					return;
+				}
 
 				let {
 					naturalWidth,

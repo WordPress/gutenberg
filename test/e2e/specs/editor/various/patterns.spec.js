@@ -499,7 +499,9 @@ test.describe( 'Synced pattern', () => {
 
 		let hasError = false;
 		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) hasError = true;
+			if ( msg.type() === 'error' ) {
+				hasError = true;
+			}
 		} );
 
 		// Need to reload the page to make pattern available in the store.
