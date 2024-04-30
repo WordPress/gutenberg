@@ -287,7 +287,6 @@ export const Tooltip = styled.span< TooltipProps >`
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
-	transition: opacity 120ms ease;
 	user-select: none;
 	line-height: 1.4;
 
