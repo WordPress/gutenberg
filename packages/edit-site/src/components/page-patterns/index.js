@@ -12,7 +12,6 @@ import {
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
 import {
 	useState,
@@ -67,7 +66,7 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -253,10 +252,8 @@ function Title( { item, categoryId } ) {
 
 export default function DataviewsPatterns() {
 	const {
-		categoryType,
-		categoryId: categoryIdFromURL,
-		path,
-	} = getQueryArgs( window.location.href );
+		params: { categoryType, categoryId: categoryIdFromURL, path },
+	} = useLocation();
 	const type =
 		categoryType ||
 		( path === '/wp_template_part/all'

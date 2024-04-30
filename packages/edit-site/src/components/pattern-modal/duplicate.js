@@ -4,7 +4,6 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { getQueryArgs } from '@wordpress/url';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
@@ -16,12 +15,14 @@ import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
 
 const { DuplicatePatternModal } = unlock( patternsPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function PatternDuplicateModal() {
 	const { record } = useEditedEntityRecord();
-	const { categoryType, categoryId } = getQueryArgs( window.location.href );
+	const {
+		params: { categoryType, categoryId },
+	} = useLocation();
 	const { closeModal } = useDispatch( interfaceStore );
 	const history = useHistory();
 
