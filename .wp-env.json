@@ -1,7 +1,7 @@
 {
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
-	"themes": [ "./test/emptytheme", "./test/emptytheme-child" ],
+	"themes": [ "./test/emptytheme" ],
 	"env": {
 		"tests": {
 			"mappings": {
