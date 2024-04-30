@@ -106,22 +106,24 @@
 
 	&::after {
 		position: absolute;
-		top: $grid-unit-30;
+		top: $grid-unit-20;
 		left: $grid-unit-05;
 		right: 0;
-		bottom: $grid-unit-30;
+		bottom: $grid-unit-20;
 		content: "";
 		width: $grid-unit-05;
-		background: $gray-600;
+		background-color: rgba($gray-700, 0.4);
 		border-radius: $radius-block-ui;
 	}
 
 	&.is-left {
-		left: -$grid-unit-20;
+		// Subtract half of the handle width to properly center.
+		left: -$grid-unit-20 - ($grid-unit-05 / 2);
 	}
 
 	&.is-right {
-		right: -$grid-unit-20;
+		// Subtract half of the handle width to properly center.
+		right: -$grid-unit-20 - ($grid-unit-05 / 2);
 	}
 
 	&:hover,
