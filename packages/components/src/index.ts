@@ -100,7 +100,13 @@ export {
 	ItemGroup as __experimentalItemGroup,
 	Item as __experimentalItem,
 } from './item-group';
-export { default as __experimentalInputControl } from './input-control';
+export {
+	/**
+	 * @deprecated Import `InputControl` instead.
+	 */
+	default as __experimentalInputControl,
+	InputControl,
+} from './input-control';
 export { default as __experimentalInputControlPrefixWrapper } from './input-control/input-prefix-wrapper';
 export { default as __experimentalInputControlSuffixWrapper } from './input-control/input-suffix-wrapper';
 export { default as KeyboardShortcuts } from './keyboard-shortcuts';

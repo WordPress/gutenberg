@@ -28,7 +28,7 @@ function UnconnectedInputControlPrefixWrapper(
  *
  * ```jsx
  * import {
- *   __experimentalInputControl as InputControl,
+ *   InputControl,
  *   __experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
  * } from '@wordpress/components';
  *
