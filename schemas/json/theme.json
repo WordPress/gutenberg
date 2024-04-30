@@ -258,6 +258,11 @@
 							"description": "Allow users to set a background image.",
 							"type": "boolean",
 							"default": false
+						},
+						"backgroundSize": {
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
