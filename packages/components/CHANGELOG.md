@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `Scrollable`: Remove "experimental" designation ([#61063](https://github.com/WordPress/gutenberg/pull/61063)).
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
