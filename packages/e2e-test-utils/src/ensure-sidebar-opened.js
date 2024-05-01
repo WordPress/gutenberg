@@ -5,9 +5,11 @@
  */
 export async function ensureSidebarOpened() {
 	const toggleSidebarButton = await page.$(
-		'.editor-header__settings [aria-label="Settings"][aria-expanded="false"],' +
+		'.edit-post-header__settings [aria-label="Settings"][aria-expanded="false"],' +
 			'.edit-site-header__actions [aria-label="Settings"][aria-expanded="false"],' +
-			'.edit-widgets-header__actions [aria-label="Settings"][aria-expanded="false"]'
+			'.edit-widgets-header__actions [aria-label="Settings"][aria-expanded="false"],' +
+			'.edit-site-header-edit-mode__actions [aria-label="Settings"][aria-expanded="false"],' +
+			'.editor-header__settings [aria-label="Settings"][aria-expanded="false"]'
 	);
 
 	if ( toggleSidebarButton ) {
