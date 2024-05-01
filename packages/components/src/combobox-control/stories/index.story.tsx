@@ -111,3 +111,19 @@ WithCustomRenderItem.args = {
 		);
 	},
 };
+
+/**
+ * You can disable options in the list
+ * by setting the `disabled` property to true
+ * for individual items in the option object.
+ */
+export const WithDisabledItems = Template.bind( {} );
+const optionsWithDisabledItems = countryOptions.map( ( option, index ) => {
+	return { ...option, disabled: index % 2 === 0 };
+} );
+
+WithDisabledItems.args = {
+	allowReset: false,
+	label: 'Select a country',
+	options: optionsWithDisabledItems,
+};
