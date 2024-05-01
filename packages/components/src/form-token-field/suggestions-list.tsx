@@ -65,6 +65,10 @@ export function SuggestionsList<
 	};
 
 	const handleClick = ( suggestion: T ) => {
+		if ( typeof suggestion === 'object' && suggestion?.disabled ) {
+			return;
+		}
+
 		return () => {
 			onSelect?.( suggestion );
 		};
