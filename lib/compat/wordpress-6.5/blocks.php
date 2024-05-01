@@ -74,7 +74,12 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 				$selector = 'h[1-6]';
 			}
 			if ( 'core/button' === $block_name && 'text' === $attribute_name ) {
-				$selector = 'a';
+				// Check if it is a <button> or <a> tag.
+				if ( preg_match( '/<button[^>]*>.*?<\/button>/', $block_content ) ) {
+					$selector = 'button';
+				} else {
+					$selector = 'a';
+				}
 			}
 			if ( empty( $selector ) ) {
 				return $block_content;
