@@ -38,13 +38,20 @@ describe( 'getEntityRecord', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getEntityConfig: jest.fn( () => ENTITIES[ 0 ] ),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE );
 
-		await getEntityRecord( 'root', 'postType', 'post' )( { dispatch } );
+		await getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( { dispatch, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -75,11 +82,13 @@ describe( 'getEntityRecord', () => {
 		const select = {
 			hasEntityRecords: jest.fn( () => {} ),
 		};
-
 		const dispatch = Object.assign( jest.fn(), {
 			receiveEntityRecords: jest.fn(),
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
+		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getEntityConfig: jest.fn( () => ENTITIES[ 0 ] ),
 		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
@@ -92,7 +101,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( { dispatch, select } );
+		)( { dispatch, select, resolveSelect } );
 
 		// Check resolution cache for an existing entity that fulfills the request with query.
 		expect( select.hasEntityRecords ).toHaveBeenCalledWith(
@@ -155,13 +164,19 @@ describe( 'getEntityRecords', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getEntityConfig: jest.fn( () => ENTITIES[ 0 ] ),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -186,13 +201,19 @@ describe( 'getEntityRecords', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getEntityConfig: jest.fn( () => ENTITIES[ 0 ] ),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -216,13 +237,19 @@ describe( 'getEntityRecords', () => {
 			__unstableAcquireStoreLock: jest.fn(),
 			__unstableReleaseStoreLock: jest.fn(),
 		} );
+		const resolveSelect = Object.assign( jest.fn(), {
+			getEntityConfig: jest.fn( () => ENTITIES[ 0 ] ),
+		} );
 		// Provide entities
 		dispatch.mockReturnValueOnce( ENTITIES );
 
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPES );
 
-		await getEntityRecords( 'root', 'postType' )( { dispatch, registry } );
+		await getEntityRecords(
+			'root',
+			'postType'
+		)( { dispatch, registry, resolveSelect } );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
