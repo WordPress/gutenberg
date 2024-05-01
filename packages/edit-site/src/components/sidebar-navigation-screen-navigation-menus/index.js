@@ -85,9 +85,11 @@ export default function SidebarNavigationScreenNavigationMenus() {
 
 	const hasNavigationMenus = !! navigationMenus?.length;
 
+	const backPath = {};
+
 	if ( isLoading ) {
 		return (
-			<SidebarNavigationScreenWrapper>
+			<SidebarNavigationScreenWrapper backPath={ backPath }>
 				<Spinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
 			</SidebarNavigationScreenWrapper>
 		);
@@ -97,6 +99,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SidebarNavigationScreenWrapper
 				description={ __( 'No Navigation Menus found.' ) }
+				backPath={ backPath }
 			/>
 		);
 	}
@@ -106,6 +109,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		return (
 			<SingleNavigationMenu
 				navigationMenu={ firstNavigationMenu }
+				backPath={ backPath }
 				handleDelete={ () => handleDelete( firstNavigationMenu ) }
 				handleDuplicate={ () => handleDuplicate( firstNavigationMenu ) }
 				handleSave={ ( edits ) =>
@@ -116,7 +120,7 @@ export default function SidebarNavigationScreenNavigationMenus() {
 	}
 
 	return (
-		<SidebarNavigationScreenWrapper>
+		<SidebarNavigationScreenWrapper backPath={ backPath }>
 			<ItemGroup>
 				{ navigationMenus?.map( ( { id, title, status }, index ) => (
 					<NavMenuItem
@@ -138,12 +142,14 @@ export function SidebarNavigationScreenWrapper( {
 	actions,
 	title,
 	description,
+	backPath,
 } ) {
 	return (
 		<SidebarNavigationScreen
 			title={ title || __( 'Navigation' ) }
 			actions={ actions }
 			description={ description || __( 'Manage your Navigation Menus.' ) }
+			backPath={ backPath }
 			content={ children }
 		/>
 	);

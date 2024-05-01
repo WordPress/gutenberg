@@ -24,6 +24,7 @@ export default function SidebarNavigationScreenTemplatesBrowse() {
 			description={ __(
 				'Create new templates, or reset any customizations made to the templates supplied by your theme.'
 			) }
+			backPath={ {} }
 			content={
 				<DataviewsTemplatesSidebarContent
 					activeView={ activeView }

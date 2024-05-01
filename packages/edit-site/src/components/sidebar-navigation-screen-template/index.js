@@ -108,6 +108,7 @@ export default function SidebarNavigationScreenTemplate() {
 	return (
 		<SidebarNavigationScreen
 			title={ title }
+			backPath={ { path: '/wp_template', postId } }
 			actions={
 				<>
 					<TemplateActions

@@ -45,6 +45,7 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ __( 'Manage pages' ) }
+						backPath={ {} }
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),

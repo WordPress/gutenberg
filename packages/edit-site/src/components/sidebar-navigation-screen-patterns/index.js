@@ -144,6 +144,7 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			backPath={ {} }
 			actions={ <AddNewPattern /> }
 			content={
 				<>
