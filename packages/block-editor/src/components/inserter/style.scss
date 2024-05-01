@@ -239,6 +239,10 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
+.block-editor-inserter__patterns-empty {
+	padding: $grid-unit-20;
+}
+
 .block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
 	padding: $grid-unit-20;

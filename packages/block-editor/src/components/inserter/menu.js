@@ -16,13 +16,11 @@ import {
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
@@ -32,7 +30,6 @@ import { MediaTab, MediaCategoryPanel, useMediaCategories } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
-import { store as blockEditorStore } from '../../store';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
@@ -69,15 +66,6 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
-	const { showPatterns } = useSelect(
-		( select ) => {
-			const { hasAllowedPatterns } = unlock( select( blockEditorStore ) );
-			return {
-				showPatterns: hasAllowedPatterns( destinationRootClientId ),
-			};
-		},
-		[ destinationRootClientId ]
-	);
 
 	const mediaCategories = useMediaCategories( destinationRootClientId );
 	const showMedia = mediaCategories.length > 0;
@@ -243,8 +231,6 @@ function InserterMenu(
 		},
 	} ) );
 
-	const showAsTabs = ! delayedFilterValue && ( showPatterns || showMedia );
-
 	// When the pattern panel is showing, we want to use zoom out mode
 	useZoomOut( showPatternPanel );
 
@@ -262,11 +248,7 @@ function InserterMenu(
 				'show-panel': showPatternPanel || showMediaPanel,
 			} ) }
 		>
-			<div
-				className={ classnames( 'block-editor-inserter__main-area', {
-					'show-as-tabs': showAsTabs,
-				} ) }
-			>
+			<div className="block-editor-inserter__main-area show-as-tabs">
 				<SearchControl
 					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
@@ -299,19 +281,12 @@ function InserterMenu(
 						/>
 					</div>
 				) }
-				{ showAsTabs && (
-					<InserterTabs
-						showPatterns={ showPatterns }
-						showMedia={ showMedia }
-						onSelect={ handleSetSelectedTab }
-						tabsContents={ inserterTabsContents }
-					/>
-				) }
-				{ ! delayedFilterValue && ! showAsTabs && (
-					<div className="block-editor-inserter__no-tab-container">
-						{ blocksTab }
-					</div>
-				) }
+				<InserterTabs
+					showPatterns
+					showMedia={ showMedia }
+					onSelect={ handleSetSelectedTab }
+					tabsContents={ inserterTabsContents }
+				/>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
 				<Popover

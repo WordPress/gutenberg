@@ -30,6 +30,11 @@ function BlockPatternsTab( {
 
 	return (
 		<>
+			{ categories.length === 0 && (
+				<div className="block-editor-inserter__patterns-empty">
+					<p>{ __( 'No available patterns.' ) }</p>
+				</div>
+			) }
 			{ ! isMobile && (
 				<div className="block-editor-inserter__block-patterns-tabs-container">
 					<CategoryTabs
