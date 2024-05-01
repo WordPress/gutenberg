@@ -78,6 +78,7 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -98,6 +99,10 @@ export default function Layout() {
 			isDistractionFree: select( preferencesStore ).get(
 				'core',
 				'distractionFree'
+			),
+			hasBlockBreadcrumbs: select( preferencesStore ).get(
+				'core',
+				'showBlockBreadcrumbs'
 			),
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
@@ -182,6 +187,10 @@ export default function Layout() {
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 						'is-zoom-out': isZoomOutMode,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>

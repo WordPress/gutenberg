@@ -84,8 +84,8 @@
 		// This needs specificity.
 		&.has-icon.has-icon {
 			// Reduce the default padding when a button only has an icon.
-			padding-left: $grid-unit-15;
-			padding-right: $grid-unit-15;
+			padding-left: $grid-unit-10;
+			padding-right: $grid-unit-10;
 			min-width: $block-toolbar-height;
 		}
 

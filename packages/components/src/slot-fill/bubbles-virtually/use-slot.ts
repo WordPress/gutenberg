@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo, useContext } from '@wordpress/element';
+import { useObservableValue } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -13,7 +14,6 @@ import type {
 	FillProps,
 	SlotKey,
 } from '../types';
-import { useObservableValue } from './observable-map';
 
 export default function useSlot( name: SlotKey ) {
 	const registry = useContext( SlotFillContext );

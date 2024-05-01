@@ -226,8 +226,9 @@ const UnforwardedPopover = (
 					const { firstElementChild } = refs.floating.current ?? {};
 
 					// Only HTMLElement instances have the `style` property.
-					if ( ! ( firstElementChild instanceof HTMLElement ) )
+					if ( ! ( firstElementChild instanceof HTMLElement ) ) {
 						return;
+					}
 
 					// Reduce the height of the popover to the available space.
 					Object.assign( firstElementChild.style, {

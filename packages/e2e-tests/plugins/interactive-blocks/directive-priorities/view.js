@@ -24,8 +24,8 @@ const namespace = 'directive-priorities';
  */
 const executionProof = ( n ) => {
 	const el = document.querySelector( '[data-testid="execution order"]' );
-	if ( ! el.textContent ) el.textContent = n;
-	else el.textContent += `, ${ n }`;
+	if ( ! el.textContent ) {el.textContent = n;}
+	else {el.textContent += `, ${ n }`;}
 };
 
 /**

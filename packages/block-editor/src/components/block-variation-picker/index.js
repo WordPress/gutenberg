@@ -13,7 +13,7 @@ import { layout } from '@wordpress/icons';
 function BlockVariationPicker( {
 	icon = layout,
 	label = __( 'Choose variation' ),
-	instructions = __( 'Select a variation to start with.' ),
+	instructions = __( 'Select a variation to start with:' ),
 	variations,
 	onSelect,
 	allowSkip,
@@ -42,7 +42,8 @@ function BlockVariationPicker( {
 				{ variations.map( ( variation ) => (
 					<li key={ variation.name }>
 						<Button
-							variant="secondary"
+							__next40pxDefaultSize
+							variant="tertiary"
 							icon={
 								variation.icon && variation.icon.src
 									? variation.icon.src

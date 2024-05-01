@@ -221,7 +221,9 @@ export function CommandMenu() {
 		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {

@@ -49,7 +49,9 @@ export default function PostTermsEdit( {
 
 	const selectedTerm = useSelect(
 		( select ) => {
-			if ( ! term ) return {};
+			if ( ! term ) {
+				return {};
+			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
 			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};

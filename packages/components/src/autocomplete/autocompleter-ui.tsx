@@ -55,7 +55,9 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			popoverRef,
 			useRefEffect(
 				( node ) => {
-					if ( ! contentRef.current ) return;
+					if ( ! contentRef.current ) {
+						return;
+					}
 
 					// If the popover is rendered in a different document than
 					// the content, we need to duplicate the options list in the

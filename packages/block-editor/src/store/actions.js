@@ -675,7 +675,9 @@ export const __unstableDeleteSelection =
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
 
-		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+		if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+			return;
+		}
 
 		// It's not mergeable if there's no rich text selection.
 		if (
@@ -683,8 +685,9 @@ export const __unstableDeleteSelection =
 			! selectionFocus.attributeKey ||
 			typeof selectionAnchor.offset === 'undefined' ||
 			typeof selectionFocus.offset === 'undefined'
-		)
+		) {
 			return false;
+		}
 
 		const anchorRootClientId = select.getBlockRootClientId(
 			selectionAnchor.clientId
@@ -825,7 +828,9 @@ export const __unstableSplitSelection =
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
 
-		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+		if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+			return;
+		}
 
 		// Can't split if the selection is not set.
 		if (
@@ -833,8 +838,9 @@ export const __unstableSplitSelection =
 			! selectionFocus.attributeKey ||
 			typeof selectionAnchor.offset === 'undefined' ||
 			typeof selectionFocus.offset === 'undefined'
-		)
+		) {
 			return;
+		}
 
 		const anchorRootClientId = select.getBlockRootClientId(
 			selectionAnchor.clientId
@@ -931,7 +937,9 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		if ( ! blockAType ) return;
+		if ( ! blockAType ) {
+			return;
+		}
 
 		const blockB = select.getBlock( clientIdB );
 

@@ -23,7 +23,7 @@ export default function SidebarNavigationScreenPattern() {
 	const history = useHistory();
 	const location = useLocation();
 	const {
-		params: { postType, postId },
+		params: { postType, postId, categoryId, categoryType },
 	} = location;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
@@ -48,10 +48,14 @@ export default function SidebarNavigationScreenPattern() {
 	 * Depending on whether the theme supports block-template-parts, we go back to Patterns or Template screens.
 	 * This is temporary. We aim to consolidate to /patterns.
 	 */
-	const backPath =
-		isTemplatePartsMode && postType === 'wp_template_part'
-			? { path: '/wp_template_part/all' }
-			: { path: '/patterns' };
+	const backPath = {
+		categoryId,
+		categoryType,
+		path:
+			isTemplatePartsMode && postType === 'wp_template_part'
+				? '/wp_template_part/all'
+				: '/patterns',
+	};
 
 	return (
 		<SidebarNavigationScreen

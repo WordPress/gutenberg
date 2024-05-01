@@ -56,10 +56,11 @@ function Root( { className, ...settings } ) {
 			getSettings,
 			__unstableGetEditorMode,
 			getTemporarilyEditingAsBlocks,
+			isTyping,
 		} = unlock( select( blockEditorStore ) );
 		const { outlineMode, focusMode } = getSettings();
 		return {
-			isOutlineMode: outlineMode,
+			isOutlineMode: outlineMode && ! isTyping(),
 			isFocusMode: focusMode,
 			editorMode: __unstableGetEditorMode(),
 			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
