@@ -62,66 +62,39 @@ const getIndexOfMatchingSuggestion = (
 		? -1
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
+/**
+ * Get the next index of a matching suggestion,
+ * considering the offset, the current index, and the offset/direction.
+ *
+ * @param {number} current             - The current index.
+ * @param {number} offset              - The offset.
+ * @param {Array}  matchingSuggestions - The array of matching suggestions.
+ * @return {number} The next index of a matching suggestion.
+ */
 const getNextIndexOfMatchingSuggestion = (
 	current: number,
 	offset: number,
 	matchingSuggestions: ComboboxControlOption[]
 ): number => {
-	/*
-	 * Map the matchingSuggestions to include the index,
-	 * and filter the disabled suggestions.
-	 */
-	const notDisabledSuggestions: ComboboxControlOption[] &
-		{
-			index: number;
-		}[] = matchingSuggestions
-		.map( ( suggestion, i ) => {
-			return {
-				...suggestion,
-				index: i,
-			};
-		} )
-		.filter( ( suggestion ) => ! suggestion.disabled );
+	const step = offset > 0 ? 1 : -1;
+	let index = current + step;
 
-	/*
-	 * Create a copy of the notDisabledSuggestions array,
-	 * and reverse it, to get the inverse order
-	 * to find the next suggestion when the offset is negative.
-	 */
-	const inverseNotDisabledSuggestions = [
-		...notDisabledSuggestions,
-	].reverse();
+	while ( index !== current ) {
+		if ( index < 0 ) {
+			index = matchingSuggestions.length - 1; // Go to the end if it goes past the beginning
+		} else if ( index >= matchingSuggestions.length ) {
+			index = 0; // Go to the beginning if it goes past the end
+		}
 
-	const dir = offset > 0 ? 'down' : 'up';
+		// If the suggestion is not disabled, return the index
+		if ( ! matchingSuggestions[ index ].disabled ) {
+			return index;
+		}
 
-	/*
-	 * Get the next index of the suggestion,
-	 * based on the current index and the offset.
-	 */
-	const nextSuggestion =
-		dir === 'down'
-			? notDisabledSuggestions.find(
-					( suggestion ) => suggestion.index > current
-			  )
-			: inverseNotDisabledSuggestions.find(
-					( suggestion ) => suggestion.index < current
-			  );
-
-	/*
-	 * If there is no next suggestion, return the first suggestion not disabled elemen,
-	 * if the offset is positive, or the last suggestion not disabled element,
-	 */
-	if ( ! nextSuggestion ) {
-		const nextIndex =
-			dir === 'down'
-				? notDisabledSuggestions[ 0 ].index
-				: notDisabledSuggestions[ notDisabledSuggestions.length - 1 ]
-						.index;
-
-		return nextIndex;
+		index += step; // Move to the next suggestion
 	}
 
-	return nextSuggestion.index;
+	return -1; // No valid suggestion found
 };
 
 /**
