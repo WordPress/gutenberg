@@ -35,10 +35,10 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		url,
 		frontPageTemplateId,
 	} = useSelect( ( select ) => {
-		const { getSite, getUnstableBase, getEntityRecords } =
-			select( coreDataStore );
+		const { getSite, getEntityRecords } = select( coreDataStore );
+		// This resource is preloaded.
 		const siteData = getSite();
-		const base = getUnstableBase();
+		// This resource is preloaded.
 		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
 		} );
@@ -63,10 +63,10 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 				: false;
 		}
 		return {
-			hasLoadedAllDependencies: !! base && !! siteData,
+			hasLoadedAllDependencies: !! siteData,
 			homepageId: _homepageId,
 			postsPageId: _postsPageId,
-			url: base?.home,
+			url: siteData?.home,
 			frontPageTemplateId: _frontPageTemplateId,
 		};
 	}, [] );
