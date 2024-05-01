@@ -117,11 +117,8 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	/* Patterns and Template Parts
-	 * `/wp_template_part/all` path is no longer used, but uses Patterns page screens for
-	 * backwards compatibility.
-	 */
-	if ( path === '/patterns' || path === '/wp_template_part/all' ) {
+	// Patterns
+	if ( path === '/patterns' ) {
 		return {
 			key: 'patterns',
 			areas: {
