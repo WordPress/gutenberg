@@ -136,10 +136,12 @@ function _gutenberg_get_block_templates_files( $template_type, $query = array() 
 		return null;
 	}
 
+	// @core-merge: This code will go into Core's '_get_block_templates_files' function.
 	$default_template_types = array();
 	if ( 'wp_template' === $template_type ) {
 		$default_template_types = get_default_block_template_types();
 	}
+	// @core-merge: End of the code that will go into Core.
 
 	// Prepare metadata from $query.
 	$slugs_to_include = isset( $query['slug__in'] ) ? $query['slug__in'] : array();
@@ -213,10 +215,12 @@ function _gutenberg_get_block_templates_files( $template_type, $query = array() 
 					$template_files[ $template_slug ] = $candidate;
 				}
 
+				// @core-merge: This code will go into Core's '_get_block_templates_files' function.
 				// The custom templates with no associated post-types are available for all post-types.
 				if ( $post_type && ! isset( $candidate['postTypes'] ) && $is_custom ) {
 					$template_files[ $template_slug ] = $candidate;
 				}
+				// @core-merge: End of the code that will go into Core.
 			}
 		}
 	}
