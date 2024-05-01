@@ -38,7 +38,7 @@ runs:
         - name: Find npm log location
           id: npm-cache-location
           if: ${{ failure() || runner.debug }}
-          run: echo "NODE_CACHE_LOCATION=${npm config get cache)" >> $GITHUB_OUTPUT
+          run: echo "NODE_CACHE_LOCATION=$(npm config get cache)" >> $GITHUB_OUTPUT
           shell: bash
 
         - name: Upload logs as artifact
