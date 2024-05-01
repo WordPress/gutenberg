@@ -63,8 +63,8 @@ const getIndexOfMatchingSuggestion = (
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
 /**
- * Get the next index of a matching suggestion,
- * considering the offset, the current index, and the offset/direction.
+ * Get the next index of a matching suggestions,
+ * considering the current index, and the offset/direction.
  *
  * @param {number} current             - The current index.
  * @param {number} offset              - The offset.
