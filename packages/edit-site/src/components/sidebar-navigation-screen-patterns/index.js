@@ -110,20 +110,12 @@ function CategoriesGroup( {
 	);
 }
 
-const EMPTY_ARRAY = [];
 export default function SidebarNavigationScreenPatterns() {
 	const {
 		params: { categoryType, categoryId, path },
 	} = useLocation();
-	const isTemplatePartsPath = path === '/wp_template_part/all';
-	const currentCategory =
-		categoryId ||
-		( isTemplatePartsPath
-			? TEMPLATE_PART_ALL_AREAS_CATEGORY
-			: PATTERN_DEFAULT_CATEGORY );
-	const currentType =
-		categoryType ||
-		( isTemplatePartsPath ? TEMPLATE_PART_POST_TYPE : PATTERN_TYPES.theme );
+	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
+	const currentType = categoryType || PATTERN_TYPES.theme;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
@@ -148,28 +140,11 @@ export default function SidebarNavigationScreenPatterns() {
 	return (
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
-			title={
-				isTemplatePartsPath
-					? __( 'Manage template parts' )
-					: __( 'Patterns' )
-			}
-			description={
-				isTemplatePartsPath
-					? __(
-							'Create new template parts, or reset any customizations made to the template parts supplied by your theme.'
-					  )
-					: __(
-							'Manage what patterns are available when editing the site.'
-					  )
-			}
-			actions={
-				( isBlockBasedTheme || ! isTemplatePartsPath ) && (
-					<AddNewPattern
-						canCreateParts={ isBlockBasedTheme }
-						canCreatePatterns={ ! isTemplatePartsPath }
-					/>
-				)
-			}
+			title={ __( 'Patterns' ) }
+			description={ __(
+				'Manage what patterns are available when editing the site.'
+			) }
+			actions={ <AddNewPattern /> }
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }
@@ -183,11 +158,7 @@ export default function SidebarNavigationScreenPatterns() {
 							<CategoriesGroup
 								path={ path }
 								templatePartAreas={ templatePartAreas }
-								patternCategories={
-									isTemplatePartsPath
-										? EMPTY_ARRAY
-										: patternCategories
-								}
+								patternCategories={ patternCategories }
 								currentCategory={ currentCategory }
 								currentType={ currentType }
 							/>
