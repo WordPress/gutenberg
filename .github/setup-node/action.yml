@@ -33,7 +33,7 @@ runs:
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: |
-              npm ci --force
+              npm ci --force || true
               echo "LOGS!!!!!"
               ls -1 C:\npm\cache\_logs |  xargs -I {} cat C:\npm\cache\_logs/{}
           shell: bash
