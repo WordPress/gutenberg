@@ -32,7 +32,7 @@ runs:
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
-          run: npm ci
+          run: npm ci --force
           shell: bash
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
