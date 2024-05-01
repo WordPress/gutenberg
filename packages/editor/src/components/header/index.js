@@ -52,13 +52,16 @@ function Header( {
 		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-		const { getEditorMode, getEditorSettings } = select( editorStore );
+		const {
+			getEditorMode,
+			getEditorSettings,
+			isPublishSidebarOpened: _isPublishSidebarOpened,
+		} = select( editorStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
-			isPublishSidebarOpened:
-				select( editorStore ).isPublishSidebarOpened(),
+			isPublishSidebarOpened: _isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			isNestedEntity:
