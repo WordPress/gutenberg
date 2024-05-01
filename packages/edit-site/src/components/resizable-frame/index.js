@@ -203,11 +203,11 @@ function ResizableFrame( {
 		},
 		visible: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 		},
 		active: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 			scaleY: 1.3,
 		},
 	};
