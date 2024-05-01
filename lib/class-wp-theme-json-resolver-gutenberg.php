@@ -355,6 +355,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
 		}
+
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
 		return $with_theme_supports;
@@ -615,11 +616,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
 			$result->set_spacing_sizes();
+			$result->resolve_relative_paths();
 			return $result;
 		}
 
 		$result->merge( static::get_user_data() );
 		$result->set_spacing_sizes();
+		$result->resolve_relative_paths();
 		return $result;
 	}
 

@@ -10,16 +10,11 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { getCSSRules, compileCSS } from '@wordpress/style-engine';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
-	BACKGROUND_SUPPORT_KEY,
-	BackgroundImagePanel,
-	setBackgroundStyleDefaults,
-} from './background';
+import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
@@ -39,7 +34,6 @@ import {
 } from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { store as blockEditorStore } from '../store';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -287,13 +281,14 @@ export function omitStyle( style, paths, preserveReference = false ) {
  * @param {Object|string}             blockNameOrType Block type.
  * @param {Object}                    attributes      Block attributes.
  * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
+ *
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps(
 	props,
 	blockNameOrType,
 	attributes,
-	skipPaths = skipSerializationPathsSave,
+	skipPaths = skipSerializationPathsSave
 ) {
 	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
@@ -316,15 +311,6 @@ export function addSaveProps(
 			} );
 		}
 	} );
-
-	/*
-	 * Set styles defaults.
-	 * Applies default values to the style object based on the block settings.
-	 * Only applies to background styles for now.
-	 */
-	if ( !! style.background ) {
-		style = setBackgroundStyleDefaults( style );
-	}
 
 	props.style = {
 		...getInlineStyles( style ),
@@ -383,13 +369,6 @@ const elementTypes = [
 ];
 
 function useBlockProps( { name, style } ) {
-	const { stylesheetURI, templateURI } = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
-		return {
-			stylesheetURI: _settings?.__experimentalCurrentTheme?.stylesheetURI,
-			templateURI: _settings?.__experimentalCurrentTheme?.templateURI,
-		};
-	} );
 	const blockElementsContainerIdentifier = `wp-elements-${ useInstanceId(
 		useBlockProps
 	) }`;
@@ -476,7 +455,7 @@ function useBlockProps( { name, style } ) {
 		{ className: blockElementsContainerIdentifier },
 		name,
 		{ style },
-		skipSerializationPathsEdit,
+		skipSerializationPathsEdit
 	);
 }
 

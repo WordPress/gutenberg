@@ -49,7 +49,6 @@ createBlockEditFilter(
 );
 createBlockListBlockFilter( [
 	align,
-	background,
 	textAlign,
 	style,
 	color,
@@ -60,6 +59,7 @@ createBlockListBlockFilter( [
 	border,
 	position,
 	childLayout,
+	background,
 ] );
 createBlockSaveFilter( [
 	align,
