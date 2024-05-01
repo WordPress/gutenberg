@@ -31,7 +31,7 @@ runs:
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
 
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
+          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' && 'Windows' !== runner.os }}
           run: npm ci
           shell: bash
 
