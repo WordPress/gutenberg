@@ -136,6 +136,11 @@ $block-inserter-tabs-height: 44px;
 		flex-direction: column;
 		overflow-y: auto;
 	}
+
+	// The first tab panel needs space-between to prevent a flash of the "hint" from appearing at the top then moving down.
+	.block-editor-inserter__tablist + .block-editor-inserter__tabpanel {
+		justify-content: space-between;
+	}
 }
 
 .block-editor-inserter__no-tab-container {
