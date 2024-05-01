@@ -271,7 +271,7 @@ export default () => {
 				const start = performance.now();
 				const result = evaluate( entry );
 				performance.measure(
-					`interactivity api watch ${ entry.suffix }`,
+					`interactivity api watch ${ entry.namespace }`,
 					{
 						start,
 						end: performance.now(),
@@ -282,7 +282,7 @@ export default () => {
 									dataType: 'track-entry',
 								},
 								color: 'primary',
-								track: entry.suffix,
+								track: `IA: watch ${ entry.namespace }`,
 							},
 						},
 					}
@@ -300,7 +300,7 @@ export default () => {
 				const start = performance.now();
 				const result = evaluate( entry );
 				performance.measure(
-					`interactivity api init ${ entry.suffix }`,
+					`interactivity api init ${ entry.namespace }`,
 					{
 						start,
 						end: performance.now(),
@@ -311,7 +311,7 @@ export default () => {
 									dataType: 'track-entry',
 								},
 								color: 'primary',
-								track: entry.suffix,
+								track: `IA: init ${ entry.namespace }`,
 							},
 						},
 					}
@@ -340,7 +340,7 @@ export default () => {
 					const start = performance.now();
 					evaluate( entry, event );
 					performance.measure(
-						`interactivity api on ${ entry.suffix }`,
+						`interactivity api on ${ entry.namespace }`,
 						{
 							start,
 							end: performance.now(),
@@ -351,7 +351,7 @@ export default () => {
 										dataType: 'track-entry',
 									},
 									color: 'primary',
-									track: entry.suffix,
+									track: `IA: on ${ entry.namespace }`,
 								},
 							},
 						}
