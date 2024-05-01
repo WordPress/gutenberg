@@ -80,11 +80,9 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'checkbox', { name: 'Pending review' } )
-			.setChecked( true );
-
+		const postStatusButton = page.locator( '.editor-post-status-trigger' );
+		await postStatusButton.click();
+		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
 			page.evaluate( () =>
@@ -94,7 +92,7 @@ test.describe( 'Change detection', () => {
 				page
 					.getByRole( 'region', { name: 'Editor top bar' } )
 					.getByRole( 'button', { name: 'saved' } )
-			).toBeDisabled(),
+			).toBeHidden(),
 		] );
 
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
@@ -119,7 +117,7 @@ test.describe( 'Change detection', () => {
 
 		const updateButton = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Update' } );
+			.getByRole( 'button', { name: 'Save' } );
 		await expect( updateButton ).toBeDisabled();
 
 		// Should be dirty after autosave change of published post.
@@ -417,7 +415,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'OK' } )
+			.getByRole( 'button', { name: 'Move to trash' } )
 			.click();
 
 		await expect(

@@ -202,7 +202,7 @@ function NavigationMenuSelector( {
 									! hasResolvedNavigationMenus
 								}
 							>
-								{ __( 'Create new menu' ) }
+								{ __( 'Create new Menu' ) }
 							</MenuItem>
 						</MenuGroup>
 					) }

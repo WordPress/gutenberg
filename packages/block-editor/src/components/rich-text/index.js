@@ -12,7 +12,7 @@ import {
 	forwardRef,
 	createContext,
 } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
@@ -26,25 +26,15 @@ import { getBlockType, store as blocksStore } from '@wordpress/blocks';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { blockBindingsKey } from '../block-edit/context';
+import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
-import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useMarkPersistent } from './use-mark-persistent';
-import { usePasteHandler } from './use-paste-handler';
-import { useBeforeInputRules } from './use-before-input-rules';
-import { useInputRules } from './use-input-rules';
-import { useDelete } from './use-delete';
-import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
-import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
-import { useShortcuts } from './use-shortcuts';
-import { useInputEvents } from './use-input-events';
-import { useInsertReplacementText } from './use-insert-replacement-text';
-import { useFirefoxCompat } from './use-firefox-compat';
+import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
-import { Content } from './content';
+import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import { unlock } from '../../lock-unlock';
 import { canBindBlock } from '../../hooks/use-bindings-attributes';
@@ -357,6 +347,7 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
+	const registry = useRegistry();
 	const TagName = tagName;
 	return (
 		<>
@@ -400,48 +391,30 @@ export function RichTextWrapper(
 					forwardedRef,
 					autocompleteProps.ref,
 					props.ref,
-					useBeforeInputRules( { value, onChange } ),
-					useInputRules( {
+					useEventListeners( {
+						registry,
 						getValue,
 						onChange,
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
 						selectionChange,
-					} ),
-					useInsertReplacementText(),
-					useRemoveBrowserShortcuts(),
-					useShortcuts( keyboardShortcuts ),
-					useInputEvents( inputEvents ),
-					useUndoAutomaticChange(),
-					usePasteHandler( {
 						isSelected,
 						disableFormats,
-						onChange,
 						value,
-						formatTypes,
 						tagName,
-						onReplace,
 						onSplit,
 						__unstableEmbedURLOnPaste,
 						pastePlainText,
-					} ),
-					useDelete( {
-						value,
 						onMerge,
 						onRemove,
-					} ),
-					useEnter( {
 						removeEditorOnlyFormats,
-						value,
-						onReplace,
-						onSplit,
-						onChange,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
+						keyboardShortcuts,
+						inputEvents,
 					} ),
-					useFirefoxCompat(),
 					anchorRef,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
@@ -485,6 +458,50 @@ PrivateRichText.isEmpty = ( value ) => {
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
 const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+	const context = useBlockEditContext();
+	const isPreviewMode = context[ isPreviewModeKey ];
+
+	if ( isPreviewMode ) {
+		// Remove all non-content props.
+		const {
+			children,
+			tagName: Tag = 'div',
+			value,
+			onChange,
+			isSelected,
+			multiline,
+			inlineToolbar,
+			wrapperClassName,
+			autocompleters,
+			onReplace,
+			placeholder,
+			allowedFormats,
+			withoutInteractiveFormatting,
+			onRemove,
+			onMerge,
+			onSplit,
+			__unstableOnSplitAtEnd,
+			__unstableOnSplitAtDoubleLineEnd,
+			identifier,
+			preserveWhiteSpace,
+			__unstablePastePlainText,
+			__unstableEmbedURLOnPaste,
+			__unstableDisableFormats,
+			disableLineBreaks,
+			__unstableAllowPrefixTransformations,
+			readOnly,
+			...contentProps
+		} = removeNativeProps( props );
+		return (
+			<Tag
+				{ ...contentProps }
+				dangerouslySetInnerHTML={ {
+					__html: valueToHTMLString( value, multiline ),
+				} }
+			/>
+		);
+	}
+
 	return <PrivateRichText ref={ ref } { ...props } readOnly={ false } />;
 } );
 

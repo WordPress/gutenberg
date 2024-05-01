@@ -7,7 +7,6 @@ import { downloadZip } from 'client-zip';
 /**
  * WordPress dependencies
  */
-import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -23,6 +22,7 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -38,7 +38,7 @@ import {
 } from '../../utils/constants';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
@@ -198,7 +198,7 @@ export const deleteAction = {
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
 			const promiseResult = await Promise.allSettled(
@@ -364,9 +364,9 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const history = useHistory();
 		function onPatternSuccess( { pattern } ) {
@@ -400,11 +400,11 @@ export const duplicateTemplatePartAction = {
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const { createSuccessNotice } = useDispatch( noticesStore );
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const history = useHistory();
-		async function onTemplatePartSuccess( templatePart ) {
+		function onTemplatePartSuccess( templatePart ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.

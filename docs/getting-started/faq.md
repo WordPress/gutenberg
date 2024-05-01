@@ -314,7 +314,7 @@ See the [Meta Box Tutorial](https://developer.wordpress.org/block-editor/how-to-
 
 ### How can plugins extend the Gutenberg UI?
 
-The main extension point we want to emphasize is creating new blocks. Blocks are added to the block editor using plugins, see the [Create a Block Tutorial](https://developer.wordpress.org/block-editor/getting-stared/create-block/) to get started.
+The main extension point we want to emphasize is creating new blocks. Blocks are added to the block editor using plugins, see the [Build your first block Tutorial](https://developer.wordpress.org/block-editor/getting-started/tutorial/) to get started.
 
 ### Are Custom Post Types still supported?
 

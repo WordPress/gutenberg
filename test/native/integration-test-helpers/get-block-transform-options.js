@@ -14,7 +14,7 @@ import { openBlockActionsMenu } from './open-block-actions-menu';
  *
  * @param {import('@testing-library/react-native').RenderAPI} screen    A Testing Library screen.
  * @param {string}                                            blockName Name of the block.
- * @return {[import('react-test-renderer').ReactTestInstance]} Block transform options.
+ * @return {[HTMLElement]} Block transform options.
  */
 export const getBlockTransformOptions = async ( screen, blockName ) => {
 	const { getByTestId, getByText } = screen;

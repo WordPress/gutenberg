@@ -15,10 +15,10 @@ import { waitForStoreResolvers } from './wait-for-store-resolvers';
  * case any of the inner elements use selectors that are associated with store
  * resolvers.
  *
- * @param {import('react-test-renderer').ReactTestInstance} block                    Block test instance to trigger layout event.
- * @param {Object}                                          [options]                Configuration options for the event.
- * @param {number}                                          [options.width]          Width value to be passed to the event.
- * @param {number}                                          [options.blockListIndex] Block list index, for cases when there is more than one, like in inner blocks.
+ * @param {HTMLElement} block                    Block test instance to trigger layout event.
+ * @param {Object}      [options]                Configuration options for the event.
+ * @param {number}      [options.width]          Width value to be passed to the event.
+ * @param {number}      [options.blockListIndex] Block list index, for cases when there is more than one, like in inner blocks.
  */
 export const triggerBlockListLayout = async (
 	block,
