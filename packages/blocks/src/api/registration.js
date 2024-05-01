@@ -7,6 +7,11 @@ import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 
 /**
+ * External dependencies
+ */
+import deepmerge from 'deepmerge';
+
+/**
  * Internal dependencies
  */
 import i18nBlockSchema from './i18n-block.json';
@@ -727,7 +732,11 @@ export const registerBlockVariation = ( blockName, variation ) => {
 		console.warn( 'Variation names must be unique strings.' );
 	}
 
-	dispatch( blocksStore ).addBlockVariations( blockName, variation );
+	if ( variation.supports.alias ) {
+		registerBlockAlias( blockName, variation );
+	} else {
+		dispatch( blocksStore ).addBlockVariations( blockName, variation );
+	}
 };
 
 /**
@@ -757,4 +766,72 @@ export const registerBlockVariation = ( blockName, variation ) => {
  */
 export const unregisterBlockVariation = ( blockName, variationName ) => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
+};
+
+/**
+ * Registers a new block alias for the given block type.
+ *
+ * For more information on block variations see
+ * [the official documentation ](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/).
+ *
+ * @param {string} blockName Name of the block (example: “core/columns”).
+ * @param {Object} alias     Object describing a block variation.
+ *
+ * @example
+ * ```js
+ * import { __ } from '@wordpress/i18n';
+ * import { registerBlockAlias } from '@wordpress/blocks';
+ * import { Button } from '@wordpress/components';
+ *
+ * const ExampleComponent = () => {
+ *     return (
+ *         <Button
+ *             onClick={ () => {
+ *                 registerBlockAlias( 'core/embed', {
+ *                     name: 'custom',
+ *                     title: __( 'My Custom Embed' ),
+ *                     attributes: { providerNameSlug: 'custom' },
+ *                 } );
+ *             } }
+ *          >
+ *              __( 'Add a custom variation for core/embed' ) }
+ *         </Button>
+ *     );
+ * };
+ * ```
+ */
+const registerBlockAlias = ( blockName, alias ) => {
+	const canonicalBlock = select( blocksStore ).getBlockType( blockName );
+
+	if ( ! canonicalBlock ) {
+		console.warn( `Block "${ blockName }" does not exist.` );
+		return;
+	}
+
+	Object.keys( alias.attributes || {} ).forEach( ( key ) => {
+		const aliasAttributeObject = alias.attributes[ key ];
+		const attributeObject = canonicalBlock.attributes[ key ];
+
+		if ( ! attributeObject ) {
+			console.warn(
+				`Attribute "${ key }" does not exist in the original block.`
+			);
+			return;
+		}
+
+		if ( aliasAttributeObject.type === attributeObject.type ) {
+			alias.attributes[ key ] = {
+				...aliasAttributeObject,
+			};
+		} else {
+			alias.attributes[ key ] = { ...attributeObject };
+		}
+	} );
+
+	const mergedBlockSettings = deepmerge( canonicalBlock, alias );
+
+	registerBlockType( alias.name, {
+		...mergedBlockSettings,
+		canonicalName: blockName,
+	} );
 };
