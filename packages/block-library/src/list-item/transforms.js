@@ -3,6 +3,11 @@
  */
 import { createBlock, cloneBlock } from '@wordpress/blocks';
 
+/**
+ * Internal dependencies
+ */
+import { convertToListItems } from './utils';
+
 const transforms = {
 	to: [
 		{
@@ -12,6 +17,12 @@ const transforms = {
 				createBlock( 'core/paragraph', attributes ),
 				...innerBlocks.map( ( block ) => cloneBlock( block ) ),
 			],
+		},
+	],
+	from: [
+		{
+			type: 'paste',
+			transform: ( blocks ) => convertToListItems( blocks ),
 		},
 	],
 };

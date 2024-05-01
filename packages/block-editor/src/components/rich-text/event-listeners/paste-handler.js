@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	pasteHandler,
-	findTransform,
-	getBlockTransforms,
-} from '@wordpress/blocks';
+import { pasteHandler } from '@wordpress/blocks';
 import { isEmpty, insert, create } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 
@@ -13,7 +9,6 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { addActiveFormats } from '../utils';
-import { splitValue } from '../split-value';
 import { getPasteEventData } from '../../../utils/pasting';
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
@@ -27,12 +22,20 @@ export default ( props ) => ( element ) => {
 			formatTypes,
 			tagName,
 			onReplace,
-			onSplit,
 			__unstableEmbedURLOnPaste,
+			preserveWhiteSpace,
 			pastePlainText,
 		} = props.current;
 
-		const { plainText, html, files } = getPasteEventData( event );
+		if ( event.target !== element ) {
+			return;
+		}
+
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		const { plainText, html } = getPasteEventData( event );
 
 		event.preventDefault();
 
@@ -45,38 +48,39 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		const transformed = formatTypes.reduce(
+			( accumlator, { __unstablePasteRule } ) => {
+				// Only allow one transform.
+				if ( __unstablePasteRule && accumlator === value ) {
+					accumlator = __unstablePasteRule( value, {
+						html,
+						plainText,
+					} );
+				}
+
+				return accumlator;
+			},
+			value
+		);
+
+		if ( transformed !== value ) {
+			onChange( transformed );
+			return;
+		}
+
 		const isInternal =
 			event.clipboardData.getData( 'rich-text' ) === 'true';
-
-		function pasteInline( content ) {
-			const transformed = formatTypes.reduce(
-				( accumulator, { __unstablePasteRule } ) => {
-					// Only allow one transform.
-					if ( __unstablePasteRule && accumulator === value ) {
-						accumulator = __unstablePasteRule( value, {
-							html,
-							plainText,
-						} );
-					}
-
-					return accumulator;
-				},
-				value
-			);
-			if ( transformed !== value ) {
-				onChange( transformed );
-			} else {
-				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
-				onChange( insert( value, valueToInsert ) );
-			}
-		}
 
 		// If the data comes from a rich text instance, we can directly use it
 		// without filtering the data. The filters are only meant for externally
 		// pasted content and remove inline styles.
 		if ( isInternal ) {
-			pasteInline( html );
+			const pastedValue = create( {
+				html,
+				preserveWhiteSpace,
+			} );
+			addActiveFormats( pastedValue, value.activeFormats );
+			onChange( insert( value, pastedValue ) );
 			return;
 		}
 
@@ -85,47 +89,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		if ( files?.length ) {
-			// Allows us to ask for this information when we get a report.
-			// eslint-disable-next-line no-console
-			window.console.log( 'Received items:\n\n', files );
-
-			const fromTransforms = getBlockTransforms( 'from' );
-			const blocks = files
-				.reduce( ( accumulator, file ) => {
-					const transformation = findTransform(
-						fromTransforms,
-						( transform ) =>
-							transform.type === 'files' &&
-							transform.isMatch( [ file ] )
-					);
-					if ( transformation ) {
-						accumulator.push(
-							transformation.transform( [ file ] )
-						);
-					}
-					return accumulator;
-				}, [] )
-				.flat();
-			if ( ! blocks.length ) {
-				return;
-			}
-
-			if ( onReplace && isEmpty( value ) ) {
-				onReplace( blocks );
-			} else {
-				splitValue( {
-					value,
-					pastedBlocks: blocks,
-					onReplace,
-					onSplit,
-				} );
-			}
-
-			return;
-		}
-
-		let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
+		let mode = 'INLINE';
 
 		const trimmedPlainText = plainText.trim();
 
@@ -144,26 +108,24 @@ export default ( props ) => ( element ) => {
 			plainText,
 			mode,
 			tagName,
+			preserveWhiteSpace,
 		} );
 
 		if ( typeof content === 'string' ) {
-			pasteInline( content );
+			const valueToInsert = create( { html: content } );
+			addActiveFormats( valueToInsert, value.activeFormats );
+			onChange( insert( value, valueToInsert ) );
 		} else if ( content.length > 0 ) {
 			if ( onReplace && isEmpty( value ) ) {
 				onReplace( content, content.length - 1, -1 );
-			} else {
-				splitValue( {
-					value,
-					pastedBlocks: content,
-					onReplace,
-					onSplit,
-				} );
 			}
 		}
 	}
 
-	element.addEventListener( 'paste', _onPaste );
+	const { defaultView } = element.ownerDocument;
+
+	defaultView.addEventListener( 'paste', _onPaste );
 	return () => {
-		element.removeEventListener( 'paste', _onPaste );
+		defaultView.removeEventListener( 'paste', _onPaste );
 	};
 };
