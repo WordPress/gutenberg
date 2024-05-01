@@ -106,7 +106,7 @@ export default function ButtonsEdit( {
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
-				isFloating={ true }
+				isFloating
 				onAddBlock={ onAddNextButton }
 			/>
 		</View>

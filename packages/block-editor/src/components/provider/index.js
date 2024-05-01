@@ -57,10 +57,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 export const BlockEditorProvider = ( props ) => {
 	return (
-		<ExperimentalBlockEditorProvider
-			{ ...props }
-			stripExperimentalSettings={ true }
-		>
+		<ExperimentalBlockEditorProvider { ...props } stripExperimentalSettings>
 			{ props.children }
 		</ExperimentalBlockEditorProvider>
 	);

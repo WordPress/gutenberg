@@ -35,6 +35,7 @@ function ElementItem( { parentMenu, element, label } ) {
 		prefix + 'typography.letterSpacing'
 	);
 	const [ backgroundColor ] = useGlobalStyle( prefix + 'color.background' );
+	const [ fallbackBackgroundColor ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( prefix + 'color.gradient' );
 	const [ color ] = useGlobalStyle( prefix + 'color.text' );
 
@@ -54,7 +55,10 @@ function ElementItem( { parentMenu, element, label } ) {
 					className="edit-site-global-styles-screen-typography__indicator"
 					style={ {
 						fontFamily: fontFamily ?? 'serif',
-						background: gradientValue ?? backgroundColor,
+						background:
+							gradientValue ??
+							backgroundColor ??
+							fallbackBackgroundColor,
 						color,
 						fontStyle,
 						fontWeight,

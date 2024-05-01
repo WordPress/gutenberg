@@ -6,9 +6,17 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { Notice } from '@wordpress/components';
-import { useInstanceId, useViewportMatch } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	Notice,
+	__unstableAnimatePresence as AnimatePresence,
+	__unstableMotion as motion,
+} from '@wordpress/components';
+import {
+	useInstanceId,
+	useViewportMatch,
+	useReducedMotion,
+} from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	BlockBreadcrumb,
@@ -16,11 +24,6 @@ import {
 	store as blockEditorStore,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import {
-	InterfaceSkeleton,
-	ComplementaryArea,
-	store as interfaceStore,
-} from '@wordpress/interface';
 import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
@@ -31,6 +34,8 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,7 +45,7 @@ import {
 	SidebarInspectorFill,
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
-import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
+import Header from '../header-edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -59,7 +64,13 @@ const {
 	ExperimentalEditorProvider: EditorProvider,
 	InserterSidebar,
 	ListViewSidebar,
+	InterfaceSkeleton,
+	ComplementaryArea,
+	interfaceStore,
+	SavePublishPanels,
 } = unlock( editorPrivateApis );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -70,9 +81,13 @@ const interfaceLabels = {
 	actions: __( 'Editor publish' ),
 	/* translators: accessibility text for the editor footer landmark region. */
 	footer: __( 'Editor footer' ),
+	/* translators: accessibility text for the editor header landmark region. */
+	header: __( 'Editor top bar' ),
 };
 
-export default function Editor( { isLoading } ) {
+const ANIMATION_DURATION = 0.25;
+
+export default function Editor( { isLoading, onClick } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -82,6 +97,7 @@ export default function Editor( { isLoading } ) {
 	const { type: editedPostType } = editedPost;
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const disableMotion = useReducedMotion();
 
 	const {
 		context,
@@ -128,9 +144,7 @@ export default function Editor( { isLoading } ) {
 			blockEditorMode: __unstableGetEditorMode(),
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isRightSidebarOpen: getActiveComplementaryArea(
-				editSiteStore.name
-			),
+			isRightSidebarOpen: getActiveComplementaryArea( 'core' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -174,7 +188,25 @@ export default function Editor( { isLoading } ) {
 		'edit-site-editor__loading-progress'
 	);
 
+	const { closeGeneralSidebar } = useDispatch( editSiteStore );
+
 	const settings = useSpecificEditorSettings();
+
+	// Local state for save panel.
+	// Note 'truthy' callback implies an open panel.
+	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
+		useState( false );
+
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+
 	const isReady =
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
@@ -209,8 +241,56 @@ export default function Editor( { isLoading } ) {
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,
+								'is-entity-save-view-open':
+									!! entitiesSavedStatesCallback,
 							}
 						) }
+						header={
+							<AnimatePresence initial={ false }>
+								{ canvasMode === 'edit' && (
+									<motion.div
+										initial={ {
+											marginTop: -60,
+										} }
+										animate={ {
+											marginTop: 0,
+										} }
+										exit={ {
+											marginTop: -60,
+										} }
+										transition={ {
+											type: 'tween',
+											duration:
+												// Disable transition in mobile to emulate a full page transition.
+												disableMotion ||
+												! isLargeViewport
+													? 0
+													: ANIMATION_DURATION,
+											ease: [ 0.6, 0, 0.4, 1 ],
+										} }
+									>
+										<Header
+											setEntitiesSavedStatesCallback={
+												setEntitiesSavedStatesCallback
+											}
+										/>
+									</motion.div>
+								) }
+							</AnimatePresence>
+						}
+						actions={
+							<SavePublishPanels
+								closeEntitiesSavedStates={
+									closeEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									entitiesSavedStatesCallback
+								}
+								setEntitiesSavedStatesCallback={
+									setEntitiesSavedStatesCallback
+								}
+							/>
+						}
 						notices={ <EditorSnackbars /> }
 						content={
 							<>
@@ -225,7 +305,7 @@ export default function Editor( { isLoading } ) {
 										{ ! isLargeViewport && (
 											<BlockToolbar hideDragHandle />
 										) }
-										<SiteEditorCanvas />
+										<SiteEditorCanvas onClick={ onClick } />
 										<PatternModal />
 									</>
 								) }
@@ -234,24 +314,27 @@ export default function Editor( { isLoading } ) {
 								) }
 								{ isEditMode && (
 									<>
-										<KeyboardShortcutsEditMode />
 										<EditorKeyboardShortcutsRegister />
 										<EditorKeyboardShortcuts />
+										<BlockKeyboardShortcuts />
 									</>
 								) }
 							</>
 						}
 						secondarySidebar={
 							isEditMode &&
-							( ( shouldShowInserter && <InserterSidebar /> ) ||
+							( ( shouldShowInserter && (
+								<InserterSidebar
+									closeGeneralSidebar={ closeGeneralSidebar }
+									isRightSidebarOpen={ isRightSidebarOpen }
+								/>
+							) ) ||
 								( shouldShowListView && <ListViewSidebar /> ) )
 						}
 						sidebar={
-							! isDistractionFree &&
 							isEditMode &&
-							isRightSidebarOpen &&
 							! isDistractionFree && (
-								<ComplementaryArea.Slot scope="core/edit-site" />
+								<ComplementaryArea.Slot scope="core" />
 							)
 						}
 						footer={

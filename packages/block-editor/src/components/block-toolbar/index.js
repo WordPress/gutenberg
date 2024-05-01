@@ -63,6 +63,7 @@ export function PrivateBlockToolbar( {
 		isDefaultEditingMode,
 		blockType,
 		blockName,
+		toolbarKey,
 		shouldShowVisualToolbar,
 		showParentSelector,
 		isUsingBindings,
@@ -103,6 +104,7 @@ export function PrivateBlockToolbar( {
 			blockType: selectedBlockClientId && getBlockType( _blockName ),
 			shouldShowVisualToolbar: isValid && isVisual,
 			rootClientId: blockRootClientId,
+			toolbarKey: `${ selectedBlockClientId }${ firstParentClientId }`,
 			showParentSelector:
 				parentBlockType &&
 				getBlockEditingMode( firstParentClientId ) === 'default' &&
@@ -159,7 +161,7 @@ export function PrivateBlockToolbar( {
 			__experimentalOnIndexChange={ __experimentalOnIndexChange }
 			// Resets the index whenever the active block changes so
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-			key={ blockClientId }
+			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
 				{ ! isMultiToolbar &&
@@ -169,22 +171,29 @@ export function PrivateBlockToolbar( {
 					<BlockBindingsIndicator />
 				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) &&
-					isDefaultEditingMode && (
+					( isDefaultEditingMode || isSynced ) && (
 						<div
 							ref={ nodeRef }
 							{ ...showHoveredOrFocusedGestures }
 						>
 							<ToolbarGroup className="block-editor-block-toolbar__block-controls">
-								<BlockSwitcher clientIds={ blockClientIds } />
-								{ ! isMultiToolbar && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
-								<BlockMover
+								<BlockSwitcher
 									clientIds={ blockClientIds }
-									hideDragHandle={ hideDragHandle }
+									disabled={ ! isDefaultEditingMode }
 								/>
+								{ isDefaultEditingMode && (
+									<>
+										{ ! isMultiToolbar && (
+											<BlockLockToolbar
+												clientId={ blockClientId }
+											/>
+										) }
+										<BlockMover
+											clientIds={ blockClientIds }
+											hideDragHandle={ hideDragHandle }
+										/>
+									</>
+								) }
 							</ToolbarGroup>
 						</div>
 					) }

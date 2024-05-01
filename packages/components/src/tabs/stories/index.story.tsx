@@ -73,7 +73,7 @@ const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab tabId="tab1" disabled={ true }>
+				<Tabs.Tab tabId="tab1" disabled>
 					Tab 1
 				</Tabs.Tab>
 				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>

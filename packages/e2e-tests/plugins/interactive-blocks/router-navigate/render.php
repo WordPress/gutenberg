@@ -7,8 +7,6 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-wp_enqueue_script_module( 'router-navigate-view' );
-
 if ( $attributes['disableNavigation'] ) {
 	wp_interactivity_config(
 		'core/router',

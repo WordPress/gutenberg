@@ -187,7 +187,7 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
-				selectUser={ true }
+				selectUser
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }

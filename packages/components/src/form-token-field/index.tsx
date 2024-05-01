@@ -40,7 +40,7 @@ const identity = ( value: string ) => value;
  * Tokens are separated by the "," character. Suggestions can be selected with the up or down arrows and added with the tab or enter key.
  *
  * The `value` property is handled in a manner similar to controlled form components.
- * See [Forms](http://facebook.github.io/react/docs/forms.html) in the React Documentation for more information.
+ * See [Forms](https://react.dev/reference/react-dom/components#form-components) in the React Documentation for more information.
  */
 export function FormTokenField( props: FormTokenFieldProps ) {
 	const {
@@ -711,7 +711,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					justify="flex-start"
 					align="center"
 					gap={ 1 }
-					wrap={ true }
+					wrap
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					hasTokens={ !! value.length }
 				>

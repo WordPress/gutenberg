@@ -113,15 +113,18 @@ function cli( command, args, pipe = false ) {
  */
 async function fetchPRs() {
 	const { items } = await GitHubFetch(
-		`/search/issues?q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
+		`/search/issues?per_page=100&q=is:pr state:closed sort:updated label:"${ LABEL }" repo:WordPress/gutenberg`
 	);
 	const PRs = items
-		.map( ( { id, number, title, pull_request, closed_at } ) => ( {
+		// eslint-disable-next-line camelcase
+		.map( ( { id, number, title, pull_request } ) => ( {
 			id,
 			number,
 			title,
+			// eslint-disable-next-line camelcase
 			pull_request,
 		} ) )
+		// eslint-disable-next-line camelcase
 		.filter( ( { pull_request } ) => !! pull_request?.merged_at )
 		.sort(
 			( a, b ) =>

@@ -347,6 +347,7 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<RichText
+						identifier="buttonText"
 						className={ buttonClasses }
 						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
@@ -546,6 +547,7 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
+					identifier="label"
 					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }

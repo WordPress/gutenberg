@@ -123,10 +123,11 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
@@ -586,7 +587,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background

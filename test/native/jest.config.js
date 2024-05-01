@@ -25,7 +25,6 @@ const RAW_HANDLING_UNSUPPORTED_UNIT_TESTS = [
 	'html-formatting-remover',
 	'phrasing-content-reducer',
 	'figure-content-reducer',
-	'special-comment-converter',
 	'normalise-blocks',
 	'image-corrector',
 ];

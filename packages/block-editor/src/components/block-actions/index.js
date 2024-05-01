@@ -98,16 +98,10 @@ export default function BlockActions( {
 			return removeBlocks( clientIds, updateSelection );
 		},
 		onInsertBefore() {
-			const clientId = Array.isArray( clientIds )
-				? clientIds[ 0 ]
-				: clientId;
-			insertBeforeBlock( clientId );
+			insertBeforeBlock( clientIds[ 0 ] );
 		},
 		onInsertAfter() {
-			const clientId = Array.isArray( clientIds )
-				? clientIds[ clientIds.length - 1 ]
-				: clientId;
-			insertAfterBlock( clientId );
+			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onMoveTo() {
 			setNavigationMode( true );

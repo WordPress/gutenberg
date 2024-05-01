@@ -10,7 +10,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
+import { useIsTemplatesAccessible } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
@@ -18,7 +18,6 @@ const { useHistory } = unlock( routerPrivateApis );
 export function useAdminNavigationCommands() {
 	const history = useHistory();
 	const isTemplatesAccessible = useIsTemplatesAccessible();
-	const isBlockBasedTheme = useIsBlockBasedTheme();
 
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
@@ -45,7 +44,11 @@ export function useAdminNavigationCommands() {
 		label: __( 'Patterns' ),
 		icon: symbol,
 		callback: ( { close } ) => {
-			if ( isTemplatesAccessible && isBlockBasedTheme ) {
+			// The site editor and templates both check whether the user
+			// can read templates. We can leverage that here and this
+			// command links to the classic dashboard manage patterns page
+			// if the user can't access it.
+			if ( isTemplatesAccessible ) {
 				const args = {
 					path: '/patterns',
 				};

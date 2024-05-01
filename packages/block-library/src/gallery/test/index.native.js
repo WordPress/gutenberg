@@ -92,7 +92,7 @@ describe( 'Gallery block', () => {
 		expect( getBlock( screen, 'Gallery' ) ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();
 
-		getBlockSpy.mockReset();
+		getBlockSpy.mockRestore();
 	} );
 
 	it( 'selects a gallery item', async () => {

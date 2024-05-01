@@ -251,13 +251,13 @@ export default function BorderPanel( {
 				>
 					<BorderBoxControl
 						colors={ colors }
-						enableAlpha={ true }
+						enableAlpha
 						enableStyle={ showBorderStyle }
 						onChange={ onBorderChange }
 						popoverOffset={ 40 }
 						popoverPlacement="left-start"
 						value={ border }
-						__experimentalIsRenderedInSidebar={ true }
+						__experimentalIsRenderedInSidebar
 						size={ '__unstable-large' }
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }

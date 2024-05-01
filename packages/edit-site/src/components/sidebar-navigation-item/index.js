@@ -13,15 +13,42 @@ import {
 } from '@wordpress/components';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useContext } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+import { SidebarNavigationContext } from '../sidebar';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 export default function SidebarNavigationItem( {
 	className,
 	icon,
 	withChevron = false,
 	suffix,
+	path,
+	onClick,
 	children,
 	...props
 } ) {
+	const history = useHistory();
+	const navigate = useContext( SidebarNavigationContext );
+
+	// If there is no custom click handler, create one that navigates to `path`.
+	function handleClick( e ) {
+		if ( onClick ) {
+			onClick( e );
+			navigate( 'forward' );
+		} else if ( path ) {
+			e.preventDefault();
+			history.push( { path } );
+			navigate( 'forward', `[id="${ path }"]` );
+		}
+	}
+
 	return (
 		<Item
 			className={ classnames(
@@ -29,6 +56,8 @@ export default function SidebarNavigationItem( {
 				{ 'with-suffix': ! withChevron && suffix },
 				className
 			) }
+			onClick={ handleClick }
+			id={ path }
 			{ ...props }
 		>
 			<HStack justify="flex-start">

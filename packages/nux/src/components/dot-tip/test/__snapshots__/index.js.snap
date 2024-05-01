@@ -3,7 +3,7 @@
 exports[`DotTip should render correctly 1`] = `
 <div
   aria-label="Editor tips"
-  class="components-popover components-popover nux-dot-tip is-positioned"
+  class="components-popover nux-dot-tip is-positioned"
   data-wp-c16t="true"
   data-wp-component="Popover"
   role="dialog"

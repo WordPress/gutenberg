@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Enable `curly` eslint rule when using prettier ([#61204](https://github.com/WordPress/gutenberg/pull/61204)).
+
+## 17.13.0 (2024-04-19)
+
+## 17.12.0 (2024-04-03)
+
+## 17.11.0 (2024-03-21)
+
+## 17.10.0 (2024-03-06)
+
 ## 17.9.0 (2024-02-21)
 
 ## 17.8.0 (2024-02-09)

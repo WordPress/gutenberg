@@ -8,13 +8,15 @@ const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
-	// Don't expose documentation for mobile only and G2 components just yet.
+	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
 		'**/src/mobile/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
 		'packages/components/src/dropdown-menu-v2/README.md',
 		'packages/components/src/progress-bar/README.md',
+		'packages/components/src/tabs/README.md',
+		'packages/components/src/custom-select-control-v2/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )

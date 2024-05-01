@@ -191,7 +191,7 @@ function BlockHooksControlPure( {
 			<PanelBody
 				className="block-editor-hooks__block-hooks"
 				title={ __( 'Plugins' ) }
-				initialOpen={ true }
+				initialOpen
 			>
 				<p className="block-editor-hooks__block-hooks-helptext">
 					{ __(

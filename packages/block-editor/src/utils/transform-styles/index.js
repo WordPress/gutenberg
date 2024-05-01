@@ -19,6 +19,7 @@ function transformStyle(
 		return css;
 	}
 
+	const postcssFriendlyCSS = css.replace( ':where(body)', 'body' );
 	try {
 		return postcss(
 			[
@@ -31,7 +32,7 @@ function transformStyle(
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
-		).process( css, {} ).css; // use sync PostCSS API
+		).process( postcssFriendlyCSS, {} ).css; // use sync PostCSS API
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
 			// eslint-disable-next-line no-console

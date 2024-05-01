@@ -36,11 +36,11 @@ const Pagination = memo( function Pagination( {
 					{ createInterpolateElement(
 						sprintf(
 							// translators: %s: Total number of pages.
-							_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
+							_x( 'Page <CurrentPageControl /> of %s', 'paging' ),
 							totalPages
 						),
 						{
-							CurrenPageControl: (
+							CurrentPageControl: (
 								<SelectControl
 									aria-label={ __( 'Current page' ) }
 									value={ view.page }

@@ -82,13 +82,9 @@ test.describe( 'Patterns', () => {
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'Save' } )
 			.click();
-		await page
-			.getByRole( 'region', { name: 'Save panel' } )
-			.getByRole( 'button', { name: 'Save' } )
-			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
-		).toContainText( 'Site updated' );
+		).toContainText( 'Pattern updated' );
 
 		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
 		await patterns.navigation
@@ -172,7 +168,7 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'Reset filters' } )
+			.getByRole( 'button', { name: 'Reset', exact: true } )
 			.click();
 		await expect( searchBox ).toHaveValue( '' );
 		await expect( patterns.item ).toHaveCount( 3 );

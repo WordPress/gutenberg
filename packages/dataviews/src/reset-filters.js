@@ -21,6 +21,7 @@ export default function ResetFilter( { filters, view, onChangeView } ) {
 			__experimentalIsFocusable
 			size="compact"
 			variant="tertiary"
+			className="dataviews-filters__reset-button"
 			onClick={ () => {
 				onChangeView( {
 					...view,
@@ -30,7 +31,7 @@ export default function ResetFilter( { filters, view, onChangeView } ) {
 				} );
 			} }
 		>
-			{ __( 'Reset filters' ) }
+			{ __( 'Reset' ) }
 		</Button>
 	);
 }

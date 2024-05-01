@@ -133,6 +133,17 @@ function KeyboardShortcutsRegister() {
 			},
 		} );
 
+		// List view shortcuts.
+		registerShortcut( {
+			name: 'core/block-editor/collapse-list-view',
+			category: 'list-view',
+			description: __( 'Collapse all other items.' ),
+			keyCombination: {
+				modifier: 'alt',
+				character: 'l',
+			},
+		} );
+
 		registerShortcut( {
 			name: 'core/block-editor/group',
 			category: 'block',

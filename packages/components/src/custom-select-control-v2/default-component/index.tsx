@@ -9,8 +9,9 @@ import * as Ariakit from '@ariakit/react';
 import _CustomSelect from '../custom-select';
 import type { CustomSelectProps } from '../types';
 import type { WordPressComponentProps } from '../../context';
+import Item from '../item';
 
-function CustomSelect(
+function CustomSelectControlV2(
 	props: WordPressComponentProps< CustomSelectProps, 'button', false >
 ) {
 	const { defaultValue, onChange, value, ...restProps } = props;
@@ -24,4 +25,6 @@ function CustomSelect(
 	return <_CustomSelect { ...restProps } store={ store } />;
 }
 
-export default CustomSelect;
+CustomSelectControlV2.Item = Item;
+
+export default CustomSelectControlV2;

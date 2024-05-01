@@ -2,6 +2,8 @@
  * Internal dependencies
  */
 import { selectBlockPatternsKey } from './private-keys';
+import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
 
 export const checkAllowList = ( list, item, defaultResult = null ) => {
 	if ( typeof list === 'boolean' ) {
@@ -52,5 +54,16 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 		state.settings.__experimentalReusableBlocks,
 		state.settings[ selectBlockPatternsKey ]?.( select ),
 		state.blockPatterns,
+		unlock( select( STORE_NAME ) ).getReusableBlocks(),
 	];
 };
+
+export function getInsertBlockTypeDependants( state, rootClientId ) {
+	return [
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId.get( rootClientId ),
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockEditingModes,
+	];
+}

@@ -177,7 +177,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ renderTestDefaultControlComponent }
 			/>
 		);
@@ -217,7 +217,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ mockRenderDefaultControl }
 				viewports={ customViewportSet }
 			/>
@@ -319,7 +319,7 @@ describe( 'Default and Responsive modes', () => {
 			<ResponsiveBlockControl
 				title="Padding"
 				property="padding"
-				isResponsive={ true }
+				isResponsive
 				renderDefaultControl={ spyRenderDefaultControl }
 				renderResponsiveControls={ mockRenderResponsiveControls }
 			/>

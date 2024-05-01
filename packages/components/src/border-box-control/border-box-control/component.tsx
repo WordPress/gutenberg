@@ -111,7 +111,7 @@ const UnconnectedBorderBoxControl = (
 						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
-						withSlider={ true }
+						withSlider
 						width={
 							size === '__unstable-large' ? '116px' : '110px'
 						}

@@ -102,8 +102,12 @@ export function createLinkFormat( {
 		},
 	};
 
-	if ( type ) format.attributes.type = type;
-	if ( id ) format.attributes.id = id;
+	if ( type ) {
+		format.attributes.type = type;
+	}
+	if ( id ) {
+		format.attributes.id = id;
+	}
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';

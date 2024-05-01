@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import _CustomSelect from '../custom-select';
+import CustomSelectItem from '../item';
 import type { LegacyCustomSelectProps } from '../types';
-import { CustomSelectItem } from '..';
 import * as Styled from '../styles';
 import { ContextSystemProvider } from '../../context';
 
-function CustomSelect( props: LegacyCustomSelectProps ) {
+function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	const {
 		__experimentalShowSelectedHint,
 		__next40pxDefaultSize = false,
@@ -30,7 +30,9 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) return;
+			if ( ! onChange ) {
+				return;
+			}
 
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
@@ -68,9 +70,7 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
 				<CustomSelectItem
 					key={ key }
 					value={ name }
-					children={
-						__experimentalShowSelectedHint ? withHint : name
-					}
+					children={ __experimentalHint ? withHint : name }
 					{ ...rest }
 				/>
 			);
@@ -130,4 +130,4 @@ function CustomSelect( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export default CustomSelect;
+export default CustomSelectControl;

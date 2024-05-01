@@ -188,6 +188,7 @@ export default function PostNavigationLinkEdit( {
 				) }
 				<RichText
 					tagName="a"
+					identifier="label"
 					aria-label={ ariaLabel }
 					placeholder={ placeholder }
 					value={ label }
@@ -207,7 +208,7 @@ export default function PostNavigationLinkEdit( {
 				{ isNext && displayArrow && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
-						aria-hidden={ true }
+						aria-hidden
 					>
 						{ displayArrow }
 					</span>

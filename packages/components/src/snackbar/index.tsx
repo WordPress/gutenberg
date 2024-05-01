@@ -168,7 +168,7 @@ function UnforwardedSnackbar(
 				{ explicitDismiss && (
 					<span
 						role="button"
-						aria-label="Dismiss this notice"
+						aria-label={ __( 'Dismiss this notice' ) }
 						tabIndex={ 0 }
 						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }

@@ -546,7 +546,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
-							hideCancelButton={ true }
+							hideCancelButton
 							size="__unstable-large"
 						/>
 					) }
@@ -556,7 +556,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
-						hideCancelButton={ true }
+						hideCancelButton
 						size="__unstable-large"
 					/>
 					<ToggleControl
@@ -602,7 +602,7 @@ function GalleryEdit( props ) {
 								handleUpload={ false }
 								onSelect={ updateImages }
 								name={ __( 'Add' ) }
-								multiple={ true }
+								multiple
 								mediaIds={ images
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }

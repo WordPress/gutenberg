@@ -265,7 +265,7 @@ class MediaContainer extends Component {
 										isSelected={ isSelected }
 										style={ styles.video }
 										source={ { uri: mediaUrl } }
-										paused={ true }
+										paused
 									/>
 								</View>
 							) }
@@ -329,7 +329,7 @@ class MediaContainer extends Component {
 		if ( mediaUrl ) {
 			return (
 				<MediaUpload
-					isReplacingMedia={ true }
+					isReplacingMedia
 					onSelect={ this.onSelectMediaUploadOption }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ mediaId }

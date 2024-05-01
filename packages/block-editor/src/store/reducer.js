@@ -304,20 +304,15 @@ const withBlockTree =
 					action.blocks
 				);
 				newState.tree = new Map( newState.tree );
-				action.replacedClientIds
-					.concat(
-						// Controlled inner blocks are only removed
-						// if the block doesn't move to another position
-						// otherwise their content will be lost.
-						action.replacedClientIds
-							.filter(
-								( clientId ) => ! inserterClientIds[ clientId ]
-							)
-							.map( ( clientId ) => 'controlled||' + clientId )
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					// Controlled inner blocks are only removed
+					// if the block doesn't move to another position
+					// otherwise their content will be lost.
+					if ( ! inserterClientIds[ clientId ] ) {
+						newState.tree.delete( 'controlled||' + clientId );
+					}
+				} );
 
 				updateBlockTreeForBlocks( newState, action.blocks );
 				updateParentInnerBlocksInTree(
@@ -329,16 +324,13 @@ const withBlockTree =
 				// If there are no replaced blocks, it means we're removing blocks so we need to update their parent.
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				updateParentInnerBlocksInTree(
@@ -351,28 +343,20 @@ const withBlockTree =
 			case 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN':
 				const parentsOfRemovedBlocks = [];
 				for ( const clientId of action.clientIds ) {
+					const parentId = state.parents.get( clientId );
 					if (
-						state.parents.get( clientId ) !== undefined &&
-						( state.parents.get( clientId ) === '' ||
-							newState.byClientId.get(
-								state.parents.get( clientId )
-							) )
+						parentId !== undefined &&
+						( parentId === '' ||
+							newState.byClientId.get( parentId ) )
 					) {
-						parentsOfRemovedBlocks.push(
-							state.parents.get( clientId )
-						);
+						parentsOfRemovedBlocks.push( parentId );
 					}
 				}
 				newState.tree = new Map( newState.tree );
-				action.removedClientIds
-					.concat(
-						action.removedClientIds.map(
-							( clientId ) => 'controlled||' + clientId
-						)
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					newState.tree.delete( 'controlled||' + clientId );
+				} );
 				updateParentInnerBlocksInTree(
 					newState,
 					parentsOfRemovedBlocks,
@@ -1703,36 +1687,42 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return action.blocks.reduce( ( prevState, block ) => {
-				const { attributes, name: blockName } = block;
-				let id = blockName;
-				// If a block variation match is found change the name to be the same with the
-				// one that is used for block variations in the Inserter (`getItemFromVariation`).
-				const match = select( blocksStore ).getActiveBlockVariation(
-					blockName,
-					attributes
-				);
-				if ( match?.name ) {
-					id += '/' + match.name;
-				}
-				if ( blockName === 'core/block' ) {
-					id += '/' + attributes.ref;
-				}
+		case 'REPLACE_BLOCKS': {
+			const nextInsertUsage = action.blocks.reduce(
+				( prevUsage, block ) => {
+					const { attributes, name: blockName } = block;
+					let id = blockName;
+					// If a block variation match is found change the name to be the same with the
+					// one that is used for block variations in the Inserter (`getItemFromVariation`).
+					const match = select( blocksStore ).getActiveBlockVariation(
+						blockName,
+						attributes
+					);
+					if ( match?.name ) {
+						id += '/' + match.name;
+					}
+					if ( blockName === 'core/block' ) {
+						id += '/' + attributes.ref;
+					}
 
-				return {
-					...prevState,
-					insertUsage: {
-						...prevState.insertUsage,
+					return {
+						...prevUsage,
 						[ id ]: {
 							time: action.time,
-							count: prevState.insertUsage[ id ]
-								? prevState.insertUsage[ id ].count + 1
+							count: prevUsage[ id ]
+								? prevUsage[ id ].count + 1
 								: 1,
 						},
-					},
-				};
-			}, state );
+					};
+				},
+				state.insertUsage
+			);
+
+			return {
+				...state,
+				insertUsage: nextInsertUsage,
+			};
+		}
 	}
 
 	return state;
@@ -1880,6 +1870,27 @@ export function highlightedBlock( state, action ) {
 			}
 
 			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning current expanded block in the list view.
+ *
+ * @param {string|null} state  Current expanded block.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function expandedBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EXPANDED_IN_LIST_VIEW':
+			return action.clientId;
 		case 'SELECT_BLOCK':
 			if ( action.clientId !== state ) {
 				return null;
@@ -2064,6 +2075,7 @@ const combinedReducers = combineReducers( {
 	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
+	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,

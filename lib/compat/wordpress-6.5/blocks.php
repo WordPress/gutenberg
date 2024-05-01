@@ -149,13 +149,13 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 	return;
 }
 
-	/**
-	 * Process the block bindings attribute.
-	 *
-	 * @param string   $block_content Block Content.
-	 * @param array    $parsed_block  The full block, including name and attributes.
-	 * @param WP_Block $block_instance The block instance.
-	 */
+/**
+ * Process the block bindings attribute.
+ *
+ * @param string   $block_content Block Content.
+ * @param array    $parsed_block  The full block, including name and attributes.
+ * @param WP_Block $block_instance The block instance.
+ */
 function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
 	$supported_block_attrs = array(
 		'core/paragraph' => array( 'content' ),
@@ -217,3 +217,197 @@ function gutenberg_process_block_bindings( $block_content, $parsed_block, $block
 }
 
 add_filter( 'render_block', 'gutenberg_process_block_bindings', 20, 3 );
+
+/**
+ * Enable the viewStyle block API for core versions < 6.5
+ *
+ */
+if ( ! property_exists( 'WP_Block_Type', 'view_style_handles' ) ) {
+	/**
+	 * Registers viewStyle assets on block type registration (=same moment core would do it).
+	 *
+	 * @param array $settings Array of determined settings for registering a block type.
+	 * @param array $metadata Metadata provided for registering a block type.
+	 * @return array The block type settings
+	 */
+	function gutenberg_filter_block_type_metadata_settings_register_view_styles( $settings, $metadata ) {
+		if ( empty( $metadata['viewStyle'] ) ) {
+			return $settings;
+		}
+		$styles           = $metadata['viewStyle'];
+		$processed_styles = array();
+		if ( is_array( $styles ) ) {
+			for ( $index = 0; $index < count( $styles ); $index++ ) {
+				$result = gutenberg_register_block_view_style_handle(
+					$metadata,
+					$index
+				);
+				if ( $result ) {
+					$processed_styles[] = $result;
+				}
+			}
+		} else {
+			$result = gutenberg_register_block_view_style_handle(
+				$metadata
+			);
+			if ( $result ) {
+				$processed_styles[] = $result;
+			}
+		}
+
+		if ( ! empty( $processed_styles ) ) {
+			$settings['view_style_handles'] = $processed_styles;
+		}
+		return $settings;
+	}
+
+	add_filter( 'block_type_metadata_settings', 'gutenberg_filter_block_type_metadata_settings_register_view_styles', 10, 2 );
+
+	/**
+	 * Enqueue view styles associated with the block.
+	 *
+	 * @param string   $block_content The block content.
+	 * @param array    $block         The full block, including name and attributes.
+	 * @param WP_Block $instance      The block instance.
+	 */
+	function gutenberg_filter_render_block_enqueue_view_styles( $block_content, $parsed_block, $block_instance ) {
+		$block_type = $block_instance->block_type;
+
+		if ( ! empty( $block_type->view_style_handles ) ) {
+			foreach ( $block_type->view_style_handles as $view_style_handle ) {
+				wp_enqueue_style( $view_style_handle );
+			}
+		}
+
+		return $block_content;
+	}
+
+	add_filter( 'render_block', 'gutenberg_filter_render_block_enqueue_view_styles', 10, 3 );
+
+
+	/**
+	 * Registers a REST field for block types to provide view styles.
+	 *
+	 * Adds the `view_style_handles` field to block type objects in the REST API, which
+	 * lists the style handles associated with the block's viewStyle key.
+	 */
+	function gutenberg_register_view_style_rest_field() {
+		register_rest_field(
+			'block-type',
+			'view_style_handles',
+			array(
+				'get_callback' => function ( $item ) {
+					$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $item['name'] );
+					if ( isset( $block_type->view_style_handles ) ) {
+						return $block_type->view_style_handles;
+					}
+					return array();
+				},
+			)
+		);
+	}
+
+	add_action( 'rest_api_init', 'gutenberg_register_view_style_rest_field' );
+
+	/**
+	 * A compat version of `register_block_style_handle()` to use the viewStyle handle.
+	 * Required for core versions < 6.5, since a custom version of generate_block_asset_handle has to be used
+	 * that supports the viewStyle property and correctly creates the handle
+	 *
+	 * @param array  $metadata   Block metadata.
+	 * @param int    $index      Optional. Index of the style to register when multiple items passed.
+	 *                           Default 0.
+	 * @return string|false Style handle provided directly or created through
+	 *                      style's registration, or false on failure.
+	 */
+	function gutenberg_register_block_view_style_handle( $metadata, $index = 0 ) {
+		$style_handle = $metadata['viewStyle'];
+		if ( is_array( $style_handle ) ) {
+			if ( empty( $style_handle[ $index ] ) ) {
+				return false;
+			}
+			$style_handle = $style_handle[ $index ];
+		}
+		$style_handle_name = gutenberg_generate_view_style_block_asset_handle( $metadata['name'], $index );
+		// If the style handle is already registered, skip re-registering.
+		if ( wp_style_is( $style_handle_name, 'registered' ) ) {
+			return $style_handle_name;
+		}
+		static $wpinc_path_norm = '';
+		if ( ! $wpinc_path_norm ) {
+			$wpinc_path_norm = wp_normalize_path( realpath( ABSPATH . WPINC ) );
+		}
+		$is_core_block = isset( $metadata['file'] ) && str_starts_with( $metadata['file'], $wpinc_path_norm );
+		// Skip registering individual styles for each core block when a bundled version provided.
+		if ( $is_core_block && ! wp_should_load_separate_core_block_assets() ) {
+			return false;
+		}
+		$style_path      = remove_block_asset_path_prefix( $style_handle );
+		$is_style_handle = $style_handle === $style_path;
+		// Allow only passing style handles for core blocks.
+		if ( $is_core_block && ! $is_style_handle ) {
+			return false;
+		}
+		// Return the style handle unless it's the first item for every core block that requires special treatment.
+		if ( $is_style_handle && ! ( $is_core_block && 0 === $index ) ) {
+			return $style_handle;
+		}
+		// Check whether styles should have a ".min" suffix or not.
+		$suffix = SCRIPT_DEBUG ? '' : '.min';
+		if ( $is_core_block ) {
+			$style_path = "view{$suffix}.css"; // Use view.css for viewStyle of core blocks
+		}
+		$style_path_norm = wp_normalize_path( realpath( dirname( $metadata['file'] ) . '/' . $style_path ) );
+		$style_uri       = get_block_asset_url( $style_path_norm );
+		$version         = ! $is_core_block && isset( $metadata['version'] ) ? $metadata['version'] : false;
+		$result          = wp_register_style(
+			$style_handle_name,
+			$style_uri,
+			array(),
+			$version
+		);
+		if ( ! $result ) {
+			return false;
+		}
+		if ( $style_uri ) {
+			wp_style_add_data( $style_handle_name, 'path', $style_path_norm );
+			if ( $is_core_block ) {
+				$rtl_file = str_replace( "{$suffix}.css", "-rtl{$suffix}.css", $style_path_norm );
+			} else {
+				$rtl_file = str_replace( '.css', '-rtl.css', $style_path_norm );
+			}
+			if ( is_rtl() && file_exists( $rtl_file ) ) {
+				wp_style_add_data( $style_handle_name, 'rtl', 'replace' );
+				wp_style_add_data( $style_handle_name, 'suffix', $suffix );
+				wp_style_add_data( $style_handle_name, 'path', $rtl_file );
+			}
+		}
+		return $style_handle_name;
+	}
+
+	/**
+	 * A compat version of `generate_block_asset_handle()` to use the viewStyle asset handle.
+	 *
+	 * @param string $block_name Name of the block.
+	 * @param string $field_name Name of the metadata field.
+	 * @param int    $index      Optional. Index of the asset when multiple items passed.
+	 *                           Default 0.
+	 * @return string Generated asset name for the block's field.
+	 */
+	function gutenberg_generate_view_style_block_asset_handle( $block_name, $index = 0 ) {
+		if ( str_starts_with( $block_name, 'core/' ) ) {
+			$asset_handle  = str_replace( 'core/', 'wp-block-', $block_name );
+			$asset_handle .= '-view';
+			if ( $index > 0 ) {
+				$asset_handle .= '-' . ( $index + 1 );
+			}
+			return $asset_handle;
+		}
+
+		$asset_handle = str_replace( '/', '-', $block_name ) . '-view-style';
+		if ( $index > 0 ) {
+			$asset_handle .= '-' . ( $index + 1 );
+		}
+		return $asset_handle;
+	}
+}

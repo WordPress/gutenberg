@@ -298,7 +298,7 @@ export default function ListViewDropIndicatorPreview( {
 			className="block-editor-list-view-drop-indicator--preview"
 			variant="unstyled"
 			flip={ false }
-			resize={ true }
+			resize
 		>
 			<div
 				style={ style }

@@ -7,8 +7,10 @@
 }
 
 .edit-site-global-styles-preview__iframe {
+	border-radius: $radius-block-ui + 1px; // Visually resembles the $radius-block-ui.
 	max-width: 100%;
 	display: block;
+	width: 100%;
 }
 
 .edit-site-typography-preview {
@@ -27,9 +29,8 @@
 	max-width: 100%;
 }
 
-.edit-site-global-styles-screen-typography,
-.edit-site-global-styles-screen-css {
-	margin: $grid-unit-20;
+.edit-site-global-styles-screen {
+	margin: $grid-unit-15 $grid-unit-20 $grid-unit-20;
 }
 
 .edit-site-global-styles-screen-typography__indicator {
@@ -50,14 +51,16 @@
 	justify-content: center;
 }
 
-.edit-site-global-styles-screen-colors {
-	margin: $grid-unit-20;
+.edit-site-global-styles-screen .color-block-support-panel {
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0;
+	border-top: none;
+	row-gap: calc(#{$grid-unit-05} * 3);
+}
 
-	.color-block-support-panel {
-		padding-left: 0;
-		padding-right: 0;
-		border-top: none;
-	}
+.edit-site-global-styles-screen-colors__palette-count {
+	color: $gray-700;
 }
 
 .edit-site-global-styles-header__description {
@@ -113,6 +116,7 @@
 	flex: 1 1 auto;
 	display: flex;
 	flex-direction: column;
+	margin: $grid-unit-20;
 
 	.components-v-stack {
 		flex: 1 1 auto;
@@ -165,3 +169,4 @@
 .edit-site-global-styles-sidebar__panel .block-editor-block-icon svg {
 	fill: currentColor;
 }
+

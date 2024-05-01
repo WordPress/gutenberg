@@ -64,7 +64,7 @@ describe( 'ColorPaletteControl', () => {
 				] }
 				gradients={ [] }
 				disableCustomColors={ false }
-				disableCustomGradients={ true }
+				disableCustomGradients
 				onColorChange={ noop }
 				onGradientChange={ noop }
 			/>
@@ -102,7 +102,7 @@ describe( 'ColorPaletteControl', () => {
 						slug: 'light-green-cyan-to-vivid-green-cyan',
 					},
 				] }
-				disableCustomColors={ true }
+				disableCustomColors
 				disableCustomGradients={ false }
 				onColorChange={ noop }
 				onGradientChange={ noop }

@@ -72,7 +72,14 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = gutenberg_render_elements_support( $block_markup, $block );
+		/*
+		 * To ensure a consistent elements class name it is generated within a
+		 * `render_block_data` filter and stored in the `className` attribute.
+		 * As a result the block data needs to be passed through the same
+		 * function for this test.
+		 */
+		$filtered_block = gutenberg_render_elements_support_styles( $block );
+		$actual         = gutenberg_render_elements_class_name( $block_markup, $filtered_block );
 
 		$this->assertMatchesRegularExpression(
 			$expected_markup,
@@ -192,7 +199,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 			),
 		);
 
-		gutenberg_render_elements_support_styles( null, $block );
+		gutenberg_render_elements_support_styles( $block );
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
 
 		$this->assertMatchesRegularExpression(

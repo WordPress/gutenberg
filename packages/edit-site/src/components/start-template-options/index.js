@@ -137,7 +137,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 			closeLabel={ __( 'Cancel' ) }
 			focusOnMount="firstElement"
 			onRequestClose={ onClose }
-			isFullScreen={ true }
+			isFullScreen
 		>
 			<div className="edit-site-start-template-options__modal-content">
 				<PatternSelection

@@ -97,6 +97,7 @@ module.exports = {
 	},
 	rules: {
 		'jest/expect-expect': 'off',
+		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
@@ -400,6 +401,24 @@ module.exports = {
 								name: '@wordpress/core-data',
 								message:
 									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
 							},
 						],
 					},
