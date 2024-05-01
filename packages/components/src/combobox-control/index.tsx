@@ -83,28 +83,45 @@ const getNextIndexOfMatchingSuggestion = (
 		} )
 		.filter( ( suggestion ) => ! suggestion.disabled );
 
+	/*
+	 * Create a copy of the notDisabledSuggestions array,
+	 * and reverse it, to get the inverse order
+	 * to find the next suggestion when the offset is negative.
+	 */
+	const inverseNotDisabledSuggestions = [
+		...notDisabledSuggestions,
+	].reverse();
+
 	const dir = offset > 0 ? 'down' : 'up';
+
 	/*
 	 * Get the next index of the suggestion,
 	 * based on the current index and the offset.
 	 */
-	const nextSuggestion = notDisabledSuggestions.find( ( suggestion ) => {
-		return dir === 'down'
-			? suggestion.index > current
-			: suggestion.index < current;
-	} );
+	const nextSuggestion =
+		dir === 'down'
+			? notDisabledSuggestions.find(
+					( suggestion ) => suggestion.index > current
+			  )
+			: inverseNotDisabledSuggestions.find(
+					( suggestion ) => suggestion.index < current
+			  );
 
 	/*
 	 * If there is no next suggestion, return the first suggestion not disabled elemen,
 	 * if the offset is positive, or the last suggestion not disabled element,
 	 */
 	if ( ! nextSuggestion ) {
-		return dir === 'down'
-			? notDisabledSuggestions[ 0 ].index
-			: notDisabledSuggestions[ notDisabledSuggestions.length - 1 ].index;
+		const nextIndex =
+			dir === 'down'
+				? notDisabledSuggestions[ 0 ].index
+				: notDisabledSuggestions[ notDisabledSuggestions.length - 1 ]
+						.index;
+
+		return nextIndex;
 	}
 
-	return nextSuggestion?.index;
+	return nextSuggestion.index;
 };
 
 /**
