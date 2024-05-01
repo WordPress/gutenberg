@@ -123,10 +123,12 @@ const getNextIndexOfMatchingSuggestion = (
  * 	{
  * 		value: 'normal',
  * 		label: 'Normal',
+ *      disabled: true,
  * 	},
  * 	{
  * 		value: 'large',
  * 		label: 'Large',
+ *      disabled: false,
  * 	},
  * ];
  *
