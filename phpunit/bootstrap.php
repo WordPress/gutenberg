@@ -186,18 +186,6 @@ function gutenberg_register_test_block_for_feature_selectors() {
 }
 tests_add_filter( 'init', 'gutenberg_register_test_block_for_feature_selectors' );
 
-// Used in class-wp-theme-json-test.php to mock theme file URIs.
-function gutenberg_tests_filter_theme_file_uri( $file ) {
-	// Tests can pass a file path with `example/` to return a dummy absolute theme file URI.
-	if ( strpos( $file, 'example/' ) ) {
-		$file_name = explode( 'example/', $file )[1];
-		return 'https://example.org/wp-content/themes/example-theme/example/' . $file_name;
-	}
-	// Default active theme URI.
-	return get_stylesheet_directory_uri() . '/' . $file;
-}
-tests_add_filter( 'theme_file_uri', 'gutenberg_tests_filter_theme_file_uri' );
-
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
 

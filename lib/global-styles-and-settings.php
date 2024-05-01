@@ -27,7 +27,7 @@ function gutenberg_get_global_stylesheet( $types = array() ) {
 			return $cached;
 		}
 	}
-	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->resolve_theme_file_uris();
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data();
 
 	$supports_theme_json = wp_theme_has_theme_json();
 	if ( empty( $types ) && ! $supports_theme_json ) {

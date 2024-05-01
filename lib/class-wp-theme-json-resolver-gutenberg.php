@@ -604,6 +604,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
 			$result->set_spacing_sizes();
+			$result->resolve_theme_file_uris();
 			return $result;
 		}
 
@@ -753,7 +754,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
 				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
+				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->resolve_theme_file_uris()->get_raw_data();
 				if ( empty( $variation['title'] ) ) {
 					$variation['title'] = basename( $path, '.json' );
 				}
@@ -761,35 +762,5 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 		}
 		return $variations;
-	}
-
-	/**
-	 * Resolves relative paths in theme.json styles to theme absolute paths.
-	 *
-	 * @since 6.6.0
-	 *
-	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
-	 * @return WP_Theme_JSON_Gutenberg A theme json instance with resolved paths.
-	 */
-	protected static function resolve_theme_file_uris( $theme_json ) {
-		if ( empty( $theme_json ) ) {
-			return;
-		}
-
-		/*
-		 * Styles backgrounds.
-		 * Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
-		 * Blocks, elements, and block variations are not yet supported.
-		 */
-		if (
-			isset( $theme_json['styles']['background']['backgroundImage']['url'] ) &&
-			is_string( $theme_json['styles']['background']['backgroundImage']['url'] ) &&
-			! isset( wp_parse_url( $theme_json['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
-			_wp_array_set(
-				$theme_json,
-				array( 'styles', 'background', 'backgroundImage', 'url' ),
-				esc_url( get_theme_file_uri( $theme_json['styles']['background']['backgroundImage']['url'] ) )
-			);
-		}
 	}
 }

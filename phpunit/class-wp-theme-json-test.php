@@ -4878,8 +4878,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 		);
-		$expected_styles = "body { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:where(body){background-image: url('https://example.org/wp-content/themes/example-theme/example/img/image.png');}";
+		$expected_styles = ":where(body) { margin: 0; }.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}.is-layout-flow > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-flow > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-flow > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > .alignleft{float: left;margin-inline-start: 0;margin-inline-end: 2em;}.is-layout-constrained > .alignright{float: right;margin-inline-start: 2em;margin-inline-end: 0;}.is-layout-constrained > .aligncenter{margin-left: auto !important;margin-right: auto !important;}.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)){margin-left: auto !important;margin-right: auto !important;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}:where(body){background-image: url('https://example.org/wp-content/themes/example-theme/example/img/image.png');}";
+
+		/*
+		 * This filter callback normalizes the return value from `get_theme_file_uri`
+		 * to guard against changes in test environments.
+		 * The test suite otherwise returns full system dir path, e.g.,
+		 * /wordpress-phpunit/includes/../data/themedir1/default/example/img/image.png
+		 */
+		$filter_theme_file_uri_callback = function ( $file ) {
+			return 'https://example.org/wp-content/themes/example-theme/example/' . explode( 'example/', $file )[1];
+		};
+		add_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
 		$this->assertSame( $expected_styles, $theme_json->resolve_theme_file_uris()->get_stylesheet(), 'Styles returned from "::resolve_theme_file_uris()->get_stylesheet()" with resolved top-level theme background images do not match expected string' );
+		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+
 		$this->assertSame( $expected_data, $theme_json->get_data(), 'Styles returned from "::get_data()" with resolved top-level theme background images do not match expected array' );
 	}
 
