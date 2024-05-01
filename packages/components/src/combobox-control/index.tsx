@@ -62,6 +62,51 @@ const getIndexOfMatchingSuggestion = (
 		? -1
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
+const getNextIndexOfMatchingSuggestion = (
+	current: number,
+	offset: number,
+	matchingSuggestions: ComboboxControlOption[]
+): number => {
+	/*
+	 * Map the matchingSuggestions to include the index,
+	 * and filter the disabled suggestions.
+	 */
+	const notDisabledSuggestions: ComboboxControlOption[] &
+		{
+			index: number;
+		}[] = matchingSuggestions
+		.map( ( suggestion, i ) => {
+			return {
+				...suggestion,
+				index: i,
+			};
+		} )
+		.filter( ( suggestion ) => ! suggestion.disabled );
+
+	const dir = offset > 0 ? 'down' : 'up';
+	/*
+	 * Get the next index of the suggestion,
+	 * based on the current index and the offset.
+	 */
+	const nextSuggestion = notDisabledSuggestions.find( ( suggestion ) => {
+		return dir === 'down'
+			? suggestion.index > current
+			: suggestion.index < current;
+	} );
+
+	/*
+	 * If there is no next suggestion, return the first suggestion not disabled elemen,
+	 * if the offset is positive, or the last suggestion not disabled element,
+	 */
+	if ( ! nextSuggestion ) {
+		return dir === 'down'
+			? notDisabledSuggestions[ 0 ].index
+			: notDisabledSuggestions[ notDisabledSuggestions.length - 1 ].index;
+	}
+
+	return nextSuggestion?.index;
+};
+
 /**
  * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
  * being able to search for options using a search input.
@@ -181,12 +226,13 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			selectedSuggestion,
 			matchingSuggestions
 		);
-		let nextIndex = index + offset;
-		if ( nextIndex < 0 ) {
-			nextIndex = matchingSuggestions.length - 1;
-		} else if ( nextIndex >= matchingSuggestions.length ) {
-			nextIndex = 0;
-		}
+
+		const nextIndex = getNextIndexOfMatchingSuggestion(
+			index,
+			offset,
+			matchingSuggestions
+		);
+
 		setSelectedSuggestion( matchingSuggestions[ nextIndex ] );
 		setIsExpanded( true );
 	};
