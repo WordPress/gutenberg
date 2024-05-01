@@ -10,9 +10,9 @@ import {
 	forwardRef,
 	useState,
 	useCallback,
+	useImperativeHandle,
 	useMemo,
 	useRef,
-	useImperativeHandle,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
