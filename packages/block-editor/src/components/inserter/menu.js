@@ -140,104 +140,6 @@ function InserterMenu(
 
 	const showAsTabs = showPatterns || showMedia;
 
-	const blocksTab = useMemo(
-		() => (
-			<>
-				<div className="block-editor-inserter__block-list">
-					<BlockTypesTab
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
-						onHover={ onHover }
-						showMostUsedBlocks={ showMostUsedBlocks }
-					/>
-				</div>
-				{ showInserterHelpPanel && (
-					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
-							{ __( 'A tip for using the block editor' ) }
-						</VisuallyHidden>
-						<Tips />
-					</div>
-				) }
-			</>
-		),
-		[
-			destinationRootClientId,
-			onInsert,
-			onHover,
-			showMostUsedBlocks,
-			showInserterHelpPanel,
-		]
-	);
-
-	const patternsTab = useMemo(
-		() => (
-			<BlockPatternsTab
-				rootClientId={ destinationRootClientId }
-				onInsert={ onInsertPattern }
-				onSelectCategory={ onClickPatternCategory }
-				selectedCategory={ selectedPatternCategory }
-			>
-				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onHover={ onHoverPattern }
-						category={ selectedPatternCategory }
-						patternFilter={ patternFilter }
-						showTitlesAsTooltip
-					/>
-				) }
-			</BlockPatternsTab>
-		),
-		[
-			destinationRootClientId,
-			onHoverPattern,
-			onInsertPattern,
-			onClickPatternCategory,
-			patternFilter,
-			selectedPatternCategory,
-			showPatternPanel,
-		]
-	);
-
-	const mediaTab = useMemo(
-		() => (
-			<MediaTab
-				rootClientId={ destinationRootClientId }
-				selectedCategory={ selectedMediaCategory }
-				onSelectCategory={ setSelectedMediaCategory }
-				onInsert={ onInsert }
-			>
-				{ showMediaPanel && (
-					<MediaCategoryPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
-						category={ selectedMediaCategory }
-					/>
-				) }
-			</MediaTab>
-		),
-		[
-			destinationRootClientId,
-			onInsert,
-			selectedMediaCategory,
-			setSelectedMediaCategory,
-			showMediaPanel,
-		]
-	);
-
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
-
-	const handleSetSelectedTab = ( value ) => {
-		// If no longer on patterns tab remove the category setting.
-		if ( value !== 'patterns' ) {
-			setSelectedPatternCategory( null );
-		}
-		setSelectedTab( value );
-	};
-
 	const searchRef = useRef();
 	useImperativeHandle( ref, () => ( {
 		focusSearch: () => {
@@ -255,7 +157,9 @@ function InserterMenu(
 					__nextHasNoMarginBottom
 					className="block-editor-inserter__search"
 					onChange={ ( value ) => {
-						if ( hoveredItem ) setHoveredItem( null );
+						if ( hoveredItem ) {
+							setHoveredItem( null );
+						}
 						setFilterValue( value );
 					} }
 					value={ filterValue }
@@ -300,6 +204,123 @@ function InserterMenu(
 		searchRef,
 	] );
 
+	const blocksTab = useMemo(
+		() => (
+			<>
+				{ inserterSearch }
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
+				</div>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+			inserterSearch,
+		]
+	);
+
+	const patternsTab = useMemo(
+		() => (
+			<>
+				{ inserterSearch }
+				<BlockPatternsTab
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsertPattern }
+					onSelectCategory={ onClickPatternCategory }
+					selectedCategory={ selectedPatternCategory }
+				>
+					{ showPatternPanel && (
+						<PatternCategoryPreviewPanel
+							rootClientId={ destinationRootClientId }
+							onInsert={ onInsertPattern }
+							onHover={ onHoverPattern }
+							category={ selectedPatternCategory }
+							patternFilter={ patternFilter }
+							showTitlesAsTooltip
+						/>
+					) }
+				</BlockPatternsTab>
+			</>
+		),
+		[
+			destinationRootClientId,
+			onHoverPattern,
+			onInsertPattern,
+			onClickPatternCategory,
+			patternFilter,
+			selectedPatternCategory,
+			showPatternPanel,
+			inserterSearch,
+		]
+	);
+
+	const mediaTab = useMemo(
+		() => (
+			<>
+				{ inserterSearch }
+				<MediaTab
+					rootClientId={ destinationRootClientId }
+					selectedCategory={ selectedMediaCategory }
+					onSelectCategory={ setSelectedMediaCategory }
+					onInsert={ onInsert }
+				>
+					{ showMediaPanel && (
+						<MediaCategoryPanel
+							rootClientId={ destinationRootClientId }
+							onInsert={ onInsert }
+							category={ selectedMediaCategory }
+						/>
+					) }
+				</MediaTab>
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			selectedMediaCategory,
+			setSelectedMediaCategory,
+			showMediaPanel,
+			inserterSearch,
+		]
+	);
+
+	const inserterTabsContents = useMemo(
+		() => ( {
+			blocks: blocksTab,
+			patterns: patternsTab,
+			media: mediaTab,
+		} ),
+		[ blocksTab, mediaTab, patternsTab ]
+	);
+
+	// When the pattern panel is showing, we want to use zoom out mode
+	useZoomOut( showPatternPanel );
+
+	const handleSetSelectedTab = ( value ) => {
+		// If no longer on patterns tab remove the category setting.
+		if ( value !== 'patterns' ) {
+			setSelectedPatternCategory( null );
+		}
+		setSelectedTab( value );
+	};
+
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__menu', {
@@ -317,18 +338,8 @@ function InserterMenu(
 						showPatterns={ showPatterns }
 						showMedia={ showMedia }
 						onSelect={ handleSetSelectedTab }
-					>
-						{ ( selectedTab === 'blocks' ||
-							selectedTab === 'patterns' ) &&
-							inserterSearch }
-						{ selectedTab === 'blocks' &&
-							! delayedFilterValue &&
-							blocksTab }
-						{ selectedTab === 'patterns' &&
-							! delayedFilterValue &&
-							patternsTab }
-						{ selectedTab === 'media' && mediaTab }
-					</InserterTabs>
+						tabsContents={ inserterTabsContents }
+					/>
 				) }
 				{ ! showAsTabs && (
 					<div className="block-editor-inserter__no-tab-container">

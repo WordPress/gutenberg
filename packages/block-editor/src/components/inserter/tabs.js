@@ -32,7 +32,7 @@ function InserterTabs( {
 	showPatterns = false,
 	showMedia = false,
 	onSelect,
-	children,
+	tabsContents,
 } ) {
 	const tabs = [
 		blocksTab,
@@ -61,7 +61,7 @@ function InserterTabs( {
 						focusable={ false }
 						className="block-editor-inserter__tabpanel"
 					>
-						{ children }
+						{ tabsContents[ tab.name ] }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
