@@ -86,6 +86,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 			<SidebarNavigationScreenWrapper
 				actions={
 					<ScreenNavigationMoreMenu
+						menuId={ navigationMenu?.id }
 						menuTitle={ decodeEntities( menuTitle ) }
 						onDelete={ _handleDelete }
 						onSave={ _handleSave }
