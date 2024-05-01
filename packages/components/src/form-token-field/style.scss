@@ -181,4 +181,15 @@
 		background: $components-color-accent;
 		color: $white;
 	}
+
+	&.is-disabled,
+	&[aria-disabled="true"] {
+		opacity: 0.25;
+
+		&.is-selected {
+			background: transparent;
+			color: $gray-900;
+			cursor: default;
+		}
+	}
 }
