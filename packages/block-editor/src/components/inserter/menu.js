@@ -12,11 +12,12 @@ import {
 	useCallback,
 	useMemo,
 	useRef,
+	useImperativeHandle,
 } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useDebouncedInput, useRefEffect } from '@wordpress/compose';
+import { useDebouncedInput } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -237,13 +238,12 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
-	const hasAutoFocused = useRef( false );
-	const searchRef = useRefEffect( ( element ) => {
-		if ( element && hasAutoFocused.current === false ) {
-			hasAutoFocused.current = true;
-			window.requestAnimationFrame( () => element.focus() );
-		}
-	}, [] );
+	const searchRef = useRef();
+	useImperativeHandle( ref, () => ( {
+		focusSearch: () => {
+			window.requestAnimationFrame( () => searchRef.current.focus() );
+		},
+	} ) );
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
