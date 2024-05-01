@@ -30,6 +30,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import { computeIFrameScale } from './utils';
 
 const {
 	LayoutStyle,
@@ -161,13 +162,17 @@ function EditorCanvas( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
+		const { getSettings, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -319,6 +324,16 @@ function EditorCanvas( {
 		} ),
 	] );
 
+	const frameSize = isZoomOutMode ? 20 : undefined;
+	const scale = isZoomOutMode
+		? ( contentWidth ) =>
+				computeIFrameScale(
+					{ width: 1000, scale: 0.55 },
+					{ width: 400, scale: 0.9 },
+					contentWidth
+				)
+		: undefined;
+
 	return (
 		<BlockCanvas
 			shouldIframe={
@@ -336,6 +351,8 @@ function EditorCanvas( {
 					...iframeProps?.style,
 					...deviceStyles,
 				},
+				scale,
+				frameSize,
 			} }
 		>
 			{ themeSupportsLayout &&

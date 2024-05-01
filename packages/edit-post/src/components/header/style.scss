@@ -249,3 +249,12 @@
 .components-popover.more-menu-dropdown__content {
 	z-index: z-index(".components-popover.more-menu__content");
 }
+
+.edit-post-header__preview-options {
+	opacity: 1;
+	transition: opacity 0.3s;
+
+	&.is-zoomed-out {
+		opacity: 0;
+	}
+}
