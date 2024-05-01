@@ -94,6 +94,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				) }
 				{ typographyVariations?.length && (
 					<TypographyVariations
+						addGlobalStyles
 						title={ __( 'Typography' ) }
 						gap={ gap }
 					/>

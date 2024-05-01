@@ -16,7 +16,11 @@ import PreviewIframe from '../preview-iframe';
 import Variation from './variation';
 import Subtitle from '../subtitle';
 
-export default function TypographyVariations( { title, gap = 2 } ) {
+export default function TypographyVariations( {
+	title,
+	gap = 2,
+	addGlobalStyles = false,
+} ) {
 	const typographyVariations = useTypographyVariations();
 
 	if ( ! typographyVariations?.length ) {
@@ -37,6 +41,7 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 						<Variation key={ index } variation={ variation }>
 							{ ( isFocused ) => (
 								<PreviewIframe
+									addGlobalStyles={ addGlobalStyles }
 									label={ variation?.title }
 									isFocused={ isFocused }
 								>

@@ -38,6 +38,7 @@ export default function PreviewIframe( {
 	label,
 	isFocused,
 	withHoverView,
+	addGlobalStyles = true,
 } ) {
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
@@ -129,7 +130,10 @@ export default function PreviewIframe( {
 						style={ {
 							height: normalizedHeight * ratio,
 							width: '100%',
-							background: gradientValue ?? backgroundColor,
+							color: addGlobalStyles ? undefined : '#000',
+							background: addGlobalStyles
+								? gradientValue ?? backgroundColor
+								: '#fff',
 							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
