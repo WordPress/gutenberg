@@ -6,7 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	forwardRef,
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
@@ -291,6 +298,18 @@ function InserterMenu(
 		setSelectedTab( value );
 	};
 
+	// Focus first active tab, if any
+	const tabsRef = useRef();
+	useLayoutEffect( () => {
+		if ( tabsRef.current ) {
+			window.requestAnimationFrame( () => {
+				tabsRef.current
+					.querySelector( '[role="tab"][aria-selected="true"]' )
+					?.focus();
+			} );
+		}
+	}, [] );
+
 	return (
 		<div
 			className={ classnames( 'block-editor-inserter__menu', {
@@ -300,6 +319,7 @@ function InserterMenu(
 		>
 			<div className="block-editor-inserter__main-area">
 				<InserterTabs
+					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					tabsContents={ inserterTabsContents }
 				/>
