@@ -6,13 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useState,
-	useCallback,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { forwardRef, useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
@@ -121,8 +115,6 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && selectedMediaCategory;
 
-	const searchRef = useRef();
-
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -141,7 +133,6 @@ function InserterMenu(
 					value={ filterValue }
 					label={ __( 'Search for blocks and patterns' ) }
 					placeholder={ __( 'Search' ) }
-					ref={ searchRef }
 				/>
 				{ !! delayedFilterValue && (
 					<InserterSearchResults
@@ -177,7 +168,6 @@ function InserterMenu(
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
-		searchRef,
 	] );
 
 	const blocksTab = useMemo(
