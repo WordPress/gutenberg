@@ -37,7 +37,7 @@ export default function InserterSidebar( {
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: false,
+		focusOnMount: null, // Needs to be null not force for Firefox.
 	} );
 
 	const libraryRef = useRef();
