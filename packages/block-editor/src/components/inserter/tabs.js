@@ -28,17 +28,8 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( {
-	showPatterns = false,
-	showMedia = false,
-	onSelect,
-	tabsContents,
-} ) {
-	const tabs = [
-		blocksTab,
-		showPatterns && patternsTab,
-		showMedia && mediaTab,
-	].filter( Boolean );
+function InserterTabs( { onSelect, tabsContents } ) {
+	const tabs = [ blocksTab, patternsTab, mediaTab ].filter( Boolean );
 
 	return (
 		<div className="block-editor-inserter__tabs">
