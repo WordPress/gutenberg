@@ -15,7 +15,7 @@ runs:
               node-version-file: '.nvmrc'
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: ${{ 'Windows' != runner.os && 'npm' || '' }}
+              cache: npm
 
         - name: Get Node.js and npm version
           id: node-version
@@ -25,14 +25,13 @@ runs:
 
         - name: Cache node_modules
           id: cache-node_modules
-          if: ${{ 'Windows' != runner.os }}
-          uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+          uses: actions/cache@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
           with:
               path: '**/node_modules'
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
 
         - name: Install npm dependencies
-          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' && 'Windows' != runner.os }}
+          if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
           run: npm ci
           shell: bash
 
