@@ -45,8 +45,8 @@ runs:
           if: ${{ failure() || runner.debug }}
           uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
           with:
-              name: npm-logs-${{ github.job }}
-              path: ${{ steps.npm-cache-location.outputs.NODE_CACHE_LOCATION }}/_logs
+              name: npm-logs-${{ job.conatiner.id }}
+              path: '${{ steps.npm-cache-location.outputs.NODE_CACHE_LOCATION }}/_logs'
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.
