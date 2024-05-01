@@ -174,7 +174,7 @@ export function UnforwardedButton(
 	const anchorProps: ComponentPropsWithoutRef< 'a' > =
 		Tag === 'a' ? { href, target } : {};
 
-	if ( disabled && isFocusable ) {
+	if ( ( disabled && isFocusable ) || isBusy ) {
 		// In this case, the button will be disabled, but still focusable and
 		// perceivable by screen reader users.
 		buttonProps[ 'aria-disabled' ] = true;

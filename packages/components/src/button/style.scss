@@ -56,7 +56,7 @@
 		// Show the boundary of the button, in High Contrast Mode.
 		outline: 1px solid transparent;
 
-		&:hover:not(:disabled):not(.is-busy) {
+		&:hover:not(:disabled) {
 			background: $components-color-accent-darker-10;
 			color: $components-color-accent-inverted;
 		}
@@ -75,7 +75,7 @@
 		&:disabled:active:enabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
-		&[aria-disabled="true"]:active:enabled {
+		&[aria-disabled="true"]:active:enabled:not(.is-busy) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			color: rgba($white, 0.4);
 			background: $components-color-accent;
@@ -121,12 +121,16 @@
 		}
 
 		&:disabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover {
-			color: $gray-600;
+		&[aria-disabled="true"]:not(.is-busy),
+		&[aria-disabled="true"]:hover:not(.is-busy) {
 			background: transparent;
 			transform: none;
 			opacity: 1;
+		}
+
+		&[aria-disabled="true"],
+		&[aria-disabled="true"]:hover {
+			color: $gray-600;
 		}
 	}
 
@@ -161,7 +165,7 @@
 		color: $components-color-accent;
 		background: transparent;
 
-		&:hover:not(:disabled, [aria-disabled="true"]):not(.is-busy) {
+		&:hover:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
 			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
