@@ -789,6 +789,14 @@
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
+
+	.components-toolbar-group {
+		align-items: center;
+	}
+
+	.components-button.is-busy {
+		max-height: $button-size;
+	}
 }
 
 .dataviews-bulk-actions {
