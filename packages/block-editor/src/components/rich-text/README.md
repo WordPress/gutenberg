@@ -125,6 +125,8 @@ registerBlockType( /* ... */, {
 
 Helper function to test if supplied variable (e.g. content of RichText) is empty. It tests if value of variable is empty or if variable is an empty array.
 
+### `value: String | Array`
+
 ### Example
 
 Some [attributes in paragraph block](https://github.com/WordPress/gutenberg/blob/59ed45e2d9db32e50b17b5801f0841f6d7489b0c/packages/block-library/src/paragraph/edit.js#L174) are set differrently if content of `RichText` is empty.
