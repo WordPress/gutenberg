@@ -2196,9 +2196,9 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
-			// Processes background styles.
+			// Processes background styles in order to build any `url()` functions.
 			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
-				$background_styles = gutenberg_get_background_support_styles( $styles['background'] );
+				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
 				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
 			}
 
@@ -4084,5 +4084,22 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $valid_variations;
+	}
+
+	// @TODO abstract and test this.
+	public function resolve_relative_paths() {
+		// Styles backgrounds.
+		/*
+		 * "theme" source implies relative path to the theme directory
+		 */
+		if ( ! empty( $this->theme_json['styles']['background']['backgroundImage']['url'] ) && is_string( $this->theme_json['styles']['background']['backgroundImage']['url'] ) ) {
+			$background_image_source = ! empty( $this->theme_json['styles']['background']['backgroundImage']['source'] ) ? $this->theme_json['styles']['background']['backgroundImage']['source'] : null;
+			if ( 'theme' === $background_image_source ) {
+				$this->theme_json['styles']['background']['backgroundImage']['url'] = esc_url( get_theme_file_uri( $this->theme_json['styles']['background']['backgroundImage']['url'] ) );
+			}
+		}
+		// Elements... (backgrounds not yet supported)
+
+		// Block variations... (backgrounds not yet supported)
 	}
 }

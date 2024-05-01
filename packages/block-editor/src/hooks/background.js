@@ -181,7 +181,7 @@ function useBlockProps( { name, style } ) {
 	const { backgroundImageURL } = useSelect(
 		( select ) => {
 			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
-			let file;
+			let file = style?.background?.backgroundImage?.url;
 			if (
 				!! style?.background?.backgroundImage?.url &&
 				style?.background?.backgroundImage?.source === 'theme'
@@ -201,14 +201,26 @@ function useBlockProps( { name, style } ) {
 	) {
 		return;
 	}
+	const newBackgroundStyles = {};
+	if ( ! style?.background?.backgroundSize ) {
+		newBackgroundStyles.backgroundSize = 'cover';
+	}
+
+	if (
+		'contain' === style?.background?.backgroundSize &&
+		! style?.background?.backgroundPosition
+	) {
+		newBackgroundStyles.backgroundPosition = 'center';
+	}
 
 	return {
 		style: {
 			// @TODO this should be backgroundImage. How to do that?
 			// Also, maybe consider reinstating https://github.com/WordPress/gutenberg/blob/fc98542a7dbba194bb4096d49cd0bd093b63f43e/packages/block-editor/src/hooks/background.js#L82
-			background: `url( '${ encodeURI(
+			backgroundImage: `url( '${ encodeURI(
 				safeDecodeURI( backgroundImageURL )
 			) }' )`,
+			...newBackgroundStyles,
 		},
 	};
 }
