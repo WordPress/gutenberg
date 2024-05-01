@@ -36,7 +36,6 @@ import { store as blockEditorStore } from '../../store';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 
 const NOOP = () => {};
-
 function InserterMenu(
 	{
 		rootClientId,
