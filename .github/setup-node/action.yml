@@ -15,7 +15,7 @@ runs:
               node-version-file: '.nvmrc'
               node-version: ${{ inputs.node-version }}
               check-latest: true
-              cache: npm
+              cache: ${{ 'Windows' != runner.os && 'npm' || '' }}
 
         - name: Get Node.js and npm version
           id: node-version
