@@ -13,7 +13,6 @@ import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
-import InserterNoResults from './no-results';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -102,10 +101,6 @@ export function BlockTypesTab( {
 	const currentlyRenderedCollections = useAsyncList(
 		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
-
-	if ( ! items.length ) {
-		return <InserterNoResults />;
-	}
 
 	return (
 		<InserterListbox>

@@ -14,7 +14,6 @@ import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
 import CategoryTabs from '../category-tabs';
-import InserterNoResults from '../no-results';
 
 function BlockPatternsTab( {
 	onSelectCategory,
@@ -28,10 +27,6 @@ function BlockPatternsTab( {
 	const categories = usePatternCategories( rootClientId );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
-
-	if ( ! categories.length ) {
-		return <InserterNoResults />;
-	}
 
 	return (
 		<>

@@ -16,7 +16,6 @@ import { useMediaCategories } from './hooks';
 import { getBlockAndPreviewFromMedia } from './utils';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import CategoryTabs from '../category-tabs';
-import InserterNoResults from '../no-results';
 
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
@@ -48,10 +47,6 @@ function MediaTab( {
 			} ) ),
 		[ mediaCategories ]
 	);
-
-	if ( ! categories.length ) {
-		return <InserterNoResults />;
-	}
 
 	return (
 		<>
