@@ -3,7 +3,7 @@
  */
 import { useCommand } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { plus, symbol } from '@wordpress/icons';
+import { plus, symbol, symbolFilled } from '@wordpress/icons';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -61,6 +61,26 @@ export function useAdminNavigationCommands() {
 			} else {
 				document.location.href = 'edit.php?post_type=wp_block';
 			}
+		},
+	} );
+
+	useCommand( {
+		name: 'core/edit-site/open-template-parts',
+		label: __( 'Template Parts' ),
+		icon: symbolFilled,
+		callback: ( { close } ) => {
+			const args = {
+				path: '/patterns',
+				categoryType: 'wp_template_part',
+				categoryId: 'all-parts',
+			};
+			const targetUrl = addQueryArgs( 'site-editor.php', args );
+			if ( isSiteEditor ) {
+				history.push( args );
+			} else {
+				document.location = targetUrl;
+			}
+			close();
 		},
 	} );
 }

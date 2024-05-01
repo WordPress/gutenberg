@@ -338,26 +338,6 @@ function useSiteEditorBasicNavigationCommands() {
 			},
 		} );
 
-		result.push( {
-			name: 'core/edit-site/open-template-parts',
-			label: __( 'Template Parts' ),
-			icon: symbolFilled,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
-					categoryType: 'wp_template_part',
-					categoryId: 'all-parts',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
 		return result;
 	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
 
