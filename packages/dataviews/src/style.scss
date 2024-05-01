@@ -807,6 +807,7 @@
 	flex-wrap: wrap;
 	width: 100%;
 	bottom: $grid-unit-30;
+	z-index: z-index(".dataviews-bulk-actions");
 
 	.components-accessible-toolbar {
 		border-color: $gray-300;
@@ -824,7 +825,6 @@
 	.dataviews-bulk-actions__selection-count {
 		display: flex;
 		align-items: center;
-		margin: 0 $grid-unit-10 0 $grid-unit-15;
-		color: $gray-700;
+		margin: 0 $grid-unit-10 0 $grid-unit-10;
 	}
 }
