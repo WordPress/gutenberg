@@ -43,6 +43,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.4/theme-previews.php';
 
 	// WordPress 6.5 compat.
+	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-edit-site-export-controller-6-5.php';
 	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
 	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
 
@@ -142,6 +143,9 @@ require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/l10n.php';
 require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
+
+// Theme export class.
+require __DIR__ . '/experimental/theme-export/class-wp-theme-export.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 	require __DIR__ . '/experimental/disable-tinymce.php';
