@@ -11,10 +11,15 @@ import { createBlock } from './factory';
 import { getBlockType } from './registration';
 
 /**
+ * @typedef {import('../types').Block} Block
+ * @typedef {import('../types').InnerBlockTemplate} InnerBlockTemplate
+ */
+
+/**
  * Checks whether a list of blocks matches a template by comparing the block names.
  *
- * @param {Array} blocks   Block list.
- * @param {Array} template Block template.
+ * @param {Block[]}              blocks   Block list.
+ * @param {InnerBlockTemplate[]} template Block template.
  *
  * @return {boolean} Whether the list of blocks matches a templates.
  */
@@ -75,10 +80,10 @@ function normalizeAttribute( definition, value ) {
  * (If it has the same name) and if doesn't match, we create a new block based on the template.
  * Extra blocks not present in the template are removed.
  *
- * @param {Array} blocks   Block list.
- * @param {Array} template Block template.
+ * @param {Block[]}               blocks   Block list.
+ * @param {InnerBlockTemplate[]=} template Block template.
  *
- * @return {Array} Updated Block list.
+ * @return {Block[]} Updated Block list.
  */
 export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 	// If no template is provided, return blocks unmodified.

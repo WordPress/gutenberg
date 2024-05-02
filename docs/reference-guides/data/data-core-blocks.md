@@ -45,14 +45,14 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Name of block (example: “core/columns”).
--   _attributes_ `Object`: Block attributes used to determine active variation.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+-   _attributes_ `BlockAttributes`: Block attributes used to determine active variation.
+-   _scope_ `BlockVariationScope=`: Block variation scope name.
 
 _Returns_
 
--   `(WPBlockVariation|undefined)`: Active block variation.
+-   `BlockVariation|undefined`: Active block variation.
 
 ### getBlockStyles
 
@@ -83,12 +83,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _name_ `string`: Block type name.
 
 _Returns_
 
--   `Array?`: Block Styles.
+-   `BlockStyle[]|undefined`: Block Styles.
 
 ### getBlockSupport
 
@@ -121,14 +121,14 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _nameOrType_ `(string|Object)`: Block name or type object
--   _feature_ `Array|string`: Feature to retrieve
+-   _state_ `BlockStoreState`: Data state.
+-   _nameOrType_ `string|BlockType`: Block name or type object
+-   _feature_ `string|string[]`: Feature to retrieve
 -   _defaultSupports_ `*`: Default value to return if not explicitly defined
 
 _Returns_
 
--   `?*`: Block support value
+-   `*`: Block support value
 
 ### getBlockType
 
@@ -167,12 +167,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _name_ `string`: Block type name.
 
 _Returns_
 
--   `Object?`: Block Type.
+-   `BlockType|undefined`: Block Type.
 
 ### getBlockTypes
 
@@ -202,11 +202,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `Array`: Block Types.
+-   `BlockType[]`: Block Types.
 
 ### getBlockVariations
 
@@ -238,13 +238,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Block type name.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+-   _scope_ `BlockVariationScope=`: Block variation scope name.
 
 _Returns_
 
--   `(WPBlockVariation[]|void)`: Block variations.
+-   `(BlockVariation[]|undefined) & EnhancedSelector`: Block variations.
 
 ### getCategories
 
@@ -274,11 +274,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `WPBlockCategory[]`: Categories list.
+-   `BlockCategory[]`: Categories list.
 
 ### getChildBlockNames
 
@@ -310,12 +310,12 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
 
--   `Array`: Array of child block names.
+-   `string[]`: Array of child block names.
 
 ### getCollections
 
@@ -346,11 +346,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `Object`: Collections list.
+-   `BlockCollection[]`: Collections list.
 
 ### getDefaultBlockName
 
@@ -381,11 +381,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string?`: Default block name.
+-   `string|undefined`: Default block name.
 
 ### getDefaultBlockVariation
 
@@ -420,13 +420,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Block type name.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+-   _scope_ `BlockVariationScope=`: Block variation scope name.
 
 _Returns_
 
--   `?WPBlockVariation`: The default block variation.
+-   `BlockVariation|undefined`: The default block variation.
 
 ### getFreeformFallbackBlockName
 
@@ -460,11 +460,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string?`: Name of the block for handling non-block content.
+-   `string|undefined`: Name of the block for handling non-block content.
 
 ### getGroupingBlockName
 
@@ -498,11 +498,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string?`: Name of the block for handling the grouping of blocks.
+-   `string|undefined`: Name of the block for handling the grouping of blocks.
 
 ### getUnregisteredFallbackBlockName
 
@@ -536,11 +536,11 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 
 _Returns_
 
--   `string?`: Name of the block for handling unregistered blocks.
+-   `string|undefined`: Name of the block for handling unregistered blocks.
 
 ### hasBlockSupport
 
@@ -572,8 +572,8 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
--   _nameOrType_ `(string|Object)`: Block name or type object.
+-   _state_ `BlockStoreState`: Data state.
+-   _nameOrType_ `string|BlockType`: Block name or type object.
 -   _feature_ `string`: Feature to test.
 -   _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
@@ -611,7 +611,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
@@ -653,7 +653,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Data state.
+-   _state_ `BlockStoreState`: Data state.
 -   _blockName_ `string`: Block type name.
 
 _Returns_
@@ -696,13 +696,13 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _state_ `Object`: Blocks state.
--   _nameOrType_ `(string|Object)`: Block name or type object.
+-   _state_ `BlockStoreState`: Blocks state.
+-   _nameOrType_ `string|BlockType`: Block name or type object.
 -   _searchTerm_ `string`: Search term by which to filter.
 
 _Returns_
 
--   `Object[]`: Whether block type matches search term.
+-   `boolean`: Whether block type matches search term.
 
 <!-- END TOKEN(Autogenerated selectors|../../../packages/blocks/src/store/selectors.js) -->
 

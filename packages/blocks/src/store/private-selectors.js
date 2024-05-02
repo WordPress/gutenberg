@@ -35,9 +35,9 @@ const ROOT_BLOCK_SUPPORTS = [
 /**
  * Filters the list of supported styles for a given element.
  *
- * @param {string[]}         blockSupports list of supported styles.
- * @param {string|undefined} name          block name.
- * @param {string|undefined} element       element name.
+ * @param {string[]} blockSupports list of supported styles.
+ * @param {string=}  name          block name.
+ * @param {string=}  element       element name.
  *
  * @return {string[]} filtered list of supported styles.
  */

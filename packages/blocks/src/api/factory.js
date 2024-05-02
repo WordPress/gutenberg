@@ -22,13 +22,21 @@ import {
 } from './utils';
 
 /**
+ * @typedef {import('../types').Block} Block
+ * @typedef {import('../types').BlockType} BlockType
+ * @typedef {import('../types').BlockAttributes} BlockAttributes
+ * @typedef {import('../types').InnerBlockTemplate} InnerBlockTemplate
+ * @typedef {import('../types').Transform} Transform
+ */
+
+/**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name        Block name.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @param {string}          name        Block name.
+ * @param {BlockAttributes} attributes  Block attributes.
+ * @param {Block[]=}        innerBlocks Nested blocks.
  *
- * @return {Object} Block object.
+ * @return {Block} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
@@ -55,9 +63,9 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
  * It handles the case of having InnerBlocks as Blocks by
  * converting them to the proper format to continue recursively.
  *
- * @param {Array} innerBlocksOrTemplate Nested blocks or InnerBlocks templates.
+ * @param {Array<Block|InnerBlockTemplate>} innerBlocksOrTemplate Nested blocks or InnerBlocks templates.
  *
- * @return {Object[]} Array of Block objects.
+ * @return {Block[]} Array of Block objects.
  */
 export function createBlocksFromInnerBlocksTemplate(
 	innerBlocksOrTemplate = []
@@ -83,11 +91,11 @@ export function createBlocksFromInnerBlocksTemplate(
  * Given a block object, returns a copy of the block object while sanitizing its attributes,
  * optionally merging new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
+ * @param {Block}           block           Block instance.
+ * @param {BlockAttributes} mergeAttributes Block attributes.
+ * @param {Block[]=}        newInnerBlocks  Nested blocks.
  *
- * @return {Object} A cloned block.
+ * @return {Block} A cloned block.
  */
 export function __experimentalCloneSanitizedBlock(
 	block,
@@ -120,9 +128,9 @@ export function __experimentalCloneSanitizedBlock(
  * Given a block object, returns a copy of the block object,
  * optionally merging new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block           Block instance.
- * @param {Object} mergeAttributes Block attributes.
- * @param {?Array} newInnerBlocks  Nested blocks.
+ * @param {Block}           block           Block instance.
+ * @param {BlockAttributes} mergeAttributes Block attributes.
+ * @param {Block[]=}        newInnerBlocks  Nested blocks.
  *
  * @return {Object} A cloned block.
  */
@@ -146,9 +154,9 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * Returns a boolean indicating whether a transform is possible based on
  * various bits of context.
  *
- * @param {Object} transform The transform object to validate.
- * @param {string} direction Is this a 'from' or 'to' transform.
- * @param {Array}  blocks    The blocks to transform from.
+ * @param {Transform}   transform The transform object to validate.
+ * @param {'from'|'to'} direction Is this a 'from' or 'to' transform.
+ * @param {Block[]}     blocks    The blocks to transform from.
  *
  * @return {boolean} Is the transform possible?
  */
@@ -218,9 +226,9 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * 'from' transforms on other blocks.
  *
- * @param {Array} blocks The blocks to transform from.
+ * @param {Block[]} blocks The blocks to transform from.
  *
- * @return {Array} Block types that the blocks can be transformed into.
+ * @return {BlockType[]} Block types that the blocks can be transformed into.
  */
 const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 	if ( ! blocks.length ) {
@@ -250,9 +258,9 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
  * Returns block types that the 'blocks' can be transformed into, based on
  * the source block's own 'to' transforms.
  *
- * @param {Array} blocks The blocks to transform from.
+ * @param {Block[]} blocks The blocks to transform from.
  *
- * @return {Array} Block types that the source can be transformed into.
+ * @return {BlockType[]} Block types that the source can be transformed into.
  */
 const getBlockTypesForPossibleToTransforms = ( blocks ) => {
 	if ( ! blocks.length ) {
@@ -286,7 +294,7 @@ const getBlockTypesForPossibleToTransforms = ( blocks ) => {
  * and if so whether it is a "wildcard" transform
  * ie: targets "any" block type
  *
- * @param {Object} t the Block transform object
+ * @param {Transform} t the Block transform object
  *
  * @return {boolean} whether transform is a wildcard transform
  */
@@ -312,9 +320,9 @@ export const isContainerGroupBlock = ( name ) =>
  * Returns an array of block types that the set of blocks received as argument
  * can be transformed into.
  *
- * @param {Array} blocks Blocks array.
+ * @param {Block[]} blocks Blocks array.
  *
- * @return {Array} Block types that the blocks argument can be transformed to.
+ * @return {BlockType[]} Block types that the blocks argument can be transformed to.
  */
 export function getPossibleBlockTransformations( blocks ) {
 	if ( ! blocks.length ) {
@@ -341,10 +349,10 @@ export function getPossibleBlockTransformations( blocks ) {
  * null if the transforms set is empty or the predicate function returns a
  * falsey value for all entries.
  *
- * @param {Object[]} transforms Transforms to search.
- * @param {Function} predicate  Function returning true on matching transform.
+ * @param {Transform[]}                       transforms Transforms to search.
+ * @param {(transform: Transform) => boolean} predicate  Function returning true on matching transform.
  *
- * @return {?Object} Highest-priority transform candidate.
+ * @return {Transform|undefined} Highest-priority transform candidate.
  */
 export function findTransform( transforms, predicate ) {
 	// The hooks library already has built-in mechanisms for managing priority
@@ -373,10 +381,10 @@ export function findTransform( transforms, predicate ) {
  * If no block name is provided, returns transforms for all blocks. A normal
  * transform object includes `blockName` as a property.
  *
- * @param {string}        direction       Transform direction ("to", "from").
- * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {'from'|'to'}      direction       Transform direction ("to", "from").
+ * @param {BlockType|string} blockTypeOrName Block type or name.
  *
- * @return {Array} Block transforms for direction.
+ * @return {Transform[]} Block transforms for direction.
  */
 export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
@@ -429,8 +437,8 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 /**
  * Checks that a given transforms isMatch method passes for given source blocks.
  *
- * @param {Object} transform A transform object.
- * @param {Array}  blocks    Blocks array.
+ * @param {Transform} transform A transform object.
+ * @param {Block[]}   blocks    Blocks array.
  *
  * @return {boolean} True if given blocks are a match for the transform.
  */
@@ -450,10 +458,10 @@ function maybeCheckTransformIsMatch( transform, blocks ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param {Array|Object} blocks Blocks array or block object.
- * @param {string}       name   Block name.
+ * @param {Block[]|Block} blocks Blocks array or block object.
+ * @param {string}        name   Block name.
  *
- * @return {?Array} Array of blocks or null.
+ * @return {Block[]|null} Array of blocks or null.
  */
 export function switchToBlockType( blocks, name ) {
 	const blocksArray = Array.isArray( blocks ) ? blocks : [ blocks ];
@@ -491,6 +499,7 @@ export function switchToBlockType( blocks, name ) {
 		return null;
 	}
 
+	/** @type {Block|Block[]|null} */
 	let transformationResults;
 
 	if ( transformation.isMultiBlock ) {
@@ -554,10 +563,10 @@ export function switchToBlockType( blocks, name ) {
 		 * All of the original blocks are passed, since transformations are
 		 * many-to-many, not one-to-one.
 		 *
-		 * @param {Object}   transformedBlock The transformed block.
-		 * @param {Object[]} blocks           Original blocks transformed.
+		 * @param {Block}    transformedBlock The transformed block.
+		 * @param {Block[]}  blocks           Original blocks transformed.
 		 * @param {Object[]} index            Index of the transformed block on the array of results.
-		 * @param {Object[]} results          An array all the blocks that resulted from the transformation.
+		 * @param {Block[]}  results          An array all the blocks that resulted from the transformation.
 		 */
 		return applyFilters(
 			'blocks.switchToBlockType.transformedBlock',
@@ -575,9 +584,9 @@ export function switchToBlockType( blocks, name ) {
  * Create a block object from the example API.
  *
  * @param {string} name
- * @param {Object} example
+ * @param {Block}  example
  *
- * @return {Object} block.
+ * @return {Block} block.
  */
 export const getBlockFromExample = ( name, example ) => {
 	try {

@@ -5,6 +5,11 @@ import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
 import { parseWithAttributeSchema } from './get-block-attributes';
 
+/**
+ * @typedef {import('../../types').BlockType} BlockType
+ * @typedef {import('../../types').BlockAttributes} BlockAttributes
+ */
+
 const CLASS_ATTR_SCHEMA = {
 	type: 'string',
 	source: 'attribute',
@@ -35,11 +40,11 @@ export function getHTMLRootElementClasses( innerHTML ) {
  * found, the unknown classes are treated as custom classes. This prevents the
  * block from being considered as invalid.
  *
- * @param {Object} blockAttributes Original block attributes.
- * @param {Object} blockType       Block type settings.
- * @param {string} innerHTML       Original block markup.
+ * @param {BlockAttributes} blockAttributes Original block attributes.
+ * @param {BlockType}       blockType       Block type settings.
+ * @param {string}          innerHTML       Original block markup.
  *
- * @return {Object} Filtered block attributes.
+ * @return {BlockAttributes} Filtered block attributes.
  */
 export function fixCustomClassname( blockAttributes, blockType, innerHTML ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {

@@ -14,6 +14,13 @@ import { RichTextData } from '@wordpress/rich-text';
 export { matcher as node } from './node';
 export { matcher as children } from './children';
 
+/**
+ * Higher order HTML selector matching function.
+ *
+ * @param {string=} selector     Selector to use for matching.
+ * @param {string=} multilineTag Child node tag name to select from match.
+ * @return {(domNode: Node) => string|undefined} The matching function.
+ */
 export function html( selector, multilineTag ) {
 	return ( domNode ) => {
 		let match = domNode;
