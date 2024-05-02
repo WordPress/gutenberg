@@ -43,9 +43,9 @@ export default function AspectRatioTool( {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
 
-	const [ defaultRatios ] = useSettings( 'dimensions.aspectRatios.default' );
-	const [ themeRatios ] = useSettings( 'dimensions.aspectRatios.theme' );
-	const [ showDefaultRatios ] = useSettings(
+	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
+		'dimensions.aspectRatios.default',
+		'dimensions.aspectRatios.theme',
 		'dimensions.defaultAspectRatios'
 	);
 

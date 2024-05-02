@@ -66,9 +66,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
 
-	const [ defaultRatios ] = useSettings( 'dimensions.aspectRatios.default' );
-	const [ themeRatios ] = useSettings( 'dimensions.aspectRatios.theme' );
-	const [ showDefaultRatios ] = useSettings(
+	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
+		'dimensions.aspectRatios.default',
+		'dimensions.aspectRatios.theme',
 		'dimensions.defaultAspectRatios'
 	);
 
