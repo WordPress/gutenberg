@@ -6,6 +6,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -140,7 +141,10 @@ export default function useClipboardHandler() {
 					return;
 				}
 				const { plainText, html, files } = getPasteEventData( event );
-				const isFullySelected = __unstableIsFullySelected();
+				const isFullySelected =
+					__unstableIsFullySelected() ||
+					( selectedBlockClientIds.length === 1 &&
+						isUnmodifiedBlock( selectedBlockClientIds[ 0 ] ) );
 				let blocks = [];
 
 				if ( files.length ) {

@@ -906,14 +906,6 @@ export const __unstableSplitSelection =
 			// If selection is at the start or end, we can simply insert an
 			// empty block, provided this block has no inner blocks.
 			else if ( ! select.getBlockOrder( selectionA.clientId ).length ) {
-				function getRichTextAttributeLength( clientId, attributeKey ) {
-					return create( {
-						html: select.getBlockAttributes( clientId )[
-							attributeKey
-						],
-					} ).text.length;
-				}
-
 				function createEmpty() {
 					const defaultBlockName = getDefaultBlockName();
 					return select.canInsertBlockType(
@@ -926,10 +918,9 @@ export const __unstableSplitSelection =
 						  );
 				}
 
-				const length = getRichTextAttributeLength(
-					selectionA.clientId,
+				const length = select.getBlockAttributes( selectionA.clientId )[
 					attributeKeyA
-				);
+				].length;
 
 				if ( selectionA.offset === 0 && length ) {
 					dispatch.insertBlocks(
