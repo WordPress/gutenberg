@@ -1769,6 +1769,19 @@ export const blockListSettings = ( state = {}, action ) => {
 				[ clientId ]: action.settings,
 			};
 		}
+
+		case 'BATCH_UPDATE_BLOCK_LIST_SETTINGS': {
+			const { settingsByClientId } = action;
+			const updates = {};
+			for ( const [ clientId, _settings ] of settingsByClientId ) {
+				if ( ! fastDeepEqual( state[ clientId ], _settings ) ) {
+					updates[ clientId ] = _settings;
+				}
+			}
+			return Object.keys( updates ).length
+				? { ...state, ...updates }
+				: state;
+		}
 	}
 	return state;
 };

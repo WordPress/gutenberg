@@ -27,6 +27,20 @@ const privateSettings = [
 ];
 
 /**
+ * Action that changes the nested settings of a given block.
+ *
+ * @param {Map} settingsByClientId A map of block client IDs to their settings.
+ *
+ * @return {Object} Action object
+ */
+export function batchUpdateBlockListSettings( settingsByClientId ) {
+	return {
+		type: 'BATCH_UPDATE_BLOCK_LIST_SETTINGS',
+		settingsByClientId,
+	};
+}
+
+/**
  * Action that updates the block editor settings and
  * conditionally preserves the experimental ones.
  *
