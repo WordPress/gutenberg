@@ -377,12 +377,19 @@ export function RichTextWrapper(
 			) }
 			<TagName
 				// Overridable props.
-				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
 				aria-label={ placeholder }
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
 				{ ...autocompleteProps }
+				/*
+				 * We'll allow any valid role here except for group.
+				 * Group is defined in the useBlockProps hook so any block calling this hook directly on the RichText component will end up with group role.
+				 * Paragraph block is a good example of this implementation. Could be others.
+				 * Textbox is mainly the only role needed here but the support is there if another role should need to be used.
+				 * Annoying, end of long list of issues.
+				 */
+				role={ 'group' === props.role ? 'textbox' : props.role }
 				ref={ useMergeRefs( [
 					// Rich text ref must be first because its focus listener
 					// must be set up before any other ref calls .focus() on

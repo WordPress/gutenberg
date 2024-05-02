@@ -158,6 +158,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		...props,
 		ref: mergedRefs,
 		id: `block-${ clientId }${ htmlSuffix }`,
+		role: 'group',
 		'aria-label': blockLabel,
 		'data-block': clientId,
 		'data-type': name,
