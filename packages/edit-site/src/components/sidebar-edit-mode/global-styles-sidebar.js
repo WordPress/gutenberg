@@ -141,7 +141,7 @@ export default function GlobalStylesSidebar() {
 					gap={ 1 }
 				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
-						<h2 className="edit-site-global-styles-sidebar__header-title">
+						<h2 className="interface-complementary-area-header__title">
 							{ __( 'Styles' ) }
 						</h2>
 					</FlexBlock>
