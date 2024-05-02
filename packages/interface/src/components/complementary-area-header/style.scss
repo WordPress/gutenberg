@@ -17,7 +17,7 @@
 
 .interface-complementary-area-header {
 	background: $white;
-	padding-right: $grid-unit-05;
+	padding-right: $grid-unit-15; // Reduced padding to account for close buttons.
 
 	.interface-complementary-area-header__title {
 		margin: 0;
