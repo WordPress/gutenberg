@@ -20,7 +20,7 @@ const colorFormats = {
 	// invalidColor1: 'invalid',
 	// invalidColor2: 'hwb(0, 0%, 0%)',
 };
-const shadowFormats = {
+const validShadowFormats = {
 	xy: '{x} {y}',
 	xyInset: '{x} {y} inset',
 	insetXY: 'inset {x} {y}',
@@ -64,10 +64,13 @@ const shadowFormats = {
 	insetColorXYBlurSpread: 'inset {color} {x} {y} {blur} {spread}',
 
 	multipleSpaces: '{x}  {y}   {blur} {spread}',
+};
 
-	// invalidShadow1: '{x}',
+const invalidShadowFormats = {
+	invalidShadow1: '{x}',
 	// invalidShadow2: '{x} {color} {y}',
 	// invalidShadow3: '{x} {y} {color} {blur}',
+	// invalidShadow4: '{x} {y} {blur} {spread} {color} 5px',
 };
 
 const combinedShadows = {
@@ -84,19 +87,36 @@ const shadowUnits = {
 	halfRem: '0.5rem',
 	percent: '1%',
 	halfPercent: '0.5%',
+	ex: '1ex',
+	inch: '1in',
+	cm: '1cm',
+	mm: '1mm',
+	pt: '1pt',
+	pc: '1pc',
+	vh: '1vh',
+	vw: '1vw',
+	vmin: '1vmin',
+	vmax: '1vmax',
+	ch: '1ch',
+	lh: '1lh',
 	zero: '0',
 };
 
 // Data helper functions
-function getShadowString( format, parts ) {
-	return format.replace( /{([^}]+)}/g, ( match, key ) => parts[ key ] );
+function getShadowString( formatString, values ) {
+	return formatString.replace( /\{(\w+)\}/g, ( match, placeholder ) => {
+		if ( values.hasOwnProperty( placeholder ) ) {
+			return values[ placeholder ];
+		}
+		return match;
+	} );
 }
 function getCombinedShadowString( format, parts ) {
-	return format.replace( /{(\d+)}/g, ( match, index ) => parts[ index - 1 ] );
+	return format.replace( /{(\d+)}/g, ( _, index ) => parts[ index - 1 ] );
 }
 
 describe( 'getShadowParts', () => {
-	Object.entries( shadowFormats ).forEach( ( [ shadowKey, shadow ] ) => {
+	Object.entries( validShadowFormats ).forEach( ( [ shadowKey, shadow ] ) => {
 		describe( `test shadow format: ${ shadowKey }`, () => {
 			Object.entries( colorFormats ).forEach( ( [ colorKey, color ] ) => {
 				Object.entries( combinedShadows ).forEach(
@@ -132,9 +152,16 @@ describe( 'getShadowParts', () => {
 } );
 
 describe( 'shadowStringToObject', () => {
-	const defaultColor = '#000';
+	const defaultShadow = {
+		x: '0',
+		y: '0',
+		blur: '0',
+		spread: '0',
+		color: '#000',
+		inset: false,
+	};
 
-	Object.entries( shadowFormats ).forEach( ( [ shadowKey, shadow ] ) => {
+	Object.entries( validShadowFormats ).forEach( ( [ shadowKey, shadow ] ) => {
 		describe( `test shadow format: ${ shadowKey }`, () => {
 			Object.entries( colorFormats ).forEach( ( [ colorKey, color ] ) => {
 				const hasX = shadow.includes( '{x}' );
@@ -145,20 +172,20 @@ describe( 'shadowStringToObject', () => {
 				const hasInset = shadow.includes( 'inset' );
 
 				const shadowString = getShadowString( shadow, {
-					...( hasX ? { x: shadowUnits.px } : {} ),
-					...( hasY ? { y: shadowUnits.px } : {} ),
-					...( hasBlur ? { blur: shadowUnits.px } : {} ),
-					...( hasSpread ? { spread: shadowUnits.px } : {} ),
+					x: shadowUnits.px,
+					y: shadowUnits.px,
+					blur: shadowUnits.px,
+					spread: shadowUnits.px,
 					color,
 				} );
 
 				const input = shadowString;
 				const output = {
-					x: hasX ? shadowUnits.px : '0',
-					y: hasY ? shadowUnits.px : '0',
-					blur: hasBlur ? shadowUnits.px : '0',
-					spread: hasSpread ? shadowUnits.px : '0',
-					color: hasColor ? color : defaultColor,
+					x: hasX ? shadowUnits.px : defaultShadow.x,
+					y: hasY ? shadowUnits.px : defaultShadow.y,
+					blur: hasBlur ? shadowUnits.px : defaultShadow.blur,
+					spread: hasSpread ? shadowUnits.px : defaultShadow.spread,
+					color: hasColor ? color : defaultShadow.color,
 					inset: hasInset,
 				};
 
@@ -166,6 +193,59 @@ describe( 'shadowStringToObject', () => {
 					const shadowObj = shadowStringToObject( input );
 					expect( shadowObj ).toEqual( output );
 				} );
+			} );
+		} );
+	} );
+
+	describe( `test invalid shadow formats`, () => {
+		const color = colorFormats.hex;
+		Object.entries( invalidShadowFormats ).forEach(
+			( [ shadowKey, shadow ] ) => {
+				const shadowString = getShadowString( shadow, {
+					x: shadowUnits.px,
+					y: shadowUnits.px,
+					blur: shadowUnits.px,
+					spread: shadowUnits.px,
+					color,
+				} );
+
+				const input = shadowString;
+				const output = defaultShadow;
+
+				it( `should return default shadow object for ${ shadowKey }`, () => {
+					const shadowObj = shadowStringToObject( input );
+					expect( shadowObj ).toEqual( output );
+				} );
+			}
+		);
+	} );
+
+	describe( `test shadow with all units`, () => {
+		const shadow = validShadowFormats.xyBlurSpreadColor;
+		const color = colorFormats.hex;
+
+		Object.entries( shadowUnits ).forEach( ( [ unitKey, unit ] ) => {
+			const shadowString = getShadowString( shadow, {
+				x: unit,
+				y: unit,
+				blur: unit,
+				spread: unit,
+				color,
+			} );
+
+			const input = shadowString;
+			const output = {
+				x: unit,
+				y: unit,
+				blur: unit,
+				spread: unit,
+				color,
+				inset: false,
+			};
+
+			it( `should return shadow object for the unit: ${ unitKey }`, () => {
+				const shadowObj = shadowStringToObject( input );
+				expect( shadowObj ).toEqual( output );
 			} );
 		} );
 	} );

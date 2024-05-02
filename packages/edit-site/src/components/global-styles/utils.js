@@ -68,13 +68,13 @@ export function shadowStringToObject( shadowValue ) {
 		return defaultShadow;
 	}
 
-	// Step 2: Extract length values
+	// Step 2: Extract length values (x, y, blur, spread) from shadow string
 	const lengthsRegex =
 		/(?:^|\s)(-?\d*\.?\d+(?:px|%|in|cm|mm|em|rem|ex|pt|pc|vh|vw|vmin|vmax|ch|lh)?)(?=\s|$)(?![^(]*\))/g;
 	const matches = shadowValue.match( lengthsRegex ) || [];
 	const lengths = matches.slice( 0, 4 );
 
-	// Step 3: Check if there are at least 2 length values
+	// Step 3: Check if there are at least 2 length values (x, y are required for string to be valid shadow)
 	if ( lengths.length < 2 ) {
 		return defaultShadow;
 	}
@@ -93,10 +93,10 @@ export function shadowStringToObject( shadowValue ) {
 	return {
 		x: x?.trim(),
 		y: y?.trim(),
-		blur: blur?.trim() || '0',
-		spread: spread?.trim() || '0',
+		blur: blur?.trim() || defaultShadow.blur,
+		spread: spread?.trim() || defaultShadow.spread,
 		inset,
-		color: colorString || `#000`,
+		color: colorString || defaultShadow.color,
 	};
 }
 
