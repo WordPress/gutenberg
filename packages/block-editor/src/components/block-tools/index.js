@@ -7,6 +7,8 @@ import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef } from '@wordpress/element';
 import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -176,6 +178,7 @@ export default function BlockTools( {
 					groupingBlockName
 				);
 				replaceBlocks( clientIds, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
 			}
 		}
 	}
