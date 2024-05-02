@@ -7,12 +7,12 @@ import {
 	TouchableWithoutFeedback,
 	View,
 } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 
 /**
  * WordPress dependencies
  */
-import { Component, useEffect } from '@wordpress/element';
+import { Component, useCallback } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -70,6 +70,7 @@ import { store as editPostStore } from '@wordpress/edit-post';
  */
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
+import { unlock } from '../lock-unlock';
 
 import {
 	LINK_DESTINATION_NONE,
@@ -91,35 +92,76 @@ function LinkSettings( {
 	image,
 	isLinkSheetVisible,
 	setMappedAttributes,
+	lightboxSetting,
 } ) {
 	const route = useRoute();
-	const { href: url, label, linkDestination, linkTarget, rel } = attributes;
+	const {
+		href: url,
+		label,
+		linkDestination,
+		linkTarget,
+		rel,
+		lightbox,
+	} = attributes;
+
+	const onSetLightbox = useCallback(
+		( enable ) => {
+			if ( enable && ! lightboxSetting?.enabled ) {
+				setMappedAttributes( {
+					lightbox: { enabled: true },
+				} );
+			} else if ( ! enable && lightboxSetting?.enabled ) {
+				setMappedAttributes( {
+					lightbox: { enabled: false },
+				} );
+			} else {
+				setMappedAttributes( {
+					lightbox: undefined,
+				} );
+			}
+		},
+		[ lightboxSetting?.enabled, setMappedAttributes ]
+	);
 
 	// Persist attributes passed from child screen.
-	useEffect( () => {
-		const { inputValue: newUrl } = route.params || {};
+	useFocusEffect(
+		useCallback( () => {
+			if ( ! route.params ) {
+				return;
+			}
 
-		let newLinkDestination;
-		switch ( newUrl ) {
-			case attributes.url:
-				newLinkDestination = LINK_DESTINATION_MEDIA;
-				break;
-			case image?.link:
-				newLinkDestination = LINK_DESTINATION_ATTACHMENT;
-				break;
-			case '':
-				newLinkDestination = LINK_DESTINATION_NONE;
-				break;
-			default:
-				newLinkDestination = LINK_DESTINATION_CUSTOM;
-				break;
-		}
+			const { inputValue: newUrl, lightboxEnabled } = route.params;
 
-		setMappedAttributes( {
-			url: newUrl,
-			linkDestination: newLinkDestination,
-		} );
-	}, [ route.params?.inputValue ] );
+			let newLinkDestination;
+			switch ( newUrl ) {
+				case attributes.url:
+					newLinkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case image?.link:
+					newLinkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case '':
+					newLinkDestination = LINK_DESTINATION_NONE;
+					break;
+				default:
+					newLinkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+			}
+
+			onSetLightbox( lightboxEnabled );
+
+			setMappedAttributes( {
+				url: newUrl,
+				linkDestination: newLinkDestination,
+			} );
+		}, [
+			attributes.url,
+			image?.link,
+			onSetLightbox,
+			route.params,
+			setMappedAttributes,
+		] )
+	);
 
 	let valueMask;
 	switch ( linkDestination ) {
@@ -135,6 +177,14 @@ function LinkSettings( {
 		default:
 			valueMask = __( 'None' );
 			break;
+	}
+
+	const showLightboxSetting =
+		!! lightbox || lightboxSetting?.allowEditing === true;
+	const lightboxEnabled =
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+	if ( showLightboxSetting && lightboxEnabled ) {
+		valueMask = __( 'Expand on click' );
 	}
 
 	const linkSettingsOptions = {
@@ -173,6 +223,8 @@ function LinkSettings( {
 							linkDestination: attributes.linkDestination,
 							imageUrl: attributes.url,
 							attachmentPageUrl: image?.link,
+							showLightboxSetting,
+							lightboxEnabled,
 						}
 					);
 				} }
@@ -670,6 +722,7 @@ export class ImageEdit extends Component {
 			featuredImageId,
 			wasBlockJustInserted,
 			shouldUseFastImage,
+			lightboxSetting,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 		const hasImageContext = context
@@ -736,6 +789,7 @@ export class ImageEdit extends Component {
 					image={ this.props.image }
 					isLinkSheetVisible={ this.state.isLinkSheetVisible }
 					setMappedAttributes={ this.setMappedAttributes }
+					lightboxSetting={ lightboxSetting }
 				/>
 				<PanelBody
 					title={ __( 'Featured Image' ) }
@@ -924,6 +978,9 @@ export default compose( [
 				url &&
 				! hasQueryArg( url, 'w' ) );
 		const image = shouldGetMedia ? getMedia( id ) : null;
+		const [ lightboxSetting ] = unlock(
+			select( blockEditorStore )
+		).getBlockSettings( clientId, [ 'lightbox' ] );
 
 		return {
 			image,
@@ -935,6 +992,7 @@ export default compose( [
 				clientId,
 				'inserter_menu'
 			),
+			lightboxSetting,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

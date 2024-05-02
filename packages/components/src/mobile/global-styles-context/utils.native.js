@@ -399,7 +399,7 @@ export function useMobileGlobalStylesColors( type = 'colors' ) {
 		: defaultPalette;
 }
 
-export function getColorsAndGradients(
+export function getDefaultGlobalStyles(
 	defaultEditorColors = [],
 	defaultEditorGradients = [],
 	rawFeatures
@@ -425,6 +425,7 @@ export function getColorsAndGradients(
 				defaultPalette: defaultEditorColors?.length > 0,
 				defaultGradients: defaultEditorGradients?.length > 0,
 			},
+			blocks: features?.blocks,
 		},
 	};
 }
@@ -467,6 +468,7 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 				customLineHeight: features?.custom?.[ 'line-height' ],
 			},
 			spacing: features?.spacing,
+			blocks: features?.blocks,
 		},
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};

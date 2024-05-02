@@ -144,6 +144,61 @@ describe( 'Image Block', () => {
 		expect( getEditorHtml() ).toBe( expectedHtml );
 	} );
 
+	it( 'enables expand on click when lightbox setting is enabled', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+			withGlobalStyles: true,
+		} );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
+
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () =>
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+		);
+		fireEvent.press( screen.getByText( 'None' ) );
+		fireEvent.press( screen.getByText( 'Expand on click' ) );
+
+		const expectedHtml = `<!-- wp:image {"lightbox":{"enabled":true},"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+<figure class="wp-block-image size-large is-style-default"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/><figcaption class="wp-element-caption">Mountain</figcaption></figure>
+<!-- /wp:image -->`;
+		expect( getEditorHtml() ).toBe( expectedHtml );
+	} );
+
+	it( 'does not show the expand on click option when lightbox setting is disabled', async () => {
+		const initialHtml = `
+		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+		<figure class="wp-block-image size-large is-style-default">
+			<img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/>
+		<figcaption class="wp-element-caption">Mountain</figcaption></figure>
+		<!-- /wp:image -->`;
+		const screen = await initializeEditor( {
+			initialHtml,
+			withGlobalStyles: false,
+		} );
+		// Check that image is fetched via `getMedia`
+		expect( apiFetch ).toHaveBeenCalledWith( FETCH_MEDIA.request );
+
+		const [ imageBlock ] = screen.getAllByLabelText( /Image Block/ );
+		fireEvent.press( imageBlock );
+		// Awaiting navigation event seemingly required due to React Navigation bug
+		// https://github.com/react-navigation/react-navigation/issues/9701
+		await act( () =>
+			fireEvent.press( screen.getByLabelText( 'Open Settings' ) )
+		);
+		fireEvent.press( screen.getByText( 'None' ) );
+		expect( screen.queryByText( 'Expand on click' ) ).toBeNull();
+	} );
+
 	it( 'sets link to Custom URL', async () => {
 		const initialHtml = `
 		<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->

@@ -35,7 +35,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
+import { getDefaultGlobalStyles, getGlobalStyles } from '@wordpress/components';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 
@@ -106,7 +106,7 @@ class NativeEditorProvider extends Component {
 
 		updateEditorSettings( {
 			capabilities,
-			...this.getThemeColors( this.props ),
+			...this.getThemeSettings( this.props ),
 			locale,
 			hostAppNamespace,
 		} );
@@ -171,7 +171,7 @@ class NativeEditorProvider extends Component {
 							galleryWithImageBlocks;
 					}
 					updateEditorSettings(
-						this.getThemeColors( editorSettings )
+						this.getThemeSettings( editorSettings )
 					);
 				}
 			);
@@ -262,14 +262,14 @@ class NativeEditorProvider extends Component {
 		}
 	}
 
-	getThemeColors( { rawStyles, rawFeatures } ) {
+	getThemeSettings( { rawStyles, rawFeatures } ) {
 		const { defaultEditorColors, defaultEditorGradients } = this.props;
 
 		if ( rawStyles && rawFeatures ) {
 			return getGlobalStyles( rawStyles, rawFeatures );
 		}
 
-		return getColorsAndGradients(
+		return getDefaultGlobalStyles(
 			defaultEditorColors,
 			defaultEditorGradients,
 			rawFeatures
