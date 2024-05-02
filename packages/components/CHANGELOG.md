@@ -12,6 +12,7 @@
 ### Bug Fix
 
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
+-   `Panel`: fix issue with double border ([#61318](https://github.com/WordPress/gutenberg/pull/61318)).
 
 ### Enhancements
 
