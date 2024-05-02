@@ -372,6 +372,14 @@
 			}
 		},
 		"blocks": {
+			"core/social-links": {
+				"spacing": {
+					"padding": {
+						"left": "0",
+						"right": "0"
+					}
+				}
+			},
 			"core/button": {
 				"variations": {
 					"outline": {

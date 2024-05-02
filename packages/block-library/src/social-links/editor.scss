@@ -11,8 +11,19 @@
 	transform: none;
 }
 
-.editor-styles-wrapper .wp-block-social-links {
+// Zero specificity selectors are to allow theme.json styling of the inner
+// social link blocks. The outer social links block still needs higher
+// specificity to overcome `ul,ol` defaults and resets.
+:where(.wp-block-social-links),
+:where(.wp-block-social-links.is-style-logos-only .wp-block-social-links__social-placeholder .wp-social-link) {
 	padding: 0;
+}
+:where(.wp-block-social-links__social-placeholder .wp-social-link) {
+	padding: 0.25em;
+}
+:where(.wp-block-social-links.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-social-link) {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
 
 // Placeholder/setup state.
@@ -35,19 +46,6 @@
 	// Wrap the remaining placeholders in a container so the plus can overlap.
 	> .wp-block-social-links__social-placeholder-icons {
 		display: flex;
-	}
-
-	.wp-social-link {
-		padding: 0.25em;
-
-		.is-style-pill-shape & {
-			padding-left: calc((2/3) * 1em);
-			padding-right: calc((2/3) * 1em);
-		}
-
-		.is-style-logos-only & {
-			padding: 0;
-		}
 	}
 
 	.wp-social-link::before {

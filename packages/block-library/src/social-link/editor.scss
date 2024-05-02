@@ -4,7 +4,7 @@
 
 // The editor uses the button element, the frontend uses a link.
 // Therefore we unstyle the button element to make it more like the frontend.
-.wp-block-social-link-anchor {
+:where(.wp-block-social-link-anchor) {
 	align-items: center;
 	background: none;
 	border: 0;
@@ -31,11 +31,11 @@
 	}
 }
 
-.wp-block-social-links.is-style-pill-shape .wp-social-link button {
+:where(.wp-block-social-links.is-style-pill-shape .wp-social-link button) {
 	padding-left: calc((2/3) * 1em);
 	padding-right: calc((2/3) * 1em);
 }
 
-.wp-block-social-links.is-style-logos-only .wp-social-link button {
+:where(.wp-block-social-links.is-style-logos-only .wp-social-link button) {
 	padding: 0;
 }

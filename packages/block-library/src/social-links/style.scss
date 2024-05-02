@@ -1,16 +1,19 @@
+:where(.wp-block-social-links) {
+	// Unset background colors that can be inherited from Global Styles.
+	background: none;
+	padding-left: 0;
+	padding-right: 0;
+}
+
 .wp-block-social-links {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 
-	padding-left: 0;
-	padding-right: 0;
 	// Some themes set text-indent on all <ul>
 	text-indent: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
 
-	// Unset background colors that can be inherited from Global Styles.
-	background: none;
 
 	// Some themes add underlines, false underlines (via shadows), and borders to <a>.
 	.wp-social-link a,
@@ -21,12 +24,6 @@
 	}
 
 	.wp-social-link {
-		// By setting the font size, we can scale icons and paddings consistently based on that.
-		// This also allows themes to override this, if need be.
-		a {
-			padding: 0.25em;
-		}
-
 		svg {
 			width: 1em;
 			height: 1em;
@@ -119,13 +116,12 @@
 }
 
 // Treatment for logos only style.
+// The specificity of this selector has not been reduced to zero as per global
+// style variation selectors as the lack of background should be enforced for
+// this block style.
 .wp-block-social-links.is-style-logos-only {
 	.wp-social-link {
 		background: none;
-
-		a {
-			padding: 0;
-		}
 
 		// Make these bigger.
 		svg {
@@ -137,16 +133,23 @@
 	@import "../social-link/socials-without-bg.scss";
 }
 
-// Treatment for pill shape style.
-.wp-block-social-links.is-style-pill-shape {
-	.wp-social-link {
-		width: auto;
-	}
 
-	.wp-social-link a {
-		padding-left: calc((2/3) * 1em);
-		padding-right: calc((2/3) * 1em);
-	}
+// Treatment for pill shape style.
+.wp-block-social-links.is-style-pill-shape .wp-social-link {
+	width: auto;
+}
+
+// The following rules have their selector specificity set to zero to facilitate
+// theme.json styling of the inner social-link block padding.
+:where(.wp-block-social-links .wp-social-link a) {
+	padding: 0.25em;
+}
+:where(.wp-block-social-links.is-style-logos-only .wp-social-link a) {
+	padding: 0;
+}
+:where(.wp-block-social-links.is-style-pill-shape .wp-social-link a) {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
 
 // Ensure the Snapchat label is visible when no custom
