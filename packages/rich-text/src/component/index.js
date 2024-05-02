@@ -92,7 +92,6 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		hadSelectionUpdate.current = isSelected;
-		setRecordFromProps();
 	} else if (
 		selectionStart !== record.current.start ||
 		selectionEnd !== record.current.end
