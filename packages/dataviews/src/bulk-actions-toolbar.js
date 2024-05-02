@@ -37,25 +37,65 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
-function ActionTrigger( { action, onClick, items, isBusy } ) {
-	const isDisabled = useMemo( () => {
-		return isBusy || items.every( ( item ) => ! action.isEligible( item ) );
-	}, [ action, items, isBusy ] );
+function ActionTrigger( { action, onClick, isBusy } ) {
 	return (
 		<ToolbarButton
-			disabled={ isDisabled }
+			disabled={ isBusy }
 			label={ action.label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			isDisabled={ isDisabled }
+			isDisabled={ isBusy }
 		/>
 	);
 }
 
 const EMPTY_ARRAY = [];
+
+function ActionButton( {
+	action,
+	selectedItems,
+	actionInProgress,
+	setActionInProgress,
+} ) {
+	const selectedEligibleItems = useMemo( () => {
+		return selectedItems.filter( ( item ) => {
+			return action.isEligible( item );
+		} );
+	}, [ action, selectedItems ] );
+	if ( !! action.RenderModal ) {
+		return (
+			<ActionWithModal
+				key={ action.id }
+				action={ action }
+				items={ selectedEligibleItems }
+				ActionTrigger={ ActionTrigger }
+				onActionStart={ () => {
+					setActionInProgress( action.id );
+				} }
+				onActionPerformed={ () => {
+					setActionInProgress( null );
+				} }
+			/>
+		);
+	}
+	return (
+		<ActionTrigger
+			key={ action.id }
+			action={ action }
+			items={ selectedItems }
+			onClick={ () => {
+				setActionInProgress( action.id );
+				action.callback( selectedItems, () => {
+					setActionInProgress( action.id );
+				} );
+			} }
+			isBusy={ actionInProgress === action.id }
+		/>
+	);
+}
 
 function renderToolbarContent(
 	selection,
@@ -84,34 +124,13 @@ function renderToolbarContent(
 			</ToolbarGroup>
 			<ToolbarGroup>
 				{ actionsToShow.map( ( action ) => {
-					if ( !! action.RenderModal ) {
-						return (
-							<ActionWithModal
-								key={ action.id }
-								action={ action }
-								items={ selectedItems }
-								ActionTrigger={ ActionTrigger }
-								onActionStart={ () => {
-									setActionInProgress( action.id );
-								} }
-								onActionPerformed={ () => {
-									setActionInProgress( null );
-								} }
-							/>
-						);
-					}
 					return (
-						<ActionTrigger
+						<ActionButton
 							key={ action.id }
 							action={ action }
-							items={ selectedItems }
-							onClick={ () => {
-								setActionInProgress( action.id );
-								action.callback( selectedItems, () => {
-									setActionInProgress( action.id );
-								} );
-							} }
-							isBusy={ actionInProgress === action.id }
+							selectedItems={ selectedItems }
+							actionInProgress={ actionInProgress }
+							setActionInProgress={ setActionInProgress }
 						/>
 					);
 				} ) }
