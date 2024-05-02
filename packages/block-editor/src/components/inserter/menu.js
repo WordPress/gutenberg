@@ -179,10 +179,6 @@ function InserterMenu(
 	] );
 
 	const blocksTab = useMemo( () => {
-		if ( selectedTab !== 'blocks' ) {
-			return null;
-		}
-
 		return (
 			<>
 				<div className="block-editor-inserter__block-list">
@@ -209,14 +205,9 @@ function InserterMenu(
 		onHover,
 		showMostUsedBlocks,
 		showInserterHelpPanel,
-		selectedTab,
 	] );
 
 	const patternsTab = useMemo( () => {
-		if ( selectedTab !== 'patterns' ) {
-			return null;
-		}
-
 		return (
 			<BlockPatternsTab
 				rootClientId={ destinationRootClientId }
@@ -244,14 +235,9 @@ function InserterMenu(
 		patternFilter,
 		selectedPatternCategory,
 		showPatternPanel,
-		selectedTab,
 	] );
 
 	const mediaTab = useMemo( () => {
-		if ( selectedTab !== 'media' ) {
-			return null;
-		}
-
 		return (
 			<MediaTab
 				rootClientId={ destinationRootClientId }
@@ -274,7 +260,6 @@ function InserterMenu(
 		selectedMediaCategory,
 		setSelectedMediaCategory,
 		showMediaPanel,
-		selectedTab,
 	] );
 
 	// When the pattern panel is showing, we want to use zoom out mode
