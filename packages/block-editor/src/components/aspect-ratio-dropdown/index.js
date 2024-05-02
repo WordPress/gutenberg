@@ -66,15 +66,11 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
 
-	const [ defaultRatios ] = (
-		useSettings( [ 'dimensions.aspectRatios.default' ] ) || [ [] ]
-	).map( presetRatioAsNumber );
-	const [ themeRatios ] = (
-		useSettings( [ 'dimensions.aspectRatios.theme' ] ) || [ [] ]
-	).map( presetRatioAsNumber );
-	const [ showDefaultRatios ] = useSettings( [
-		'dimensions.defaultAspectRatios',
-	] );
+	const [ defaultRatios ] = useSettings( 'dimensions.aspectRatios.default' );
+	const [ themeRatios ] = useSettings( 'dimensions.aspectRatios.theme' );
+	const [ showDefaultRatios ] = useSettings(
+		'dimensions.defaultAspectRatios'
+	);
 
 	return (
 		<DropdownMenu
@@ -96,17 +92,18 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 						aspectRatios={ [
 							// All ratios should be mirrored in AspectRatioTool in @wordpress/block-editor.
 							{
-								title: __( 'Original' ),
+								slug: 'original',
+								name: __( 'Original' ),
 								aspect: defaultAspect,
 							},
 							...( showDefaultRatios
-								? defaultRatios.filter(
-										( { ratio } ) => ratio === 1
-								  )
+								? defaultRatios
+										.map( presetRatioAsNumber )
+										.filter( ( { ratio } ) => ratio === 1 )
 								: [] ),
 						] }
 					/>
-					{ themeRatios.length > 0 && (
+					{ themeRatios?.length > 0 && (
 						<AspectRatioGroup
 							label={ __( 'Theme' ) }
 							isDisabled={ isInProgress }
@@ -127,9 +124,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ defaultRatios.filter(
-								( { ratio } ) => ratio > 1
-							) }
+							aspectRatios={ defaultRatios
+								.map( presetRatioAsNumber )
+								.filter( ( { ratio } ) => ratio > 1 ) }
 						/>
 					) }
 					{ showDefaultRatios && (
@@ -141,9 +138,9 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 								onClose();
 							} }
 							value={ aspect }
-							aspectRatios={ defaultRatios.filter(
-								( { ratio } ) => ratio < 1
-							) }
+							aspectRatios={ defaultRatios
+								.map( presetRatioAsNumber )
+								.filter( ( { ratio } ) => ratio < 1 ) }
 						/>
 					) }
 				</>
