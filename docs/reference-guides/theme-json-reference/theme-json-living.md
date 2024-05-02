@@ -114,7 +114,6 @@ Settings related to background.
 Settings related to dimensions.
 
 | Property  | Type   | Default | Props  |
-<<<<<<< HEAD
 | ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
 | defaultAspectRatios | boolean | true |  |
@@ -203,7 +202,6 @@ Generate custom CSS custom properties of the form `--wp--custom--{key}--{nested-
 
 
 ---
-
 ## Styles
 
 
@@ -315,7 +313,6 @@ Sets custom CSS to apply styling not covered by other theme.json properties.
 
 
 ---
-
 ## customTemplates
 
 Additional metadata for custom templates defined in the templates folder.
