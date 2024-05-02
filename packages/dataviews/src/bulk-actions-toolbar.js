@@ -39,7 +39,7 @@ const SNACKBAR_VARIANTS = {
 
 function ActionTrigger( { action, onClick, items, isBusy } ) {
 	const isDisabled = useMemo( () => {
-		return isBusy || items.some( ( item ) => ! action.isEligible( item ) );
+		return isBusy || items.every( ( item ) => ! action.isEligible( item ) );
 	}, [ action, items, isBusy ] );
 	return (
 		<ToolbarButton
