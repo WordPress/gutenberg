@@ -1,5 +1,7 @@
 .wp-block-separator {
 	// Dots style
+	// This block style selector can't have zero specificity, that global
+	// styles uses for block styles, in order to maintain the dots appearance.
 	&.is-style-dots {
 		// Override any background themes often set on the hr tag for this style.
 		// also override the color set in the editor since it's intented for normal HR
