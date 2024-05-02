@@ -25,7 +25,7 @@ const Search = memo( function Search( { label, view, onChangeView } ) {
 				search: debouncedSearch,
 			} );
 		}
-	}, [ debouncedSearch ] );
+	}, [ debouncedSearch, view ] );
 	const searchLabel = label || __( 'Search' );
 	return (
 		<SearchControl
