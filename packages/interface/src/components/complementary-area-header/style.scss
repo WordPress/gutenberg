@@ -35,6 +35,13 @@
 			display: flex;
 		}
 	}
+
+	// Emulate 'compact' button size, as Dropdown does not support compact yet.
+	.components-dropdown > .components-button.has-icon {
+		height: $grid-unit-40;
+		min-width: $grid-unit-40;
+		padding: $grid-unit-05;
+	}
 }
 
 // This overrides the negative margins between two consecutives panels.
