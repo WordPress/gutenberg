@@ -380,6 +380,15 @@
 					}
 				}
 			},
+			"core/site-logo": {
+				"variations": {
+					"rounded": {
+						"border": {
+							"radius": "9999px"
+						}
+					}
+				}
+			},
 			"core/button": {
 				"variations": {
 					"outline": {
