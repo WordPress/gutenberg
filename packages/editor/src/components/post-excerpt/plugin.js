@@ -37,7 +37,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostExcerpt' );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { __experimentalPluginPostExcerpt as PluginPostExcerpt } from '@wordpress/editor';
+ * import { __experimentalPluginPostExcerpt as PluginPostExcerpt } from '@wordpress/edit-post';
  *
  * const MyPluginPostExcerpt = () => (
  * 	<PluginPostExcerpt className="my-plugin-post-excerpt">
