@@ -165,21 +165,6 @@ export const resetButton = css`
 	}
 `;
 
-export const borderControlStylePicker = css`
-	${ StyledLabel } {
-		${ labelStyles }
-	}
-`;
-
-export const borderStyleButton = css`
-	&&&&& {
-		min-width: 32px;
-		width: 32px;
-		height: 32px;
-		padding: 4px;
-	}
-`;
-
 export const borderSlider = () => css`
 	flex: 1 1 60%;
 	${ rtl( { marginRight: space( 3 ) } )() }

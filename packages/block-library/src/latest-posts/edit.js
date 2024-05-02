@@ -431,7 +431,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = getSettings().formats.date;
 
 	return (
-		<div>
+		<>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
@@ -518,7 +518,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								<div className={ imageClasses }>
 									{ addLinkToFeaturedImage ? (
 										<a
-											className="wp-block-latest-posts__post-title"
 											href={ post.link }
 											rel="noreferrer noopener"
 											onClick={
@@ -533,6 +532,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 								</div>
 							) }
 							<a
+								className="wp-block-latest-posts__post-title"
 								href={ post.link }
 								rel="noreferrer noopener"
 								dangerouslySetInnerHTML={
@@ -582,6 +582,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</div>
+		</>
 	);
 }

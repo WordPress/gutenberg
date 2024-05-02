@@ -21,7 +21,7 @@ export default function TextEditor() {
 	const isRichEditingEnabled = useSelect( ( select ) => {
 		return select( editorStore ).getEditorSettings().richEditingEnabled;
 	}, [] );
-	const { switchEditorMode } = useDispatch( editPostStore );
+	const { switchEditorMode } = useDispatch( editorStore );
 
 	const { isWelcomeGuideVisible } = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );

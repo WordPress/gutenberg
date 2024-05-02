@@ -65,7 +65,9 @@ export function getItemId(
 	value?: AlignmentMatrixControlValue
 ) {
 	const normalized = normalize( value );
-	if ( ! normalized ) return;
+	if ( ! normalized ) {
+		return;
+	}
 
 	const id = normalized.replace( ' ', '-' );
 	return `${ prefixId }-${ id }`;
@@ -94,7 +96,9 @@ export function getAlignmentIndex(
 	alignment: AlignmentMatrixControlValue = 'center'
 ) {
 	const normalized = normalize( alignment );
-	if ( ! normalized ) return undefined;
+	if ( ! normalized ) {
+		return undefined;
+	}
 
 	const index = ALIGNMENTS.indexOf( normalized );
 	return index > -1 ? index : undefined;

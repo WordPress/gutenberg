@@ -13,6 +13,7 @@ import {
 	Fragment,
 	isValidElement,
 	memo,
+	PureComponent,
 	StrictMode,
 	useCallback,
 	useContext,
@@ -237,6 +238,11 @@ export { lazy };
  * @see https://reactjs.org/docs/react-api.html#reactsuspense
  */
 export { Suspense };
+
+/**
+ * @see https://reactjs.org/docs/react-api.html#reactpurecomponent
+ */
+export { PureComponent };
 
 /**
  * Concatenate two or more React children objects.

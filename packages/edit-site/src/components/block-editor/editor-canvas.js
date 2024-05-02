@@ -11,7 +11,10 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -22,27 +25,43 @@ import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
+import { computeIFrameScale } from '../../utils/math';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
-	const { hasBlocks, isFocusMode, templateType, canvasMode, isZoomOutMode } =
-		useSelect( ( select ) => {
-			const { getBlockCount, __unstableGetEditorMode } =
-				select( blockEditorStore );
-			const { getEditedPostType, getCanvasMode } = unlock(
-				select( editSiteStore )
-			);
-			const _templateType = getEditedPostType();
+function EditorCanvas( {
+	enableResizing,
+	settings,
+	children,
+	onClick,
+	...props
+} ) {
+	const {
+		hasBlocks,
+		isFocusMode,
+		templateType,
+		canvasMode,
+		isZoomOutMode,
+		currentPostIsTrashed,
+	} = useSelect( ( select ) => {
+		const { getBlockCount, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const { getEditedPostType, getCanvasMode } = unlock(
+			select( editSiteStore )
+		);
+		const _templateType = getEditedPostType();
 
-			return {
-				templateType: _templateType,
-				isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
-				canvasMode: getCanvasMode(),
-				hasBlocks: !! getBlockCount(),
-			};
-		}, [] );
+		return {
+			templateType: _templateType,
+			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			canvasMode: getCanvasMode(),
+			hasBlocks: !! getBlockCount(),
+			currentPostIsTrashed:
+				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
+				'trash',
+		};
+	}, [] );
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -52,20 +71,39 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 		}
 	}, [ canvasMode ] );
 
-	const viewModeProps = {
-		'aria-label': __( 'Editor Canvas' ),
+	// In view mode, make the canvas iframe be perceived and behave as a button
+	// to switch to edit mode, with a meaningful label and no title attribute.
+	const viewModeIframeProps = {
+		'aria-label': __( 'Edit' ),
+		'aria-disabled': currentPostIsTrashed,
+		title: null,
 		role: 'button',
 		tabIndex: 0,
 		onFocus: () => setIsFocused( true ),
 		onBlur: () => setIsFocused( false ),
 		onKeyDown: ( event ) => {
 			const { keyCode } = event;
-			if ( keyCode === ENTER || keyCode === SPACE ) {
+			if (
+				( keyCode === ENTER || keyCode === SPACE ) &&
+				! currentPostIsTrashed
+			) {
 				event.preventDefault();
 				setCanvasMode( 'edit' );
 			}
 		},
-		onClick: () => setCanvasMode( 'edit' ),
+		onClick: () => {
+			if ( !! onClick ) {
+				onClick();
+			} else {
+				setCanvasMode( 'edit' );
+			}
+		},
+		onClickCapture: ( event ) => {
+			if ( currentPostIsTrashed ) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		},
 		readonly: true,
 	};
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
@@ -91,13 +129,26 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					enableResizing ? 'min-height:0!important;' : ''
 				}}body{position:relative; ${
 					canvasMode === 'view'
-						? 'cursor: pointer; min-height: 100vh;'
+						? `min-height: 100vh; ${
+								currentPostIsTrashed ? '' : 'cursor: pointer;'
+						  }`
 						: ''
 				}}}`,
 			},
 		],
-		[ settings.styles, enableResizing, canvasMode ]
+		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
+
+	const frameSize = isZoomOutMode ? 20 : undefined;
+
+	const scale = isZoomOutMode
+		? ( contentWidth ) =>
+				computeIFrameScale(
+					{ width: 1000, scale: 0.55 },
+					{ width: 400, scale: 0.9 },
+					contentWidth
+				)
+		: undefined;
 
 	return (
 		<EditorCanvasRoot
@@ -107,9 +158,8 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				expand: isZoomOutMode,
-				scale: isZoomOutMode ? 0.45 : undefined,
-				frameSize: isZoomOutMode ? 100 : undefined,
+				scale,
+				frameSize,
 				className: classnames(
 					'edit-site-visual-editor__editor-canvas',
 					{
@@ -117,7 +167,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 					}
 				),
 				...props,
-				...( canvasMode === 'view' ? viewModeProps : {} ),
+				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
 		>
 			{ children }

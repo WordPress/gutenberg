@@ -106,7 +106,9 @@ export default function PostExcerptEditor( {
 	 * excerpt has been produced from the content.
 	 */
 	const strippedRenderedExcerpt = useMemo( () => {
-		if ( ! renderedExcerpt ) return '';
+		if ( ! renderedExcerpt ) {
+			return '';
+		}
 		const document = new window.DOMParser().parseFromString(
 			renderedExcerpt,
 			'text/html'
@@ -149,6 +151,7 @@ export default function PostExcerptEditor( {
 					? 'wp-block-post-excerpt__more-link--padding'
 					: ''
 			}` }
+			identifier="moreText"
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
 			placeholder={ __( 'Add "read more" link text' ) }
@@ -156,12 +159,12 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
-			withoutInteractiveFormatting={ true }
 			style={ {
 				...borderProps.style,
 				color: textColor,
 				backgroundColor: bgColor,
 			} }
+			withoutInteractiveFormatting
 		/>
 	);
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {

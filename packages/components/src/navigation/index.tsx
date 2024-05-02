@@ -28,6 +28,8 @@ const noop = () => {};
 /**
  * Render a navigation list with optional groupings and hierarchy.
  *
+ * @deprecated Use `Navigator` instead.
+ *
  * ```jsx
  * import {
  *   __experimentalNavigation as Navigation,

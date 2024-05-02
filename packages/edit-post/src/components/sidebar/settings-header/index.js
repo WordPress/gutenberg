@@ -4,6 +4,7 @@
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { forwardRef } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
@@ -14,23 +15,30 @@ import { sidebars } from '../settings-sidebar';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SettingsHeader = () => {
-	const { documentLabel, isTemplateMode } = useSelect( ( select ) => {
-		const { getPostTypeLabel, getRenderingMode } = select( editorStore );
+const SettingsHeader = ( _, ref ) => {
+	const { documentLabel } = useSelect( ( select ) => {
+		const { getPostTypeLabel } = select( editorStore );
 
 		return {
 			// translators: Default label for the Document sidebar tab, not selected.
 			documentLabel: getPostTypeLabel() || _x( 'Document', 'noun' ),
-			isTemplateMode: getRenderingMode() === 'template-only',
 		};
 	}, [] );
 
 	return (
-		<Tabs.TabList>
-			<Tabs.Tab tabId={ sidebars.document }>
-				{ isTemplateMode ? __( 'Template' ) : documentLabel }
+		<Tabs.TabList ref={ ref }>
+			<Tabs.Tab
+				tabId={ sidebars.document }
+				// Used for focus management in the SettingsSidebar component.
+				data-tab-id={ sidebars.document }
+			>
+				{ documentLabel }
 			</Tabs.Tab>
-			<Tabs.Tab tabId={ sidebars.block }>
+			<Tabs.Tab
+				tabId={ sidebars.block }
+				// Used for focus management in the SettingsSidebar component.
+				data-tab-id={ sidebars.block }
+			>
 				{ /* translators: Text label for the Block Settings Sidebar tab. */ }
 				{ __( 'Block' ) }
 			</Tabs.Tab>
@@ -38,4 +46,4 @@ const SettingsHeader = () => {
 	);
 };
 
-export default SettingsHeader;
+export default forwardRef( SettingsHeader );

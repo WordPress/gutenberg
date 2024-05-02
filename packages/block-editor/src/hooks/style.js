@@ -15,7 +15,7 @@ import { getCSSRules, compileCSS } from '@wordpress/style-engine';
  * Internal dependencies
  */
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
-import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
+import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import {
 	TypographyPanel,
@@ -42,6 +42,7 @@ const styleSupportKeys = [
 	DIMENSIONS_SUPPORT_KEY,
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
+	SHADOW_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType ) =>
@@ -110,6 +111,9 @@ const skipSerializationPathsEdit = {
 	[ `${ SPACING_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		SPACING_SUPPORT_KEY,
 	],
+	[ `${ SHADOW_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		SHADOW_SUPPORT_KEY,
+	],
 };
 
 /**
@@ -126,10 +130,14 @@ const skipSerializationPathsEdit = {
  */
 const skipSerializationPathsSave = {
 	...skipSerializationPathsEdit,
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: [
+		`${ DIMENSIONS_SUPPORT_KEY }.aspectRatio`,
+	], // Skip serialization of aspect ratio in save mode.
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
 const skipSerializationPathsSaveChecks = {
+	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
 

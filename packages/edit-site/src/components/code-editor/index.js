@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -31,7 +32,7 @@ export default function CodeEditor() {
 		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
 
 		return {
-			shortcut: getShortcutRepresentation( 'core/edit-site/toggle-mode' ),
+			shortcut: getShortcutRepresentation( 'core/editor/toggle-mode' ),
 			content: editedRecord?.content,
 			blocks: editedRecord?.blocks,
 			type: _type,
@@ -52,7 +53,7 @@ export default function CodeEditor() {
 		return content;
 	}, [ content, blocks ] );
 
-	const { switchEditorMode } = useDispatch( editSiteStore );
+	const { switchEditorMode } = useDispatch( editorStore );
 	return (
 		<div className="edit-site-code-editor">
 			<div className="edit-site-code-editor__toolbar">

@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	ErrorBoundary,
 	PostLockedModal,
@@ -12,7 +11,6 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
 
 /**
@@ -22,7 +20,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import usePostHistory from './hooks/use-post-history';
+import useNavigateToEntityRecord from './hooks/use-navigate-to-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -33,66 +31,40 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
+	const {
+		currentPost,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
+	} = useNavigateToEntityRecord(
 		initialPostId,
-		initialPostType
+		initialPostType,
+		'post-only'
 	);
 
-	const {
-		hasInlineToolbar,
-		post,
-		preferredStyleVariations,
-		hiddenBlockTypes,
-		blockTypes,
-		template,
-	} = useSelect(
+	const { post, template } = useSelect(
 		( select ) => {
-			const {
-				isFeatureActive,
-				getEditedPostTemplate,
-				getHiddenBlockTypes,
-			} = select( editPostStore );
-			const { getEntityRecord, getPostType, getEntityRecords, canUser } =
+			const { getEditedPostTemplate } = select( editPostStore );
+			const { getEntityRecord, getPostType, canUser } =
 				select( coreStore );
 			const { getEditorSettings } = select( editorStore );
-			const { getBlockTypes } = select( blocksStore );
-			const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-				currentPost.postType
+
+			const postObject = getEntityRecord(
+				'postType',
+				currentPost.postType,
+				currentPost.postId
 			);
-			// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-			// to avoid the special case.
-			let postObject;
-			if ( isTemplate ) {
-				const posts = getEntityRecords(
-					'postType',
-					currentPost.postType,
-					{
-						wp_id: currentPost.postId,
-					}
-				);
-				postObject = posts?.[ 0 ];
-			} else {
-				postObject = getEntityRecord(
-					'postType',
-					currentPost.postType,
-					currentPost.postId
-				);
-			}
+
 			const supportsTemplateMode =
 				getEditorSettings().supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canEditTemplate = canUser( 'create', 'templates' );
+			const canViewTemplate = canUser( 'read', 'templates' );
 			return {
-				hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-				preferredStyleVariations: select( preferencesStore ).get(
-					'core/edit-post',
-					'preferredStyleVariations'
-				),
-				hiddenBlockTypes: getHiddenBlockTypes(),
-				blockTypes: getBlockTypes(),
 				template:
-					supportsTemplateMode && isViewable && canEditTemplate
+					supportsTemplateMode &&
+					isViewable &&
+					canViewTemplate &&
+					currentPost.postType !== 'wp_template'
 						? getEditedPostTemplate()
 						: null,
 				post: postObject,
@@ -101,50 +73,22 @@ function Editor( {
 		[ currentPost.postType, currentPost.postId ]
 	);
 
-	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
-
-	const editorSettings = useMemo( () => {
-		const result = {
+	const editorSettings = useMemo(
+		() => ( {
 			...settings,
-			getPostLinkProps,
-			goBack,
-			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
-				onChange: updatePreferredStyleVariations,
-			},
-			hasInlineToolbar,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			defaultRenderingMode: 'post-only',
+		} ),
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+	);
 
-			// Keep a reference of the `allowedBlockTypes` from the server to handle use cases
-			// where we need to differentiate if a block is disabled by the user or some plugin.
-			defaultAllowedBlockTypes: settings.allowedBlockTypes,
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
 		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( hiddenBlockTypes.length > 0 ) {
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? blockTypes.map( ( { name } ) => name )
-					: settings.allowedBlockTypes || [];
-
-			result.allowedBlockTypes = defaultAllowedBlockTypes.filter(
-				( type ) => ! hiddenBlockTypes.includes( type )
-			);
-		}
-
-		return result;
-	}, [
-		settings,
-		hasInlineToolbar,
-		hiddenBlockTypes,
-		blockTypes,
-		preferredStyleVariations,
-		updatePreferredStyleVariations,
-		getPostLinkProps,
-		goBack,
-	] );
+	}, [ initialPostType, initialPostId ] );
 
 	if ( ! post ) {
 		return null;
@@ -162,8 +106,8 @@ function Editor( {
 			>
 				<ErrorBoundary>
 					<CommandMenu />
-					<EditorInitialization postId={ currentPost.postId } />
-					<Layout />
+					<EditorInitialization />
+					<Layout initialPost={ initialPost } />
 				</ErrorBoundary>
 				<PostLockedModal />
 			</ExperimentalEditorProvider>

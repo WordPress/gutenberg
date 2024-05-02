@@ -7,11 +7,11 @@ import classnames from 'classnames';
  */
 import { useSelect } from '@wordpress/data';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import BackButton from './back-button';
 import ResizableEditor from './resizable-editor';
 import EditorCanvas from './editor-canvas';
 import EditorCanvasContainer from '../editor-canvas-container';
@@ -20,24 +20,31 @@ import { store as editSiteStore } from '../../store';
 import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
+	TEMPLATE_POST_TYPE,
 } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
-export default function SiteEditorCanvas() {
-	const { templateType, isFocusMode, isViewMode } = useSelect( ( select ) => {
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
+const { useLocation } = unlock( routerPrivateApis );
 
-		const _templateType = getEditedPostType();
+export default function SiteEditorCanvas( { onClick } ) {
+	const location = useLocation();
+	const { templateType, isFocusableEntity, isViewMode, isZoomOutMode } =
+		useSelect( ( select ) => {
+			const { getEditedPostType, getCanvasMode } = unlock(
+				select( editSiteStore )
+			);
+			const { __unstableGetEditorMode } = select( blockEditorStore );
+			const _templateType = getEditedPostType();
 
-		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isViewMode: getCanvasMode() === 'view',
-		};
-	}, [] );
-
+			return {
+				templateType: _templateType,
+				isFocusableEntity: FOCUSABLE_ENTITIES.includes( _templateType ),
+				isViewMode: getCanvasMode() === 'view',
+				isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			};
+		}, [] );
+	const isFocusMode = location.params.focusMode || isFocusableEntity;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 
 	const settings = useSiteEditorSettings();
@@ -47,7 +54,11 @@ export default function SiteEditorCanvas() {
 		isFocusMode &&
 		! isViewMode &&
 		// Disable resizing in mobile viewport.
-		! isMobileViewport;
+		! isMobileViewport &&
+		// Dsiable resizing in zoomed-out mode.
+		! isZoomOutMode &&
+		// Disable resizing when editing a template in focus mode.
+		templateType !== TEMPLATE_POST_TYPE;
 
 	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
@@ -67,7 +78,6 @@ export default function SiteEditorCanvas() {
 							'is-view-mode': isViewMode,
 						} ) }
 					>
-						<BackButton />
 						<ResizableEditor
 							enableResizing={ enableResizing }
 							height={
@@ -79,8 +89,14 @@ export default function SiteEditorCanvas() {
 							<EditorCanvas
 								enableResizing={ enableResizing }
 								settings={ settings }
+								onClick={ onClick }
 							>
-								{ resizeObserver }
+								{
+									// Avoid resize listeners when not needed,
+									// these will trigger unnecessary re-renders
+									// when animating the iframe width.
+									enableResizing && resizeObserver
+								}
 							</EditorCanvas>
 						</ResizableEditor>
 					</div>

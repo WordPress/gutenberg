@@ -15,6 +15,8 @@ const {
 	clickIfClickable,
 	launchApp,
 	tapStatusBariOS,
+	longPressElement,
+	longPressMiddleOfElement,
 } = require( '../helpers/utils' );
 
 const ADD_BLOCK_ID = isAndroid() ? 'Add block' : 'add-block-button';
@@ -105,6 +107,57 @@ class EditorPage {
 		await typeString( this.driver, block, text, clear );
 	}
 
+	async typeKeyString( inputString ) {
+		const actions = this.driver.action( 'key' );
+
+		for ( const char of inputString ) {
+			await actions.down( char ).up( char );
+		}
+
+		await actions.perform();
+	}
+
+	async pasteClipboardToTextBlock( element, { timeout = 1000 } = {} ) {
+		if ( this.driver.isAndroid ) {
+			await longPressMiddleOfElement( this.driver, element );
+		} else {
+			await longPressElement( this.driver, element );
+		}
+
+		if ( this.driver.isAndroid ) {
+			// Long pressing seemingly results in drag-and-drop blurring the input, so
+			// we tap again to re-focus the input.
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( { origin: element } )
+				.down()
+				.up()
+				.perform();
+
+			const location = await element.getLocation();
+			const approximatePasteMenuLocation = {
+				x: location.x + 30,
+				y: location.y - 120,
+			};
+			await this.driver
+				.action( 'pointer', {
+					parameters: { pointerType: 'touch' },
+				} )
+				.move( approximatePasteMenuLocation )
+				.down()
+				.up()
+				.perform();
+		} else {
+			const pasteMenuItem = await this.driver.$(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+			await pasteMenuItem.waitForDisplayed( { timeout } );
+			await pasteMenuItem.click();
+		}
+	}
+
 	// Finds the wd element for new block that was added and sets the element attribute
 	// and accessibilityId attributes on this object and selects the block
 	// position uses one based numbering.
@@ -162,6 +215,36 @@ class EditorPage {
 		return lastElementFound;
 	}
 
+	/**
+	 * Selects a block.
+	 *
+	 * @param {import('webdriverio').ChainablePromiseElement} block                           The block to select.
+	 * @param {Object}                                        options                         Configuration options.
+	 * @param {Object}                                        [options.offset={ x: 0, y: 0 }] The offset for the click position.
+	 * @param {number|Function}                               [options.offset.x=0]            The x-coordinate offset or a function that calculates the offset based on the block's width.
+	 * @param {number|Function}                               [options.offset.y=0]            The y-coordinate offset or a function that calculates the offset based on the block's height.
+	 *
+	 * @return {import('webdriverio').ChainablePromiseElement} The selected block.
+	 */
+	async selectBlock( block, options = {} ) {
+		const { offset = { x: 0, y: 0 } } = options;
+		const size = await block.getSize();
+
+		let offsetX = offset.x;
+		if ( typeof offset.x === 'function' ) {
+			offsetX = offset.x( size.width );
+		}
+
+		let offsetY = offset.y;
+		if ( typeof offset.y === 'function' ) {
+			offsetY = offset.y( size.height );
+		}
+
+		await block.click( { x: offsetX, y: offsetY } );
+
+		return block;
+	}
+
 	async getFirstBlockVisible() {
 		const firstBlockLocator = `//*[contains(@${ this.accessibilityIdXPathAttrib }, " Block. Row ")]`;
 		return await waitForVisible( this.driver, firstBlockLocator );
@@ -208,7 +291,7 @@ class EditorPage {
 
 		if ( options.autoscroll ) {
 			if ( isAndroid() ) {
-				await swipeDown( this.driver );
+				await swipeDown( this.driver, { endYCoefficient: 2 } );
 			} else {
 				await tapStatusBariOS( this.driver );
 			}
@@ -245,7 +328,10 @@ class EditorPage {
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.androidScrollAndReturnElement( accessibilityLabel );
 		}
 		return elements[ elements.length - 1 ];
@@ -258,7 +344,10 @@ class EditorPage {
 		const elements = await this.driver.$$( `~${ id }` );
 
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver, undefined, 100, 1 );
+			await swipeUp( this.driver, undefined, {
+				delay: 100,
+				endYCoefficient: 1,
+			} );
 			return this.scrollAndReturnElementByAccessibilityId( id );
 		}
 		return elements[ elements.length - 1 ];
@@ -625,46 +714,6 @@ class EditorPage {
 		await moveDownButton.click();
 	}
 
-	// Position of the block to remove
-	// Block will no longer be present if this succeeds.
-	async removeBlockAtPosition( blockName = '', position = 1 ) {
-		if ( ! ( await this.hasBlockAtPosition( position, blockName ) ) ) {
-			throw Error( `No Block at position ${ position }` );
-		}
-
-		const buttonElementName = isAndroid()
-			? '//*'
-			: '//XCUIElementTypeButton';
-		const blockActionsMenuButtonIdentifier = `Open Block Actions Menu`;
-		const blockActionsMenuButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ blockActionsMenuButtonIdentifier }")]`;
-		if ( isAndroid() ) {
-			const block = await this.getBlockAtPosition( blockName, position );
-			let checkList = await this.driver.$$(
-				blockActionsMenuButtonLocator
-			);
-			while ( checkList.length === 0 ) {
-				await swipeUp( this.driver, block ); // Swipe up to show remove icon at the bottom.
-				checkList = await this.driver.$$(
-					blockActionsMenuButtonLocator
-				);
-			}
-		}
-
-		const blockActionsMenuButton = await waitForVisible(
-			this.driver,
-			blockActionsMenuButtonLocator
-		);
-		await blockActionsMenuButton.click();
-		const removeActionButtonIdentifier = 'Remove block';
-		const removeActionButtonLocator = `${ buttonElementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ removeActionButtonIdentifier }")]`;
-		const removeActionButton = await waitForVisible(
-			this.driver,
-			removeActionButtonLocator
-		);
-
-		await removeActionButton.click();
-	}
-
 	// =========================
 	// Formatting toolbar functions
 	// =========================
@@ -683,6 +732,22 @@ class EditorPage {
 		);
 
 		await element.click();
+	}
+
+	async toggleHighlightColor( color ) {
+		await this.toggleFormatting( 'Text color' );
+		let element = `~${ color }`;
+
+		if ( ! color ) {
+			element = isAndroid()
+				? '~Clear selected color'
+				: '(//XCUIElementTypeOther[@name="Clear selected color"])[2]';
+		}
+
+		await this.driver.waitUntil( this.driver.$( element ).isDisplayed );
+		const button = await this.driver.$( element );
+		await button.click();
+		await this.dismissBottomSheet();
 	}
 
 	// =========================
@@ -1013,7 +1078,7 @@ class EditorPage {
 	async addButtonWithInlineAppender( position = 1 ) {
 		const appenderButton = isAndroid()
 			? await this.waitForElementToBeDisplayedByXPath(
-					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[${ position }]/android.view.ViewGroup/android.widget.Button`
+					`//android.widget.Button[@content-desc="Buttons Block. Row 1"]/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.Button[${ position }]`
 			  )
 			: await this.waitForElementToBeDisplayedById( 'appender-button' );
 		await appenderButton.click();
@@ -1067,6 +1132,8 @@ const blockNames = {
 	button: 'Button',
 	preformatted: 'Preformatted',
 	unsupported: 'Unsupported',
+	mediaText: 'Media & Text',
+	quote: 'Quote',
 };
 
 module.exports = { setupEditor, blockNames };

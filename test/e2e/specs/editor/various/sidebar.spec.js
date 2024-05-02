@@ -111,13 +111,21 @@ test.describe( 'Sidebar', () => {
 			.getByRole( 'heading', { level: 2 } );
 
 		await expect( documentSettingsPanels ).toHaveText( [
+			'No Title',
 			'Summary',
 			'Categories',
 			'Tags',
-			'Featured image',
-			'Excerpt',
 			'Discussion',
 		] );
+		// Also check 'panels' that are not rendered as TabPanels.
+		const postExcerptPanel = page.getByRole( 'button', {
+			name: 'Add an excerpt…',
+		} );
+		const postFeaturedImagePanel = page.getByRole( 'button', {
+			name: 'Set featured image',
+		} );
+		await expect( postExcerptPanel ).toHaveCount( 1 );
+		await expect( postFeaturedImagePanel ).toHaveCount( 1 );
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } =
@@ -131,6 +139,8 @@ test.describe( 'Sidebar', () => {
 			removeEditorPanel( 'post-status' );
 		} );
 
-		await expect( documentSettingsPanels ).toHaveCount( 0 );
+		await expect( documentSettingsPanels ).toHaveCount( 1 );
+		await expect( postExcerptPanel ).toHaveCount( 0 );
+		await expect( postFeaturedImagePanel ).toHaveCount( 0 );
 	} );
 } );

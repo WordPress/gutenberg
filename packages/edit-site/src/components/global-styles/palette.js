@@ -87,7 +87,9 @@ function Palette( { name } ) {
 									</ColorIndicatorWrapper>
 								) ) }
 						</ZStack>
-						<FlexItem>{ paletteButtonText }</FlexItem>
+						<FlexItem className="edit-site-global-styles-screen-colors__palette-count">
+							{ paletteButtonText }
+						</FlexItem>
 					</HStack>
 				</NavigationButtonAsItem>
 			</ItemGroup>

@@ -1,12 +1,5 @@
 $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
-.components-custom-gradient-picker {
-	&:not(.is-next-has-no-margin) {
-		margin-top: $grid-unit-15;
-		margin-bottom: $grid-unit-30;
-	}
-}
-
 .components-custom-gradient-picker__gradient-bar {
 	border-radius: $radius-block-ui;
 	width: 100%;

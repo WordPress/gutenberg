@@ -19,6 +19,7 @@ import { store as blocksStore } from '@wordpress/blocks';
  */
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { usePaddingAppender } from './use-padding-appender';
 
 const { EditorCanvas } = unlock( editorPrivateApis );
 
@@ -30,6 +31,7 @@ export default function VisualEditor( { styles } ) {
 		renderingMode,
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
 		const { getEditorSettings, getRenderingMode } = select( editorStore );
@@ -43,12 +45,16 @@ export default function VisualEditor( { styles } ) {
 			hasV3BlocksOnly: getBlockTypes().every( ( type ) => {
 				return type.apiVersion >= 3;
 			} ),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
+
+	const paddingAppenderRef = usePaddingAppender();
 
 	let paddingBottom;
 
@@ -74,12 +80,11 @@ export default function VisualEditor( { styles } ) {
 	const isToBeIframed =
 		( ( hasV3BlocksOnly || ( isGutenbergPlugin && isBlockBasedTheme ) ) &&
 			! hasMetaBoxes ) ||
-		renderingMode === 'template-only';
+		isEditingTemplate;
 
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
-				'is-template-mode': renderingMode === 'template-only',
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
@@ -89,6 +94,7 @@ export default function VisualEditor( { styles } ) {
 				// We should auto-focus the canvas (title) on load.
 				// eslint-disable-next-line jsx-a11y/no-autofocus
 				autoFocus={ ! isWelcomeGuideVisible }
+				contentRef={ paddingAppenderRef }
 			/>
 		</div>
 	);

@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { __experimentalHStack as HStack } from '@wordpress/components';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,9 +11,23 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS } from './constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
+import BulkActions from './bulk-actions';
+import { normalizeFields } from './normalize-fields';
 
 const defaultGetItemId = ( item ) => item.id;
+const defaultOnSelectionChange = () => {};
+
+function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
 
 export default function DataViews( {
 	view,
@@ -24,80 +35,114 @@ export default function DataViews( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions,
+	actions = [],
 	data,
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
 	supportedLayouts,
-	onSelectionChange,
-	deferredRendering = false,
+	onSelectionChange = defaultOnSelectionChange,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
+	const [ openedFilter, setOpenedFilter ] = useState( null );
+
+	useEffect( () => {
+		if (
+			selection.length > 0 &&
+			selection.some(
+				( id ) => ! data.some( ( item ) => getItemId( item ) === id )
+			)
+		) {
+			const newSelection = selection.filter( ( id ) =>
+				data.some( ( item ) => getItemId( item ) === id )
+			);
+			setSelection( newSelection );
+			onSelectionChange(
+				data.filter( ( item ) =>
+					newSelection.includes( getItemId( item ) )
+				)
+			);
+		}
+	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
 		( items ) => {
-			setSelection( items.map( ( item ) => item.id ) );
+			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
-		[ setSelection, onSelectionChange ]
+		[ setSelection, getItemId, onSelectionChange ]
 	);
 
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
 	).component;
-	const _fields = useMemo( () => {
-		return fields.map( ( field ) => ( {
-			...field,
-			render: field.render || field.getValue,
-		} ) );
-	}, [ fields ] );
+	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
+
+	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
+		actions,
+		data
+	);
 	return (
 		<div className="dataviews-wrapper">
-			<VStack spacing={ 0 } justify="flex-start">
+			<HStack
+				alignment="top"
+				justify="start"
+				className="dataviews-filters__view-actions"
+			>
 				<HStack
-					alignment="flex-start"
-					className="dataviews__filters-view-actions"
+					justify="start"
+					className="dataviews-filters__container"
+					wrap
 				>
-					<HStack justify="start" wrap>
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
-						<Filters
-							fields={ _fields }
+					{ search && (
+						<Search
+							label={ searchLabel }
 							view={ view }
 							onChangeView={ onChangeView }
 						/>
-					</HStack>
-					<ViewActions
+					) }
+					<Filters
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
+						openedFilter={ openedFilter }
+						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
-				<ViewComponent
+				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+					hasPossibleBulkAction && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
+				<ViewActions
 					fields={ _fields }
 					view={ view }
 					onChangeView={ onChangeView }
-					actions={ actions }
-					data={ data }
-					getItemId={ getItemId }
-					isLoading={ isLoading }
-					onSelectionChange={ onSetSelection }
-					selection={ selection }
-					deferredRendering={ deferredRendering }
+					supportedLayouts={ supportedLayouts }
 				/>
-				<Pagination
-					view={ view }
-					onChangeView={ onChangeView }
-					paginationInfo={ paginationInfo }
-				/>
-			</VStack>
+			</HStack>
+			<ViewComponent
+				fields={ _fields }
+				view={ view }
+				onChangeView={ onChangeView }
+				actions={ actions }
+				data={ data }
+				getItemId={ getItemId }
+				isLoading={ isLoading }
+				onSelectionChange={ onSetSelection }
+				selection={ selection }
+				setOpenedFilter={ setOpenedFilter }
+			/>
+			<Pagination
+				view={ view }
+				onChangeView={ onChangeView }
+				paginationInfo={ paginationInfo }
+			/>
 		</div>
 	);
 }

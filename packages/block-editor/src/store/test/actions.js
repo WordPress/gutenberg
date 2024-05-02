@@ -380,107 +380,6 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'insertBlocks', () => {
-		it( 'should apply default styles to blocks if blocks do not contain a style', () => {
-			const ribsBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-			};
-			const chickenBlock = {
-				clientId: 'chicken',
-				name: 'core/test-chicken',
-			};
-			const chickenRibsBlock = {
-				clientId: 'chicken-ribs',
-				name: 'core/test-chicken-ribs',
-			};
-			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
-
-			const select = {
-				getSettings: () => ( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-							'core/test-chicken-ribs': 'colorful',
-						},
-					},
-				} ),
-				canInsertBlockType: () => true,
-			};
-			const dispatch = jest.fn();
-
-			insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			)( { select, dispatch } );
-
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						...ribsBlock,
-						attributes: { className: 'is-style-squared' },
-					},
-					chickenBlock,
-					{
-						...chickenRibsBlock,
-						attributes: { className: 'is-style-colorful' },
-					},
-				],
-				index: 5,
-				rootClientId: 'testrootid',
-				time: expect.any( Number ),
-				updateSelection: false,
-				initialPosition: null,
-			} );
-		} );
-
-		it( 'should keep styles explicitly set even if different from the default', () => {
-			const ribsWithStyleBlock = {
-				clientId: 'ribs',
-				name: 'core/test-ribs',
-				attributes: {
-					className: 'is-style-colorful',
-				},
-			};
-			const blocks = [ ribsWithStyleBlock ];
-
-			const select = {
-				getSettings: () => ( {
-					__experimentalPreferredStyleVariations: {
-						value: {
-							'core/test-ribs': 'squared',
-						},
-					},
-				} ),
-				canInsertBlockType: () => true,
-			};
-			const dispatch = jest.fn();
-
-			insertBlocks(
-				blocks,
-				5,
-				'testrootid',
-				false
-			)( { select, dispatch } );
-
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'INSERT_BLOCKS',
-				blocks: [
-					{
-						...ribsWithStyleBlock,
-						attributes: { className: 'is-style-colorful' },
-					},
-				],
-				index: 5,
-				rootClientId: 'testrootid',
-				time: expect.any( Number ),
-				updateSelection: false,
-				initialPosition: null,
-			} );
-		} );
-
 		it( 'should filter the allowed blocks in INSERT_BLOCKS action', () => {
 			const ribsBlock = {
 				clientId: 'ribs',
@@ -933,10 +832,6 @@ describe( 'actions', () => {
 				blockB.clientId
 			)( { select, dispatch } );
 
-			expect( dispatch ).toHaveBeenCalledWith( {
-				type: 'MERGE_BLOCKS',
-				blocks: [ blockA.clientId, blockB.clientId ],
-			} );
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
 

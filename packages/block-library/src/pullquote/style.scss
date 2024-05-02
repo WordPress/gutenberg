@@ -1,5 +1,4 @@
 .wp-block-pullquote {
-	padding: 3em 0;
 	text-align: center; // Default text-alignment where the `textAlign` attribute value isn't specified.
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 	box-sizing: border-box;
@@ -8,6 +7,18 @@
 	blockquote,
 	cite {
 		color: inherit;
+	}
+
+	blockquote {
+		margin: 0;
+	}
+
+	p {
+		margin-top: 0;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
 	&.alignleft,
@@ -24,9 +35,10 @@
 	}
 }
 
-// Lowest specificity to avoid overriding layout styles.
+// Lowest specificity to avoid overriding layout and global styles.
 :where(.wp-block-pullquote) {
 	margin: 0 0 1em 0;
+	padding: 4em 0;
 }
 
 // Ensure that we are reasonably specific to override theme defaults.

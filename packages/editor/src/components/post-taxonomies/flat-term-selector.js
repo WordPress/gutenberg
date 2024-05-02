@@ -40,10 +40,13 @@ const isSameTermName = ( termA, termB ) =>
 	unescapeString( termB ).toLowerCase();
 
 const termNamesToIds = ( names, terms ) => {
-	return names.map(
-		( termName ) =>
-			terms.find( ( term ) => isSameTermName( term.name, termName ) ).id
-	);
+	return names
+		.map(
+			( termName ) =>
+				terms.find( ( term ) => isSameTermName( term.name, termName ) )
+					?.id
+		)
+		.filter( ( id ) => id !== undefined );
 };
 
 export function FlatTermSelector( { slug } ) {
@@ -193,9 +196,8 @@ export function FlatTermSelector( { slug } ) {
 		setValues( uniqueTerms );
 
 		if ( newTermNames.length === 0 ) {
-			return onUpdateTerms(
-				termNamesToIds( uniqueTerms, availableTerms )
-			);
+			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+			return;
 		}
 
 		if ( ! hasCreateAction ) {
@@ -209,7 +211,7 @@ export function FlatTermSelector( { slug } ) {
 		)
 			.then( ( newTerms ) => {
 				const newAvailableTerms = availableTerms.concat( newTerms );
-				return onUpdateTerms(
+				onUpdateTerms(
 					termNamesToIds( uniqueTerms, newAvailableTerms )
 				);
 			} )
@@ -217,6 +219,9 @@ export function FlatTermSelector( { slug } ) {
 				createErrorNotice( error.message, {
 					type: 'snackbar',
 				} );
+				// In case of a failure, try assigning available terms.
+				// This will invalidate the optimistic update.
+				onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
 			} );
 	}
 

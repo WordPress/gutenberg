@@ -53,22 +53,22 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 }
 
 <fieldset
-  class="interface-preferences-modal__section"
+  class="preferences-modal__section"
 >
   <legend
-    class="interface-preferences-modal__section-legend"
+    class="preferences-modal__section-legend"
   >
     <h2
-      class="interface-preferences-modal__section-title"
+      class="preferences-modal__section-title"
     >
       Advanced panels
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__section-content"
+    class="preferences-modal__section-content"
   >
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -165,22 +165,22 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 }
 
 <fieldset
-  class="interface-preferences-modal__section"
+  class="preferences-modal__section"
 >
   <legend
-    class="interface-preferences-modal__section-legend"
+    class="preferences-modal__section-legend"
   >
     <h2
-      class="interface-preferences-modal__section-title"
+      class="preferences-modal__section-title"
     >
       Advanced panels
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__section-content"
+    class="preferences-modal__section-content"
   >
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -221,7 +221,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       </div>
     </div>
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -263,7 +263,7 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
       </div>
     </div>
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -361,22 +361,22 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
 }
 
 <fieldset
-  class="interface-preferences-modal__section"
+  class="preferences-modal__section"
 >
   <legend
-    class="interface-preferences-modal__section-legend"
+    class="preferences-modal__section-legend"
   >
     <h2
-      class="interface-preferences-modal__section-title"
+      class="preferences-modal__section-title"
     >
       Advanced panels
     </h2>
   </legend>
   <div
-    class="interface-preferences-modal__section-content"
+    class="preferences-modal__section-content"
   >
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"
@@ -418,7 +418,7 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
       </div>
     </div>
     <div
-      class="interface-preferences-modal__option"
+      class="preference-base-option"
     >
       <div
         class="components-base-control components-toggle-control emotion-0 emotion-1"

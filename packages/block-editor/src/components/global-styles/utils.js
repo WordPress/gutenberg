@@ -6,32 +6,12 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * Internal dependencies
  */
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -77,10 +57,7 @@ export const PRESET_METADATA = [
 	{
 		path: [ 'typography', 'fontSizes' ],
 		valueFunc: ( preset, settings ) =>
-			getTypographyFontSizeValue(
-				preset,
-				getFluidTypographyOptionsFromSettings( settings )
-			),
+			getTypographyFontSizeValue( preset, settings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -387,6 +364,10 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( ! scope || ! selector ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
@@ -398,6 +379,57 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Scopes a collection of selectors for features and subfeatures.
+ *
+ * @example
+ * ```js
+ * const scope = '.custom-scope';
+ * const selectors = {
+ *     color: '.wp-my-block p',
+ *     typography: { fontSize: '.wp-my-block caption' },
+ * };
+ * const result = scopeFeatureSelector( scope, selectors );
+ * // result is {
+ * //     color: '.custom-scope .wp-my-block p',
+ * //     typography: { fonSize: '.custom-scope .wp-my-block caption' },
+ * // }
+ * ```
+ *
+ * @param {string} scope     Selector to scope collection of selectors with.
+ * @param {Object} selectors Collection of feature selectors e.g.
+ *
+ * @return {Object|undefined} Scoped collection of feature selectors.
+ */
+export function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			featureSelectors[ feature ] = {};
+
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
 }
 
 /**
@@ -445,4 +477,40 @@ export function areGlobalStyleConfigsEqual( original, variation ) {
 		fastDeepEqual( original?.styles, variation?.styles ) &&
 		fastDeepEqual( original?.settings, variation?.settings )
 	);
+}
+
+/**
+ * Generates the selector for a block style variation by creating the
+ * appropriate CSS class and adding it to the ancestor portion of the block's
+ * selector.
+ *
+ * For example, take the Button block which has a compound selector:
+ * `.wp-block-button .wp-block-button__link`. With a variation named 'custom',
+ * the class `.is-style-custom` should be added to the `.wp-block-button`
+ * ancestor only.
+ *
+ * This function will take into account comma separated and complex selectors.
+ *
+ * @param {string} variation     Name for the variation.
+ * @param {string} blockSelector CSS selector for the block.
+ *
+ * @return {string} CSS selector for the block style variation.
+ */
+export function getBlockStyleVariationSelector( variation, blockSelector ) {
+	const variationClass = `.is-style-${ variation }`;
+
+	if ( ! blockSelector ) {
+		return variationClass;
+	}
+
+	const ancestorRegex = /((?::\([^)]+\))?\s*)([^\s:]+)/;
+	const addVariationClass = ( _match, group1, group2 ) => {
+		return group1 + group2 + variationClass;
+	};
+
+	const result = blockSelector
+		.split( ',' )
+		.map( ( part ) => part.replace( ancestorRegex, addVariationClass ) );
+
+	return result.join( ',' );
 }

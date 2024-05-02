@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -24,30 +24,59 @@ const POPOVER_PROPS = {
 };
 
 export default function BlockThemeControl( { id } ) {
-	const { isTemplateHidden } = useSelect( ( select ) => {
-		const { getRenderingMode } = unlock( select( editorStore ) );
+	const {
+		isTemplateHidden,
+		onNavigateToEntityRecord,
+		getEditorSettings,
+		hasGoBack,
+	} = useSelect( ( select ) => {
+		const { getRenderingMode, getEditorSettings: _getEditorSettings } =
+			unlock( select( editorStore ) );
+		const editorSettings = _getEditorSettings();
 		return {
 			isTemplateHidden: getRenderingMode() === 'post-only',
+			onNavigateToEntityRecord: editorSettings.onNavigateToEntityRecord,
+			getEditorSettings: _getEditorSettings,
+			hasGoBack: editorSettings.hasOwnProperty(
+				'onNavigateToPreviousEntityRecord'
+			),
 		};
 	}, [] );
+
 	const { editedRecord: template, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_template',
 		id
 	);
-	const { getEditorSettings } = useSelect( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
+
+	const canCreateTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
 
 	if ( ! hasResolved ) {
 		return null;
 	}
 
+	// The site editor does not have a `onNavigateToPreviousEntityRecord` setting as it uses its own routing
+	// and assigns its own backlink to focusMode pages.
+	const notificationAction = hasGoBack
+		? [
+				{
+					label: __( 'Go back' ),
+					onClick: () =>
+						getEditorSettings().onNavigateToPreviousEntityRecord(),
+				},
+		  ]
+		: undefined;
 	return (
 		<DropdownMenu
 			popoverProps={ POPOVER_PROPS }
 			focusOnMount
 			toggleProps={ {
+				size: 'compact',
 				variant: 'tertiary',
 			} }
 			label={ __( 'Template options' ) }
@@ -57,35 +86,34 @@ export default function BlockThemeControl( { id } ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								setRenderingMode( 'template-only' );
-								onClose();
-								createSuccessNotice(
-									__(
-										'Editing template. Changes made here affect all posts and pages that use the template.'
-									),
-									{
-										type: 'snackbar',
-										actions: [
-											{
-												label: __( 'Go back' ),
-												onClick: () =>
-													setRenderingMode(
-														getEditorSettings()
-															.defaultRenderingMode
-													),
-											},
-										],
-									}
-								);
-							} }
-						>
-							{ __( 'Edit template' ) }
-						</MenuItem>
+						{ canCreateTemplate && (
+							<MenuItem
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: template.id,
+										postType: 'wp_template',
+									} );
+									onClose();
+									createSuccessNotice(
+										__(
+											'Editing template. Changes made here affect all posts and pages that use the template.'
+										),
+										{
+											type: 'snackbar',
+											actions: notificationAction,
+										}
+									);
+								} }
+							>
+								{ __( 'Edit template' ) }
+							</MenuItem>
+						) }
+
 						<SwapTemplateButton onClick={ onClose } />
 						<ResetDefaultTemplate onClick={ onClose } />
-						<CreateNewTemplate onClick={ onClose } />
+						{ canCreateTemplate && (
+							<CreateNewTemplate onClick={ onClose } />
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
@@ -100,7 +128,7 @@ export default function BlockThemeControl( { id } ) {
 								);
 							} }
 						>
-							{ __( 'Template preview' ) }
+							{ __( 'Show template' ) }
 						</MenuItem>
 					</MenuGroup>
 				</>

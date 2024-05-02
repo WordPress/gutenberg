@@ -29,7 +29,7 @@ export default function DataViewItem( {
 	suffix,
 } ) {
 	const {
-		params: { path },
+		params: { path, layout },
 	} = useLocation();
 
 	const iconToUse =
@@ -37,8 +37,9 @@ export default function DataViewItem( {
 
 	const linkInfo = useLink( {
 		path,
-		activeView: isCustom === 'true' ? customViewId : slug,
-		isCustom,
+		layout,
+		activeView: isCustom ? customViewId : slug,
+		isCustom: isCustom ? 'true' : 'false',
 	} );
 	return (
 		<HStack

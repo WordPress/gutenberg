@@ -49,7 +49,9 @@ export default function PostTermsEdit( {
 
 	const selectedTerm = useSelect(
 		( select ) => {
-			if ( ! term ) return {};
+			if ( ! term ) {
+				return {};
+			}
 			const { getTaxonomy } = select( coreStore );
 			const taxonomy = getTaxonomy( term );
 			return taxonomy?.visibility?.publicly_queryable ? taxonomy : {};
@@ -95,6 +97,7 @@ export default function PostTermsEdit( {
 				{ isLoading && hasPost && <Spinner /> }
 				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
+						identifier="prefix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__prefix"
 						aria-label={ __( 'Prefix' ) }
@@ -138,6 +141,7 @@ export default function PostTermsEdit( {
 						__( 'Term items not found.' ) ) }
 				{ ! isLoading && ( isSelected || suffix ) && (
 					<RichText
+						identifier="suffix"
 						allowedFormats={ ALLOWED_FORMATS }
 						className="wp-block-post-terms__suffix"
 						aria-label={ __( 'Suffix' ) }

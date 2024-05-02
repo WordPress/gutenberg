@@ -14,14 +14,16 @@
 
 	&.block-editor-block-card__title {
 		font-size: $default-font-size;
-		line-height: $button-size-small;
+		line-height: $default-line-height;
 		margin: 0;
+		padding: 3px 0; // This makes the title as high as the icon.
 	}
 }
 
 .block-editor-block-card__description {
 	display: block;
 	font-size: $default-font-size;
+	line-height: $default-line-height;
 	margin-top: $grid-unit-05;
 }
 

@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { lock } from './lock-unlock';
+import OverridesPanel from './components/overrides-panel';
 import {
 	default as CreatePatternModal,
 	CreatePatternModalContents,
@@ -10,10 +11,13 @@ import {
 	default as DuplicatePatternModal,
 	useDuplicatePatternProps,
 } from './components/duplicate-pattern-modal';
+import { isOverridableBlock } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
-import PartialSyncingControls from './components/partial-syncing-controls';
+import PatternOverridesControls from './components/pattern-overrides-controls';
+import ResetOverridesControl from './components/reset-overrides-control';
+import { useAddPatternCategory } from './private-hooks';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
@@ -25,14 +29,18 @@ import {
 
 export const privateApis = {};
 lock( privateApis, {
+	OverridesPanel,
 	CreatePatternModal,
 	CreatePatternModalContents,
 	DuplicatePatternModal,
+	isOverridableBlock,
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,
 	RenamePatternCategoryModal,
-	PartialSyncingControls,
+	PatternOverridesControls,
+	ResetOverridesControl,
+	useAddPatternCategory,
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_USER_CATEGORY,

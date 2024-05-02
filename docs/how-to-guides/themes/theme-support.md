@@ -52,13 +52,17 @@ add_action( 'after_setup_theme', 'mytheme_setup_theme_supported_features' );
 
 Core blocks include default structural styles. These are loaded in both the editor and the front end by default. An example of these styles is the CSS that powers the columns block. Without these rules, the block would result in a broken layout containing no columns at all.
 
-The block editor allows themes to opt-in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in your theme, add theme support for `wp-block-styles`:
+### Opinionated block styles
+
+The block editor allows themes to opt in to slightly more opinionated styles for the front end. An example of these styles is the default color bar to the left of blockquotes. If you'd like to use these opinionated styles in a classic theme, add theme support for `wp-block-styles`:
 
 ```php
 add_theme_support( 'wp-block-styles' );
 ```
 
 You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
+
+For block themes or themes providing a `theme.json` file, it is not recommended to use this theme support. Instead, to ensure there is no styling conflict between global styles rules and block styles, add the desired block styles to the theme's `theme.json` file.
 
 ### Wide Alignment:
 
@@ -438,7 +442,6 @@ Link support has been made stable as part of WordPress 5.8. It's `false` by defa
 
 ```json
 {
-	"version": 1,
 	"settings": {
 		"color": {
 			"link": true
@@ -472,7 +475,7 @@ Use this setting to enable the following Global Styles settings:
 - color: link
 - spacing: blockGap, margin, padding
 - typography: lineHeight
-- dimensions: minHeight
+- dimensions: aspectRatio, minHeight
 - position: sticky
 
 ```php

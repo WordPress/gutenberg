@@ -1,16 +1,13 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -18,6 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import { unlock } from '../lock-unlock';
 
+const { interfaceStore } = unlock( editorPrivateApis );
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
@@ -30,8 +28,7 @@ const EMPTY_OBJECT = {};
  */
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
-		select( preferencesStore ).get( 'core/edit-post', 'editorMode' ) ??
-		'visual'
+		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
 );
 
 /**
@@ -44,9 +41,7 @@ export const getEditorMode = createRegistrySelector(
 export const isEditorSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/edit-post'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return [ 'edit-post/document', 'edit-post/block' ].includes(
 			activeGeneralSidebar
 		);
@@ -63,9 +58,7 @@ export const isEditorSidebarOpened = createRegistrySelector(
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {
 		const activeGeneralSidebar =
-			select( interfaceStore ).getActiveComplementaryArea(
-				'core/edit-post'
-			);
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
 		return (
 			!! activeGeneralSidebar &&
 			! [ 'edit-post/document', 'edit-post/block' ].includes(
@@ -91,9 +84,7 @@ export const isPluginSidebarOpened = createRegistrySelector(
  */
 export const getActiveGeneralSidebarName = createRegistrySelector(
 	( select ) => () => {
-		return select( interfaceStore ).getActiveComplementaryArea(
-			'core/edit-post'
-		);
+		return select( interfaceStore ).getActiveComplementaryArea( 'core' );
 	}
 );
 
@@ -162,24 +153,20 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 		alternative: `select( 'core/preferences' ).get`,
 	} );
 
-	// These preferences now exist in the preferences store.
-	// Fetch them so that they can be merged into the post
-	// editor preferences.
-	const preferences = [
-		'hiddenBlockTypes',
-		'editorMode',
-		'preferredStyleVariations',
-	].reduce( ( accumulatedPrefs, preferenceKey ) => {
-		const value = select( preferencesStore ).get(
-			'core/edit-post',
-			preferenceKey
-		);
+	const corePreferences = [ 'editorMode', 'hiddenBlockTypes' ].reduce(
+		( accumulatedPrefs, preferenceKey ) => {
+			const value = select( preferencesStore ).get(
+				'core',
+				preferenceKey
+			);
 
-		return {
-			...accumulatedPrefs,
-			[ preferenceKey ]: value,
-		};
-	}, {} );
+			return {
+				...accumulatedPrefs,
+				[ preferenceKey ]: value,
+			};
+		},
+		{}
+	);
 
 	// Panels were a preference, but the data structure changed when the state
 	// was migrated to the preferences store. They need to be converted from
@@ -193,7 +180,7 @@ export const getPreferences = createRegistrySelector( ( select ) => () => {
 	const panels = convertPanelsToOldFormat( inactivePanels, openPanels );
 
 	return {
-		...preferences,
+		...corePreferences,
 		panels,
 	};
 } );
@@ -225,23 +212,29 @@ export function getPreference( state, preferenceKey, defaultValue ) {
  */
 export const getHiddenBlockTypes = createRegistrySelector( ( select ) => () => {
 	return (
-		select( preferencesStore ).get(
-			'core/edit-post',
-			'hiddenBlockTypes'
-		) ?? EMPTY_ARRAY
+		select( preferencesStore ).get( 'core', 'hiddenBlockTypes' ) ??
+		EMPTY_ARRAY
 	);
 } );
 
 /**
  * Returns true if the publish sidebar is opened.
  *
+ * @deprecated
+ *
  * @param {Object} state Global application state
  *
  * @return {boolean} Whether the publish sidebar is open.
  */
-export function isPublishSidebarOpened( state ) {
-	return state.publishSidebarActive;
-}
+export const isPublishSidebarOpened = createRegistrySelector(
+	( select ) => () => {
+		deprecated( `select( 'core/edit-post' ).isPublishSidebarOpened`, {
+			since: '6.6',
+			alternative: `select( 'core/editor' ).isPublishSidebarOpened`,
+		} );
+		return select( editorStore ).isPublishSidebarOpened();
+	}
+);
 
 /**
  * Returns true if the given panel was programmatically removed, or false otherwise.
@@ -351,10 +344,7 @@ export const isFeatureActive = createRegistrySelector(
  */
 export const isPluginItemPinned = createRegistrySelector(
 	( select ) => ( state, pluginName ) => {
-		return select( interfaceStore ).isItemPinned(
-			'core/edit-post',
-			pluginName
-		);
+		return select( interfaceStore ).isItemPinned( 'core', pluginName );
 	}
 );
 
@@ -545,7 +535,7 @@ export const isEditingTemplate = createRegistrySelector( ( select ) => () => {
 		since: '6.5',
 		alternative: `select( 'core/editor' ).getRenderingMode`,
 	} );
-	return select( editorStore ).getRenderingMode() !== 'post-only';
+	return select( editorStore ).getCurrentPostType() === 'wp_template';
 } );
 
 /**
@@ -566,29 +556,63 @@ export function areMetaBoxesInitialized( state ) {
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
+		const {
+			id: postId,
+			type: postType,
+			slug,
+		} = select( editorStore ).getCurrentPost();
+		const { getSite, getEditedEntityRecord, getEntityRecords } =
+			select( coreStore );
+		const siteSettings = getSite();
+		// First check if the current page is set as the posts page.
+		const isPostsPage = +postId === siteSettings?.page_for_posts;
+		if ( isPostsPage ) {
+			const defaultTemplateId = select( coreStore ).getDefaultTemplateId(
+				{ slug: 'home' }
+			);
+			return getEditedEntityRecord(
+				'postType',
+				'wp_template',
+				defaultTemplateId
+			);
+		}
 		const currentTemplate =
 			select( editorStore ).getEditedPostAttribute( 'template' );
 		if ( currentTemplate ) {
-			const templateWithSameSlug = select( coreStore )
-				.getEntityRecords( 'postType', 'wp_template', { per_page: -1 } )
-				?.find( ( template ) => template.slug === currentTemplate );
+			const templateWithSameSlug = getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			)?.find( ( template ) => template.slug === currentTemplate );
 			if ( ! templateWithSameSlug ) {
 				return templateWithSameSlug;
 			}
-			return select( coreStore ).getEditedEntityRecord(
+			return getEditedEntityRecord(
 				'postType',
 				'wp_template',
 				templateWithSameSlug.id
 			);
 		}
-
-		const post = select( editorStore ).getCurrentPost();
-		if ( post.link ) {
-			return select( coreStore ).__experimentalGetTemplateForLink(
-				post.link
-			);
+		let slugToCheck;
+		// In `draft` status we might not have a slug available, so we use the `single`
+		// post type templates slug(ex page, single-post, single-product etc..).
+		// Pages do not need the `single` prefix in the slug to be prioritized
+		// through template hierarchy.
+		if ( slug ) {
+			slugToCheck =
+				postType === 'page'
+					? `${ postType }-${ slug }`
+					: `single-${ postType }-${ slug }`;
+		} else {
+			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		}
-
-		return null;
+		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
+			slug: slugToCheck,
+		} );
+		return select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			defaultTemplateId
+		);
 	}
 );

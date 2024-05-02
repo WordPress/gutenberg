@@ -1,0 +1,13 @@
+.block-editor-block-bindings-toolbar-indicator {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 6px;
+	svg {
+		fill: var(--wp-block-synced-color);
+	}
+}
+
+.editor-collapsible-block-toolbar .block-editor-block-bindings-toolbar-indicator {
+	height: 32px;
+}

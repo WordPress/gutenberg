@@ -45,7 +45,7 @@ export default function useScrollToSection(
 			if (
 				! scrollViewRef.current ||
 				! scrollEnabled ||
-				! scrollViewMeasurements
+				! scrollViewMeasurements.current
 			) {
 				return;
 			}

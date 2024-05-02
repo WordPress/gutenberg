@@ -7,7 +7,6 @@ import { Button, ToolbarItem } from '@wordpress/components';
 import {
 	NavigableToolbar,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback, useRef } from '@wordpress/element';
@@ -21,8 +20,6 @@ import RedoButton from '../undo-redo/redo';
 import useLastSelectedWidgetArea from '../../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-
-const { useCanBlockToolbarBeFocused } = unlock( blockEditorPrivateApis );
 
 function DocumentTools() {
 	const isMediumViewport = useViewportMatch( 'medium' );
@@ -75,14 +72,11 @@ function DocumentTools() {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	// If there's a block toolbar to be focused, disable the focus shortcut for the document toolbar.
-	const blockToolbarCanBeFocused = useCanBlockToolbarBeFocused();
-
 	return (
 		<NavigableToolbar
 			className="edit-widgets-header-toolbar"
 			aria-label={ __( 'Document tools' ) }
-			shouldUseKeyboardFocusShortcut={ ! blockToolbarCanBeFocused }
+			variant="unstyled"
 		>
 			<ToolbarItem
 				ref={ inserterButton }
@@ -101,11 +95,12 @@ function DocumentTools() {
 					'Toggle block inserter',
 					'Generic label for block inserter button'
 				) }
+				size="compact"
 			/>
 			{ isMediumViewport && (
 				<>
-					<UndoButton />
-					<RedoButton />
+					<ToolbarItem as={ UndoButton } />
+					<ToolbarItem as={ RedoButton } />
 					<ToolbarItem
 						as={ Button }
 						className="edit-widgets-header-toolbar__list-view-toggle"
@@ -115,6 +110,7 @@ function DocumentTools() {
 						label={ __( 'List View' ) }
 						onClick={ toggleListView }
 						ref={ listViewToggleRef }
+						size="compact"
 					/>
 				</>
 			) }

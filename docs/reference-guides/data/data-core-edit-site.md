@@ -371,7 +371,7 @@ Resolves the template for a page and displays both. If no path is given, attempt
 
 _Returns_
 
--   `number`: The resolved template ID for the page route.
+-   `Object`: Action object.
 
 ### setTemplate
 
@@ -395,9 +395,17 @@ _Returns_
 
 ### switchEditorMode
 
-Undocumented declaration.
+> **Deprecated**
+
+Triggers an action used to switch editor mode.
+
+_Parameters_
+
+-   _mode_ `string`: The editor mode.
 
 ### toggleDistractionFree
+
+> **Deprecated**
 
 Action that toggles Distraction free mode. Distraction free mode expects there are no sidebars, as due to the z-index values set, you can't close sidebars.
 

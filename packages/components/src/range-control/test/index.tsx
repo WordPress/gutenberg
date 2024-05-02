@@ -297,7 +297,7 @@ describe( 'RangeControl', () => {
 			render(
 				<RangeControl
 					initialPosition={ 10 }
-					allowReset={ true }
+					allowReset
 					onChange={ spy }
 					resetFallbackValue={ 33 }
 				/>
@@ -320,7 +320,7 @@ describe( 'RangeControl', () => {
 					initialPosition={ undefined }
 					min={ 0 }
 					max={ 100 }
-					allowReset={ true }
+					allowReset
 					resetFallbackValue={ undefined }
 				/>
 			);

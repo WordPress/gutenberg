@@ -8,6 +8,36 @@ test.describe( 'List (@firefox)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'can be copied from multi selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const copied = `<!-- wp:list -->
+<ul><!-- wp:list-item -->
+<li>one</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>two</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`;
+
+		expect( await editor.getEditedPostContent() ).toBe(
+			copied + '\n\n' + copied
+		);
+	} );
+
 	test( 'can be created by using an asterisk at the start of a paragraph block', async ( {
 		editor,
 		page,

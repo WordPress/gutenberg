@@ -347,6 +347,7 @@ export default function SearchEdit( {
 
 				{ ! buttonUseIcon && (
 					<RichText
+						identifier="buttonText"
 						className={ buttonClasses }
 						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
@@ -400,7 +401,7 @@ export default function SearchEdit( {
 			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Display Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<BaseControl
 						label={ __( 'Width' ) }
 						id={ unitControlInputId }
@@ -546,6 +547,7 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
+					identifier="label"
 					className={ labelClassnames }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }

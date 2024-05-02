@@ -14,10 +14,11 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		'meta',
 		postId
 	);
+	const footnotesSupported = 'string' === typeof meta?.footnotes;
 	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const blockProps = useBlockProps();
 
-	if ( postType !== 'post' && postType !== 'page' ) {
+	if ( ! footnotesSupported ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder

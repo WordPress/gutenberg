@@ -3,7 +3,7 @@
 		"name": "core/table",
 		"isValid": true,
 		"attributes": {
-			"hasFixedLayout": false,
+			"hasFixedLayout": true,
 			"caption": "",
 			"head": [
 				{

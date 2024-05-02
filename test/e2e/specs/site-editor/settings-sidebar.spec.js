@@ -38,8 +38,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 		} );
 
 		test( `should show the currently selected template's title and description`, async ( {
@@ -53,10 +53,10 @@ test.describe( 'Settings sidebar', () => {
 				name: 'Editor settings',
 			} );
 			const templateTitle = settingsSideber.locator(
-				'.edit-site-sidebar-card__title'
+				'.editor-post-card-panel__title'
 			);
 			const templateDescription = settingsSideber.locator(
-				'.edit-site-sidebar-card__description'
+				'.editor-post-card-panel__description'
 			);
 
 			await expect( templateTitle ).toHaveText( 'Index' );
@@ -90,8 +90,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 		} );
 	} );
 
@@ -105,16 +105,17 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 
 			// By inserting the block is also selected.
 			await editor.insertBlock( { name: 'core/heading' } );
+
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 		} );
 
 		test( 'should switch to Template tab when a block was selected and we select the Template', async ( {
@@ -129,8 +130,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Block (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Block' );
 
 			await page.evaluate( () => {
 				window.wp.data
@@ -141,8 +142,8 @@ test.describe( 'Settings sidebar', () => {
 			await expect(
 				page
 					.getByRole( 'region', { name: 'Editor settings' } )
-					.getByRole( 'button', { name: 'Template (selected)' } )
-			).toHaveClass( /is-active/ );
+					.getByRole( 'tab', { selected: true } )
+			).toHaveText( 'Template' );
 		} );
 	} );
 } );

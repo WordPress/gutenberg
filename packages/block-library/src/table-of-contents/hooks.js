@@ -17,7 +17,7 @@ function getLatestHeadings( select, clientId ) {
 		getBlockAttributes,
 		getBlockName,
 		getClientIdsWithDescendants,
-		__experimentalGetGlobalBlocksByName: getGlobalBlocksByName,
+		getBlocksByName,
 	} = select( blockEditorStore );
 
 	// FIXME: @wordpress/block-library should not depend on @wordpress/editor.
@@ -28,7 +28,7 @@ function getLatestHeadings( select, clientId ) {
 	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const permalink = select( 'core/editor' ).getPermalink() ?? null;
 
-	const isPaginated = getGlobalBlocksByName( 'core/nextpage' ).length !== 0;
+	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
 	const { onlyIncludeCurrentPage } = getBlockAttributes( clientId ) ?? {};
 
 	// Get the client ids of all blocks in the editor.

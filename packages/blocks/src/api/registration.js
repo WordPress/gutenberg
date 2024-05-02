@@ -168,6 +168,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'example',
 		'variations',
 		'blockHooks',
+		'allowedBlocks',
 	];
 
 	const settings = Object.fromEntries(
@@ -722,6 +723,10 @@ export const getBlockVariations = ( blockName, scope ) => {
  * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
+	if ( typeof variation.name !== 'string' ) {
+		console.warn( 'Variation names must be unique strings.' );
+	}
+
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 

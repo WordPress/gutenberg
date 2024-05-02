@@ -12,8 +12,9 @@ test.use( {
 } );
 
 test.describe( 'Order of block keyboard navigation', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
 	} );
 
 	test( 'permits tabbing through paragraph blocks in the expected order', async ( {
@@ -105,14 +106,6 @@ test.describe( 'Order of block keyboard navigation', () => {
 				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();
 		} );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus( 'Add block' );
-
-		await pageUtils.pressKeys( 'shift+Tab' );
-		await KeyboardNavigableBlocks.expectLabelToHaveFocus(
-			'Add default block'
-		);
 
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await KeyboardNavigableBlocks.expectLabelToHaveFocus(

@@ -6,14 +6,11 @@ import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { getFilteredTemplatePartBlocks } from './utils';
-import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 import { unlock } from '../lock-unlock';
 
 /**
@@ -243,20 +240,9 @@ export function isSaveViewOpened( state ) {
  */
 export const getCurrentTemplateTemplateParts = createRegistrySelector(
 	( select ) => () => {
-		const templateParts = select( coreDataStore ).getEntityRecords(
-			'postType',
-			TEMPLATE_PART_POST_TYPE,
-			{ per_page: -1 }
-		);
-
-		const clientIds =
-			select( blockEditorStore ).__experimentalGetGlobalBlocksByName(
-				'core/template-part'
-			);
-		const blocks =
-			select( blockEditorStore ).getBlocksByClientId( clientIds );
-
-		return getFilteredTemplatePartBlocks( blocks, templateParts );
+		return unlock(
+			select( editorStore )
+		).getCurrentTemplateTemplateParts();
 	}
 );
 
@@ -268,7 +254,7 @@ export const getCurrentTemplateTemplateParts = createRegistrySelector(
  * @return {string} Editing mode.
  */
 export const getEditorMode = createRegistrySelector( ( select ) => () => {
-	return select( preferencesStore ).get( 'core/edit-site', 'editorMode' );
+	return select( preferencesStore ).get( 'core', 'editorMode' );
 } );
 
 /**

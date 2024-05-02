@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Platform, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
@@ -11,6 +11,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as blocksStore } from '@wordpress/blocks';
+import {
+	privateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -18,18 +23,25 @@ import { useViewportMatch } from '@wordpress/compose';
 import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
+import { lock, unlock } from '../../lock-unlock';
 
 const EMPTY_BLOCKS_LIST = [];
+
+function __experimentalReusableBlocksSelect( select ) {
+	return (
+		select( coreStore ).getEntityRecords( 'postType', 'wp_block', {
+			per_page: -1,
+		} ) ?? EMPTY_BLOCKS_LIST
+	);
+}
 
 const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'__experimentalPreferredStyleVariations',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
-	'allowedBlockTypes',
 	'blockInspectorTabs',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
@@ -50,8 +62,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'getPostLinkProps',
-	'hasInlineToolbar',
+	'onNavigateToEntityRecord',
 	'imageDefaultSize',
 	'imageDimensions',
 	'imageEditing',
@@ -59,10 +70,10 @@ const BLOCK_EDITOR_SETTINGS = [
 	'isRTL',
 	'locale',
 	'maxWidth',
-	'onUpdateDefaultBlockStyles',
 	'postContentAttributes',
 	'postsPerPage',
 	'readOnly',
+	'sectionRootClientId',
 	'styles',
 	'titlePlaceholder',
 	'supportsLayout',
@@ -78,52 +89,67 @@ const BLOCK_EDITOR_SETTINGS = [
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
- * @param {Object} settings EditorProvider settings prop.
- * @param {string} postType Editor root level post type.
- * @param {string} postId   Editor root level post ID.
+ * @param {Object} settings      EditorProvider settings prop.
+ * @param {string} postType      Editor root level post type.
+ * @param {string} postId        Editor root level post ID.
+ * @param {string} renderingMode Editor rendering mode.
  *
  * @return {Object} Block Editor Settings.
  */
-function useBlockEditorSettings( settings, postType, postId ) {
+function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allowRightClickOverrides,
+		blockTypes,
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
 		keepCaretInsideBlock,
-		reusableBlocks,
 		hasUploadPermissions,
+		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
 		pageOnFront,
 		pageForPosts,
 		userPatternCategories,
-		restBlockPatterns,
 		restBlockPatternCategories,
+		sectionRootClientId,
 	} = useSelect(
 		( select ) => {
-			const isWeb = Platform.OS === 'web';
 			const {
 				canUser,
 				getRawEntityRecord,
 				getEntityRecord,
 				getUserPatternCategories,
-				getEntityRecords,
-				getBlockPatterns,
 				getBlockPatternCategories,
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
-
+			const { getBlockTypes } = select( blocksStore );
+			const { getBlocksByName, getBlockAttributes } =
+				select( blockEditorStore );
 			const siteSettings = canUser( 'read', 'settings' )
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
+
+			function getSectionRootBlock() {
+				if ( renderingMode === 'template-locked' ) {
+					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
+				}
+
+				return (
+					getBlocksByName( 'core/group' ).find(
+						( clientId ) =>
+							getBlockAttributes( clientId )?.tagName === 'main'
+					) ?? ''
+				);
+			}
 
 			return {
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
 				),
+				blockTypes: getBlockTypes(),
 				canUseUnfilteredHTML: getRawEntityRecord(
 					'postType',
 					postType,
@@ -132,23 +158,19 @@ function useBlockEditorSettings( settings, postType, postId ) {
 				focusMode: get( 'core', 'focusMode' ),
 				hasFixedToolbar:
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
+				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
-				reusableBlocks: isWeb
-					? getEntityRecords( 'postType', 'wp_block', {
-							per_page: -1,
-					  } )
-					: EMPTY_BLOCKS_LIST, // Reusable blocks are fetched in the native version of this hook.
 				hasUploadPermissions: canUser( 'create', 'media' ) ?? true,
 				userCanCreatePages: canUser( 'create', 'pages' ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				userPatternCategories: getUserPatternCategories(),
-				restBlockPatterns: getBlockPatterns(),
 				restBlockPatternCategories: getBlockPatternCategories(),
+				sectionRootClientId: getSectionRootBlock(),
 			};
 		},
-		[ postType, postId, isLargeViewport ]
+		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
 	const settingsBlockPatterns =
@@ -160,22 +182,16 @@ function useBlockEditorSettings( settings, postType, postId ) {
 
 	const blockPatterns = useMemo(
 		() =>
-			[
-				...( settingsBlockPatterns || [] ),
-				...( restBlockPatterns || [] ),
-			]
-				.filter(
-					( x, index, arr ) =>
-						index === arr.findIndex( ( y ) => x.name === y.name )
-				)
-				.filter( ( { postTypes } ) => {
+			[ ...( settingsBlockPatterns || [] ) ].filter(
+				( { postTypes } ) => {
 					return (
 						! postTypes ||
 						( Array.isArray( postTypes ) &&
 							postTypes.includes( postType ) )
 					);
-				} ),
-		[ settingsBlockPatterns, restBlockPatterns, postType ]
+				}
+			),
+		[ settingsBlockPatterns, postType ]
 	);
 
 	const blockPatternCategories = useMemo(
@@ -215,23 +231,48 @@ function useBlockEditorSettings( settings, postType, postId ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const allowedBlockTypes = useMemo( () => {
+		// Omit hidden block types if exists and non-empty.
+		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
+			// Defer to passed setting for `allowedBlockTypes` if provided as
+			// anything other than `true` (where `true` is equivalent to allow
+			// all block types).
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? blockTypes.map( ( { name } ) => name )
+					: settings.allowedBlockTypes || [];
+
+			return defaultAllowedBlockTypes.filter(
+				( type ) => ! hiddenBlockTypes.includes( type )
+			);
+		}
+
+		return settings.allowedBlockTypes;
+	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
+
 	const forceDisableFocusMode = settings.focusMode === false;
 
-	return useMemo(
-		() => ( {
+	return useMemo( () => {
+		const blockEditorSettings = {
 			...Object.fromEntries(
 				Object.entries( settings ).filter( ( [ key ] ) =>
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
+			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalBlockPatterns: blockPatterns,
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+				unlock( select( coreStore ) ).getBlockPatternsForPostType(
+					postType
+				),
+			[ unlock( privateApis ).reusableBlocksSelectKey ]:
+				__experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
 			__experimentalUserPatternCategories: userPatternCategories,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
@@ -259,30 +300,34 @@ function useBlockEditorSettings( settings, postType, postId ) {
 					? [ [ 'core/navigation', {}, [] ] ]
 					: settings.template,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
-		} ),
-		[
-			allowRightClickOverrides,
-			focusMode,
-			forceDisableFocusMode,
-			hasFixedToolbar,
-			isDistractionFree,
-			keepCaretInsideBlock,
-			settings,
-			hasUploadPermissions,
-			reusableBlocks,
-			userPatternCategories,
-			blockPatterns,
-			blockPatternCategories,
-			canUseUnfilteredHTML,
-			undo,
-			createPageEntity,
-			userCanCreatePages,
-			pageOnFront,
-			pageForPosts,
-			postType,
-			setIsInserterOpened,
-		]
-	);
+		};
+		lock( blockEditorSettings, {
+			sectionRootClientId,
+		} );
+		return blockEditorSettings;
+	}, [
+		allowedBlockTypes,
+		allowRightClickOverrides,
+		focusMode,
+		forceDisableFocusMode,
+		hasFixedToolbar,
+		isDistractionFree,
+		keepCaretInsideBlock,
+		settings,
+		hasUploadPermissions,
+		userPatternCategories,
+		blockPatterns,
+		blockPatternCategories,
+		canUseUnfilteredHTML,
+		undo,
+		createPageEntity,
+		userCanCreatePages,
+		pageOnFront,
+		pageForPosts,
+		postType,
+		setIsInserterOpened,
+		sectionRootClientId,
+	] );
 }
 
 export default useBlockEditorSettings;

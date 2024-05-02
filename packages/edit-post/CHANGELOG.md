@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 7.33.0 (2024-04-19)
+
+## 7.32.0 (2024-04-03)
+
+## 7.31.0 (2024-03-21)
+
+## 7.30.0 (2024-03-06)
+
+## 7.29.0 (2024-02-21)
+
+## 7.28.0 (2024-02-09)
+
+## 7.27.0 (2024-01-24)
+
+## 7.26.0 (2024-01-10)
+
 ### Deprecations
 
 -   Move the panels visibility actions and selectors to the editor package deprecating `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.

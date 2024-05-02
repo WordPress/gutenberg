@@ -6,20 +6,28 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Platform, useCallback, useContext } from '@wordpress/element';
-import { isRTL, __ } from '@wordpress/i18n';
+import {
+	Platform,
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	store as editorStore,
 	PageAttributesPanel,
+	PluginDocumentSettingPanel,
+	PluginSidebar,
 	PostDiscussionPanel,
-	PostExcerptPanel,
-	PostFeaturedImagePanel,
 	PostLastRevisionPanel,
 	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -27,14 +35,15 @@ import {
 import SettingsHeader from '../settings-header';
 import PostStatus from '../post-status';
 import MetaBoxes from '../../meta-boxes';
-import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
-import PluginSidebarEditPost from '../plugin-sidebar';
-import TemplateSummary from '../template-summary';
 import { store as editPostStore } from '../../../store';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../../lock-unlock';
 
+const { PostCardPanel, PostActions, interfaceStore } =
+	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
+const { PatternOverridesPanel, useAutoSwitchEditorSidebars } =
+	unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
@@ -45,22 +54,96 @@ export const sidebars = {
 	block: 'edit-post/block',
 };
 
-const SidebarContent = ( {
-	sidebarName,
-	keyboardShortcut,
-	isTemplateMode,
-} ) => {
-	// Because `PluginSidebarEditPost` renders a `ComplementaryArea`, we
+const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
+	const tabListRef = useRef( null );
+	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
 
+	// This effect addresses a race condition caused by tabbing from the last
+	// block in the editor into the settings sidebar. Without this effect, the
+	// selected tab and browser focus can become separated in an unexpected way
+	// (e.g the "block" tab is focused, but the "post" tab is selected).
+	useEffect( () => {
+		const tabsElements = Array.from(
+			tabListRef.current?.querySelectorAll( '[role="tab"]' ) || []
+		);
+		const selectedTabElement = tabsElements.find(
+			// We are purposefully using a custom `data-tab-id` attribute here
+			// because we don't want rely on any assumptions about `Tabs`
+			// component internals.
+			( element ) => element.getAttribute( 'data-tab-id' ) === tabName
+		);
+		const activeElement = selectedTabElement?.ownerDocument.activeElement;
+		const tabsHasFocus = tabsElements.some( ( element ) => {
+			return activeElement && activeElement.id === element.id;
+		} );
+		if (
+			tabsHasFocus &&
+			selectedTabElement &&
+			selectedTabElement.id !== activeElement?.id
+		) {
+			selectedTabElement?.focus();
+		}
+	}, [ tabName ] );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						const postType = items[ 0 ].type;
+						document.location.href = addQueryArgs( 'edit.php', {
+							post_type: postType,
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											const postId = newItem.id;
+											document.location.href =
+												addQueryArgs( 'post.php', {
+													post: postId,
+													action: 'edit',
+												} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ createSuccessNotice ]
+	);
+
 	return (
-		<PluginSidebarEditPost
-			identifier={ sidebarName }
+		<PluginSidebar
+			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SettingsHeader />
+					<SettingsHeader ref={ tabListRef } />
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -77,65 +160,63 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ ! isTemplateMode && (
-						<>
-							<PostStatus />
-							<PluginDocumentSettingPanel.Slot />
-							<PostLastRevisionPanel />
-							<PostTaxonomiesPanel />
-							<PostFeaturedImagePanel />
-							<PostExcerptPanel />
-							<PostDiscussionPanel />
-							<PageAttributesPanel />
-							<MetaBoxes location="side" />
-						</>
-					) }
-					{ isTemplateMode && <TemplateSummary /> }
+					<PostCardPanel
+						actions={
+							<PostActions
+								onActionPerformed={ onActionPerformed }
+							/>
+						}
+					/>
+					{ ! isEditingTemplate && <PostStatus /> }
+					<PluginDocumentSettingPanel.Slot />
+					<PostLastRevisionPanel />
+					<PostTaxonomiesPanel />
+					<PostDiscussionPanel />
+					<PageAttributesPanel />
+					<PatternOverridesPanel />
+					{ ! isEditingTemplate && <MetaBoxes location="side" /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
-		</PluginSidebarEditPost>
+		</PluginSidebar>
 	);
 };
 
 const SettingsSidebar = () => {
-	const {
-		sidebarName,
-		isSettingsSidebarActive,
-		keyboardShortcut,
-		isTemplateMode,
-	} = useSelect( ( select ) => {
-		// The settings sidebar is used by the edit-post/document and edit-post/block sidebars.
-		// sidebarName represents the sidebar that is active or that should be active when the SettingsSidebar toggle button is pressed.
-		// If one of the two sidebars is active the component will contain the content of that sidebar.
-		// When neither of the two sidebars is active we can not simply return null, because the PluginSidebarEditPost
-		// component, besides being used to render the sidebar, also renders the toggle button. In that case sidebarName
-		// should contain the sidebar that will be active when the toggle button is pressed. If a block
-		// is selected, that should be edit-post/block otherwise it's edit-post/document.
-		let sidebar = select( interfaceStore ).getActiveComplementaryArea(
-			editPostStore.name
-		);
-		let isSettingsSidebar = true;
-		if ( ! [ sidebars.document, sidebars.block ].includes( sidebar ) ) {
-			isSettingsSidebar = false;
-			if ( select( blockEditorStore ).getBlockSelectionStart() ) {
-				sidebar = sidebars.block;
+	useAutoSwitchEditorSidebars();
+	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
+		( select ) => {
+			const shortcut = select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
+
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
+			const _isEditorSidebarOpened = [
+				sidebars.block,
+				sidebars.document,
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = !! select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? sidebars.block
+					: sidebars.document;
 			}
-			sidebar = sidebars.document;
-		}
-		const shortcut = select(
-			keyboardShortcutsStore
-		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
-		return {
-			sidebarName: sidebar,
-			isSettingsSidebarActive: isSettingsSidebar,
-			keyboardShortcut: shortcut,
-			isTemplateMode:
-				select( editorStore ).getRenderingMode() === 'template-only',
-		};
-	}, [] );
+
+			return {
+				tabName: _tabName,
+				keyboardShortcut: shortcut,
+				isEditingTemplate:
+					select( editorStore ).getCurrentPostType() ===
+					'wp_template',
+			};
+		},
+		[]
+	);
 
 	const { openGeneralSidebar } = useDispatch( editPostStore );
 
@@ -150,18 +231,14 @@ const SettingsSidebar = () => {
 
 	return (
 		<Tabs
-			// Due to how this component is controlled (via a value from the
-			// `interfaceStore`), when the sidebar closes the currently selected
-			// tab can't be found. This causes the component to continuously reset
-			// the selection to `null` in an infinite loop.Proactively setting
-			// the selected tab to `null` avoids that.
-			selectedTabId={ isSettingsSidebarActive ? sidebarName : null }
+			selectedTabId={ tabName }
 			onSelect={ onTabSelect }
+			selectOnMove={ false }
 		>
 			<SidebarContent
-				sidebarName={ sidebarName }
+				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
-				isTemplateMode={ isTemplateMode }
+				isEditingTemplate={ isEditingTemplate }
 			/>
 		</Tabs>
 	);

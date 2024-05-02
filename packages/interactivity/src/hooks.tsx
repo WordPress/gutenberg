@@ -1,15 +1,21 @@
+/* @jsx createElement */
+
 /**
  * External dependencies
  */
-import { h, options, createContext, cloneElement } from 'preact';
+import {
+	h as createElement,
+	options,
+	createContext,
+	cloneElement,
+} from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import { deepSignal } from 'deepsignal';
 import type { VNode, Context, RefObject } from 'preact';
 
 /**
  * Internal dependencies
  */
-import { stores } from './store';
+import { store, stores, universalUnlock } from './store';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -60,8 +66,7 @@ interface Scope {
 	evaluate: Evaluate;
 	context: Context< any >;
 	ref: RefObject< HTMLElement >;
-	state: any;
-	props: any;
+	attributes: createElement.JSX.HTMLAttributes;
 }
 
 interface Evaluate {
@@ -107,8 +112,9 @@ const immutableHandlers = {
 	deleteProperty: immutableError,
 };
 const deepImmutable = < T extends Object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) )
+	if ( ! immutableMap.has( target ) ) {
 		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
+	}
 	return immutableMap.get( target );
 };
 
@@ -127,7 +133,7 @@ const namespaceStack: string[] = [];
  * @return The context content.
  */
 export const getContext = < T extends object >( namespace?: string ): T =>
-	getScope()?.context[ namespace || namespaceStack.slice( -1 )[ 0 ] ];
+	getScope()?.context[ namespace || getNamespace() ];
 
 /**
  * Retrieves a representation of the element where a function from the store
@@ -142,11 +148,10 @@ export const getElement = () => {
 			'Cannot call `getElement()` outside getters and actions used by directives.'
 		);
 	}
-	const { ref, state, props } = getScope();
+	const { ref, attributes } = getScope();
 	return Object.freeze( {
 		ref: ref.current,
-		state,
-		props: deepImmutable( props ),
+		attributes: deepImmutable( attributes ),
 	} );
 };
 
@@ -158,6 +163,8 @@ export const setScope = ( scope: Scope ) => {
 export const resetScope = () => {
 	scopeStack.pop();
 };
+
+export const getNamespace = () => namespaceStack.slice( -1 )[ 0 ];
 
 export const setNamespace = ( namespace: string ) => {
 	namespaceStack.push( namespace );
@@ -192,7 +199,7 @@ const directivePriorities: Record< string, number > = {};
  * the `data-wp-alert` directive will have the `onclick` event handler, e.g.,
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "messages" }'>
+ * <div data-wp-interactive="messages">
  *   <button data-wp-alert="state.alert">Click me!</button>
  * </div>
  * ```
@@ -202,7 +209,7 @@ const directivePriorities: Record< string, number > = {};
  * attribute, followed by the suffix, like in the following HTML snippet:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "myblock" }'>
+ * <div data-wp-interactive="myblock">
  *   <button
  *     data-wp-color--text="state.text"
  *     data-wp-color--background="state.background"
@@ -253,8 +260,14 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	let resolvedStore = stores.get( namespace );
+	if ( typeof resolvedStore === 'undefined' ) {
+		resolvedStore = store( namespace, undefined, {
+			lock: universalUnlock,
+		} );
+	}
 	let current = {
-		...stores.get( namespace ),
+		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
 	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
@@ -262,7 +275,7 @@ const resolve = ( path, namespace ) => {
 };
 
 // Generate the evaluate function.
-const getEvaluate: GetEvaluate =
+export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, ...args ) => {
 		let { value: path, namespace } = entry;
@@ -313,12 +326,12 @@ const Directives = ( {
 	scope.context = useContext( context );
 	/* eslint-disable react-hooks/rules-of-hooks */
 	scope.ref = previousScope?.ref || useRef( null );
-	scope.state = previousScope?.state || useRef( deepSignal( {} ) ).current;
 	/* eslint-enable react-hooks/rules-of-hooks */
 
-	// Create a fresh copy of the vnode element and add the props to the scope.
+	// Create a fresh copy of the vnode element and add the props to the scope,
+	// named as attributes (HTML Attributes).
 	element = cloneElement( element, { ref: scope.ref } );
-	scope.props = element.props;
+	scope.attributes = element.props;
 
 	// Recursively render the wrapper for the next priority level.
 	const children =
@@ -347,7 +360,9 @@ const Directives = ( {
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) props.children = wrapper;
+		if ( wrapper !== undefined ) {
+			props.children = wrapper;
+		}
 	}
 
 	resetScope();
@@ -361,10 +376,11 @@ options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key )
+		if ( directives.key ) {
 			vnode.key = directives.key.find(
 				( { suffix } ) => suffix === 'default'
 			).value;
+		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {
@@ -373,12 +389,14 @@ options.vnode = ( vnode: VNode< any > ) => {
 				priorityLevels,
 				originalProps: props,
 				type: vnode.type,
-				element: h( vnode.type as any, props ),
+				element: createElement( vnode.type as any, props ),
 				top: true,
 			};
 			vnode.type = Directives;
 		}
 	}
 
-	if ( old ) old( vnode );
+	if ( old ) {
+		old( vnode );
+	}
 };

@@ -12,24 +12,6 @@
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
 	}
-
-	// Some browsers, most notably IE11, honor an older version of the flexbox spec
-	// which takes absolutely positioned items into account when calculating `space-between`.
-	// https://www.w3.org/TR/2012/WD-css3-flexbox-20120612/#abspos-flex-items
-	//
-	// This difference is causing our header layout to break when focused in IE11.
-	// Our focused region styles use an absolutely positioned :after pseudo element to draw an outline,
-	// and IE11 is adding space between it and our last real child, shifting righthand UI elements
-	// to the left. For a workaround, we change the flex order to move the undesired spacing to the middle
-	// where it is no longer noticeable.
-	> .edit-post-header__settings {
-		order: 1;
-
-		// Restore default order for all other browsers
-		@supports (position: sticky) {
-			order: initial;
-		}
-	}
 }
 
 .edit-post-header__toolbar {
@@ -43,6 +25,10 @@
 	// Leave enough room for the focus ring to show.
 	padding: 2px 0;
 	align-items: center;
+	// Allow focus ring to be fully visible on furthest right button.
+	@include break-medium() {
+		padding-right: var(--wp-admin-border-width-focus);
+	}
 
 	.table-of-contents {
 		display: none;
@@ -51,53 +37,6 @@
 			display: block;
 		}
 	}
-
-	.selected-block-tools-wrapper {
-		overflow-x: hidden;
-		display: flex;
-
-		.block-editor-block-contextual-toolbar {
-			border-bottom: 0;
-		}
-
-		&::after {
-			content: "";
-			width: $border-width;
-			margin-top: $grid-unit + $grid-unit-05;
-			margin-bottom: $grid-unit + $grid-unit-05;
-			background-color: $gray-300;
-			margin-left: $grid-unit;
-		}
-
-		// Modified group borders
-		.components-toolbar-group,
-		.components-toolbar {
-			border-right: none;
-
-			&::after {
-				content: "";
-				width: $border-width;
-				margin-top: $grid-unit + $grid-unit-05;
-				margin-bottom: $grid-unit + $grid-unit-05;
-				background-color: $gray-300;
-				margin-left: $grid-unit;
-			}
-
-			& .components-toolbar-group.components-toolbar-group {
-				&::after {
-					display: none;
-				}
-			}
-		}
-
-		&.is-collapsed {
-			display: none;
-		}
-	}
-}
-
-.edit-post-header__block-tools-toggle {
-	margin-left: 2px; // Allow focus ring to be fully visible
 }
 
 .edit-post-header__center {
@@ -121,7 +60,7 @@
 	padding-right: $grid-unit-05;
 
 	@include break-small () {
-		padding-right: $grid-unit-20 - ($grid-unit-15 * 0.5);
+		padding-right: $grid-unit-10;
 	}
 
 	gap: $grid-unit-10;
@@ -194,17 +133,26 @@
 }
 
 .show-icon-labels {
-
 	.edit-post-header__toolbar .block-editor-block-mover {
+		// Modified group borders.
 		border-left: none;
 
 		&::before {
 			content: "";
 			width: $border-width;
-			margin-top: $grid-unit + $grid-unit-05;
-			margin-bottom: $grid-unit + $grid-unit-05;
+			height: $grid-unit-30;
 			background-color: $gray-300;
+			margin-top: $grid-unit-05;
 			margin-left: $grid-unit;
+		}
+
+		// Modified block movers horizontal separator.
+		.block-editor-block-mover__move-button-container {
+			&::before {
+				width: calc(100% - #{$grid-unit-30});
+				background: $gray-300;
+				left: calc(50% + 1px);
+			}
 		}
 	}
 }
@@ -263,8 +211,7 @@
 	}
 
 	.edit-post-header {
-		backdrop-filter: blur(20px) !important;
-		background-color: rgba(255, 255, 255, 0.9);
+		background-color: $white;
 		border-bottom: 1px solid #e0e0e0;
 		position: absolute;
 		width: 100%;
@@ -275,7 +222,6 @@
 			visibility: hidden;
 		}
 
-		& > .edit-post-header__toolbar .editor-document-tools__inserter-toggle,
 		& > .edit-post-header__toolbar .editor-document-tools__document-overview-toggle,
 		& > .edit-post-header__settings > .editor-preview-dropdown,
 		& > .edit-post-header__settings > .interface-pinned-items {
@@ -298,4 +244,8 @@
 		position: absolute;
 		z-index: 35;
 	}
+}
+
+.components-popover.more-menu-dropdown__content {
+	z-index: z-index(".components-popover.more-menu__content");
 }

@@ -25,6 +25,10 @@ const {
 } = require( './config' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
 const { getPackageProp, hasPackageProp } = require( './package' );
+const {
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
+} = require( './block-json' );
 
 module.exports = {
 	fromProjectRoot,
@@ -40,6 +44,8 @@ module.exports = {
 	getWordPressSrcDirectory,
 	getWebpackEntryPoints,
 	getRenderPropPaths,
+	getBlockJsonModuleFields,
+	getBlockJsonScriptFields,
 	hasArgInCLI,
 	hasBabelConfig,
 	hasCssnanoConfig,

@@ -28,8 +28,10 @@ const meta: Meta< typeof Tabs > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.TabPanel': Tabs.TabPanel,
 	},
+	tags: [ 'status-private' ],
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
+		badges: [ 'private' ],
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -71,7 +73,7 @@ const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
 			<Tabs.TabList>
-				<Tabs.Tab tabId="tab1" disabled={ true }>
+				<Tabs.Tab tabId="tab1" disabled>
 					Tab 1
 				</Tabs.Tab>
 				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>

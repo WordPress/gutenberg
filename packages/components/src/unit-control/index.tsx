@@ -56,11 +56,7 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = useDeprecated36pxDefaultSizeProp(
-		unitControlProps,
-		'wp.components.UnitControl',
-		'6.4'
-	);
+	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -174,8 +170,12 @@ function UnforwardedUnitControl(
 			// Unless the meta key was pressed (to avoid interfering with
 			// shortcuts, e.g. pastes), moves focus to the unit select if a key
 			// matches the first character of a unit.
-			if ( ! event.metaKey && reFirstCharacterOfUnits.test( event.key ) )
+			if (
+				! event.metaKey &&
+				reFirstCharacterOfUnits.test( event.key )
+			) {
 				refInputSuffix.current?.focus();
+			}
 		};
 	}
 

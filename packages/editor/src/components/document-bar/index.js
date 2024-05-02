@@ -11,27 +11,24 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__experimentalText as Text,
-	__experimentalHStack as HStack,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
-import {
-	chevronLeftSmall,
-	chevronRightSmall,
-	page as pageIcon,
-	navigation as navigationIcon,
-	symbol,
-} from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { useEntityRecord } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
+import { useReducedMotion } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-const typeLabels = {
+const TYPE_LABELS = {
 	// translators: 1: Pattern title.
 	wp_pattern: __( 'Editing pattern: %s' ),
 	// translators: 1: Navigation menu title.
@@ -42,147 +39,152 @@ const typeLabels = {
 	wp_template_part: __( 'Editing template part: %s' ),
 };
 
-const icons = {
-	wp_block: symbol,
-	wp_navigation: navigationIcon,
-};
+const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
+
+const GLOBAL_POST_TYPES = [
+	...TEMPLATE_POST_TYPES,
+	'wp_block',
+	'wp_navigation',
+];
+
+const MotionButton = motion( Button );
 
 export default function DocumentBar() {
 	const {
-		isEditingTemplate,
-		templateId,
 		postType,
-		postId,
-		goBack,
-		getEditorSettings,
+		document,
+		isResolving,
+		templateIcon,
+		templateTitle,
+		onNavigateToPreviousEntityRecord,
 	} = useSelect( ( select ) => {
 		const {
-			getRenderingMode,
-			getCurrentTemplateId,
-			getCurrentPostId,
 			getCurrentPostType,
-			getEditorSettings: getSettings,
+			getCurrentPostId,
+			getEditorSettings,
+			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const _templateId = getCurrentTemplateId();
-		const back = getSettings().goBack;
+		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
+			select( coreStore );
+		const _postType = getCurrentPostType();
+		const _postId = getCurrentPostId();
+		const _document = getEditedEntityRecord(
+			'postType',
+			_postType,
+			_postId
+		);
+		const _templateInfo = getTemplateInfo( _document );
 		return {
-			isEditingTemplate:
-				!! _templateId && getRenderingMode() === 'template-only',
-			templateId: _templateId,
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-			goBack: typeof back === 'function' ? back : undefined,
-			getEditorSettings: getSettings,
+			postType: _postType,
+			document: _document,
+			isResolving: isResolvingSelector(
+				'getEditedEntityRecord',
+				'postType',
+				_postType,
+				_postId
+			),
+			templateIcon: unlock( select( editorStore ) ).getPostIcon(
+				_postType,
+				{
+					area: _document?.area,
+				}
+			),
+			templateTitle: _templateInfo.title,
+			onNavigateToPreviousEntityRecord:
+				getEditorSettings().onNavigateToPreviousEntityRecord,
 		};
 	}, [] );
 
-	const { setRenderingMode } = useDispatch( editorStore );
-
-	const handleOnBack = () => {
-		if ( isEditingTemplate ) {
-			setRenderingMode( getEditorSettings().defaultRenderingMode );
-			return;
-		}
-		if ( goBack ) {
-			goBack();
-		}
-	};
-
-	return (
-		<BaseDocumentActions
-			postType={ isEditingTemplate ? 'wp_template' : postType }
-			postId={ isEditingTemplate ? templateId : postId }
-			onBack={ isEditingTemplate || goBack ? handleOnBack : undefined }
-		/>
-	);
-}
-
-function BaseDocumentActions( { postType, postId, onBack } ) {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
-	const { editedRecord: doc, isResolving } = useEntityRecord(
-		'postType',
-		postType,
-		postId
-	);
-	const { templateIcon, templateTitle } = useSelect( ( select ) => {
-		const { __experimentalGetTemplateInfo: getTemplateInfo } =
-			select( editorStore );
-		const templateInfo = getTemplateInfo( doc );
-		return {
-			templateIcon: templateInfo.icon,
-			templateTitle: templateInfo.title,
-		};
-	} );
-	const isNotFound = ! doc && ! isResolving;
-	const icon = icons[ postType ] ?? pageIcon;
-	const [ isAnimated, setIsAnimated ] = useState( false );
-	const isMounting = useRef( true );
-	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
-		postType
-	);
-	const isGlobalEntity = [
-		'wp_template',
-		'wp_navigation',
-		'wp_template_part',
-		'wp_block',
-	].includes( postType );
+	const isReducedMotion = useReducedMotion();
 
+	const isNotFound = ! document && ! isResolving;
+	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
+	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
+	const hasBackButton = !! onNavigateToPreviousEntityRecord;
+	const title = isTemplate ? templateTitle : document.title;
+
+	const mounted = useRef( false );
 	useEffect( () => {
-		if ( ! isMounting.current ) {
-			setIsAnimated( true );
-		}
-		isMounting.current = false;
-	}, [ postType, postId ] );
-
-	const title = isTemplate ? templateTitle : doc.title;
+		mounted.current = true;
+	}, [] );
 
 	return (
 		<div
 			className={ classnames( 'editor-document-bar', {
-				'has-back-button': !! onBack,
-				'is-animated': isAnimated,
+				'has-back-button': hasBackButton,
 				'is-global': isGlobalEntity,
 			} ) }
 		>
-			{ onBack && (
-				<Button
-					className="editor-document-bar__back"
-					icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
-					onClick={ ( event ) => {
-						event.stopPropagation();
-						onBack();
-					} }
-					size="compact"
-				>
-					{ __( 'Back' ) }
-				</Button>
-			) }
-			{ isNotFound && <Text>{ __( 'Document not found' ) }</Text> }
-			{ ! isNotFound && (
+			<AnimatePresence>
+				{ hasBackButton && (
+					<MotionButton
+						className="editor-document-bar__back"
+						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
+						onClick={ ( event ) => {
+							event.stopPropagation();
+							onNavigateToPreviousEntityRecord();
+						} }
+						size="compact"
+						initial={
+							mounted.current
+								? { opacity: 0, transform: 'translateX(15%)' }
+								: false // Don't show entry animation when DocumentBar mounts.
+						}
+						animate={ { opacity: 1, transform: 'translateX(0%)' } }
+						exit={ { opacity: 0, transform: 'translateX(15%)' } }
+						transition={
+							isReducedMotion ? { duration: 0 } : undefined
+						}
+					>
+						{ __( 'Back' ) }
+					</MotionButton>
+				) }
+			</AnimatePresence>
+			{ isNotFound ? (
+				<Text>{ __( 'Document not found' ) }</Text>
+			) : (
 				<Button
 					className="editor-document-bar__command"
 					onClick={ () => openCommandCenter() }
 					size="compact"
 				>
-					<HStack
+					<motion.div
 						className="editor-document-bar__title"
-						spacing={ 1 }
-						justify="center"
+						// Force entry animation when the back button is added or removed.
+						key={ hasBackButton }
+						initial={
+							mounted.current
+								? {
+										opacity: 0,
+										transform: hasBackButton
+											? 'translateX(15%)'
+											: 'translateX(-15%)',
+								  }
+								: false // Don't show entry animation when DocumentBar mounts.
+						}
+						animate={ {
+							opacity: 1,
+							transform: 'translateX(0%)',
+						} }
+						transition={
+							isReducedMotion ? { duration: 0 } : undefined
+						}
 					>
-						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
+						<BlockIcon icon={ templateIcon } />
 						<Text
 							size="body"
 							as="h1"
 							aria-label={
-								typeLabels[ postType ]
+								TYPE_LABELS[ postType ]
 									? // eslint-disable-next-line @wordpress/valid-sprintf
-									  sprintf( typeLabels[ postType ], title )
+									  sprintf( TYPE_LABELS[ postType ], title )
 									: undefined
 							}
 						>
 							{ title }
 						</Text>
-					</HStack>
+					</motion.div>
 					<span className="editor-document-bar__shortcut">
 						{ displayShortcut.primary( 'k' ) }
 					</span>

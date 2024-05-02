@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { paramCase as kebabCase } from 'change-case';
+import { downloadZip } from 'client-zip';
 
 /**
  * WordPress dependencies
  */
-import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
 	TextControl,
@@ -22,6 +22,7 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -35,26 +36,57 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_DEFAULT_CATEGORY,
 } from '../../utils/constants';
+import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
-export const exportJSONaction = {
-	id: 'export-pattern',
-	label: __( 'Export as JSON' ),
-	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
-	callback: ( item ) => {
-		const json = {
+function getJsonFromItem( item ) {
+	return JSON.stringify(
+		{
 			__file: item.type,
 			title: item.title || item.name,
 			content: item.patternPost.content.raw,
 			syncStatus: item.patternPost.wp_pattern_sync_status,
-		};
+		},
+		null,
+		2
+	);
+}
+
+export const exportJSONaction = {
+	id: 'export-pattern',
+	label: __( 'Export as JSON' ),
+	supportsBulk: true,
+	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
+	callback: async ( items ) => {
+		if ( items.length === 1 ) {
+			return downloadBlob(
+				`${ kebabCase( items[ 0 ].title || items[ 0 ].name ) }.json`,
+				getJsonFromItem( items[ 0 ] ),
+				'application/json'
+			);
+		}
+		const nameCount = {};
+		const filesToZip = items.map( ( item ) => {
+			const name = kebabCase( item.title || item.name );
+			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
+			return {
+				name: `${
+					name +
+					( nameCount[ name ] > 1
+						? '-' + ( nameCount[ name ] - 1 )
+						: '' )
+				}.json`,
+				lastModified: new Date(),
+				input: getJsonFromItem( item ),
+			};
+		} );
 		return downloadBlob(
-			`${ kebabCase( item.title || item.name ) }.json`,
-			JSON.stringify( json, null, 2 ),
-			'application/json'
+			__( 'patterns-export' ) + '.zip',
+			await downloadZip( filesToZip ).blob(),
+			'application/zip'
 		);
 	},
 };
@@ -70,7 +102,8 @@ export const renameAction = {
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 		return isCustomPattern && ! hasThemeFile;
 	},
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const [ title, setTitle ] = useState( () => item.title );
 		const { editEntityRecord, saveEditedEntityRecord } =
 			useDispatch( coreStore );
@@ -159,48 +192,125 @@ export const deleteAction = {
 		return canDeleteOrReset( item ) && ! hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	supportsBulk: true,
+	RenderModal: ( { items, closeModal, onPerform } ) => {
 		const { __experimentalDeleteReusableBlock } =
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplate } = useDispatch( editSiteStore );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
-			try {
-				await __experimentalDeleteReusableBlock( item.id );
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: The pattern's title e.g. 'Call to action'.
+			const promiseResult = await Promise.allSettled(
+				items.map( ( item ) => {
+					return __experimentalDeleteReusableBlock( item.id );
+				} )
+			);
+			// If all the promises were fulfilled with success.
+			if (
+				promiseResult.every( ( { status } ) => status === 'fulfilled' )
+			) {
+				let successMessage;
+				if ( promiseResult.length === 1 ) {
+					successMessage = sprintf(
+						/* translators: The posts's title. */
 						__( '"%s" deleted.' ),
-						item.title
-					),
-					{ type: 'snackbar', id: 'edit-site-patterns-success' }
-				);
-			} catch ( error ) {
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: __( 'An error occurred while deleting the pattern.' );
-				createErrorNotice( errorMessage, {
+						items[ 0 ].title
+					);
+				} else {
+					successMessage = __( 'The patterns were deleted.' );
+				}
+				createSuccessNotice( successMessage, {
 					type: 'snackbar',
-					id: 'edit-site-patterns-error',
+					id: 'edit-site-page-trashed',
 				} );
+			} else {
+				// If there was at lease one failure.
+				let errorMessage;
+				// If we were trying to delete a single pattern.
+				if ( promiseResult.length === 1 ) {
+					if ( promiseResult[ 0 ].reason?.message ) {
+						errorMessage = promiseResult[ 0 ].reason.message;
+					} else {
+						errorMessage = __(
+							'An error occurred while deleting the pattern.'
+						);
+					}
+					// If we were trying to delete multiple patterns.
+				} else {
+					const errorMessages = new Set();
+					const failedPromises = promiseResult.filter(
+						( { status } ) => status === 'rejected'
+					);
+					for ( const failedPromise of failedPromises ) {
+						if ( failedPromise.reason?.message ) {
+							errorMessages.add( failedPromise.reason.message );
+						}
+					}
+					if ( errorMessages.size === 0 ) {
+						errorMessage = __(
+							'An error occurred while deleting the patterns.'
+						);
+					} else if ( errorMessages.size === 1 ) {
+						errorMessage = sprintf(
+							/* translators: %s: an error message */
+							__(
+								'An error occurred while deleting the patterns: %s'
+							),
+							[ ...errorMessages ][ 0 ]
+						);
+					} else {
+						errorMessage = sprintf(
+							/* translators: %s: a list of comma separated error messages */
+							__(
+								'Some errors occurred while deleting the patterns: %s'
+							),
+							[ ...errorMessages ].join( ',' )
+						);
+					}
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
+				}
 			}
 		};
-		const deleteItem = () =>
-			item.type === TEMPLATE_PART_POST_TYPE
-				? removeTemplate( item )
-				: deletePattern();
+		const deleteItem = () => {
+			if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
+				removeTemplates( items );
+			} else {
+				deletePattern();
+			}
+			if ( onPerform ) {
+				onPerform();
+			}
+			closeModal();
+		};
+		let questionMessage;
+		if ( items.length === 1 ) {
+			questionMessage = sprintf(
+				// translators: %s: The page's title.
+				__( 'Are you sure you want to delete "%s"?' ),
+				decodeEntities( items[ 0 ].title || items[ 0 ].name )
+			);
+		} else if (
+			items.length > 1 &&
+			items[ 0 ].type === TEMPLATE_PART_POST_TYPE
+		) {
+			questionMessage = sprintf(
+				// translators: %d: The number of template parts (2 or more).
+				__( 'Are you sure you want to delete %d template parts?' ),
+				items.length
+			);
+		} else {
+			questionMessage = sprintf(
+				// translators: %d: The number of patterns (2 or more).
+				__( 'Are you sure you want to delete %d patterns?' ),
+				items.length
+			);
+		}
 		return (
 			<VStack spacing="5">
-				<Text>
-					{ sprintf(
-						// translators: %s: The pattern or template part's title e.g. 'Call to action'.
-						__( 'Are you sure you want to delete "%s"?' ),
-						decodeEntities( item.title || item.name )
-					) }
-				</Text>
+				<Text>{ questionMessage }</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
 						{ __( 'Cancel' ) }
@@ -216,21 +326,20 @@ export const deleteAction = {
 
 export const resetAction = {
 	id: 'reset-action',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
 		return canDeleteOrReset( item ) && hasThemeFile;
 	},
 	hideModalHeader: true,
-	RenderModal: ( { item, closeModal } ) => {
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
 		const { removeTemplate } = useDispatch( editSiteStore );
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
+					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -240,7 +349,7 @@ export const resetAction = {
 						variant="primary"
 						onClick={ () => removeTemplate( item ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -250,13 +359,14 @@ export const resetAction = {
 
 export const duplicatePatternAction = {
 	id: 'duplicate-pattern',
-	label: __( 'Duplicate' ),
+	label: _x( 'Duplicate', 'action label' ),
 	isEligible: ( item ) => item.type !== TEMPLATE_PART_POST_TYPE,
-	modalHeader: __( 'Duplicate pattern' ),
-	RenderModal: ( { item, closeModal } ) => {
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+	modalHeader: _x( 'Duplicate pattern', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const history = useHistory();
 		function onPatternSuccess( { pattern } ) {
@@ -275,8 +385,54 @@ export const duplicatePatternAction = {
 		return (
 			<CreatePatternModalContents
 				onClose={ closeModal }
-				confirmLabel={ __( 'Duplicate' ) }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
 				{ ...duplicatedProps }
+			/>
+		);
+	},
+};
+
+export const duplicateTemplatePartAction = {
+	id: 'duplicate-template-part',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible: ( item ) => item.type === TEMPLATE_PART_POST_TYPE,
+	modalHeader: _x( 'Duplicate template part', 'action label' ),
+	RenderModal: ( { items, closeModal } ) => {
+		const [ item ] = items;
+		const { createSuccessNotice } = useDispatch( noticesStore );
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
+		const history = useHistory();
+		function onTemplatePartSuccess( templatePart ) {
+			createSuccessNotice(
+				sprintf(
+					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.
+					__( '"%s" duplicated.' ),
+					item.title
+				),
+				{ type: 'snackbar', id: 'edit-site-patterns-success' }
+			);
+			history.push( {
+				postType: TEMPLATE_PART_POST_TYPE,
+				postId: templatePart?.id,
+				categoryType: TEMPLATE_PART_POST_TYPE,
+				categoryId,
+			} );
+			closeModal();
+		}
+		return (
+			<CreateTemplatePartModalContents
+				blocks={ item.blocks }
+				defaultArea={ item.templatePart.area }
+				defaultTitle={ sprintf(
+					/* translators: %s: Existing template part title */
+					__( '%s (Copy)' ),
+					item.title
+				) }
+				onCreate={ onTemplatePartSuccess }
+				onError={ closeModal }
+				confirmLabel={ _x( 'Duplicate', 'action label' ) }
 			/>
 		);
 	},

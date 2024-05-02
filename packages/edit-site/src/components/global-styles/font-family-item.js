@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _n } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
 	__experimentalItem as Item,
@@ -32,9 +32,12 @@ function FontFamilyItem( { font } ) {
 		<Item onClick={ handleClick }>
 			<HStack justify="space-between">
 				<FlexItem style={ previewStyle }>{ font.name }</FlexItem>
-				<FlexItem style={ { color: '#9e9e9e' } }>
-					{ variantsCount }{ ' ' }
-					{ _n( 'variant', 'variants', variantsCount ) }
+				<FlexItem className="edit-site-global-styles-screen-typography__font-variants-count">
+					{ sprintf(
+						/* translators: %d: Number of font variants. */
+						_n( '%d variant', '%d variants', variantsCount ),
+						variantsCount
+					) }
 				</FlexItem>
 			</HStack>
 		</Item>

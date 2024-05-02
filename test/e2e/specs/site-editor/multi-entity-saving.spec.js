@@ -45,12 +45,16 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 				.getByRole( 'button', { name: 'Open save panel' } )
 		).toBeVisible();
 
-		await editor.saveSiteEditorEntities();
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await expect( saveButton ).toBeDisabled();
+
+		// Check focus returns to Saved button.
+		await expect( saveButton ).toBeFocused();
 	} );
 
 	test( 'save flow should allow re-saving after changing the same block attribute', async ( {
@@ -72,7 +76,9 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		// Change font size.
 		await fontSizePicker.getByRole( 'radio', { name: 'Small' } ).click();
 
-		await editor.saveSiteEditorEntities();
+		await editor.saveSiteEditorEntities( {
+			isOnlyCurrentEntityDirty: true,
+		} );
 
 		// Change font size again.
 		await fontSizePicker.getByRole( 'radio', { name: 'Medium' } ).click();

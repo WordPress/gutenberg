@@ -171,6 +171,7 @@ export default function PostPreviewButton( {
 			disabled={ ! isSaveable }
 			onClick={ openPreviewWindow }
 			role={ role }
+			size="compact"
 		>
 			{ textContent || (
 				<>

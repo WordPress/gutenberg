@@ -12,6 +12,7 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetElementClassName,
 } from '@wordpress/block-editor';
 
@@ -40,6 +41,7 @@ export default function save( { attributes, className } ) {
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
@@ -56,6 +58,7 @@ export default function save( { attributes, className } ) {
 		...borderProps.style,
 		...colorProps.style,
 		...spacingProps.style,
+		...shadowProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied

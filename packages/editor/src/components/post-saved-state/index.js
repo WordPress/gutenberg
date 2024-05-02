@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
-	Tooltip,
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -41,13 +40,14 @@ export default function PostSavedState( { forceIsDirty } ) {
 		isAutosaving,
 		isDirty,
 		isNew,
-		isPending,
 		isPublished,
 		isSaveable,
 		isSaving,
 		isScheduled,
 		hasPublishAction,
 		showIconLabels,
+		postStatus,
+		postStatusHasChanged,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -60,14 +60,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				getCurrentPost,
 				isAutosavingPost,
 				getEditedPostAttribute,
+				getPostEdits,
 			} = select( editorStore );
 			const { get } = select( preferencesStore );
-
 			return {
 				isAutosaving: isAutosavingPost(),
 				isDirty: forceIsDirty || isEditedPostDirty(),
 				isNew: isEditedPostNew(),
-				isPending: 'pending' === getEditedPostAttribute( 'status' ),
 				isPublished: isCurrentPostPublished(),
 				isSaving: isSavingPost(),
 				isSaveable: isEditedPostSaveable(),
@@ -75,11 +74,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 				hasPublishAction:
 					getCurrentPost()?._links?.[ 'wp:action-publish' ] ?? false,
 				showIconLabels: get( 'core', 'showIconLabels' ),
+				postStatus: getEditedPostAttribute( 'status' ),
+				postStatusHasChanged: !! getPostEdits()?.status,
 			};
 		},
 		[ forceIsDirty ]
 	);
-
+	const isPending = postStatus === 'pending';
 	const { savePost } = useDispatch( editorStore );
 
 	const wasSaving = usePrevious( isSaving );
@@ -103,7 +104,13 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return null;
 	}
 
-	if ( isPublished || isScheduled ) {
+	if (
+		isPublished ||
+		isScheduled ||
+		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) ||
+		( postStatusHasChanged &&
+			[ 'pending', 'draft' ].includes( postStatus ) )
+	) {
 		return null;
 	}
 
@@ -116,7 +123,6 @@ export default function PostSavedState( { forceIsDirty } ) {
 	const isSaved = forceSavedMessage || ( ! isNew && ! isDirty );
 	const isSavedState = isSaving || isSaved;
 	const isDisabled = isSaving || isSaved || ! isSaveable;
-
 	let text;
 
 	if ( isSaving ) {
@@ -129,54 +135,38 @@ export default function PostSavedState( { forceIsDirty } ) {
 		text = shortLabel;
 	}
 
-	const buttonAccessibleLabel = text || label;
-
-	/**
-	 * The tooltip needs to be enabled only if the button is not disabled. When
-	 * relying on the internal Button tooltip functionality, this causes the
-	 * resulting `button` element to be always removed and re-added to the DOM,
-	 * causing focus loss. An alternative approach to circumvent the issue
-	 * is not to use the `label` and `shortcut` props on `Button` (which would
-	 * trigger the tooltip), and instead manually wrap the `Button` in a separate
-	 * `Tooltip` component.
-	 */
-	const tooltipProps = isDisabled
-		? undefined
-		: {
-				text: buttonAccessibleLabel,
-				shortcut: displayShortcut.primary( 's' ),
-		  };
-
 	// Use common Button instance for all saved states so that focus is not
 	// lost.
 	return (
-		<Tooltip { ...tooltipProps }>
-			<Button
-				className={
-					isSaveable || isSaving
-						? classnames( {
-								'editor-post-save-draft': ! isSavedState,
-								'editor-post-saved-state': isSavedState,
-								'is-saving': isSaving,
-								'is-autosaving': isAutosaving,
-								'is-saved': isSaved,
-								[ getAnimateClassName( {
-									type: 'loading',
-								} ) ]: isSaving,
-						  } )
-						: undefined
-				}
-				onClick={ isDisabled ? undefined : () => savePost() }
-				variant="tertiary"
-				size="compact"
-				icon={ isLargeViewport ? undefined : cloudUpload }
-				// Make sure the aria-label has always a value, as the default `text` is undefined on small screens.
-				aria-label={ buttonAccessibleLabel }
-				aria-disabled={ isDisabled }
-			>
-				{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
-				{ text }
-			</Button>
-		</Tooltip>
+		<Button
+			className={
+				isSaveable || isSaving
+					? classnames( {
+							'editor-post-save-draft': ! isSavedState,
+							'editor-post-saved-state': isSavedState,
+							'is-saving': isSaving,
+							'is-autosaving': isAutosaving,
+							'is-saved': isSaved,
+							[ getAnimateClassName( {
+								type: 'loading',
+							} ) ]: isSaving,
+					  } )
+					: undefined
+			}
+			onClick={ isDisabled ? undefined : () => savePost() }
+			/*
+			 * We want the tooltip to show the keyboard shortcut only when the
+			 * button does something, i.e. when it's not disabled.
+			 */
+			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
+			variant="tertiary"
+			size="compact"
+			icon={ isLargeViewport ? undefined : cloudUpload }
+			label={ text || label }
+			aria-disabled={ isDisabled }
+		>
+			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
+			{ text }
+		</Button>
 	);
 }

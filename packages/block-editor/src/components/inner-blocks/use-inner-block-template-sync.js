@@ -23,7 +23,6 @@ import { store as blockEditorStore } from '../../store';
  * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
  * @param {string}  clientId                       The block client ID.
- * @param {Array}   innerBlocks
  * @param {Object}  template                       The template to match.
  * @param {string}  templateLock                   The template lock state for the inner blocks. For
  *                                                 example, if the template lock is set to "all",
@@ -37,7 +36,6 @@ import { store as blockEditorStore } from '../../store';
  */
 export default function useInnerBlockTemplateSync(
 	clientId,
-	innerBlocks,
 	template,
 	templateLock,
 	templateInsertUpdatesSelection
@@ -112,5 +110,5 @@ export default function useInnerBlockTemplateSync(
 		return () => {
 			isCancelled = true;
 		};
-	}, [ innerBlocks, template, templateLock, clientId ] );
+	}, [ template, templateLock, clientId ] );
 }
