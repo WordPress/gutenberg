@@ -118,9 +118,9 @@ function InserterMenu(
 	const showPatternPanel =
 		selectedTab === 'patterns' &&
 		! delayedFilterValue &&
-		selectedPatternCategory;
+		!! selectedPatternCategory;
 
-	const showMediaPanel = selectedTab === 'media' && selectedMediaCategory;
+	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
