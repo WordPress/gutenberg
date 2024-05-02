@@ -39,7 +39,7 @@ function AspectRatioGroup( {
 	);
 }
 
-function ratioToNumber( str ) {
+export function ratioToNumber( str ) {
 	// TODO: support two-value aspect ratio?
 	// https://css-tricks.com/almanac/properties/a/aspect-ratio/#aa-it-can-take-two-values
 	const [ a, b, ...rest ] = str.split( '/' ).map( Number );
