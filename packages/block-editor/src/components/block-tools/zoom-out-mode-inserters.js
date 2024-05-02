@@ -89,7 +89,6 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 					whileHover="hover"
 					whileTap="pressed"
 					exit="start"
-					className="block-editor-block-list__insertion-point is-vertical is-with-inserter"
 				>
 					<motion.div
 						variants={ lineVariants }
@@ -99,7 +98,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 
 					<motion.div
 						variants={ inserterVariants }
-						className="block-editor-block-list__insertion-point-inserter"
+						className="block-editor-block-list__insertion-point-inserter is-with-inserter"
 					>
 						<Inserter
 							position="bottom center"
