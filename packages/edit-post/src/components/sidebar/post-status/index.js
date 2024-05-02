@@ -42,7 +42,7 @@ const {
 const PANEL_NAME = 'post-status';
 
 export default function PostStatus() {
-	const { isOpened, isRemoved, showExcerptAndLastEditedPanels } = useSelect(
+	const { isOpened, isRemoved, showPostContentPanels } = useSelect(
 		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
@@ -57,7 +57,7 @@ export default function PostStatus() {
 				isOpened: isEditorPanelOpened( PANEL_NAME ),
 				// Post excerpt panel is rendered in different place depending on the post type.
 				// So we cannot make this check inside the PostExcerpt component based on the current edited entity.
-				showExcerptAndLastEditedPanels: ! [
+				showPostContentPanels: ! [
 					'wp_template',
 					'wp_template_part',
 					'wp_block',
@@ -82,7 +82,7 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						{ showExcerptAndLastEditedPanels && (
+						{ showPostContentPanels && (
 							<VStack
 								spacing={ 3 }
 								//  TODO: this needs to be consolidated with the panel in site editor, when we unify them.
@@ -91,14 +91,11 @@ export default function PostStatus() {
 								<PostFeaturedImagePanel
 									withPanelBody={ false }
 								/>
-
-								<>
-									<PrivatePostExcerptPanel />
-									<VStack spacing={ 1 }>
-										<PostContentInformation />
-										<PostLastEditedPanel />
-									</VStack>
-								</>
+								<PrivatePostExcerptPanel />
+								<VStack spacing={ 1 }>
+									<PostContentInformation />
+									<PostLastEditedPanel />
+								</VStack>
 							</VStack>
 						) }
 						<VStack

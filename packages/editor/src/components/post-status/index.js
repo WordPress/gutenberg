@@ -226,12 +226,7 @@ export default function PostStatus() {
 
 	return (
 		<PostPanelRow label={ __( 'Status' ) } ref={ setPopoverAnchor }>
-			{ ! canEdit && (
-				<div className="editor-post-status">
-					<PostStatusLabel />
-				</div>
-			) }
-			{ canEdit && (
+			{ canEdit ? (
 				<Dropdown
 					className="editor-post-status"
 					contentClassName="editor-change-status__content"
@@ -313,6 +308,10 @@ export default function PostStatus() {
 						</>
 					) }
 				/>
+			) : (
+				<div className="editor-post-status">
+					<PostStatusLabel />
+				</div>
 			) }
 		</PostPanelRow>
 	);

@@ -33,7 +33,7 @@ import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
 
 export default function PostCardPanel( { className, actions } ) {
-	const { title, showExcerptAndLastEditedPanels, icon, postType } = useSelect(
+	const { title, showPostContentPanels, icon, postType } = useSelect(
 		( select ) => {
 			const {
 				getEditedPostAttribute,
@@ -59,7 +59,7 @@ export default function PostCardPanel( { className, actions } ) {
 				} ),
 				// Post excerpt panel and Last Edited info are rendered in different place depending on the post type.
 				// So we cannot make this check inside the PostExcerpt or PostLastEditedPanel component based on the current edited entity.
-				showExcerptAndLastEditedPanels: [
+				showPostContentPanels: [
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					PATTERN_POST_TYPE,
@@ -72,7 +72,7 @@ export default function PostCardPanel( { className, actions } ) {
 		<PanelBody>
 			<div
 				className={ classnames( 'editor-post-card-panel', className, {
-					'has-description': showExcerptAndLastEditedPanels,
+					'has-description': showPostContentPanels,
 				} ) }
 			>
 				<HStack
@@ -96,7 +96,7 @@ export default function PostCardPanel( { className, actions } ) {
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
-					{ showExcerptAndLastEditedPanels && (
+					{ showPostContentPanels && (
 						<VStack
 							className="editor-post-card-panel__description"
 							spacing={ 2 }
