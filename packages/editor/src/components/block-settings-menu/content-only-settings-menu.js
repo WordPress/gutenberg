@@ -27,7 +27,9 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 			} = select( blockEditorStore );
 			const contentOnly =
 				getBlockEditingMode( clientId ) === 'contentOnly';
-			if ( ! contentOnly ) return {};
+			if ( ! contentOnly ) {
+				return {};
+			}
 			const patternParent = getBlockParentsByBlockName(
 				clientId,
 				'core/block',
@@ -63,7 +65,9 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 		[ clientId ]
 	);
 
-	if ( ! entity ) return null;
+	if ( ! entity ) {
+		return null;
+	}
 
 	const isPattern = entity.type === 'wp_block';
 

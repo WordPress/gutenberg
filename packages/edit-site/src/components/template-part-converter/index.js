@@ -42,7 +42,9 @@ function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
 	);
 
 	// Do not show the convert button if the block is in content-only mode.
-	if ( isContentOnly ) return null;
+	if ( isContentOnly ) {
+		return null;
+	}
 
 	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {
