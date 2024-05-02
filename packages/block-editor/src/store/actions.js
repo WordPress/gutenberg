@@ -952,7 +952,7 @@ export const __unstableSplitSelection =
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
 
-		const head = {
+		let head = {
 			// Preserve the original client ID.
 			...blockA,
 			// If both start and end are the same, should only copy innerBlocks
@@ -986,7 +986,7 @@ export const __unstableSplitSelection =
 			return;
 		}
 
-		let offset;
+		let selection;
 		const output = [];
 		const clonedBlocks = [ ...blocks ];
 		const firstBlock = clonedBlocks.shift();
@@ -998,10 +998,17 @@ export const __unstableSplitSelection =
 
 		if ( firstBlocks?.length ) {
 			const first = firstBlocks.shift();
-			output.push( {
+			head = {
 				...head,
 				attributes: headType.merge( head.attributes, first.attributes ),
-			} );
+			};
+			output.push( head );
+			selection = {
+				clientId: head.clientId,
+				attributeKey: attributeKeyA,
+				offset: create( { html: head.attributes[ attributeKeyA ] } )
+					.text.length,
+			};
 			clonedBlocks.unshift( ...firstBlocks );
 		} else {
 			if ( ! isUnmodifiedBlock( head ) ) {
@@ -1033,9 +1040,13 @@ export const __unstableSplitSelection =
 					),
 				} );
 				output.push( ...lastBlocks );
-				offset = create( {
-					html: lastBlock.attributes[ attributeKeyB ],
-				} ).text.length;
+				selection = {
+					clientId: tail.clientId,
+					attributeKey: attributeKeyB,
+					offset: create( {
+						html: last.attributes[ attributeKeyB ],
+					} ).text.length,
+				};
 			} else {
 				output.push( lastBlock );
 				if ( ! isUnmodifiedBlock( tail ) ) {
@@ -1053,12 +1064,12 @@ export const __unstableSplitSelection =
 				output.length - 1,
 				0
 			);
-			if ( offset ) {
+			if ( selection ) {
 				dispatch.selectionChange(
-					tail.clientId,
-					attributeKeyB,
-					offset,
-					offset
+					selection.clientId,
+					selection.attributeKey,
+					selection.offset,
+					selection.offset
 				);
 			}
 		} );
