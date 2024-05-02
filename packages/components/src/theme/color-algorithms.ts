@@ -76,7 +76,9 @@ function warnContrastIssues( issues: ReturnType< typeof checkContrasts > ) {
 }
 
 function generateAccentDependentColors( accent?: string ) {
-	if ( ! accent ) return {};
+	if ( ! accent ) {
+		return {};
+	}
 
 	return {
 		accent,
@@ -87,7 +89,9 @@ function generateAccentDependentColors( accent?: string ) {
 }
 
 function generateBackgroundDependentColors( background?: string ) {
-	if ( ! background ) return {};
+	if ( ! background ) {
+		return {};
+	}
 
 	const foreground = getForegroundForColor( background );
 

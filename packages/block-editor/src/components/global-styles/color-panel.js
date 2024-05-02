@@ -587,7 +587,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background

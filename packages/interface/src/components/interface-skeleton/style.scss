@@ -43,6 +43,7 @@ html.interface-interface-skeleton__html-container {
 @include editor-left(".interface-interface-skeleton");
 
 .interface-interface-skeleton__body {
+	position: relative;
 	flex-grow: 1;
 	display: flex;
 
@@ -114,7 +115,7 @@ html.interface-interface-skeleton__html-container {
 
 		// Set this z-index only when the sidebar is opened. When it's closed, the
 		// button to open the sidebar that is shown when navigating regions needs to
-		// be above the footer. See `edit-post-layout__toggle-sidebar-panel`.
+		// be above the footer. See `editor-layout__toggle-sidebar-panel`.
 		.is-sidebar-opened & {
 			z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
 		}

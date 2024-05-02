@@ -226,6 +226,8 @@ test.describe( 'Navigation block', () => {
 				name: 'Add submenu',
 			} );
 			await addSubmenuButton.click();
+			await page.keyboard.type( '#yup' );
+			await page.keyboard.press( 'Enter' );
 
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );

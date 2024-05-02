@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
 	PanelBody,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -28,7 +29,12 @@ import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
 import { unlock } from '../../../lock-unlock';
 
-const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
+const {
+	PostStatus: PostStatusPanel,
+	PrivatePostExcerptPanel,
+	PostContentInformation,
+	PostLastEditedPanel,
+} = unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -36,16 +42,30 @@ const { PostStatus: PostStatusPanel } = unlock( editorPrivateApis );
 const PANEL_NAME = 'post-status';
 
 export default function PostStatus() {
-	const { isOpened, isRemoved } = useSelect( ( select ) => {
-		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
-		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } =
-			select( editorStore );
-		return {
-			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
-		};
-	}, [] );
+	const { isOpened, isRemoved, showPostContentPanels } = useSelect(
+		( select ) => {
+			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+			const {
+				isEditorPanelRemoved,
+				isEditorPanelOpened,
+				getCurrentPostType,
+			} = select( editorStore );
+			const postType = getCurrentPostType();
+			return {
+				isRemoved: isEditorPanelRemoved( PANEL_NAME ),
+				isOpened: isEditorPanelOpened( PANEL_NAME ),
+				// Post excerpt panel is rendered in different place depending on the post type.
+				// So we cannot make this check inside the PostExcerpt component based on the current edited entity.
+				showPostContentPanels: ! [
+					'wp_template',
+					'wp_template_part',
+					'wp_block',
+				].includes( postType ),
+			};
+		},
+		[]
+	);
 	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( isRemoved ) {
@@ -62,12 +82,32 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostStatusPanel />
-						<PostFeaturedImagePanel withPanelBody={ false } />
-						<PostSchedulePanel />
-						<PostTemplatePanel />
-						<PostURLPanel />
-						<PostSyncStatus />
+						{ showPostContentPanels && (
+							<VStack
+								spacing={ 3 }
+								//  TODO: this needs to be consolidated with the panel in site editor, when we unify them.
+								style={ { marginBlockEnd: '24px' } }
+							>
+								<PostFeaturedImagePanel
+									withPanelBody={ false }
+								/>
+								<PrivatePostExcerptPanel />
+								<VStack spacing={ 1 }>
+									<PostContentInformation />
+									<PostLastEditedPanel />
+								</VStack>
+							</VStack>
+						) }
+						<VStack
+							spacing={ 1 }
+							style={ { marginBlockEnd: '12px' } }
+						>
+							<PostStatusPanel />
+							<PostSchedulePanel />
+							<PostTemplatePanel />
+							<PostURLPanel />
+							<PostSyncStatus />
+						</VStack>
 						<PostSticky />
 						<PostFormat />
 						<PostSlug />

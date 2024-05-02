@@ -155,7 +155,9 @@ function InputField(
 				target,
 			};
 
-			if ( ! distance ) return;
+			if ( ! distance ) {
+				return;
+			}
 			event.stopPropagation();
 
 			/**

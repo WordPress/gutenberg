@@ -16,13 +16,13 @@ function insertTextAtPosition( text, newText, start, end ) {
 /**
  * Changes the text and selection of a RichText component.
  *
- * @param {import('react-test-renderer').ReactTestInstance} richText                        RichText test instance.
- * @param {string}                                          text                            Text to set.
- * @param {Object}                                          options                         Configuration options for selection.
- * @param {number}                                          [options.initialSelectionStart] Selection start position before the text is inserted.
- * @param {number}                                          [options.initialSelectionEnd]   Selection end position before the text is inserted.
- * @param {number}                                          [options.finalSelectionStart]   Selection start position after the text is inserted.
- * @param {number}                                          [options.finalSelectionEnd]     Selection end position after the text is inserted.
+ * @param {HTMLElement} richText                        RichText test instance.
+ * @param {string}      text                            Text to set.
+ * @param {Object}      options                         Configuration options for selection.
+ * @param {number}      [options.initialSelectionStart] Selection start position before the text is inserted.
+ * @param {number}      [options.initialSelectionEnd]   Selection end position before the text is inserted.
+ * @param {number}      [options.finalSelectionStart]   Selection start position after the text is inserted.
+ * @param {number}      [options.finalSelectionEnd]     Selection end position after the text is inserted.
  */
 export const typeInRichText = ( richText, text, options = {} ) => {
 	const currentValueSansOuterHtmlTags = stripOuterHtmlTags(

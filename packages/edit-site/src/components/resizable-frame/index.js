@@ -203,11 +203,11 @@ function ResizableFrame( {
 		},
 		visible: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 		},
 		active: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 			scaleY: 1.3,
 		},
 	};
@@ -226,8 +226,9 @@ function ResizableFrame( {
 			variants={ frameAnimationVariants }
 			animate={ isFullWidth ? 'fullWidth' : 'default' }
 			onAnimationComplete={ ( definition ) => {
-				if ( definition === 'fullWidth' )
+				if ( definition === 'fullWidth' ) {
 					setFrameSize( { width: '100%', height: '100%' } );
+				}
 			} }
 			transition={ FRAME_TRANSITION }
 			size={ frameSize }

@@ -200,7 +200,9 @@ export default function Image( {
 			return;
 		}
 
-		if ( externalBlob ) return;
+		if ( externalBlob ) {
+			return;
+		}
 
 		window
 			// Avoid cache, which seems to help avoid CORS problems.

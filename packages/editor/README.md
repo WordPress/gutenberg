@@ -128,13 +128,29 @@ Example:
 
 ### AutosaveMonitor
 
-AutosaveMonitor component. Monitors the changes made to the edited post and triggers autosave if necessary.
+Monitors the changes made to the edited post and triggers autosave if necessary.
+
+The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called. The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as the specific way of detecting changes.
+
+There are two caveats:
+
+-   If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+-   The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
 
 _Usage_
 
 ```jsx
 <AutosaveMonitor interval={ 30000 } />
 ```
+
+_Parameters_
+
+-   _props_ `Object`: - The properties passed to the component.
+-   _props.autosave_ `Function`: - The function to call when changes need to be saved.
+-   _props.interval_ `number`: - The maximum time in seconds between an unsaved change and an autosave.
+-   _props.isAutosaveable_ `boolean`: - If false, the check for changes is retried every second.
+-   _props.disableIntervalChecks_ `boolean`: - If true, disables the timer and any change will immediately trigger `props.autosave()`.
+-   _props.isDirty_ `boolean`: - Indicates if there are unsaved changes.
 
 ### BlockAlignmentToolbar
 
@@ -194,7 +210,11 @@ _Usage_
 
 ### CharacterCount
 
-Undocumented declaration.
+Renders the character count of the post content.
+
+_Returns_
+
+-   `number`: The character count.
 
 ### cleanForSlug
 
@@ -238,27 +258,71 @@ Undocumented declaration.
 
 ### DocumentOutline
 
-Undocumented declaration.
+Renders a document outline component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onSelect_ `Function`: Function to be called when an outline item is selected.
+-   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### DocumentOutlineCheck
 
-Undocumented declaration.
+Component check if there are any headings (core/heading blocks) present in the document.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
-Undocumented declaration.
+Renders the redo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorHistoryUndo
 
-Undocumented declaration.
+Renders the undo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### EditorKeyboardShortcutsRegister
 
-Undocumented declaration.
+Component for registering editor keyboard shortcuts.
+
+_Returns_
+
+-   `Element`: The component to be rendered.
 
 ### EditorNotices
 
@@ -270,7 +334,11 @@ Undocumented declaration.
 
 ### EditorSnackbars
 
-Undocumented declaration.
+Renders the editor snackbars component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### EntitiesSavedStates
 
@@ -376,19 +444,40 @@ _Parameters_
 
 ### PageAttributesCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports page attributes.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
-Undocumented declaration.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesPanel
 
-Undocumented declaration.
+Renders the Page Attributes Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesParent
 
-Undocumented declaration.
+Renders the Page Attributes Parent component. A dropdown menu in an editor interface for selecting the parent page of a given page.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return null if post type is not hierarchical.
 
 ### PageTemplate
 
@@ -587,7 +676,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
+import { PluginPostPublishPanel } from '@wordpress/editor';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -666,7 +755,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
@@ -733,7 +822,7 @@ function MyPluginSidebar() {
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { PluginSidebar } from '@wordpress/edit-post';
+import { PluginSidebar } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
@@ -801,15 +890,32 @@ _Returns_
 
 ### PostAuthor
 
-Undocumented declaration.
+Renders the component for selecting the post author.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostAuthorCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the author.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return `null` if the post type doesn't supports the author or if there are no authors available.
 
 ### PostAuthorPanel
 
-Undocumented declaration.
+Renders the Post Author Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostComments
 
@@ -821,7 +927,13 @@ Undocumented declaration.
 
 ### PostExcerpt
 
-Undocumented declaration.
+Renders an editable textarea for the post excerpt. Templates, template parts and patterns use the `excerpt` field as a description semantically. Additionally templates and template parts override the `excerpt` field as `description` in REST API. So this component handles proper labeling and updating the edited entity.
+
+_Parameters_
+
+-   _props_ `Object`: - Component props.
+-   _props.hideLabelFromVision_ `[boolean]`: - Whether to visually hide the textarea's label.
+-   _props.updateOnBlur_ `[boolean]`: - Whether to update the post on change or use local state and update on blur.
 
 ### PostExcerptCheck
 
