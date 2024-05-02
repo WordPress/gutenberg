@@ -148,7 +148,6 @@ function LinkUIBlockInserter( { clientId, onBack, onSelectBlock } ) {
 export function LinkUI( props ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ focusAddBlockButton, setFocusAddBlockButton ] = useState( false );
-	const [ showBackdrop, setShowBackdrop ] = useState( true );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const pagesPermissions = useResourcePermissions( 'pages' );
 	const postsPermissions = useResourcePermissions( 'posts' );
@@ -214,102 +213,88 @@ export function LinkUI( props ) {
 	const { onClose: onSelectBlock } = props;
 
 	return (
-		<>
-			{ showBackdrop && (
+		<Popover
+			placement="bottom"
+			onClose={ props.onClose }
+			anchor={ props.anchor }
+			shift
+		>
+			{ ! addingBlock && (
 				<div
-					className="components-popover-pointer-events-trap"
-					aria-hidden="true"
-					onClick={ () => setShowBackdrop( false ) }
+					role="dialog"
+					aria-labelledby={ dialogTitleId }
+					aria-describedby={ dialogDescritionId }
+				>
+					<VisuallyHidden>
+						<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
+
+						<p id={ dialogDescritionId }>
+							{ __(
+								'Search for and add a link to your Navigation.'
+							) }
+						</p>
+					</VisuallyHidden>
+					<LinkControl
+						hasTextControl
+						hasRichPreviews
+						value={ link }
+						showInitialSuggestions
+						withCreateSuggestion={ userCanCreate }
+						createSuggestion={ handleCreate }
+						createSuggestionButtonText={ ( searchTerm ) => {
+							let format;
+
+							if ( type === 'post' ) {
+								/* translators: %s: search term. */
+								format = __(
+									'Create draft post: <mark>%s</mark>'
+								);
+							} else {
+								/* translators: %s: search term. */
+								format = __(
+									'Create draft page: <mark>%s</mark>'
+								);
+							}
+
+							return createInterpolateElement(
+								sprintf( format, searchTerm ),
+								{
+									mark: <mark />,
+								}
+							);
+						} }
+						noDirectEntry={ !! type }
+						noURLSuggestion={ !! type }
+						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						onChange={ props.onChange }
+						onRemove={ props.onRemove }
+						onCancel={ props.onCancel }
+						renderControlBottom={ () =>
+							! link?.url?.length && (
+								<LinkUITools
+									focusAddBlockButton={ focusAddBlockButton }
+									setAddingBlock={ () => {
+										setAddingBlock( true );
+										setFocusAddBlockButton( false );
+									} }
+								/>
+							)
+						}
+					/>
+				</div>
+			) }
+
+			{ addingBlock && (
+				<LinkUIBlockInserter
+					clientId={ props.clientId }
+					onBack={ () => {
+						setAddingBlock( false );
+						setFocusAddBlockButton( true );
+					} }
+					onSelectBlock={ onSelectBlock }
 				/>
 			) }
-			<Popover
-				placement="bottom"
-				onClose={ props.onClose }
-				anchor={ props.anchor }
-				shift
-			>
-				{ ! addingBlock && (
-					<div
-						role="dialog"
-						aria-labelledby={ dialogTitleId }
-						aria-describedby={ dialogDescritionId }
-					>
-						<VisuallyHidden>
-							<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
-
-							<p id={ dialogDescritionId }>
-								{ __(
-									'Search for and add a link to your Navigation.'
-								) }
-							</p>
-						</VisuallyHidden>
-						<LinkControl
-							hasTextControl
-							hasRichPreviews
-							value={ link }
-							showInitialSuggestions
-							withCreateSuggestion={ userCanCreate }
-							createSuggestion={ handleCreate }
-							createSuggestionButtonText={ ( searchTerm ) => {
-								let format;
-
-								if ( type === 'post' ) {
-									/* translators: %s: search term. */
-									format = __(
-										'Create draft post: <mark>%s</mark>'
-									);
-								} else {
-									/* translators: %s: search term. */
-									format = __(
-										'Create draft page: <mark>%s</mark>'
-									);
-								}
-
-								return createInterpolateElement(
-									sprintf( format, searchTerm ),
-									{
-										mark: <mark />,
-									}
-								);
-							} }
-							noDirectEntry={ !! type }
-							noURLSuggestion={ !! type }
-							suggestionsQuery={ getSuggestionsQuery(
-								type,
-								kind
-							) }
-							onChange={ props.onChange }
-							onRemove={ props.onRemove }
-							onCancel={ props.onCancel }
-							renderControlBottom={ () =>
-								! link?.url?.length && (
-									<LinkUITools
-										focusAddBlockButton={
-											focusAddBlockButton
-										}
-										setAddingBlock={ () => {
-											setAddingBlock( true );
-											setFocusAddBlockButton( false );
-										} }
-									/>
-								)
-							}
-						/>
-					</div>
-				) }
-
-				{ addingBlock && (
-					<LinkUIBlockInserter
-						clientId={ props.clientId }
-						onBack={ () => {
-							setAddingBlock( false );
-							setFocusAddBlockButton( true );
-						} }
-						onSelectBlock={ onSelectBlock }
-					/>
-				) }
-			</Popover>
-		</>
+		</Popover>
 	);
 }
 

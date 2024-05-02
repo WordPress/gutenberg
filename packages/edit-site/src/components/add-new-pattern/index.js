@@ -11,8 +11,8 @@ import {
 	privateApis as editPatternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
-import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -37,13 +37,14 @@ export default function AddNewPattern() {
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
-	const isBlockBasedTheme = useSelect( ( select ) => {
-		return select( coreStore ).getCurrentTheme()?.is_block_theme;
-	}, [] );
 	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -73,13 +74,13 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
-			icon: symbol,
-			onClick: () => setShowPatternModal( true ),
-			title: __( 'Create pattern' ),
-		},
-	];
+	const controls = [];
+
+	controls.push( {
+		icon: symbol,
+		onClick: () => setShowPatternModal( true ),
+		title: __( 'Create pattern' ),
+	} );
 
 	if ( isBlockBasedTheme ) {
 		controls.push( {
@@ -131,7 +132,9 @@ export default function AddNewPattern() {
 				ref={ patternUploadInputRef }
 				onChange={ async ( event ) => {
 					const file = event.target.files?.[ 0 ];
-					if ( ! file ) return;
+					if ( ! file ) {
+						return;
+					}
 					try {
 						let currentCategoryId;
 						// When we're not handling template parts, we should

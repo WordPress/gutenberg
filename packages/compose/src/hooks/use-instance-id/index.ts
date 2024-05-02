@@ -51,7 +51,9 @@ function useInstanceId(
 	preferredId?: string | number
 ): string | number {
 	return useMemo( () => {
-		if ( preferredId ) return preferredId;
+		if ( preferredId ) {
+			return preferredId;
+		}
 		const id = createId( object );
 
 		return prefix ? `${ prefix }-${ id }` : id;

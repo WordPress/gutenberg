@@ -112,8 +112,9 @@ const immutableHandlers = {
 	deleteProperty: immutableError,
 };
 const deepImmutable = < T extends Object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) )
+	if ( ! immutableMap.has( target ) ) {
 		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
+	}
 	return immutableMap.get( target );
 };
 
@@ -359,7 +360,9 @@ const Directives = ( {
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) props.children = wrapper;
+		if ( wrapper !== undefined ) {
+			props.children = wrapper;
+		}
 	}
 
 	resetScope();
@@ -373,10 +376,11 @@ options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key )
+		if ( directives.key ) {
 			vnode.key = directives.key.find(
 				( { suffix } ) => suffix === 'default'
 			).value;
+		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {
@@ -392,5 +396,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 		}
 	}
 
-	if ( old ) old( vnode );
+	if ( old ) {
+		old( vnode );
+	}
 };

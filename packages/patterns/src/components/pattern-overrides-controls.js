@@ -85,7 +85,9 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 	}
 
 	// Avoid overwriting other (e.g. meta) bindings.
-	if ( isConnectedToOtherSources ) return null;
+	if ( isConnectedToOtherSources ) {
+		return null;
+	}
 
 	const hasName = !! attributes.metadata?.name;
 	const allowOverrides =
@@ -108,6 +110,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 						__next40pxDefaultSize
 						className="pattern-overrides-control__allow-overrides-button"
 						variant="secondary"
+						aria-haspopup="dialog"
 						onClick={ () => {
 							if ( allowOverrides ) {
 								setShowDisallowOverridesModal( true );

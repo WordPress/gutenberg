@@ -158,7 +158,7 @@ const SocialLinkEdit = ( {
 				/>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<Button
+				<button
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
@@ -171,7 +171,7 @@ const SocialLinkEdit = ( {
 					>
 						{ socialLinkText }
 					</span>
-				</Button>
+				</button>
 				{ isSelected && showURLPopover && (
 					<SocialLinkURLPopover
 						url={ url }

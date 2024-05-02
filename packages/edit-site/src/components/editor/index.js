@@ -34,6 +34,8 @@ import {
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,7 +46,6 @@ import {
 } from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
-import KeyboardShortcutsEditMode from '../keyboard-shortcuts/edit-mode';
 import WelcomeGuide from '../welcome-guide';
 import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
@@ -66,7 +67,10 @@ const {
 	InterfaceSkeleton,
 	ComplementaryArea,
 	interfaceStore,
+	SavePublishPanels,
 } = unlock( editorPrivateApis );
+
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor content landmark region. */
@@ -187,6 +191,22 @@ export default function Editor( { isLoading, onClick } ) {
 	const { closeGeneralSidebar } = useDispatch( editSiteStore );
 
 	const settings = useSpecificEditorSettings();
+
+	// Local state for save panel.
+	// Note 'truthy' callback implies an open panel.
+	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
+		useState( false );
+
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+
 	const isReady =
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
@@ -221,6 +241,8 @@ export default function Editor( { isLoading, onClick } ) {
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,
+								'is-entity-save-view-open':
+									!! entitiesSavedStatesCallback,
 							}
 						) }
 						header={
@@ -247,10 +269,27 @@ export default function Editor( { isLoading, onClick } ) {
 											ease: [ 0.6, 0, 0.4, 1 ],
 										} }
 									>
-										<Header />
+										<Header
+											setEntitiesSavedStatesCallback={
+												setEntitiesSavedStatesCallback
+											}
+										/>
 									</motion.div>
 								) }
 							</AnimatePresence>
+						}
+						actions={
+							<SavePublishPanels
+								closeEntitiesSavedStates={
+									closeEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									entitiesSavedStatesCallback
+								}
+								setEntitiesSavedStatesCallback={
+									setEntitiesSavedStatesCallback
+								}
+							/>
 						}
 						notices={ <EditorSnackbars /> }
 						content={
@@ -275,9 +314,9 @@ export default function Editor( { isLoading, onClick } ) {
 								) }
 								{ isEditMode && (
 									<>
-										<KeyboardShortcutsEditMode />
 										<EditorKeyboardShortcutsRegister />
 										<EditorKeyboardShortcuts />
+										<BlockKeyboardShortcuts />
 									</>
 								) }
 							</>

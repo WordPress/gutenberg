@@ -86,7 +86,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
-		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
@@ -96,7 +95,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		isEditingDisabled,
@@ -116,7 +114,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
 		useNavModeExit( clientId ),
-		useIsHovered( { isEnabled: isOutlineEnabled } ),
+		useIsHovered(),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -144,6 +142,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		);
 	}
 
+	let hasNegativeMargin = false;
+	if (
+		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
+	) {
+		hasNegativeMargin = true;
+	}
+
 	return {
 		tabIndex: blockEditingMode === 'disabled' ? -1 : 0,
 		...wrapperProps,
@@ -169,11 +177,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,
 				'has-child-selected': hasChildSelected,
-				'remove-outline': removeOutline,
 				'is-block-moving-mode': isBlockMovingMode,
 				'can-insert-moving-block': canInsertMovingBlock,
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
+				'has-negative-margin': hasNegativeMargin,
 				'is-content-locked-temporarily-editing-as-blocks':
 					isTemporarilyEditingAsBlocks,
 			},

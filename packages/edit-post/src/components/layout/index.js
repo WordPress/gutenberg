@@ -34,6 +34,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -41,14 +42,12 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
-import ActionsPanel from './actions-panel';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -61,9 +60,11 @@ const {
 	ListViewSidebar,
 	ComplementaryArea,
 	FullscreenMode,
+	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -158,6 +159,7 @@ function Layout( { initialPost } ) {
 		showMetaBoxes,
 		documentLabel,
 		hasHistory,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -180,10 +182,10 @@ function Layout( { initialPost } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
@@ -192,6 +194,7 @@ function Layout( { initialPost } ) {
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
+			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 		};
 	}, [] );
 
@@ -242,6 +245,8 @@ function Layout( { initialPost } ) {
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+		'has-block-breadcrumbs':
+			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	const secondarySidebarLabel = isListViewOpened
@@ -286,6 +291,7 @@ function Layout( { initialPost } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
+			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isWideViewport }
@@ -343,7 +349,7 @@ function Layout( { initialPost } ) {
 					)
 				}
 				actions={
-					<ActionsPanel
+					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
 							entitiesSavedStatesCallback
@@ -351,6 +357,7 @@ function Layout( { initialPost } ) {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						forceIsDirtyPublishPanel={ hasActiveMetaboxes }
 					/>
 				}
 				shortcuts={ {
@@ -358,7 +365,6 @@ function Layout( { initialPost } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<EditPostPreferencesModal />
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />

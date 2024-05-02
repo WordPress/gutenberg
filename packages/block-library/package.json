@@ -52,6 +52,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interactivity": "file:../interactivity",
 		"@wordpress/interactivity-router": "file:../interactivity-router",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",

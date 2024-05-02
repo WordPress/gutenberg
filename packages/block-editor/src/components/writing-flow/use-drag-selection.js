@@ -18,7 +18,9 @@ import { store as blockEditorStore } from '../../store';
 function setContentEditableWrapper( node, value ) {
 	node.contentEditable = value;
 	// Firefox doesn't automatically move focus.
-	if ( value ) node.focus();
+	if ( value ) {
+		node.focus();
+	}
 }
 
 /**
