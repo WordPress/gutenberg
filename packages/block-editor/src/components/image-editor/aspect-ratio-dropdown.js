@@ -9,8 +9,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useSettings } from '../use-settings';
-import { POPOVER_PROPS } from '../image-editor/constants';
-import { useImageEditingContext } from '../image-editor/context';
+import { POPOVER_PROPS } from './constants';
+import { useImageEditingContext } from './context';
 
 function AspectRatioGroup( {
 	aspectRatios,

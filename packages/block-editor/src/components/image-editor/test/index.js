@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { ratioToNumber } from '../';
+import { ratioToNumber } from '../aspect-ratio-dropdown';
 
 test( 'ratioToNumber', () => {
 	expect( ratioToNumber( '1/1' ) ).toBe( 1 );

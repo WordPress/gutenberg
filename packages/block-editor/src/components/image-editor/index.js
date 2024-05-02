@@ -6,7 +6,7 @@ import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import AspectRatioDropdown from '../aspect-ratio-dropdown';
+import AspectRatioDropdown from './aspect-ratio-dropdown';
 import BlockControls from '../block-controls';
 import ImageEditingProvider from './context';
 import Cropper from './cropper';
