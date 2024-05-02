@@ -54,7 +54,7 @@
 				"fontSize": true
 			}
 		},
-    "interactivity": {
+		"interactivity": {
 			"clientNavigation": true
 		},
 		"__experimentalBorder": {
@@ -68,6 +68,7 @@
 				"radius": true,
 				"style": true,
 				"width": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",
