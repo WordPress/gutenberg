@@ -229,7 +229,7 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 			// Multiselect via keyboard.
 			await pageUtils.pressKeys( 'primary+a', { times: 2 } );
 
-			await pageUtils.pressKeys( 'primaryAlt+g' ); // Keyboard shortcut for Insert before.
+			await pageUtils.pressKeys( 'primary+g' ); // Keyboard shortcut for Insert before.
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/group',
@@ -263,7 +263,7 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 				} )
 				.first();
 			await editor.selectBlocks( firstParagraphBlock );
-			await pageUtils.pressKeys( 'primaryAlt+g' );
+			await pageUtils.pressKeys( 'primary+g' );
 
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{

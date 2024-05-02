@@ -148,10 +148,10 @@ function KeyboardShortcutsRegister() {
 			name: 'core/block-editor/group',
 			category: 'block',
 			description: __(
-				'Create a group block from the selected block(s).'
+				'Create a group block from the selected multiple blocks.'
 			),
 			keyCombination: {
-				modifier: 'primaryAlt',
+				modifier: 'primary',
 				character: 'g',
 			},
 		} );
