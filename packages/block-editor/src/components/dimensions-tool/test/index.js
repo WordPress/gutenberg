@@ -33,6 +33,7 @@ function Example( { initialValue, onChange, ...props } ) {
 				} }
 				defaultScale="cover"
 				defaultAspectRatio="auto"
+				aspectRatioOptions={ [ { label: '16/9', value: '16/9' } ] }
 				value={ value }
 				{ ...props }
 			/>
