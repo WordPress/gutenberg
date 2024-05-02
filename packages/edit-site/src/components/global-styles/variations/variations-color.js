@@ -24,13 +24,13 @@ export default function ColorVariations( { title, gap = 2 } ) {
 	return (
 		<VStack spacing={ 3 }>
 			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
-			<Grid columns={ 3 } gap={ gap }>
+			<VStack spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
 					<Variation key={ index } variation={ variation }>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }
-			</Grid>
+			</VStack>
 		</VStack>
 	);
 }

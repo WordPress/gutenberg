@@ -38,6 +38,7 @@ export default function PreviewIframe( {
 	label,
 	isFocused,
 	withHoverView,
+	height = normalizedHeight,
 } ) {
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
@@ -118,7 +119,7 @@ export default function PreviewIframe( {
 				<Iframe
 					className="edit-site-global-styles-preview__iframe"
 					style={ {
-						height: normalizedHeight * ratio,
+						height: height * ratio,
 					} }
 					onMouseEnter={ () => setIsHovered( true ) }
 					onMouseLeave={ () => setIsHovered( false ) }
@@ -127,7 +128,7 @@ export default function PreviewIframe( {
 					<EditorStyles styles={ editorStyles } />
 					<motion.div
 						style={ {
-							height: normalizedHeight * ratio,
+							height: height * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
 							cursor: withHoverView ? 'pointer' : undefined,
