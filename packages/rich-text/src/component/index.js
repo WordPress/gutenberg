@@ -92,6 +92,7 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		hadSelectionUpdate.current = isSelected;
+		record.current = create();
 	} else if (
 		selectionStart !== record.current.start ||
 		selectionEnd !== record.current.end
