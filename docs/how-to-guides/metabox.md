@@ -258,3 +258,7 @@ Most PHP meta boxes should continue to work in the block editor, but some meta b
 -   Plugins making updates to their DOM on "submit" or on "save".
 
 Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as _meta boxes overlaying the editor_ or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.
+
+## Additional resources
+
+- [Creating a custom block that stores post meta](https://developer.wordpress.org/news/2023/03/03/creating-a-custom-block-that-stores-post-meta/)
