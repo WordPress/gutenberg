@@ -36,13 +36,17 @@ const SocialLinkURLPopover = ( {
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
-			onClose={ () => setPopover( false ) }
+			onClose={ () => {
+				setPopover( false );
+				popoverAnchor?.focus();
+			} }
 		>
 			<form
 				className="block-editor-url-popover__link-editor"
 				onSubmit={ ( event ) => {
 					event.preventDefault();
 					setPopover( false );
+					popoverAnchor?.focus();
 				} }
 			>
 				<div className="block-editor-url-input">
@@ -143,6 +147,7 @@ const SocialLinkEdit = ( {
 					className="wp-block-social-link-anchor"
 					ref={ setPopoverAnchor }
 					onClick={ () => setPopover( true ) }
+					aria-haspopup="dialog"
 				>
 					<IconComponent />
 					<span

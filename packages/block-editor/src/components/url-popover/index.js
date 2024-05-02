@@ -71,6 +71,7 @@ const URLPopover = forwardRef(
 		return (
 			<Popover
 				ref={ ref }
+				role="dialog"
 				className="block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				placement={ computedPlacement }
