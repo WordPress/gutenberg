@@ -78,8 +78,7 @@ export default function useInput() {
 								selectionStart.attributeKey
 							];
 						const transforms = getBlockTransforms( 'from' ).filter(
-							( { type, blockName: name } ) =>
-								type === 'enter' && blockName === name
+							( { type } ) => type === 'enter'
 						);
 						const transformation = findTransform(
 							transforms,
