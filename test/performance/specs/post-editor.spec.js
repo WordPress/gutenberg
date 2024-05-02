@@ -418,9 +418,11 @@ test.describe( 'Post Editor Performance', () => {
 			const globalInserterToggle = page.getByRole( 'button', {
 				name: 'Toggle block inserter',
 			} );
-
 			// Open Inserter.
 			await globalInserterToggle.click();
+
+			await page.getByRole( 'searchbox' ).click();
+
 			await perfUtils.expectExpandedState( globalInserterToggle, 'true' );
 
 			const samples = 10;
@@ -657,7 +659,7 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByRole( 'button', { name: 'Test' } ).click();
+				await page.getByText( 'Test' ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {

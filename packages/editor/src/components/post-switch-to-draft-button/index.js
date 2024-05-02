@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 
+// TODO: deprecate..
 export default function PostSwitchToDraftButton() {
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 

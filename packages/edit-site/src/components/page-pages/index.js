@@ -22,7 +22,6 @@ import {
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
 } from '../sidebar-dataviews/default-views';
 import {
-	ENUMERATION_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -189,7 +188,7 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-const PAGE_ACTIONS = [
+let PAGE_ACTIONS = [
 	'edit-post',
 	'view-post',
 	'restore',
@@ -198,6 +197,19 @@ const PAGE_ACTIONS = [
 	'rename-post',
 	'move-to-trash',
 ];
+
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	PAGE_ACTIONS = [
+		'edit-post',
+		'view-post',
+		'restore',
+		'permanently-delete',
+		'view-post-revisions',
+		'duplicate-post',
+		'rename-post',
+		'move-to-trash',
+	];
+}
 
 export default function PagePages() {
 	const postType = 'page';
@@ -263,7 +275,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -316,7 +328,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -329,7 +340,6 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
-				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {

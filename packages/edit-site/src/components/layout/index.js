@@ -19,7 +19,6 @@ import {
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { NavigableRegion } from '@wordpress/interface';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import {
 	CommandMenu,
@@ -31,11 +30,11 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import Sidebar from '../sidebar';
 import ErrorBoundary from '../error-boundary';
 import { store as editSiteStore } from '../../store';
 import useInitEditedEntityFromURL from '../sync-state-with-url/use-init-edited-entity-from-url';
@@ -51,10 +50,13 @@ import { useEditModeCommands } from '../../hooks/commands/use-edit-mode-commands
 import { useIsSiteEditorLoading } from './hooks';
 import useLayoutAreas from './router';
 import useMovingAnimation from './animation';
+import SidebarContent from '../sidebar';
+import SaveHub from '../save-hub';
 
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
 const { useGlobalStyle } = unlock( blockEditorPrivateApis );
+const { NavigableRegion } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
@@ -76,6 +78,7 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -84,10 +87,10 @@ export default function Layout() {
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
+				'core/editor/previous-region'
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
+				'core/editor/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
 				'core',
@@ -96,6 +99,10 @@ export default function Layout() {
 			isDistractionFree: select( preferencesStore ).get(
 				'core',
 				'distractionFree'
+			),
+			hasBlockBreadcrumbs: select( preferencesStore ).get(
+				'core',
+				'showBlockBreadcrumbs'
 			),
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
@@ -180,6 +187,10 @@ export default function Layout() {
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 						'is-zoom-out': isZoomOutMode,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>
@@ -223,8 +234,7 @@ export default function Layout() {
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
 					*/ }
-					{ ( ! isMobileViewport ||
-						( isMobileViewport && ! areas.mobile ) ) && (
+					{ ( ! isMobileViewport || ! areas.mobile ) && (
 						<NavigableRegion
 							ariaLabel={ __( 'Navigation' ) }
 							className="edit-site-layout__sidebar-region"
@@ -247,7 +257,10 @@ export default function Layout() {
 										} }
 										className="edit-site-layout__sidebar"
 									>
-										<Sidebar />
+										<SidebarContent routeKey={ routeKey }>
+											{ areas.sidebar }
+										</SidebarContent>
+										<SaveHub />
 									</motion.div>
 								) }
 							</AnimatePresence>

@@ -84,7 +84,9 @@ function RichTextMultiline(
 							const newValues = values.slice();
 							let offset = 0;
 							if ( forward ) {
-								if ( ! newValues[ index + 1 ] ) return;
+								if ( ! newValues[ index + 1 ] ) {
+									return;
+								}
 								newValues.splice(
 									index,
 									2,
@@ -92,7 +94,9 @@ function RichTextMultiline(
 								);
 								offset = newValues[ index ].length - 1;
 							} else {
-								if ( ! newValues[ index - 1 ] ) return;
+								if ( ! newValues[ index - 1 ] ) {
+									return;
+								}
 								newValues.splice(
 									index - 1,
 									2,

@@ -28,18 +28,13 @@ import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import {
-	ComplementaryArea,
-	FullscreenMode,
-	InterfaceSkeleton,
-	store as interfaceStore,
-} from '@wordpress/interface';
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
 /**
  * Internal dependencies
@@ -47,16 +42,12 @@ import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
-import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import EditPostPreferencesModal from '../preferences-modal';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
-import ActionsPanel from './actions-panel';
-import StartPageOptions from '../start-page-options';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -64,7 +55,16 @@ import useCommonCommands from '../../hooks/commands/use-common-commands';
 const { getLayoutStyles } = unlock( blockEditorPrivateApis );
 const { useCommands } = unlock( coreCommandsPrivateApis );
 const { useCommandContext } = unlock( commandsPrivateApis );
-const { InserterSidebar, ListViewSidebar } = unlock( editorPrivateApis );
+const {
+	InserterSidebar,
+	ListViewSidebar,
+	ComplementaryArea,
+	FullscreenMode,
+	SavePublishPanels,
+	InterfaceSkeleton,
+	interfaceStore,
+} = unlock( editorPrivateApis );
+const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -159,6 +159,7 @@ function Layout( { initialPost } ) {
 		showMetaBoxes,
 		documentLabel,
 		hasHistory,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -169,9 +170,8 @@ function Layout( { initialPost } ) {
 			showMetaBoxes:
 				select( editorStore ).getRenderingMode() === 'post-only',
 			sidebarIsOpened: !! (
-				select( interfaceStore ).getActiveComplementaryArea(
-					editPostStore.name
-				) || select( editorStore ).isPublishSidebarOpened()
+				select( interfaceStore ).getActiveComplementaryArea( 'core' ) ||
+				select( editorStore ).isPublishSidebarOpened()
 			),
 			isFullscreenActive:
 				select( editPostStore ).isFeatureActive( 'fullscreenMode' ),
@@ -182,10 +182,10 @@ function Layout( { initialPost } ) {
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/previous-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/previous-region' ),
 			nextShortcut: select(
 				keyboardShortcutsStore
-			).getAllShortcutKeyCombinations( 'core/edit-post/next-region' ),
+			).getAllShortcutKeyCombinations( 'core/editor/next-region' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
@@ -194,6 +194,7 @@ function Layout( { initialPost } ) {
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
+			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 		};
 	}, [] );
 
@@ -244,6 +245,8 @@ function Layout( { initialPost } ) {
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+		'has-block-breadcrumbs':
+			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	const secondarySidebarLabel = isListViewOpened
@@ -288,6 +291,7 @@ function Layout( { initialPost } ) {
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
 			<EditorKeyboardShortcuts />
+			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
 				isDistractionFree={ isDistractionFree && isWideViewport }
@@ -308,7 +312,7 @@ function Layout( { initialPost } ) {
 				secondarySidebar={ secondarySidebar() }
 				sidebar={
 					! isDistractionFree && (
-						<ComplementaryArea.Slot scope="core/edit-post" />
+						<ComplementaryArea.Slot scope="core" />
 					)
 				}
 				notices={ <EditorSnackbars /> }
@@ -345,7 +349,7 @@ function Layout( { initialPost } ) {
 					)
 				}
 				actions={
-					<ActionsPanel
+					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
 							entitiesSavedStatesCallback
@@ -353,6 +357,7 @@ function Layout( { initialPost } ) {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						forceIsDirtyPublishPanel={ hasActiveMetaboxes }
 					/>
 				}
 				shortcuts={ {
@@ -360,11 +365,8 @@ function Layout( { initialPost } ) {
 					next: nextShortcut,
 				} }
 			/>
-			<EditPostPreferencesModal />
-			<KeyboardShortcutHelpModal />
 			<WelcomeGuide />
 			<InitPatternModal />
-			<StartPageOptions />
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && <SettingsSidebar /> }
 		</>

@@ -38,7 +38,7 @@ function isElementVisible( element ) {
  * - it is not a "Modal" component or it does not have the prop "visible" set to "false".
  * - its ancestor elements are also visible.
  *
- * @param {import('react-test-renderer').ReactTestInstance} element
+ * @param {HTMLElement} element
  * @return {boolean} True if the given element is visible.
  */
 export function toBeVisible( element ) {

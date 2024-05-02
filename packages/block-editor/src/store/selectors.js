@@ -31,6 +31,12 @@ import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
+import {
+	getContentLockingParent,
+	getTemporarilyEditingAsBlocks,
+	getTemporarilyEditingFocusModeToRevert,
+} from './private-selectors';
+
 /**
  * A block selection object.
  *
@@ -1024,7 +1030,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const selectionFocus = getSelectionEnd( state );
 
 	// It's not mergeable if the start and end are within the same block.
-	if ( selectionAnchor.clientId === selectionFocus.clientId ) return false;
+	if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+		return false;
+	}
 
 	// It's not mergeable if there's no rich text selection.
 	if (
@@ -1032,8 +1040,9 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 		! selectionFocus.attributeKey ||
 		typeof selectionAnchor.offset === 'undefined' ||
 		typeof selectionFocus.offset === 'undefined'
-	)
+	) {
 		return false;
+	}
 
 	const anchorRootClientId = getBlockRootClientId(
 		state,
@@ -1075,12 +1084,16 @@ export function __unstableIsSelectionMergeable( state, isForward ) {
 	const targetBlockName = getBlockName( state, targetBlockClientId );
 	const targetBlockType = getBlockType( targetBlockName );
 
-	if ( ! targetBlockType.merge ) return false;
+	if ( ! targetBlockType.merge ) {
+		return false;
+	}
 
 	const blockToMerge = getBlock( state, blockToMergeClientId );
 
 	// It's mergeable if the blocks are of the same type.
-	if ( blockToMerge.name === targetBlockName ) return true;
+	if ( blockToMerge.name === targetBlockName ) {
+		return true;
+	}
 
 	// If the blocks are of a different type, try to transform the block being
 	// merged into the same type of block.
@@ -1932,7 +1945,9 @@ const buildBlockTypeItem =
 			isDisabled,
 			frecency: calculateFrecency( time, count ),
 		};
-		if ( buildScope === 'transform' ) return blockItemBase;
+		if ( buildScope === 'transform' ) {
+			return blockItemBase;
+		}
 
 		const inserterVariations = getBlockVariations(
 			blockType.name,
@@ -2373,7 +2388,9 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state, blockNames, rootClientId = null ) => {
-			if ( ! blockNames ) return EMPTY_ARRAY;
+			if ( ! blockNames ) {
+				return EMPTY_ARRAY;
+			}
 			const patterns =
 				select( STORE_NAME ).__experimentalGetAllowedPatterns(
 					rootClientId
@@ -2432,7 +2449,9 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
 	( select ) =>
 		createSelector(
 			( state, blocks, rootClientId = null ) => {
-				if ( ! blocks ) return EMPTY_ARRAY;
+				if ( ! blocks ) {
+					return EMPTY_ARRAY;
+				}
 				/**
 				 * For now we only handle blocks without InnerBlocks and take into account
 				 * the `__experimentalRole` property of blocks' attributes for the transformation.
@@ -2756,50 +2775,6 @@ export const __unstableGetVisibleBlocks = createSelector(
 	( state ) => [ state.blockVisibility ]
 );
 
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- */
-export const __unstableGetContentLockingParent = createSelector(
-	( state, clientId ) => {
-		let current = clientId;
-		let result;
-		while ( ( current = state.blocks.parents.get( current ) ) ) {
-			if (
-				getBlockName( state, current ) === 'core/block' ||
-				getTemplateLock( state, current ) === 'contentOnly'
-			) {
-				result = current;
-			}
-		}
-		return result;
-	},
-	( state ) => [ state.blocks.parents, state.blockListSettings ]
-);
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingAsBlocks( state ) {
-	return state.temporarilyEditingAsBlocks;
-}
-
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- *
- * @param {Object} state Global application state.
- */
-export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
-	return state.temporarilyEditingFocusModeRevert;
-}
-
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 	// Prevent overlay on blocks with a non-default editing mode. If the mdoe is
 	// 'disabled' then the overlay is redundant since the block can't be
@@ -3013,3 +2988,66 @@ export const isGroupable = createRegistrySelector(
 			);
 		}
 );
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state    Global application state.
+ * @param {Object} clientId Client Id of the block.
+ *
+ * @return {?string} Client ID of the ancestor block that is content locking the block.
+ */
+export const __unstableGetContentLockingParent = ( state, clientId ) => {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetContentLockingParent",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getContentLockingParent( state, clientId );
+};
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingAsBlocks( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingAsBlocks",
+		{
+			since: '6.1',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingAsBlocks( state );
+}
+
+/**
+ * DO-NOT-USE in production.
+ * This selector is created for internal/experimental only usage and may be
+ * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
+ *
+ * @deprecated
+ *
+ * @param {Object} state Global application state.
+ */
+export function __unstableGetTemporarilyEditingFocusModeToRevert( state ) {
+	deprecated(
+		"wp.data.select( 'core/block-editor' ).__unstableGetTemporarilyEditingFocusModeToRevert",
+		{
+			since: '6.5',
+			version: '6.7',
+		}
+	);
+	return getTemporarilyEditingFocusModeToRevert( state );
+}

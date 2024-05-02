@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
@@ -82,15 +82,6 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
-	const isControlled = useSelect(
-		( select ) => {
-			return (
-				! clientId ||
-				select( blockEditorStore ).areInnerBlocksControlled( clientId )
-			);
-		},
-		[ clientId ]
-	);
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -187,15 +178,6 @@ export default function useBlockSync( {
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {
-		// When the block becomes uncontrolled, it means its inner state has been reset
-		// we need to take the blocks again from the external value property.
-		if ( ! isControlled ) {
-			pendingChanges.current.outgoing = [];
-			setControlledBlocks();
-		}
-	}, [ isControlled ] );
-
-	useEffect( () => {
 		const {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
@@ -216,8 +198,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate

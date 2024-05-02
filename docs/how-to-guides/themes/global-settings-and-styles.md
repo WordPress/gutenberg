@@ -1,6 +1,6 @@
 # Global Settings & Styles (theme.json)
 
-WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file. Then `theme.json` [evolved to a v2](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/) with WordPress 5.9 release. This page documents its format.
+WordPress 5.8 comes with [a new mechanism](https://make.wordpress.org/core/2021/06/25/introducing-theme-json-in-wordpress-5-8/) to configure the editor that enables a finer-grained control and introduces the first step in managing styles for future WordPress releases: the `theme.json` file.
 
 ## Rationale
 
@@ -48,7 +48,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -86,7 +86,7 @@ body {
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line-height": {
@@ -115,7 +115,7 @@ This specification is the same for the three different origins that use this for
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {},
 	"styles": {},
 	"customTemplates": {},
@@ -125,10 +125,13 @@ This specification is the same for the three different origins that use this for
 
 ### Version
 
-This field describes the format of the `theme.json` file. The current version is [v2](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/), [introduced in WordPress 5.9](https://make.wordpress.org/core/2022/01/08/updates-for-settings-styles-and-theme-json/). It also works with the current Gutenberg plugin.
+This field describes the format of the `theme.json` file. The latest version is [version 3](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/) introduced in WordPress 6.6.
 
-If you have used [v1](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-v1/) previously, you don’t need to update the version in the v1 file to v2, as it’ll be [migrated](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) into v2 at runtime for you.
+New versions are introduced when a breaking change needs to be made. This allows theme authors to choose when to opt-in to the breaking changes and migrate their theme.json files to the new format.
 
+Older versions of `theme.json` are backwards-compatible and will continue to work with newer versions of WordPress and the Gutenberg plugin. However new features will be developed on the latest version.
+
+Follow the instructions in [migrating to newer versions](https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-migrations/) for details on updating to the latest version.
 
 ### Settings
 
@@ -145,7 +148,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"border": {
 			"radius": false,
@@ -209,7 +212,7 @@ The settings section has the following structure:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"border": {
@@ -357,7 +360,7 @@ The naming schema for the classes and the custom properties is as follows:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"duotone": [
@@ -532,7 +535,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"baseFont": 16,
@@ -577,7 +580,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"custom": false
@@ -597,7 +600,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"blocks": {
 			"core/button": {
@@ -614,7 +617,7 @@ Note that the name of the variable is created by adding `--` in between each nes
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"color": {
 			"palette": [
@@ -682,7 +685,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"radius": "value",
@@ -761,7 +764,7 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles": {
 		"border": {
 			"color": "value",
@@ -856,7 +859,7 @@ Styles found at the top-level will be enqueued using the `body` selector.
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -885,7 +888,7 @@ By default, the block selector is generated based on its name such as `.wp-block
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"color": {
 			"text": "var(--wp--preset--color--primary)"
@@ -972,7 +975,7 @@ If they're found in the top-level the element selector will be used. If they're 
 
 ```json
 {
-	"version": 1,
+	"version": 3,
 	"styles": {
 		"typography": {
 			"fontSize": "var(--wp--preset--font-size--normal)"
@@ -1066,7 +1069,7 @@ For example, this is how to provide styles for the existing `plain` variation fo
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"styles":{
 		"blocks": {
 			"core/quote": {
@@ -1103,7 +1106,7 @@ Within this field themes can list the custom templates present in the `templates
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"customTemplates": [
 		{
 			"name": "my-custom-template",
@@ -1132,7 +1135,7 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ```json
 {
-    "version": 2,
+    "version": 3,
 	"templateParts": [
 		{
 			"name": "my-template-part",
@@ -1145,22 +1148,28 @@ Currently block variations exist for "header" and "footer" values of the area te
 
 ### patterns
 
-<div class="callout callout-alert">Supported in WordPress from version 6.0 using <a href="https://developer.wordpress.org/block-editor/reference-guides/theme-json-reference/theme-json-living/">version 2</a> of <code>theme.json</code>.</div>
+<div class="callout callout-alert">Supported in WordPress from version 6.0.</div>
 
 Within this field themes can list patterns to register from [Pattern Directory](https://wordpress.org/patterns/). The `patterns` field is an array of pattern `slugs` from the Pattern Directory. Pattern slugs can be extracted by the `url` in single pattern view at the Pattern Directory. For example in this url `https://wordpress.org/patterns/pattern/partner-logos` the slug is `partner-logos`.
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
 }
 ```
 
 ## Developing with theme.json
 
-It can be difficult to remember the theme.json settings and properties while you develop, so a JSON scheme was created to help. The schema is available at https://schemas.wp.org/trunk/theme.json
+It can be difficult to remember the theme.json settings and properties and which versions of WordPress support which settings while you develop, so it can be helpful to use the provided JSON schema for theme.json.
 
-Code editors can pick up the schema and can provide help like tooltips, autocomplete, or schema validation in the editor. To use the schema in Visual Studio Code, add `"$schema": "https://schemas.wp.org/trunk/theme.json"` to the beginning of your theme.json file.
+Many code editors support JSON schema and can provide help like tooltips, autocomplete, or schema validation right in your editor.
+
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`. To ensure that you're only using features available to your users, it's best to use the oldest version that your theme supports.
+
+The latest schema including all the latest changes from the Gutenberg plugin is available at `https://schemas.wp.org/trunk/theme.json`.
+
+Check your editor's documentation for JSON schema support. In Visual Studio Code, for example, you need to add `"$schema": "https://schemas.wp.org/wp/x.x/theme.json"` as a top-level property of your theme.json file, but other editors may be configured differently.
 
 ![Example using validation with schema](https://developer.wordpress.org/files/2021/11/theme-json-schema-updated.gif)
 
@@ -1210,7 +1219,7 @@ For example:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"lineHeight": {
@@ -1240,7 +1249,7 @@ A few notes about this process:
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"custom": {
 			"line--height": { // DO NOT DO THIS
@@ -1284,7 +1293,7 @@ body {
 
 ### Specificity for link colors provided by the user
 
-In v1, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
+In WordPress 5.8, when a user selected a link color for a specific block we attached a class to that block in the form of `.wp-element-<ID>` and then enqueued the following style:
 
 ```css
 .wp-element-<ID> a { color: <USER_COLOR_VALUE> !important; }
@@ -1304,7 +1313,7 @@ For blocks that contain inner blocks, such as Group, Columns, Buttons, and Socia
 
 ```json
 {
-	"version": 2,
+	"version": 3,
 	"settings": {
 		"spacing": {
 			"blockGap": true,

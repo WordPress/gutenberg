@@ -40,8 +40,10 @@ export default function PatternsHeader( {
 		const templatePartArea = templatePartAreas.find(
 			( area ) => area.area === categoryId
 		);
-		title = templatePartArea?.label;
-		description = templatePartArea?.description;
+		title = templatePartArea?.label || __( 'All Template Parts' );
+		description =
+			templatePartArea?.description ||
+			__( 'Includes every template part defined for any area.' );
 	} else if ( type === PATTERN_TYPES.theme ) {
 		patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
@@ -50,7 +52,9 @@ export default function PatternsHeader( {
 		description = patternCategory?.description;
 	}
 
-	if ( ! title ) return null;
+	if ( ! title ) {
+		return null;
+	}
 
 	return (
 		<VStack className="edit-site-patterns__section-header">

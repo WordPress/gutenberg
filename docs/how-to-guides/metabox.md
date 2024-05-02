@@ -18,7 +18,7 @@ This guide shows how to create a block that prompts a user for a single value, a
 
 This guide assumes you are already familiar with WordPress plugins, post meta, and basic JavaScript. Review the [Getting started with JavaScript tutorial](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) for an introduction.
 
-The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for a deeper understanding of creating custom blocks.
+The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/tutorial.md) for a deeper understanding of creating custom blocks.
 
 You will need:
 
@@ -107,8 +107,7 @@ registerBlockType( 'myguten/meta-block', {
 } );
 ```
 
-Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by
-saving and reloading your draft, the form will still be filled in on reload.
+Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by saving and reloading your draft, the form will still be filled in on reload.
 
 You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
 

@@ -15,3 +15,6 @@ c56e8a1910ed74f405b74bbb12fe81dea974e5c3
 
 # ESLint: Enable react/jsx-boolean-value
 9a34927870df80ac3b2da14d71f81d20ec23e2b6
+
+# Autofix eslint curly rule.
+0221522f253e094b277a1485b7a2d186cb172632

@@ -109,7 +109,9 @@ const PanelBodyTitle = forwardRef(
 		}: WordPressComponentProps< PanelBodyTitleProps, 'button' >,
 		ref: React.ForwardedRef< any >
 	) => {
-		if ( ! title ) return null;
+		if ( ! title ) {
+			return null;
+		}
 
 		return (
 			<h2 className="components-panel__body-title">
