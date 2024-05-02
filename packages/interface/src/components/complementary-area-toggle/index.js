@@ -39,6 +39,7 @@ function ComplementaryAreaToggle( {
 					enableComplementaryArea( scope, identifier );
 				}
 			} }
+			size="small"
 			{ ...props }
 		/>
 	);
