@@ -36,6 +36,7 @@ const SocialLinkURLPopover = ( {
 	return (
 		<URLPopover
 			anchor={ popoverAnchor }
+			aria-label={ __( 'Edit social link' ) }
 			onClose={ () => {
 				setPopover( false );
 				popoverAnchor?.focus();
