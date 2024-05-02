@@ -69,7 +69,6 @@ export default function AspectRatioTool( {
 		},
 		...( showDefaultRatios ? defaultOptions : [] ),
 		...( themeOptions ? themeOptions : [] ),
-		...( options ? options : [] ),
 		{
 			label: _x( 'Custom', 'Aspect ratio option for dimensions control' ),
 			value: 'custom',
@@ -91,7 +90,7 @@ export default function AspectRatioTool( {
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ displayValue }
-				options={ aspectRatioOptions }
+				options={ options ?? aspectRatioOptions }
 				onChange={ onChange }
 				size={ '__unstable-large' }
 				__nextHasNoMarginBottom
