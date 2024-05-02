@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { symbol } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -183,11 +183,13 @@ export default function ReusableBlockConvertButton( {
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 							/>
-
 							<ToggleControl
-								label={ __( 'Synced' ) }
+								label={ _x(
+									'Synced',
+									'Option that makes an individual pattern synchronized'
+								) }
 								help={ __(
-									'Editing the pattern will update it anywhere it is used.'
+									'Sync this pattern across multiple locations.'
 								) }
 								checked={ ! syncType }
 								onChange={ () => {

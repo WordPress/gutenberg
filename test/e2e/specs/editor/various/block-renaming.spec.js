@@ -4,8 +4,30 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Renaming', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+
+		// Registering block must be after creation of Post.
+		await page.evaluate( () => {
+			const registerBlockType = window.wp.blocks.registerBlockType;
+
+			registerBlockType(
+				'my-plugin/block-that-does-not-support-renaming',
+				{
+					title: 'No Rename Support Block',
+					icon: 'smiley',
+					supports: {
+						renaming: false,
+					},
+					edit() {
+						return null;
+					},
+					save() {
+						return null;
+					},
+				}
+			);
+		} );
 	} );
 
 	test.describe( 'Dialog renaming', () => {
@@ -15,7 +37,7 @@ test.describe( 'Block Renaming', () => {
 			pageUtils,
 		} ) => {
 			// Turn on block list view by default.
-			await editor.setPreferences( 'core/edit-site', {
+			await editor.setPreferences( 'core', {
 				showListViewByDefault: true,
 			} );
 
@@ -23,18 +45,12 @@ test.describe( 'Block Renaming', () => {
 				name: 'Block navigation structure',
 			} );
 
-			// Create a two blocks on the page.
 			await editor.insertBlock( {
-				name: 'core/paragraph',
+				name: 'core/group',
 				attributes: { content: 'First Paragraph' },
 			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Second Paragraph' },
-			} );
 
-			// Multiselect via keyboard.
-			await pageUtils.pressKeys( 'primary+a' );
+			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
 
 			// Convert to a Group block which supports renaming.
@@ -144,135 +160,94 @@ test.describe( 'Block Renaming', () => {
 			] );
 		} );
 
-		test( 'does not allow renaming of blocks that do not support renaming', async ( {
-			// use `core/template-part` as the block
-			editor,
-			page,
-		} ) => {
-			await editor.insertBlock( {
-				name: 'core/navigation',
-			} );
-
-			// Opens the block options menu and check there is not a `Rename` option
-			await editor.clickBlockToolbarButton( 'Options' );
-			//
-
-			const renameMenuItem = page.getByRole( 'menuitem', {
-				name: 'Rename',
-			} );
-
-			// TODO: assert that the locator didn't find a DOM node at all.
-			await expect( renameMenuItem ).toBeHidden();
-		} );
-	} );
-
-	test.describe( 'Block inspector renaming', () => {
-		test( 'allows renaming of blocks that support the feature via "Advanced" section of block inspector tools', async ( {
+		test( 'does not allow renaming of blocks that do not support the feature', async ( {
 			editor,
 			page,
 			pageUtils,
 		} ) => {
-			// Create a two blocks on the page.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'First Paragraph' },
-			} );
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Second Paragraph' },
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
 			} );
 
-			// Multiselect via keyboard.
+			await editor.insertBlock( {
+				name: 'my-plugin/block-that-does-not-support-renaming',
+			} );
+
+			// Select via keyboard.
 			await pageUtils.pressKeys( 'primary+a' );
-			await pageUtils.pressKeys( 'primary+a' );
 
-			// Convert to a Group block which supports renaming.
-			await editor.clickBlockOptionsMenuItem( 'Group' );
+			const blockActionsTrigger = listView.getByRole( 'button', {
+				name: 'Options',
+			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await blockActionsTrigger.click();
 
-			const advancedPanelToggle = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
+			const renameMenuItem = page
+				.getByRole( 'menu', {
+					name: 'Options',
 				} )
-				.getByRole( 'button', {
-					name: 'Advanced',
-					expanded: false,
+				.getByRole( 'menuitem', {
+					name: 'Rename',
 				} );
 
-			await advancedPanelToggle.click();
-
-			const nameInput = page.getByRole( 'textbox', {
-				name: 'Block name',
-			} );
-
-			await expect( nameInput ).toBeEmpty();
-
-			await nameInput.fill( 'My new name' );
-
-			await expect( nameInput ).toHaveValue( 'My new name' );
-
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/group',
-					attributes: {
-						metadata: {
-							name: 'My new name',
-						},
-					},
-				},
-			] );
-
-			await nameInput.focus();
-			await pageUtils.pressKeys( 'primary+a' );
-			await page.keyboard.press( 'Delete' );
-
-			await expect.poll( editor.getBlocks ).toMatchObject( [
-				{
-					name: 'core/group',
-					attributes: {
-						metadata: {
-							name: '',
-						},
-					},
-				},
-			] );
+			// Expect the Rename menu item not to exist at all.
+			await expect( renameMenuItem ).toBeHidden();
 		} );
 
-		test( 'does not allow renaming of blocks that do not support renaming', async ( {
+		test( 'displays Rename action in related menu when block is not selected', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
-			await editor.insertBlock( {
-				name: 'core/navigation',
+			await pageUtils.pressKeys( 'access+o' );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
 			} );
 
-			await editor.openDocumentSettingsSidebar();
+			await editor.insertBlock( {
+				name: 'core/heading',
+			} );
 
-			const settingsTab = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+			} );
+
+			// Select the Paragraph block.
+			await listView
+				.getByRole( 'link', {
+					name: 'Paragraph',
 				} )
-				.getByRole( 'tab', { name: 'Settings' } );
+				.click();
 
-			await settingsTab.click();
+			// Trigger actions menu for the Heading (not the selected block).
+			const headingItem = listView.getByRole( 'gridcell', {
+				name: 'Heading',
+			} );
 
-			const advancedPanelToggle = page
-				.getByRole( 'region', {
-					name: 'Editor settings',
-				} )
+			// The options menu button is a sibling of the menu item gridcell.
+			const headingItemActions = headingItem
+				.locator( '..' ) // parent selector.
 				.getByRole( 'button', {
-					name: 'Advanced',
-					expanded: false,
+					name: 'Options',
 				} );
 
-			await advancedPanelToggle.click();
+			await headingItemActions.click();
 
-			const nameInput = page.getByRole( 'textbox', {
-				name: 'Block name',
-			} );
+			// usage of `page` is required because the options menu is rendered
+			// into a slot outside of the treegrid.
+			const renameMenuItem = page
+				.getByRole( 'menu', {
+					name: 'Options',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'Rename',
+				} );
 
-			await expect( nameInput ).toBeHidden();
+			// Expect the Rename menu item not to exist at all.
+			await expect( renameMenuItem ).toBeVisible();
 		} );
 	} );
 } );

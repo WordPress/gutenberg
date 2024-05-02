@@ -1,106 +1,19 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useContext, useState } from '@wordpress/element';
-import { ENTER } from '@wordpress/keycodes';
+import { useMemo } from '@wordpress/element';
 import { __experimentalGrid as Grid } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
-import StylesPreview from './preview';
-import { unlock } from '../../lock-unlock';
+import PreviewStyles from './preview-styles';
+import Variation from './variations/variation';
 
-const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
-	blockEditorPrivateApis
-);
-
-function Variation( { variation } ) {
-	const [ isFocused, setIsFocused ] = useState( false );
-	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
-	const context = useMemo( () => {
-		return {
-			user: {
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			},
-			base,
-			merged: mergeBaseAndUserConfigs( base, variation ),
-			setUserConfig: () => {},
-		};
-	}, [ variation, base ] );
-
-	const selectVariation = () => {
-		setUserConfig( () => {
-			return {
-				settings: variation.settings,
-				styles: variation.styles,
-			};
-		} );
-	};
-
-	const selectOnEnter = ( event ) => {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			selectVariation();
-		}
-	};
-
-	const isActive = useMemo( () => {
-		return areGlobalStyleConfigsEqual( user, variation );
-	}, [ user, variation ] );
-
-	let label = variation?.title;
-	if ( variation?.description ) {
-		label = sprintf(
-			/* translators: %1$s: variation title. %2$s variation description. */
-			__( '%1$s (%2$s)' ),
-			variation?.title,
-			variation?.description
-		);
-	}
-
-	return (
-		<GlobalStylesContext.Provider value={ context }>
-			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
-				role="button"
-				onClick={ selectVariation }
-				onKeyDown={ selectOnEnter }
-				tabIndex="0"
-				aria-label={ label }
-				aria-current={ isActive }
-				onFocus={ () => setIsFocused( true ) }
-				onBlur={ () => setIsFocused( false ) }
-			>
-				<div className="edit-site-global-styles-variations_item-preview">
-					<StylesPreview
-						label={ variation?.title }
-						isFocused={ isFocused }
-						withHoverView
-					/>
-				</div>
-			</div>
-		</GlobalStylesContext.Provider>
-	);
-}
-
-export default function StyleVariationsContainer() {
+export default function StyleVariationsContainer( { gap = 2 } ) {
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -126,9 +39,19 @@ export default function StyleVariationsContainer() {
 		<Grid
 			columns={ 2 }
 			className="edit-site-global-styles-style-variations-container"
+			gap={ gap }
 		>
 			{ withEmptyVariation.map( ( variation, index ) => (
-				<Variation key={ index } variation={ variation } />
+				<Variation key={ index } variation={ variation }>
+					{ ( isFocused ) => (
+						<PreviewStyles
+							label={ variation?.title }
+							withHoverView
+							isFocused={ isFocused }
+							variation={ variation }
+						/>
+					) }
+				</Variation>
 			) ) }
 		</Grid>
 	);

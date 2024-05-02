@@ -1,0 +1,21 @@
+.editor-post-panel__row {
+	width: 100%;
+	min-height: $button-size-next-default-40px;
+	justify-content: flex-start !important;
+	align-items: flex-start !important;
+}
+
+.editor-post-panel__row-label {
+	width: 30%;
+	flex-shrink: 0;
+	min-height: $button-size-next-default-40px;
+	display: flex;
+	align-items: center;
+}
+
+.editor-post-panel__row-control {
+	flex-grow: 1;
+	min-height: $button-size-next-default-40px;
+	display: flex;
+	align-items: center;
+}

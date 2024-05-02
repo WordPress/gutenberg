@@ -4,8 +4,8 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
+
 <div>
 	<div data-wp-show-mock="state.falseValue">
 		<span data-testid="not inside an island">
@@ -13,15 +13,23 @@
 		</span>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive="tovdom-islands">
 		<div data-wp-show-mock="state.falseValue">
-			<span data-testid="inside an island">
+			<span data-testid="inside an island with json object">
 				This should not be shown because it is inside an island.
 			</span>
 		</div>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="inside an island with string">
+				This should not be shown because it is inside an island.
+			</span>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
 		<div data-wp-ignore>
 			<div data-wp-show-mock="state.falseValue">
 				<span
@@ -34,8 +42,8 @@
 		</div>
 	</div>
 
-	<div data-wp-interactive>
-		<div data-wp-interactive>
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="tovdom-islands">
 			<div
 				data-wp-show-mock="state.falseValue"
 				data-testid="island inside another island"
@@ -48,9 +56,12 @@
 		</div>
 	</div>
 
-	<div data-wp-interactive>
+	<div data-wp-interactive="tovdom-islands">
 		<div>
-			<div data-wp-interactive data-wp-ignore>
+			<div
+				data-wp-interactive="tovdom-islands"
+				data-wp-ignore
+			>
 				<div data-wp-show-mock="state.falseValue">
 					<span
 						data-testid="island inside inner block of isolated island"
@@ -61,6 +72,16 @@
 					</span>
 				</div>
 			</div>
+		</div>
+	</div>
+
+	<div data-wp-interactive="tovdom-islands">
+		<div data-wp-interactive="something-new"></div>
+		<div data-wp-show-mock="state.falseValue">
+			<span data-testid="directive after different namespace">
+				The directive above should keep the `tovdom-island` namespace,
+				so this message should not be visible.
+			</span>
 		</div>
 	</div>
 </div>

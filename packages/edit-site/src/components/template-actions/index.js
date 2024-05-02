@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import RenameMenuItem from './rename-menu-item';
+import RenamePostMenuItem from '../rename-post-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function TemplateActions( {
@@ -36,10 +36,7 @@ export default function TemplateActions( {
 			select( coreStore ).getEntityRecord( 'postType', postType, postId ),
 		[ postType, postId ]
 	);
-	const { removeTemplate, revertTemplate } = useDispatch( editSiteStore );
-	const { saveEditedEntityRecord } = useDispatch( coreStore );
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+	const { removeTemplate } = useDispatch( editSiteStore );
 	const isRemovable = isTemplateRemovable( template );
 	const isRevertable = isTemplateRevertable( template );
 
@@ -47,6 +44,49 @@ export default function TemplateActions( {
 		return null;
 	}
 
+	return (
+		<DropdownMenu
+			icon={ moreVertical }
+			label={ __( 'Actions' ) }
+			className={ className }
+			toggleProps={ toggleProps }
+		>
+			{ ( { onClose } ) => (
+				<MenuGroup>
+					{ isRemovable && (
+						<>
+							<RenamePostMenuItem
+								post={ template }
+								onClose={ onClose }
+							/>
+							<DeleteMenuItem
+								onRemove={ () => {
+									removeTemplate( template );
+									onRemove?.();
+									onClose();
+								} }
+								title={ template.title.rendered }
+							/>
+						</>
+					) }
+					{ isRevertable && (
+						<ResetMenuItem
+							template={ template }
+							onClose={ onClose }
+						/>
+					) }
+				</MenuGroup>
+			) }
+		</DropdownMenu>
+	);
+}
+
+function ResetMenuItem( { template, onClose } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { revertTemplate } = useDispatch( editSiteStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 	async function revertAndSaveTemplate() {
 		try {
 			await revertTemplate( template, { allowUndo: false } );
@@ -55,11 +95,10 @@ export default function TemplateActions( {
 				template.type,
 				template.id
 			);
-
 			createSuccessNotice(
 				sprintf(
 					/* translators: The template/part's name. */
-					__( '"%s" reverted.' ),
+					__( '"%s" reset.' ),
 					decodeEntities( template.title.rendered )
 				),
 				{
@@ -82,48 +121,23 @@ export default function TemplateActions( {
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	}
-
 	return (
-		<DropdownMenu
-			icon={ moreVertical }
-			label={ __( 'Actions' ) }
-			className={ className }
-			toggleProps={ toggleProps }
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup>
-					{ isRemovable && (
-						<>
-							<RenameMenuItem
-								template={ template }
-								onClose={ onClose }
-							/>
-							<DeleteMenuItem
-								onRemove={ () => {
-									removeTemplate( template );
-									onRemove?.();
-									onClose();
-								} }
-								title={ template.title.rendered }
-							/>
-						</>
-					) }
-					{ isRevertable && (
-						<MenuItem
-							info={ __(
-								'Use the template as supplied by the theme.'
-							) }
-							onClick={ () => {
-								revertAndSaveTemplate();
-								onClose();
-							} }
-						>
-							{ __( 'Clear customizations' ) }
-						</MenuItem>
-					) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+		<>
+			<MenuItem onClick={ () => setIsModalOpen( true ) }>
+				{ __( 'Reset' ) }
+			</MenuItem>
+			<ConfirmDialog
+				isOpen={ isModalOpen }
+				onConfirm={ () => {
+					revertAndSaveTemplate();
+					onClose();
+				} }
+				onCancel={ () => setIsModalOpen( false ) }
+				confirmButtonText={ __( 'Reset' ) }
+			>
+				{ __( 'Reset to default and clear all customizations?' ) }
+			</ConfirmDialog>
+		</>
 	);
 }
 

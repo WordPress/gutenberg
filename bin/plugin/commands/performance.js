@@ -63,7 +63,9 @@ function sanitizeBranchName( branch ) {
  * @return {number|undefined} Median value or undefined if array empty.
  */
 function median( array ) {
-	if ( ! array || ! array.length ) return undefined;
+	if ( ! array || ! array.length ) {
+		return undefined;
+	}
 
 	const numbers = [ ...array ].sort( ( a, b ) => a - b );
 	const middleIndex = Math.floor( numbers.length / 2 );
@@ -87,6 +89,7 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 		testRunnerDir,
 		{
 			...process.env,
+			PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1',
 			WP_ARTIFACTS_PATH: ARTIFACTS_PATH,
 			RESULTS_ID: runKey,
 		}
@@ -433,6 +436,22 @@ async function runPerformanceTests( branches, options ) {
 			for ( const [ metric, value ] of Object.entries( metrics ) ) {
 				invertedResult[ metric ] = invertedResult[ metric ] || {};
 				invertedResult[ metric ][ branch ] = `${ value } ms`;
+			}
+		}
+
+		if ( branches.length === 2 ) {
+			const [ branch1, branch2 ] = branches;
+			for ( const metric in invertedResult ) {
+				const value1 = parseFloat(
+					invertedResult[ metric ][ branch1 ]
+				);
+				const value2 = parseFloat(
+					invertedResult[ metric ][ branch2 ]
+				);
+				const percentageChange = ( ( value1 - value2 ) / value2 ) * 100;
+				invertedResult[ metric ][
+					'% Change'
+				] = `${ percentageChange.toFixed( 2 ) }%`;
 			}
 		}
 

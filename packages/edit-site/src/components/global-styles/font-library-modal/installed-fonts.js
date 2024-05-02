@@ -1,29 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useContext, useEffect, useState } from '@wordpress/element';
 import {
-	privateApis as componentsPrivateApis,
-	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
 	Button,
-	Spinner,
+	__experimentalConfirmDialog as ConfirmDialog,
+	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
+	__experimentalNavigatorProvider as NavigatorProvider,
+	__experimentalNavigatorScreen as NavigatorScreen,
+	__experimentalNavigatorToParentButton as NavigatorToParentButton,
+	__experimentalUseNavigator as useNavigator,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+	Flex,
 	Notice,
-	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { useContext, useEffect, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import TabLayout from './tab-layout';
-import { FontLibraryContext } from './context';
-import FontsGrid from './fonts-grid';
-import LibraryFontDetails from './library-font-details';
-import LibraryFontCard from './library-font-card';
-import ConfirmDeleteDialog from './confirm-delete-dialog';
-import { getNoticeFromUninstallResponse } from './utils/get-notice-from-response';
 import { unlock } from '../../../lock-unlock';
+import { FontLibraryContext } from './context';
+import FontCard from './font-card';
+import LibraryFontVariant from './library-font-variant';
+import { sortFontFaces } from './utils/sort-font-faces';
 const { ProgressBar } = unlock( componentsPrivateApis );
 
 function InstalledFonts() {
@@ -33,171 +40,328 @@ function InstalledFonts() {
 		baseThemeFonts,
 		handleSetLibraryFontSelected,
 		refreshLibrary,
-		uninstallFont,
+		uninstallFontFamily,
 		isResolvingLibrary,
+		isInstalling,
+		saveFontFamilies,
+		getFontFacesActivated,
+		fontFamiliesHasChanges,
+		notice,
+		setNotice,
+		fontFamilies,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
+	const customFontFamilyId =
+		libraryFontSelected?.source === 'custom' && libraryFontSelected?.id;
 
-	const handleUnselectFont = () => {
-		handleSetLibraryFontSelected( null );
-	};
+	const canUserDelete = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			return (
+				customFontFamilyId &&
+				canUser( 'delete', 'font-families', customFontFamilyId )
+			);
+		},
+		[ customFontFamilyId ]
+	);
 
-	const handleSelectFont = ( font ) => {
-		handleSetLibraryFontSelected( font );
-	};
+	const shouldDisplayDeleteButton =
+		!! libraryFontSelected &&
+		libraryFontSelected?.source !== 'theme' &&
+		canUserDelete;
 
-	const [ notice, setNotice ] = useState( null );
-
-	const handleConfirmUninstall = async () => {
-		const response = await uninstallFont( libraryFontSelected );
-		const uninstallNotice = getNoticeFromUninstallResponse( response );
-		setNotice( uninstallNotice );
-		// If the font was succesfully uninstalled it is unselected
-		if ( ! response?.errors?.length ) {
-			handleUnselectFont();
-		}
-		setIsConfirmDeleteOpen( false );
-	};
-
-	const handleUninstallClick = async () => {
+	const handleUninstallClick = () => {
 		setIsConfirmDeleteOpen( true );
 	};
 
-	const handleCancelUninstall = () => {
-		setIsConfirmDeleteOpen( false );
+	const getFontFacesToDisplay = ( font ) => {
+		if ( ! font ) {
+			return [];
+		}
+		if ( ! font.fontFace || ! font.fontFace.length ) {
+			return [
+				{
+					fontFamily: font.fontFamily,
+					fontStyle: 'normal',
+					fontWeight: '400',
+				},
+			];
+		}
+		return sortFontFaces( font.fontFace );
 	};
 
-	const tabDescription = !! libraryFontSelected
-		? __(
-				'Choose font variants. Keep in mind that too many variants could make your site slower.'
-		  )
-		: null;
-
-	const shouldDisplayDeleteButton =
-		!! libraryFontSelected && libraryFontSelected?.source !== 'theme';
+	const getFontCardVariantsText = ( font ) => {
+		const variantsInstalled =
+			font?.fontFace?.length > 0 ? font.fontFace.length : 1;
+		const variantsActive = getFontFacesActivated(
+			font.slug,
+			font.source
+		).length;
+		return sprintf(
+			/* translators: 1: Active font variants, 2: Total font variants. */
+			__( '%1$s/%2$s variants active' ),
+			variantsActive,
+			variantsInstalled
+		);
+	};
 
 	useEffect( () => {
+		handleSetLibraryFontSelected( libraryFontSelected );
 		refreshLibrary();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
-	// Reset notice after 5 seconds
-	useEffect( () => {
-		if ( notice ) {
-			const timeout = setTimeout( () => {
-				setNotice( null );
-			}, 5000 );
-			return () => clearTimeout( timeout );
-		}
-	}, [ notice ] );
-
 	return (
-		<TabLayout
-			title={ libraryFontSelected?.name || '' }
-			description={ tabDescription }
-			handleBack={ !! libraryFontSelected && handleUnselectFont }
-			footer={
-				<Footer
-					shouldDisplayDeleteButton={ shouldDisplayDeleteButton }
-					handleUninstallClick={ handleUninstallClick }
-				/>
-			}
-		>
-			<ConfirmDeleteDialog
-				font={ libraryFontSelected }
-				isConfirmDeleteOpen={ isConfirmDeleteOpen }
-				handleConfirmUninstall={ handleConfirmUninstall }
-				handleCancelUninstall={ handleCancelUninstall }
-			/>
+		<div className="font-library-modal__tabpanel-layout">
+			{ isResolvingLibrary && (
+				<div className="font-library-modal__loading">
+					<ProgressBar />
+				</div>
+			) }
 
-			{ notice && (
+			{ ! isResolvingLibrary && (
 				<>
-					<FlexItem>
-						<Spacer margin={ 2 } />
-						<Notice
-							isDismissible={ false }
-							status={ notice.type }
-							className="font-library-modal__font-collection__notice"
+					<NavigatorProvider
+						initialPath={
+							libraryFontSelected ? '/fontFamily' : '/'
+						}
+					>
+						<NavigatorScreen path="/">
+							<VStack spacing="8">
+								{ notice && (
+									<Notice
+										status={ notice.type }
+										onRemove={ () => setNotice( null ) }
+									>
+										{ notice.message }
+									</Notice>
+								) }
+								{ baseCustomFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Installed Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseCustomFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
+															font
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+								{ baseThemeFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Theme Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseThemeFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
+															font
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+							</VStack>
+						</NavigatorScreen>
+
+						<NavigatorScreen path="/fontFamily">
+							<ConfirmDeleteDialog
+								font={ libraryFontSelected }
+								isOpen={ isConfirmDeleteOpen }
+								setIsOpen={ setIsConfirmDeleteOpen }
+								setNotice={ setNotice }
+								uninstallFontFamily={ uninstallFontFamily }
+								handleSetLibraryFontSelected={
+									handleSetLibraryFontSelected
+								}
+							/>
+
+							<Flex justify="flex-start">
+								<NavigatorToParentButton
+									icon={ chevronLeft }
+									size="small"
+									onClick={ () => {
+										handleSetLibraryFontSelected( null );
+									} }
+									label={ __( 'Back' ) }
+								/>
+								<Heading
+									level={ 2 }
+									size={ 13 }
+									className="edit-site-global-styles-header"
+								>
+									{ libraryFontSelected?.name }
+								</Heading>
+							</Flex>
+							{ notice && (
+								<>
+									<Spacer margin={ 1 } />
+									<Notice
+										status={ notice.type }
+										onRemove={ () => setNotice( null ) }
+									>
+										{ notice.message }
+									</Notice>
+									<Spacer margin={ 1 } />
+								</>
+							) }
+							<Spacer margin={ 4 } />
+							<Text>
+								{ __(
+									'Choose font variants. Keep in mind that too many variants could make your site slower.'
+								) }
+							</Text>
+							<Spacer margin={ 4 } />
+							<VStack spacing={ 0 }>
+								<Spacer margin={ 8 } />
+								{ getFontFacesToDisplay(
+									libraryFontSelected
+								).map( ( face, i ) => (
+									<LibraryFontVariant
+										font={ libraryFontSelected }
+										face={ face }
+										key={ `face${ i }` }
+									/>
+								) ) }
+							</VStack>
+						</NavigatorScreen>
+					</NavigatorProvider>
+
+					<HStack
+						justify="flex-end"
+						className="font-library-modal__tabpanel-layout__footer"
+					>
+						{ isInstalling && <ProgressBar /> }
+						{ shouldDisplayDeleteButton && (
+							<Button
+								isDestructive
+								variant="tertiary"
+								onClick={ handleUninstallClick }
+							>
+								{ __( 'Delete' ) }
+							</Button>
+						) }
+						<Button
+							variant="primary"
+							onClick={ () => {
+								saveFontFamilies( fontFamilies );
+							} }
+							disabled={ ! fontFamiliesHasChanges }
+							__experimentalIsFocusable
 						>
-							{ notice.message }
-						</Notice>
-					</FlexItem>
-					<Spacer margin={ 4 } />
+							{ __( 'Update' ) }
+						</Button>
+					</HStack>
 				</>
 			) }
-
-			{ ! libraryFontSelected && (
-				<>
-					{ isResolvingLibrary && <Spinner /> }
-					{ baseCustomFonts.length > 0 && (
-						<>
-							<Spacer margin={ 2 } />
-							<FontsGrid>
-								{ baseCustomFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
-							<Spacer margin={ 8 } />
-						</>
-					) }
-
-					{ baseThemeFonts.length > 0 && (
-						<>
-							<FontsGrid title={ __( 'Theme Fonts' ) }>
-								{ baseThemeFonts.map( ( font ) => (
-									<LibraryFontCard
-										font={ font }
-										key={ font.slug }
-										onClick={ () => {
-											handleSelectFont( font );
-										} }
-									/>
-								) ) }
-							</FontsGrid>
-						</>
-					) }
-				</>
-			) }
-
-			{ libraryFontSelected && (
-				<LibraryFontDetails
-					font={ libraryFontSelected }
-					isConfirmDeleteOpen={ isConfirmDeleteOpen }
-					handleConfirmUninstall={ handleConfirmUninstall }
-					handleCancelUninstall={ handleCancelUninstall }
-				/>
-			) }
-		</TabLayout>
+		</div>
 	);
 }
 
-function Footer( { shouldDisplayDeleteButton, handleUninstallClick } ) {
-	const { saveFontFamilies, fontFamiliesHasChanges, isInstalling } =
-		useContext( FontLibraryContext );
+function ConfirmDeleteDialog( {
+	font,
+	isOpen,
+	setIsOpen,
+	setNotice,
+	uninstallFontFamily,
+	handleSetLibraryFontSelected,
+} ) {
+	const navigator = useNavigator();
+
+	const handleConfirmUninstall = async () => {
+		setNotice( null );
+		setIsOpen( false );
+		try {
+			await uninstallFontFamily( font );
+			navigator.goBack();
+			handleSetLibraryFontSelected( null );
+			setNotice( {
+				type: 'success',
+				message: __( 'Font family uninstalled successfully.' ),
+			} );
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message:
+					__( 'There was an error uninstalling the font family. ' ) +
+					error.message,
+			} );
+		}
+	};
+
+	const handleCancelUninstall = () => {
+		setIsOpen( false );
+	};
+
 	return (
-		<HStack justify="space-between">
-			{ isInstalling && <ProgressBar /> }
-			<div>
-				{ shouldDisplayDeleteButton && (
-					<Button variant="tertiary" onClick={ handleUninstallClick }>
-						{ __( 'Delete' ) }
-					</Button>
+		<ConfirmDialog
+			isOpen={ isOpen }
+			cancelButtonText={ __( 'Cancel' ) }
+			confirmButtonText={ __( 'Delete' ) }
+			onCancel={ handleCancelUninstall }
+			onConfirm={ handleConfirmUninstall }
+		>
+			{ font &&
+				sprintf(
+					/* translators: %s: Name of the font. */
+					__(
+						'Are you sure you want to delete "%s" font and all its variants and assets?'
+					),
+					font.name
 				) }
-			</div>
-			<Button
-				disabled={ ! fontFamiliesHasChanges }
-				variant="primary"
-				onClick={ saveFontFamilies }
-			>
-				{ __( 'Update' ) }
-			</Button>
-		</HStack>
+		</ConfirmDialog>
 	);
 }
 

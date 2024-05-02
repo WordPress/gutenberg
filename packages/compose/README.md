@@ -11,7 +11,7 @@ const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -129,6 +129,14 @@ _Returns_
 
 -   Higher-order component.
 
+### observableMap
+
+A constructor (factory) for `ObservableMap`, a map-like key/value data structure where the individual entries are observable: using the `subscribe` method, you can subscribe to updates for a particular keys. Each subscriber always observes one specific key and is not notified about any unrelated changes (for different keys) in the `ObservableMap`.
+
+_Returns_
+
+-   `ObservableMap< K, V >`: A new instance of the `ObservableMap` type.
+
 ### pipe
 
 Composes multiple higher-order components into a single higher-order component. Performs left-to-right function composition, where each successive invocation is supplied the return value of the previous.
@@ -140,6 +148,8 @@ _Related_
 -   <https://docs-lodash.com/v4/flow/>
 
 ### pure
+
+> **Deprecated** Use `memo` or `PureComponent` instead.
 
 Given a component returns the enhanced component augmented with a component only re-rendering when its props/state change
 
@@ -248,6 +258,18 @@ _Parameters_
 _Returns_
 
 -   `import('../../utils/debounce').DebouncedFunc<TFunc>`: Debounced function.
+
+### useDebouncedInput
+
+Helper hook for input fields that need to debounce the value before using it.
+
+_Parameters_
+
+-   _defaultValue_ `any`: The default value to use.
+
+_Returns_
+
+-   `[string, Function, string]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -427,6 +449,19 @@ _Parameters_
 _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+
+### useObservableValue
+
+React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.
+
+_Parameters_
+
+-   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+-   _name_ `K`: The map key to observe.
+
+_Returns_
+
+-   `V | undefined`: The value corresponding to the map key requested.
 
 ### usePrevious
 

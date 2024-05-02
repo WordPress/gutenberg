@@ -1,24 +1,42 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import {
+	DocumentBar,
+	PostSavedState,
+	PostPreviewButton,
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
-import HeaderToolbar from './header-toolbar';
-import MoreMenu from './more-menu';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import { default as DevicePreview } from '../device-preview';
-import ViewLink from '../view-link';
+import PostEditorMoreMenu from './more-menu';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
-import DocumentActions from './document-actions';
+import { unlock } from '../../lock-unlock';
+
+const {
+	CollapsableBlockToolbar,
+	DocumentTools,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+	MoreMenu,
+	PostPublishButtonOrToggle,
+} = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -32,22 +50,37 @@ const slideX = {
 	hover: { x: 0, transition: { type: 'tween', delay: 0.2 } },
 };
 
-function Header( {
-	setEntitiesSavedStatesCallback,
-	setListViewToggleElement,
-} ) {
-	const isLargeViewport = useViewportMatch( 'large' );
-	const { hasActiveMetaboxes, isPublishSidebarOpened, showIconLabels } =
-		useSelect(
-			( select ) => ( {
-				hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
-				isPublishSidebarOpened:
-					select( editPostStore ).isPublishSidebarOpened(),
-				showIconLabels:
-					select( editPostStore ).isFeatureActive( 'showIconLabels' ),
-			} ),
-			[]
-		);
+function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
+	const isWideViewport = useViewportMatch( 'large' );
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const {
+		isTextEditor,
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		showIconLabels,
+		hasHistory,
+		hasFixedToolbar,
+	} = useSelect( ( select ) => {
+		const { get: getPreference } = select( preferencesStore );
+		const { getEditorMode } = select( editorStore );
+
+		return {
+			isTextEditor: getEditorMode() === 'text',
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			hasHistory:
+				!! select( editorStore ).getEditorSettings()
+					.onNavigateToPreviousEntityRecord,
+			isPublishSidebarOpened:
+				select( editorStore ).isPublishSidebarOpened(),
+			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+		};
+	}, [] );
+
+	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
+
+	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
+		useState( true );
 
 	return (
 		<div className="edit-post-header">
@@ -56,7 +89,10 @@ function Header( {
 					variants={ slideX }
 					transition={ { type: 'tween', delay: 0.8 } }
 				>
-					<FullscreenModeClose showTooltip />
+					<FullscreenModeClose
+						showTooltip
+						initialPost={ initialPost }
+					/>
 				</motion.div>
 			</MainDashboardButton.Slot>
 			<motion.div
@@ -64,11 +100,22 @@ function Header( {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="edit-post-header__toolbar"
 			>
-				<HeaderToolbar
-					setListViewToggleElement={ setListViewToggleElement }
-				/>
-				<div className="edit-post-header__center">
-					<DocumentActions />
+				<DocumentTools disableBlockTools={ isTextEditor } />
+				{ hasTopToolbar && (
+					<CollapsableBlockToolbar
+						isCollapsed={ isBlockToolsCollapsed }
+						onToggle={ setIsBlockToolsCollapsed }
+					/>
+				) }
+				<div
+					className={ classnames( 'edit-post-header__center', {
+						'is-collapsed':
+							hasHistory &&
+							! isBlockToolsCollapsed &&
+							hasTopToolbar,
+					} ) }
+				>
+					{ hasHistory && <DocumentBar /> }
 				</div>
 			</motion.div>
 			<motion.div
@@ -82,29 +129,25 @@ function Header( {
 					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
 					// We track that DOM node to return focus to the PostPublishButtonOrToggle
 					// when the publish sidebar has been closed.
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						showIconLabels={ showIconLabels }
-					/>
+					<PostSavedState forceIsDirty={ hasActiveMetaboxes } />
 				) }
-				<DevicePreview />
-				<PostPreviewButton forceIsAutosaveable={ hasActiveMetaboxes } />
-				<ViewLink />
+				<PreviewDropdown forceIsAutosaveable={ hasActiveMetaboxes } />
+				<PostPreviewButton
+					className="edit-post-header__post-preview-button"
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
+				<PostViewLink />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					setEntitiesSavedStatesCallback={
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				{ ( isLargeViewport || ! showIconLabels ) && (
-					<>
-						<PinnedItems.Slot scope="core/edit-post" />
-						<MoreMenu showIconLabels={ showIconLabels } />
-					</>
+				{ ( isWideViewport || ! showIconLabels ) && (
+					<PinnedItems.Slot scope="core" />
 				) }
-				{ showIconLabels && ! isLargeViewport && (
-					<MoreMenu showIconLabels={ showIconLabels } />
-				) }
+				<MoreMenu />
+				<PostEditorMoreMenu />
 			</motion.div>
 		</div>
 	);

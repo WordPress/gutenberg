@@ -23,6 +23,7 @@ describe( 'useEntityRecord', () => {
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
+		triggerFetch.mockReset();
 	} );
 
 	const TEST_RECORD = { id: 1, hello: 'world' };
@@ -44,12 +45,13 @@ describe( 'useEntityRecord', () => {
 
 		expect( data ).toEqual( {
 			edit: expect.any( Function ),
-			editedRecord: {},
+			editedRecord: false,
 			hasEdits: false,
 			edits: {},
 			record: undefined,
 			save: expect.any( Function ),
 			hasResolved: false,
+			hasStarted: false,
 			isResolving: false,
 			status: 'IDLE',
 		} );
@@ -69,6 +71,7 @@ describe( 'useEntityRecord', () => {
 			record: { hello: 'world', id: 1 },
 			save: expect.any( Function ),
 			hasResolved: true,
+			hasStarted: true,
 			isResolving: false,
 			status: 'SUCCESS',
 		} );
@@ -98,6 +101,7 @@ describe( 'useEntityRecord', () => {
 				record: { hello: 'world', id: 1 },
 				save: expect.any( Function ),
 				hasResolved: true,
+				hasStarted: true,
 				isResolving: false,
 				status: 'SUCCESS',
 			} )
@@ -112,5 +116,45 @@ describe( 'useEntityRecord', () => {
 		expect( widget.record ).toEqual( { hello: 'world', id: 1 } );
 		expect( widget.editedRecord ).toEqual( { hello: 'foo', id: 1 } );
 		expect( widget.edits ).toEqual( { hello: 'foo' } );
+	} );
+
+	it( 'does not resolve entity record when disabled via options', async () => {
+		triggerFetch.mockImplementation( () => TEST_RECORD );
+
+		let data;
+		const TestComponent = ( { enabled } ) => {
+			data = useEntityRecord( 'root', 'widget', 1, { enabled } );
+			return <div />;
+		};
+		const UI = ( { enabled } ) => (
+			<RegistryProvider value={ registry }>
+				<TestComponent enabled={ enabled } />
+			</RegistryProvider>
+		);
+
+		const { rerender } = render( <UI enabled /> );
+
+		// A minimum delay for a fetch request. The same delay is used again as a control.
+		await act(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
+		);
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+
+		rerender( <UI enabled={ false } /> );
+
+		expect( data ).toEqual( {
+			edit: expect.any( Function ),
+			editedRecord: {},
+			hasEdits: false,
+			edits: {},
+			record: null,
+			save: expect.any( Function ),
+		} );
+
+		// The same delay.
+		await act(
+			() => new Promise( ( resolve ) => setTimeout( resolve, 0 ) )
+		);
+		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

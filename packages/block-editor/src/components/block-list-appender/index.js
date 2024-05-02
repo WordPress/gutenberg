@@ -39,61 +39,12 @@ function DefaultAppender( { rootClientId } ) {
 	);
 }
 
-function useAppender( rootClientId, CustomAppender ) {
-	const isVisible = useSelect(
-		( select ) => {
-			const {
-				getTemplateLock,
-				getSelectedBlockClientId,
-				__unstableGetEditorMode,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-
-			if ( CustomAppender === false ) {
-				return false;
-			}
-
-			if ( ! CustomAppender ) {
-				const selectedBlockClientId = getSelectedBlockClientId();
-				const isParentSelected =
-					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId );
-				if ( ! isParentSelected ) {
-					return false;
-				}
-			}
-
-			if (
-				getTemplateLock( rootClientId ) ||
-				getBlockEditingMode( rootClientId ) === 'disabled' ||
-				__unstableGetEditorMode() === 'zoom-out'
-			) {
-				return false;
-			}
-
-			return true;
-		},
-		[ rootClientId, CustomAppender ]
-	);
-
-	if ( ! isVisible ) {
-		return null;
-	}
-
-	return CustomAppender ? (
-		<CustomAppender />
-	) : (
-		<DefaultAppender rootClientId={ rootClientId } />
-	);
-}
-
-function BlockListAppender( {
+export default function BlockListAppender( {
 	rootClientId,
-	renderAppender,
+	CustomAppender,
 	className,
 	tagName: TagName = 'div',
 } ) {
-	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(
 		( select ) => {
 			const {
@@ -113,10 +64,6 @@ function BlockListAppender( {
 		},
 		[ rootClientId ]
 	);
-
-	if ( ! appender ) {
-		return null;
-	}
 
 	return (
 		<TagName
@@ -146,9 +93,11 @@ function BlockListAppender( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default BlockListAppender;

@@ -45,7 +45,6 @@ export default function ColorPalettePanel( { name } ) {
 		'color.defaultPalette',
 		name
 	);
-
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const popoverProps = isMobileViewport ? mobilePopoverProps : undefined;
 

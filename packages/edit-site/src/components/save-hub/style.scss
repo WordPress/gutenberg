@@ -3,7 +3,7 @@
 	border-top: 1px solid $gray-800;
 	flex-shrink: 0;
 	margin: 0;
-	padding: $grid-unit-20 + $grid-unit-05 $canvas-padding;
+	padding: $grid-unit-20 $canvas-padding;
 }
 
 .edit-site-save-hub__button {
@@ -17,5 +17,12 @@
 
 	&[aria-disabled="true"]:hover {
 		color: inherit;
+	}
+
+	&:not(.is-primary) {
+		&.is-busy,
+		&.is-busy[aria-disabled="true"]:hover {
+			color: $gray-900;
+		}
 	}
 }

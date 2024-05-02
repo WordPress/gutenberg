@@ -89,7 +89,9 @@ export default function PostExcerptEditor( {
 	 * excerpt has been produced from the content.
 	 */
 	const strippedRenderedExcerpt = useMemo( () => {
-		if ( ! renderedExcerpt ) return '';
+		if ( ! renderedExcerpt ) {
+			return '';
+		}
 		const document = new window.DOMParser().parseFromString(
 			renderedExcerpt,
 			'text/html'
@@ -127,6 +129,7 @@ export default function PostExcerptEditor( {
 	}
 	const readMoreLink = (
 		<RichText
+			identifier="moreText"
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
 			aria-label={ __( '“Read more” link text' ) }
@@ -135,7 +138,7 @@ export default function PostExcerptEditor( {
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
 			}
-			withoutInteractiveFormatting={ true }
+			withoutInteractiveFormatting
 		/>
 	);
 	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {

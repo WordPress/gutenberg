@@ -14,7 +14,7 @@ Tabs organizes content across different screens, data sets, and interactions. It
 
 #### Uncontrolled Mode
 
-Tabs can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `initialTabId` prop can be used to set the initially selected tab. If this prop is not set, the first tab will be selected by default. In addition, in most cases where the currently active tab becomes disabled or otherwise unavailable, uncontrolled mode will automatically fall back to selecting the first available tab.
+Tabs can be used in an uncontrolled mode, where the component manages its own state. In this mode, the `defaultTabId` prop can be used to set the initially selected tab. If this prop is not set, the first tab will be selected by default. In addition, in most cases where the currently active tab becomes disabled or otherwise unavailable, uncontrolled mode will automatically fall back to selecting the first available tab.
 
 ```jsx
 import { Tabs } from '@wordpress/components';
@@ -24,25 +24,25 @@ const onSelect = ( tabName ) => {
 };
 
 const MyUncontrolledTabs = () => (
-		<Tabs onSelect={onSelect} initialTab="tab2">
-			<Tabs.TabList >
-				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
+		<Tabs onSelect={ onSelect } defaultTabId="tab2">
+			<Tabs.TabList>
+				<Tabs.Tab tabId="tab1" title="Tab 1">
 					Tab 1
 				</Tabs.Tab>
-				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
+				<Tabs.Tab tabId="tab2" title="Tab 2">
 					Tab 2
 				</Tabs.Tab>
-				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
+				<Tabs.Tab tabId="tab3" title="Tab 3">
 					Tab 3
 				</Tabs.Tab>
 			</Tabs.TabList>
-			<Tabs.TabPanel id={ 'tab1' }>
+			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab2' }>
+			<Tabs.TabPanel tabId="tab2">
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' }>
+			<Tabs.TabPanel tabId="tab3">
 				<p>Selected tab: Tab 3</p>
 			</Tabs.TabPanel>
 		</Tabs>
@@ -51,7 +51,7 @@ const MyUncontrolledTabs = () => (
 
 #### Controlled Mode
 
-Tabs can also be used in a controlled mode, where the parent component specifies the `selectedTabId` and the `onSelect` props to control tab selection. In this mode, the `initialTabId` prop will be ignored if it is provided. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab, leaving the controlling component in charge of implementing the desired logic.
+Tabs can also be used in a controlled mode, where the parent component specifies the `selectedTabId` and the `onSelect` props to control tab selection. In this mode, the `defaultTabId` prop will be ignored if it is provided. If the `selectedTabId` is `null`, no tab is selected. In this mode, if the currently selected tab becomes disabled or otherwise unavailable, the component will _not_ fall back to another available tab, leaving the controlling component in charge of implementing the desired logic.
 
 ```jsx
 import { Tabs } from '@wordpress/components';
@@ -71,24 +71,24 @@ const MyControlledTabs = () => (
 				onSelect( selectedId );
 			} }
 		>
-			<Tabs.TabList >
-				<Tabs.Tab id={ 'tab1' } title={ 'Tab 1' }>
+			<Tabs.TabList>
+				<Tabs.Tab tabId="tab1" title="Tab 1">
 					Tab 1
 				</Tabs.Tab>
-				<Tabs.Tab id={ 'tab2' } title={ 'Tab 2' }>
+				<Tabs.Tab tabId="tab2" title="Tab 2">
 					Tab 2
 				</Tabs.Tab>
-				<Tabs.Tab id={ 'tab3' } title={ 'Tab 3' }>
+				<Tabs.Tab tabId="tab3" title="Tab 3">
 					Tab 3
 				</Tabs.Tab>
 			</Tabs.TabList>
-			<Tabs.TabPanel id={ 'tab1' }>
+			<Tabs.TabPanel tabId="tab1">
 				<p>Selected tab: Tab 1</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab2' }>
+			<Tabs.TabPanel tabId="tab2">
 				<p>Selected tab: Tab 2</p>
 			</Tabs.TabPanel>
-			<Tabs.TabPanel id={ 'tab3' }>
+			<Tabs.TabPanel tabId="tab3">
 				<p>Selected tab: Tab 3</p>
 			</Tabs.TabPanel>
 		</Tabs>
@@ -120,7 +120,7 @@ When `true`, the tab will be selected when receiving focus (automatic tab activa
 -   Required: No
 -   Default: `true`
 
-###### `initialTabId`: `string`
+###### `defaultTabId`: `string`
 
 The id of the tab to be selected upon mounting of component. If this prop is not set, the first tab will be selected by default. The id provided will be internally prefixed with a unique instance ID to avoid collisions.
 
@@ -159,44 +159,19 @@ The children elements, which should be a series of `Tabs.TabPanel` components.
 
 -   Required: No
 
-###### `className`: `string`
-
-The class name to apply to the tablist.
-
--   Required: No
--   Default: ''
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tablist.
-
-- Required: No
-
 #### Tab
 
 ##### Props
 
-###### `id`: `string`
+###### `tabId`: `string`
 
-The id of the tab, which is prepended with the `Tabs` instance ID.
+A unique identifier for the tab, which is used to generate a unique id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.TabPanel` component.
 
 - Required: Yes
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
-
-- Required: No
 
 ###### `children`: `React.ReactNode`
 
 The children elements, generally the text to display on the tab.
-
-- Required: No
-
-###### `className`: `string`
-
-The class name to apply to the tab.
 
 - Required: No
 
@@ -223,20 +198,15 @@ The children elements, generally the content to display on the tabpanel.
 
 - Required: No
 
-###### `id`: `string`
+###### `tabId`: `string`
 
-The id of the tabpanel, which is combined with the `Tabs` instance ID and the suffix `-view`
+A unique identifier for the tabpanel, which is used to generate an instanced id for the underlying element. The value of this prop should match with the value of the `tabId` prop on the corresponding `Tabs.Tab` component.
 
 - Required: Yes
 
-###### `className`: `string`
+###### `focusable`: `boolean`
 
-The class name to apply to the tabpanel.
-
-- Required: No
-
-###### `style`: `React.CSSProperties`
-
-Custom CSS styles for the tab.
+Determines whether or not the tabpanel element should be focusable. If `false`, pressing the tab key will skip over the tabpanel, and instead focus on the first focusable element in the panel (if there is one).
 
 - Required: No
+- Default: `true`

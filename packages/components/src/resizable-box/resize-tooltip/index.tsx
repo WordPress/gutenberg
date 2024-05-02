@@ -55,7 +55,9 @@ function ResizeTooltip(
 		position,
 	} );
 
-	if ( ! isVisible ) return null;
+	if ( ! isVisible ) {
+		return null;
+	}
 
 	const classes = classnames( 'components-resize-tooltip', className );
 

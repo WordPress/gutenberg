@@ -1,4 +1,5 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "test/directive-priorities",
 	"title": "E2E Interactivity tests - directive priorities",
@@ -9,6 +10,6 @@
 		"interactivity": true
 	},
 	"textdomain": "e2e-interactivity",
-	"viewScript": "directive-priorities-view",
+	"viewScriptModule": "file:./view.js",
 	"render": "file:./render.php"
 }

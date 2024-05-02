@@ -1,105 +1,69 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { memo, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import {
-	__experimentalNavigatorProvider as NavigatorProvider,
-	__experimentalNavigatorScreen as NavigatorScreen,
-} from '@wordpress/components';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+import classnames from 'classnames';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
-import SidebarNavigationScreenTemplates from '../sidebar-navigation-screen-templates';
-import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
-import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
-import useSyncPathWithURL, {
-	getPathFromURL,
-} from '../sync-state-with-url/use-sync-path-with-url';
-import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
-import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
-import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
-import SaveHub from '../save-hub';
-import { unlock } from '../../lock-unlock';
-import SidebarNavigationScreenPages from '../sidebar-navigation-screen-pages';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
-import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import DataViewsSidebarContent from '../sidebar-dataviews';
+import {
+	useCallback,
+	createContext,
+	useState,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
-const { useLocation } = unlock( routerPrivateApis );
+export const SidebarNavigationContext = createContext( () => {} );
 
-function SidebarScreens() {
-	useSyncPathWithURL();
+export default function SidebarContent( { routeKey, children } ) {
+	const [ navState, setNavState ] = useState( {
+		direction: null,
+		focusSelector: null,
+	} );
 
-	return (
-		<>
-			<NavigatorScreen path="/">
-				<SidebarNavigationScreenMain />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation">
-				<SidebarNavigationScreenNavigationMenus />
-			</NavigatorScreen>
-			<NavigatorScreen path="/navigation/:postType/:postId">
-				<SidebarNavigationScreenNavigationMenu />
-			</NavigatorScreen>
-			<NavigatorScreen path="/wp_global_styles">
-				<SidebarNavigationScreenGlobalStyles />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page">
-				<SidebarNavigationScreenPages />
-			</NavigatorScreen>
-			<NavigatorScreen path="/page/:postId">
-				<SidebarNavigationScreenPage />
-			</NavigatorScreen>
-			{ window?.__experimentalAdminViews && (
-				<NavigatorScreen path="/pages">
-					<SidebarNavigationScreen
-						title={ __( 'All Pages' ) }
-						description={ __( 'Manage your pages.' ) }
-						backPath="/page"
-						content={ <DataViewsSidebarContent /> }
-					/>
-				</NavigatorScreen>
-			) }
-			<NavigatorScreen path="/:postType(wp_template)">
-				<SidebarNavigationScreenTemplates />
-			</NavigatorScreen>
-			<NavigatorScreen path="/patterns">
-				<SidebarNavigationScreenPatterns />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template|wp_template_part)/all">
-				<SidebarNavigationScreenTemplatesBrowse />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template_part|wp_block)/:postId">
-				<SidebarNavigationScreenPattern />
-			</NavigatorScreen>
-			<NavigatorScreen path="/:postType(wp_template)/:postId">
-				<SidebarNavigationScreenTemplate />
-			</NavigatorScreen>
-		</>
-	);
-}
+	const navigate = useCallback( ( direction, focusSelector = null ) => {
+		setNavState( ( prevState ) => ( {
+			direction,
+			focusSelector:
+				direction === 'forward' && focusSelector
+					? focusSelector
+					: prevState.focusSelector,
+		} ) );
+	}, [] );
 
-function Sidebar() {
-	const { params: urlParams } = useLocation();
-	const initialPath = useRef( getPathFromURL( urlParams ) );
+	const wrapperRef = useRef();
+	useEffect( () => {
+		let elementToFocus;
+		if ( navState.direction === 'back' && navState.focusSelector ) {
+			elementToFocus = wrapperRef.current.querySelector(
+				navState.focusSelector
+			);
+		}
+		if ( navState.direction !== null && ! elementToFocus ) {
+			const [ firstTabbable ] = focus.tabbable.find( wrapperRef.current );
+			elementToFocus = firstTabbable ?? wrapperRef.current;
+		}
+		elementToFocus?.focus();
+	}, [ navState ] );
+
+	const wrapperCls = classnames( 'edit-site-sidebar__screen-wrapper', {
+		'slide-from-left': navState.direction === 'back',
+		'slide-from-right': navState.direction === 'forward',
+	} );
 
 	return (
-		<>
-			<NavigatorProvider
-				className="edit-site-sidebar__content"
-				initialPath={ initialPath.current }
-			>
-				<SidebarScreens />
-			</NavigatorProvider>
-			<SaveHub />
-		</>
+		<SidebarNavigationContext.Provider value={ navigate }>
+			<div className="edit-site-sidebar__content">
+				<div
+					ref={ wrapperRef }
+					key={ routeKey }
+					className={ wrapperCls }
+				>
+					{ children }
+				</div>
+			</div>
+		</SidebarNavigationContext.Provider>
 	);
 }
-
-export default memo( Sidebar );

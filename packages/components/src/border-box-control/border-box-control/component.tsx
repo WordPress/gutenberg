@@ -89,7 +89,6 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
-
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel
@@ -112,7 +111,7 @@ const UnconnectedBorderBoxControl = (
 						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
-						withSlider={ true }
+						withSlider
 						width={
 							size === '__unstable-large' ? '116px' : '110px'
 						}

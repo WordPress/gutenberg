@@ -27,9 +27,9 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-post' },
+		{ className: classnames( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -38,13 +38,14 @@ function PostTemplateInnerBlocks() {
 function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
+	classList,
 	isHidden,
 	setActiveBlockContextId,
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: 'wp-block-post',
+			className: classnames( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -96,7 +97,6 @@ export default function PostTemplateEdit( {
 			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
 			...restQueryArgs
 		} = {},
-		queryContext = [ { page: 1 } ],
 		templateSlug,
 		previewPostType,
 	},
@@ -104,18 +104,11 @@ export default function PostTemplateEdit( {
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
-
-	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-			const taxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-				context: 'view',
-			} );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -126,12 +119,17 @@ export default function PostTemplateEdit( {
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
+				offset: offset || 0,
 				order,
 				orderby: orderBy,
 			};
 			// There is no need to build the taxQuery if we inherit.
 			if ( taxQuery && ! inherit ) {
+				const taxonomies = getTaxonomies( {
+					type: postType,
+					per_page: -1,
+					context: 'view',
+				} );
 				// We have to build the tax query for the REST API and use as
 				// keys the taxonomies `rest_base` with the `term ids` as values.
 				const builtTaxQuery = Object.entries( taxQuery ).reduce(
@@ -194,7 +192,6 @@ export default function PostTemplateEdit( {
 		},
 		[
 			perPage,
-			page,
 			offset,
 			order,
 			orderBy,
@@ -217,6 +214,7 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
+				classList: post.class_list ?? '',
 			} ) ),
 		[ posts ]
 	);
@@ -284,11 +282,14 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									classList={ blockContext.classList }
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
+								classList={ blockContext.classList }
 								setActiveBlockContextId={
 									setActiveBlockContextId
 								}

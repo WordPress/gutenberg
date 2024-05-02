@@ -1,18 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { PanelRow } from '@wordpress/components';
 import {
 	PostSticky as PostStickyForm,
 	PostStickyCheck,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../../lock-unlock';
+
+const { PostPanelRow } = unlock( editorPrivateApis );
 
 export function PostSticky() {
 	return (
 		<PostStickyCheck>
-			<PanelRow>
+			<PostPanelRow>
 				<PostStickyForm />
-			</PanelRow>
+			</PostPanelRow>
 		</PostStickyCheck>
 	);
 }

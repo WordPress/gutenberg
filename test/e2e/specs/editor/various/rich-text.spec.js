@@ -3,7 +3,7 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
-test.describe( 'RichText', () => {
+test.describe( 'RichText (@firefox, @webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -20,7 +20,7 @@ test.describe( 'RichText', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await editor.insertBlock( { name: 'core/heading' } );
 		await editor.clickBlockToolbarButton( 'Change level' );
-		await page.locator( 'button[aria-label="Heading 3"]' ).click();
+		await page.locator( 'role=menuitemradio[name="Heading 3"]' ).click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -438,7 +438,7 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should keep internal selection after blur', async ( {
+	test( 'should keep internal selection after blur (-webkit)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -609,7 +609,8 @@ test.describe( 'RichText', () => {
 		] );
 	} );
 
-	test( 'should preserve internal formatting', async ( {
+	// For some reason, tabbing in the highlight popover doesn't work in WebKit.
+	test( 'should preserve internal formatting (-webkit, -firefox)', async ( {
 		page,
 		editor,
 		pageUtils,

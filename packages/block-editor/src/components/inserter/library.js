@@ -21,23 +21,19 @@ function InserterLibrary(
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
 		__experimentalFilterValue,
+		__experimentalOnPatternCategorySelection,
 		onSelect = noop,
 		shouldFocusBlock = false,
 	},
 	ref
 ) {
-	const { destinationRootClientId, prioritizePatterns } = useSelect(
+	const { destinationRootClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSettings } =
-				select( blockEditorStore );
-
+			const { getBlockRootClientId } = select( blockEditorStore );
 			const _rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 			return {
 				destinationRootClientId: _rootClientId,
-				prioritizePatterns:
-					getSettings().__experimentalPreferPatternsOnRoot &&
-					! _rootClientId,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -53,8 +49,10 @@ function InserterLibrary(
 			showMostUsedBlocks={ showMostUsedBlocks }
 			__experimentalInsertionIndex={ __experimentalInsertionIndex }
 			__experimentalFilterValue={ __experimentalFilterValue }
+			__experimentalOnPatternCategorySelection={
+				__experimentalOnPatternCategorySelection
+			}
 			shouldFocusBlock={ shouldFocusBlock }
-			prioritizePatterns={ prioritizePatterns }
 			ref={ ref }
 		/>
 	);

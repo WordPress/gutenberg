@@ -24,7 +24,7 @@ import { useReducedMotion } from '@wordpress/compose';
  */
 import { store as editPostStore } from '../../../store';
 
-function FullscreenModeClose( { showTooltip, icon, href } ) {
+function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( editorStore );
@@ -33,7 +33,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 				select( coreStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
-
+			const _postType = initialPost?.type || getCurrentPostType();
 			return {
 				isActive: isFeatureActive( 'fullscreenMode' ),
 				isRequestingSiteIcon: isResolving( 'getEntityRecord', [
@@ -41,7 +41,7 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 					'__unstableBase',
 					undefined,
 				] ),
-				postType: getPostType( getCurrentPostType() ),
+				postType: getPostType( _postType ),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},
@@ -88,17 +88,20 @@ function FullscreenModeClose( { showTooltip, icon, href } ) {
 		'has-icon': siteIconUrl,
 	} );
 
+	const buttonHref =
+		href ??
+		addQueryArgs( 'edit.php', {
+			post_type: postType.slug,
+		} );
+
+	const buttonLabel = postType?.labels?.view_items ?? __( 'Back' );
+
 	return (
 		<motion.div whileHover="expand">
 			<Button
 				className={ classes }
-				href={
-					href ??
-					addQueryArgs( 'edit.php', {
-						post_type: postType.slug,
-					} )
-				}
-				label={ postType?.labels?.view_items ?? __( 'Back' ) }
+				href={ buttonHref }
+				label={ buttonLabel }
 				showTooltip={ showTooltip }
 			>
 				{ buttonIcon }

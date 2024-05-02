@@ -3,11 +3,12 @@
  */
 import {
 	act,
+	advanceAnimationByFrames,
 	fireEvent,
 	initializeEditor,
+	screen,
 	waitForStoreResolvers,
 	within,
-	advanceAnimationByFrames,
 } from 'test/helpers';
 import { fireGestureHandler } from 'react-native-gesture-handler/jest-utils';
 import { State } from 'react-native-gesture-handler';
@@ -52,15 +53,15 @@ const DEFAULT_TOUCH_EVENTS = [
 export const initializeWithBlocksLayouts = async ( blocks ) => {
 	const initialHtml = blocks.map( ( block ) => block.html ).join( '\n' );
 
-	const screen = await initializeEditor( { initialHtml } );
-	const { getAllByLabelText } = screen;
+	await initializeEditor( { initialHtml } );
 
 	const waitPromises = [];
+	const blockListItems = screen.getAllByTestId( 'block-list-item-cell' );
+	// Check that rendered block list items match expected block count.
+	expect( blockListItems.length ).toBe( blocks.length );
+
 	blocks.forEach( ( block, index ) => {
-		const a11yLabel = new RegExp(
-			`${ block.name } Block\\. Row ${ index + 1 }`
-		);
-		const [ element ] = getAllByLabelText( a11yLabel );
+		const element = blockListItems[ index ];
 		// "onLayout" event will populate the blocks layouts data.
 		fireEvent( element, 'layout', {
 			nativeEvent: { layout: block.layout },
@@ -107,11 +108,11 @@ export const initializeWithBlocksLayouts = async ( blocks ) => {
 /**
  * Fires long-press gesture event on a block.
  *
- * @param {import('react-test-renderer').ReactTestInstance} block                  Block test instance.
- * @param {string}                                          testID                 Id for querying the draggable trigger element.
- * @param {Object}                                          [options]              Configuration options for the gesture event.
- * @param {boolean}                                         [options.failed]       Determines if the gesture should fail.
- * @param {number}                                          [options.triggerIndex] In case there are multiple draggable triggers, this specifies the index to use.
+ * @param {HTMLElement} block                  Block test instance.
+ * @param {string}      testID                 Id for querying the draggable trigger element.
+ * @param {Object}      [options]              Configuration options for the gesture event.
+ * @param {boolean}     [options.failed]       Determines if the gesture should fail.
+ * @param {number}      [options.triggerIndex] In case there are multiple draggable triggers, this specifies the index to use.
  */
 export const fireLongPress = (
 	block,
@@ -139,8 +140,8 @@ export const fireLongPress = (
 /**
  * Fires pan gesture event on a BlockDraggable component.
  *
- * @param {import('react-test-renderer').ReactTestInstance} blockDraggable BlockDraggable test instance.
- * @param {Object}                                          [touchEvents]  Array of touch events to dispatch on the pan gesture.
+ * @param {HTMLElement} blockDraggable BlockDraggable test instance.
+ * @param {Object}      [touchEvents]  Array of touch events to dispatch on the pan gesture.
  */
 export const firePanGesture = (
 	blockDraggable,
@@ -168,7 +169,7 @@ export const firePanGesture = (
  *
  * @param {import('@testing-library/react-native').RenderAPI} screen The Testing Library screen.
  *
- * @return {import('react-test-renderer').ReactTestInstance} Draggable chip test instance.
+ * @return {HTMLElement} Draggable chip test instance.
  */
 export const getDraggableChip = ( { getByTestId } ) => {
 	let draggableChip;

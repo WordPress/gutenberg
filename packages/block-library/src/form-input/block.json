@@ -19,10 +19,10 @@
 			"type": "string"
 		},
 		"label": {
-			"type": "string",
+			"type": "rich-text",
 			"default": "Label",
 			"selector": ".wp-block-form-input__label-content",
-			"source": "html",
+			"source": "rich-text",
 			"__experimentalRole": "content"
 		},
 		"inlineLabel": {

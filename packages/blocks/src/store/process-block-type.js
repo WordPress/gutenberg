@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { isPlainObject } from 'is-plain-object';
+import { isValidElementType } from 'react-is';
 
 /**
  * WordPress dependencies
@@ -17,7 +18,8 @@ import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
 
-const { error, warn } = window.console;
+const error = ( ...args ) => window?.console?.error?.( ...args );
+const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to
@@ -32,6 +34,37 @@ const LEGACY_CATEGORY_MAPPING = {
 };
 
 /**
+ * Merge block variations bootstrapped from the server and client.
+ *
+ * When a variation is registered in both places, its properties are merged.
+ *
+ * @param {Array} bootstrappedVariations - A block type variations from the server.
+ * @param {Array} clientVariations       - A block type variations from the client.
+ * @return {Array} The merged array of block variations.
+ */
+function mergeBlockVariations(
+	bootstrappedVariations = [],
+	clientVariations = []
+) {
+	const result = [ ...bootstrappedVariations ];
+
+	clientVariations.forEach( ( clientVariation ) => {
+		const index = result.findIndex(
+			( bootstrappedVariation ) =>
+				bootstrappedVariation.name === clientVariation.name
+		);
+
+		if ( index !== -1 ) {
+			result[ index ] = { ...result[ index ], ...clientVariation };
+		} else {
+			result.push( clientVariation );
+		}
+	} );
+
+	return result;
+}
+
+/**
  * Takes the unprocessed block type settings, merges them with block type metadata
  * and applies all the existing filters for the registered block type.
  * Next, it validates all the settings and performs additional processing to the block type definition.
@@ -44,6 +77,8 @@ const LEGACY_CATEGORY_MAPPING = {
 export const processBlockType =
 	( name, blockSettings ) =>
 	( { select } ) => {
+		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
+
 		const blockType = {
 			name,
 			icon: BLOCK_ICON_DEFAULT,
@@ -54,11 +89,14 @@ export const processBlockType =
 			selectors: {},
 			supports: {},
 			styles: [],
-			variations: [],
 			blockHooks: {},
 			save: () => null,
-			...select.getBootstrappedBlockType( name ),
+			...bootstrappedBlockType,
 			...blockSettings,
+			variations: mergeBlockVariations(
+				bootstrappedBlockType?.variations,
+				blockSettings?.variations
+			),
 		};
 
 		const settings = applyFilters(
@@ -112,8 +150,8 @@ export const processBlockType =
 			error( 'The "save" property must be a valid function.' );
 			return;
 		}
-		if ( 'edit' in settings && typeof settings.edit !== 'function' ) {
-			error( 'The "edit" property must be a valid function.' );
+		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
+			error( 'The "edit" property must be a valid component.' );
 			return;
 		}
 

@@ -1,16 +1,17 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { MediaPreview } from './media-preview';
+import { unlock } from '../../../lock-unlock';
+
+const { CompositeV2: Composite, useCompositeStoreV2: useCompositeStore } =
+	unlock( componentsPrivateApis );
 
 function MediaList( {
 	mediaList,
@@ -18,10 +19,10 @@ function MediaList( {
 	onClick,
 	label = __( 'Media List' ),
 } ) {
-	const composite = useCompositeState();
+	const compositeStore = useCompositeStore();
 	return (
 		<Composite
-			{ ...composite }
+			store={ compositeStore }
 			role="listbox"
 			className="block-editor-inserter__media-list"
 			aria-label={ label }
@@ -32,7 +33,6 @@ function MediaList( {
 					media={ media }
 					category={ category }
 					onClick={ onClick }
-					composite={ composite }
 				/>
 			) ) }
 		</Composite>

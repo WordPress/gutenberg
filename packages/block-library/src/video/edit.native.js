@@ -29,6 +29,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -217,7 +218,7 @@ class VideoEdit extends Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectMediaUploadOption }
 				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
@@ -289,8 +290,10 @@ class VideoEdit extends Component {
 						} ) => {
 							const showVideo =
 								isURL( src ) &&
+								getProtocol( attributes.src ) !== 'file:' &&
 								! isUploadInProgress &&
 								! isUploadFailed;
+
 							const icon = this.getIcon(
 								isUploadFailed
 									? ICON_TYPE.RETRY
@@ -331,7 +334,7 @@ class VideoEdit extends Component {
 												}
 												style={ videoStyle }
 												source={ { uri: src } }
-												paused={ true }
+												paused
 											/>
 										</View>
 									) }
@@ -364,9 +367,9 @@ class VideoEdit extends Component {
 						} }
 					/>
 					<BlockCaption
-						accessible={ true }
+						accessible
 						accessibilityLabelCreator={ ( caption ) =>
-							! caption
+							RichText.isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(

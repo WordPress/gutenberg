@@ -1,23 +1,6 @@
-.components-inline-color-popover {
+.format-library__inline-color-popover {
 
-	.components-popover__content {
-		.components-tab-panel__tab-content {
-			padding: 16px;
-		}
-
-		.components-color-palette {
-			margin-top: 0.6rem;
-		}
-
-		.components-base-control__title {
-			display: block;
-			margin-bottom: 16px;
-			font-weight: 600;
-			color: #191e23;
-		}
-
-		.component-color-indicator {
-			vertical-align: text-bottom;
-		}
+	[role="tabpanel"] {
+		padding: 16px;
 	}
 }

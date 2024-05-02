@@ -56,6 +56,8 @@ export interface Options {
 	enabled: boolean;
 }
 
+const EMPTY_OBJECT = {};
+
 /**
  * Resolves the specified entity record.
  *
@@ -167,24 +169,34 @@ export default function useEntityRecord< RecordType >(
 	);
 
 	const { editedRecord, hasEdits, edits } = useSelect(
-		( select ) => ( {
-			editedRecord: select( coreStore ).getEditedEntityRecord(
-				kind,
-				name,
-				recordId
-			),
-			hasEdits: select( coreStore ).hasEditsForEntityRecord(
-				kind,
-				name,
-				recordId
-			),
-			edits: select( coreStore ).getEntityRecordNonTransientEdits(
-				kind,
-				name,
-				recordId
-			),
-		} ),
-		[ kind, name, recordId ]
+		( select ) => {
+			if ( ! options.enabled ) {
+				return {
+					editedRecord: EMPTY_OBJECT,
+					hasEdits: false,
+					edits: EMPTY_OBJECT,
+				};
+			}
+
+			return {
+				editedRecord: select( coreStore ).getEditedEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				hasEdits: select( coreStore ).hasEditsForEntityRecord(
+					kind,
+					name,
+					recordId
+				),
+				edits: select( coreStore ).getEntityRecordNonTransientEdits(
+					kind,
+					name,
+					recordId
+				),
+			};
+		},
+		[ kind, name, recordId, options.enabled ]
 	);
 
 	const { data: record, ...querySelectRest } = useQuerySelect(

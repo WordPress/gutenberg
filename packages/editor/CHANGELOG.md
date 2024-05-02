@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 13.33.0 (2024-04-19)
+
+## 13.32.0 (2024-04-03)
+
+## 13.31.0 (2024-03-21)
+
+## 13.30.0 (2024-03-06)
+
+## 13.29.0 (2024-02-21)
+
+## 13.28.0 (2024-02-09)
+
+## 13.27.0 (2024-01-24)
+
+## 13.26.0 (2024-01-10)
+
+### New Features
+
+-   Add the editor panels visibility state to the editor store in addition to the following actions and selectors: `toggleEditorPanelEnabled`, `toggleEditorPanelOpened`, `removeEditorPanel`, `isEditorPanelRemoved`, `isEditorPanelOpened` and `isEditorPanelEnabled`.
+
+## 13.25.0 (2023-12-13)
+
+## 13.24.0 (2023-11-29)
+
+## 13.23.0 (2023-11-16)
+
 ## 13.22.0 (2023-11-02)
 
 ## 13.21.0 (2023-10-18)

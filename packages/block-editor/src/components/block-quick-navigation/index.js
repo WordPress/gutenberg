@@ -5,7 +5,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
+	__experimentalTruncate as Truncate,
+	Flex,
+	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
 import {
@@ -72,10 +74,14 @@ function BlockQuickNavigationItem( { clientId } ) {
 			isPressed={ isSelected }
 			onClick={ () => selectBlock( clientId ) }
 		>
-			<HStack justify="flex-start">
-				<BlockIcon icon={ icon } />
-				<FlexItem>{ name }</FlexItem>
-			</HStack>
+			<Flex>
+				<FlexItem>
+					<BlockIcon icon={ icon } />
+				</FlexItem>
+				<FlexBlock style={ { textAlign: 'left' } }>
+					<Truncate>{ name }</Truncate>
+				</FlexBlock>
+			</Flex>
 		</Button>
 	);
 }

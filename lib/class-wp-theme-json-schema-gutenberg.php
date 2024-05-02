@@ -2,12 +2,8 @@
 /**
  * WP_Theme_JSON_Schema_Gutenberg class
  *
- * This class/file will NOT be backported to Core. It exists to provide a
- * migration path for theme.json files that used the deprecated "behaviors".
- * This file will be removed from Gutenberg in version 17.0.0.
- *
- * @package gutenberg
- * @since 16.7.0
+ * @package Gutenberg
+ * @since 5.9.0
  */
 
 if ( class_exists( 'WP_Theme_JSON_Schema_Gutenberg' ) ) {
@@ -42,6 +38,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Function that migrates a given theme.json structure to the last version.
 	 *
 	 * @since 5.9.0
+	 * @since 6.5.0 Migrate up to v3.
 	 *
 	 * @param array $theme_json The structure to migrate.
 	 *
@@ -54,12 +51,14 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			);
 		}
 
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = self::migrate_v1_to_v2( $theme_json );
-		}
-
-		if ( 2 === $theme_json['version'] ) {
-			$theme_json = self::migrate_deprecated_lightbox_behaviors( $theme_json );
+		// Migrate each version in order starting with the current version.
+		switch ( $theme_json['version'] ) {
+			case 1:
+				$theme_json = self::migrate_v1_to_v2( $theme_json );
+				// no break
+			case 2:
+				$theme_json = self::migrate_v2_to_v3( $theme_json );
+				// no break
 		}
 
 		return $theme_json;
@@ -95,41 +94,51 @@ class WP_Theme_JSON_Schema_Gutenberg {
 		return $new;
 	}
 
-
 	/**
-	 * Migrate away from the previous syntax that used a top-level "behaviors" key
-	 * in the `theme.json` to a new "lightbox" setting.
+	 * Migrates from v2 to v3.
 	 *
-	 * This function SHOULD NOT be ported to Core!!!
+	 * - Sets settings.typography.defaultFontSizes to false.
 	 *
-	 * It is a temporary migration that will be removed in Gutenberg 17.0.0
+	 * @since 6.5.0
 	 *
-	 * @since 16.7.0
+	 * @param array $old Data to migrate.
 	 *
-	 * @param array $old Data with (potentially) behaviors.
-	 * @return array Data with behaviors removed.
+	 * @return array Data with defaultFontSizes set to false.
 	 */
-	private static function migrate_deprecated_lightbox_behaviors( $old ) {
+	private static function migrate_v2_to_v3( $old ) {
 		// Copy everything.
 		$new = $old;
 
-		// Migrate the old behaviors syntax to the new "lightbox" syntax.
-		if ( isset( $old['behaviors']['blocks']['core/image']['lightbox']['enabled'] ) ) {
-			_wp_array_set(
-				$new,
-				array( 'settings', 'blocks', 'core/image', 'lightbox', 'enabled' ),
-				$old['behaviors']['blocks']['core/image']['lightbox']['enabled']
-			);
+		// Set the new version.
+		$new['version'] = 3;
+
+		/*
+		 * Remaining changes do not need to be applied to the custom origin,
+		 * as they should take on the value of the theme origin.
+		 */
+		if (
+			isset( $new['isGlobalStylesUserThemeJSON'] ) &&
+			true === $new['isGlobalStylesUserThemeJSON']
+		) {
+			return $new;
 		}
 
-		// Migrate the behaviors setting to the new syntax. This setting controls
-		// whether the Lightbox UI shows up in the block editor.
-		if ( isset( $old['settings']['blocks']['core/image']['behaviors']['lightbox'] ) ) {
-			_wp_array_set(
-				$new,
-				array( 'settings', 'blocks', 'core/image', 'lightbox', 'allowEditing' ),
-				$old['settings']['blocks']['core/image']['behaviors']['lightbox']
-			);
+		/*
+		 * Even though defaultFontSizes is a new setting, we need to migrate
+		 * it as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided font sizes as they could match the default ones and
+		 * affect the generated CSS. And in v2 we provided default font sizes
+		 * when the theme did not provide any.
+		 */
+		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
+			if ( ! isset( $new['settings'] ) ) {
+				$new['settings'] = array();
+			}
+			if ( ! isset( $new['settings']['typography'] ) ) {
+				$new['settings']['typography'] = array();
+			}
+			$new['settings']['typography']['defaultFontSizes'] = false;
 		}
 
 		return $new;

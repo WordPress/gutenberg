@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -14,7 +9,11 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { STORE_NAME } from './name';
-import { getQueriedItems, getQueriedTotalItems } from './queried-data';
+import {
+	getQueriedItems,
+	getQueriedTotalItems,
+	getQueriedTotalPages,
+} from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import {
 	getNormalizedCommaSeparable,
@@ -46,6 +45,7 @@ export interface State {
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
 	userPatternCategories: Array< UserPatternCategory >;
+	defaultTemplates: Record< string, string >;
 }
 
 type EntityRecordKey = string | number;
@@ -61,6 +61,16 @@ interface QueriedData {
 	queries: Record< ET.Context, Record< string, Array< number > > >;
 }
 
+type RevisionRecord =
+	| Record< ET.Context, Record< number, ET.PostRevision > >
+	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+
+interface RevisionsQueriedData {
+	items: RevisionRecord;
+	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
+	queries: Record< ET.Context, Record< string, Array< number > > >;
+}
+
 interface EntityState< EntityRecord extends ET.EntityRecord > {
 	edits: Record< string, Partial< EntityRecord > >;
 	saving: Record<
@@ -69,6 +79,7 @@ interface EntityState< EntityRecord extends ET.EntityRecord > {
 	>;
 	deleting: Record< string, Partial< { pending: boolean; error: Error } > >;
 	queriedData: QueriedData;
+	revisions?: RevisionsQueriedData;
 }
 
 interface EntityConfig {
@@ -80,6 +91,12 @@ interface UserState {
 	queries: Record< string, EntityRecordKey[] >;
 	byId: Record< EntityRecordKey, ET.User< 'edit' > >;
 }
+
+type TemplateQuery = {
+	slug?: string;
+	is_custom?: boolean;
+	ignore_empty?: boolean;
+};
 
 export interface UserPatternCategory {
 	id: number;
@@ -212,10 +229,11 @@ export function getEntitiesByKind( state: State, kind: string ): Array< any > {
  *
  * @return Array of entities with config matching kind.
  */
-export function getEntitiesConfig( state: State, kind: string ): Array< any > {
-	return state.entities.config.filter( ( entity ) => entity.kind === kind );
-}
-
+export const getEntitiesConfig = createSelector(
+	( state: State, kind: string ): Array< any > =>
+		state.entities.config.filter( ( entity ) => entity.kind === kind ),
+	( state: State, kind: string ) => state.entities.config
+);
 /**
  * Returns the entity config given its kind and name.
  *
@@ -601,9 +619,18 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query.per_page === -1 ) return 1;
+	if ( query.per_page === -1 ) {
+		return 1;
+	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
-	if ( ! totalItems ) return totalItems;
+	if ( ! totalItems ) {
+		return totalItems;
+	}
+	// If `per_page` is not set and the query relies on the defaults of the
+	// REST endpoint, get the info from query's meta.
+	if ( ! query.per_page ) {
+		return getQueriedTotalPages( queriedState, query );
+	}
 	return Math.ceil( totalItems / query.per_page );
 };
 
@@ -823,10 +850,21 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
+	): ET.Updatable< EntityRecord > | false => {
+		const raw = getRawEntityRecord( state, kind, name, recordId );
+		const edited = getEntityRecordEdits( state, kind, name, recordId );
+		// Never return a non-falsy empty object. Unfortunately we can't return
+		// undefined or null because we were previously returning an empty
+		// object, so trying to read properties from the result would throw.
+		// Using false here is a workaround to avoid breaking changes.
+		if ( ! raw && ! edited ) {
+			return false;
+		}
+		return {
+			...raw,
+			...edited,
+		};
+	},
 	(
 		state: State,
 		kind: string,
@@ -1241,7 +1279,7 @@ export function getReferenceByDistinctEdits( state ) {
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): Optional< ET.Updatable< ET.WpTemplate > > | null {
+): Optional< ET.Updatable< ET.WpTemplate > > | null | false {
 	const records = getEntityRecords< ET.WpTemplate >(
 		state,
 		'postType',
@@ -1335,13 +1373,20 @@ export function getUserPatternCategories(
 /**
  * Returns the revisions of the current global styles theme.
  *
- * @param state Data state.
+ * @deprecated since WordPress 6.5.0. Callers should use `select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )` instead, where `recordKey` is the id of the global styles parent post.
+ *
+ * @param      state Data state.
  *
  * @return The current global styles.
  */
 export function getCurrentThemeGlobalStylesRevisions(
 	state: State
 ): Array< object > | null {
+	deprecated( "select( 'core' ).getCurrentThemeGlobalStylesRevisions()", {
+		since: '6.5.0',
+		alternative:
+			"select( 'core' ).getRevisions( 'root', 'globalStyles', ${ recordKey } )",
+	} );
 	const currentGlobalStylesId =
 		__experimentalGetCurrentGlobalStylesId( state );
 
@@ -1351,3 +1396,118 @@ export function getCurrentThemeGlobalStylesRevisions(
 
 	return state.themeGlobalStyleRevisions[ currentGlobalStylesId ];
 }
+
+/**
+ * Returns the default template use to render a given query.
+ *
+ * @param state Data state.
+ * @param query Query.
+ *
+ * @return The default template id for the given query.
+ */
+export function getDefaultTemplateId(
+	state: State,
+	query: TemplateQuery
+): string {
+	return state.defaultTemplates[ JSON.stringify( query ) ];
+}
+
+/**
+ * Returns an entity's revisions.
+ *
+ * @param state     State tree
+ * @param kind      Entity kind.
+ * @param name      Entity name.
+ * @param recordKey The key of the entity record whose revisions you want to fetch.
+ * @param query     Optional query. If requesting specific
+ *                  fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [Entity kind]".
+ *
+ * @return Record.
+ */
+export const getRevisions = (
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): RevisionRecord[] | null => {
+	const queriedStateRevisions =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedStateRevisions ) {
+		return null;
+	}
+
+	return getQueriedItems( queriedStateRevisions, query );
+};
+
+/**
+ * Returns a single, specific revision of a parent entity.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query. If requesting specific
+ *                    fields, fields must always include the ID. For valid query parameters see revisions schema in [the REST API Handbook](https://developer.wordpress.org/rest-api/reference/). Then see the arguments available "Retrieve a [entity kind]".
+ *
+ * @return Record.
+ */
+export const getRevision = createSelector(
+	(
+		state: State,
+		kind: string,
+		name: string,
+		recordKey: EntityRecordKey,
+		revisionKey: EntityRecordKey,
+		query?: GetRecordsHttpQuery
+	): RevisionRecord | Record< PropertyKey, never > | undefined => {
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
+				recordKey
+			];
+
+		if ( ! queriedState ) {
+			return undefined;
+		}
+
+		const context = query?.context ?? 'default';
+
+		if ( query === undefined ) {
+			// If expecting a complete item, validate that completeness.
+			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
+				return undefined;
+			}
+
+			return queriedState.items[ context ][ revisionKey ];
+		}
+
+		const item = queriedState.items[ context ]?.[ revisionKey ];
+		if ( item && query._fields ) {
+			const filteredItem = {};
+			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+
+			for ( let f = 0; f < fields.length; f++ ) {
+				const field = fields[ f ].split( '.' );
+				let value = item;
+				field.forEach( ( fieldName ) => {
+					value = value?.[ fieldName ];
+				} );
+				setNestedValue( filteredItem, field, value );
+			}
+
+			return filteredItem;
+		}
+
+		return item;
+	},
+	( state: State, kind, name, recordKey, revisionKey, query ) => {
+		const context = query?.context ?? 'default';
+		return [
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.items?.[ context ]?.[ revisionKey ],
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
+				?.itemIsComplete?.[ context ]?.[ revisionKey ],
+		];
+	}
+);

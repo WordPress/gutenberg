@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -32,15 +32,16 @@ function useShallowMemo( value ) {
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
  * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
  *
  * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
  *
- * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ * @param {?boolean}             __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
  *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
@@ -53,6 +54,7 @@ function useShallowMemo( value ) {
  */
 export default function useNestedSettingsUpdate(
 	clientId,
+	parentLock,
 	allowedBlocks,
 	prioritizedInserterBlocks,
 	defaultBlock,
@@ -64,20 +66,11 @@ export default function useNestedSettingsUpdate(
 	orientation,
 	layout
 ) {
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
+
 	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 	const registry = useRegistry();
-
-	const { parentLock } = useSelect(
-		( select ) => {
-			const rootClientId =
-				select( blockEditorStore ).getBlockRootClientId( clientId );
-			return {
-				parentLock:
-					select( blockEditorStore ).getTemplateLock( rootClientId ),
-			};
-		},
-		[ clientId ]
-	);
 
 	// Implementors often pass a new array on every render,
 	// and the contents of the arrays are just strings, so the entire array
@@ -143,6 +136,16 @@ export default function useNestedSettingsUpdate(
 
 		if ( directInsert !== undefined ) {
 			newSettings.directInsert = directInsert;
+		}
+
+		if (
+			newSettings.directInsert !== undefined &&
+			typeof newSettings.directInsert !== 'boolean'
+		) {
+			deprecated( 'Using `Function` as a `directInsert` argument', {
+				alternative: '`boolean` values',
+				since: '6.5',
+			} );
 		}
 
 		// Batch updates to block list settings to avoid triggering cascading renders

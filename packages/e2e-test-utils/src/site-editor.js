@@ -117,7 +117,7 @@ export async function openGlobalStylesPanel( panelName ) {
  */
 export async function openPreviousGlobalStylesPanel() {
 	await page.click(
-		'div[aria-label="Editor settings"] button[aria-label="Navigate to the previous view"]'
+		'div[aria-label="Editor settings"] button[aria-label="Back"]'
 	);
 }
 

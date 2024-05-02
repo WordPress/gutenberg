@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { compose, ifCondition } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -34,12 +33,26 @@ const TagsPanel = () => {
 	);
 };
 
-class MaybeTagsPanel extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			hadTagsWhenOpeningThePanel: props.hasTags,
+const MaybeTagsPanel = () => {
+	const { hasTags, isPostTypeSupported } = useSelect( ( select ) => {
+		const postType = select( editorStore ).getCurrentPostType();
+		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
+		const _isPostTypeSupported = tagsTaxonomy?.types?.includes( postType );
+		const areTagsFetched = tagsTaxonomy !== undefined;
+		const tags =
+			tagsTaxonomy &&
+			select( editorStore ).getEditedPostAttribute(
+				tagsTaxonomy.rest_base
+			);
+		return {
+			hasTags: !! tags?.length,
+			isPostTypeSupported: areTagsFetched && _isPostTypeSupported,
 		};
+	}, [] );
+	const [ hadTagsWhenOpeningThePanel ] = useState( hasTags );
+
+	if ( ! isPostTypeSupported ) {
+		return null;
 	}
 
 	/*
@@ -52,34 +65,11 @@ class MaybeTagsPanel extends Component {
 	 * hiding this panel and keeping the user from adding
 	 * more than one tag.
 	 */
-	render() {
-		if ( ! this.state.hadTagsWhenOpeningThePanel ) {
-			return <TagsPanel />;
-		}
-
-		return null;
+	if ( ! hadTagsWhenOpeningThePanel ) {
+		return <TagsPanel />;
 	}
-}
 
-export default compose(
-	withSelect( ( select ) => {
-		const postType = select( editorStore ).getCurrentPostType();
-		const tagsTaxonomy = select( coreStore ).getTaxonomy( 'post_tag' );
-		const tags =
-			tagsTaxonomy &&
-			select( editorStore ).getEditedPostAttribute(
-				tagsTaxonomy.rest_base
-			);
-		return {
-			areTagsFetched: tagsTaxonomy !== undefined,
-			isPostTypeSupported:
-				tagsTaxonomy &&
-				tagsTaxonomy.types.some( ( type ) => type === postType ),
-			hasTags: tags && tags.length,
-		};
-	} ),
-	ifCondition(
-		( { areTagsFetched, isPostTypeSupported } ) =>
-			isPostTypeSupported && areTagsFetched
-	)
-)( MaybeTagsPanel );
+	return null;
+};
+
+export default MaybeTagsPanel;

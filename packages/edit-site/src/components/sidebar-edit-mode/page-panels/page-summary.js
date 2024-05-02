@@ -2,36 +2,40 @@
  * WordPress dependencies
  */
 import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	PluginPostStatusInfo,
+	PostAuthorPanel,
+	PostURLPanel,
+	PostSchedulePanel,
+	PostTemplatePanel,
+	PostFeaturedImagePanel,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+
 /**
  * Internal dependencies
  */
-import PageStatus from './page-status';
-import PublishDate from './publish-date';
-import EditTemplate from './edit-template';
+import { unlock } from '../../../lock-unlock';
 
-export default function PageSummary( {
-	status,
-	date,
-	password,
-	postId,
-	postType,
-} ) {
+const { PrivatePostExcerptPanel, PostStatus } = unlock( editorPrivateApis );
+
+export default function PageSummary() {
 	return (
-		<VStack>
-			<PageStatus
-				status={ status }
-				date={ date }
-				password={ password }
-				postId={ postId }
-				postType={ postType }
-			/>
-			<PublishDate
-				status={ status }
-				date={ date }
-				postId={ postId }
-				postType={ postType }
-			/>
-			<EditTemplate />
+		<VStack spacing={ 0 }>
+			<PluginPostStatusInfo.Slot>
+				{ ( fills ) => (
+					<>
+						<PostStatus />
+						<PostFeaturedImagePanel withPanelBody={ false } />
+						<PrivatePostExcerptPanel />
+						<PostSchedulePanel />
+						<PostTemplatePanel />
+						<PostURLPanel />
+						<PostAuthorPanel />
+						{ fills }
+					</>
+				) }
+			</PluginPostStatusInfo.Slot>
 		</VStack>
 	);
 }

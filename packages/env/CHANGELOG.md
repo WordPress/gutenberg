@@ -2,6 +2,36 @@
 
 ## Unreleased
 
+## 9.8.0 (2024-04-19)
+
+## 9.7.0 (2024-04-03)
+
+## 9.6.0 (2024-03-21)
+
+## 9.5.0 (2024-03-06)
+
+## 9.4.0 (2024-02-21)
+
+### Bug fix
+
+-   Fix `mariadb` version to LTS [#59237](https://github.com/WordPress/gutenberg/pull/59237)
+
+## 9.3.0 (2024-02-09)
+
+## 9.2.0 (2024-01-24)
+
+## 9.1.0 (2024-01-10)
+
+## 9.0.0 (2023-12-13)
+
+### Breaking Change
+
+- Update Docker usage to `docker compose` V2 following [deprecation](https://docs.docker.com/compose/migrate/) of `docker-compose` V1.
+
+## 8.13.0 (2023-11-29)
+
+## 8.12.0 (2023-11-16)
+
 ## 8.11.0 (2023-11-02)
 
 ### Enhancement

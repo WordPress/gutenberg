@@ -95,7 +95,7 @@ export default function usePatternCategories() {
 		sortedCategories.unshift( {
 			name: PATTERN_DEFAULT_CATEGORY,
 			label: __( 'All patterns' ),
-			description: __( 'A list of all patterns from all sources' ),
+			description: __( 'A list of all patterns from all sources.' ),
 			count: themePatterns.length + userPatterns.length,
 		} );
 

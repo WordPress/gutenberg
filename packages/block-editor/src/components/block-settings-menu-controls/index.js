@@ -22,13 +22,11 @@ import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 
+import { BlockRenameControl, useBlockRename } from '../block-rename';
+
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( {
-	fillProps,
-	clientIds = null,
-	__unstableDisplayLocation,
-} ) => {
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const { selectedBlocks, selectedClientIds } = useSelect(
 		( select ) => {
 			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
@@ -44,7 +42,9 @@ const BlockSettingsMenuControlsSlot = ( {
 	);
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
+	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
 	const showLockButton = selectedClientIds.length === 1 && canLock;
+	const showRenameButton = selectedClientIds.length === 1 && canRename;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -57,7 +57,6 @@ const BlockSettingsMenuControlsSlot = ( {
 		<Slot
 			fillProps={ {
 				...fillProps,
-				__unstableDisplayLocation,
 				selectedBlocks,
 				selectedClientIds,
 			} }
@@ -81,6 +80,11 @@ const BlockSettingsMenuControlsSlot = ( {
 						) }
 						{ showLockButton && (
 							<BlockLockMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+							/>
+						) }
+						{ showRenameButton && (
+							<BlockRenameControl
 								clientId={ selectedClientIds[ 0 ] }
 							/>
 						) }

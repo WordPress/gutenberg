@@ -23,11 +23,17 @@
 	z-index: z-index(".block-library-template-part__selection-search");
 }
 
-.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
-.is-outline-mode .block-editor-block-list__block:not(.remove-outline).is-reusable {
-	&.is-highlighted,
-	&.is-selected {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+// We don't use .is-outline-mode in this case so colors take effect properly in the block editor.
+// Will be a better result when outlines are not shadows, but outlines, so we can target outline-color, not redefine the entire shadow.
+.block-editor-block-list__block:not(.remove-outline).wp-block-template-part,
+.block-editor-block-list__block:not(.remove-outline).is-reusable {
+	&.is-highlighted::after,
+	&.is-selected::after {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
+	}
+
+	&.is-hovered::after {
+		box-shadow: 0 0 0 $border-width var(--wp-block-synced-color);
 	}
 
 	&.block-editor-block-list__block:not([contenteditable]):focus {
@@ -39,4 +45,8 @@
 			}
 		}
 	}
+}
+
+.is-outline-mode .block-editor-block-list__block:not(.remove-outline).wp-block-template-part.has-editable-outline::after {
+	border: none;
 }

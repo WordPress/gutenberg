@@ -16,6 +16,10 @@ const MyTooltip = () => (
 );
 ```
 
+### Nested tooltips
+
+In case one or more `Tooltip` components are rendered inside another `Tooltip` component, only the tooltip associated to the outermost `Tooltip` component will be rendered in the browser and shown to the user appropriately. The rest of the nested `Tooltip` components will simply no-op and pass-through their anchor.
+
 ## Props
 
 The component accepts the following props:

@@ -5,6 +5,7 @@
 	"title": "List item",
 	"category": "text",
 	"parent": [ "core/list" ],
+	"allowedBlocks": [ "core/list" ],
 	"description": "Create a list item.",
 	"textdomain": "default",
 	"attributes": {
@@ -12,16 +13,23 @@
 			"type": "string"
 		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "li",
-			"default": "",
 			"__experimentalRole": "content"
 		}
 	},
 	"supports": {
 		"className": false,
 		"__experimentalSelector": "li",
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -34,6 +42,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	}
 }

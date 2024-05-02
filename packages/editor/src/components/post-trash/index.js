@@ -38,6 +38,7 @@ export default function PostTrash() {
 	return (
 		<>
 			<Button
+				__next40pxDefaultSize
 				className="editor-post-trash"
 				isDestructive
 				variant="secondary"
@@ -53,6 +54,7 @@ export default function PostTrash() {
 				isOpen={ showConfirmDialog }
 				onConfirm={ handleConfirm }
 				onCancel={ () => setShowConfirmDialog( false ) }
+				confirmButtonText={ __( 'Move to trash' ) }
 			>
 				{ __(
 					'Are you sure you want to move this post to the trash?'

@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { COLORS, reduceMotion, rtl } from '../../utils';
+import { COLORS, rtl } from '../../utils';
 import { space } from '../../utils/space';
 
 import type {
@@ -287,20 +287,22 @@ export const Tooltip = styled.span< TooltipProps >`
 	pointer-events: none;
 	position: absolute;
 	text-align: center;
-	transition: opacity 120ms ease;
 	user-select: none;
 	line-height: 1.4;
 
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 120ms ease;
+	}
+
 	${ tooltipShow };
 	${ tooltipPosition };
-	${ reduceMotion( 'transition' ) };
 	${ rtl(
 		{ transform: 'translateX(-50%)' },
 		{ transform: 'translateX(50%)' }
 	) }
 `;
 
-// @todo: Refactor RangeControl with latest HStack configuration
+// @todo Refactor RangeControl with latest HStack configuration
 // @see: packages/components/src/h-stack
 export const InputNumber = styled( NumberControl )`
 	display: inline-block;

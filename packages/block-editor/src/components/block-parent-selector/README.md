@@ -8,11 +8,6 @@ In practice the BlockParentSelector component renders a <ToolbarButton /> compon
 
 ![Block parent selector test](https://make.wordpress.org/core/files/2020/09/block-parent-selector-test.gif)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

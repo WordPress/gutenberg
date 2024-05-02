@@ -61,7 +61,9 @@ export function AlignmentMatrixControl( {
 		activeId: getItemId( baseId, value ),
 		setActiveId: ( nextActiveId ) => {
 			const nextValue = getItemValue( baseId, nextActiveId );
-			if ( nextValue ) onChange?.( nextValue );
+			if ( nextValue ) {
+				onChange?.( nextValue );
+			}
 		},
 		rtl: isRTL(),
 	} );

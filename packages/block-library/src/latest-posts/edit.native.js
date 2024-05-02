@@ -201,7 +201,7 @@ class LatestPostsEdit extends Component {
 								value={ featuredImageAlign }
 								onChange={ this.onSetFeaturedImageAlign }
 								controls={ [ 'left', 'center', 'right' ] }
-								isBottomSheetControl={ true }
+								isBottomSheetControl
 							/>
 							<ToggleControl
 								label={ __( 'Add link to featured image' ) }

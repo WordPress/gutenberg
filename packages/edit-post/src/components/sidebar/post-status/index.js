@@ -7,23 +7,29 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { PostSwitchToDraftButton, PostSyncStatus } from '@wordpress/editor';
+import {
+	PluginPostStatusInfo,
+	PostAuthorPanel,
+	PostSchedulePanel,
+	PostSyncStatus,
+	PostURLPanel,
+	PostTemplatePanel,
+	PostFeaturedImagePanel,
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';
-import PostSchedule from '../post-schedule';
 import PostSticky from '../post-sticky';
-import PostAuthor from '../post-author';
 import PostSlug from '../post-slug';
 import PostFormat from '../post-format';
-import PostPendingStatus from '../post-pending-status';
-import PluginPostStatusInfo from '../plugin-post-status-info';
-import { store as editPostStore } from '../../../store';
-import PostTemplate from '../post-template';
-import PostURL from '../post-url';
+import { unlock } from '../../../lock-unlock';
+
+const { PostStatus: PostStatusPanel, PrivatePostExcerptPanel } =
+	unlock( editorPrivateApis );
 
 /**
  * Module Constants
@@ -31,17 +37,31 @@ import PostURL from '../post-url';
 const PANEL_NAME = 'post-status';
 
 export default function PostStatus() {
-	const { isOpened, isRemoved } = useSelect( ( select ) => {
-		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
-		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
-		const { isEditorPanelRemoved, isEditorPanelOpened } =
-			select( editPostStore );
-		return {
-			isRemoved: isEditorPanelRemoved( PANEL_NAME ),
-			isOpened: isEditorPanelOpened( PANEL_NAME ),
-		};
-	}, [] );
-	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+	const { isOpened, isRemoved, showPostExcerptPanel } = useSelect(
+		( select ) => {
+			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
+			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
+			const {
+				isEditorPanelRemoved,
+				isEditorPanelOpened,
+				getCurrentPostType,
+			} = select( editorStore );
+			const postType = getCurrentPostType();
+			return {
+				isRemoved: isEditorPanelRemoved( PANEL_NAME ),
+				isOpened: isEditorPanelOpened( PANEL_NAME ),
+				// Post excerpt panel is rendered in different place depending on the post type.
+				// So we cannot make this check inside the PostExcerpt component based on the current edited entity.
+				showPostExcerptPanel: ! [
+					'wp_template',
+					'wp_template_part',
+					'wp_block',
+				].includes( postType ),
+			};
+		},
+		[]
+	);
+	const { toggleEditorPanelOpened } = useDispatch( editorStore );
 
 	if ( isRemoved ) {
 		return null;
@@ -57,25 +77,23 @@ export default function PostStatus() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostVisibility />
-						<PostSchedule />
-						<PostTemplate />
-						<PostURL />
+						<PostStatusPanel />
+						<PostFeaturedImagePanel withPanelBody={ false } />
+						{ showPostExcerptPanel && <PrivatePostExcerptPanel /> }
+						<PostSchedulePanel />
+						<PostTemplatePanel />
+						<PostURLPanel />
+						<PostSyncStatus />
 						<PostSticky />
-						<PostPendingStatus />
 						<PostFormat />
 						<PostSlug />
-						<PostAuthor />
-						<PostSyncStatus />
+						<PostAuthorPanel />
 						{ fills }
 						<HStack
 							style={ {
 								marginTop: '16px',
 							} }
-							spacing={ 4 }
-							wrap
 						>
-							<PostSwitchToDraftButton />
 							<PostTrash />
 						</HStack>
 					</>

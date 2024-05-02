@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, _n } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { backup } from '@wordpress/icons';
@@ -31,13 +31,13 @@ function LastRevision() {
 				} ) }
 				className="editor-post-last-revision__title"
 				icon={ backup }
-			>
-				{ sprintf(
-					/* translators: %d: number of revisions */
-					_n( '%d Revision', '%d Revisions', revisionsCount ),
+				iconPosition="right"
+				text={ sprintf(
+					/* translators: %s: number of revisions */
+					__( 'Revisions (%s)' ),
 					revisionsCount
 				) }
-			</Button>
+			/>
 		</PostLastRevisionCheck>
 	);
 }

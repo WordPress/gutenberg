@@ -4,15 +4,17 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
-import { kebabCase } from '../utils/object';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
+import { unlock } from '../lock-unlock';
 
 /*
  * This utility is intended to assist where the serialization of the typography
@@ -29,15 +31,13 @@ import { kebabCase } from '../utils/object';
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
+	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
-	const fluidTypographySettings =
-		getFluidTypographyOptionsFromSettings( settings );
-
 	typographyStyles = {
 		...typographyStyles,
 		fontSize: getTypographyFontSizeValue(
 			{ size: attributes?.style?.typography?.fontSize },
-			fluidTypographySettings
+			settings
 		),
 	};
 
@@ -45,9 +45,12 @@ export function getTypographyClassesAndStyles( attributes, settings ) {
 	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
-
+	const textAlignClassName = !! attributes?.style?.typography?.textAlign
+		? `has-text-align-${ attributes?.style?.typography?.textAlign }`
+		: '';
 	const className = classnames(
 		fontFamilyClassName,
+		textAlignClassName,
 		getFontSizeClass( attributes?.fontSize )
 	);
 

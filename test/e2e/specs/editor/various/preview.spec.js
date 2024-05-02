@@ -22,11 +22,6 @@ test.describe( 'Preview', () => {
 	} ) => {
 		const editorPage = page;
 
-		// Disabled until content present.
-		await expect(
-			editorPage.locator( 'role=button[name="Preview"i]' )
-		).toBeDisabled();
-
 		await editor.canvas
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello World' );
@@ -188,12 +183,16 @@ test.describe( 'Preview', () => {
 
 		// Return to editor and switch to Draft.
 		await editorPage.bringToFront();
+		const postStatusButton = page.locator( '.editor-post-status-trigger' );
+		await postStatusButton.click();
+		await page.getByRole( 'radio', { name: 'Draft' } ).click();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Switch to draft' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Save',
+				exact: true,
+			} )
 			.click();
-		// FIXME: The confirmation dialog is not named yet.
-		await page.click( 'role=dialog >> role=button[name="OK"i]' );
 
 		// Wait for the status change.
 		// @see https://github.com/WordPress/gutenberg/pull/43933
@@ -301,7 +300,7 @@ test.describe( 'Preview with private custom post type', () => {
 		} );
 
 		// Open the view menu.
-		await page.click( 'role=button[name="Preview"i]' );
+		await page.click( 'role=button[name="View"i]' );
 
 		await expect(
 			page.locator( 'role=menuitem[name="Preview in new tab"i]' )
@@ -316,7 +315,7 @@ class PreviewUtils {
 
 	async waitForPreviewNavigation( previewPage ) {
 		const previewToggle = this.page.locator(
-			'role=button[name="Preview"i][expanded=false]'
+			'role=button[name="View"i][expanded=false]'
 		);
 		const isDropdownClosed = await previewToggle.isVisible();
 		if ( isDropdownClosed ) {
@@ -335,9 +334,9 @@ class PreviewUtils {
 		);
 		await this.page.click( 'role=menuitem[name="Preferences"i]' );
 
-		// Navigate to panels section.
+		// Navigate to general section.
 		await this.page.click(
-			'role=dialog[name="Preferences"i] >> role=tab[name="Panels"i]'
+			'role=dialog[name="Preferences"i] >> role=tab[name="General"i]'
 		);
 
 		// Find custom fields checkbox.

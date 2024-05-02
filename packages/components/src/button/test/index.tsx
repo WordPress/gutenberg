@@ -43,7 +43,7 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with is-secondary and is-small class', () => {
-			render( <Button variant="secondary" isSmall /> );
+			render( <Button variant="secondary" size="small" /> );
 			const button = screen.getByRole( 'button' );
 
 			expect( button ).toHaveClass( 'is-secondary' );
@@ -110,6 +110,128 @@ describe( 'Button', () => {
 			expect( screen.getByRole( 'button' ) ).not.toHaveClass(
 				'has-text'
 			);
+		} );
+
+		it( 'should render correctly as a tooltip anchor', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<>
+					<Tooltip text="Tooltip text">
+						<Button icon={ plusCircle } label="Tooltip anchor" />
+					</Tooltip>
+					<Button>Focus me</Button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Tooltip anchor',
+			} );
+
+			await user.tab();
+
+			expect( anchor ).toHaveFocus();
+
+			const tooltip = await screen.findByRole( 'tooltip', {
+				name: 'Tooltip text',
+			} );
+
+			expect( tooltip ).toBeVisible();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Focus me' } )
+			).toHaveFocus();
+
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Tooltip text',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should render correctly as a tooltip anchor, ignoring its internal tooltip in favour of the external tooltip', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<>
+					<Tooltip text="Tooltip text">
+						<Button icon={ plusCircle } label="Button label" />
+					</Tooltip>
+					<Button>Focus me</Button>
+				</>
+			);
+
+			const anchor = screen.getByRole( 'button', {
+				name: 'Button label',
+			} );
+
+			await user.tab();
+
+			expect( anchor ).toHaveFocus();
+
+			const tooltip = await screen.findByRole( 'tooltip', {
+				name: 'Tooltip text',
+			} );
+
+			expect( tooltip ).toBeVisible();
+			// Check that the tooltip that would be normally rendered internally by
+			// the `Button` component is ignored, because of an outer tooltip.
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Button label',
+				} )
+			).not.toBeInTheDocument();
+
+			await user.tab();
+
+			expect(
+				screen.getByRole( 'button', { name: 'Focus me' } )
+			).toHaveFocus();
+
+			expect(
+				screen.queryByRole( 'tooltip', {
+					name: 'Tooltip text',
+				} )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should not trash the rendered HTML elements when toggling between showing and not showing a tooltip', async () => {
+			const user = userEvent.setup();
+
+			const { rerender } = render(
+				<Button label="Button label">Test button</Button>
+			);
+
+			const button = screen.getByRole( 'button', {
+				name: 'Button label',
+			} );
+
+			expect( button ).toBeVisible();
+
+			await user.tab();
+
+			expect( button ).toHaveFocus();
+
+			// Re-render the button, but this time change the settings so that it
+			// shows a tooltip.
+			rerender(
+				<Button label="Button label" showTooltip>
+					Test button
+				</Button>
+			);
+
+			// The same button element that we referenced before should still be
+			// in the document and have focus.
+			expect( button ).toHaveFocus();
+
+			// Re-render the button, but stop showing a tooltip.
+			rerender( <Button label="Button label">Test button</Button> );
+
+			// The same button element that we referenced before should still be
+			// in the document and have focus.
+			expect( button ).toHaveFocus();
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
@@ -432,13 +554,11 @@ describe( 'Button', () => {
 
 	describe( 'deprecated props', () => {
 		it( 'should not break when the legacy isPrimary prop is passed', () => {
-			// @ts-expect-error
 			render( <Button isPrimary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-primary' );
 		} );
 
 		it( 'should not break when the legacy isSecondary prop is passed', () => {
-			// @ts-expect-error
 			render( <Button isSecondary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
@@ -446,19 +566,16 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy isTertiary prop is passed', () => {
-			// @ts-expect-error
 			render( <Button isTertiary /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-tertiary' );
 		} );
 
 		it( 'should not break when the legacy isLink prop is passed', () => {
-			// @ts-expect-error
 			render( <Button isLink /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-link' );
 		} );
 
 		it( 'should warn when the isDefault prop is passed', () => {
-			// @ts-expect-error
 			render( <Button isDefault /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass(
 				'is-secondary'
@@ -468,6 +585,11 @@ describe( 'Button', () => {
 
 		it( 'should not break when the legacy isSmall prop is passed', () => {
 			render( <Button isSmall /> );
+			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
+		} );
+
+		it( 'should have the is-small class when small class prop is passed', () => {
+			render( <Button size="small" /> );
 			expect( screen.getByRole( 'button' ) ).toHaveClass( 'is-small' );
 		} );
 

@@ -2,7 +2,7 @@
  * External dependencies
  */
 // eslint-disable-next-line no-restricted-imports
-import { Separator } from 'reakit';
+import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -20,8 +20,8 @@ function UnconnectedDivider(
 	const contextProps = useContextSystem( props, 'Divider' );
 
 	return (
-		<Separator
-			as={ DividerView }
+		<Ariakit.Separator
+			render={ <DividerView /> }
 			{ ...contextProps }
 			ref={ forwardedRef }
 		/>

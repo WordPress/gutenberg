@@ -1,5 +1,5 @@
 // Provide special styling for the placeholder.
-// @todo: this particular minimal style of placeholder could be componentized further.
+// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-post-featured-image {
 	.block-editor-media-placeholder {
 		z-index: 1; // Need to put it above the overlay so the upload button works.
@@ -21,6 +21,7 @@
 
 		// Style the upload button.
 		.components-button {
+			margin: auto;
 			padding: 0;
 			display: flex;
 			justify-content: center;
@@ -95,6 +96,42 @@
 		min-width: $grid-unit-60;
 		height: 100%;
 		width: 100%;
+	}
+
+	// When the Post Featured Image block is linked,
+	// it's wrapped with a disabled <a /> tag.
+	// Restore cursor style so it doesn't appear 'clickable'.
+	> a {
+		cursor: default;
+	}
+
+	// When the Post Featured Image block is linked,
+	// and wrapped with a disabled <a /> tag
+	// ensure that the placeholder items are visible when selected.
+	&.is-selected .components-placeholder.has-illustration {
+		.components-button,
+		.components-placeholder__instructions,
+		.components-placeholder__label {
+			opacity: 1;
+			pointer-events: auto;
+		}
+	}
+
+	// When image being uploaded.
+	&.is-transient {
+		position: relative;
+
+		img {
+			opacity: 0.3;
+		}
+
+		// Show spinner while image is being uploaded.
+		.components-spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+		}
 	}
 }
 

@@ -1,29 +1,28 @@
 /**
  * WordPress dependencies
  */
-import apiFetch from '@wordpress/api-fetch';
-import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { parse } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
-import { addQueryArgs } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { speak } from '@wordpress/a11y';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME as editSiteStoreName } from './constants';
-import isTemplateRevertable from '../utils/is-template-revertable';
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 } from '../utils/constants';
+import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
+
 /**
  * Dispatches an action that toggles a feature flag.
  *
@@ -31,11 +30,14 @@ import {
  */
 export function toggleFeature( featureName ) {
 	return function ( { registry } ) {
-		deprecated( "select( 'core/edit-site' ).toggleFeature( featureName )", {
-			since: '6.0',
-			alternative:
-				"select( 'core/preferences').toggle( 'core/edit-site', featureName )",
-		} );
+		deprecated(
+			"dispatch( 'core/edit-site' ).toggleFeature( featureName )",
+			{
+				since: '6.0',
+				alternative:
+					"dispatch( 'core/preferences').toggle( 'core/edit-site', featureName )",
+			}
+		);
 
 		registry
 			.dispatch( preferencesStore )
@@ -46,58 +48,61 @@ export function toggleFeature( featureName ) {
 /**
  * Action that changes the width of the editing canvas.
  *
+ * @deprecated
+ *
  * @param {string} deviceType
  *
  * @return {Object} Action object.
  */
-export function __experimentalSetPreviewDeviceType( deviceType ) {
-	return {
-		type: 'SET_PREVIEW_DEVICE_TYPE',
-		deviceType,
+export const __experimentalSetPreviewDeviceType =
+	( deviceType ) =>
+	( { registry } ) => {
+		deprecated(
+			"dispatch( 'core/edit-site' ).__experimentalSetPreviewDeviceType",
+			{
+				since: '6.5',
+				version: '6.7',
+				hint: 'registry.dispatch( editorStore ).setDeviceType',
+			}
+		);
+		registry.dispatch( editorStore ).setDeviceType( deviceType );
 	};
-}
 
 /**
  * Action that sets a template, optionally fetching it from REST API.
  *
- * @param {number} templateId   The template ID.
- * @param {string} templateSlug The template slug.
  * @return {Object} Action object.
  */
-export const setTemplate =
-	( templateId, templateSlug ) =>
-	async ( { dispatch, registry } ) => {
-		if ( ! templateSlug ) {
-			try {
-				const template = await registry
-					.resolveSelect( coreStore )
-					.getEntityRecord(
-						'postType',
-						TEMPLATE_POST_TYPE,
-						templateId
-					);
-				templateSlug = template?.slug;
-			} catch ( error ) {}
-		}
+export function setTemplate() {
+	deprecated( "dispatch( 'core/edit-site' ).setTemplate", {
+		since: '6.5',
+		version: '6.8',
+		hint: 'The setTemplate is not needed anymore, the correct entity is resolved from the URL automatically.',
+	} );
 
-		dispatch( {
-			type: 'SET_EDITED_POST',
-			postType: TEMPLATE_POST_TYPE,
-			id: templateId,
-			context: { templateSlug },
-		} );
+	return {
+		type: 'NOTHING',
 	};
+}
 
 /**
  * Action that adds a new template and sets it as the current template.
  *
  * @param {Object} template The template.
  *
+ * @deprecated
+ *
  * @return {Object} Action object used to set the current template.
  */
 export const addTemplate =
 	( template ) =>
 	async ( { dispatch, registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).addTemplate", {
+			since: '6.5',
+			version: '6.8',
+			hint: 'use saveEntityRecord directly',
+		} );
+
 		const newTemplate = await registry
 			.dispatch( coreStore )
 			.saveEntityRecord( 'postType', TEMPLATE_POST_TYPE, template );
@@ -118,7 +123,6 @@ export const addTemplate =
 			type: 'SET_EDITED_POST',
 			postType: TEMPLATE_POST_TYPE,
 			id: newTemplate.id,
-			context: { templateSlug: newTemplate.slug },
 		} );
 	};
 
@@ -129,51 +133,10 @@ export const addTemplate =
  */
 export const removeTemplate =
 	( template ) =>
-	async ( { registry } ) => {
-		try {
-			await registry
-				.dispatch( coreStore )
-				.deleteEntityRecord( 'postType', template.type, template.id, {
-					force: true,
-				} );
-
-			const lastError = registry
-				.select( coreStore )
-				.getLastEntityDeleteError(
-					'postType',
-					template.type,
-					template.id
-				);
-
-			if ( lastError ) {
-				throw lastError;
-			}
-
-			// Depending on how the entity was retrieved it's title might be
-			// an object or simple string.
-			const templateTitle =
-				typeof template.title === 'string'
-					? template.title
-					: template.title?.rendered;
-
-			registry.dispatch( noticesStore ).createSuccessNotice(
-				sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" deleted.' ),
-					decodeEntities( templateTitle )
-				),
-				{ type: 'snackbar', id: 'site-editor-template-deleted-success' }
-			);
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'An error occurred while deleting the template.' );
-
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).removeTemplates( [
+			template,
+		] );
 	};
 
 /**
@@ -211,14 +174,16 @@ export function setNavigationMenu( navigationMenuId ) {
  *
  * @param {string} postType The entity's post type.
  * @param {string} postId   The entity's ID.
+ * @param {Object} context  The entity's context.
  *
  * @return {Object} Action object.
  */
-export function setEditedEntity( postType, postId ) {
+export function setEditedEntity( postType, postId, context ) {
 	return {
 		type: 'SET_EDITED_POST',
 		postType,
 		id: postId,
+		context,
 	};
 }
 
@@ -254,75 +219,19 @@ export function setEditedPostContext( context ) {
  * Resolves the template for a page and displays both. If no path is given, attempts
  * to use the postId to generate a path like `?p=${ postId }`.
  *
- * @param {Object} page         The page object.
- * @param {string} page.type    The page type.
- * @param {string} page.slug    The page slug.
- * @param {string} page.path    The page path.
- * @param {Object} page.context The page context.
+ * @deprecated
  *
- * @return {number} The resolved template ID for the page route.
+ * @return {Object} Action object.
  */
-export const setPage =
-	( page ) =>
-	async ( { dispatch, registry } ) => {
-		let template;
-		const getDefaultTemplate = async ( slug ) =>
-			apiFetch( {
-				path: addQueryArgs( '/wp/v2/templates/lookup', {
-					slug: `page-${ slug }`,
-				} ),
-			} );
+export function setPage() {
+	deprecated( "dispatch( 'core/edit-site' ).setPage", {
+		since: '6.5',
+		version: '6.8',
+		hint: 'The setPage is not needed anymore, the correct entity is resolved from the URL automatically.',
+	} );
 
-		if ( page.path ) {
-			template = await registry
-				.resolveSelect( coreStore )
-				.__experimentalGetTemplateForLink( page.path );
-		} else {
-			const editedEntity = await registry
-				.resolveSelect( coreStore )
-				.getEditedEntityRecord(
-					'postType',
-					page.context?.postType || 'post',
-					page.context?.postId
-				);
-			const currentTemplateSlug = editedEntity?.template;
-			if ( currentTemplateSlug ) {
-				const currentTemplate = (
-					await registry
-						.resolveSelect( coreStore )
-						.getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
-							per_page: -1,
-						} )
-				)?.find( ( { slug } ) => slug === currentTemplateSlug );
-				if ( currentTemplate ) {
-					template = currentTemplate;
-				} else {
-					// If a page has a `template` set and is not included in the list
-					// of the current theme's templates, query for current theme's default template.
-					template = await getDefaultTemplate( editedEntity?.slug );
-				}
-			} else {
-				// Page's `template` is empty, that indicates we need to use the default template for the page.
-				template = await getDefaultTemplate( editedEntity?.slug );
-			}
-		}
-
-		if ( ! template ) {
-			return;
-		}
-
-		dispatch( {
-			type: 'SET_EDITED_POST',
-			postType: TEMPLATE_POST_TYPE,
-			id: template.id,
-			context: {
-				...page.context,
-				templateSlug: template.slug,
-			},
-		} );
-
-		return template.id;
-	};
+	return { type: 'NOTHING' };
+}
 
 /**
  * Action that sets the active navigation panel menu.
@@ -369,23 +278,38 @@ export function setIsNavigationPanelOpened() {
 }
 
 /**
- * Opens or closes the inserter.
+ * Returns an action object used to open/close the inserter.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
+ * @deprecated
  *
- * @return {Object} Action object.
+ * @param {boolean|Object} value Whether the inserter should be opened (true) or closed (false).
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsInserterOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsInserterOpened",
+		} );
+		registry.dispatch( editorStore ).setIsInserterOpened( value );
 	};
-}
+
+/**
+ * Returns an action object used to open/close the list view.
+ *
+ * @deprecated
+ *
+ * @param {boolean} isOpen A boolean representing whether the list view should be opened or closed.
+ */
+export const setIsListViewOpened =
+	( isOpen ) =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).setIsListViewOpened", {
+			since: '6.5',
+			alternative: "dispatch( 'core/editor').setIsListViewOpened",
+		} );
+		registry.dispatch( editorStore ).setIsListViewOpened( isOpen );
+	};
 
 /**
  * Returns an action object used to update the settings.
@@ -400,27 +324,6 @@ export function updateSettings( settings ) {
 		settings,
 	};
 }
-
-/**
- * Sets whether the list view panel should be open.
- *
- * @param {boolean} isOpen If true, opens the list view. If false, closes it.
- *                         It does not toggle the state, but sets it directly.
- */
-export const setIsListViewOpened =
-	( isOpen ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
-		if ( isDistractionFree && isOpen ) {
-			dispatch.toggleDistractionFree();
-		}
-		dispatch( {
-			type: 'SET_IS_LIST_VIEW_OPENED',
-			isOpen,
-		} );
-	};
 
 /**
  * Sets whether the save view panel should be open.
@@ -444,130 +347,14 @@ export function setIsSaveViewOpened( isOpen ) {
  *                                      reverting the template. Default true.
  */
 export const revertTemplate =
-	( template, { allowUndo = true } = {} ) =>
-	async ( { registry } ) => {
-		const noticeId = 'edit-site-template-reverted';
-		registry.dispatch( noticesStore ).removeNotice( noticeId );
-		if ( ! isTemplateRevertable( template ) ) {
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( __( 'This template is not revertable.' ), {
-					type: 'snackbar',
-				} );
-			return;
-		}
-
-		try {
-			const templateEntityConfig = registry
-				.select( coreStore )
-				.getEntityConfig( 'postType', template.type );
-
-			if ( ! templateEntityConfig ) {
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						__(
-							'The editor has encountered an unexpected error. Please reload.'
-						),
-						{ type: 'snackbar' }
-					);
-				return;
-			}
-
-			const fileTemplatePath = addQueryArgs(
-				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
-			);
-
-			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
-			if ( ! fileTemplate ) {
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						__(
-							'The editor has encountered an unexpected error. Please reload.'
-						),
-						{ type: 'snackbar' }
-					);
-				return;
-			}
-
-			const serializeBlocks = ( {
-				blocks: blocksForSerialization = [],
-			} ) => __unstableSerializeAndClean( blocksForSerialization );
-
-			const edited = registry
-				.select( coreStore )
-				.getEditedEntityRecord(
-					'postType',
-					template.type,
-					template.id
-				);
-
-			// We are fixing up the undo level here to make sure we can undo
-			// the revert in the header toolbar correctly.
-			registry.dispatch( coreStore ).editEntityRecord(
-				'postType',
-				template.type,
-				template.id,
-				{
-					content: serializeBlocks, // Required to make the `undo` behave correctly.
-					blocks: edited.blocks, // Required to revert the blocks in the editor.
-					source: 'custom', // required to avoid turning the editor into a dirty state
-				},
-				{
-					undoIgnore: true, // Required to merge this edit with the last undo level.
-				}
-			);
-
-			const blocks = parse( fileTemplate?.content?.raw );
-			registry
-				.dispatch( coreStore )
-				.editEntityRecord( 'postType', template.type, fileTemplate.id, {
-					content: serializeBlocks,
-					blocks,
-					source: 'theme',
-				} );
-
-			if ( allowUndo ) {
-				const undoRevert = () => {
-					registry
-						.dispatch( coreStore )
-						.editEntityRecord(
-							'postType',
-							template.type,
-							edited.id,
-							{
-								content: serializeBlocks,
-								blocks: edited.blocks,
-								source: 'custom',
-							}
-						);
-				};
-
-				registry
-					.dispatch( noticesStore )
-					.createSuccessNotice( __( 'Template reverted.' ), {
-						type: 'snackbar',
-						id: noticeId,
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: undoRevert,
-							},
-						],
-					} );
-			}
-		} catch ( error ) {
-			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
-					: __( 'Template revert failed. Please reload.' );
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice( errorMessage, { type: 'snackbar' } );
-		}
+	( template, options ) =>
+	( { registry } ) => {
+		return unlock( registry.dispatch( editorStore ) ).revertTemplate(
+			template,
+			options
+		);
 	};
+
 /**
  * Action that opens an editor sidebar.
  *
@@ -575,16 +362,10 @@ export const revertTemplate =
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
-		if ( isDistractionFree ) {
-			dispatch.toggleDistractionFree();
-		}
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editSiteStoreName, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -593,34 +374,24 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) => {
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editSiteStoreName );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 	};
 
+/**
+ * Triggers an action used to switch editor mode.
+ *
+ * @deprecated
+ *
+ * @param {string} mode The editor mode.
+ */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry
-			.dispatch( 'core/preferences' )
-			.set( 'core/edit-site', 'editorMode', mode );
-
-		// Unselect blocks when we switch to a non visual mode.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if ( mode === 'visual' ) {
-			speak( __( 'Visual editor selected' ), 'assertive' );
-		} else if ( mode === 'text' ) {
-			const isDistractionFree = registry
-				.select( preferencesStore )
-				.get( 'core/edit-site', 'distractionFree' );
-			if ( isDistractionFree ) {
-				dispatch.toggleDistractionFree();
-			}
-			speak( __( 'Code editor selected' ), 'assertive' );
-		}
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -633,6 +404,10 @@ export const switchEditorMode =
 export const setHasPageContentFocus =
 	( hasPageContentFocus ) =>
 	( { dispatch, registry } ) => {
+		deprecated( `dispatch( 'core/edit-site' ).setHasPageContentFocus`, {
+			since: '6.5',
+		} );
+
 		if ( hasPageContentFocus ) {
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 		}
@@ -646,41 +421,15 @@ export const setHasPageContentFocus =
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
  */
 export const toggleDistractionFree =
 	() =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core/edit-site', 'distractionFree' );
-		if ( ! isDistractionFree ) {
-			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core/edit-site', 'fixedToolbar', false );
-				dispatch.setIsInserterOpened( false );
-				dispatch.setIsListViewOpened( false );
-				dispatch.closeGeneralSidebar();
-			} );
-		}
-		registry.batch( () => {
-			registry
-				.dispatch( preferencesStore )
-				.set(
-					'core/edit-site',
-					'distractionFree',
-					! isDistractionFree
-				);
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/edit-site/distraction-free-mode/notice',
-						type: 'snackbar',
-					}
-				);
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-site' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};

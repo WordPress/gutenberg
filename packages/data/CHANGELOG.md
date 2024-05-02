@@ -2,6 +2,32 @@
 
 ## Unreleased
 
+## 9.26.0 (2024-04-19)
+
+- Add new `createSelector` function for creating memoized store selectors ([#60370](https://github.com/WordPress/gutenberg/pull/60370)).
+
+## 9.25.0 (2024-04-03)
+
+## 9.24.0 (2024-03-21)
+
+-  Deprecate the `getIsResolved` meta-selector ([#59679](https://github.com/WordPress/gutenberg/pull/59679)).
+
+## 9.23.0 (2024-03-06)
+
+## 9.22.0 (2024-02-21)
+
+## 9.21.0 (2024-02-09)
+
+## 9.20.0 (2024-01-24)
+
+## 9.19.0 (2024-01-10)
+
+## 9.18.0 (2023-12-13)
+
+## 9.17.0 (2023-11-29)
+
+## 9.16.0 (2023-11-16)
+
 ## 9.15.0 (2023-11-02)
 
 ## 9.14.0 (2023-10-18)

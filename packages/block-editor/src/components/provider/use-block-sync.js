@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { undoIgnoreBlocks } from '../../store/undo-ignore';
 
 const noop = () => {};
 
@@ -76,27 +77,11 @@ export default function useBlockSync( {
 		resetBlocks,
 		resetSelection,
 		replaceInnerBlocks,
-		selectBlock,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const {
-		hasSelectedBlock,
-		getBlockName,
-		getBlocks,
-		getSelectionStart,
-		getSelectionEnd,
-		getBlock,
-	} = registry.select( blockEditorStore );
-	const isControlled = useSelect(
-		( select ) => {
-			return (
-				! clientId ||
-				select( blockEditorStore ).areInnerBlocksControlled( clientId )
-			);
-		},
-		[ clientId ]
-	);
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -180,9 +165,6 @@ export default function useBlockSync( {
 			// bound sync, unset the outbound value to avoid considering it in
 			// subsequent renders.
 			pendingChanges.current.outgoing = [];
-			const hadSelection = hasSelectedBlock();
-			const selectionAnchor = getSelectionStart();
-			const selectionFocus = getSelectionEnd();
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
@@ -191,27 +173,9 @@ export default function useBlockSync( {
 					controlledSelection.selectionEnd,
 					controlledSelection.initialPosition
 				);
-			} else {
-				const selectionStillExists = getBlock(
-					selectionAnchor.clientId
-				);
-				if ( hadSelection && ! selectionStillExists ) {
-					selectBlock( clientId );
-				} else {
-					resetSelection( selectionAnchor, selectionFocus );
-				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
-
-	useEffect( () => {
-		// When the block becomes uncontrolled, it means its inner state has been reset
-		// we need to take the blocks again from the external value property.
-		if ( ! isControlled ) {
-			pendingChanges.current.outgoing = [];
-			setControlledBlocks();
-		}
-	}, [ isControlled ] );
 
 	useEffect( () => {
 		const {
@@ -234,8 +198,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate
@@ -283,6 +248,10 @@ export default function useBlockSync( {
 				const updateParent = isPersistent
 					? onChangeRef.current
 					: onInputRef.current;
+				const undoIgnore = undoIgnoreBlocks.has( blocks );
+				if ( undoIgnore ) {
+					undoIgnoreBlocks.delete( blocks );
+				}
 				updateParent( blocks, {
 					selection: {
 						selectionStart: getSelectionStart(),
@@ -290,6 +259,7 @@ export default function useBlockSync( {
 						initialPosition:
 							getSelectedBlocksInitialCaretPosition(),
 					},
+					undoIgnore,
 				} );
 			}
 			previousAreBlocksDifferent = areBlocksDifferent;

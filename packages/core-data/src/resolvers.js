@@ -17,6 +17,7 @@ import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { forwardResolver, getNormalizedCommaSeparable } from './utils';
 import { getSyncProvider } from './sync';
+import { fetchBlockPatterns } from './fetch';
 
 /**
  * Requests authors from the REST API.
@@ -58,7 +59,7 @@ export const getCurrentUser =
 export const getEntityRecord =
 	( kind, name, key = '', query ) =>
 	async ( { select, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -192,8 +193,8 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind, name, query = {} ) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	async ( { dispatch, registry } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -237,6 +238,9 @@ export const getEntityRecords =
 					totalItems: parseInt(
 						response.headers.get( 'X-WP-Total' )
 					),
+					totalPages: parseInt(
+						response.headers.get( 'X-WP-TotalPages' )
+					),
 				};
 			} else {
 				records = Object.values( await apiFetch( { path } ) );
@@ -244,7 +248,7 @@ export const getEntityRecords =
 
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
-			// that way we consider the query "fullfilled".
+			// that way we consider the query "fulfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
 					query._fields.split( ',' ).forEach( ( field ) => {
@@ -257,37 +261,41 @@ export const getEntityRecords =
 				} );
 			}
 
-			dispatch.receiveEntityRecords(
-				kind,
-				name,
-				records,
-				query,
-				false,
-				undefined,
-				meta
-			);
+			registry.batch( () => {
+				dispatch.receiveEntityRecords(
+					kind,
+					name,
+					records,
+					query,
+					false,
+					undefined,
+					meta
+				);
 
-			// When requesting all fields, the list of results can be used to
-			// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
-			// See https://github.com/WordPress/gutenberg/pull/26575
-			if ( ! query?._fields && ! query.context ) {
-				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
-				const resolutionsArgs = records
-					.filter( ( record ) => record[ key ] )
-					.map( ( record ) => [ kind, name, record[ key ] ] );
+				// When requesting all fields, the list of results can be used to
+				// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+				// See https://github.com/WordPress/gutenberg/pull/26575
+				if ( ! query?._fields && ! query.context ) {
+					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+					const resolutionsArgs = records
+						.filter( ( record ) => record[ key ] )
+						.map( ( record ) => [ kind, name, record[ key ] ] );
 
-				dispatch( {
-					type: 'START_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-				dispatch( {
-					type: 'FINISH_RESOLUTIONS',
-					selectorName: 'getEntityRecord',
-					args: resolutionsArgs,
-				} );
-			}
-		} finally {
+					dispatch( {
+						type: 'START_RESOLUTIONS',
+						selectorName: 'getEntityRecord',
+						args: resolutionsArgs,
+					} );
+					dispatch( {
+						type: 'FINISH_RESOLUTIONS',
+						selectorName: 'getEntityRecord',
+						args: resolutionsArgs,
+					} );
+				}
+
+				dispatch.__unstableReleaseStoreLock( lock );
+			} );
+		} catch ( e ) {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -322,7 +330,7 @@ export const getCurrentTheme =
 export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 
 /**
- * Requests a preview from the from the Embed API.
+ * Requests a preview from the Embed API.
  *
  * @param {string} url URL to get the preview for.
  */
@@ -425,7 +433,7 @@ export const canUser =
 export const canUserEditEntityRecord =
 	( kind, name, recordId ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -619,17 +627,7 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 export const getBlockPatterns =
 	() =>
 	async ( { dispatch } ) => {
-		const restPatterns = await apiFetch( {
-			path: '/wp/v2/block-patterns/patterns',
-		} );
-		const patterns = restPatterns?.map( ( pattern ) =>
-			Object.fromEntries(
-				Object.entries( pattern ).map( ( [ key, value ] ) => [
-					camelCase( key ),
-					value,
-				] )
-			)
-		);
+		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
@@ -688,7 +686,7 @@ export const getNavigationFallbackId =
 			const existingFallbackEntityRecord = select.getEntityRecord(
 				'postType',
 				'wp_navigation',
-				fallback?.id
+				fallback.id
 			);
 			const invalidateNavigationQueries = ! existingFallbackEntityRecord;
 			dispatch.receiveEntityRecords(
@@ -703,7 +701,198 @@ export const getNavigationFallbackId =
 			dispatch.finishResolution( 'getEntityRecord', [
 				'postType',
 				'wp_navigation',
-				fallback?.id,
+				fallback.id,
 			] );
+		}
+	};
+
+export const getDefaultTemplateId =
+	( query ) =>
+	async ( { dispatch } ) => {
+		const template = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
+		} );
+		if ( template ) {
+			dispatch.receiveDefaultTemplateId( query, template.id );
+		}
+	};
+
+/**
+ * Requests an entity's revisions from the REST API.
+ *
+ * @param {string}           kind      Entity kind.
+ * @param {string}           name      Entity name.
+ * @param {number|string}    recordKey The key of the entity record whose revisions you want to fetch.
+ * @param {Object|undefined} query     Optional object of query parameters to
+ *                                     include with request. If requesting specific
+ *                                     fields, fields must always include the ID.
+ */
+export const getRevisions =
+	( kind, name, recordKey, query = {} ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+			return;
+		}
+
+		if ( query._fields ) {
+			// If requesting specific fields, items and query association to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: [
+					...new Set( [
+						...( getNormalizedCommaSeparable( query._fields ) ||
+							[] ),
+						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
+					] ),
+				].join(),
+			};
+		}
+
+		const path = addQueryArgs(
+			entityConfig.getRevisionsUrl( recordKey ),
+			query
+		);
+
+		let records, response;
+		const meta = {};
+		const isPaginated =
+			entityConfig.supportsPagination && query.per_page !== -1;
+		try {
+			response = await apiFetch( { path, parse: ! isPaginated } );
+		} catch ( error ) {
+			// Do nothing if our request comes back with an API error.
+			return;
+		}
+
+		if ( response ) {
+			if ( isPaginated ) {
+				records = Object.values( await response.json() );
+				meta.totalItems = parseInt(
+					response.headers.get( 'X-WP-Total' )
+				);
+			} else {
+				records = Object.values( response );
+			}
+
+			// If we request fields but the result doesn't contain the fields,
+			// explicitly set these fields as "undefined"
+			// that way we consider the query "fulfilled".
+			if ( query._fields ) {
+				records = records.map( ( record ) => {
+					query._fields.split( ',' ).forEach( ( field ) => {
+						if ( ! record.hasOwnProperty( field ) ) {
+							record[ field ] = undefined;
+						}
+					} );
+
+					return record;
+				} );
+			}
+
+			dispatch.receiveRevisions(
+				kind,
+				name,
+				recordKey,
+				records,
+				query,
+				false,
+				meta
+			);
+
+			// When requesting all fields, the list of results can be used to
+			// resolve the `getRevision` selector in addition to `getRevisions`.
+			if ( ! query?._fields && ! query.context ) {
+				const key = entityConfig.key || DEFAULT_ENTITY_KEY;
+				const resolutionsArgs = records
+					.filter( ( record ) => record[ key ] )
+					.map( ( record ) => [
+						kind,
+						name,
+						recordKey,
+						record[ key ],
+					] );
+
+				dispatch( {
+					type: 'START_RESOLUTIONS',
+					selectorName: 'getRevision',
+					args: resolutionsArgs,
+				} );
+				dispatch( {
+					type: 'FINISH_RESOLUTIONS',
+					selectorName: 'getRevision',
+					args: resolutionsArgs,
+				} );
+			}
+		}
+	};
+
+// Invalidate cache when a new revision is created.
+getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
+	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
+	name === action.name &&
+	kind === action.kind &&
+	! action.error &&
+	recordKey === action.recordId;
+
+/**
+ * Requests a specific Entity revision from the REST API.
+ *
+ * @param {string}           kind        Entity kind.
+ * @param {string}           name        Entity name.
+ * @param {number|string}    recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param {number|string}    revisionKey The revision's key.
+ * @param {Object|undefined} query       Optional object of query parameters to
+ *                                       include with request. If requesting specific
+ *                                       fields, fields must always include the ID.
+ */
+export const getRevision =
+	( kind, name, recordKey, revisionKey, query ) =>
+	async ( { dispatch } ) => {
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
+		const entityConfig = configs.find(
+			( config ) => config.name === name && config.kind === kind
+		);
+
+		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+			return;
+		}
+
+		if ( query !== undefined && query._fields ) {
+			// If requesting specific fields, items and query association to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: [
+					...new Set( [
+						...( getNormalizedCommaSeparable( query._fields ) ||
+							[] ),
+						entityConfig.revisionKey || DEFAULT_ENTITY_KEY,
+					] ),
+				].join(),
+			};
+		}
+		const path = addQueryArgs(
+			entityConfig.getRevisionsUrl( recordKey, revisionKey ),
+			query
+		);
+
+		let record;
+		try {
+			record = await apiFetch( { path } );
+		} catch ( error ) {
+			// Do nothing if our request comes back with an API error.
+			return;
+		}
+
+		if ( record ) {
+			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};

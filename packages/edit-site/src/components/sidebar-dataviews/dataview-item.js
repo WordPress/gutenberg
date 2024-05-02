@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { page, columns } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { __experimentalHStack as HStack } from '@wordpress/components';
+import { VIEW_LAYOUTS } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -12,11 +18,6 @@ import SidebarNavigationItem from '../sidebar-navigation-item';
 import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
-function getDataViewIcon( type ) {
-	const icons = { list: page, grid: columns };
-	return icons[ type ];
-}
-
 export default function DataViewItem( {
 	title,
 	slug,
@@ -25,25 +26,39 @@ export default function DataViewItem( {
 	icon,
 	isActive,
 	isCustom,
+	suffix,
 } ) {
 	const {
-		params: { path },
+		params: { path, layout },
 	} = useLocation();
 
-	const iconToUse = icon || getDataViewIcon( type );
+	const iconToUse =
+		icon || VIEW_LAYOUTS.find( ( v ) => v.type === type ).icon;
 
 	const linkInfo = useLink( {
 		path,
-		activeView: isCustom === 'true' ? customViewId : slug,
-		isCustom,
+		layout,
+		activeView: isCustom ? customViewId : slug,
+		isCustom: isCustom ? 'true' : 'false',
 	} );
 	return (
-		<SidebarNavigationItem
-			icon={ iconToUse }
-			{ ...linkInfo }
-			aria-current={ isActive ? 'true' : undefined }
+		<HStack
+			justify="flex-start"
+			className={ classnames(
+				'edit-site-sidebar-dataviews-dataview-item',
+				{
+					'is-selected': isActive,
+				}
+			) }
 		>
-			{ title }
-		</SidebarNavigationItem>
+			<SidebarNavigationItem
+				icon={ iconToUse }
+				{ ...linkInfo }
+				aria-current={ isActive ? 'true' : undefined }
+			>
+				{ title }
+			</SidebarNavigationItem>
+			{ suffix }
+		</HStack>
 	);
 }

@@ -2,6 +2,44 @@
 
 ## Unreleased
 
+## 4.40.0 (2024-04-19)
+
+## 4.39.0 (2024-04-03)
+
+### New Feature
+
+-   Add new `namespacePascalCase` template variable ([#60223](https://github.com/WordPress/gutenberg/pull/60223)).
+
+## 4.38.0 (2024-03-21)
+
+## 4.37.0 (2024-03-06)
+
+## 4.36.0 (2024-02-21)
+
+### Bug Fix
+
+-   Add missing `viewScriptModule` field ([#59140](https://github.com/WordPress/gutenberg/pull/59140)).
+
+### Internal
+
+-   Remove deprecated `viewModule` field ([#59198](https://github.com/WordPress/gutenberg/pull/59198)).
+
+## 4.35.0 (2024-02-09)
+
+## 4.34.0 (2024-01-24)
+
+## 4.33.0 (2024-01-10)
+
+### New Feature
+
+-   Add support for the `viewModule` property ([#57712](https://github.com/WordPress/gutenberg/pull/57712)).
+
+## 4.32.0 (2023-12-13)
+
+## 4.31.0 (2023-11-29)
+
+## 4.30.0 (2023-11-16)
+
 ## 4.29.0 (2023-11-02)
 
 ## 4.28.0 (2023-10-18)

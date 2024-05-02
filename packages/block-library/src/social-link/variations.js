@@ -19,6 +19,7 @@ import {
 	GoodreadsIcon,
 	GoogleIcon,
 	GitHubIcon,
+	GravatarIcon,
 	InstagramIcon,
 	LastfmIcon,
 	LinkedInIcon,
@@ -159,6 +160,12 @@ const variations = [
 		attributes: { service: 'github' },
 		title: 'GitHub',
 		icon: GitHubIcon,
+	},
+	{
+		name: 'gravatar',
+		attributes: { service: 'gravatar' },
+		title: 'Gravatar',
+		icon: GravatarIcon,
 	},
 	{
 		name: 'instagram',
@@ -332,7 +339,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.service === variationAttributes.service;
 } );

@@ -24,10 +24,18 @@ export async function visitSiteEditor(
 	const { postId, postType, path, canvas } = options;
 	const query = new URLSearchParams();
 
-	if ( postId ) query.set( 'postId', String( postId ) );
-	if ( postType ) query.set( 'postType', postType );
-	if ( path ) query.set( 'path', path );
-	if ( canvas ) query.set( 'canvas', canvas );
+	if ( postId ) {
+		query.set( 'postId', String( postId ) );
+	}
+	if ( postType ) {
+		query.set( 'postType', postType );
+	}
+	if ( path ) {
+		query.set( 'path', path );
+	}
+	if ( canvas ) {
+		query.set( 'canvas', canvas );
+	}
 
 	await this.visitAdminPage( 'site-editor.php', query.toString() );
 
@@ -47,7 +55,9 @@ export async function visitSiteEditor(
 	 * loading is done.
 	 */
 	await this.page
-		.locator( '.edit-site-canvas-loader' )
+		// Spinner was used instead of the progress bar in an earlier version of
+		// the site editor.
+		.locator( '.edit-site-canvas-loader, .edit-site-canvas-spinner' )
 		// Bigger timeout is needed for larger entities, for example the large
 		// post html fixture that we load for performance tests, which often
 		// doesn't make it under the default 10 seconds.

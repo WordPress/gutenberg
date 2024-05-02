@@ -76,7 +76,7 @@ If you're using one of these stores to access and manipulate WordPress data in y
 
 These are packages used in development mode to help developers with daily tasks to develop, build and ship JavaScript applications, WordPress plugins and themes. They include tools for linting your codebase, building it, testing it...
 
-## Editor Packages
+## Editor packages
 
 ![Post Editor Modules Architecture](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/modules.png)
 

@@ -20,7 +20,7 @@ export default function useMerge( clientId, onMerge ) {
 	} = useSelect( blockEditorStore );
 	const { mergeBlocks, moveBlocksToPosition } =
 		useDispatch( blockEditorStore );
-	const [ , outdentListItem ] = useOutdentListItem( clientId );
+	const outdentListItem = useOutdentListItem();
 
 	function getTrailingId( id ) {
 		const order = getBlockOrder( id );
@@ -35,8 +35,12 @@ export default function useMerge( clientId, onMerge ) {
 	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
-		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) return;
+		if ( ! parentListItemId ) {
+			return;
+		}
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) {
+			return;
+		}
 		return parentListItemId;
 	}
 
@@ -49,9 +53,13 @@ export default function useMerge( clientId, onMerge ) {
 	 */
 	function _getNextId( id ) {
 		const next = getNextBlockClientId( id );
-		if ( next ) return next;
+		if ( next ) {
+			return next;
+		}
 		const parentListItemId = getParentListItemId( id );
-		if ( ! parentListItemId ) return;
+		if ( ! parentListItemId ) {
+			return;
+		}
 		return _getNextId( parentListItemId );
 	}
 

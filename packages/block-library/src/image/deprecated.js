@@ -651,6 +651,14 @@ const v6 = {
 			},
 		},
 	},
+	migrate( attributes ) {
+		const { height, width } = attributes;
+		return {
+			...attributes,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
+		};
+	},
 	save( { attributes } ) {
 		const {
 			url,
@@ -1047,6 +1055,14 @@ const v8 = {
 		},
 	},
 	migrate( { width, height, ...attributes } ) {
+		// We need to perform a check here because in cases
+		// where attributes are added dynamically to blocks,
+		// block invalidation overrides the isEligible() method
+		// and forces the migration to run, so it's not guaranteed
+		// that `behaviors` or `behaviors.lightbox` will be defined.
+		if ( ! attributes.behaviors?.lightbox ) {
+			return attributes;
+		}
 		const {
 			behaviors: {
 				lightbox: { enabled },

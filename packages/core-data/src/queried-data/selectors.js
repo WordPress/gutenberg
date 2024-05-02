@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import EquivalentKeyMap from 'equivalent-key-map';
+
+/**
+ * WordPress dependencies
+ */
+import { createSelector } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -52,7 +56,9 @@ function getQueriedItemsUncached( state, query ) {
 		if ( Array.isArray( include ) && ! include.includes( itemId ) ) {
 			continue;
 		}
-
+		if ( itemId === undefined ) {
+			continue;
+		}
 		// Having a target item ID doesn't guarantee that this object has been queried.
 		if ( ! state.items[ context ]?.hasOwnProperty( itemId ) ) {
 			return null;
@@ -123,4 +129,10 @@ export function getQueriedTotalItems( state, query = {} ) {
 	const { stableKey, context } = getQueryParts( query );
 
 	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalItems ?? null;
+}
+
+export function getQueriedTotalPages( state, query = {} ) {
+	const { stableKey, context } = getQueryParts( query );
+
+	return state.queries?.[ context ]?.[ stableKey ]?.meta?.totalPages ?? null;
 }

@@ -32,18 +32,19 @@ export const settings = {
 			return;
 		}
 
-		const entity = select( coreDataStore ).getEntityRecord(
+		const { getCurrentTheme, getEditedEntityRecord } =
+			select( coreDataStore );
+		const entity = getEditedEntityRecord(
 			'postType',
 			'wp_template_part',
-			theme + '//' + slug
+			( theme || getCurrentTheme()?.stylesheet ) + '//' + slug
 		);
 		if ( ! entity ) {
 			return;
 		}
 
 		return (
-			decodeEntities( entity.title?.rendered ) ||
-			capitalCase( entity.slug )
+			decodeEntities( entity.title ) || capitalCase( entity.slug || '' )
 		);
 	},
 	edit,

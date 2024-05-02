@@ -6,14 +6,43 @@ sidebar_position: 3
 
 You can customize the block editor by providing a `settings` prop to the `BlockEditorProvider` component. This prop accepts an object with the following properties:
 
+## __experimentalFeatures
+
+The experimental features setting is an object that allows you to enable/disable common block editor features. For instance, the following settings enables support for text, background colors and allow users to pick a custom color or one of the defined theme palette colors. Core block types and third-party block types using the block supports feature will automatically take these settings into account.
+
+```js
+import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
+
+const features = {
+	color: {
+		custom: true,
+		text: true,
+		background: true,
+		palette: {
+			theme: [
+				{ name: 'red', color: '#f00', slug: 'red' },
+				{ name: 'white', color: '#fff', slug: 'white' },
+				{ name: 'blue', color: '#00f', slug: 'blue' },
+			],
+		},
+	},
+};
+
+export default function App() {
+	return (
+		<BlockEditorProvider settings={ { __experimentalFeatures: features } }>
+			<BlockCanvas />
+		</BlockEditorProvider>
+	);
+}
+```
+
 ## styles
 
 The styles setting is an array of editor styles to enqueue in the iframe/canvas of the block editor. Each style is an object with a `css` property. Example:
 
 ```jsx
-import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
-
-export const editorStyles = [
+const styles = [
 	{
 		css: `
 			body {
@@ -36,14 +65,6 @@ export const editorStyles = [
 		`,
 	},
 ];
-
-export default function App() {
-	return (
-		<BlockEditorProvider settings={ { styles: editorStyles } }>
-			<BlockCanvas />
-		</BlockEditorProvider>
-	);
-}
 ```
 
 ## mediaUpload
@@ -91,7 +112,7 @@ Providing a `mediaUpload` function also enables drag and dropping files into the
 The inserter media categories setting is an array of media categories to display in the inserter. Each category is an object with `name` and `labels` values, a `fetch` function and a few extra keys. Example:
 
 ```jsx
-{
+const inserterMediaCategories = {
     name: 'openverse',
     labels: {
         name: 'Openverse',
