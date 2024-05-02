@@ -126,6 +126,17 @@
 	height: 60px;
 }
 
+.edit-site-global-styles__shadow-editor-panel {
+	$panelPadding: $grid-unit-20;
+	width: 280px;
+	padding: $panelPadding;
+
+	& .edit-site-global-styles__shadow-editor-color-palette {
+		// color palette adds empty .components-circular-option-picker
+		margin-bottom: -3 * $grid-unit-05;
+	}
+}
+
 .edit-site-global-styles-screen-css {
 	flex: 1 1 auto;
 	display: flex;

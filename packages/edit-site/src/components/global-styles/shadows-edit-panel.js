@@ -16,11 +16,15 @@ import {
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalUseNavigator as useNavigator,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Dropdown,
+	DropdownMenu,
+	NavigableMenu,
 	RangeControl,
 	Button,
 	FlexItem,
-	ColorPicker,
+	ColorPalette,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -30,6 +34,7 @@ import {
 	shadow as shadowIcon,
 	lineSolid,
 	settings,
+	moreVertical,
 } from '@wordpress/icons';
 import { useState, useMemo } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
@@ -49,6 +54,21 @@ import {
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
+const menuItems = [
+	{
+		label: __( 'Rename' ),
+		action: 'rename',
+	},
+	{
+		label: __( 'Duplicate' ),
+		action: 'duplicate',
+	},
+	{
+		label: __( 'Delete' ),
+		action: 'delete',
+	},
+];
+
 export default function ShadowsEditPanel() {
 	const {
 		params: { category, slug },
@@ -67,9 +87,53 @@ export default function ShadowsEditPanel() {
 		);
 	}, 100 );
 
+	const onMenuClick = ( action ) => {
+		switch ( action ) {
+			case 'rename':
+				break;
+			case 'duplicate':
+				break;
+			case 'delete':
+				break;
+		}
+	};
+
 	return (
 		<>
-			<ScreenHeader title={ selectedShadow.name } />
+			<HStack justify="space-between">
+				<ScreenHeader title={ selectedShadow.name } />
+				<FlexItem>
+					<Spacer marginBottom={ 0 } paddingX={ 4 }>
+						<DropdownMenu
+							icon={ moreVertical }
+							label={ __( 'Shadow options' ) }
+							toggleProps={ {
+								size: 'small',
+							} }
+						>
+							{ ( { onClose } ) =>
+								menuItems.map( ( item ) => (
+									<NavigableMenu
+										role="menu"
+										key={ item.action }
+									>
+										<Button
+											variant="tertiary"
+											onClick={ () => {
+												onMenuClick( item.action );
+												onClose();
+											} }
+											className="components-palette-edit__menu-button"
+										>
+											{ item.label }
+										</Button>
+									</NavigableMenu>
+								) )
+							}
+						</DropdownMenu>
+					</Spacer>
+				</FlexItem>
+			</HStack>
 			<div className="edit-site-global-styles-screen">
 				<ShadowsPreview shadow={ selectedShadow.shadow } />
 				<ShadowEditor
@@ -163,6 +227,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 		offset: 36,
 		shift: true,
 	};
+	const shadowObj = shadowStringToObject( shadow );
 
 	return (
 		<Dropdown
@@ -189,7 +254,9 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 								<Icon icon={ shadowIcon } />
 							</FlexItem>
 							<FlexItem style={ { flexGrow: 1 } }>
-								Drop shadow
+								{ shadowObj.inset
+									? __( 'Inner shadow' )
+									: __( 'Drop shadow' ) }
 							</FlexItem>
 							{ canRemove && (
 								<FlexItem
@@ -213,7 +280,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 				<DropdownContentWrapper paddingSize="none">
 					<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 						<ShadowPopover
-							shadow={ shadow }
+							shadowObj={ shadowObj }
 							onChange={ onChange }
 						/>
 					</div>
@@ -223,8 +290,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 	);
 }
 
-function ShadowPopover( { shadow: savedShadow, onChange } ) {
-	const shadowObj = shadowStringToObject( savedShadow );
+function ShadowPopover( { shadowObj, onChange } ) {
 	const [ shadow, setShadow ] = useState( {
 		x: shadowObj.x,
 		y: shadowObj.y,
@@ -233,6 +299,8 @@ function ShadowPopover( { shadow: savedShadow, onChange } ) {
 		color: shadowObj.color,
 		inset: shadowObj.inset,
 	} );
+	const __experimentalIsRenderedInSidebar = true;
+	const enableAlpha = true;
 
 	const onShadowChange = ( key, value ) => {
 		onChange( shadowObjectToString( shadow ) );
@@ -243,35 +311,58 @@ function ShadowPopover( { shadow: savedShadow, onChange } ) {
 	};
 
 	return (
-		<div style={ { width: '260px', padding: '16px' } }>
+		<div className="edit-site-global-styles__shadow-editor-panel">
 			<VStack>
-				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
-				<Spacer marginBottom={ 4 } />
-				<ShadowColorPicker
-					color={ shadow.color }
-					onChange={ ( value ) => onShadowChange( 'color', value ) }
-				/>
-				<Spacer marginBottom={ 4 } />
-				<Grid id={ 'grid-123' } columns={ 2 } gap={ 6 } rowGap={ 2 }>
+				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
+				<div className="edit-site-global-styles__shadow-editor-color-palette">
+					<ColorPalette
+						clearable={ false }
+						enableAlpha={ enableAlpha }
+						__experimentalIsRenderedInSidebar={
+							__experimentalIsRenderedInSidebar
+						}
+						value={ shadow.color }
+						onChange={ ( value ) =>
+							onShadowChange( 'color', value )
+						}
+					/>
+				</div>
+				<ToggleGroupControl
+					value={ shadow.inset ? 'inset' : 'outset' }
+					isBlock
+					onChange={ ( value ) =>
+						onShadowChange( 'inset', value === 'inset' )
+					}
+				>
+					<ToggleGroupControlOption
+						value="outset"
+						label={ __( 'Outset' ) }
+					/>
+					<ToggleGroupControlOption
+						value="inset"
+						label={ __( 'Inset' ) }
+					/>
+				</ToggleGroupControl>
+				<Grid columns={ 2 } gap={ 6 } rowGap={ 2 }>
 					<ShadowInputControl
-						label="X position"
+						label={ __( 'X Position' ) }
 						value={ shadow.x }
 						onChange={ ( value ) => onShadowChange( 'x', value ) }
 					/>
 					<ShadowInputControl
-						label="Y position"
+						label={ __( 'Y Position' ) }
 						value={ shadow.y }
 						onChange={ ( value ) => onShadowChange( 'y', value ) }
 					/>
 					<ShadowInputControl
-						label="Blur"
+						label={ __( 'Blur' ) }
 						value={ shadow.blur }
 						onChange={ ( value ) =>
 							onShadowChange( 'blur', value )
 						}
 					/>
 					<ShadowInputControl
-						label="Spread"
+						label={ __( 'Spread' ) }
 						value={ shadow.spread }
 						onChange={ ( value ) =>
 							onShadowChange( 'spread', value )
@@ -283,49 +374,6 @@ function ShadowPopover( { shadow: savedShadow, onChange } ) {
 	);
 }
 
-function ShadowColorPicker( { color, onChange } ) {
-	const popoverProps = {
-		placement: 'left-start',
-		offset: 36,
-		shift: true,
-	};
-
-	return (
-		<Dropdown
-			popoverProps={ popoverProps }
-			className="block-editor-tools-panel-color-gradient-settings__dropdown"
-			renderToggle={ ( { onToggle, isOpen } ) => {
-				const toggleProps = {
-					onClick: onToggle,
-					className: classnames(
-						'block-editor-panel-color-gradient-settings__dropdown',
-						{ 'is-open': isOpen }
-					),
-				};
-
-				return (
-					<Button
-						{ ...toggleProps }
-						style={ { background: color, height: '64px' } }
-					/>
-				);
-			} }
-			renderContent={ () => (
-				<DropdownContentWrapper paddingSize="none">
-					<div className="block-editor-panel-color-gradient-settings__dropdown-content">
-						<ColorPicker
-							color={ color }
-							onChange={ onChange }
-							enableAlpha
-							defaultColor={ '#000' }
-						/>
-					</div>
-				</DropdownContentWrapper>
-			) }
-		/>
-	);
-}
-
 function ShadowInputControl( { label, value, onChange } ) {
 	const [ useInput, setUseInput ] = useState( false );
 
@@ -334,7 +382,7 @@ function ShadowInputControl( { label, value, onChange } ) {
 			<HStack justify="space-between">
 				<Subtitle>{ label }</Subtitle>
 				<Button
-					label={ __( 'Label' ) }
+					label={ __( 'Use custom size' ) }
 					icon={ settings }
 					onClick={ () => {
 						setUseInput( ! useInput );
