@@ -77,6 +77,9 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				label={ __( 'Play inline' ) }
 				onChange={ toggleFactory.playsInline }
 				checked={ !! playsInline }
+				help={ __(
+					'Enable video playback within the page on mobile browsers.'
+				) }
 			/>
 			<SelectControl
 				__nextHasNoMarginBottom
