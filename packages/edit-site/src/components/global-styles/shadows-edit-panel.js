@@ -13,6 +13,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
 	__experimentalUnitControl as UnitControl,
+	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalGrid as Grid,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	__experimentalUseNavigator as useNavigator,
@@ -36,8 +37,7 @@ import {
 	settings,
 	moreVertical,
 } from '@wordpress/icons';
-import { useState, useMemo } from '@wordpress/element';
-import { debounce } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -50,7 +50,8 @@ import {
 	getShadowParts,
 	shadowStringToObject,
 	shadowObjectToString,
-} from './utils';
+	CUSTOM_VALUE_SETTINGS,
+} from './shadow-utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
@@ -76,16 +77,19 @@ export default function ShadowsEditPanel() {
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
 	);
-	const selectedShadow = useMemo(
-		() => ( shadows || [] ).find( ( shadow ) => shadow.slug === slug ),
-		[ shadows, slug ]
+	const [ selectedShadow, setSelectedShadow ] = useState( () =>
+		( shadows || [] ).find( ( shadow ) => shadow.slug === slug )
 	);
-	const onShadowChange = debounce( ( shadow ) => {
-		const updatedShadow = { ...( selectedShadow || {} ), shadow };
-		setShadows(
-			shadows.map( ( s ) => ( s.slug === slug ? updatedShadow : s ) )
+
+	const onShadowChange = ( shadow ) => {
+		setSelectedShadow( { ...selectedShadow, shadow } );
+		const updatedShadows = shadows.map( ( s ) =>
+			s.slug === slug ? { ...selectedShadow, shadow } : s
 		);
-	}, 100 );
+		// TODO: this call make the app slow
+		// may be requestAnimationFrame ??
+		setShadows( updatedShadows );
+	};
 
 	const onMenuClick = ( action ) => {
 		switch ( action ) {
@@ -227,7 +231,13 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 		offset: 36,
 		shift: true,
 	};
-	const shadowObj = shadowStringToObject( shadow );
+	const [ shadowObj, setShadowObj ] = useState(
+		shadowStringToObject( shadow )
+	);
+	const onShadowChange = ( newShadow ) => {
+		setShadowObj( newShadow );
+		onChange( shadowObjectToString( newShadow ) );
+	};
 
 	return (
 		<Dropdown
@@ -281,7 +291,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 					<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 						<ShadowPopover
 							shadowObj={ shadowObj }
-							onChange={ onChange }
+							onChange={ onShadowChange }
 						/>
 					</div>
 				</DropdownContentWrapper>
@@ -303,11 +313,12 @@ function ShadowPopover( { shadowObj, onChange } ) {
 	const enableAlpha = true;
 
 	const onShadowChange = ( key, value ) => {
-		onChange( shadowObjectToString( shadow ) );
-		setShadow( {
+		const newShadow = {
 			...shadow,
 			[ key ]: value,
-		} );
+		};
+		setShadow( newShadow );
+		onChange( newShadow );
 	};
 
 	return (
@@ -375,7 +386,20 @@ function ShadowPopover( { shadowObj, onChange } ) {
 }
 
 function ShadowInputControl( { label, value, onChange } ) {
-	const [ useInput, setUseInput ] = useState( false );
+	const [ isCustomInput, setIsCustomInput ] = useState( false );
+	const [ parsedQuantity, parsedUnit ] =
+		parseQuantityAndUnitFromRawValue( value );
+
+	const sliderOnChange = ( next ) => {
+		onChange(
+			next !== undefined ? [ next, parsedUnit || 'px' ].join( '' ) : '0px'
+		);
+	};
+	const onValueChange = ( next ) => {
+		const isNumeric = next !== undefined && ! isNaN( parseFloat( next ) );
+		const nextValue = isNumeric ? next : '0px';
+		onChange( nextValue );
+	};
 
 	return (
 		<VStack justify={ 'flex-start' }>
@@ -385,26 +409,31 @@ function ShadowInputControl( { label, value, onChange } ) {
 					label={ __( 'Use custom size' ) }
 					icon={ settings }
 					onClick={ () => {
-						setUseInput( ! useInput );
+						setIsCustomInput( ! isCustomInput );
 					} }
-					isPressed={ useInput }
+					isPressed={ isCustomInput }
 					size="small"
 				/>
 			</HStack>
-			{ useInput ? (
+			{ isCustomInput ? (
 				<UnitControl
 					label={ label }
 					hideLabelFromVision
 					value={ value }
-					onChange={ onChange }
+					onChange={ onValueChange }
 				/>
 			) : (
 				<RangeControl
-					value={ value }
-					onChange={ onChange }
+					value={ parsedQuantity ?? 0 }
+					onChange={ sliderOnChange }
 					withInputField={ false }
 					min={ 0 }
-					max={ 10 }
+					max={
+						CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10
+					}
+					step={
+						CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.step ?? 0.1
+					}
 				/>
 			) }
 		</VStack>
