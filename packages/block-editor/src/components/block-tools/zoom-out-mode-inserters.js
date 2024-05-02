@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion, Button } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -38,11 +34,6 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		};
 	}, [] );
 
-	const toggleProps = {
-		type: 'button',
-		icon: undefined,
-	};
-
 	const disableMotion = useReducedMotion();
 	const lineVariants = {
 		// Initial position starts from the center and invisible.
@@ -66,6 +57,8 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const inserterVariants = {
 		start: {
 			scale: disableMotion ? 1 : 0,
+			translateX: '-50%',
+			translateY: '-50%',
 		},
 		rest: {
 			scale: 1,
@@ -87,6 +80,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 				previousClientId={ clientId }
 				nextClientId={ blockOrder[ index + 1 ] }
 				__unstableContentRef={ __unstableContentRef }
+				className="block-editor-button-pattern-inserter"
 			>
 				<motion.div
 					layout={ ! disableMotion }
@@ -105,15 +99,33 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 
 					<motion.div
 						variants={ inserterVariants }
-						className={ classnames(
-							'block-editor-block-list__insertion-point-inserter'
-						) }
+						className="block-editor-block-list__insertion-point-inserter"
 					>
 						<Inserter
 							position="bottom center"
 							clientId={ blockOrder[ index + 1 ] }
 							__experimentalIsQuick
-							{ ...toggleProps }
+							renderToggle={ ( { disabled, onToggle } ) => {
+								const label = _x(
+									'Add pattern',
+									'Generic label for pattern inserter button'
+								);
+
+								const inserterButton = (
+									<Button
+										variant="primary"
+										size="compact"
+										className="block-editor-button-pattern-inserter__button"
+										onClick={ onToggle }
+										label={ label }
+										disabled={ disabled }
+									>
+										{ label }
+									</Button>
+								);
+
+								return inserterButton;
+							} }
 						/>
 					</motion.div>
 				</motion.div>

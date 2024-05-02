@@ -262,3 +262,10 @@
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
 }
+
+/* Add pattern button for zoom-out mode */
+
+.block-editor-button-pattern-inserter .block-editor-block-list__insertion-point-inserter {
+	left: 50%;
+	top: 50%;
+}
