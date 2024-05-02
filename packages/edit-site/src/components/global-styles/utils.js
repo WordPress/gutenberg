@@ -49,54 +49,55 @@ export function getFontFamilies( themeJson ) {
 }
 
 export function getShadowParts( shadow ) {
-	// TODO: this function should work with all unite tests
-	const colorStart = shadow.indexOf( 'rgb' );
-	const pattern = /(?<=\)),?\s*/;
-	return shadow
-		.split( colorStart !== -1 ? pattern : ',' )
-		.map( ( part ) => part.trim() );
+	const shadowValues = shadow.match( /(?:[^,(]|\([^)]*\))+/g ) || [];
+	return shadowValues.map( ( value ) => value.trim() );
 }
 
-export function shadowStringToObject( shadow ) {
-	// TODO: this function should work with all unite tests
-	const colorStart = shadow.indexOf( 'rgb' );
-	const inset = shadow.indexOf( 'inset' ) !== -1;
-	let parts = [];
-	const defaultColor = '#000';
-	let { x, y, blur, spread, color } = {
-		x: 0,
-		y: 0,
-		blur: 0,
-		spread: 0,
-		color: defaultColor,
+export function shadowStringToObject( shadowValue ) {
+	const defaultShadow = {
+		x: '0',
+		y: '0',
+		blur: '0',
+		spread: '0',
+		color: '#000',
+		inset: false,
 	};
 
-	if ( colorStart !== -1 ) {
-		color = shadow.substring( colorStart );
-		parts = shadow.substring( 0, colorStart ).trim().split( ' ' );
-	} else {
-		parts = shadow.split( ' ' );
-		color = parts.pop();
+	// Step 1: Check for "none" keyword
+	if ( shadowValue.includes( 'none' ) ) {
+		return defaultShadow;
 	}
 
-	if ( parts.length === 4 ) {
-		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
-		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
-		blur = parseInt( parts[ 2 ].replace( 'px', '' ) );
-		spread = parseInt( parts[ 3 ].replace( 'px', '' ) );
-	} else if ( parts.length === 3 ) {
-		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
-		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
-		blur = parseInt( parts[ 2 ].replace( 'px', '' ) );
-	} else if ( parts.length === 2 ) {
-		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
-		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
-	} else {
-		x = parseInt( parts[ 0 ].replace( 'px', '' ) );
-		y = parseInt( parts[ 1 ].replace( 'px', '' ) );
+	// Step 2: Extract length values
+	const lengthsRegex =
+		/(?:^|\s)(-?\d*\.?\d+(?:px|%|in|cm|mm|em|rem|ex|pt|pc|vh|vw|vmin|vmax|ch|lh)?)(?=\s|$)(?![^(]*\))/g;
+	const matches = shadowValue.match( lengthsRegex ) || [];
+	const lengths = matches.slice( 0, 4 );
+
+	// Step 3: Check if there are at least 2 length values
+	if ( lengths.length < 2 ) {
+		return defaultShadow;
 	}
 
-	return { x, y, blur, spread, color, inset };
+	// Step 4: Check for `inset`
+	const inset = shadowValue.includes( 'inset' );
+
+	// Step 5. Strip lengths and inset from shadow string, leaving just color.
+	let colorString = shadowValue.replace( lengthsRegex, '' ).trim();
+	if ( inset ) {
+		colorString = colorString.replace( 'inset', '' ).trim();
+	}
+
+	// Step 6. Create and return parsed shadow object.
+	const [ x, y, blur, spread ] = lengths;
+	return {
+		x: x?.trim(),
+		y: y?.trim(),
+		blur: blur?.trim() || '0',
+		spread: spread?.trim() || '0',
+		inset,
+		color: colorString || `#000`,
+	};
 }
 
 export function shadowObjectToString( shadowObj ) {

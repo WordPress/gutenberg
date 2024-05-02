@@ -154,12 +154,12 @@ describe( 'shadowStringToObject', () => {
 
 				const input = shadowString;
 				const output = {
-					x: hasX ? shadowUnits.px : 0,
-					y: hasY ? shadowUnits.px : 0,
-					blur: hasBlur ? shadowUnits.px : 0,
-					spread: hasSpread ? shadowUnits.px : 0,
+					x: hasX ? shadowUnits.px : '0',
+					y: hasY ? shadowUnits.px : '0',
+					blur: hasBlur ? shadowUnits.px : '0',
+					spread: hasSpread ? shadowUnits.px : '0',
 					color: hasColor ? color : defaultColor,
-					insert: hasInset,
+					inset: hasInset,
 				};
 
 				it( `should return shadow object for ${ colorKey } color`, () => {
