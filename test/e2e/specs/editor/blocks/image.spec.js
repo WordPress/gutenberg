@@ -327,7 +327,7 @@ test.describe( 'Image', () => {
 		await editor.clickBlockToolbarButton( 'Crop' );
 		await editor.clickBlockToolbarButton( 'Aspect Ratio' );
 		await page.click(
-			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="16:9"i]'
+			'role=menu[name="Aspect Ratio"i] >> role=menuitemradio[name="Wide - 16:9"i]'
 		);
 		await editor.clickBlockToolbarButton( 'Apply' );
 
