@@ -72,6 +72,7 @@ const URLPopover = forwardRef(
 			<Popover
 				ref={ ref }
 				role="dialog"
+				aria-label={ __( 'Link settings' ) }
 				className="block-editor-url-popover"
 				focusOnMount={ focusOnMount }
 				placement={ computedPlacement }
