@@ -42,8 +42,11 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 					getBlockAttributes( patternParent ).ref
 				);
 			} else {
-				const templateId = select( editorStore ).getCurrentTemplateId();
-				if ( templateId ) {
+				const { getCurrentPostType, getCurrentTemplateId } =
+					select( editorStore );
+				const currentPostType = getCurrentPostType();
+				const templateId = getCurrentTemplateId();
+				if ( currentPostType === 'page' && templateId ) {
 					record = select( coreStore ).getEntityRecord(
 						'postType',
 						'wp_template',
