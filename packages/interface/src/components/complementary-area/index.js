@@ -330,6 +330,7 @@ function ComplementaryArea( {
 									}
 									isPressed={ isPinned }
 									aria-expanded={ isPinned }
+									size="compact"
 								/>
 							) }
 						</>
