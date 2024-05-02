@@ -2145,8 +2145,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
-	 * @since 6.5.0 Passing current theme JSON settings to wp_get_typography_font_size_value().
-	 * @since 6.6.0 Using style engine to correctly fetch background CSS values.
+	 * @since 6.5.0 Output a `min-height: unset` rule when `aspect-ratio` is set.
+	 * @since 6.6.0 Passing current theme JSON settings to wp_get_typography_font_size_value(). Using style engine to correctly fetch background CSS values.
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
