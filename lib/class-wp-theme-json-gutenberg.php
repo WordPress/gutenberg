@@ -132,7 +132,7 @@ class WP_Theme_JSON_Gutenberg {
 			'prevent_override'  => array( 'dimensions', 'defaultAspectRatios' ),
 			'use_default_names' => false,
 			'value_key'         => 'ratio',
-			'css_vars'          => '--wp--preset--aspectRatio--$slug',
+			'css_vars'          => '--wp--preset--aspect-ratio--$slug',
 			'classes'           => array(),
 			'properties'        => array( 'aspect-ratio' ),
 		),
