@@ -158,7 +158,7 @@ function getMissingText( type ) {
  * packages/block-library/src/navigation-submenu/edit.js
  * Consider reuseing this components for both blocks.
  */
-function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
+function Controls( { attributes, setAttributes } ) {
 	const { label, url, description, title, rel } = attributes;
 	return (
 		<PanelBody title={ __( 'Settings' ) }>
@@ -171,8 +171,6 @@ function Controls( { attributes, setAttributes, setIsLabelFieldFocused } ) {
 				} }
 				label={ __( 'Text' ) }
 				autoComplete="off"
-				onFocus={ () => setIsLabelFieldFocused( true ) }
-				onBlur={ () => setIsLabelFieldFocused( false ) }
 			/>
 			<TextControl
 				__nextHasNoMarginBottom
@@ -263,10 +261,6 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 	const linkUIref = useRef();
 	const prevUrl = usePrevious( url );
-
-	// Change the label using inspector causes rich text to change focus on firefox.
-	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
-	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
 
 	const {
 		isAtMaxNesting,
@@ -484,7 +478,6 @@ export default function NavigationLinkEdit( {
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setIsLabelFieldFocused={ setIsLabelFieldFocused }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -499,51 +492,47 @@ export default function NavigationLinkEdit( {
 						</div>
 					) : (
 						<>
-							{ ! isInvalid &&
-								! isDraft &&
-								! isLabelFieldFocused && (
-									<>
-										<RichText
-											ref={ ref }
-											identifier="label"
-											className="wp-block-navigation-item__label"
-											value={ label }
-											onChange={ ( labelValue ) =>
-												setAttributes( {
-													label: labelValue,
-												} )
-											}
-											onMerge={ mergeBlocks }
-											onReplace={ onReplace }
-											__unstableOnSplitAtEnd={ () =>
-												insertBlocksAfter(
-													createBlock(
-														'core/navigation-link'
-													)
+							{ ! isInvalid && ! isDraft && (
+								<>
+									<RichText
+										ref={ ref }
+										identifier="label"
+										className="wp-block-navigation-item__label"
+										value={ label }
+										onChange={ ( labelValue ) =>
+											setAttributes( {
+												label: labelValue,
+											} )
+										}
+										onMerge={ mergeBlocks }
+										onReplace={ onReplace }
+										__unstableOnSplitAtEnd={ () =>
+											insertBlocksAfter(
+												createBlock(
+													'core/navigation-link'
 												)
-											}
-											aria-label={ __(
-												'Navigation link text'
-											) }
-											placeholder={ itemLabelPlaceholder }
-											withoutInteractiveFormatting
-											allowedFormats={ [
-												'core/bold',
-												'core/italic',
-												'core/image',
-												'core/strikethrough',
-											] }
-										/>
-										{ description && (
-											<span className="wp-block-navigation-item__description">
-												{ description }
-											</span>
+											)
+										}
+										aria-label={ __(
+											'Navigation link text'
 										) }
-									</>
-								) }
-							{ ( isInvalid ||
-								isDraft ||
-								isLabelFieldFocused ) && (
+										placeholder={ itemLabelPlaceholder }
+										withoutInteractiveFormatting
+										allowedFormats={ [
+											'core/bold',
+											'core/italic',
+											'core/image',
+											'core/strikethrough',
+										] }
+									/>
+									{ description && (
+										<span className="wp-block-navigation-item__description">
+											{ description }
+										</span>
+									) }
+								</>
+							) }
+							{ ( isInvalid || isDraft ) && (
 								<div className="wp-block-navigation-link__placeholder-text wp-block-navigation-link__label">
 									<Tooltip text={ tooltipText }>
 										<span
