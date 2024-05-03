@@ -288,6 +288,8 @@ export function applySelection( { startPath, endPath }, current ) {
 	// selection manipulations may shift focus, ensure that focus is restored to
 	// its previous state.
 	// Do not take focus if user is not in iFrame editing canvas.
+	//
+	// See: https://github.com/WordPress/gutenberg/issues/61315
 	if (
 		activeElement.closest( 'iframe' ) &&
 		activeElement !== ownerDocument.activeElement
