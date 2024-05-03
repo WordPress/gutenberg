@@ -46,7 +46,7 @@ function buildMenuLabel( title, id, status ) {
 // Save a boolean to prevent us creating a fallback more than once per session.
 let hasCreatedFallback = false;
 
-export default function SidebarNavigationScreenNavigationMenus() {
+export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	const {
 		records: navigationMenus,
 		isResolving: isResolvingNavigationMenus,
@@ -84,8 +84,6 @@ export default function SidebarNavigationScreenNavigationMenus() {
 		useNavigationMenuHandlers();
 
 	const hasNavigationMenus = !! navigationMenus?.length;
-
-	const backPath = {};
 
 	if ( isLoading ) {
 		return (

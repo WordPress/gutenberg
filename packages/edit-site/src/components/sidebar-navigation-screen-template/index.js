@@ -94,7 +94,7 @@ function useTemplateDetails( postType, postId ) {
 	return { title, description, content, footer };
 }
 
-export default function SidebarNavigationScreenTemplate() {
+export default function SidebarNavigationScreenTemplate( { backPath } ) {
 	const history = useHistory();
 	const {
 		params: { postType, postId },
@@ -108,7 +108,7 @@ export default function SidebarNavigationScreenTemplate() {
 	return (
 		<SidebarNavigationScreen
 			title={ title }
-			backPath={ { path: '/wp_template' } }
+			backPath={ backPath }
 			actions={
 				<>
 					<TemplateActions

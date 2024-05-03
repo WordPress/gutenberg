@@ -32,7 +32,7 @@ import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-d
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { PostActions } = unlock( editorPrivateApis );
 
-export default function SidebarNavigationScreenPage() {
+export default function SidebarNavigationScreenPage( { backPath } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const history = useHistory();
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -140,7 +140,7 @@ export default function SidebarNavigationScreenPage() {
 
 	return record ? (
 		<SidebarNavigationScreen
-			backPath={ { path: '/page', postId } }
+			backPath={ backPath }
 			title={ decodeEntities(
 				record?.title?.rendered || __( '(no title)' )
 			) }

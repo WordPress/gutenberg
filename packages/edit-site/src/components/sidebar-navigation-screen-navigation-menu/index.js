@@ -22,7 +22,7 @@ const { useLocation } = unlock( routerPrivateApis );
 
 export const postType = `wp_navigation`;
 
-export default function SidebarNavigationScreenNavigationMenu() {
+export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 	const {
 		params: { postId },
 	} = useLocation();
@@ -60,8 +60,6 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const _handleDelete = () => handleDelete( navigationMenu );
 	const _handleSave = ( edits ) => handleSave( navigationMenu, edits );
 	const _handleDuplicate = () => handleDuplicate( navigationMenu );
-
-	const backPath = { path: '/navigation' };
 
 	if ( isLoading ) {
 		return (
