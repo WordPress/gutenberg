@@ -201,19 +201,6 @@ export default function useClipboardHandler() {
 				}
 
 				const [ firstSelectedClientId ] = selectedBlockClientIds;
-				const firstSelectedBlockName = getBlockName(
-					firstSelectedClientId
-				);
-
-				const [ transform ] = getBlockTransforms(
-					'from',
-					firstSelectedBlockName
-				).filter( ( { type } ) => type === 'paste' );
-
-				if ( transform ) {
-					blocks = transform.transform( blocks );
-				}
-
 				const rootClientId = getBlockRootClientId(
 					firstSelectedClientId
 				);
