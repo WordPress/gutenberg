@@ -104,46 +104,26 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { block, allowRightClickOverrides, showBlockActions } = useSelect(
+	const { block, blockName, allowRightClickOverrides } = useSelect(
 		( select ) => {
-			const {
-				getBlock,
-				getBlockName,
-				getSettings,
-				getContentLockingParent,
-				getBlockEditingMode,
-				getTemplateLock,
-			} = unlock( select( blockEditorStore ) );
-			const _blockName = getBlockName( clientId );
-			const isContentOnly =
-				getBlockEditingMode( clientId ) === 'contentOnly';
-			const contentLockingParent = getContentLockingParent( clientId );
-			// Don't show the block actions for template lock contentOnly.
-			// This block currently doesn't have any action to display in the menu dropdown.
-			const isContentLockingParentTemplateLock =
-				getTemplateLock( contentLockingParent ) === 'contentOnly';
-			// When a block hides its toolbar it also hides the block settings menu,
-			// since that menu is part of the toolbar in the editor canvas.
-			// List View respects this by also hiding the block settings menu.
-			const hasToolbar = hasBlockSupport(
-				_blockName,
-				'__experimentalToolbar',
-				true
-			);
+			const { getBlock, getBlockName, getSettings } =
+				select( blockEditorStore );
 
 			return {
 				block: getBlock( clientId ),
-				blockName: _blockName,
+				blockName: getBlockName( clientId ),
 				allowRightClickOverrides:
 					getSettings().allowRightClickOverrides,
-				showBlockActions:
-					hasToolbar &&
-					! ( isContentOnly && isContentLockingParentTemplateLock ),
 			};
 		},
 		[ clientId ]
 	);
 
+	const showBlockActions =
+		// When a block hides its toolbar it also hides the block settings menu,
+		// since that menu is part of the toolbar in the editor canvas.
+		// List View respects this by also hiding the block settings menu.
+		hasBlockSupport( blockName, '__experimentalToolbar', true );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 

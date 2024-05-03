@@ -5,18 +5,20 @@ import {
 	BlockSettingsMenuControls,
 	__unstableBlockSettingsMenuFirstItem as BlockSettingsMenuFirstItem,
 	store as blockEditorStore,
+	useBlockDisplayInformation,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalText as Text, MenuItem } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-function ContentOnlySettingsMenuItems( { clientId } ) {
+function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 	const { entity, onNavigateToEntityRecord } = useSelect(
 		( select ) => {
 			const {
@@ -66,7 +68,12 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 	);
 
 	if ( ! entity ) {
-		return null;
+		return (
+			<TemplateLockContentOnlyMenuItems
+				clientId={ clientId }
+				onClose={ onClose }
+			/>
+		);
 	}
 
 	const isPattern = entity.type === 'wp_block';
@@ -110,13 +117,63 @@ function ContentOnlySettingsMenuItems( { clientId } ) {
 	);
 }
 
+function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
+	const { contentLockingParent } = useSelect(
+		( select ) => {
+			const { getContentLockingParent } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				contentLockingParent: getContentLockingParent( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+	const blockDisplayInformation =
+		useBlockDisplayInformation( contentLockingParent );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	if ( ! blockDisplayInformation?.title ) return null;
+
+	return (
+		<>
+			<BlockSettingsMenuFirstItem>
+				<Text
+					variant="muted"
+					as="p"
+					className="editor-content-only-settings-menu__description"
+				>
+					{ sprintf(
+						// translators: %s: block's title.
+						__(
+							'Only the content of blocks inside "%s" can be edited.'
+						),
+						blockDisplayInformation.title
+					) }
+				</Text>
+			</BlockSettingsMenuFirstItem>
+			<MenuItem
+				onClick={ () => {
+					updateBlockAttributes( contentLockingParent, {
+						templateLock: undefined,
+					} );
+					onClose();
+				} }
+			>
+				{ __( 'Remove template lock' ) }
+			</MenuItem>
+		</>
+	);
+}
+
 export default function ContentOnlySettingsMenu() {
 	return (
 		<BlockSettingsMenuControls>
-			{ ( { selectedClientIds } ) =>
+			{ ( { selectedClientIds, onClose } ) =>
 				selectedClientIds.length === 1 && (
 					<ContentOnlySettingsMenuItems
 						clientId={ selectedClientIds[ 0 ] }
+						onClose={ onClose }
 					/>
 				)
 			}
