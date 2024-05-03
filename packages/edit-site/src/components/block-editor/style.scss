@@ -117,12 +117,12 @@
 
 	&.is-left {
 		// Subtract half of the handle width to properly center.
-		left: -$grid-unit-20 - ($grid-unit-05 / 2);
+		left: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&.is-right {
 		// Subtract half of the handle width to properly center.
-		right: -$grid-unit-20 - ($grid-unit-05 / 2);
+		right: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&:hover,

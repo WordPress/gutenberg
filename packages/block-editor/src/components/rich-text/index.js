@@ -20,6 +20,7 @@ import {
 } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -108,8 +109,14 @@ export function RichTextWrapper(
 ) {
 	props = removeNativeProps( props );
 
-	const instanceId = useInstanceId( RichTextWrapper );
+	if ( onSplit ) {
+		deprecated( 'wp.blockEditor.RichText onSplit prop', {
+			since: '6.4',
+			alternative: 'block.json support key: "splitting"',
+		} );
+	}
 
+	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;

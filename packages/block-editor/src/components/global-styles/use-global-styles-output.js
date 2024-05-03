@@ -818,7 +818,7 @@ export const toStyles = (
 		 * user-generated values take precedence in the CSS cascade.
 		 * @link https://github.com/WordPress/gutenberg/issues/36147.
 		 */
-		ruleset += 'body {margin: 0;';
+		ruleset += ':where(body) {margin: 0;';
 
 		// Root padding styles should only be output for full templates, not patterns or template parts.
 		if ( options.rootPadding && useRootPaddingAlign && isTemplate ) {

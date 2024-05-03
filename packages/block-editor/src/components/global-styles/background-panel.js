@@ -275,9 +275,7 @@ function BackgroundImageToolsPanelItem( {
 		};
 	}, [] );
 
-	const hasValue =
-		hasBackgroundImageValue( style ) ||
-		hasBackgroundImageValue( inheritedValue );
+	const hasValue = hasBackgroundImageValue( style );
 
 	return (
 		<ToolsPanelItem

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.5.0 (2024-05-02)
+
 ### Enhancements
 
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
@@ -12,6 +14,7 @@
 ### Bug Fix
 
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
+-   `Panel`: Fix issue with collapsing panel header ([#61319](https://github.com/WordPress/gutenberg/pull/61319)).
 
 ### Enhancements
 
