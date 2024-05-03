@@ -31,6 +31,7 @@ export default function useClipboardHandler() {
 		hasMultiSelection,
 		getSettings,
 		getBlockName,
+		getBlock,
 		__unstableIsFullySelected,
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
@@ -145,7 +146,7 @@ export default function useClipboardHandler() {
 					__unstableIsFullySelected() ||
 					( selectedBlockClientIds.length === 1 &&
 						isUnmodifiedDefaultBlock(
-							selectedBlockClientIds[ 0 ]
+							getBlock( selectedBlockClientIds[ 0 ] )
 						) );
 				let blocks = [];
 

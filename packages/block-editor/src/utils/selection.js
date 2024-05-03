@@ -34,7 +34,7 @@ export function retrieveSelectedAttribute( blockAttributes ) {
 
 export function findRichTextAttributeKey( blockType ) {
 	for ( const [ key, value ] of Object.entries( blockType.attributes ) ) {
-		if ( value.source === 'rich-text' ) {
+		if ( value.source === 'rich-text' || value.source === 'html' ) {
 			return key;
 		}
 	}
