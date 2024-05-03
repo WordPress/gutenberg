@@ -51,7 +51,7 @@ Refer to the [`interactivity` support property docs](https://developer.wordpress
 
 #### Load Interactivity API Javascript code with `viewScriptModule`
 
-The Interactivity API script requires using Javascript modules that can be [natively loaded in WordPress from v6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). The JavaScript files using the Interactivity API, should be enqueued via the [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module):
+The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress from 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Block can use [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to easily enqueue their Script Modules:
 
 ```json
 // block.json
