@@ -15,7 +15,8 @@ This documentation was generated from the JSON schema for theme.json.
 
 The latest schema for version 3 including all the latest changes from the Gutenberg plugin is available at `https://schemas.wp.org/trunk/theme.json`.
 
-Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`. For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`.
+Theme.json schemas for each WordPress version are available at `https://schemas.wp.org/wp/{{version}}/theme.json`.  
+For example a schema for WordPress 5.8 is available at `https://schemas.wp.org/wp/5.8/theme.json`.
 
 See [Developing with theme.json](/docs/how-to-guides/themes/global-settings-and-styles.md#developing-with-themejson) for how to use the JSON schema in your editor.
 
