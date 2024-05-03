@@ -33,7 +33,7 @@
 
 		&.is-pill,
 		&.is-pill::after {
-			border-radius: 48px; // Should match the value of presetColorSwatchSize in the /packages/edit-site/src/components/global-styles/preset-colors.js file.
+			border-radius: 100px;
 			overflow: hidden;
 		}
 

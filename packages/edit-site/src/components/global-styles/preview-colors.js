@@ -23,7 +23,6 @@ const firstFrameVariants = {
 	},
 };
 
-// Should match the value for is-pill in the packages/edit-site/src/components/global-styles/variations/style.scss file.
 const presetColorSwatchSize = 48;
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
