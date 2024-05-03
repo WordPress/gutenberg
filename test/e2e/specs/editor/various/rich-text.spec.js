@@ -488,6 +488,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -496,7 +498,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			},
 			{
 				name: 'core/paragraph',
-				attributes: { content: '2b' },
+				attributes: { content: '2‸b' },
 			},
 		] );
 	} );
@@ -515,11 +517,13 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( '13' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: '123' },
+				attributes: { content: '12‸3' },
 			},
 		] );
 	} );
@@ -542,11 +546,13 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'a1<strong>2</strong>3b' },
+				attributes: { content: 'a1<strong>2</strong>3‸b' },
 			},
 		] );
 	} );
@@ -592,11 +598,13 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: '<strong>132</strong>3' },
+				attributes: { content: '<strong>13‸2</strong>3' },
 			},
 		] );
 	} );
@@ -685,6 +693,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 
 		// Paste paragraph contents.
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -696,7 +706,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				innerBlocks: [
 					{
 						name: 'core/list-item',
-						attributes: { content: '1<br>2' },
+						attributes: { content: '1<br>2‸' },
 					},
 				],
 			},

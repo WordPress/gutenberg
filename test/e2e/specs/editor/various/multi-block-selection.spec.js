@@ -457,7 +457,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 2 ] );
 	} );
 
-	test( 'should cut and paste', async ( { editor, pageUtils } ) => {
+	test( 'should cut and paste', async ( { editor, pageUtils, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: '1' },
@@ -474,10 +474,12 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{ name: 'core/paragraph', attributes: { content: '1' } },
-			{ name: 'core/paragraph', attributes: { content: '2' } },
+			{ name: 'core/paragraph', attributes: { content: '2‸' } },
 		] );
 	} );
 
