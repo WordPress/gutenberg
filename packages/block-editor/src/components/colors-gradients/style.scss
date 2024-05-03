@@ -44,7 +44,7 @@ $swatch-gap: 12px;
 		$panelPadding: $grid-unit-20;
 
 		// Ensure the popover perfectly wraps the swatches.
-		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
+		width: ( $swatch-size * 5 ) + ( $swatch-gap * 6 ) + ( $panelPadding * 2 );
 		padding: $panelPadding;
 	}
 }
