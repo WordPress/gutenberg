@@ -58,7 +58,7 @@ test.describe( 'Navigation colors', () => {
 		editor,
 		page,
 		colorControl,
-	} ) => {
+	}, testInfo ) => {
 		const expectedNavigationColors = {
 			textColor: colorControl.black,
 			backgroundColor: colorControl.transparent, // There should be no background color set even though the body background is black.
@@ -73,6 +73,8 @@ test.describe( 'Navigation colors', () => {
 		await page.goto( `/?p=${ postId }` );
 
 		await colorControl.testFrontendColors( expectedNavigationColors );
+
+		expect( testInfo.retry ).toBeTruthy();
 	} );
 
 	test( 'Top level navigation links inherit the text color from the theme/group but do not apply to the submenu or overlay text', async ( {

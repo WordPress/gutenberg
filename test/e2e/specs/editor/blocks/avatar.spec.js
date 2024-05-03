@@ -29,7 +29,7 @@ test.describe( 'Avatar', () => {
 	test( 'should change image when user is changed', async ( {
 		editor,
 		page,
-	} ) => {
+	}, testInfo ) => {
 		// Inserting a quote block
 		await editor.insertBlock( {
 			name: 'core/avatar',
@@ -71,5 +71,7 @@ test.describe( 'Avatar', () => {
 		const newSrc = await updatedAvatarImage.getAttribute( 'src' );
 
 		expect( newSrc ).not.toBe( originalSrc );
+
+		expect( testInfo.retry ).toBeTruthy();
 	} );
 } );
