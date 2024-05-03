@@ -1,7 +1,7 @@
-// Must equal $color-palette-circle-size and $color-palette-circle-spacing from:
+// Must equal $swatch-size and $swatch-gap from:
 // @wordpress/components/src/circular-option-picker/style.scss
 $swatch-size: 28px;
-$swatch-gap: 12px;
+$swatch-gap: 8px;
 
 $popover-width: 260px;
 $popover-padding: $grid-unit-20;
