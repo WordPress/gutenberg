@@ -61,7 +61,7 @@ export default function SidebarNavigationScreenNavigationMenu() {
 	const _handleSave = ( edits ) => handleSave( navigationMenu, edits );
 	const _handleDuplicate = () => handleDuplicate( navigationMenu );
 
-	const backPath = { path: '/navigation', postId };
+	const backPath = { path: '/navigation' };
 
 	if ( isLoading ) {
 		return (
