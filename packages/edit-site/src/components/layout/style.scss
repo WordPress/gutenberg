@@ -197,7 +197,7 @@
 		box-shadow: none;
 	}
 
-	&.edit-site-site-hub__view-mode-toggle--navigation::before {
+	&[role="button"]::before {
 		top: 0;
 		right: 0;
 		bottom: 0;

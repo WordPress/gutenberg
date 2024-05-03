@@ -118,13 +118,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 				>
 					<Button
 						{ ...siteIconButtonProps }
-						className={ classnames(
-							'edit-site-layout__view-mode-toggle',
-							{
-								'edit-site-site-hub__view-mode-toggle--navigation':
-									siteIconButtonProps.role === 'button',
-							}
-						) }
+						className="edit-site-layout__view-mode-toggle"
 					>
 						<motion.div
 							initial={ false }
