@@ -63,41 +63,6 @@ const getIndexOfMatchingSuggestion = (
 		: matchingSuggestions.indexOf( selectedSuggestion );
 
 /**
- * Get the next index of a matching suggestions,
- * considering the current index, and the offset/direction.
- *
- * @param {number} current             - The current index.
- * @param {number} offset              - The offset.
- * @param {Array}  matchingSuggestions - The array of matching suggestions.
- * @return {number} The next index of a matching suggestion.
- */
-const getNextIndexOfMatchingSuggestion = (
-	current: number,
-	offset: number,
-	matchingSuggestions: ComboboxControlOption[]
-): number => {
-	const step = offset > 0 ? 1 : -1;
-	let index = current + step;
-
-	while ( index !== current ) {
-		if ( index < 0 ) {
-			index = matchingSuggestions.length - 1; // Go to the end if it goes past the beginning
-		} else if ( index >= matchingSuggestions.length ) {
-			index = 0; // Go to the beginning if it goes past the end
-		}
-
-		// If the suggestion is not disabled, return the index
-		if ( ! matchingSuggestions[ index ].disabled ) {
-			return index;
-		}
-
-		index += step; // Move to the next suggestion
-	}
-
-	return -1; // No valid suggestion found
-};
-
-/**
  * `ComboboxControl` is an enhanced version of a [`SelectControl`](../select-control/README.md) with the addition of
  * being able to search for options using a search input.
  *
@@ -218,13 +183,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			selectedSuggestion,
 			matchingSuggestions
 		);
-
-		const nextIndex = getNextIndexOfMatchingSuggestion(
-			index,
-			offset,
-			matchingSuggestions
-		);
-
+		let nextIndex = index + offset;
+		if ( nextIndex < 0 ) {
+			nextIndex = matchingSuggestions.length - 1;
+		} else if ( nextIndex >= matchingSuggestions.length ) {
+			nextIndex = 0;
+		}
 		setSelectedSuggestion( matchingSuggestions[ nextIndex ] );
 		setIsExpanded( true );
 	};
