@@ -3,9 +3,11 @@
  */
 import { computed, signal, Signal } from '@preact/signals-core';
 
+// Expose this to use it in state/context handlers.
+export const objToProxy = new WeakMap();
+
 const proxyToSignals = new WeakMap();
 const proxyToHandlers = new WeakMap();
-const objToProxy = new WeakMap();
 const arrayToArrayOfSignals = new WeakMap();
 const ignore = new WeakSet();
 const objToIterable = new WeakMap();
@@ -15,15 +17,17 @@ let peeking = false;
 
 export const deepSignal = < T extends object >(
 	obj: T,
-	handlers = null
+	handlers: ProxyHandler< T > | null = null
 ): DeepSignal< T > => {
-	if ( ! shouldProxy( obj ) )
+	if ( ! shouldProxy( obj ) ) {
 		throw new Error( "This object can't be observed." );
-	if ( ! objToProxy.has( obj ) )
+	}
+	if ( ! objToProxy.has( obj ) ) {
 		objToProxy.set(
 			obj,
 			createProxy( obj, handlers || objectHandlers ) as DeepSignal< T >
 		);
+	}
 	return objToProxy.get( obj );
 };
 
@@ -62,21 +66,25 @@ const throwOnMutation = () => {
 const get =
 	( isArrayOfSignals: boolean ) =>
 	( target: object, fullKey: string, receiver: object ): unknown => {
-		if ( peeking ) return Reflect.get( target, fullKey, receiver );
+		if ( peeking ) {
+			return Reflect.get( target, fullKey, receiver );
+		}
 		let returnSignal = isArrayOfSignals || fullKey[ 0 ] === '$';
 		if ( ! isArrayOfSignals && returnSignal && Array.isArray( target ) ) {
 			if ( fullKey === '$' ) {
-				if ( ! arrayToArrayOfSignals.has( target ) )
+				if ( ! arrayToArrayOfSignals.has( target ) ) {
 					arrayToArrayOfSignals.set(
 						target,
 						createProxy( target, arrayHandlers )
 					);
+				}
 				return arrayToArrayOfSignals.get( target );
 			}
 			returnSignal = fullKey === '$length';
 		}
-		if ( ! proxyToSignals.has( receiver ) )
+		if ( ! proxyToSignals.has( receiver ) ) {
 			proxyToSignals.set( receiver, new Map() );
+		}
 		const signals = proxyToSignals.get( receiver );
 		const key = returnSignal ? fullKey.replace( rg, '' ) : fullKey;
 		if (
@@ -89,12 +97,15 @@ const get =
 			);
 		} else {
 			let value = Reflect.get( target, key, receiver );
-			if ( returnSignal && typeof value === 'function' ) return undefined; // Prevent a TS error.
-			if ( typeof key === 'symbol' && wellKnownSymbols.has( key ) )
+			if ( returnSignal && typeof value === 'function' ) {
+				return undefined;
+			} // Prevent a TS error.
+			if ( typeof key === 'symbol' && wellKnownSymbols.has( key ) ) {
 				return value;
+			}
 			if ( ! signals.has( key ) ) {
 				if ( shouldProxy( value ) ) {
-					if ( ! objToProxy.has( value ) )
+					if ( ! objToProxy.has( value ) ) {
 						objToProxy.set(
 							value,
 							createProxy(
@@ -102,6 +113,7 @@ const get =
 								proxyToHandlers.get( receiver )
 							)
 						);
+					}
 					value = objToProxy.get( value );
 				}
 				signals.set( key, signal( value ) );
@@ -118,49 +130,64 @@ export const objectHandlers = {
 		val: any,
 		receiver: object
 	): boolean {
-		if ( typeof descriptor( target, fullKey )?.set === 'function' )
+		if ( typeof descriptor( target, fullKey )?.set === 'function' ) {
 			return Reflect.set( target, fullKey, val, receiver );
-		if ( ! proxyToSignals.has( receiver ) )
+		}
+		if ( ! proxyToSignals.has( receiver ) ) {
 			proxyToSignals.set( receiver, new Map() );
+		}
 		const signals = proxyToSignals.get( receiver );
 		if ( fullKey[ 0 ] === '$' ) {
-			if ( ! ( val instanceof Signal ) ) throwOnMutation();
+			if ( ! ( val instanceof Signal ) ) {
+				throwOnMutation();
+			}
 			const key = fullKey.replace( rg, '' );
 			signals.set( key, val );
 			return Reflect.set( target, key, val.peek(), receiver );
 		}
 		let internal = val;
 		if ( shouldProxy( val ) ) {
-			if ( ! objToProxy.has( val ) )
+			if ( ! objToProxy.has( val ) ) {
 				objToProxy.set(
 					val,
 					createProxy( val, proxyToHandlers.get( receiver ) )
 				);
+			}
 			internal = objToProxy.get( val );
 		}
 		const isNew = ! ( fullKey in target );
 		const result = Reflect.set( target, fullKey, val, receiver );
-		if ( ! signals.has( fullKey ) )
+		if ( ! signals.has( fullKey ) ) {
 			signals.set( fullKey, signal( internal ) );
-		else signals.get( fullKey ).value = internal;
-		if ( isNew && objToIterable.has( target ) )
+		} else {
+			signals.get( fullKey ).value = internal;
+		}
+		if ( isNew && objToIterable.has( target ) ) {
 			objToIterable.get( target ).value++;
-		if ( Array.isArray( target ) && signals.has( 'length' ) )
+		}
+		if ( Array.isArray( target ) && signals.has( 'length' ) ) {
 			signals.get( 'length' ).value = target.length;
+		}
 		return result;
 	},
 	deleteProperty( target: object, key: string ): boolean {
-		if ( key[ 0 ] === '$' ) throwOnMutation();
+		if ( key[ 0 ] === '$' ) {
+			throwOnMutation();
+		}
 		const signals = proxyToSignals.get( objToProxy.get( target ) );
 		const result = Reflect.deleteProperty( target, key );
-		if ( signals && signals.has( key ) )
+		if ( signals && signals.has( key ) ) {
 			signals.get( key ).value = undefined;
-		if ( objToIterable.has( target ) ) objToIterable.get( target ).value++;
+		}
+		if ( objToIterable.has( target ) ) {
+			objToIterable.get( target ).value++;
+		}
 		return result;
 	},
 	ownKeys( target: object ): ( string | symbol )[] {
-		if ( ! objToIterable.has( target ) )
+		if ( ! objToIterable.has( target ) ) {
 			objToIterable.set( target, signal( 0 ) );
+		}
 		( objToIterable as any )._ = objToIterable.get( target ).value;
 		return Reflect.ownKeys( target );
 	},
@@ -179,7 +206,9 @@ const wellKnownSymbols = new Set(
 );
 const supported = new Set( [ Object, Array ] );
 const shouldProxy = ( val: any ): boolean => {
-	if ( typeof val !== 'object' || val === null ) return false;
+	if ( typeof val !== 'object' || val === null ) {
+		return false;
+	}
 	return supported.has( val.constructor ) && ! ignore.has( val );
 };
 
