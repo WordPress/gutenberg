@@ -18,7 +18,7 @@ function ScreenColorPalette( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Palette' ) }
+				title={ __( 'Edit Palette' ) }
 				description={ __(
 					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
 				) }
