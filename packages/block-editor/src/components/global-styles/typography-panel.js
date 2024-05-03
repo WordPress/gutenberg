@@ -6,6 +6,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
@@ -90,6 +91,11 @@ function useHasLetterSpacingControl( settings ) {
 function useHasTextTransformControl( settings ) {
 	return settings?.typography?.textTransform;
 }
+
+function useHasDropCapControl( settings ) {
+	return settings?.typography?.dropCap;
+}
+
 
 function useHasTextDecorationControl( settings ) {
 	return settings?.typography?.textDecoration;
@@ -334,6 +340,16 @@ export default function TypographyPanel( {
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
 
+	// Drop cap
+	const hasDropCapControl = useHasDropCapControl( settings );
+	const dropCap = !! value?.typography?.dropCap;
+	const setDropCap = () =>
+		onChange(
+			setImmutably( value, [ 'typography', 'dropCap' ], ! dropCap )
+		);
+	const hasDropCap = () => !! value?.typography?.dropCap;
+	const resetDropCap = () => setDropCap( undefined );
+
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
 			...previousValue,
@@ -511,6 +527,23 @@ export default function TypographyPanel( {
 						isBlock
 						size="__unstable-large"
 						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasDropCapControl && (
+				<ToolsPanelItem
+					hasValue={ hasDropCap }
+					label={ __( 'Drop cap' ) }
+					onDeselect={ resetDropCap }
+					panelId={ panelId }
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Drop cap' ) }
+						checked={ !! dropCap }
+						onChange={ setDropCap }
+/*						help={ helpText }
+						disabled={ hasDropCapDisabled( align ) ? true : false }*/
 					/>
 				</ToolsPanelItem>
 			) }

@@ -198,6 +198,7 @@ export function getBlockSettings( state, clientId, ...paths ) {
 
 		// 2. Fall back to the settings from the block editor store (__experimentalFeatures).
 		const settings = getSettings( state );
+
 		if ( result === undefined && blockName ) {
 			result = getValueFromObjectPath(
 				settings.__experimentalFeatures?.blocks?.[ blockName ],

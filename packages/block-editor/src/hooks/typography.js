@@ -4,6 +4,7 @@
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -50,9 +51,13 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 ];
 
 function styleToAttributes( style ) {
-	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
+	const updatedStyle = { ...omit( style, [ 'fontFamily', 'dropCap' ] ) };
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
+	const dropCapValue =
+		typeof style?.typography?.dropCap === 'boolean'
+			? style?.typography?.dropCap
+			: undefined;
 	const fontSizeSlug = fontSizeValue?.startsWith( 'var:preset|font-size|' )
 		? fontSizeValue.substring( 'var:preset|font-size|'.length )
 		: undefined;
@@ -62,19 +67,24 @@ function styleToAttributes( style ) {
 		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
 		: undefined;
 	updatedStyle.typography = {
-		...omit( updatedStyle.typography, [ 'fontFamily' ] ),
+		...omit( updatedStyle.typography, [ 'fontFamily', 'dropCap' ] ),
 		fontSize: fontSizeSlug ? undefined : fontSizeValue,
+	};
+	const updatedAttributes = {
+		dropCap: dropCapValue,
+		fontFamily: fontFamilySlug,
+		fontSize: fontSizeSlug,
 	};
 	return {
 		style: cleanEmptyObject( updatedStyle ),
-		fontFamily: fontFamilySlug,
-		fontSize: fontSizeSlug,
+		...updatedAttributes,
 	};
 }
 
 function attributesToStyle( attributes ) {
 	return {
 		...attributes.style,
+		dropCap: undefined,
 		typography: {
 			...attributes.style?.typography,
 			fontFamily: attributes.fontFamily
@@ -83,6 +93,10 @@ function attributesToStyle( attributes ) {
 			fontSize: attributes.fontSize
 				? 'var:preset|font-size|' + attributes.fontSize
 				: attributes.style?.typography?.fontSize,
+			dropCap:
+				typeof attributes?.dropCap === 'boolean'
+					? attributes.dropCap
+					: undefined,
 		},
 	};
 }
@@ -112,23 +126,43 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 
 export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 	function selector( select ) {
-		const { style, fontFamily, fontSize } =
+		const { style, fontFamily, fontSize, align, dropCap } =
 			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, fontFamily, fontSize };
+		return { style, fontFamily, fontSize, align, dropCap };
 	}
-	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
-	const isEnabled = useHasTypographyPanel( settings );
-	const value = useMemo(
-		() => attributesToStyle( { style, fontFamily, fontSize } ),
-		[ style, fontSize, fontFamily ]
+	const { style, fontFamily, fontSize, align, dropCap } = useSelect(
+		selector,
+		[ clientId ]
 	);
+	const isEnabled = useHasTypographyPanel( settings );
+
+	/*
+	 * Drop cap is a special case.
+	 * It's only supported by paragraph blocks
+	 * under certain conditions
+	 * and not in global styles.
+	 */
+	const hasDropCap =
+		'core/paragraph' === name &&
+		settings?.typography?.dropCap &&
+		! ( align === ( isRTL() ? 'left' : 'right' ) || align === 'center' );
+
+	const value = useMemo(
+		() => attributesToStyle( { style, fontFamily, fontSize, dropCap } ),
+		[ style, fontSize, fontFamily, dropCap ]
+	);
+
 
 	const onChange = ( newStyle ) => {
 		setAttributes( styleToAttributes( newStyle ) );
 	};
 
-	if ( ! isEnabled ) {
+	if ( ! isEnabled && ! hasDropCap ) {
 		return null;
+	}
+
+	if ( hasDropCap ) {
+		settings.typography.dropCap = true;
 	}
 
 	const defaultControls = getBlockSupport( name, [

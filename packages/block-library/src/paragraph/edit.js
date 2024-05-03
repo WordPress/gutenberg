@@ -134,13 +134,13 @@ function ParagraphBlock( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls group="typography">
+{/*			<InspectorControls group="typography">
 				<DropCapControl
 					clientId={ clientId }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
-			</InspectorControls>
+			</InspectorControls>*/}
 			<RichText
 				identifier="content"
 				tagName="p"
