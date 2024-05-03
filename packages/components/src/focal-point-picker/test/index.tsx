@@ -3,15 +3,12 @@
  */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-/**
- * Internal dependencies
- */
-import type { FocalPointPickerProps } from '../types';
 
 /**
  * Internal dependencies
  */
 import Picker from '..';
+import type { FocalPointPickerProps } from '../types';
 
 type Log = { name: string; args: any[] };
 type EventLogger = ( name: string, args: any[] ) => void;
