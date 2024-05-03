@@ -23,15 +23,12 @@ const firstFrameVariants = {
 	},
 };
 
-const presetColorSwatchSize = 48;
-
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	return (
 		<PreviewIframe
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
-			height={ presetColorSwatchSize }
 		>
 			{ ( { key } ) => (
 				<motion.div

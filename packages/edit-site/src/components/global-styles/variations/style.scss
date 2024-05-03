@@ -31,6 +31,10 @@
 			@include reduce-motion("transition");
 		}
 
+		&.is-pill {
+			height: 48px;
+		}
+
 		&.is-pill,
 		&.is-pill::after {
 			border-radius: 100px;
