@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { useEffect, Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -114,26 +113,6 @@ function HeadingEdit( {
 				value={ content }
 				onChange={ onContentChange }
 				onMerge={ mergeBlocks }
-				onSplit={ ( value, isOriginal ) => {
-					let block;
-
-					if ( isOriginal || value ) {
-						block = createBlock( 'core/heading', {
-							...attributes,
-							content: value,
-						} );
-					} else {
-						block = createBlock(
-							getDefaultBlockName() ?? 'core/heading'
-						);
-					}
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
-				} }
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Heading' ) }

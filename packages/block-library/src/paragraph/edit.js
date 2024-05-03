@@ -21,15 +21,12 @@ import {
 	useSettings,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
-
-const name = 'core/paragraph';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -149,24 +146,6 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value, isOriginal ) => {
-					let newAttributes;
-
-					if ( isOriginal || value ) {
-						newAttributes = {
-							...attributes,
-							content: value,
-						};
-					}
-
-					const block = createBlock( name, newAttributes );
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
-				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onRemove }
