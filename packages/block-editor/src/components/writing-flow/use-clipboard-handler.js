@@ -6,7 +6,6 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
-	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -31,7 +30,6 @@ export default function useClipboardHandler() {
 		hasMultiSelection,
 		getSettings,
 		getBlockName,
-		getBlock,
 		__unstableIsFullySelected,
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
@@ -142,12 +140,7 @@ export default function useClipboardHandler() {
 					return;
 				}
 				const { plainText, html, files } = getPasteEventData( event );
-				const isFullySelected =
-					__unstableIsFullySelected() ||
-					( selectedBlockClientIds.length === 1 &&
-						isUnmodifiedDefaultBlock(
-							getBlock( selectedBlockClientIds[ 0 ] )
-						) );
+				const isFullySelected = __unstableIsFullySelected();
 				let blocks = [];
 
 				if ( files.length ) {
