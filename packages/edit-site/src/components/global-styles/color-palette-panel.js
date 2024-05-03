@@ -83,9 +83,6 @@ export default function ColorPalettePanel( { name } ) {
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
-				emptyMessage={ __(
-					'Custom colors are empty! Add some colors to create your own color palette.'
-				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
