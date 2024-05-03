@@ -62,7 +62,7 @@ export default function PostSchedulePanel() {
 					contentClassName="editor-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
-							__next40pxDefaultSize
+							size="compact"
 							className="editor-post-schedule__dialog-toggle"
 							variant="tertiary"
 							onClick={ onToggle }

@@ -110,6 +110,7 @@ function PatternOverridesControls( { attributes, name, setAttributes } ) {
 						__next40pxDefaultSize
 						className="pattern-overrides-control__allow-overrides-button"
 						variant="secondary"
+						aria-haspopup="dialog"
 						onClick={ () => {
 							if ( allowOverrides ) {
 								setShowDisallowOverridesModal( true );

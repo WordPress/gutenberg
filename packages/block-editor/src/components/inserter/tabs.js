@@ -29,7 +29,7 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( { onSelect, tabsContents }, ref ) {
+function InserterTabs( { onSelect, children }, ref ) {
 	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
@@ -53,7 +53,7 @@ function InserterTabs( { onSelect, tabsContents }, ref ) {
 						focusable={ false }
 						className="block-editor-inserter__tabpanel"
 					>
-						{ tabsContents[ tab.name ] }
+						{ children }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
