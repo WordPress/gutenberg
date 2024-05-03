@@ -3,15 +3,19 @@
 	background: $white;
 	height: 100%;
 	container: edit-site-page / inline-size;
+	transition: width ease-out 0.2s;
+	@include reduce-motion("transition");
 }
 
 .edit-site-page-header {
-	padding: $grid-unit-30 $grid-unit-60;
+	padding: $grid-unit-20 $grid-unit-60;
 	border-bottom: 1px solid $gray-100;
 	background: $white;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".edit-site-page-header");
+	transition: padding ease-out 0.2s;
+	@include reduce-motion("transition");
 	.components-text {
 		color: $gray-800;
 	}

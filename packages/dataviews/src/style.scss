@@ -7,14 +7,16 @@
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: $grid-unit-30 $grid-unit-60;
+	padding: $grid-unit-20 $grid-unit-60;
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
+	transition: padding ease-out 0.2s;
+	@include reduce-motion("transition");
 
 	.components-search-control {
 		.components-base-control__field {
-			max-width: 128px;
+			max-width: 240px;
 		}
 	}
 }
@@ -24,6 +26,7 @@
 		&,
 		&:hover {
 			opacity: 0;
+			padding: 0;
 		}
 
 		&:focus {
@@ -45,6 +48,8 @@
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
+	transition: padding ease-out 0.2s;
+	@include reduce-motion("transition");
 }
 
 .dataviews-pagination__page-selection {
@@ -785,5 +790,13 @@
 	.dataviews-pagination,
 	.dataviews-filters__view-actions {
 		padding: $grid-unit-20 $grid-unit-30;
+	}
+
+	.dataviews-filters__view-actions {
+		.components-search-control {
+			.components-base-control__field {
+				max-width: 112px;
+			}
+		}
 	}
 }
