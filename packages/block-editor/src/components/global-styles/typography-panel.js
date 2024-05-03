@@ -8,12 +8,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { mergeOrigins, hasOriginValue } from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -62,7 +61,9 @@ function useHasFontSizeControl( settings ) {
 }
 
 function useHasFontFamilyControl( settings ) {
-	return hasOriginValue( settings?.typography?.fontFamilies );
+	return [ 'default', 'theme', 'custom' ].some(
+		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
+	);
 }
 
 function useHasLineHeightControl( settings ) {
@@ -170,8 +171,12 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies ?? {};
-	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const mergedFontFamilies = useMemo( () => {
+		return [ 'default', 'theme', 'custom' ].flatMap(
+			( key ) => fontFamilies[ key ] ?? []
+		);
+	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(
