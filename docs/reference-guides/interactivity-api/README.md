@@ -40,15 +40,30 @@ You can start creating interactions once you set up a block development environm
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json` file.
 
-```
+```json
+// block.json
 "supports": {
     "interactivity": true
 },
 ```
 
+Refer to the [`interactivity` support property docs](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity) to get a more detailed description of this property.
+
+#### Load Interactivity API Javascript code with `viewScriptModule`
+
+The Interactivity API script requires using Javascript modules that can be [natively loaded in WordPress from v6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). The JavaScript files using the Interactivity API, should be enqueued via the [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module):
+
+```json
+// block.json
+{
+   ...
+   "viewScriptModule": "file:./view.js"
+}
+```
+
 #### Add `wp-interactive` directive to a DOM element
 
-To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#wp-interactive) directive to the element in the block's `render.php` or `save.js` files.
+To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#wp-interactive) directive to the element in the block's `render.php` or `save.js` files. Its value must be the unique namespace of your plugin or block:
 
 
 ```html
