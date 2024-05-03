@@ -45,7 +45,7 @@ runs:
           if: ${{ failure() || runner.debug }}
           uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
           with:
-              name: npm-logs-${{ matrix.os }}-${{ matrix.node }}
+              name: npm-logs-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}
               path: '${{ steps.npm-cache-location.outputs.NODE_CACHE_LOCATION }}/_logs'
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
