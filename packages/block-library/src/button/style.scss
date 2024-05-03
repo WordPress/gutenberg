@@ -98,22 +98,20 @@ $blocks-block__margin: 0.5em;
 	border-radius: 0 !important;
 }
 
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link,
-.wp-block-button .wp-block-button__link:where(.is-style-outline) {
-	border: 2px solid currentColor;
-	padding: 0.667em 1.333em;
-}
-
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-text-color),
-.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-text-color) {
-	color: currentColor;
-}
-
-.wp-block-button:where(.is-style-outline) > .wp-block-button__link:not(.has-background),
-.wp-block-button .wp-block-button__link:where(.is-style-outline):not(.has-background) {
+// Block style variations require zero specificity selectors for nesting.
+// Classic themes require the block style variation styles loaded here.
+// Block themes however would override these styles with button element or
+// block type styles. To work around this the styles related to block supports
+// e.g. border and background-color, are duplicated in the base theme.json so
+// they take precedence.
+:where(.wp-block-button.is-style-outline > .wp-block-button__link),
+:where(.wp-block-button .wp-block-button__link.is-style-outline) {
 	background-color: transparent;
 	// background-image is required to overwrite a gradient background
 	background-image: none;
+	border: 2px solid currentColor;
+	color: currentColor;
+	padding: 0.667em 1.333em;
 }
 
 .wp-block-button .wp-block-button__link {
