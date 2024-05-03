@@ -71,7 +71,7 @@ export default function GradientPalettePanel( { name } ) {
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit

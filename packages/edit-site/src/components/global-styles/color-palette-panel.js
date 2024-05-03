@@ -52,7 +52,7 @@ export default function ColorPalettePanel( { name } ) {
 	return (
 		<VStack
 			className="edit-site-global-styles-color-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeColors && !! themeColors.length && (
 				<PaletteEdit
