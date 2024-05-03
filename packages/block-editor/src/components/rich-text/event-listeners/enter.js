@@ -22,6 +22,8 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
+		// The event listener is attached to the window, so we need to check if
+		// the target is the element.
 		if ( event.target !== element ) {
 			return;
 		}
@@ -71,8 +73,8 @@ export default ( props ) => ( element ) => {
 
 	const { defaultView } = element.ownerDocument;
 
-	// Attach the listener to the window so parent elements have the
-	// chance to prevent the default behavior.
+	// Attach the listener to the window so parent elements have the chance to
+	// prevent the default behavior.
 	defaultView.addEventListener( 'keydown', onKeyDown );
 	element.addEventListener( 'keydown', onKeyDownDeprecated );
 	return () => {
