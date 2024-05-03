@@ -78,12 +78,12 @@ const getIndexOfMatchingSuggestion = (
  * 	{
  * 		value: 'normal',
  * 		label: 'Normal',
- *      disabled: true,
+ * 		disabled: true,
  * 	},
  * 	{
  * 		value: 'large',
  * 		label: 'Large',
- *      disabled: false,
+ * 		disabled: false,
  * 	},
  * ];
  *
