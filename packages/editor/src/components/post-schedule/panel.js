@@ -28,6 +28,11 @@ const DESIGN_POST_TYPES = [
 	NAVIGATION_POST_TYPE,
 ];
 
+/**
+ * Renders the Post Schedule Panel component.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSchedulePanel() {
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
 	const postType = useSelect(
