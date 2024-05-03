@@ -28,7 +28,7 @@ runs:
           uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
@@ -45,7 +45,7 @@ runs:
           if: ${{ failure() || runner.debug }}
           uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
           with:
-              name: npm-logs-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}
+              name: npm-logs-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.node-version.outputs.NODE_VERSION }}
               path: '${{ steps.npm-cache-location.outputs.NODE_CACHE_LOCATION }}/_logs'
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
