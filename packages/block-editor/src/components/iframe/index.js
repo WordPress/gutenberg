@@ -352,7 +352,15 @@ function Iframe( {
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {
+						// We should only stop propagation of the React event,
+						// the native event should further bubble inside the
+						// iframe to the document and window.
+						// Alternatively, we could consider redispatching the
+						// native event in the iframe.
+						const { stopPropagation } = event.nativeEvent;
+						event.nativeEvent.stopPropagation = () => {};
 						event.stopPropagation();
+						event.nativeEvent.stopPropagation = stopPropagation;
 						bubbleEvent(
 							event,
 							window.KeyboardEvent,

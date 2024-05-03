@@ -60,7 +60,7 @@ function PostURLToggle( { isOpen, onClick } ) {
 	const decodedSlug = safeDecodeURIComponent( slug );
 	return (
 		<Button
-			__next40pxDefaultSize
+			size="compact"
 			className="editor-post-url__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }

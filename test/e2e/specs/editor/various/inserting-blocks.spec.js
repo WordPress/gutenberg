@@ -598,6 +598,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.getByRole( 'searchbox', {
 				name: 'Search for blocks and patterns',
 			} )
+			.first()
 			.fill( 'Verse' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
@@ -607,9 +608,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				.getByRole( 'searchbox', {
 					name: 'Search for blocks and patterns',
 				} )
+				.first()
 		).toHaveValue( 'Verse' );
 		await expect(
-			page.getByRole( 'listbox', { name: 'Blocks' } )
+			page.getByRole( 'listbox', { name: 'Blocks' } ).first()
 		).toHaveCount( 1 );
 	} );
 

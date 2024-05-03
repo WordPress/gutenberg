@@ -402,7 +402,7 @@ function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: 'all',
+		templateLock: 'contentOnly',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined
