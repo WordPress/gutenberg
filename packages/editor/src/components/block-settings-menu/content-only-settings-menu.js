@@ -133,7 +133,9 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 		useBlockDisplayInformation( contentLockingParent );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	if ( ! blockDisplayInformation?.title ) return null;
+	if ( ! blockDisplayInformation?.title ) {
+		return null;
+	}
 
 	return (
 		<>
