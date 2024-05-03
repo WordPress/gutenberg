@@ -20,7 +20,7 @@ function ScreenColorPalette( { name } ) {
 			<ScreenHeader
 				title={ __( 'Edit Palette' ) }
 				description={ __(
-					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+					'The combination of colors used across this site and in color pickers.'
 				) }
 			/>
 			<Tabs>
