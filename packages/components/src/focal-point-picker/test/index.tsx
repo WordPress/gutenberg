@@ -3,11 +3,27 @@
  */
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+/**
+ * Internal dependencies
+ */
+import type { FocalPointPickerProps } from '../types';
 
 /**
  * Internal dependencies
  */
 import Picker from '..';
+
+type Log = { name: string; args: any[] };
+type EventLogger = ( name: string, args: any[] ) => void;
+
+const props: FocalPointPickerProps = {
+	onChange: jest.fn(),
+	url: 'test-url',
+	value: {
+		x: 0,
+		y: 0,
+	},
+};
 
 describe( 'FocalPointPicker', () => {
 	describe( 'focus and blur', () => {
@@ -16,7 +32,7 @@ describe( 'FocalPointPicker', () => {
 
 			const mockOnChange = jest.fn();
 
-			render( <Picker onChange={ mockOnChange } /> );
+			render( <Picker { ...props } onChange={ mockOnChange } /> );
 
 			const draggableArea = screen.getByRole( 'button' );
 
@@ -32,6 +48,7 @@ describe( 'FocalPointPicker', () => {
 
 			render(
 				<Picker
+					{ ...props }
 					onChange={ mockOnChange }
 					onDrag={ mockOnDrag }
 					onDragEnd={ mockOnDragEnd }
@@ -57,15 +74,16 @@ describe( 'FocalPointPicker', () => {
 
 	describe( 'drag gestures', () => {
 		it( 'should call onDragStart, onDrag, onDragEnd and onChange in that order', () => {
-			const logs = [];
-			const eventLogger = ( name, args ) => logs.push( { name, args } );
+			const logs: Log[] = [];
+			const eventLogger: EventLogger = ( name, args ) =>
+				logs.push( { name, args } );
 			const events = [ 'onDragStart', 'onDrag', 'onDragEnd', 'onChange' ];
-			const handlers = {};
+			const handlers: { [ key: string ]: EventLogger } = {};
 			events.forEach( ( name ) => {
 				handlers[ name ] = ( ...all ) => eventLogger( name, all );
 			} );
 
-			render( <Picker { ...handlers } /> );
+			render( <Picker { ...props } { ...handlers } /> );
 
 			const dragArea = screen.getByRole( 'button' );
 
@@ -92,6 +110,7 @@ describe( 'FocalPointPicker', () => {
 
 			render(
 				<Picker
+					{ ...props }
 					value={ { x: 0.25, y: 0.25 } }
 					onChange={ spyChange }
 					resolvePoint={ () => {
@@ -118,12 +137,12 @@ describe( 'FocalPointPicker', () => {
 	describe( 'controllability', () => {
 		it( 'should update value from props', () => {
 			const { rerender } = render(
-				<Picker value={ { x: 0.25, y: 0.5 } } />
+				<Picker { ...props } value={ { x: 0.25, y: 0.5 } } />
 			);
 			const xInput = screen.getByRole( 'spinbutton', {
 				name: 'Focal point left position',
-			} );
-			rerender( <Picker value={ { x: 0.93, y: 0.5 } } /> );
+			} ) as HTMLButtonElement;
+			rerender( <Picker { ...props } value={ { x: 0.93, y: 0.5 } } /> );
 			expect( xInput.value ).toBe( '93' );
 		} );
 		it( 'call onChange with the expected values', async () => {
@@ -131,7 +150,11 @@ describe( 'FocalPointPicker', () => {
 
 			const spyChange = jest.fn();
 			render(
-				<Picker value={ { x: 0.14, y: 0.62 } } onChange={ spyChange } />
+				<Picker
+					{ ...props }
+					value={ { x: 0.14, y: 0.62 } }
+					onChange={ spyChange }
+				/>
 			);
 			// Focus and press arrow up
 			const dragArea = screen.getByRole( 'button' );
@@ -151,20 +174,27 @@ describe( 'FocalPointPicker', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Picker
-					value={ { x: '0.1', y: '0.2' } }
+					{ ...props }
+					value={ {
+						x: '0.1' as unknown as number,
+						y: '0.2' as unknown as number,
+					} }
 					onChange={ onChangeSpy }
 				/>
 			);
-
 			expect(
-				screen.getByRole( 'spinbutton', {
-					name: 'Focal point left position',
-				} ).value
+				(
+					screen.getByRole( 'spinbutton', {
+						name: 'Focal point left position',
+					} ) as HTMLButtonElement
+				 ).value
 			).toBe( '10' );
 			expect(
-				screen.getByRole( 'spinbutton', {
-					name: 'Focal point top position',
-				} ).value
+				(
+					screen.getByRole( 'spinbutton', {
+						name: 'Focal point top position',
+					} ) as HTMLButtonElement
+				 ).value
 			).toBe( '20' );
 			expect( onChangeSpy ).not.toHaveBeenCalled();
 		} );
