@@ -128,13 +128,13 @@ WithCustomRenderItem.args = {
  * by setting the `disabled` property to true
  * for individual items in the option object.
  */
-export const WithDisabledItems = Template.bind( {} );
-const optionsWithDisabledItems = countryOptions.map( ( option, index ) => {
+export const WithDisabledOptions = Template.bind( {} );
+const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => {
 	return { ...option, disabled: index % 3 === 0 };
 } );
 
-WithDisabledItems.args = {
+WithDisabledOptions.args = {
 	allowReset: false,
 	label: 'Select a country',
-	options: optionsWithDisabledItems,
+	options: optionsWithDisabledOptions,
 };
