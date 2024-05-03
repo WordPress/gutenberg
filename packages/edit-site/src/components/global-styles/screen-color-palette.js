@@ -25,10 +25,10 @@ function ScreenColorPalette( { name } ) {
 			/>
 			<Tabs>
 				<Tabs.TabList>
-					<Tabs.Tab tabId="solid">{ __( 'Solid' ) }</Tabs.Tab>
+					<Tabs.Tab tabId="color">{ __( 'Color' ) }</Tabs.Tab>
 					<Tabs.Tab tabId="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
 				</Tabs.TabList>
-				<Tabs.TabPanel tabId="solid" focusable={ false }>
+				<Tabs.TabPanel tabId="color" focusable={ false }>
 					<ColorPalettePanel name={ name } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId="gradient" focusable={ false }>
