@@ -64,4 +64,157 @@ test.describe( 'Query block', () => {
 			] );
 		} );
 	} );
+	test.describe( 'Query Loop - interactivity', () => {
+		test( 'Insert interactive block', async ( { page, editor } ) => {
+			/* Open List View */
+			const listViewToggleButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Document Overview' } );
+
+			const listViewIsClosed =
+				( await listViewToggleButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+
+			if ( listViewIsClosed ) {
+				await listViewToggleButton.click();
+				await page
+					.getByRole( 'region', { name: 'Document Overview' } )
+					.getByRole( 'button', { name: 'Close' } )
+					.waitFor();
+			}
+
+			await editor.insertBlock( { name: 'core/query' } );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Query Loop' } )
+				.getByRole( 'button', { name: 'Choose' } )
+				.click();
+
+			await page
+				.getByRole( 'dialog', { name: 'Choose a pattern' } )
+				.getByRole( 'option', { name: 'Standard' } )
+				.click();
+
+			const queryBlock = editor.canvas.locator(
+				'role=document[name="Block: Query Loop"i]'
+			);
+
+			await expect( queryBlock ).toBeVisible();
+
+			await editor.openDocumentSettingsSidebar();
+
+			await page.getByLabel( 'Force page reload' ).setChecked( false );
+
+			await expect(
+				page.getByLabel( 'Force page reload' )
+			).not.toBeChecked();
+
+			await queryBlock.focus();
+
+			await editor.canvas
+				.locator( 'role=button[name="Add block"i]' )
+				.click();
+
+			await page
+				.getByRole( 'listbox', { name: 'Blocks' } )
+				.getByRole( 'option', { name: 'Heading' } )
+				.click();
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.fill( 'Test Heading' );
+
+			await queryBlock.focus();
+
+			await editor.openDocumentSettingsSidebar();
+
+			await expect(
+				page.getByLabel( 'Force page reload' )
+			).not.toBeChecked();
+		} );
+
+		test( 'Insert non-interactive block', async ( { page, editor } ) => {
+			await editor.insertBlock( { name: 'core/query' } );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Query Loop' } )
+				.getByRole( 'button', { name: 'Choose' } )
+				.click();
+
+			await page
+				.getByRole( 'dialog', { name: 'Choose a pattern' } )
+				.getByRole( 'option', { name: 'Standard' } )
+				.click();
+
+			const queryBlock = editor.canvas.locator(
+				'role=document[name="Block: Query Loop"i]'
+			);
+
+			await expect( queryBlock ).toBeVisible();
+
+			/* Open List View */
+			const listViewToggleButton = page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Document Overview' } );
+
+			const listViewIsClosed =
+				( await listViewToggleButton.getAttribute(
+					'aria-expanded'
+				) ) === 'false';
+
+			if ( listViewIsClosed ) {
+				await listViewToggleButton.click();
+				await page
+					.getByRole( 'region', { name: 'Document Overview' } )
+					.getByRole( 'button', { name: 'Close' } )
+					.waitFor();
+			}
+
+			await editor.openDocumentSettingsSidebar();
+
+			await page.getByLabel( 'Force page reload' ).setChecked( false );
+
+			await expect(
+				page.getByLabel( 'Force page reload' )
+			).not.toBeChecked();
+
+			//
+			await queryBlock.focus();
+
+			await editor.canvas
+				.locator( 'role=button[name="Add block"i]' )
+				.click();
+
+			await page
+				.getByLabel( 'Search for blocks and patterns' )
+				.fill( 'Shortcode' );
+
+			await page
+				.getByRole( 'listbox', { name: 'Blocks' } )
+				.getByRole( 'option', { name: 'Shortcode' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'alertdialog', {
+					name: 'Query block: Force page reload enabled',
+				} )
+			).toBeVisible();
+
+			await page
+				.getByRole( 'alertdialog', {
+					name: 'Query block: Force page reload enabled',
+				} )
+				.getByRole( 'button', { name: 'OK' } )
+				.click();
+
+			await queryBlock.focus();
+
+			await editor.openDocumentSettingsSidebar();
+
+			await expect(
+				page.getByLabel( 'Force page reload' )
+			).toBeChecked();
+		} );
+	} );
 } );
