@@ -48,6 +48,7 @@ function ActionTrigger( { action, onClick, isBusy } ) {
 			onClick={ onClick }
 			isBusy={ isBusy }
 			isDisabled={ isBusy }
+			tooltipPosition="top"
 		/>
 	);
 }
@@ -139,6 +140,7 @@ function renderToolbarContent(
 				<ToolbarButton
 					icon={ closeSmall }
 					showTooltip
+					tooltipPosition="top"
 					label={ __( 'Cancel' ) }
 					isDisabled={ !! actionInProgress }
 					onClick={ () => {
