@@ -66,24 +66,6 @@ test.describe( 'Query block', () => {
 	} );
 	test.describe( 'Query Loop - interactivity', () => {
 		test( 'Insert interactive block', async ( { page, editor } ) => {
-			/* Open List View */
-			const listViewToggleButton = page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Document Overview' } );
-
-			const listViewIsClosed =
-				( await listViewToggleButton.getAttribute(
-					'aria-expanded'
-				) ) === 'false';
-
-			if ( listViewIsClosed ) {
-				await listViewToggleButton.click();
-				await page
-					.getByRole( 'region', { name: 'Document Overview' } )
-					.getByRole( 'button', { name: 'Close' } )
-					.waitFor();
-			}
-
 			await editor.insertBlock( { name: 'core/query' } );
 
 			await editor.canvas
@@ -153,24 +135,6 @@ test.describe( 'Query block', () => {
 
 			await expect( queryBlock ).toBeVisible();
 
-			/* Open List View */
-			const listViewToggleButton = page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Document Overview' } );
-
-			const listViewIsClosed =
-				( await listViewToggleButton.getAttribute(
-					'aria-expanded'
-				) ) === 'false';
-
-			if ( listViewIsClosed ) {
-				await listViewToggleButton.click();
-				await page
-					.getByRole( 'region', { name: 'Document Overview' } )
-					.getByRole( 'button', { name: 'Close' } )
-					.waitFor();
-			}
-
 			await editor.openDocumentSettingsSidebar();
 
 			await page.getByLabel( 'Force page reload' ).setChecked( false );
@@ -179,7 +143,6 @@ test.describe( 'Query block', () => {
 				page.getByLabel( 'Force page reload' )
 			).not.toBeChecked();
 
-			//
 			await queryBlock.focus();
 
 			await editor.canvas
