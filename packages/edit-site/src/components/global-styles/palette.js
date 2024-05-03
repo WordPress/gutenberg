@@ -10,7 +10,7 @@ import {
 	ColorIndicator,
 	Button,
 } from '@wordpress/components';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { shuffle } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -55,13 +55,7 @@ function Palette( { name } ) {
 		? '/colors/palette'
 		: '/blocks/' + encodeURIComponent( name ) + '/colors/palette';
 	const paletteButtonText =
-		colors.length > 0
-			? sprintf(
-					// Translators: %d: Number of palette colors.
-					_n( '%d color', '%d colors', colors.length ),
-					colors.length
-			  )
-			: __( 'Add custom colors' );
+		colors.length > 0 ? __( 'Edit' ) : __( 'Add palette' );
 
 	return (
 		<VStack spacing={ 3 }>
@@ -87,7 +81,7 @@ function Palette( { name } ) {
 									</ColorIndicatorWrapper>
 								) ) }
 						</ZStack>
-						<FlexItem className="edit-site-global-styles-screen-colors__palette-count">
+						<FlexItem className="edit-site-global-styles-screen-colors__palette-text">
 							{ paletteButtonText }
 						</FlexItem>
 					</HStack>
