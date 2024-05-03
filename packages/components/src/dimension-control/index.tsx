@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -87,10 +87,7 @@ export function DimensionControl( props: DimensionControlProps ) {
 	return (
 		<SelectControl
 			__next40pxDefaultSize={ __next40pxDefaultSize }
-			className={ classnames(
-				className,
-				'block-editor-dimension-control'
-			) }
+			className={ clsx( className, 'block-editor-dimension-control' ) }
 			label={ selectLabel }
 			hideLabelFromVision={ false }
 			value={ value }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -111,7 +111,7 @@ function Root( { className, ...settings } ) {
 				useInBetweenInserter(),
 				useTypingObserver(),
 			] ),
-			className: classnames( 'is-root-container', className, {
+			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',

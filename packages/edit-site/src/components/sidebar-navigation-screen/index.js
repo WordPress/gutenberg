@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -93,12 +93,9 @@ export default function SidebarNavigationScreen( {
 	return (
 		<>
 			<VStack
-				className={ classnames(
-					'edit-site-sidebar-navigation-screen__main',
-					{
-						'has-footer': !! footer,
-					}
-				) }
+				className={ clsx( 'edit-site-sidebar-navigation-screen__main', {
+					'has-footer': !! footer,
+				} ) }
 				spacing={ 0 }
 				justify="flex-start"
 			>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -58,7 +58,7 @@ export function UnforwardedInputControl(
 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
 	const id = useUniqueId( idProp );
-	const classes = classNames( 'components-input-control', className );
+	const classes = clsx( 'components-input-control', className );
 
 	const draftHookProps = useDraft( {
 		value,
