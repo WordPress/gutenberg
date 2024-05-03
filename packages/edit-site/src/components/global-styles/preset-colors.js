@@ -8,18 +8,14 @@ import { __unstableMotion as motion } from '@wordpress/components';
  */
 import { useStylesPreviewColors } from './hooks';
 
-export default function HighlightedColors( {
-	normalizedColorSwatchSize,
-	ratio,
-} ) {
+export default function PresetColors() {
 	const { paletteColors } = useStylesPreviewColors();
-	const scaledSwatchSize = normalizedColorSwatchSize * ratio;
 	return paletteColors.slice( 0, 5 ).map( ( { slug, color }, index ) => (
 		<motion.div
 			key={ `${ slug }-${ index }` }
 			style={ {
 				flexGrow: 1,
-				height: scaledSwatchSize,
+				height: '100%',
 				background: color,
 			} }
 			animate={ {

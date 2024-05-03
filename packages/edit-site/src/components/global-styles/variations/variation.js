@@ -21,7 +21,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children } ) {
+export default function Variation( { variation, children, isPill } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -84,7 +84,12 @@ export default function Variation( { variation, children } ) {
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
-				<div className="edit-site-global-styles-variations_item-preview">
+				<div
+					className={ classnames(
+						'edit-site-global-styles-variations_item-preview',
+						{ 'is-pill': isPill }
+					) }
+				>
 					{ children( isFocused ) }
 				</div>
 			</div>

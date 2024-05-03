@@ -31,6 +31,12 @@
 			@include reduce-motion("transition");
 		}
 
+		&.is-pill,
+		&.is-pill::after {
+			border-radius: 48px; // Should match the value of presetColorSwatchSize in the /packages/edit-site/src/components/global-styles/preset-colors.js file.
+			overflow: hidden;
+		}
+
 		.edit-site-global-styles-color-variations & {
 			padding: $grid-unit-10;
 		}

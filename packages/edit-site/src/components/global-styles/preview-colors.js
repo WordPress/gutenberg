@@ -23,7 +23,8 @@ const firstFrameVariants = {
 	},
 };
 
-const normalizedColorSwatchSize = 48;
+// Should match the value for is-pill in the packages/edit-site/src/components/global-styles/variations/style.scss file.
+const presetColorSwatchSize = 48;
 
 const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 	return (
@@ -31,10 +32,11 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 			label={ label }
 			isFocused={ isFocused }
 			withHoverView={ withHoverView }
-			height={ normalizedColorSwatchSize }
+			height={ presetColorSwatchSize }
 		>
-			{ ( { ratio, key } ) => (
+			{ ( { key } ) => (
 				<motion.div
+					key={ key }
 					variants={ firstFrameVariants }
 					style={ {
 						height: '100%',
@@ -49,12 +51,7 @@ const StylesPreviewColors = ( { label, isFocused, withHoverView } ) => {
 							overflow: 'hidden',
 						} }
 					>
-						<PresetColors
-							normalizedColorSwatchSize={
-								normalizedColorSwatchSize
-							}
-							ratio={ 1 }
-						/>
+						<PresetColors />
 					</HStack>
 				</motion.div>
 			) }
