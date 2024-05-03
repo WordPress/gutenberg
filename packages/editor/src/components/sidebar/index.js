@@ -120,7 +120,6 @@ const SidebarContent = ( {
 					<PostTransformPanel />
 					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
-					<PostDiscussionPanel />
 					<PageAttributesPanel />
 					<PatternOverridesPanel />
 					{ extraPanels }
