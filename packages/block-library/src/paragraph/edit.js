@@ -73,22 +73,24 @@ function DropCapControl( { clientId, attributes, setAttributes } ) {
 	}
 
 	return (
-		<ToolsPanelItem
-			hasValue={ () => !! dropCap }
-			label={ __( 'Drop cap' ) }
-			onDeselect={ () => setAttributes( { dropCap: undefined } ) }
-			resetAllFilter={ () => ( { dropCap: undefined } ) }
-			panelId={ clientId }
-		>
-			<ToggleControl
-				__nextHasNoMarginBottom
+		<InspectorControls group="typography">
+			<ToolsPanelItem
+				hasValue={ () => !! dropCap }
 				label={ __( 'Drop cap' ) }
-				checked={ !! dropCap }
-				onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
-				help={ helpText }
-				disabled={ hasDropCapDisabled( align ) ? true : false }
-			/>
-		</ToolsPanelItem>
+				onDeselect={ () => setAttributes( { dropCap: undefined } ) }
+				resetAllFilter={ () => ( { dropCap: undefined } ) }
+				panelId={ clientId }
+			>
+				<ToggleControl
+					__nextHasNoMarginBottom
+					label={ __( 'Drop cap' ) }
+					checked={ !! dropCap }
+					onChange={ () => setAttributes( { dropCap: ! dropCap } ) }
+					help={ helpText }
+					disabled={ hasDropCapDisabled( align ) ? true : false }
+				/>
+			</ToolsPanelItem>
+		</InspectorControls>
 	);
 }
 
@@ -134,13 +136,11 @@ function ParagraphBlock( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls group="typography">
-				<DropCapControl
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
-			</InspectorControls>
+			<DropCapControl
+				clientId={ clientId }
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
 			<RichText
 				identifier="content"
 				tagName="p"
