@@ -141,7 +141,7 @@ function ColorGradientControlInner( {
 							>
 								<Tabs.TabList>
 									<Tabs.Tab tabId={ TAB_IDS.color }>
-										{ __( 'Solid' ) }
+										{ __( 'Color' ) }
 									</Tabs.Tab>
 									<Tabs.Tab tabId={ TAB_IDS.gradient }>
 										{ __( 'Gradient' ) }

@@ -545,7 +545,7 @@ export default function ColorPanel( {
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
-					label: __( 'Solid' ),
+					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
