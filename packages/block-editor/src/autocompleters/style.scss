@@ -4,6 +4,10 @@
 	.block-editor-block-icon {
 		margin-right: $grid-unit-10;
 	}
+
+	&.is-selected .block-editor-block-icon {
+		color: inherit !important;
+	}
 }
 
 .block-editor-autocompleters__link {
