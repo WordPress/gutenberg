@@ -344,7 +344,9 @@ test.describe( 'Quote', () => {
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );
 		let error;
 		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) error = msg.text();
+			if ( msg.type() === 'error' ) {
+				error = msg.text();
+			}
 		} );
 		await page.keyboard.press( 'Backspace' );
 		expect( error ).toBeUndefined();

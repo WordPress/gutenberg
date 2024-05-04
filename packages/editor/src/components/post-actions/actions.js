@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 
@@ -104,7 +104,7 @@ const trashPostAction = {
 								}
 								createSuccessNotice( successMessage, {
 									type: 'snackbar',
-									id: 'edit-site-page-trashed',
+									id: 'trash-post-action',
 								} );
 							} else {
 								// If there was at lease one failure.
@@ -217,7 +217,7 @@ function usePermanentlyDeletePostAction() {
 					}
 					createSuccessNotice( successMessage, {
 						type: 'snackbar',
-						id: 'edit-site-post-permanently-deleted',
+						id: 'permanently-delete-post-action',
 					} );
 					if ( onActionPerformed ) {
 						onActionPerformed( posts );
@@ -328,7 +328,7 @@ function useRestorePostAction() {
 							  ),
 						{
 							type: 'snackbar',
-							id: 'edit-site-post-restored',
+							id: 'restore-post-action',
 						}
 					);
 					if ( onActionPerformed ) {
@@ -500,6 +500,120 @@ const renamePostAction = {
 	},
 };
 
+export const duplicatePostAction = {
+	id: 'duplicate-post',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible( { status } ) {
+		return status !== 'trash';
+	},
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+		const [ item ] = items;
+		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+		const [ title, setTitle ] = useState(
+			sprintf(
+				/* translators: %s: Existing item title */
+				__( '%s (Copy)' ),
+				getItemTitle( item )
+			)
+		);
+
+		const { saveEntityRecord } = useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		async function createPage( event ) {
+			event.preventDefault();
+
+			if ( isCreatingPage ) {
+				return;
+			}
+			setIsCreatingPage( true );
+			try {
+				const newItem = await saveEntityRecord(
+					'postType',
+					item.type,
+					{
+						status: 'draft',
+						title,
+						slug: title || __( 'No title' ),
+						author: item.author,
+						comment_status: item.comment_status,
+						content:
+							typeof item.content === 'string'
+								? item.content
+								: item.content.raw,
+						excerpt: item.excerpt.raw,
+						meta: item.meta,
+						parent: item.parent,
+						password: item.password,
+						template: item.template,
+						format: item.format,
+						featured_media: item.featured_media,
+						menu_order: item.menu_order,
+						ping_status: item.ping_status,
+						categories: item.categories,
+						tags: item.tags,
+					},
+					{ throwOnError: true }
+				);
+
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: Title of the created template e.g: "Category".
+						__( '"%s" successfully created.' ),
+						newItem.title?.rendered || title
+					),
+					{
+						id: 'duplicate-post-action',
+						type: 'snackbar',
+					}
+				);
+
+				if ( onActionPerformed ) {
+					onActionPerformed( [ newItem ] );
+				}
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while duplicating the page.' );
+
+				createErrorNotice( errorMessage, {
+					type: 'snackbar',
+				} );
+			} finally {
+				setIsCreatingPage( false );
+				closeModal();
+			}
+		}
+		return (
+			<form onSubmit={ createPage }>
+				<VStack spacing={ 3 }>
+					<TextControl
+						label={ __( 'Title' ) }
+						onChange={ setTitle }
+						placeholder={ __( 'No title' ) }
+						value={ title }
+					/>
+					<HStack spacing={ 2 } justify="end">
+						<Button variant="tertiary" onClick={ closeModal }>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							type="submit"
+							isBusy={ isCreatingPage }
+							aria-disabled={ isCreatingPage }
+						>
+							{ _x( 'Duplicate', 'action label' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		);
+	},
+};
+
 const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
@@ -538,7 +652,7 @@ const resetTemplateAction = {
 						  ),
 					{
 						type: 'snackbar',
-						id: 'edit-site-template-reverted',
+						id: 'revert-template-action',
 					}
 				);
 			} catch ( error ) {
@@ -782,6 +896,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 				deleteTemplateAction,
 				permanentlyDeletePostAction,
 				postRevisionsAction,
+				duplicatePostAction,
 				renamePostAction,
 				renameTemplateAction,
 				trashPostAction,

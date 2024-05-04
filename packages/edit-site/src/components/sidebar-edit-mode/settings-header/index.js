@@ -10,7 +10,6 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from '../constants';
 import { unlock } from '../../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -24,16 +23,16 @@ const SettingsHeader = ( _, ref ) => {
 	return (
 		<Tabs.TabList ref={ ref }>
 			<Tabs.Tab
-				tabId={ SIDEBAR_TEMPLATE }
+				tabId="edit-post/document"
 				// Used for focus management in the SettingsSidebar component.
-				data-tab-id={ SIDEBAR_TEMPLATE }
+				data-tab-id="edit-post/document"
 			>
 				{ postTypeLabel }
 			</Tabs.Tab>
 			<Tabs.Tab
-				tabId={ SIDEBAR_BLOCK }
+				tabId="edit-post/block"
 				// Used for focus management in the SettingsSidebar component.
-				data-tab-id={ SIDEBAR_BLOCK }
+				data-tab-id="edit-post/block"
 			>
 				{ __( 'Block' ) }
 			</Tabs.Tab>

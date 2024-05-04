@@ -89,6 +89,7 @@ export default function PostURL( { onClose } ) {
 								<Button
 									icon={ copySmall }
 									ref={ copyButtonRef }
+									label={ __( 'Copy' ) }
 								/>
 							}
 							label={ __( 'Link' ) }

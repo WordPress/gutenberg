@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,14 +21,21 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import { Icon, chevronDownSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+} from '../../store/constants';
+import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
-import { Icon, chevronDownSmall } from '@wordpress/icons';
 
-function PostStatusLabel() {
+function PostStatusLabel( { canEdit } ) {
 	const status = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
 		[]
@@ -54,12 +61,13 @@ function PostStatusLabel() {
 	}
 	return (
 		<Text
-			className={ classnames( 'editor-post-status-label', {
+			className={ clsx( 'editor-post-status-label', {
 				[ ` has-status-${ status }` ]: !! status,
+				'has-icon': canEdit,
 			} ) }
 		>
 			{ statusLabel }
-			<Icon icon={ chevronDownSmall } />
+			{ canEdit && <Icon icon={ chevronDownSmall } /> }
 		</Text>
 	);
 }
@@ -122,6 +130,13 @@ const STATUS_OPTIONS = [
 	},
 ];
 
+const DESIGN_POST_TYPES = [
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+];
+
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
 		( select ) => {
@@ -165,6 +180,10 @@ export default function PostStatus() {
 		[ popoverAnchor ]
 	);
 
+	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+		return null;
+	}
+
 	const updatePost = ( {
 		status: newStatus = status,
 		password: newPassword = password,
@@ -205,84 +224,95 @@ export default function PostStatus() {
 		} );
 	};
 
-	if ( ! canEdit ) {
-		return <PostStatusLabel />;
-	}
-
 	return (
-		<Dropdown
-			className="editor-post-status"
-			contentClassName="editor-change-status__content"
-			popoverProps={ popoverProps }
-			focusOnMount
-			ref={ setPopoverAnchor }
-			renderToggle={ ( { onToggle } ) => (
-				<Button
-					className="editor-post-status-trigger"
-					onClick={ onToggle }
-				>
-					<PostStatusLabel />
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<>
-					<InspectorPopoverHeader
-						title={ __( 'Status & visibility' ) }
-						onClose={ onClose }
-					/>
-					<form>
-						<VStack spacing={ 4 }>
-							<RadioControl
-								className="editor-change-status__options"
-								hideLabelFromVision
-								label={ __( 'Status' ) }
-								options={ STATUS_OPTIONS }
-								onChange={ handleStatus }
-								selected={
-									status === 'auto-draft' ? 'draft' : status
-								}
+		<PostPanelRow label={ __( 'Status' ) } ref={ setPopoverAnchor }>
+			{ canEdit ? (
+				<Dropdown
+					className="editor-post-status"
+					contentClassName="editor-change-status__content"
+					popoverProps={ popoverProps }
+					focusOnMount
+					renderToggle={ ( { onToggle } ) => (
+						<Button
+							className="editor-post-status-trigger"
+							onClick={ onToggle }
+						>
+							<PostStatusLabel canEdit={ canEdit } />
+						</Button>
+					) }
+					renderContent={ ( { onClose } ) => (
+						<>
+							<InspectorPopoverHeader
+								title={ __( 'Status & visibility' ) }
+								onClose={ onClose }
 							/>
-							{ status !== 'private' && (
-								<VStack
-									as="fieldset"
-									spacing={ 4 }
-									className="editor-change-status__password-fieldset"
-								>
-									<CheckboxControl
-										__nextHasNoMarginBottom
-										label={ __( 'Password protected' ) }
-										help={ __(
-											'Only visible to those who know the password'
-										) }
-										checked={ showPassword }
-										onChange={ handleTogglePassword }
+							<form>
+								<VStack spacing={ 4 }>
+									<RadioControl
+										className="editor-change-status__options"
+										hideLabelFromVision
+										label={ __( 'Status' ) }
+										options={ STATUS_OPTIONS }
+										onChange={ handleStatus }
+										selected={
+											status === 'auto-draft'
+												? 'draft'
+												: status
+										}
 									/>
-									{ showPassword && (
-										<div className="editor-change-status__password-input">
-											<TextControl
-												label={ __( 'Password' ) }
-												onChange={ ( value ) =>
-													updatePost( {
-														password: value,
-													} )
-												}
-												value={ password }
-												placeholder={ __(
-													'Use a secure password'
-												) }
-												type="text"
-												id={ passwordInputId }
-												__next40pxDefaultSize
+									{ status !== 'private' && (
+										<VStack
+											as="fieldset"
+											spacing={ 4 }
+											className="editor-change-status__password-fieldset"
+										>
+											<CheckboxControl
 												__nextHasNoMarginBottom
+												label={ __(
+													'Password protected'
+												) }
+												help={ __(
+													'Only visible to those who know the password'
+												) }
+												checked={ showPassword }
+												onChange={
+													handleTogglePassword
+												}
 											/>
-										</div>
+											{ showPassword && (
+												<div className="editor-change-status__password-input">
+													<TextControl
+														label={ __(
+															'Password'
+														) }
+														onChange={ ( value ) =>
+															updatePost( {
+																password: value,
+															} )
+														}
+														value={ password }
+														placeholder={ __(
+															'Use a secure password'
+														) }
+														type="text"
+														id={ passwordInputId }
+														__next40pxDefaultSize
+														__nextHasNoMarginBottom
+													/>
+												</div>
+											) }
+										</VStack>
 									) }
 								</VStack>
-							) }
-						</VStack>
-					</form>
-				</>
+							</form>
+						</>
+					) }
+				/>
+			) : (
+				<div className="editor-post-status">
+					<PostStatusLabel />
+				</div>
 			) }
-		/>
+		</PostPanelRow>
 	);
 }

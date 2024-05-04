@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -78,6 +78,7 @@ export default function Layout() {
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -86,10 +87,10 @@ export default function Layout() {
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
+				'core/editor/previous-region'
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
+				'core/editor/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
 				'core',
@@ -98,6 +99,10 @@ export default function Layout() {
 			isDistractionFree: select( preferencesStore ).get(
 				'core',
 				'distractionFree'
+			),
+			hasBlockBreadcrumbs: select( preferencesStore ).get(
+				'core',
+				'showBlockBreadcrumbs'
 			),
 			isZoomOutMode:
 				select( blockEditorStore ).__unstableGetEditorMode() ===
@@ -172,7 +177,7 @@ export default function Layout() {
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
-				className={ classnames(
+				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
@@ -182,6 +187,10 @@ export default function Layout() {
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
 						'is-zoom-out': isZoomOutMode,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>
@@ -282,7 +291,7 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<div
-									className={ classnames(
+									className={ clsx(
 										'edit-site-layout__canvas',
 										{
 											'is-right-aligned':

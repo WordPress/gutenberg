@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useMemo, useState, Fragment, Children } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -28,18 +28,28 @@ const {
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-const POST_ACTIONS_WHILE_EDITING = [
+let POST_ACTIONS_WHILE_EDITING = [
 	'view-post',
 	'view-post-revisions',
 	'rename-post',
 	'move-to-trash',
 ];
 
+if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	POST_ACTIONS_WHILE_EDITING = [
+		'view-post',
+		'view-post-revisions',
+		'duplicate-post',
+		'rename-post',
+		'move-to-trash',
+	];
+}
+
 export default function PostActions( { onActionPerformed, buttonProps } ) {
+	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
 	const { postType, item } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPost } = select( editorStore );
 		return {
@@ -47,27 +57,17 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 			item: getCurrentPost(),
 		};
 	} );
-	const actions = usePostActions(
+	const allActions = usePostActions(
 		onActionPerformed,
 		POST_ACTIONS_WHILE_EDITING
 	);
 
-	const { primaryActions, secondaryActions } = useMemo( () => {
-		return actions.reduce(
-			( accumulator, action ) => {
-				if ( action.isEligible && ! action.isEligible( item ) ) {
-					return accumulator;
-				}
-				if ( action.isPrimary ) {
-					accumulator.primaryActions.push( action );
-				} else {
-					accumulator.secondaryActions.push( action );
-				}
-				return accumulator;
-			},
-			{ primaryActions: [], secondaryActions: [] }
-		);
-	}, [ actions, item ] );
+	const actions = useMemo( () => {
+		return allActions.filter( ( action ) => {
+			return ! action.isEligible || action.isEligible( item );
+		} );
+	}, [ allActions, item ] );
+
 	if (
 		[
 			TEMPLATE_POST_TYPE,
@@ -79,34 +79,30 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 	}
 	return (
 		<DropdownMenu
+			open={ isActionsMenuOpen }
 			trigger={
 				<Button
 					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					disabled={
-						! primaryActions.length && ! secondaryActions.length
-					}
+					disabled={ ! actions.length }
 					className="editor-all-actions-button"
+					onClick={ () =>
+						setIsActionsMenuOpen( ! isActionsMenuOpen )
+					}
 					{ ...buttonProps }
 				/>
 			}
+			onOpenChange={ setIsActionsMenuOpen }
 			placement="bottom-end"
 		>
-			<WithDropDownMenuSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithDropDownMenuSeparators>
+			<ActionsDropdownMenuGroup
+				actions={ actions }
+				item={ item }
+				onClose={ () => {
+					setIsActionsMenuOpen( false );
+				} }
+			/>
 		</DropdownMenu>
 	);
 }
@@ -129,7 +125,8 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 }
 
 // Copied as is from packages/dataviews/src/item-actions.js
-function ActionWithModal( { action, item, ActionTrigger } ) {
+// With an added onClose prop.
+function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -152,7 +149,10 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 				>
 					<RenderModal
 						items={ [ item ] }
-						closeModal={ () => setIsModalOpen( false ) }
+						closeModal={ () => {
+							setIsModalOpen( false );
+							onClose();
+						} }
 					/>
 				</Modal>
 			) }
@@ -160,20 +160,9 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-// Copied as is from packages/dataviews/src/view-table.js
-function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
-
 // Copied as is from packages/dataviews/src/item-actions.js
-function ActionsDropdownMenuGroup( { actions, item } ) {
+// With an added onClose prop.
+function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -184,6 +173,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 							action={ action }
 							item={ item }
 							ActionTrigger={ DropdownMenuItemTrigger }
+							onClose={ onClose }
 						/>
 					);
 				}

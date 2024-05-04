@@ -27,8 +27,12 @@ export default function useOutdentListItem() {
 	function getParentListItemId( id ) {
 		const listId = getBlockRootClientId( id );
 		const parentListItemId = getBlockRootClientId( listId );
-		if ( ! parentListItemId ) return;
-		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) return;
+		if ( ! parentListItemId ) {
+			return;
+		}
+		if ( getBlockName( parentListItemId ) !== 'core/list-item' ) {
+			return;
+		}
 		return parentListItemId;
 	}
 
@@ -37,17 +41,23 @@ export default function useOutdentListItem() {
 			clientIds = [ clientIds ];
 		}
 
-		if ( ! clientIds.length ) return;
+		if ( ! clientIds.length ) {
+			return;
+		}
 
 		const firstClientId = clientIds[ 0 ];
 
 		// Can't outdent if it's not a list item.
-		if ( getBlockName( firstClientId ) !== 'core/list-item' ) return;
+		if ( getBlockName( firstClientId ) !== 'core/list-item' ) {
+			return;
+		}
 
 		const parentListItemId = getParentListItemId( firstClientId );
 
 		// Can't outdent if it's at the top level.
-		if ( ! parentListItemId ) return;
+		if ( ! parentListItemId ) {
+			return;
+		}
 
 		const parentListId = getBlockRootClientId( firstClientId );
 		const lastClientId = clientIds[ clientIds.length - 1 ];

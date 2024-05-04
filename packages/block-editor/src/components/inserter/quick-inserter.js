@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -96,7 +96,7 @@ export default function QuickInserter( {
 
 	return (
 		<div
-			className={ classnames( 'block-editor-inserter__quick-inserter', {
+			className={ clsx( 'block-editor-inserter__quick-inserter', {
 				'has-search': showSearch,
 				'has-expand': setInserterIsOpened,
 			} ) }

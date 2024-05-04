@@ -122,7 +122,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$data     = $response->get_data();
 		$expected = array(
 			array(
-				'version'  => 2,
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color' => array(
 						'palette' => array(

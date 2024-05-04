@@ -13,7 +13,8 @@ import { settings } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, SORTING_DIRECTIONS } from './constants';
+import { SORTING_DIRECTIONS } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 
 const {
 	DropdownMenuV2: DropdownMenu,

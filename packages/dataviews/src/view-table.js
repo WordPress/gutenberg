@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -218,7 +218,9 @@ function BulkSelectionCheckbox( {
 					onSelectionChange( selectableItems );
 				}
 			} }
-			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
 		/>
 	);
 }
@@ -255,7 +257,7 @@ function TableRow( {
 
 	return (
 		<tr
-			className={ classnames( 'dataviews-view-table__row', {
+			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -325,7 +327,7 @@ function TableRow( {
 					} }
 				>
 					<div
-						className={ classnames(
+						className={ clsx(
 							'dataviews-view-table__cell-content-wrapper',
 							{
 								'dataviews-view-table__primary-field':
@@ -514,7 +516,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classnames( {
+				className={ clsx( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

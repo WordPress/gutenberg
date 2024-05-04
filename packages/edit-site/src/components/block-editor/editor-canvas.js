@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -152,7 +152,7 @@ function EditorCanvas( {
 
 	return (
 		<EditorCanvasRoot
-			className={ classnames( 'edit-site-editor-canvas__block-list', {
+			className={ clsx( 'edit-site-editor-canvas__block-list', {
 				'is-navigation-block': isTemplateTypeNavigation,
 			} ) }
 			renderAppender={ showBlockAppender }
@@ -160,12 +160,9 @@ function EditorCanvas( {
 			iframeProps={ {
 				scale,
 				frameSize,
-				className: classnames(
-					'edit-site-visual-editor__editor-canvas',
-					{
-						'is-focused': isFocused && canvasMode === 'view',
-					}
-				),
+				className: clsx( 'edit-site-visual-editor__editor-canvas', {
+					'is-focused': isFocused && canvasMode === 'view',
+				} ),
 				...props,
 				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }

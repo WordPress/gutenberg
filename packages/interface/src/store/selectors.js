@@ -8,7 +8,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { normalizeComplementaryAreaScope } from './deprecated';
+import {
+	normalizeComplementaryAreaScope,
+	normalizeComplementaryAreaName,
+} from './deprecated';
 
 /**
  * Returns the complementary area that is active in a given scope.
@@ -67,6 +70,7 @@ export const isComplementaryAreaLoading = createRegistrySelector(
 export const isItemPinned = createRegistrySelector(
 	( select ) => ( state, scope, item ) => {
 		scope = normalizeComplementaryAreaScope( scope );
+		item = normalizeComplementaryAreaName( scope, item );
 		const pinnedItems = select( preferencesStore ).get(
 			scope,
 			'pinnedItems'

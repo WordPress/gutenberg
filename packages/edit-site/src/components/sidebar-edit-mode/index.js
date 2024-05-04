@@ -11,7 +11,13 @@ import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	PageAttributesPanel,
+	PostDiscussionPanel,
+	PostLastRevisionPanel,
+	PostTaxonomiesPanel,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -21,12 +27,12 @@ import GlobalStylesSidebar from './global-styles-sidebar';
 import SettingsHeader from './settings-header';
 import PagePanels from './page-panels';
 import TemplatePanel from './template-panel';
-import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
-const { interfaceStore } = unlock( editorPrivateApis );
+const { interfaceStore, useAutoSwitchEditorSidebars, PatternOverridesPanel } =
+	unlock( editorPrivateApis );
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
@@ -83,15 +89,21 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 				// margin to the panel.
 				// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 				className="edit-site-sidebar__panel"
+				isActiveByDefault
 			>
 				<Tabs.Context.Provider value={ tabsContextValue }>
 					<Tabs.TabPanel
-						tabId={ SIDEBAR_TEMPLATE }
+						tabId="edit-post/document"
 						focusable={ false }
 					>
 						{ isEditingPage ? <PagePanels /> : <TemplatePanel /> }
+						<PostLastRevisionPanel />
+						<PostTaxonomiesPanel />
+						<PostDiscussionPanel />
+						<PageAttributesPanel />
+						<PatternOverridesPanel />
 					</Tabs.TabPanel>
-					<Tabs.TabPanel tabId={ SIDEBAR_BLOCK } focusable={ false }>
+					<Tabs.TabPanel tabId="edit-post/block" focusable={ false }>
 						<InspectorSlot bubblesVirtually />
 					</Tabs.TabPanel>
 				</Tabs.Context.Provider>
@@ -102,58 +114,35 @@ const FillContents = ( { tabName, isEditingPage, supportsGlobalStyles } ) => {
 };
 
 export function SidebarComplementaryAreaFills() {
-	const {
-		tabName,
-		isEditorSidebarOpened,
-		hasBlockSelection,
-		supportsGlobalStyles,
-		isEditingPage,
-	} = useSelect( ( select ) => {
-		const sidebar =
-			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+	useAutoSwitchEditorSidebars();
+	const { tabName, supportsGlobalStyles, isEditingPage } = useSelect(
+		( select ) => {
+			const sidebar =
+				select( interfaceStore ).getActiveComplementaryArea( 'core' );
 
-		const _isEditorSidebarOpened = [
-			SIDEBAR_BLOCK,
-			SIDEBAR_TEMPLATE,
-		].includes( sidebar );
-		let _tabName = sidebar;
-		if ( ! _isEditorSidebarOpened ) {
-			_tabName = !! select( blockEditorStore ).getBlockSelectionStart()
-				? SIDEBAR_BLOCK
-				: SIDEBAR_TEMPLATE;
-		}
-
-		return {
-			tabName: _tabName,
-			isEditorSidebarOpened: _isEditorSidebarOpened,
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
-			supportsGlobalStyles:
-				select( coreStore ).getCurrentTheme()?.is_block_theme,
-			isEditingPage: select( editSiteStore ).isPage(),
-		};
-	}, [] );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
-
-	useEffect( () => {
-		// Don't automatically switch tab when the sidebar is closed or when we
-		// are focused on page content.
-		if ( ! isEditorSidebarOpened ) {
-			return;
-		}
-		if ( hasBlockSelection ) {
-			if ( ! isEditingPage ) {
-				enableComplementaryArea( 'core', SIDEBAR_BLOCK );
+			const _isEditorSidebarOpened = [
+				'edit-post/block',
+				'edit-post/document',
+			].includes( sidebar );
+			let _tabName = sidebar;
+			if ( ! _isEditorSidebarOpened ) {
+				_tabName = !! select(
+					blockEditorStore
+				).getBlockSelectionStart()
+					? 'edit-post/block'
+					: 'edit-post/document';
 			}
-		} else {
-			enableComplementaryArea( 'core', SIDEBAR_TEMPLATE );
-		}
-	}, [
-		hasBlockSelection,
-		isEditorSidebarOpened,
-		isEditingPage,
-		enableComplementaryArea,
-	] );
+
+			return {
+				tabName: _tabName,
+				supportsGlobalStyles:
+					select( coreStore ).getCurrentTheme()?.is_block_theme,
+				isEditingPage: select( editSiteStore ).isPage(),
+			};
+		},
+		[]
+	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	// `newSelectedTabId` could technically be falsey if no tab is selected (i.e.
 	// the initial render) or when we don't want a tab displayed (i.e. the

@@ -141,7 +141,9 @@ export function withScope( func: ( ...args: unknown[] ) => unknown ) {
 				} catch ( e ) {
 					gen.throw( e );
 				}
-				if ( it.done ) break;
+				if ( it.done ) {
+					break;
+				}
 			}
 			return value;
 		};

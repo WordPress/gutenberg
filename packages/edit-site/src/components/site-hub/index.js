@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -23,6 +23,7 @@ import { memo } from '@wordpress/element';
 import { search, external } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -44,13 +45,16 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 				getSite,
 				getUnstableBase, // Site index.
 			} = select( coreStore );
-
+			const _site = getSite();
 			return {
 				canvasMode: getCanvasMode(),
 				dashboardLink:
 					getSettings().__experimentalDashboardLink || 'index.php',
 				homeUrl: getUnstableBase()?.home,
-				siteTitle: getSite()?.title,
+				siteTitle:
+					! _site?.title && !! _site?.url
+						? filterURLForDisplay( _site?.url )
+						: _site?.title,
 			};
 		},
 		[]
@@ -83,7 +87,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 
 	return (
 		<motion.div
-			className={ classnames( 'edit-site-site-hub', className ) }
+			className={ clsx( 'edit-site-site-hub', className ) }
 			variants={ {
 				isDistractionFree: { x: '-100%' },
 				isDistractionFreeHovering: { x: 0 },
@@ -99,7 +103,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 		>
 			<HStack justify="flex-start" spacing="0">
 				<motion.div
-					className={ classnames(
+					className={ clsx(
 						'edit-site-site-hub__view-mode-toggle-container',
 						{
 							'has-transparent-background': isTransparent,

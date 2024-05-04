@@ -39,13 +39,13 @@ Components may be assigned with class names that indicate states (for example, a
 
 **Example:**
 
-Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`classnames` package](https://www.npmjs.com/package/classnames) can be a helpful utility for conditionally applying modifier class names.
+Consider again the Notices example. We may want to apply specific styling for dismissible notices. The [`clsx` package](https://www.npmjs.com/package/clsx) can be a helpful utility for conditionally applying modifier class names.
 
 ```jsx
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 export default function Notice( { children, onRemove, isDismissible } ) {
-	const classes = classnames( 'components-notice', {
+	const classes = clsx( 'components-notice', {
 		'is-dismissible': isDismissible,
 	} );
 
