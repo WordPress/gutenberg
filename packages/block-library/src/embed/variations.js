@@ -367,7 +367,7 @@ const variations = [
 		icon: embedBlueskyIcon,
 		description: __( 'Embed a Bluesky post.' ),
 		patterns: [ /^https?:\/\/(www\.)?bsky\.app\/obj\/.+/i ],
-		attributes: { providerNameSlug: 'bluesky', responsive: true },
+		attributes: { providerNameSlug: 'bluesky' },
 	},
 ];
 
