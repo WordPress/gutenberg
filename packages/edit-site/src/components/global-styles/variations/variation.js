@@ -82,7 +82,7 @@ export default function Variation( { variation, children, isPill } ) {
 				onBlur={ () => setIsFocused( false ) }
 			>
 				<div
-					className={ classnames(
+					className={ clsx(
 						'edit-site-global-styles-variations_item-preview',
 						{ 'is-pill': isPill }
 					) }
