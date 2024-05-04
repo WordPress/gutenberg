@@ -3,7 +3,7 @@
  * External dependencies
  */
 import { useSelect } from 'downshift';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -135,10 +135,7 @@ export default function CustomSelectControl( props ) {
 	}
 	return (
 		<div
-			className={ classnames(
-				'components-custom-select-control',
-				className
-			) }
+			className={ clsx( 'components-custom-select-control', className ) }
 		>
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="label" { ...getLabelProps() }>
@@ -194,7 +191,7 @@ export default function CustomSelectControl( props ) {
 										item,
 										index,
 										key: item.key,
-										className: classnames(
+										className: clsx(
 											item.className,
 											'components-custom-select-control__item',
 											{

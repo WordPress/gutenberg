@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,7 @@ const DEFAULT_BLOCK = {
 function ButtonsEdit( { attributes, className } ) {
 	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
-		className: classnames( className, {
+		className: clsx( className, {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );

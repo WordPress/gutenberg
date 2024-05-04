@@ -148,8 +148,20 @@ export default function useLayoutAreas() {
 
 	// Navigation
 	if ( path === '/navigation' ) {
+		if ( postId ) {
+			return {
+				key: 'navigation',
+				areas: {
+					sidebar: <SidebarNavigationScreenNavigationMenu />,
+					preview: <Editor isLoading={ isSiteEditorLoading } />,
+					mobile: canvas === 'edit' && (
+						<Editor isLoading={ isSiteEditorLoading } />
+					),
+				},
+			};
+		}
 		return {
-			key: 'styles',
+			key: 'navigation',
 			areas: {
 				sidebar: <SidebarNavigationScreenNavigationMenus />,
 				preview: <Editor isLoading={ isSiteEditorLoading } />,

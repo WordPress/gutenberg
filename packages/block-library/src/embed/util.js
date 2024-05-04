@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 import memoize from 'memize';
 
 /**
@@ -182,12 +182,16 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
-			accumulator[ className ] = false;
+			accumulator.push( className );
 			return accumulator;
 		},
-		{ 'wp-has-aspect-ratio': false }
+		[ 'wp-has-aspect-ratio' ]
 	);
-	return classnames( existingClassNames, aspectRatioClassNames );
+	let outputClassNames = existingClassNames;
+	for ( const className of aspectRatioClassNames ) {
+		outputClassNames = outputClassNames.replace( className, '' );
+	}
+	return outputClassNames.trim();
 };
 
 /**
@@ -230,7 +234,7 @@ export function getClassNames(
 					return removeAspectRatioClasses( existingClassNames );
 				}
 				// Close aspect ratio match found.
-				return classnames(
+				return clsx(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
 					'wp-has-aspect-ratio'

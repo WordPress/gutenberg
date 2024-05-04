@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -248,7 +248,7 @@ function EditorCanvas( {
 		'core/post-content'
 	);
 
-	const blockListLayoutClass = classnames(
+	const blockListLayoutClass = clsx(
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
@@ -328,7 +328,7 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
-				className: classnames( 'editor-canvas__iframe', {
+				className: clsx( 'editor-canvas__iframe', {
 					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
@@ -362,7 +362,7 @@ function EditorCanvas( {
 				) }
 			{ renderingMode === 'post-only' && ! isDesignPostType && (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'editor-editor-canvas__post-title-wrapper',
 						// The following class is only here for backward comapatibility
 						// some themes might be using it to style the post title.
@@ -387,7 +387,7 @@ function EditorCanvas( {
 				uniqueId={ wrapperUniqueId }
 			>
 				<BlockList
-					className={ classnames(
+					className={ clsx(
 						className,
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only' || isDesignPostType

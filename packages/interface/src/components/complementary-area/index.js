@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -291,10 +291,7 @@ function ComplementaryArea( {
 			<ComplementaryAreaFill
 				activeArea={ activeArea }
 				isActive={ isActive }
-				className={ classnames(
-					'interface-complementary-area',
-					className
-				) }
+				className={ clsx( 'interface-complementary-area', className ) }
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
 			>
