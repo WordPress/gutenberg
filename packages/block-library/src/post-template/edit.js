@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ const TEMPLATE = [
 
 function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: classnames( 'wp-block-post', classList ) },
+		{ className: clsx( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -45,7 +45,7 @@ function PostTemplateBlockPreview( {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: classnames( 'wp-block-post', classList ),
+			className: clsx( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -220,7 +220,7 @@ export default function PostTemplateEdit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
+		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
 		} ),

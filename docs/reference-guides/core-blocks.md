@@ -51,7 +51,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Name:** core/button
 -	**Category:** design
 -	**Parent:** core/buttons
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), shadow (), spacing (padding), splitting, typography (fontSize, lineHeight), ~~alignWide~~, ~~align~~, ~~reusable~~
 -	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textAlign, textColor, title, type, url, width
 
 ## Buttons
@@ -359,7 +359,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
 -	**Attributes:** content, level, placeholder, textAlign
 
 ## Home Link
@@ -426,7 +426,7 @@ Create a list item. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Category:** text
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
--	**Supports:** interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** content, placeholder
 
 ## Login/out
@@ -531,7 +531,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~className~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~
 -	**Attributes:** align, content, direction, dropCap, placeholder
 
 ## Pattern placeholder

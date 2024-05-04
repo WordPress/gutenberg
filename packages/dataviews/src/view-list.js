@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -57,7 +57,7 @@ function ListItem( {
 			ref={ itemRef }
 			render={ <li /> }
 			role="row"
-			className={ classNames( {
+			className={ clsx( {
 				'is-selected': isSelected,
 			} ) }
 		>
@@ -167,7 +167,7 @@ export default function ViewList( {
 	if ( ! hasData ) {
 		return (
 			<div
-				className={ classNames( {
+				className={ clsx( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

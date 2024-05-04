@@ -3,7 +3,9 @@
  */
 import { forwardRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { ENTER } from '@wordpress/keycodes';
+import { create, split, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -33,6 +35,8 @@ function RichTextMultiline(
 	} );
 
 	const { clientId } = useBlockEditContext();
+	const { getSelectionStart, getSelectionEnd } =
+		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 
 	const multilineTagName = getMultilineTag( multiline );
@@ -68,8 +72,32 @@ function RichTextMultiline(
 							_onChange( newValues );
 						} }
 						isSelected={ undefined }
-						onSplit={ ( v ) => v }
-						onReplace={ ( array ) => {
+						onKeyDown={ ( event ) => {
+							if ( event.keyCode !== ENTER ) {
+								return;
+							}
+
+							event.preventDefault();
+
+							const { offset: start } = getSelectionStart();
+							const { offset: end } = getSelectionEnd();
+
+							// Cannot split if there is no selection.
+							if (
+								typeof start !== 'number' ||
+								typeof end !== 'number'
+							) {
+								return;
+							}
+
+							const richTextValue = create( { html: _value } );
+							richTextValue.start = start;
+							richTextValue.end = end;
+
+							const array = split( richTextValue ).map( ( v ) =>
+								toHTMLString( { value: v } )
+							);
+
 							const newValues = values.slice();
 							newValues.splice( index, 1, ...array );
 							_onChange( newValues );

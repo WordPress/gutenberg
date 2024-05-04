@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -222,7 +222,7 @@ export function MediaPreview( { media, onClick, category } ) {
 			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
-						className={ classnames(
+						className={ clsx(
 							'block-editor-inserter__media-list__list-item',
 							{
 								'is-hovered': isHovered,

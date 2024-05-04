@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -69,12 +69,9 @@ export default function Variation( { variation, children } ) {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
+				className={ clsx( 'edit-site-global-styles-variations_item', {
+					'is-active': isActive,
+				} ) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }

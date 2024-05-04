@@ -24,6 +24,7 @@ export default function SingleNavigationMenu( {
 			actions={
 				<>
 					<ScreenNavigationMoreMenu
+						menuId={ navigationMenu?.id }
 						menuTitle={ decodeEntities( menuTitle ) }
 						onDelete={ handleDelete }
 						onSave={ handleSave }

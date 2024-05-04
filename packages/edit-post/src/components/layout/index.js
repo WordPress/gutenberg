@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -240,7 +240,7 @@ function Layout( { initialPost } ) {
 		document.body.classList.remove( 'show-icon-labels' );
 	}
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -87,7 +87,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 
 	return (
 		<motion.div
-			className={ classnames( 'edit-site-site-hub', className ) }
+			className={ clsx( 'edit-site-site-hub', className ) }
 			variants={ {
 				isDistractionFree: { x: '-100%' },
 				isDistractionFreeHovering: { x: 0 },
@@ -103,7 +103,7 @@ const SiteHub = memo( ( { isTransparent, className } ) => {
 		>
 			<HStack justify="flex-start" spacing="0">
 				<motion.div
-					className={ classnames(
+					className={ clsx(
 						'edit-site-site-hub__view-mode-toggle-container',
 						{
 							'has-transparent-background': isTransparent,
