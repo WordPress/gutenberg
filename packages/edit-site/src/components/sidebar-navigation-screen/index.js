@@ -62,7 +62,7 @@ export default function SidebarNavigationScreen( {
 	);
 	const location = useLocation();
 	const history = useHistory();
-	const navigate = useContext( SidebarNavigationContext );
+	const { navigate } = useContext( SidebarNavigationContext );
 	const backPath = backPathProp ?? location.state?.backPath;
 	const icon = isRTL() ? chevronRight : chevronLeft;
 
