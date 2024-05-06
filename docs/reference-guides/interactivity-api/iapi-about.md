@@ -71,6 +71,10 @@ The Interactivity API pipeline promotes **progressive enhancement** by building 
 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
+<div class="callout callout-warning">
+  Full-page client-side navigation will be an exception to this compatibility with other libraries rule. See [Client-side navigation](#client-side-navigation) for more details.
+</div>
+
 ### Declarative and reactive
 
 The Interactivity API follows an approach similar to other popular JS frameworks by separating state, actions, and callbacks and defining them declaratively. Why declaratively?
@@ -145,9 +149,7 @@ Using imperative code may be easier when creating simple user experiences, but i
 The API has been designed to be as performant as possible:
 
 - **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
-- **It only loads the directives needed** by the blocks present on the page. For example, if no blocks are using data-wp-show, the code for this directive won’t be loaded.
 - **The scripts will load without blocking the page rendering**.
-- There are ongoing explorations about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 
 ### Extensible
 
@@ -166,6 +168,10 @@ Using built-in directives does not require a build step and only requires a smal
 ### Client-side navigation
 
 The Interactivity API comes with built-in primitives for adding client-side navigation to your site. This functionality is completely optional, but it opens the possibility to create these user experiences without having to opt out of the WordPress rendering system.
+
+<div class="callout callout-info">
+  Full-page client-side navigation with the Interactivity API is still a work in progress (see https://github.com/WordPress/gutenberg/issues/60951), but it's expected that to enable this behaviour all the interactivity required for blocks is provided with the Interactivity API Standard. Only in this case, the Interactivity API won't be fully compatible with other libraries (such as jQuery). 
+</div>
 
 It also pairs very well with the [View Transitions API](https://developer.chrome.com/docs/web-platform/view-transitions/) allowing developers to animate page transitions easily.
 
