@@ -50,6 +50,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 		} ),
 	};
 
+	const blockClientRect = blockElement.getBoundingClientRect();
+	const rootBlockClientRect = rootBlockElement.getBoundingClientRect();
+
 	/*
 	 * The bounding element is equivalent to the root block element, but
 	 * its bounding client rect is modified to account for the resizer
@@ -59,13 +62,11 @@ export function GridItemResizer( { clientId, onChange } ) {
 		offsetWidth: rootBlockElement.offsetWidth,
 		offsetHeight: rootBlockElement.offsetHeight,
 		getBoundingClientRect: () => {
-			const rootBlockClientRect =
-				rootBlockElement.getBoundingClientRect();
 			const resizerTop =
 				resizerDummyRef.current?.getBoundingClientRect()?.top;
 			// Fallback value of 60 to account for editor top bar height.
 			const heightDifference = resizerTop
-				? resizerTop - blockElement.getBoundingClientRect().top
+				? resizerTop - blockClientRect.top
 				: 60;
 			return {
 				bottom: rootBlockClientRect.bottom + heightDifference,
@@ -79,6 +80,15 @@ export function GridItemResizer( { clientId, onChange } ) {
 			};
 		},
 	};
+
+	/*
+	 * Only enable resizing to a side if that side is not on the
+	 * edge of the grid.
+	 */
+	const enableTop = blockClientRect.top > rootBlockClientRect.top;
+	const enableBottom = blockClientRect.bottom < rootBlockClientRect.bottom;
+	const enableLeft = blockClientRect.left > rootBlockClientRect.left;
+	const enableRight = blockClientRect.right < rootBlockClientRect.right;
 
 	return (
 		<BlockPopoverCover
@@ -94,12 +104,12 @@ export function GridItemResizer( { clientId, onChange } ) {
 					height: '100%',
 				} }
 				enable={ {
-					bottom: true,
+					bottom: enableBottom,
 					bottomLeft: false,
 					bottomRight: false,
-					left: true,
-					right: true,
-					top: true,
+					left: enableLeft,
+					right: enableRight,
+					top: enableTop,
 					topLeft: false,
 					topRight: false,
 				} }
