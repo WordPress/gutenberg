@@ -119,17 +119,11 @@ export function toVdom( root ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
-					const prefix = directiveMatch ? directiveMatch[ 1 ] : '';
-					const suffix =
-						directiveMatch && directiveMatch[ 2 ]
-							? directiveMatch[ 2 ]
-							: 'default';
-
 					if ( ! directiveMatch ) {
 						if (
 							// @ts-expect-error This is a debug-only warning.
 							typeof SCRIPT_DEBUG !== 'undefined' &&
-							// @ts-expect-error
+							// @ts-expect-error This is a debug-only warning.
 							SCRIPT_DEBUG === true
 						) {
 							// eslint-disable-next-line no-console
@@ -137,6 +131,9 @@ export function toVdom( root ) {
 						}
 						return obj;
 					}
+					const prefix = directiveMatch[ 1 ] || '';
+					const suffix = directiveMatch[ 2 ] || 'default';
+
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
