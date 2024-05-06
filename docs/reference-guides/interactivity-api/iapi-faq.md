@@ -92,8 +92,8 @@ No. Blocks outside the Interactivity API can coexist with blocks using it. Howev
 The API has been designed with performance in mind, so it shouldn’t be a problem:
 
 - **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
-- **All the scripts that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
-- There are ongoing explorations about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
+- **All the script modules that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
+- There are ongoing explorations about the possibility of **delaying the script modules loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 
 ## Does it work with the Core Translation API?
 
