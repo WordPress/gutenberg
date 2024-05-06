@@ -97,7 +97,7 @@ The API has been designed with performance in mind, so it shouldn’t be a probl
 
 ## Does it work with the Core Translation API?
 
-It does! As the Interactivity API works perfectly with server-side rendering, you can use all the WordPress APIs including [`__()`](https://developer.wordpress.org/reference/functions/__/) and [`_e()`](https://developer.wordpress.org/reference/functions/_e/). You can use it to translate the text in the HTML (as you normally would) and even use it inside the store when using `wp_initial_state()` on the server side. It might look something like this:
+As the Interactivity API works perfectly with server-side rendering, you can use all the WordPress APIs including [`__()`](https://developer.wordpress.org/reference/functions/__/) and [`_e()`](https://developer.wordpress.org/reference/functions/_e/). You can use it to translate the text in the HTML (as you normally would) and even use it inside the store when using `wp_initial_state()` on the server side. It might look something like this:
 
 ```php
 // render.php
@@ -109,6 +109,8 @@ wp_interactivity_state( 'favoriteMovies', array(
 ) );
 ```
 
+A translation API compatible with script modules (needed for the Interactivity API) is 
+currently being worked on. Check https://core.trac.wordpress.org/ticket/60234 to follow the progress on this work.
 
 ## I’m concerned about XSS; can JavaScript be injected into directives?
 
