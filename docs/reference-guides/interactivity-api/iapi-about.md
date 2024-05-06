@@ -33,7 +33,7 @@ Directives are the result of deep [research into different possibilities and app
 
 The API is designed for the world of blocks and takes WordPress history of being closely attached to web standards to heart.
 
-As directives are added to the HTML, they work great with dynamic blocks and PHP.
+As directives are HTML attributes, they are perfect for dynamic blocks and PHP.
 
 _Dynamic block example_
 ```html
@@ -67,7 +67,7 @@ As the Interactivity API works perfectly with server-side rendering, you can use
 
 ### Optional and gradual adoption
 
-The Interactivity API pipeline promotes **progressive enhancement** by building on top of WordPress’s solid foundation and patterns. It was carefully designed not to force any use cases to pay for the costs of other use cases.
+The Interactivity API pipeline promotes **progressive enhancement** by building on top of WordPress’s solid foundation and patterns.
 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
@@ -138,7 +138,7 @@ store( 'wpmovies', {
 </div>
 ```
 
-Using imperative code may be easier when creating simple user experiences, but it becomes much more difficult as blocks become more complex. The Interactivity API must cover all use cases, from the simplest to the most challenging. That’s why a declarative approach using directives better fits the Interactivity API.
+Using imperative code may be easier when creating simple user experiences, but it becomes much more difficult as applications become more complex. The Interactivity API must cover all use cases, from the simplest to the most challenging. That’s why a declarative approach using directives better fits the Interactivity API.
 
 ### Performant
 
