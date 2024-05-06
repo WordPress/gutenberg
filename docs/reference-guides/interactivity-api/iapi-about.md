@@ -67,7 +67,7 @@ As the Interactivity API works perfectly with server-side rendering, you can use
 
 ### Optional and gradual adoption
 
-The Interactivity API pipeline promotes **progressive enhancement** by building on top of WordPress’s solid foundation and patterns. It was carefully designed not to force any use cases to pay for the costs of other use cases.
+The Interactivity API pipeline promotes **progressive enhancement** by building on top of WordPress’s solid foundation and patterns.
 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
