@@ -135,16 +135,10 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					// when the publish sidebar has been closed.
 					<PostSavedState forceIsDirty={ hasActiveMetaboxes } />
 				) }
-				<div
-					className={ classnames(
-						'edit-post-header__preview-options',
-						{ 'is-zoomed-out': isZoomedOutView }
-					) }
-				>
-					<PreviewDropdown
-						forceIsAutosaveable={ hasActiveMetaboxes }
-					/>
-				</div>
+				<PreviewDropdown
+					disabled={ isZoomedOutView }
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
 				<PostPreviewButton
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }

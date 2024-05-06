@@ -147,18 +147,13 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 					transition={ toolbarTransition }
 				>
 					{ isLargeViewport && (
-						<div
-							className={ clsx(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
-						>
-							<PreviewDropdown
-								disabled={
-									isFocusMode || ! hasDefaultEditorCanvasView
-								}
-							/>
-						</div>
+						<PreviewDropdown
+							disabled={
+								isFocusMode ||
+								! hasDefaultEditorCanvasView ||
+								isZoomedOutView
+							}
+						/>
 					) }
 					<PostViewLink />
 					{
