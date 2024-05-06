@@ -9,6 +9,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
+import { doAction, privateApis } from '@wordpress/hooks';
 
 import {
 	Button,
@@ -455,6 +456,11 @@ const renamePostAction = {
 				createSuccessNotice( __( 'Name updated' ), {
 					type: 'snackbar',
 				} );
+				doAction(
+					unlock( privateApis ).privateHooksMap.get(
+						'postActions.renamePost'
+					)
+				);
 				onActionPerformed?.( items );
 			} catch ( error ) {
 				const errorMessage =

@@ -1,13 +1,24 @@
 /**
+ * Internal dependencies
+ */
+
+import { privateHooksSet } from './private-hooks';
+
+/**
  * Validate a hookName string.
  *
- * @param {string} hookName The hook name to validate. Should be a non empty string containing
- *                          only numbers, letters, dashes, periods and underscores. Also,
- *                          the hook name cannot begin with `__`.
+ * @param {string|symbol} hookName The hook name to validate. Should be a non
+ *                                 empty string containing only numbers,
+ *                                 letters, dashes, periods and underscores.
+ *                                 Also, the hook name cannot begin with `__`.
  *
  * @return {boolean} Whether the hook name is valid.
  */
 function validateHookName( hookName ) {
+	if ( 'symbol' === typeof hookName && privateHooksSet.has( hookName ) ) {
+		return true;
+	}
+
 	if ( 'string' !== typeof hookName || '' === hookName ) {
 		// eslint-disable-next-line no-console
 		console.error( 'The hook name must be a non-empty string.' );

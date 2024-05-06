@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { camelCase } from 'change-case';
+
+/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
@@ -11,6 +16,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { doAction, privateApis as hooksPrivateApis } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -362,13 +368,17 @@ export default function PagePages() {
 	);
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
+			// Dispatch a private action corresponding to `actionId` under the
+			// `pagePages` namespace, if such a private action is registered.
+			// For instance, `pagePages.editPost`.
+			//
+			// @see packages/hooks/src/private-hooks.js
+			const hookName = unlock( hooksPrivateApis ).privateHooksMap.get(
+				`pagePages.${ camelCase( actionId ) }`
+			);
+
+			if ( hookName ) {
+				doAction( hookName, items, history );
 			}
 		},
 		[ history ]

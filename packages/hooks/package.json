@@ -26,7 +26,8 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.16.0"
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/private-apis": "^0.39.0"
 	},
 	"publishConfig": {
 		"access": "public"
