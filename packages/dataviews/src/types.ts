@@ -6,7 +6,7 @@ import type { IconType } from '@wordpress/components';
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 interface Option {
 	value: any;
@@ -221,7 +221,7 @@ export interface ActionModal extends ActionBase {
 		closeModal?: () => void;
 		onActionStart?: ( items: Item[] ) => void;
 		onActionPerformed?: ( items: Item[] ) => void;
-	} ) => JSX.Element;
+	} ) => ReactElement;
 
 	/**
 	 * Whether to hide the modal header.
