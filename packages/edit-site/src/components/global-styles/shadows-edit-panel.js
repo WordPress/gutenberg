@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
+	__experimentalInputControl as InputControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 	__experimentalGrid as Grid,
@@ -19,15 +20,17 @@ import {
 	__experimentalUseNavigator as useNavigator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Dropdown,
-	DropdownMenu,
-	NavigableMenu,
 	RangeControl,
 	Button,
+	Flex,
 	FlexItem,
 	ColorPalette,
+	Modal,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	Icon,
@@ -54,15 +57,16 @@ import {
 } from './shadow-utils';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 const menuItems = [
 	{
 		label: __( 'Rename' ),
 		action: 'rename',
-	},
-	{
-		label: __( 'Duplicate' ),
-		action: 'duplicate',
 	},
 	{
 		label: __( 'Delete' ),
@@ -73,6 +77,7 @@ const menuItems = [
 export default function ShadowsEditPanel() {
 	const {
 		params: { category, slug },
+		goTo,
 	} = useNavigator();
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
@@ -80,6 +85,10 @@ export default function ShadowsEditPanel() {
 	const [ selectedShadow, setSelectedShadow ] = useState( () =>
 		( shadows || [] ).find( ( shadow ) => shadow.slug === slug )
 	);
+	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
+		useState( false );
+	const [ isRenameModalVisible, setIsRenameModalVisible ] = useState( false );
+	const [ shadowName, setShadowName ] = useState( selectedShadow.name );
 
 	const onShadowChange = ( shadow ) => {
 		setSelectedShadow( { ...selectedShadow, shadow } );
@@ -94,49 +103,70 @@ export default function ShadowsEditPanel() {
 	const onMenuClick = ( action ) => {
 		switch ( action ) {
 			case 'rename':
-				break;
-			case 'duplicate':
+				setIsRenameModalVisible( true );
 				break;
 			case 'delete':
+				setIsConfirmDialogVisible( true );
 				break;
 		}
 	};
 
-	return (
+	const handleShadowDelete = () => {
+		const updatedShadows = shadows.filter( ( s ) => s.slug !== slug );
+		setShadows( updatedShadows );
+		goTo( `/shadows` );
+	};
+
+	const handleShadowRename = ( newName ) => {
+		if ( ! newName ) {
+			return;
+		}
+		const updatedShadows = shadows.map( ( s ) =>
+			s.slug === slug ? { ...selectedShadow, name: newName } : s
+		);
+		setSelectedShadow( { ...selectedShadow, name: newName } );
+		setShadows( updatedShadows );
+	};
+
+	return ! selectedShadow ? (
+		<ScreenHeader title={ '' } />
+	) : (
 		<>
 			<HStack justify="space-between">
 				<ScreenHeader title={ selectedShadow.name } />
-				<FlexItem>
-					<Spacer marginBottom={ 0 } paddingX={ 4 }>
-						<DropdownMenu
-							icon={ moreVertical }
-							label={ __( 'Shadow options' ) }
-							toggleProps={ {
-								size: 'small',
-							} }
+				{ category === 'custom' && (
+					<FlexItem>
+						<Spacer
+							marginTop={ 2 }
+							marginBottom={ 0 }
+							paddingX={ 4 }
 						>
-							{ ( { onClose } ) =>
-								menuItems.map( ( item ) => (
-									<NavigableMenu
-										role="menu"
+							<DropdownMenu
+								trigger={
+									<Button
+										variant="tertiary"
+										size="small"
+										icon={ moreVertical }
+										label={ __( 'Menu' ) }
+									/>
+								}
+							>
+								{ menuItems.map( ( item ) => (
+									<DropdownMenuItem
 										key={ item.action }
+										onClick={ () =>
+											onMenuClick( item.action )
+										}
 									>
-										<Button
-											variant="tertiary"
-											onClick={ () => {
-												onMenuClick( item.action );
-												onClose();
-											} }
-											className="components-palette-edit__menu-button"
-										>
+										<DropdownMenuItemLabel>
 											{ item.label }
-										</Button>
-									</NavigableMenu>
-								) )
-							}
-						</DropdownMenu>
-					</Spacer>
-				</FlexItem>
+										</DropdownMenuItemLabel>
+									</DropdownMenuItem>
+								) ) }
+							</DropdownMenu>
+						</Spacer>
+					</FlexItem>
+				) }
 			</HStack>
 			<div className="edit-site-global-styles-screen">
 				<ShadowsPreview shadow={ selectedShadow.shadow } />
@@ -145,6 +175,70 @@ export default function ShadowsEditPanel() {
 					onChange={ onShadowChange }
 				/>
 			</div>
+			{ isConfirmDialogVisible && (
+				<ConfirmDialog
+					isOpen
+					onConfirm={ () => {
+						handleShadowDelete();
+						setIsConfirmDialogVisible( false );
+					} }
+					onCancel={ () => {
+						setIsConfirmDialogVisible( false );
+					} }
+					confirmButtonText={ __( 'Delete' ) }
+				>
+					{ sprintf(
+						// translators: %s: name of the shadow
+						'Are you sure you want to delete the shadow "%s"?',
+						selectedShadow.name
+					) }
+				</ConfirmDialog>
+			) }
+			{ isRenameModalVisible && (
+				<Modal
+					title={ __( 'Rename' ) }
+					onRequestClose={ () => setIsRenameModalVisible( false ) }
+					size="small"
+				>
+					<form
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							handleShadowRename( shadowName );
+							setIsRenameModalVisible( false );
+						} }
+					>
+						<InputControl
+							autoComplete="off"
+							label={ __( 'Name' ) }
+							placeholder={ __( 'Shadow name' ) }
+							value={ shadowName }
+							onChange={ ( value ) => setShadowName( value ) }
+						/>
+						<Spacer marginBottom={ 6 } />
+						<Flex
+							className="block-editor-shadow-edit-modal__actions"
+							justify="flex-end"
+							expanded={ false }
+						>
+							<FlexItem>
+								<Button
+									variant="tertiary"
+									onClick={ () =>
+										setIsRenameModalVisible( false )
+									}
+								>
+									{ __( 'Cancel' ) }
+								</Button>
+							</FlexItem>
+							<FlexItem>
+								<Button variant="primary" type="submit">
+									{ __( 'Save' ) }
+								</Button>
+							</FlexItem>
+						</Flex>
+					</form>
+				</Modal>
+			) }
 		</>
 	);
 }
@@ -246,7 +340,7 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleProps = {
 					onClick: onToggle,
-					className: classnames(
+					className: clsx(
 						'block-editor-panel-color-gradient-settings__dropdown',
 						{ 'is-open': isOpen }
 					),
