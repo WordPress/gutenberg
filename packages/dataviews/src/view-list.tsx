@@ -28,7 +28,7 @@ import type {
 	ViewList as ViewListType,
 } from './types';
 
-type ListViewProps = {
+interface ListViewProps {
 	view: ViewListType;
 	fields: NormalizedField[];
 	data: Data;
@@ -37,9 +37,9 @@ type ListViewProps = {
 	onSelectionChange: ( selection: Item[] ) => void;
 	selection: Item[];
 	id: string;
-};
+}
 
-type ListViewItemProps = {
+interface ListViewItemProps {
 	id: string;
 	item: Item;
 	isSelected: boolean;
@@ -47,7 +47,7 @@ type ListViewItemProps = {
 	mediaField?: NormalizedField;
 	primaryField?: NormalizedField;
 	visibleFields: NormalizedField[];
-};
+}
 
 const {
 	useCompositeStoreV2: useCompositeStore,
