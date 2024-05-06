@@ -212,7 +212,7 @@ const getGlobalEventDirective = ( type ) => {
 			.forEach( ( entry ) => {
 				const event = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
-					const cb = () => evaluate( entry, event );
+					const cb = ( cbEvent ) => evaluate( entry, cbEvent );
 					const globalVar = type === 'window' ? window : document;
 					globalVar.addEventListener( event, cb );
 					return () => globalVar.removeEventListener( event, cb );
