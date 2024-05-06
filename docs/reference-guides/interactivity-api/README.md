@@ -22,6 +22,11 @@ Use the following links to locate the topic you're interested in. If you have ne
 - **[API Reference](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
 - **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
 
+To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
+- **[About the Interactivity API](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-about/):** To learn more about the API Goals and the reasoning behind the use of a standard to add interactivity to blocks.
+- **[Frequently Asked Questions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-faq/):** To find responses to some frequently asked questions about the technology behind and alternatives.
+
+
 ## Requirements of the Interactivity API
 
 Interactivity API is included in Core in WordPress 6.5. For versions below, you'll need Gutenberg 17.5 or higher installed and activated in your WordPress installation.
