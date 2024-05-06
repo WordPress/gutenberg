@@ -92,7 +92,6 @@ No. Blocks outside the Interactivity API can coexist with blocks using it. Howev
 The API has been designed with performance in mind, so it shouldn’t be a problem:
 
 - **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
-- **It only loads the directives needed** by the blocks present on the page. For example, if no blocks use data-wp-show, that directive won’t be loaded.
 - **All the scripts that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
 - There are ongoing explorations about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 

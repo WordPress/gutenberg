@@ -38,7 +38,7 @@ As directives are added to the HTML, they work great with dynamic blocks and PHP
 _Dynamic block example_
 ```html
 <div
-  data-wp-interactive='{ "namespace": "wpmovies" }'
+  data-wp-interactive='wpmovies'
   data-wp-context='{ "isOpen": false }'
   data-wp-watch="callbacks.logIsOpen"
 >
@@ -121,7 +121,7 @@ store( 'wpmovies', {
 <!-- Render.php file -->
  
 <div
-  data-wp-interactive='{ "namespace": "wpmovies" }'
+  data-wp-interactive='wpmovies'
   data-wp-context="{ 'isOpen': true }"
 >
   <button
