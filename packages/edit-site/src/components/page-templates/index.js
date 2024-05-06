@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	Icon,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalHStack as HStack,
 	VisuallyHidden,
@@ -159,7 +160,7 @@ function Preview( { item, viewType } ) {
 				style={ { backgroundColor } }
 			>
 				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<Async>
+					<Async placeholder={ <Spinner /> }>
 						<BlockPreview blocks={ blocks } />
 					</Async>
 				) }
@@ -172,7 +173,7 @@ function Preview( { item, viewType } ) {
 					>
 						{ isEmpty && __( 'Empty template' ) }
 						{ ! isEmpty && (
-							<Async>
+							<Async placeholder={ <Spinner /> }>
 								<BlockPreview blocks={ blocks } />
 							</Async>
 						) }
