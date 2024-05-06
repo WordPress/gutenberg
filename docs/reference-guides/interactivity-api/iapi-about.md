@@ -33,7 +33,7 @@ Directives are the result of deep [research into different possibilities and app
 
 The API is designed for the world of blocks and takes WordPress history of being closely attached to web standards to heart.
 
-As directives are added to the HTML, they work great with dynamic blocks and PHP.
+As directives are HTML attributes, they are perfect for dynamic blocks and PHP.
 
 _Dynamic block example_
 ```html
