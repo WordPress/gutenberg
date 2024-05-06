@@ -54,49 +54,6 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 }
 
 /**
- * Updates a styles object with default background values.
- *
- * @param {Object} blockStyles           A styles object.
- * @param {Object} options               Optional settings.
- * @param {string} options.stylesheetURI The URI of the current theme directory.
- * @param {string} options.selector      The block selector.
- * @return {Object}                     Updated styles.
- */
-export function setBackgroundStyleDefaults( blockStyles, options ) {
-	if (
-		typeof blockStyles?.background !== 'object' ||
-		Object.keys( blockStyles?.background ).length === 0
-	) {
-		return blockStyles;
-	}
-
-	const backgroundImage = blockStyles?.background?.backgroundImage;
-	const newBackgroundStyles = {};
-
-	// Set block background defaults.
-	if ( options?.selector !== ROOT_BLOCK_SELECTOR && !! backgroundImage ) {
-		if ( ! blockStyles?.background?.backgroundSize ) {
-			newBackgroundStyles.backgroundSize = 'cover';
-		}
-
-		if (
-			'contain' === blockStyles?.background?.backgroundSize &&
-			! blockStyles?.background?.backgroundPosition
-		) {
-			newBackgroundStyles.backgroundPosition = 'center';
-		}
-	}
-
-	return {
-		...blockStyles,
-		background: {
-			...blockStyles.background,
-			...newBackgroundStyles,
-		},
-	};
-}
-
-/**
  * Generates a CSS class name if an background image is set.
  *
  * @param {Object} style A block's style attribute.

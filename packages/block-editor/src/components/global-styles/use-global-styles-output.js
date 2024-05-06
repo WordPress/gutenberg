@@ -36,7 +36,6 @@ import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import { setBackgroundStyleDefaults } from '../../hooks/background';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -393,17 +392,6 @@ export function getStylesDeclarations(
 		},
 		[]
 	);
-
-	/*
-	 * Set styles defaults.
-	 * Applies default values to the style object based on the block settings.
-	 * Only applies to background styles for now.
-	 */
-	if ( !! blockStyles?.background ) {
-		blockStyles = setBackgroundStyleDefaults( blockStyles, {
-			selector,
-		} );
-	}
 
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
