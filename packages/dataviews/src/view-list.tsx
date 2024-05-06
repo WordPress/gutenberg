@@ -21,6 +21,33 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import type {
+	Data,
+	Item,
+	NormalizedField,
+	ViewList as ViewListType,
+} from './types';
+
+interface ListViewProps {
+	view: ViewListType;
+	fields: NormalizedField[];
+	data: Data;
+	isLoading: boolean;
+	getItemId: ( item: Item ) => string;
+	onSelectionChange: ( selection: Item[] ) => void;
+	selection: Item[];
+	id: string;
+}
+
+interface ListViewItemProps {
+	id: string;
+	item: Item;
+	isSelected: boolean;
+	onSelect: ( item: Item ) => void;
+	mediaField?: NormalizedField;
+	primaryField?: NormalizedField;
+	visibleFields: NormalizedField[];
+}
 
 const {
 	useCompositeStoreV2: useCompositeStore,
@@ -37,8 +64,8 @@ function ListItem( {
 	mediaField,
 	primaryField,
 	visibleFields,
-} ) {
-	const itemRef = useRef( null );
+}: ListViewItemProps ) {
+	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
 
@@ -120,16 +147,17 @@ function ListItem( {
 	);
 }
 
-export default function ViewList( {
-	view,
-	fields,
-	data,
-	isLoading,
-	getItemId,
-	onSelectionChange,
-	selection,
-	id: preferredId,
-} ) {
+export default function ViewList( props: ListViewProps ) {
+	const {
+		view,
+		fields,
+		data,
+		isLoading,
+		getItemId,
+		onSelectionChange,
+		selection,
+		id: preferredId,
+	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( item.id )
@@ -150,12 +178,12 @@ export default function ViewList( {
 	);
 
 	const onSelect = useCallback(
-		( item ) => onSelectionChange( [ item ] ),
+		( item: Item ) => onSelectionChange( [ item ] ),
 		[ onSelectionChange ]
 	);
 
 	const getItemDomId = useCallback(
-		( item ) => ( item ? `${ baseId }-${ getItemId( item ) }` : undefined ),
+		( item?: Item ) => ( item ? `${ baseId }-${ getItemId( item ) }` : '' ),
 		[ baseId, getItemId ]
 	);
 
