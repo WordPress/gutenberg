@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -81,11 +81,16 @@ function InbetweenInsertionPointPopover( {
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
+	const { getBlockEditingMode } = useSelect( blockEditorStore );
 
 	const disableMotion = useReducedMotion();
 
 	function onClick( event ) {
-		if ( event.target === ref.current && nextClientId ) {
+		if (
+			event.target === ref.current &&
+			nextClientId &&
+			getBlockEditingMode( nextClientId ) !== 'disabled'
+		) {
 			selectBlock( nextClientId, -1 );
 		}
 	}
@@ -145,7 +150,7 @@ function InbetweenInsertionPointPopover( {
 			? 'is-horizontal'
 			: 'is-vertical';
 
-	const className = classnames(
+	const className = clsx(
 		'block-editor-block-list__insertion-point',
 		orientationClassname
 	);
@@ -170,7 +175,7 @@ function InbetweenInsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ classnames( className, {
+				className={ clsx( className, {
 					'is-with-inserter': isInserterShown,
 				} ) }
 				onHoverEnd={ maybeHideInserterPoint }
@@ -183,7 +188,7 @@ function InbetweenInsertionPointPopover( {
 				{ isInserterShown && (
 					<motion.div
 						variants={ inserterVariants }
-						className={ classnames(
+						className={ clsx(
 							'block-editor-block-list__insertion-point-inserter'
 						) }
 					>

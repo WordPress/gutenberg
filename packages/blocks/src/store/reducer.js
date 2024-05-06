@@ -66,19 +66,6 @@ function bootstrappedBlockTypes( state = {}, action ) {
 			// Don't overwrite if already set. It covers the case when metadata
 			// was initialized from the server.
 			if ( serverDefinition ) {
-				// The `selectors` prop is not yet included in the server provided
-				// definitions and needs to be polyfilled. This can be removed when the
-				// minimum supported WordPress is >= 6.3.
-				if (
-					serverDefinition.selectors === undefined &&
-					blockType.selectors
-				) {
-					newDefinition = {
-						...serverDefinition,
-						selectors: blockType.selectors,
-					};
-				}
-
 				// The `blockHooks` prop is not yet included in the server provided
 				// definitions and needs to be polyfilled. This can be removed when the
 				// minimum supported WordPress is >= 6.4.
@@ -383,6 +370,22 @@ export function collections( state = {}, action ) {
 	return state;
 }
 
+export function blockBindingsSources( state = {}, action ) {
+	if ( action.type === 'REGISTER_BLOCK_BINDINGS_SOURCE' ) {
+		return {
+			...state,
+			[ action.sourceName ]: {
+				label: action.sourceLabel,
+				getValue: action.getValue,
+				setValue: action.setValue,
+				getPlaceholder: action.getPlaceholder,
+				lockAttributesEditing: action.lockAttributesEditing ?? true,
+			},
+		};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	bootstrappedBlockTypes,
 	unprocessedBlockTypes,
@@ -395,4 +398,5 @@ export default combineReducers( {
 	groupingBlockName,
 	categories,
 	collections,
+	blockBindingsSources,
 } );

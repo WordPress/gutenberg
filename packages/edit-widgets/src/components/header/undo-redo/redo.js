@@ -31,6 +31,7 @@ function RedoButton( props, ref ) {
 			// See: https://github.com/WordPress/gutenberg/issues/3486
 			aria-disabled={ ! hasRedo }
 			onClick={ hasRedo ? redo : undefined }
+			size="compact"
 		/>
 	);
 }

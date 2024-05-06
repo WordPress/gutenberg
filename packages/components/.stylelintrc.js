@@ -4,11 +4,11 @@ module.exports = {
 	rules: {
 		'declaration-property-value-disallowed-list': [
 			{
-				'/.*/': '/--wp-admin-theme-/',
+				'/.*/': [ '/--wp-admin-theme-/', '/--wp-components-color-/' ],
 			},
 			{
 				message:
-					'--wp-admin-theme-* variables do not support component theming. Use Sass variables from packages/components/src/utils/theme-variables.scss instead.',
+					'To support component theming and ensure proper fallbacks, use Sass variables from packages/components/src/utils/theme-variables.scss instead.',
 			},
 		],
 	},

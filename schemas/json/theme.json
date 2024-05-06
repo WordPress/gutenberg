@@ -4,7 +4,7 @@
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
-			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
+			"createTheme": "https://developer.wordpress.org/themes/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
 		"refComplete": {
@@ -20,7 +20,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage\n- border: color, radius, style, width\n- color: link\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, minHeight\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -241,6 +241,11 @@
 							"description": "Allow users to set button colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"caption": {
+							"description": "Allow users to set caption colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -256,6 +261,11 @@
 					"properties": {
 						"backgroundImage": {
 							"description": "Allow users to set a background image.",
+							"type": "boolean",
+							"default": false
+						},
+						"backgroundSize": {
+							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
 							"type": "boolean",
 							"default": false
 						}
@@ -489,6 +499,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -540,6 +555,11 @@
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
+						},
+						"textAlign": {
+							"description": "Allow users to set the text align.",
+							"type": "boolean",
+							"default": true
 						},
 						"textColumns": {
 							"description": "Allow users to set the number of text columns.",
@@ -1619,6 +1639,10 @@
 								}
 							]
 						},
+						"textAlign": {
+							"description": "Sets the `text-align` CSS property.",
+							"type": "string"
+						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",
 							"type": "string"
@@ -2225,7 +2249,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 2 ]
+			"enum": [ 3 ]
 		},
 		"title": {
 			"type": "string",
@@ -2292,6 +2316,68 @@
 						"blocks": {
 							"description": "Styles defined on a per-block basis using the block's selector.",
 							"$ref": "#/definitions/stylesBlocksPropertiesComplete"
+						},
+						"background": {
+							"description": "Background styles.",
+							"type": "object",
+							"properties": {
+								"backgroundImage": {
+									"description": "Sets the `background-image` CSS property.",
+									"oneOf": [
+										{
+											"description": "A valid CSS value for the background-image property.",
+											"type": "string"
+										},
+										{
+											"type": "object",
+											"properties": {
+												"url": {
+													"description": "A URL to an image file.",
+													"type": "string"
+												}
+											},
+											"additionalProperties": false
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundPosition": {
+									"description": "Sets the `background-position` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundRepeat": {
+									"description": "Sets the `background-repeat` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								},
+								"backgroundSize": {
+									"description": "Sets the `background-size` CSS property.",
+									"oneOf": [
+										{
+											"type": "string"
+										},
+										{
+											"$ref": "#/definitions/refComplete"
+										}
+									]
+								}
+							},
+							"additionalProperties": false
 						}
 					},
 					"additionalProperties": false

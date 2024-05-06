@@ -3,11 +3,6 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-/**
- * Internal dependencies
- */
-import { NAVIGATION_MOBILE_COLLAPSE } from './constants';
-
 const focusableSelectors = [
 	'a[href]',
 	'input:not([disabled]):not([type="hidden"]):not([aria-hidden])',
@@ -67,11 +62,20 @@ const { state, actions } = store(
 					// Only open on hover if the overlay is closed.
 					Object.values( overlayOpenedBy || {} ).filter( Boolean )
 						.length === 0
-				)
+				) {
 					actions.openMenu( 'hover' );
+				}
 			},
 			closeMenuOnHover() {
-				actions.closeMenu( 'hover' );
+				const { type, overlayOpenedBy } = getContext();
+				if (
+					type === 'submenu' &&
+					// Only close on hover if the overlay is closed.
+					Object.values( overlayOpenedBy || {} ).filter( Boolean )
+						.length === 0
+				) {
+					actions.closeMenu( 'hover' );
+				}
 			},
 			openMenuOnClick() {
 				const ctx = getContext();
@@ -90,7 +94,9 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
-				if ( window.document.activeElement !== ref ) ref.focus();
+				if ( window.document.activeElement !== ref ) {
+					ref.focus();
+				}
 				const { menuOpenedBy } = state;
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
@@ -133,7 +139,7 @@ const { state, actions } = store(
 				}
 			},
 			handleMenuFocusout( event ) {
-				const { modal } = getContext();
+				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
@@ -144,7 +150,8 @@ const { state, actions } = store(
 				if (
 					event.relatedTarget === null ||
 					( ! modal?.contains( event.relatedTarget ) &&
-						event.target !== window.document.activeElement )
+						event.target !== window.document.activeElement &&
+						type === 'submenu' )
 				) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
@@ -200,27 +207,6 @@ const { state, actions } = store(
 						ref.querySelectorAll( focusableSelectors );
 					focusableElements?.[ 0 ]?.focus();
 				}
-			},
-			initNav() {
-				const context = getContext();
-				const mediaQuery = window.matchMedia(
-					`(max-width: ${ NAVIGATION_MOBILE_COLLAPSE })`
-				);
-
-				// Run once to set the initial state.
-				context.isCollapsed = mediaQuery.matches;
-
-				function handleCollapse( event ) {
-					context.isCollapsed = event.matches;
-				}
-
-				// Run on resize to update the state.
-				mediaQuery.addEventListener( 'change', handleCollapse );
-
-				// Remove the listener when the component is unmounted.
-				return () => {
-					mediaQuery.removeEventListener( 'change', handleCollapse );
-				};
 			},
 		},
 	},

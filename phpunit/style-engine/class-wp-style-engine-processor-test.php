@@ -58,7 +58,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nice_css_rule->set_at_rule( '@media (min-width: 80rem)' );
+		$a_nice_css_rule->set_rules_group( '@media (min-width: 80rem)' );
 
 		$a_nicer_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-nicer-rule' );
 		$a_nicer_css_rule->add_declarations(
@@ -68,7 +68,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'purple',
 			)
 		);
-		$a_nicer_css_rule->set_at_rule( '@layer nicety' );
+		$a_nicer_css_rule->set_rules_group( '@layer nicety' );
 
 		$a_nice_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_nice_processor->add_rules( array( $a_nice_css_rule, $a_nicer_css_rule ) );
@@ -143,7 +143,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_wonderful_css_rule->set_at_rule( '@media (min-width: 80rem)' );
+		$a_wonderful_css_rule->set_rules_group( '@media (min-width: 80rem)' );
 
 		$a_very_wonderful_css_rule = new WP_Style_Engine_CSS_Rule_Gutenberg( '.a-very_wonderful-rule' );
 		$a_very_wonderful_css_rule->add_declarations(
@@ -152,7 +152,7 @@ class WP_Style_Engine_Processor_Test extends WP_UnitTestCase {
 				'background-color' => 'orange',
 			)
 		);
-		$a_very_wonderful_css_rule->set_at_rule( '@layer wonderfulness' );
+		$a_very_wonderful_css_rule->set_rules_group( '@layer wonderfulness' );
 
 		$a_wonderful_processor = new WP_Style_Engine_Processor_Gutenberg();
 		$a_wonderful_processor->add_rules( array( $a_wonderful_css_rule, $a_very_wonderful_css_rule ) );

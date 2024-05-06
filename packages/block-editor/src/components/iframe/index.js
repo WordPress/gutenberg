@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -106,13 +106,14 @@ function Iframe( {
 	tabIndex = 0,
 	scale = 1,
 	frameSize = 0,
-	expand = false,
 	readonly,
 	forwardedRef: ref,
+	title = __( 'Editor canvas' ),
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const settings = select( blockEditorStore ).getSettings();
+		const { getSettings } = select( blockEditorStore );
+		const settings = getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.__unstableIsPreviewMode,
@@ -123,8 +124,11 @@ function Iframe( {
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [ contentResizeListener, { height: contentHeight } ] =
-		useResizeObserver();
+	const [
+		contentResizeListener,
+		{ height: contentHeight, width: contentWidth },
+	] = useResizeObserver();
+
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
 			setIframeDocument( node.contentDocument );
@@ -138,6 +142,8 @@ function Iframe( {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+
+			documentElement.classList.add( 'block-editor-iframe__html' );
 
 			clearerRef( documentElement );
 
@@ -201,6 +207,20 @@ function Iframe( {
 		};
 	}, [] );
 
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		const onResize = () => {
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -208,6 +228,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -218,7 +242,19 @@ function Iframe( {
 	<head>
 		<meta charset="utf-8">
 		<script>window.frameElement._load()</script>
-		<style>html{height:auto!important;min-height:100%;}body{margin:0}</style>
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+			/* Lowest specificity to not override global styles */
+			:where(body) {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background-color: white;
+			}
+		</style>
 		${ styles }
 		${ scripts }
 	</head>
@@ -236,33 +272,63 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
-	// We need to counter the margin created by scaling the iframe. If the scale
-	// is e.g. 0.45, then the top + bottom margin is 0.55 (1 - scale). Just the
-	// top or bottom margin is 0.55 / 2 ((1 - scale) / 2).
-	const marginFromScaling = ( contentHeight * ( 1 - scale ) ) / 2;
+	scale =
+		typeof scale === 'function'
+			? scale( contentWidth, contentHeight )
+			: scale;
+
+	useEffect( () => {
+		if ( ! iframeDocument ) {
+			return;
+		}
+
+		if ( scale !== 1 ) {
+			// Hack to get proper margins when scaling the iframe document.
+			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
+
+			iframeDocument.body.classList.add( 'is-zoomed-out' );
+
+			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
+			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
+			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
+			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
+			if ( iframeWindowInnerHeight > contentHeight * scale ) {
+				iframeDocument.body.style.minHeight = `${ Math.floor(
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
+				) }px`;
+			}
+
+			return () => {
+				iframeDocument.body.classList.remove( 'is-zoomed-out' );
+				iframeDocument.documentElement.style.transform = '';
+				iframeDocument.documentElement.style.marginTop = '';
+				iframeDocument.documentElement.style.marginBottom = '';
+				iframeDocument.body.style.minHeight = '';
+			};
+		}
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		contentHeight,
+		iframeWindowInnerHeight,
+		contentWidth,
+	] );
+
+	// Make sure to not render the before and after focusable div elements in view
+	// mode. They're only needed to capture focus in edit mode.
+	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
 	return (
 		<>
-			{ tabIndex >= 0 && before }
+			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
 				{ ...props }
 				style={ {
 					border: 0,
 					...props.style,
-					height: expand ? contentHeight : props.style?.height,
-					marginTop:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginTop,
-					marginBottom:
-						scale !== 1
-							? -marginFromScaling + frameSize
-							: props.style?.marginBottom,
-					transform:
-						scale !== 1
-							? `scale( ${ scale } )`
-							: props.style?.transform,
+					height: props.style?.height,
 					transition: 'all .3s',
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
@@ -271,8 +337,11 @@ function Iframe( {
 				// mode. Also preload the styles to avoid a flash of unstyled
 				// content.
 				src={ src }
-				title={ __( 'Editor canvas' ) }
+				title={ title }
 				onKeyDown={ ( event ) => {
+					if ( props.onKeyDown ) {
+						props.onKeyDown( event );
+					}
 					// If the event originates from inside the iframe, it means
 					// it bubbled through the portal, but only with React
 					// events. We need to to bubble native events as well,
@@ -283,7 +352,15 @@ function Iframe( {
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {
+						// We should only stop propagation of the React event,
+						// the native event should further bubble inside the
+						// iframe to the document and window.
+						// Alternatively, we could consider redispatching the
+						// native event in the iframe.
+						const { stopPropagation } = event.nativeEvent;
+						event.nativeEvent.stopPropagation = () => {};
 						event.stopPropagation();
+						event.nativeEvent.stopPropagation = stopPropagation;
 						bubbleEvent(
 							event,
 							window.KeyboardEvent,
@@ -299,7 +376,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
@@ -313,7 +390,7 @@ function Iframe( {
 						iframeDocument.documentElement
 					) }
 			</iframe>
-			{ tabIndex >= 0 && after }
+			{ shouldRenderFocusCaptureElements && after }
 		</>
 	);
 }

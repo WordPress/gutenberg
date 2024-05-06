@@ -55,20 +55,12 @@
 @import "./post-featured-image/editor.scss";
 @import "./post-comments-form/editor.scss";
 @import "./post-content/editor.scss";
-
 @import "./editor-elements.scss";
 
 :root .editor-styles-wrapper {
 	@include background-colors-deprecated();
 	@include foreground-colors-deprecated();
 	@include gradient-colors-deprecated();
-}
-
-// This CSS Custom Properties aren't used anymore as defaults,
-// but we still need to keep them for backward compatibility.
-:where(.editor-styles-wrapper) {
-	--wp--preset--font-size--normal: 16px;
-	--wp--preset--font-size--huge: 42px;
 }
 
 // Font sizes (not used now, kept because of backward compatibility).
@@ -81,14 +73,6 @@
 
 :where(.editor-styles-wrapper) .has-larger-font-size {
 	font-size: 42px;
-}
-
-:where(.editor-styles-wrapper) .has-normal-font-size {
-	font-size: var(--wp--preset--font-size--normal);
-}
-
-:where(.editor-styles-wrapper) .has-huge-font-size {
-	font-size: var(--wp--preset--font-size--huge);
 }
 
 /**

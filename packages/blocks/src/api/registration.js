@@ -551,21 +551,6 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
 }
 
 /**
- * Returns the hooked blocks for a given anchor block.
- *
- * Given an anchor block name, returns an object whose keys are relative positions,
- * and whose values are arrays of block names that are hooked to the anchor block
- * at that relative position.
- *
- * @param {string} name Anchor block name.
- *
- * @return {Object} Lists of hooked block names for each relative position.
- */
-export function getHookedBlocks( name ) {
-	return select( blocksStore ).getHookedBlocks( name );
-}
-
-/**
  * Determines whether or not the given block is a reusable block. This is a
  * special block type that is used to point to a global block stored via the
  * API.
@@ -738,6 +723,10 @@ export const getBlockVariations = ( blockName, scope ) => {
  * ```
  */
 export const registerBlockVariation = ( blockName, variation ) => {
+	if ( typeof variation.name !== 'string' ) {
+		console.warn( 'Variation names must be unique strings.' );
+	}
+
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 

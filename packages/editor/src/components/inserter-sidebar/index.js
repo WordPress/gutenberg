@@ -10,7 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -19,7 +19,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
-export default function InserterSidebar() {
+export default function InserterSidebar( {
+	closeGeneralSidebar,
+	isRightSidebarOpen,
+} ) {
 	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
 		const { getInsertionPoint } = unlock( select( editorStore ) );
 		const { get } = select( preferencesStore );
@@ -34,13 +37,10 @@ export default function InserterSidebar() {
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: null,
+		focusOnMount: true,
 	} );
 
 	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
 
 	return (
 		<div
@@ -65,6 +65,9 @@ export default function InserterSidebar() {
 						insertionPoint.insertionIndex
 					}
 					__experimentalFilterValue={ insertionPoint.filterValue }
+					__experimentalOnPatternCategorySelection={
+						isRightSidebarOpen ? closeGeneralSidebar : undefined
+					}
 					ref={ libraryRef }
 				/>
 			</div>

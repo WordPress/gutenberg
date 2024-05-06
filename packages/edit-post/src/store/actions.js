@@ -1,14 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { speak } from '@wordpress/a11y';
-import { store as noticesStore } from '@wordpress/notices';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
 
@@ -16,8 +14,9 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { store as editPostStore } from '.';
 import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -26,16 +25,10 @@ import { unlock } from '../lock-unlock';
  */
 export const openGeneralSidebar =
 	( name ) =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			dispatch.toggleDistractionFree();
-		}
+	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editPostStore.name, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -44,9 +37,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editPostStore.name );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -88,37 +79,52 @@ export const closeModal =
 /**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function openPublishSidebar() {
-	return {
-		type: 'OPEN_PUBLISH_SIDEBAR',
+export const openPublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).openPublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').openPublishSidebar",
+		} );
+		registry.dispatch( editorStore ).openPublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user closed the
  * publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object.
  */
-export function closePublishSidebar() {
-	return {
-		type: 'CLOSE_PUBLISH_SIDEBAR',
+export const closePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).closePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').closePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).closePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used in signalling that the user toggles the publish sidebar.
+ * @deprecated
  *
  * @return {Object} Action object
  */
-export function togglePublishSidebar() {
-	return {
-		type: 'TOGGLE_PUBLISH_SIDEBAR',
+export const togglePublishSidebar =
+	() =>
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).togglePublishSidebar", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').togglePublishSidebar",
+		} );
+		registry.dispatch( editorStore ).togglePublishSidebar();
 	};
-}
 
 /**
  * Returns an action object used to enable or disable a panel in the editor.
@@ -190,30 +196,18 @@ export const toggleFeature =
 /**
  * Triggers an action used to switch editor mode.
  *
+ * @deprecated
+ *
  * @param {string} mode The editor mode.
  */
 export const switchEditorMode =
 	( mode ) =>
-	( { dispatch, registry } ) => {
-		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
-
-		// Unselect blocks when we switch to the code editor.
-		if ( mode !== 'visual' ) {
-			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-		}
-
-		if (
-			mode === 'text' &&
-			registry.select( preferencesStore ).get( 'core', 'distractionFree' )
-		) {
-			dispatch.toggleDistractionFree();
-		}
-
-		const message =
-			mode === 'visual'
-				? __( 'Visual editor selected' )
-				: __( 'Code editor selected' );
-		speak( message, 'assertive' );
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).switchEditorMode", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').switchEditorMode",
+		} );
+		registry.dispatch( editorStore ).switchEditorMode( mode );
 	};
 
 /**
@@ -226,59 +220,25 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/edit-post', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ](
-				'core/edit-post',
-				pluginName
-			);
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**
  * Returns an action object used in signaling that a style should be auto-applied when a block is created.
  *
- * @param {string}  blockName  Name of the block.
- * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+ * @deprecated
  */
-export const updatePreferredStyleVariations =
-	( blockName, blockStyle ) =>
-	( { registry } ) => {
-		if ( ! blockName ) {
-			return;
-		}
-
-		const existingVariations =
-			registry
-				.select( preferencesStore )
-				.get( 'core/edit-post', 'preferredStyleVariations' ) ?? {};
-
-		// When the blockStyle is omitted, remove the block's preferred variation.
-		if ( ! blockStyle ) {
-			const updatedVariations = {
-				...existingVariations,
-			};
-
-			delete updatedVariations[ blockName ];
-
-			registry
-				.dispatch( preferencesStore )
-				.set(
-					'core/edit-post',
-					'preferredStyleVariations',
-					updatedVariations
-				);
-		} else {
-			// Else add the variation.
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core/edit-post', 'preferredStyleVariations', {
-					...existingVariations,
-					[ blockName ]: blockStyle,
-				} );
-		}
-	};
+export function updatePreferredStyleVariations() {
+	deprecated( "dispatch( 'core/edit-post' ).updatePreferredStyleVariations", {
+		since: '6.6',
+		hint: 'Preferred Style Variations are not supported anymore.',
+	} );
+	return { type: 'NOTHING' };
+}
 
 /**
  * Update the provided block types to be visible.
@@ -534,64 +494,15 @@ export const initializeMetaBoxes =
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @deprecated
  */
 export const toggleDistractionFree =
 	() =>
-	( { dispatch, registry } ) => {
-		const isDistractionFree = registry
-			.select( preferencesStore )
-			.get( 'core', 'distractionFree' );
-		if ( isDistractionFree ) {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'fixedToolbar', false );
-		}
-		if ( ! isDistractionFree ) {
-			registry.batch( () => {
-				registry
-					.dispatch( preferencesStore )
-					.set( 'core', 'fixedToolbar', true );
-				registry.dispatch( editorStore ).setIsInserterOpened( false );
-				registry.dispatch( editorStore ).setIsListViewOpened( false );
-				dispatch.closeGeneralSidebar();
-			} );
-		}
-		registry.batch( () => {
-			registry
-				.dispatch( preferencesStore )
-				.set( 'core', 'distractionFree', ! isDistractionFree );
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/edit-post/distraction-free-mode/notice',
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: () => {
-									registry.batch( () => {
-										registry
-											.dispatch( preferencesStore )
-											.set(
-												'core',
-												'fixedToolbar',
-												isDistractionFree ? true : false
-											);
-										registry
-											.dispatch( preferencesStore )
-											.toggle(
-												'core',
-												'distractionFree'
-											);
-									} );
-								},
-							},
-						],
-					}
-				);
+	( { registry } ) => {
+		deprecated( "dispatch( 'core/edit-post' ).toggleDistractionFree", {
+			since: '6.6',
+			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
+		registry.dispatch( editorStore ).toggleDistractionFree();
 	};

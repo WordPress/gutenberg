@@ -34,14 +34,12 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ ! attributes.isPreview }
 						onClick={ () => setAttributes( { isPreview: false } ) }
 					>
 						{ __( 'Edit' ) }
 					</ToolbarButton>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ attributes.isPreview }
 						onClick={ () => setAttributes( { isPreview: true } ) }
 					>

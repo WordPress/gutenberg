@@ -294,12 +294,12 @@
 						},
 						"heading": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set heading colors in a block, heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"description": "This property adds block controls which allow the user to set heading colors in a block. Heading color is disabled by default.\n\nHeading color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"button": {
 							"type": "boolean",
-							"description": "This property adds block controls which allow the user to set button colors in a block, button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.heading, its attributes definition is extended to include the style attribute",
+							"description": "This property adds block controls which allow the user to set button colors in a block. Button color is disabled by default.\n\nButton color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.button, its attributes definition is extended to include the style attribute",
 							"default": false
 						},
 						"enableContrastChecker": {
@@ -312,11 +312,6 @@
 				"customClassName": {
 					"type": "boolean",
 					"description": "This property adds a field to define a custom className for the block’s wrapper.",
-					"default": true
-				},
-				"defaultStylePicker": {
-					"type": "boolean",
-					"description": "When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to false.",
 					"default": true
 				},
 				"dimensions": {
@@ -342,6 +337,22 @@
 						"duotone": {
 							"type": "boolean",
 							"description": "Allow blocks to define a duotone filter.",
+							"default": false
+						}
+					}
+				},
+				"background": {
+					"type": "object",
+					"description": "This value signals that a block supports some of the CSS style properties related to background. When it does, the block editor will show UI controls for the user to set their values if the theme declares support.\n\nWhen the block declares support for a specific background property, its attributes definition is extended to include the style attribute.",
+					"properties": {
+						"backgroundImage": {
+							"type": "boolean",
+							"description": "Allow blocks to define a background image.",
+							"default": false
+						},
+						"backgroundSize": {
+							"type": "boolean",
+							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
 							"default": false
 						}
 					}
@@ -466,6 +477,11 @@
 									"type": "boolean",
 									"description": "For the `flex` layout type only, determines display of the orientation control in the block toolbar.",
 									"default": true
+								},
+								"allowCustomContentAndWideSize": {
+									"type": "boolean",
+									"description": "For the `constrained` layout type only, determines display of the custom content and wide size controls in the block sidebar.",
+									"default": true
 								}
 							}
 						}
@@ -556,10 +572,12 @@
 					}
 				},
 				"shadow": {
+					"default": false,
 					"description": "Allow blocks to define a box shadow.",
 					"oneOf": [
 						{
-							"type": "boolean"
+							"type": "boolean",
+							"description": "Defines whether a box shadow is enabled or not."
 						},
 						{
 							"type": "object"
@@ -579,8 +597,49 @@
 							"type": "boolean",
 							"description": "This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if the theme declares support.\n\nWhen the block declares support for lineHeight, its attributes definition is extended to include a new attribute style of object type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own style attribute with a default",
 							"default": false
+						},
+						"textAlign": {
+							"description": "This property adds block toolbar controls which allow to change block's text alignment.",
+							"oneOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [ "left", "center", "right" ]
+									}
+								}
+							],
+							"default": false
 						}
 					}
+				},
+				"interactivity": {
+					"description": "Indicates if the block is using Interactivity API features.",
+					"oneOf": [
+						{
+							"type": "boolean",
+							"description": "Indicates whether the block is using the Interactivity API directives.",
+							"default": false
+						},
+						{
+							"type": "object",
+							"properties": {
+								"clientNavigation": {
+									"type": "boolean",
+									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
+									"default": false
+								},
+								"interactive": {
+									"type": "boolean",
+									"description": "Indicates whether the block is using the Interactivity API directives.",
+									"default": false
+								}
+							}
+						}
+					]
 				}
 			},
 			"additionalProperties": true
@@ -681,31 +740,6 @@
 							}
 						}
 					]
-				},
-				"interactivity": {
-					"description": "Indicates if the block is using Interactivity API features.",
-					"oneOf": [
-						{
-							"type": "boolean",
-							"description": "Indicates whether the block is using the Interactivity API directives.",
-							"default": false
-						},
-						{
-							"type": "object",
-							"properties": {
-								"clientNavigation": {
-									"type": "boolean",
-									"description": "Indicates whether a block is compatible with the Interactivity API client-side navigation.\n\nSet it to true only if the block is not interactive or if it is interactive using the Interactivity API. Set it to false if the block is interactive but uses vanilla JS, jQuery or another JS framework/library other than the Interactivity API.",
-									"default": false
-								},
-								"interactive": {
-									"type": "boolean",
-									"description": "Indicates whether the block is using the Interactivity API directives.",
-									"default": false
-								}
-							}
-						}
-					]
 				}
 			}
 		},
@@ -789,6 +823,20 @@
 		},
 		"viewScript": {
 			"description": "Block type frontend script definition. It will be enqueued only when viewing the content on the front of the site.",
+			"oneOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			]
+		},
+		"viewScriptModule": {
+			"description": "Block type frontend script module definition. It will be enqueued only when viewing the content on the front of the site.",
 			"oneOf": [
 				{
 					"type": "string"

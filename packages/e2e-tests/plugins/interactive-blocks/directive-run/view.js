@@ -29,7 +29,7 @@ directive(
 
 const html = `
 <div
-	data-wp-interactive='{ "namespace": "directive-run" }'
+	data-wp-interactive="directive-run"
 	data-wp-router-region='test-directive-run'
 >
 	<div data-testid="hydrated" data-wp-text="state.isHydrated"></div>

@@ -7,14 +7,12 @@
  * @phpcs:disable VariableAnalysis.CodeAnalysis.VariableAnalysis.UndefinedVariable
  */
 
-wp_enqueue_script_module( 'store-tag-view' );
-
 // These variables simulates SSR.
 $test_store_tag_counter = 'ok' === $attributes['condition'] ? 3 : 0;
 $test_store_tag_double  = $test_store_tag_counter * 2;
 ?>
 
-<div data-wp-interactive='{ "namespace": "store-tag" }'>
+<div data-wp-interactive="store-tag">
 	<div>
 		Counter:
 		<span

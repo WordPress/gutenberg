@@ -7,7 +7,6 @@ import {
 	DropZone,
 	Button,
 	Spinner,
-	ResponsiveWrapper,
 	withNotices,
 	withFilters,
 	__experimentalHStack as HStack,
@@ -33,7 +32,7 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 // Used when labels from post type were not yet loaded or when they are not present.
 const DEFAULT_FEATURE_IMAGE_LABEL = __( 'Featured image' );
-const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Set featured image' );
+const DEFAULT_SET_FEATURE_IMAGE_LABEL = __( 'Add a featured image' );
 
 const instructions = (
 	<p>
@@ -99,10 +98,7 @@ function PostFeaturedImage( {
 	const toggleRef = useRef();
 	const [ isLoading, setIsLoading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
-	const { mediaWidth, mediaHeight, mediaSourceUrl } = getMediaDetails(
-		media,
-		currentPostId
-	);
+	const { mediaSourceUrl } = getMediaDetails( media, currentPostId );
 
 	function onDropFiles( filesList ) {
 		getSettings().mediaUpload( {
@@ -183,16 +179,11 @@ function PostFeaturedImage( {
 									}
 								>
 									{ !! featuredImageId && media && (
-										<ResponsiveWrapper
-											naturalWidth={ mediaWidth }
-											naturalHeight={ mediaHeight }
-											isInline
-										>
-											<img
-												src={ mediaSourceUrl }
-												alt=""
-											/>
-										</ResponsiveWrapper>
+										<img
+											className="editor-post-featured-image__preview-image"
+											src={ mediaSourceUrl }
+											alt=""
+										/>
 									) }
 									{ isLoading && <Spinner /> }
 									{ ! featuredImageId &&

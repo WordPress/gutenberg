@@ -15,6 +15,7 @@
 
 // The modal window element.
 .components-modal__frame {
+	@include reset;
 	// Use the entire viewport on smaller screens.
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;

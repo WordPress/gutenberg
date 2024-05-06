@@ -251,7 +251,7 @@ function ListViewBranch( props ) {
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
-					isExpanded={ true }
+					isExpanded
 				>
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (

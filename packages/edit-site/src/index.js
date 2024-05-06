@@ -11,7 +11,6 @@ import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
@@ -71,11 +70,6 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 	} );
 
-	dispatch( interfaceStore ).setDefaultComplementaryArea(
-		'core/edit-site',
-		'edit-site/template'
-	);
-
 	dispatch( editSiteStore ).updateSettings( settings );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
@@ -103,8 +97,6 @@ export function reinitializeEditor() {
 	} );
 }
 
-export { default as PluginSidebar } from './components/sidebar-edit-mode/plugin-sidebar';
-export { default as PluginSidebarMoreMenuItem } from './components/header-edit-mode/plugin-sidebar-more-menu-item';
-export { default as PluginMoreMenuItem } from './components/header-edit-mode/plugin-more-menu-item';
 export { default as PluginTemplateSettingPanel } from './components/plugin-template-setting-panel';
 export { store } from './store';
+export * from './deprecated';

@@ -14,6 +14,7 @@ import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useBlockCommands } from '../use-block-commands';
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -23,6 +24,7 @@ export function ExperimentalBlockCanvas( {
 	contentRef: contentRefProp,
 	iframeProps,
 } ) {
+	useBlockCommands();
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
 	const localRef = useRef();

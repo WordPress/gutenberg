@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,9 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 			popoverRef,
 			useRefEffect(
 				( node ) => {
-					if ( ! contentRef.current ) return;
+					if ( ! contentRef.current ) {
+						return;
+					}
 
 					// If the popover is rendered in a different document than
 					// the content, we need to duplicate the options list in the
@@ -139,7 +141,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 						role="option"
 						aria-selected={ index === selectedIndex }
 						disabled={ option.isDisabled }
-						className={ classnames(
+						className={ clsx(
 							'components-autocomplete__result',
 							className,
 							{

@@ -1,29 +1,20 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
-import {
-	BlockToolbar,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { PinnedItems } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
-import {
-	Button,
-	__unstableMotion as motion,
-	Popover,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	DocumentBar,
+	PostSavedState,
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -31,7 +22,7 @@ import {
 /**
  * Internal dependencies
  */
-import MoreMenu from './more-menu';
+import SiteEditorMoreMenuItems from './more-menu';
 import SaveButton from '../save-button';
 import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
@@ -41,23 +32,29 @@ import {
 } from '../editor-canvas-container';
 import { unlock } from '../../lock-unlock';
 import { FOCUSABLE_ENTITIES } from '../../utils/constants';
+import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { PostViewLink, PreviewDropdown } = unlock( editorPrivateApis );
+const {
+	CollapsableBlockToolbar,
+	MoreMenu,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+	PostPublishButtonOrToggle,
+} = unlock( editorPrivateApis );
 
-export default function HeaderEditMode() {
+export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 	const {
 		templateType,
 		isDistractionFree,
 		blockEditorMode,
-		blockSelectionStart,
 		showIconLabels,
 		editorCanvasView,
-		hasFixedToolbar,
-		isZoomOutMode,
+		isFixedToolbar,
+		isPublishSidebarOpened,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
-		const { getBlockSelectionStart, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { get: getPreference } = select( preferencesStore );
 		const { getDeviceType } = select( editorStore );
 
@@ -65,20 +62,20 @@ export default function HeaderEditMode() {
 			deviceType: getDeviceType(),
 			templateType: getEditedPostType(),
 			blockEditorMode: __unstableGetEditorMode(),
-			blockSelectionStart: getBlockSelectionStart(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			editorCanvasView: unlock(
 				select( editSiteStore )
 			).getEditorCanvasContainerView(),
-			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			isDistractionFree: getPreference( 'core', 'distractionFree' ),
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
+			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isPublishSidebarOpened:
+				select( editorStore ).isPublishSidebarOpened(),
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const isTopToolbar = ! isZoomOutMode && hasFixedToolbar && isLargeViewport;
-	const blockToolbarRef = useRef();
+	const showTopToolbar =
+		isLargeViewport && isFixedToolbar && blockEditorMode !== 'zoom-out';
 	const disableMotion = useReducedMotion();
 
 	const hasDefaultEditorCanvasView = ! useHasEditorCanvasContainer();
@@ -89,15 +86,6 @@ export default function HeaderEditMode() {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	const hasBlockSelected = !! blockSelectionStart;
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( blockSelectionStart ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ blockSelectionStart ] );
 
 	const toolbarVariants = {
 		isDistractionFree: { y: '-50px' },
@@ -112,10 +100,12 @@ export default function HeaderEditMode() {
 		ease: 'easeOut',
 	};
 
+	const _isPreviewingTheme = isPreviewingTheme();
 	return (
 		<div
-			className={ classnames( 'edit-site-header-edit-mode', {
+			className={ clsx( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
+				'show-block-toolbar': ! isBlockToolsCollapsed && showTopToolbar,
 			} ) }
 		>
 			{ hasDefaultEditorCanvasView && (
@@ -128,55 +118,17 @@ export default function HeaderEditMode() {
 						blockEditorMode={ blockEditorMode }
 						isDistractionFree={ isDistractionFree }
 					/>
-					{ isTopToolbar && (
-						<>
-							<div
-								className={ classnames(
-									'selected-block-tools-wrapper',
-									{
-										'is-collapsed': isBlockToolsCollapsed,
-									}
-								) }
-							>
-								<BlockToolbar hideDragHandle />
-							</div>
-							<Popover.Slot
-								ref={ blockToolbarRef }
-								name="block-toolbar"
-							/>
-							{ hasBlockSelected && (
-								<Button
-									className="edit-site-header-edit-mode__block-tools-toggle"
-									icon={
-										isBlockToolsCollapsed ? next : previous
-									}
-									onClick={ () => {
-										setIsBlockToolsCollapsed(
-											( collapsed ) => ! collapsed
-										);
-									} }
-									label={
-										isBlockToolsCollapsed
-											? __( 'Show block tools' )
-											: __( 'Hide block tools' )
-									}
-								/>
-							) }
-						</>
+					{ showTopToolbar && (
+						<CollapsableBlockToolbar
+							isCollapsed={ isBlockToolsCollapsed }
+							onToggle={ setIsBlockToolsCollapsed }
+						/>
 					) }
 				</motion.div>
 			) }
 
 			{ ! isDistractionFree && (
-				<div
-					className={ classnames(
-						'edit-site-header-edit-mode__center',
-						{
-							'is-collapsed':
-								! isBlockToolsCollapsed && isLargeViewport,
-						}
-					) }
-				>
+				<div className="edit-site-header-edit-mode__center">
 					{ ! hasDefaultEditorCanvasView ? (
 						getEditorCanvasContainerTitle( editorCanvasView )
 					) : (
@@ -193,7 +145,7 @@ export default function HeaderEditMode() {
 				>
 					{ isLargeViewport && (
 						<div
-							className={ classnames(
+							className={ clsx(
 								'edit-site-header-edit-mode__preview-options',
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }
@@ -206,11 +158,31 @@ export default function HeaderEditMode() {
 						</div>
 					) }
 					<PostViewLink />
-					<SaveButton />
-					{ ! isDistractionFree && (
-						<PinnedItems.Slot scope="core/edit-site" />
+					{
+						// TODO: For now we conditionally render the Save/Publish buttons based on
+						// some specific site editor extra handling. Examples are when we're previewing
+						// a theme, handling of global styles changes or when we're in 'view' mode,
+						// which opens the save panel in a Modal.
+					 }
+					{ ! _isPreviewingTheme && ! isPublishSidebarOpened && (
+						// This button isn't completely hidden by the publish sidebar.
+						// We can't hide the whole toolbar when the publish sidebar is open because
+						// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+						// We track that DOM node to return focus to the PostPublishButtonOrToggle
+						// when the publish sidebar has been closed.
+						<PostSavedState />
 					) }
-					<MoreMenu showIconLabels={ showIconLabels } />
+					{ ! _isPreviewingTheme && (
+						<PostPublishButtonOrToggle
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
+					) }
+					{ _isPreviewingTheme && <SaveButton size="compact" /> }
+					{ ! isDistractionFree && <PinnedItems.Slot scope="core" /> }
+					<MoreMenu />
+					<SiteEditorMoreMenuItems />
 				</motion.div>
 			</div>
 		</div>

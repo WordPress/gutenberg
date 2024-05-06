@@ -33,7 +33,7 @@ register_block_type(
 );
 ```
 
-Here is a more complete example, including the `init` hook. 
+Here is a more complete example, including the `init` hook.
 
 ```php
 function minimal_block_ca6eda___register_block() {
@@ -46,7 +46,7 @@ _See the [full block example](https://github.com/WordPress/block-development-exa
 
 ## Registering a block with JavaScript (client-side)
 
-When the block has already been registered on the server, you only need to register the client-side settings in JavaScipt using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:
+When the block has already been registered on the server, you only need to register the client-side settings in JavaScript using the [`registerBlockType`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-blocks/#registerblocktype) method from the `@wordpress/blocks` package. You just need to make sure you use the same block name as defined in the block's `block.json` file. Here's an example:
 
 ```js
 import { registerBlockType } from '@wordpress/blocks';
@@ -71,7 +71,7 @@ The function accepts two parameters:
 The `settings` object passed as the second parameter includes many properties, but these are the two most important ones:
 
 - **`edit`:** The React component that gets used in the Editor for our block.
-- **`save`:** The function that returns the static HTML markup that gets saved to the database. 
+- **`save`:** The function that returns the static HTML markup that gets saved to the database.
 
 The `registerBlockType()` function returns the registered block type (`WPBlock`) on success or `undefined` on failure. Here's an example:
 

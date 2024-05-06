@@ -69,13 +69,6 @@ export default function ButtonsEdit( {
 		[ clientId ]
 	);
 
-	const preferredStyle = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
-		return preferredStyleVariations?.value?.[ 'core/button' ];
-	}, [] );
-
 	const { getBlockOrder } = useSelect( blockEditorStore );
 	const { insertBlock, removeBlock, selectBlock } =
 		useDispatch( blockEditorStore );
@@ -113,7 +106,7 @@ export default function ButtonsEdit( {
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
-				isFloating={ true }
+				isFloating
 				onAddBlock={ onAddNextButton }
 			/>
 		</View>
@@ -144,16 +137,7 @@ export default function ButtonsEdit( {
 			) }
 			{ resizeObserver }
 			<InnerBlocks
-				template={ [
-					[
-						'core/button',
-						{
-							className:
-								preferredStyle &&
-								`is-style-${ preferredStyle }`,
-						},
-					],
-				] }
+				template={ [ [ 'core/button' ] ] }
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}

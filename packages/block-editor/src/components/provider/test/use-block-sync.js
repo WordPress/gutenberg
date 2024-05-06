@@ -71,6 +71,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( fakeBlocks );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 1 );
 
 		const testBlocks = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
@@ -88,6 +89,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( testBlocks );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 2 );
 
 		unmount();
 
@@ -95,6 +97,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		expect( resetBlocks ).toHaveBeenCalledWith( [] );
+		expect( resetBlocks ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'replaces the inner blocks of a block when the controlled value changes if a clientId is passed', async () => {
@@ -123,6 +126,7 @@ describe( 'useBlockSync hook', () => {
 			'test', // It should use the given client ID.
 			fakeBlocks // It should use the controlled blocks value.
 		);
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
 
 		const testBlocks = [
 			{
@@ -148,6 +152,7 @@ describe( 'useBlockSync hook', () => {
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [
 			expect.objectContaining( { name: 'test/test-block' } ),
 		] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 2 );
 
 		unmount();
 
@@ -155,6 +160,7 @@ describe( 'useBlockSync hook', () => {
 		expect( onInput ).not.toHaveBeenCalled();
 		expect( resetBlocks ).not.toHaveBeenCalled();
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'does not add the controlled blocks to the block-editor store if the store already contains them', async () => {
@@ -354,6 +360,7 @@ describe( 'useBlockSync hook', () => {
 		);
 
 		expect( replaceInnerBlocks ).toHaveBeenCalledWith( 'test', [] );
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
 		expect( onChange ).not.toHaveBeenCalled();
 		expect( onInput ).not.toHaveBeenCalled();
 	} );

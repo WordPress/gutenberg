@@ -1,47 +1,42 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
-	BlockToolbar,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import {
+	DocumentBar,
 	PostSavedState,
 	PostPreviewButton,
 	store as editorStore,
-	DocumentBar,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { next, previous } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	Button,
-	__unstableMotion as motion,
-	Popover,
-} from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
-import MoreMenu from './more-menu';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import PostEditorMoreMenu from './more-menu';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { DocumentTools, PostViewLink, PreviewDropdown } =
-	unlock( editorPrivateApis );
+const {
+	CollapsableBlockToolbar,
+	DocumentTools,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+	MoreMenu,
+	PostPublishButtonOrToggle,
+} = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -58,43 +53,34 @@ const slideX = {
 function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const blockToolbarRef = useRef();
 	const {
 		isTextEditor,
-		hasBlockSelection,
 		hasActiveMetaboxes,
-		hasFixedToolbar,
 		isPublishSidebarOpened,
 		showIconLabels,
 		hasHistory,
+		hasFixedToolbar,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
-		const { getEditorMode } = select( editPostStore );
+		const { getEditorMode } = select( editorStore );
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
-			hasBlockSelection:
-				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory:
 				!! select( editorStore ).getEditorSettings()
 					.onNavigateToPreviousEntityRecord,
 			isPublishSidebarOpened:
-				select( editPostStore ).isPublishSidebarOpened(),
-			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+				select( editorStore ).isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
+			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 		};
 	}, [] );
 
+	const hasTopToolbar = isLargeViewport && hasFixedToolbar;
+
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	useEffect( () => {
-		// If we have a new block selection, show the block tools
-		if ( hasBlockSelection ) {
-			setIsBlockToolsCollapsed( false );
-		}
-	}, [ hasBlockSelection ] );
 
 	return (
 		<div className="edit-post-header">
@@ -115,48 +101,18 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				className="edit-post-header__toolbar"
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
-				{ hasFixedToolbar && isLargeViewport && (
-					<>
-						<div
-							className={ classnames(
-								'selected-block-tools-wrapper',
-								{
-									'is-collapsed': isBlockToolsCollapsed,
-								}
-							) }
-						>
-							<BlockToolbar hideDragHandle />
-						</div>
-						<Popover.Slot
-							ref={ blockToolbarRef }
-							name="block-toolbar"
-						/>
-						{ hasBlockSelection && (
-							<Button
-								className="edit-post-header__block-tools-toggle"
-								icon={ isBlockToolsCollapsed ? next : previous }
-								onClick={ () => {
-									setIsBlockToolsCollapsed(
-										( collapsed ) => ! collapsed
-									);
-								} }
-								label={
-									isBlockToolsCollapsed
-										? __( 'Show block tools' )
-										: __( 'Hide block tools' )
-								}
-							/>
-						) }
-					</>
+				{ hasTopToolbar && (
+					<CollapsableBlockToolbar
+						isCollapsed={ isBlockToolsCollapsed }
+						onToggle={ setIsBlockToolsCollapsed }
+					/>
 				) }
 				<div
-					className={ classnames( 'edit-post-header__center', {
+					className={ clsx( 'edit-post-header__center', {
 						'is-collapsed':
 							hasHistory &&
-							hasBlockSelection &&
 							! isBlockToolsCollapsed &&
-							hasFixedToolbar &&
-							isLargeViewport,
+							hasTopToolbar,
 					} ) }
 				>
 					{ hasHistory && <DocumentBar /> }
@@ -188,9 +144,10 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					}
 				/>
 				{ ( isWideViewport || ! showIconLabels ) && (
-					<PinnedItems.Slot scope="core/edit-post" />
+					<PinnedItems.Slot scope="core" />
 				) }
-				<MoreMenu showIconLabels={ showIconLabels } />
+				<MoreMenu />
+				<PostEditorMoreMenu />
 			</motion.div>
 		</div>
 	);

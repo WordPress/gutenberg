@@ -38,7 +38,9 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		}, [] );
 	const { setDeviceType } = useDispatch( editorStore );
 	const isMobile = useViewportMatch( 'medium', '<' );
-	if ( isMobile ) return null;
+	if ( isMobile ) {
+		return null;
+	}
 
 	const popoverProps = {
 		placement: 'bottom-end',

@@ -7,7 +7,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +20,24 @@ const {
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
+
+export function useHasAPossibleBulkAction( actions, item ) {
+	return useMemo( () => {
+		return actions.some( ( action ) => {
+			return action.supportsBulk && action.isEligible( item );
+		} );
+	}, [ actions, item ] );
+}
+
+export function useSomeItemHasAPossibleBulkAction( actions, data ) {
+	return useMemo( () => {
+		return data.some( ( item ) => {
+			return actions.some( ( action ) => {
+				return action.supportsBulk && action.isEligible( item );
+			} );
+		} );
+	}, [ actions, data ] );
+}
 
 function ActionWithModal( {
 	action,
@@ -107,14 +125,46 @@ export default function BulkActions( {
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const areAllSelected = selection && selection.length === data.length;
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState();
+	const selectableItems = useMemo( () => {
+		return data.filter( ( item ) => {
+			return bulkActions.some( ( action ) => action.isEligible( item ) );
+		} );
+	}, [ data, bulkActions ] );
+
+	const numberSelectableItems = selectableItems.length;
+	const areAllSelected =
+		selection && selection.length === numberSelectableItems;
+
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
 			selection.includes( getItemId( item ) )
 		);
 	}, [ selection, data, getItemId ] );
+
+	const hasNonSelectableItemSelected = useMemo( () => {
+		return selectedItems.some( ( item ) => {
+			return ! selectableItems.includes( item );
+		} );
+	}, [ selectedItems, selectableItems ] );
+	useEffect( () => {
+		if ( hasNonSelectableItemSelected ) {
+			onSelectionChange(
+				selectedItems.filter( ( selectedItem ) => {
+					return selectableItems.some( ( item ) => {
+						return getItemId( selectedItem ) === getItemId( item );
+					} );
+				} )
+			);
+		}
+	}, [
+		hasNonSelectableItemSelected,
+		selectedItems,
+		selectableItems,
+		getItemId,
+		onSelectionChange,
+	] );
 
 	if ( bulkActions.length === 0 ) {
 		return null;
@@ -157,9 +207,9 @@ export default function BulkActions( {
 						disabled={ areAllSelected }
 						hideOnClick={ false }
 						onClick={ () => {
-							onSelectionChange( data );
+							onSelectionChange( selectableItems );
 						} }
-						suffix={ data.length }
+						suffix={ numberSelectableItems }
 					>
 						{ __( 'Select all' ) }
 					</DropdownMenuItem>

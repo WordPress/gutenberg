@@ -96,7 +96,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+              uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
               with:
                   ref: ${{ matrix.branch }}
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -147,7 +147,7 @@ jobs:
                   fi
 
             - name: Upload Changelog artifact
-              uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
+              uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
               with:
                   name: changelog ${{ matrix.label }}
                   path: ./changelog.txt
@@ -189,7 +189,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" ./trunk/readme.txt
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+              uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
               with:
                   name: changelog trunk
                   path: trunk
@@ -247,7 +247,7 @@ jobs:
                   sed -i "s/$STABLE_TAG_PLACEHOLDER/Stable tag: $VERSION/g" "$VERSION/readme.txt"
 
             - name: Download Changelog Artifact
-              uses: actions/download-artifact@eaceaf801fd36c7dee90939fad912460b18a1ffe # v4.1.2
+              uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
               with:
                   name: changelog trunk
                   path: ${{ github.event.release.name }}

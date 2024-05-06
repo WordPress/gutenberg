@@ -147,9 +147,9 @@ store( 'directive-each', {
 			state
 				.animalBreeds
 				.forEach( ( { name, breeds } ) => {
-					if ( name === 'Dog') breeds.unshift( 'german shepherd' );
-					if ( name === 'Cat') breeds.unshift( 'maine coon' );
-					if ( name === 'Rat') breeds.unshift( 'satin' );
+					if ( name === 'Dog') {breeds.unshift( 'german shepherd' );}
+					if ( name === 'Cat') {breeds.unshift( 'maine coon' );}
+					if ( name === 'Rat') {breeds.unshift( 'satin' );}
 				} );
 		}
 	}
@@ -157,7 +157,7 @@ store( 'directive-each', {
 
 const html = `
 <div
-	data-wp-interactive='{ "namespace": "directive-each" }'
+	data-wp-interactive="directive-each"
 	data-wp-router-region="navigation-updated list"
 	data-wp-context='{ "list": [ "alpha", "beta", "gamma", "delta" ] }'
 	data-testid="navigation-updated list"

@@ -27,15 +27,20 @@ const Pagination = memo( function Pagination( {
 				justify="end"
 				className="dataviews-pagination"
 			>
-				<HStack justify="flex-start" expanded={ false } spacing={ 2 }>
+				<HStack
+					justify="flex-start"
+					expanded={ false }
+					spacing={ 2 }
+					className="dataviews-pagination__page-selection"
+				>
 					{ createInterpolateElement(
 						sprintf(
 							// translators: %s: Total number of pages.
-							_x( 'Page <CurrenPageControl /> of %s', 'paging' ),
+							_x( 'Page <CurrentPageControl /> of %s', 'paging' ),
 							totalPages
 						),
 						{
-							CurrenPageControl: (
+							CurrentPageControl: (
 								<SelectControl
 									aria-label={ __( 'Current page' ) }
 									value={ view.page }

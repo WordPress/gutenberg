@@ -14,6 +14,7 @@ import {
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
+	isUnmodifiedBlock,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -25,12 +26,15 @@ import deprecated from '@wordpress/deprecated';
  */
 import {
 	retrieveSelectedAttribute,
+	findRichTextAttributeKey,
 	START_OF_SELECTED_AREA,
 } from '../utils/selection';
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
+import { STORE_NAME } from './constants';
+import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -331,36 +335,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
-	const preferredStyleVariations =
-		blockEditorSettings?.__experimentalPreferredStyleVariations?.value ??
-		{};
-	return blocks.map( ( block ) => {
-		const blockName = block.name;
-		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
-			return block;
-		}
-		if ( ! preferredStyleVariations[ blockName ] ) {
-			return block;
-		}
-		const className = block.attributes?.className;
-		if ( className?.includes( 'is-style-' ) ) {
-			return block;
-		}
-		const { attributes = {} } = block;
-		const blockStyle = preferredStyleVariations[ blockName ];
-		return {
-			...block,
-			attributes: {
-				...attributes,
-				className: `${
-					className || ''
-				} is-style-${ blockStyle }`.trim(),
-			},
-		};
-	} );
-}
-
 /* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
@@ -378,10 +352,7 @@ export const replaceBlocks =
 	( { select, dispatch, registry } ) => {
 		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
-		blocks = getBlocksWithDefaultStylesApplied(
-			castArray( blocks ),
-			select.getSettings()
-		);
+		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
 		// Replace is valid if the new blocks can be inserted in the root block.
 		for ( let index = 0; index < blocks.length; index++ ) {
@@ -594,10 +565,7 @@ export const insertBlocks =
 			);
 		}
 
-		blocks = getBlocksWithDefaultStylesApplied(
-			castArray( blocks ),
-			select.getSettings()
-		);
+		blocks = castArray( blocks );
 		const allowedBlocks = [];
 		for ( const block of blocks ) {
 			const isValid = select.canInsertBlockType(
@@ -709,7 +677,9 @@ export const __unstableDeleteSelection =
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
 
-		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
+		if ( selectionAnchor.clientId === selectionFocus.clientId ) {
+			return;
+		}
 
 		// It's not mergeable if there's no rich text selection.
 		if (
@@ -717,8 +687,9 @@ export const __unstableDeleteSelection =
 			! selectionFocus.attributeKey ||
 			typeof selectionAnchor.offset === 'undefined' ||
 			typeof selectionFocus.offset === 'undefined'
-		)
+		) {
 			return false;
+		}
 
 		const anchorRootClientId = select.getBlockRootClientId(
 			selectionAnchor.clientId
@@ -852,24 +823,13 @@ export const __unstableDeleteSelection =
 
 /**
  * Split the current selection.
+ * @param {?Array} blocks
  */
 export const __unstableSplitSelection =
-	() =>
-	( { select, dispatch } ) => {
+	( blocks = [] ) =>
+	( { registry, select, dispatch } ) => {
 		const selectionAnchor = select.getSelectionStart();
 		const selectionFocus = select.getSelectionEnd();
-
-		if ( selectionAnchor.clientId === selectionFocus.clientId ) return;
-
-		// Can't split if the selection is not set.
-		if (
-			! selectionAnchor.attributeKey ||
-			! selectionFocus.attributeKey ||
-			typeof selectionAnchor.offset === 'undefined' ||
-			typeof selectionFocus.offset === 'undefined'
-		)
-			return;
-
 		const anchorRootClientId = select.getBlockRootClientId(
 			selectionAnchor.clientId
 		);
@@ -900,12 +860,91 @@ export const __unstableSplitSelection =
 
 		const selectionA = selectionStart;
 		const selectionB = selectionEnd;
-
 		const blockA = select.getBlock( selectionA.clientId );
 		const blockB = select.getBlock( selectionB.clientId );
+		const blockAType = getBlockType( blockA.name );
+		const blockBType = getBlockType( blockB.name );
+		const attributeKeyA =
+			typeof selectionA.attributeKey === 'string'
+				? selectionA.attributeKey
+				: findRichTextAttributeKey( blockAType );
+		const attributeKeyB =
+			typeof selectionB.attributeKey === 'string'
+				? selectionB.attributeKey
+				: findRichTextAttributeKey( blockBType );
 
-		const htmlA = blockA.attributes[ selectionA.attributeKey ];
-		const htmlB = blockB.attributes[ selectionB.attributeKey ];
+		// Can't split if the selection is not set.
+		if (
+			! attributeKeyA ||
+			! attributeKeyB ||
+			typeof selectionAnchor.offset === 'undefined' ||
+			typeof selectionFocus.offset === 'undefined'
+		) {
+			return;
+		}
+
+		// We can do some short-circuiting if the selection is collapsed.
+		if (
+			selectionA.clientId === selectionB.clientId &&
+			attributeKeyA === attributeKeyB &&
+			selectionA.offset === selectionB.offset
+		) {
+			// If an unmodified default block is selected, replace it. We don't
+			// want to be converting into a default block.
+			if ( blocks.length ) {
+				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+					dispatch.replaceBlocks(
+						[ selectionA.clientId ],
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					return;
+				}
+			}
+
+			// If selection is at the start or end, we can simply insert an
+			// empty block, provided this block has no inner blocks.
+			else if ( ! select.getBlockOrder( selectionA.clientId ).length ) {
+				function createEmpty() {
+					const defaultBlockName = getDefaultBlockName();
+					return select.canInsertBlockType(
+						defaultBlockName,
+						anchorRootClientId
+					)
+						? createBlock( defaultBlockName )
+						: createBlock(
+								select.getBlockName( selectionA.clientId )
+						  );
+				}
+
+				const length = select.getBlockAttributes( selectionA.clientId )[
+					attributeKeyA
+				].length;
+
+				if ( selectionA.offset === 0 && length ) {
+					dispatch.insertBlocks(
+						[ createEmpty() ],
+						select.getBlockIndex( selectionA.clientId ),
+						anchorRootClientId,
+						false
+					);
+					return;
+				}
+
+				if ( selectionA.offset === length ) {
+					dispatch.insertBlocks(
+						[ createEmpty() ],
+						select.getBlockIndex( selectionA.clientId ) + 1,
+						anchorRootClientId
+					);
+					return;
+				}
+			}
+		}
+
+		const htmlA = blockA.attributes[ attributeKeyA ];
+		const htmlB = blockB.attributes[ attributeKeyB ];
 
 		let valueA = create( { html: htmlA } );
 		let valueB = create( { html: htmlB } );
@@ -913,28 +952,127 @@ export const __unstableSplitSelection =
 		valueA = remove( valueA, selectionA.offset, valueA.text.length );
 		valueB = remove( valueB, 0, selectionB.offset );
 
-		dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
-			{
-				// Preserve the original client ID.
-				...blockA,
-				attributes: {
-					...blockA.attributes,
-					[ selectionA.attributeKey ]: toHTMLString( {
-						value: valueA,
-					} ),
-				},
+		let head = {
+			// Preserve the original client ID.
+			...blockA,
+			// If both start and end are the same, should only copy innerBlocks
+			// once.
+			innerBlocks:
+				blockA.clientId === blockB.clientId ? [] : blockA.innerBlocks,
+			attributes: {
+				...blockA.attributes,
+				[ attributeKeyA ]: toHTMLString( { value: valueA } ),
 			},
-			{
-				// Preserve the original client ID.
-				...blockB,
-				attributes: {
-					...blockB.attributes,
-					[ selectionB.attributeKey ]: toHTMLString( {
-						value: valueB,
-					} ),
-				},
+		};
+
+		const tail = {
+			...blockB,
+			// Only preserve the original client ID if the end is different.
+			clientId:
+				blockA.clientId === blockB.clientId
+					? createBlock( blockB.name ).clientId
+					: blockB.clientId,
+			attributes: {
+				...blockB.attributes,
+				[ attributeKeyB ]: toHTMLString( { value: valueB } ),
 			},
-		] );
+		};
+
+		if ( ! blocks.length ) {
+			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+				head,
+				tail,
+			] );
+			return;
+		}
+
+		let selection;
+		const output = [];
+		const clonedBlocks = [ ...blocks ];
+		const firstBlock = clonedBlocks.shift();
+		const headType = getBlockType( head.name );
+		const firstBlocks =
+			headType.merge && firstBlock.name === headType.name
+				? [ firstBlock ]
+				: switchToBlockType( firstBlock, headType.name );
+
+		if ( firstBlocks?.length ) {
+			const first = firstBlocks.shift();
+			head = {
+				...head,
+				attributes: headType.merge( head.attributes, first.attributes ),
+			};
+			output.push( head );
+			selection = {
+				clientId: head.clientId,
+				attributeKey: attributeKeyA,
+				offset: create( { html: head.attributes[ attributeKeyA ] } )
+					.text.length,
+			};
+			clonedBlocks.unshift( ...firstBlocks );
+		} else {
+			if ( ! isUnmodifiedBlock( head ) ) {
+				output.push( head );
+			}
+			output.push( firstBlock );
+		}
+
+		const lastBlock = clonedBlocks.pop();
+		const tailType = getBlockType( tail.name );
+
+		if ( clonedBlocks.length ) {
+			output.push( ...clonedBlocks );
+		}
+
+		if ( lastBlock ) {
+			const lastBlocks =
+				tailType.merge && tailType.name === lastBlock.name
+					? [ lastBlock ]
+					: switchToBlockType( lastBlock, tailType.name );
+
+			if ( lastBlocks?.length ) {
+				const last = lastBlocks.pop();
+				output.push( {
+					...tail,
+					attributes: tailType.merge(
+						last.attributes,
+						tail.attributes
+					),
+				} );
+				output.push( ...lastBlocks );
+				selection = {
+					clientId: tail.clientId,
+					attributeKey: attributeKeyB,
+					offset: create( {
+						html: last.attributes[ attributeKeyB ],
+					} ).text.length,
+				};
+			} else {
+				output.push( lastBlock );
+				if ( ! isUnmodifiedBlock( tail ) ) {
+					output.push( tail );
+				}
+			}
+		} else if ( ! isUnmodifiedBlock( tail ) ) {
+			output.push( tail );
+		}
+
+		registry.batch( () => {
+			dispatch.replaceBlocks(
+				select.getSelectedBlockClientIds(),
+				output,
+				output.length - 1,
+				0
+			);
+			if ( selection ) {
+				dispatch.selectionChange(
+					selection.clientId,
+					selection.attributeKey,
+					selection.offset,
+					selection.offset
+				);
+			}
+		} );
 	};
 
 /**
@@ -960,14 +1098,14 @@ export const __unstableExpandSelection =
 export const mergeBlocks =
 	( firstBlockClientId, secondBlockClientId ) =>
 	( { registry, select, dispatch } ) => {
-		const blocks = [ firstBlockClientId, secondBlockClientId ];
-		dispatch( { type: 'MERGE_BLOCKS', blocks } );
-
-		const [ clientIdA, clientIdB ] = blocks;
+		const clientIdA = firstBlockClientId;
+		const clientIdB = secondBlockClientId;
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		if ( ! blockAType ) return;
+		if ( ! blockAType ) {
+			return;
+		}
 
 		const blockB = select.getBlock( clientIdB );
 
@@ -1470,16 +1608,46 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select } ) => {
-		// When switching to zoom-out mode, we need to select the root block
+	( { dispatch, select, registry } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
 		if ( mode === 'zoom-out' ) {
 			const firstSelectedClientId = select.getBlockSelectionStart();
-			if ( firstSelectedClientId ) {
-				dispatch.selectBlock(
-					select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					)
+			const allBlocks = select.getBlocks();
+
+			const { sectionRootClientId } = unlock(
+				registry.select( STORE_NAME ).getSettings()
+			);
+			if ( sectionRootClientId ) {
+				const sectionClientIds =
+					select.getBlockOrder( sectionRootClientId );
+				const lastSectionClientId =
+					sectionClientIds[ sectionClientIds.length - 1 ];
+				if ( sectionClientIds ) {
+					if ( firstSelectedClientId ) {
+						const parents = select.getBlockParents(
+							firstSelectedClientId
+						);
+						const firstSectionClientId = parents.find( ( parent ) =>
+							sectionClientIds.includes( parent )
+						);
+						if ( firstSectionClientId ) {
+							dispatch.selectBlock( firstSectionClientId );
+						} else {
+							dispatch.selectBlock( lastSectionClientId );
+						}
+					} else {
+						dispatch.selectBlock( lastSectionClientId );
+					}
+				}
+			} else if ( firstSelectedClientId ) {
+				const rootClientId = select.getBlockHierarchyRootClientId(
+					firstSelectedClientId
 				);
+				dispatch.selectBlock( rootClientId );
+			} else {
+				// If there's no block selected and no sectionRootClientId, select the last root block.
+				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
+				dispatch.selectBlock( lastRootBlock?.clientId );
 			}
 		}
 
@@ -1575,7 +1743,7 @@ export const duplicateBlocks =
 	};
 
 /**
- * Action that inserts an empty block before a given block.
+ * Action that inserts a default block before a given block.
  *
  * @param {string} clientId
  */
@@ -1591,16 +1759,34 @@ export const insertBeforeBlock =
 			return;
 		}
 
-		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex
-		);
+		const blockIndex = select.getBlockIndex( clientId );
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
+		}
+
+		const copiedAttributes = {};
+		if ( directInsertBlock.attributesToCopy ) {
+			const attributes = select.getBlockAttributes( clientId );
+			directInsertBlock.attributesToCopy.forEach( ( key ) => {
+				if ( attributes[ key ] ) {
+					copiedAttributes[ key ] = attributes[ key ];
+				}
+			} );
+		}
+
+		const block = createBlock( directInsertBlock.name, {
+			...directInsertBlock.attributes,
+			...copiedAttributes,
+		} );
+		return dispatch.insertBlock( block, blockIndex, rootClientId );
 	};
 
 /**
- * Action that inserts an empty block after a given block.
+ * Action that inserts a default block after a given block.
  *
  * @param {string} clientId
  */
@@ -1616,12 +1802,34 @@ export const insertAfterBlock =
 			return;
 		}
 
-		const firstSelectedIndex = select.getBlockIndex( clientId );
-		return dispatch.insertDefaultBlock(
-			{},
-			rootClientId,
-			firstSelectedIndex + 1
-		);
+		const blockIndex = select.getBlockIndex( clientId );
+		const directInsertBlock = rootClientId
+			? select.getDirectInsertBlock( rootClientId )
+			: null;
+
+		if ( ! directInsertBlock ) {
+			return dispatch.insertDefaultBlock(
+				{},
+				rootClientId,
+				blockIndex + 1
+			);
+		}
+
+		const copiedAttributes = {};
+		if ( directInsertBlock.attributesToCopy ) {
+			const attributes = select.getBlockAttributes( clientId );
+			directInsertBlock.attributesToCopy.forEach( ( key ) => {
+				if ( attributes[ key ] ) {
+					copiedAttributes[ key ] = attributes[ key ];
+				}
+			} );
+		}
+
+		const block = createBlock( directInsertBlock.name, {
+			...directInsertBlock.attributes,
+			...copiedAttributes,
+		} );
+		return dispatch.insertBlock( block, blockIndex + 1, rootClientId );
 	};
 
 /**

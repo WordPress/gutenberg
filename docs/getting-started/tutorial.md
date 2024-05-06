@@ -373,8 +373,8 @@ Save the file, and you can now move on to the Editor.
 
 Open the `edit.js` file. You will need to accomplish two tasks.
 
-Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes
-Update the block to display the correct content depending on the defined attributes
+- Add a user interface that allows the user to enter a starting year, toggle the functionality on or off, and store these settings as attributes.
+- Update the block to display the correct content depending on the defined attributes.
 
 #### Adding the user interface
 

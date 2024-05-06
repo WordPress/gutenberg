@@ -24,11 +24,11 @@ Be sure that the parent element containing `<ResizeTooltip />` has the `position
 -   `bottom` (Default)
 -   `corner`
 
-##### `bottom`
+#### `bottom`
 
 The `bottom` position (default) renders the dimensions label at the bottom-center of the (parent) element.
 
-##### `corner`
+#### `corner`
 
 The `corner` position renders the dimensions label in the top-right corner of the (parent) element.
 

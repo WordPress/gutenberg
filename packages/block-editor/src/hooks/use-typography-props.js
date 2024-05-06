@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,10 +13,7 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
  */
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from '../components/global-styles/typography-utils';
+import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 import { unlock } from '../lock-unlock';
 
 /*
@@ -36,14 +33,11 @@ import { unlock } from '../lock-unlock';
 export function getTypographyClassesAndStyles( attributes, settings ) {
 	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
-	const fluidTypographySettings =
-		getFluidTypographyOptionsFromSettings( settings );
-
 	typographyStyles = {
 		...typographyStyles,
 		fontSize: getTypographyFontSizeValue(
 			{ size: attributes?.style?.typography?.fontSize },
-			fluidTypographySettings
+			settings
 		),
 	};
 
@@ -51,9 +45,12 @@ export function getTypographyClassesAndStyles( attributes, settings ) {
 	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
-
-	const className = classnames(
+	const textAlignClassName = !! attributes?.style?.typography?.textAlign
+		? `has-text-align-${ attributes?.style?.typography?.textAlign }`
+		: '';
+	const className = clsx(
 		fontFamilyClassName,
+		textAlignClassName,
 		getFontSizeClass( attributes?.fontSize )
 	);
 

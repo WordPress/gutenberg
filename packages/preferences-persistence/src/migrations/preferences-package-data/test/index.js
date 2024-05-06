@@ -20,9 +20,6 @@ const input = {
 		fullscreenMode: false,
 		hiddenBlockTypes: [ 'core/audio', 'core/cover' ],
 		editorMode: 'visual',
-		preferredStyleVariations: {
-			'core/quote': 'large',
-		},
 		inactivePanels: [],
 		openPanels: [ 'post-status' ],
 		pinnedItems: {
@@ -53,6 +50,9 @@ describe( 'convertPreferencesPackageData', () => {
 		    "openPanels": [
 		      "post-status",
 		    ],
+		    "pinnedItems": {
+		      "my-sidebar-plugin/title-sidebar": false,
+		    },
 		  },
 		  "core/customize-widgets": {
 		    "fixedToolbar": true,
@@ -60,16 +60,9 @@ describe( 'convertPreferencesPackageData', () => {
 		  },
 		  "core/edit-post": {
 		    "fullscreenMode": false,
-		    "pinnedItems": {
-		      "my-sidebar-plugin/title-sidebar": false,
-		    },
-		    "preferredStyleVariations": {
-		      "core/quote": "large",
-		    },
 		    "welcomeGuide": false,
 		  },
 		  "core/edit-site": {
-		    "isComplementaryAreaVisible": true,
 		    "welcomeGuide": false,
 		    "welcomeGuideStyles": false,
 		  },

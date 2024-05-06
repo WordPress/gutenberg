@@ -16,8 +16,8 @@ import {
 	resetNamespace,
 } from './hooks';
 
-const isObject = ( item: unknown ): boolean =>
-	!! item && typeof item === 'object' && ! Array.isArray( item );
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	item && typeof item === 'object' && item.constructor === Object;
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -26,27 +26,20 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) Object.assign( target, { [ key ]: {} } );
+				if ( ! target[ key ] ) {
+					target[ key ] = {};
+				}
 				deepMerge( target[ key ], source[ key ] );
 			} else {
-				Object.assign( target, { [ key ]: source[ key ] } );
+				try {
+					target[ key ] = source[ key ];
+				} catch ( e ) {
+					// Assignemnts fail for properties that are only getters.
+					// When that's the case, the assignment is simply ignored.
+				}
 			}
 		}
 	}
-};
-
-const parseInitialData = () => {
-	const storeTag = document.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
-	);
-	if ( storeTag?.textContent ) {
-		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
-	}
-	return {};
 };
 
 export const stores = new Map();
@@ -100,13 +93,13 @@ const handlers = {
 			}
 		}
 
-		const result = Reflect.get( target, key, receiver );
+		const result = Reflect.get( target, key );
 
 		// Check if the proxy is the store root and no key with that name exist. In
 		// that case, return an empty object for the requested key.
 		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
 			const obj = {};
-			Reflect.set( target, key, obj, receiver );
+			Reflect.set( target, key, obj );
 			return proxify( obj, ns );
 		}
 
@@ -118,7 +111,7 @@ const handlers = {
 				const scope = getScope();
 				const gen: Generator< any > = result( ...args );
 
-				let value: any;
+				let value: unknown;
 				let it: IteratorResult< any >;
 
 				while ( true ) {
@@ -134,10 +127,17 @@ const handlers = {
 					try {
 						value = await it.value;
 					} catch ( e ) {
+						setNamespace( ns );
+						setScope( scope );
 						gen.throw( e );
+					} finally {
+						resetScope();
+						resetNamespace();
 					}
 
-					if ( it.done ) break;
+					if ( it.done ) {
+						break;
+					}
 				}
 
 				return value;
@@ -159,9 +159,15 @@ const handlers = {
 		}
 
 		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) ) return proxify( result, ns );
+		if ( isObject( result ) ) {
+			return proxify( result, ns );
+		}
 
 		return result;
+	},
+	// Prevents passing the current proxy as the receiver to the deepSignal.
+	set( target: any, key: string, value: any ) {
+		return Reflect.set( target, key, value );
 	},
 };
 
@@ -202,7 +208,7 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
-const universalUnlock =
+export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
 /**
@@ -235,7 +241,7 @@ const universalUnlock =
  * the store by using directives in the HTML, e.g.:
  *
  * ```html
- * <div data-wp-interactive='{ "namespace": "counter" }'>
+ * <div data-wp-interactive="counter">
  *   <button
  *     data-wp-text="state.double"
  *     data-wp-on--click="actions.increment"
@@ -274,7 +280,10 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		const rawStore = { state: deepSignal( state ), ...block };
+		const rawStore = {
+			state: deepSignal( isObject( state ) ? state : {} ),
+			...block,
+		};
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
@@ -310,15 +319,36 @@ export function store(
 	return stores.get( namespace );
 }
 
+export const parseInitialData = ( dom = document ) => {
+	const storeTag = dom.querySelector(
+		`script[type="application/json"]#wp-interactivity-data`
+	);
+	if ( storeTag?.textContent ) {
+		try {
+			return JSON.parse( storeTag.textContent );
+		} catch ( e ) {
+			// Do nothing.
+		}
+	}
+	return {};
+};
+
+export const populateInitialData = ( data?: {
+	state?: Record< string, unknown >;
+	config?: Record< string, unknown >;
+} ) => {
+	if ( isObject( data?.state ) ) {
+		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+			store( namespace, { state }, { lock: universalUnlock } );
+		} );
+	}
+	if ( isObject( data?.config ) ) {
+		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+			storeConfigs.set( namespace, config );
+		} );
+	}
+};
+
 // Parse and populate the initial state and config.
 const data = parseInitialData();
-if ( isObject( data?.state ) ) {
-	Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
-		store( namespace, { state }, { lock: universalUnlock } );
-	} );
-}
-if ( isObject( data?.config ) ) {
-	Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
-		storeConfigs.set( namespace, config );
-	} );
-}
+populateInitialData( data );

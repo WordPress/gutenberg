@@ -244,7 +244,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$theme_json_data = static::read_json_file( $theme_json_file );
 				$theme_json_data = static::translate( $theme_json_data, $wp_theme->get( 'TextDomain' ) );
 			} else {
-				$theme_json_data = array();
+				$theme_json_data = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 			}
 
 			/**
@@ -319,6 +319,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 			$theme_support_data['settings']['color']['defaultGradients'] = $default_gradients;
 
+			if ( ! isset( $theme_support_data['settings']['shadow'] ) ) {
+				$theme_support_data['settings']['shadow'] = array();
+			}
+			/*
+			 * Shadow presets are explicitly disabled for classic themes until a
+			 * decision is made for whether the default presets should match the
+			 * other presets or if they should be disabled by default in classic
+			 * themes. See https://github.com/WordPress/gutenberg/issues/59989.
+			 */
+			$theme_support_data['settings']['shadow']['defaultPresets'] = false;
+
 			// Allow themes to enable all border settings via theme_support.
 			if ( current_theme_supports( 'border' ) ) {
 				$theme_support_data['settings']['border']['color']  = true;
@@ -339,15 +350,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				);
 			}
 
-			// BEGIN EXPERIMENTAL.
 			// Allow themes to enable appearance tools via theme_support.
-			// This feature was backported for WordPress 6.2 as of https://core.trac.wordpress.org/ticket/56487
-			// and then reverted as of https://core.trac.wordpress.org/ticket/57649
-			// Not to backport until the issues are resolved.
 			if ( current_theme_supports( 'appearance-tools' ) ) {
 				$theme_support_data['settings']['appearanceTools'] = true;
 			}
-			// END EXPERIMENTAL.
 		}
 		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
 		$with_theme_supports->merge( static::$theme );
@@ -369,7 +375,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return static::$blocks;
 		}
 
-		$config = array( 'version' => 2 );
+		$config = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA );
 		foreach ( $blocks as $block_name => $block_type ) {
 			if ( isset( $block_type->supports['__experimentalStyle'] ) ) {
 				$config['styles']['blocks'][ $block_name ] = static::remove_json_comments( $block_type->supports['__experimentalStyle'] );
@@ -538,14 +544,17 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
 				$decoded_data['isGlobalStylesUserThemeJSON']
 			) {
-				unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
 				$config = $decoded_data;
 			}
 		}
 
 		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
-		$theme_json   = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
-		$config       = $theme_json->get_data();
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+		$config     = $theme_json->get_data();
+
+		// Needs to be set for schema migrations of user data.
+		$config['isGlobalStylesUserThemeJSON'] = true;
+
 		static::$user = new WP_Theme_JSON_Gutenberg( $config, 'custom' );
 
 		return static::$user;

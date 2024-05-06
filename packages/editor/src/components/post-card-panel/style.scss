@@ -1,0 +1,28 @@
+.editor-post-card-panel {
+	&__content {
+		flex-grow: 1;
+	}
+
+	&__title {
+		width: 100%;
+
+		&.editor-post-card-panel__title {
+			margin: 3px 0 0 0;
+		}
+	}
+
+	&__icon {
+		flex: 0 0 $icon-size;
+		width: $icon-size;
+		height: $icon-size;
+	}
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	&.has-description &__header {
+		margin-bottom: $grid-unit-10;
+	}
+}

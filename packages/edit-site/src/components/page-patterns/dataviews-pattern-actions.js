@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { paramCase as kebabCase } from 'change-case';
+import { downloadZip } from 'client-zip';
 
 /**
  * WordPress dependencies
  */
-import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -22,6 +22,7 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -37,25 +38,55 @@ import {
 } from '../../utils/constants';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
-export const exportJSONaction = {
-	id: 'export-pattern',
-	label: __( 'Export as JSON' ),
-	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
-	callback: ( [ item ] ) => {
-		const json = {
+function getJsonFromItem( item ) {
+	return JSON.stringify(
+		{
 			__file: item.type,
 			title: item.title || item.name,
 			content: item.patternPost.content.raw,
 			syncStatus: item.patternPost.wp_pattern_sync_status,
-		};
+		},
+		null,
+		2
+	);
+}
+
+export const exportJSONaction = {
+	id: 'export-pattern',
+	label: __( 'Export as JSON' ),
+	supportsBulk: true,
+	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
+	callback: async ( items ) => {
+		if ( items.length === 1 ) {
+			return downloadBlob(
+				`${ kebabCase( items[ 0 ].title || items[ 0 ].name ) }.json`,
+				getJsonFromItem( items[ 0 ] ),
+				'application/json'
+			);
+		}
+		const nameCount = {};
+		const filesToZip = items.map( ( item ) => {
+			const name = kebabCase( item.title || item.name );
+			nameCount[ name ] = ( nameCount[ name ] || 0 ) + 1;
+			return {
+				name: `${
+					name +
+					( nameCount[ name ] > 1
+						? '-' + ( nameCount[ name ] - 1 )
+						: '' )
+				}.json`,
+				lastModified: new Date(),
+				input: getJsonFromItem( item ),
+			};
+		} );
 		return downloadBlob(
-			`${ kebabCase( item.title || item.name ) }.json`,
-			JSON.stringify( json, null, 2 ),
-			'application/json'
+			__( 'patterns-export' ) + '.zip',
+			await downloadZip( filesToZip ).blob(),
+			'application/zip'
 		);
 	},
 };
@@ -167,7 +198,7 @@ export const deleteAction = {
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
 			const promiseResult = await Promise.allSettled(
@@ -295,7 +326,7 @@ export const deleteAction = {
 
 export const resetAction = {
 	id: 'reset-action',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
@@ -308,9 +339,7 @@ export const resetAction = {
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
+					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -320,7 +349,7 @@ export const resetAction = {
 						variant="primary"
 						onClick={ () => removeTemplate( item ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -335,9 +364,9 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const history = useHistory();
 		function onPatternSuccess( { pattern } ) {
@@ -371,11 +400,11 @@ export const duplicateTemplatePartAction = {
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const { createSuccessNotice } = useDispatch( noticesStore );
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const history = useHistory();
-		async function onTemplatePartSuccess( templatePart ) {
+		function onTemplatePartSuccess( templatePart ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.

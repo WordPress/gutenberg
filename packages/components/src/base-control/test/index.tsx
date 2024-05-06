@@ -14,7 +14,7 @@ const MyBaseControl = ( props: Omit< BaseControlProps, 'children' > ) => {
 	const { baseControlProps, controlProps } = useBaseControlProps( props );
 
 	return (
-		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom={ true }>
+		<BaseControl { ...baseControlProps } __nextHasNoMarginBottom>
 			<textarea { ...controlProps } />
 		</BaseControl>
 	);

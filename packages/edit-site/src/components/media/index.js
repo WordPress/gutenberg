@@ -8,18 +8,16 @@ function Media( { id, size = [ 'large', 'medium', 'thumbnail' ], ...props } ) {
 	const currentSize = size.find(
 		( s ) => !! media?.media_details?.sizes[ s ]
 	);
-	const mediaDetails = media?.media_details?.sizes[ currentSize ];
-	if ( ! mediaDetails ) {
+
+	const mediaUrl =
+		media?.media_details?.sizes[ currentSize ]?.source_url ||
+		media?.source_url;
+
+	if ( ! mediaUrl ) {
 		return null;
 	}
 
-	return (
-		<img
-			{ ...props }
-			src={ mediaDetails.source_url }
-			alt={ media.alt_text }
-		/>
-	);
+	return <img { ...props } src={ mediaUrl } alt={ media.alt_text } />;
 }
 
 export default Media;

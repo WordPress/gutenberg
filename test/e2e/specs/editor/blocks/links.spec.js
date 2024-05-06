@@ -921,6 +921,51 @@ test.describe( 'Links', () => {
 	} );
 
 	test.describe( 'Editing link text', () => {
+		test( 'should allow editing text underneath popover when activated via mouse', async ( {
+			page,
+			editor,
+			LinkUtils,
+		} ) => {
+			await LinkUtils.createLink();
+
+			// Click on some other part of the text to move the caret.
+			await editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.click();
+
+			// Click on the link to activate the Link UI.
+			const richTextLink = editor.canvas.getByRole( 'link', {
+				name: 'Gutenberg',
+			} );
+
+			await richTextLink.click();
+
+			// Check focus remains in the RichText.
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toBeFocused();
+
+			// Type to modify the link text.
+			await page.keyboard.type( ' is awesome' );
+
+			// expect link UI to be visible
+			const linkPopover = LinkUtils.getLinkPopover();
+
+			await expect( linkPopover ).toBeVisible();
+
+			// Press "Edit" on Link UI
+			await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+
+			// Check that the Link Text input reflects the change to the text
+			// made in the RichText.
+			const textInput = linkPopover.getByLabel( 'Text', { exact: true } );
+			await expect( textInput ).toHaveValue( 'Gute is awesomenberg' );
+		} );
+
 		test( 'should allow for modification of link text via the Link UI', async ( {
 			page,
 			pageUtils,
@@ -1026,8 +1071,8 @@ test.describe( 'Links', () => {
 			pageUtils,
 			editor,
 		} ) => {
-			const textToSelect = `\u2003\u2003 spaces\u2003 `;
-			const textWithWhitespace = `Text with leading and trailing       spaces    `;
+			const textToSelect = `         spaces     `;
+			const textWithWhitespace = `Text with leading and trailing${ textToSelect }`;
 
 			// Create a block with some text.
 			await editor.insertBlock( {

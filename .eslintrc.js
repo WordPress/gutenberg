@@ -76,6 +76,11 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
 ];
 
 module.exports = {
@@ -97,6 +102,7 @@ module.exports = {
 	},
 	rules: {
 		'jest/expect-expect': 'off',
+		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/is-gutenberg-plugin': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
@@ -354,20 +360,25 @@ module.exports = {
 		},
 		{
 			files: [ 'packages/components/src/**' ],
-			excludedFiles: [ 'packages/components/src/utils/colors-values.js' ],
+			excludedFiles: [
+				'packages/components/src/utils/colors-values.js',
+				'packages/components/src/theme/**',
+			],
 			rules: {
 				'no-restricted-syntax': [
 					'error',
 					{
-						selector: 'Literal[value=/--wp-admin-theme-/]',
+						selector:
+							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 						message:
 							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 					{
 						selector:
-							'TemplateElement[value.cooked=/--wp-admin-theme-/]',
+							// Allow overriding definitions, but not access with var()
+							':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 						message:
-							'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+							'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
 					},
 				],
 			},
@@ -395,6 +406,24 @@ module.exports = {
 								name: '@wordpress/core-data',
 								message:
 									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
 							},
 						],
 					},

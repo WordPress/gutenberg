@@ -1,55 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	useBlockEditingMode,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useSelect, useRegistry } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
-/**
- * Internal dependencies
- */
-import { PAGE_CONTENT_BLOCK_TYPES } from './constants';
-
-function DisableBlock( { clientId } ) {
-	const isDescendentOfQueryLoop = useSelect(
-		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
-			return (
-				getBlockParentsByBlockName( clientId, 'core/query' ).length !==
-				0
-			);
-		},
-		[ clientId ]
-	);
-	const mode = isDescendentOfQueryLoop ? undefined : 'contentOnly';
-	const { setBlockEditingMode, unsetBlockEditingMode } =
-		useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( mode ) {
-			setBlockEditingMode( clientId, mode );
-			return () => {
-				unsetBlockEditingMode( clientId );
-			};
-		}
-	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
-}
+const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
+	'core/post-title',
+	'core/post-featured-image',
+	'core/post-content',
+	'core/template-part',
+] );
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	useBlockEditingMode( 'disabled' );
-	const clientIds = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlocksByName(
-			PAGE_CONTENT_BLOCK_TYPES
+	// Note that there are two separate subscription because the result for each
+	// returns a new array.
+	const contentOnlyIds = useSelect( ( select ) => {
+		const { getBlocksByName, getBlockParents, getBlockName } =
+			select( blockEditorStore );
+		return getBlocksByName( CONTENT_ONLY_BLOCKS ).filter( ( clientId ) =>
+			getBlockParents( clientId ).every( ( parentClientId ) => {
+				const parentBlockName = getBlockName( parentClientId );
+				return (
+					// Ignore descendents of the query block.
+					parentBlockName !== 'core/query' &&
+					// Enable only the top-most block.
+					! CONTENT_ONLY_BLOCKS.includes( parentBlockName )
+				);
+			} )
+		);
+	}, [] );
+	const disabledIds = useSelect( ( select ) => {
+		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
+		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
+			( clientId ) => getBlockOrder( clientId )
 		);
 	}, [] );
 
-	return clientIds.map( ( clientId ) => {
-		return <DisableBlock key={ clientId } clientId={ clientId } />;
-	} );
+	const registry = useRegistry();
+
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		registry.batch( () => {
+			setBlockEditingMode( '', 'disabled' );
+			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of disabledIds ) {
+				setBlockEditingMode( clientId, 'disabled' );
+			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				unsetBlockEditingMode( '' );
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of disabledIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+			} );
+		};
+	}, [ contentOnlyIds, disabledIds, registry ] );
+
+	return null;
 }

@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,10 +57,8 @@ export function UnforwardedInputControl(
 		...restProps
 	} = useDeprecated36pxDefaultSizeProp< InputControlProps >( props );
 
-	const [ isFocused, setIsFocused ] = useState( false );
-
 	const id = useUniqueId( idProp );
-	const classes = classNames( 'components-input-control', className );
+	const classes = clsx( 'components-input-control', className );
 
 	const draftHookProps = useDraft( {
 		value,
@@ -87,7 +85,6 @@ export function UnforwardedInputControl(
 				gap={ 3 }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFocused={ isFocused }
 				justify="left"
 				label={ label }
 				labelPosition={ labelPosition }
@@ -103,14 +100,12 @@ export function UnforwardedInputControl(
 					className="components-input-control__input"
 					disabled={ disabled }
 					id={ id }
-					isFocused={ isFocused }
 					isPressEnterToChange={ isPressEnterToChange }
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
 					paddingInlineStart={ prefix ? space( 2 ) : undefined }
 					paddingInlineEnd={ suffix ? space( 2 ) : undefined }
 					ref={ ref }
-					setIsFocused={ setIsFocused }
 					size={ size }
 					stateReducer={ stateReducer }
 					{ ...draftHookProps }
@@ -126,7 +121,7 @@ export function UnforwardedInputControl(
  *
  * ```jsx
  * import { __experimentalInputControl as InputControl } from '@wordpress/components';
- * import { useState } from '@wordpress/compose';
+ * import { useState } from 'react';
  *
  * const Example = () => {
  *   const [ value, setValue ] = useState( '' );

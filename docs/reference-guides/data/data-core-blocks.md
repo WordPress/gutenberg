@@ -504,54 +504,6 @@ _Returns_
 
 -   `string?`: Name of the block for handling the grouping of blocks.
 
-### getHookedBlocks
-
-Returns the hooked blocks for a given anchor block.
-
-Given an anchor block name, returns an object whose keys are relative positions, and whose values are arrays of block names that are hooked to the anchor block at that relative position.
-
-_Usage_
-
-```js
-import { store as blocksStore } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
-
-const ExampleComponent = () => {
-	const hookedBlockNames = useSelect(
-		( select ) =>
-			select( blocksStore ).getHookedBlocks( 'core/navigation' ),
-		[]
-	);
-
-	return (
-		<ul>
-			{ Object.keys( hookedBlockNames ).length &&
-				Object.keys( hookedBlockNames ).map( ( relativePosition ) => (
-					<li key={ relativePosition }>
-						{ relativePosition }>
-						<ul>
-							{ hookedBlockNames[ relativePosition ].map(
-								( hookedBlock ) => (
-									<li key={ hookedBlock }>{ hookedBlock }</li>
-								)
-							) }
-						</ul>
-					</li>
-				) ) }
-		</ul>
-	);
-};
-```
-
-_Parameters_
-
--   _state_ `Object`: Data state.
--   _blockName_ `string`: Anchor block type name.
-
-_Returns_
-
--   `Object`: Lists of hooked block names for each relative position.
-
 ### getUnregisteredFallbackBlockName
 
 Returns the name of the block for handling unregistered blocks.

@@ -143,7 +143,7 @@ export function SidebarNavigationScreenWrapper( {
 		<SidebarNavigationScreen
 			title={ title || __( 'Navigation' ) }
 			actions={ actions }
-			description={ description || __( 'Manage your Navigation menus.' ) }
+			description={ description || __( 'Manage your Navigation Menus.' ) }
 			content={ children }
 		/>
 	);
@@ -152,7 +152,7 @@ export function SidebarNavigationScreenWrapper( {
 const NavMenuItem = ( { postId, ...props } ) => {
 	const linkInfo = useLink( {
 		postId,
-		postType: NAVIGATION_POST_TYPE,
+		path: '/navigation',
 	} );
 	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
 };

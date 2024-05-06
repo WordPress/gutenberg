@@ -82,7 +82,7 @@ const BottomSheetTextControl = ( {
 						label={ label }
 						onChangeText={ ( text ) => onChange( text ) }
 						defaultValue={ initialValue }
-						multiline={ true }
+						multiline
 						placeholder={ placeholder }
 						placeholderTextColor={ '#87a6bc' }
 						style={ textEditorStyle }

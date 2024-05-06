@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { render, screen, waitFor, within } from '@testing-library/react';
-import { press, click } from '@ariakit/test';
+import { press, click, sleep } from '@ariakit/test';
 
 /**
  * Internal dependencies
@@ -39,6 +39,7 @@ describe( 'AlignmentMatrixControl', () => {
 		it( 'should be centered by default', async () => {
 			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
 
+			await sleep();
 			await press.Tab();
 
 			expect( getCell( 'center center' ) ).toHaveFocus();
@@ -109,6 +110,7 @@ describe( 'AlignmentMatrixControl', () => {
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
+					await sleep();
 					await press.Tab();
 					await press[ keyRef ]();
 

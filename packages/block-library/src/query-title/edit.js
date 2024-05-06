@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ export default function QueryTitleEdit( {
 
 	const TagName = `h${ level }`;
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-query-title__placeholder', {
+		className: clsx( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

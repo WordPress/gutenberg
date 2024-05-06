@@ -22,7 +22,7 @@ export default function TemplatePartNavigationMenu( { id } ) {
 			<Heading
 				className="edit-site-sidebar-navigation-screen-template-part-navigation-menu__title"
 				size="11"
-				upperCase={ true }
+				upperCase
 				weight={ 500 }
 			>
 				{ title || __( 'Navigation' ) }

@@ -51,11 +51,14 @@ const registerGutenberg = ( {
 			// Initialize editor
 			this.editorComponent = setup();
 
+			// TODO: Reinstate the optional setup configuration once we identify why
+			// it throws an error after the latest RN 0.73 upgrade.
+			// https://github.com/facebook/metro/blob/877933ddc03672a00214d26afe620b79479d6489/packages/metro-file-map/src/lib/TreeFS.js#L417
 			// Apply optional setup configuration, enabling modification via hooks.
-			if ( __DEV__ && typeof require.context === 'function' ) {
-				const req = require.context( './', false, /setup-local\.js$/ );
-				req.keys().forEach( ( key ) => req( key ).default() );
-			}
+			// if ( __DEV__ && typeof require.context === 'function' ) {
+			// 	const req = require.context( './', false, /setup-local\.js$/ );
+			// 	req.keys().forEach( ( key ) => req( key ).default() );
+			// }
 
 			// Dispatch pre-render hooks.
 			doAction( 'native.pre-render', parentProps );

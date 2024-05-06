@@ -110,7 +110,7 @@ export class PostPublishPanel extends Component {
 						</PostPublishPanelPrepublish>
 					) }
 					{ isPostPublish && (
-						<PostPublishPanelPostpublish focusOnMount={ true }>
+						<PostPublishPanelPostpublish focusOnMount>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }

@@ -138,3 +138,10 @@ The optional custom text to display as the confirmation button's label
 -   Default: "Cancel"
 
 The optional custom text to display as the cancellation button's label
+
+## Best practices
+
+The ConfirmDialog component should:
+
+-   Be used only for short confirmation messages where a cancel and confirm actions are provided.
+-   Use a descriptive text for the _confirm_ button. Default is "OK".

@@ -1,6 +1,6 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"$schema": "../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
@@ -236,6 +236,7 @@
 		},
 		"typography": {
 			"customFontSize": true,
+			"defaultFontSizes": true,
 			"dropCap": true,
 			"fontSizes": [
 				{
@@ -263,6 +264,7 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": false,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true,
@@ -297,7 +299,12 @@
 					"background": "#32373c"
 				},
 				"spacing": {
-					"padding": "calc(0.667em + 2px) calc(1.333em + 2px)"
+					"padding": {
+						"top": "calc(0.667em + 2px)",
+						"right": "calc(1.333em + 2px)",
+						"bottom": "calc(0.667em + 2px)",
+						"left": "calc(1.333em + 2px)"
+					}
 				},
 				"typography": {
 					"fontSize": "inherit",

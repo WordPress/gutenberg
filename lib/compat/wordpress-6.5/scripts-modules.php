@@ -17,6 +17,8 @@ if ( ! function_exists( 'wp_script_modules' ) ) {
 	 *
 	 * @since 6.5.0
 	 *
+	 * @global WP_Script_Modules $wp_script_modules
+	 *
 	 * @return WP_Script_Modules The main WP_Script_Modules instance.
 	 */
 	function wp_script_modules(): WP_Script_Modules {
@@ -205,5 +207,18 @@ if ( ! function_exists( 'wp_dequeue_script_module' ) ) {
 	 */
 	function wp_dequeue_script_module( string $id ) {
 		wp_script_modules()->dequeue( $id );
+	}
+}
+
+if ( ! function_exists( 'wp_deregister_script_module' ) ) {
+	/**
+	 * Deregisters the script module.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param string $id The identifier of the script module.
+	 */
+	function wp_deregister_script_module( string $id ) {
+		wp_script_modules()->deregister( $id );
 	}
 }

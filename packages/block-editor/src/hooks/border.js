@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,9 +18,14 @@ import { useSelect } from '@wordpress/data';
 import { getColorClassName } from '../components/colors';
 import InspectorControls from '../components/inspector-controls';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	cleanEmptyObject,
+	shouldSkipSerialization,
+	useBlockSettings,
+} from './utils';
 import {
 	useHasBorderPanel,
+	useHasBorderPanelControls,
 	BorderPanel as StylesBorderPanel,
 } from '../components/global-styles';
 import { store as blockEditorStore } from '../store';
@@ -220,14 +225,21 @@ export function hasShadowSupport( blockName ) {
 	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
 }
 
-export function getBorderPanelLabel( {
+export function useBorderPanelLabel( {
 	blockName,
 	hasBorderControl,
 	hasShadowControl,
 } = {} ) {
+	const settings = useBlockSettings( blockName );
+	const controls = useHasBorderPanelControls( settings );
+
 	if ( ! hasBorderControl && ! hasShadowControl && blockName ) {
-		hasBorderControl = hasBorderSupport( blockName );
-		hasShadowControl = hasShadowSupport( blockName );
+		hasBorderControl =
+			controls?.hasBorderColor ||
+			controls?.hasBorderStyle ||
+			controls?.hasBorderWidth ||
+			controls?.hasBorderRadius;
+		hasShadowControl = controls?.hasShadow;
 	}
 
 	if ( hasBorderControl && hasShadowControl ) {
@@ -308,7 +320,7 @@ function addSaveProps( props, blockNameOrType, attributes ) {
 	}
 
 	const borderClasses = getBorderClasses( attributes );
-	const newClassName = classnames( props.className, borderClasses );
+	const newClassName = clsx( props.className, borderClasses );
 
 	// If we are clearing the last of the previous classes in `className`
 	// set it to `undefined` to avoid rendering empty DOM attributes.
@@ -329,7 +341,7 @@ export function getBorderClasses( attributes ) {
 	const { borderColor, style } = attributes;
 	const borderColorClass = getColorClassName( 'border-color', borderColor );
 
-	return classnames( {
+	return clsx( {
 		'has-border-color': borderColor || style?.border?.color,
 		[ borderColorClass ]: !! borderColorClass,
 	} );
