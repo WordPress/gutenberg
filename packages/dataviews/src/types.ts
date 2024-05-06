@@ -3,8 +3,6 @@
  */
 import type { ReactNode } from 'react';
 
-type Item = Record< string, any >;
-
 interface Option {
 	value: any;
 	label: string;
@@ -16,6 +14,8 @@ interface filterByConfig {
 }
 
 type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
+
+export type Item = Record< string, any >;
 
 export interface Field {
 	/**
@@ -101,7 +101,7 @@ export interface Filter {
 	value: any;
 }
 
-export interface View {
+interface ViewBase {
 	/**
 	 * The layout of the view.
 	 */
@@ -141,4 +141,26 @@ export interface View {
 	 * The number of items per page
 	 */
 	perPage?: number;
+
+	/**
+	 * The hidden fields.
+	 */
+	hiddenFields: string[];
 }
+export interface ViewList extends ViewBase {
+	type: 'list';
+
+	layout: {
+		/**
+		 * The field to use as the primary field.
+		 */
+		primaryField: string;
+
+		/**
+		 * The field to use as the media field.
+		 */
+		mediaField: string;
+	};
+}
+
+export type View = ViewList | ViewBase;
