@@ -95,10 +95,6 @@ The API has been designed with performance in mind, so it shouldn’t be a probl
 - **All the scripts that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
 - There are ongoing explorations about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 
-## Can I use directives in the block editor?
-
-No. Right now, directives only work in the frontend of blocks. However, it’ll be investigated whether some directives (and also your custom directives) could be reused across the frontend and the editor. It’s worth emphasizing that the realities of the editor application and the frontend of a website are very different, particularly around the interactivity they afford. It needs to be ensured that the right tools are built for the right context. An interesting area to explore further would be to expose directives in the editor so users and builders can use them to attach behaviors to their sites on demand.
-
 ## Does it work with the Core Translation API?
 
 It does! As the Interactivity API works perfectly with server-side rendering, you can use all the WordPress APIs including [`__()`](https://developer.wordpress.org/reference/functions/__/) and [`_e()`](https://developer.wordpress.org/reference/functions/_e/). You can use it to translate the text in the HTML (as you normally would) and even use it inside the store when using `wp_initial_state()` on the server side. It might look something like this:
