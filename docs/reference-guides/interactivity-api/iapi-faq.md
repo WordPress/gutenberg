@@ -112,11 +112,11 @@ wp_interactivity_state( 'favoriteMovies', array(
 ```
 
 A translation API compatible with script modules (needed for the Interactivity API) is 
-currently being worked on. Check https://core.trac.wordpress.org/ticket/60234 to follow the progress on this work.
+currently being worked on. Check [#60234](https://core.trac.wordpress.org/ticket/60234) to follow the progress on this work.
 
 ## I’m concerned about XSS; can JavaScript be injected into directives?
 
-No. The Interactivity API only allows for [References](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/#references) to be passed as values to the directives. This way, there is no need to eval() full JavaScript expressions, so it’s not possible to perform XSS attacks.
+No. The Interactivity API only allows for [References](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#values-of-directives-are-references-to-store-properties) to be passed as values to the directives. This way, there is no need to eval() full JavaScript expressions, so it’s not possible to perform XSS attacks.
 
 ## Does this work with Custom Security Policies?
 

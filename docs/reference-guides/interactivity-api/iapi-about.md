@@ -1,6 +1,6 @@
 # About the Interactivity API
 
-The Interactivity API is **a standard system of directives, based on declarative code, for adding frontend interactivity to blocks**.
+The Interactivity API is **a [standard](#why-a-standard) system of [directives](#why-directives), based on declarative code, for [adding frontend interactivity to blocks](#api-goals)**.
 
 **Directives extend HTML with special attributes** that tell the Interactivity API to attach a specified behavior to a DOM element or even to transform it. For those familiar with [Alpine.js](https://alpinejs.dev/), it’s a similar approach but explicitly designed to work seamlessly with WordPress.
 
@@ -72,7 +72,7 @@ The Interactivity API pipeline promotes **progressive enhancement** by building 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
 <div class="callout callout-warning">
-  Full-page client-side navigation will be an exception to this compatibility with other libraries rule. See <a href="#client-side-navigation">Client-side navigation</a> for more details.
+  Full-page client-side navigation with the Interactivity API will be an exception to this compatibility with other libraries rule. See <a href="#client-side-navigation">Client-side navigation</a> for more details.
 </div>
 
 ### Declarative and reactive
