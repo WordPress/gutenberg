@@ -65,13 +65,12 @@ function ListItem( {
 	primaryField,
 	visibleFields,
 }: ListViewItemProps ) {
-	const itemRef = useRef( null );
+	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
 
 	useEffect( () => {
 		if ( isSelected ) {
-			// @ts-ignore
 			itemRef.current?.scrollIntoView( {
 				behavior: 'auto',
 				block: 'nearest',
