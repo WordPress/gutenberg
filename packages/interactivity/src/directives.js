@@ -207,24 +207,17 @@ const cssStringToObject = ( val ) => {
  */
 const getGlobalEventDirective = ( type ) => {
 	return ( { directives, evaluate } ) => {
-		const events = new Map();
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const event = entry.suffix.split( '--' )[ 0 ];
-				if ( ! events.has( event ) ) events.set( event, new Set() );
-				events.get( event ).add( entry );
-			} );
-		events.forEach( ( entries, eventType ) => {
-			entries.forEach( ( entry ) => {
+				const event = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
-					const cb = ( event ) => evaluate( entry, event );
+					const cb = () => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
-					globalVar.addEventListener( eventType, cb );
-					return () => globalVar.removeEventListener( eventType, cb );
+					globalVar.addEventListener( event, cb );
+					return () => globalVar.removeEventListener( event, cb );
 				}, [] );
 			} );
-		} );
 	};
 };
 
