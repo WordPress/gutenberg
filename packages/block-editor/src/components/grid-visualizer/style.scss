@@ -13,7 +13,9 @@
 }
 
 .block-editor-grid-visualizer__item {
-	border: $border-width dashed $gray-300;
+	background-color: color-mix(in srgb, currentColor 10%, transparent);
+	outline: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+	border-radius: 2px;
 }
 
 .block-editor-grid-item-resizer {
