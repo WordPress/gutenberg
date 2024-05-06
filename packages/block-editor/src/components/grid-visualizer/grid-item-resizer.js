@@ -122,6 +122,22 @@ export function GridItemResizer( { clientId, onChange } ) {
 					 * so that it resizes in the right direction.
 					 */
 					setResizeDirection( direction );
+
+					/*
+					 * The mouseup event on the resize handle doesn't trigger if the mouse
+					 * isn't directly above the handle, so we try to detect if it happens
+					 * outside the grid and dispatch a mouseup event on the handle.
+					 */
+					const rootElementParent = rootBlockElement.parentElement;
+					rootElementParent.addEventListener(
+						'mouseup',
+						() => {
+							event.target.dispatchEvent(
+								new Event( 'mouseup', { bubbles: true } )
+							);
+						},
+						true
+					);
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
 					const gridElement = blockElement.parentElement;
