@@ -39,7 +39,7 @@ _Dynamic block example_
 ```html
 <div
   data-wp-interactive='wpmovies'
-  data-wp-context='{ "isOpen": false }'
+  <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
   data-wp-watch="callbacks.logIsOpen"
 >
   <button
@@ -126,7 +126,7 @@ store( 'wpmovies', {
  
 <div
   data-wp-interactive='wpmovies'
-  data-wp-context="{ 'isOpen': true }"
+  <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => true ) ); ?>
 >
   <button
     data-wp-on--click="actions.toggle"
