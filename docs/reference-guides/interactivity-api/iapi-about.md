@@ -39,7 +39,7 @@ _Dynamic block example_
 ```html
 <div
   data-wp-interactive='{ "namespace": "wpmovies" }'
-  data-wp-context='{ "isOpen": false }'
+  <?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
   data-wp-watch="callbacks.logIsOpen"
 >
   <button
