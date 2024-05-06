@@ -12,6 +12,7 @@
 		<button
 			data-testid="button"
 			data-wp-on--click="actions.clickHandler"
+			data-wp-on--=""
 		>Click me!</button>
 	</div>
 	<div>

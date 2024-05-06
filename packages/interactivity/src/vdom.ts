@@ -125,17 +125,18 @@ export function toVdom( root ) {
 							? directiveMatch[ 2 ]
 							: 'default';
 
-					if (
-						! directiveMatch &&
-						// @ts-expect-error This is a debug-only warning.
-						typeof SCRIPT_DEBUG !== 'undefined' &&
-						// @ts-expect-error
-						SCRIPT_DEBUG === true
-					) {
-						// eslint-disable-next-line no-console
-						console.warn( `Invalid directive: ${ name }.` );
+					if ( ! directiveMatch ) {
+						if (
+							// @ts-expect-error This is a debug-only warning.
+							typeof SCRIPT_DEBUG !== 'undefined' &&
+							// @ts-expect-error
+							SCRIPT_DEBUG === true
+						) {
+							// eslint-disable-next-line no-console
+							console.warn( `Invalid directive: ${ name }.` );
+						}
+						return obj;
 					}
-
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
