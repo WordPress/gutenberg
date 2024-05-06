@@ -173,7 +173,7 @@ It also pairs very well with the [View Transitions API](https://developer.chrome
 
 Blocks using the Interactivity API and interactive blocks using other approaches like jQuery can coexist, and everything will work as expected. However, the Interactivity API comes with some benefits for your interactive blocks:
 
-- **Blocks can communicate with each other easily**. With a standard, this communication is handled by default. When different blocks use different approaches to frontend interactivity, inter-block communication becomes more complex and almost impossible when separate developers create blocks.
+- **Blocks can communicate with each other easily**. With a standard, this communication is handled by default. When different blocks use different approaches to frontend interactivity, inter-block communication becomes more complex and almost impossible when different developers create blocks.
 - **Composability and compatibility**: You can combine interactive blocks, and nest them in structures with defined behaviors. Thanks to following the same standard, they are fully cross-compatible. If each block used a different approach to interactivity, they would likely break.
 - **Fewer KBs will be sent to the browser**. If each plugin author uses a different JS framework, more code will be loaded in the front end. If all the blocks use the same one, the code is reused.
 - If all the blocks on a page use this standard, **site-wide features like client-side navigation can be enabled**.
