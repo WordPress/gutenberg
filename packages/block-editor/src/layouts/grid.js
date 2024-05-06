@@ -132,10 +132,13 @@ export default {
 				rules.push(
 					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
 				);
+			} else {
+				rules.push( `grid-auto-rows: minmax(0, 1fr)` );
 			}
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
+				`grid-auto-rows: minmax(0, 1fr)`,
 				`container-type: inline-size`
 			);
 		}

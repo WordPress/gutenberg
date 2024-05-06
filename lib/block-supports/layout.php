@@ -476,6 +476,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 					'selector'     => $selector,
 					'declarations' => array( 'grid-template-rows' => 'repeat(' . $layout['rowCount'] . ', minmax(0, 1fr))' ),
 				);
+			} else {
+				$layout_styles[] = array(
+					'selector'     => $selector,
+					'declarations' => array( 'grid-auto-rows' => 'minmax(0, 1fr)' ),
+				);
 			}
 		} else {
 			$minimum_column_width = ! empty( $layout['minimumColumnWidth'] ) ? $layout['minimumColumnWidth'] : '12rem';
@@ -484,6 +489,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'selector'     => $selector,
 				'declarations' => array(
 					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'grid-auto-rows'        => 'minmax(0, 1fr)',
 					'container-type'        => 'inline-size',
 				),
 			);
