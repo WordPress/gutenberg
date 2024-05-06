@@ -16,6 +16,7 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
+import { isDebug } from './constants';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -260,18 +261,35 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	if ( namespace === '' ) {
+		if ( isDebug ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`Namespace cannot be an empty string. Error found when trying to use "${ path }"`
+			);
+		}
+		return;
+	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
 			lock: universalUnlock,
 		} );
 	}
-	let current = {
+	const current = {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
-	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
-	return current;
+	try {
+		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {
+		if ( isDebug ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`The namespace "${ namespace }" defined in "data-wp-interactive" does not match with the store.`
+			);
+		}
+	}
 };
 
 // Generate the evaluate function.
