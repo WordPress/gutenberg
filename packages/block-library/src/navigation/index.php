@@ -23,6 +23,7 @@ class WP_Navigation_Block_Renderer {
 	private static $needs_list_item_wrapper = array(
 		'core/site-title',
 		'core/site-logo',
+		'core/social-links'
 	);
 
 	/**
