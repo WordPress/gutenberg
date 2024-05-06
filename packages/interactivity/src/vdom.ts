@@ -119,7 +119,7 @@ export function toVdom( root ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
-					if ( ! directiveMatch ) {
+					if ( directiveMatch === null ) {
 						if (
 							// @ts-expect-error This is a debug-only warning.
 							typeof SCRIPT_DEBUG !== 'undefined' &&
