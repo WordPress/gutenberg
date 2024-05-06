@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { MouseEventHandler, ReactNode } from 'react';
 
 /**
@@ -109,7 +109,6 @@ export function SuggestionsList<
 		>
 			{ suggestions.map( ( suggestion, index ) => {
 				const matchText = computeSuggestionMatch( suggestion );
-
 				const isSelected = index === selectedIndex;
 				const isDisabled =
 					typeof suggestion === 'object' && suggestion?.disabled;
@@ -118,7 +117,7 @@ export function SuggestionsList<
 						? suggestion?.value
 						: displayTransform( suggestion );
 
-				const className = classnames(
+				const className = clsx(
 					'components-form-token-field__suggestion',
 					{
 						'is-selected': isSelected,

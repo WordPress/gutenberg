@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -302,10 +302,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		<DetectOutside onFocusOutside={ onFocusOutside }>
 			<BaseControl
 				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				className={ classnames(
-					className,
-					'components-combobox-control'
-				) }
+				className={ clsx( className, 'components-combobox-control' ) }
 				label={ label }
 				id={ `components-form-token-input-${ instanceId }` }
 				hideLabelFromVision={ hideLabelFromVision }

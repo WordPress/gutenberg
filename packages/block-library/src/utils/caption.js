@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -94,7 +94,7 @@ export function Caption( {
 					<RichText
 						identifier={ attributeKey }
 						tagName={ tagName }
-						className={ classnames(
+						className={ clsx(
 							className,
 							__experimentalGetElementClassName( 'caption' )
 						) }

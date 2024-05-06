@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -446,12 +446,12 @@ function ListViewBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const moverCellClassName = classnames(
+	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
 	);
 
-	const listViewBlockSettingsClassName = classnames(
+	const listViewBlockSettingsClassName = clsx(
 		'block-editor-list-view-block__menu-cell',
 		{ 'is-visible': isHovered || isFirstSelectedBlock }
 	);
@@ -463,7 +463,7 @@ function ListViewBlock( {
 		colSpan = 3;
 	}
 
-	const classes = classnames( {
+	const classes = clsx( {
 		'is-selected': isSelected,
 		'is-first-selected': isFirstSelectedBlock,
 		'is-last-selected': isLastSelectedBlock,

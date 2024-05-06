@@ -3,7 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -202,7 +202,7 @@ const UnforwardedTabPanel = (
 						<Ariakit.Tab
 							key={ tab.name }
 							id={ prependInstanceId( tab.name ) }
-							className={ classnames(
+							className={ clsx(
 								'components-tab-panel__tabs-item',
 								tab.className,
 								{

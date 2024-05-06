@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -61,7 +61,7 @@ function PostStatusLabel( { canEdit } ) {
 	}
 	return (
 		<Text
-			className={ classnames( 'editor-post-status-label', {
+			className={ clsx( 'editor-post-status-label', {
 				[ ` has-status-${ status }` ]: !! status,
 				'has-icon': canEdit,
 			} ) }

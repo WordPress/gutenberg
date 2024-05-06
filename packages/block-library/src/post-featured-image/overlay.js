@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,7 +38,7 @@ const Overlay = ( { attributes, overlayColor } ) => {
 	return (
 		<span
 			aria-hidden="true"
-			className={ classnames(
+			className={ clsx(
 				'wp-block-post-featured-image__overlay',
 				dimRatioToClass( dimRatio ),
 				{
