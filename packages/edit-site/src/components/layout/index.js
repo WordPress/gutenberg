@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -177,7 +177,7 @@ export default function Layout() {
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
-				className={ classnames(
+				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
@@ -291,7 +291,7 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<div
-									className={ classnames(
+									className={ clsx(
 										'edit-site-layout__canvas',
 										{
 											'is-right-aligned':

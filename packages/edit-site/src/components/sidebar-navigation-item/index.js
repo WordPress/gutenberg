@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -51,7 +51,7 @@ export default function SidebarNavigationItem( {
 
 	return (
 		<Item
-			className={ classnames(
+			className={ clsx(
 				'edit-site-sidebar-navigation-item',
 				{ 'with-suffix': ! withChevron && suffix },
 				className

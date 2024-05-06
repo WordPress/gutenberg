@@ -38,7 +38,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Function that migrates a given theme.json structure to the last version.
 	 *
 	 * @since 5.9.0
-	 * @since 6.5.0 Migrate up to v3.
+	 * @since 6.6.0 Migrate up to v3.
 	 *
 	 * @param array $theme_json The structure to migrate.
 	 *
@@ -99,7 +99,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 *
 	 * - Sets settings.typography.defaultFontSizes to false.
 	 *
-	 * @since 6.5.0
+	 * @since 6.6.0
 	 *
 	 * @param array $old Data to migrate.
 	 *

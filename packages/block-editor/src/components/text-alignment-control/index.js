@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -78,7 +78,7 @@ export default function TextAlignmentControl( {
 		<SegmentedTextControl
 			label={ __( 'Text alignment' ) }
 			options={ validOptions }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-text-alignment-control',
 				className
 			) }

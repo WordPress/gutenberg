@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -31,7 +31,7 @@ export default function BlockToolbarBreadcrumb( {
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
-			className={ classnames( 'block-editor-block-list__block-popover', {
+			className={ clsx( 'block-editor-block-list__block-popover', {
 				'is-insertion-point-visible': isInsertionPointVisible,
 			} ) }
 			resize={ false }

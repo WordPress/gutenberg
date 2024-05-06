@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -94,7 +94,7 @@ function BlockPattern( {
 											? descriptionId
 											: undefined
 									}
-									className={ classnames(
+									className={ clsx(
 										'block-editor-block-patterns-list__item',
 										{
 											'block-editor-block-patterns-list__list-item-synced':

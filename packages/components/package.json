@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "27.4.0",
+	"version": "27.5.0",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,7 @@
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
-		"classnames": "^2.3.1",
+		"clsx": "^2.1.1",
 		"colord": "^2.7.0",
 		"date-fns": "^3.6.0",
 		"deepmerge": "^4.3.0",

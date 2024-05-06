@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -237,7 +237,7 @@ export default function Editor( { isLoading, onClick } ) {
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
-						className={ classnames(
+						className={ clsx(
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,

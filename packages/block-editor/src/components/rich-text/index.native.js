@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -644,7 +644,7 @@ export function RichTextWrapper(
 										  }
 										: editableProps.style
 								}
-								className={ classnames(
+								className={ clsx(
 									classes,
 									props.className,
 									editableProps.className
