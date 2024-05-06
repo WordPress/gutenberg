@@ -138,7 +138,7 @@ store( 'wpmovies', {
 </div>
 ```
 
-Using imperative code may be easier when creating simple user experiences, but it becomes much more difficult as blocks become more complex. The Interactivity API must cover all use cases, from the simplest to the most challenging. That’s why a declarative approach using directives better fits the Interactivity API.
+Using imperative code may be easier when creating simple user experiences, but it becomes much more difficult as applications become more complex. The Interactivity API must cover all use cases, from the simplest to the most challenging. That’s why a declarative approach using directives better fits the Interactivity API.
 
 ### Performant
 
