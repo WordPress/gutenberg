@@ -13,10 +13,6 @@ Its three main components are:
 Preact has a number of advantages over React and other JavaScript frameworks like Vue, Svelte, or Solid in the context of the frontend (which is the focus of the Interactivity API):
 
 - It’s small: 8kB, including [hooks](https://preactjs.com/guide/v10/hooks/) and [signals](https://preactjs.com/blog/introducing-signals/).
-- It’s battle-tested.
-- It’s performant (even more when used with signals).
-- It’s compatible with React (through preact/compat, useful to share the same Editor components for some use cases where SSR is not important, and the components are very complex, like an e-commerce cart and checkout, for example).
-- It’s HTML-friendly (unlike React).
 - It gives us DOM diffing out of the box.
 - It’s extremely extensible through their Option Hooks. They use that extensibility for the hooks (preact/hooks), compatibility with React (preact/compat) and their signals (@preact/signals). Basically, everything but the DOM diffing algorithm.
 - Its core team has been great and very helpful. They are also interested in enhancing this “island-based” usage of Preact.
@@ -70,13 +66,17 @@ The main difference is that the Interactivity API is **declarative and reactive*
 
 Finally, comparing it with jQuery, **the Interactivity API runtime is ~10kb**, which is much more lightweight. Actually, there is an ongoing effort to remove heavy frameworks like jQuery across the WordPress ecosystem, and this would help in this regard.
 
-## Do I need to know React, PHP, and this new Interactivity API?
+## Do I need to know React, PHP, and this Interactivity API?
 
 If you want to add frontend interactivity to your blocks using this API, the short answer is yes. If your block is not interactive, the block creation workflow will remain exactly the same.
 
-This API only adds a new standard way to easily add frontend interactivity to blocks. This means that you still need to use React to handle the editor part of your blocks.
+The Interactivity API introduces a new standard method to facilitate the integration of interactive behaviors into the frontend part of WordPress. This means that you still need to use React to handle the editor part of your blocks.
 
 On the other hand, if you want to create an interactive block, with the Interactivity API you don’t have to deal with complex topics like tooling, integration with WordPress, inter-block communication, or the server-side rendering of the interactive parts.
+
+## Can the Interactivity API be used beyond a block?
+
+Absolutely, yes, it is not limited to blocks. You'll see a lot of mentions of how the Interactivity API provides a standard for creating interactive blocks, but that's only because that's the most common use case. More generally speaking, the Interactivity API standard can be used to add "interactive behaviors" to the front end of any part of WordPress.
 
 ## Does this mean I must migrate all my interactive blocks to use this API?
 
