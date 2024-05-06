@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -266,7 +266,7 @@ function ResizableFrame( {
 								key="handle"
 								role="separator"
 								aria-orientation="vertical"
-								className={ classnames(
+								className={ clsx(
 									'edit-site-resizable-frame__handle',
 									{ 'is-resizing': isResizing }
 								) }
@@ -298,7 +298,7 @@ function ResizableFrame( {
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
 			onResizeStop={ handleResizeStop }
-			className={ classnames( 'edit-site-resizable-frame__inner', {
+			className={ clsx( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
 			} ) }
 			showHandle={ false } // Do not show the default handle, as we're using a custom one.

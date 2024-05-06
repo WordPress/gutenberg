@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -114,7 +114,7 @@ function ColorGradientControlInner( {
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom
-			className={ classnames(
+			className={ clsx(
 				'block-editor-color-gradient-control',
 				className
 			) }

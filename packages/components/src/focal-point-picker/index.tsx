@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -232,10 +232,7 @@ export function FocalPointPicker( {
 		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = classnames(
-		'components-focal-point-picker-control',
-		className
-	);
+	const classes = clsx( 'components-focal-point-picker-control', className );
 
 	const instanceId = useInstanceId( FocalPointPicker );
 	const id = `inspector-focal-point-picker-control-${ instanceId }`;

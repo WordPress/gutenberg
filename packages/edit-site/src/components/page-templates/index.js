@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -111,12 +111,9 @@ function AuthorField( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }

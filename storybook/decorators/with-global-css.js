@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -59,7 +59,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	}, [ context.globals.css ] );
 
 	return (
-		<div className={ classnames( classes ) }>
+		<div className={ clsx( classes ) }>
 			{ externalStyles.map( ( stylesheet ) => (
 				<link key={ stylesheet } rel="stylesheet" href={ stylesheet } />
 			) ) }

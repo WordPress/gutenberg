@@ -59,7 +59,7 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	let backgroundStylesWithDefaults;
 
 	// Set block background defaults.
-	if ( backgroundImage?.source === 'file' && !! backgroundImage?.url ) {
+	if ( !! backgroundImage?.url ) {
 		if ( ! backgroundStyle?.backgroundSize ) {
 			backgroundStylesWithDefaults = {
 				backgroundSize: 'cover',

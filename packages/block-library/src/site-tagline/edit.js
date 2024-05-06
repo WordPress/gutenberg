@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -51,7 +51,7 @@ export default function SiteTaglineEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			'wp-block-site-tagline__placeholder': ! canUserEdit && ! tagline,
 		} ),

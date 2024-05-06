@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -106,7 +106,7 @@ function Guide( {
 
 	return (
 		<Modal
-			className={ classnames( 'components-guide', className ) }
+			className={ clsx( 'components-guide', className ) }
 			contentLabel={ contentLabel }
 			isDismissible={ pages.length > 1 }
 			onRequestClose={ onFinish }

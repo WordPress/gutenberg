@@ -17,7 +17,12 @@ import {
  */
 import { unlock } from '../../../lock-unlock';
 
-const { PrivatePostExcerptPanel, PostStatus } = unlock( editorPrivateApis );
+const {
+	PrivatePostExcerptPanel,
+	PostStatus,
+	PostContentInformation,
+	PostLastEditedPanel,
+} = unlock( editorPrivateApis );
 
 export default function PageSummary() {
 	return (
@@ -25,12 +30,27 @@ export default function PageSummary() {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostStatus />
-						<PostFeaturedImagePanel withPanelBody={ false } />
-						<PrivatePostExcerptPanel />
-						<PostSchedulePanel />
-						<PostTemplatePanel />
-						<PostURLPanel />
+						<VStack
+							spacing={ 3 }
+							//  TODO: this needs to be consolidated with the panel in post editor, when we unify them.
+							style={ { marginBlockEnd: '24px' } }
+						>
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							<PrivatePostExcerptPanel />
+							<VStack spacing={ 1 }>
+								<PostContentInformation />
+								<PostLastEditedPanel />
+							</VStack>
+						</VStack>
+						<VStack
+							spacing={ 1 }
+							style={ { marginBlockEnd: '12px' } }
+						>
+							<PostStatus />
+							<PostSchedulePanel />
+							<PostTemplatePanel />
+							<PostURLPanel />
+						</VStack>
 						<PostAuthorPanel />
 						{ fills }
 					</>

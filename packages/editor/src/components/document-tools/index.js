@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -107,7 +107,7 @@ function DocumentTools( {
 		// supported, but we're keeping it in the list of class names for backwards
 		// compatibility.
 		<NavigableToolbar
-			className={ classnames(
+			className={ clsx(
 				'editor-document-tools',
 				'edit-post-header-toolbar',
 				className

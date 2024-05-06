@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 27.5.0 (2024-05-02)
+
 ### Enhancements
 
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
 -   `Placeholder`: Unify appearance across. ([#59275](https://github.com/WordPress/gutenberg/pull/59275)).
@@ -12,6 +19,7 @@
 ### Bug Fix
 
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
+-   `Panel`: Fix issue with collapsing panel header ([#61319](https://github.com/WordPress/gutenberg/pull/61319)).
 
 ### Enhancements
 

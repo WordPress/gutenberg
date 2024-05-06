@@ -269,7 +269,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -318,7 +318,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -368,7 +368,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -430,7 +430,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -493,7 +493,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				// Start tracing.
@@ -647,7 +647,7 @@ test.describe( 'Post Editor Performance', () => {
 			const iterations = samples + throwaway;
 			for ( let i = 1; i <= iterations; i++ ) {
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				await globalInserterToggle.click();

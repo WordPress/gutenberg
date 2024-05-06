@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -164,7 +164,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		inert: isSubtreeDisabled ? 'true' : undefined,
-		className: classnames(
+		className: clsx(
 			'block-editor-block-list__block',
 			{
 				// The wp-block className is important for editor styles.
