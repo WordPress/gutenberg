@@ -4,7 +4,7 @@
 import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
-import { safeDecodeURI } from '@wordpress/url';
+import { safeDecodeURI, isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -183,8 +183,7 @@ function useBlockProps( { name, style } ) {
 			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
 			let file = style?.background?.backgroundImage?.url;
 			if (
-				!! style?.background?.backgroundImage?.url &&
-				style?.background?.backgroundImage?.source === 'theme'
+				!! style?.background?.backgroundImage?.url && ! isURL( style?.background?.backgroundImage?.url )
 			) {
 				file = getThemeFileURI( style.background.backgroundImage.url );
 			}

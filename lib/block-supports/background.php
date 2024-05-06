@@ -31,6 +31,30 @@ function gutenberg_register_background_support( $block_type ) {
 }
 
 /**
+ * Given a theme.json or block background styles, returns the background styles for a block.
+ *
+ * @since 6.6.0
+ *
+ * @param  array $background_styles Background style properties.
+ * @return array                     Style engine array of CSS string and style declarations.
+ */
+function gutenberg_get_background_support_styles( $background_styles = array() ) {
+	/*
+	 * Styles backgrounds.
+	 * Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
+	 * Blocks, elements, and block variations are not yet supported.
+	 */
+	if (
+		isset( $background_styles['backgroundImage']['url'] ) &&
+		is_string( $background_styles['backgroundImage']['url'] ) &&
+		! isset( wp_parse_url( $background_styles['backgroundImage']['url'] )['host'] ) ) {
+		$background_styles['backgroundImage']['url'] = esc_url( get_theme_file_uri( $background_styles['backgroundImage']['url'] ) );
+	}
+	return gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
+}
+
+
+/**
  * Renders the background styles to the block wrapper.
  * This block support uses the `render_block` hook to ensure that
  * it is also applied to non-server-rendered blocks.
@@ -66,7 +90,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		}
 	}
 
-	$styles = gutenberg_style_engine_get_styles( array( 'background' => $background_styles ) );
+	$styles = gutenberg_get_background_support_styles( $background_styles );
 
 	if ( ! empty( $styles['css'] ) ) {
 		// Inject background styles to the first element, presuming it's the wrapper, if it exists.

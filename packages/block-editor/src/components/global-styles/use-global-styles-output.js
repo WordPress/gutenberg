@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useContext, useMemo } from '@wordpress/element';
 import { getCSSRules } from '@wordpress/style-engine';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -1218,6 +1219,52 @@ export function processCSSNesting( css, blockSelector ) {
 	return processedCSS;
 }
 
+function useResolveThemeFileURIs( mergedConfig ) {
+	/*
+	 * This only resolves top-level background image URLs.
+	 * To support nested styles (block etc) possible approaches:
+	 * 1. registry.batch ???
+	 * 2. create an action to parse entire config and resolve URLs.
+	 */
+	const { backgroundImageURL } = useSelect(
+		( select ) => {
+			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
+			let file = mergedConfig?.styles?.background?.backgroundImage?.url;
+			if (
+				!! mergedConfig?.styles?.background?.backgroundImage?.url && ! isURL(  mergedConfig?.styles?.background?.backgroundImage?.url )
+			) {
+				file = getThemeFileURI(  mergedConfig.styles.background.backgroundImage.url );
+			}
+			return {
+				backgroundImageURL: file,
+			};
+		},
+		[ mergedConfig?.styles?.background?.backgroundImage?.url ]
+	);
+
+	return useMemo( () => {
+		if ( ! backgroundImageURL ) {
+			return mergedConfig;
+		}
+		const updatedConfig = {
+			...mergedConfig,
+			styles: {
+				...mergedConfig.styles,
+				background: {
+					...mergedConfig.styles.background,
+					backgroundImage: {
+						...mergedConfig.styles.background.backgroundImage,
+						url: backgroundImageURL,
+					},
+				},
+			},
+		};
+		return updatedConfig;
+	}, [
+		backgroundImageURL,
+	] );
+}
+
 /**
  * Returns the global styles output using a global styles configuration.
  * If wishing to generate global styles and settings based on the
@@ -1230,6 +1277,7 @@ export function processCSSNesting( css, blockSelector ) {
  */
 export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
+	const resolvedConfig = useResolveThemeFileURIs( mergedConfig );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 
@@ -1247,10 +1295,10 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const { getBlockStyles } = useSelect( blocksStore );
 
 	return useMemo( () => {
-		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
+		if ( ! resolvedConfig?.styles || ! resolvedConfig?.settings ) {
 			return [];
 		}
-		const updatedConfig = updateConfigWithSeparator( mergedConfig );
+		const updatedConfig = updateConfigWithSeparator( resolvedConfig );
 
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
@@ -1313,7 +1361,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
-		mergedConfig,
+		resolvedConfig,
 		disableLayoutStyles,
 		isTemplate,
 		getBlockStyles,
