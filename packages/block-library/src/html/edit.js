@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
 import {
 	BlockControls,
 	PlainText,
@@ -10,7 +9,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
-	Disabled,
 	ToolbarGroup,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -22,7 +20,6 @@ import { useInstanceId } from '@wordpress/compose';
 import Preview from './preview';
 
 export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
-	const isDisabled = useContext( Disabled.Context );
 	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
 	const blockProps = useBlockProps( {
 		className: 'block-library-html__edit',
@@ -47,7 +44,7 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ attributes.isPreview || isDisabled ? (
+			{ attributes.isPreview ? (
 				<>
 					<Preview
 						content={ attributes.content }
