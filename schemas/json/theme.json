@@ -2331,12 +2331,6 @@
 										{
 											"type": "object",
 											"properties": {
-												"source": {
-													"description": "The origin of the image. 'file' denotes that the 'url' is a path to an image or other file.",
-													"type": "string",
-													"enum": [ "file" ],
-													"default": "file"
-												},
 												"url": {
 													"description": "A URL to an image file.",
 													"type": "string"
