@@ -31,9 +31,7 @@ export default function BackgroundPanel() {
 
 	const defaultControls = {
 		backgroundImage: true,
-		backgroundSize:
-			!! style?.background?.backgroundImage &&
-			!! inheritedStyle?.background?.backgroundImage,
+		backgroundSize: false,
 	};
 
 	return (
