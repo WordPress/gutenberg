@@ -10,6 +10,7 @@
 
 ### Enhancements
 
+-   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).

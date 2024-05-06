@@ -182,7 +182,6 @@
 		color: $white;
 	}
 
-	&.is-disabled,
 	&[aria-disabled="true"] {
 		opacity: 0.25;
 

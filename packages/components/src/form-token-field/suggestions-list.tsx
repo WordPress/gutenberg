@@ -121,7 +121,6 @@ export function SuggestionsList<
 					'components-form-token-field__suggestion',
 					{
 						'is-selected': isSelected,
-						'is-disabled': isDisabled,
 					}
 				);
 
