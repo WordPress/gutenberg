@@ -24,7 +24,7 @@ interface DirectiveEntry {
 
 type DirectiveEntries = Record< string, DirectiveEntry[] >;
 
-interface DirectiveArgs {
+export interface DirectiveArgs {
 	/**
 	 * Object map with the defined directives of the element being evaluated.
 	 */
@@ -348,7 +348,7 @@ const Directives = ( {
 		);
 
 	const props = { ...originalProps, children };
-	const directiveArgs = {
+	const directiveArgs: DirectiveArgs = {
 		directives,
 		props,
 		element,

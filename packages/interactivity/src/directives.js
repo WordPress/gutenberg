@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { h as createElement } from 'preact';
+import { h as createElement, Component } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek } from 'deepsignal';
 
@@ -220,6 +220,30 @@ const getGlobalEventDirective =
 				}, [] );
 			} );
 	};
+
+/**
+ * @augments {Component<import('./hooks').DirectiveArgs>}
+ */
+class IgnoredComponent extends Component {
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	render( props ) {
+		const {
+			element: {
+				type: Type,
+				props: { innerHTML, ...rest },
+			},
+		} = props;
+		return (
+			<Type
+				dangerouslySetInnerHTML={ { __html: innerHTML } }
+				{ ...rest }
+			/>
+		);
+	}
+}
 
 export default () => {
 	// data-wp-context
@@ -459,24 +483,9 @@ export default () => {
 	} );
 
 	// data-wp-ignore
-	directive(
-		'ignore',
-		( {
-			element: {
-				type: Type,
-				props: { innerHTML, ...rest },
-			},
-		} ) => {
-			// Preserve the initial inner HTML.
-			const cached = useMemo( () => innerHTML, [] );
-			return (
-				<Type
-					dangerouslySetInnerHTML={ { __html: cached } }
-					{ ...rest }
-				/>
-			);
-		}
-	);
+	directive( 'ignore', ( args ) => {
+		return <IgnoredComponent { ...args } />;
+	} );
 
 	// data-wp-text
 	directive( 'text', ( { directives: { text }, element, evaluate } ) => {
