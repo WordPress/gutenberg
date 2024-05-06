@@ -78,6 +78,8 @@ On the other hand, if you want to create an interactive block, with the Interact
 
 Absolutely, yes, it is not limited to blocks. You'll see a lot of mentions of how the Interactivity API provides a standard for creating interactive blocks, but that's only because that's the most common use case. More generally speaking, the Interactivity API standard can be used to add "interactive behaviors" to the front end of any part of WordPress.
 
+See the [`wp_interactivity_process_directives`](https://developer.wordpress.org/reference/functions/wp_interactivity_process_directives/) for details on using the Interactivity API outside of blocks with arbitrary HTML.
+
 ## Does this mean I must migrate all my interactive blocks to use this API?
 
 No. Blocks outside the Interactivity API can coexist with blocks using it. However, as explained above, keep in mind that there are some benefits for blocks that use the API:
