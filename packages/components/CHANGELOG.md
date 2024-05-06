@@ -15,6 +15,7 @@
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
 -   `Placeholder`: Unify appearance across. ([#59275](https://github.com/WordPress/gutenberg/pull/59275)).
 -   `Toolbar`: Adjust top toolbar to use same metrics as block toolbar ([#61126](https://github.com/WordPress/gutenberg/pull/61126)).
+-   `FormTokenField`: Hide component label when not defined ([#61395](https://github.com/WordPress/gutenberg/pull/61336)).
 
 ### Bug Fix
 
