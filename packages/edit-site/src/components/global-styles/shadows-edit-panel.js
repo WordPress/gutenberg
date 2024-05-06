@@ -452,11 +452,13 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					<ShadowInputControl
 						label={ __( 'X Position' ) }
 						value={ shadow.x }
+						hasNegativeRange
 						onChange={ ( value ) => onShadowChange( 'x', value ) }
 					/>
 					<ShadowInputControl
 						label={ __( 'Y Position' ) }
 						value={ shadow.y }
+						hasNegativeRange
 						onChange={ ( value ) => onShadowChange( 'y', value ) }
 					/>
 					<ShadowInputControl
@@ -469,6 +471,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					<ShadowInputControl
 						label={ __( 'Spread' ) }
 						value={ shadow.spread }
+						hasNegativeRange
 						onChange={ ( value ) =>
 							onShadowChange( 'spread', value )
 						}
@@ -479,7 +482,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 	);
 }
 
-function ShadowInputControl( { label, value, onChange } ) {
+function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 	const [ isCustomInput, setIsCustomInput ] = useState( false );
 	const [ parsedQuantity, parsedUnit ] =
 		parseQuantityAndUnitFromRawValue( value );
@@ -521,7 +524,14 @@ function ShadowInputControl( { label, value, onChange } ) {
 					value={ parsedQuantity ?? 0 }
 					onChange={ sliderOnChange }
 					withInputField={ false }
-					min={ 0 }
+					min={
+						hasNegativeRange
+							? -(
+									CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]
+										?.max ?? 10
+							  )
+							: 0
+					}
 					max={
 						CUSTOM_VALUE_SETTINGS[ parsedUnit ?? 'px' ]?.max ?? 10
 					}

@@ -117,13 +117,17 @@
 	border: $gray-200 $border-width solid;
 	border-radius: $radius-block-ui;
 	overflow: auto;
-}
+	background-image: repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5), repeating-linear-gradient(45deg, #f5f5f5 25%, #0000 0, #0000 75%, #f5f5f5 0, #f5f5f5);
+	background-position: 0 0, 8px 8px;
+	background-size: 16px 16px;
 
-.edit-site-global-styles__shadow-preview-block {
-	border: $gray-200 $border-width solid;
-	border-radius: $radius-block-ui;
-	width: 60%;
-	height: 60px;
+	.edit-site-global-styles__shadow-preview-block {
+		border: $gray-200 $border-width solid;
+		border-radius: $radius-block-ui;
+		background-color: $white;
+		width: 60%;
+		height: 60px;
+	}
 }
 
 .edit-site-global-styles__shadow-editor-panel {

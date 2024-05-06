@@ -40,7 +40,7 @@ export default function ShadowsPanel() {
 			<ScreenHeader
 				title={ __( 'Shadows' ) }
 				description={ __(
-					'Shadows and the application of those shadows on site elements.'
+					'Manage and create shadow styles for use across the site.'
 				) }
 			/>
 			<div className="edit-site-global-styles-screen">
@@ -53,17 +53,17 @@ export default function ShadowsPanel() {
 						shadows={ defaultShadows || [] }
 						category={ 'default' }
 					/>
-					<ShadowList
-						label={ __( 'Theme' ) }
-						shadows={ themeShadows || [] }
-						category={ 'theme' }
-						placeholder={ __( 'Theme shadows are empty!' ) }
-					/>
+					{ themeShadows && themeShadows.length > 0 && (
+						<ShadowList
+							label={ __( 'Theme' ) }
+							shadows={ themeShadows || [] }
+							category={ 'theme' }
+						/>
+					) }
 					<ShadowList
 						label={ __( 'Custom' ) }
 						shadows={ customShadows || [] }
 						category={ 'custom' }
-						placeholder={ __( 'Custom shadows are empty!' ) }
 						onCreate={ onCreateShadow }
 					/>
 				</VStack>
@@ -72,7 +72,7 @@ export default function ShadowsPanel() {
 	);
 }
 
-function ShadowList( { label, placeholder, shadows, category, onCreate } ) {
+function ShadowList( { label, shadows, category, onCreate } ) {
 	const handleAddShadow = () => {
 		onCreate( {
 			name: `Shadow ${ shadows.length + 1 }`,
@@ -100,7 +100,7 @@ function ShadowList( { label, placeholder, shadows, category, onCreate } ) {
 					) }
 				</FlexItem>
 			</HStack>
-			{ shadows.length ? (
+			{ shadows.length > 0 && (
 				<ItemGroup isBordered isSeparated>
 					{ shadows.map( ( shadow ) => (
 						<ShadowItem
@@ -110,8 +110,6 @@ function ShadowList( { label, placeholder, shadows, category, onCreate } ) {
 						/>
 					) ) }
 				</ItemGroup>
-			) : (
-				<div>{ placeholder }</div>
 			) }
 		</VStack>
 	);
