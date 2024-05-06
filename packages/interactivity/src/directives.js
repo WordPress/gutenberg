@@ -268,25 +268,32 @@ export default () => {
 	directive( 'watch', ( { directives: { watch }, evaluate } ) => {
 		watch.forEach( ( entry ) => {
 			useWatch( () => {
-				const start = performance.now();
+				if ( SCRIPT_DEBUG ) {
+					// eslint-disable-next-line no-unused-vars
+					const start = performance.now();
+				}
 				const result = evaluate( entry );
-				performance.measure(
-					`interactivity api watch ${ entry.namespace }`,
-					{
-						start,
-						end: performance.now(),
-						detail: {
-							devtools: {
-								metadata: {
-									extensionName: 'Interactivity API: Watch',
-									dataType: 'track-entry',
+				if ( SCRIPT_DEBUG ) {
+					performance.measure(
+						`interactivity api watch ${ entry.namespace }`,
+						{
+							// eslint-disable-next-line no-undef
+							start,
+							end: performance.now(),
+							detail: {
+								devtools: {
+									metadata: {
+										extensionName:
+											'Interactivity API: Watch',
+										dataType: 'track-entry',
+									},
+									color: 'primary',
+									track: `IA: watch ${ entry.namespace }`,
 								},
-								color: 'primary',
-								track: `IA: watch ${ entry.namespace }`,
 							},
-						},
-					}
-				);
+						}
+					);
+				}
 				return result;
 			} );
 		} );
@@ -297,25 +304,32 @@ export default () => {
 		init.forEach( ( entry ) => {
 			// TODO: Replace with useEffect to prevent unneeded scopes.
 			useInit( () => {
-				const start = performance.now();
+				if ( SCRIPT_DEBUG ) {
+					// eslint-disable-next-line no-unused-vars
+					const start = performance.now();
+				}
 				const result = evaluate( entry );
-				performance.measure(
-					`interactivity api init ${ entry.namespace }`,
-					{
-						start,
-						end: performance.now(),
-						detail: {
-							devtools: {
-								metadata: {
-									extensionName: 'Interactivity API: Init',
-									dataType: 'track-entry',
+				if ( SCRIPT_DEBUG ) {
+					performance.measure(
+						`interactivity api init ${ entry.namespace }`,
+						{
+							// eslint-disable-next-line no-undef
+							start,
+							end: performance.now(),
+							detail: {
+								devtools: {
+									metadata: {
+										extensionName:
+											'Interactivity API: Init',
+										dataType: 'track-entry',
+									},
+									color: 'primary',
+									track: `IA: init ${ entry.namespace }`,
 								},
-								color: 'primary',
-								track: `IA: init ${ entry.namespace }`,
 							},
-						},
-					}
-				);
+						}
+					);
+				}
 				return result;
 			} );
 		} );
@@ -337,25 +351,32 @@ export default () => {
 		events.forEach( ( entries, eventType ) => {
 			element.props[ `on${ eventType }` ] = ( event ) => {
 				entries.forEach( ( entry ) => {
-					const start = performance.now();
+					if ( SCRIPT_DEBUG ) {
+						// eslint-disable-next-line no-unused-vars
+						const start = performance.now();
+					}
 					evaluate( entry, event );
-					performance.measure(
-						`interactivity api on ${ entry.namespace }`,
-						{
-							start,
-							end: performance.now(),
-							detail: {
-								devtools: {
-									metadata: {
-										extensionName: 'Interactivity API: On',
-										dataType: 'track-entry',
+					if ( SCRIPT_DEBUG ) {
+						performance.measure(
+							`interactivity api on ${ entry.namespace }`,
+							{
+								// eslint-disable-next-line no-undef
+								start,
+								end: performance.now(),
+								detail: {
+									devtools: {
+										metadata: {
+											extensionName:
+												'Interactivity API: On',
+											dataType: 'track-entry',
+										},
+										color: 'primary',
+										track: `IA: on ${ entry.namespace }`,
 									},
-									color: 'primary',
-									track: `IA: on ${ entry.namespace }`,
 								},
-							},
-						}
-					);
+							}
+						);
+					}
 				} );
 			};
 		} );
