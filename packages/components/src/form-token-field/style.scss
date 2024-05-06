@@ -184,12 +184,10 @@
 
 	&[aria-disabled="true"] {
 		pointer-events: none;
-		opacity: 0.25;
+		color: $gray-600;
 
 		&.is-selected {
-			background: $gray-300;
-			color: $gray-900;
-			cursor: default;
+			background: $gray-100;
 		}
 	}
 }
