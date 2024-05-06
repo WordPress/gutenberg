@@ -70,7 +70,8 @@ export default function useClipboardHandler() {
 				const hasSelection =
 					event.type === 'copy' || event.type === 'cut'
 						? documentHasUncollapsedSelection( ownerDocument )
-						: documentHasSelection( ownerDocument );
+						: documentHasSelection( ownerDocument ) &&
+						  ! ownerDocument.activeElement.isContentEditable;
 
 				// Let native copy behaviour take over in input fields.
 				if ( hasSelection ) {
