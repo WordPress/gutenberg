@@ -7,10 +7,16 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	Button,
 	FlexItem,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { Icon, plus, shadow as shadowIcon } from '@wordpress/icons';
+import {
+	Icon,
+	plus,
+	shadow as shadowIcon,
+	moreVertical,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -21,18 +27,49 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ScreenHeader from './header';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
+const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
+} = unlock( componentsPrivateApis );
 
 export const defaultShadow = '6px 6px #000';
 
 export default function ShadowsPanel() {
-	const [ defaultShadows ] = useGlobalSetting( 'shadow.presets.default' );
-	const [ themeShadows ] = useGlobalSetting( 'shadow.presets.theme' );
+	const [ defaultShadows, setDefaultShadows ] = useGlobalSetting(
+		'shadow.presets.default'
+	);
+	const [ baseDefaultShadows ] = useGlobalSetting(
+		'shadow.presets.default',
+		undefined,
+		'base'
+	);
+	const [ defaultShadowsEnabled ] = useGlobalSetting(
+		'shadow.defaultPresets'
+	);
+
+	const [ themeShadows, setThemeShadows ] = useGlobalSetting(
+		'shadow.presets.theme'
+	);
+	const [ baseThemeShadows ] = useGlobalSetting(
+		'shadow.presets.theme',
+		undefined,
+		'base'
+	);
 	const [ customShadows, setCustomShadows ] = useGlobalSetting(
 		'shadow.presets.custom'
 	);
 
 	const onCreateShadow = ( shadow ) => {
 		setCustomShadows( [ ...( customShadows || [] ), shadow ] );
+	};
+
+	const onResetShadows = ( shadowCategory ) => {
+		if ( shadowCategory === 'default' ) {
+			setDefaultShadows( baseDefaultShadows );
+		} else if ( shadowCategory === 'theme' ) {
+			setThemeShadows( baseThemeShadows );
+		}
 	};
 
 	return (
@@ -48,22 +85,29 @@ export default function ShadowsPanel() {
 					className="edit-site-global-styles-shadows-panel"
 					spacing={ 7 }
 				>
-					<ShadowList
-						label={ __( 'Default' ) }
-						shadows={ defaultShadows || [] }
-						category={ 'default' }
-					/>
+					{ defaultShadowsEnabled && (
+						<ShadowList
+							label={ __( 'Default' ) }
+							shadows={ defaultShadows || [] }
+							category="default"
+							canReset={ defaultShadows !== baseDefaultShadows }
+							onReset={ () => onResetShadows( 'default' ) }
+						/>
+					) }
 					{ themeShadows && themeShadows.length > 0 && (
 						<ShadowList
 							label={ __( 'Theme' ) }
 							shadows={ themeShadows || [] }
-							category={ 'theme' }
+							category="theme"
+							canReset={ themeShadows !== baseThemeShadows }
+							onReset={ () => onResetShadows( 'theme' ) }
 						/>
 					) }
 					<ShadowList
 						label={ __( 'Custom' ) }
 						shadows={ customShadows || [] }
-						category={ 'custom' }
+						category="custom"
+						canCreate
 						onCreate={ onCreateShadow }
 					/>
 				</VStack>
@@ -72,7 +116,15 @@ export default function ShadowsPanel() {
 	);
 }
 
-function ShadowList( { label, shadows, category, onCreate } ) {
+function ShadowList( {
+	label,
+	shadows,
+	category,
+	canCreate,
+	onCreate,
+	canReset,
+	onReset,
+} ) {
 	const handleAddShadow = () => {
 		onCreate( {
 			name: `Shadow ${ shadows.length + 1 }`,
@@ -88,7 +140,7 @@ function ShadowList( { label, shadows, category, onCreate } ) {
 					<Subtitle level={ 3 }>{ label }</Subtitle>
 				</FlexItem>
 				<FlexItem>
-					{ category === 'custom' && (
+					{ canCreate ? (
 						<Button
 							size="small"
 							icon={ plus }
@@ -97,6 +149,26 @@ function ShadowList( { label, shadows, category, onCreate } ) {
 								handleAddShadow();
 							} }
 						/>
+					) : (
+						<DropdownMenu
+							trigger={
+								<Button
+									variant="tertiary"
+									size="small"
+									icon={ moreVertical }
+									label={ __( 'Menu' ) }
+								/>
+							}
+						>
+							<DropdownMenuItem
+								onClick={ onReset }
+								disabled={ ! canReset }
+							>
+								<DropdownMenuItemLabel>
+									{ __( 'Reset shadows' ) }
+								</DropdownMenuItemLabel>
+							</DropdownMenuItem>
+						</DropdownMenu>
 					) }
 				</FlexItem>
 			</HStack>
