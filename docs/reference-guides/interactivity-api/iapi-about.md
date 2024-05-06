@@ -72,7 +72,7 @@ The Interactivity API pipeline promotes **progressive enhancement** by building 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
 <div class="callout callout-warning">
-  Full-page client-side navigation will be an exception to this compatibility with other libraries rule. See [Client-side navigation](#client-side-navigation) for more details.
+  Full-page client-side navigation will be an exception to this compatibility with other libraries rule. See <a href="#client-side-navigation">Client-side navigation</a> for more details.
 </div>
 
 ### Declarative and reactive
@@ -170,7 +170,7 @@ Using built-in directives does not require a build step and only requires a smal
 The Interactivity API comes with built-in primitives for adding client-side navigation to your site. This functionality is completely optional, but it opens the possibility to create these user experiences without having to opt out of the WordPress rendering system.
 
 <div class="callout callout-info">
-  Full-page client-side navigation with the Interactivity API is still a work in progress (see https://github.com/WordPress/gutenberg/issues/60951), but it's expected that to enable this behaviour all the interactivity required for blocks is provided with the Interactivity API Standard. Only in this case, the Interactivity API won't be fully compatible with other libraries (such as jQuery). 
+  Full-page client-side navigation with the Interactivity API is still a work in progress (see <a href="https://github.com/WordPress/gutenberg/issues/60951">#60951</a>). Still, it is expected that all the interactive blocks will have to use the Interactivity API to enable full-page client-side navigation with the Interactivity API. Only in this case, the Interactivity API won't be fully compatible with other libraries (such as jQuery). 
 </div>
 
 It also pairs very well with the [View Transitions API](https://developer.chrome.com/docs/web-platform/view-transitions/) allowing developers to animate page transitions easily.
