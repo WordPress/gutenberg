@@ -148,7 +148,7 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 					{ sprintf(
 						// translators: %s: block's title.
 						__(
-							'Only the content of blocks inside "%s" can be edited.'
+							'The parent "%s" block is partially locked, preventing the movement or deletion of child blocks, as well as the addition of any inner blocks.'
 						),
 						blockDisplayInformation.title
 					) }
@@ -162,7 +162,11 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 					onClose();
 				} }
 			>
-				{ __( 'Remove template lock' ) }
+				{ sprintf(
+					// translators: %s: block's title.
+					__( 'Unlock "%s"' ),
+					blockDisplayInformation.title
+				) }
 			</MenuItem>
 		</>
 	);
