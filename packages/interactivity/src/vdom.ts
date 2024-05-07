@@ -5,7 +5,7 @@ import { h } from 'preact';
 /**
  * Internal dependencies
  */
-import { directivePrefix as p } from './constants';
+import { isDebug, directivePrefix as p } from './constants';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -120,12 +120,7 @@ export function toVdom( root ) {
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
 					if ( directiveMatch === null ) {
-						if (
-							// @ts-expect-error This is a debug-only warning.
-							typeof SCRIPT_DEBUG !== 'undefined' &&
-							// @ts-expect-error This is a debug-only warning.
-							SCRIPT_DEBUG === true
-						) {
+						if ( isDebug ) {
 							// eslint-disable-next-line no-console
 							console.warn( `Invalid directive: ${ name }.` );
 						}

@@ -286,7 +286,7 @@ const resolve = ( path, namespace ) => {
 		if ( isDebug ) {
 			// eslint-disable-next-line no-console
 			console.warn(
-				`The namespace "${ namespace }" defined in "data-wp-interactive" does not match with the store.`
+				`There was an error when trying to resolve the path "${ path }" in the namespace "${ namespace }".`
 			);
 		}
 	}
