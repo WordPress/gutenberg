@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,6 +35,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -66,6 +67,7 @@ const {
 	InterfaceSkeleton,
 	ComplementaryArea,
 	interfaceStore,
+	SavePublishPanels,
 } = unlock( editorPrivateApis );
 
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
@@ -189,6 +191,22 @@ export default function Editor( { isLoading, onClick } ) {
 	const { closeGeneralSidebar } = useDispatch( editSiteStore );
 
 	const settings = useSpecificEditorSettings();
+
+	// Local state for save panel.
+	// Note 'truthy' callback implies an open panel.
+	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
+		useState( false );
+
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
+
 	const isReady =
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
@@ -219,10 +237,12 @@ export default function Editor( { isLoading, onClick } ) {
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
-						className={ classnames(
+						className={ clsx(
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,
+								'is-entity-save-view-open':
+									!! entitiesSavedStatesCallback,
 							}
 						) }
 						header={
@@ -249,10 +269,27 @@ export default function Editor( { isLoading, onClick } ) {
 											ease: [ 0.6, 0, 0.4, 1 ],
 										} }
 									>
-										<Header />
+										<Header
+											setEntitiesSavedStatesCallback={
+												setEntitiesSavedStatesCallback
+											}
+										/>
 									</motion.div>
 								) }
 							</AnimatePresence>
+						}
+						actions={
+							<SavePublishPanels
+								closeEntitiesSavedStates={
+									closeEntitiesSavedStates
+								}
+								isEntitiesSavedStatesOpen={
+									entitiesSavedStatesCallback
+								}
+								setEntitiesSavedStatesCallback={
+									setEntitiesSavedStatesCallback
+								}
+							/>
 						}
 						notices={ <EditorSnackbars /> }
 						content={

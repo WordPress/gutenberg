@@ -496,11 +496,15 @@ function FontLibraryProvider( { children } ) {
 
 	const loadFontFaceAsset = async ( fontFace ) => {
 		// If the font doesn't have a src, don't load it.
-		if ( ! fontFace.src ) return;
+		if ( ! fontFace.src ) {
+			return;
+		}
 		// Get the src of the font.
 		const src = getDisplaySrcFromFontFace( fontFace.src );
 		// If the font is already loaded, don't load it again.
-		if ( ! src || loadedFontUrls.has( src ) ) return;
+		if ( ! src || loadedFontUrls.has( src ) ) {
+			return;
+		}
 		// Load the font in the browser.
 		loadFontFaceInBrowser( fontFace, src, 'document' );
 		// Add the font to the loaded fonts list.
@@ -518,7 +522,9 @@ function FontLibraryProvider( { children } ) {
 			const hasData = !! collections.find(
 				( collection ) => collection.slug === slug
 			)?.font_families;
-			if ( hasData ) return;
+			if ( hasData ) {
+				return;
+			}
 			const response = await fetchFontCollection( slug );
 			const updatedCollections = collections.map( ( collection ) =>
 				collection.slug === slug

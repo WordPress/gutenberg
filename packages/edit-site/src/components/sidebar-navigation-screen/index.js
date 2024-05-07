@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -33,6 +33,13 @@ import { SidebarNavigationContext } from '../sidebar';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function getBackPath( params ) {
+	// Navigation Menus are not currently part of a data view.
+	// Therefore when navigating back from a navigation menu
+	// the target path is the navigation listing view.
+	if ( params.path === '/navigation' && params.postId ) {
+		return { path: '/navigation' };
+	}
+
 	// From a data view path we navigate back to root
 	if ( params.path ) {
 		return {};
@@ -86,12 +93,9 @@ export default function SidebarNavigationScreen( {
 	return (
 		<>
 			<VStack
-				className={ classnames(
-					'edit-site-sidebar-navigation-screen__main',
-					{
-						'has-footer': !! footer,
-					}
-				) }
+				className={ clsx( 'edit-site-sidebar-navigation-screen__main', {
+					'has-footer': !! footer,
+				} ) }
 				spacing={ 0 }
 				justify="flex-start"
 			>

@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  */
 import { Flex } from '../../flex';
 import UnitControl from '../../unit-control';
-import { COLORS, CONFIG, reduceMotion } from '../../utils';
+import { COLORS, CONFIG } from '../../utils';
 import type { FocalPointPickerControlsProps } from '../types';
 import { INITIAL_BOUNDS } from '../utils';
 
@@ -106,10 +106,11 @@ export const GridView = styled.div`
 	position: absolute;
 	top: 50%;
 	transform: translate3d( -50%, -50%, 0 );
-	transition: opacity 100ms linear;
 	z-index: 1;
 
-	${ reduceMotion( 'transition' ) }
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 100ms linear;
+	}
 
 	opacity: ${ ( { showOverlay }: { showOverlay?: boolean } ) =>
 		showOverlay ? 1 : 0 };

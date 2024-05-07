@@ -7,7 +7,6 @@ import { downloadZip } from 'client-zip';
 /**
  * WordPress dependencies
  */
-import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
@@ -39,7 +38,7 @@ import {
 } from '../../utils/constants';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
@@ -365,9 +364,9 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const history = useHistory();
 		function onPatternSuccess( { pattern } ) {
@@ -401,11 +400,11 @@ export const duplicateTemplatePartAction = {
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const { createSuccessNotice } = useDispatch( noticesStore );
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const history = useHistory();
-		async function onTemplatePartSuccess( templatePart ) {
+		function onTemplatePartSuccess( templatePart ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.

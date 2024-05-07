@@ -776,15 +776,29 @@ export const toStyles = (
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
 	disableLayoutStyles = false,
-	isTemplate = true
+	isTemplate = true,
+	styleOptions = undefined
 ) => {
+	// These allow opting out of certain sets of styles.
+	const options = {
+		blockGap: true,
+		blockStyles: true,
+		layoutStyles: true,
+		marginReset: true,
+		presets: true,
+		rootPadding: true,
+		...styleOptions,
+	};
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 	const { contentSize, wideSize } = tree?.settings?.layout || {};
+	const hasBodyStyles =
+		options.marginReset || options.rootPadding || options.layoutStyles;
+
 	let ruleset = '';
 
-	if ( contentSize || wideSize ) {
+	if ( options.presets && ( contentSize || wideSize ) ) {
 		ruleset += `${ ROOT_CSS_PROPERTIES_SELECTOR } {`;
 		ruleset = contentSize
 			? ruleset + ` --wp--style--global--content-size: ${ contentSize };`
@@ -795,203 +809,211 @@ export const toStyles = (
 		ruleset += '}';
 	}
 
-	/*
-	 * Reset default browser margin on the body element.
-	 * This is set on the body selector **before** generating the ruleset
-	 * from the `theme.json`. This is to ensure that if the `theme.json` declares
-	 * `margin` in its `spacing` declaration for the `body` element then these
-	 * user-generated values take precedence in the CSS cascade.
-	 * @link https://github.com/WordPress/gutenberg/issues/36147.
-	 */
-	ruleset += 'body {margin: 0;';
-
-	// Root padding styles should only be output for full templates, not patterns or template parts.
-	if ( useRootPaddingAlign && isTemplate ) {
+	if ( hasBodyStyles ) {
 		/*
-		 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
-		 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
+		 * Reset default browser margin on the body element.
+		 * This is set on the body selector **before** generating the ruleset
+		 * from the `theme.json`. This is to ensure that if the `theme.json` declares
+		 * `margin` in its `spacing` declaration for the `body` element then these
+		 * user-generated values take precedence in the CSS cascade.
+		 * @link https://github.com/WordPress/gutenberg/issues/36147.
 		 */
-		ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
-			.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }
-			.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
-			.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }
-			.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
-			.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
+		ruleset += ':where(body) {margin: 0;';
+
+		// Root padding styles should only be output for full templates, not patterns or template parts.
+		if ( options.rootPadding && useRootPaddingAlign && isTemplate ) {
+			/*
+			 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
+			 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
+			 */
+			ruleset += `padding-right: 0; padding-left: 0; padding-top: var(--wp--style--root--padding-top); padding-bottom: var(--wp--style--root--padding-bottom) }
+				.has-global-padding { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+				.has-global-padding :where(.has-global-padding:not(.wp-block-block)) { padding-right: 0; padding-left: 0; }
+				.has-global-padding > .alignfull { margin-right: calc(var(--wp--style--root--padding-right) * -1); margin-left: calc(var(--wp--style--root--padding-left) * -1); }
+				.has-global-padding :where(.has-global-padding:not(.wp-block-block)) > .alignfull { margin-right: 0; margin-left: 0; }
+				.has-global-padding > .alignfull:where(:not(.has-global-padding):not(.is-layout-flex):not(.is-layout-grid)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: var(--wp--style--root--padding-right); padding-left: var(--wp--style--root--padding-left); }
+				.has-global-padding :where(.has-global-padding) > .alignfull:where(:not(.has-global-padding)) > :where(.wp-block:not(.alignfull),p,h1,h2,h3,h4,h5,h6,ul,ol) { padding-right: 0; padding-left: 0;`;
+		}
+
+		ruleset += '}';
 	}
 
-	ruleset += '}';
+	if ( options.blockStyles ) {
+		nodesWithStyles.forEach(
+			( {
+				selector,
+				duotoneSelector,
+				styles,
+				fallbackGapValue,
+				hasLayoutSupport,
+				featureSelectors,
+				styleVariationSelectors,
+			} ) => {
+				// Process styles for block support features with custom feature level
+				// CSS selectors set.
+				if ( featureSelectors ) {
+					const featureDeclarations = getFeatureDeclarations(
+						featureSelectors,
+						styles
+					);
 
-	nodesWithStyles.forEach(
-		( {
-			selector,
-			duotoneSelector,
-			styles,
-			fallbackGapValue,
-			hasLayoutSupport,
-			featureSelectors,
-			styleVariationSelectors,
-		} ) => {
-			// Process styles for block support features with custom feature level
-			// CSS selectors set.
-			if ( featureSelectors ) {
-				const featureDeclarations = getFeatureDeclarations(
-					featureSelectors,
-					styles
-				);
-
-				Object.entries( featureDeclarations ).forEach(
-					( [ cssSelector, declarations ] ) => {
-						if ( declarations.length ) {
-							const rules = declarations.join( ';' );
-							ruleset += `:where(${ cssSelector }){${ rules };}`;
-						}
-					}
-				);
-			}
-
-			if ( styleVariationSelectors ) {
-				Object.entries( styleVariationSelectors ).forEach(
-					( [ styleVariationName, styleVariationSelector ] ) => {
-						const styleVariations =
-							styles?.variations?.[ styleVariationName ];
-						if ( styleVariations ) {
-							// If the block uses any custom selectors for block support, add those first.
-							if ( featureSelectors ) {
-								const featureDeclarations =
-									getFeatureDeclarations(
-										featureSelectors,
-										styleVariations
-									);
-
-								Object.entries( featureDeclarations ).forEach(
-									( [ baseSelector, declarations ] ) => {
-										if ( declarations.length ) {
-											const cssSelector =
-												concatFeatureVariationSelectorString(
-													baseSelector,
-													styleVariationSelector
-												);
-											const rules =
-												declarations.join( ';' );
-											ruleset += `${ cssSelector }{${ rules };}`;
-										}
-									}
-								);
-							}
-
-							// Otherwise add regular selectors.
-							const styleVariationDeclarations =
-								getStylesDeclarations(
-									styleVariations,
-									styleVariationSelector,
-									useRootPaddingAlign,
-									tree
-								);
-							if ( styleVariationDeclarations.length ) {
-								ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
-									';'
-								) };}`;
+					Object.entries( featureDeclarations ).forEach(
+						( [ cssSelector, declarations ] ) => {
+							if ( declarations.length ) {
+								const rules = declarations.join( ';' );
+								ruleset += `:where(${ cssSelector }){${ rules };}`;
 							}
 						}
-					}
-				);
-			}
-
-			// Process duotone styles.
-			if ( duotoneSelector ) {
-				const duotoneStyles = {};
-				if ( styles?.filter ) {
-					duotoneStyles.filter = styles.filter;
-					delete styles.filter;
+					);
 				}
-				const duotoneDeclarations =
-					getStylesDeclarations( duotoneStyles );
-				if ( duotoneDeclarations.length ) {
-					ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+
+				if ( styleVariationSelectors ) {
+					Object.entries( styleVariationSelectors ).forEach(
+						( [ styleVariationName, styleVariationSelector ] ) => {
+							const styleVariations =
+								styles?.variations?.[ styleVariationName ];
+							if ( styleVariations ) {
+								// If the block uses any custom selectors for block support, add those first.
+								if ( featureSelectors ) {
+									const featureDeclarations =
+										getFeatureDeclarations(
+											featureSelectors,
+											styleVariations
+										);
+
+									Object.entries(
+										featureDeclarations
+									).forEach(
+										( [ baseSelector, declarations ] ) => {
+											if ( declarations.length ) {
+												const cssSelector =
+													concatFeatureVariationSelectorString(
+														baseSelector,
+														styleVariationSelector
+													);
+												const rules =
+													declarations.join( ';' );
+												ruleset += `${ cssSelector }{${ rules };}`;
+											}
+										}
+									);
+								}
+
+								// Otherwise add regular selectors.
+								const styleVariationDeclarations =
+									getStylesDeclarations(
+										styleVariations,
+										styleVariationSelector,
+										useRootPaddingAlign,
+										tree
+									);
+								if ( styleVariationDeclarations.length ) {
+									ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
+										';'
+									) };}`;
+								}
+							}
+						}
+					);
+				}
+
+				// Process duotone styles.
+				if ( duotoneSelector ) {
+					const duotoneStyles = {};
+					if ( styles?.filter ) {
+						duotoneStyles.filter = styles.filter;
+						delete styles.filter;
+					}
+					const duotoneDeclarations =
+						getStylesDeclarations( duotoneStyles );
+					if ( duotoneDeclarations.length ) {
+						ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
+					}
+				}
+
+				// Process blockGap and layout styles.
+				if (
+					! disableLayoutStyles &&
+					( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+				) {
+					ruleset += getLayoutStyles( {
+						style: styles,
+						selector,
+						hasBlockGapSupport,
+						hasFallbackGapSupport,
+						fallbackGapValue,
+					} );
+				}
+
+				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
+				const declarations = getStylesDeclarations(
+					styles,
+					selector,
+					useRootPaddingAlign,
+					tree,
+					isTemplate
+				);
+				if ( declarations?.length ) {
+					ruleset += `:where(${ selector }){${ declarations.join(
 						';'
 					) };}`;
 				}
-			}
 
-			// Process blockGap and layout styles.
-			if (
-				! disableLayoutStyles &&
-				( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
-			) {
-				ruleset += getLayoutStyles( {
-					style: styles,
-					selector,
-					hasBlockGapSupport,
-					hasFallbackGapSupport,
-					fallbackGapValue,
-				} );
-			}
-
-			// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-			const declarations = getStylesDeclarations(
-				styles,
-				selector,
-				useRootPaddingAlign,
-				tree,
-				isTemplate
-			);
-			if ( declarations?.length ) {
-				ruleset += `:where(${ selector }){${ declarations.join(
-					';'
-				) };}`;
-			}
-
-			// Check for pseudo selector in `styles` and handle separately.
-			const pseudoSelectorStyles = Object.entries( styles ).filter(
-				( [ key ] ) => key.startsWith( ':' )
-			);
-
-			if ( pseudoSelectorStyles?.length ) {
-				pseudoSelectorStyles.forEach(
-					( [ pseudoKey, pseudoStyle ] ) => {
-						const pseudoDeclarations =
-							getStylesDeclarations( pseudoStyle );
-
-						if ( ! pseudoDeclarations?.length ) {
-							return;
-						}
-
-						// `selector` maybe provided in a form
-						// where block level selectors have sub element
-						// selectors appended to them as a comma separated
-						// string.
-						// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-						// Split and append pseudo selector to create
-						// the proper rules to target the elements.
-						const _selector = selector
-							.split( ',' )
-							.map( ( sel ) => sel + pseudoKey )
-							.join( ',' );
-
-						const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
-							';'
-						) };}`;
-
-						ruleset += pseudoRule;
-					}
+				// Check for pseudo selector in `styles` and handle separately.
+				const pseudoSelectorStyles = Object.entries( styles ).filter(
+					( [ key ] ) => key.startsWith( ':' )
 				);
+
+				if ( pseudoSelectorStyles?.length ) {
+					pseudoSelectorStyles.forEach(
+						( [ pseudoKey, pseudoStyle ] ) => {
+							const pseudoDeclarations =
+								getStylesDeclarations( pseudoStyle );
+
+							if ( ! pseudoDeclarations?.length ) {
+								return;
+							}
+
+							// `selector` maybe provided in a form
+							// where block level selectors have sub element
+							// selectors appended to them as a comma separated
+							// string.
+							// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
+							// Split and append pseudo selector to create
+							// the proper rules to target the elements.
+							const _selector = selector
+								.split( ',' )
+								.map( ( sel ) => sel + pseudoKey )
+								.join( ',' );
+
+							const pseudoRule = `${ _selector }{${ pseudoDeclarations.join(
+								';'
+							) };}`;
+
+							ruleset += pseudoRule;
+						}
+					);
+				}
 			}
-		}
-	);
+		);
+	}
 
-	/* Add alignment / layout styles */
-	ruleset =
-		ruleset +
-		'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
-	ruleset =
-		ruleset +
-		'.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
-	ruleset =
-		ruleset +
-		'.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+	if ( options.layoutStyles ) {
+		/* Add alignment / layout styles */
+		ruleset =
+			ruleset +
+			'.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
+		ruleset =
+			ruleset +
+			'.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
+		ruleset =
+			ruleset +
+			'.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
+	}
 
-	if ( hasBlockGapSupport ) {
+	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
@@ -1006,20 +1028,22 @@ export const toStyles = (
 			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
-	nodesWithSettings.forEach( ( { selector, presets } ) => {
-		if (
-			ROOT_BLOCK_SELECTOR === selector ||
-			ROOT_CSS_PROPERTIES_SELECTOR === selector
-		) {
-			// Do not add extra specificity for top-level classes.
-			selector = '';
-		}
+	if ( options.presets ) {
+		nodesWithSettings.forEach( ( { selector, presets } ) => {
+			if (
+				ROOT_BLOCK_SELECTOR === selector ||
+				ROOT_CSS_PROPERTIES_SELECTOR === selector
+			) {
+				// Do not add extra specificity for top-level classes.
+				selector = '';
+			}
 
-		const classes = getPresetsClasses( selector, presets );
-		if ( classes.length > 0 ) {
-			ruleset += classes;
-		}
-	} );
+			const classes = getPresetsClasses( selector, presets );
+			if ( classes.length > 0 ) {
+				ruleset += classes;
+			}
+		} );
+	}
 
 	return ruleset;
 };

@@ -18,7 +18,7 @@ import { shadow as shadowIcon, Icon, check } from '@wordpress/icons';
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -92,15 +92,12 @@ export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
 			role="option"
 			aria-label={ label }
 			aria-selected={ isActive }
-			className={ classNames(
-				'block-editor-global-styles__shadow__item',
-				{
-					'is-active': isActive,
-				}
-			) }
+			className={ clsx( 'block-editor-global-styles__shadow__item', {
+				'is-active': isActive,
+			} ) }
 			render={
 				<Button
-					className={ classNames(
+					className={ clsx(
 						'block-editor-global-styles__shadow-indicator',
 						{
 							unset: type === 'unset',
@@ -147,7 +144,7 @@ function renderShadowToggle() {
 	return ( { onToggle, isOpen } ) => {
 		const toggleProps = {
 			onClick: onToggle,
-			className: classNames( { 'is-open': isOpen } ),
+			className: clsx( { 'is-open': isOpen } ),
 			'aria-expanded': isOpen,
 		};
 

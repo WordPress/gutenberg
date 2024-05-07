@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -92,7 +92,9 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 
 function hasOverridableBlocks( blocks ) {
 	return blocks.some( ( block ) => {
-		if ( isOverridableBlock( block ) ) return true;
+		if ( isOverridableBlock( block ) ) {
+			return true;
+		}
 		return hasOverridableBlocks( block.innerBlocks );
 	} );
 }
@@ -159,7 +161,9 @@ function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
 	/** @type {Record<string, { values: Record<string, unknown>}>} */
 	const content = {};
 	for ( const block of blocks ) {
-		if ( block.name === patternBlockName ) continue;
+		if ( block.name === patternBlockName ) {
+			continue;
+		}
 		if ( block.innerBlocks.length ) {
 			Object.assign(
 				content,
@@ -261,8 +265,9 @@ function ReusableBlockEdit( {
 	);
 	const isMissing = hasResolved && ! record;
 
-	// The initial value of the `content` attribute.
-	const initialContent = useRef( content );
+	// The value of the `content` attribute, stored in a `ref` to avoid triggering the effect
+	// that runs `applyInitialContentValuesToInnerBlocks` unnecessarily.
+	const contentRef = useRef( content );
 
 	// The default content values from the original pattern for overridable attributes.
 	// Set by the `applyInitialContentValuesToInnerBlocks` function.
@@ -349,7 +354,7 @@ function ReusableBlockEdit( {
 		// Build a map of clientIds to the old nano id system to provide back compat.
 		legacyIdMap.current = getLegacyIdMap(
 			initialBlocks,
-			initialContent.current
+			contentRef.current
 		);
 		defaultContent.current = {};
 		const originalEditingMode = getBlockEditingMode( patternClientId );
@@ -360,7 +365,7 @@ function ReusableBlockEdit( {
 				const blocks = hasPatternOverridesSource
 					? applyInitialContentValuesToInnerBlocks(
 							initialBlocks,
-							initialContent.current,
+							contentRef.current,
 							defaultContent.current,
 							legacyIdMap.current
 					  )
@@ -389,7 +394,7 @@ function ReusableBlockEdit( {
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,
 			{ [ `align${ alignment }` ]: alignment }
@@ -397,7 +402,7 @@ function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: 'all',
+		templateLock: 'contentOnly',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined
@@ -417,13 +422,15 @@ function ReusableBlockEdit( {
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
+					const updatedContent = getContentValuesFromInnerBlocks(
+						blocks,
+						defaultContent.current,
+						legacyIdMap.current
+					);
 					setAttributes( {
-						content: getContentValuesFromInnerBlocks(
-							blocks,
-							defaultContent.current,
-							legacyIdMap.current
-						),
+						content: updatedContent,
 					} );
+					contentRef.current = updatedContent;
 				} );
 			}
 		}, blockEditorStore );

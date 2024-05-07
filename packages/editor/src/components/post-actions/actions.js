@@ -547,9 +547,12 @@ export const duplicatePostAction = {
 						parent: item.parent,
 						password: item.password,
 						template: item.template,
+						format: item.format,
 						featured_media: item.featured_media,
 						menu_order: item.menu_order,
 						ping_status: item.ping_status,
+						categories: item.categories,
+						tags: item.tags,
 					},
 					{ throwOnError: true }
 				);

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,7 @@ export default function Edit( props ) {
 	const { isWide = false } = props;
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'is-wide-widget': isWide,
 		} ),
 	} );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -203,11 +203,11 @@ function ResizableFrame( {
 		},
 		visible: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 		},
 		active: {
 			opacity: 1,
-			left: -16,
+			left: -14, // Account for the handle's width.
 			scaleY: 1.3,
 		},
 	};
@@ -226,8 +226,9 @@ function ResizableFrame( {
 			variants={ frameAnimationVariants }
 			animate={ isFullWidth ? 'fullWidth' : 'default' }
 			onAnimationComplete={ ( definition ) => {
-				if ( definition === 'fullWidth' )
+				if ( definition === 'fullWidth' ) {
 					setFrameSize( { width: '100%', height: '100%' } );
+				}
 			} }
 			transition={ FRAME_TRANSITION }
 			size={ frameSize }
@@ -265,7 +266,7 @@ function ResizableFrame( {
 								key="handle"
 								role="separator"
 								aria-orientation="vertical"
-								className={ classnames(
+								className={ clsx(
 									'edit-site-resizable-frame__handle',
 									{ 'is-resizing': isResizing }
 								) }
@@ -297,7 +298,7 @@ function ResizableFrame( {
 			onResizeStart={ handleResizeStart }
 			onResize={ handleResize }
 			onResizeStop={ handleResizeStop }
-			className={ classnames( 'edit-site-resizable-frame__inner', {
+			className={ clsx( 'edit-site-resizable-frame__inner', {
 				'is-resizing': isResizing,
 			} ) }
 			showHandle={ false } // Do not show the default handle, as we're using a custom one.
