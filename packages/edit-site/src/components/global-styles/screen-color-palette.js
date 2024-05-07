@@ -18,9 +18,9 @@ function ScreenColorPalette( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Edit Palette' ) }
+				title={ __( 'Edit palette' ) }
 				description={ __(
-					'The combination of colors used across this site and in color pickers.'
+					'The combination of colors used across the site and in color pickers.'
 				) }
 			/>
 			<Tabs>
