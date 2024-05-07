@@ -375,7 +375,8 @@
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./bin/api-docs/are-api-docs-unstaged.js"
+			"node ./bin/api-docs/are-api-docs-unstaged.js",
+			"node ./bin/packages/lint-staged-typecheck.js"
 		],
 		"**/tsconfig.json": [
 			"npm run lint:tsconfig"
