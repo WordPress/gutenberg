@@ -518,35 +518,6 @@ async function runPerformanceTests( branches, options ) {
 		// Print the results.
 		console.table( invertedResult );
 
-		/**
-		 * Formats an array of objects as a Markdown table.
-		 *
-		 * For example, this array:
-		 *
-		 * [
-		 * 	{
-		 * 	    foo: 123,
-		 * 	    bar: 456,
-		 * 	    baz: 'Yes',
-		 * 	},
-		 * 	{
-		 * 	    foo: 777,
-		 * 	    bar: 999,
-		 * 	    baz: 'No',
-		 * 	}
-		 * ]
-		 *
-		 * Will result in the following table:
-		 *
-		 * | foo | bar | baz |
-		 * |-----|-----|-----|
-		 * | 123 | 456 | Yes |
-		 * | 777 | 999 | No  |
-		 *
-		 * @param {Array<Object>} rows Table rows.
-		 * @return {string} Markdown table content.
-		 */
-
 		// Use yet another structure to generate a Markdown table.
 
 		const rows = [];
