@@ -33,8 +33,6 @@ import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
 } from './private-actions';
-import { STORE_NAME } from './constants';
-import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -1608,49 +1606,7 @@ export const setNavigationMode =
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
-		// When switching to zoom-out mode, we need to select the parent section
-		if ( mode === 'zoom-out' ) {
-			const firstSelectedClientId = select.getBlockSelectionStart();
-			const allBlocks = select.getBlocks();
-
-			const { sectionRootClientId } = unlock(
-				registry.select( STORE_NAME ).getSettings()
-			);
-			if ( sectionRootClientId ) {
-				const sectionClientIds =
-					select.getBlockOrder( sectionRootClientId );
-				const lastSectionClientId =
-					sectionClientIds[ sectionClientIds.length - 1 ];
-				if ( sectionClientIds ) {
-					if ( firstSelectedClientId ) {
-						const parents = select.getBlockParents(
-							firstSelectedClientId
-						);
-						const firstSectionClientId = parents.find( ( parent ) =>
-							sectionClientIds.includes( parent )
-						);
-						if ( firstSectionClientId ) {
-							dispatch.selectBlock( firstSectionClientId );
-						} else {
-							dispatch.selectBlock( lastSectionClientId );
-						}
-					} else {
-						dispatch.selectBlock( lastSectionClientId );
-					}
-				}
-			} else if ( firstSelectedClientId ) {
-				const rootClientId = select.getBlockHierarchyRootClientId(
-					firstSelectedClientId
-				);
-				dispatch.selectBlock( rootClientId );
-			} else {
-				// If there's no block selected and no sectionRootClientId, select the last root block.
-				const lastRootBlock = allBlocks[ allBlocks.length - 1 ];
-				dispatch.selectBlock( lastRootBlock?.clientId );
-			}
-		}
-
+	( { dispatch } ) => {
 		dispatch( { type: 'SET_EDITOR_MODE', mode } );
 
 		if ( mode === 'navigation' ) {
