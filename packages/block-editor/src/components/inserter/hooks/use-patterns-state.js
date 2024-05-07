@@ -23,6 +23,7 @@ import { unlock } from '../../../lock-unlock';
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = ( onInsert, rootClientId ) => {
+	const { __unstableGetEditorMode } = useSelect( blockEditorStore );
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
 			const { __experimentalGetAllowedPatterns, getSettings } =
@@ -30,7 +31,6 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
-				__unstableGetEditorMode,
 			} = getSettings();
 			let sectionRootClientId;
 
