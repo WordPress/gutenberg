@@ -619,12 +619,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$column_count         = isset( $block['parentLayout']['columnCount'] ) ? $block['parentLayout']['columnCount'] : null;
 
 		/*
-		* If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
-		* the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
-		* once the grid has less columns than the start.
-		* If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
-		* In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
-		*/
+		 * If columnSpan or columnStart is set, and the parent grid is responsive, i.e. if it has a minimumColumnWidth set,
+		 * the columnSpan should be removed once the grid is smaller than the span, and columnStart should be removed
+		 * once the grid has less columns than the start.
+		 * If there's a minimumColumnWidth, the grid is responsive. But if the minimumColumnWidth value wasn't changed, it won't be set.
+		 * In that case, if columnCount doesn't exist, we can assume that the grid is responsive.
+		 */
 		if ( ( $column_span || $column_start ) && ( $minimum_column_width || ! $column_count ) ) {
 			$column_span_number  = floatval( $column_span );
 			$column_start_number = floatval( $column_start );
@@ -669,9 +669,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 
 		/*
-		* Add to the style engine store to enqueue and render layout styles.
-		* Return styles here just to check if any exist.
-		*/
+		 * Add to the style engine store to enqueue and render layout styles.
+		 * Return styles here just to check if any exist.
+		 */
 		$child_css = gutenberg_style_engine_get_stylesheet_from_css_rules(
 			$child_layout_styles,
 			array(
@@ -685,20 +685,20 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-		// Prep the processor for modifying the block output.
-		$processor = new WP_HTML_Tag_Processor( $block_content );
+	// Prep the processor for modifying the block output.
+	$processor = new WP_HTML_Tag_Processor( $block_content );
 
-		// Having no tags implies there are no tags onto which to add class names.
+	// Having no tags implies there are no tags onto which to add class names.
 	if ( ! $processor->next_tag() ) {
 		return $block_content;
 	}
 
-		/*
-		* A block may not support layout but still be affected by a parent block's layout.
-		*
-		* In these cases add the appropriate class names and then return early; there's
-		* no need to investigate on this block whether additional layout constraints apply.
-		*/
+	/*
+	 * A block may not support layout but still be affected by a parent block's layout.
+	 *
+	 * In these cases add the appropriate class names and then return early; there's
+	 * no need to investigate on this block whether additional layout constraints apply.
+	 */
 	if ( ! $block_supports_layout && ! empty( $outer_class_names ) ) {
 		foreach ( $outer_class_names as $class_name ) {
 			$processor->add_class( $class_name );
