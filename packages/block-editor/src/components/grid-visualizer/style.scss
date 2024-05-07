@@ -1,33 +1,52 @@
-// TODO: Specificity hacks to get rid of all these darn !importants.
-
 .block-editor-grid-visualizer {
-	z-index: z-index(".block-editor-grid-visualizer") !important;
-}
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-visualizer.block-editor-grid-visualizer {
+		z-index: z-index(".block-editor-grid-visualizer");
 
-.block-editor-grid-visualizer .components-popover__content * {
-	pointer-events: none !important;
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
 }
 
 .block-editor-grid-visualizer__grid {
 	display: grid;
 }
 
-.block-editor-grid-visualizer__item {
+.block-editor-grid-visualizer__cell {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+}
+
+.block-editor-grid-visualizer__drop-zone {
 	border: $border-width dashed $gray-300;
+	width: 100%;
+	height: 100%;
+
+	// Make drop zone 8x8 at minimum so that it's easier to drag into. This will overflow the parent.
+	min-width: $grid-unit-10;
+	min-height: $grid-unit-10;
 }
 
 .block-editor-grid-item-resizer {
-	z-index: z-index(".block-editor-grid-visualizer") !important;
-}
+	// Specificity to override the z-index and pointer-events set by .components-popover.
+	&.block-editor-grid-item-resizer.block-editor-grid-item-resizer {
+		z-index: z-index(".block-editor-grid-visualizer");
 
-.block-editor-grid-item-resizer .components-popover__content * {
-	pointer-events: none !important;
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
 }
 
 .block-editor-grid-item-resizer__box {
 	border: $border-width solid var(--wp-admin-theme-color);
 
 	.components-resizable-box__handle {
-		pointer-events: all !important;
+		// Specificity to override the pointer-events set by .components-popover.
+		&.components-resizable-box__handle.components-resizable-box__handle {
+			pointer-events: all;
+		}
 	}
 }

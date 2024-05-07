@@ -51,7 +51,9 @@ function GridVisualizerGrid( { blockElement } ) {
 			style={ gridInfo.style }
 		>
 			{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-				<div key={ i } className="block-editor-grid-visualizer__item" />
+				<div key={ i } className="block-editor-grid-visualizer__cell">
+					<div className="block-editor-grid-visualizer__drop-zone" />
+				</div>
 			) ) }
 		</div>
 	);
