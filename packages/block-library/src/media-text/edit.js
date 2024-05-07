@@ -274,7 +274,16 @@ function MediaTextEdit( {
 	const mediaTextGeneralSettings = (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
-			resetAll={ resetAll }
+			resetAll={ () => {
+				setAttributes( {
+					isStackedOnMobile: true,
+					imageFill: false,
+					mediaAlt: '',
+					focalPoint: undefined,
+					mediaWidth: 50,
+					mediaSizeSlug: undefined,
+				} );
+			} }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
 		>
 			<ToolsPanelItem
@@ -360,21 +369,30 @@ function MediaTextEdit( {
 					</ToolsPanelItem>
 				) }
 			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
-				<TextareaControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt }
-					onChange={ onMediaAltChange }
-					help={
-						<>
-							<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-								{ __( 'Describe the purpose of the image.' ) }
-							</ExternalLink>
-							<br />
-							{ __( 'Leave empty if decorative.' ) }
-						</>
-					}
-				/>
+					isShownByDefault
+					hasValue={ () => !! mediaAlt }
+					onDeselect={ () => setAttributes( { mediaAlt: '' } ) }
+				>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ __( 'Alternative text' ) }
+						value={ mediaAlt }
+						onChange={ onMediaAltChange }
+						help={
+							<>
+								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
+					/>
+				</ToolsPanelItem>
 			) }
 			{ mediaType === 'image' && (
 				<ResolutionTool
@@ -397,17 +415,6 @@ function MediaTextEdit( {
 	);
 
 	const blockEditingMode = useBlockEditingMode();
-
-	function resetAll() {
-		setAttributes( {
-			isStackedOnMobile: true,
-			imageFill: false,
-			mediaAlt: undefined,
-			focalPoint: undefined,
-			mediaWidth: 50,
-			mediaSizeSlug: undefined,
-		} );
-	}
 
 	return (
 		<>
