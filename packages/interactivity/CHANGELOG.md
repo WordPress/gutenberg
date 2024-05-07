@@ -7,6 +7,7 @@
 -	Allow multiple event handlers for the same type with `data-wp-on-document` and `data-wp-on-window`. ([#61009](https://github.com/WordPress/gutenberg/pull/61009))
 
 -	Prevent wrong written directives from killing the runtime ([#61249](https://github.com/WordPress/gutenberg/pull/61249))
+-	Prevent empty namespace or different namespaces from killing the runtime ([#61409](https://github.com/WordPress/gutenberg/pull/61409))
 
 ## 5.6.0 (2024-05-02)
 
@@ -19,8 +20,6 @@
 ### Bug Fixes
 
 -   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
-
--   Prevent empty namespace or different namespaces from killing the runtime ([#61409](https://github.com/WordPress/gutenberg/pull/61409))
 
 ## 5.4.0 (2024-04-03)
 
