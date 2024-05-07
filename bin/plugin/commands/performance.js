@@ -136,8 +136,7 @@ function formatAsMarkdownTable( rows ) {
 		result += `| ${ header } `;
 	}
 	result += '|\n';
-	// eslint-disable-next-line no-unused-vars
-	for ( const header of headers ) {
+	for ( let i = 0; i < headers.length; i++ ) {
 		result += '| ------ ';
 	}
 	result += '|\n';
