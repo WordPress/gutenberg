@@ -7,7 +7,11 @@ export function useScrollIntoView( { isSelected } ) {
 	return useRefEffect(
 		( node ) => {
 			if ( isSelected ) {
-				const { defaultView } = node.ownerDocument;
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+				if ( ! defaultView ) {
+					return;
+				}
 				const observer = new defaultView.IntersectionObserver(
 					( entries ) => {
 						// Once observing starts, we always get an initial

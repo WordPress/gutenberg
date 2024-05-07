@@ -2751,7 +2751,7 @@ export function wasBlockJustInserted( state, clientId, source ) {
  * @return {boolean} True if the block is visible.
  */
 export function isBlockVisible( state, clientId ) {
-	return state.blockVisibility?.[ clientId ];
+	return state.blockVisibility?.[ clientId ] ?? true;
 }
 
 /**
