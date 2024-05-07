@@ -36,7 +36,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.
-				managePatternsUrl: canUser( 'read', 'templates' )
+				managePatternsUrl: canUser( 'create', 'templates' )
 					? addQueryArgs( 'site-editor.php', {
 							path: '/patterns',
 					  } )

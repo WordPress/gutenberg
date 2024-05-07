@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 
 export function useIsTemplatesAccessible() {
 	return useSelect(
-		( select ) => select( coreStore ).canUser( 'read', 'templates' ),
+		( select ) => select( coreStore ).canUser( 'create', 'templates' ),
 		[]
 	);
 }
