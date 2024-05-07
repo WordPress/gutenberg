@@ -10,7 +10,7 @@
 	position: relative;
 	display: flex;
 	justify-content: flex-end;
-	z-index: 2;
+	z-index: z-index(".editor-inserter-sidebar__header");
 }
 
 .editor-inserter-sidebar__close-button {
