@@ -43,7 +43,8 @@
 		},
 		"spacing": {
 			"blockGap": {
-				"__experimentalDefault": "1.25em"
+				"__experimentalDefault": "1.25em",
+				"sides": [ "horizontal", "vertical" ]
 			},
 			"__experimentalDefaultControls": {
 				"blockGap": true
