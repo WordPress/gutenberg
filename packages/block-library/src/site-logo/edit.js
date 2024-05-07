@@ -106,7 +106,7 @@ const SiteLogo = ( {
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const borderProps = useBorderProps( attributes );
 	const classes = clsx( 'custom-logo-link' );
-  
+
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -146,7 +146,7 @@ const SiteLogo = ( {
 	const img = (
 		<>
 			<img
-				className={ classnames( 'custom-logo', borderProps.className ) }
+				className={ clsx( 'custom-logo', borderProps.className ) }
 				src={ logoUrl }
 				alt={ alt }
 				onLoad={ ( event ) => {
