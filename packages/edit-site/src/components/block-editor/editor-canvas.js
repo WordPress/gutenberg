@@ -25,7 +25,6 @@ import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
-import { useRefEffect } from '@wordpress/compose';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
@@ -34,7 +33,6 @@ function EditorCanvas( {
 	settings,
 	children,
 	onClick,
-	contentWidth: containerWidth,
 	...props
 } ) {
 	const {
@@ -140,27 +138,12 @@ function EditorCanvas( {
 		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
 
-	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
-
-	const ref = useRefEffect( ( node ) => {
-		const {
-			ownerDocument: { defaultView },
-		} = node;
-
-		setWindowInnerWidth( defaultView.innerWidth );
-		const onResize = () => {
-			setWindowInnerWidth( defaultView.innerWidth );
-		};
-		defaultView.addEventListener( 'resize', onResize );
-		return () => {
-			defaultView.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
 	const frameSize = isZoomOutMode ? 20 : undefined;
 
 	const scale = isZoomOutMode
-		? ( Math.min( containerWidth, 800 ) - 2 * frameSize ) / windowInnerWidth
+		? ( _contentWidth, _contentHeight, containerWidth, windowInnerWidth ) =>
+				( Math.min( containerWidth, 800 ) - 2 * frameSize ) /
+				windowInnerWidth
 		: undefined;
 
 	return (
@@ -173,7 +156,6 @@ function EditorCanvas( {
 			iframeProps={ {
 				scale,
 				frameSize,
-				containerWidth,
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',
 				} ),
@@ -181,7 +163,6 @@ function EditorCanvas( {
 				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
 		>
-			<div ref={ ref } />
 			{ children }
 		</EditorCanvasRoot>
 	);

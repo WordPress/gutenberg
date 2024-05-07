@@ -332,7 +332,12 @@ function Iframe( {
 
 	scale =
 		typeof scale === 'function'
-			? scale( contentWidth, contentHeight )
+			? scale(
+					contentWidth,
+					contentHeight,
+					containerWidth,
+					windowInnerWidth
+			  )
 			: scale;
 
 	const marginCorrection = -( windowInnerWidth - containerWidth ) / 2;
@@ -346,7 +351,6 @@ function Iframe( {
 			ref={ windowResizeRef }
 			style={ {
 				height: '100%',
-				width: '100%',
 				overflowX: 'hidden',
 			} }
 		>
