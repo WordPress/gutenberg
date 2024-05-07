@@ -5,13 +5,14 @@ import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
 	privateApis as editPatternsPrivateApis,
 	store as patternsStore,
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -30,7 +31,7 @@ const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
-export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
+export default function AddNewPattern() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
@@ -40,6 +41,10 @@ export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
+	const isBlockBasedTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
+		[]
+	);
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -71,15 +76,13 @@ export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 
 	const controls = [];
 
-	if ( canCreatePatterns ) {
-		controls.push( {
-			icon: symbol,
-			onClick: () => setShowPatternModal( true ),
-			title: __( 'Create pattern' ),
-		} );
-	}
+	controls.push( {
+		icon: symbol,
+		onClick: () => setShowPatternModal( true ),
+		title: __( 'Create pattern' ),
+	} );
 
-	if ( canCreateParts ) {
+	if ( isBlockBasedTheme ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
@@ -87,15 +90,13 @@ export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 		} );
 	}
 
-	if ( canCreatePatterns ) {
-		controls.push( {
-			icon: upload,
-			onClick: () => {
-				patternUploadInputRef.current.click();
-			},
-			title: __( 'Import pattern from JSON' ),
-		} );
-	}
+	controls.push( {
+		icon: upload,
+		onClick: () => {
+			patternUploadInputRef.current.click();
+		},
+		title: __( 'Import pattern from JSON' ),
+	} );
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (
@@ -131,7 +132,9 @@ export default function AddNewPattern( { canCreateParts, canCreatePatterns } ) {
 				ref={ patternUploadInputRef }
 				onChange={ async ( event ) => {
 					const file = event.target.files?.[ 0 ];
-					if ( ! file ) return;
+					if ( ! file ) {
+						return;
+					}
 					try {
 						let currentCategoryId;
 						// When we're not handling template parts, we should

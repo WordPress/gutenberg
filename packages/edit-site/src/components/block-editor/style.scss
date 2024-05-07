@@ -31,7 +31,6 @@
 		display: block;
 		width: 100%;
 		height: 100%;
-		background: $white;
 	}
 
 	.edit-site-visual-editor__editor-canvas {
@@ -106,37 +105,33 @@
 
 	&::after {
 		position: absolute;
-		top: $grid-unit-30;
+		top: $grid-unit-20;
 		left: $grid-unit-05;
 		right: 0;
-		bottom: $grid-unit-30;
+		bottom: $grid-unit-20;
 		content: "";
 		width: $grid-unit-05;
-		background: $gray-600;
+		background-color: rgba($gray-700, 0.4);
 		border-radius: $radius-block-ui;
 	}
 
 	&.is-left {
-		left: -$grid-unit-20;
+		// Subtract half of the handle width to properly center.
+		left: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&.is-right {
-		right: -$grid-unit-20;
+		// Subtract half of the handle width to properly center.
+		right: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&:hover,
+	&:focus,
 	&:active {
 		opacity: 1;
-		&.is-variation-default::after {
-			background: $gray-400;
+		&::after {
+			background-color: var(--wp-admin-theme-color);
 		}
-		&.is-variation-separator::after {
-			background: var(--wp-admin-theme-color);
-		}
-	}
-
-	&:focus::after {
-		box-shadow: 0 0 0 1px $gray-800, 0 0 0 calc(var(--wp-admin-border-width-focus) + 1px) var(--wp-admin-theme-color);
 	}
 
 	&.is-variation-separator:focus::after {

@@ -13,7 +13,7 @@ directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
 		const entry = showMock.find( ( { suffix } ) => suffix === 'default' );
-		if ( ! evaluate( entry ) ) return null;
+		if ( ! evaluate( entry ) ) {return null;}
 		return element;
 	}
 );

@@ -13,7 +13,6 @@
 @import "./components/page-templates/style.scss";
 @import "./components/table/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
-@import "./components/sidebar-edit-mode/page-panels/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
 @import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
@@ -93,9 +92,6 @@ body.js.site-editor-php {
 		display: none;
 	}
 
-	.interface-interface-skeleton__content {
-		background-color: $gray-300;
-	}
 }
 
 /**

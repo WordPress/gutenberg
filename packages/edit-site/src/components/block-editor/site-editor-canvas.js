@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -73,7 +73,7 @@ export default function SiteEditorCanvas( { onClick } ) {
 					</div>
 				) : (
 					<div
-						className={ classnames( 'edit-site-visual-editor', {
+						className={ clsx( 'edit-site-visual-editor', {
 							'is-focus-mode': isFocusMode || !! editorCanvasView,
 							'is-view-mode': isViewMode,
 						} ) }

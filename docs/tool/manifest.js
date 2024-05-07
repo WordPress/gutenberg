@@ -1,3 +1,5 @@
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+
 /**
  * External dependencies
  */
@@ -124,6 +126,29 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}
 	} );
+
+	const slugs = pageItems.map( ( { slug } ) => slug );
+	const duplicatedSlugs = slugs.filter(
+		( item, idx ) => idx !== slugs.indexOf( item )
+	);
+
+	const FgRed = '\x1b[31m';
+	const Reset = '\x1b[0m';
+
+	if ( duplicatedSlugs.length > 0 ) {
+		console.error(
+			`${ FgRed } The handbook generation setup creates pages based on their slug, so each slug has to be unique. ${ Reset }`
+		);
+		console.error(
+			`${ FgRed } More info at https://github.com/WordPress/gutenberg/issues/61206#issuecomment-2085361154 ${ Reset }\n`
+		);
+		throw new Error(
+			`${ FgRed } Duplicate slugs found in the TOC: ${ duplicatedSlugs.join(
+				', '
+			) } ${ Reset }`
+		);
+	}
+
 	return pageItems;
 }
 

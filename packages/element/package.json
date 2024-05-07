@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "5.33.0",
+	"version": "5.34.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,8 +34,8 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react": "^18.3.0",
+		"react-dom": "^18.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

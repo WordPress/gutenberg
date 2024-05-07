@@ -6,7 +6,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
 import type { ReactNode, ForwardedRef } from 'react';
@@ -21,45 +21,45 @@ const SIDE_HANDLE_CLASS_NAME = 'components-resizable-box__side-handle';
 const CORNER_HANDLE_CLASS_NAME = 'components-resizable-box__corner-handle';
 
 const HANDLE_CLASSES = {
-	top: classnames(
+	top: clsx(
 		HANDLE_CLASS_NAME,
 		SIDE_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-top'
 	),
-	right: classnames(
+	right: clsx(
 		HANDLE_CLASS_NAME,
 		SIDE_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-right'
 	),
-	bottom: classnames(
+	bottom: clsx(
 		HANDLE_CLASS_NAME,
 		SIDE_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-bottom'
 	),
-	left: classnames(
+	left: clsx(
 		HANDLE_CLASS_NAME,
 		SIDE_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-left'
 	),
-	topLeft: classnames(
+	topLeft: clsx(
 		HANDLE_CLASS_NAME,
 		CORNER_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-top',
 		'components-resizable-box__handle-left'
 	),
-	topRight: classnames(
+	topRight: clsx(
 		HANDLE_CLASS_NAME,
 		CORNER_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-top',
 		'components-resizable-box__handle-right'
 	),
-	bottomRight: classnames(
+	bottomRight: clsx(
 		HANDLE_CLASS_NAME,
 		CORNER_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-bottom',
 		'components-resizable-box__handle-right'
 	),
-	bottomLeft: classnames(
+	bottomLeft: clsx(
 		HANDLE_CLASS_NAME,
 		CORNER_HANDLE_CLASS_NAME,
 		'components-resizable-box__handle-bottom',
@@ -107,7 +107,7 @@ function UnforwardedResizableBox(
 ): JSX.Element {
 	return (
 		<Resizable
-			className={ classnames(
+			className={ clsx(
 				'components-resizable-box__container',
 				showHandle && 'has-show-handle',
 				className

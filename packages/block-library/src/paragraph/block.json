@@ -30,6 +30,7 @@
 		}
 	},
 	"supports": {
+		"splitting": true,
 		"anchor": true,
 		"className": false,
 		"color": {

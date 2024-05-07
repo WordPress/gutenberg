@@ -10,7 +10,7 @@ import {
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -37,13 +37,10 @@ export default function InserterSidebar( {
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: null,
+		focusOnMount: true,
 	} );
 
 	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
 
 	return (
 		<div

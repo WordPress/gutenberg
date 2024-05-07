@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -51,7 +51,7 @@ function ColumnEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const classes = classnames( 'block-core-columns', {
+	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(

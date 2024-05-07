@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -136,7 +136,7 @@ function useBlockProps( { name, style } ) {
 
 	const textAlign = style.typography.textAlign;
 
-	const className = classnames( {
+	const className = clsx( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 	return { className };
@@ -169,7 +169,7 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 			'textAlign'
 		)
 	) {
-		props.className = classnames(
+		props.className = clsx(
 			`has-text-align-${ textAlign }`,
 			props.className
 		);
