@@ -24,14 +24,19 @@ import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 const usePatternsState = ( onInsert, rootClientId ) => {
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
 		( select ) => {
-			const { __experimentalGetAllowedPatterns, getSettings } =
-				select( blockEditorStore );
+			const {
+				__experimentalGetAllowedPatterns,
+				getSettings,
+				getClientIdsWithDescendants,
+			} = select( blockEditorStore );
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
 			} = getSettings();
+			const firstClientId = getClientIdsWithDescendants()[ 0 ];
+			const clientId = rootClientId ? rootClientId : firstClientId;
 			return {
-				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				patterns: __experimentalGetAllowedPatterns( clientId ),
 				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
