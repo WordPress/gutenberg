@@ -90,7 +90,7 @@ function DropdownMenuItemTrigger( {
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
-			hideOnClick={ 'RenderModal' in action }
+			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
 			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
