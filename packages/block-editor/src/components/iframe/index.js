@@ -320,7 +320,7 @@ function Iframe( {
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
 	return (
-		<>
+		<ViewportScaling enabled={ ! isPreviewMode }>
 			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
 			<iframe
@@ -391,7 +391,57 @@ function Iframe( {
 					) }
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
-		</>
+		</ViewportScaling>
+	);
+}
+
+function ViewportScaling( { children, enabled } ) {
+	const [ viewportWidth, setViewportWidth ] = useState();
+	const [ resizeElement, { width: divWidth } ] = useResizeObserver();
+	const ref = useRefEffect( ( node ) => {
+		const { ownerDocument } = node;
+		const { defaultView } = ownerDocument;
+
+		setViewportWidth( defaultView.innerWidth );
+		const onResize = () => {
+			setViewportWidth( defaultView.innerWidth );
+		};
+		defaultView.addEventListener( 'resize', onResize );
+		return () => {
+			defaultView.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	if ( ! enabled ) {
+		return children;
+	}
+
+	return (
+		<div
+			ref={ ref }
+			style={ {
+				height: '100%',
+				overflow: 'hidden',
+			} }
+		>
+			{ resizeElement }
+			<div
+				style={ {
+					width: `${ viewportWidth }px`,
+					height: '100%',
+				} }
+			>
+				<div
+					style={ {
+						transform: `scale(${ divWidth / viewportWidth })`,
+						transformOrigin: 'top left',
+						height: `calc(100% / ${ divWidth / viewportWidth })`,
+					} }
+				>
+					{ children }
+				</div>
+			</div>
+		</div>
 	);
 }
 
