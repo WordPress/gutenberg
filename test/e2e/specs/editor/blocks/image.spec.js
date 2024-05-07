@@ -843,37 +843,27 @@ test.describe( 'Image', () => {
 } );
 
 test.describe( 'Image - lightbox', () => {
+	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		uploadedMedia = await requestUtils.uploadMedia(
+			path.resolve(
+				process.cwd(),
+				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+			)
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
-		await editor.insertBlock( { name: 'core/image' } );
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
 	} );
 
 	test.describe( 'should respect theme.json settings and block overrides', () => {
-		let uploadedMedia;
-
-		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllMedia();
-
-			uploadedMedia = await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
-			);
-		} );
-
 		test.describe( 'Theme.json settings - allow editing FALSE, enabled FALSE', () => {
 			test.beforeAll( async ( { requestUtils } ) => {
 				await requestUtils.activatePlugin(
@@ -888,12 +878,9 @@ test.describe( 'Image - lightbox', () => {
 			} );
 
 			test( 'Block settings - link DISABLED, lightbox UNDEFINED - should hide UI when block override is undefined', async ( {
-				admin,
 				editor,
 				page,
 			} ) => {
-				await admin.createNewPost();
-
 				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none"} -->
 				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
 				<!-- /wp:image --> ` );
@@ -916,12 +903,9 @@ test.describe( 'Image - lightbox', () => {
 			} );
 
 			test( 'Block settings - link DISABLED, lightbox ENABLED - should show UI while block override is active, but hide UI if override is removed', async ( {
-				admin,
 				editor,
 				page,
 			} ) => {
-				await admin.createNewPost();
-
 				await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
 				<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
 				<!-- /wp:image --> ` );
