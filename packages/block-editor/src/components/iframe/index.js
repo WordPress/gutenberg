@@ -209,23 +209,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const windowResizeRef = useRefEffect( ( node ) => {
-		const {
-			ownerDocument: { defaultView },
-		} = node;
-
-		setWindowInnerWidth( defaultView.innerWidth );
-		const onResize = () => {
-			setWindowInnerWidth( defaultView.innerWidth );
-		};
-		defaultView.addEventListener( 'resize', onResize );
-		return () => {
-			defaultView.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
-	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
-
 	const iframeResizeRef = useRefEffect( ( node ) => {
 		const nodeWindow = node.ownerDocument.defaultView;
 
@@ -239,6 +222,21 @@ function Iframe( {
 	}, [] );
 
 	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		setWindowInnerWidth( nodeWindow.innerWidth );
+		const onResize = () => {
+			setWindowInnerWidth( nodeWindow.innerWidth );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
 
 	const scaleRef = useRefEffect(
 		( body ) => {
