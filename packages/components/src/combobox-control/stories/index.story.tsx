@@ -129,9 +129,10 @@ WithCustomRenderItem.args = {
  * for individual items in the option object.
  */
 export const WithDisabledOptions = Template.bind( {} );
-const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => {
-	return { ...option, disabled: index % 3 === 0 };
-} );
+const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
+	...option,
+	disabled: index % 3 === 0, // Disable options at index 0, 3, 6, etc.
+} ) );
 
 WithDisabledOptions.args = {
 	allowReset: false,
