@@ -119,9 +119,10 @@ export function toVdom( root ) {
 			// Reduce the directives array to build the __directives object.
 			props.__directives = directives.reduce(
 				// The reducer function accumulates the __directives object.
-				( obj, [ name, ns, value ] ) => {
+				( obj, [ directiveName, namespace, inputValue ] ) => {
 					// Check if the directive name matches the expected format.
-					const directiveMatch = directiveParser.exec( name );
+					const directiveMatch =
+						directiveParser.exec( directiveName );
 					if ( directiveMatch === null ) {
 						if (
 							// @ts-expect-error This is a debug-only warning.
@@ -130,20 +131,22 @@ export function toVdom( root ) {
 							SCRIPT_DEBUG === true
 						) {
 							// eslint-disable-next-line no-console
-							console.warn( `Invalid directive: ${ name }.` );
+							console.warn(
+								`Invalid directive: ${ directiveName }.`
+							);
 						}
 						return obj;
 					}
-					// Splitting the directive name into prefix and suffix.
-					const prefix = directiveMatch[ 1 ] || ''; // The prefix part of the directive name.
-					const suffix = directiveMatch[ 2 ] || 'default'; // The suffix part of the directive name, defaulting to 'default' if not present.
+					// Splitting the directive name into directive type and input.
+					const directiveType = directiveMatch[ 1 ] || ''; // The directive type part of the directive name.
+					const directiveInput = directiveMatch[ 2 ] || 'default'; // The directive input part of the directive name, defaulting to 'default' if not present.
 
-					// Creating or updating the array for the specific prefix in the directives object.
-					obj[ prefix ] = obj[ prefix ] || [];
-					obj[ prefix ].push( {
-						namespace: ns ?? currentNamespace(),
-						value,
-						suffix,
+					// Creating or updating the array for the specific directive type in the directives object.
+					obj[ directiveType ] = obj[ directiveType ] || [];
+					obj[ directiveType ].push( {
+						namespace: namespace ?? currentNamespace(),
+						input: inputValue,
+						directiveInput,
 					} );
 					return obj;
 				},
