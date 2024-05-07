@@ -89,6 +89,15 @@ test.describe( 'Post Editor Performance', () => {
 							}
 						}
 					);
+
+					const serverTiming = await metrics.getServerTiming();
+
+					for ( const [ key, value ] of Object.entries(
+						serverTiming
+					) ) {
+						results[ key ] ??= [];
+						results[ key ].push( value );
+					}
 				}
 			} );
 		}
