@@ -25,6 +25,8 @@ test.describe( 'Copy/cut/paste', () => {
 
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -47,6 +49,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -84,6 +88,7 @@ test.describe( 'Copy/cut/paste', () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
 		await editor.insertBlock( { name: 'core/paragraph' } );
+		// Ensure the selection is correct.
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -110,6 +115,8 @@ test.describe( 'Copy/cut/paste', () => {
 
 		await page.keyboard.press( 'Enter' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -131,6 +138,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'Pasted: ' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -272,6 +281,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -306,6 +317,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -338,6 +351,7 @@ test.describe( 'Copy/cut/paste', () => {
 		// Create a new block at the top of the document to paste there.
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
+		// Ensure the selection is correct.
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -373,6 +387,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -404,6 +420,8 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -434,12 +452,15 @@ test.describe( 'Copy/cut/paste', () => {
 		// Create a new code block to paste there.
 		await editor.insertBlock( { name: 'core/code' } );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	test( 'should paste single line in post title', async ( {
 		pageUtils,
 		editor,
+		page,
 	} ) => {
 		// This test checks whether we are correctly handling single line
 		// pasting in the post title. Previously we were accidentally falling
@@ -450,6 +471,8 @@ test.describe( 'Copy/cut/paste', () => {
 			html: '<span style="border: 1px solid black">Hello World</span>',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
 		// Expect the span to be filtered out.
 		expect(
 			await editor.canvas
@@ -470,12 +493,12 @@ test.describe( 'Copy/cut/paste', () => {
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
 		// Ensure the selection is correct.
-		await page.keyboard.type( 'y' );
+		await page.keyboard.type( '‸' );
 		expect(
 			await editor.canvas
 				.locator( ':root' )
 				.evaluate( () => document.activeElement.innerHTML )
-		).toBe( 'axyb' );
+		).toBe( 'ax‸b' );
 	} );
 
 	test( 'should paste preformatted in list', async ( {
@@ -490,7 +513,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await editor.insertBlock( { name: 'core/list' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		// Ensure the selection is correct.
-		await page.keyboard.type( 'y' );
+		await page.keyboard.type( '‸' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -539,7 +562,7 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
-	test( 'should auto-link', async ( { pageUtils, editor } ) => {
+	test( 'should auto-link', async ( { pageUtils, editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'a' },
@@ -549,12 +572,13 @@ test.describe( 'Copy/cut/paste', () => {
 			html: 'https://wordpress.org/gutenberg',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.type( '‸' );
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>a',
+						'<a href="https://wordpress.org/gutenberg">https://wordpress.org/gutenberg</a>‸a',
 				},
 			},
 		] );
@@ -575,6 +599,7 @@ test.describe( 'Copy/cut/paste', () => {
 	test( 'should not link selection for non http(s) protocol', async ( {
 		pageUtils,
 		editor,
+		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -588,11 +613,12 @@ test.describe( 'Copy/cut/paste', () => {
 			html: 'movie: b',
 		} );
 		await pageUtils.pressKeys( 'primary+v' );
+		await page.keyboard.type( '‸' );
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'movie: b',
+					content: 'movie: b‸',
 				},
 			},
 		] );
