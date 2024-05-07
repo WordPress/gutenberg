@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,7 +21,9 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import { useSettings } from '../components/use-settings';
+import { useBlockEditContext } from '../components/block-edit';
+import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../store';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -86,7 +89,8 @@ export function getColorClassesAndStyles( attributes ) {
  */
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
-
+	const isDisabled = ! backgroundColor && ! textColor && ! gradient;
+	const { clientId = null } = useBlockEditContext();
 	const [
 		userPalette,
 		themePalette,
@@ -94,13 +98,22 @@ export function useColorProps( attributes ) {
 		userGradients,
 		themeGradients,
 		defaultGradients,
-	] = useSettings(
-		'color.palette.custom',
-		'color.palette.theme',
-		'color.palette.default',
-		'color.gradients.custom',
-		'color.gradients.theme',
-		'color.gradients.default'
+	] = useSelect(
+		( select ) => {
+			if ( isDisabled ) {
+				return [];
+			}
+			return unlock( select( blockEditorStore ) ).getBlockSettings(
+				clientId,
+				'color.palette.custom',
+				'color.palette.theme',
+				'color.palette.default',
+				'color.gradients.custom',
+				'color.gradients.theme',
+				'color.gradients.default'
+			);
+		},
+		[ clientId, isDisabled ]
 	);
 
 	const colors = useMemo(
@@ -119,6 +132,10 @@ export function useColorProps( attributes ) {
 		],
 		[ userGradients, themeGradients, defaultGradients ]
 	);
+
+	if ( isDisabled ) {
+		return {};
+	}
 
 	const colorProps = getColorClassesAndStyles( attributes );
 

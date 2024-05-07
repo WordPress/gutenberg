@@ -17,6 +17,10 @@ import { getInlineStyles } from './style';
 export function getShadowClassesAndStyles( attributes ) {
 	const shadow = attributes.style?.shadow || '';
 
+	if ( ! shadow ) {
+		return {};
+	}
+
 	return {
 		style: getInlineStyles( { shadow } ),
 	};

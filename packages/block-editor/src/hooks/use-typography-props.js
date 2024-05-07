@@ -31,6 +31,10 @@ import { unlock } from '../lock-unlock';
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
+	if ( ! attributes?.style?.typography ) {
+		return {};
+	}
+
 	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
 	typographyStyles = {

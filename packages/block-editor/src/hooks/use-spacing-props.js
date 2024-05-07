@@ -19,7 +19,12 @@ export function getSpacingClassesAndStyles( attributes ) {
 	const { style } = attributes;
 
 	// Collect inline styles for spacing.
-	const spacingStyles = style?.spacing || {};
+	const spacingStyles = style?.spacing;
+
+	if ( ! spacingStyles ) {
+		return {};
+	}
+
 	const styleProp = getInlineStyles( { spacing: spacingStyles } );
 
 	return {

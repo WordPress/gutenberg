@@ -38,20 +38,23 @@ export function getBorderClassesAndStyles( attributes ) {
  * @return {Object} ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const { colors } = useMultipleOriginColorsAndGradients();
-	const borderProps = getBorderClassesAndStyles( attributes );
-	const { borderColor } = attributes;
+	const { borderColor, style } = attributes;
+	const isDisabled = ! borderColor && ! style?.border;
+	const { colors } = useMultipleOriginColorsAndGradients( { isDisabled } );
+
+	if ( isDisabled ) {
+		return {};
+	}
 
 	// Force inline styles to apply named border colors when themes do not load
 	// their color stylesheets in the editor.
-	if ( borderColor ) {
-		const borderColorObject = getMultiOriginColor( {
-			colors,
-			namedColor: borderColor,
-		} );
+	const borderProps = getBorderClassesAndStyles( attributes );
+	const borderColorObject = getMultiOriginColor( {
+		colors,
+		namedColor: borderColor,
+	} );
 
-		borderProps.style.borderColor = borderColorObject.color;
-	}
+	borderProps.style.borderColor = borderColorObject.color;
 
 	return borderProps;
 }
