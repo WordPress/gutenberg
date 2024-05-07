@@ -7,16 +7,18 @@
 }
 
 .editor-inserter-sidebar__header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
+	position: relative;
 	display: flex;
 	justify-content: flex-end;
+	z-index: z-index(".editor-inserter-sidebar__header");
+}
+
+.editor-inserter-sidebar__close-button {
+	position: absolute;
+	top: $grid-unit-15;
+	right: $grid-unit-15;
 }
 
 .editor-inserter-sidebar__content {
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
-	@include break-medium() {
-		height: 100%;
-	}
+	height: 100%;
 }
