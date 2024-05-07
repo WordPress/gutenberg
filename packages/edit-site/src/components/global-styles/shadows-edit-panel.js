@@ -40,7 +40,7 @@ import {
 	settings,
 	moreVertical,
 } from '@wordpress/icons';
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -95,8 +95,6 @@ export default function ShadowsEditPanel() {
 		const updatedShadows = shadows.map( ( s ) =>
 			s.slug === slug ? { ...selectedShadow, shadow } : s
 		);
-		// TODO: this call make the app slow
-		// may be requestAnimationFrame ??
 		setShadows( updatedShadows );
 	};
 
@@ -265,7 +263,7 @@ function ShadowsPreview( { shadow } ) {
 }
 
 function ShadowEditor( { shadow, onChange } ) {
-	const shadowParts = getShadowParts( shadow );
+	const shadowParts = useMemo( () => getShadowParts( shadow ), [ shadow ] );
 
 	const onChangeShadowPart = ( index, part ) => {
 		shadowParts[ index ] = part;
@@ -325,11 +323,11 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 		offset: 36,
 		shift: true,
 	};
-	const [ shadowObj, setShadowObj ] = useState(
-		shadowStringToObject( shadow )
+	const shadowObj = useMemo(
+		() => shadowStringToObject( shadow ),
+		[ shadow ]
 	);
 	const onShadowChange = ( newShadow ) => {
-		setShadowObj( newShadow );
 		onChange( shadowObjectToString( newShadow ) );
 	};
 
@@ -395,23 +393,14 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 }
 
 function ShadowPopover( { shadowObj, onChange } ) {
-	const [ shadow, setShadow ] = useState( {
-		x: shadowObj.x,
-		y: shadowObj.y,
-		blur: shadowObj.blur,
-		spread: shadowObj.spread,
-		color: shadowObj.color,
-		inset: shadowObj.inset,
-	} );
 	const __experimentalIsRenderedInSidebar = true;
 	const enableAlpha = true;
 
 	const onShadowChange = ( key, value ) => {
 		const newShadow = {
-			...shadow,
+			...shadowObj,
 			[ key ]: value,
 		};
-		setShadow( newShadow );
 		onChange( newShadow );
 	};
 
@@ -426,14 +415,14 @@ function ShadowPopover( { shadowObj, onChange } ) {
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
-						value={ shadow.color }
+						value={ shadowObj.color }
 						onChange={ ( value ) =>
 							onShadowChange( 'color', value )
 						}
 					/>
 				</div>
 				<ToggleGroupControl
-					value={ shadow.inset ? 'inset' : 'outset' }
+					value={ shadowObj.inset ? 'inset' : 'outset' }
 					isBlock
 					onChange={ ( value ) =>
 						onShadowChange( 'inset', value === 'inset' )
@@ -451,26 +440,26 @@ function ShadowPopover( { shadowObj, onChange } ) {
 				<Grid columns={ 2 } gap={ 6 } rowGap={ 2 }>
 					<ShadowInputControl
 						label={ __( 'X Position' ) }
-						value={ shadow.x }
+						value={ shadowObj.x }
 						hasNegativeRange
 						onChange={ ( value ) => onShadowChange( 'x', value ) }
 					/>
 					<ShadowInputControl
 						label={ __( 'Y Position' ) }
-						value={ shadow.y }
+						value={ shadowObj.y }
 						hasNegativeRange
 						onChange={ ( value ) => onShadowChange( 'y', value ) }
 					/>
 					<ShadowInputControl
 						label={ __( 'Blur' ) }
-						value={ shadow.blur }
+						value={ shadowObj.blur }
 						onChange={ ( value ) =>
 							onShadowChange( 'blur', value )
 						}
 					/>
 					<ShadowInputControl
 						label={ __( 'Spread' ) }
-						value={ shadow.spread }
+						value={ shadowObj.spread }
 						hasNegativeRange
 						onChange={ ( value ) =>
 							onShadowChange( 'spread', value )

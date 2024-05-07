@@ -9,7 +9,7 @@ import {
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	Icon,
@@ -191,7 +191,10 @@ function ShadowItem( { shadow, category } ) {
 	return (
 		<NavigationButtonAsItem
 			path={ `/shadows/edit/${ category }/${ shadow.slug }` }
-			aria-label={ 'edit' }
+			aria-label={
+				// translators: %s: name of the shadow
+				sprintf( 'Edit shadow %s', shadow.name )
+			}
 		>
 			<HStack justify="flex-start">
 				<FlexItem
