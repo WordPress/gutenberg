@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs, useDisabled } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -28,6 +28,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
+import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { canBindBlock } from '../../../hooks/use-bindings-attributes';
 
@@ -122,28 +123,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
-		useRefEffect(
-			( node ) => {
-				if ( isSelected ) {
-					const { defaultView } = node.ownerDocument;
-					const observer = new defaultView.IntersectionObserver(
-						( entries ) => {
-							// Once observing starts, we always get an initial
-							// entry with the intersecting state.
-							if ( ! entries[ 0 ].isIntersecting ) {
-								node.scrollIntoView();
-								observer.disconnect();
-							}
-						}
-					);
-					observer.observe( node );
-					return () => {
-						observer.disconnect();
-					};
-				}
-			},
-			[ isSelected ]
-		),
+		useScrollIntoView( { isSelected } ),
 	] );
 
 	const blockEditContext = useBlockEditContext();
