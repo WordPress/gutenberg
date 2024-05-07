@@ -9,36 +9,48 @@ import {
 	PostSchedulePanel,
 	PostTemplatePanel,
 	PostFeaturedImagePanel,
+	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import PageStatus from './page-status';
+import { unlock } from '../../../lock-unlock';
 
-export default function PageSummary( {
-	status,
-	date,
-	password,
-	postId,
-	postType,
-} ) {
+const {
+	PrivatePostExcerptPanel,
+	PostStatus,
+	PostContentInformation,
+	PostLastEditedPanel,
+} = unlock( editorPrivateApis );
+
+export default function PageSummary() {
 	return (
 		<VStack spacing={ 0 }>
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<PostFeaturedImagePanel withPanelBody={ false } />
-						<PageStatus
-							status={ status }
-							date={ date }
-							password={ password }
-							postId={ postId }
-							postType={ postType }
-						/>
-						<PostSchedulePanel />
-						<PostTemplatePanel />
-						<PostURLPanel />
+						<VStack
+							spacing={ 3 }
+							//  TODO: this needs to be consolidated with the panel in post editor, when we unify them.
+							style={ { marginBlockEnd: '24px' } }
+						>
+							<PostFeaturedImagePanel withPanelBody={ false } />
+							<PrivatePostExcerptPanel />
+							<VStack spacing={ 1 }>
+								<PostContentInformation />
+								<PostLastEditedPanel />
+							</VStack>
+						</VStack>
+						<VStack
+							spacing={ 1 }
+							style={ { marginBlockEnd: '12px' } }
+						>
+							<PostStatus />
+							<PostSchedulePanel />
+							<PostTemplatePanel />
+							<PostURLPanel />
+						</VStack>
 						<PostAuthorPanel />
 						{ fills }
 					</>

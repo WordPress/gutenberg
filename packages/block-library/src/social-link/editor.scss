@@ -1,19 +1,33 @@
-// The editor uses the button component, the frontend uses a link.
-// Therefore we unstyle the button component to make it more like the frontend.
 .wp-block-social-links .wp-social-link {
 	line-height: 0;
+}
 
-	button {
-		font-size: inherit;
-		color: currentColor;
-		height: auto;
-		line-height: 0;
+// The editor uses the button element, the frontend uses a link.
+// Therefore we unstyle the button element to make it more like the frontend.
+.wp-block-social-link-anchor {
+	align-items: center;
+	background: none;
+	border: 0;
+	box-sizing: border-box;
+	cursor: pointer;
+	display: inline-flex;
+	font-size: inherit;
+	color: currentColor;
+	height: auto;
 
-		// This rule ensures social link buttons display correctly in template parts.
-		opacity: 1;
+	// This rule ensures social link buttons display correctly in template parts.
+	opacity: 1;
 
-		// This rule is duplicated from the style.scss and needs to be the same as there.
-		padding: 0.25em;
+	// This rule is duplicated from the style.scss and needs to be the same as there.
+	padding: 0.25em;
+
+	// Focus styles replicate the `@wordpress/components` button component.
+	&:focus:not(:disabled) {
+		border-radius: 2px;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 3px solid transparent;
 	}
 }
 

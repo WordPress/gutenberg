@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,6 @@ import {
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
 import {
 	useState,
@@ -26,14 +25,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
-import {
-	Icon,
-	header,
-	footer,
-	symbolFilled as uncategorized,
-	symbol,
-	lockSmall,
-} from '@wordpress/icons';
+import { Icon, lockSmall } from '@wordpress/icons';
 import { usePrevious } from '@wordpress/compose';
 import { useEntityRecords } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
@@ -52,7 +44,6 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
-	ENUMERATION_TYPE,
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
@@ -68,15 +59,14 @@ import { unlock } from '../../lock-unlock';
 import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
-import { useAddedBy } from '../page-templates-template-parts/hooks';
+import { useAddedBy } from '../page-templates/hooks';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
-const templatePartIcons = { header, footer, uncategorized };
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
 	[ LAYOUT_TABLE ]: {
@@ -93,7 +83,7 @@ const DEFAULT_VIEW = {
 	search: '',
 	page: 1,
 	perPage: 20,
-	hiddenFields: [ 'sync-status' ],
+	hiddenFields: [],
 	layout: {
 		...defaultConfigPerViewType[ LAYOUT_GRID ],
 	},
@@ -119,16 +109,14 @@ const SYNC_FILTERS = [
 ];
 
 function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
-	if ( item.type === PATTERN_TYPES.theme ) {
-		return children;
-	}
 	return (
 		<button
 			className="page-patterns-preview-field__button"
 			type="button"
-			onClick={ onClick }
+			onClick={ item.type !== PATTERN_TYPES.theme ? onClick : undefined }
 			aria-label={ item.title }
 			aria-describedby={ ariaDescribedBy }
+			aria-disabled={ item.type === PATTERN_TYPES.theme }
 		>
 			{ children }
 		</button>
@@ -138,21 +126,8 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 function Preview( { item, categoryId, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isEmpty = ! item.blocks?.length;
-	// Only custom patterns or custom template parts can be renamed or deleted.
-	const isCustomPattern =
-		isUserPattern || ( isTemplatePart && item.isCustom );
-	const ariaDescriptions = [];
-	if ( isCustomPattern ) {
-		// User patterns don't have descriptions, but can be edited and deleted, so include some help text.
-		ariaDescriptions.push(
-			__( 'Press Enter to edit, or Delete to delete the pattern.' )
-		);
-	} else if ( item.description ) {
-		ariaDescriptions.push( item.description );
-	}
 
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
 	const { onClick } = useLink( {
@@ -171,16 +146,7 @@ function Preview( { item, categoryId, viewType } ) {
 			<PreviewWrapper
 				item={ item }
 				onClick={ onClick }
-				ariaDescribedBy={
-					ariaDescriptions.length
-						? ariaDescriptions
-								.map(
-									( _, index ) =>
-										`${ descriptionId }-${ index }`
-								)
-								.join( ' ' )
-						: undefined
-				}
+				ariaDescribedBy={ item.description ? descriptionId : undefined }
 			>
 				{ isEmpty && isTemplatePart && __( 'Empty template part' ) }
 				{ isEmpty && ! isTemplatePart && __( 'Empty pattern' ) }
@@ -193,16 +159,11 @@ function Preview( { item, categoryId, viewType } ) {
 					</Async>
 				) }
 			</PreviewWrapper>
-			{ ! isNonUserPattern &&
-				ariaDescriptions.map( ( ariaDescription, index ) => (
-					<div
-						key={ index }
-						hidden
-						id={ `${ descriptionId }-${ index }` }
-					>
-						{ ariaDescription }
-					</div>
-				) ) }
+			{ item.description && (
+				<div hidden id={ descriptionId }>
+					{ item.description }
+				</div>
+			) }
 		</div>
 	);
 }
@@ -216,12 +177,9 @@ function Author( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -242,9 +200,7 @@ function Author( { item, viewType } ) {
 
 function Title( { item, categoryId } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isNonUserPattern = item.type === PATTERN_TYPES.theme;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-	let itemIcon;
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
@@ -252,12 +208,6 @@ function Title( { item, categoryId } ) {
 		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
-	if ( ! isUserPattern && templatePartIcons[ categoryId ] ) {
-		itemIcon = templatePartIcons[ categoryId ];
-	} else {
-		itemIcon =
-			item.syncStatus === PATTERN_SYNC_TYPES.full ? symbol : undefined;
-	}
 	return (
 		<HStack alignment="center" justify="flex-start" spacing={ 2 }>
 			<Flex
@@ -280,19 +230,6 @@ function Title( { item, categoryId } ) {
 					</Button>
 				) }
 			</Flex>
-			{ itemIcon && ! isNonUserPattern && (
-				<Tooltip
-					placement="top"
-					text={ __(
-						'Editing this pattern will also update anywhere it is used'
-					) }
-				>
-					<Icon
-						className="edit-site-patterns__pattern-icon"
-						icon={ itemIcon }
-					/>
-				</Tooltip>
-			) }
 			{ item.type === PATTERN_TYPES.theme && (
 				<Tooltip
 					placement="top"
@@ -310,9 +247,11 @@ function Title( { item, categoryId } ) {
 }
 
 export default function DataviewsPatterns() {
-	const { categoryType, categoryId = PATTERN_DEFAULT_CATEGORY } =
-		getQueryArgs( window.location.href );
+	const {
+		params: { categoryType, categoryId: categoryIdFromURL },
+	} = useLocation();
 	const type = categoryType || PATTERN_TYPES.theme;
+	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
@@ -360,6 +299,7 @@ export default function DataviewsPatterns() {
 				),
 				enableSorting: false,
 				enableHiding: false,
+				width: '1%',
 			},
 			{
 				header: __( 'Title' ),
@@ -392,7 +332,6 @@ export default function DataviewsPatterns() {
 						</span>
 					);
 				},
-				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IS ],
@@ -408,7 +347,6 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => {
 					return <Author viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				filterBy: {
 					isPrimary: true,

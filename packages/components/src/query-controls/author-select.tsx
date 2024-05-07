@@ -13,7 +13,9 @@ export default function AuthorSelect( {
 	selectedAuthorId,
 	onChange: onChangeProp,
 }: AuthorSelectProps ) {
-	if ( ! authorList ) return null;
+	if ( ! authorList ) {
+		return null;
+	}
 	const termsTree = buildTermsTree( authorList );
 	return (
 		<TreeSelect

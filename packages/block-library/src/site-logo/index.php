@@ -74,6 +74,7 @@ function register_block_core_site_logo_setting() {
 				'name' => 'site_logo',
 			),
 			'type'         => 'integer',
+			'label'        => __( 'Logo' ),
 			'description'  => __( 'Site logo.' ),
 		)
 	);
@@ -93,6 +94,7 @@ function register_block_core_site_icon_setting() {
 		array(
 			'show_in_rest' => true,
 			'type'         => 'integer',
+			'label'        => __( 'Icon' ),
 			'description'  => __( 'Site icon.' ),
 		)
 	);

@@ -560,13 +560,13 @@ test.describe( 'Navigation block - List view editing', () => {
 		await page.keyboard.press( 'ArrowUp' );
 
 		await expect(
-			page.getByRole( 'menuitem', { name: 'Create new menu' } )
+			page.getByRole( 'menuitem', { name: 'Create new Menu' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'Enter' );
 
 		await expect(
-			page.getByText( 'This navigation menu is empty.' )
+			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
 
 		// Move focus to the appender

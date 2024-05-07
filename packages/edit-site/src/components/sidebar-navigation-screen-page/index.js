@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalVStack as VStack,
@@ -17,6 +17,7 @@ import { safeDecodeURIComponent, filterURLForDisplay } from '@wordpress/url';
 import { useEffect, useCallback } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ const { PostActions } = unlock( editorPrivateApis );
 export default function SidebarNavigationScreenPage( { backPath } ) {
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 	const history = useHistory();
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const {
 		params: { postId },
 	} = useLocation();
@@ -83,16 +85,53 @@ export default function SidebarNavigationScreenPage( { backPath } ) {
 
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
-			if ( actionId === 'move-to-trash' ) {
-				history.push( {
-					path: '/' + items[ 0 ].type,
-					postId: undefined,
-					postType: undefined,
-					canvas: 'view',
-				} );
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						history.push( {
+							path: '/' + items[ 0 ].type,
+							postId: undefined,
+							postType: undefined,
+							canvas: 'view',
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.push( {
+												path: undefined,
+												postId: newItem.id,
+												postType: newItem.type,
+												canvas: 'edit',
+											} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
 			}
 		},
-		[ history ]
+		[ history, createSuccessNotice ]
 	);
 
 	const featureImageAltText = featuredMediaAltText

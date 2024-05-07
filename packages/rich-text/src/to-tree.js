@@ -223,7 +223,9 @@ export function toTree( {
 
 		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
 			const replacement = replacements[ i ];
-			if ( ! replacement ) continue;
+			if ( ! replacement ) {
+				continue;
+			}
 			const { type, attributes, innerHTML } = replacement;
 			const formatType = getFormatType( type );
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,6 @@ import {
 	NavigableToolbar,
 	ToolSelector,
 	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
@@ -28,8 +27,6 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
-
-const { useShowBlockTools } = unlock( blockEditorPrivateApis );
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -76,7 +73,6 @@ function DocumentTools( {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const { showFixedToolbar } = useShowBlockTools();
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -111,13 +107,12 @@ function DocumentTools( {
 		// supported, but we're keeping it in the list of class names for backwards
 		// compatibility.
 		<NavigableToolbar
-			className={ classnames(
+			className={ clsx(
 				'editor-document-tools',
 				'edit-post-header-toolbar',
 				className
 			) }
 			aria-label={ toolbarAriaLabel }
-			shouldUseKeyboardFocusShortcut={ ! showFixedToolbar }
 			variant="unstyled"
 		>
 			<div className="editor-document-tools__left">

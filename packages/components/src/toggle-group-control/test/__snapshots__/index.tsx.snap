@@ -107,8 +107,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -123,9 +121,10 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   color: #fff;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-12 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
@@ -190,8 +189,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -205,9 +202,10 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   padding-right: 0;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-18 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
@@ -436,8 +434,6 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -446,9 +442,10 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   z-index: 2;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-12 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
@@ -656,8 +653,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -672,9 +667,10 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   color: #fff;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-12 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
@@ -739,8 +735,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -754,9 +748,10 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   padding-right: 0;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-18 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
@@ -979,8 +974,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   padding: 0 12px;
   position: relative;
   text-align: center;
-  -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
-  transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -989,9 +982,10 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   z-index: 2;
 }
 
-@media ( prefers-reduced-motion: reduce ) {
+@media not ( prefers-reduced-motion ) {
   .emotion-12 {
-    transition-duration: 0ms;
+    -webkit-transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
+    transition: background 160ms linear,color 160ms linear,font-weight 60ms linear;
   }
 }
 
