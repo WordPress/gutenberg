@@ -97,7 +97,7 @@ jobs:
     report-to-issues:
         name: Report to GitHub
         needs: [merge-artifacts]
-        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report }}
+        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
         runs-on: ubuntu-latest
         steps:
             # Checkout defaults to using the branch which triggered the event, which
