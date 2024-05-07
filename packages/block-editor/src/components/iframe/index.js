@@ -212,6 +212,7 @@ function Iframe( {
 	const iframeResizeRef = useRefEffect( ( node ) => {
 		const nodeWindow = node.ownerDocument.defaultView;
 
+		setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		const onResize = () => {
 			setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		};
@@ -238,23 +239,44 @@ function Iframe( {
 
 	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
 
+	const [ scaleState, setScaleState ] = useState( 1 );
+	useEffect( () => {
+		setScaleState(
+			typeof scale === 'function'
+				? scale(
+						contentWidth,
+						contentHeight,
+						containerWidth,
+						windowInnerWidth
+				  )
+				: scale
+		);
+	}, [
+		scale,
+		contentWidth,
+		contentHeight,
+		containerWidth,
+		windowInnerWidth,
+	] );
+
 	const scaleRef = useRefEffect(
 		( body ) => {
 			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
+			const bottomFrameSize =
+				frameSize - contentHeight * ( 1 - scaleState );
 
 			const { documentElement } = body.ownerDocument;
 
 			body.classList.add( 'is-zoomed-out' );
 
-			documentElement.style.transform = `scale( ${ scale } )`;
+			documentElement.style.transform = `scale( ${ scaleState } )`;
 			documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way
 			// to do this.
 			documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * scale ) {
+			if ( iframeWindowInnerHeight > contentHeight * scaleState ) {
 				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
+					( iframeWindowInnerHeight - 2 * frameSize ) / scaleState
 				) }px`;
 			}
 
@@ -267,7 +289,7 @@ function Iframe( {
 			};
 		},
 		[
-			scale,
+			scaleState,
 			frameSize,
 			iframeDocument,
 			contentHeight,
@@ -286,8 +308,8 @@ function Iframe( {
 		// Avoid resize listeners when not needed, these will trigger
 		// unnecessary re-renders when animating the iframe width, or when
 		// expanding preview iframes.
-		scale === 1 ? null : iframeResizeRef,
-		scale === 1 ? null : scaleRef,
+		scaleState === 1 ? null : iframeResizeRef,
+		scaleState === 1 ? null : scaleRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -327,16 +349,6 @@ function Iframe( {
 	}, [ html ] );
 
 	useEffect( () => cleanup, [ cleanup ] );
-
-	scale =
-		typeof scale === 'function'
-			? scale(
-					contentWidth,
-					contentHeight,
-					containerWidth,
-					windowInnerWidth
-			  )
-			: scale;
 
 	const marginCorrection = -( windowInnerWidth - containerWidth ) / 2;
 
