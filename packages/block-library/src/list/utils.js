@@ -81,8 +81,13 @@ export function migrateToListV2( attributes ) {
 
 	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
 
+	Object.keys(attributes).forEach((key) => {
+		if(attributes[key] !== undefined && !['start','reversed','type','values'].includes(key))
+		 listBlock.attributes[key] = attributes[key]
+	  })
+
 	return [
-		{ ...otherAttributes, ...listBlock.attributes },
+		listBlock.attributes,
 		listBlock.innerBlocks,
 	];
 }
