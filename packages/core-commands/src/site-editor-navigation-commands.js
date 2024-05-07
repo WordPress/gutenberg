@@ -22,7 +22,11 @@ import { useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
+import {
+	useIsTemplatesAccessible,
+	useIsTemplatesEditable,
+	useIsBlockBasedTheme,
+} from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
@@ -259,101 +263,105 @@ function useSiteEditorBasicNavigationCommands() {
 		'site-editor.php'
 	);
 	const isTemplatesAccessible = useIsTemplatesAccessible();
+	const isTemplatesEditable = useIsTemplatesEditable();
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
 
-		if ( ! isTemplatesAccessible || ! isBlockBasedTheme ) {
-			return result;
+		if ( isTemplatesAccessible && isBlockBasedTheme ) {
+			result.push( {
+				name: 'core/edit-site/open-navigation',
+				label: __( 'Navigation' ),
+				icon: navigation,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/navigation',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-styles',
+				label: __( 'Styles' ),
+				icon: styles,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/wp_global_styles',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-pages',
+				label: __( 'Pages' ),
+				icon: page,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/page',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
+
+			result.push( {
+				name: 'core/edit-site/open-templates',
+				label: __( 'Templates' ),
+				icon: layout,
+				callback: ( { close } ) => {
+					const args = {
+						path: '/wp_template',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
+				},
+			} );
 		}
 
 		result.push( {
-			name: 'core/edit-site/open-navigation',
-			label: __( 'Navigation' ),
-			icon: navigation,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/navigation',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-styles',
-			label: __( 'Styles' ),
-			icon: styles,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/wp_global_styles',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-pages',
-			label: __( 'Pages' ),
-			icon: page,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/page',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/edit-site/open-templates',
-			label: __( 'Templates' ),
-			icon: layout,
-			callback: ( { close } ) => {
-				const args = {
-					path: '/wp_template',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = targetUrl;
-				}
-				close();
-			},
-		} );
-
-		result.push( {
-			name: 'core/manage-reusable-blocks',
+			name: 'core/edit-site/open-patterns',
 			label: __( 'Patterns' ),
 			icon: symbol,
 			callback: ( { close } ) => {
-				const args = {
-					path: '/patterns',
-				};
-				const targetUrl = addQueryArgs( 'site-editor.php', args );
-				if ( isSiteEditor ) {
-					history.push( args );
+				if ( isTemplatesEditable ) {
+					const args = {
+						path: '/patterns',
+					};
+					const targetUrl = addQueryArgs( 'site-editor.php', args );
+					if ( isSiteEditor ) {
+						history.push( args );
+					} else {
+						document.location = targetUrl;
+					}
+					close();
 				} else {
-					document.location = targetUrl;
+					// If a user cannot access the site editor
+					document.location.href = 'edit.php?post_type=wp_block';
 				}
-				close();
 			},
 		} );
 

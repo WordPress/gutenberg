@@ -11,6 +11,13 @@ export function useIsTemplatesAccessible() {
 	);
 }
 
+export function useIsTemplatesEditable() {
+	return useSelect(
+		( select ) => select( coreStore ).canUser( 'create', 'templates' ),
+		[]
+	);
+}
+
 export function useIsBlockBasedTheme() {
 	return useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
