@@ -47,6 +47,7 @@ function InserterMenu(
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
+		onClose,
 	},
 	ref
 ) {
@@ -301,7 +302,11 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs ref={ tabsRef } onSelect={ handleSetSelectedTab }>
+				<InserterTabs
+					ref={ tabsRef }
+					onSelect={ handleSetSelectedTab }
+					onClose={ onClose }
+				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&
 						! delayedFilterValue &&
