@@ -25,7 +25,7 @@ import {
 	FOCUSABLE_ENTITIES,
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
-import { computeIFrameScale } from '../../utils/math';
+import { useRefEffect } from '@wordpress/compose';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
@@ -34,6 +34,7 @@ function EditorCanvas( {
 	settings,
 	children,
 	onClick,
+	contentWidth,
 	...props
 } ) {
 	const {
@@ -139,36 +140,70 @@ function EditorCanvas( {
 		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
 
+	const [ windowWidth, setWindowWidth ] = useState( window.innerWidth );
+
+	const ref = useRefEffect( ( node ) => {
+		const {
+			ownerDocument: { defaultView },
+		} = node;
+
+		setWindowWidth( defaultView.innerWidth );
+		const onResize = () => {
+			setWindowWidth( defaultView.innerWidth );
+		};
+		defaultView.addEventListener( 'resize', onResize );
+		return () => {
+			defaultView.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
 	const frameSize = isZoomOutMode ? 20 : undefined;
 
 	const scale = isZoomOutMode
-		? ( contentWidth ) =>
-				computeIFrameScale(
-					{ width: 1000, scale: 0.55 },
-					{ width: 400, scale: 0.9 },
-					contentWidth
-				)
+		? ( Math.min( contentWidth, 800 ) - 2 * frameSize ) / windowWidth
 		: undefined;
 
+	const marginCorrection = -( windowWidth - contentWidth ) / 2;
+
 	return (
-		<EditorCanvasRoot
-			className={ clsx( 'edit-site-editor-canvas__block-list', {
-				'is-navigation-block': isTemplateTypeNavigation,
-			} ) }
-			renderAppender={ showBlockAppender }
-			styles={ styles }
-			iframeProps={ {
-				scale,
-				frameSize,
-				className: clsx( 'edit-site-visual-editor__editor-canvas', {
-					'is-focused': isFocused && canvasMode === 'view',
-				} ),
-				...props,
-				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
+		<div
+			style={ {
+				height: '100%',
+				overflowX: 'hidden',
 			} }
 		>
-			{ children }
-		</EditorCanvasRoot>
+			<div
+				ref={ ref }
+				style={ {
+					width: '100vw',
+					height: '100%',
+					marginLeft: `${ marginCorrection }px`,
+				} }
+			>
+				<EditorCanvasRoot
+					className={ clsx( 'edit-site-editor-canvas__block-list', {
+						'is-navigation-block': isTemplateTypeNavigation,
+					} ) }
+					renderAppender={ showBlockAppender }
+					styles={ styles }
+					iframeProps={ {
+						scale,
+						frameSize,
+						className: clsx(
+							'edit-site-visual-editor__editor-canvas',
+							{
+								'is-focused':
+									isFocused && canvasMode === 'view',
+							}
+						),
+						...props,
+						...( canvasMode === 'view' ? viewModeIframeProps : {} ),
+					} }
+				>
+					{ children }
+				</EditorCanvasRoot>
+			</div>
+		</div>
 	);
 }
 

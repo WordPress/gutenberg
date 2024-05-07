@@ -64,6 +64,9 @@ export default function SiteEditorCanvas( { onClick } ) {
 	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
 	const forceFullHeight = isNavigationFocusMode;
 
+	const [ contentResizeListener, { width: contentWidth } ] =
+		useResizeObserver();
+
 	return (
 		<EditorCanvasContainer.Slot>
 			{ ( [ editorCanvasView ] ) =>
@@ -78,6 +81,7 @@ export default function SiteEditorCanvas( { onClick } ) {
 							'is-view-mode': isViewMode,
 						} ) }
 					>
+						{ contentResizeListener }
 						<ResizableEditor
 							enableResizing={ enableResizing }
 							height={
@@ -90,6 +94,7 @@ export default function SiteEditorCanvas( { onClick } ) {
 								enableResizing={ enableResizing }
 								settings={ settings }
 								onClick={ onClick }
+								contentWidth={ contentWidth }
 							>
 								{
 									// Avoid resize listeners when not needed,
