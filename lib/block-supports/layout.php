@@ -479,7 +479,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			} else {
 				$layout_styles[] = array(
 					'selector'     => $selector,
-					'declarations' => array( 'grid-auto-rows' => 'minmax(50px, min-content)' ),
+					'declarations' => array( 'grid-auto-rows' => 'minmax(1.5em, min-content)' ),
 				);
 			}
 		} else {
@@ -489,7 +489,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 				'selector'     => $selector,
 				'declarations' => array(
 					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
-					'grid-auto-rows'        => 'minmax(50px, min-content)',
+					'grid-auto-rows'        => 'minmax(1.5em, min-content)',
 					'container-type'        => 'inline-size',
 				),
 			);

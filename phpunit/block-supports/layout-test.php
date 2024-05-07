@@ -371,7 +371,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'type' => 'grid',
 					),
 				),
-				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));grid-auto-rows:minmax(50px, min-content);container-type:inline-size;}',
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(min(12rem, 100%), 1fr));grid-auto-rows:minmax(1.5em, min-content);container-type:inline-size;}',
 			),
 			'grid layout with columnCount'                 => array(
 				'args'            => array(
@@ -381,7 +381,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'columnCount' => 3,
 					),
 				),
-				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-auto-rows:minmax(50px, min-content);}',
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-auto-rows:minmax(1.5em, min-content);}',
 			),
 			'default layout with blockGap to verify converting gap value into valid CSS' => array(
 				'args'            => array(

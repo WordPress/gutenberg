@@ -133,12 +133,12 @@ export default {
 					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
 				);
 			} else {
-				rules.push( `grid-auto-rows: minmax(50px, min-content)` );
+				rules.push( `grid-auto-rows: minmax(1.5em, min-content)` );
 			}
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
-				`grid-auto-rows: minmax(50px, min-content)`,
+				`grid-auto-rows: minmax(1.5em, min-content)`,
 				`container-type: inline-size`
 			);
 		}
