@@ -177,7 +177,11 @@ export default function useLayoutAreas() {
 			return {
 				key: 'navigation',
 				areas: {
-					sidebar: <SidebarNavigationScreenNavigationMenu />,
+					sidebar: (
+						<SidebarNavigationScreenNavigationMenu
+							backPath={ { path: '/navigation' } }
+						/>
+					),
 					preview: <Editor isLoading={ isSiteEditorLoading } />,
 					mobile: canvas === 'edit' && (
 						<Editor isLoading={ isSiteEditorLoading } />
