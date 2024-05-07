@@ -12,6 +12,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * Retrieves the block patterns inserter state.
@@ -29,9 +30,20 @@ const usePatternsState = ( onInsert, rootClientId ) => {
 			const {
 				__experimentalUserPatternCategories,
 				__experimentalBlockPatternCategories,
+				__unstableGetEditorMode,
 			} = getSettings();
+			let sectionRootClientId;
+
+			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				sectionRootClientId = unlock(
+					getSettings()
+				).sectionRootClientId;
+			}
+
 			return {
-				patterns: __experimentalGetAllowedPatterns( rootClientId ),
+				patterns: __experimentalGetAllowedPatterns(
+					sectionRootClientId ?? rootClientId
+				),
 				userPatternCategories: __experimentalUserPatternCategories,
 				patternCategories: __experimentalBlockPatternCategories,
 			};
