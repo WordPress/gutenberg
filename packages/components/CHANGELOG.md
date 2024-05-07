@@ -10,7 +10,7 @@
 
 ### Enhancements
 
--   `FormTokenField`: Hide label when not defined ([#61336(https://github.com/WordPress/gutenberg/pull/61336)).
+-   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
 -   `InputControl`: Add a password visibility toggle story ([#60898](https://github.com/WordPress/gutenberg/pull/60898)).
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
