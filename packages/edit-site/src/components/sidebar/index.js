@@ -11,7 +11,7 @@ import {
 	useContext,
 	useState,
 	useRef,
-	useEffect,
+	useLayoutEffect,
 } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
@@ -60,7 +60,7 @@ function SidebarContentWrapper( { children } ) {
 	const wrapperRef = useRef();
 	const [ navAnimation, setNavAnimation ] = useState( null );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const { direction, focusSelector } = navState.get();
 		focusSidebarElement( wrapperRef.current, direction, focusSelector );
 		setNavAnimation( direction );
