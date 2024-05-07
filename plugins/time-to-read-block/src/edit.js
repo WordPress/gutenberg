@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import classnames from 'clsx';
 
 /**
  * WordPress dependencies
@@ -60,7 +60,8 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		 */
 		const wordCountType = _x(
 			'words',
-			'Word count type. Do not translate!'
+			'Word count type. Do not translate!',
+			'time-to-read-block'
 		);
 
 		const minutesToRead = Math.max(
@@ -72,8 +73,14 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 
 		return sprintf(
 			/* translators: %d is the number of minutes the post will take to read. */
-			_n( '%d minute', '%d minutes', minutesToRead ),
-			minutesToRead
+			_n(
+				'%d minute',
+				'%d minutes',
+				minutesToRead,
+				'time-to-read-block'
+			),
+			minutesToRead,
+			'time-to-read-block'
 		);
 	}, [ contentStructure, blocks ] );
 

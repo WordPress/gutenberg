@@ -1,7 +1,7 @@
 {
-	"name": "post-time-to-read",
-	"version": "0.1.0",
-	"description": "Example block scaffolded with Create Block tool.",
+	"name": "time-to-read-block",
+	"version": "1.0.0",
+	"description": "Block to display the minutes required to finish reading a post.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
@@ -24,6 +24,7 @@
 		"@wordpress/core-data": "^6.33.0",
 		"@wordpress/element": "^5.33.0",
 		"@wordpress/i18n": "^4.56.0",
-		"@wordpress/wordcount": "^3.56.0"
+		"@wordpress/wordcount": "^3.56.0",
+		"clsx": "^2.1.1"
 	}
 }

@@ -1,0 +1,15 @@
+{
+	"overrides": [
+		{
+			"files": [ "src/**/*.js" ],
+			"rules": {
+				"@wordpress/i18n-text-domain": [
+					"error",
+					{
+						"allowedTextDomain": "time-to-read-block"
+					}
+				]
+			}
+		}
+	]
+}

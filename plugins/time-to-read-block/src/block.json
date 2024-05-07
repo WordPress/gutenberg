@@ -4,8 +4,8 @@
 	"name": "gutenberg/time-to-read",
 	"title": "Time To Read",
 	"category": "theme",
-	"description": "Show minutes required to finish reading the post.",
-	"textdomain": "post-time-to-read",
+	"description": "Show minutes required to finish reading a post.",
+	"textdomain": "time-to-read",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"textAlign": {

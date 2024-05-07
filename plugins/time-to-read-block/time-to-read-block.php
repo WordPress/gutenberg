@@ -1,14 +1,16 @@
 <?php
 /**
  * Plugin Name:       Time to Read Block
- * Description:       Example block scaffolded with Create Block tool.
- * Requires at least: 6.1
+ * Plugin URI:        https://github.com/WordPress/gutenberg/tree/trunk/plugins/time-to-read-block
+ * Description:       A block that shows the average time it takes to read the current post.
+ * Version:           1.0.0
+ * Requires at least: 6.4
  * Requires PHP:      7.0
- * Version:           0.1.0
- * Author:            The WordPress Contributors
+ * Author:            WordPress.org
+ * Author URI:        https://wordpress.org/
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       post-time-to-read
+ * Text Domain:       time-to-read-block
  *
  */
 
@@ -20,7 +22,7 @@
  * @param  WP_Block $block      Block instance.
  * @return string Returns the rendered post author name block.
  */
-function render_block_core_post_time_to_read( $attributes, $content, $block ) {
+function gutenberg_render_time_to_read_block( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
@@ -36,11 +38,11 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
 
 	$word_count_type = wp_get_word_count_type();
 
-	$minutes_to_read = max( 1, (int) round( post_time_to_read_word_count( $content, $word_count_type ) / $average_reading_rate ) );
+	$minutes_to_read = max( 1, (int) round( gutenberg_time_to_read_word_count( $content, $word_count_type ) / $average_reading_rate ) );
 
 	$minutes_to_read_string = sprintf(
 		/* translators: %s is the number of minutes the post will take to read. */
-		_n( '%s minute', '%s minutes', $minutes_to_read ),
+		_n( '%s minute', '%s minutes', $minutes_to_read, 'time-to-read-block' ),
 		$minutes_to_read
 	);
 
@@ -84,7 +86,7 @@ function render_block_core_post_time_to_read( $attributes, $content, $block ) {
  * }
  * @return int The word or character count.
  */
-function post_time_to_read_word_count( $text, $type, $settings = array() ) {
+function gutenberg_time_to_read_word_count( $text, $type, $settings = array() ) {
 	$defaults = array(
 		'html_regexp'                        => '/<\/?[a-z][^>]*?>/i',
 		'html_comment_regexp'                => '/<!--[\s\S]*?-->/',
@@ -164,13 +166,13 @@ function post_time_to_read_word_count( $text, $type, $settings = array() ) {
 /**
  * Registers the `gutenberg/time-to-read-read` block on the server.
  */
-function register_block_core_post_time_to_read() {
+function gutenberg_register_time_to_read_block() {
 	register_block_type(
 		__DIR__ . '/build',
 		array(
-			'render_callback' => 'render_block_core_post_time_to_read',
+			'render_callback' => 'gutenberg_render_time_to_read_block',
 		)
 	);
 }
 
-add_action( 'init', 'register_block_core_post_time_to_read' );
+add_action( 'init', 'gutenberg_register_time_to_read_block' );
