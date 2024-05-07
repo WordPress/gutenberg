@@ -161,7 +161,7 @@ Each directive controls a small part of the DOM, and you can combine multiple di
 
 ### Compatible with the existing block development tooling
 
-The API works out of the box with standard block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/).
+The API works out of the box with standard block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/). The only requirement for `wp-scripts` to properly build the [Script Modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) using the Interactivity API is the use of the --experimental-modules flag for both [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts.
 
 ### Client-side navigation
 

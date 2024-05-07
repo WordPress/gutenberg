@@ -67,6 +67,19 @@ The Interactivity API provides the `@wordpress/interactivity` Script Module. Jav
 }
 ```
 
+The use of `viewScriptModule` also requires the `--experimental-modules` flag for both the [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts of `wp-scripts` to ensure a proper build of the Script Modules.
+
+
+```json
+// package.json
+{
+    "scripts": {
+        ...
+		"build": "wp-scripts build --experimental-modules",
+		"start": "wp-scripts start --experimental-modules"
+	}
+```
+
 #### Add `wp-interactive` directive to a DOM element
 
 To "activate" the Interactivity API in a DOM element (and its children), add the [`wp-interactive`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/packages-interactivity-api-reference/#wp-interactive) directive to the DOM element in the block's `render.php` or `save.js` files. 
