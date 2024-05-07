@@ -64,7 +64,7 @@ export function createListBlockFromDOMElement( listElement ) {
 }
 
 export function migrateToListV2( attributes ) {
-	const { values, start, reversed, ordered, type, ...otherAttributes } =
+	const { values, start, reversed, ordered, type } =
 		attributes;
 
 	const list = document.createElement( ordered ? 'ol' : 'ul' );
