@@ -53,10 +53,10 @@ function PostStatusLabel( { canEdit } ) {
 			statusLabel = __( 'Draft' );
 			break;
 		case 'pending':
-			statusLabel = __( 'Pending review' );
+			statusLabel = __( 'Pending' );
 			break;
 		case 'private':
-			statusLabel = __( 'Published privately' );
+			statusLabel = __( 'Private' );
 			break;
 	}
 	return (
