@@ -128,6 +128,8 @@ function Iframe( {
 		contentResizeListener,
 		{ height: contentHeight, width: contentWidth },
 	] = useResizeObserver();
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -208,6 +210,23 @@ function Iframe( {
 	}, [] );
 
 	const windowResizeRef = useRefEffect( ( node ) => {
+		const {
+			ownerDocument: { defaultView },
+		} = node;
+
+		setWindowInnerWidth( defaultView.innerWidth );
+		const onResize = () => {
+			setWindowInnerWidth( defaultView.innerWidth );
+		};
+		defaultView.addEventListener( 'resize', onResize );
+		return () => {
+			defaultView.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
+
+	const iframeResizeRef = useRefEffect( ( node ) => {
 		const nodeWindow = node.ownerDocument.defaultView;
 
 		const onResize = () => {
@@ -269,7 +288,7 @@ function Iframe( {
 		// Avoid resize listeners when not needed, these will trigger
 		// unnecessary re-renders when animating the iframe width, or when
 		// expanding preview iframes.
-		scale === 1 ? null : windowResizeRef,
+		scale === 1 ? null : iframeResizeRef,
 		scale === 1 ? null : scaleRef,
 	] );
 
@@ -316,83 +335,101 @@ function Iframe( {
 			? scale( contentWidth, contentHeight )
 			: scale;
 
+	const marginCorrection = -( windowInnerWidth - containerWidth ) / 2;
+
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
 	return (
-		<>
-			{ shouldRenderFocusCaptureElements && before }
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<iframe
-				{ ...props }
+		<div
+			ref={ windowResizeRef }
+			style={ {
+				height: '100%',
+				width: '100%',
+				overflowX: 'hidden',
+			} }
+		>
+			{ containerResizeListener }
+			<div
 				style={ {
-					border: 0,
-					...props.style,
-					height: props.style?.height,
-					transition: 'all .3s',
-				} }
-				ref={ useMergeRefs( [ ref, setRef ] ) }
-				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
-				src={ src }
-				title={ title }
-				onKeyDown={ ( event ) => {
-					if ( props.onKeyDown ) {
-						props.onKeyDown( event );
-					}
-					// If the event originates from inside the iframe, it means
-					// it bubbled through the portal, but only with React
-					// events. We need to to bubble native events as well,
-					// though by doing so we also trigger another React event,
-					// so we need to stop the propagation of this event to avoid
-					// duplication.
-					if (
-						event.currentTarget.ownerDocument !==
-						event.target.ownerDocument
-					) {
-						// We should only stop propagation of the React event,
-						// the native event should further bubble inside the
-						// iframe to the document and window.
-						// Alternatively, we could consider redispatching the
-						// native event in the iframe.
-						const { stopPropagation } = event.nativeEvent;
-						event.nativeEvent.stopPropagation = () => {};
-						event.stopPropagation();
-						event.nativeEvent.stopPropagation = stopPropagation;
-						bubbleEvent(
-							event,
-							window.KeyboardEvent,
-							event.currentTarget
-						);
-					}
+					width: '100vw',
+					height: '100%',
+					marginLeft: `${ marginCorrection }px`,
 				} }
 			>
-				{ iframeDocument &&
-					createPortal(
-						// We want to prevent React events from bubbling throught the iframe
-						// we bubble these manually.
-						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
-						<body
-							ref={ bodyRef }
-							className={ clsx(
-								'block-editor-iframe__body',
-								'editor-styles-wrapper',
-								...bodyClasses
-							) }
-						>
-							{ contentResizeListener }
-							<StyleProvider document={ iframeDocument }>
-								{ children }
-							</StyleProvider>
-						</body>,
-						iframeDocument.documentElement
-					) }
-			</iframe>
-			{ shouldRenderFocusCaptureElements && after }
-		</>
+				{ shouldRenderFocusCaptureElements && before }
+				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+				<iframe
+					{ ...props }
+					style={ {
+						border: 0,
+						...props.style,
+						height: props.style?.height,
+						transition: 'all .3s',
+					} }
+					ref={ useMergeRefs( [ ref, setRef ] ) }
+					tabIndex={ tabIndex }
+					// Correct doctype is required to enable rendering in standards
+					// mode. Also preload the styles to avoid a flash of unstyled
+					// content.
+					src={ src }
+					title={ title }
+					onKeyDown={ ( event ) => {
+						if ( props.onKeyDown ) {
+							props.onKeyDown( event );
+						}
+						// If the event originates from inside the iframe, it means
+						// it bubbled through the portal, but only with React
+						// events. We need to to bubble native events as well,
+						// though by doing so we also trigger another React event,
+						// so we need to stop the propagation of this event to avoid
+						// duplication.
+						if (
+							event.currentTarget.ownerDocument !==
+							event.target.ownerDocument
+						) {
+							// We should only stop propagation of the React event,
+							// the native event should further bubble inside the
+							// iframe to the document and window.
+							// Alternatively, we could consider redispatching the
+							// native event in the iframe.
+							const { stopPropagation } = event.nativeEvent;
+							event.nativeEvent.stopPropagation = () => {};
+							event.stopPropagation();
+							event.nativeEvent.stopPropagation = stopPropagation;
+							bubbleEvent(
+								event,
+								window.KeyboardEvent,
+								event.currentTarget
+							);
+						}
+					} }
+				>
+					{ iframeDocument &&
+						createPortal(
+							// We want to prevent React events from bubbling throught the iframe
+							// we bubble these manually.
+							/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
+							<body
+								ref={ bodyRef }
+								className={ clsx(
+									'block-editor-iframe__body',
+									'editor-styles-wrapper',
+									...bodyClasses
+								) }
+							>
+								{ contentResizeListener }
+								<StyleProvider document={ iframeDocument }>
+									{ children }
+								</StyleProvider>
+							</body>,
+							iframeDocument.documentElement
+						) }
+				</iframe>
+				{ shouldRenderFocusCaptureElements && after }
+			</div>
+		</div>
 	);
 }
 
