@@ -1139,4 +1139,53 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 		$default_presets_for_block = $theme_json->get_settings()['shadow']['defaultPresets'];
 		$this->assertTrue( $default_presets_for_block );
 	}
+
+	/**
+	 * Tests that classic themes still get core default settings such as color palette and duotone.
+	 */
+	public function test_resolve_theme_file_uris() {
+		$theme_json_resolver = new ReflectionClass( 'WP_Theme_JSON_Resolver_Gutenberg' );
+		$func                = $theme_json_resolver->getMethod( 'resolve_theme_file_uris' );
+
+		$func->setAccessible( true );
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'example/img/image.png',
+						),
+					),
+				),
+			)
+		);
+
+		$expected_data = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
+					),
+				),
+			),
+		);
+
+		/*
+		 * This filter callback normalizes the return value from `get_theme_file_uri`
+		 * to guard against changes in test environments.
+		 * The test suite otherwise returns full system dir path, e.g.,
+		 * /wordpress-phpunit/includes/../data/themedir1/default/example/img/image.png
+		 */
+		$filter_theme_file_uri_callback = function ( $file ) {
+			return 'https://example.org/wp-content/themes/example-theme/example/' . explode( 'example/', $file )[1];
+		};
+		add_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+		$actual = $func->invoke( null, $theme_json );
+		remove_filter( 'theme_file_uri', $filter_theme_file_uri_callback );
+
+		$this->assertSame( $expected_data, $actual->get_raw_data() );
+	}
 }

@@ -4096,35 +4096,4 @@ class WP_Theme_JSON_Gutenberg {
 
 		return $valid_variations;
 	}
-
-	/**
-	 * Resolves relative paths in theme.json styles to theme absolute paths.
-	 *
-	 * @since 6.6.0
-	 *
-	 * @return WP_Theme_JSON_Gutenberg The current instance of $this.
-	 */
-	public function resolve_theme_file_uris() {
-		if ( empty( $this->theme_json ) ) {
-			return $this;
-		}
-
-		/*
-		 * Styles backgrounds.
-		 * Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
-		 * Blocks, elements, and block variations are not yet supported.
-		 */
-		if (
-			isset( $this->theme_json['styles']['background']['backgroundImage']['url'] ) &&
-			is_string( $this->theme_json['styles']['background']['backgroundImage']['url'] ) &&
-			! isset( wp_parse_url( $this->theme_json['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
-				_wp_array_set(
-					$this->theme_json,
-					array( 'styles', 'background', 'backgroundImage', 'url' ),
-					esc_url( get_theme_file_uri( $this->theme_json['styles']['background']['backgroundImage']['url'] ) )
-				);
-		}
-
-		return $this;
-	}
 }

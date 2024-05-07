@@ -604,7 +604,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( static::get_core_data() );
 		if ( 'default' === $origin ) {
 			$result->set_spacing_sizes();
-			$result->resolve_theme_file_uris();
+			$result = static::resolve_theme_file_uris( $result );
 			return $result;
 		}
 
@@ -616,13 +616,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		$result->merge( static::get_theme_data() );
 		if ( 'theme' === $origin ) {
 			$result->set_spacing_sizes();
-			$result->resolve_theme_file_uris();
+			$result = static::resolve_theme_file_uris( $result );
 			return $result;
 		}
 
 		$result->merge( static::get_user_data() );
 		$result->set_spacing_sizes();
-		$result->resolve_theme_file_uris();
+		$result = static::resolve_theme_file_uris( $result );
 		return $result;
 	}
 
@@ -753,8 +753,9 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
-				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->resolve_theme_file_uris()->get_raw_data();
+				$translated          = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+				$with_resolved_paths = static::resolve_theme_file_uris( new WP_Theme_JSON_Gutenberg( $translated ) );
+				$variation           = $with_resolved_paths->get_raw_data();
 				if ( empty( $variation['title'] ) ) {
 					$variation['title'] = basename( $path, '.json' );
 				}
@@ -762,5 +763,43 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			}
 		}
 		return $variations;
+	}
+
+
+	/**
+	 * Resolves relative paths in theme.json styles to theme absolute paths.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
+	 * @return WP_Theme_JSON_Gutenberg The theme json instance with merged resolved paths.
+	 */
+	protected static function resolve_theme_file_uris( $theme_json ) {
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+			return $theme_json;
+		}
+
+		$theme_json_data          = $theme_json->get_raw_data();
+		$resolved_theme_json_data = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		);
+
+		/*
+		 * Styles backgrounds.
+		 * Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
+		 * Blocks, elements, and block variations are not yet supported.
+		 */
+		if (
+			isset( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
+			is_string( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
+			! isset( wp_parse_url( $theme_json_data['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
+				$resolved_theme_json_data['styles']['background']['backgroundImage']['url'] = esc_url( get_theme_file_uri( $theme_json_data['styles']['background']['backgroundImage']['url'] ) );
+		}
+
+		if ( ! empty( $resolved_theme_json_data ) ) {
+			$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
+		}
+
+		return $theme_json;
 	}
 }
