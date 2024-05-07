@@ -623,18 +623,6 @@ export function defaultTemplates( state = {}, action ) {
 	return state;
 }
 
-export function themeFileURIs( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_THEME_FILE_URI':
-			return {
-				...state,
-				[ action.file ]: action.url,
-			};
-	}
-
-	return state;
-}
-
 export default combineReducers( {
 	terms,
 	users,
@@ -656,5 +644,4 @@ export default combineReducers( {
 	userPatternCategories,
 	navigationFallbackId,
 	defaultTemplates,
-	themeFileURIs,
 } );

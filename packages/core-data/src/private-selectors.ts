@@ -50,7 +50,3 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 			() => [ select( STORE_NAME ).getBlockPatterns() ]
 		)
 );
-
-export function getThemeFileURI( state: State, file: string ) {
-	return state.themeFileURIs?.[ file ];
-}
