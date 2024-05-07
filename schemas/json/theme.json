@@ -4,7 +4,7 @@
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
-			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
+			"createTheme": "https://developer.wordpress.org/themes/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
 		"refComplete": {
@@ -499,6 +499,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -2244,7 +2249,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 2 ]
+			"enum": [ 3 ]
 		},
 		"title": {
 			"type": "string",
@@ -2326,12 +2331,6 @@
 										{
 											"type": "object",
 											"properties": {
-												"source": {
-													"description": "The origin of the image. 'file' denotes that the 'url' is a path to an image or other file.",
-													"type": "string",
-													"enum": [ "file" ],
-													"default": "file"
-												},
 												"url": {
 													"description": "A URL to an image file.",
 													"type": "string"

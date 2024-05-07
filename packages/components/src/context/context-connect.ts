@@ -116,7 +116,9 @@ function _contextConnect<
 export function getConnectNamespace(
 	Component: ReactChild | undefined | {}
 ): string[] {
-	if ( ! Component ) return [];
+	if ( ! Component ) {
+		return [];
+	}
 
 	let namespaces = [];
 
@@ -145,7 +147,9 @@ export function hasConnectNamespace(
 	Component: ReactNode,
 	match: string[] | string
 ): boolean {
-	if ( ! Component ) return false;
+	if ( ! Component ) {
+		return false;
+	}
 
 	if ( typeof match === 'string' ) {
 		return getConnectNamespace( Component ).includes( match );

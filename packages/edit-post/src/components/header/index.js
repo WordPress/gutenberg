@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	DocumentBar,
 	PostSavedState,
@@ -18,20 +17,26 @@ import { useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useState, useCallback } from '@wordpress/element';
+import { useState } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
 import FullscreenModeClose from './fullscreen-mode-close';
 import PostEditorMoreMenu from './more-menu';
-import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import MainDashboardButton from './main-dashboard-button';
-import ContextualToolbar from './contextual-toolbar';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { DocumentTools, PostViewLink, PreviewDropdown, PinnedItems, MoreMenu } =
-	unlock( editorPrivateApis );
+const {
+	CollapsableBlockToolbar,
+	DocumentTools,
+	PostViewLink,
+	PreviewDropdown,
+	PinnedItems,
+	MoreMenu,
+	PostPublishButtonOrToggle,
+} = unlock( editorPrivateApis );
 
 const slideY = {
 	hidden: { y: '-50px' },
@@ -50,7 +55,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTextEditor,
-		blockSelectionStart,
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		showIconLabels,
@@ -62,8 +66,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
-			blockSelectionStart:
-				select( blockEditorStore ).getBlockSelectionStart(),
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			hasHistory:
 				!! select( editorStore ).getEditorSettings()
@@ -79,13 +81,6 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
-
-	const handleToggleCollapse = useCallback(
-		( isCollapsed ) => {
-			setIsBlockToolsCollapsed( isCollapsed );
-		},
-		[ setIsBlockToolsCollapsed ]
-	);
 
 	return (
 		<div className="edit-post-header">
@@ -107,14 +102,13 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 			>
 				<DocumentTools disableBlockTools={ isTextEditor } />
 				{ hasTopToolbar && (
-					<ContextualToolbar
+					<CollapsableBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
-						blockSelectionStart={ blockSelectionStart }
-						toggleCollapse={ handleToggleCollapse }
+						onToggle={ setIsBlockToolsCollapsed }
 					/>
 				) }
 				<div
-					className={ classnames( 'edit-post-header__center', {
+					className={ clsx( 'edit-post-header__center', {
 						'is-collapsed':
 							hasHistory &&
 							! isBlockToolsCollapsed &&

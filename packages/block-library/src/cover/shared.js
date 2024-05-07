@@ -103,7 +103,9 @@ export function getPositionClassName( contentPosition ) {
 	/*
 	 * Only render a className if the contentPosition is not center (the default).
 	 */
-	if ( isContentPositionCenter( contentPosition ) ) return '';
+	if ( isContentPositionCenter( contentPosition ) ) {
+		return '';
+	}
 
 	return POSITION_CLASSNAMES[ contentPosition ];
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -165,10 +165,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		<OptionPickerImplementation
 			{ ...additionalProps }
 			baseId={ baseId }
-			className={ classnames(
-				'components-circular-option-picker',
-				className
-			) }
+			className={ clsx( 'components-circular-option-picker', className ) }
 			actions={ actions }
 			options={ options }
 		>

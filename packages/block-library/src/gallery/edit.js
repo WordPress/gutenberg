@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -488,7 +488,7 @@ function GalleryEdit( props ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( className, 'has-nested-images' ),
+		className: clsx( className, 'has-nested-images' ),
 	} );
 
 	const nativeInnerBlockProps = Platform.isNative && {

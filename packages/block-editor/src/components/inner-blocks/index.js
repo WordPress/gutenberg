@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -287,7 +287,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	return {
 		...props,
 		ref,
-		className: classnames(
+		className: clsx(
 			props.className,
 			'block-editor-block-list__layout',
 			__unstableDisableLayoutClassNames ? '' : layoutClassNames,

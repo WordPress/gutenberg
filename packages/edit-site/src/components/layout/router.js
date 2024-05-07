@@ -117,26 +117,11 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// Template parts
-	/*
-	 * This is for legacy reasons, as the template parts are now part of the patterns screen.
-	 * However, hybrid themes (classic themes that support template parts) still access this URL.
-	 * While there are plans to make them use the patterns screen instead, we cannot do it for now.
-	 * See discussion at https://github.com/WordPress/gutenberg/pull/60689
+	/* Patterns and Template Parts
+	 * `/wp_template_part/all` path is no longer used, but uses Patterns page screens for
+	 * backwards compatibility.
 	 */
-	if ( path === '/wp_template_part/all' ) {
-		return {
-			key: 'template-parts',
-			areas: {
-				sidebar: <SidebarNavigationScreenPatterns />,
-				content: <PagePatterns />,
-				mobile: <PagePatterns />,
-			},
-		};
-	}
-
-	// Patterns
-	if ( path === '/patterns' ) {
+	if ( path === '/patterns' || path === '/wp_template_part/all' ) {
 		return {
 			key: 'patterns',
 			areas: {
@@ -163,8 +148,20 @@ export default function useLayoutAreas() {
 
 	// Navigation
 	if ( path === '/navigation' ) {
+		if ( postId ) {
+			return {
+				key: 'navigation',
+				areas: {
+					sidebar: <SidebarNavigationScreenNavigationMenu />,
+					preview: <Editor isLoading={ isSiteEditorLoading } />,
+					mobile: canvas === 'edit' && (
+						<Editor isLoading={ isSiteEditorLoading } />
+					),
+				},
+			};
+		}
 		return {
-			key: 'styles',
+			key: 'navigation',
 			areas: {
 				sidebar: <SidebarNavigationScreenNavigationMenus />,
 				preview: <Editor isLoading={ isSiteEditorLoading } />,

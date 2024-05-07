@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -105,7 +105,8 @@ const SiteLogo = ( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
 	const borderProps = useBorderProps( attributes );
-	const classes = classnames( 'custom-logo-link' );
+	const classes = clsx( 'custom-logo-link' );
+  
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -601,7 +602,7 @@ export default function LogoEdit( {
 		);
 	}
 	const placeholder = ( content ) => {
-		const placeholderClassName = classnames(
+		const placeholderClassName = clsx(
 			'block-editor-media-placeholder',
 			className
 		);
@@ -621,7 +622,7 @@ export default function LogoEdit( {
 		);
 	};
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-default-size': ! width,
 		'is-transient': temporaryURL,
 		'has-custom-border':

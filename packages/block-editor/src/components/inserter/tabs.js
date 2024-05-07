@@ -3,6 +3,7 @@
  */
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,20 +29,11 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( {
-	showPatterns = false,
-	showMedia = false,
-	onSelect,
-	tabsContents,
-} ) {
-	const tabs = [
-		blocksTab,
-		showPatterns && patternsTab,
-		showMedia && mediaTab,
-	].filter( Boolean );
+function InserterTabs( { onSelect, children }, ref ) {
+	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
-		<div className="block-editor-inserter__tabs">
+		<div className="block-editor-inserter__tabs" ref={ ref }>
 			<Tabs onSelect={ onSelect }>
 				<Tabs.TabList className="block-editor-inserter__tablist">
 					{ tabs.map( ( tab ) => (
@@ -61,7 +53,7 @@ function InserterTabs( {
 						focusable={ false }
 						className="block-editor-inserter__tabpanel"
 					>
-						{ tabsContents[ tab.name ] }
+						{ children }
 					</Tabs.TabPanel>
 				) ) }
 			</Tabs>
@@ -69,4 +61,4 @@ function InserterTabs( {
 	);
 }
 
-export default InserterTabs;
+export default forwardRef( InserterTabs );

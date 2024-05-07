@@ -92,7 +92,7 @@ function useMarks( {
 	if ( ! Array.isArray( marks ) ) {
 		marks = [];
 		const count = 1 + Math.round( range / step );
-		while ( count > marks.push( { value: step * marks.length + min } ) );
+		while ( count > marks.push( { value: step * marks.length + min } ) ) {}
 	}
 
 	const placedMarks: RangeMarkProps[] = [];

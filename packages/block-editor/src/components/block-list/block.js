@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -64,7 +64,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (
@@ -177,7 +177,7 @@ function BlockListBlock( {
 	if ( isAligned ) {
 		blockEdit = (
 			<div
-				className={ classnames( 'wp-block', isSticky && className ) }
+				className={ clsx( 'wp-block', isSticky && className ) }
 				data-align={ wrapperProps[ 'data-align' ] }
 			>
 				{ blockEdit }
@@ -217,7 +217,7 @@ function BlockListBlock( {
 
 	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
 
-	restWrapperProps.className = classnames(
+	restWrapperProps.className = clsx(
 		restWrapperProps.className,
 		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
 		! ( dataAlign && isSticky ) && className
@@ -534,7 +534,6 @@ function BlockListBlockProvider( props ) {
 				hasSelectedInnerBlock,
 
 				getBlockIndex,
-				isTyping,
 				isBlockMultiSelected,
 				isBlockSubtreeDisabled,
 				isBlockHighlighted,
@@ -566,11 +565,8 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
-			const {
-				outlineMode,
-				supportsLayout,
-				__unstableIsPreviewMode: isPreviewMode,
-			} = getSettings();
+			const { supportsLayout, __unstableIsPreviewMode: isPreviewMode } =
+				getSettings();
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const previewContext = {
 				isPreviewMode,
@@ -606,7 +602,6 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const typing = isTyping();
 			const movingClientId = hasBlockMovingClientId();
 			const blockEditingMode = getBlockEditingMode( clientId );
 
@@ -639,7 +634,6 @@ function BlockListBlockProvider( props ) {
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
 					isBlockSubtreeDisabled( clientId ),
-				isOutlineEnabled: outlineMode,
 				hasOverlay:
 					__unstableHasActiveBlockOverlayActive( clientId ) &&
 					! isDragging(),
@@ -657,7 +651,6 @@ function BlockListBlockProvider( props ) {
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
-				removeOutline: _isSelected && outlineMode && typing,
 				isBlockMovingMode: !! movingClientId,
 				canInsertMovingBlock:
 					movingClientId &&
@@ -697,7 +690,6 @@ function BlockListBlockProvider( props ) {
 		blockApiVersion,
 		blockTitle,
 		isSubtreeDisabled,
-		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
 		isHighlighted,
@@ -706,7 +698,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		templateLock,
@@ -743,7 +734,6 @@ function BlockListBlockProvider( props ) {
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
-		isOutlineEnabled,
 		hasOverlay,
 		initialPosition,
 		blockEditingMode,
@@ -753,7 +743,6 @@ function BlockListBlockProvider( props ) {
 		isReusable,
 		isDragging,
 		hasChildSelected,
-		removeOutline,
 		isBlockMovingMode,
 		canInsertMovingBlock,
 		templateLock,

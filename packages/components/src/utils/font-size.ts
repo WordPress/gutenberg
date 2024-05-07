@@ -51,7 +51,9 @@ export function getFontSize(
 
 	if ( typeof size !== 'number' ) {
 		const parsed = parseFloat( size );
-		if ( Number.isNaN( parsed ) ) return size;
+		if ( Number.isNaN( parsed ) ) {
+			return size;
+		}
 		size = parsed;
 	}
 
