@@ -152,6 +152,24 @@ function formatAsMarkdownTable( rows ) {
 }
 
 /**
+ * Nicely formats a given value.
+ *
+ * @param {string} metric Metric.
+ * @param {number} value
+ */
+function formatValue( metric, value ) {
+	if ( 'wpMemoryUsage' === metric ) {
+		return `${ ( value / Math.pow( 10, 6 ) ).toFixed( 2 ) } MB`;
+	}
+
+	if ( 'wpDbQueries' === metric ) {
+		return value.toString();
+	}
+
+	return `${ value } ms`;
+}
+
+/**
  * Runs the performances tests on an array of branches and output the result.
  *
  * @param {string[]}                    branches Branches to compare
@@ -495,7 +513,10 @@ async function runPerformanceTests( branches, options ) {
 		) ) {
 			for ( const [ metric, value ] of Object.entries( metrics ) ) {
 				invertedResult[ metric ] = invertedResult[ metric ] || {};
-				invertedResult[ metric ][ branch ] = `${ value } ms`;
+				invertedResult[ metric ][ branch ] = formatValue(
+					metric,
+					value
+				);
 			}
 		}
 
