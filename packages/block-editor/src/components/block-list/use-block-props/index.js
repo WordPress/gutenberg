@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled } from '@wordpress/compose';
+import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -122,6 +122,28 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			clientId,
 			isEnabled: name === 'core/block' || templateLock === 'contentOnly',
 		} ),
+		useRefEffect(
+			( node ) => {
+				if ( isSelected ) {
+					const { defaultView } = node.ownerDocument;
+					const observer = new defaultView.IntersectionObserver(
+						( entries ) => {
+							// Once observing starts, we always get an initial
+							// entry with the intersecting state.
+							if ( ! entries[ 0 ].isIntersecting ) {
+								node.scrollIntoView();
+								observer.disconnect();
+							}
+						}
+					);
+					observer.observe( node );
+					return () => {
+						observer.disconnect();
+					};
+				}
+			},
+			[ isSelected ]
+		),
 	] );
 
 	const blockEditContext = useBlockEditContext();
