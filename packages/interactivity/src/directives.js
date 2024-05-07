@@ -210,12 +210,12 @@ const getGlobalEventDirective = ( type ) => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
-				const event = entry.suffix.split( '--', 1 )[ 0 ];
+				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
-					const cb = ( cbEvent ) => evaluate( entry, cbEvent );
+					const cb = ( event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
-					globalVar.addEventListener( event, cb );
-					return () => globalVar.removeEventListener( event, cb );
+					globalVar.addEventListener( eventName, cb );
+					return () => globalVar.removeEventListener( eventName, cb );
 				}, [] );
 			} );
 	};
