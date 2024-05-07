@@ -45,6 +45,7 @@ function InserterTabs( { onSelect, children, onClose }, ref ) {
 						icon={ closeSmall }
 						label={ __( 'Close block inserter' ) }
 						onClick={ () => onClose() }
+						size="small"
 					/>
 
 					<Tabs.TabList className="block-editor-inserter__tablist">
