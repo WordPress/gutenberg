@@ -64,8 +64,7 @@ export function createListBlockFromDOMElement( listElement ) {
 }
 
 export function migrateToListV2( attributes ) {
-	const { values, start, reversed, ordered, type } =
-		attributes;
+	const { values, start, reversed, ordered, type } = attributes;
 
 	const list = document.createElement( ordered ? 'ol' : 'ul' );
 	list.innerHTML = values;
@@ -81,15 +80,16 @@ export function migrateToListV2( attributes ) {
 
 	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
 
-	Object.keys(attributes).forEach((key) => {
-		if(attributes[key] !== undefined && !['start','reversed','type','values'].includes(key))
-		 listBlock.attributes[key] = attributes[key]
-	  })
+	Object.keys( attributes ).forEach( ( key ) => {
+		if (
+			attributes[ key ] !== undefined &&
+			! [ 'start', 'reversed', 'type', 'values' ].includes( key )
+		) {
+			listBlock.attributes[ key ] = attributes[ key ];
+		}
+	} );
 
-	return [
-		listBlock.attributes,
-		listBlock.innerBlocks,
-	];
+	return [ listBlock.attributes, listBlock.innerBlocks ];
 }
 
 export function migrateTypeToInlineStyle( attributes ) {
