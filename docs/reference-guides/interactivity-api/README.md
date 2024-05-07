@@ -9,7 +9,7 @@ Blocks can share data, actions, and callbacks between them. This makes communica
 For more information about the genesis of the Interactivity API, check out the [original proposal](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/). You can also review the [merge announcement](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), the [status update post](https://make.wordpress.org/core/2023/08/15/status-update-on-the-interactivity-api/), and the official [Trac ticket](https://core.trac.wordpress.org/ticket/60356).
 
 <div class="callout callout-info">
-    The Interactivity API is supported by the package <code>@wordpress/interactivity</code> which is bundled in WordPress Core from v6.5
+    The Interactivity API is supported by the package <a href="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity/"><code>@wordpress/interactivity</code></a> which is bundled in WordPress Core from v6.5
 </div>
 
 ## Navigating the Interactivity API docs
@@ -21,6 +21,12 @@ Use the following links to locate the topic you're interested in. If you have ne
 - **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/)** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
 - **[API Reference](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
 - **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
+
+To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
+
+- **[About the Interactivity API](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-about/):** To learn more about the API Goals and the reasoning behind the use of a standard to add interactivity to blocks.
+- **[Frequently Asked Questions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-faq/):** To find responses to some frequently asked questions about the technology behind and alternatives.
+
 
 ## Requirements of the Interactivity API
 
@@ -51,7 +57,7 @@ Refer to the [`interactivity` support property docs](https://developer.wordpress
 
 #### Load Interactivity API Javascript code with `viewScriptModule`
 
-The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` [block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
+The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
 
 ```json
 // block.json
