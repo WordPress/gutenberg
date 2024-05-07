@@ -138,8 +138,8 @@ export function toVdom( root ) {
 						return obj;
 					}
 					// Splitting the directive name into directive type and input.
-					const directiveType = directiveMatch[ 1 ] || ''; // The directive type part of the directive name.
-					const directiveInput = directiveMatch[ 2 ] || 'default'; // The directive input part of the directive name, defaulting to 'default' if not present.
+					const directiveType = directiveMatch[ 1 ] || '';
+					const directiveInput = directiveMatch[ 2 ] || 'default';
 
 					// Creating or updating the array for the specific directive type in the directives object.
 					obj[ directiveType ] = obj[ directiveType ] || [];
