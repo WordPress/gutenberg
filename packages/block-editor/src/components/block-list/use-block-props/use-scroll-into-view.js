@@ -9,7 +9,7 @@ export function useScrollIntoView( { isSelected } ) {
 			if ( isSelected ) {
 				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
-				if ( ! defaultView ) {
+				if ( ! defaultView.IntersectionObserver ) {
 					return;
 				}
 				const observer = new defaultView.IntersectionObserver(
