@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
-import { typography, color, layout, image, shadow as shadowIcon } from '@wordpress/icons';
+import {
+	typography,
+	color,
+	layout,
+	image,
+	shadow as shadowIcon,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
