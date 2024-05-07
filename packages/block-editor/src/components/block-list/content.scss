@@ -274,7 +274,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		}
 	}
 
-	&.is-hovered,
+	&.is-hovered:not(.is-selected),
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
 		&::after {
