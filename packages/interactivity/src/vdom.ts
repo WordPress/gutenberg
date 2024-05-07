@@ -116,8 +116,11 @@ export function toVdom( root ) {
 		}
 
 		if ( directives.length ) {
+			// Reduce the directives array to build the __directives object.
 			props.__directives = directives.reduce(
+				// The reducer function accumulates the __directives object.
 				( obj, [ name, ns, value ] ) => {
+					// Check if the directive name matches the expected format.
 					const directiveMatch = directiveParser.exec( name );
 					if ( directiveMatch === null ) {
 						if (
@@ -131,9 +134,11 @@ export function toVdom( root ) {
 						}
 						return obj;
 					}
-					const prefix = directiveMatch[ 1 ] || '';
-					const suffix = directiveMatch[ 2 ] || 'default';
+					// Splitting the directive name into prefix and suffix.
+					const prefix = directiveMatch[ 1 ] || ''; // The prefix part of the directive name.
+					const suffix = directiveMatch[ 2 ] || 'default'; // The suffix part of the directive name, defaulting to 'default' if not present.
 
+					// Creating or updating the array for the specific prefix in the directives object.
 					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
