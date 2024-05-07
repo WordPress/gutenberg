@@ -126,6 +126,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				getCurrentTheme,
 			} = select( coreStore );
 			const _currentTheme = getCurrentTheme();
+			console.log( '_currentTheme', _currentTheme );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
 			const { getBlocksByName, getBlockAttributes } =
@@ -296,7 +297,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			// Check these two properties: they were not present in the site editor.
 			__experimentalCreatePageEntity: createPageEntity,
 			__experimentalUserCanCreatePages: userCanCreatePages,
-			__experimentalCurrentTheme: {
+			currentTheme: {
 				stylesheetURI: currentTheme?.stylesheet_uri,
 				templateURI: currentTheme?.template_uri,
 			},

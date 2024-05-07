@@ -36,6 +36,7 @@ import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import useResolveThemeFileURIs from './use-resolve-theme-file-uris';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -1207,52 +1208,6 @@ export function processCSSNesting( css, blockSelector ) {
 	return processedCSS;
 }
 
-function useResolveThemeFileURIs( mergedConfig ) {
-	/*
-	 * This only resolves top-level background image URLs.
-	 * To support nested styles (block etc) possible approaches:
-	 * 1. registry.batch ???
-	 * 2. create an action to parse entire config and resolve URLs.
-	 */
-	const { backgroundImageURL } = useSelect(
-		( select ) => {
-			const { getThemeFileURI } = unlock( select( blockEditorStore ) );
-			let file = mergedConfig?.styles?.background?.backgroundImage?.url;
-			if (
-				!! mergedConfig?.styles?.background?.backgroundImage?.url && ! isURL(  mergedConfig?.styles?.background?.backgroundImage?.url )
-			) {
-				file = getThemeFileURI(  mergedConfig.styles.background.backgroundImage.url );
-			}
-			return {
-				backgroundImageURL: file,
-			};
-		},
-		[ mergedConfig?.styles?.background?.backgroundImage?.url ]
-	);
-
-	return useMemo( () => {
-		if ( ! backgroundImageURL ) {
-			return mergedConfig;
-		}
-		const updatedConfig = {
-			...mergedConfig,
-			styles: {
-				...mergedConfig.styles,
-				background: {
-					...mergedConfig.styles.background,
-					backgroundImage: {
-						...mergedConfig.styles.background.backgroundImage,
-						url: backgroundImageURL,
-					},
-				},
-			},
-		};
-		return updatedConfig;
-	}, [
-		backgroundImageURL,
-	] );
-}
-
 /**
  * Returns the global styles output using a global styles configuration.
  * If wishing to generate global styles and settings based on the
@@ -1266,6 +1221,7 @@ function useResolveThemeFileURIs( mergedConfig ) {
 export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const resolvedConfig = useResolveThemeFileURIs( mergedConfig );
+	console.log( 'resolvedConfig', resolvedConfig );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 
