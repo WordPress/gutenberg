@@ -112,7 +112,7 @@ const UnforwardedFontSizePicker = (
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem' ].includes( valueUnit );
+		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
 	return (
