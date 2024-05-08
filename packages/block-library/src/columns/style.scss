@@ -98,15 +98,21 @@
 	* Individual Column Alignment
 	*/
 	&.is-vertically-aligned-top {
-		align-self: flex-start;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-start;
 	}
 
 	&.is-vertically-aligned-center {
-		align-self: center;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
 	}
 
 	&.is-vertically-aligned-bottom {
-		align-self: flex-end;
+		display: flex;
+		flex-direction: column;
+		justify-content: flex-end;
 	}
 
 	&.is-vertically-aligned-stretch {
