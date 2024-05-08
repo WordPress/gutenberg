@@ -1,3 +1,6 @@
+// This width comes from the Inserter component.
+$block-inserter-width: 350px;
+
 .editor-inserter-sidebar {
 	@include reset;
 
@@ -11,6 +14,7 @@
 	display: flex;
 	justify-content: flex-end;
 	z-index: z-index(".editor-inserter-sidebar__header");
+	width: $block-inserter-width;
 }
 
 .editor-inserter-sidebar__close-button {
