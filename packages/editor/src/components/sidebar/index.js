@@ -16,45 +16,43 @@ import {
 import { isRTL, __, sprintf } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import {
-	store as editorStore,
-	PageAttributesPanel,
-	PluginDocumentSettingPanel,
-	PluginSidebar,
-	PostDiscussionPanel,
-	PostLastRevisionPanel,
-	PostTaxonomiesPanel,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
-import SettingsHeader from '../settings-header';
-import PostStatus from '../post-status';
-import MetaBoxes from '../../meta-boxes';
-import { store as editPostStore } from '../../../store';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-import { unlock } from '../../../lock-unlock';
+import PageAttributesPanel from '../page-attributes/panel';
+import PatternOverridesPanel from '../pattern-overrides-panel';
+import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
+import PluginSidebar from '../plugin-sidebar';
+import PostActions from '../post-actions';
+import PostCardPanel from '../post-card-panel';
+import PostDiscussionPanel from '../post-discussion/panel';
+import PostLastRevisionPanel from '../post-last-revision/panel';
+import PostSummary from './post-summary';
+import PostTaxonomiesPanel from '../post-taxonomies/panel';
+import SidebarHeader from './header';
+import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
+import { sidebars } from './constants';
+import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
-const { PostCardPanel, PostActions, interfaceStore } =
-	unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
-const { PatternOverridesPanel, useAutoSwitchEditorSidebars } =
-	unlock( editorPrivateApis );
 
 const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	web: true,
 	native: false,
 } );
-export const sidebars = {
-	document: 'edit-post/document',
-	block: 'edit-post/block',
-};
 
-const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
+const SidebarContent = ( {
+	tabName,
+	keyboardShortcut,
+	isEditingTemplate,
+	extraPanels,
+} ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
@@ -143,15 +141,15 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SettingsHeader ref={ tabListRef } />
+					<SidebarHeader ref={ tabListRef } />
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
 			// This classname is added so we can apply a corrective negative
 			// margin to the panel.
 			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
-			className="edit-post-sidebar__panel"
-			headerClassName="edit-post-sidebar__panel-tabs"
+			className="editor-sidebar__panel"
+			headerClassName="editor-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			toggleShortcut={ keyboardShortcut }
@@ -167,14 +165,14 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 							/>
 						}
 					/>
-					{ ! isEditingTemplate && <PostStatus /> }
+					{ ! isEditingTemplate && <PostSummary /> }
 					<PluginDocumentSettingPanel.Slot />
 					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
 					<PostDiscussionPanel />
 					<PageAttributesPanel />
 					<PatternOverridesPanel />
-					{ ! isEditingTemplate && <MetaBoxes location="side" /> }
+					{ extraPanels }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
 					<BlockInspector />
@@ -184,7 +182,7 @@ const SidebarContent = ( { tabName, keyboardShortcut, isEditingTemplate } ) => {
 	);
 };
 
-const SettingsSidebar = () => {
+const Sidebar = ( { extraPanels } ) => {
 	useAutoSwitchEditorSidebars();
 	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
 		( select ) => {
@@ -218,15 +216,15 @@ const SettingsSidebar = () => {
 		[]
 	);
 
-	const { openGeneralSidebar } = useDispatch( editPostStore );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const onTabSelect = useCallback(
 		( newSelectedTabId ) => {
 			if ( !! newSelectedTabId ) {
-				openGeneralSidebar( newSelectedTabId );
+				enableComplementaryArea( 'core', newSelectedTabId );
 			}
 		},
-		[ openGeneralSidebar ]
+		[ enableComplementaryArea ]
 	);
 
 	return (
@@ -239,9 +237,10 @@ const SettingsSidebar = () => {
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				isEditingTemplate={ isEditingTemplate }
+				extraPanels={ extraPanels }
 			/>
 		</Tabs>
 	);
 };
 
-export default SettingsSidebar;
+export default Sidebar;
