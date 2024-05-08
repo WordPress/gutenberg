@@ -9,6 +9,7 @@ import * as Ariakit from '@ariakit/react';
  */
 import { useInstanceId } from '@wordpress/compose';
 import {
+	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
@@ -17,6 +18,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -155,9 +157,13 @@ function ListItem( {
 							<CompositeItem
 								store={ store }
 								render={
-									<Ariakit.MenuButton>
-										Menu
-									</Ariakit.MenuButton>
+									<Button
+										size="compact"
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										disabled={ ! actions.length }
+										className="dataviews-all-actions-button"
+									/>
 								}
 							/>
 							<Ariakit.Menu>
