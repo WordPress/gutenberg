@@ -1,9 +1,7 @@
 /**
- * Fullscreen mode button.
+ *  Show icon label overrides.
  */
 .show-icon-labels .editor-header {
-	// Exception for the fullscreen mode button.
-	// Undo the width override for fullscreen mode button.
 	.edit-post-fullscreen-mode-close.has-icon {
 		width: $header-height;
 		svg {
