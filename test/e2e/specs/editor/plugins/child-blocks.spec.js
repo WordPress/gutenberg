@@ -16,12 +16,12 @@ test.describe( 'Child Blocks', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-child-blocks' );
 	} );
 
-	test( 'are hidden from the global block inserter', async ( { page } ) => {
+	test( 'are hidden from the global Block Inserter', async ( { page } ) => {
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter' } );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockInserter.click();
@@ -47,9 +47,9 @@ test.describe( 'Child Blocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter' } );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockInserter.click();
@@ -81,9 +81,9 @@ test.describe( 'Child Blocks', () => {
 
 		const blockInserter = page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } );
+			.getByRole( 'button', { name: 'Block Inserter' } );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockInserter.click();

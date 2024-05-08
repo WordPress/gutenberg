@@ -166,7 +166,7 @@ describe( 'Buttons block', () => {
 			const buttonBlock = await getBlock( screen, 'Button' );
 			fireEvent.press( buttonBlock );
 
-			// Open the block inserter
+			// Open the Block Inserter
 			fireEvent.press( screen.getByLabelText( 'Add block' ) );
 
 			const blockList = screen.getByTestId( 'InserterUI-Blocks' );

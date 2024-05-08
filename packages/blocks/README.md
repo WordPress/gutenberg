@@ -502,8 +502,8 @@ _Parameters_
 
 -   _namespace_ `string`: The namespace to group blocks by in the inserter; corresponds to the block namespace.
 -   _settings_ `Object`: The block collection settings.
--   _settings.title_ `string`: The title to display in the block inserter.
--   _settings.icon_ `[Object]`: The icon to display in the block inserter.
+-   _settings.title_ `string`: The title to display in the Block Inserter.
+-   _settings.icon_ `[Object]`: The icon to display in the Block Inserter.
 
 ### registerBlockStyle
 

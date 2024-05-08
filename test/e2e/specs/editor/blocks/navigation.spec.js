@@ -335,7 +335,7 @@ test.describe( 'Navigation block', () => {
 		const navBlock = navigation.getNavBlock();
 
 		const navBlockInserter = navigation.getNavBlockInserter();
-		// Wait until the nav block inserter is visible before we continue. Otherwise the navigation block may not have finished being created.
+		// Wait until the nav Block Inserter is visible before we continue. Otherwise the navigation block may not have finished being created.
 		await expect( navBlockInserter ).toBeVisible();
 
 		/**
@@ -517,7 +517,7 @@ test.describe( 'Navigation block', () => {
 		// Deleting with no more siblings should focus the navigation block again
 		await pageUtils.pressKeys( 'access+z' );
 		await expect( navBlock ).toBeFocused();
-		// Wait until the nav block inserter is visible before we continue.
+		// Wait until the nav Block Inserter is visible before we continue.
 		await expect( navBlockInserter ).toBeVisible();
 		// Now the appender should be visible and reachable with an arrow down
 		await pageUtils.pressKeys( 'ArrowDown' );
@@ -629,7 +629,7 @@ class Navigation {
 	async useBlockInserter() {
 		const navBlockInserter = this.getNavBlockInserter();
 
-		// Wait until the nav block inserter is visible before we move on to using it
+		// Wait until the nav Block Inserter is visible before we move on to using it
 		await expect( navBlockInserter ).toBeVisible();
 
 		await expect( navBlockInserter ).toBeFocused();

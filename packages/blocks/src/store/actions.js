@@ -287,8 +287,8 @@ export function updateCategory( slug, category ) {
  * @ignore
  *
  * @param {string} namespace The namespace of the blocks to put in the collection
- * @param {string} title     The title to display in the block inserter
- * @param {Object} icon      (optional) The icon to display in the block inserter
+ * @param {string} title     The title to display in the Block Inserter
+ * @param {Object} icon      (optional) The icon to display in the Block Inserter
  *
  * @return {Object} Action object.
  */

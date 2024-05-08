@@ -312,7 +312,7 @@ export function removedPanels( state = [], action ) {
 }
 
 /**
- * Reducer to set the block inserter panel open or closed.
+ * Reducer to set the Block Inserter panel open or closed.
  *
  * Note: this reducer interacts with the list view panel reducer
  * to make sure that only one of the two panels is open at the same time.

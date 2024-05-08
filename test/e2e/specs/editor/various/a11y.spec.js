@@ -40,10 +40,10 @@ test.describe( 'a11y (@firefox, @webkit)', () => {
 
 		// This test assumes the Editor is not in Fullscreen mode. Check the
 		// first tabbable element within the 'Editor top bar' region is the
-		// 'Toggle block inserter' button.
+		// 'Block Inserter' button.
 		await pageUtils.pressKeys( 'Tab' );
 		await expect(
-			page.locator( 'role=button[name=/Toggle block inserter/i]' )
+			page.locator( 'role=button[name=/Block Inserter/i]' )
 		).toBeFocused();
 	} );
 

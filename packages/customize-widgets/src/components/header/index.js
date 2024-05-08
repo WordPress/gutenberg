@@ -84,7 +84,7 @@ function Header( {
 						icon={ plus }
 						label={ _x(
 							'Add block',
-							'Generic label for block inserter button'
+							'Generic label for Block Inserter button'
 						) }
 						onClick={ () => {
 							setIsInserterOpened( ( isOpen ) => ! isOpen );

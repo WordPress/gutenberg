@@ -4,7 +4,7 @@ The `BlockTypesList` component lets users display a list of blocks in different 
 
 This component is present in the block insertion tab, the reusable blocks tab and the quick block insertion modal in the editor.
 
-![Block types list in the block inserter tab](https://make.wordpress.org/core/files/2020/09/block-types-list-emplacement-1.png)
+![Block types list in the Block Inserter tab](https://make.wordpress.org/core/files/2020/09/block-types-list-emplacement-1.png)
 
 ![Block types list in the reusables blocks tab](https://make.wordpress.org/core/files/2020/09/block-types-list-emplacement-2.png)
 

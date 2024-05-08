@@ -437,7 +437,7 @@ test.describe( 'Image', () => {
 
 		async function openMediaTab() {
 			const blockInserter = page.getByRole( 'button', {
-				name: 'Toggle block inserter',
+				name: 'Block Inserter',
 			} );
 			const isClosed =
 				( await blockInserter.getAttribute( 'aria-pressed' ) ) ===

@@ -39,7 +39,7 @@
 		},
 		"title": {
 			"type": "string",
-			"description": "This is the display title for your block, which can be translated with our translation functions. The block inserter will show this name."
+			"description": "This is the display title for your block, which can be translated with our translation functions. The Block Inserter will show this name."
 		},
 		"category": {
 			"description": "Blocks are grouped into categories to help users browse and discover them.\n Core provided categories are: text, media, design, widgets, theme, embed\n\nPlugins and Themes can also register custom block categories.\n\nhttps://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/#managing-block-categories",

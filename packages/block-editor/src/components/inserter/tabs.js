@@ -18,18 +18,18 @@ const { Tabs } = unlock( componentsPrivateApis );
 
 const blocksTab = {
 	name: 'blocks',
-	/* translators: Blocks tab title in the block inserter. */
+	/* translators: Blocks tab title in the Block Inserter. */
 	title: __( 'Blocks' ),
 };
 const patternsTab = {
 	name: 'patterns',
-	/* translators: Theme and Directory Patterns tab title in the block inserter. */
+	/* translators: Theme and Directory Patterns tab title in the Block Inserter. */
 	title: __( 'Patterns' ),
 };
 
 const mediaTab = {
 	name: 'media',
-	/* translators: Media tab title in the block inserter. */
+	/* translators: Media tab title in the Block Inserter. */
 	title: __( 'Media' ),
 };
 
@@ -43,7 +43,7 @@ function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
 					<Button
 						className="block-editor-inserter-sidebar__close-button"
 						icon={ closeSmall }
-						label={ __( 'Close block inserter' ) }
+						label={ __( 'Close' ) }
 						onClick={ () => onClose() }
 						size="small"
 					/>

@@ -311,8 +311,8 @@ function translateBlockSettingUsingI18nSchema(
  *
  * @param {string} namespace       The namespace to group blocks by in the inserter; corresponds to the block namespace.
  * @param {Object} settings        The block collection settings.
- * @param {string} settings.title  The title to display in the block inserter.
- * @param {Object} [settings.icon] The icon to display in the block inserter.
+ * @param {string} settings.title  The title to display in the Block Inserter.
+ * @param {Object} [settings.icon] The icon to display in the Block Inserter.
  *
  * @example
  * ```js

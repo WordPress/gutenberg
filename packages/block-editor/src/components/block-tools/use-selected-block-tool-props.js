@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 /**
- * Returns props for the selected block tools and empty block inserter.
+ * Returns props for the selected block tools and empty Block Inserter.
  *
  * @param {string} clientId Selected block client ID.
  */

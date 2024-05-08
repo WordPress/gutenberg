@@ -3039,7 +3039,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isInserterOpened', () => {
-		it( 'returns the block inserter panel isOpened state', () => {
+		it( 'returns the Block Inserter panel isOpened state', () => {
 			const state = {
 				blockInserterPanel: true,
 			};

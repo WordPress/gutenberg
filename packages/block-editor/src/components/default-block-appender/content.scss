@@ -37,7 +37,7 @@
 		}
 
 		// Since this appender will only ever appear on an entirely empty document, we don't account for last-child.
-		// This is also because it will never be the last child, the block inserter that sits in this appender is the last child.
+		// This is also because it will never be the last child, the Block Inserter that sits in this appender is the last child.
 	}
 
 	// Dropzone.

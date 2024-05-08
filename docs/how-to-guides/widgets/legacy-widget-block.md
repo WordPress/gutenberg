@@ -2,9 +2,9 @@
 
 The Legacy Widget block allows users to add, edit and preview third party widgets that are registered by plugins and widgets that were added using the classic Widgets Editor.
 
-Third party widgets can be added by inserting a Legacy Widget block using the block inserter and selecting the widget from the block's dropdown.
+Third party widgets can be added by inserting a Legacy Widget block using the Block Inserter and selecting the widget from the block's dropdown.
 
-Third party widgets may also be added by searching for the name of the widget in the block inserter and selecting the widget. A variation of the Legacy Widget block will be inserted.
+Third party widgets may also be added by searching for the name of the widget in the Block Inserter and selecting the widget. A variation of the Legacy Widget block will be inserted.
 
 ## Compatibility with the Legacy Widget block
 
@@ -134,7 +134,7 @@ transforms: {
 
 #### 3) Hide the widget from the Legacy Widget block
 
-As a final touch, we can tell the Legacy Widget block to hide your widget from the "Select widget" dropdown and from the block inserter. This encourages users to use the block that replaces your widget.
+As a final touch, we can tell the Legacy Widget block to hide your widget from the "Select widget" dropdown and from the Block Inserter. This encourages users to use the block that replaces your widget.
 
 This can be done using the `widget_types_to_hide_from_legacy_widget_block` filter.
 

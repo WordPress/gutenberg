@@ -66,7 +66,7 @@ Group toolbar controls in logical segments. Don't add a segment for each.
 
 ### Block identification
 
-A block should have a straightforward, short name so users can easily find it in the block library. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the block library.
+A block should have a straightforward, short name so users can easily find it in the Block Inserter. A block named "YouTube" is easy to find and understand. The same block, named "Embedded Video (YouTube)", would be less clear and harder to find in the Block Inserter.
 
 When referring to a block in documentation or UI, use title case for the block title and lowercase for the "block" descriptor. For example:
 
@@ -76,11 +76,11 @@ When referring to a block in documentation or UI, use title case for the block t
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://fonts.google.com/icons). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
-![A screenshot of the block library with concise block names](https://developer.wordpress.org/files/2022/01/blocks-do.png)
+![A screenshot of the Block Inserter with concise block names](https://developer.wordpress.org/files/2022/01/blocks-do.png)
 **Do:**
 Use concise block names.
 
-![A screenshot of the block library with long, multi-line block names](https://developer.wordpress.org/files/2022/01/blocks-dont.png)
+![A screenshot of the Block Inserter with long, multi-line block names](https://developer.wordpress.org/files/2022/01/blocks-dont.png)
 **Don't:**
 Avoid long, multi-line block names.
 

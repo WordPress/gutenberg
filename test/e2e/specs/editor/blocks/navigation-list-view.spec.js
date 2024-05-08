@@ -171,7 +171,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await appender.click();
 
-		// Expect to see the block inserter.
+		// Expect to see the Block Inserter.
 		await expect(
 			page.getByRole( 'searchbox', {
 				name: 'Search for blocks and patterns',

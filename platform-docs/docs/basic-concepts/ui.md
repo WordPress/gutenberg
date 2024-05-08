@@ -26,4 +26,4 @@ While the block toolbar contains what are considered to be the "main tools" to m
 
 ## The Block Inserter
 
-By default the block editor renders a block inserter at the end of the canvas if there's no block selected. It also renders an inserter if you hover over the area between two consecutive blocks. That said, you can also decide to render a permanent inserter, for instance in a header of your editor. You can do so by using the `Inserter` component.
+By default the block editor renders a Block Inserter at the end of the canvas if there's no block selected. It also renders an inserter if you hover over the area between two consecutive blocks. That said, you can also decide to render a permanent inserter, for instance in a header of your editor. You can do so by using the `Inserter` component.

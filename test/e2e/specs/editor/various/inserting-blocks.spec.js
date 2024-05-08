@@ -72,7 +72,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		await page.fill(
@@ -135,7 +135,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		await page.fill(
@@ -191,7 +191,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		const PATTERN_NAME = 'Social links with a shared background color';
@@ -283,7 +283,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		// Insert a synced pattern.
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 		await page.fill(
 			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
@@ -347,7 +347,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		const PATTERN_NAME = 'Social links with a shared background color';
@@ -389,7 +389,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 
 		const inserterButton = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+			name: 'Block Inserter',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
@@ -503,7 +503,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await editor.selectBlocks( paragraphBlock );
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
@@ -624,7 +624,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 		await page.getByRole( 'option', { name: 'More', exact: true } ).click();
 
@@ -646,7 +646,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
@@ -674,7 +674,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter' } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Media' } )
@@ -726,7 +726,7 @@ test.describe( 'insert media from inserter', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
 		await page.getByRole( 'tab', { name: 'Images' } ).click();
 		await page.getByLabel( uploadedMedia.title.raw ).click();
@@ -756,7 +756,7 @@ class InsertingBlocksUtils {
 		for ( let i = 0; i < 2; i += 1 ) {
 			await this.page.mouse.move(
 				// Hover on the right side of the block to avoid collapsing with the preview.
-				// But not too far to avoid triggering the grouping block inserter.
+				// But not too far to avoid triggering the grouping Block Inserter.
 				boundingBox.x + boundingBox.width - 32,
 				// Hover on the bottom of the paragraph block.
 				boundingBox.y + boundingBox.height - 1

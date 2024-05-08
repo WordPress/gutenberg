@@ -8,13 +8,13 @@ test.describe( 'Group', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'can be created using the block inserter', async ( {
+	test( 'can be created using the Block Inserter', async ( {
 		editor,
 		page,
 	} ) => {
 		// Search for the group block and insert it.
 		const inserterButton = page.locator(
-			'role=button[name="Toggle block inserter"i]'
+			'role=button[name="Block Inserter"i]'
 		);
 
 		await inserterButton.click();

@@ -338,13 +338,13 @@ This should match the namespace declared in the block name; the name of your plu
 
 -   **Type:** `String`
 
-This will display in the block inserter section, which will list all blocks in this collection.
+This will display in the Block Inserter section, which will list all blocks in this collection.
 
 #### Icon
 
 -   **Type:** `Object`
 
-(Optional) An icon to display alongside the title in the block inserter.
+(Optional) An icon to display alongside the title in the Block Inserter.
 
 ```js
 // Registering a block collection

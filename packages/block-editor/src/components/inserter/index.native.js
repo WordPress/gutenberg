@@ -43,7 +43,7 @@ const defaultRenderToggle = ( {
 		<ToolbarButton
 			title={ _x(
 				'Add block',
-				'Generic label for block inserter button'
+				'Generic label for Block Inserter button'
 			) }
 			icon={ <Icon icon={ plus } style={ iconStyle } /> }
 			onClick={ onToggle }

@@ -26,11 +26,11 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with svg icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockLibrary.getByRole( 'searchbox' ).fill( 'TestSimpleSvgIcon' );
@@ -60,11 +60,11 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with dash icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockLibrary
@@ -100,11 +100,11 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with function icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockLibrary.getByRole( 'searchbox' ).fill( 'TestFunctionIcon' );
@@ -137,11 +137,11 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockLibrary
@@ -185,11 +185,11 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await blockLibrary

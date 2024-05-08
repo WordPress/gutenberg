@@ -29,7 +29,7 @@ test.describe( 'Style Book', () => {
 
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
-			page.locator( 'role=button[name="Toggle block inserter"i]' )
+			page.locator( 'role=button[name="Block Inserter"i]' )
 		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Tools"i]' )

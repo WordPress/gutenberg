@@ -21,12 +21,12 @@ test.describe( 'Allowed Patterns', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 
 		await page
 			.getByRole( 'region', {
-				name: 'Block Library',
+				name: 'Block Inserter',
 			} )
 			.getByRole( 'searchbox', {
 				name: 'Search for blocks and patterns',
@@ -64,12 +64,12 @@ test.describe( 'Allowed Patterns', () => {
 			await admin.createNewPost();
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter' } )
 				.click();
 
 			await page
 				.getByRole( 'region', {
-					name: 'Block Library',
+					name: 'Block Inserter',
 				} )
 				.getByRole( 'searchbox', {
 					name: 'Search for blocks and patterns',

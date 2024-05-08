@@ -2,7 +2,7 @@
 
 These two components allow rendering editor UI by the block (in a popover) but outside the canvas. This is important to avoid messing with the style and layout of the block list.
 
-For example, it's used to render the contextual block toolbar and the in-between block inserter.
+For example, it's used to render the contextual block toolbar and the in-between Block Inserter.
 
 ## BlockPopover
 

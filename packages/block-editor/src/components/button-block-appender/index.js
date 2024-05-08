@@ -43,7 +43,7 @@ function ButtonBlockAppender(
 				} else {
 					label = _x(
 						'Add block',
-						'Generic label for block inserter button'
+						'Generic label for Block Inserter button'
 					);
 				}
 				const isToggleButton = ! hasSingleBlockType;

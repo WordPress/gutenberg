@@ -48,7 +48,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 
-		// Open the block inserter.
+		// Open the Block Inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 
@@ -81,7 +81,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		await column.last().click();
 
-		// Open the block inserter.
+		// Open the Block Inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 
@@ -103,7 +103,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 
-		// Open the block inserter.
+		// Open the Block Inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 
@@ -199,7 +199,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 			)
 			.click();
 
-		// Open the block inserter.
+		// Open the Block Inserter.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 

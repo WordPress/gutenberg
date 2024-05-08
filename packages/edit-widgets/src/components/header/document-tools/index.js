@@ -72,8 +72,8 @@ function DocumentTools() {
 				/* translators: button label text should, if possible, be under 16
 					characters. */
 				label={ _x(
-					'Toggle block inserter',
-					'Generic label for block inserter button'
+					'Block Inserter',
+					'Generic label for Block Inserter button'
 				) }
 				size="compact"
 			/>

@@ -369,7 +369,7 @@ test.describe( 'Post Editor Performance', () => {
 			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
-				name: 'Toggle block inserter',
+				name: 'Block Inserter',
 			} );
 
 			const samples = 10;
@@ -425,7 +425,7 @@ test.describe( 'Post Editor Performance', () => {
 			await admin.editPost( draftId );
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
-				name: 'Toggle block inserter',
+				name: 'Block Inserter',
 			} );
 			// Open Inserter.
 			await globalInserterToggle.click();
@@ -484,7 +484,7 @@ test.describe( 'Post Editor Performance', () => {
 			await perfUtils.disableAutosave();
 
 			const globalInserterToggle = page.getByRole( 'button', {
-				name: 'Toggle block inserter',
+				name: 'Block Inserter',
 			} );
 			const paragraphBlockItem = page.locator(
 				'.block-editor-inserter__menu .editor-block-list-item-paragraph'
@@ -536,7 +536,7 @@ test.describe( 'Post Editor Performance', () => {
 			await admin.createNewPost();
 			await perfUtils.disableAutosave();
 			const globalInserterToggle = page.getByRole( 'button', {
-				name: 'Toggle block inserter',
+				name: 'Block Inserter',
 			} );
 
 			const testPatterns = [

@@ -33,14 +33,12 @@ test.describe( 'Columns', () => {
 			.first()
 			.click();
 
-		// Toggle Block inserter
-		await page
-			.locator( 'role=button[name="Toggle block inserter"i]' )
-			.click();
+		// Block Inserter button
+		await page.locator( 'role=button[name="Block Inserter"i]' ).click();
 
 		// Verify Column
 		const inserterOptions = page.locator(
-			'role=region[name="Block Library"i] >> role=option'
+			'role=region[name="Block Inserter"i] >> role=option'
 		);
 		await expect( inserterOptions ).toHaveCount( 1 );
 		await expect( inserterOptions ).toHaveText( 'Column' );

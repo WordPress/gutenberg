@@ -569,7 +569,7 @@ class EditorPage {
 		return x > width || y > height;
 	}
 
-	// Attempts to find the given block button in the block inserter control.
+	// Attempts to find the given block button in the Block Inserter control.
 	async findBlockButton( blockName ) {
 		await this.waitForInserter();
 		const blockAccessibilityLabel = `${ blockName } block`;

@@ -48,7 +48,7 @@ const defaultRenderToggle = ( {
 	} else if ( ! label && prioritizePatterns ) {
 		label = __( 'Add pattern' );
 	} else if ( ! label ) {
-		label = _x( 'Add block', 'Generic label for block inserter button' );
+		label = _x( 'Add block', 'Generic label for Block Inserter button' );
 	}
 
 	// Handle both onClick functions from the toggle and the parent component.
