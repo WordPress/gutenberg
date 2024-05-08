@@ -9,8 +9,9 @@ import * as Ariakit from '@ariakit/react';
  */
 import { useInstanceId } from '@wordpress/compose';
 import {
-	__experimentalHStack as HStack,		
+	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -20,6 +21,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { unlock } from './lock-unlock';
 import type {
 	Data,
 	Item,
@@ -51,6 +53,13 @@ interface ListViewItemProps {
 	visibleFields: NormalizedField[];
 }
 
+const {
+	CompositeV2: Composite,
+	CompositeItemV2: CompositeItem,
+	CompositeRowV2: CompositeRow,
+	useCompositeStoreV2: useCompositeStore,
+} = unlock( componentsPrivateApis );
+
 function ListItem( {
 	actions,
 	id,
@@ -77,7 +86,8 @@ function ListItem( {
 	}, [ isSelected ] );
 
 	return (
-		<Ariakit.CompositeRow
+		<CompositeRow
+			ref={ itemRef }
 			render={ <li /> }
 			role="row"
 			className={ clsx( {
@@ -86,7 +96,7 @@ function ListItem( {
 		>
 			<HStack className="dataviews-view-list__item-wrapper">
 				<div role="gridcell">
-					<Ariakit.CompositeItem
+					<CompositeItem
 						store={ store }
 						render={ <div /> }
 						role="button"
@@ -137,12 +147,12 @@ function ListItem( {
 								</div>
 							</VStack>
 						</HStack>
-					</Ariakit.CompositeItem>
+					</CompositeItem>
 				</div>
 				{ actions && (
 					<div role="gridcell">
 						<Ariakit.MenuProvider>
-							<Ariakit.CompositeItem
+							<CompositeItem
 								store={ store }
 								render={
 									<Ariakit.MenuButton>
@@ -157,7 +167,7 @@ function ListItem( {
 					</div>
 				) }
 			</HStack>
-		</Ariakit.CompositeRow>
+		</CompositeRow>
 	);
 }
 
@@ -202,7 +212,7 @@ export default function ViewList( props: ListViewProps ) {
 		[ baseId, getItemId ]
 	);
 
-	const store = Ariakit.useCompositeStore( {
+	const store = useCompositeStore( {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
 
@@ -223,7 +233,7 @@ export default function ViewList( props: ListViewProps ) {
 	}
 
 	return (
-		<Ariakit.Composite
+		<Composite
 			id={ baseId }
 			render={ <ul /> }
 			className="dataviews-view-list"
@@ -247,6 +257,6 @@ export default function ViewList( props: ListViewProps ) {
 					/>
 				);
 			} ) }
-		</Ariakit.Composite>
+		</Composite>
 	);
 }
