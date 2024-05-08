@@ -64,7 +64,7 @@ describe( 'token-list', () => {
 
 		it( 'sets to stringified value', () => {
 			const list = new TokenList();
-			list.value = undefined;
+			list.value = undefined as unknown as string;
 
 			expect( list.value ).toBe( 'undefined' );
 		} );
