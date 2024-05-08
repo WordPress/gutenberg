@@ -18,6 +18,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useState } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -60,9 +61,11 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 		showIconLabels,
 		hasHistory,
 		hasFixedToolbar,
+		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const { getEditorMode } = select( editorStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isTextEditor: getEditorMode() === 'text',
@@ -74,6 +77,7 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 				select( editorStore ).isPublishSidebarOpened(),
 			showIconLabels: getPreference( 'core', 'showIconLabels' ),
 			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
+			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -131,7 +135,10 @@ function Header( { setEntitiesSavedStatesCallback, initialPost } ) {
 					// when the publish sidebar has been closed.
 					<PostSavedState forceIsDirty={ hasActiveMetaboxes } />
 				) }
-				<PreviewDropdown forceIsAutosaveable={ hasActiveMetaboxes } />
+				<PreviewDropdown
+					disabled={ isZoomedOutView }
+					forceIsAutosaveable={ hasActiveMetaboxes }
+				/>
 				<PostPreviewButton
 					className="edit-post-header__post-preview-button"
 					forceIsAutosaveable={ hasActiveMetaboxes }
