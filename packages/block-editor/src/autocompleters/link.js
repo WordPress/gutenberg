@@ -7,6 +7,8 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { Icon, page, post } from '@wordpress/icons';
 
+// Update packages/block-editor/src/autocompleters/link.js
+
 const SHOWN_SUGGESTIONS = 10;
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
