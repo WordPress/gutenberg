@@ -17,6 +17,19 @@
 	}
 }
 
+@mixin selectedOutline() {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	outline-color: var(--wp-admin-theme-color);
+	outline-style: solid;
+	outline-width: var(--wp-admin-border-width-focus);
+	outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+}
 
 // Hide selections on this element, otherwise Safari will include it stacked
 // under your actual selection.
@@ -88,18 +101,8 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 		// We're using a pseudo element to overflow placeholder borders
 		// and any border inside the block itself.
 		&::after {
-			content: "";
-			position: absolute;
+			@include selectedOutline();
 			z-index: 1;
-			pointer-events: none;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			outline-color: var(--wp-admin-theme-color);
-			outline-style: solid;
-			outline-width: var(--wp-admin-border-width-focus);
-			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
@@ -278,17 +281,7 @@ _::-webkit-full-page-media, _:future, :root .has-multi-selection .block-editor-b
 	&:not(.rich-text):not([contenteditable="true"]).is-selected {
 
 		&::after {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			outline-color: var(--wp-admin-theme-color);
-			outline-style: solid;
-			outline-width: var(--wp-admin-border-width-focus);
-			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+			@include selectedOutline();
 		}
 	}
 }
