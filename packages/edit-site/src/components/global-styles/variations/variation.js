@@ -23,6 +23,9 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 );
 
 export default function Variation( { variation, children, isPill } ) {
+	// @TODO _links need to be merged as well somehow so that
+	// they are always returned in "mergedConfig" in the global-styles-provider.
+	// console.log( 'variation', variation );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(

@@ -607,17 +607,19 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
-		$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
-		$data   = array();
-		$fields = $this->get_fields_for_response( $request );
+		$theme               = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
+		$data                = array();
+		$fields              = $this->get_fields_for_response( $request );
+		$resolved_theme_uris = array();
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
 			$data['settings'] = $theme->get_settings();
 		}
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
-			$raw_data       = $theme->get_raw_data();
-			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+			$raw_data            = $theme->get_raw_data();
+			$data['styles']      = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -632,6 +634,11 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 					'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
 				),
 			);
+
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$links['theme_file_uris'] = $resolved_theme_uris;
+			}
+
 			$response->add_links( $links );
 		}
 
