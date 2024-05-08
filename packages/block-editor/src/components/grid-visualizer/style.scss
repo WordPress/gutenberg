@@ -14,7 +14,8 @@
 
 .block-editor-grid-visualizer__item {
 	background-color: color-mix(in srgb, currentColor 10%, transparent);
-	outline: $border-width solid color-mix(in srgb, currentColor 20%, transparent);
+	box-shadow: inset 0 0 0 $border-width color-mix(in srgb, currentColor 20%, #0000);
+	outline: 1px solid transparent;
 	border-radius: $radius-block-ui;
 }
 
