@@ -5,16 +5,16 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
-import {
-	EXCLUDED_PATTERN_SOURCES,
-	PATTERN_TYPES,
-} from '../../../utils/constants';
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
+
+const { EXCLUDED_PATTERN_SOURCES, PATTERN_TYPES } =
+	unlock( patternsPrivateApis );
 
 function injectThemeAttributeInBlockTemplateContent(
 	block,
@@ -67,7 +67,7 @@ function filterPatterns( patterns, template ) {
 	} );
 }
 
-function preparePatterns( patterns, template, currentThemeStylesheet ) {
+function preparePatterns( patterns, currentThemeStylesheet ) {
 	return patterns.map( ( pattern ) => ( {
 		...pattern,
 		keywords: pattern.keywords || [],
@@ -84,31 +84,22 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 }
 
 export function useAvailablePatterns( template ) {
-	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
-		useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const settings = getSettings();
+	const { blockPatterns, currentThemeStylesheet } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
 
-			return {
-				blockPatterns:
-					settings.__experimentalAdditionalBlockPatterns ??
-					settings.__experimentalBlockPatterns,
-				restBlockPatterns: select( coreStore ).getBlockPatterns(),
-				currentThemeStylesheet:
-					select( coreStore ).getCurrentTheme().stylesheet,
-			};
-		}, [] );
+		return {
+			blockPatterns: getSettings().__experimentalBlockPatterns,
+			currentThemeStylesheet:
+				select( coreStore ).getCurrentTheme().stylesheet,
+		};
+	}, [] );
 
 	return useMemo( () => {
-		const mergedPatterns = [
-			...( blockPatterns || [] ),
-			...( restBlockPatterns || [] ),
-		];
-		const filteredPatterns = filterPatterns( mergedPatterns, template );
+		const filteredPatterns = filterPatterns( blockPatterns, template );
 		return preparePatterns(
 			filteredPatterns,
 			template,
 			currentThemeStylesheet
 		);
-	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
+	}, [ blockPatterns, template, currentThemeStylesheet ] );
 }
