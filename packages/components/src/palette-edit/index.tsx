@@ -605,9 +605,7 @@ export function PaletteEdit( {
 				</PaletteEditContents>
 			) }
 			{ ! hasElements && emptyMessage && (
-				<PaletteEditContents>
-					{ emptyMessage }
-				</PaletteEditContents>
+				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
 			) }
 		</PaletteEditStyles>
 	);
