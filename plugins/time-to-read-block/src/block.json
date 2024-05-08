@@ -5,7 +5,7 @@
 	"title": "Time To Read",
 	"category": "theme",
 	"description": "Show minutes required to finish reading a post.",
-	"textdomain": "time-to-read",
+	"textdomain": "time-to-read-block",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
 		"textAlign": {

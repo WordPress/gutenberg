@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="WordPress Coding Standards for the Time to Read Block plugins">
-	<description>Sniffs for Gutenberg, with minor modifications needed for this plugin.</description>
+<ruleset name="WordPress Coding Standards for the Time to Read Block plugin">
+	<description>Includes sniffs for Gutenberg, with minor modifications needed for this plugin.</description>
 
 	<rule ref="../../phpcs.xml.dist"/>
 	<rule ref="WordPress.WP.I18n">

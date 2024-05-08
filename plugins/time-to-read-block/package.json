@@ -2,7 +2,7 @@
 	"name": "time-to-read-block",
 	"version": "1.0.0",
 	"description": "Block to display the minutes required to finish reading a post.",
-	"author": "The WordPress Contributors",
+	"author": "WordPress.org",
 	"license": "GPL-2.0-or-later",
 	"main": "build/index.js",
 	"scripts": {

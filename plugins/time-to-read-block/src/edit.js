@@ -79,8 +79,7 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 				minutesToRead,
 				'time-to-read-block'
 			),
-			minutesToRead,
-			'time-to-read-block'
+			minutesToRead
 		);
 	}, [ contentStructure, blocks ] );
 
