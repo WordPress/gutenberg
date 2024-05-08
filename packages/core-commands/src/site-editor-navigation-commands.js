@@ -196,31 +196,67 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			) {
 				return [];
 			}
-			return orderedRecords.map( ( record ) => {
-				const isSiteEditor = getPath( window.location.href )?.includes(
-					'site-editor.php'
-				);
-				const extraArgs = isSiteEditor
-					? { canvas: getQueryArg( window.location.href, 'canvas' ) }
-					: {};
+			const isSiteEditor = getPath( window.location.href )?.includes(
+				'site-editor.php'
+			);
+			const result = [];
+			result.push(
+				...orderedRecords.map( ( record ) => {
+					const extraArgs = isSiteEditor
+						? {
+								canvas: getQueryArg(
+									window.location.href,
+									'canvas'
+								),
+						  }
+						: {};
 
-				return {
-					name: templateType + '-' + record.id,
-					searchLabel: record.title?.rendered + ' ' + record.id,
-					label: record.title?.rendered
-						? record.title?.rendered
-						: __( '(no title)' ),
-					icon: icons[ templateType ],
+					return {
+						name: templateType + '-' + record.id,
+						searchLabel: record.title?.rendered + ' ' + record.id,
+						label: record.title?.rendered
+							? record.title?.rendered
+							: __( '(no title)' ),
+						icon: icons[ templateType ],
+						callback: ( { close } ) => {
+							const args = {
+								postType: templateType,
+								postId: record.id,
+								didAccessPatternsPage:
+									! isBlockBasedTheme &&
+									( isPatternsPage || didAccessPatternsPage )
+										? 1
+										: undefined,
+								...extraArgs,
+							};
+							const targetUrl = addQueryArgs(
+								'site-editor.php',
+								args
+							);
+							if ( isSiteEditor ) {
+								history.push( args );
+							} else {
+								document.location = targetUrl;
+							}
+							close();
+						},
+					};
+				} )
+			);
+
+			if (
+				orderedRecords?.length > 0 &&
+				templateType === 'wp_template_part'
+			) {
+				result.push( {
+					name: 'core/edit-site/open-template-parts',
+					label: __( 'Template parts' ),
+					icon: symbolFilled,
 					callback: ( { close } ) => {
 						const args = {
-							postType: templateType,
-							postId: record.id,
-							didAccessPatternsPage:
-								! isBlockBasedTheme &&
-								( isPatternsPage || didAccessPatternsPage )
-									? 1
-									: undefined,
-							...extraArgs,
+							path: '/patterns',
+							categoryType: 'wp_template_part',
+							categoryId: 'all-parts',
 						};
 						const targetUrl = addQueryArgs(
 							'site-editor.php',
@@ -233,8 +269,9 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 						}
 						close();
 					},
-				};
-			} );
+				} );
+			}
+			return result;
 		}, [ isBlockBasedTheme, orderedRecords, history ] );
 
 		return {
