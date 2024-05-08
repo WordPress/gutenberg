@@ -76,7 +76,7 @@ export default function BlockThemeControl( { id } ) {
 			popoverProps={ POPOVER_PROPS }
 			focusOnMount
 			toggleProps={ {
-				__next40pxDefaultSize: true,
+				size: 'compact',
 				variant: 'tertiary',
 			} }
 			label={ __( 'Template options' ) }
@@ -128,7 +128,7 @@ export default function BlockThemeControl( { id } ) {
 								);
 							} }
 						>
-							{ __( 'Template preview' ) }
+							{ __( 'Show template' ) }
 						</MenuItem>
 					</MenuGroup>
 				</>

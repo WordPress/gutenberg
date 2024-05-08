@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/widgets",
-	"version": "3.33.0",
+	"version": "3.34.0",
 	"description": "Functionality used by the widgets block editor in the Widgets screen and the Customizer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"classnames": "^2.3.1"
+		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

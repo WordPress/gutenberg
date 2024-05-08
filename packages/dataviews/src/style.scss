@@ -292,24 +292,25 @@
 	}
 
 	.dataviews-view-grid__card {
-		border-radius: $radius-block-ui * 2;
-		border: 1px solid $gray-200;
 		height: 100%;
 		justify-content: flex-start;
 
 		.dataviews-view-grid__title-actions {
-			padding: $grid-unit-05 $grid-unit $grid-unit-05 $grid-unit-05;
+			padding: $grid-unit-10 0 $grid-unit-05;
 		}
 
 		.dataviews-view-grid__primary-field {
-			min-height: $grid-unit-50;
+			min-height: $grid-unit-40; // Preserve layout when there is no ellipsis button
 		}
-		&.is-selected {
-			border-color: var(--wp-admin-theme-color);
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
+		&.is-selected {
 			.dataviews-view-grid__fields .dataviews-view-grid__field .dataviews-view-grid__field-value {
 				color: $gray-900;
+			}
+
+			.page-pages-preview-field__button::after {
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 			}
 		}
 	}
@@ -318,14 +319,27 @@
 		width: 100%;
 		min-height: 200px;
 		aspect-ratio: 1/1;
-		border-bottom: 1px solid $gray-200;
 		background-color: $gray-100;
-		border-radius: 3px 3px 0 0;
+		border-radius: $grid-unit-05;
+		overflow: hidden;
+		position: relative;
 
 		img {
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.1);
+			border-radius: $grid-unit-05;
+			pointer-events: none;
 		}
 	}
 
@@ -337,7 +351,6 @@
 		&:not(:empty) {
 			padding: $grid-unit-15 0;
 			padding-top: 0;
-			margin: 0 $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field {
@@ -366,8 +379,7 @@
 
 	.dataviews-view-grid__badge-fields {
 		&:not(:empty) {
-			padding: $grid-unit-15;
-			padding-top: 0;
+			padding-bottom: $grid-unit-15;
 		}
 
 		.dataviews-view-grid__field-value {
@@ -385,7 +397,6 @@
 
 .dataviews-view-list {
 	margin: 0;
-	padding: $grid-unit-10;
 
 	li {
 		margin: 0;
@@ -393,18 +404,7 @@
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
-			padding-right: $grid-unit-30;
 			border-radius: $grid-unit-05;
-
-			&::after {
-				position: absolute;
-				content: "";
-				top: 100%;
-				left: $grid-unit-30;
-				right: $grid-unit-30;
-				background: $gray-100;
-				height: 1px;
-			}
 
 			> * {
 				width: 100%;
@@ -418,6 +418,7 @@
 			&:hover,
 			&:focus-within {
 				color: var(--wp-admin-theme-color);
+				background-color: #f8f8f8;
 
 				.dataviews-view-list__primary-field,
 				.dataviews-view-list__fields {
@@ -430,37 +431,33 @@
 	li.is-selected,
 	li.is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: var(--wp-admin-theme-color);
-			color: $white;
+			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			color: $gray-900;
 
 			.dataviews-view-list__primary-field,
 			.dataviews-view-list__fields,
 			.components-button {
-				color: $white;
-			}
-
-			&::after {
-				background: transparent;
+				color: var(--wp-admin-theme-color);
 			}
 		}
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-15 0 $grid-unit-15 $grid-unit-30;
+		padding: $grid-unit-20 $grid-unit-40;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
+		border-top: 1px solid $gray-100;
 
 		&:focus-visible {
 			&::before {
 				position: absolute;
 				content: "";
-				top: -1px;
-				right: -1px;
-				bottom: -1px;
-				left: -1px;
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-				z-index: -1;
-				border-radius: $grid-unit-05;
+				top: calc(var(--wp-admin-border-width-focus) + 1px);
+				right: var(--wp-admin-border-width-focus);
+				bottom: var(--wp-admin-border-width-focus);
+				left: var(--wp-admin-border-width-focus);
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				border-radius: $radius-block-ui;
 			}
 		}
 		.dataviews-view-list__primary-field {
@@ -472,11 +469,11 @@
 	.dataviews-view-list__media-wrapper {
 		width: $grid-unit-50;
 		height: $grid-unit-50;
-		border-radius: $grid-unit-05;
 		overflow: hidden;
 		position: relative;
 		flex-shrink: 0;
 		background-color: $gray-100;
+		border-radius: $grid-unit-05;
 
 		img {
 			width: 100%;
@@ -553,10 +550,6 @@
 
 .dataviews-bulk-edit-button.components-button {
 	flex-shrink: 0;
-}
-
-.dataviews-view-grid__title-actions .dataviews-view-table-selection-checkbox {
-	margin-left: $grid-unit-10;
 }
 
 .dataviews-filter-summary__popover {

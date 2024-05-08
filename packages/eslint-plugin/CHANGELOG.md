@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 18.0.0 (2024-05-02)
+
+### Breaking Changes
+
+-   Enable `curly` eslint rule when using prettier ([#61204](https://github.com/WordPress/gutenberg/pull/61204)).
+
 ## 17.13.0 (2024-04-19)
 
 ## 17.12.0 (2024-04-03)

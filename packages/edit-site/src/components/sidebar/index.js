@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ export default function SidebarContent( { routeKey, children } ) {
 		elementToFocus?.focus();
 	}, [ navState ] );
 
-	const wrapperCls = classnames( 'edit-site-sidebar__screen-wrapper', {
+	const wrapperCls = clsx( 'edit-site-sidebar__screen-wrapper', {
 		'slide-from-left': navState.direction === 'back',
 		'slide-from-right': navState.direction === 'forward',
 	} );

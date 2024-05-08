@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -107,7 +107,7 @@ export function Option( {
 
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				className,
 				'components-circular-option-picker__option-wrapper'
 			) }

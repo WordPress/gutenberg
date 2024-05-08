@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -57,7 +57,7 @@ export default function TextTransformControl( { className, value, onChange } ) {
 		<SegmentedTextControl
 			label={ __( 'Letter case' ) }
 			options={ TEXT_TRANSFORMS }
-			className={ classnames(
+			className={ clsx(
 				'block-editor-text-transform-control',
 				className
 			) }

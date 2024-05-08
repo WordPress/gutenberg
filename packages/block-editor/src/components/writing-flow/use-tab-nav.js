@@ -118,7 +118,9 @@ export default function useTabNav() {
 				// do it again here because after clearing block selection,
 				// focus land on the writing flow container and pressing Tab
 				// will no longer send focus through the focus capture element.
-				if ( event.target === node ) setNavigationMode( true );
+				if ( event.target === node ) {
+					setNavigationMode( true );
+				}
 				return;
 			}
 

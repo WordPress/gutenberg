@@ -66,4 +66,30 @@ test.describe( 'Site editor url navigation', () => {
 			'/wp-admin/site-editor.php?postId=emptytheme%2F%2Fdemo&postType=wp_template_part&canvas=edit'
 		);
 	} );
+
+	test( 'The Patterns page should keep the previously selected template part category', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitSiteEditor();
+		const navigation = page.getByRole( 'region', {
+			name: 'Navigation',
+		} );
+		await navigation.getByRole( 'button', { name: 'Patterns' } ).click();
+		await navigation.getByRole( 'button', { name: 'General' } ).click();
+		await page
+			.getByRole( 'region', {
+				name: 'Patterns content',
+			} )
+			.getByLabel( 'header', { exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'region', { name: 'Editor content' } )
+		).toBeVisible();
+		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
+		await navigation.getByRole( 'button', { name: 'Back' } ).click();
+		await expect(
+			navigation.getByRole( 'button', { name: 'General' } )
+		).toHaveAttribute( 'aria-current', 'true' );
+	} );
 } );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { Flex } from '@wordpress/components';
 function ColorIndicatorWrapper( { className, ...props } ) {
 	return (
 		<Flex
-			className={ classnames(
+			className={ clsx(
 				'edit-site-global-styles__color-indicator-wrapper',
 				className
 			) }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -64,7 +64,7 @@ function BlockMover( {
 
 	return (
 		<ToolbarGroup
-			className={ classnames( 'block-editor-block-mover', {
+			className={ clsx( 'block-editor-block-mover', {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
