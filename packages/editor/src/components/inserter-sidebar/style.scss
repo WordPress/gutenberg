@@ -6,13 +6,13 @@
 	flex-direction: column;
 }
 
-.editor-inserter-sidebar__header {
+.block-editor-inserter-sidebar__header {
 	border-bottom: $border-width solid $gray-300;
 	padding-right: $grid-unit-10;
 	display: flex;
 	justify-content: space-between;
 
-	.editor-inserter-sidebar__close-button {
+	.block-editor-inserter-sidebar__close-button {
 		order: 1;
 		align-self: center;
 	}

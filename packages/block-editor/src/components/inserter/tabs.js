@@ -39,9 +39,9 @@ function InserterTabs( { onSelect, children, onClose }, ref ) {
 	return (
 		<div className="block-editor-inserter__tabs" ref={ ref }>
 			<Tabs onSelect={ onSelect }>
-				<div className="editor-inserter-sidebar__header">
+				<div className="block-editor-inserter-sidebar__header">
 					<Button
-						className="editor-inserter-sidebar__close-button"
+						className="block-editor-inserter-sidebar__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close block inserter' ) }
 						onClick={ () => onClose() }
