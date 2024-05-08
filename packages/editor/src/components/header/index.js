@@ -38,7 +38,9 @@ const slideY = {
 function Header( {
 	customSaveButton,
 	forceIsDirty,
+	forceDisableBlockTools,
 	setEntitiesSavedStatesCallback,
+	title,
 	children,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
@@ -85,7 +87,9 @@ function Header( {
 				transition={ { type: 'tween', delay: 0.8 } }
 				className="editor-header__toolbar"
 			>
-				<DocumentTools disableBlockTools={ isTextEditor } />
+				<DocumentTools
+					disableBlockTools={ forceDisableBlockTools || isTextEditor }
+				/>
 				{ hasTopToolbar && (
 					<CollapsableBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
@@ -98,9 +102,13 @@ function Header( {
 							! isBlockToolsCollapsed && hasTopToolbar,
 					} ) }
 				>
-					<PostTypeSupportCheck supportKeys="title">
-						<DocumentBar />
-					</PostTypeSupportCheck>
+					{ ! title ? (
+						<PostTypeSupportCheck supportKeys="title">
+							<DocumentBar />
+						</PostTypeSupportCheck>
+					) : (
+						title
+					) }
 				</div>
 			</motion.div>
 			<motion.div
