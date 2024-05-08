@@ -4,7 +4,6 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -70,6 +69,7 @@ export default function InserterSidebar( {
 						isRightSidebarOpen ? closeGeneralSidebar : undefined
 					}
 					ref={ libraryRef }
+					onClose={ closeInserterSidebar }
 				/>
 			</div>
 		</div>
