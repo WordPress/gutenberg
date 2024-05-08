@@ -22,6 +22,7 @@ const BlockDraggable = ( {
 	clientIds,
 	cloneClassname,
 	elementId,
+	getFinalPosition,
 	onDragStart,
 	onDragEnd,
 	fadeWhenDisabled = false,
@@ -184,9 +185,11 @@ const BlockDraggable = ( {
 
 	return (
 		<Draggable
+			animateToFinalPosition
 			appendToOwnerDocument={ appendToOwnerDocument }
 			cloneClassname={ cloneClassname }
 			__experimentalTransferDataType="wp-blocks"
+			getFinalPosition={ getFinalPosition }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				// Defer hiding the dragged source element to the next

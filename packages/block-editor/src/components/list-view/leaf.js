@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useMovingAnimation from '../use-moving-animation';
+// import useMovingAnimation from '../use-moving-animation';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
@@ -33,13 +33,17 @@ const ListViewLeaf = forwardRef(
 		},
 		ref
 	) => {
-		const animationRef = useMovingAnimation( {
-			clientId: props[ 'data-block' ],
-			enableAnimation: true,
-			triggerAnimationOnChange: path,
-		} );
+		// TODO: See if we can enable the moving animation when
+		// rearranging via the editor canvas, but _not_ when dragging and dropping
+		// within the list view directly.
 
-		const mergedRef = useMergeRefs( [ ref, animationRef ] );
+		// const animationRef = useMovingAnimation( {
+		// 	clientId: props[ 'data-block' ],
+		// 	enableAnimation: true,
+		// 	triggerAnimationOnChange: path,
+		// } );
+
+		const mergedRef = useMergeRefs( [ ref ] );
 
 		return (
 			<AnimatedTreeGridRow

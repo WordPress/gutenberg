@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -47,8 +47,14 @@ const ListViewBlockContents = forwardRef(
 			[]
 		);
 
-		const { AdditionalBlockContent, insertedBlock, setInsertedBlock } =
-			useListViewContext();
+		const {
+			AdditionalBlockContent,
+			draggedClientIds,
+			insertedBlock,
+			listViewInstanceId,
+			setInsertedBlock,
+			treeGridElementRef,
+		} = useListViewContext();
 
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
@@ -65,6 +71,15 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		// TODO: This function could be moved further up, as it doesn't need to be defined on each block.
+		const getFinalPosition = useCallback( () => {
+			const targetElem = treeGridElementRef.current?.querySelector(
+				`[role=row][data-block="${ draggedClientIds[ 0 ] }"]`
+			);
+
+			return targetElem?.getBoundingClientRect();
+		}, [ draggedClientIds, treeGridElementRef ] );
+
 		return (
 			<>
 				{ AdditionalBlockContent && (
@@ -78,6 +93,9 @@ const ListViewBlockContents = forwardRef(
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
 					cloneClassname={ 'block-editor-list-view-draggable-chip' }
+					dragComponent={ null }
+					elementId={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
+					getFinalPosition={ getFinalPosition }
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton

@@ -13,6 +13,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { DraggableProps } from './types';
+import { __unstableAnimate as animate } from '../animation';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
@@ -63,7 +64,9 @@ export function Draggable( {
 	onDragStart,
 	onDragOver,
 	onDragEnd,
+	animateToFinalPosition = false,
 	appendToOwnerDocument = false,
+	getFinalPosition,
 	cloneClassname,
 	elementId,
 	transferData,
@@ -71,6 +74,7 @@ export function Draggable( {
 	__experimentalDragComponent: dragComponent,
 }: DraggableProps ) {
 	const dragComponentRef = useRef< HTMLDivElement >( null );
+	const cloneWrapperRef = useRef< Element | null >( null );
 	const cleanup = useRef( () => {} );
 
 	/**
@@ -80,8 +84,42 @@ export function Draggable( {
 	 */
 	function end( event: DragEvent ) {
 		event.preventDefault();
-		cleanup.current();
 
+		// TODO: should check if prefers reduced motion is active
+
+		if (
+			animateToFinalPosition &&
+			getFinalPosition &&
+			cloneWrapperRef.current
+		) {
+			const finalPosition = getFinalPosition();
+			const currentPosition =
+				cloneWrapperRef.current?.getBoundingClientRect();
+
+			if ( finalPosition && currentPosition ) {
+				const elem: Element = cloneWrapperRef.current;
+
+				animate(
+					elem,
+					{
+						x: [ currentPosition.x, finalPosition.x ],
+						y: [ currentPosition.y, finalPosition.y ],
+					},
+					{
+						duration: 0.2,
+						onComplete: () => {
+							cleanup.current();
+							if ( onDragEnd ) {
+								onDragEnd( event );
+							}
+						},
+					}
+				);
+				return;
+			}
+		}
+
+		cleanup.current();
 		if ( onDragEnd ) {
 			onDragEnd( event );
 		}
@@ -109,6 +147,8 @@ export function Draggable( {
 		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
 		cloneWrapper.style.top = '0';
 		cloneWrapper.style.left = '0';
+
+		cloneWrapperRef.current = cloneWrapper;
 
 		const dragImage = ownerDocument.createElement( 'div' );
 
