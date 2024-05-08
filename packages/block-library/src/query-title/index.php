@@ -38,20 +38,20 @@ function render_block_core_query_title( $attributes ) {
 		}
 	}
 	if ( $is_search ) {
-		$title = isset($attributes['searchResultsTerm']) && !empty($attributes['searchResultsTerm']) ? $attributes['searchResultsTerm'] : __( 'Search results' );
+		$title = isset( $attributes['searchResultsTerm'] ) && ! empty( $attributes['searchResultsTerm'] ) ? $attributes['searchResultsTerm'] : __( 'Search results' );
 
 		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] ) {
 
 			// Get the prefix and suffix.
-			$prefix = isset($attributes['searchResultsTerm']) ? $attributes['searchResultsTerm'] : __('Search results for: ');
-			$suffix = isset($attributes['searchResultsTermSuffix']) ? $attributes['searchResultsTermSuffix'] : '';
+			$prefix = isset( $attributes['searchResultsTerm'] ) ? $attributes['searchResultsTerm'] : __( 'Search results for: ' );
+			$suffix = isset( $attributes['searchResultsTermSuffix'] ) ? $attributes['searchResultsTermSuffix'] : '';
 
 			// Get the search query.
 			$search_query = get_search_query();
 
 			$title = sprintf(
 				/* translators: 1: Search term prefix, 2: Search term, 3: Search term suffix. */
-				__('%1$s "%2$s" %3$s'),
+				__( '%1$s "%2$s" %3$s' ),
 				$prefix,
 				$search_query,
 				$suffix
