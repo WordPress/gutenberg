@@ -335,7 +335,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
-	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
+	$wrapper_markup = $is_nested || $is_navigation_child ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
 	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids, $colors );
 
