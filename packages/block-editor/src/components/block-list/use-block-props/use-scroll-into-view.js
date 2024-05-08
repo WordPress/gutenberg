@@ -23,8 +23,8 @@ export function useScrollIntoView( { isSelected } ) {
 									? 'instant'
 									: 'smooth',
 							} );
-							observer.disconnect();
 						}
+						observer.disconnect();
 					}
 				);
 				observer.observe( node );
