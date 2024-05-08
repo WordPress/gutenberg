@@ -18,7 +18,6 @@ function Inserter( {
 	previousClientId,
 	nextClientId,
 	sectionRootClientId,
-	__unstableContentRef,
 	index,
 	setActiveInserter,
 } ) {
@@ -42,7 +41,6 @@ function Inserter( {
 		<BlockPopoverInbetween
 			previousClientId={ previousClientId }
 			nextClientId={ nextClientId }
-			__unstableContentRef={ __unstableContentRef }
 			className="block-editor-button-pattern-inserter"
 		>
 			<Button
@@ -68,7 +66,7 @@ function Inserter( {
 function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
 	const [ activeInserter, setActiveInserter ] = useState( null );
-	const { blockOrder, sectionRootClientId, blockInsertionPoint } = useSelect(
+	const { blockOrder, sectionRootClientId, isInserterOpened } = useSelect(
 		( select ) => {
 			const { sectionRootClientId: root } = unlock(
 				select( blockEditorStore ).getSettings()
@@ -77,7 +75,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 				blockOrder: select( blockEditorStore ).getBlockOrder( root ),
 				// To do: move ZoomOutModeInserters to core/editor.
 				// eslint-disable-next-line @wordpress/data-no-store-string-literals
-				blockInsertionPoint: select( 'core/editor' ).isInserterOpened(),
+				isInserterOpened: select( 'core/editor' ).isInserterOpened(),
 				sectionRootClientId: root,
 			};
 		},
@@ -85,10 +83,10 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 	);
 
 	useEffect( () => {
-		if ( ! blockInsertionPoint ) {
+		if ( ! isInserterOpened ) {
 			setActiveInserter( null );
 		}
-	}, [ blockInsertionPoint ] );
+	}, [ isInserterOpened ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
