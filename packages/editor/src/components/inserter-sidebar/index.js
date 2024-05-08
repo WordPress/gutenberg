@@ -26,8 +26,21 @@ export default function InserterSidebar( {
 	const { insertionPoint, showMostUsedBlocks, blockSectionRootClientId } =
 		useSelect( ( select ) => {
 			const { getInsertionPoint } = unlock( select( editorStore ) );
-			const { getBlockSectionRootClientId } = select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				__unstableGetEditorMode,
+				getSettings,
+			} = select( blockEditorStore );
 			const { get } = select( preferencesStore );
+			const getBlockSectionRootClientId = () => {
+				if ( __unstableGetEditorMode() === 'zoom-out' ) {
+					const { sectionRootClientId } = unlock( getSettings() );
+					if ( sectionRootClientId ) {
+						return sectionRootClientId;
+					}
+				}
+				return getBlockRootClientId();
+			};
 			return {
 				insertionPoint: getInsertionPoint(),
 				showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
