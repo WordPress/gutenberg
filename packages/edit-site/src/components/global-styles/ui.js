@@ -76,7 +76,11 @@ function GlobalStylesActionMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More' ) }
+				toggleProps={ { size: 'compact' } }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
