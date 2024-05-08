@@ -1883,6 +1883,7 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 			metadata: {
 				...initialAttributes.metadata,
 				// If the variation supports alias, set the alias attribute to the variation name.
+				// This is needed for convertAliasBlockNameAndAttributes to convert it to/from the alias/canonical block name.
 				...( supportsAlias && { alias: variation.name } ),
 			},
 		},
