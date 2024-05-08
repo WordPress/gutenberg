@@ -22,7 +22,7 @@ function preserveThemePreview( params ) {
 	}
 	const currentSearch = new URLSearchParams( history.location.search );
 	const currentThemePreview = currentSearch.get( 'wp_theme_preview' );
-	if ( currentThemePreview === undefined ) {
+	if ( currentThemePreview === null ) {
 		return params;
 	}
 	return { ...params, wp_theme_preview: currentThemePreview };
