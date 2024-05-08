@@ -7,18 +7,17 @@
 }
 
 .editor-inserter-sidebar__header {
-	position: relative;
+	padding-top: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	display: flex;
 	justify-content: flex-end;
-	z-index: z-index(".editor-inserter-sidebar__header");
-}
-
-.editor-inserter-sidebar__close-button {
-	position: absolute;
-	top: $grid-unit-15 - $border-width * 0.5; // Account for the existing border to make this the same close as in list view.
-	right: $grid-unit-15;
 }
 
 .editor-inserter-sidebar__content {
-	height: 100%;
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	@include break-medium() {
+		height: 100%;
+	}
 }

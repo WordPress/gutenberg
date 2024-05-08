@@ -2,9 +2,9 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import { closeSmall } from '@wordpress/icons';
+import { close } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
@@ -31,19 +31,18 @@ export default function InserterSidebar( {
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const libraryRef = useRef();
 
 	return (
 		<div className="editor-inserter-sidebar">
-			<div className="editor-inserter-sidebar__header">
+			<TagName className="editor-inserter-sidebar__header">
 				<Button
-					className="editor-inserter-sidebar__close-button"
-					icon={ closeSmall }
+					icon={ close }
 					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
-					size="small"
 				/>
-			</div>
+			</TagName>
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
