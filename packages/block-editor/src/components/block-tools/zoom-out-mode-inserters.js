@@ -25,6 +25,10 @@ function ZoomOutModeInserters() {
 		const { getSettings, getBlockOrder } = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
+		// Or we perhaps we should move the insertion point state to the
+		// block-editor store. I'm not sure what it was ever moved to the editor
+		// store, because all the inserter components all live in the
+		// block-editor package.
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const editor = select( 'core/editor' );
 		return {
