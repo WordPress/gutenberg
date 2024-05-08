@@ -394,10 +394,10 @@ function MediaTextEdit( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ mediaType === 'image' && (
+			{ mediaType === 'image' && ! useFeaturedImage && (
 				<ResolutionTool
 					value={ mediaSizeSlug }
-					imageSizeOptions={ imageSizeOptions }
+					options={ imageSizeOptions }
 					onChange={ updateImage }
 				/>
 			) }
