@@ -207,6 +207,20 @@ function Iframe( {
 		};
 	}, [] );
 
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		const onResize = () => {
+			setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -214,6 +228,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		scale === 1 ? null : windowResizeRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -282,7 +300,7 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-zoom-out-inner-height',
-			`${ iframeDocument.defaultView.innerHeight }px`
+			`${ iframeWindowInnerHeight }px`
 		);
 
 		return () => {
@@ -301,7 +319,14 @@ function Iframe( {
 				'--wp-zoom-out-inner-height'
 			);
 		};
-	}, [ scale, frameSize, iframeDocument, contentHeight, isZoomedOut ] );
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		iframeWindowInnerHeight,
+		contentHeight,
+		isZoomedOut,
+	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
