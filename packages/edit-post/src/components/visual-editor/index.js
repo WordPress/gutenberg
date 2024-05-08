@@ -13,6 +13,7 @@ import {
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -32,12 +33,13 @@ export default function VisualEditor( { styles } ) {
 		isBlockBasedTheme,
 		hasV3BlocksOnly,
 		isEditingTemplate,
+		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { isFeatureActive } = select( editPostStore );
 		const { getEditorSettings, getRenderingMode } = select( editorStore );
 		const { getBlockTypes } = select( blocksStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const editorSettings = getEditorSettings();
-
 		return {
 			isWelcomeGuideVisible: isFeatureActive( 'welcomeGuide' ),
 			renderingMode: getRenderingMode(),
@@ -47,6 +49,7 @@ export default function VisualEditor( { styles } ) {
 			} ),
 			isEditingTemplate:
 				select( editorStore ).getCurrentPostType() === 'wp_template',
+			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -60,7 +63,11 @@ export default function VisualEditor( { styles } ) {
 
 	// Add a constant padding for the typewritter effect. When typing at the
 	// bottom, there needs to be room to scroll up.
-	if ( ! hasMetaBoxes && renderingMode === 'post-only' ) {
+	if (
+		! isZoomedOutView &&
+		! hasMetaBoxes &&
+		renderingMode === 'post-only'
+	) {
 		paddingBottom = '40vh';
 	}
 

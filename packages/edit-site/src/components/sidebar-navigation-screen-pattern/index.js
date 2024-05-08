@@ -19,23 +19,17 @@ import TemplateActions from '../template-actions';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
-export default function SidebarNavigationScreenPattern() {
+export default function SidebarNavigationScreenPattern( { backPath } ) {
 	const history = useHistory();
 	const location = useLocation();
 	const {
-		params: { postType, postId, categoryId, categoryType },
+		params: { postType, postId },
 	} = location;
 	const { setCanvasMode } = unlock( useDispatch( editSiteStore ) );
 
 	useInitEditedEntityFromURL();
 
 	const patternDetails = usePatternDetails( postType, postId );
-
-	const backPath = {
-		categoryId,
-		categoryType,
-		path: '/patterns',
-	};
 
 	return (
 		<SidebarNavigationScreen

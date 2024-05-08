@@ -320,7 +320,6 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'background-image' => array(
 			array( 'background', 'backgroundImage', 'url' ),
-			array( 'background', 'backgroundImage', 'source' ),
 		),
 	);
 
