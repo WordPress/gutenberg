@@ -68,15 +68,27 @@ function Inserter( {
 function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
 	const [ activeInserter, setActiveInserter ] = useState( null );
-	const { blockOrder, sectionRootClientId } = useSelect( ( select ) => {
-		const { sectionRootClientId: root } = unlock(
-			select( blockEditorStore ).getSettings()
-		);
-		return {
-			blockOrder: select( blockEditorStore ).getBlockOrder( root ),
-			sectionRootClientId: root,
-		};
-	}, [] );
+	const { blockOrder, sectionRootClientId, blockInsertionPoint } = useSelect(
+		( select ) => {
+			const { sectionRootClientId: root } = unlock(
+				select( blockEditorStore ).getSettings()
+			);
+			return {
+				blockOrder: select( blockEditorStore ).getBlockOrder( root ),
+				// To do: move ZoomOutModeInserters to core/editor.
+				// eslint-disable-next-line @wordpress/data-no-store-string-literals
+				blockInsertionPoint: select( 'core/editor' ).isInserterOpened(),
+				sectionRootClientId: root,
+			};
+		},
+		[]
+	);
+
+	useEffect( () => {
+		if ( ! blockInsertionPoint ) {
+			setActiveInserter( null );
+		}
+	}, [ blockInsertionPoint ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
