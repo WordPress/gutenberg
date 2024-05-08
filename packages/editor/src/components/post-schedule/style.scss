@@ -16,6 +16,11 @@
 	height: auto;
 	min-height: $button-size-compact;
 
+	// This needs specificity.
+	&.components-button {
+		text-wrap: pretty;
+	}
+
 	// The line height + the padding should be the same as the button size.
 	line-height: inherit;
 }
