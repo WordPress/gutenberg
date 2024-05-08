@@ -17,6 +17,7 @@ import {
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { store as blockEditorStore } from '../../store';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -48,6 +50,11 @@ function InserterMenu(
 	},
 	ref
 ) {
+	const isZoomOutMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		[]
+	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -289,6 +296,7 @@ function InserterMenu(
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
+				'is-zoom-out': isZoomOutMode,
 			} ) }
 			ref={ ref }
 		>

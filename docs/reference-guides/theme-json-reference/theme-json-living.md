@@ -116,6 +116,8 @@ Settings related to dimensions.
 | Property  | Type   | Default | Props  |
 | ---    | ---    | ---    |---   |
 | aspectRatio | boolean | false |  |
+| defaultAspectRatios | boolean | true |  |
+| aspectRatios | array |  | name, ratio, slug |
 | minHeight | boolean | false |  |
 
 ---

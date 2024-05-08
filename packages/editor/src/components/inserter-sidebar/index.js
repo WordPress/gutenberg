@@ -5,10 +5,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -35,19 +32,10 @@ export default function InserterSidebar( {
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: true,
-	} );
-
 	const libraryRef = useRef();
 
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="editor-inserter-sidebar"
-		>
+		<div className="editor-inserter-sidebar">
 			<TagName className="editor-inserter-sidebar__header">
 				<Button
 					icon={ close }

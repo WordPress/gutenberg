@@ -26,16 +26,6 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../utils/constants';
 
-const FRAME_SIZE = 20;
-const ZOOM_OUT_MAX_WIDTH = 800;
-
-function computeZoomOutScale( { containerWidth, windowInnerWidth } ) {
-	return (
-		( Math.min( containerWidth, ZOOM_OUT_MAX_WIDTH ) - 2 * FRAME_SIZE ) /
-		windowInnerWidth
-	);
-}
-
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( {
@@ -50,11 +40,9 @@ function EditorCanvas( {
 		isFocusMode,
 		templateType,
 		canvasMode,
-		isZoomOutMode,
 		currentPostIsTrashed,
 	} = useSelect( ( select ) => {
-		const { getBlockCount, __unstableGetEditorMode } =
-			select( blockEditorStore );
+		const { getBlockCount } = select( blockEditorStore );
 		const { getEditedPostType, getCanvasMode } = unlock(
 			select( editSiteStore )
 		);
@@ -63,7 +51,6 @@ function EditorCanvas( {
 		return {
 			templateType: _templateType,
 			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
-			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 			canvasMode: getCanvasMode(),
 			hasBlocks: !! getBlockCount(),
 			currentPostIsTrashed:
@@ -156,8 +143,6 @@ function EditorCanvas( {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				scale: isZoomOutMode ? computeZoomOutScale : undefined,
-				frameSize: isZoomOutMode ? FRAME_SIZE : undefined,
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',
 				} ),

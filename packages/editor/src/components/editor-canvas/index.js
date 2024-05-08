@@ -50,6 +50,16 @@ const DESIGN_POST_TYPES = [
 	'wp_template_part',
 ];
 
+const FRAME_SIZE = 20;
+const ZOOM_OUT_MAX_WIDTH = 800;
+
+function computeZoomOutScale( { containerWidth, windowInnerWidth } ) {
+	return (
+		( Math.min( containerWidth, ZOOM_OUT_MAX_WIDTH ) - 2 * FRAME_SIZE ) /
+		windowInnerWidth
+	);
+}
+
 /**
  * Given an array of nested blocks, find the first Post Content
  * block inside it, recursing through any nesting levels,
@@ -161,13 +171,17 @@ function EditorCanvas( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
+		const { getSettings, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -336,6 +350,8 @@ function EditorCanvas( {
 					...iframeProps?.style,
 					...deviceStyles,
 				},
+				scale: isZoomOutMode ? computeZoomOutScale : undefined,
+				frameSize: isZoomOutMode ? FRAME_SIZE : undefined,
 			} }
 		>
 			{ themeSupportsLayout &&
