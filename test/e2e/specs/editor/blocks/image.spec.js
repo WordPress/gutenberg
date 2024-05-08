@@ -424,6 +424,9 @@ test.describe( 'Image', () => {
 		page,
 		editor,
 	} ) => {
+		// This is a temp workaround for dragging and dropping images from the inserter.
+		// This should be removed when we have the zoom out view for media categories.
+		await page.setViewportSize( { width: 1400, height: 800 } );
 		await editor.insertBlock( { name: 'core/image' } );
 		const imageBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Image',
