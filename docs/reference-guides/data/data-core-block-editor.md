@@ -422,6 +422,19 @@ _Returns_
 
 -   `Array`: Array of clientIds of blocks with name equal to blockName.
 
+### getBlockSectionRootClientId
+
+Gets the section root client ID, if exists, otherwise the root client ID.
+
+_Parameters_
+
+-   _state_ `Object`: Editor state.
+-   _clientId_ `string`: Block from which to find root client ID.
+
+_Returns_
+
+-   `?string`: Section Root client ID, otherwise Root client ID, if exists
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.

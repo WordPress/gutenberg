@@ -553,6 +553,24 @@ export function getBlockRootClientId( state, clientId ) {
 }
 
 /**
+ * Gets the section root client ID, if exists, otherwise the root client ID.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {?string} Section Root client ID, otherwise Root client ID, if exists
+ */
+export function getBlockSectionRootClientId( state, clientId ) {
+	if ( __unstableGetEditorMode( state ) === 'zoom-out' ) {
+		const { sectionRootClientId } = unlock( getSettings( state ) );
+		if ( sectionRootClientId ) {
+			return sectionRootClientId;
+		}
+	}
+	return getBlockRootClientId( state, clientId );
+}
+
+/**
  * Given a block client ID, returns the list of all its parents from top to bottom.
  *
  * @param {Object}  state     Editor state.

@@ -3,8 +3,11 @@
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, VisuallyHidden } from '@wordpress/components';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
+import {
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
@@ -20,14 +23,17 @@ export default function InserterSidebar( {
 	closeGeneralSidebar,
 	isRightSidebarOpen,
 } ) {
-	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
-		const { getInsertionPoint } = unlock( select( editorStore ) );
-		const { get } = select( preferencesStore );
-		return {
-			insertionPoint: getInsertionPoint(),
-			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
-		};
-	}, [] );
+	const { insertionPoint, showMostUsedBlocks, blockSectionRootClientId } =
+		useSelect( ( select ) => {
+			const { getInsertionPoint } = unlock( select( editorStore ) );
+			const { getBlockSectionRootClientId } = select( blockEditorStore );
+			const { get } = select( preferencesStore );
+			return {
+				insertionPoint: getInsertionPoint(),
+				showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
+				blockSectionRootClientId: getBlockSectionRootClientId(),
+			};
+		}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -48,7 +54,9 @@ export default function InserterSidebar( {
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
-					rootClientId={ insertionPoint.rootClientId }
+					rootClientId={
+						blockSectionRootClientId ?? insertionPoint.rootClientId
+					}
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
