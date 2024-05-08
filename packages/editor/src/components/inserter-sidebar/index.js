@@ -1,15 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
-import { Button } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import { closeSmall } from '@wordpress/icons';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -47,15 +44,6 @@ export default function InserterSidebar( {
 			{ ...inserterDialogProps }
 			className="editor-inserter-sidebar"
 		>
-			<div className="editor-inserter-sidebar__header">
-				<Button
-					className="editor-inserter-sidebar__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close block inserter' ) }
-					onClick={ () => setIsInserterOpened( false ) }
-					size="small"
-				/>
-			</div>
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
@@ -69,6 +57,7 @@ export default function InserterSidebar( {
 					__experimentalOnPatternCategorySelection={
 						isRightSidebarOpen ? closeGeneralSidebar : undefined
 					}
+					onClose={ () => setIsInserterOpened( false ) }
 					ref={ libraryRef }
 				/>
 			</div>

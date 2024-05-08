@@ -24,6 +24,7 @@ function InserterLibrary(
 		__experimentalOnPatternCategorySelection,
 		onSelect = noop,
 		shouldFocusBlock = false,
+		onClose,
 	},
 	ref
 ) {
@@ -41,6 +42,7 @@ function InserterLibrary(
 
 	return (
 		<InserterMenu
+			onClose={ onClose }
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
 			clientId={ clientId }

@@ -10,11 +10,15 @@ $block-inserter-width: 350px;
 }
 
 .editor-inserter-sidebar__header {
+	border-bottom: $border-width solid $gray-300;
 	position: relative;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
 	z-index: z-index(".editor-inserter-sidebar__header");
-	width: $block-inserter-width;
+	.editor-inserter-sidebar__close-button {
+		order: 1;
+		align-self: center;
+	}
 }
 
 .editor-inserter-sidebar__close-button {

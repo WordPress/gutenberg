@@ -39,6 +39,7 @@ function InserterMenu(
 		clientId,
 		isAppender,
 		__experimentalInsertionIndex,
+		onClose,
 		onSelect,
 		showInserterHelpPanel,
 		showMostUsedBlocks,
@@ -293,7 +294,11 @@ function InserterMenu(
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs ref={ tabsRef } onSelect={ handleSetSelectedTab }>
+				<InserterTabs
+					ref={ tabsRef }
+					onClose={ onClose }
+					onSelect={ handleSetSelectedTab }
+				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&
 						! delayedFilterValue &&
