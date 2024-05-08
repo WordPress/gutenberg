@@ -268,7 +268,6 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		// Needed for calculations in block-list content.scss.
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-zoom-out-scale',
 			`${ scale }`
