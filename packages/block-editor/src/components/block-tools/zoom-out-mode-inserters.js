@@ -3,8 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
-import { __unstableMotion as motion, Button } from '@wordpress/components';
-import { useReducedMotion } from '@wordpress/compose';
+import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
 
@@ -19,7 +18,6 @@ function Inserter( {
 	previousClientId,
 	nextClientId,
 	sectionRootClientId,
-	disableMotion,
 	__unstableContentRef,
 	index,
 } ) {
@@ -34,36 +32,6 @@ function Inserter( {
 		},
 		[ index ]
 	);
-	const lineVariants = {
-		// Initial position starts from the center and invisible.
-		start: {
-			opacity: 0,
-			scale: 0,
-		},
-		// The line expands to fill the container. If the inserter is visible it
-		// is delayed so it appears orchestrated.
-		rest: {
-			opacity: 1,
-			scale: 1,
-			transition: { delay: 0.5, type: 'tween' },
-		},
-		hover: {
-			opacity: 1,
-			scale: 1,
-			transition: { delay: 0.5, type: 'tween' },
-		},
-	};
-	const patternInserterVariants = {
-		start: {
-			scale: disableMotion ? 1 : 0,
-			translateX: '-50%',
-			translateY: '-50%',
-		},
-		rest: {
-			scale: 1,
-			transition: { delay: 0.4, type: 'tween' },
-		},
-	};
 
 	const label = _x(
 		'Add pattern',
@@ -76,41 +44,21 @@ function Inserter( {
 			__unstableContentRef={ __unstableContentRef }
 			className="block-editor-button-pattern-inserter"
 		>
-			<motion.div
-				layout={ ! disableMotion }
-				initial={ disableMotion ? 'rest' : 'start' }
-				animate="rest"
-				whileHover="hover"
-				whileTap="pressed"
-				exit="start"
-				className="block-editor-block-list__insertion-point is-vertical is-pattern-inserter"
-			>
-				<motion.div
-					variants={ lineVariants }
-					className="block-editor-block-list__insertion-point-indicator"
-					data-testid="block-list-insertion-point-indicator"
-				/>
-				<motion.div
-					variants={ patternInserterVariants }
-					className="block-editor-block-list__insertion-point-inserter"
-				>
-					<Button
-						variant="primary"
-						icon={ plus }
-						size="compact"
-						className="block-editor-button-pattern-inserter__button"
-						onClick={ () => {
-							setInserterIsOpened( {
-								rootClientId: sectionRootClientId,
-								insertionIndex,
-								tab: 'patterns',
-								category: 'all',
-							} );
-						} }
-						label={ label }
-					/>
-				</motion.div>
-			</motion.div>
+			<Button
+				variant="primary"
+				icon={ plus }
+				size="compact"
+				className="block-editor-button-pattern-inserter__button"
+				onClick={ () => {
+					setInserterIsOpened( {
+						rootClientId: sectionRootClientId,
+						insertionIndex,
+						tab: 'patterns',
+						category: 'all',
+					} );
+				} }
+				label={ label }
+			/>
 		</BlockPopoverInbetween>
 	);
 }
@@ -137,8 +85,6 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		};
 	}, [] );
 
-	const disableMotion = useReducedMotion();
-
 	if ( ! isReady ) {
 		return null;
 	}
@@ -153,7 +99,6 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 				previousClientId={ clientId }
 				nextClientId={ blockOrder[ index ] }
 				sectionRootClientId={ sectionRootClientId }
-				disableMotion={ disableMotion }
 				index={ index }
 				blockOrder={ blockOrder }
 				__unstableContentRef={ __unstableContentRef }
