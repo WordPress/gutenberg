@@ -25,13 +25,14 @@
 
 .edit-site-site-hub__title .components-button {
 	color: $gray-200;
+	display: block;
 	flex-grow: 1;
 	font-size: 15px;
 	font-weight: 500;
 	overflow: hidden;
 	text-decoration: none;
-	text-overflow: ellipsis;
 	white-space: nowrap;
+	text-overflow: ellipsis;
 
 	&:hover,
 	&:focus,
