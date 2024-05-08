@@ -1,17 +1,14 @@
-interface Environment {
-	NODE_ENV: unknown;
-	IS_GUTENBERG_PLUGIN?: boolean;
-	IS_WORDPRESS_CORE?: boolean;
-}
-
 declare namespace NodeJS {
-	export interface ProcessEnv extends Environment {}
-
-	export interface Process {
-		env: ProcessEnv;
+	interface ProcessEnv {
+		readonly NODE_ENV?: 'production' | 'development' | 'test';
+	}
+	interface Process {
+		env: NodeJS.ProcessEnv;
 	}
 }
 
 declare var process: NodeJS.Process;
 
-declare var SCRIPT_DEBUG: boolean;
+declare var SCRIPT_DEBUG: undefined | boolean;
+declare var IS_GUTENBERG_PLUGIN: undefined | boolean;
+declare var IS_WORDPRESS_CORE: undefined | boolean;
