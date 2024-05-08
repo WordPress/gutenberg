@@ -20,6 +20,21 @@ const {
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
+/**
+ * Checks if there is a current value in the background image block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background image value set.
+ */
+export function hasBackgroundImageValue( style ) {
+	return (
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url ||
+		typeof style?.background?.backgroundImage === 'string'
+	);
+}
+
 export default function BackgroundPanel() {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
@@ -31,7 +46,9 @@ export default function BackgroundPanel() {
 
 	const defaultControls = {
 		backgroundImage: true,
-		backgroundSize: false,
+		backgroundSize:
+			hasBackgroundImageValue( style ) ||
+			hasBackgroundImageValue( inheritedStyle ),
 	};
 
 	return (
