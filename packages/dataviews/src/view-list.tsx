@@ -40,7 +40,7 @@ interface ListViewProps {
 }
 
 interface ListViewItemProps {
-	id: any;
+	id?: string;
 	item: Item;
 	isSelected: boolean;
 	onSelect: ( item: Item ) => void;
