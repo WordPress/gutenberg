@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -52,7 +52,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 	return (
 		<li
 			key={ id }
-			className={ classnames( 'wp-block-pages-list__item', {
+			className={ clsx( 'wp-block-pages-list__item', {
 				'has-child': hasChildren,
 				'wp-block-navigation-item': isNavigationChild,
 				'open-on-click': context.openSubmenusOnClick,
@@ -76,7 +76,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 				</>
 			) : (
 				<a
-					className={ classnames( 'wp-block-pages-list__item__link', {
+					className={ clsx( 'wp-block-pages-list__item__link', {
 						'wp-block-navigation-item__content': isNavigationChild,
 					} ) }
 					href={ link }

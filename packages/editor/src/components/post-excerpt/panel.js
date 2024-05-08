@@ -1,6 +1,9 @@
 /**
  * WordPress dependencies
  */
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -186,46 +189,48 @@ function PrivateExcerpt() {
 		: __( 'Edit excerpt' );
 	return (
 		<>
-			{ excerptText }
-			<Dropdown
-				className="editor-post-excerpt__dropdown"
-				contentClassName="editor-post-excerpt__dropdown__content"
-				popoverProps={ popoverProps }
-				focusOnMount
-				ref={ setPopoverAnchor }
-				renderToggle={ ( { onToggle } ) => (
-					<Button
-						className="editor-post-excerpt__dropdown__trigger"
-						onClick={ onToggle }
-						label={ triggerEditLabel }
-						variant="link"
-					>
-						{ excerpt ? __( 'Edit' ) : excerptPlaceholder }
-					</Button>
-				) }
-				renderContent={ ( { onClose } ) => (
-					<>
-						<InspectorPopoverHeader
-							title={ label }
-							onClose={ onClose }
-						/>
+			<div>
+				{ excerptText }
+				<Dropdown
+					className="editor-post-excerpt__dropdown"
+					contentClassName="editor-post-excerpt__dropdown__content"
+					popoverProps={ popoverProps }
+					focusOnMount
+					ref={ setPopoverAnchor }
+					renderToggle={ ( { onToggle } ) => (
+						<Button
+							className="editor-post-excerpt__dropdown__trigger"
+							onClick={ onToggle }
+							label={ triggerEditLabel }
+							variant="link"
+						>
+							{ excerpt ? __( 'Edit' ) : excerptPlaceholder }
+						</Button>
+					) }
+					renderContent={ ( { onClose } ) => (
+						<>
+							<InspectorPopoverHeader
+								title={ label }
+								onClose={ onClose }
+							/>
 
-						<VStack spacing={ 4 }>
-							<PluginPostExcerpt.Slot>
-								{ ( fills ) => (
-									<>
-										<PostExcerptForm
-											hideLabelFromVision
-											updateOnBlur
-										/>
-										{ fills }
-									</>
-								) }
-							</PluginPostExcerpt.Slot>
-						</VStack>
-					</>
-				) }
-			/>
+							<VStack spacing={ 4 }>
+								<PluginPostExcerpt.Slot>
+									{ ( fills ) => (
+										<>
+											<PostExcerptForm
+												hideLabelFromVision
+												updateOnBlur
+											/>
+											{ fills }
+										</>
+									) }
+								</PluginPostExcerpt.Slot>
+							</VStack>
+						</>
+					) }
+				/>
+			</div>
 		</>
 	);
 }

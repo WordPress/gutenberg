@@ -12,27 +12,45 @@ test.describe( 'Hybrid theme', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'can access template parts list page', async ( { admin, page } ) => {
-		await admin.visitAdminPage(
-			'site-editor.php',
-			'postType=wp_template_part&path=/wp_template_part/all'
-		);
+	test( 'can access Patterns page', async ( { admin, page } ) => {
+		await admin.visitAdminPage( 'site-editor.php', 'path=/patterns' );
 
 		await expect(
-			page.getByText( 'header', { exact: true } )
+			page.getByRole( 'heading', { level: 1, text: 'Patterns' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'heading', { level: 2, text: 'All patterns' } )
 		).toBeVisible();
 	} );
 
-	test( 'can view a template part', async ( { admin, editor, page } ) => {
+	test( 'should show Patterns page when accessing template parts list page', async ( {
+		admin,
+		page,
+	} ) => {
 		await admin.visitAdminPage(
 			'site-editor.php',
-			'postType=wp_template_part&path=/wp_template_part/all'
+			'path=/wp_template_part/all'
 		);
 
-		const templatePart = page.getByText( 'header', { exact: true } );
+		await expect(
+			page.getByRole( 'heading', { level: 1, text: 'Patterns' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'heading', { level: 2, text: 'All patterns' } )
+		).toBeVisible();
+	} );
 
-		await expect( templatePart ).toBeVisible();
-		await templatePart.click();
+	test( 'can view a template part list', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.visitAdminPage( 'site-editor.php', 'path=/patterns' );
+
+		await page
+			.getByRole( 'button', { name: 'All template parts' } )
+			.click();
+		await page.getByText( 'header', { exact: true } ).click();
 
 		await expect(
 			page.getByRole( 'region', { name: 'Editor content' } )

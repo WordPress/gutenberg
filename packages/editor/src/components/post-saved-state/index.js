@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -141,7 +141,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		<Button
 			className={
 				isSaveable || isSaving
-					? classnames( {
+					? clsx( {
 							'editor-post-save-draft': ! isSavedState,
 							'editor-post-saved-state': isSavedState,
 							'is-saving': isSaving,

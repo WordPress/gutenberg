@@ -48,18 +48,13 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		await editor.saveSiteEditorEntities( {
 			isOnlyCurrentEntityDirty: true,
 		} );
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Saved' } )
-		).toBeDisabled();
+		const saveButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } );
+		await expect( saveButton ).toBeDisabled();
 
 		// Check focus returns to Saved button.
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Saved' } )
-		).toBeFocused();
+		await expect( saveButton ).toBeFocused();
 	} );
 
 	test( 'save flow should allow re-saving after changing the same block attribute', async ( {

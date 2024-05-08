@@ -17,6 +17,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
+import EnablePublishSidebarOption from './enable-publish-sidebar';
 import BlockManager from '../block-manager';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
@@ -136,6 +137,18 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								/>
 							</PageAttributesCheck>
 						</PreferencesModalSection>
+						{ isLargeViewport && (
+							<PreferencesModalSection
+								title={ __( 'Publishing' ) }
+							>
+								<EnablePublishSidebarOption
+									help={ __(
+										'Review settings, such as visibility and tags.'
+									) }
+									label={ __( 'Enable pre-publish checks' ) }
+								/>
+							</PreferencesModalSection>
+						) }
 						{ extraSections?.general }
 					</>
 				),
@@ -258,6 +271,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			setIsInserterOpened,
 			setIsListViewOpened,
 			setPreference,
+			isLargeViewport,
 		]
 	);
 

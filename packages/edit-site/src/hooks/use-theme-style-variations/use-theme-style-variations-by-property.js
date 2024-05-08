@@ -153,22 +153,53 @@ export default function useThemeStyleVariationsByProperty( {
 				? cloneDeep( baseVariation )
 				: null;
 
-		let processedStyleVariations = variations.map( ( variation ) => {
-			let result = {
-				...filterObjectByProperty( cloneDeep( variation ), property ),
-				title: variation?.title,
-				description: variation?.description,
-			};
+		let processedStyleVariations = variations.reduce(
+			( accumulator, variation ) => {
+				const variationFilteredByProperty = filterObjectByProperty(
+					cloneDeep( variation ),
+					property
+				);
+				// Remove variations that are empty once the property is filtered out.
+				if ( Object.keys( variationFilteredByProperty ).length === 0 ) {
+					return accumulator;
+				}
 
-			if ( clonedBaseVariation ) {
-				/*
-				 * Overwrites all baseVariation object `styleProperty` properties
-				 * with the theme variation `styleProperty` properties.
-				 */
-				result = mergeBaseAndUserConfigs( clonedBaseVariation, result );
-			}
-			return result;
-		} );
+				let result = {
+					...variationFilteredByProperty,
+					title: variation?.title,
+					description: variation?.description,
+				};
+
+				if ( clonedBaseVariation ) {
+					/*
+					 * Overwrites all baseVariation object `styleProperty` properties
+					 * with the theme variation `styleProperty` properties.
+					 */
+					result = mergeBaseAndUserConfigs(
+						clonedBaseVariation,
+						result
+					);
+				}
+
+				// Detect if this is a duplicate variation.
+				const isDuplicate = accumulator.some( ( item ) => {
+					return (
+						JSON.stringify( item.styles ) ===
+							JSON.stringify( result?.styles ) &&
+						JSON.stringify( item.settings ) ===
+							JSON.stringify( result?.settings )
+					);
+				} );
+				if ( isDuplicate ) {
+					return accumulator;
+				}
+
+				// If the variation is not a duplicate, add it to the accumulator.
+				accumulator.push( result );
+				return accumulator;
+			},
+			[] // Initial accumulator value.
+		);
 
 		if ( 'function' === typeof filter ) {
 			processedStyleVariations =
@@ -177,4 +208,26 @@ export default function useThemeStyleVariationsByProperty( {
 
 		return processedStyleVariations;
 	}, [ variations, property, baseVariation, filter ] );
+}
+
+/**
+ * Compares a style variation to the same variation filtered by a single property.
+ * Returns true if the variation contains only the property specified.
+ *
+ * @param {Object} variation The variation to compare.
+ * @param {string} property  The property to compare.
+ * @return {boolean} Whether the variation contains only a single property.
+ */
+export function isVariationWithSingleProperty( variation, property ) {
+	const variationWithProperty = filterObjectByProperty(
+		cloneDeep( variation ),
+		property
+	);
+
+	return (
+		JSON.stringify( variationWithProperty?.styles ) ===
+			JSON.stringify( variation?.styles ) &&
+		JSON.stringify( variationWithProperty?.settings ) ===
+			JSON.stringify( variation?.settings )
+	);
 }

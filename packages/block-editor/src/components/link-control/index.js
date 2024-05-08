@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -359,7 +359,7 @@ function LinkControl( {
 			{ isEditing && (
 				<>
 					<div
-						className={ classnames( {
+						className={ clsx( {
 							'block-editor-link-control__search-input-wrapper': true,
 							'has-text-control': showTextControl,
 							'has-actions': showActions,

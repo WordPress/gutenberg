@@ -41,7 +41,9 @@ const fetchPage = async ( url, { html } ) => {
 	try {
 		if ( ! html ) {
 			const res = await window.fetch( url );
-			if ( res.status !== 200 ) return false;
+			if ( res.status !== 200 ) {
+				return false;
+			}
 			html = await res.text();
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
@@ -232,7 +234,9 @@ export const { state, actions } = store( 'core/router', {
 
 			// Don't update the navigation status immediately, wait 400 ms.
 			const loadingTimeout = setTimeout( () => {
-				if ( navigatingTo !== href ) return;
+				if ( navigatingTo !== href ) {
+					return;
+				}
 
 				if ( loadingAnimation ) {
 					navigation.hasStarted = true;
@@ -254,7 +258,9 @@ export const { state, actions } = store( 'core/router', {
 			// Once the page is fetched, the destination URL could have changed
 			// (e.g., by clicking another link in the meantime). If so, bail
 			// out, and let the newer execution to update the HTML.
-			if ( navigatingTo !== href ) return;
+			if ( navigatingTo !== href ) {
+				return;
+			}
 
 			if (
 				page &&
@@ -289,7 +295,9 @@ export const { state, actions } = store( 'core/router', {
 
 				// Scroll to the anchor if exits in the link.
 				const { hash } = new URL( href, window.location );
-				if ( hash ) document.querySelector( hash )?.scrollIntoView();
+				if ( hash ) {
+					document.querySelector( hash )?.scrollIntoView();
+				}
 			} else {
 				yield forcePageReload( href );
 			}
@@ -308,7 +316,9 @@ export const { state, actions } = store( 'core/router', {
 		 */
 		prefetch( url, options = {} ) {
 			const { clientNavigationDisabled } = getConfig();
-			if ( clientNavigationDisabled ) return;
+			if ( clientNavigationDisabled ) {
+				return;
+			}
 
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {

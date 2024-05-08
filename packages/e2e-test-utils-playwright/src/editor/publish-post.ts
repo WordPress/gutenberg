@@ -16,7 +16,7 @@ export async function publishPost( this: Editor ) {
 		.getByRole( 'button', { name: 'Save', exact: true } );
 	const publishButton = this.page
 		.getByRole( 'region', { name: 'Editor top bar' } )
-		.getByRole( 'button', { name: 'Publish' } );
+		.getByRole( 'button', { name: 'Publish', exact: true } );
 	const buttonToClick = ( await saveButton.isVisible() )
 		? saveButton
 		: publishButton;

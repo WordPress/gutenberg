@@ -34,6 +34,23 @@ sprintf(
 // translators: %s: Color
 i18n.sprintf( i18n.__( 'Color: %s' ), color );`,
 		},
+		{
+			code: `
+sprintf(
+	/*
+	 * translators: %s is the name of the city we couldn't locate.
+	 * Replace the examples with cities related to your locale. Test that
+	 * they match the expected location and have upcoming events before
+	 * including them. If no cities related to your locale have events,
+	 * then use cities related to your locale that would be recognizable
+	 * to most users. Use only the city name itself, without any region
+	 * or country. Use the endonym (native locale name) instead of the
+	 * English name if possible.
+	 */
+	__( 'We couldn’t locate %s. Please try another nearby city. For example: Kansas City; Springfield; Portland.' ),
+templateParams.unknownCity
+);`,
+		},
 	],
 	invalid: [
 		{

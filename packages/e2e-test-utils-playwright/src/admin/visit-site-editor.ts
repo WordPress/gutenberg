@@ -24,10 +24,18 @@ export async function visitSiteEditor(
 	const { postId, postType, path, canvas } = options;
 	const query = new URLSearchParams();
 
-	if ( postId ) query.set( 'postId', String( postId ) );
-	if ( postType ) query.set( 'postType', postType );
-	if ( path ) query.set( 'path', path );
-	if ( canvas ) query.set( 'canvas', canvas );
+	if ( postId ) {
+		query.set( 'postId', String( postId ) );
+	}
+	if ( postType ) {
+		query.set( 'postType', postType );
+	}
+	if ( path ) {
+		query.set( 'path', path );
+	}
+	if ( canvas ) {
+		query.set( 'canvas', canvas );
+	}
 
 	await this.visitAdminPage( 'site-editor.php', query.toString() );
 

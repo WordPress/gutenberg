@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef, MouseEvent as ReactMouseEvent } from 'react';
 
 /**
@@ -55,7 +55,7 @@ function UnforwardedToolbarButton(
 							props.onClick( event );
 						}
 					} }
-					className={ classnames(
+					className={ clsx(
 						'components-toolbar__control',
 						className
 					) }
@@ -76,7 +76,7 @@ function UnforwardedToolbarButton(
 	// Button.
 	return (
 		<ToolbarItem
-			className={ classnames( 'components-toolbar-button', className ) }
+			className={ clsx( 'components-toolbar-button', className ) }
 			{ ...extraProps }
 			{ ...props }
 			ref={ ref }

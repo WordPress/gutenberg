@@ -1,4 +1,4 @@
-# Migrating to Newer Versions
+# Migrating Theme.json to Newer Versions
 
 This guide documents the changes between different `theme.json` versions and how to upgrade. Using older versions will continue to be supported. Upgrading is recommended because new development will continue in the newer versions.
 
@@ -6,7 +6,7 @@ This guide documents the changes between different `theme.json` versions and how
 
 Upgrading to v2 enables some new features and adjusts the naming of some old features to be more consistent with one another.
 
-How to migrate from v1 to v2:
+### How to migrate from v1 to v2:
 
 1. Update `version` to `2`.
 2. Rename the properties that were updated (see below) if you're using them.
@@ -68,10 +68,10 @@ The default font sizes provided by core (`settings.typography.fontSizes`) have b
 
 Upgrading to v3 adjusts preset defaults to be more consistent with one another.
 
-### How to migrate from v1 to v2:
+### How to migrate from v2 to v3:
 
 1. Update `version` to `3`.
-2. Configure the changed defaults.
+2. Configure the changed defaults (see below).
 
 ### Changed defaults
 
@@ -79,11 +79,17 @@ Upgrading to v3 adjusts preset defaults to be more consistent with one another.
 
 In theme.json v2, the default font sizes were only shown when theme sizes were not defined. A theme providing font sizes with the same slugs as the defaults would always override them.
 
+The default `fontSizes` slugs are: `small`, `medium`, `large`, `x-large`, and `xx-large`.
+
 The new `defaultFontSizes` option gives control over showing default font sizes and preventing those defaults from being overridden.
 
 - When set to `true` it will show the default font sizes and prevent them from being overridden by the theme.
 - When set to `false` it will hide the default font sizes and allow the theme to use the default slugs.
 
-It is `true` by default when switching to v3. This is to be consistent with how other `default*` options work such as `settings.color.defaultPalette`.
+It is `true` by default when switching to v3. This is to be consistent with how other `default*` options work such as `settings.color.defaultPalette`, but differs from the behavior in v2.
 
-To keep behavior similar to v2, set this value to `false`.
+In theme.json v2, the default font sizes were only shown when theme sizes were not defined. A theme providing font sizes with the same slugs as the defaults would always override the default ones.
+
+To keep behavior similar to v2 with a v3 theme.json:
+* If you do not have any `fontSizes` defined, `defaultFontSizes` can be left out or set to `true`.
+* If you have some `fontSizes` defined, set `defaultFontSizes` to `false`.

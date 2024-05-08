@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -142,7 +142,7 @@ const UnconnectedDropdown = (
 					}
 					variant={ variant }
 					{ ...popoverProps }
-					className={ classnames(
+					className={ clsx(
 						'components-dropdown__content',
 						popoverProps?.className,
 						contentClassName

@@ -82,7 +82,8 @@ const ImageWrapper = ( { href, children } ) => {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
 				// Restore cursor style so it doesn't appear 'clickable'
-				// Safari needs the display property.
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
 				cursor: 'default',
 				display: 'inline',
 			} }
@@ -200,7 +201,9 @@ export default function Image( {
 			return;
 		}
 
-		if ( externalBlob ) return;
+		if ( externalBlob ) {
+			return;
+		}
 
 		window
 			// Avoid cache, which seems to help avoid CORS problems.

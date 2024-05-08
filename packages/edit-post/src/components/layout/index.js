@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,6 @@ import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
-import ActionsPanel from './actions-panel';
 import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useCommonCommands from '../../hooks/commands/use-common-commands';
@@ -61,6 +60,7 @@ const {
 	ListViewSidebar,
 	ComplementaryArea,
 	FullscreenMode,
+	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
 } = unlock( editorPrivateApis );
@@ -159,6 +159,8 @@ function Layout( { initialPost } ) {
 		showMetaBoxes,
 		documentLabel,
 		hasHistory,
+		hasBlockBreadcrumbs,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -193,6 +195,9 @@ function Layout( { initialPost } ) {
 			hasBlockSelected:
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
+			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			blockEditorMode:
+				select( blockEditorStore ).__unstableGetEditorMode(),
 		};
 	}, [] );
 
@@ -238,11 +243,13 @@ function Layout( { initialPost } ) {
 		document.body.classList.remove( 'show-icon-labels' );
 	}
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
 		'is-entity-save-view-open': !! entitiesSavedStatesCallback,
+		'has-block-breadcrumbs':
+			hasBlockBreadcrumbs && ! isDistractionFree && isWideViewport,
 	} );
 
 	const secondarySidebarLabel = isListViewOpened
@@ -338,6 +345,7 @@ function Layout( { initialPost } ) {
 					! isMobileViewport &&
 					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
+					blockEditorMode !== 'zoom-out' &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb rootLabelText={ documentLabel } />
@@ -345,7 +353,7 @@ function Layout( { initialPost } ) {
 					)
 				}
 				actions={
-					<ActionsPanel
+					<SavePublishPanels
 						closeEntitiesSavedStates={ closeEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={
 							entitiesSavedStatesCallback
@@ -353,6 +361,7 @@ function Layout( { initialPost } ) {
 						setEntitiesSavedStatesCallback={
 							setEntitiesSavedStatesCallback
 						}
+						forceIsDirtyPublishPanel={ hasActiveMetaboxes }
 					/>
 				}
 				shortcuts={ {
