@@ -52,7 +52,7 @@ export default function ColorPalettePanel( { name } ) {
 	return (
 		<VStack
 			className="edit-site-global-styles-color-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeColors && !! themeColors.length && (
 				<PaletteEdit
@@ -83,9 +83,6 @@ export default function ColorPalettePanel( { name } ) {
 				onChange={ setCustomColors }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelHeadingLevel={ 3 }
-				emptyMessage={ __(
-					'Custom colors are empty! Add some colors to create your own color palette.'
-				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>

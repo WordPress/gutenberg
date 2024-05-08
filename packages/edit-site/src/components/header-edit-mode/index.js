@@ -18,13 +18,13 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import SiteEditorMoreMenuItems from './more-menu';
 import SaveButton from '../save-button';
-import DocumentTools from './document-tools';
 import { store as editSiteStore } from '../../store';
 import {
 	getEditorCanvasContainerTitle,
@@ -36,6 +36,7 @@ import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
 const {
 	CollapsableBlockToolbar,
+	DocumentTools,
 	MoreMenu,
 	PostViewLink,
 	PreviewDropdown,
@@ -52,11 +53,12 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 		editorCanvasView,
 		isFixedToolbar,
 		isPublishSidebarOpened,
+		isVisualMode,
 	} = useSelect( ( select ) => {
 		const { getEditedPostType } = select( editSiteStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { get: getPreference } = select( preferencesStore );
-		const { getDeviceType } = select( editorStore );
+		const { getDeviceType, getEditorMode } = select( editorStore );
 
 		return {
 			deviceType: getDeviceType(),
@@ -70,6 +72,7 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 			isFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
 			isPublishSidebarOpened:
 				select( editorStore ).isPublishSidebarOpened(),
+			isVisualMode: getEditorMode() === 'visual',
 		};
 	}, [] );
 
@@ -115,8 +118,8 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 					transition={ toolbarTransition }
 				>
 					<DocumentTools
-						blockEditorMode={ blockEditorMode }
-						isDistractionFree={ isDistractionFree }
+						disableBlockTools={ ! isVisualMode }
+						listViewLabel={ __( 'List View' ) }
 					/>
 					{ showTopToolbar && (
 						<CollapsableBlockToolbar
@@ -144,18 +147,13 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 					transition={ toolbarTransition }
 				>
 					{ isLargeViewport && (
-						<div
-							className={ clsx(
-								'edit-site-header-edit-mode__preview-options',
-								{ 'is-zoomed-out': isZoomedOutView }
-							) }
-						>
-							<PreviewDropdown
-								disabled={
-									isFocusMode || ! hasDefaultEditorCanvasView
-								}
-							/>
-						</div>
+						<PreviewDropdown
+							disabled={
+								isFocusMode ||
+								! hasDefaultEditorCanvasView ||
+								isZoomedOutView
+							}
+						/>
 					) }
 					<PostViewLink />
 					{

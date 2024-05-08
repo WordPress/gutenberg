@@ -2,14 +2,11 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, VisuallyHidden } from '@wordpress/components';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import { close } from '@wordpress/icons';
 import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -23,44 +20,45 @@ export default function InserterSidebar( {
 	closeGeneralSidebar,
 	isRightSidebarOpen,
 } ) {
-	const { insertionPoint, showMostUsedBlocks } = useSelect( ( select ) => {
-		const { getInsertionPoint } = unlock( select( editorStore ) );
-		const { get } = select( preferencesStore );
-		return {
-			insertionPoint: getInsertionPoint(),
-			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
-		};
-	}, [] );
+	const { insertionPoint, showMostUsedBlocks, blockSectionRootClientId } =
+		useSelect( ( select ) => {
+			const { getInsertionPoint } = unlock( select( editorStore ) );
+			const {
+				getBlockRootClientId,
+				__unstableGetEditorMode,
+				getSettings,
+			} = select( blockEditorStore );
+			const { get } = select( preferencesStore );
+			const getBlockSectionRootClientId = () => {
+				if ( __unstableGetEditorMode() === 'zoom-out' ) {
+					const { sectionRootClientId } = unlock( getSettings() );
+					if ( sectionRootClientId ) {
+						return sectionRootClientId;
+					}
+				}
+				return getBlockRootClientId();
+			};
+			return {
+				insertionPoint: getInsertionPoint(),
+				showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
+				blockSectionRootClientId: getBlockSectionRootClientId(),
+			};
+		}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: true,
-	} );
-
 	const libraryRef = useRef();
 
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="editor-inserter-sidebar"
-		>
-			<TagName className="editor-inserter-sidebar__header">
-				<Button
-					icon={ close }
-					label={ __( 'Close block inserter' ) }
-					onClick={ () => setIsInserterOpened( false ) }
-				/>
-			</TagName>
+		<div className="editor-inserter-sidebar">
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
-					rootClientId={ insertionPoint.rootClientId }
+					rootClientId={
+						blockSectionRootClientId ?? insertionPoint.rootClientId
+					}
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
@@ -69,6 +67,7 @@ export default function InserterSidebar( {
 						isRightSidebarOpen ? closeGeneralSidebar : undefined
 					}
 					ref={ libraryRef }
+					onClose={ () => setIsInserterOpened( false ) }
 				/>
 			</div>
 		</div>
