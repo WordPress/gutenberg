@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useRefEffect } from '@wordpress/compose';
+import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 
 export function useScrollIntoView( { isSelected } ) {
+	const prefersReducedMotion = useReducedMotion();
 	return useRefEffect(
 		( node ) => {
 			if ( isSelected ) {
@@ -17,7 +18,11 @@ export function useScrollIntoView( { isSelected } ) {
 						// Once observing starts, we always get an initial
 						// entry with the intersecting state.
 						if ( ! entries[ 0 ].isIntersecting ) {
-							node.scrollIntoView();
+							node.scrollIntoView( {
+								behavior: prefersReducedMotion
+									? 'instant'
+									: 'smooth',
+							} );
 							observer.disconnect();
 						}
 					}
