@@ -1,5 +1,5 @@
 // Same as the group block styles.
-.wp-block-template-part {
+:where(.wp-block-template-part) {
 	&.has-background {
 		// Matches paragraph Block padding
 		padding: $block-bg-padding--v $block-bg-padding--h;

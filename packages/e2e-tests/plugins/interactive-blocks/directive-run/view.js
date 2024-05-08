@@ -3,13 +3,15 @@
  */
 import {
 	store,
-	directive,
-	navigate,
 	useInit,
 	useWatch,
-	cloneElement,
 	getElement,
+	privateApis
 } from '@wordpress/interactivity';
+
+const { directive, cloneElement } = privateApis(
+	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
+);
 
 // Custom directive to show hide the content elements in which it is placed.
 directive(
@@ -27,8 +29,8 @@ directive(
 
 const html = `
 <div
-	data-wp-interactive='{ "namespace": "directive-run" }'
-	data-wp-navigation-id='test-directive-run'
+	data-wp-interactive="directive-run"
+	data-wp-router-region='test-directive-run'
 >
 	<div data-testid="hydrated" data-wp-text="state.isHydrated"></div>
 	<div data-testid="mounted" data-wp-text="state.isMounted"></div>
@@ -58,8 +60,11 @@ const { state } = store( 'directive-run', {
 		increment() {
 			state.clickCount = state.clickCount + 1;
 		},
-		navigate() {
-			navigate( window.location, {
+		*navigate() {
+			const { actions } = yield import(
+				"@wordpress/interactivity-router"
+			);
+			return actions.navigate( window.location, {
 				force: true,
 				html,
 			} );

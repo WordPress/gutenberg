@@ -30,12 +30,12 @@ export const TooltipWrapper = styled.div`
 `;
 
 export const Tooltip = styled.div`
-	background: ${ COLORS.gray[ 900 ] };
+	background: ${ COLORS.theme.foreground };
 	border-radius: 2px;
 	box-sizing: border-box;
 	font-family: ${ font( 'default.fontFamily' ) };
 	font-size: 12px;
-	color: ${ COLORS.ui.textDark };
+	color: ${ COLORS.theme.foregroundInverted };
 	padding: 4px 8px;
 	position: relative;
 `;
@@ -45,7 +45,7 @@ export const Tooltip = styled.div`
 
 export const LabelText = styled( Text )`
 	&&& {
-		color: ${ COLORS.ui.textDark };
+		color: ${ COLORS.theme.foregroundInverted };
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;

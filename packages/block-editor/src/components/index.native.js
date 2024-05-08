@@ -49,6 +49,7 @@ export { default as MediaUploadProgress } from './media-upload-progress';
 export {
 	MEDIA_UPLOAD_STATE_UPLOADING,
 	MEDIA_UPLOAD_STATE_SUCCEEDED,
+	MEDIA_UPLOAD_STATE_PAUSED,
 	MEDIA_UPLOAD_STATE_FAILED,
 	MEDIA_UPLOAD_STATE_RESET,
 } from './media-upload-progress/constants';
@@ -61,8 +62,10 @@ export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { useSettings, default as useSetting } from './use-settings';
 export {
-	RecursionProvider as __experimentalRecursionProvider,
-	useHasRecursion as __experimentalUseHasRecursion,
+	RecursionProvider,
+	DeprecatedExperimentalRecursionProvider as __experimentalRecursionProvider,
+	useHasRecursion,
+	DeprecatedExperimentalUseHasRecursion as __experimentalUseHasRecursion,
 } from './recursion-provider';
 export { default as Warning } from './warning';
 export { default as ContrastChecker } from './contrast-checker';

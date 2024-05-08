@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,15 +21,12 @@ import {
 	useSettings,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useOnEnter } from './use-enter';
-
-const name = 'core/paragraph';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -51,9 +48,9 @@ function hasDropCapDisabled( align ) {
 }
 
 function DropCapControl( { clientId, attributes, setAttributes } ) {
-	// Please do no add a useSelect call to the paragraph block unconditionaly.
-	// Every useSelect added to a (frequestly used) block will degrade the load
-	// and type bit. By moving it within InspectorControls, the subscription is
+	// Please do not add a useSelect call to the paragraph block unconditionally.
+	// Every useSelect added to a (frequently used) block will degrade load
+	// and type performance. By moving it within InspectorControls, the subscription is
 	// now only added for the selected block(s).
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
 
@@ -103,7 +100,7 @@ function ParagraphBlock( {
 	const { align, content, direction, dropCap, placeholder } = attributes;
 	const blockProps = useBlockProps( {
 		ref: useOnEnter( { clientId, content } ),
-		className: classnames( {
+		className: clsx( {
 			'has-drop-cap': hasDropCapDisabled( align ) ? false : dropCap,
 			[ `has-text-align-${ align }` ]: align,
 		} ),
@@ -149,24 +146,6 @@ function ParagraphBlock( {
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
 				}
-				onSplit={ ( value, isOriginal ) => {
-					let newAttributes;
-
-					if ( isOriginal || value ) {
-						newAttributes = {
-							...attributes,
-							content: value,
-						};
-					}
-
-					const block = createBlock( name, newAttributes );
-
-					if ( isOriginal ) {
-						block.clientId = clientId;
-					}
-
-					return block;
-				} }
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onRemove }

@@ -25,6 +25,7 @@ export default function DataViewsSidebarContent() {
 	if ( ! path || ! PATH_TO_TYPE[ path ] ) {
 		return null;
 	}
+	const isCustomBoolean = isCustom === 'true';
 	const type = PATH_TO_TYPE[ path ];
 
 	return (
@@ -39,19 +40,21 @@ export default function DataViewsSidebarContent() {
 							icon={ dataview.icon }
 							type={ dataview.view.type }
 							isActive={
-								isCustom === 'false' &&
+								! isCustomBoolean &&
 								dataview.slug === activeView
 							}
-							isCustom="false"
+							isCustom={ false }
 						/>
 					);
 				} ) }
 			</ItemGroup>
-			<CustomDataViewsList
-				activeView={ activeView }
-				type={ type }
-				isCustom="true"
-			/>
+			{ window?.__experimentalCustomViews && (
+				<CustomDataViewsList
+					activeView={ activeView }
+					type={ type }
+					isCustom
+				/>
+			) }
 		</>
 	);
 }

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash } from '@wordpress/icons';
+import { trash, pages, drafts } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import {
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 	LAYOUT_GRID,
-	OPERATOR_IN,
+	OPERATOR_IS_ANY,
 } from '../../utils/constants';
 
 export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
@@ -49,17 +49,23 @@ const DEFAULT_PAGE_BASE = {
 export const DEFAULT_VIEWS = {
 	page: [
 		{
-			title: __( 'All' ),
+			title: __( 'All pages' ),
 			slug: 'all',
+			icon: pages,
 			view: DEFAULT_PAGE_BASE,
 		},
 		{
 			title: __( 'Drafts' ),
 			slug: 'drafts',
+			icon: drafts,
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'draft' },
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'draft',
+					},
 				],
 			},
 		},
@@ -70,7 +76,11 @@ export const DEFAULT_VIEWS = {
 			view: {
 				...DEFAULT_PAGE_BASE,
 				filters: [
-					{ field: 'status', operator: OPERATOR_IN, value: 'trash' },
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'trash',
+					},
 				],
 			},
 		},

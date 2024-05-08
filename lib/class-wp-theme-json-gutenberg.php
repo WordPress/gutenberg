@@ -6,10 +6,6 @@
  * @since 5.8.0
  */
 
-if ( class_exists( 'WP_Theme_JSON_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Class that encapsulates the processing of structures that adhere to the theme.json spec.
  *
@@ -40,6 +36,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	protected static $blocks_metadata = array();
+
+	/**
+	 * The CSS selector for the top-level preset settings.
+	 *
+	 * @since 6.6.0
+	 * @var string
+	 */
+	const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 	/**
 	 * The CSS selector for the top-level styles.
@@ -119,9 +123,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0 Replaced `override` with `prevent_override` and updated the
 	 *              `prevent_override` value for `color.duotone` to use `color.defaultDuotone`.
 	 * @since 6.2.0 Added 'shadow' presets.
+	 * @since 6.6.0 Added `aspectRatios`.
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
+		array(
+			'path'              => array( 'dimensions', 'aspectRatios' ),
+			'prevent_override'  => array( 'dimensions', 'defaultAspectRatios' ),
+			'use_default_names' => false,
+			'value_key'         => 'ratio',
+			'css_vars'          => '--wp--preset--aspect-ratio--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'aspect-ratio' ),
+		),
 		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
@@ -207,12 +221,18 @@ class WP_Theme_JSON_Gutenberg {
 	 *              removed the `--wp--style--block-gap` property.
 	 * @since 6.2.0 Added `outline-*`, and `min-height` properties.
 	 * @since 6.3.0 Added `writing-mode` property.
+	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 *
 	 * @var array
 	 */
 	const PROPERTIES_METADATA = array(
+		'aspect-ratio'                      => array( 'dimensions', 'aspectRatio' ),
 		'background'                        => array( 'color', 'gradient' ),
 		'background-color'                  => array( 'color', 'background' ),
+		'background-image'                  => array( 'background', 'backgroundImage' ),
+		'background-position'               => array( 'background', 'backgroundPosition' ),
+		'background-repeat'                 => array( 'background', 'backgroundRepeat' ),
+		'background-size'                   => array( 'background', 'backgroundSize' ),
 		'border-radius'                     => array( 'border', 'radius' ),
 		'border-top-left-radius'            => array( 'border', 'radius', 'topLeft' ),
 		'border-top-right-radius'           => array( 'border', 'radius', 'topRight' ),
@@ -234,6 +254,7 @@ class WP_Theme_JSON_Gutenberg {
 		'border-left-width'                 => array( 'border', 'left', 'width' ),
 		'border-left-style'                 => array( 'border', 'left', 'style' ),
 		'color'                             => array( 'color', 'text' ),
+		'text-align'                        => array( 'typography', 'textAlign' ),
 		'column-count'                      => array( 'typography', 'textColumns' ),
 		'font-family'                       => array( 'typography', 'fontFamily' ),
 		'font-size'                         => array( 'typography', 'fontSize' ),
@@ -276,25 +297,29 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * Indirect properties are not output directly by `compute_style_properties`,
 	 * but are used elsewhere in the processing of global styles. The indirect
-	 * property is used to validate whether or not a style value is allowed.
+	 * property is used to validate whether a style value is allowed.
 	 *
 	 * @since 6.2.0
+	 * @since 6.6.0 Added background-image properties.
 	 *
 	 * @var array
 	 */
 	const INDIRECT_PROPERTIES_METADATA = array(
-		'gap'        => array(
+		'gap'              => array(
 			array( 'spacing', 'blockGap' ),
 		),
-		'column-gap' => array(
+		'column-gap'       => array(
 			array( 'spacing', 'blockGap', 'left' ),
 		),
-		'row-gap'    => array(
+		'row-gap'          => array(
 			array( 'spacing', 'blockGap', 'top' ),
 		),
-		'max-width'  => array(
+		'max-width'        => array(
 			array( 'layout', 'contentSize' ),
 			array( 'layout', 'wideSize' ),
+		),
+		'background-image' => array(
+			array( 'background', 'backgroundImage', 'url' ),
 		),
 	);
 
@@ -381,7 +406,10 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'minHeight' => null,
+			'aspectRatio'         => null,
+			'aspectRatios'        => null,
+			'defaultAspectRatios' => null,
+			'minHeight'           => null,
 		),
 		'layout'                        => array(
 			'contentSize'                   => null,
@@ -421,6 +449,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'       => null,
 			'letterSpacing'    => null,
 			'lineHeight'       => null,
+			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
 			'textTransform'    => null,
@@ -433,7 +462,6 @@ class WP_Theme_JSON_Gutenberg {
 			'fontFamily' => null,
 			'name'       => null,
 			'slug'       => null,
-			'preview'    => null,
 			'fontFace'   => array(
 				array(
 					'ascentOverride'        => null,
@@ -449,7 +477,6 @@ class WP_Theme_JSON_Gutenberg {
 					'sizeAdjust'            => null,
 					'src'                   => null,
 					'unicodeRange'          => null,
-					'preview'               => null,
 				),
 			),
 		),
@@ -466,10 +493,17 @@ class WP_Theme_JSON_Gutenberg {
 	 *              added new property `shadow`,
 	 *              updated `blockGap` to be allowed at any level.
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
-	 *
+	 * @since 6.6.0 Added `background` sub properties to top-level only.
+	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
+		'background' => array(
+			'backgroundImage'    => 'top',
+			'backgroundPosition' => 'top',
+			'backgroundRepeat'   => 'top',
+			'backgroundSize'     => 'top',
+		),
 		'border'     => array(
 			'color'  => null,
 			'radius' => null,
@@ -486,7 +520,8 @@ class WP_Theme_JSON_Gutenberg {
 			'text'       => null,
 		),
 		'dimensions' => array(
-			'minHeight' => null,
+			'aspectRatio' => null,
+			'minHeight'   => null,
 		),
 		'filter'     => array(
 			'duotone' => null,
@@ -510,6 +545,7 @@ class WP_Theme_JSON_Gutenberg {
 			'fontWeight'     => null,
 			'letterSpacing'  => null,
 			'lineHeight'     => null,
+			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
@@ -661,6 +697,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'heading' ),
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
+		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'minHeight' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.
@@ -680,9 +717,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 5.9.0 Changed value from 1 to 2.
+	 * @since 6.5.0 Changed value from 2 to 3.
 	 * @var int
 	 */
-	const LATEST_SCHEMA = 2;
+	const LATEST_SCHEMA = 3;
 
 	/**
 	 * Constructor.
@@ -693,24 +731,18 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $origin     Optional. What source of data this object represents.
 	 *                           One of 'default', 'theme', or 'custom'. Default 'theme'.
 	 */
-	public function __construct( $theme_json = array(), $origin = 'theme' ) {
+	public function __construct( $theme_json = array( 'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA ), $origin = 'theme' ) {
 		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
 			$origin = 'theme';
 		}
 
-		$this->theme_json    = WP_Theme_JSON_Schema::migrate( $theme_json );
+		$this->theme_json    = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 		$registry            = WP_Block_Type_Registry::get_instance();
 		$valid_block_names   = array_keys( $registry->get_all_registered() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
-		}
-		$theme_json       = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-		$this->theme_json = static::maybe_opt_in_into_settings( $theme_json );
+		$valid_variations    = static::get_valid_block_style_variations();
+		$theme_json          = static::sanitize( $this->theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		$this->theme_json    = static::maybe_opt_in_into_settings( $theme_json );
 
 		// Internally, presets are keyed by origin.
 		$nodes = static::get_setting_nodes( $this->theme_json );
@@ -1010,7 +1042,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				if ( $duotone_support ) {
 					$root_selector    = wp_get_block_css_selector( $block_type );
-					$duotone_selector = WP_Theme_JSON_Gutenberg::scope_selector( $root_selector, $duotone_support );
+					$duotone_selector = static::scope_selector( $root_selector, $duotone_support );
 				}
 			}
 
@@ -1022,7 +1054,7 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $block_type->styles ) ) {
 				$style_selectors = array();
 				foreach ( $block_type->styles as $style ) {
-					$style_selectors[ $style['name'] ] = static::append_to_selector( '.is-style-' . $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
+					$style_selectors[ $style['name'] ] = static::get_block_style_variation_selector( $style['name'], static::$blocks_metadata[ $block_name ]['selector'] );
 				}
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
 			}
@@ -1175,7 +1207,7 @@ class WP_Theme_JSON_Gutenberg {
 				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
 			}
 			foreach ( $style_nodes as &$node ) {
-				$node['selector'] = static::scope_selector( $options['scope'], $node['selector'] );
+				$node = static::scope_style_node_selectors( $options['scope'], $node );
 			}
 			unset( $node );
 		}
@@ -1185,7 +1217,7 @@ class WP_Theme_JSON_Gutenberg {
 				$setting_nodes[ $root_settings_key ]['selector'] = $options['root_selector'];
 			}
 			if ( false !== $root_style_key ) {
-				$setting_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
+				$style_nodes[ $root_style_key ]['selector'] = $options['root_selector'];
 			}
 		}
 
@@ -1232,7 +1264,7 @@ class WP_Theme_JSON_Gutenberg {
 			);
 
 			foreach ( $base_styles_nodes as $base_style_node ) {
-				$stylesheet .= $this->get_layout_styles( $base_style_node );
+				$stylesheet .= $this->get_layout_styles( $base_style_node, $types );
 			}
 		}
 
@@ -1287,21 +1319,67 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The global styles custom CSS.
 	 */
 	public function get_custom_css() {
-		// Add the global styles root CSS.
-		$stylesheet = $this->theme_json['styles']['css'] ?? '';
+		$block_custom_css = '';
+		$block_nodes      = $this->get_block_custom_css_nodes();
+		foreach ( $block_nodes as $node ) {
+			$block_custom_css .= $this->get_block_custom_css( $node['css'], $node['selector'] );
+		}
+
+		return $this->get_base_custom_css() . $block_custom_css;
+	}
+
+	/**
+	 * Returns the global styles base custom CSS.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @return string The global styles base custom CSS.
+	 */
+	public function get_base_custom_css() {
+		return isset( $this->theme_json['styles']['css'] ) ? $this->theme_json['styles']['css'] : '';
+	}
+
+	/**
+	 * Returns the block nodes with custom CSS.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @return array The block nodes.
+	 */
+	public function get_block_custom_css_nodes() {
+		$block_nodes = array();
 
 		// Add the global styles block CSS.
 		if ( isset( $this->theme_json['styles']['blocks'] ) ) {
 			foreach ( $this->theme_json['styles']['blocks'] as $name => $node ) {
-				$custom_block_css = $this->theme_json['styles']['blocks'][ $name ]['css'] ?? null;
+				$custom_block_css = isset( $this->theme_json['styles']['blocks'][ $name ]['css'] )
+					? $this->theme_json['styles']['blocks'][ $name ]['css']
+					: null;
 				if ( $custom_block_css ) {
-					$selector    = static::$blocks_metadata[ $name ]['selector'];
-					$stylesheet .= $this->process_blocks_custom_css( $custom_block_css, $selector );
+					$block_nodes[] = array(
+						'name'     => $name,
+						'selector' => static::$blocks_metadata[ $name ]['selector'],
+						'css'      => $custom_block_css,
+					);
 				}
 			}
 		}
 
-		return $stylesheet;
+		return $block_nodes;
+	}
+
+	/**
+	 * Returns the global styles custom CSS for a single block.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array  $css The block css node.
+	 * @param string $selector The block selector.
+	 *
+	 * @return string The global styles custom CSS for the block.
+	 */
+	public function get_block_custom_css( $css, $selector ) {
+		return $this->process_blocks_custom_css( $css, $selector );
 	}
 
 	/**
@@ -1394,7 +1472,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 * @return string Layout styles for the block.
 	 */
-	protected function get_layout_styles( $block_metadata ) {
+	protected function get_layout_styles( $block_metadata, $types = array() ) {
 		$block_rules = '';
 		$block_type  = null;
 
@@ -1415,7 +1493,7 @@ class WP_Theme_JSON_Gutenberg {
 		$has_fallback_gap_support = ! $has_block_gap_support; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback gap styles support.
 		$node                     = _wp_array_get( $this->theme_json, $block_metadata['path'], array() );
 		$layout_definitions       = gutenberg_get_layout_definitions();
-		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
+		$layout_selector_pattern  = '/^[a-zA-Z0-9\-\.\,\ *+>:\(\)]*$/'; // Allow alphanumeric classnames, spaces, wildcard, sibling, child combinator and pseudo class selectors.
 
 		// Gap styles will only be output if the theme has block gap support, or supports a fallback gap.
 		// Default layout gap styles will be skipped for themes that do not explicitly opt-in to blockGap with a `true` or `false` value.
@@ -1486,7 +1564,7 @@ class WP_Theme_JSON_Gutenberg {
 										$spacing_rule['selector']
 									);
 								} else {
-									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(%s .%s) %s' : '%s-%s%s';
+									$format          = static::ROOT_BLOCK_SELECTOR === $selector ? ':where(.%2$s) %3$s' : ':where(%1$s-%2$s) %3$s';
 									$layout_selector = sprintf(
 										$format,
 										$selector,
@@ -1540,12 +1618,27 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( $base_style_rules as $base_style_rule ) {
 						$declarations = array();
 
+						// Skip outputting base styles for flow and constrained layout types if theme doesn't support theme.json. The 'base-layout-styles' type flags this.
+						if ( in_array( 'base-layout-styles', $types, true ) && ( 'default' === $layout_definition['name'] || 'constrained' === $layout_definition['name'] ) ) {
+							continue;
+						}
+
 						if (
 							isset( $base_style_rule['selector'] ) &&
 							preg_match( $layout_selector_pattern, $base_style_rule['selector'] ) &&
 							! empty( $base_style_rule['rules'] )
 						) {
 							foreach ( $base_style_rule['rules'] as $css_property => $css_value ) {
+								// Skip rules that reference content size or wide size if they are not defined in the theme.json.
+								if (
+									is_string( $css_value ) &&
+									( str_contains( $css_value, '--global--content-size' ) || str_contains( $css_value, '--global--wide-size' ) ) &&
+									! isset( $this->theme_json['settings']['layout']['contentSize'] ) &&
+									! isset( $this->theme_json['settings']['layout']['wideSize'] )
+								) {
+									continue;
+								}
+
 								if ( static::is_safe_css_declaration( $css_property, $css_value ) ) {
 									$declarations[] = array(
 										'name'  => $css_property,
@@ -1555,8 +1648,7 @@ class WP_Theme_JSON_Gutenberg {
 							}
 
 							$layout_selector = sprintf(
-								'%s .%s%s',
-								$selector,
+								'.%s%s',
 								$class_name,
 								$base_style_rule['selector']
 							);
@@ -1695,7 +1787,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The result of processing the presets.
 	 */
 	protected static function compute_preset_classes( $settings, $selector, $origins ) {
-		if ( static::ROOT_BLOCK_SELECTOR === $selector ) {
+		if ( static::ROOT_BLOCK_SELECTOR === $selector || static::ROOT_CSS_PROPERTIES_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
 			$selector = '';
@@ -1749,6 +1841,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string Scoped selector.
 	 */
 	public static function scope_selector( $scope, $selector ) {
+		if ( ! $scope || ! $selector ) {
+			return $selector;
+		}
+
 		$scopes    = explode( ',', $scope );
 		$selectors = explode( ',', $selector );
 
@@ -1769,6 +1865,39 @@ class WP_Theme_JSON_Gutenberg {
 
 		$result = implode( ', ', $selectors_scoped );
 		return $result;
+	}
+
+	/**
+	 * Scopes the selectors for a given style node. This includes the primary
+	 * selector, i.e. `$node['selector']`, as well as any custom selectors for
+	 * features and subfeatures, e.g. `$node['selectors']['border']` etc.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param string $scope Selector to scope to.
+	 * @param array  $node  Style node with selectors to scope.
+	 *
+	 * @return array Node with updated selectors.
+	 */
+	protected static function scope_style_node_selectors( $scope, $node ) {
+		$node['selector'] = static::scope_selector( $scope, $node['selector'] );
+
+		if ( empty( $node['selectors'] ) ) {
+			return $node;
+		}
+
+		foreach ( $node['selectors'] as $feature => $selector ) {
+			if ( is_string( $selector ) ) {
+				$node['selectors'][ $feature ] = static::scope_selector( $scope, $selector );
+			}
+			if ( is_array( $selector ) ) {
+				foreach ( $selector as $subfeature => $subfeature_selector ) {
+					$node['selectors'][ $feature ][ $subfeature ] = static::scope_selector( $scope, $subfeature_selector );
+				}
+			}
+		}
+
+		return $node;
 	}
 
 	/**
@@ -1801,6 +1930,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * </code>
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Passing $settings to the callbacks defined in static::PRESETS_METADATA.
 	 *
 	 * @param array $settings        Settings to process.
 	 * @param array $preset_metadata One of the PRESETS_METADATA values.
@@ -1827,7 +1957,7 @@ class WP_Theme_JSON_Gutenberg {
 					is_callable( $preset_metadata['value_func'] )
 				) {
 					$value_func = $preset_metadata['value_func'];
-					$value      = call_user_func( $value_func, $preset );
+					$value      = call_user_func( $value_func, $preset, $settings );
 				} else {
 					// If we don't have a value, then don't add it to the result.
 					continue;
@@ -2026,6 +2156,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Added the `$settings` and `$properties` parameters.
 	 * @since 6.1.0 Added `$theme_json`, `$selector`, and `$use_root_padding` parameters.
+	 * @since 6.5.0 Output a `min-height: unset` rule when `aspect-ratio` is set.
+	 * @since 6.6.0 Passing current theme JSON settings to wp_get_typography_font_size_value(). Using style engine to correctly fetch background CSS values.
 	 *
 	 * @param array   $styles Styles to process.
 	 * @param array   $settings Theme settings.
@@ -2075,6 +2207,12 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// Processes background styles.
+			if ( 'background' === $value_path[0] && isset( $styles['background'] ) ) {
+				$background_styles = gutenberg_style_engine_get_styles( array( 'background' => $styles['background'] ) );
+				$value             = $background_styles['declarations'][ $css_property ] ?? $value;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
@@ -2089,8 +2227,18 @@ class WP_Theme_JSON_Gutenberg {
 				 * whether the incoming value can be converted to a fluid value.
 				 * Values that already have a clamp() function will not pass the test,
 				 * and therefore the original $value will be returned.
+				 * Pass the current theme_json settings to override any global settings.
 				 */
-				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ) );
+				$value = gutenberg_get_typography_font_size_value( array( 'size' => $value ), $settings );
+			}
+
+			if ( 'aspect-ratio' === $css_property ) {
+				// For aspect ratio to work, other dimensions rules must be unset.
+				// This ensures that a fixed height does not override the aspect ratio.
+				$declarations[] = array(
+					'name'  => 'min-height',
+					'value' => 'unset',
+				);
 			}
 
 			$declarations[] = array(
@@ -2202,7 +2350,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Top-level.
 		$nodes[] = array(
 			'path'     => array( 'settings' ),
-			'selector' => static::ROOT_BLOCK_SELECTOR,
+			'selector' => static::ROOT_CSS_PROPERTIES_SELECTOR,
 		);
 
 		// Calculate paths for blocks.
@@ -2444,6 +2592,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Gets the CSS rules for a particular block from theme.json.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Setting a min-height of HTML when root styles have a background gradient or image.
 	 *
 	 * @param array $block_metadata Metadata about the block to get styles for.
 	 *
@@ -2454,6 +2603,7 @@ class WP_Theme_JSON_Gutenberg {
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
+		$is_root_selector = static::ROOT_BLOCK_SELECTOR === $selector;
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -2539,10 +2689,16 @@ class WP_Theme_JSON_Gutenberg {
 		$block_rules = '';
 
 		/*
-		 * 1. Separate the declarations that use the general selector
+		 * 1. Bespoke declaration modifiers:
+		 * - 'filter': Separate the declarations that use the general selector
 		 * from the ones using the duotone selector.
+		 * - 'background|background-image': set the html min-height to 100%
+		 * to ensure the background covers the entire viewport.
+		 *
 		 */
-		$declarations_duotone = array();
+		$declarations_duotone       = array();
+		$should_set_root_min_height = false;
+
 		foreach ( $declarations as $index => $declaration ) {
 			if ( 'filter' === $declaration['name'] ) {
 				/*
@@ -2559,6 +2715,28 @@ class WP_Theme_JSON_Gutenberg {
 				}
 				unset( $declarations[ $index ] );
 			}
+
+			if ( $is_root_selector && ( 'background-image' === $declaration['name'] || 'background' === $declaration['name'] ) ) {
+				$should_set_root_min_height = true;
+			}
+		}
+
+		/*
+		 * If root styles has a background-image or a background (gradient) set,
+		 * set the min-height to '100%'. Minus `--wp-admin--admin-bar--height` for logged-in view.
+		 * Setting the CSS rule on the HTML tag ensures background gradients and images behave similarly,
+		 * and matches the behavior of the site editor.
+		 */
+		if ( $should_set_root_min_height ) {
+			$block_rules .= static::to_ruleset(
+				'html',
+				array(
+					array(
+						'name'  => 'min-height',
+						'value' => 'calc(100% - var(--wp-admin--admin-bar--height, 0px))',
+					),
+				)
+			);
 		}
 
 		// Update declarations if there are separators with only background color defined.
@@ -2567,7 +2745,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( $selector, $declarations );
+		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2576,7 +2754,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 4. Generate Layout block gap styles.
 		if (
-			static::ROOT_BLOCK_SELECTOR !== $selector &&
+			! $is_root_selector &&
 			! empty( $block_metadata['name'] )
 		) {
 			$block_rules .= $this->get_layout_styles( $block_metadata );
@@ -2584,7 +2762,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( $feature_selector, $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.
@@ -2599,6 +2777,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Outputs the CSS for layout rules on the root.
 	 *
 	 * @since 6.1.0
+	 * @since 6.6.0 Use `ROOT_CSS_PROPERTIES_SELECTOR` for CSS custom properties.
 	 *
 	 * @param string $selector The root node selector.
 	 * @param array  $block_metadata The metadata for the root block.
@@ -2610,16 +2789,6 @@ class WP_Theme_JSON_Gutenberg {
 		$use_root_padding = isset( $this->theme_json['settings']['useRootPaddingAwareAlignments'] ) && true === $this->theme_json['settings']['useRootPaddingAwareAlignments'];
 
 		/*
-		* Reset default browser margin on the root body element.
-		* This is set on the root selector **before** generating the ruleset
-		* from the `theme.json`. This is to ensure that if the `theme.json` declares
-		* `margin` in its `spacing` declaration for the `body` element then these
-		* user-generated values take precedence in the CSS cascade.
-		* @link https://github.com/WordPress/gutenberg/issues/36147.
-		*/
-		$css .= 'body { margin: 0;';
-
-		/*
 		* If there are content and wide widths in theme.json, output them
 		* as custom properties on the body element so all blocks can use them.
 		*/
@@ -2628,11 +2797,19 @@ class WP_Theme_JSON_Gutenberg {
 			$content_size = static::is_safe_css_declaration( 'max-width', $content_size ) ? $content_size : 'initial';
 			$wide_size    = isset( $settings['layout']['wideSize'] ) ? $settings['layout']['wideSize'] : $settings['layout']['contentSize'];
 			$wide_size    = static::is_safe_css_declaration( 'max-width', $wide_size ) ? $wide_size : 'initial';
-			$css         .= '--wp--style--global--content-size: ' . $content_size . ';';
-			$css         .= '--wp--style--global--wide-size: ' . $wide_size . ';';
+			$css         .= static::ROOT_CSS_PROPERTIES_SELECTOR . ' { --wp--style--global--content-size: ' . $content_size . ';';
+			$css         .= '--wp--style--global--wide-size: ' . $wide_size . '; }';
 		}
 
-		$css .= '}';
+		/*
+		* Reset default browser margin on the body element.
+		* This is set on the body selector **before** generating the ruleset
+		* from the `theme.json`. This is to ensure that if the `theme.json` declares
+		* `margin` in its `spacing` declaration for the `body` element then these
+		* user-generated values take precedence in the CSS cascade.
+		* @link https://github.com/WordPress/gutenberg/issues/36147.
+		*/
+		$css .= ':where(body) { margin: 0; }';
 
 		if ( $use_root_padding ) {
 			// Top and bottom padding are applied to the outer block container.
@@ -2654,17 +2831,15 @@ class WP_Theme_JSON_Gutenberg {
 		$css .= '.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }';
 		$css .= '.wp-site-blocks > .alignright { float: right; margin-left: 2em; }';
 		$css .= '.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }';
-
-		$block_gap_value       = $this->theme_json['styles']['spacing']['blockGap'] ?? '0.5em';
-		$has_block_gap_support = isset( $this->theme_json['settings']['spacing']['blockGap'] );
-		if ( $has_block_gap_support ) {
+		// Block gap styles will be output unless explicitly set to `null`. See static::PROTECTED_PROPERTIES.
+		if ( isset( $this->theme_json['settings']['spacing']['blockGap'] ) ) {
 			$block_gap_value = static::get_property_value( $this->theme_json, array( 'styles', 'spacing', 'blockGap' ) );
 			$css            .= ":where(.wp-site-blocks) > * { margin-block-start: $block_gap_value; margin-block-end: 0; }";
-			$css            .= ':where(.wp-site-blocks) > :first-child:first-child { margin-block-start: 0; }';
-			$css            .= ':where(.wp-site-blocks) > :last-child:last-child { margin-block-end: 0; }';
+			$css            .= ':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
+			$css            .= ':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 
 			// For backwards compatibility, ensure the legacy block gap CSS variable is still available.
-			$css .= "$selector { --wp--style--block-gap: $block_gap_value; }";
+			$css .= static::ROOT_CSS_PROPERTIES_SELECTOR . " { --wp--style--block-gap: $block_gap_value; }";
 		}
 		$css .= $this->get_layout_styles( $block_metadata );
 
@@ -2717,7 +2892,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 5.8.0
 	 * @since 5.9.0 Duotone preset also has origins.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * @param WP_Theme_JSON_Gutenberg $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
 		$incoming_data    = $incoming->get_raw_data();
@@ -2759,12 +2934,15 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// Replace the presets.
-			foreach ( static::PRESETS_METADATA as $preset ) {
-				$override_preset = ! static::get_metadata_boolean( $this->theme_json['settings'], $preset['prevent_override'], true );
+			foreach ( static::PRESETS_METADATA as $preset_metadata ) {
+				$prevent_override = $preset_metadata['prevent_override'];
+				if ( is_array( $prevent_override ) ) {
+					$prevent_override = _wp_array_get( $this->theme_json['settings'], $preset_metadata['prevent_override'] );
+				}
 
 				foreach ( static::VALID_ORIGINS as $origin ) {
 					$base_path = $node['path'];
-					foreach ( $preset['path'] as $leaf ) {
+					foreach ( $preset_metadata['path'] as $leaf ) {
 						$base_path[] = $leaf;
 					}
 
@@ -2776,7 +2954,8 @@ class WP_Theme_JSON_Gutenberg {
 						continue;
 					}
 
-					if ( 'theme' === $origin && $preset['use_default_names'] ) {
+					// Set names for theme presets based on the slug if they are not set and can use default names.
+					if ( 'theme' === $origin && $preset_metadata['use_default_names'] ) {
 						foreach ( $content as $key => $item ) {
 							if ( ! isset( $item['name'] ) ) {
 								$name = static::get_name_from_defaults( $item['slug'], $base_path );
@@ -2787,19 +2966,17 @@ class WP_Theme_JSON_Gutenberg {
 						}
 					}
 
-					if (
-						( 'theme' !== $origin ) ||
-						( 'theme' === $origin && $override_preset )
-					) {
-						_wp_array_set( $this->theme_json, $path, $content );
-					} else {
-						$slugs_node = static::get_default_slugs( $this->theme_json, $node['path'] );
-						$slugs      = array_merge_recursive( $slugs_global, $slugs_node );
+					// Filter out default slugs from theme presets when defaults should not be overridden.
+					if ( 'theme' === $origin && $prevent_override ) {
+						$slugs_node    = static::get_default_slugs( $this->theme_json, $node['path'] );
+						$preset_global = _wp_array_get( $slugs_global, $preset_metadata['path'], array() );
+						$preset_node   = _wp_array_get( $slugs_node, $preset_metadata['path'], array() );
+						$preset_slugs  = array_merge_recursive( $preset_global, $preset_node );
 
-						$slugs_for_preset = _wp_array_get( $slugs, $preset['path'], array() );
-						$content          = static::filter_slugs( $content, $slugs_for_preset );
-						_wp_array_set( $this->theme_json, $path, $content );
+						$content = static::filter_slugs( $content, $preset_slugs );
 					}
+
+					_wp_array_set( $this->theme_json, $path, $content );
 				}
 			}
 		}
@@ -2991,17 +3168,11 @@ class WP_Theme_JSON_Gutenberg {
 	public static function remove_insecure_properties( $theme_json ) {
 		$sanitized = array();
 
-		$theme_json = WP_Theme_JSON_Schema::migrate( $theme_json );
+		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json );
 
 		$valid_block_names   = array_keys( static::get_blocks_metadata() );
 		$valid_element_names = array_keys( static::ELEMENTS );
-		$valid_variations    = array();
-		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
-			if ( ! isset( $block_meta['styleVariations'] ) ) {
-				continue;
-			}
-			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
-		}
+		$valid_variations    = static::get_valid_block_style_variations();
 
 		$theme_json = static::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
 
@@ -3801,12 +3972,18 @@ class WP_Theme_JSON_Gutenberg {
 	 * Replaces CSS variables with their values in place.
 	 *
 	 * @since 6.3.0
+	 * @since 6.6.0 Check for empty style before processing.
+	 *
 	 * @param array $styles CSS declarations to convert.
 	 * @param array $values key => value pairs to use for replacement.
 	 * @return array
 	 */
 	private static function convert_variables_to_value( $styles, $values ) {
 		foreach ( $styles as $key => $style ) {
+			if ( empty( $style ) ) {
+				continue;
+			}
+
 			if ( is_array( $style ) ) {
 				$styles[ $key ] = self::convert_variables_to_value( $style, $values );
 				continue;
@@ -3868,5 +4045,55 @@ class WP_Theme_JSON_Gutenberg {
 
 		$theme_json->theme_json['styles'] = self::convert_variables_to_value( $styles, $vars );
 		return $theme_json;
+	}
+
+	/**
+	 * Generates a selector for a block style variation.
+	 *
+	 * @param string $variation_name Name of the block style variation.
+	 * @param string $block_selector CSS selector for the block.
+	 *
+	 * @return string Block selector with block style variation selector added to it.
+	 */
+	protected static function get_block_style_variation_selector( $variation_name, $block_selector ) {
+		$variation_class = ".is-style-$variation_name";
+
+		if ( ! $block_selector ) {
+			return $variation_class;
+		}
+
+		$limit          = 1;
+		$selector_parts = explode( ',', $block_selector );
+		$result         = array();
+
+		foreach ( $selector_parts as $part ) {
+			$result[] = preg_replace_callback(
+				'/((?::\([^)]+\))?\s*)([^\s:]+)/',
+				function ( $matches ) use ( $variation_class ) {
+					return $matches[1] . $matches[2] . $variation_class;
+				},
+				$part,
+				$limit
+			);
+		}
+
+		return implode( ',', $result );
+	}
+
+	/**
+	 * Collects valid block style variations keyed by block type.
+	 *
+	 * @return array Valid block style variations by block type.
+	 */
+	protected static function get_valid_block_style_variations() {
+		$valid_variations = array();
+		foreach ( self::get_blocks_metadata() as $block_name => $block_meta ) {
+			if ( ! isset( $block_meta['styleVariations'] ) ) {
+				continue;
+			}
+			$valid_variations[ $block_name ] = array_keys( $block_meta['styleVariations'] );
+		}
+
+		return $valid_variations;
 	}
 }

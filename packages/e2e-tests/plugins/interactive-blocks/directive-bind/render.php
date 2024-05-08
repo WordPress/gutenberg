@@ -4,11 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
-gutenberg_enqueue_module( 'directive-bind-view' );
 ?>
 
-<div data-wp-interactive='{ "namespace": "directive-bind" }'>
+<div data-wp-interactive="directive-bind">
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"

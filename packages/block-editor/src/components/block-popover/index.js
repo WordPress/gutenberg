@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -28,8 +28,6 @@ function BlockPopover(
 		clientId,
 		bottomClientId,
 		children,
-		__unstableRefreshSize,
-		__unstableCoverTarget = false,
 		__unstablePopoverSlot,
 		__unstableContentRef,
 		shift = true,
@@ -74,30 +72,6 @@ function BlockPopover(
 			observer.disconnect();
 		};
 	}, [ selectedElement ] );
-
-	const style = useMemo( () => {
-		if (
-			// popoverDimensionsRecomputeCounter is by definition always equal or greater
-			// than 0. This check is only there to satisfy the correctness of the
-			// exhaustive-deps rule for the `useMemo` hook.
-			popoverDimensionsRecomputeCounter < 0 ||
-			! selectedElement ||
-			lastSelectedElement !== selectedElement
-		) {
-			return {};
-		}
-
-		return {
-			position: 'absolute',
-			width: selectedElement.offsetWidth,
-			height: selectedElement.offsetHeight,
-		};
-	}, [
-		selectedElement,
-		lastSelectedElement,
-		__unstableRefreshSize,
-		popoverDimensionsRecomputeCounter,
-	] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
@@ -170,14 +144,10 @@ function BlockPopover(
 			flip={ false }
 			shift={ shift }
 			{ ...props }
-			className={ classnames(
-				'block-editor-block-popover',
-				props.className
-			) }
+			className={ clsx( 'block-editor-block-popover', props.className ) }
 			variant="unstyled"
 		>
-			{ __unstableCoverTarget && <div style={ style }>{ children }</div> }
-			{ ! __unstableCoverTarget && children }
+			{ children }
 		</Popover>
 	);
 }

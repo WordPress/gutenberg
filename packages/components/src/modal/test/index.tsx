@@ -178,7 +178,9 @@ describe( 'Modal', () => {
 					{ isShown && (
 						<Modal
 							onKeyDown={ ( { key } ) => {
-								if ( key === 'o' ) setIsShown( false );
+								if ( key === 'o' ) {
+									setIsShown( false );
+								}
 							} }
 							onRequestClose={ noop }
 						>
@@ -335,7 +337,7 @@ describe( 'Modal', () => {
 		it( 'should focus the Modal dialog when `true` passed as value for `focusOnMount` prop', async () => {
 			const user = userEvent.setup();
 
-			render( <FocusMountDemo focusOnMount={ true } /> );
+			render( <FocusMountDemo focusOnMount /> );
 
 			const opener = screen.getByRole( 'button', {
 				name: 'Toggle Modal',
@@ -402,12 +404,17 @@ describe( 'Modal', () => {
 					metaKey,
 				} ) => {
 					if ( key === 'a' ) {
-						if ( metaKey ) return setIsA1Shown( ( v ) => ! v );
+						if ( metaKey ) {
+							return setIsA1Shown( ( v ) => ! v );
+						}
 						return setIsAShown( ( v ) => ! v );
 					}
-					if ( key === 'b' ) return setIsBShown( ( v ) => ! v );
-					if ( key === 'c' )
+					if ( key === 'b' ) {
+						return setIsBShown( ( v ) => ! v );
+					}
+					if ( key === 'c' ) {
 						return setIsClassOverriden( ( v ) => ! v );
+					}
 				};
 				document.addEventListener( 'keydown', toggles );
 				return () =>

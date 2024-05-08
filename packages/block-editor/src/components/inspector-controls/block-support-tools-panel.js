@@ -68,8 +68,8 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			resetAll={ resetAll }
 			key={ panelId }
 			panelId={ panelId }
-			hasInnerWrapper={ true }
-			shouldRenderPlaceholderItems={ true } // Required to maintain fills ordering.
+			hasInnerWrapper
+			shouldRenderPlaceholderItems // Required to maintain fills ordering.
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }

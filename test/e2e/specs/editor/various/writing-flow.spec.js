@@ -923,32 +923,36 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:table -->
-<figure class="wp-block-table"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<figure class="wp-block-table"><table class="has-fixed-layout"><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
 <!-- /wp:table -->` );
 	} );
 
-	test( 'should unselect all blocks when hitting double escape', async ( {
+	test( 'escape should toggle between edit and navigation modes', async ( {
 		page,
 		writingFlowUtils,
 	} ) => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Random Paragraph' );
 
+		// First escape enters navigation mode.
+		await page.keyboard.press( 'Escape' );
+		const navigationButton = page.getByLabel(
+			'Paragraph Block. Row 1. Random Paragraph'
+		);
+		await expect( navigationButton ).toBeVisible();
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
 
-		// First escape enters navigaiton mode.
+		// Second escape Toggles back to Edit Mode
 		await page.keyboard.press( 'Escape' );
+		await expect( navigationButton ).toBeHidden();
+		const blockToolbar = page.getByLabel( 'Block tools' );
+
+		await expect( blockToolbar ).toBeVisible();
 		await expect
 			.poll( writingFlowUtils.getActiveBlockName )
 			.toBe( 'core/paragraph' );
-
-		// Second escape unselects the blocks.
-		await page.keyboard.press( 'Escape' );
-		await expect
-			.poll( writingFlowUtils.getActiveBlockName )
-			.toBe( undefined );
 	} );
 
 	// Checks for regressions of https://github.com/WordPress/gutenberg/issues/40091.
@@ -1169,7 +1173,7 @@ class WritingFlowUtils {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 		await this.editor.canvas
-			.locator( 'role=button[name="Add block"i]' )
+			.locator( '.is-selected >> role=button[name="Add block"i]' )
 			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'

@@ -10,11 +10,15 @@ import { useEffect, useState } from '@wordpress/element';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import { store as blockEditorStore } from '../../store';
 import Inserter from '../inserter';
+import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
 	const blockOrder = useSelect( ( select ) => {
-		return select( blockEditorStore ).getBlockOrder();
+		const { sectionRootClientId } = unlock(
+			select( blockEditorStore ).getSettings()
+		);
+		return select( blockEditorStore ).getBlockOrder( sectionRootClientId );
 	}, [] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
@@ -31,21 +35,18 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		return null;
 	}
 
-	return blockOrder.map( ( clientId, index ) => {
-		if ( index === blockOrder.length - 1 ) {
-			return null;
-		}
+	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		return (
 			<BlockPopoverInbetween
-				key={ clientId }
+				key={ index }
 				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index + 1 ] }
+				nextClientId={ blockOrder[ index ] }
 				__unstableContentRef={ __unstableContentRef }
 			>
 				<div className="block-editor-block-list__insertion-point-inserter is-with-inserter">
 					<Inserter
 						position="bottom center"
-						clientId={ blockOrder[ index + 1 ] }
+						clientId={ blockOrder[ index ] }
 						__experimentalIsQuick
 					/>
 				</div>

@@ -1,0 +1,16 @@
+[
+	{
+		"blockName": "core/block",
+		"attrs": {
+			"ref": 123,
+			"overrides": {
+				"V98q_x": {
+					"content": "Some value"
+				}
+			}
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

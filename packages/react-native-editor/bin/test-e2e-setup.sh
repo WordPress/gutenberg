@@ -1,5 +1,13 @@
 #!/bin/bash -e
 
+# =================================================================
+# Appium Drivers
+#
+# NOTE: Please update the following versions when upgrading Appium.
+# =================================================================
+UI_AUTOMATOR_2_VERSION="2.32.3"
+XCUITEST_VERSION="5.7.0"
+
 set -o pipefail
 
 if command -v appium >/dev/null 2>&1; then
@@ -23,18 +31,30 @@ function log_error() {
 
 output=$($APPIUM_CMD driver list --installed --json)
 
-if echo "$output" | grep -q 'uiautomator2'; then
-	log_info "UiAutomator2 available."
+# UiAutomator2 driver installation
+matched_version=$(echo "$output" | jq -r '.uiautomator2.version // empty')
+if [ -z "$matched_version" ]; then
+	log_info "UiAutomator2 not installed, installing version $UI_AUTOMATOR_2_VERSION..."
+	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
+elif [ "$matched_version" = "$UI_AUTOMATOR_2_VERSION" ]; then
+	log_info "UiAutomator2 version $UI_AUTOMATOR_2_VERSION is available."
 else
-	log_info "UiAutomator2 not found, installing..."
-	$APPIUM_CMD driver install uiautomator2
+	log_info "UiAutomator2 version $matched_version is installed, replacing it with version $UI_AUTOMATOR_2_VERSION..."
+	$APPIUM_CMD driver uninstall uiautomator2
+	$APPIUM_CMD driver install "uiautomator2@$UI_AUTOMATOR_2_VERSION"
 fi
 
-if echo "$output" | grep -q 'xcuitest'; then
-	log_info "XCUITest available."
+# XCUITest driver installation
+matched_version=$(echo "$output" | jq -r '.xcuitest.version // empty')
+if [ -z "$matched_version" ]; then
+	log_info "XCUITest not installed, installing version $XCUITEST_VERSION..."
+	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
+elif [ "$matched_version" = "$XCUITEST_VERSION" ]; then
+	log_info "XCUITest version $XCUITEST_VERSION is available."
 else
-	log_info "XCUITest not found, installing..."
-	$APPIUM_CMD driver install xcuitest
+	log_info "XCUITest version $matched_version is installed, replacing it with version $XCUITEST_VERSION..."
+	$APPIUM_CMD driver uninstall xcuitest
+	$APPIUM_CMD driver install "xcuitest@$XCUITEST_VERSION"
 fi
 
 CONFIG_FILE="$(pwd)/__device-tests__/helpers/device-config.json"

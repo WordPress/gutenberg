@@ -12,7 +12,7 @@ jobs:
               with:
                   mode: exactly
                   count: 1
-                  labels: '[Type] Automated Testing, [Type] Breaking Change, [Type] Bug, [Type] Build Tooling, [Type] Code Quality, [Type] Copy, [Type] Developer Documentation, [Type] Enhancement, [Type] Experimental, [Type] Feature, [Type] New API, [Type] Task, [Type] Performance, [Type] Project Management, [Type] Regression, [Type] Security, [Type] WP Core Ticket, Backport from WordPress Core'
+                  labels: '[Type] Automated Testing, [Type] Breaking Change, [Type] Bug, [Type] Build Tooling, [Type] Code Quality, [Type] Copy, [Type] Developer Documentation, [Type] Enhancement, [Type] Experimental, [Type] Feature, [Type] New API, [Type] Task, [Type] Technical Prototype, [Type] Performance, [Type] Project Management, [Type] Regression, [Type] Security, [Type] WP Core Ticket, Backport from WordPress Core'
                   add_comment: true
                   message: "**Warning: Type of PR label mismatch**\n\n To merge this PR, it requires {{ errorString }} {{ count }} label indicating the type of PR. Other labels are optional and not being checked here. \n- **Type-related labels to choose from**: {{ provided }}.\n- **Labels found**: {{ applied }}.\n\nRead more about [Type labels in Gutenberg](https://github.com/WordPress/gutenberg/labels?q=type). Don't worry if you don't have the required permissions to add labels; the PR reviewer should be able to help with the task."
                   exit_type: failure

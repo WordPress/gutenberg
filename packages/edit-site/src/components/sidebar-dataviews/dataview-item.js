@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,7 @@ export default function DataViewItem( {
 	suffix,
 } ) {
 	const {
-		params: { path },
+		params: { path, layout },
 	} = useLocation();
 
 	const iconToUse =
@@ -37,18 +37,16 @@ export default function DataViewItem( {
 
 	const linkInfo = useLink( {
 		path,
-		activeView: isCustom === 'true' ? customViewId : slug,
-		isCustom,
+		layout,
+		activeView: isCustom ? customViewId : slug,
+		isCustom: isCustom ? 'true' : 'false',
 	} );
 	return (
 		<HStack
 			justify="flex-start"
-			className={ classnames(
-				'edit-site-sidebar-dataviews-dataview-item',
-				{
-					'is-selected': isActive,
-				}
-			) }
+			className={ clsx( 'edit-site-sidebar-dataviews-dataview-item', {
+				'is-selected': isActive,
+			} ) }
 		>
 			<SidebarNavigationItem
 				icon={ iconToUse }

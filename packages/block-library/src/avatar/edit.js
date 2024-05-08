@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -124,7 +124,7 @@ const ResizableAvatar = ( {
 				<img
 					src={ doubledSizedSrc }
 					alt={ avatar.alt }
-					className={ classnames(
+					className={ clsx(
 						'avatar',
 						'avatar-' + attributes.size,
 						'photo',
@@ -187,27 +187,17 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
-				selectUser={ true }
+				selectUser
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			<div>
-				{ attributes.isLink ? (
-					<a
-						href="#avatar-pseudo-link"
-						className="wp-block-avatar__link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						<ResizableAvatar
-							attributes={ attributes }
-							avatar={ avatar }
-							blockProps={ blockProps }
-							isSelected={ isSelected }
-							setAttributes={ setAttributes }
-						/>
-					</a>
-				) : (
+			{ attributes.isLink ? (
+				<a
+					href="#avatar-pseudo-link"
+					className="wp-block-avatar__link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
 					<ResizableAvatar
 						attributes={ attributes }
 						avatar={ avatar }
@@ -215,8 +205,16 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 						isSelected={ isSelected }
 						setAttributes={ setAttributes }
 					/>
-				) }
-			</div>
+				</a>
+			) : (
+				<ResizableAvatar
+					attributes={ attributes }
+					avatar={ avatar }
+					blockProps={ blockProps }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</>
 	);
 };

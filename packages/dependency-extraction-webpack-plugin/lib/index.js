@@ -293,7 +293,7 @@ class DependencyExtractionWebpackPlugin {
 					...Array.from( chunkStaticDeps ).sort(),
 					...Array.from( chunkDynamicDeps )
 						.sort()
-						.map( ( id ) => ( { id, type: 'dynamic' } ) ),
+						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
 				],
 				version: contentHash,
 			};

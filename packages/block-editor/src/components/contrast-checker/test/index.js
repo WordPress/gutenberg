@@ -221,7 +221,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor="#C44B4B"
 				textColor="#000000"
-				isLargeText={ true }
+				isLargeText
 			/>
 		);
 
@@ -263,7 +263,7 @@ describe( 'ContrastChecker', () => {
 				backgroundColor="#C44B4B"
 				textColor="#000000"
 				fontSize={ 23 }
-				isLargeText={ true }
+				isLargeText
 			/>
 		);
 
@@ -363,7 +363,7 @@ describe( 'ContrastChecker', () => {
 				backgroundColor={ backgroundColor }
 				textColor={ textColor }
 				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -378,7 +378,7 @@ describe( 'ContrastChecker', () => {
 				textColor={ 'rgba(0,0,0,0.9)' }
 				linkColor={ linkColor }
 				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -399,7 +399,7 @@ describe( 'ContrastChecker', () => {
 				linkColor={ 'rgba(0,0,0,0.9)' }
 				textColor={ textColor }
 				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -420,7 +420,7 @@ describe( 'ContrastChecker', () => {
 				textColor={ textColor }
 				linkColor={ linkColor }
 				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -437,7 +437,7 @@ describe( 'ContrastChecker', () => {
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -454,7 +454,7 @@ describe( 'ContrastChecker', () => {
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -477,7 +477,7 @@ describe( 'ContrastChecker', () => {
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 
@@ -498,7 +498,7 @@ describe( 'ContrastChecker', () => {
 				linkColor={ 'rgba(0,0,0,0.7)' }
 				textColor={ 'rgba(0,0,0,0.7)' }
 				isLargeText={ isLargeText }
-				enableAlphaChecker={ true }
+				enableAlphaChecker
 			/>
 		);
 

@@ -71,7 +71,7 @@ export default function GradientPalettePanel( { name } ) {
 	return (
 		<VStack
 			className="edit-site-global-styles-gradient-palette-panel"
-			spacing={ 10 }
+			spacing={ 8 }
 		>
 			{ !! themeGradients && !! themeGradients.length && (
 				<PaletteEdit
@@ -102,9 +102,6 @@ export default function GradientPalettePanel( { name } ) {
 				onChange={ setCustomGradients }
 				paletteLabel={ __( 'Custom' ) }
 				paletteLabelLevel={ 3 }
-				emptyMessage={ __(
-					'Custom gradients are empty! Add some gradients to create your own palette.'
-				) }
 				slugPrefix="custom-"
 				popoverProps={ popoverProps }
 			/>
@@ -114,8 +111,8 @@ export default function GradientPalettePanel( { name } ) {
 					<Spacer margin={ 3 } />
 					<DuotonePicker
 						duotonePalette={ duotonePalette }
-						disableCustomDuotone={ true }
-						disableCustomColors={ true }
+						disableCustomDuotone
+						disableCustomColors
 						clearable={ false }
 						onChange={ noop }
 					/>

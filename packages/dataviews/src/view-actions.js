@@ -13,7 +13,8 @@ import { settings } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { VIEW_LAYOUTS, SORTING_DIRECTIONS } from './constants';
+import { SORTING_DIRECTIONS } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -56,7 +57,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						value={ availableView.type }
 						name="view-actions-available-view"
 						checked={ availableView.type === view.type }
-						hideOnClick={ true }
+						hideOnClick
 						onChange={ ( e ) => {
 							onChangeView( {
 								...view,
@@ -83,8 +84,7 @@ function PageSizeMenu( { view, onChangeView } ) {
 					suffix={ <span aria-hidden="true">{ view.perPage }</span> }
 				>
 					<DropdownMenuItemLabel>
-						{ /* TODO: probably label per view type. */ }
-						{ __( 'Rows per page' ) }
+						{ __( 'Items per page' ) }
 					</DropdownMenuItemLabel>
 				</DropdownMenuItem>
 			}
@@ -267,13 +267,11 @@ const ViewActions = memo( function ViewActions( {
 			}
 		>
 			<DropdownMenuGroup>
-				{ window?.__experimentalAdminViews && (
-					<ViewTypeMenu
-						view={ view }
-						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
-					/>
-				) }
+				<ViewTypeMenu
+					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
+				/>
 				<SortMenu
 					fields={ fields }
 					view={ view }

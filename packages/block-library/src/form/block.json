@@ -5,6 +5,15 @@
 	"name": "core/form",
 	"title": "Form",
 	"category": "common",
+	"allowedBlocks": [
+		"core/paragraph",
+		"core/heading",
+		"core/form-input",
+		"core/form-submit-button",
+		"core/form-submission-notification",
+		"core/group",
+		"core/columns"
+	],
 	"description": "A form.",
 	"keywords": [ "container", "wrapper", "row", "section" ],
 	"textdomain": "default",

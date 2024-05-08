@@ -66,7 +66,7 @@ function Revisions( { userConfig, blocks } ) {
 		<EditorCanvasContainer
 			title={ __( 'Revisions' ) }
 			closeButtonLabel={ __( 'Close revisions' ) }
-			enableResizing={ true }
+			enableResizing
 		>
 			<Iframe
 				className="edit-site-revisions__iframe"

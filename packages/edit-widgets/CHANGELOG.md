@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 5.34.0 (2024-05-02)
+
+## 5.33.0 (2024-04-19)
+
+## 5.32.0 (2024-04-03)
+
+## 5.31.0 (2024-03-21)
+
+## 5.30.0 (2024-03-06)
+
+## 5.29.0 (2024-02-21)
+
+## 5.28.0 (2024-02-09)
+
+## 5.27.0 (2024-01-24)
+
 ## 5.26.0 (2024-01-10)
 
 ## 5.25.0 (2023-12-13)
@@ -130,8 +150,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 1.3.0 (2021-03-17)
 

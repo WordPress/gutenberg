@@ -17,9 +17,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import { useState } from 'react';
 import {
+	BlockCanvas,
 	BlockEditorProvider,
 	BlockList,
-	WritingFlow,
 } from '@wordpress/block-editor';
 
 function MyEditorComponent() {
@@ -707,6 +707,23 @@ _Related_
 
 Private @wordpress/block-editor APIs.
 
+### RecursionProvider
+
+A React context provider for use with the `useHasRecursion` hook to prevent recursive renders.
+
+Wrap block content with this provider and provide the same `uniqueId` prop as used with `useHasRecursion`.
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _props.blockName_ `string`: Optional block name.
+-   _props.children_ `JSX.Element`: React children.
+
+_Returns_
+
+-   `JSX.Element`: A React element.
+
 ### ReusableBlocksRenameHint
 
 Undocumented declaration.
@@ -941,6 +958,21 @@ _Returns_
 
 -   `any`: value
 
+### useHasRecursion
+
+A React hook for keeping track of blocks previously rendered up in the block tree. Blocks susceptible to recursion can use this hook in their `Edit` function to prevent said recursion.
+
+Use this with the `RecursionProvider` component, using the same `uniqueId` value for both the hook and the provider.
+
+_Parameters_
+
+-   _uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
+-   _blockName_ `string`: Optional block name.
+
+_Returns_
+
+-   `boolean`: A boolean describing whether the provided id has already been rendered.
+
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper element. Call this hook and pass the returned props to the element to mark as an inner blocks wrapper, automatically rendering inner blocks as children. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
@@ -995,6 +1027,14 @@ _Parameters_
 _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
+
+### useZoomOut
+
+A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+
+_Parameters_
+
+-   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
 
 ### Warning
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -25,19 +25,20 @@ function ChangesSummary( { revision, previousRevision } ) {
 	const changes = getGlobalStylesChanges( revision, previousRevision, {
 		maxResults: 7,
 	} );
-	const changesLength = changes.length;
 
-	if ( ! changesLength ) {
+	if ( ! changes.length ) {
 		return null;
 	}
 
 	return (
-		<span
+		<ul
 			data-testid="global-styles-revision-changes"
 			className="edit-site-global-styles-screen-revisions__changes"
 		>
-			{ changes.join( ', ' ) }
-		</span>
+			{ changes.map( ( change ) => (
+				<li key={ change }>{ change }</li>
+			) ) }
+		</ul>
 	);
 }
 
@@ -149,7 +150,7 @@ function RevisionsButtons( {
 
 				return (
 					<li
-						className={ classnames(
+						className={ clsx(
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,
@@ -219,6 +220,7 @@ function RevisionsButtons( {
 							) : (
 								<Button
 									disabled={ areStylesEqual }
+									size="compact"
 									variant="primary"
 									className="edit-site-global-styles-screen-revisions__apply-button"
 									onClick={ onApplyRevision }

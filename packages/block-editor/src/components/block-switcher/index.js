@@ -21,7 +21,6 @@ import { copy } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
@@ -161,8 +160,7 @@ function BlockSwitcherDropdownMenuContents( {
 	);
 }
 
-export const BlockSwitcher = ( { clientIds } ) => {
-	const blockInformation = useBlockDisplayInformation( clientIds?.[ 0 ] );
+export const BlockSwitcher = ( { clientIds, disabled } ) => {
 	const {
 		canRemove,
 		hasBlockStyles,
@@ -175,28 +173,38 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			const {
 				getBlockRootClientId,
 				getBlocksByClientId,
+				getBlockAttributes,
 				canRemoveBlocks,
 			} = select( blockEditorStore );
-			const { getBlockStyles, getBlockType } = select( blocksStore );
+			const { getBlockStyles, getBlockType, getActiveBlockVariation } =
+				select( blocksStore );
 			const _blocks = getBlocksByClientId( clientIds );
 			if ( ! _blocks.length || _blocks.some( ( block ) => ! block ) ) {
 				return { invalidBlocks: true };
 			}
-			const rootClientId = getBlockRootClientId( clientIds );
+			const rootClientId = getBlockRootClientId(
+				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
+			);
 			const [ { name: firstBlockName } ] = _blocks;
 			const _isSingleBlockSelected = _blocks.length === 1;
+			const blockType = getBlockType( firstBlockName );
+
 			let _icon;
 			if ( _isSingleBlockSelected ) {
-				_icon = blockInformation?.icon; // Take into account active block variations.
+				const match = getActiveBlockVariation(
+					firstBlockName,
+					getBlockAttributes( clientIds[ 0 ] )
+				);
+				// Take into account active block variations.
+				_icon = match?.icon || blockType.icon;
 			} else {
 				const isSelectionOfSameType =
 					new Set( _blocks.map( ( { name } ) => name ) ).size === 1;
 				// When selection consists of blocks of multiple types, display an
 				// appropriate icon to communicate the non-uniformity.
-				_icon = isSelectionOfSameType
-					? getBlockType( firstBlockName )?.icon
-					: copy;
+				_icon = isSelectionOfSameType ? blockType.icon : copy;
 			}
+
 			return {
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
 				hasBlockStyles:
@@ -209,7 +217,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 					_isSingleBlockSelected && isTemplatePart( _blocks[ 0 ] ),
 			};
 		},
-		[ clientIds, blockInformation?.icon ]
+		[ clientIds ]
 	);
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: clientIds?.[ 0 ],
@@ -218,14 +226,20 @@ export const BlockSwitcher = ( { clientIds } ) => {
 	if ( invalidBlocks ) {
 		return null;
 	}
-	const hideDropdown = ! hasBlockStyles && ! canRemove;
+
+	const isSingleBlock = clientIds.length === 1;
+	const blockSwitcherLabel = isSingleBlock
+		? blockTitle
+		: __( 'Multiple blocks selected' );
+
+	const hideDropdown = disabled || ( ! hasBlockStyles && ! canRemove );
 	if ( hideDropdown ) {
 		return (
 			<ToolbarGroup>
 				<ToolbarButton
 					disabled
 					className="block-editor-block-switcher__no-switcher-icon"
-					title={ blockTitle }
+					title={ blockSwitcherLabel }
 					icon={
 						<>
 							<BlockIcon icon={ icon } showColors />
@@ -240,10 +254,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 			</ToolbarGroup>
 		);
 	}
-	const isSingleBlock = clientIds.length === 1;
-	const blockSwitcherLabel = isSingleBlock
-		? blockTitle
-		: __( 'Multiple blocks selected' );
+
 	const blockSwitcherDescription = isSingleBlock
 		? __( 'Change block type or style' )
 		: sprintf(

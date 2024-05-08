@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 const TEMPLATE = [
 	[
@@ -29,7 +29,7 @@ const TEMPLATE = [
 const Edit = ( { attributes, clientId } ) => {
 	const { type } = attributes;
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-form-submission-notification', {
+		className: clsx( 'wp-block-form-submission-notification', {
 			[ `form-notification-type-${ type }` ]: type,
 		} ),
 	} );

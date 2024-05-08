@@ -19,7 +19,7 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 		( select ) => ( {
 			shortcut: select(
 				keyboardShortcutsStore
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			).getShortcutRepresentation( 'core/editor/toggle-sidebar' ),
 			areAdvancedSettingsOpened:
 				select( editPostStore ).getActiveGeneralSidebarName() ===
 				'edit-post/block',

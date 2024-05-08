@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ export default function PostNavigationLinkEdit( {
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -66,7 +66,6 @@ export default function PostNavigationLinkEdit( {
 			const filteredTaxonomies = getTaxonomies( {
 				type: postType,
 				per_page: -1,
-				context: 'view',
 			} );
 			return filteredTaxonomies;
 		},
@@ -78,11 +77,7 @@ export default function PostNavigationLinkEdit( {
 			value: '',
 		};
 		const taxonomyOptions = ( taxonomies ?? [] )
-			.filter(
-				( tax ) =>
-					tax.slug !== 'nav_menu' &&
-					tax.slug !== 'wp_pattern_category'
-			)
+			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
 			.map( ( item ) => {
 				return {
 					value: item.slug,
@@ -168,7 +163,6 @@ export default function PostNavigationLinkEdit( {
 					onChange={ ( value ) =>
 						setAttributes( {
 							taxonomy: value,
-							inSameTerm: value === '' ? false : true,
 						} )
 					}
 					help={ __(
@@ -194,6 +188,7 @@ export default function PostNavigationLinkEdit( {
 				) }
 				<RichText
 					tagName="a"
+					identifier="label"
 					aria-label={ ariaLabel }
 					placeholder={ placeholder }
 					value={ label }
@@ -213,7 +208,7 @@ export default function PostNavigationLinkEdit( {
 				{ isNext && displayArrow && (
 					<span
 						className={ `wp-block-post-navigation-link__arrow-next is-arrow-${ arrow }` }
-						aria-hidden={ true }
+						aria-hidden
 					>
 						{ displayArrow }
 					</span>

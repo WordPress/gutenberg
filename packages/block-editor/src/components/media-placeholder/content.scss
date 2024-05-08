@@ -1,10 +1,3 @@
-.block-editor-media-placeholder__url-input-container {
-	// Reset the margin to ensure the url popover is adjacent to the button.
-	.block-editor-media-placeholder__button {
-		margin-bottom: 0;
-	}
-}
-
 .block-editor-media-placeholder__url-input-form {
 	display: flex;
 
@@ -27,10 +20,6 @@
 
 .block-editor-media-placeholder__url-input-submit-button {
 	flex-shrink: 1;
-}
-
-.block-editor-media-placeholder__button {
-	margin-bottom: 0.5rem;
 }
 
 .block-editor-media-placeholder__cancel-button.is-link {

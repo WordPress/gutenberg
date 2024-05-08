@@ -471,7 +471,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >`: Current user object.
+-   `ET.User< 'edit' >`: Current user object.
 
 ### getDefaultTemplateId
 
@@ -499,7 +499,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< EntityRecord > | undefined`: The entity record, merged with its edits.
+-   `ET.Updatable< EntityRecord > | false`: The entity record, merged with its edits.
 
 ### getEmbedPreview
 
@@ -825,7 +825,7 @@ _Parameters_
 
 _Returns_
 
--   `undefined< 'edit' >[]`: Users list.
+-   `ET.User< 'edit' >[]`: Users list.
 
 ### hasEditsForEntityRecord
 

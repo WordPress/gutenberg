@@ -3,18 +3,6 @@
  */
 import { combineReducers } from '@wordpress/data';
 
-export function publishSidebarActive( state = false, action ) {
-	switch ( action.type ) {
-		case 'OPEN_PUBLISH_SIDEBAR':
-			return true;
-		case 'CLOSE_PUBLISH_SIDEBAR':
-			return false;
-		case 'TOGGLE_PUBLISH_SIDEBAR':
-			return ! state;
-	}
-	return state;
-}
-
 /**
  * Reducer keeping track of the meta boxes isSaving state.
  * A "true" value means the meta boxes saving request is in-flight.
@@ -103,5 +91,4 @@ const metaBoxes = combineReducers( {
 
 export default combineReducers( {
 	metaBoxes,
-	publishSidebarActive,
 } );

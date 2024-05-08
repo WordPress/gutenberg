@@ -18,12 +18,13 @@ import { store } from '../../store';
 let MemoizedBlockList;
 
 const MAX_HEIGHT = 2000;
+const EMPTY_ADDITIONAL_STYLES = [];
 
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
 	minHeight,
-	additionalStyles = [],
+	additionalStyles = EMPTY_ADDITIONAL_STYLES,
 } ) {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;

@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+## 6.34.0 (2024-05-02)
+
+-   Added new `observableMap` data structure and `useObservableValue` React hook ([#60945](https://github.com/WordPress/gutenberg/pull/60945)).
+
+## 6.33.0 (2024-04-19)
+
+## 6.32.0 (2024-04-03)
+
+## 6.31.0 (2024-03-21)
+
+## 6.30.0 (2024-03-06)
+
+## 6.29.0 (2024-02-21)
+
+## 6.28.0 (2024-02-09)
+
+## 6.27.0 (2024-01-24)
+
 ### Deprecations
 
 -   The `pure` HoC has been deprecated. Use `memo` or `PureComponent` instead ([#57173](https://github.com/WordPress/gutenberg/pull/57173)).

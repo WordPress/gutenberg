@@ -4,13 +4,24 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function ResetFilter( { view, onChangeView } ) {
+export default function ResetFilter( { filters, view, onChangeView } ) {
+	const isPrimary = ( field ) =>
+		filters.some(
+			( _filter ) => _filter.field === field && _filter.isPrimary
+		);
+	const isDisabled =
+		! view.search &&
+		! view.filters?.some(
+			( _filter ) =>
+				_filter.value !== undefined || ! isPrimary( _filter.field )
+		);
 	return (
 		<Button
-			disabled={ view.search === '' && view.filters?.length === 0 }
+			disabled={ isDisabled }
 			__experimentalIsFocusable
 			size="compact"
 			variant="tertiary"
+			className="dataviews-filters__reset-button"
 			onClick={ () => {
 				onChangeView( {
 					...view,
@@ -20,7 +31,7 @@ export default function ResetFilter( { view, onChangeView } ) {
 				} );
 			} }
 		>
-			{ __( 'Reset filters' ) }
+			{ __( 'Reset' ) }
 		</Button>
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import {
 	ErrorBoundary,
 	PostLockedModal,
@@ -11,7 +11,6 @@ import {
 import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { CommandMenu } from '@wordpress/commands';
 
 /**
@@ -21,7 +20,7 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import { store as editPostStore } from './store';
 import { unlock } from './lock-unlock';
-import usePostHistory from './hooks/use-post-history';
+import useNavigateToEntityRecord from './hooks/use-navigate-to-entity-record';
 
 const { ExperimentalEditorProvider } = unlock( editorPrivateApis );
 
@@ -32,89 +31,64 @@ function Editor( {
 	initialEdits,
 	...props
 } ) {
-	const { currentPost, getPostLinkProps, goBack } = usePostHistory(
+	const {
+		currentPost,
+		onNavigateToEntityRecord,
+		onNavigateToPreviousEntityRecord,
+	} = useNavigateToEntityRecord(
 		initialPostId,
-		initialPostType
+		initialPostType,
+		'post-only'
 	);
 
-	const { hasInlineToolbar, post, preferredStyleVariations, template } =
-		useSelect(
-			( select ) => {
-				const { isFeatureActive, getEditedPostTemplate } =
-					select( editPostStore );
-				const {
-					getEntityRecord,
-					getPostType,
-					getEntityRecords,
-					canUser,
-				} = select( coreStore );
-				const { getEditorSettings } = select( editorStore );
-				const isTemplate = [
-					'wp_template',
-					'wp_template_part',
-				].includes( currentPost.postType );
-				// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
-				// to avoid the special case.
-				let postObject;
-				if ( isTemplate ) {
-					const posts = getEntityRecords(
-						'postType',
-						currentPost.postType,
-						{
-							wp_id: currentPost.postId,
-						}
-					);
-					postObject = posts?.[ 0 ];
-				} else {
-					postObject = getEntityRecord(
-						'postType',
-						currentPost.postType,
-						currentPost.postId
-					);
-				}
-				const supportsTemplateMode =
-					getEditorSettings().supportsTemplateMode;
-				const isViewable =
-					getPostType( currentPost.postType )?.viewable ?? false;
-				const canEditTemplate = canUser( 'create', 'templates' );
-				return {
-					hasInlineToolbar: isFeatureActive( 'inlineToolbar' ),
-					preferredStyleVariations: select( preferencesStore ).get(
-						'core/edit-post',
-						'preferredStyleVariations'
-					),
-					template:
-						supportsTemplateMode && isViewable && canEditTemplate
-							? getEditedPostTemplate()
-							: null,
-					post: postObject,
-				};
-			},
-			[ currentPost.postType, currentPost.postId ]
-		);
+	const { post, template } = useSelect(
+		( select ) => {
+			const { getEditedPostTemplate } = select( editPostStore );
+			const { getEntityRecord, getPostType, canUser } =
+				select( coreStore );
+			const { getEditorSettings } = select( editorStore );
 
-	const { updatePreferredStyleVariations } = useDispatch( editPostStore );
+			const postObject = getEntityRecord(
+				'postType',
+				currentPost.postType,
+				currentPost.postId
+			);
 
-	const editorSettings = useMemo( () => {
-		const result = {
+			const supportsTemplateMode =
+				getEditorSettings().supportsTemplateMode;
+			const isViewable =
+				getPostType( currentPost.postType )?.viewable ?? false;
+			const canViewTemplate = canUser( 'read', 'templates' );
+			return {
+				template:
+					supportsTemplateMode &&
+					isViewable &&
+					canViewTemplate &&
+					currentPost.postType !== 'wp_template'
+						? getEditedPostTemplate()
+						: null,
+				post: postObject,
+			};
+		},
+		[ currentPost.postType, currentPost.postId ]
+	);
+
+	const editorSettings = useMemo(
+		() => ( {
 			...settings,
-			getPostLinkProps,
-			goBack,
-			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
-				onChange: updatePreferredStyleVariations,
-			},
-			hasInlineToolbar,
+			onNavigateToEntityRecord,
+			onNavigateToPreviousEntityRecord,
+			defaultRenderingMode: 'post-only',
+		} ),
+		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
+	);
+
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
 		};
-		return result;
-	}, [
-		settings,
-		hasInlineToolbar,
-		preferredStyleVariations,
-		updatePreferredStyleVariations,
-		getPostLinkProps,
-		goBack,
-	] );
+	}, [ initialPostType, initialPostId ] );
 
 	if ( ! post ) {
 		return null;
@@ -132,8 +106,8 @@ function Editor( {
 			>
 				<ErrorBoundary>
 					<CommandMenu />
-					<EditorInitialization postId={ currentPost.postId } />
-					<Layout />
+					<EditorInitialization />
+					<Layout initialPost={ initialPost } />
 				</ErrorBoundary>
 				<PostLockedModal />
 			</ExperimentalEditorProvider>

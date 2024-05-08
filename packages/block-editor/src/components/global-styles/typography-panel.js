@@ -13,7 +13,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { mergeOrigins, hasMergedOrigins } from '../use-settings';
+import { mergeOrigins, hasOriginValue } from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -22,7 +22,7 @@ import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { setImmutably, uniqByProperty } from '../../utils/object';
+import { setImmutably } from '../../utils/object';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -62,7 +62,7 @@ function useHasFontSizeControl( settings ) {
 }
 
 function useHasFontFamilyControl( settings ) {
-	return hasMergedOrigins( settings?.typography?.fontFamilies );
+	return hasOriginValue( settings?.typography?.fontFamilies );
 }
 
 function useHasLineHeightControl( settings ) {
@@ -104,44 +104,20 @@ function useHasTextColumnsControl( settings ) {
 }
 
 /**
- * TODO: The reversing and filtering of default font sizes is a hack so the
- * dropdown UI matches what is generated in the global styles CSS stylesheet.
- *
- * This is a temporary solution until #57733 is resolved. At which point,
- * the mergedFontSizes would just need to be the concatenated array of all
- * presets or a custom dropdown with sections for each.
- *
- * @see {@link https://github.com/WordPress/gutenberg/issues/57733}
+ * Concatenate all the font sizes into a single list for the font size picker.
  *
  * @param {Object} settings The global styles settings.
  *
  * @return {Array} The merged font sizes.
  */
 function getMergedFontSizes( settings ) {
-	// The font size presets are merged in reverse order so that the duplicates
-	// that may defined later in the array have higher priority to match the CSS.
-	const mergedFontSizesAll = uniqByProperty(
-		[
-			settings?.typography?.fontSizes?.custom,
-			settings?.typography?.fontSizes?.theme,
-			settings?.typography?.fontSizes?.default,
-		].flatMap( ( presets ) => presets?.toReversed() ?? [] ),
-		'slug'
-	).reverse();
-
-	// Default presets exist in the global styles CSS no matter the setting, so
-	// filtering them out in the UI has to be done after merging.
-	const mergedFontSizes =
-		settings?.typography?.defaultFontSizes === false
-			? mergedFontSizesAll.filter(
-					( { slug } ) =>
-						! [ 'small', 'medium', 'large', 'x-large' ].includes(
-							slug
-						)
-			  )
-			: mergedFontSizesAll;
-
-	return mergedFontSizes;
+	const fontSizes = settings?.typography?.fontSizes;
+	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
+	return [
+		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+	];
 }
 
 function TypographyToolsPanel( {
@@ -194,7 +170,7 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies;
+	const fontFamilies = settings?.typography?.fontFamilies ?? {};
 	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
@@ -374,7 +350,7 @@ export default function TypographyPanel( {
 		>
 			{ hasFontFamilyEnabled && (
 				<ToolsPanelItem
-					label={ __( 'Font family' ) }
+					label={ __( 'Font' ) }
 					hasValue={ hasFontFamily }
 					onDeselect={ resetFontFamily }
 					isShownByDefault={ defaultControls.fontFamily }
@@ -391,7 +367,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasFontSizeEnabled && (
 				<ToolsPanelItem
-					label={ __( 'Font size' ) }
+					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
 					onDeselect={ resetFontSize }
 					isShownByDefault={ defaultControls.fontSize }
@@ -405,7 +381,6 @@ export default function TypographyPanel( {
 						withReset={ false }
 						withSlider
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -469,14 +444,14 @@ export default function TypographyPanel( {
 			{ hasTextColumnsControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text columns' ) }
+					label={ __( 'Columns' ) }
 					hasValue={ hasTextColumns }
 					onDeselect={ resetTextColumns }
 					isShownByDefault={ defaultControls.textColumns }
 					panelId={ panelId }
 				>
 					<NumberControl
-						label={ __( 'Text columns' ) }
+						label={ __( 'Columns' ) }
 						max={ MAX_TEXT_COLUMNS }
 						min={ MIN_TEXT_COLUMNS }
 						onChange={ setTextColumns }
@@ -490,7 +465,7 @@ export default function TypographyPanel( {
 			{ hasTextDecorationControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text decoration' ) }
+					label={ __( 'Decoration' ) }
 					hasValue={ hasTextDecoration }
 					onDeselect={ resetTextDecoration }
 					isShownByDefault={ defaultControls.textDecoration }
@@ -507,7 +482,7 @@ export default function TypographyPanel( {
 			{ hasWritingModeControl && (
 				<ToolsPanelItem
 					className="single-column"
-					label={ __( 'Text orientation' ) }
+					label={ __( 'Orientation' ) }
 					hasValue={ hasWritingMode }
 					onDeselect={ resetWritingMode }
 					isShownByDefault={ defaultControls.writingMode }

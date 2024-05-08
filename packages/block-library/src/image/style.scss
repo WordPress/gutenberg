@@ -301,7 +301,7 @@
 			animation: both turn-on-visibility 0.35s;
 		}
 	}
-	&.hideanimationenabled {
+	&.show-closing-animation {
 		&:not(.active) {
 			animation: both turn-off-visibility 0.35s;
 			img {
@@ -327,7 +327,7 @@
 					animation: turn-on-visibility 0.4s forwards;
 				}
 			}
-			&.hideanimationenabled {
+			&.show-closing-animation {
 				&:not(.active) {
 					animation: none;
 					.lightbox-image-container {

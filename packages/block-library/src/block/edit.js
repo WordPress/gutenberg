@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,8 +18,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
+	RecursionProvider,
+	useHasRecursion,
 	InnerBlocks,
 	useBlockProps,
 	Warning,
@@ -28,36 +28,38 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { parse, cloneBlock } from '@wordpress/blocks';
+import { parse, cloneBlock, store as blocksStore } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
+import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
-const { PARTIAL_SYNCING_SUPPORTED_BLOCKS } = unlock( patternsPrivateApis );
-
-function isPartiallySynced( block ) {
-	return (
-		Object.keys( PARTIAL_SYNCING_SUPPORTED_BLOCKS ).includes(
-			block.name
-		) &&
-		!! block.attributes.metadata?.bindings &&
-		Object.values( block.attributes.metadata.bindings ).some(
-			( binding ) => binding.source.name === 'pattern_attributes'
-		)
-	);
-}
-function getPartiallySyncedAttributes( block ) {
-	return Object.entries( block.attributes.metadata.bindings )
-		.filter(
-			( [ , binding ] ) => binding.source.name === 'pattern_attributes'
-		)
-		.map( ( [ attributeKey ] ) => attributeKey );
-}
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
+
+function getLegacyIdMap( blocks, content, nameCount = {} ) {
+	let idToClientIdMap = {};
+	for ( const block of blocks ) {
+		if ( block?.innerBlocks?.length ) {
+			idToClientIdMap = {
+				...idToClientIdMap,
+				...getLegacyIdMap( block.innerBlocks, content, nameCount ),
+			};
+		}
+
+		const id = block.attributes.metadata?.id;
+		const clientId = block.clientId;
+		if ( id && content?.[ id ] ) {
+			idToClientIdMap[ clientId ] = id;
+		}
+	}
+	return idToClientIdMap;
+}
 
 const useInferredLayout = ( blocks, parentLayout ) => {
 	const initialInferredAlignmentRef = useRef();
@@ -88,25 +90,53 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
+function hasOverridableBlocks( blocks ) {
+	return blocks.some( ( block ) => {
+		if ( isOverridableBlock( block ) ) {
+			return true;
+		}
+		return hasOverridableBlocks( block.innerBlocks );
+	} );
+}
+
+function getOverridableAttributes( block ) {
+	return Object.entries( block.attributes.metadata.bindings )
+		.filter(
+			( [ , binding ] ) => binding.source === 'core/pattern-overrides'
+		)
+		.map( ( [ attributeKey ] ) => attributeKey );
+}
+
+function applyInitialContentValuesToInnerBlocks(
+	blocks,
+	content = {},
+	defaultValues,
+	legacyIdMap
+) {
 	return blocks.map( ( block ) => {
-		const innerBlocks = applyInitialOverrides(
+		const innerBlocks = applyInitialContentValuesToInnerBlocks(
 			block.innerBlocks,
-			overrides,
-			defaultValues
+			content,
+			defaultValues,
+			legacyIdMap
 		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId )
+		const metadataName =
+			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
+
+		if ( ! metadataName || ! isOverridableBlock( block ) ) {
 			return { ...block, innerBlocks };
-		const attributes = getPartiallySyncedAttributes( block );
+		}
+
+		const attributes = getOverridableAttributes( block );
 		const newAttributes = { ...block.attributes };
 		for ( const attributeKey of attributes ) {
-			defaultValues[ blockId ] ??= {};
-			defaultValues[ blockId ][ attributeKey ] =
+			defaultValues[ metadataName ] ??= {};
+			defaultValues[ metadataName ][ attributeKey ] =
 				block.attributes[ attributeKey ];
-			if ( overrides[ blockId ]?.[ attributeKey ] !== undefined ) {
-				newAttributes[ attributeKey ] =
-					overrides[ blockId ][ attributeKey ];
+
+			const contentValues = content[ metadataName ];
+			if ( contentValues?.[ attributeKey ] !== undefined ) {
+				newAttributes[ attributeKey ] = contentValues[ attributeKey ];
 			}
 		}
 		return {
@@ -117,66 +147,131 @@ function applyInitialOverrides( blocks, overrides = {}, defaultValues ) {
 	} );
 }
 
-function getOverridesFromBlocks( blocks, defaultValues ) {
-	/** @type {Record<string, Record<string, unknown>>} */
-	const overrides = {};
+function isAttributeEqual( attribute1, attribute2 ) {
+	if (
+		attribute1 instanceof RichTextData &&
+		attribute2 instanceof RichTextData
+	) {
+		return attribute1.toString() === attribute2.toString();
+	}
+	return attribute1 === attribute2;
+}
+
+function getContentValuesFromInnerBlocks( blocks, defaultValues, legacyIdMap ) {
+	/** @type {Record<string, { values: Record<string, unknown>}>} */
+	const content = {};
 	for ( const block of blocks ) {
-		Object.assign(
-			overrides,
-			getOverridesFromBlocks( block.innerBlocks, defaultValues )
-		);
-		const blockId = block.attributes.metadata?.id;
-		if ( ! isPartiallySynced( block ) || ! blockId ) continue;
-		const attributes = getPartiallySyncedAttributes( block );
+		if ( block.name === patternBlockName ) {
+			continue;
+		}
+		if ( block.innerBlocks.length ) {
+			Object.assign(
+				content,
+				getContentValuesFromInnerBlocks(
+					block.innerBlocks,
+					defaultValues,
+					legacyIdMap
+				)
+			);
+		}
+		const metadataName =
+			legacyIdMap?.[ block.clientId ] ?? block.attributes.metadata?.name;
+		if ( ! metadataName || ! isOverridableBlock( block ) ) {
+			continue;
+		}
+
+		const attributes = getOverridableAttributes( block );
+
 		for ( const attributeKey of attributes ) {
 			if (
-				block.attributes[ attributeKey ] !==
-				defaultValues[ blockId ][ attributeKey ]
+				! isAttributeEqual(
+					block.attributes[ attributeKey ],
+					defaultValues?.[ metadataName ]?.[ attributeKey ]
+				)
 			) {
-				overrides[ blockId ] ??= {};
+				content[ metadataName ] ??= {};
 				// TODO: We need a way to represent `undefined` in the serialized overrides.
 				// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
-				overrides[ blockId ][ attributeKey ] =
-					block.attributes[ attributeKey ];
+				content[ metadataName ][ attributeKey ] =
+					block.attributes[ attributeKey ] === undefined
+						? // TODO: We use an empty string to represent undefined for now until
+						  // we support a richer format for overrides and the block binding API.
+						  // Currently only the `linkTarget` attribute of `core/button` is affected.
+						  ''
+						: block.attributes[ attributeKey ];
 			}
 		}
 	}
-	return Object.keys( overrides ).length > 0 ? overrides : undefined;
+	return Object.keys( content ).length > 0 ? content : undefined;
 }
 
 function setBlockEditMode( setEditMode, blocks, mode ) {
 	blocks.forEach( ( block ) => {
 		const editMode =
-			mode || ( isPartiallySynced( block ) ? 'contentOnly' : 'disabled' );
+			mode ||
+			( isOverridableBlock( block ) ? 'contentOnly' : 'disabled' );
 		setEditMode( block.clientId, editMode );
-		setBlockEditMode( setEditMode, block.innerBlocks, mode );
+
+		setBlockEditMode(
+			setEditMode,
+			block.innerBlocks,
+			// Disable editing for nested patterns.
+			block.name === patternBlockName ? 'disabled' : mode
+		);
 	} );
 }
 
-function getHasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isPartiallySynced( block ) ) return true;
-		return getHasOverridableBlocks( block.innerBlocks );
-	} );
+function RecursionWarning() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
 }
 
-export default function ReusableBlockEdit( {
+// Wrap the main Edit function for the pattern block with a recursion wrapper
+// that allows short-circuiting rendering as early as possible, before any
+// of the other effects in the block edit have run.
+export default function ReusableBlockEditRecursionWrapper( props ) {
+	const { ref } = props.attributes;
+	const hasAlreadyRendered = useHasRecursion( ref );
+
+	if ( hasAlreadyRendered ) {
+		return <RecursionWarning />;
+	}
+
+	return (
+		<RecursionProvider uniqueId={ ref }>
+			<ReusableBlockEdit { ...props } />
+		</RecursionProvider>
+	);
+}
+
+function ReusableBlockEdit( {
 	name,
-	attributes: { ref, overrides },
+	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	clientId: patternClientId,
 	setAttributes,
 } ) {
 	const registry = useRegistry();
-	const hasAlreadyRendered = useHasRecursion( ref );
 	const { record, editedRecord, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
 	);
 	const isMissing = hasResolved && ! record;
-	const initialOverrides = useRef( overrides );
-	const defaultValuesRef = useRef( {} );
+
+	// The value of the `content` attribute, stored in a `ref` to avoid triggering the effect
+	// that runs `applyInitialContentValuesToInnerBlocks` unnecessarily.
+	const contentRef = useRef( content );
+
+	// The default content values from the original pattern for overridable attributes.
+	// Set by the `applyInitialContentValuesToInnerBlocks` function.
+	const defaultContent = useRef( {} );
 
 	const {
 		replaceInnerBlocks,
@@ -185,45 +280,61 @@ export default function ReusableBlockEdit( {
 	} = useDispatch( blockEditorStore );
 	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 
-	const { innerBlocks, userCanEdit, getBlockEditingMode, getPostLinkProps } =
-		useSelect(
-			( select ) => {
-				const { canUser } = select( coreStore );
-				const {
-					getBlocks,
-					getBlockEditingMode: editingMode,
-					getSettings,
-				} = select( blockEditorStore );
-				const blocks = getBlocks( patternClientId );
-				const canEdit = canUser( 'update', 'blocks', ref );
+	const {
+		innerBlocks,
+		userCanEdit,
+		getBlockEditingMode,
+		onNavigateToEntityRecord,
+		editingMode,
+		hasPatternOverridesSource,
+	} = useSelect(
+		( select ) => {
+			const { canUser } = select( coreStore );
+			const {
+				getBlocks,
+				getSettings,
+				getBlockEditingMode: _getBlockEditingMode,
+			} = select( blockEditorStore );
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const blocks = getBlocks( patternClientId );
+			const canEdit = canUser( 'update', 'blocks', ref );
 
-				// For editing link to the site editor if the theme and user permissions support it.
-				return {
-					innerBlocks: blocks,
-					userCanEdit: canEdit,
-					getBlockEditingMode: editingMode,
-					getPostLinkProps: getSettings().getPostLinkProps,
-				};
-			},
-			[ patternClientId, ref ]
-		);
-
-	const editOriginalProps = getPostLinkProps
-		? getPostLinkProps( {
-				postId: ref,
-				postType: 'wp_block',
-				canvas: 'edit',
-		  } )
-		: {};
-
-	useEffect(
-		() => setBlockEditMode( setBlockEditingMode, innerBlocks ),
-		[ innerBlocks, setBlockEditingMode ]
+			// For editing link to the site editor if the theme and user permissions support it.
+			return {
+				innerBlocks: blocks,
+				userCanEdit: canEdit,
+				getBlockEditingMode: _getBlockEditingMode,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				editingMode: _getBlockEditingMode( patternClientId ),
+				hasPatternOverridesSource: !! getBlockBindingsSource(
+					'core/pattern-overrides'
+				),
+			};
+		},
+		[ patternClientId, ref ]
 	);
 
-	const hasOverridableBlocks = useMemo(
-		() => getHasOverridableBlocks( innerBlocks ),
-		[ innerBlocks ]
+	// Sync the editing mode of the pattern block with the inner blocks.
+	useEffect( () => {
+		setBlockEditMode(
+			setBlockEditingMode,
+			innerBlocks,
+			// Disable editing if the pattern itself is disabled.
+			editingMode === 'disabled' || ! hasPatternOverridesSource
+				? 'disabled'
+				: undefined
+		);
+	}, [
+		editingMode,
+		innerBlocks,
+		setBlockEditingMode,
+		hasPatternOverridesSource,
+	] );
+
+	const canOverrideBlocks = useMemo(
+		() => hasPatternOverridesSource && hasOverridableBlocks( innerBlocks ),
+		[ hasPatternOverridesSource, innerBlocks ]
 	);
 
 	const initialBlocks = useMemo(
@@ -236,26 +347,36 @@ export default function ReusableBlockEdit( {
 		[ editedRecord.blocks, editedRecord.content ]
 	);
 
+	const legacyIdMap = useRef( {} );
+
 	// Apply the initial overrides from the pattern block to the inner blocks.
 	useEffect( () => {
-		defaultValuesRef.current = {};
-		const editingMode = getBlockEditingMode( patternClientId );
+		// Build a map of clientIds to the old nano id system to provide back compat.
+		legacyIdMap.current = getLegacyIdMap(
+			initialBlocks,
+			contentRef.current
+		);
+		defaultContent.current = {};
+		const originalEditingMode = getBlockEditingMode( patternClientId );
 		// Replace the contents of the blocks with the overrides.
 		registry.batch( () => {
 			setBlockEditingMode( patternClientId, 'default' );
 			syncDerivedUpdates( () => {
-				replaceInnerBlocks(
-					patternClientId,
-					applyInitialOverrides(
-						initialBlocks,
-						initialOverrides.current,
-						defaultValuesRef.current
-					)
-				);
+				const blocks = hasPatternOverridesSource
+					? applyInitialContentValuesToInnerBlocks(
+							initialBlocks,
+							contentRef.current,
+							defaultContent.current,
+							legacyIdMap.current
+					  )
+					: initialBlocks;
+
+				replaceInnerBlocks( patternClientId, blocks );
 			} );
-			setBlockEditingMode( patternClientId, editingMode );
+			setBlockEditingMode( patternClientId, originalEditingMode );
 		} );
 	}, [
+		hasPatternOverridesSource,
 		__unstableMarkNextChangeAsNotPersistent,
 		patternClientId,
 		initialBlocks,
@@ -273,7 +394,7 @@ export default function ReusableBlockEdit( {
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,
 			{ [ `align${ alignment }` ]: alignment }
@@ -281,16 +402,19 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: 'all',
+		templateLock: 'contentOnly',
 		layout,
 		renderAppender: innerBlocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	// Sync the `overrides` attribute from the updated blocks to the pattern block.
+	// Sync the `content` attribute from the updated blocks to the pattern block.
 	// `syncDerivedUpdates` is used here to avoid creating an additional undo level.
 	useEffect( () => {
+		if ( ! hasPatternOverridesSource ) {
+			return;
+		}
 		const { getBlocks } = registry.select( blockEditorStore );
 		let prevBlocks = getBlocks( patternClientId );
 		return registry.subscribe( () => {
@@ -298,37 +422,40 @@ export default function ReusableBlockEdit( {
 			if ( blocks !== prevBlocks ) {
 				prevBlocks = blocks;
 				syncDerivedUpdates( () => {
+					const updatedContent = getContentValuesFromInnerBlocks(
+						blocks,
+						defaultContent.current,
+						legacyIdMap.current
+					);
 					setAttributes( {
-						overrides: getOverridesFromBlocks(
-							blocks,
-							defaultValuesRef.current
-						),
+						content: updatedContent,
 					} );
+					contentRef.current = updatedContent;
 				} );
 			}
 		}, blockEditorStore );
-	}, [ syncDerivedUpdates, patternClientId, registry, setAttributes ] );
+	}, [
+		hasPatternOverridesSource,
+		syncDerivedUpdates,
+		patternClientId,
+		registry,
+		setAttributes,
+	] );
 
-	const handleEditOriginal = ( event ) => {
-		setBlockEditMode( setBlockEditingMode, innerBlocks, 'default' );
-		editOriginalProps.onClick( event );
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
 	};
 
-	const resetOverrides = () => {
-		if ( overrides ) {
+	const resetContent = () => {
+		if ( content ) {
 			replaceInnerBlocks( patternClientId, initialBlocks );
 		}
 	};
 
 	let children = null;
-
-	if ( hasAlreadyRendered ) {
-		children = (
-			<Warning>
-				{ __( 'Block cannot be rendered inside itself.' ) }
-			</Warning>
-		);
-	}
 
 	if ( isMissing ) {
 		children = (
@@ -347,29 +474,26 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
-			{ userCanEdit && editOriginalProps && (
+		<>
+			{ userCanEdit && onNavigateToEntityRecord && (
 				<BlockControls>
 					<ToolbarGroup>
-						<ToolbarButton
-							href={ editOriginalProps.href }
-							onClick={ handleEditOriginal }
-						>
+						<ToolbarButton onClick={ handleEditOriginal }>
 							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
 			) }
 
-			{ hasOverridableBlocks && (
+			{ canOverrideBlocks && (
 				<BlockControls>
 					<ToolbarGroup>
 						<ToolbarButton
-							onClick={ resetOverrides }
-							disabled={ ! overrides }
+							onClick={ resetContent }
+							disabled={ ! content }
 							__experimentalIsFocusable
 						>
-							{ __( 'Reset to original' ) }
+							{ __( 'Reset' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
@@ -380,6 +504,6 @@ export default function ReusableBlockEdit( {
 			) : (
 				<div { ...blockProps }>{ children }</div>
 			) }
-		</RecursionProvider>
+		</>
 	);
 }

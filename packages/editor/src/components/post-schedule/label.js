@@ -102,7 +102,7 @@ function getTimezoneAbbreviation() {
 	}
 
 	const symbol = timezone.offset < 0 ? '' : '+';
-	return `UTC${ symbol }${ timezone.offset }`;
+	return `UTC${ symbol }${ timezone.offsetFormatted }`;
 }
 
 function isTimezoneSameAsSiteTimezone( date ) {

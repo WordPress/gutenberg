@@ -286,7 +286,7 @@ export const deleteEntityRecord =
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -503,7 +503,7 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -780,7 +780,7 @@ export const saveEditedEntityRecord =
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -824,7 +824,7 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -948,7 +948,7 @@ export function receiveDefaultTemplateId( query, templateId ) {
 export const receiveRevisions =
 	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
 	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await dispatch( getOrLoadEntitiesConfig( kind, name ) );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);

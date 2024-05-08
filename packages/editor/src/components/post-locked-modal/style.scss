@@ -1,9 +1,3 @@
-.editor-post-locked-modal {
-	@include break-small() {
-		max-width: $break-mobile;
-	}
-}
-
 .editor-post-locked-modal__buttons {
 	margin-top: $grid-unit-30;
 }

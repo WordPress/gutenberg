@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,9 @@ import type { NavigationItemProps } from '../types';
 
 const noop = () => {};
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export function NavigationItem( props: NavigationItemProps ) {
 	const {
 		badge,
@@ -57,7 +60,7 @@ export function NavigationItem( props: NavigationItemProps ) {
 
 	const isActive = item && activeItem === item;
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-active': isActive,
 	} );
 

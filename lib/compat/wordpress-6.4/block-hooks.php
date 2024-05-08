@@ -73,6 +73,7 @@ function gutenberg_add_hooked_blocks( $settings, $metadata ) {
 		'keywords'         => 'keywords',
 		'example'          => 'example',
 		'variations'       => 'variations',
+		'allowed_blocks'   => 'allowedBlocks',
 	);
 	// Add `block_hooks` to the list of fields to pick.
 	$fields_to_pick['block_hooks'] = 'blockHooks';
@@ -289,7 +290,7 @@ function gutenberg_register_block_hooks_rest_field() {
 		'block_hooks',
 		array(
 			'schema' => array(
-				'description'       => __( 'This block is automatically inserted near any occurence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
+				'description'       => __( 'This block is automatically inserted near any occurrence of the block types used as keys of this map, into a relative position given by the corresponding value.', 'gutenberg' ),
 				'type'              => 'object',
 				'patternProperties' => array(
 					'^[a-zA-Z0-9-]+/[a-zA-Z0-9-]+$' => array(
