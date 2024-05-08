@@ -29,9 +29,24 @@ import {
 
 // Store the fallback proxy for each context proxy.
 const proxyToFallback = new WeakMap();
-const setProxyFallback = ( proxy, fallback = {} ) =>
-	proxyToFallback.set( proxy, fallback );
+const proxyToAssignedObjects = new WeakMap();
+
 let ignoreFallbacks = false;
+
+const updateProxyFallback = ( proxy, fallback = {} ) =>
+	proxyToFallback.set( proxy, fallback );
+
+const addAssignedObject = ( proxy, key ) => {
+	if ( ! proxyToAssignedObjects.has( proxy ) ) {
+		proxyToAssignedObjects.set( proxy, new Set() );
+	}
+	const assignedObjects = proxyToAssignedObjects.get( proxy );
+	assignedObjects.add( key );
+};
+const isNotAssignedObject = ( proxy, key ) => {
+	const assignedObjects = proxyToAssignedObjects.get( proxy );
+	return ! ( assignedObjects && assignedObjects.has( key ) );
+};
 
 const isPlainObject = ( item: unknown ): boolean =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
@@ -53,8 +68,11 @@ const contextHandlers = {
 			}
 
 			// If the prop contains an object, set the appropriate fallback.
-			if ( isPlainObject( currentProp ) ) {
-				setProxyFallback( currentProp, fallback[ k ] );
+			if (
+				isNotAssignedObject( receiver, k ) &&
+				isPlainObject( currentProp )
+			) {
+				updateProxyFallback( currentProp, fallback[ k ] );
 			}
 		}
 
@@ -67,6 +85,10 @@ const contextHandlers = {
 		if ( ! ignoreFallbacks && ! ( k in target ) && k in fallback ) {
 			fallback[ k ] = value;
 			return true;
+		}
+
+		if ( ! ignoreFallbacks && typeof value === 'object' ) {
+			addAssignedObject( receiver, k );
 		}
 
 		// Delegate to the deepsignal to set the value.
@@ -255,7 +277,7 @@ export default () => {
 						[ namespace ]: deepClone( value ),
 					} );
 				}
-				setProxyFallback( currentValue.current, inheritedValue );
+				updateProxyFallback( currentValue.current, inheritedValue );
 				return currentValue.current;
 			}, [ defaultEntry, inheritedValue ] );
 
@@ -578,7 +600,7 @@ export default () => {
 					{ [ namespace ]: {} },
 					contextHandlers
 				);
-				setProxyFallback( itemContext, inheritedValue );
+				updateProxyFallback( itemContext, inheritedValue );
 
 				// Set the item after proxifying the context.
 				itemContext[ namespace ][ itemProp ] = item;
