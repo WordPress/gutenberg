@@ -110,7 +110,7 @@ function CategoriesGroup( {
 	);
 }
 
-export default function SidebarNavigationScreenPatterns() {
+export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
 		params: { categoryType, categoryId, path },
 	} = useLocation();
@@ -144,6 +144,7 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			backPath={ backPath }
 			actions={ <AddNewPattern /> }
 			content={
 				<>

@@ -40,7 +40,7 @@ interface ListViewProps {
 }
 
 interface ListViewItemProps {
-	id: string;
+	id?: string;
 	item: Item;
 	isSelected: boolean;
 	onSelect: ( item: Item ) => void;
@@ -183,7 +183,8 @@ export default function ViewList( props: ListViewProps ) {
 	);
 
 	const getItemDomId = useCallback(
-		( item?: Item ) => ( item ? `${ baseId }-${ getItemId( item ) }` : '' ),
+		( item?: Item ) =>
+			item ? `${ baseId }-${ getItemId( item ) }` : undefined,
 		[ baseId, getItemId ]
 	);
 

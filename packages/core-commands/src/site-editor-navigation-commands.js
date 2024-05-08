@@ -22,11 +22,7 @@ import { useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	useIsTemplatesAccessible,
-	useIsTemplatesEditable,
-	useIsBlockBasedTheme,
-} from './hooks';
+import { useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
@@ -262,13 +258,14 @@ function useSiteEditorBasicNavigationCommands() {
 	const isSiteEditor = getPath( window.location.href )?.includes(
 		'site-editor.php'
 	);
-	const isTemplatesAccessible = useIsTemplatesAccessible();
-	const isTemplatesEditable = useIsTemplatesEditable();
+	const canCreateTemplate = useSelect( ( select ) => {
+		return select( coreStore ).canUser( 'create', 'templates' );
+	}, [] );
 	const isBlockBasedTheme = useIsBlockBasedTheme();
 	const commands = useMemo( () => {
 		const result = [];
 
-		if ( isTemplatesAccessible && isBlockBasedTheme ) {
+		if ( canCreateTemplate && isBlockBasedTheme ) {
 			result.push( {
 				name: 'core/edit-site/open-navigation',
 				label: __( 'Navigation' ),
@@ -347,7 +344,7 @@ function useSiteEditorBasicNavigationCommands() {
 			label: __( 'Patterns' ),
 			icon: symbol,
 			callback: ( { close } ) => {
-				if ( isTemplatesEditable ) {
+				if ( canCreateTemplate ) {
 					const args = {
 						path: '/patterns',
 					};
@@ -366,7 +363,7 @@ function useSiteEditorBasicNavigationCommands() {
 		} );
 
 		return result;
-	}, [ history, isSiteEditor, isTemplatesAccessible, isBlockBasedTheme ] );
+	}, [ history, isSiteEditor, canCreateTemplate, isBlockBasedTheme ] );
 
 	return {
 		commands,

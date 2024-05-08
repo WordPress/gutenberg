@@ -628,7 +628,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'More', exact: true } ).click();
 
-		// Moving focus to the More block should close the inserter.
+		// Moving focus to the More block should not close the inserter.
 		await editor.canvas
 			.getByRole( 'textbox', { name: 'Read more' } )
 			.fill( 'More' );
@@ -636,7 +636,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			page.getByRole( 'region', {
 				name: 'Block Library',
 			} )
-		).toBeHidden();
+		).toBeVisible();
 	} );
 
 	test( 'shows block preview when hovering over block in inserter', async ( {

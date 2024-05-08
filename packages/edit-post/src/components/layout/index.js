@@ -160,6 +160,7 @@ function Layout( { initialPost } ) {
 		documentLabel,
 		hasHistory,
 		hasBlockBreadcrumbs,
+		blockEditorMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -195,6 +196,8 @@ function Layout( { initialPost } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			blockEditorMode:
+				select( blockEditorStore ).__unstableGetEditorMode(),
 		};
 	}, [] );
 
@@ -342,6 +345,7 @@ function Layout( { initialPost } ) {
 					! isMobileViewport &&
 					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
+					blockEditorMode !== 'zoom-out' &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb rootLabelText={ documentLabel } />
