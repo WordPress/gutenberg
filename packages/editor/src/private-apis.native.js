@@ -12,7 +12,6 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
-import Header from './components/header';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
@@ -37,7 +36,6 @@ lock( privateApis, {
 	EditorCanvas,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
-	Header,
 	InserterSidebar,
 	ListViewSidebar,
 	PatternOverridesPanel,
