@@ -4,4 +4,4 @@
  *
  * @type {Set<string>}
  */
-export const logged = new Set();
+export const logged: Set< string > = new Set();
