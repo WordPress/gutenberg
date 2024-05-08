@@ -379,9 +379,7 @@ function BackgroundSizeToolsPanelItem( {
 		( currentValueForToggle === 'cover' && repeatValue === undefined )
 	);
 
-	const hasValue =
-		hasBackgroundSizeValue( inheritedValue ) ||
-		hasBackgroundSizeValue( style );
+	const hasValue = hasBackgroundSizeValue( style );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
