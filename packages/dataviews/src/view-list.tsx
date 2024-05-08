@@ -21,7 +21,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-<<<<<<< HEAD:packages/dataviews/src/view-list.tsx
 import type {
 	Data,
 	Item,
@@ -30,28 +29,28 @@ import type {
 } from './types';
 
 interface ListViewProps {
-	view: ViewListType;
-	fields: NormalizedField[];
+	actions: [];
 	data: Data;
-	isLoading: boolean;
+	fields: NormalizedField[];
 	getItemId: ( item: Item ) => string;
+	id: string;
+	isLoading: boolean;
 	onSelectionChange: ( selection: Item[] ) => void;
 	selection: Item[];
-	id: string;
+	view: ViewListType;
 }
 
 interface ListViewItemProps {
+	actions: [];
 	id?: string;
-	item: Item;
 	isSelected: boolean;
-	onSelect: ( item: Item ) => void;
+	item: Item;
 	mediaField?: NormalizedField;
+	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField;
 	visibleFields: NormalizedField[];
 }
-=======
 import ItemActions from './item-actions';
->>>>>>> c2605916bd (Use actions in the ListItem):packages/dataviews/src/view-list.js
 
 const {
 	useCompositeStoreV2: useCompositeStore,
@@ -152,7 +151,7 @@ function ListItem( {
 						<CompositeItem
 							// To be able to pass ItemActions directly, it should pass the incoming props to the underlying element:
 							// https://ariakit.org/guide/composition#custom-components-must-be-open-for-extension
-							render={ ( props ) => (
+							render={ ( props: { actions: []; item: Item } ) => (
 								<ItemActions
 									actions={ props.actions }
 									item={ props.item }
