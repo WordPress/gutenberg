@@ -9,6 +9,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
@@ -17,13 +18,24 @@ import BlockRenameModal from './modal';
 export default function BlockRenameControl( { clientId } ) {
 	const [ renamingBlock, setRenamingBlock ] = useState( false );
 
-	const { metadata } = useSelect(
+	const { metadata, onRenameBlock } = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( blockEditorStore );
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			const settings = getSettings();
+			// Try unlocking the settings if it has been locked, otherwise renameBlock is not set.
+			let renameBlock;
+			try {
+				renameBlock = unlock( settings ).renameBlock;
+			} catch ( err ) {
+				renameBlock = undefined;
+			}
 
 			const _metadata = getBlockAttributes( clientId )?.metadata;
 			return {
 				metadata: _metadata,
+				// Custom extended rename block function.
+				onRenameBlock: renameBlock,
 			};
 		},
 		[ clientId ]
@@ -32,12 +44,6 @@ export default function BlockRenameControl( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const customName = metadata?.name;
-	const hasPatternOverrides =
-		!! customName &&
-		!! metadata?.bindings &&
-		Object.values( metadata.bindings ).some(
-			( binding ) => binding.source === 'core/pattern-overrides'
-		);
 
 	function onChange( newName ) {
 		updateBlockAttributes( [ clientId ], {
@@ -54,9 +60,12 @@ export default function BlockRenameControl( { clientId } ) {
 		<>
 			<MenuItem
 				onClick={ () => {
-					setRenamingBlock( true );
+					if ( onRenameBlock ) {
+						onRenameBlock( clientId );
+					} else {
+						setRenamingBlock( true );
+					}
 				} }
-				aria-expanded={ renamingBlock }
 				aria-haspopup="dialog"
 			>
 				{ __( 'Rename' ) }
@@ -65,7 +74,6 @@ export default function BlockRenameControl( { clientId } ) {
 				<BlockRenameModal
 					blockName={ customName || '' }
 					originalBlockName={ blockInformation?.title }
-					hasOverridesWarning={ hasPatternOverrides }
 					onClose={ () => setRenamingBlock( false ) }
 					onSave={ ( newName ) => {
 						// If the new value is the block's original name (e.g. `Group`)

@@ -8,3 +8,7 @@
 export function isEditingPattern( state, clientId ) {
 	return state.isEditingPattern[ clientId ];
 }
+
+export function getRenamingBlockClientId( state ) {
+	return state.renamingBlock;
+}

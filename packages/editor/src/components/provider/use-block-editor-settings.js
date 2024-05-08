@@ -16,6 +16,7 @@ import {
 	privateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as patternsStore } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
@@ -209,6 +210,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { setRenamingBlock } = unlock( useDispatch( patternsStore ) );
 
 	/**
 	 * Creates a Post entity.
@@ -303,6 +305,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		};
 		lock( blockEditorSettings, {
 			sectionRootClientId,
+			renameBlock: setRenamingBlock,
 		} );
 		return blockEditorSettings;
 	}, [
@@ -327,6 +330,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
+		setRenamingBlock,
 	] );
 }
 

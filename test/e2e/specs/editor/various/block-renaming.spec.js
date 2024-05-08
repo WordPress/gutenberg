@@ -64,8 +64,8 @@ test.describe( 'Block Renaming', () => {
 			} );
 
 			await expect( renameMenuItem ).toHaveAttribute(
-				'aria-expanded',
-				'true'
+				'aria-haspopup',
+				'dialog'
 			);
 
 			const renameModal = page.getByRole( 'dialog', {
@@ -101,11 +101,6 @@ test.describe( 'Block Renaming', () => {
 
 			// Check that focus is transferred back to original "Rename" menu item.
 			await expect( renameMenuItem ).toBeFocused();
-
-			await expect( renameMenuItem ).toHaveAttribute(
-				'aria-expanded',
-				'false'
-			);
 
 			// Check custom name reflected in List View.
 			listView.getByRole( 'link', {
