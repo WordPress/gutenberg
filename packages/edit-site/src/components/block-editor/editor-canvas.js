@@ -29,16 +29,15 @@ import {
 const FRAME_SIZE = 20;
 const ZOOM_OUT_MAX_WIDTH = 800;
 
-function computeIFrameScale(
-	_contentWidth,
-	_contentHeight,
-	containerWidth,
-	windowInnerWidth
-) {
+function computeZoomOutScale( { containerWidth, windowInnerWidth } ) {
 	return (
 		( Math.min( containerWidth, ZOOM_OUT_MAX_WIDTH ) - 2 * FRAME_SIZE ) /
 		windowInnerWidth
 	);
+}
+
+function computeScale( { containerWidth, windowInnerWidth } ) {
+	return containerWidth / windowInnerWidth;
 }
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
@@ -161,7 +160,7 @@ function EditorCanvas( {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				scale: isZoomOutMode ? computeIFrameScale : undefined,
+				scale: isZoomOutMode ? computeZoomOutScale : computeScale,
 				frameSize: isZoomOutMode ? FRAME_SIZE : undefined,
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',

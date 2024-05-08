@@ -124,10 +124,8 @@ function Iframe( {
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [
-		contentResizeListener,
-		{ height: contentHeight, width: contentWidth },
-	] = useResizeObserver();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 
@@ -241,26 +239,15 @@ function Iframe( {
 
 	const scale = useMemo( () => {
 		return typeof scaleProp === 'function'
-			? scaleProp(
-					contentWidth,
-					contentHeight,
+			? scaleProp( {
 					containerWidth,
-					windowInnerWidth
-			  )
+					windowInnerWidth,
+			  } )
 			: scaleProp;
-	}, [
-		scaleProp,
-		contentWidth,
-		contentHeight,
-		containerWidth,
-		windowInnerWidth,
-	] );
+	}, [ scaleProp, containerWidth, windowInnerWidth ] );
 
 	const scaleRef = useRefEffect(
 		( body ) => {
-			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
-
 			const { documentElement } = body.ownerDocument;
 
 			body.classList.add( 'is-zoomed-out' );
@@ -269,7 +256,6 @@ function Iframe( {
 			documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way
 			// to do this.
-			documentElement.style.marginBottom = `${ bottomFrameSize }px`;
 			if ( iframeWindowInnerHeight > contentHeight * scale ) {
 				iframeDocument.body.style.minHeight = `${ Math.floor(
 					( iframeWindowInnerHeight - 2 * frameSize ) / scale
@@ -290,7 +276,6 @@ function Iframe( {
 			iframeDocument,
 			contentHeight,
 			iframeWindowInnerHeight,
-			contentWidth,
 		]
 	);
 
@@ -346,7 +331,9 @@ function Iframe( {
 
 	useEffect( () => cleanup, [ cleanup ] );
 
+	// Hack to get proper margins when scaling the iframe document.
 	const marginCorrection = -( windowInnerWidth - containerWidth ) / 2;
+	const marginBottomCorrection = frameSize - contentHeight * ( 1 - scale );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -366,6 +353,7 @@ function Iframe( {
 					width: '100vw',
 					height: '100%',
 					marginLeft: `${ marginCorrection }px`,
+					marginBottom: `${ marginBottomCorrection }px`,
 				} }
 			>
 				{ shouldRenderFocusCaptureElements && before }
