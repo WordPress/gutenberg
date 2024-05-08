@@ -45,7 +45,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -63,6 +62,7 @@ const {
 	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
+	Sidebar,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -372,7 +372,7 @@ function Layout( { initialPost } ) {
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && <SettingsSidebar /> }
+			{ ! isDistractionFree && <Sidebar /> }
 		</>
 	);
 }

@@ -29,6 +29,7 @@ import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 import SavePublishPanels from './components/save-publish-panels';
 import PostContentInformation from './components/post-content-information';
 import PostLastEditedPanel from './components/post-last-edited-panel';
+import Sidebar from './components/sidebar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -54,6 +55,7 @@ lock( privateApis, {
 	SavePublishPanels,
 	PostContentInformation,
 	PostLastEditedPanel,
+	Sidebar,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,
