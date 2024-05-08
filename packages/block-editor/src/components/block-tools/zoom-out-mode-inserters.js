@@ -20,6 +20,7 @@ function Inserter( {
 	sectionRootClientId,
 	__unstableContentRef,
 	index,
+	setActiveInserter,
 } ) {
 	const { setInserterIsOpened, insertionIndex } = useSelect(
 		( select ) => {
@@ -56,6 +57,7 @@ function Inserter( {
 						tab: 'patterns',
 						category: 'all',
 					} );
+					setActiveInserter( index );
 				} }
 				label={ label }
 			/>
@@ -65,6 +67,7 @@ function Inserter( {
 
 function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
+	const [ activeInserter, setActiveInserter ] = useState( null );
 	const { blockOrder, sectionRootClientId } = useSelect( ( select ) => {
 		const { sectionRootClientId: root } = unlock(
 			select( blockEditorStore ).getSettings()
@@ -90,7 +93,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		if ( index === blockOrder.length - 1 ) {
+		if ( activeInserter === index ) {
 			return null;
 		}
 		return (
@@ -102,6 +105,7 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 				index={ index }
 				blockOrder={ blockOrder }
 				__unstableContentRef={ __unstableContentRef }
+				setActiveInserter={ setActiveInserter }
 			/>
 		);
 	} );
