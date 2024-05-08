@@ -26,7 +26,7 @@ export default function BlockQuickNavigation( { clientIds } ) {
 		return null;
 	}
 	return (
-		<VStack spacing={ 1 } classname="block-editor-block-card__description">
+		<VStack spacing={ 1 }>
 			{ clientIds.map( ( clientId ) => (
 				<BlockQuickNavigationItem
 					key={ clientId }

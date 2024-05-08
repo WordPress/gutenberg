@@ -66,7 +66,11 @@ function BlockCard( { title, icon, description, blockType, className } ) {
 			<BlockIcon icon={ icon } showColors />
 			<VStack spacing={ 1 }>
 				<h2 className="block-editor-block-card__title">{ title }</h2>
-				{ description && <Text>{ description }</Text> }
+				{ description && (
+					<Text className="block-editor-block-card__description">
+						{ description }
+					</Text>
+				) }
 			</VStack>
 		</div>
 	);
