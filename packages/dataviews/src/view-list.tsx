@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -31,8 +30,14 @@ import type {
 	ViewList as ViewListType,
 } from './types';
 
+interface Action {
+	id: string;
+	label: string;
+	callback: ( items: Item[] ) => void;
+}
+
 interface ListViewProps {
-	actions: [];
+	actions: Action[];
 	data: Data;
 	fields: NormalizedField[];
 	getItemId: ( item: Item ) => string;
@@ -44,7 +49,7 @@ interface ListViewProps {
 }
 
 interface ListViewItemProps {
-	actions: [];
+	actions: Action[];
 	id?: string;
 	isSelected: boolean;
 	item: Item;
@@ -56,6 +61,10 @@ interface ListViewItemProps {
 }
 
 const {
+	DropdownMenuV2: DropdownMenu,
+	DropdownMenuGroupV2: DropdownMenuGroup,
+	DropdownMenuItemV2: DropdownMenuItem,
+	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
@@ -153,23 +162,41 @@ function ListItem( {
 				</div>
 				{ actions && (
 					<div role="gridcell">
-						<Ariakit.MenuProvider>
-							<CompositeItem
-								store={ store }
-								render={
-									<Button
-										size="compact"
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										disabled={ ! actions.length }
-										className="dataviews-all-actions-button"
-									/>
-								}
-							/>
-							<Ariakit.Menu>
-								<Ariakit.MenuItem>Hello</Ariakit.MenuItem>
-							</Ariakit.Menu>
-						</Ariakit.MenuProvider>
+						<DropdownMenu
+							trigger={
+								<CompositeItem
+									store={ store }
+									render={
+										<Button
+											size="compact"
+											icon={ moreVertical }
+											label={ __( 'Actions' ) }
+											disabled={ ! actions.length }
+											className="dataviews-all-actions-button"
+										/>
+									}
+								/>
+							}
+							placement="bottom-end"
+						>
+							<DropdownMenuGroup>
+								{ actions.map( ( action: Action ) => {
+									return (
+										<DropdownMenuItem
+											key={ action.id }
+											action={ action }
+											onClick={ () =>
+												action.callback( [ item ] )
+											}
+										>
+											<DropdownMenuItemLabel>
+												{ action.label }
+											</DropdownMenuItemLabel>
+										</DropdownMenuItem>
+									);
+								} ) }
+							</DropdownMenuGroup>
+						</DropdownMenu>
 					</div>
 				) }
 			</HStack>
