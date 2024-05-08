@@ -343,18 +343,26 @@ function Iframe( {
 		<div
 			ref={ windowResizeRef }
 			style={ {
+				width: '100%',
 				height: '100%',
 				overflowX: 'hidden',
 			} }
 		>
 			{ containerResizeListener }
 			<div
-				style={ {
-					width: '100vw',
-					height: '100%',
-					marginLeft: `${ marginCorrection }px`,
-					marginBottom: `${ marginBottomCorrection }px`,
-				} }
+				style={
+					scale === 1
+						? {
+								width: '100%',
+								height: '100%',
+						  }
+						: {
+								width: '100vw',
+								height: '100%',
+								marginLeft: `${ marginCorrection }px`,
+								marginBottom: `${ marginBottomCorrection }px`,
+						  }
+				}
 			>
 				{ shouldRenderFocusCaptureElements && before }
 				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
