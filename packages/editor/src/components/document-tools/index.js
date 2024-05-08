@@ -15,7 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { listView, plus } from '@wordpress/icons';
+import { listView, plus, chevronUpDown } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -35,13 +35,13 @@ const preventDefault = ( event ) => {
 function DocumentTools( {
 	className,
 	disableBlockTools = false,
-	children,
 	// This is a temporary prop until the list view is fully unified between post and site editors.
 	listViewLabel = __( 'Document Overview' ),
 } ) {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened } =
+	const { setIsInserterOpened, setIsListViewOpened, setDeviceType } =
 		useDispatch( editorStore );
+	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const {
 		isDistractionFree,
 		isInserterOpened,
@@ -50,13 +50,15 @@ function DocumentTools( {
 		listViewToggleRef,
 		hasFixedToolbar,
 		showIconLabels,
+		isVisualMode,
+		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
-		const { isListViewOpened, getListViewToggleRef } = unlock(
-			select( editorStore )
-		);
+		const { isListViewOpened, getListViewToggleRef, getEditorMode } =
+			unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -68,11 +70,15 @@ function DocumentTools( {
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			isVisualMode: getEditorMode() === 'visual',
+			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
+	const isZoomedOutViewExperimentEnabled =
+		window?.__experimentalEnableZoomedOutView && isVisualMode;
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -179,7 +185,27 @@ function DocumentTools( {
 						) }
 					</>
 				) }
-				{ children }
+
+				{ isZoomedOutViewExperimentEnabled &&
+					isLargeViewport &&
+					! isDistractionFree &&
+					! hasFixedToolbar && (
+						<ToolbarItem
+							as={ Button }
+							className="edit-site-header-edit-mode__zoom-out-view-toggle"
+							icon={ chevronUpDown }
+							isPressed={ isZoomedOutView }
+							/* translators: button label text should, if possible, be under 16 characters. */
+							label={ __( 'Zoom-out View' ) }
+							onClick={ () => {
+								setDeviceType( 'Desktop' );
+								__unstableSetEditorMode(
+									isZoomedOutView ? 'edit' : 'zoom-out'
+								);
+							} }
+							size="compact"
+						/>
+					) }
 			</div>
 		</NavigableToolbar>
 	);

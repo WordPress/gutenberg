@@ -702,12 +702,9 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 }
 
-.is-zoom-out {
-	.block-editor-inserter__menu {
-		display: flex;
-	}
-
-	.show-panel::after {
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
 		// Makes space for the inserter flyout panel
 		@include break-medium {
 			content: "";
