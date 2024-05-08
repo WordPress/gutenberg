@@ -161,6 +161,7 @@ function Layout( { initialPost } ) {
 		hasHistory,
 		hasBlockBreadcrumbs,
 		blockEditorMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -198,6 +199,8 @@ function Layout( { initialPost } ) {
 			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			blockEditorMode:
 				select( blockEditorStore ).__unstableGetEditorMode(),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
@@ -372,7 +375,13 @@ function Layout( { initialPost } ) {
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && <Sidebar /> }
+			{ ! isDistractionFree && (
+				<Sidebar
+					extraPanels={
+						! isEditingTemplate && <MetaBoxes location="side" />
+					}
+				/>
+			) }
 		</>
 	);
 }
