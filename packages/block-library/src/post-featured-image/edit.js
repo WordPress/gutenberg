@@ -62,7 +62,6 @@ export default function PostFeaturedImageEdit( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const {
 		isLink,
-		aspectRatio,
 		height,
 		width,
 		scale,
@@ -71,6 +70,7 @@ export default function PostFeaturedImageEdit( {
 		linkTarget,
 		useFirstImageFromPost,
 	} = attributes;
+	const blockSupportAspectRatio = attributes?.style?.dimensions?.aspectRatio;
 	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const [ storedFeaturedImage, setFeaturedImage ] = useEntityProp(
@@ -132,7 +132,7 @@ export default function PostFeaturedImageEdit( {
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
 	const blockProps = useBlockProps( {
-		style: { width, height, aspectRatio },
+		style: { width, height, blockSupportAspectRatio },
 		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
@@ -150,8 +150,8 @@ export default function PostFeaturedImageEdit( {
 				) }
 				withIllustration
 				style={ {
-					height: !! aspectRatio && '100%',
-					width: !! aspectRatio && '100%',
+					height: !! blockSupportAspectRatio && '100%',
+					width: !! blockSupportAspectRatio && '100%',
 					...borderProps.style,
 					...shadowProps.style,
 				} }
@@ -285,9 +285,9 @@ export default function PostFeaturedImageEdit( {
 	const imageStyles = {
 		...borderProps.style,
 		...shadowProps.style,
-		height: aspectRatio ? '100%' : height,
-		width: !! aspectRatio && '100%',
-		objectFit: !! ( height || aspectRatio ) && scale,
+		height: blockSupportAspectRatio ? '100%' : height,
+		width: !! blockSupportAspectRatio && '100%',
+		objectFit: !! ( height || blockSupportAspectRatio ) && scale,
 	};
 
 	/**

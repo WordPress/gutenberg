@@ -11,9 +11,6 @@
 			"type": "boolean",
 			"default": false
 		},
-		"aspectRatio": {
-			"type": "string"
-		},
 		"width": {
 			"type": "string"
 		},
@@ -63,6 +60,9 @@
 		"color": {
 			"text": false,
 			"background": false
+		},
+		"dimensions": {
+			"aspectRatio": true
 		},
 		"__experimentalBorder": {
 			"color": true,
