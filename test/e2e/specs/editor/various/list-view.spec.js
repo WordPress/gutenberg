@@ -1005,11 +1005,10 @@ test.describe( 'List View', () => {
 			.poll( listViewUtils.getBlocksWithA11yAttributes )
 			.toMatchObject( [
 				{ name: 'core/paragraph', selected: false, focused: false },
-
 				{
 					name: 'core/group',
 					selected: true,
-					focused: false,
+					focused: true,
 					innerBlocks: [
 						{
 							name: 'core/heading',

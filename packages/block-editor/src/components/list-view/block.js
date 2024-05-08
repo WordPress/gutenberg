@@ -333,17 +333,21 @@ function ListViewBlock( {
 			// Expand all parents of the current block.
 			expand( blockParents );
 		} else if ( isMatch( 'core/block-editor/group', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length > 1 && isGroupable( clientIds ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
 				event.preventDefault();
-				const blocks = getBlocksByClientId( clientIds );
+				const blocks = getBlocksByClientId( blocksToUpdate );
 				const groupingBlockName = getGroupingBlockName();
 				const newBlocks = switchToBlockType(
 					blocks,
 					groupingBlockName
 				);
-				replaceBlocks( clientIds, newBlocks );
+				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
+				const newlySelectedBlocks = getSelectedBlockClientIds();
+				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+				setOpenedBlockSettingsMenu( undefined );
+				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
 		}
 	}
