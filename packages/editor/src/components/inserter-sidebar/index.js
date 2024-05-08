@@ -62,6 +62,8 @@ export default function InserterSidebar( {
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
+					__experimentalInitialTab={ insertionPoint.tab }
+					__experimentalInitialCategory={ insertionPoint.category }
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					__experimentalOnPatternCategorySelection={
 						isRightSidebarOpen ? closeGeneralSidebar : undefined

@@ -48,6 +48,8 @@ function InserterMenu(
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
 		onClose,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 	},
 	ref
 ) {
@@ -59,12 +61,15 @@ function InserterMenu(
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] =
-		useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		__experimentalInitialCategory
+	);
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( 'blocks' );
+	const [ selectedTab, setSelectedTab ] = useState(
+		__experimentalInitialTab
+	);
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -231,6 +236,7 @@ function InserterMenu(
 						category={ selectedPatternCategory }
 						patternFilter={ patternFilter }
 						showTitlesAsTooltip
+						initialCategory={ __experimentalInitialCategory }
 					/>
 				) }
 			</BlockPatternsTab>
@@ -243,6 +249,7 @@ function InserterMenu(
 		patternFilter,
 		selectedPatternCategory,
 		showPatternPanel,
+		__experimentalInitialCategory,
 	] );
 
 	const mediaTab = useMemo( () => {
@@ -306,6 +313,7 @@ function InserterMenu(
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
+					selectedTab={ selectedTab }
 				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&
