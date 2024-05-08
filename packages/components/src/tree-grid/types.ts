@@ -120,4 +120,9 @@ export type TreeGridProps = {
 		startRow: HTMLElement,
 		destinationRow: HTMLElement
 	) => void;
+	/**
+	 * Number of rows for each page of the tree grid.
+	 * Used to calculate how far PAGEUP and PAGEDOWN keys should move the focus.
+	 */
+	pageSize?: number;
 };
