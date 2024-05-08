@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -181,7 +181,7 @@ export function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
-	const classes = classnames( 'components-drop-zone', className, {
+	const classes = clsx( 'components-drop-zone', className, {
 		'is-active':
 			( isDraggingOverDocument || isDraggingOverElement ) &&
 			( ( type === 'file' && onFilesDrop ) ||

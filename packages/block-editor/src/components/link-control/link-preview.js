@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -80,7 +80,7 @@ export default function LinkPreview( {
 	return (
 		<div
 			aria-label={ __( 'Currently selected' ) }
-			className={ classnames( 'block-editor-link-control__search-item', {
+			className={ clsx( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -92,7 +92,7 @@ export default function LinkPreview( {
 			<div className="block-editor-link-control__search-item-top">
 				<span className="block-editor-link-control__search-item-header">
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-link-control__search-item-icon',
 							{
 								'is-image': richData?.icon,

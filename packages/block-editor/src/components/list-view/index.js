@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -366,7 +366,7 @@ function ListViewComponent(
 			) }
 			<TreeGrid
 				id={ id }
-				className={ classnames( 'block-editor-list-view-tree', {
+				className={ clsx( 'block-editor-list-view-tree', {
 					'is-dragging':
 						draggedClientIds?.length > 0 &&
 						blockDropTargetIndex !== undefined,

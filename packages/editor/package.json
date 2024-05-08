@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "13.33.0",
+	"version": "13.34.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -64,7 +64,7 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
-		"classnames": "^2.3.1",
+		"clsx": "^2.1.1",
 		"date-fns": "^3.6.0",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",

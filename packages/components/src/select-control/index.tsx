@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -74,7 +74,7 @@ function UnforwardedSelectControl(
 		props.onChange?.( event.target.value, { event } );
 	};
 
-	const classes = classNames( 'components-select-control', className );
+	const classes = clsx( 'components-select-control', className );
 
 	return (
 		<BaseControl

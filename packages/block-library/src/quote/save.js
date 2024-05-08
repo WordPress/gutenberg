@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { InnerBlocks, RichText, useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const { textAlign, citation } = attributes;
 
-	const className = classNames( {
+	const className = clsx( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 

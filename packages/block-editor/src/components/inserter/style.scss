@@ -116,7 +116,8 @@ $block-inserter-tabs-height: 44px;
 	overflow: hidden;
 
 	.block-editor-inserter__tablist {
-		border-bottom: $border-width solid $gray-300;
+		// Make room for the close button
+		width: calc(100% - #{$grid-unit-60});
 
 		button[role="tab"] {
 			flex-grow: 1;
@@ -135,6 +136,7 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 		flex-direction: column;
 		overflow-y: auto;
+		border-top: $border-width solid $gray-300;
 	}
 }
 

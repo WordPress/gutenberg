@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -103,7 +103,7 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 	const _isPreviewingTheme = isPreviewingTheme();
 	return (
 		<div
-			className={ classnames( 'edit-site-header-edit-mode', {
+			className={ clsx( 'edit-site-header-edit-mode', {
 				'show-icon-labels': showIconLabels,
 				'show-block-toolbar': ! isBlockToolsCollapsed && showTopToolbar,
 			} ) }
@@ -145,7 +145,7 @@ export default function HeaderEditMode( { setEntitiesSavedStatesCallback } ) {
 				>
 					{ isLargeViewport && (
 						<div
-							className={ classnames(
+							className={ clsx(
 								'edit-site-header-edit-mode__preview-options',
 								{ 'is-zoomed-out': isZoomedOutView }
 							) }

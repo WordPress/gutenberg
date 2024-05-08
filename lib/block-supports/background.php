@@ -53,10 +53,10 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	}
 
 	$background_styles                    = array();
-	$background_styles['backgroundSize']  = isset( $block_attributes['style']['background']['backgroundSize'] ) ? $block_attributes['style']['background']['backgroundSize'] : 'cover';
 	$background_styles['backgroundImage'] = isset( $block_attributes['style']['background']['backgroundImage'] ) ? $block_attributes['style']['background']['backgroundImage'] : array();
 
-	if ( isset( $background_styles['backgroundImage']['source'] ) && 'file' === $background_styles['backgroundImage']['source'] && isset( $background_styles['backgroundImage']['url'] ) ) {
+	if ( ! empty( $background_styles['backgroundImage'] ) ) {
+		$background_styles['backgroundSize']     = isset( $block_attributes['style']['background']['backgroundSize'] ) ? $block_attributes['style']['background']['backgroundSize'] : 'cover';
 		$background_styles['backgroundPosition'] = isset( $block_attributes['style']['background']['backgroundPosition'] ) ? $block_attributes['style']['background']['backgroundPosition'] : null;
 		$background_styles['backgroundRepeat']   = isset( $block_attributes['style']['background']['backgroundRepeat'] ) ? $block_attributes['style']['background']['backgroundRepeat'] : null;
 

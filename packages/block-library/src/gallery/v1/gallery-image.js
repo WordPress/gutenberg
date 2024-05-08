@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -192,7 +192,7 @@ class GalleryImage extends Component {
 			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 		);
 
-		const className = classnames( {
+		const className = clsx( {
 			'is-selected': isSelected,
 			'is-transient': isBlobURL( url ),
 		} );

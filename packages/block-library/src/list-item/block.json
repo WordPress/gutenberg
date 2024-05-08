@@ -21,6 +21,7 @@
 	},
 	"supports": {
 		"className": false,
+		"splitting": true,
 		"__experimentalSelector": "li",
 		"spacing": {
 			"margin": true,
