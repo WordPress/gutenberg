@@ -12,8 +12,6 @@
  * @package gutenberg
  */
 
-// Update gutenberg.php
-
 ### BEGIN AUTO-GENERATED DEFINES
 defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
 ### END AUTO-GENERATED DEFINES

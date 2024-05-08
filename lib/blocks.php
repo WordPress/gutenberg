@@ -5,8 +5,6 @@
  * @package gutenberg
  */
 
-// Update lib/blocks.php
-
 /**
  * Substitutes the implementation of a core-registered block type, if exists,
  * with the built result from the plugin.
