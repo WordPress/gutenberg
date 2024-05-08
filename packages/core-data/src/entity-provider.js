@@ -253,7 +253,12 @@ export function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		( newBlocks, options ) => {
 			const { selection, ...rest } = options;
 			const footnotesChanges = updateFootnotes( newBlocks );
-			const edits = { selection, ...footnotesChanges };
+			const edits = {
+				selection,
+				content: ( { blocks: blocksForSerialization = [] } ) =>
+					__unstableSerializeAndClean( blocksForSerialization ),
+				...footnotesChanges,
+			};
 
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,
