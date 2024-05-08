@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	getBlockDefaultClassName,
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
@@ -1866,6 +1867,9 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 	const initialAttributes = {
 		...item.initialAttributes,
 		...variation.attributes,
+		...( supportsAlias && {
+			className: getBlockDefaultClassName( variation.name ),
+		} ),
 	};
 	return {
 		...item,
