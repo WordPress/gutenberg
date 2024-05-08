@@ -2,15 +2,15 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -34,16 +34,12 @@ export default function InserterSidebar( {
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const TagName = ! isMobileViewport ? VisuallyHidden : 'div';
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
-		focusOnMount: null,
+		focusOnMount: true,
 	} );
 
 	const libraryRef = useRef();
-	useEffect( () => {
-		libraryRef.current.focusSearch();
-	}, [] );
 
 	return (
 		<div
@@ -51,13 +47,15 @@ export default function InserterSidebar( {
 			{ ...inserterDialogProps }
 			className="editor-inserter-sidebar"
 		>
-			<TagName className="editor-inserter-sidebar__header">
+			<div className="editor-inserter-sidebar__header">
 				<Button
-					icon={ close }
+					className="editor-inserter-sidebar__close-button"
+					icon={ closeSmall }
 					label={ __( 'Close block inserter' ) }
 					onClick={ () => setIsInserterOpened( false ) }
+					size="small"
 				/>
-			</TagName>
+			</div>
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }

@@ -304,20 +304,15 @@ const withBlockTree =
 					action.blocks
 				);
 				newState.tree = new Map( newState.tree );
-				action.replacedClientIds
-					.concat(
-						// Controlled inner blocks are only removed
-						// if the block doesn't move to another position
-						// otherwise their content will be lost.
-						action.replacedClientIds
-							.filter(
-								( clientId ) => ! inserterClientIds[ clientId ]
-							)
-							.map( ( clientId ) => 'controlled||' + clientId )
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					// Controlled inner blocks are only removed
+					// if the block doesn't move to another position
+					// otherwise their content will be lost.
+					if ( ! inserterClientIds[ clientId ] ) {
+						newState.tree.delete( 'controlled||' + clientId );
+					}
+				} );
 
 				updateBlockTreeForBlocks( newState, action.blocks );
 				updateParentInnerBlocksInTree(
@@ -358,15 +353,10 @@ const withBlockTree =
 					}
 				}
 				newState.tree = new Map( newState.tree );
-				action.removedClientIds
-					.concat(
-						action.removedClientIds.map(
-							( clientId ) => 'controlled||' + clientId
-						)
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					newState.tree.delete( 'controlled||' + clientId );
+				} );
 				updateParentInnerBlocksInTree(
 					newState,
 					parentsOfRemovedBlocks,

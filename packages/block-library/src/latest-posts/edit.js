@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -383,7 +383,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'wp-block-latest-posts__list': true,
 			'is-grid': postLayout === 'grid',
 			'has-dates': displayPostDate,
@@ -454,7 +454,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 					const { url: imageSourceUrl, alt: featuredImageAlt } =
 						getFeaturedImageDetails( post, featuredImageSizeSlug );
-					const imageClasses = classnames( {
+					const imageClasses = clsx( {
 						'wp-block-latest-posts__featured-image': true,
 						[ `align${ featuredImageAlign }` ]:
 							!! featuredImageAlign,

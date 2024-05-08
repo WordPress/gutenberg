@@ -16,6 +16,7 @@ $z-layers: (
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element
 	".block-library-query-pattern__selection-search": 2, // higher sticky element
+	".editor-inserter-sidebar__header": 2,
 
 	// These next two share a stacking context
 	".interface-complementary-area .components-panel" : 0, // lower scrolling content
@@ -88,6 +89,7 @@ $z-layers: (
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
 	".edit-post-layout__toggle-sidebar-panel": 100000,
+	".editor-layout__toggle-sidebar-panel": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be at top of

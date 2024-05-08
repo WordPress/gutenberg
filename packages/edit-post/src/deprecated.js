@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	privateApis as editorPrivateApis,
 	PluginBlockSettingsMenuItem as EditorPluginBlockSettingsMenuItem,
 	PluginDocumentSettingPanel as EditorPluginDocumentSettingPanel,
 	PluginMoreMenuItem as EditorPluginMoreMenuItem,
@@ -12,6 +13,12 @@ import {
 	PluginSidebarMoreMenuItem as EditorPluginSidebarMoreMenuItem,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+const { PluginPostExcerpt } = unlock( editorPrivateApis );
 
 const deprecateSlot = ( name ) => {
 	deprecated( `wp.editPost.${ name }`, {
@@ -84,4 +91,17 @@ export function PluginSidebarMoreMenuItem( props ) {
 	deprecateSlot( 'PluginSidebarMoreMenuItem' );
 	return <EditorPluginSidebarMoreMenuItem { ...props } />;
 }
+
+/**
+ * @see PluginPostExcerpt in @wordpress/editor package.
+ */
+export function __experimentalPluginPostExcerpt() {
+	deprecated( 'wp.editPost.__experimentalPluginPostExcerpt', {
+		since: '6.6',
+		hint: 'Core and custom panels can be access programmatically using their panel name.',
+		link: 'https://developer.wordpress.org/block-editor/reference-guides/slotfills/plugin-document-setting-panel/#accessing-a-panel-programmatically',
+	} );
+	return PluginPostExcerpt;
+}
+
 /* eslint-enable jsdoc/require-param */

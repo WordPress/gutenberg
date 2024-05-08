@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,6 @@ import {
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
 import {
 	useState,
@@ -43,10 +42,8 @@ import {
 	LAYOUT_LIST,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
-	ENUMERATION_TYPE,
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
@@ -68,7 +65,7 @@ const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -180,12 +177,9 @@ function Author( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -254,20 +248,10 @@ function Title( { item, categoryId } ) {
 
 export default function DataviewsPatterns() {
 	const {
-		categoryType,
-		categoryId: categoryIdFromURL,
-		path,
-	} = getQueryArgs( window.location.href );
-	const type =
-		categoryType ||
-		( path === '/wp_template_part/all'
-			? TEMPLATE_PART_POST_TYPE
-			: PATTERN_TYPES.theme );
-	const categoryId =
-		categoryIdFromURL ||
-		( path === '/wp_template_part/all'
-			? TEMPLATE_PART_ALL_AREAS_CATEGORY
-			: PATTERN_DEFAULT_CATEGORY );
+		params: { categoryType, categoryId: categoryIdFromURL },
+	} = useLocation();
+	const type = categoryType || PATTERN_TYPES.theme;
+	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
 	const isUncategorizedThemePatterns =
 		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
@@ -348,7 +332,6 @@ export default function DataviewsPatterns() {
 						</span>
 					);
 				},
-				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IS ],
@@ -364,7 +347,6 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => {
 					return <Author viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				filterBy: {
 					isPrimary: true,

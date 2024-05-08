@@ -49,7 +49,9 @@ function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 
 	const setInsertedBlockAttributes =
 		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
-			if ( ! _insertedBlockClientId ) return;
+			if ( ! _insertedBlockClientId ) {
+				return;
+			}
 			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
 		};
 

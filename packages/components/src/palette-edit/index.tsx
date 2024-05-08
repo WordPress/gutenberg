@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -130,7 +130,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 				resize: false,
 				placement: 'left-start',
 				...receivedPopoverProps,
-				className: classnames(
+				className: clsx(
 					'components-palette-edit__popover',
 					receivedPopoverProps?.className
 				),

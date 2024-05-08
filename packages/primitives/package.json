@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/primitives",
-	"version": "3.54.0",
+	"version": "3.55.0",
 	"description": "WordPress cross-platform primitives.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -32,7 +32,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.16.0",
 		"@wordpress/element": "file:../element",
-		"classnames": "^2.3.1"
+		"clsx": "^2.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
