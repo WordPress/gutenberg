@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useState, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	store as editorStore,
@@ -138,13 +138,15 @@ function EditorCanvas( {
 		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
 	);
 
-	const frameSize = isZoomOutMode ? 20 : undefined;
+	const frameSize = 20;
+	const maxWidth = 800;
 
-	const scale = isZoomOutMode
-		? ( _contentWidth, _contentHeight, containerWidth, windowInnerWidth ) =>
-				( Math.min( containerWidth, 800 ) - 2 * frameSize ) /
-				windowInnerWidth
-		: undefined;
+	const scale = useCallback(
+		( _contentWidth, _contentHeight, containerWidth, windowInnerWidth ) =>
+			( Math.min( containerWidth, maxWidth ) - 2 * frameSize ) /
+			windowInnerWidth,
+		[]
+	);
 
 	return (
 		<EditorCanvasRoot
@@ -154,8 +156,8 @@ function EditorCanvas( {
 			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
-				scale,
-				frameSize,
+				scale: isZoomOutMode ? scale : undefined,
+				frameSize: isZoomOutMode ? frameSize : undefined,
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',
 				} ),

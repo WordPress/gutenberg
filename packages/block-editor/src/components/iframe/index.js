@@ -104,7 +104,7 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	scale = 1,
+	scale: scaleProp = 1,
 	frameSize = 0,
 	readonly,
 	forwardedRef: ref,
@@ -239,20 +239,17 @@ function Iframe( {
 
 	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
 
-	const [ scaleState, setScaleState ] = useState( 1 );
-	useEffect( () => {
-		setScaleState(
-			typeof scale === 'function'
-				? scale(
-						contentWidth,
-						contentHeight,
-						containerWidth,
-						windowInnerWidth
-				  )
-				: scale
-		);
+	const scale = useMemo( () => {
+		return typeof scaleProp === 'function'
+			? scaleProp(
+					contentWidth,
+					contentHeight,
+					containerWidth,
+					windowInnerWidth
+			  )
+			: scaleProp;
 	}, [
-		scale,
+		scaleProp,
 		contentWidth,
 		contentHeight,
 		containerWidth,
@@ -262,21 +259,20 @@ function Iframe( {
 	const scaleRef = useRefEffect(
 		( body ) => {
 			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize =
-				frameSize - contentHeight * ( 1 - scaleState );
+			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
 
 			const { documentElement } = body.ownerDocument;
 
 			body.classList.add( 'is-zoomed-out' );
 
-			documentElement.style.transform = `scale( ${ scaleState } )`;
+			documentElement.style.transform = `scale( ${ scale } )`;
 			documentElement.style.marginTop = `${ frameSize }px`;
 			// TODO: `marginBottom` doesn't work in Firefox. We need another way
 			// to do this.
 			documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * scaleState ) {
+			if ( iframeWindowInnerHeight > contentHeight * scale ) {
 				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scaleState
+					( iframeWindowInnerHeight - 2 * frameSize ) / scale
 				) }px`;
 			}
 
@@ -289,7 +285,7 @@ function Iframe( {
 			};
 		},
 		[
-			scaleState,
+			scale,
 			frameSize,
 			iframeDocument,
 			contentHeight,
@@ -308,8 +304,8 @@ function Iframe( {
 		// Avoid resize listeners when not needed, these will trigger
 		// unnecessary re-renders when animating the iframe width, or when
 		// expanding preview iframes.
-		scaleState === 1 ? null : iframeResizeRef,
-		scaleState === 1 ? null : scaleRef,
+		scale === 1 ? null : iframeResizeRef,
+		scale === 1 ? null : scaleRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
