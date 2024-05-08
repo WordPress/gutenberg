@@ -55,9 +55,6 @@ function ZoomOutModeInserters() {
 	}
 
 	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
-		if ( insertionPoint.insertionIndex === index ) {
-			return null;
-		}
 		return (
 			<BlockPopoverInbetween
 				key={ index }
@@ -65,24 +62,37 @@ function ZoomOutModeInserters() {
 				nextClientId={ blockOrder[ index ] }
 				className="block-editor-button-pattern-inserter"
 			>
-				<Button
-					variant="primary"
-					icon={ plus }
-					size="compact"
-					className="block-editor-button-pattern-inserter__button"
-					onClick={ () => {
-						setInserterIsOpened( {
-							rootClientId: sectionRootClientId,
-							insertionIndex: index,
-							tab: 'patterns',
-							category: 'all',
-						} );
-					} }
-					label={ _x(
-						'Add pattern',
-						'Generic label for pattern inserter button'
-					) }
-				/>
+				{ insertionPoint.insertionIndex === index && (
+					<div
+						style={ {
+							opacity: 1,
+							height: '4px',
+							width: '100%',
+							transform: 'translateY(-50%)',
+						} }
+						className="block-editor-block-list__insertion-point-indicator"
+					/>
+				) }
+				{ insertionPoint.insertionIndex !== index && (
+					<Button
+						variant="primary"
+						icon={ plus }
+						size="compact"
+						className="block-editor-button-pattern-inserter__button"
+						onClick={ () => {
+							setInserterIsOpened( {
+								rootClientId: sectionRootClientId,
+								insertionIndex: index,
+								tab: 'patterns',
+								category: 'all',
+							} );
+						} }
+						label={ _x(
+							'Add pattern',
+							'Generic label for pattern inserter button'
+						) }
+					/>
+				) }
 			</BlockPopoverInbetween>
 		);
 	} );
