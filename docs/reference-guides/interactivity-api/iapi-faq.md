@@ -99,7 +99,7 @@ The API has been designed with performance in mind, so it shouldn’t be a probl
 
 ## Does it work with the Core Translation API?
 
-As the Interactivity API works perfectly with server-side rendering, you can use all the WordPress APIs including [`__()`](https://developer.wordpress.org/reference/functions/__/) and [`_e()`](https://developer.wordpress.org/reference/functions/_e/). You can use it to translate the text in the HTML (as you normally would) and even use it inside the store when using `wp_initial_state()` on the server side. It might look something like this:
+As the Interactivity API works perfectly with server-side rendering, you can use all the WordPress APIs including [`__()`](https://developer.wordpress.org/reference/functions/__/) and [`_e()`](https://developer.wordpress.org/reference/functions/_e/). You can use it to translate the text in the HTML (as you normally would) and even use it inside the store when [using `wp_interactivity_state()` on the server side](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#setting-the-store). It might look something like this:
 
 ```php
 // render.php
@@ -111,12 +111,11 @@ wp_interactivity_state( 'favoriteMovies', array(
 ) );
 ```
 
-A translation API compatible with script modules (needed for the Interactivity API) is 
-currently being worked on. Check https://core.trac.wordpress.org/ticket/60234 to follow the progress on this work.
+A translation API compatible with script modules (needed for the Interactivity API) is currently being worked on. Check [#60234](https://core.trac.wordpress.org/ticket/60234) to follow the progress on this work.
 
 ## I’m concerned about XSS; can JavaScript be injected into directives?
 
-No. The Interactivity API only allows for [References](https://make.wordpress.org/core/2023/03/30/proposal-the-interactivity-api-a-better-developer-experience-in-building-interactive-blocks/#references) to be passed as values to the directives. This way, there is no need to eval() full JavaScript expressions, so it’s not possible to perform XSS attacks.
+No. The Interactivity API only allows for [References](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#values-of-directives-are-references-to-store-properties) to be passed as values to the directives. This way, there is no need to eval() full JavaScript expressions, so it’s not possible to perform XSS attacks.
 
 ## Does this work with Custom Security Policies?
 

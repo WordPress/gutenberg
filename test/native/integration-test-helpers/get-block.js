@@ -5,7 +5,7 @@
  * @param {string}                                            blockName          Name of the block.
  * @param {Object}                                            options            Configuration options for getting the block.
  * @param {number}                                            [options.rowIndex] Row index of the block.
- * @return {HTMLElement} Block instance.
+ * @return {import('react-test-renderer').ReactTestInstance} Block instance.
  */
 export const getBlock = ( screen, blockName, { rowIndex = 1 } = {} ) => {
 	return screen.getAllByLabelText(

@@ -1,6 +1,6 @@
 # About the Interactivity API
 
-The Interactivity API is **a standard system of directives, based on declarative code, for adding frontend interactivity to blocks**.
+The Interactivity API is **a [standard](#why-a-standard) system of [directives](#why-directives), based on declarative code, for [adding frontend interactivity to blocks](#api-goals)**.
 
 **Directives extend HTML with special attributes** that tell the Interactivity API to attach a specified behavior to a DOM element or even to transform it. For those familiar with [Alpine.js](https://alpinejs.dev/), it’s a similar approach but explicitly designed to work seamlessly with WordPress.
 
@@ -50,13 +50,13 @@ _Dynamic block example_
     Toggle
   </button>
  
-  <p id="p-1" data-wp-show="context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
 ```
 
-As you can see, directives like `data-wp-on--click` or `data-wp-show` are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives’ logic and creating the appropriate markup.
+As you can see, directives like [`data-wp-on--click`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-on) or [`data-wp-bind--hidden`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-bind) are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives’ logic and creating the appropriate markup.
 
 ### Backward compatible
 
@@ -72,7 +72,7 @@ The Interactivity API pipeline promotes **progressive enhancement** by building 
 For example, blocks with directives can coexist with other (interactive or non-interactive) blocks. This means that if there are other blocks on the page using other frameworks like jQuery, everything will work as expected.
 
 <div class="callout callout-warning">
-  Full-page client-side navigation will be an exception to this compatibility with other libraries rule. See <a href="#client-side-navigation">Client-side navigation</a> for more details.
+  Full-page client-side navigation with the Interactivity API will be an exception to this compatibility with other libraries rule. See <a href="#client-side-navigation">Client-side navigation</a> for more details.
 </div>
 
 ### Declarative and reactive
@@ -136,7 +136,7 @@ store( 'wpmovies', {
     Toggle
   </button>
  
-  <p id="p-1" data-wp-show="context.isOpen">
+  <p id="p-1" data-wp-bind--hidden="!context.isOpen">
     This element is now visible!
   </p>
 </div>
@@ -155,15 +155,13 @@ The API has been designed to be as performant as possible:
 
 Directives can be added, removed, or modified directly from the HTML. For example, users could use the [`render_block` filter](https://developer.wordpress.org/reference/hooks/render_block/) to modify the HTML and its behavior.
 
-In addition to using built-in directives, users can create custom directives to add any custom behaviors to their HTML.
-
 ### Atomic and composable
 
 Each directive controls a small part of the DOM, and you can combine multiple directives to create rich, interactive user experiences.
 
 ### Compatible with the existing block development tooling
 
-Using built-in directives does not require a build step and only requires a small runtime. A build step is necessary only when creating custom directives that return JSX. For such use cases, the API works out of the box with common block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/).
+The API works out of the box with standard block-building tools like [`wp-scripts`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/). The only requirement for `wp-scripts` to properly build the [Script Modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) using the Interactivity API is the use of the --experimental-modules flag for both [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts.
 
 ### Client-side navigation
 
