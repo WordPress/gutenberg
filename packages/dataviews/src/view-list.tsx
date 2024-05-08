@@ -2,15 +2,15 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import * as Ariakit from '@ariakit/react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
 import {
-	__experimentalHStack as HStack,
+	__experimentalHStack as HStack,		
 	__experimentalVStack as VStack,
-	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
@@ -20,7 +20,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { unlock } from './lock-unlock';
 import type {
 	Data,
 	Item,
@@ -48,16 +47,9 @@ interface ListViewItemProps {
 	mediaField?: NormalizedField;
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField;
+	store: any;
 	visibleFields: NormalizedField[];
 }
-import ItemActions from './item-actions';
-
-const {
-	useCompositeStoreV2: useCompositeStore,
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	CompositeRowV2: CompositeRow,
-} = unlock( componentsPrivateApis );
 
 function ListItem( {
 	actions,
@@ -67,6 +59,7 @@ function ListItem( {
 	onSelect,
 	mediaField,
 	primaryField,
+	store,
 	visibleFields,
 }: ListViewItemProps ) {
 	const itemRef = useRef< HTMLElement >( null );
@@ -84,8 +77,7 @@ function ListItem( {
 	}, [ isSelected ] );
 
 	return (
-		<CompositeRow
-			ref={ itemRef }
+		<Ariakit.CompositeRow
 			render={ <li /> }
 			role="row"
 			className={ clsx( {
@@ -94,7 +86,8 @@ function ListItem( {
 		>
 			<HStack className="dataviews-view-list__item-wrapper">
 				<div role="gridcell">
-					<CompositeItem
+					<Ariakit.CompositeItem
+						store={ store }
 						render={ <div /> }
 						role="button"
 						id={ id }
@@ -144,27 +137,27 @@ function ListItem( {
 								</div>
 							</VStack>
 						</HStack>
-					</CompositeItem>
+					</Ariakit.CompositeItem>
 				</div>
 				{ actions && (
 					<div role="gridcell">
-						<CompositeItem
-							// To be able to pass ItemActions directly, it should pass the incoming props to the underlying element:
-							// https://ariakit.org/guide/composition#custom-components-must-be-open-for-extension
-							render={ ( props: { actions: []; item: Item } ) => (
-								<ItemActions
-									actions={ props.actions }
-									item={ props.item }
-									isCompact
-								/>
-							) }
-							item={ item }
-							actions={ actions }
-						/>
+						<Ariakit.MenuProvider>
+							<Ariakit.CompositeItem
+								store={ store }
+								render={
+									<Ariakit.MenuButton>
+										Menu
+									</Ariakit.MenuButton>
+								}
+							/>
+							<Ariakit.Menu>
+								<Ariakit.MenuItem>Hello</Ariakit.MenuItem>
+							</Ariakit.Menu>
+						</Ariakit.MenuProvider>
 					</div>
 				) }
 			</HStack>
-		</CompositeRow>
+		</Ariakit.CompositeRow>
 	);
 }
 
@@ -209,7 +202,7 @@ export default function ViewList( props: ListViewProps ) {
 		[ baseId, getItemId ]
 	);
 
-	const store = useCompositeStore( {
+	const store = Ariakit.useCompositeStore( {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
 
@@ -230,7 +223,7 @@ export default function ViewList( props: ListViewProps ) {
 	}
 
 	return (
-		<Composite
+		<Ariakit.Composite
 			id={ baseId }
 			render={ <ul /> }
 			className="dataviews-view-list"
@@ -249,10 +242,11 @@ export default function ViewList( props: ListViewProps ) {
 						onSelect={ onSelect }
 						mediaField={ mediaField }
 						primaryField={ primaryField }
+						store={ store }
 						visibleFields={ visibleFields }
 					/>
 				);
 			} ) }
-		</Composite>
+		</Ariakit.Composite>
 	);
 }
