@@ -3,7 +3,7 @@
  */
 import { logged } from './utils';
 
-function isDev() {
+function isDev(): boolean {
 	return typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true;
 }
 
@@ -24,7 +24,7 @@ function isDev() {
  * }
  * ```
  */
-export default function warning( message ) {
+export default function warning( message: string ): void {
 	if ( ! isDev() ) {
 		return;
 	}
