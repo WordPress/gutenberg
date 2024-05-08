@@ -136,7 +136,10 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex className="edit-site-global-styles-sidebar__header">
+				<Flex
+					className="edit-site-global-styles-sidebar__header"
+					gap={ 1 }
+				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<h2 className="edit-site-global-styles-sidebar__header-title">
 							{ __( 'Styles' ) }
@@ -151,6 +154,7 @@ export default function GlobalStylesSidebar() {
 							}
 							disabled={ shouldClearCanvasContainerView }
 							onClick={ toggleStyleBook }
+							size="compact"
 						/>
 					</FlexItem>
 					<FlexItem>
@@ -162,6 +166,7 @@ export default function GlobalStylesSidebar() {
 							isPressed={
 								isRevisionsOpened || isRevisionsStyleBookOpened
 							}
+							size="compact"
 						/>
 					</FlexItem>
 					<GlobalStylesMenuSlot />
