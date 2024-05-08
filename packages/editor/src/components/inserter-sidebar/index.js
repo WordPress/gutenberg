@@ -50,11 +50,7 @@ export default function InserterSidebar( {
 	const libraryRef = useRef();
 
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="editor-inserter-sidebar"
-		>
+		<div className="editor-inserter-sidebar">
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
