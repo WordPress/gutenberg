@@ -1862,6 +1862,11 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
 const getItemFromVariation = ( state, item ) => ( variation ) => {
 	const variationId = `${ item.id }/${ variation.name }`;
 	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	const supportsAlias = variation?.supports?.alias ?? false;
+	const initialAttributes = {
+		...item.initialAttributes,
+		...variation.attributes,
+	};
 	return {
 		...item,
 		id: variationId,
@@ -1874,8 +1879,12 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 			? variation.example
 			: item.example,
 		initialAttributes: {
-			...item.initialAttributes,
-			...variation.attributes,
+			...initialAttributes,
+			metadata: {
+				...initialAttributes.metadata,
+				// If the variation supports alias, set the alias attribute to the variation name.
+				...( supportsAlias && { alias: variation.name } ),
+			},
 		},
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
