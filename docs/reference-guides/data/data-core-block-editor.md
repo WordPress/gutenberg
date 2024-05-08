@@ -424,7 +424,7 @@ _Returns_
 
 ### getBlockSectionRootClientId
 
-Gets the section root client ID, if exists, otherwise the root client ID.
+Given a block client ID, returns the section root client ID if the editor is in zoom-out mode, otherwise returns the root client ID.
 
 _Parameters_
 

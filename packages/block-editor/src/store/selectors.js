@@ -553,7 +553,8 @@ export function getBlockRootClientId( state, clientId ) {
 }
 
 /**
- * Gets the section root client ID, if exists, otherwise the root client ID.
+ * Given a block client ID, returns the section root client ID if the editor is
+ * in zoom-out mode, otherwise returns the root client ID.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
