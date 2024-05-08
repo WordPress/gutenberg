@@ -130,6 +130,9 @@ function Iframe( {
 	] = useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
+		node._load = () => {
+			setIframeDocument( node.contentDocument );
+		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -142,7 +145,6 @@ function Iframe( {
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
-			setIframeDocument( node.contentDocument );
 			clearerRef( documentElement );
 
 			// Ideally ALL classes that are added through get_body_class should
@@ -192,6 +194,7 @@ function Iframe( {
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
+			delete node._load;
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -220,8 +223,9 @@ function Iframe( {
 <html>
 	<head>
 		<meta charset="utf-8">
+		<script>window.frameElement._load()</script>
 		<style>
-			html {
+			html{
 				height: auto !important;
 				min-height: 100%;
 			}
@@ -356,8 +360,9 @@ function Iframe( {
 			>
 				{ iframeDocument &&
 					createPortal(
-						// We want to prevent React events from bubbling through the iframe
+						// We want to prevent React events from bubbling throught the iframe
 						// we bubble these manually.
+						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
 							className={ clsx(
