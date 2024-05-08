@@ -117,18 +117,6 @@ function Inserter( {
 
 function ZoomOutModeInserters( { __unstableContentRef } ) {
 	const [ isReady, setIsReady ] = useState( false );
-	// const { setInserterIsOpened } = useSelect( ( select ) => {
-	// 	const { getSettings, getBlockIndex, getBlockCount } =
-	// 		select( blockEditorStore );
-	// 	const settings = getSettings();
-	// 	const index = getBlockIndex( clientId );
-	// 	const blockCount = getBlockCount();
-
-	// 	return {
-	// 		setInserterIsOpened: settings.__experimentalSetIsInserterOpened,
-	// 		insertionIndex: index === -1 ? blockCount : index,
-	// 	};
-	// }, [] );
 	const { blockOrder, sectionRootClientId } = useSelect( ( select ) => {
 		const { sectionRootClientId: root } = unlock(
 			select( blockEditorStore ).getSettings()
@@ -148,12 +136,6 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 			clearTimeout( timeout );
 		};
 	}, [] );
-
-	// useEffect( () => {
-	// 	if ( setInserterIsOpened ) {
-	// 		setInserterIsOpened( false );
-	// 	}
-	// }, [ setInserterIsOpened ] );
 
 	const disableMotion = useReducedMotion();
 
