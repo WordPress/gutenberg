@@ -76,7 +76,7 @@ const DimensionControls = ( {
 		} ) );
 
 	// Get the block Supports aspect ratio.
-	const blockSupportsAspectRatio = attributes?.style?.dimensions?.aspectRatio;
+	const aspectRatio = attributes?.style?.dimensions?.aspectRatio;
 
 	const onDimensionChange = ( dimension, nextValue ) => {
 		const parsedValue = parseFloat( nextValue );
@@ -95,8 +95,7 @@ const DimensionControls = ( {
 	const scaleLabel = _x( 'Scale', 'Image scaling options' );
 
 	const showScaleControl =
-		height ||
-		( blockSupportsAspectRatio && blockSupportsAspectRatio !== 'auto' );
+		height || ( aspectRatio && aspectRatio !== 'auto' );
 
 	return (
 		<>
