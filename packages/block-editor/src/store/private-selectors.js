@@ -27,7 +27,7 @@ import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
-	getThemeFileURIKey,
+	getCurrentThemeKey,
 } from './private-keys';
 
 export { getBlockSettings } from './get-block-settings';
@@ -413,15 +413,6 @@ export const getReusableBlocks = createRegistrySelector(
 	}
 );
 
-export const getThemeFileURI = createRegistrySelector(
-	( select ) => ( state, file ) => {
-		const getThemeFileURISelect = state.settings[ getThemeFileURIKey ];
-		return getThemeFileURISelect
-			? getThemeFileURISelect( select, file )
-			: '';
-	}
-);
-
 /**
  * Returns the element of the last element that had focus when focus left the editor canvas.
  *
@@ -506,3 +497,13 @@ export function getTemporarilyEditingAsBlocks( state ) {
 export function getTemporarilyEditingFocusModeToRevert( state ) {
 	return state.temporarilyEditingFocusModeRevert;
 }
+
+const EMPTY_OBJECT = {};
+export const getCurrentTheme = createRegistrySelector(
+	( select ) => ( state, file ) => {
+		const getCurrentTheme = state.settings[ getCurrentThemeKey ];
+		return getCurrentTheme
+			? getCurrentTheme( select )
+			: EMPTY_OBJECT;
+	}
+);

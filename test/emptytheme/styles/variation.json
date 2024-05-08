@@ -1,5 +1,6 @@
 {
 	"version": 3,
+	"title": "hello",
 	"settings": {
 		"color": {
 			"palette": [
@@ -12,10 +13,22 @@
 		}
 	},
 	"styles": {
+		"background": {
+			"backgroundImage": {
+				"url": "img/2.jpg"
+			},
+			"backgroundSize": "contain"
+		},
 		"blocks": {
-			"core/post-title": {
-				"typography": {
-					"fontWeight": "700"
+			"core/group": {
+				"color": {
+					"text": "yellow"
+				},
+				"background": {
+					"backgroundImage": {
+						"url": "img/3.jpg"
+					},
+					"backgroundSize": "auto"
 				}
 			}
 		}

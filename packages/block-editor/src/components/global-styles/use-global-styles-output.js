@@ -1221,7 +1221,6 @@ export function processCSSNesting( css, blockSelector ) {
 export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	const resolvedConfig = useResolveThemeFileURIs( mergedConfig );
-	console.log( 'resolvedConfig', resolvedConfig );
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 

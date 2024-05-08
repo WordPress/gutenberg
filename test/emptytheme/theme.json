@@ -1,19 +1,15 @@
 {
-	"$schema": "../../schemas/json/theme.json",
-	"version": 3,
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 2,
 	"settings": {
-		"appearanceTools": true,
-		"layout": {
-			"contentSize": "840px",
-			"wideSize": "1100px"
-		}
+		"appearanceTools": true
 	},
-	"customTemplates": [
-		{
-			"name": "custom-template",
-			"title": "Custom",
-			"postTypes": [ "post" ]
+	"styles": {
+		"background": {
+			"backgroundImage": {
+				"url": "img/1.jpg"
+			},
+			"backgroundSize": "cover"
 		}
-	],
-	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]
+	}
 }

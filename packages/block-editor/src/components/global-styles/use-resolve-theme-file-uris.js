@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { isURL } from '@wordpress/url';
+import { isURL, isValidPath } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useCallback, useState, useMemo } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useEffect, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,82 +11,261 @@ import apiFetch from '@wordpress/api-fetch';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 
-async function resolveThemeJSONFileURIs( config, stylesheetURI, templateURI ) {
-	// Array to store promises of fetch operations
-	const fetchPromises = [];
-	const updatedConfig = JSON.parse( JSON.stringify( config ) )
+const resolvedURIsCache = new Map();
 
+function isRelativePath( url ) {
+	return isValidPath( url ) && ! isURL( url );
+}
 
-	if ( config?.styles?.background?.backgroundImage?.url && ! isURL( config?.styles?.background?.backgroundImage?.url ) ) {
-		let trimmedFile = config?.styles?.background?.backgroundImage?.url.trim();
-		trimmedFile = trimmedFile.startsWith( '/' ) ? trimmedFile : `/${ trimmedFile }`;
-		const activeThemeFileURL = `${ stylesheetURI }${ encodeURIComponent( trimmedFile ) }`;
-		fetchPromises.push(
-		apiFetch( { url: activeThemeFileURL, method: 'HEAD', parse: false } )
-			.then( () => {
-				updatedConfig.styles.background.backgroundImage.url = activeThemeFileURL;
-			} )
-			.catch( () => {
-				updatedConfig.styles.background.backgroundImage.url = `${ templateURI }${ trimmedFile }`;
-			} )
-		);
+function getThemeFileURIs( file, stylesheetURI, templateURI ) {
+	file = file.trim();
+	file = file.startsWith( '/' ) ? file : `/${ file }`;
+	return [ `${ stylesheetURI }${ file }`, `${ templateURI }${ file }` ];
+}
+
+function fetchThemeFileURI( url, { onSuccess, onError, onFinally } ) {
+	if ( ! isURL( url ) || ! window?.fetch ) {
+		return null;
 	}
+	return window
+		.fetch( url, { method: 'HEAD', mode: 'same-origin' } )
+		.then( onSuccess )
+		.catch( onError )
+		.finally( onFinally );
+}
 
-	if ( config?.styles?.blocks ) {
-		Object.entries( config.styles.blocks ).forEach( ( [ blockName, blockStyles ] ) => {
-			if ( blockStyles?.background?.backgroundImage?.url && ! isURL( blockStyles?.background?.backgroundImage?.url ) ) {
-				let trimmedFile = blockStyles?.background?.backgroundImage?.url.trim();
-				trimmedFile = trimmedFile.startsWith( '/' ) ? trimmedFile : `/${ trimmedFile }`;
-				const activeThemeFileURL = `${ stylesheetURI }${ encodeURIComponent( trimmedFile ) }`;
+async function resolveThemeJSONFileURIs(
+	relativePaths,
+	stylesheetURI,
+	templateURI,
+	themeStylesheet
+) {
+	const fetchPromises = [];
+	const unresolvedPaths = [ ...relativePaths ];
+	if ( relativePaths?.length ) {
+		relativePaths.forEach( ( path ) => {
+			const cacheKey = `${ themeStylesheet }-${ path }`;
+			if ( ! resolvedURIsCache.has( cacheKey ) ) {
+				const [ activeThemeFileURL, defaultThemeFileURL ] =
+					getThemeFileURIs( path, stylesheetURI, templateURI );
 				fetchPromises.push(
-					apiFetch( { url: activeThemeFileURL, method: 'HEAD', parse: false } )
-						.then( () => {
-							updatedConfig.styles.blocks[ blockName ].background.backgroundImage.url = activeThemeFileURL;
-						} )
-						.catch( () => {
-							updatedConfig.styles.blocks[ blockName ].background.backgroundImage.url = `${ templateURI }${ trimmedFile }`;
-						} )
+					fetchThemeFileURI( activeThemeFileURL, {
+						onSuccess: () => {
+							resolvedURIsCache.set(
+								cacheKey,
+								activeThemeFileURL
+							);
+						},
+						onError: () => {
+							resolvedURIsCache.set(
+								cacheKey,
+								defaultThemeFileURL
+							);
+						},
+						onFinally: () => {
+							const index = unresolvedPaths.indexOf( path );
+							unresolvedPaths.splice( index, 1 );
+						},
+					} )
 				);
 			}
 		} );
 	}
+	/*
 
-	// Wait for all fetch operations to complete
+	// Top-level styles.
+	if ( isRelativePath( config?.styles?.background?.backgroundImage?.url ) ) {
+		const cacheKey = `${ themeStylesheet }-${ config.styles.background.backgroundImage.url }`;
+		if ( ! resolvedURIsCache.has( cacheKey ) ) {
+			const [ activeThemeFileURL, defaultThemeFileURL ] =
+				getThemeFileURIs(
+					config.styles.background.backgroundImage.url,
+					stylesheetURI,
+					templateURI
+				);
+
+			fetchPromises.push(
+				fetchThemeFileURI( activeThemeFileURL, {
+					onSuccess: () => {
+						resolvedURIsCache.set( cacheKey, activeThemeFileURL );
+					},
+					onError: () => {
+						resolvedURIsCache.set( cacheKey, defaultThemeFileURL );
+					},
+				} )
+			);
+		}
+	}
+
+	// Block styles.
+	if (
+		config?.styles?.blocks &&
+		Object.keys( config.styles.blocks ).length
+	) {
+		Object.entries( config.styles.blocks ).forEach(
+			( [ , blockStyles ] ) => {
+				if (
+					isRelativePath(
+						blockStyles?.background?.backgroundImage?.url
+					)
+				) {
+					const cacheKey = `${ themeStylesheet }-${ blockStyles?.background?.backgroundImage?.url }`;
+					if ( ! resolvedURIsCache.has( cacheKey ) ) {
+						const [ activeThemeFileURL, defaultThemeFileURL ] =
+							getThemeFileURIs(
+								blockStyles.background.backgroundImage.url,
+								stylesheetURI,
+								templateURI
+							);
+						fetchPromises.push(
+							fetchThemeFileURI( activeThemeFileURL, {
+								onSuccess: () => {
+									resolvedURIsCache.set(
+										cacheKey,
+										activeThemeFileURL
+									);
+								},
+								onError: () => {
+									resolvedURIsCache.set(
+										cacheKey,
+										defaultThemeFileURL
+									);
+								},
+							} )
+						);
+					}
+				}
+			}
+		);
+	}
+*/
+
 	await Promise.allSettled( fetchPromises );
-	console.log( 'Promise updatedConfig', updatedConfig );
-	// Return the updated object
-	return updatedConfig;
+	return unresolvedPaths;
 }
 
+function getUnresolvedThemeFilePaths( config, themeStylesheet ) {
+	const paths = [];
+	if ( isRelativePath( config?.styles?.background?.backgroundImage?.url ) ) {
+		const cacheKey = `${ themeStylesheet }-${ config.styles.background.backgroundImage.url }`;
+		if ( ! resolvedURIsCache.has( cacheKey ) ) {
+			paths.push( config.styles.background.backgroundImage.url );
+		}
+	}
 
+	if (
+		config?.styles?.blocks &&
+		Object.keys( config.styles.blocks ).length
+	) {
+		Object.entries( config.styles.blocks ).forEach(
+			( [ , blockStyles ] ) => {
+				if (
+					isRelativePath(
+						blockStyles?.background?.backgroundImage?.url
+					)
+				) {
+					const cacheKey = `${ themeStylesheet }-${ blockStyles?.background?.backgroundImage?.url }`;
+					if ( ! resolvedURIsCache.has( cacheKey ) ) {
+						paths.push( blockStyles.background.backgroundImage.url );
+					}
+				}
+			}
+		);
+	}
+
+	return paths;
+}
+
+function setResolvedThemeFilePaths( config, themeStylesheet ) {
+	if ( isRelativePath( config?.styles?.background?.backgroundImage?.url ) ) {
+		const cacheKey = `${ themeStylesheet }-${ config.styles.background.backgroundImage.url }`;
+		if ( resolvedURIsCache.has( cacheKey ) ) {
+			config.styles.background.backgroundImage.url =
+				resolvedURIsCache.get( cacheKey );
+		}
+	}
+
+	if (
+		config?.styles?.blocks &&
+		Object.keys( config.styles.blocks ).length
+	) {
+		Object.entries( config.styles.blocks ).forEach(
+			( [ blockName, blockStyles ] ) => {
+				if (
+					isRelativePath(
+						blockStyles?.background?.backgroundImage?.url
+					)
+				) {
+					const cacheKey = `${ themeStylesheet }-${ blockStyles?.background?.backgroundImage?.url }`;
+					if ( resolvedURIsCache.has( cacheKey ) ) {
+						config.styles.blocks[
+							blockName
+						].background.backgroundImage.url =
+							resolvedURIsCache.get( cacheKey );
+					}
+				}
+			}
+		);
+	}
+
+	return config;
+}
+
+/*
+  Ideas:
+   Check that this needs to be run before running it by parsing out URLs early?
+   Can a function returning an array be a useEffect dependency?
+ */
 export default function useResolveThemeFileURIs( mergedConfig ) {
-	// let updatedConfig = useRef();
-	const { stylesheetURI, templateURI } = useSelect( ( select ) => {
-		const { currentTheme } = select( blockEditorStore ).getSettings();
-		return {
-			stylesheetURI: currentTheme?.stylesheetURI,
-			templateURI: currentTheme?.templateURI,
-		};
-	} );
-	const [ config, setConfig ] = useState( mergedConfig );
+	const { stylesheetURI, templateURI, themeStylesheet } = useSelect(
+		( select ) => {
+			const {
+				stylesheet_uri: _stylesheetURI,
+				template_uri: _templateURI,
+				stylesheet: _themeStylesheet,
+			} = unlock( select( blockEditorStore ) ).getCurrentTheme();
+			return {
+				stylesheetURI: _stylesheetURI,
+				templateURI: _templateURI,
+				themeStylesheet: _themeStylesheet,
+			};
+		}
+	);
 
-	useEffect(() => {
-		if ( ! mergedConfig || ! stylesheetURI || ! templateURI ) {
+	const [ unresolvedPaths, setUnresolvedPaths ] = useState(
+		getUnresolvedThemeFilePaths( mergedConfig, themeStylesheet )
+	);
+
+	useEffect( () => {
+		if (
+			! mergedConfig?.styles ||
+			! unresolvedPaths?.length ||
+			! stylesheetURI ||
+			! templateURI ||
+			! themeStylesheet
+		) {
 			return;
 		}
 
 		( async () => {
 			try {
-				const newConfig = await resolveThemeJSONFileURIs( mergedConfig, stylesheetURI, templateURI );
-				setConfig( newConfig );
-			} catch ( err ) { }
-		})();
-	}, [ stylesheetURI, templateURI, mergedConfig?.styles?.background?.backgroundImage?.url, mergedConfig?.styles?.['core/group']?.background?.backgroundImage?.url ] );
+				const _unresolvedPaths = await resolveThemeJSONFileURIs(
+					unresolvedPaths,
+					stylesheetURI,
+					templateURI,
+					themeStylesheet
+				);
+				setUnresolvedPaths( _unresolvedPaths );
+			} catch ( err ) {}
+		} )();
+	}, [
+		mergedConfig,
+		unresolvedPaths,
+		setUnresolvedPaths,
+		stylesheetURI,
+		templateURI,
+		themeStylesheet,
+	] );
 
-	return useMemo( () => {
-		if ( ! config ) {
-			return mergedConfig;
-		}
-		return config;
-	}, [ config, mergedConfig ] );
+	return setResolvedThemeFilePaths( mergedConfig, themeStylesheet );
 }
