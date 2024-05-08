@@ -21,6 +21,7 @@ import {
 } from './registration';
 import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
+import { convertAliasBlockNameAndAttributes } from './parser/convert-alias-block';
 
 /** @typedef {import('./parser').WPBlock} WPBlock */
 
@@ -322,15 +323,18 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
+	const [ correctBlockName, correctedAttributes ] =
+		convertAliasBlockNameAndAttributes( rawBlockName, attributes );
+
 	const serializedAttributes =
-		attributes && Object.entries( attributes ).length
-			? serializeAttributes( attributes ) + ' '
+		correctedAttributes && Object.entries( correctedAttributes ).length
+			? serializeAttributes( correctedAttributes ) + ' '
 			: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = rawBlockName?.startsWith( 'core/' )
-		? rawBlockName.slice( 5 )
-		: rawBlockName;
+	const blockName = correctBlockName?.startsWith( 'core/' )
+		? correctBlockName.slice( 5 )
+		: correctBlockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 
