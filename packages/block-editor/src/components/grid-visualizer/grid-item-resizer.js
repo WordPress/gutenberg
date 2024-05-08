@@ -22,7 +22,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 	 * necessary because the resizer exists outside of the iframe, so
 	 * its bounding client rect isn't the same as the block element's.
 	 */
-	const resizerDummyRef = useRef( null );
+	const resizerRef = useRef( null );
 
 	if ( ! blockElement ) {
 		return null;
@@ -62,8 +62,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 		offsetWidth: rootBlockElement.offsetWidth,
 		offsetHeight: rootBlockElement.offsetHeight,
 		getBoundingClientRect: () => {
-			const resizerTop =
-				resizerDummyRef.current?.getBoundingClientRect()?.top;
+			const resizerTop = resizerRef.current?.getBoundingClientRect()?.top;
 			// Fallback value of 60 to account for editor top bar height.
 			const heightDifference = resizerTop
 				? resizerTop - blockClientRect.top
@@ -96,6 +95,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
 			additionalStyles={ styles }
+			__unstableContentRef={ resizerRef }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"
@@ -183,10 +183,6 @@ export function GridItemResizer( { clientId, onChange } ) {
 					} );
 				} }
 			/>
-			<div
-				className="block-editor-grid-item-resizer__dummy"
-				ref={ resizerDummyRef }
-			></div>
 		</BlockPopoverCover>
 	);
 }
