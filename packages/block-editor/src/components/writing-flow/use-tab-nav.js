@@ -45,7 +45,11 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			getLastFocus()?.current.focus();
+			container.current
+				.querySelector(
+					`[data-block="${ getSelectedBlockClientId() }"]`
+				)
+				.focus();
 		} else {
 			setNavigationMode( true );
 
