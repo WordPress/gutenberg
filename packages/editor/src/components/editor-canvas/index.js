@@ -54,10 +54,7 @@ const FRAME_SIZE = 20;
 const ZOOM_OUT_MAX_WIDTH = 800;
 
 function computeZoomOutScale( { containerWidth, windowInnerWidth } ) {
-	return (
-		( Math.min( containerWidth, ZOOM_OUT_MAX_WIDTH ) - 2 * FRAME_SIZE ) /
-		windowInnerWidth
-	);
+	return Math.min( containerWidth, ZOOM_OUT_MAX_WIDTH ) / windowInnerWidth;
 }
 
 /**
