@@ -638,4 +638,148 @@ test.describe( 'Pattern Overrides', () => {
 			} )
 		).toBeHidden();
 	} );
+
+	test( 'create a pattern with synced blocks', async ( {
+		page,
+		admin,
+		editor,
+	} ) => {
+		let patternId;
+		const sharedName = 'Shared Name';
+
+		await test.step( 'create a pattern with synced blocks', async () => {
+			await admin.visitSiteEditor( { path: '/patterns' } );
+
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Create pattern' } )
+				.click();
+
+			await page
+				.getByRole( 'menu', { name: 'Create pattern' } )
+				.getByRole( 'menuitem', { name: 'Create pattern' } )
+				.click();
+
+			const createPatternDialog = page.getByRole( 'dialog', {
+				name: 'Create pattern',
+			} );
+			await createPatternDialog
+				.getByRole( 'textbox', { name: 'Name' } )
+				.fill( 'Pattern with synced values' );
+			await createPatternDialog
+				.getByRole( 'checkbox', { name: 'Synced' } )
+				.setChecked( true );
+			await createPatternDialog
+				.getByRole( 'button', { name: 'Create' } )
+				.click();
+
+			await editor.canvas.locator( 'body' ).click();
+
+			// Insert heading with shared name.
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'default content',
+					metadata: {
+						name: sharedName,
+						bindings: {
+							content: {
+								source: 'core/pattern-overrides',
+							},
+						},
+					},
+				},
+			} );
+
+			// Insert first paragraph with shared name.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'default content',
+					metadata: {
+						name: sharedName,
+						bindings: {
+							content: {
+								source: 'core/pattern-overrides',
+							},
+						},
+					},
+				},
+			} );
+
+			// Insert second paragraph with shared name.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'default content',
+					metadata: {
+						name: sharedName,
+						bindings: {
+							content: {
+								source: 'core/pattern-overrides',
+							},
+						},
+					},
+				},
+			} );
+
+			const headingBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			const firstParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.first();
+			const secondParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.last();
+
+			await firstParagraph.fill( 'updated content' );
+			await expect( headingBlock ).toHaveText( 'updated content' );
+			await expect( firstParagraph ).toHaveText( 'updated content' );
+			await expect( secondParagraph ).toHaveText( 'updated content' );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'button', { name: 'Dismiss this notice' } )
+			).toBeVisible();
+
+			patternId = new URL( page.url() ).searchParams.get( 'postId' );
+		} );
+
+		await test.step( 'create a post and insert the pattern with synced values', async () => {
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: patternId },
+			} );
+
+			const headingBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			const firstParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.first();
+			const secondParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.last();
+
+			await firstParagraph.fill( 'overriden content' );
+			await expect( headingBlock ).toHaveText( 'overriden content' );
+			await expect( firstParagraph ).toHaveText( 'overriden content' );
+			await expect( secondParagraph ).toHaveText( 'overriden content' );
+		} );
+	} );
 } );
