@@ -70,7 +70,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
-									'Opens the block List View sidebar by default.'
+									'Opens the List View sidebar by default.'
 								) }
 								label={ __( 'Always open List View' ) }
 							/>
