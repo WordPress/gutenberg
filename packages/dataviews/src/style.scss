@@ -406,14 +406,8 @@
 			position: relative;
 			border-radius: $grid-unit-05;
 
-			&::after {
-				position: absolute;
-				content: "";
-				top: 100%;
-				left: $grid-unit-30;
-				right: $grid-unit-30;
-				background: $gray-100;
-				height: 1px;
+			> * {
+				width: 100%;
 			}
 		}
 
