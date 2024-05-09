@@ -514,6 +514,10 @@
 		}
 	}
 
+	.dataviews-item-actions {
+		padding-right: $grid-unit-40;
+	}
+
 	& + .dataviews-pagination {
 		justify-content: space-between;
 	}
