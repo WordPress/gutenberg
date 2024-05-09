@@ -2,11 +2,15 @@
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
+
 /**
  * Internal dependencies
  */
@@ -17,18 +21,34 @@ export default function InserterSidebar( {
 	closeGeneralSidebar,
 	isRightSidebarOpen,
 } ) {
-	const { inserterSidebarToggleRef, insertionPoint, showMostUsedBlocks } =
-		useSelect( ( select ) => {
-			const { getInserterSidebarToggleRef, getInsertionPoint } = unlock(
-				select( editorStore )
-			);
-			const { get } = select( preferencesStore );
-			return {
-				inserterSidebarToggleRef: getInserterSidebarToggleRef(),
-				insertionPoint: getInsertionPoint(),
-				showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
-			};
-		}, [] );
+	const {
+		blockSectionRootClientId,
+		inserterSidebarToggleRef,
+		insertionPoint,
+		showMostUsedBlocks,
+	} = useSelect( ( select ) => {
+		const { getInserterSidebarToggleRef, getInsertionPoint } = unlock(
+			select( editorStore )
+		);
+		const { getBlockRootClientId, __unstableGetEditorMode, getSettings } =
+			select( blockEditorStore );
+		const { get } = select( preferencesStore );
+		const getBlockSectionRootClientId = () => {
+			if ( __unstableGetEditorMode() === 'zoom-out' ) {
+				const { sectionRootClientId } = unlock( getSettings() );
+				if ( sectionRootClientId ) {
+					return sectionRootClientId;
+				}
+			}
+			return getBlockRootClientId();
+		};
+		return {
+			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
+			insertionPoint: getInsertionPoint(),
+			showMostUsedBlocks: get( 'core', 'mostUsedBlocks' ),
+			blockSectionRootClientId: getBlockSectionRootClientId(),
+		};
+	}, [] );
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -58,7 +78,9 @@ export default function InserterSidebar( {
 					showMostUsedBlocks={ showMostUsedBlocks }
 					showInserterHelpPanel
 					shouldFocusBlock={ isMobileViewport }
-					rootClientId={ insertionPoint.rootClientId }
+					rootClientId={
+						blockSectionRootClientId ?? insertionPoint.rootClientId
+					}
 					__experimentalInsertionIndex={
 						insertionPoint.insertionIndex
 					}
