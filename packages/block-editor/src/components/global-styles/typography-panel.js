@@ -18,6 +18,7 @@ import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
 import LetterSpacingControl from '../letter-spacing-control';
+import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
 import WritingModeControl from '../writing-mode-control';
@@ -32,6 +33,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasLineHeight = useHasLineHeightControl( settings );
 	const hasFontAppearance = useHasAppearanceControl( settings );
 	const hasLetterSpacing = useHasLetterSpacingControl( settings );
+	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
@@ -43,6 +45,7 @@ export function useHasTypographyPanel( settings ) {
 		hasLineHeight ||
 		hasFontAppearance ||
 		hasLetterSpacing ||
+		hasTextAlign ||
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
@@ -89,6 +92,10 @@ function useHasLetterSpacingControl( settings ) {
 
 function useHasTextTransformControl( settings ) {
 	return settings?.typography?.textTransform;
+}
+
+function useHasTextAlignmentControl( settings ) {
+	return settings?.typography?.textAlign;
 }
 
 function useHasTextDecorationControl( settings ) {
@@ -150,6 +157,7 @@ const DEFAULT_CONTROLS = {
 	fontAppearance: true,
 	lineHeight: true,
 	letterSpacing: true,
+	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
 	writingMode: true,
@@ -165,6 +173,13 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
+	// If `panelId` has a value, it means this panel will be rendered inside
+	// the block sidebar. The text alignment UI for individual blocks is rendered
+	// in the block toolbar, so disable support if it's not in the global style.
+	if ( panelId ) {
+		settings.typography.textAlign = false;
+	}
+
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 
@@ -333,6 +348,22 @@ export default function TypographyPanel( {
 	};
 	const hasWritingMode = () => !! value?.typography?.writingMode;
 	const resetWritingMode = () => setWritingMode( undefined );
+
+	// Text Alignment
+	const hasTextAlignmentControl = useHasTextAlignmentControl( settings );
+
+	const textAlign = decodeValue( inheritedValue?.typography?.textAlign );
+	const setTextAlign = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textAlign' ],
+				newValue || undefined
+			)
+		);
+	};
+	const hasTextAlign = () => !! value?.typography?.textAlign;
+	const resetTextAlign = () => setTextAlign( undefined );
 
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -509,6 +540,22 @@ export default function TypographyPanel( {
 						onChange={ setTextTransform }
 						showNone
 						isBlock
+						size="__unstable-large"
+						__nextHasNoMarginBottom
+					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextAlignmentControl && (
+				<ToolsPanelItem
+					label={ __( 'Text alignment' ) }
+					hasValue={ hasTextAlign }
+					onDeselect={ resetTextAlign }
+					isShownByDefault={ defaultControls.textAlign }
+					panelId={ panelId }
+				>
+					<TextAlignmentControl
+						value={ textAlign }
+						onChange={ setTextAlign }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
