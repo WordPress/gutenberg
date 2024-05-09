@@ -116,7 +116,7 @@ function ListItem( {
 		}
 	}, [ isSelected ] );
 
-	const { primaryActions, eligibleActions } = useMemo( () => {
+	const { primaryAction, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
 		const _eligibleActions = actions.filter(
@@ -126,7 +126,7 @@ function ListItem( {
 			( action ) => action.isPrimary && !! action.icon
 		);
 		return {
-			primaryActions: _primaryActions,
+			primaryAction: _primaryActions?.[ 0 ],
 			eligibleActions: _eligibleActions,
 		};
 	}, [ actions, item ] );
@@ -210,67 +210,58 @@ function ListItem( {
 							width: 'auto',
 						} }
 					>
-						{ !! primaryActions.length &&
-							primaryActions.map( ( action ) => {
-								if ( !! action.RenderModal ) {
-									return (
-										<div role="gridcell">
-											<CompositeItem
-												store={ store }
-												render={
-													<Button
-														label={ action.label }
-														icon={ action.icon }
-														isDestructive={
-															action.isDestructive
-														}
-														size="compact"
-														onClick={ () =>
-															setIsModalOpen(
-																true
-															)
-														}
-													/>
-												}
-											>
-												{ isModalOpen && (
-													<ActionModal
-														action={ action }
-														item={ item }
-														closeModal={ () =>
-															setIsModalOpen(
-																false
-															)
-														}
-													/>
-												) }
-											</CompositeItem>
-										</div>
-									);
-								}
-								return (
-									<div role="gridcell" key={ action.id }>
-										<CompositeItem
-											store={ store }
-											render={
-												<Button
-													label={ action.label }
-													icon={ action.icon }
-													isDestructive={
-														action.isDestructive
-													}
-													size="compact"
-													onClick={ () =>
-														action.callback( [
-															item,
-														] )
-													}
-												/>
+						{ primaryAction && !! primaryAction.RenderModal && (
+							<div role="gridcell">
+								<CompositeItem
+									store={ store }
+									render={
+										<Button
+											label={ primaryAction.label }
+											icon={ primaryAction.icon }
+											isDestructive={
+												primaryAction.isDestructive
+											}
+											size="compact"
+											onClick={ () =>
+												setIsModalOpen( true )
 											}
 										/>
-									</div>
-								);
-							} ) }
+									}
+								>
+									{ isModalOpen && (
+										<ActionModal
+											action={ primaryAction }
+											item={ item }
+											closeModal={ () =>
+												setIsModalOpen( false )
+											}
+										/>
+									) }
+								</CompositeItem>
+							</div>
+						) }
+						{ primaryAction && ! primaryAction.RenderModal && (
+							<div role="gridcell" key={ primaryAction.id }>
+								<CompositeItem
+									store={ store }
+									render={
+										<Button
+											label={ primaryAction.label }
+											icon={ primaryAction.icon }
+											isDestructive={
+												primaryAction.isDestructive
+											}
+											size="compact"
+											onClick={ () =>
+												primaryAction.callback( [
+													item,
+												] )
+											}
+										/>
+									}
+								/>
+							</div>
+						) }
 						<div role="gridcell">
 							<DropdownMenu
 								trigger={
