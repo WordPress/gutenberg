@@ -30,10 +30,13 @@ import type {
 	ViewList as ViewListType,
 } from './types';
 
+import { ActionsDropdownMenuGroup } from './item-actions';
+
 interface Action {
 	id: string;
 	label: string;
 	callback: ( items: Item[] ) => void;
+	RenderModal: any;
 }
 
 interface ListViewProps {
@@ -62,9 +65,6 @@ interface ListViewItemProps {
 
 const {
 	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
@@ -179,23 +179,10 @@ function ListItem( {
 							}
 							placement="bottom-end"
 						>
-							<DropdownMenuGroup>
-								{ actions.map( ( action: Action ) => {
-									return (
-										<DropdownMenuItem
-											key={ action.id }
-											action={ action }
-											onClick={ () =>
-												action.callback( [ item ] )
-											}
-										>
-											<DropdownMenuItemLabel>
-												{ action.label }
-											</DropdownMenuItemLabel>
-										</DropdownMenuItem>
-									);
-								} ) }
-							</DropdownMenuGroup>
+							<ActionsDropdownMenuGroup
+								actions={ actions }
+								item={ item }
+							/>
 						</DropdownMenu>
 					</div>
 				) }

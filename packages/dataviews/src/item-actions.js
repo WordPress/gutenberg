@@ -91,7 +91,7 @@ export function ActionWithModal( {
 	);
 }
 
-function ActionsDropdownMenuGroup( { actions, item } ) {
+export function ActionsDropdownMenuGroup( { actions, item } ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
