@@ -15,7 +15,7 @@ export default function ResetOverridesControl( props ) {
 	const name = props.attributes.metadata?.name;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { isOverwritten, resetOverrides } = useSelect(
+	const { isOverriden, resetOverrides } = useSelect(
 		( select ) => {
 			if ( ! name ) {
 				return undefined;
@@ -51,7 +51,7 @@ export default function ResetOverridesControl( props ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					onClick={ resetOverrides }
-					disabled={ ! isOverwritten }
+					disabled={ ! isOverriden }
 					__experimentalIsFocusable
 				>
 					{ __( 'Reset' ) }
