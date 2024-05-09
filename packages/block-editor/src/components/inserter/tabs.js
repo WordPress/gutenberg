@@ -33,7 +33,7 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( { onClose, onSelect, children, selectedTab }, ref ) {
+function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
 	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (

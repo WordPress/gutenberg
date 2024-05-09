@@ -236,7 +236,6 @@ function InserterMenu(
 						category={ selectedPatternCategory }
 						patternFilter={ patternFilter }
 						showTitlesAsTooltip
-						initialCategory={ __experimentalInitialCategory }
 					/>
 				) }
 			</BlockPatternsTab>
@@ -249,7 +248,6 @@ function InserterMenu(
 		patternFilter,
 		selectedPatternCategory,
 		showPatternPanel,
-		__experimentalInitialCategory,
 	] );
 
 	const mediaTab = useMemo( () => {
