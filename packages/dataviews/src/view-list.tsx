@@ -8,9 +8,9 @@ import clsx from 'clsx';
  */
 import { useInstanceId } from '@wordpress/compose';
 import {
-	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Button,
 	Modal,
 	privateApis as componentsPrivateApis,
 	Spinner,
@@ -19,8 +19,8 @@ import {
 import {
 	useCallback,
 	useEffect,
-	useRef,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -40,15 +40,15 @@ import type {
 import { ActionsDropdownMenuGroup } from './item-actions';
 
 interface Action {
-	modalHeader: string;
-	hideModalHeader: any;
-	isDestructive: boolean | undefined;
-	isPrimary: boolean;
-	icon: any;
-	isEligible: any;
-	id: string;
-	label: string;
 	callback: ( items: Item[] ) => void;
+	hideModalHeader: any;
+	icon: any;
+	id: string;
+	isDestructive: boolean | undefined;
+	isEligible: any;
+	isPrimary: boolean;
+	label: string;
+	modalHeader: string;
 	RenderModal: any;
 }
 
@@ -77,21 +77,21 @@ interface ListViewItemProps {
 }
 
 const {
-	DropdownMenuV2: DropdownMenu,
+	useCompositeStoreV2: useCompositeStore,
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
-	useCompositeStoreV2: useCompositeStore,
+	DropdownMenuV2: DropdownMenu,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
 function ListItem( {
 	actions,
 	id,
-	item,
 	isSelected,
-	onSelect,
+	item,
 	mediaField,
+	onSelect,
 	primaryField,
 	store,
 	visibleFields,
