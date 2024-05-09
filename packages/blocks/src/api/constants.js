@@ -44,11 +44,16 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	backgroundRepeat: {
 		value: [ 'background', 'backgroundRepeat' ],
 		support: [ 'background', 'backgroundRepeat' ],
-		useEngine: true,
+		useEngine: false,
 	},
 	backgroundSize: {
 		value: [ 'background', 'backgroundSize' ],
 		support: [ 'background', 'backgroundSize' ],
+		useEngine: true,
+	},
+	backgroundPosition: {
+		value: [ 'background', 'backgroundPosition' ],
+		support: [ 'background', 'backgroundPosition' ],
 		useEngine: true,
 	},
 	borderColor: {
