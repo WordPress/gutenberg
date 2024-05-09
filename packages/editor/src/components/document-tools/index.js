@@ -38,7 +38,7 @@ function DocumentTools( {
 	// This is a temporary prop until the list view is fully unified between post and site editors.
 	listViewLabel = __( 'Document Overview' ),
 } ) {
-	const { setIsInserterOpened, setIsListViewOpened } =
+	const { setIsInserterOpened, setIsListViewOpened, setDeviceType } =
 		useDispatch( editorStore );
 	const {
 		isDistractionFree,
