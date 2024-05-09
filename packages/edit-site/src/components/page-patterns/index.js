@@ -391,10 +391,8 @@ export default function DataviewsPatterns() {
 		},
 		[ history, categoryId, type ]
 	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
+	const [ editAction, viewRevisionsAction ] =
+		usePostActions( onActionPerformed );
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [

@@ -188,29 +188,6 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-let PAGE_ACTIONS = [
-	'edit-post',
-	'view-post',
-	'restore',
-	'permanently-delete',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
-	PAGE_ACTIONS = [
-		'edit-post',
-		'view-post',
-		'restore',
-		'permanently-delete',
-		'view-post-revisions',
-		'duplicate-post',
-		'rename-post',
-		'move-to-trash',
-	];
-}
-
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -373,7 +350,7 @@ export default function PagePages() {
 		},
 		[ history ]
 	);
-	const actions = usePostActions( onActionPerformed, PAGE_ACTIONS );
+	const actions = usePostActions( onActionPerformed );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

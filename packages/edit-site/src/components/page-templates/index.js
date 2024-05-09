@@ -183,14 +183,6 @@ function Preview( { item, viewType } ) {
 	);
 }
 
-const TEMPLATE_ACTIONS = [
-	'edit-post',
-	'reset-template',
-	'rename-template',
-	'view-post-revisions',
-	'delete-template',
-];
-
 export default function PageTemplates() {
 	const { params } = useLocation();
 	const { activeView = 'all', layout } = params;
@@ -344,7 +336,7 @@ export default function PageTemplates() {
 		[ history ]
 	);
 
-	const actions = usePostActions( onActionPerformed, TEMPLATE_ACTIONS );
+	const actions = usePostActions( onActionPerformed );
 
 	const onChangeView = useCallback(
 		( newView ) => {

@@ -17,11 +17,6 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-} from '../../store/constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -31,36 +26,15 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-let POST_ACTIONS_WHILE_EDITING = [
-	'view-post',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
-	POST_ACTIONS_WHILE_EDITING = [
-		'view-post',
-		'view-post-revisions',
-		'duplicate-post',
-		'rename-post',
-		'move-to-trash',
-	];
-}
-
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { postType, item } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPost } = select( editorStore );
+	const { item } = useSelect( ( select ) => {
+		const { getCurrentPost } = select( editorStore );
 		return {
-			postType: getCurrentPostType(),
 			item: getCurrentPost(),
 		};
 	} );
-	const allActions = usePostActions(
-		onActionPerformed,
-		POST_ACTIONS_WHILE_EDITING
-	);
+	const allActions = usePostActions( onActionPerformed );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
@@ -68,15 +42,6 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 		} );
 	}, [ allActions, item ] );
 
-	if (
-		[
-			TEMPLATE_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType )
-	) {
-		return null;
-	}
 	return (
 		<DropdownMenu
 			open={ isActionsMenuOpen }
