@@ -207,6 +207,10 @@ _Related_
 
 Undocumented declaration.
 
+### BlockPopover
+
+Undocumented declaration.
+
 ### BlockPreview
 
 BlockPreview renders a preview of a block or array of blocks.
