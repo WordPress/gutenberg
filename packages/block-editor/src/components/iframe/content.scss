@@ -24,7 +24,7 @@
 .block-editor-iframe__html.is-zoomed-out {
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
-	$inner-height: var(--wp-block-editor-iframe-zoom-out-iframe-height);
+	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 
 	transform: scale(#{$scale});
