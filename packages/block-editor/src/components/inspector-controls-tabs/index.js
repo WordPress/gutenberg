@@ -23,6 +23,7 @@ export default function InspectorControlsTabs( {
 	clientId,
 	hasBlockStyles,
 	tabs,
+	block,
 } ) {
 	// The tabs panel will mount before fills are rendered to the list view
 	// slot. This means the list view tab isn't initially included in the
@@ -52,7 +53,10 @@ export default function InspectorControlsTabs( {
 					) ) }
 				</Tabs.TabList>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
-					<SettingsTab showAdvancedControls={ !! blockName } />
+					<SettingsTab
+						showAdvancedControls={ !! blockName }
+						block={ block }
+					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
 					<StylesTab
