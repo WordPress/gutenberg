@@ -10,8 +10,8 @@ import userEvent from '@testing-library/user-event';
 import Picker from '..';
 import type { FocalPointPickerProps } from '../types';
 
-type Log = { name: string; args: any[] };
-type EventLogger = ( name: string, args: any[] ) => void;
+type Log = { name: string; args: unknown[] };
+type EventLogger = ( name: string, args: unknown[] ) => void;
 
 const props: FocalPointPickerProps = {
 	onChange: jest.fn(),
