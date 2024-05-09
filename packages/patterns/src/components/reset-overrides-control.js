@@ -32,7 +32,7 @@ export default function ResetOverridesControl( props ) {
 			const existingOverrides = patternAttributes?.[ CONTENT ];
 
 			return {
-				isOverwritten: !! existingOverrides?.[ name ],
+				isOverriden: !! existingOverrides?.[ name ],
 				resetOverrides: async () => {
 					updateBlockAttributes( patternClientId, {
 						[ CONTENT ]: {
