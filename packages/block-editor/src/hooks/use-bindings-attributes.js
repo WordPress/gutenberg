@@ -115,6 +115,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 					const keptAttributes = { ...nextAttributes };
 
+					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(
 						nextAttributes
 					) ) {
