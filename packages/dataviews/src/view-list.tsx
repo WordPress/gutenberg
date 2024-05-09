@@ -100,6 +100,14 @@ function ListItem( {
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
 
+	const [ isHovered, setIsHovered ] = useState( false );
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
+
 	useEffect( () => {
 		if ( isSelected ) {
 			itemRef.current?.scrollIntoView( {
@@ -134,7 +142,10 @@ function ListItem( {
 			role="row"
 			className={ clsx( {
 				'is-selected': isSelected,
+				'is-hovered': isHovered,
 			} ) }
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
 		>
 			<HStack className="dataviews-view-list__item-wrapper">
 				<div role="gridcell">
