@@ -35,13 +35,10 @@ export default {
 	setValue( { registry, clientId, attributeName, value } ) {
 		const { getBlockAttributes, getBlockParents, getBlockName } =
 			registry.select( blockEditorStore );
-		const currentBlockAttributes = getBlockAttributes( clientId );
 		const parents = getBlockParents( clientId, true );
 		const patternClientId = parents.find(
 			( id ) => getBlockName( id ) === 'core/block'
 		);
-		const blockName = currentBlockAttributes?.metadata?.name;
-
 		// If there is no pattern client ID, set attributes as normal.
 		if ( ! patternClientId ) {
 			registry
@@ -52,6 +49,8 @@ export default {
 			return;
 		}
 
+		const currentBlockAttributes = getBlockAttributes( clientId );
+		const blockName = currentBlockAttributes?.metadata?.name;
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
 		registry
