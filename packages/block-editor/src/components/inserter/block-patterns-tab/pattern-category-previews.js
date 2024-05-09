@@ -8,15 +8,17 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
+	__experimentalNavigatorBackButton as NavigatorBackButton,
 	FlexBlock,
 } from '@wordpress/components';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -135,6 +137,16 @@ export function PatternCategoryPreviews( {
 				className="block-editor-inserter__patterns-category-panel-header"
 			>
 				<HStack>
+					<NavigatorBackButton
+						style={
+							// TODO: This style override is also used in ToolsPanelHeader.
+							// It should be supported out-of-the-box by Button.
+							{ minWidth: 24, padding: 0 }
+						}
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						size="small"
+						label={ __( 'Back' ) }
+					/>
 					<FlexBlock>
 						<Heading
 							className="block-editor-inserter__patterns-category-panel-title"

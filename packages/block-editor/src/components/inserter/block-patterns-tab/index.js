@@ -14,18 +14,11 @@ import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
-import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-function BlockPatternsTab( {
-	onSelectCategory,
-	selectedCategory,
-	onInsert,
-	rootClientId,
-	children,
-} ) {
+function BlockPatternsTab( { selectedCategory, onInsert, rootClientId } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
 
 	const categories = usePatternCategories( rootClientId );
@@ -51,38 +44,27 @@ function BlockPatternsTab( {
 
 	return (
 		<>
+			<MobileTabNavigation categories={ categories }>
+				{ ( category ) => (
+					<div className="block-editor-inserter__category-panel">
+						<PatternCategoryPreviews
+							key={ category.name }
+							onInsert={ onInsert }
+							rootClientId={ rootClientId }
+							category={ category }
+							showTitlesAsTooltip={ false }
+						/>
+					</div>
+				) }
+			</MobileTabNavigation>
 			{ ! isMobile && (
-				<div className="block-editor-inserter__block-patterns-tabs-container">
-					<CategoryTabs
-						categories={ categories }
-						selectedCategory={ selectedCategory }
-						onSelectCategory={ onSelectCategory }
-					>
-						{ children }
-					</CategoryTabs>
-					<Button
-						className="block-editor-inserter__patterns-explore-button"
-						onClick={ () => setShowPatternsExplorer( true ) }
-						variant="secondary"
-					>
-						{ __( 'Explore all patterns' ) }
-					</Button>
-				</div>
-			) }
-			{ isMobile && (
-				<MobileTabNavigation categories={ categories }>
-					{ ( category ) => (
-						<div className="block-editor-inserter__category-panel">
-							<PatternCategoryPreviews
-								key={ category.name }
-								onInsert={ onInsert }
-								rootClientId={ rootClientId }
-								category={ category }
-								showTitlesAsTooltip={ false }
-							/>
-						</div>
-					) }
-				</MobileTabNavigation>
+				<Button
+					className="block-editor-inserter__patterns-explore-button"
+					onClick={ () => setShowPatternsExplorer( true ) }
+					variant="secondary"
+				>
+					{ __( 'Explore all patterns' ) }
+				</Button>
 			) }
 			{ showPatternsExplorer && (
 				<PatternsExplorerModal
