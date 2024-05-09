@@ -207,21 +207,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
-
-	const windowResizeRef = useRefEffect( ( node ) => {
-		const nodeWindow = node.ownerDocument.defaultView;
-
-		setWindowInnerWidth( nodeWindow.innerWidth );
-		const onResize = () => {
-			setWindowInnerWidth( nodeWindow.innerWidth );
-		};
-		nodeWindow.addEventListener( 'resize', onResize );
-		return () => {
-			nodeWindow.removeEventListener( 'resize', onResize );
-		};
-	}, [] );
-
 	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
 
 	const iframeResizeRef = useRefEffect( ( node ) => {
@@ -230,6 +215,21 @@ function Iframe( {
 		setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		const onResize = () => {
 			setIframeWindowInnerHeight( nodeWindow.innerHeight );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
+
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		setWindowInnerWidth( nodeWindow.innerWidth );
+		const onResize = () => {
+			setWindowInnerWidth( nodeWindow.innerWidth );
 		};
 		nodeWindow.addEventListener( 'resize', onResize );
 		return () => {
