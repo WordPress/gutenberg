@@ -28,10 +28,6 @@ import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
 
-const preventDefault = ( event ) => {
-	event.preventDefault();
-};
-
 function DocumentTools( {
 	className,
 	disableBlockTools = false,
@@ -129,7 +125,6 @@ function DocumentTools( {
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpened }
-						onMouseDown={ preventDefault }
 						onClick={ toggleInserter }
 						disabled={ disableBlockTools }
 						icon={ plus }

@@ -84,9 +84,6 @@ function DocumentTools() {
 				className="edit-widgets-header-toolbar__inserter-toggle"
 				variant="primary"
 				isPressed={ isInserterOpen }
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
 				onClick={ handleClick }
 				icon={ plus }
 				/* translators: button label text should, if possible, be under 16
