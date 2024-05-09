@@ -31,6 +31,7 @@ import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
+import { BindingsPanel } from '../inspector-controls/bindings-panel';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -73,6 +74,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
+		block,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -80,6 +82,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			getContentLockingParent,
 			getTemplateLock,
+			getBlock,
 		} = unlock( select( blockEditorStore ) );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -99,6 +102,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
 					: undefined ),
+			block: getBlock( _selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -199,6 +203,7 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			<BlockInspectorSingleBlock
 				clientId={ selectedBlockClientId }
 				blockName={ blockType.name }
+				block={ block }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -240,10 +245,12 @@ const AnimatedContainer = ( {
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
+const BlockInspectorSingleBlock = ( { clientId, blockName, block } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
 	const showTabs = availableTabs?.length > 1;
-
+	const hasBindings = block?.attributes?.metadata?.bindings
+		? Object.keys( block.attributes.metadata.bindings ).length > 0
+		: false;
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -269,6 +276,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					clientId={ clientId }
 					blockName={ blockName }
 					tabs={ availableTabs }
+					block={ block }
 				/>
 			) }
 			{ ! showTabs && (
@@ -282,6 +290,7 @@ const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot group="list" />
+					{ hasBindings && <BindingsPanel block={ block } /> }
 					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
