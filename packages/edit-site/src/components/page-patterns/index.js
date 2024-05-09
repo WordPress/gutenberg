@@ -391,8 +391,11 @@ export default function DataviewsPatterns() {
 		},
 		[ history, categoryId, type ]
 	);
-	const [ editAction, viewRevisionsAction ] =
-		usePostActions( onActionPerformed );
+	const [ editAction, viewRevisionsAction ] = usePostActions(
+		type,
+		onActionPerformed
+	);
+
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
@@ -402,7 +405,7 @@ export default function DataviewsPatterns() {
 				viewRevisionsAction,
 				resetAction,
 				deleteAction,
-			];
+			].filter( Boolean );
 		}
 		return [
 			renameAction,
@@ -410,7 +413,7 @@ export default function DataviewsPatterns() {
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		];
+		].filter( Boolean );
 	}, [ type, editAction, viewRevisionsAction ] );
 	const onChangeView = useCallback(
 		( newView ) => {

@@ -987,23 +987,25 @@ const renameTemplateAction = {
 	},
 };
 
-export function usePostActions( onActionPerformed ) {
-	const { postType } = useSelect( ( select ) => {
-		const { getCurrentPostType } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		return {
-			postType: getPostType( getCurrentPostType() ),
-		};
-	} );
+export function usePostActions( postType, onActionPerformed ) {
+	const { postTypeObject } = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return {
+				postTypeObject: getPostType( postType ),
+			};
+		},
+		[ postType ]
+	);
 
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
 	const isTemplateOrTemplatePart = [
 		TEMPLATE_POST_TYPE,
 		TEMPLATE_PART_POST_TYPE,
-	].includes( postType?.slug );
-	const isPattern = postType?.slug === PATTERN_POST_TYPE;
-	const isLoaded = !! postType;
+	].includes( postType );
+	const isPattern = postType === PATTERN_POST_TYPE;
+	const isLoaded = !! postTypeObject;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -1012,7 +1014,7 @@ export function usePostActions( onActionPerformed ) {
 		const actions = [
 			editPostAction,
 			isTemplateOrTemplatePart && resetTemplateAction,
-			postType?.viewable && viewPostAction,
+			postTypeObject?.viewable && viewPostAction,
 			! isTemplateOrTemplatePart && restorePostAction,
 			isTemplateOrTemplatePart && deleteTemplateAction,
 			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
@@ -1072,7 +1074,7 @@ export function usePostActions( onActionPerformed ) {
 	}, [
 		isTemplateOrTemplatePart,
 		isPattern,
-		postType?.viewable,
+		postTypeObject?.viewable,
 		permanentlyDeletePostAction,
 		restorePostAction,
 		onActionPerformed,

@@ -350,7 +350,7 @@ export default function PagePages() {
 		},
 		[ history ]
 	);
-	const actions = usePostActions( onActionPerformed );
+	const actions = usePostActions( 'page', onActionPerformed );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

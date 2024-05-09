@@ -336,7 +336,7 @@ export default function PageTemplates() {
 		[ history ]
 	);
 
-	const actions = usePostActions( onActionPerformed );
+	const actions = usePostActions( TEMPLATE_POST_TYPE, onActionPerformed );
 
 	const onChangeView = useCallback(
 		( newView ) => {
