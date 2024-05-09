@@ -8,13 +8,13 @@
 
 .block-editor-inserter-sidebar__header {
 	border-bottom: $border-width solid $gray-300;
-	padding-right: $grid-unit-10;
+	padding-left: $grid-unit-10;
 	display: flex;
 	justify-content: space-between;
 
 	.block-editor-inserter-sidebar__close-button {
-		order: 1;
 		align-self: center;
+		margin-right: $grid-unit-20;
 	}
 }
 
