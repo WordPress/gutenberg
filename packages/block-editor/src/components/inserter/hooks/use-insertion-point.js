@@ -11,6 +11,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * @typedef WPInserterConfig
@@ -86,10 +87,23 @@ function useInsertionPoint( {
 		insertBlocks,
 		showInsertionPoint,
 		hideInsertionPoint,
-	} = useDispatch( blockEditorStore );
+		setLastFocus,
+	} = unlock( useDispatch( blockEditorStore ) );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false ) => {
+			// When we are trying to move focus or select a new block on insert, we also
+			// need to clear the last focus to avoid the focus being set to the wrong block
+			// when tabbing back into the canvas if the block was added from outside the
+			// editor canvas.
+			if (
+				shouldForceFocusBlock ||
+				shouldFocusBlock ||
+				selectBlockOnInsert
+			) {
+				setLastFocus( null );
+			}
+
 			const selectedBlock = getSelectedBlock();
 
 			if (

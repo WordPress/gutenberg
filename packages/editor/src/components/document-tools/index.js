@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,6 @@ const preventDefault = ( event ) => {
 function DocumentTools( {
 	className,
 	disableBlockTools = false,
-	children,
 	// This is a temporary prop until the list view is fully unified between post and site editors.
 	listViewLabel = __( 'Document Overview' ),
 } ) {
@@ -53,10 +52,10 @@ function DocumentTools( {
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
-		const { isListViewOpened, getListViewToggleRef } = unlock(
-			select( editorStore )
-		);
+		const { isListViewOpened, getListViewToggleRef, getEditorMode } =
+			unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -68,6 +67,8 @@ function DocumentTools( {
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
+			isVisualMode: getEditorMode() === 'visual',
+			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -107,7 +108,7 @@ function DocumentTools( {
 		// supported, but we're keeping it in the list of class names for backwards
 		// compatibility.
 		<NavigableToolbar
-			className={ classnames(
+			className={ clsx(
 				'editor-document-tools',
 				'edit-post-header-toolbar',
 				className
@@ -179,7 +180,6 @@ function DocumentTools( {
 						) }
 					</>
 				) }
-				{ children }
 			</div>
 		</NavigableToolbar>
 	);

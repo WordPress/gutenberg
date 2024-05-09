@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -53,7 +53,7 @@ const ListViewBlockContents = forwardRef(
 		const isBlockMoveTarget =
 			blockMovingClientId && selectedBlockInBlockEditor === clientId;
 
-		const className = classnames( 'block-editor-list-view-block-contents', {
+		const className = clsx( 'block-editor-list-view-block-contents', {
 			'is-dropping-before': isBlockMoveTarget,
 		} );
 

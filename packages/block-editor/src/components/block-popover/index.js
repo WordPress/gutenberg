@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -144,10 +144,7 @@ function BlockPopover(
 			flip={ false }
 			shift={ shift }
 			{ ...props }
-			className={ classnames(
-				'block-editor-block-popover',
-				props.className
-			) }
+			className={ clsx( 'block-editor-block-popover', props.className ) }
 			variant="unstyled"
 		>
 			{ children }

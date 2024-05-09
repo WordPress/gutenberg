@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ export default function Pagination( {
 			aria-label={ label }
 			spacing={ 3 }
 			justify="flex-start"
-			className={ classnames( 'edit-site-pagination', className ) }
+			className={ clsx( 'edit-site-pagination', className ) }
 		>
 			<Text variant="muted" className="edit-site-pagination__total">
 				{

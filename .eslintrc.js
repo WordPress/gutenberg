@@ -76,6 +76,11 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
 ];
 
 module.exports = {

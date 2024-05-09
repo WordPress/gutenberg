@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -42,10 +42,7 @@ export default function WritingModeControl( { className, value, onChange } ) {
 		<SegmentedTextControl
 			label={ __( 'Orientation' ) }
 			options={ WRITING_MODES }
-			className={ classnames(
-				'block-editor-writing-mode-control',
-				className
-			) }
+			className={ clsx( 'block-editor-writing-mode-control', className ) }
 			value={ value }
 			onChange={ ( newValue ) => {
 				onChange( newValue === value ? undefined : newValue );
