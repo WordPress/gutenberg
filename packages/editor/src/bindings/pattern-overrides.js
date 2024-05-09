@@ -24,13 +24,11 @@ export default {
 			]?.[ attributeName ];
 
 		// If there is no pattern client ID, or it is not overwritten, return the default value.
-		if ( ! patternClientId || ! overridableValue ) {
+		if ( ! patternClientId || overridableValue === undefined ) {
 			return currentBlockAttributes[ attributeName ];
 		}
 
-		return getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
-			currentBlockAttributes?.metadata?.name
-		]?.[ attributeName ];
+		return overridableValue === '' ? undefined : overridableValue;
 	},
 	setValue( { registry, clientId, attributeName, value } ) {
 		const { getBlockAttributes, getBlockParents, getBlockName, getBlocks } =
@@ -70,7 +68,7 @@ export default {
 				...currentBindingValue,
 				[ blockName ]: {
 					...currentBindingValue?.[ blockName ],
-					[ attributeName ]: value,
+					[ attributeName ]: value || '',
 				},
 			},
 		} );
