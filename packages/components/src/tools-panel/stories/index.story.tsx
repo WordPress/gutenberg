@@ -53,7 +53,7 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 	const [ height, setHeight ] = useState< string | undefined >();
 	const [ minHeight, setMinHeight ] = useState< string | undefined >();
 	const [ width, setWidth ] = useState< string | undefined >();
-	const [ scale, setScale ] = useState< React.ReactText | undefined >();
+	const [ scale, setScale ] = useState< number | string | undefined >();
 
 	const resetAll: typeof resetAllProp = ( filters ) => {
 		setHeight( undefined );
@@ -402,7 +402,7 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 } ) => {
 	const [ attributes, setAttributes ] = useState< {
 		height?: string;
-		scale?: React.ReactText;
+		scale?: number | string;
 	} >( {} );
 	const { height, scale } = attributes;
 
@@ -498,7 +498,7 @@ export const WithConditionallyRenderedControl: StoryFn<
 > = ( { resetAll: resetAllProp, panelId, ...props } ) => {
 	const [ attributes, setAttributes ] = useState< {
 		height?: string;
-		scale?: React.ReactText;
+		scale?: number | string;
 	} >( {} );
 	const { height, scale } = attributes;
 
