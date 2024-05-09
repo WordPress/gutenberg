@@ -3,6 +3,14 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function getPatternRecord( page, patternRef ) {
+	return await page.evaluate( async ( ref ) => {
+		return window.wp.data
+			.select( 'core' )
+			.getEditedEntityRecord( 'postType', 'wp_block', ref );
+	}, patternRef );
+}
+
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
@@ -149,28 +157,22 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', { name: 'Create' } )
 			.click();
 
-		await expect
-			.poll(
-				editor.getBlocks,
-				'The block content should be wrapped by a pattern block wrapper'
-			)
-			.toEqual( [
-				{
-					name: 'core/block',
-					attributes: { ref: expect.any( Number ) },
-					innerBlocks: [
-						{
-							attributes: {
-								content: 'A useful paragraph to reuse',
-								dropCap: false,
-							},
-							innerBlocks: [],
-							name: 'core/paragraph',
-						},
-					],
-				},
-			] );
-		const after = await editor.getBlocks();
+		// Wait until the pattern is inserted.
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Pattern',
+			} )
+			.waitFor();
+
+		const [ syncedPattern ] = await editor.getBlocks();
+		const patternRecord = await getPatternRecord(
+			page,
+			syncedPattern?.attributes?.ref
+		);
+
+		expect( patternRecord?.content ).toBe(
+			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
+		);
 
 		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
@@ -191,7 +193,30 @@ test.describe( 'Synced pattern', () => {
 			.click();
 		await page.getByRole( 'option', { name: 'My synced pattern' } ).click();
 
-		await expect.poll( editor.getBlocks ).toEqual( [ ...after, ...after ] );
+		const [ firstSyncedPattern, secondSyncedPattern ] =
+			await editor.getBlocks();
+		const firstSyncedPatternRecord = await getPatternRecord(
+			page,
+			firstSyncedPattern?.attributes?.ref
+		);
+		const secondSyncedPatternRecord = await getPatternRecord(
+			page,
+			secondSyncedPattern?.attributes?.ref
+		);
+		// Check first pattern is "My synced pattern".
+		expect( firstSyncedPatternRecord?.title ).toEqual(
+			'My synced pattern'
+		);
+		expect( firstSyncedPatternRecord?.content ).toEqual(
+			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
+		);
+		// Check second pattern is "My synced pattern".
+		expect( secondSyncedPatternRecord?.title ).toEqual(
+			'My synced pattern'
+		);
+		expect( secondSyncedPatternRecord?.content ).toEqual(
+			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
+		);
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/33072.
@@ -254,22 +279,15 @@ test.describe( 'Synced pattern', () => {
 		// Go back to the post.
 		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
 
-		await expect.poll( editor.getBlocks ).toEqual( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: {
-							content: 'Einen Guten Tag!',
-							dropCap: false,
-						},
-						innerBlocks: [],
-					},
-				],
-			},
-		] );
+		const [ syncedPattern ] = await editor.getBlocks();
+		const patternRecord = await getPatternRecord(
+			page,
+			syncedPattern?.attributes?.ref
+		);
+
+		expect( patternRecord?.content ).toBe(
+			'<!-- wp:paragraph -->\n<p>Einen Guten Tag!</p>\n<!-- /wp:paragraph -->'
+		);
 	} );
 
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/26421.
@@ -325,13 +343,16 @@ test.describe( 'Synced pattern', () => {
 			attributes: { content: 'After Edit' },
 		};
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [ expectedParagraphBlock ],
-			},
-		] );
+		// It seems edited values are stored in the `blocks` array.
+		const [ syncedPattern ] = await editor.getBlocks();
+		const [ modifiedBlock ] = (
+			await getPatternRecord( page, syncedPattern?.attributes?.ref )
+		)?.blocks;
+
+		expect( modifiedBlock?.name ).toBe( expectedParagraphBlock.name );
+		expect( modifiedBlock?.attributes?.content ).toBe(
+			expectedParagraphBlock.attributes.content
+		);
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
@@ -345,6 +366,7 @@ test.describe( 'Synced pattern', () => {
 
 	test( 'can be created, inserted, and converted to a regular block', async ( {
 		editor,
+		page,
 		requestUtils,
 	} ) => {
 		const { id } = await requestUtils.createBlock( {
@@ -359,18 +381,23 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
+		// // Wait until the pattern is created and inserted.
+		await editor.canvas.locator( 'text=Hello there!' ).waitFor();
+
+		const [ syncedPattern ] = await editor.getBlocks();
+		const patternRecord = await getPatternRecord(
+			page,
+			syncedPattern?.attributes?.ref
+		);
+
+		expect( patternRecord?.content ).toBe(
+			'<!-- wp:paragraph -->\n<p>Hello there!</p>\n<!-- /wp:paragraph -->'
+		);
+
 		const expectedParagraphBlock = {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello there!' },
 		};
-
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: id },
-				innerBlocks: [ expectedParagraphBlock ],
-			},
-		] );
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
@@ -413,22 +440,20 @@ test.describe( 'Synced pattern', () => {
 		await page.keyboard.type( '/Awesome block' );
 		await page.getByRole( 'option', { name: 'Awesome block' } ).click();
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: expect.any( Number ) },
-				innerBlocks: [
-					{
-						name: 'core/paragraph',
-						attributes: { content: 'Awesome Paragraph' },
-					},
-				],
-			},
-		] );
+		const [ syncedPattern ] = await editor.getBlocks();
+		const patternRecord = await getPatternRecord(
+			page,
+			syncedPattern?.attributes?.ref
+		);
+
+		expect( patternRecord?.content ).toBe(
+			'<!-- wp:paragraph -->\n<p>Awesome Paragraph</p>\n<!-- /wp:paragraph -->'
+		);
 	} );
 
 	test( 'can be created from multiselection and converted back to regular blocks', async ( {
 		editor,
+		page,
 		pageUtils,
 	} ) => {
 		await editor.insertBlock( {
@@ -467,13 +492,28 @@ test.describe( 'Synced pattern', () => {
 			},
 		];
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/block',
-				attributes: { ref: expect.any( Number ) },
-				innerBlocks: expectedParagraphBlocks,
-			},
-		] );
+		// Wait until the pattern is created.
+		await editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Pattern',
+			} )
+			.waitFor();
+
+		const [ syncedPattern ] = await editor.getBlocks();
+		const patternRecord = await getPatternRecord(
+			page,
+			syncedPattern?.attributes?.ref
+		);
+
+		expect( patternRecord?.content ).toBe(
+			`<!-- wp:paragraph -->
+<p>Hello there!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->`
+		);
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
