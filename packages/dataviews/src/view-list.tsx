@@ -11,11 +11,18 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Modal,
 	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { useCallback, useEffect, useRef, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useRef,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 
@@ -33,6 +40,8 @@ import type {
 import { ActionsDropdownMenuGroup } from './item-actions';
 
 interface Action {
+	modalHeader: string;
+	hideModalHeader: any;
 	isDestructive: boolean | undefined;
 	isPrimary: boolean;
 	icon: any;
@@ -73,6 +82,7 @@ const {
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
 	useCompositeStoreV2: useCompositeStore,
+	kebabCase,
 } = unlock( componentsPrivateApis );
 
 function ListItem( {
@@ -114,6 +124,8 @@ function ListItem( {
 			eligibleActions: _eligibleActions,
 		};
 	}, [ actions, item ] );
+
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	return (
 		<CompositeRow
@@ -191,32 +203,61 @@ function ListItem( {
 					>
 						{ !! primaryActions.length &&
 							primaryActions.map( ( action ) => {
-								// TODO: make keyboard layout work.
-								// if (!!action.RenderModal) {
-								// 	return (
-								// 		<div role="gridcell">
-								// 			<CompositeItem
-								// 				store={store}
-								// 				render={<ActionWithModal
-								// 					key={action.id}
-								// 					action={action}
-								// 					item={item}
-								// 					ActionTrigger={({ action, onClick }: { action: Action, onClick: () => void }) => {
-								// 						return (
-								// 							<Button
-								// 								label={action.label}
-								// 								icon={action.icon}
-								// 								isDestructive={action.isDestructive}
-								// 								size="compact"
-								// 								onClick={onClick}
-								// 							/>
-								// 						);
-								// 					}}
-								// 				/>}
-								// 			/>
-								// 		</div>
-								// 	);
-								// }
+								if ( !! action.RenderModal ) {
+									return (
+										<div role="gridcell">
+											<CompositeItem
+												store={ store }
+												render={
+													<Button
+														label={ action.label }
+														icon={ action.icon }
+														isDestructive={
+															action.isDestructive
+														}
+														size="compact"
+														onClick={ () =>
+															setIsModalOpen(
+																true
+															)
+														}
+													>
+														{ isModalOpen && (
+															<Modal
+																title={
+																	action.modalHeader ||
+																	action.label
+																}
+																__experimentalHideHeader={
+																	!! action.hideModalHeader
+																}
+																onRequestClose={ () =>
+																	setIsModalOpen(
+																		false
+																	)
+																}
+																overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+																	action.id
+																) }` }
+															>
+																<action.RenderModal
+																	items={ [
+																		item,
+																	] }
+																	closeModal={ () =>
+																		setIsModalOpen(
+																			false
+																		)
+																	}
+																/>
+															</Modal>
+														) }
+													</Button>
+												}
+											/>
+										</div>
+									);
+								}
 								return (
 									<div role="gridcell" key={ action.id }>
 										<CompositeItem
