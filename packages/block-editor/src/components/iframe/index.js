@@ -287,19 +287,19 @@ function Iframe( {
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-zoom-out-scale',
+			'--wp-block-editor-iframe-zoom-out-scale',
 			`${ scale }`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-zoom-out-frame-size',
+			'--wp-block-editor-iframe-zoom-out-frame-size',
 			`${ frameSize }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-zoom-out-content-height',
+			'--wp-block-editor-iframe-zoom-out-content-height',
 			`${ contentHeight }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-zoom-out-inner-height',
+			'--wp-block-editor-iframe-zoom-out-inner-height',
 			`${ iframeWindowInnerHeight }px`
 		);
 
@@ -307,16 +307,16 @@ function Iframe( {
 			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
 
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-zoom-out-scale'
+				'--wp-block-editor-iframe-zoom-out-scale'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-zoom-out-frame-size'
+				'--wp-block-editor-iframe-zoom-out-frame-size'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-zoom-out-content-height'
+				'--wp-block-editor-iframe-zoom-out-content-height'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-zoom-out-inner-height'
+				'--wp-block-editor-iframe-zoom-out-inner-height'
 			);
 		};
 	}, [

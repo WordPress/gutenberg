@@ -27,8 +27,8 @@
 	left: 0;
 	outline-color: var(--wp-admin-theme-color);
 	outline-style: solid;
-	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-zoom-out-scale, 1));
-	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)) / var(--wp-zoom-out-scale, 1));
+	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+	outline-offset: calc((-1 * var(--wp-admin-border-width-focus)) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
 }
 
 // Hide selections on this element, otherwise Safari will include it stacked
