@@ -169,7 +169,7 @@ export default function Editor( { isLoading, onClick } ) {
 	const shouldShowListView = isEditMode && showVisualEditor && isListViewOpen;
 	const secondarySidebarLabel = isListViewOpen
 		? __( 'List View' )
-		: __( 'Block Library' );
+		: __( 'Block Inserter' );
 	const postWithTemplate = !! context?.postId;
 
 	let title;

@@ -244,7 +244,7 @@ function Layout( { initialPost } ) {
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
-		: __( 'Block Library' );
+		: __( 'Block Inserter' );
 
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {

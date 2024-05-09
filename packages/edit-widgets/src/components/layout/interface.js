@@ -84,7 +84,7 @@ function Interface( { blockEditorSettings } ) {
 
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'List View' )
-		: __( 'Block Library' );
+		: __( 'Block Inserter' );
 
 	const hasSecondarySidebar = isListViewOpened || isInserterOpened;
 

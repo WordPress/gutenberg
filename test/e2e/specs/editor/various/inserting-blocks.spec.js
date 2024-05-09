@@ -392,7 +392,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'Block Inserter',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await inserterButton.click();
@@ -604,7 +604,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Block Library' } )
+				.getByRole( 'region', { name: 'Block Inserter' } )
 				.getByRole( 'searchbox', {
 					name: 'Search for blocks and patterns',
 				} )
@@ -634,7 +634,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.fill( 'More' );
 		await expect(
 			page.getByRole( 'region', {
-				name: 'Block Library',
+				name: 'Block Inserter',
 			} )
 		).toBeVisible();
 	} );

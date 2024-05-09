@@ -88,7 +88,7 @@ function InterfaceSkeleton(
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
 		/* translators: accessibility text for the secondary sidebar landmark region. */
-		secondarySidebar: __( 'Block Library' ),
+		secondarySidebar: __( 'Block Inserter' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */

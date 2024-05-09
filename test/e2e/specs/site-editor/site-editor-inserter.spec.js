@@ -50,7 +50,7 @@ test.describe( 'Site Editor Inserter', () => {
 			name: 'Block Inserter',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		const beforeBlocks = await editor.getBlocks();

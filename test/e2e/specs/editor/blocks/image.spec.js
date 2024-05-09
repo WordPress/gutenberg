@@ -432,7 +432,7 @@ test.describe( 'Image', () => {
 			name: 'Block: Image',
 		} );
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		async function openMediaTab() {

@@ -58,8 +58,8 @@ page.getByRole( 'button', { name: 'Hello World' } );
 It can also be chained to perform complex queries:
 
 ```js
-// Select an option with a name "Buttons" under the "Block Library" region.
-page.getByRole( 'region', { name: 'Block Library' } )
+// Select an option with a name "Buttons" under the "Block Inserter" region.
+page.getByRole( 'region', { name: 'Block Inserter' } )
 	.getByRole( 'option', { name: 'Buttons' } )
 ```
 

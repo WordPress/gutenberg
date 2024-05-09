@@ -59,7 +59,7 @@ test.describe( 'Widgets screen', () => {
 			.getByRole( 'button', { name: 'Block Inserter' } )
 			.click();
 		const blockLibrary = page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 
 		await expect(
@@ -693,7 +693,7 @@ class WidgetsScreen {
 	 */
 	getBlockInGlobalInserter = async ( blockName ) => {
 		const blockLibrary = this.#page.getByRole( 'region', {
-			name: 'Block Library',
+			name: 'Block Inserter',
 		} );
 		if ( await blockLibrary.isHidden() ) {
 			await this.#page
