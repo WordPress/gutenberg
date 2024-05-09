@@ -148,6 +148,8 @@ test.describe( 'Pattern Overrides', () => {
 			const paragraphs = patternBlocks.first().getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			// Ensure the first pattern is selected.
+			await patternBlocks.first().selectText();
 			await expect( paragraphs.first() ).not.toHaveAttribute(
 				'inert',
 				'true'
@@ -164,6 +166,8 @@ test.describe( 'Pattern Overrides', () => {
 			await paragraphs.first().selectText();
 			await page.keyboard.type( 'I would word it this way' );
 
+			// Ensure the second pattern is selected.
+			await patternBlocks.last().selectText();
 			await patternBlocks
 				.last()
 				.getByRole( 'document', {
@@ -417,7 +421,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		const postId = await editor.publishPost();
 
-		// Check it renders correctly.
+		// Check the pattern has the correct attributes.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/block',
@@ -429,41 +433,22 @@ test.describe( 'Pattern Overrides', () => {
 						},
 					},
 				},
-				innerBlocks: [
-					{
-						name: 'core/heading',
-						attributes: { content: 'Outer heading (edited)' },
-					},
-					{
-						name: 'core/block',
-						attributes: {
-							ref: innerPattern.id,
-							content: {
-								[ paragraphName ]: {
-									content: 'Inner paragraph (edited)',
-								},
-							},
-						},
-						innerBlocks: [
-							{
-								name: 'core/paragraph',
-								attributes: {
-									content: 'Inner paragraph (edited)',
-								},
-							},
-						],
-					},
-				],
+				innerBlocks: [],
 			},
 		] );
-
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-				includeHidden: true,
-			} ),
-			'The inner paragraph should not be editable'
-		).toHaveAttribute( 'inert', 'true' );
+		// Check it renders correctly.
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+			includeHidden: true,
+		} );
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			includeHidden: true,
+		} );
+		await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
+		await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+		await expect( paragraphBlock ).toHaveText( 'Inner paragraph (edited)' );
+		await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
 
 		// Edit the outer pattern.
 		await editor.selectBlocks(
@@ -478,11 +463,16 @@ test.describe( 'Pattern Overrides', () => {
 			.click();
 
 		// The inner paragraph should be editable in the pattern focus mode.
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.first()
+		);
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} ),
-			'The inner paragraph should not be editable'
+			'The inner paragraph should be editable'
 		).not.toHaveAttribute( 'inert', 'true' );
 
 		// Visit the post on the frontend.
