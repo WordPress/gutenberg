@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { unlock } from '../../lock-unlock';
 
-export const BindingsPanel = ( { block } ) => {
+export const BlockBindingsPanel = ( { block } ) => {
 	const bindings = block?.attributes?.metadata?.bindings;
 
 	const sources = useSelect( ( select ) =>
