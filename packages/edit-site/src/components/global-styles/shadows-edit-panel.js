@@ -63,7 +63,7 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-const menuItems = [
+const customShadowMenuItems = [
 	{
 		label: __( 'Rename' ),
 		action: 'rename',
@@ -71,6 +71,13 @@ const menuItems = [
 	{
 		label: __( 'Delete' ),
 		action: 'delete',
+	},
+];
+
+const presetShadowMenuItems = [
+	{
+		label: __( 'Reset' ),
+		action: 'reset',
 	},
 ];
 
@@ -82,8 +89,17 @@ export default function ShadowsEditPanel() {
 	const [ shadows, setShadows ] = useGlobalSetting(
 		`shadow.presets.${ category }`
 	);
+	const [ baseShadows ] = useGlobalSetting(
+		`shadow.presets.${ category }`,
+		undefined,
+		'base'
+	);
 	const [ selectedShadow, setSelectedShadow ] = useState( () =>
 		( shadows || [] ).find( ( shadow ) => shadow.slug === slug )
+	);
+	const baseSelectedShadow = useMemo(
+		() => ( baseShadows || [] ).find( ( b ) => b.slug === slug ),
+		[ baseShadows, slug ]
 	);
 	const [ isConfirmDialogVisible, setIsConfirmDialogVisible ] =
 		useState( false );
@@ -99,13 +115,16 @@ export default function ShadowsEditPanel() {
 	};
 
 	const onMenuClick = ( action ) => {
-		switch ( action ) {
-			case 'rename':
-				setIsRenameModalVisible( true );
-				break;
-			case 'delete':
-				setIsConfirmDialogVisible( true );
-				break;
+		if ( action === 'reset' ) {
+			const updatedShadows = shadows.map( ( s ) =>
+				s.slug === slug ? baseSelectedShadow : s
+			);
+			setSelectedShadow( baseSelectedShadow );
+			setShadows( updatedShadows );
+		} else if ( action === 'delete' ) {
+			setIsConfirmDialogVisible( true );
+		} else if ( action === 'rename' ) {
+			setIsRenameModalVisible( true );
 		}
 	};
 
@@ -132,39 +151,39 @@ export default function ShadowsEditPanel() {
 		<>
 			<HStack justify="space-between">
 				<ScreenHeader title={ selectedShadow.name } />
-				{ category === 'custom' && (
-					<FlexItem>
-						<Spacer
-							marginTop={ 2 }
-							marginBottom={ 0 }
-							paddingX={ 4 }
+				<FlexItem>
+					<Spacer marginTop={ 2 } marginBottom={ 0 } paddingX={ 4 }>
+						<DropdownMenu
+							trigger={
+								<Button
+									variant="tertiary"
+									size="small"
+									icon={ moreVertical }
+									label={ __( 'Menu' ) }
+								/>
+							}
 						>
-							<DropdownMenu
-								trigger={
-									<Button
-										variant="tertiary"
-										size="small"
-										icon={ moreVertical }
-										label={ __( 'Menu' ) }
-									/>
-								}
-							>
-								{ menuItems.map( ( item ) => (
-									<DropdownMenuItem
-										key={ item.action }
-										onClick={ () =>
-											onMenuClick( item.action )
-										}
-									>
-										<DropdownMenuItemLabel>
-											{ item.label }
-										</DropdownMenuItemLabel>
-									</DropdownMenuItem>
-								) ) }
-							</DropdownMenu>
-						</Spacer>
-					</FlexItem>
-				) }
+							{ ( category === 'custom'
+								? customShadowMenuItems
+								: presetShadowMenuItems
+							).map( ( item ) => (
+								<DropdownMenuItem
+									key={ item.action }
+									onClick={ () => onMenuClick( item.action ) }
+									disabled={
+										item.action === 'reset' &&
+										selectedShadow.shadow ===
+											baseSelectedShadow.shadow
+									}
+								>
+									<DropdownMenuItemLabel>
+										{ item.label }
+									</DropdownMenuItemLabel>
+								</DropdownMenuItem>
+							) ) }
+						</DropdownMenu>
+					</Spacer>
+				</FlexItem>
 			</HStack>
 			<div className="edit-site-global-styles-screen">
 				<ShadowsPreview shadow={ selectedShadow.shadow } />

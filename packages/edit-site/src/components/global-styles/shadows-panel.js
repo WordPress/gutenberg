@@ -7,16 +7,10 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	Button,
 	FlexItem,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import {
-	Icon,
-	plus,
-	shadow as shadowIcon,
-	moreVertical,
-} from '@wordpress/icons';
+import { Icon, plus, shadow as shadowIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,49 +21,21 @@ import { NavigationButtonAsItem } from './navigation-button';
 import ScreenHeader from './header';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-} = unlock( componentsPrivateApis );
 
 export const defaultShadow = '6px 6px #000';
 
 export default function ShadowsPanel() {
-	const [ defaultShadows, setDefaultShadows ] = useGlobalSetting(
-		'shadow.presets.default'
-	);
-	const [ baseDefaultShadows ] = useGlobalSetting(
-		'shadow.presets.default',
-		undefined,
-		'base'
-	);
+	const [ defaultShadows ] = useGlobalSetting( 'shadow.presets.default' );
 	const [ defaultShadowsEnabled ] = useGlobalSetting(
 		'shadow.defaultPresets'
 	);
-
-	const [ themeShadows, setThemeShadows ] = useGlobalSetting(
-		'shadow.presets.theme'
-	);
-	const [ baseThemeShadows ] = useGlobalSetting(
-		'shadow.presets.theme',
-		undefined,
-		'base'
-	);
+	const [ themeShadows ] = useGlobalSetting( 'shadow.presets.theme' );
 	const [ customShadows, setCustomShadows ] = useGlobalSetting(
 		'shadow.presets.custom'
 	);
 
 	const onCreateShadow = ( shadow ) => {
 		setCustomShadows( [ ...( customShadows || [] ), shadow ] );
-	};
-
-	const onResetShadows = ( shadowCategory ) => {
-		if ( shadowCategory === 'default' ) {
-			setDefaultShadows( baseDefaultShadows );
-		} else if ( shadowCategory === 'theme' ) {
-			setThemeShadows( baseThemeShadows );
-		}
 	};
 
 	return (
@@ -90,8 +56,6 @@ export default function ShadowsPanel() {
 							label={ __( 'Default' ) }
 							shadows={ defaultShadows || [] }
 							category="default"
-							canReset={ defaultShadows !== baseDefaultShadows }
-							onReset={ () => onResetShadows( 'default' ) }
 						/>
 					) }
 					{ themeShadows && themeShadows.length > 0 && (
@@ -99,8 +63,6 @@ export default function ShadowsPanel() {
 							label={ __( 'Theme' ) }
 							shadows={ themeShadows || [] }
 							category="theme"
-							canReset={ themeShadows !== baseThemeShadows }
-							onReset={ () => onResetShadows( 'theme' ) }
 						/>
 					) }
 					<ShadowList
@@ -116,15 +78,7 @@ export default function ShadowsPanel() {
 	);
 }
 
-function ShadowList( {
-	label,
-	shadows,
-	category,
-	canCreate,
-	onCreate,
-	canReset,
-	onReset,
-} ) {
+function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 	const handleAddShadow = () => {
 		onCreate( {
 			name: `Shadow ${ shadows.length + 1 }`,
@@ -140,7 +94,7 @@ function ShadowList( {
 					<Subtitle level={ 3 }>{ label }</Subtitle>
 				</FlexItem>
 				<FlexItem>
-					{ canCreate ? (
+					{ canCreate && (
 						<Button
 							size="small"
 							icon={ plus }
@@ -149,26 +103,6 @@ function ShadowList( {
 								handleAddShadow();
 							} }
 						/>
-					) : (
-						<DropdownMenu
-							trigger={
-								<Button
-									variant="tertiary"
-									size="small"
-									icon={ moreVertical }
-									label={ __( 'Menu' ) }
-								/>
-							}
-						>
-							<DropdownMenuItem
-								onClick={ onReset }
-								disabled={ ! canReset }
-							>
-								<DropdownMenuItemLabel>
-									{ __( 'Reset shadows' ) }
-								</DropdownMenuItemLabel>
-							</DropdownMenuItem>
-						</DropdownMenu>
 					) }
 				</FlexItem>
 			</HStack>
