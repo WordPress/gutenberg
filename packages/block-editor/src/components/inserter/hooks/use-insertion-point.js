@@ -92,10 +92,17 @@ function useInsertionPoint( {
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false ) => {
-			// Clear the last focused block and let writing flow handle
-			// focusing the new block when focus returns to the canvas,
-			// such as when inserting from the sidebar.
-			setLastFocus( null );
+			// When we are trying to move focus or select a new block on insert, we also
+			// need to clear the last focus to avoid the focus being set to the wrong block
+			// when tabbing back into the canvas if the block was added from outside the
+			// editor canvas.
+			if (
+				shouldForceFocusBlock ||
+				shouldFocusBlock ||
+				selectBlockOnInsert
+			) {
+				setLastFocus( null );
+			}
 
 			const selectedBlock = getSelectedBlock();
 
