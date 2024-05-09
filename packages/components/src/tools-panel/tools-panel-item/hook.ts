@@ -128,7 +128,9 @@ export function useToolsPanelItem(
 	// Notify the panel when an item's value has changed except for optional
 	// items without value because the item should not cause itself to hide.
 	useEffect( () => {
-		if ( ! isShownByDefault && ! isValueSet ) return;
+		if ( ! isShownByDefault && ! isValueSet ) {
+			return;
+		}
 
 		flagItemCustomization( isValueSet, label, menuGroup );
 	}, [
