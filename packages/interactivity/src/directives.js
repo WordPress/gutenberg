@@ -13,7 +13,7 @@ import { deepSignal, peek } from 'deepsignal';
 import { useWatch, useInit } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
 import { kebabToCamelCase } from './utils/kebab-to-camelcase';
-import { isDebug } from './constants';
+import { warn } from './utils/warn';
 
 // Assigned objects should be ignore during proxification.
 const contextAssignedObjects = new WeakMap();
@@ -243,9 +243,8 @@ export default () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
 					// Check that the value is a JSON object. Send a console warning if not.
-					if ( isDebug && ! isPlainObject( value ) ) {
-						// eslint-disable-next-line no-console
-						console.warn(
+					if ( ! isPlainObject( value ) ) {
+						warn(
 							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
 						);
 					}

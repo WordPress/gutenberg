@@ -16,7 +16,7 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { isDebug } from './constants';
+import { warn } from './utils/warn';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -261,15 +261,6 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
-	if ( namespace === '' ) {
-		if ( isDebug ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Namespace cannot be an empty string. Error found when trying to use "${ path }"`
-			);
-		}
-		return;
-	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
@@ -282,14 +273,7 @@ const resolve = ( path, namespace ) => {
 	};
 	try {
 		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {
-		if ( isDebug ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`There was an error when trying to resolve the path "${ path }" in the namespace "${ namespace }".`
-			);
-		}
-	}
+	} catch ( e ) {}
 };
 
 // Generate the evaluate function.
@@ -299,6 +283,12 @@ export const getEvaluate: GetEvaluate =
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
+		}
+		if ( ! namespace || namespace === '' ) {
+			// TODO: Support lazy/dynamically initialized stores
+			warn(
+				`The "namespace" cannot be "{}", "null" or an emtpy string. Path: ${ path }`
+			);
 		}
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
