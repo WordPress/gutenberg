@@ -8,11 +8,16 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
 const CONTENT = 'content';
 
 export default function ResetOverridesControl( props ) {
 	const name = props.attributes.metadata?.name;
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const { isOverriden, resetOverrides } = useSelect(
@@ -34,11 +39,13 @@ export default function ResetOverridesControl( props ) {
 			return {
 				isOverriden: !! existingOverrides?.[ name ],
 				resetOverrides: async () => {
-					updateBlockAttributes( patternClientId, {
-						[ CONTENT ]: {
-							...existingOverrides,
-							[ name ]: undefined,
-						},
+					syncDerivedUpdates( () => {
+						updateBlockAttributes( patternClientId, {
+							[ CONTENT ]: {
+								...existingOverrides,
+								[ name ]: undefined,
+							},
+						} );
 					} );
 				},
 			};

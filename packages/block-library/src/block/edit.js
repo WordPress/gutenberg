@@ -146,6 +146,7 @@ function ReusableBlockEdit( {
 	);
 	const isMissing = hasResolved && ! record;
 
+	const { syncDerivedUpdates } = unlock( useDispatch( blockEditorStore ) );
 	const { setBlockEditingMode } = useDispatch( blockEditorStore );
 
 	const {
@@ -232,7 +233,9 @@ function ReusableBlockEdit( {
 
 	const resetContent = () => {
 		if ( content ) {
-			setAttributes( { content: undefined } );
+			syncDerivedUpdates( () => {
+				setAttributes( { content: undefined } );
+			} );
 		}
 	};
 
