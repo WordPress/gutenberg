@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -94,8 +94,7 @@ export const SVG = forwardRef(
 		const appliedProps = {
 			...props,
 			className:
-				classnames( className, { 'is-pressed': isPressed } ) ||
-				undefined,
+				clsx( className, { 'is-pressed': isPressed } ) || undefined,
 			'aria-hidden': true,
 			focusable: false,
 		};

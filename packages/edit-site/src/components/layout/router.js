@@ -31,7 +31,7 @@ export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
+	const { postType, postId, path, layout, isCustom, canvas } = params;
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -45,6 +45,7 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ __( 'Manage pages' ) }
+						backPath={ {} }
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
@@ -78,13 +79,33 @@ export default function useLayoutAreas() {
 	if ( postType && postId ) {
 		let sidebar;
 		if ( postType === 'wp_template_part' || postType === 'wp_block' ) {
-			sidebar = <SidebarNavigationScreenPattern />;
+			sidebar = (
+				<SidebarNavigationScreenPattern
+					backPath={ {
+						path: '/patterns',
+						categoryId: params.categoryId,
+						categoryType: params.categoryType,
+					} }
+				/>
+			);
 		} else if ( postType === 'wp_template' ) {
-			sidebar = <SidebarNavigationScreenTemplate />;
+			sidebar = (
+				<SidebarNavigationScreenTemplate
+					backPath={ { path: '/wp_template' } }
+				/>
+			);
 		} else if ( postType === 'page' ) {
-			sidebar = <SidebarNavigationScreenPage />;
+			sidebar = (
+				<SidebarNavigationScreenPage
+					backPath={ { path: '/page', postId } }
+				/>
+			);
 		} else {
-			sidebar = <SidebarNavigationScreenNavigationMenu />;
+			sidebar = (
+				<SidebarNavigationScreenNavigationMenu
+					backPath={ { path: '/navigation' } }
+				/>
+			);
 		}
 		return {
 			key: 'page',
@@ -104,7 +125,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'templates-list',
 			areas: {
-				sidebar: <SidebarNavigationScreenTemplatesBrowse />,
+				sidebar: (
+					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
+				),
 				content: <PageTemplates />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
@@ -125,7 +148,7 @@ export default function useLayoutAreas() {
 		return {
 			key: 'patterns',
 			areas: {
-				sidebar: <SidebarNavigationScreenPatterns />,
+				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
 			},
@@ -137,7 +160,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'styles',
 			areas: {
-				sidebar: <SidebarNavigationScreenGlobalStyles />,
+				sidebar: (
+					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />
@@ -152,7 +177,11 @@ export default function useLayoutAreas() {
 			return {
 				key: 'navigation',
 				areas: {
-					sidebar: <SidebarNavigationScreenNavigationMenu />,
+					sidebar: (
+						<SidebarNavigationScreenNavigationMenu
+							backPath={ { path: '/navigation' } }
+						/>
+					),
 					preview: <Editor isLoading={ isSiteEditorLoading } />,
 					mobile: canvas === 'edit' && (
 						<Editor isLoading={ isSiteEditorLoading } />
@@ -163,7 +192,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'navigation',
 			areas: {
-				sidebar: <SidebarNavigationScreenNavigationMenus />,
+				sidebar: (
+					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />

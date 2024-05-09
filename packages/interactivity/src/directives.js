@@ -205,21 +205,21 @@ const cssStringToObject = ( val ) => {
  * @param {string} type 'window' or 'document'
  * @return {void}
  */
-const getGlobalEventDirective =
-	( type ) =>
-	( { directives, evaluate } ) => {
+const getGlobalEventDirective = ( type ) => {
+	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
+				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = ( event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
-					globalVar.addEventListener( entry.suffix, cb );
-					return () =>
-						globalVar.removeEventListener( entry.suffix, cb );
+					globalVar.addEventListener( eventName, cb );
+					return () => globalVar.removeEventListener( eventName, cb );
 				}, [] );
 			} );
 	};
+};
 
 export default () => {
 	// data-wp-context

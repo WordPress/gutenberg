@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,6 +30,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import { computeIFrameScale } from './utils';
 
 const {
 	LayoutStyle,
@@ -161,13 +162,17 @@ function EditorCanvas( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
+		const { getSettings, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -248,7 +253,7 @@ function EditorCanvas( {
 		'core/post-content'
 	);
 
-	const blockListLayoutClass = classnames(
+	const blockListLayoutClass = clsx(
 		{
 			'is-layout-flow': ! themeSupportsLayout,
 		},
@@ -319,6 +324,16 @@ function EditorCanvas( {
 		} ),
 	] );
 
+	const frameSize = isZoomOutMode ? 20 : undefined;
+	const scale = isZoomOutMode
+		? ( contentWidth ) =>
+				computeIFrameScale(
+					{ width: 1000, scale: 0.55 },
+					{ width: 400, scale: 0.9 },
+					contentWidth
+				)
+		: undefined;
+
 	return (
 		<BlockCanvas
 			shouldIframe={
@@ -328,7 +343,7 @@ function EditorCanvas( {
 			styles={ styles }
 			height="100%"
 			iframeProps={ {
-				className: classnames( 'editor-canvas__iframe', {
+				className: clsx( 'editor-canvas__iframe', {
 					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
@@ -336,6 +351,8 @@ function EditorCanvas( {
 					...iframeProps?.style,
 					...deviceStyles,
 				},
+				scale,
+				frameSize,
 			} }
 		>
 			{ themeSupportsLayout &&
@@ -362,7 +379,7 @@ function EditorCanvas( {
 				) }
 			{ renderingMode === 'post-only' && ! isDesignPostType && (
 				<div
-					className={ classnames(
+					className={ clsx(
 						'editor-editor-canvas__post-title-wrapper',
 						// The following class is only here for backward comapatibility
 						// some themes might be using it to style the post title.
@@ -387,7 +404,7 @@ function EditorCanvas( {
 				uniqueId={ wrapperUniqueId }
 			>
 				<BlockList
-					className={ classnames(
+					className={ clsx(
 						className,
 						'is-' + deviceType.toLowerCase() + '-preview',
 						renderingMode !== 'post-only' || isDesignPostType

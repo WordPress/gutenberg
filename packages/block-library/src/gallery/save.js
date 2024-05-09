@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 
 	const { caption, columns, imageCrop } = attributes;
 
-	const className = classnames( 'has-nested-images', {
+	const className = clsx( 'has-nested-images', {
 		[ `columns-${ columns }` ]: columns !== undefined,
 		[ `columns-default` ]: columns === undefined,
 		'is-cropped': imageCrop,
@@ -40,7 +40,7 @@ export default function saveWithInnerBlocks( { attributes } ) {
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
-					className={ classnames(
+					className={ clsx(
 						'blocks-gallery-caption',
 						__experimentalGetElementClassName( 'caption' )
 					) }

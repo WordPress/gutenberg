@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -426,7 +426,7 @@ export function RichTextWrapper(
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
-				className={ classnames(
+				className={ clsx(
 					'block-editor-rich-text__editable',
 					props.className,
 					'rich-text'
