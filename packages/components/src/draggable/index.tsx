@@ -105,6 +105,7 @@ export function Draggable( {
 			JSON.stringify( transferData )
 		);
 
+		// If dragComponent is explicitly set to false then let the browser handle the drag image.
 		if ( dragComponent === false ) {
 			return;
 		}

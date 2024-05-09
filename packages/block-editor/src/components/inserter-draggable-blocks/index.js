@@ -64,7 +64,7 @@ const InserterDraggableBlocks = ( {
 			} }
 			__experimentalDragComponent={
 				pattern ? (
-					false
+					false // Setting dragComponent explicitly to false, so that the browser handles the drag image.
 				) : (
 					<BlockDraggableChip
 						count={ blocks.length }
