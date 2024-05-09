@@ -65,10 +65,11 @@ function ZoomOutModeInserters() {
 				{ insertionPoint.insertionIndex === index && (
 					<div
 						style={ {
+							borderRadius: '0',
+							height: '12px',
 							opacity: 1,
-							height: '4px',
-							width: '100%',
 							transform: 'translateY(-50%)',
+							width: '100%',
 						} }
 						className="block-editor-block-list__insertion-point-indicator"
 					/>
