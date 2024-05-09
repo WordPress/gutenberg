@@ -284,7 +284,7 @@ export const getEvaluate: GetEvaluate =
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
 		}
-		if ( ! namespace || namespace === '' ) {
+		if ( ! namespace ) {
 			// TODO: Support lazy/dynamically initialized stores
 			warn(
 				`The "namespace" cannot be "{}", "null" or an emtpy string. Path: ${ path }`
