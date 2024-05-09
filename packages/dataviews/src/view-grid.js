@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ function GridItem( {
 		<VStack
 			spacing={ 0 }
 			key={ id }
-			className={ classnames( 'dataviews-view-grid__card', {
+			className={ clsx( 'dataviews-view-grid__card', {
 				'is-selected': hasBulkAction && isSelected,
 			} ) }
 			onClickCapture={ ( event ) => {
@@ -137,7 +137,7 @@ function GridItem( {
 						}
 						return (
 							<Flex
-								className={ classnames(
+								className={ clsx(
 									'dataviews-view-grid__field',
 									columnFields?.includes( field.id )
 										? 'is-column'
@@ -243,7 +243,7 @@ export default function ViewGrid( {
 			) }
 			{ ! hasData && (
 				<div
-					className={ classnames( {
+					className={ clsx( {
 						'dataviews-loading': isLoading,
 						'dataviews-no-results': ! isLoading,
 					} ) }

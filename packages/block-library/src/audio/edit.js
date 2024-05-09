@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -107,7 +107,7 @@ function AudioEdit( {
 		} );
 	}
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-transient': isTemporaryAudio,
 	} );
 
