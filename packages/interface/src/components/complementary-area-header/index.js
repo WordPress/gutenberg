@@ -40,8 +40,8 @@ const ComplementaryAreaHeader = ( {
 				) }
 				tabIndex={ -1 }
 			>
-				{ children }
 				{ toggleButton }
+				{ children }
 			</div>
 		</>
 	);
