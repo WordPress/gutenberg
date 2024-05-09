@@ -12,7 +12,6 @@ import { lock } from './lock-unlock';
 import { EntitiesSavedStatesExtensible } from './components/entities-saved-states';
 import useAutoSwitchEditorSidebars from './components/provider/use-auto-switch-editor-sidebars';
 import useBlockEditorSettings from './components/provider/use-block-editor-settings';
-import Header from './components/header';
 import InserterSidebar from './components/inserter-sidebar';
 import ListViewSidebar from './components/list-view-sidebar';
 import PatternOverridesPanel from './components/pattern-overrides-panel';
@@ -29,7 +28,6 @@ import { PrivatePostExcerptPanel } from './components/post-excerpt/panel';
 import SavePublishPanels from './components/save-publish-panels';
 import PostContentInformation from './components/post-content-information';
 import PostLastEditedPanel from './components/post-last-edited-panel';
-import Sidebar from './components/sidebar';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -38,7 +36,6 @@ lock( privateApis, {
 	EditorCanvas,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
-	Header,
 	InserterSidebar,
 	ListViewSidebar,
 	PatternOverridesPanel,
@@ -55,7 +52,6 @@ lock( privateApis, {
 	SavePublishPanels,
 	PostContentInformation,
 	PostLastEditedPanel,
-	Sidebar,
 
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	useAutoSwitchEditorSidebars,

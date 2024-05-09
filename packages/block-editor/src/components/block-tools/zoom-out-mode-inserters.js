@@ -35,21 +35,18 @@ function ZoomOutModeInserters( { __unstableContentRef } ) {
 		return null;
 	}
 
-	return blockOrder.map( ( clientId, index ) => {
-		if ( index === blockOrder.length - 1 ) {
-			return null;
-		}
+	return [ undefined, ...blockOrder ].map( ( clientId, index ) => {
 		return (
 			<BlockPopoverInbetween
-				key={ clientId }
+				key={ index }
 				previousClientId={ clientId }
-				nextClientId={ blockOrder[ index + 1 ] }
+				nextClientId={ blockOrder[ index ] }
 				__unstableContentRef={ __unstableContentRef }
 			>
 				<div className="block-editor-block-list__insertion-point-inserter is-with-inserter">
 					<Inserter
 						position="bottom center"
-						clientId={ blockOrder[ index + 1 ] }
+						clientId={ blockOrder[ index ] }
 						__experimentalIsQuick
 					/>
 				</div>

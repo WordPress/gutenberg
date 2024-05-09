@@ -204,6 +204,7 @@ function DocumentTools( {
 								);
 							} }
 							size="compact"
+							disabled={ disableBlockTools }
 						/>
 					) }
 			</div>

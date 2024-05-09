@@ -116,7 +116,7 @@ $block-inserter-tabs-height: 44px;
 	overflow: hidden;
 
 	.block-editor-inserter__tablist {
-		border-bottom: $border-width solid $gray-300;
+		width: 100%;
 
 		button[role="tab"] {
 			flex-grow: 1;

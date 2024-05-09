@@ -165,8 +165,9 @@
 	position: relative;
 	color: $white;
 	border-radius: 0;
-	height: $header-height;
+	height: $header-height +  $border-width;
 	width: $header-height;
+	margin-bottom: -  $border-width;
 	overflow: hidden;
 	padding: 0;
 	display: flex;
