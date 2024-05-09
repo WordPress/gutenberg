@@ -27,7 +27,7 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
 	'core/image': [ 'id', 'url', 'title', 'alt' ],
-	'core/button': [ 'url', 'text', 'linkTarget' ],
+	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
 
 /**
