@@ -34,11 +34,12 @@ export default function ResetOverridesControl( props ) {
 			return {
 				isOverriden: !! existingOverrides?.[ name ],
 				resetOverrides: async () => {
+					// If all overrides are undefined, reset the whole content attribute.
+					const newObject = existingOverrides.hasOwnProperty( name )
+						? undefined
+						: { ...existingOverrides, [ name ]: undefined };
 					updateBlockAttributes( patternClientId, {
-						[ CONTENT ]: {
-							...existingOverrides,
-							[ name ]: undefined,
-						},
+						[ CONTENT ]: newObject,
 					} );
 				},
 			};
