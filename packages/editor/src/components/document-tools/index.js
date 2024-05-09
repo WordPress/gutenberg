@@ -15,7 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { listView, plus, chevronUpDown } from '@wordpress/icons';
+import { listView, plus } from '@wordpress/icons';
 import { useRef, useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -39,9 +39,8 @@ function DocumentTools( {
 	listViewLabel = __( 'Document Overview' ),
 } ) {
 	const inserterButton = useRef();
-	const { setIsInserterOpened, setIsListViewOpened, setDeviceType } =
+	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
-	const { __unstableSetEditorMode } = useDispatch( blockEditorStore );
 	const {
 		isDistractionFree,
 		isInserterOpened,
@@ -50,8 +49,6 @@ function DocumentTools( {
 		listViewToggleRef,
 		hasFixedToolbar,
 		showIconLabels,
-		isVisualMode,
-		isZoomedOutView,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
@@ -77,8 +74,6 @@ function DocumentTools( {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView && isVisualMode;
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -185,28 +180,6 @@ function DocumentTools( {
 						) }
 					</>
 				) }
-
-				{ isZoomedOutViewExperimentEnabled &&
-					isLargeViewport &&
-					! isDistractionFree &&
-					! hasFixedToolbar && (
-						<ToolbarItem
-							as={ Button }
-							className="edit-site-header-edit-mode__zoom-out-view-toggle"
-							icon={ chevronUpDown }
-							isPressed={ isZoomedOutView }
-							/* translators: button label text should, if possible, be under 16 characters. */
-							label={ __( 'Zoom-out View' ) }
-							onClick={ () => {
-								setDeviceType( 'Desktop' );
-								__unstableSetEditorMode(
-									isZoomedOutView ? 'edit' : 'zoom-out'
-								);
-							} }
-							size="compact"
-							disabled={ disableBlockTools }
-						/>
-					) }
 			</div>
 		</NavigableToolbar>
 	);
