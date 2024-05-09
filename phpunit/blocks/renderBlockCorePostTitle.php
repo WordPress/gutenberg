@@ -1,9 +1,10 @@
 <?php
 /**
- * Post Title rendering tests.
+ * Tests for the gutenberg_render_block_core_post_title() function.
  *
  * @package WordPress
  * @subpackage Blocks
+ *
  * @covers ::gutenberg_render_block_core_post_title
  * @group blocks
  */
@@ -91,27 +92,27 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'Post title block Unit Test',
 			$rendered,
-			'Passed $rendered does not contain post title string.'
+			'Passed $rendered does not contain the post title string.'
 		);
 		$this->assertStringContainsString(
 			'</h2>',
 			$rendered,
-			'Passed $rendered does not contain html heading tag.'
+			'Passed $rendered does not contain a closing html heading tag.'
 		);
 		$this->assertStringNotContainsString(
 			get_permalink( self::$post->ID ),
 			$rendered,
-			'Passed $rendered contain post link.'
+			'Passed $rendered contain the post link.'
 		);
 		$this->assertStringNotContainsString(
 			'<a href=',
 			$rendered,
-			'Passed $rendered contain html anchor tag.'
+			'Passed $rendered contain a html anchor tag.'
 		);
 		$this->assertStringNotContainsString(
 			'has-text-align-left',
 			$rendered,
-			'Passed $rendered contain expected string.'
+			'Passed $rendered contain the has-text-align-left class.'
 		);
 
 		self::$attributes['level'] = '1';
@@ -124,7 +125,7 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'</h1>',
 			$rendered,
-			'Passed $rendered does not contain HTML heading tag.'
+			'Passed $rendered does not contain a closing HTML heading tag.'
 		);
 
 		self::$attributes['textAlign'] = 'left';
@@ -132,7 +133,7 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'has-text-align-left',
 			$rendered,
-			'Passed $rendered does not contain expected text alignment class.'
+			'Passed $rendered does not contain the has-text-align-left class.'
 		);
 
 		self::$attributes['isLink']     = true;
@@ -152,12 +153,12 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'_blank',
 			$rendered,
-			'Passed $rendered does not contain expected string.'
+			'Passed $rendered does not contain the link target attribute.'
 		);
 		$this->assertStringContainsString(
 			'no-relative',
 			$rendered,
-			'Passed $rendered does not contain expected string.'
+			'Passed $rendered does not contain the link relation attribute.'
 		);
 	}
 }
