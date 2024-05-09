@@ -38,7 +38,7 @@ function render_block_core_query_title( $attributes ) {
 		}
 	}
 	if ( $is_search ) {
-		$title = isset( $attributes['searchResultsTerm'] ) && ! empty( $attributes['searchResultsTerm'] ) ? $attributes['searchResultsTerm'] : __( 'Search results' );
+		$title = ! empty( $attributes['searchResultsTerm'] ) ? $attributes['searchResultsTerm'] : '';
 
 		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] ) {
 
