@@ -15,7 +15,7 @@ import {
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 
@@ -33,6 +33,10 @@ import type {
 import { ActionsDropdownMenuGroup } from './item-actions';
 
 interface Action {
+	isDestructive: boolean | undefined;
+	isPrimary: boolean;
+	icon: any;
+	isEligible: any;
 	id: string;
 	label: string;
 	callback: ( items: Item[] ) => void;
@@ -95,6 +99,21 @@ function ListItem( {
 			} );
 		}
 	}, [ isSelected ] );
+
+	const { primaryActions, eligibleActions } = useMemo( () => {
+		// If an action is eligible for all items, doesn't need
+		// to provide the `isEligible` function.
+		const _eligibleActions = actions.filter(
+			( action ) => ! action.isEligible || action.isEligible( item )
+		);
+		const _primaryActions = _eligibleActions.filter(
+			( action ) => action.isPrimary && !! action.icon
+		);
+		return {
+			primaryActions: _primaryActions,
+			eligibleActions: _eligibleActions,
+		};
+	}, [ actions, item ] );
 
 	return (
 		<CompositeRow
@@ -161,30 +180,91 @@ function ListItem( {
 					</CompositeItem>
 				</div>
 				{ actions && (
-					<div role="gridcell">
-						<DropdownMenu
-							trigger={
-								<CompositeItem
-									store={ store }
-									render={
-										<Button
-											size="compact"
-											icon={ moreVertical }
-											label={ __( 'Actions' ) }
-											disabled={ ! actions.length }
-											className="dataviews-all-actions-button"
+					<HStack
+						spacing={ 1 }
+						justify="flex-end"
+						className="dataviews-item-actions"
+						style={ {
+							flexShrink: '0',
+							width: 'auto',
+						} }
+					>
+						{ !! primaryActions.length &&
+							primaryActions.map( ( action ) => {
+								// TODO: make keyboard layout work.
+								// if (!!action.RenderModal) {
+								// 	return (
+								// 		<div role="gridcell">
+								// 			<CompositeItem
+								// 				store={store}
+								// 				render={<ActionWithModal
+								// 					key={action.id}
+								// 					action={action}
+								// 					item={item}
+								// 					ActionTrigger={({ action, onClick }: { action: Action, onClick: () => void }) => {
+								// 						return (
+								// 							<Button
+								// 								label={action.label}
+								// 								icon={action.icon}
+								// 								isDestructive={action.isDestructive}
+								// 								size="compact"
+								// 								onClick={onClick}
+								// 							/>
+								// 						);
+								// 					}}
+								// 				/>}
+								// 			/>
+								// 		</div>
+								// 	);
+								// }
+								return (
+									<div role="gridcell" key={ action.id }>
+										<CompositeItem
+											store={ store }
+											render={
+												<Button
+													label={ action.label }
+													icon={ action.icon }
+													isDestructive={
+														action.isDestructive
+													}
+													size="compact"
+													onClick={ () =>
+														action.callback( [
+															item,
+														] )
+													}
+												/>
+											}
 										/>
-									}
+									</div>
+								);
+							} ) }
+						<div role="gridcell">
+							<DropdownMenu
+								trigger={
+									<CompositeItem
+										store={ store }
+										render={
+											<Button
+												size="compact"
+												icon={ moreVertical }
+												label={ __( 'Actions' ) }
+												disabled={ ! actions.length }
+												className="dataviews-all-actions-button"
+											/>
+										}
+									/>
+								}
+								placement="bottom-end"
+							>
+								<ActionsDropdownMenuGroup
+									actions={ eligibleActions }
+									item={ item }
 								/>
-							}
-							placement="bottom-end"
-						>
-							<ActionsDropdownMenuGroup
-								actions={ actions }
-								item={ item }
-							/>
-						</DropdownMenu>
-					</div>
+							</DropdownMenu>
+						</div>
+					</HStack>
 				) }
 			</HStack>
 		</CompositeRow>
