@@ -30,6 +30,30 @@
 		}
 	}
 
+	.wp-block-video {
+		box-sizing: border-box;
+
+		video {
+			vertical-align: middle;
+			width: 100%;
+		}
+
+		&.aligncenter {
+			text-align: center;
+		}
+
+		figcaption {
+			margin-bottom: 1em;
+			margin-top: 0.5em;
+		}
+
+		@supports (position: sticky) {
+			[poster] {
+				object-fit: cover;
+			}
+		}
+	}
+
 	@include break-small {
 		@for $i from 2 through 6 {
 			&.columns-#{ $i } li {
