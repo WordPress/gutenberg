@@ -115,25 +115,28 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 					const keptAttributes = { ...nextAttributes };
 
-					for ( const [
-						attributeName,
-						boundAttribute,
-					] of Object.entries( bindings ) ) {
-						const source = sources[ boundAttribute.source ];
+					for ( const [ attributeName, newValue ] of Object.entries(
+						nextAttributes
+					) ) {
 						if (
-							! source?.setValue ||
+							! bindings[ attributeName ] ||
 							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
+						const source =
+							sources[ bindings[ attributeName ].source ];
+						if ( ! source?.setValue ) {
+							continue;
+						}
 						source.setValue( {
 							registry,
 							context,
 							clientId,
 							attributeName,
-							args: boundAttribute.args,
-							value: nextAttributes[ attributeName ],
+							args: bindings[ attributeName ].args,
+							value: newValue,
 						} );
 						delete keptAttributes[ attributeName ];
 					}
