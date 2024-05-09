@@ -401,6 +401,7 @@
 	li {
 		margin: 0;
 		cursor: pointer;
+		border-top: 1px solid $gray-100;
 
 		.dataviews-view-list__item-wrapper {
 			position: relative;
@@ -446,7 +447,6 @@
 		padding: $grid-unit-20 $grid-unit-40;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
-		border-top: 1px solid $gray-100;
 
 		&:focus-visible {
 			&::before {
