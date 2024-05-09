@@ -54,7 +54,7 @@ async function isGlobalInserterOpen() {
 				'.edit-widgets-header [aria-label="Block Inserter"].is-pressed,' +
 				'.edit-widgets-header [aria-label="Add block"].is-pressed,' +
 				'.edit-site-header-edit-mode__inserter-toggle.is-pressed,' +
-				'.editor-header [aria-label="Toggle block inserter"].is-pressed'
+				'.editor-header [aria-label="Block Inserter"].is-pressed'
 		);
 	} );
 }
