@@ -63,11 +63,15 @@ const InserterDraggableBlocks = ( {
 				stopDragging();
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip
-					count={ blocks.length }
-					icon={ icon || ( ! pattern && blockTypeIcon ) }
-					isPattern={ !! pattern }
-				/>
+				pattern ? (
+					false
+				) : (
+					<BlockDraggableChip
+						count={ blocks.length }
+						icon={ icon || ( ! pattern && blockTypeIcon ) }
+						isPattern={ !! pattern }
+					/>
+				)
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {

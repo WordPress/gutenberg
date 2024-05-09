@@ -105,6 +105,10 @@ export function Draggable( {
 			JSON.stringify( transferData )
 		);
 
+		if ( dragComponent === false ) {
+			return;
+		}
+
 		const cloneWrapper = ownerDocument.createElement( 'div' );
 		// Reset position to 0,0. Natural stacking order will position this lower, even with a transform otherwise.
 		cloneWrapper.style.top = '0';
