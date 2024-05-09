@@ -96,16 +96,18 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							/>
 						) }
 						{ fills }
-						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
-							<MenuItem
-								onClick={ pipe(
-									fillProps?.onClose,
-									fillProps?.onMoveTo
-								) }
-							>
-								{ __( 'Move to' ) }
-							</MenuItem>
-						) }
+						{ fillProps?.canMove &&
+							! fillProps?.onlyBlock &&
+							! isContentOnly && (
+								<MenuItem
+									onClick={ pipe(
+										fillProps?.onClose,
+										fillProps?.onMoveTo
+									) }
+								>
+									{ __( 'Move to' ) }
+								</MenuItem>
+							) }
 						{ fillProps?.count === 1 && ! isContentOnly && (
 							<BlockModeToggle
 								clientId={ fillProps?.firstBlockClientId }
