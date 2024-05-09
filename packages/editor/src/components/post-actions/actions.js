@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, edit, backup } from '@wordpress/icons';
+import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -447,20 +447,6 @@ const viewPostAction = {
 	},
 };
 
-const editPostAction = {
-	id: 'edit-post',
-	label: __( 'Edit' ),
-	isPrimary: true,
-	icon: edit,
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	callback( posts, onActionPerformed ) {
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
-	},
-};
 const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
@@ -1012,7 +998,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		}
 
 		const actions = [
-			editPostAction,
 			isTemplateOrTemplatePart && resetTemplateAction,
 			postTypeObject?.viewable && viewPostAction,
 			! isTemplateOrTemplatePart && restorePostAction,

@@ -32,11 +32,10 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
 const EMPTY_ARRAY = [];
 
 function useView( postType ) {
@@ -337,20 +336,14 @@ export default function PagePages() {
 		],
 		[ authors, view.type ]
 	);
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+
+	const postTypActions = usePostActions( 'page' );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypActions ],
+		[ postTypActions, editAction ]
 	);
-	const actions = usePostActions( 'page', onActionPerformed );
+
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
