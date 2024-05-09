@@ -11,7 +11,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Button,
-	Modal,
 	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
@@ -37,7 +36,7 @@ import type {
 	ViewList as ViewListType,
 } from './types';
 
-import { ActionsDropdownMenuGroup } from './item-actions';
+import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
 interface Action {
 	callback: ( items: Item[] ) => void;
@@ -82,7 +81,6 @@ const {
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
 	DropdownMenuV2: DropdownMenu,
-	kebabCase,
 } = unlock( componentsPrivateApis );
 
 function ListItem( {
@@ -236,32 +234,15 @@ function ListItem( {
 												}
 											>
 												{ isModalOpen && (
-													<Modal
-														title={
-															action.modalHeader ||
-															action.label
-														}
-														__experimentalHideHeader={
-															!! action.hideModalHeader
-														}
-														onRequestClose={ () =>
+													<ActionModal
+														action={ action }
+														item={ item }
+														closeModal={ () =>
 															setIsModalOpen(
 																false
 															)
 														}
-														overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-															action.id
-														) }` }
-													>
-														<action.RenderModal
-															items={ [ item ] }
-															closeModal={ () =>
-																setIsModalOpen(
-																	false
-																)
-															}
-														/>
-													</Modal>
+													/>
 												) }
 											</CompositeItem>
 										</div>

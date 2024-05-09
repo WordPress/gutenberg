@@ -47,14 +47,23 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 	);
 }
 
-export function ActionWithModal( {
-	action,
-	items,
-	ActionTrigger,
-	onActionStart,
-	onActionPerformed,
-	isBusy,
-} ) {
+export function ActionModal( { action, item, closeModal, onActionStart, onActionPerformed } ) {
+	return (
+		<Modal
+			title={ action.modalHeader || action.label }
+			__experimentalHideHeader={ !! action.hideModalHeader }
+			onRequestClose={ closeModal }
+			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+				action.id
+			) }` }
+		>
+			<action.RenderModal items={ [ item ] } closeModal={ closeModal } onActionStart={ onActionStart } onActionPerformed={ onActionPerformed }
+/>
+		</Modal>
+	);
+}
+
+function ActionWithModal( { action, item, ActionTrigger, onActionStart, onActionPerformed, isBusy } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -64,28 +73,17 @@ export function ActionWithModal( {
 		items,
 		isBusy,
 	};
-	const { RenderModal, hideModalHeader } = action;
 	return (
 		<>
 			<ActionTrigger { ...actionTriggerProps } />
 			{ isModalOpen && (
-				<Modal
-					title={ action.modalHeader || action.label }
-					__experimentalHideHeader={ !! hideModalHeader }
-					onRequestClose={ () => {
-						setIsModalOpen( false );
-					} }
-					overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-						action.id
-					) }` }
-				>
-					<RenderModal
-						items={ items }
-						closeModal={ () => setIsModalOpen( false ) }
-						onActionStart={ onActionStart }
-						onActionPerformed={ onActionPerformed }
-					/>
-				</Modal>
+				<ActionModal
+					action={ action }
+					item={ item }
+					closeModal={ () => setIsModalOpen( false ) }
+					onActionStart={ onActionStart }
+					onActionPerformed={ onActionPerformed}
+				/>
 			) }
 		</>
 	);
