@@ -12,9 +12,11 @@ import { __ } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,6 +27,8 @@ import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
 import { store as coreStore } from '@wordpress/core-data';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 export default function GlobalStylesSidebar() {
 	const {
@@ -59,7 +63,7 @@ export default function GlobalStylesSidebar() {
 			isStyleBookOpened: 'style-book' === canvasContainerView,
 			shouldClearCanvasContainerView:
 				'edit-site/global-styles' !==
-					getActiveComplementaryArea( 'core/edit-site' ) ||
+					getActiveComplementaryArea( 'core' ) ||
 				! _isVisualEditorMode ||
 				! _isEditCanvasMode,
 			showListViewByDefault: _showListViewByDefault,
@@ -132,7 +136,10 @@ export default function GlobalStylesSidebar() {
 			closeLabel={ __( 'Close Styles' ) }
 			panelClassName="edit-site-global-styles-sidebar__panel"
 			header={
-				<Flex className="edit-site-global-styles-sidebar__header">
+				<Flex
+					className="edit-site-global-styles-sidebar__header"
+					gap={ 1 }
+				>
 					<FlexBlock style={ { minWidth: 'min-content' } }>
 						<h2 className="edit-site-global-styles-sidebar__header-title">
 							{ __( 'Styles' ) }
@@ -147,6 +154,7 @@ export default function GlobalStylesSidebar() {
 							}
 							disabled={ shouldClearCanvasContainerView }
 							onClick={ toggleStyleBook }
+							size="compact"
 						/>
 					</FlexItem>
 					<FlexItem>
@@ -158,6 +166,7 @@ export default function GlobalStylesSidebar() {
 							isPressed={
 								isRevisionsOpened || isRevisionsStyleBookOpened
 							}
+							size="compact"
 						/>
 					</FlexItem>
 					<GlobalStylesMenuSlot />

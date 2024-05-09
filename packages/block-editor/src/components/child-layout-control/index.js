@@ -223,7 +223,13 @@ export default function ChildLayoutControl( {
 									} }
 									value={ columnStart }
 									min={ 1 }
-									max={ parentLayout?.columnCount }
+									max={
+										parentLayout?.columnCount
+											? parentLayout.columnCount -
+											  ( columnSpan ?? 1 ) +
+											  1
+											: undefined
+									}
 								/>
 							</FlexItem>
 							<FlexItem style={ { width: '50%' } }>
@@ -241,7 +247,13 @@ export default function ChildLayoutControl( {
 									} }
 									value={ rowStart }
 									min={ 1 }
-									max={ parentLayout?.columnCount }
+									max={
+										parentLayout?.rowCount
+											? parentLayout.rowCount -
+											  ( rowSpan ?? 1 ) +
+											  1
+											: undefined
+									}
 								/>
 							</FlexItem>
 						</Flex>

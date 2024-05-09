@@ -94,7 +94,9 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				// Safari won't send focus to the clicked element, so we need to manually place it: https://bugs.webkit.org/show_bug.cgi?id=22261
-				if ( window.document.activeElement !== ref ) ref.focus();
+				if ( window.document.activeElement !== ref ) {
+					ref.focus();
+				}
 				const { menuOpenedBy } = state;
 				if ( menuOpenedBy.click || menuOpenedBy.focus ) {
 					actions.closeMenu( 'click' );
@@ -137,7 +139,7 @@ const { state, actions } = store(
 				}
 			},
 			handleMenuFocusout( event ) {
-				const { modal } = getContext();
+				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
@@ -148,7 +150,8 @@ const { state, actions } = store(
 				if (
 					event.relatedTarget === null ||
 					( ! modal?.contains( event.relatedTarget ) &&
-						event.target !== window.document.activeElement )
+						event.target !== window.document.activeElement &&
+						type === 'submenu' )
 				) {
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );

@@ -11,7 +11,8 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 
@@ -41,7 +42,6 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
-	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 	const [ openedFilter, setOpenedFilter ] = useState( null );
@@ -136,7 +136,6 @@ export default function DataViews( {
 				isLoading={ isLoading }
 				onSelectionChange={ onSetSelection }
 				selection={ selection }
-				deferredRendering={ deferredRendering }
 				setOpenedFilter={ setOpenedFilter }
 			/>
 			<Pagination

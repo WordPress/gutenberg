@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -126,7 +126,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -221,7 +221,9 @@ export function CommandMenu() {
 		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {

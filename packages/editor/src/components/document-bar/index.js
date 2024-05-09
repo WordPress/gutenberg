@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -111,7 +111,7 @@ export default function DocumentBar() {
 
 	return (
 		<div
-			className={ classnames( 'editor-document-bar', {
+			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
 				'is-global': isGlobalEntity,
 			} ) }

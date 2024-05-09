@@ -3,16 +3,22 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: $grid-unit-10;
-	overflow: hidden;
+}
+
+.edit-site-site-hub__actions {
+	flex-shrink: 0;
 }
 
 .edit-site-site-hub__view-mode-toggle-container {
 	height: $header-height;
 	width: $header-height;
 	flex-shrink: 0;
-	background: $gray-900;
 
-	&.has-transparent-background {
+	.edit-site-layout__view-mode-toggle-icon {
+		background: $gray-900;
+	}
+
+	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
 		background: transparent;
 	}
 }
@@ -26,7 +32,6 @@
 }
 
 .edit-site-site-hub__site-view-link {
-	flex-grow: 0;
 	margin-right: var(--wp-admin-border-width-focus);
 	svg {
 		fill: $gray-200;

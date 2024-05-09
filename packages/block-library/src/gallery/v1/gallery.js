@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ export const Gallery = ( props ) => {
 	return (
 		<figure
 			{ ...blockProps }
-			className={ classnames( blockProps.className, {
+			className={ clsx( blockProps.className, {
 				[ `align${ align }` ]: align,
 				[ `columns-${ columns }` ]: columns,
 				'is-cropped': imageCrop,
@@ -97,7 +97,7 @@ export const Gallery = ( props ) => {
 			<RichTextVisibilityHelper
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
-				className={ classnames(
+				className={ clsx(
 					'blocks-gallery-caption',
 					__experimentalGetElementClassName( 'caption' )
 				) }

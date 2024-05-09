@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,20 +15,25 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { humanTimeDiff } from '@wordpress/date';
+import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
+import { PrivatePostExcerptPanel } from '../post-excerpt/panel';
+import PostLastEditedPanel from '../post-last-edited-panel';
 import { unlock } from '../../lock-unlock';
 import TemplateAreas from '../template-areas';
 
 export default function PostCardPanel( { className, actions } ) {
-	const { modified, title, templateInfo, icon, postType } = useSelect(
+	const { title, showPostContentPanels, icon, postType } = useSelect(
 		( select ) => {
 			const {
 				getEditedPostAttribute,
@@ -40,33 +45,35 @@ export default function PostCardPanel( { className, actions } ) {
 			const _type = getCurrentPostType();
 			const _id = getCurrentPostId();
 			const _record = getEditedEntityRecord( 'postType', _type, _id );
-			const _templateInfo = __experimentalGetTemplateInfo( _record );
+			const _templateInfo =
+				[ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
+					_type
+				) && __experimentalGetTemplateInfo( _record );
 			return {
 				title:
 					_templateInfo?.title || getEditedPostAttribute( 'title' ),
-				modified: getEditedPostAttribute( 'modified' ),
 				id: _id,
 				postType: _type,
-				templateInfo: _templateInfo,
 				icon: unlock( select( editorStore ) ).getPostIcon( _type, {
 					area: _record?.area,
 				} ),
+				// Post excerpt panel and Last Edited info are rendered in different place depending on the post type.
+				// So we cannot make this check inside the PostExcerpt or PostLastEditedPanel component based on the current edited entity.
+				showPostContentPanels: [
+					TEMPLATE_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+					PATTERN_POST_TYPE,
+				].includes( _type ),
 			};
-		}
+		},
+		[]
 	);
-	const description = templateInfo?.description;
-	const lastEditedText =
-		modified &&
-		sprintf(
-			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s.' ),
-			humanTimeDiff( modified )
-		);
-
 	return (
 		<PanelBody>
 			<div
-				className={ classnames( 'editor-post-card-panel', className ) }
+				className={ clsx( 'editor-post-card-panel', className, {
+					'has-description': showPostContentPanels,
+				} ) }
 			>
 				<HStack
 					spacing={ 2 }
@@ -89,15 +96,13 @@ export default function PostCardPanel( { className, actions } ) {
 					{ actions }
 				</HStack>
 				<VStack className="editor-post-card-panel__content">
-					{ ( description || lastEditedText ) && (
+					{ showPostContentPanels && (
 						<VStack
 							className="editor-post-card-panel__description"
 							spacing={ 2 }
 						>
-							{ description && <Text>{ description }</Text> }
-							{ lastEditedText && (
-								<Text>{ lastEditedText }</Text>
-							) }
+							<PrivatePostExcerptPanel />
+							<PostLastEditedPanel />
 						</VStack>
 					) }
 					{ postType === TEMPLATE_POST_TYPE && <TemplateAreas /> }

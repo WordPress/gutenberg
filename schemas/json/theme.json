@@ -4,7 +4,7 @@
 	"definitions": {
 		"//": {
 			"explainer": "https://developer.wordpress.org/themes/advanced-topics/theme-json/",
-			"createTheme": "https://developer.wordpress.org/block-editor/how-to-guides/themes/create-block-theme/",
+			"createTheme": "https://developer.wordpress.org/themes/",
 			"reference": "https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/"
 		},
 		"refComplete": {
@@ -286,6 +286,32 @@
 							"type": "boolean",
 							"default": false
 						},
+						"defaultAspectRatios": {
+							"description": "Allow users to choose aspect ratios from the default set of aspect ratios.",
+							"type": "boolean",
+							"default": true
+						},
+						"aspectRatios": {
+							"description": "Allow users to define aspect ratios for some blocks.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the aspect ratio preset.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the aspect ratio preset.",
+										"type": "string"
+									},
+									"ratio": {
+										"description": "Aspect ratio expressed as a division or decimal.",
+										"type": "string"
+									}
+								}
+							}
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
@@ -499,6 +525,11 @@
 					"description": "Settings related to typography.",
 					"type": "object",
 					"properties": {
+						"defaultFontSizes": {
+							"description": "Allow users to choose font sizes from the default font size presets.",
+							"type": "boolean",
+							"default": true
+						},
 						"customFontSize": {
 							"description": "Allow users to set custom font sizes.",
 							"type": "boolean",
@@ -550,6 +581,11 @@
 							"description": "Allow users to set custom line height.",
 							"type": "boolean",
 							"default": false
+						},
+						"textAlign": {
+							"description": "Allow users to set the text align.",
+							"type": "boolean",
+							"default": true
 						},
 						"textColumns": {
 							"description": "Allow users to set the number of text columns.",
@@ -1629,6 +1665,10 @@
 								}
 							]
 						},
+						"textAlign": {
+							"description": "Sets the `text-align` CSS property.",
+							"type": "string"
+						},
 						"textColumns": {
 							"description": "Sets the `column-count` CSS property.",
 							"type": "string"
@@ -2235,7 +2275,7 @@
 		"version": {
 			"description": "Version of theme.json to use.",
 			"type": "integer",
-			"enum": [ 2 ]
+			"enum": [ 3 ]
 		},
 		"title": {
 			"type": "string",
@@ -2260,6 +2300,7 @@
 						},
 						"background": {},
 						"color": {},
+						"dimensions": {},
 						"layout": {},
 						"lightbox": {},
 						"spacing": {},
@@ -2317,12 +2358,6 @@
 										{
 											"type": "object",
 											"properties": {
-												"source": {
-													"description": "The origin of the image. 'file' denotes that the 'url' is a path to an image or other file.",
-													"type": "string",
-													"enum": [ "file" ],
-													"default": "file"
-												},
 												"url": {
 													"description": "A URL to an image file.",
 													"type": "string"

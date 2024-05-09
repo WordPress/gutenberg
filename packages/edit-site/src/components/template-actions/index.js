@@ -21,7 +21,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { store as editSiteStore } from '../../store';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import RenameMenuItem from './rename-menu-item';
+import RenamePostMenuItem from '../rename-post-menu-item';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 export default function TemplateActions( {
@@ -55,8 +55,8 @@ export default function TemplateActions( {
 				<MenuGroup>
 					{ isRemovable && (
 						<>
-							<RenameMenuItem
-								template={ template }
+							<RenamePostMenuItem
+								post={ template }
 								onClose={ onClose }
 							/>
 							<DeleteMenuItem
@@ -135,7 +135,7 @@ function ResetMenuItem( { template, onClose } ) {
 				onCancel={ () => setIsModalOpen( false ) }
 				confirmButtonText={ __( 'Reset' ) }
 			>
-				{ __( 'Rese to default and clear all customizations?' ) }
+				{ __( 'Reset to default and clear all customizations?' ) }
 			</ConfirmDialog>
 		</>
 	);

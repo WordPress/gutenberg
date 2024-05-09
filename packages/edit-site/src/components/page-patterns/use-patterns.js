@@ -40,6 +40,7 @@ const templatePartToPattern = ( templatePart ) => ( {
 	name: createTemplatePartId( templatePart.theme, templatePart.slug ),
 	title: decodeEntities( templatePart.title.rendered ),
 	type: templatePart.type,
+	_links: templatePart._links,
 	templatePart,
 } );
 
@@ -222,6 +223,7 @@ const convertPatternPostToItem = ( patternPost, categories ) => ( {
 	syncStatus: patternPost.wp_pattern_sync_status || PATTERN_SYNC_TYPES.full,
 	title: patternPost.title.raw,
 	type: patternPost.type,
+	description: patternPost.excerpt.raw,
 	patternPost,
 } );
 

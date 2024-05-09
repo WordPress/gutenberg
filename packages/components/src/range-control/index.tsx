@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
 
 /**
@@ -116,9 +116,9 @@ function UnforwardedRangeControl(
 		: ( ( value - min ) / ( max - min ) ) * 100;
 	const fillValueOffset = `${ clamp( fillValue, 0, 100 ) }%`;
 
-	const classes = classnames( 'components-range-control', className );
+	const classes = clsx( 'components-range-control', className );
 
-	const wrapperClasses = classnames(
+	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
 		!! marks && 'is-marked'
 	);

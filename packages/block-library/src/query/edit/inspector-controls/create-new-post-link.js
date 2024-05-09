@@ -8,7 +8,9 @@ import { addQueryArgs } from '@wordpress/url';
 const CreateNewPostLink = ( {
 	attributes: { query: { postType } = {} } = {},
 } ) => {
-	if ( ! postType ) return null;
+	if ( ! postType ) {
+		return null;
+	}
 	const newPostUrl = addQueryArgs( 'post-new.php', {
 		post_type: postType,
 	} );

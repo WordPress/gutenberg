@@ -24,10 +24,18 @@ export async function createNewPost(
 	const query = new URLSearchParams();
 	const { postType, title, content, excerpt } = options;
 
-	if ( postType ) query.set( 'post_type', postType );
-	if ( title ) query.set( 'post_title', title );
-	if ( content ) query.set( 'content', content );
-	if ( excerpt ) query.set( 'excerpt', excerpt );
+	if ( postType ) {
+		query.set( 'post_type', postType );
+	}
+	if ( title ) {
+		query.set( 'post_title', title );
+	}
+	if ( content ) {
+		query.set( 'content', content );
+	}
+	if ( excerpt ) {
+		query.set( 'excerpt', excerpt );
+	}
 
 	await this.visitAdminPage( 'post-new.php', query.toString() );
 

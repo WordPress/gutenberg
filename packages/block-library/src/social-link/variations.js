@@ -346,7 +346,9 @@ const variations = [
  *  Block by providing its attributes.
  */
 variations.forEach( ( variation ) => {
-	if ( variation.isActive ) return;
+	if ( variation.isActive ) {
+		return;
+	}
 	variation.isActive = ( blockAttributes, variationAttributes ) =>
 		blockAttributes.service === variationAttributes.service;
 } );

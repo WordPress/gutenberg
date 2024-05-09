@@ -1,4 +1,4 @@
-.edit-site-sidebar-edit-mode {
+.editor-sidebar {
 	width: $sidebar-width;
 
 	> .components-panel {
@@ -36,14 +36,6 @@
 
 .edit-site-global-styles-sidebar .edit-site-global-styles-sidebar__header-title {
 	margin: 0;
-}
-
-.edit-site-global-styles-sidebar .interface-complementary-area-header .components-button.has-icon {
-	margin-left: 0;
-}
-
-.edit-site-global-styles-sidebar__reset-button.components-button {
-	margin-left: auto;
 }
 
 .edit-site-global-styles-sidebar .components-navigation__menu-title-heading {
@@ -104,6 +96,3 @@
 	}
 }
 
-.edit-site-sidebar__panel {
-	margin-top: -1px;
-}

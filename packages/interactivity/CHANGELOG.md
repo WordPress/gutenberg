@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-	Allow multiple event handlers for the same type with `data-wp-on-document` and `data-wp-on-window`. ([#61009](https://github.com/WordPress/gutenberg/pull/61009))
+
+-	Prevent wrong written directives from killing the runtime ([#61249](https://github.com/WordPress/gutenberg/pull/61249))
+
+## 5.6.0 (2024-05-02)
+
+## 5.5.0 (2024-04-19)
+
+### Enhancements
+
+-	Improve data-wp-context debugging by validating it as a stringified JSON Object. ([#61045](https://github.com/WordPress/gutenberg/pull/61045))
+
+### Bug Fixes
+
+-   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
+
 ## 5.4.0 (2024-04-03)
 
 ## 5.3.0 (2024-03-21)

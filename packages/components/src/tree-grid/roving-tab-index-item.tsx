@@ -41,7 +41,9 @@ export const RovingTabIndexItem = forwardRef(
 			return children( allProps );
 		}
 
-		if ( ! Component ) return null;
+		if ( ! Component ) {
+			return null;
+		}
 
 		return <Component { ...allProps }>{ children }</Component>;
 	}

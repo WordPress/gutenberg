@@ -3,7 +3,7 @@
  */
 import { getBlockSupport } from '@wordpress/blocks';
 import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -133,32 +133,76 @@ export function shouldSkipSerialization(
 	return skipSerialization;
 }
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+const pendingStyleOverrides = new WeakMap();
+
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	clientId,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const registry = useRegistry();
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
+
 		const _id = id || fallbackId;
-		setStyleOverride( _id, {
+		const override = {
 			id,
 			css,
 			assets,
 			__unstableType,
+			clientId,
+		};
+		// Batch updates to style overrides to avoid triggering cascading renders
+		// for each style override block included in a tree and optimize initial render.
+		if ( ! pendingStyleOverrides.get( registry ) ) {
+			pendingStyleOverrides.set( registry, [] );
+		}
+		pendingStyleOverrides.get( registry ).push( [ _id, override ] );
+		window.queueMicrotask( () => {
+			if ( pendingStyleOverrides.get( registry )?.length ) {
+				registry.batch( () => {
+					pendingStyleOverrides.get( registry ).forEach( ( args ) => {
+						setStyleOverride( ...args );
+					} );
+					pendingStyleOverrides.set( registry, [] );
+				} );
+			}
 		} );
+
 		return () => {
-			deleteStyleOverride( _id );
+			const isPending = pendingStyleOverrides
+				.get( registry )
+				?.find( ( [ currentId ] ) => currentId === _id );
+			if ( isPending ) {
+				pendingStyleOverrides.set(
+					registry,
+					pendingStyleOverrides
+						.get( registry )
+						.filter( ( [ currentId ] ) => currentId !== _id )
+				);
+			} else {
+				deleteStyleOverride( _id );
+			}
 		};
 	}, [
 		id,
 		css,
+		clientId,
 		assets,
 		__unstableType,
 		fallbackId,
 		setStyleOverride,
 		deleteStyleOverride,
+		registry,
 	] );
 }
 
@@ -179,6 +223,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -186,6 +231,7 @@ export function useBlockSettings( name, parentLayout ) {
 		fontStyle,
 		fontWeight,
 		lineHeight,
+		textAlign,
 		textColumns,
 		textDecoration,
 		writingMode,
@@ -230,6 +276,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
+		'typography.defaultFontSizes',
 		'typography.fontSizes.custom',
 		'typography.fontSizes.default',
 		'typography.fontSizes.theme',
@@ -237,6 +284,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.fontStyle',
 		'typography.fontWeight',
 		'typography.lineHeight',
+		'typography.textAlign',
 		'typography.textColumns',
 		'typography.textDecoration',
 		'typography.writingMode',
@@ -323,9 +371,11 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
+				textAlign,
 				textColumns,
 				textDecoration,
 				textTransform,
@@ -361,6 +411,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -368,6 +419,7 @@ export function useBlockSettings( name, parentLayout ) {
 		fontStyle,
 		fontWeight,
 		lineHeight,
+		textAlign,
 		textColumns,
 		textDecoration,
 		textTransform,
@@ -558,7 +610,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),

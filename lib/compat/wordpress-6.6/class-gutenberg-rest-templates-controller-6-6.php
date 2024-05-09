@@ -17,7 +17,7 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 	/**
 	 * Checks if a given request has access to read templates.
 	 *
-	 * @since 6.6
+	 * @since 6.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
@@ -42,9 +42,38 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 	}
 
 	/**
+	 * Returns a list of templates.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response
+	 */
+	public function get_items( $request ) {
+		$query = array();
+		if ( isset( $request['wp_id'] ) ) {
+			$query['wp_id'] = $request['wp_id'];
+		}
+		if ( isset( $request['area'] ) ) {
+			$query['area'] = $request['area'];
+		}
+		if ( isset( $request['post_type'] ) ) {
+			$query['post_type'] = $request['post_type'];
+		}
+
+		$templates = array();
+		foreach ( gutenberg_get_block_templates( $query, $this->post_type ) as $template ) {
+			$data        = $this->prepare_item_for_response( $template, $request );
+			$templates[] = $this->prepare_response_for_collection( $data );
+		}
+
+		return rest_ensure_response( $templates );
+	}
+
+	/**
 	 * Checks if a given request has access to read templates.
 	 *
-	 * @since 6.6
+	 * @since 6.6.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
@@ -66,5 +95,26 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 				'status' => rest_authorization_required_code(),
 			)
 		);
+	}
+
+	/**
+	 * Returns the fallback template for the given slug.
+	 *
+	 * @since 6.1.0
+	 *
+	 * @param WP_REST_Request $request The request instance.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function get_template_fallback( $request ) {
+		$hierarchy = gutenberg_get_template_hierarchy( $request['slug'], $request['is_custom'], $request['template_prefix'] );
+
+		do {
+			$fallback_template = resolve_block_template( $request['slug'], $hierarchy, '' );
+			array_shift( $hierarchy );
+		} while ( ! empty( $hierarchy ) && empty( $fallback_template->content ) );
+
+		$response = $this->prepare_item_for_response( $fallback_template, $request );
+
+		return rest_ensure_response( $response );
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -72,6 +72,116 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+
+function ColorTools( {
+	textColor,
+	setTextColor,
+	backgroundColor,
+	setBackgroundColor,
+	overlayTextColor,
+	setOverlayTextColor,
+	overlayBackgroundColor,
+	setOverlayBackgroundColor,
+	clientId,
+	navRef,
+} ) {
+	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
+	const [ detectedColor, setDetectedColor ] = useState();
+	const [
+		detectedOverlayBackgroundColor,
+		setDetectedOverlayBackgroundColor,
+	] = useState();
+	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+	// Turn on contrast checker for web only since it's not supported on mobile yet.
+	const enableContrastChecking = Platform.OS === 'web';
+	useEffect( () => {
+		if ( ! enableContrastChecking ) {
+			return;
+		}
+		detectColors(
+			navRef.current,
+			setDetectedColor,
+			setDetectedBackgroundColor
+		);
+
+		const subMenuElement = navRef.current?.querySelector(
+			'[data-type="core/navigation-submenu"] [data-type="core/navigation-link"]'
+		);
+
+		if ( ! subMenuElement ) {
+			return;
+		}
+
+		// Only detect submenu overlay colors if they have previously been explicitly set.
+		// This avoids the contrast checker from reporting on inherited submenu colors and
+		// showing the contrast warning twice.
+		if ( overlayTextColor.color || overlayBackgroundColor.color ) {
+			detectColors(
+				subMenuElement,
+				setDetectedOverlayColor,
+				setDetectedOverlayBackgroundColor
+			);
+		}
+	}, [
+		enableContrastChecking,
+		overlayTextColor.color,
+		overlayBackgroundColor.color,
+		navRef,
+	] );
+	const colorGradientSettings = useMultipleOriginColorsAndGradients();
+	if ( ! colorGradientSettings.hasColorsOrGradients ) {
+		return null;
+	}
+	return (
+		<>
+			<ColorGradientSettingsDropdown
+				__experimentalIsRenderedInSidebar
+				settings={ [
+					{
+						colorValue: textColor.color,
+						label: __( 'Text' ),
+						onColorChange: setTextColor,
+						resetAllFilter: () => setTextColor(),
+					},
+					{
+						colorValue: backgroundColor.color,
+						label: __( 'Background' ),
+						onColorChange: setBackgroundColor,
+						resetAllFilter: () => setBackgroundColor(),
+					},
+					{
+						colorValue: overlayTextColor.color,
+						label: __( 'Submenu & overlay text' ),
+						onColorChange: setOverlayTextColor,
+						resetAllFilter: () => setOverlayTextColor(),
+					},
+					{
+						colorValue: overlayBackgroundColor.color,
+						label: __( 'Submenu & overlay background' ),
+						onColorChange: setOverlayBackgroundColor,
+						resetAllFilter: () => setOverlayBackgroundColor(),
+					},
+				] }
+				panelId={ clientId }
+				{ ...colorGradientSettings }
+				gradients={ [] }
+				disableCustomGradients
+			/>
+			{ enableContrastChecking && (
+				<>
+					<ContrastChecker
+						backgroundColor={ detectedBackgroundColor }
+						textColor={ detectedColor }
+					/>
+					<ContrastChecker
+						backgroundColor={ detectedOverlayBackgroundColor }
+						textColor={ detectedOverlayColor }
+					/>
+				</>
+			) }
+		</>
+	);
+}
 
 function Navigation( {
 	attributes,
@@ -299,7 +409,7 @@ function Navigation( {
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
-		className: classnames(
+		className: clsx(
 			className,
 			{
 				'items-justified-right': justifyContent === 'right',
@@ -329,17 +439,6 @@ function Navigation( {
 			backgroundColor: ! backgroundColor?.slug && backgroundColor?.color,
 		},
 	} );
-
-	// Turn on contrast checker for web only since it's not supported on mobile yet.
-	const enableContrastChecking = Platform.OS === 'web';
-
-	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
-	const [ detectedColor, setDetectedColor ] = useState();
-	const [
-		detectedOverlayBackgroundColor,
-		setDetectedOverlayBackgroundColor,
-	] = useState();
-	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
 
 	const onSelectClassicMenu = async ( classicMenu ) => {
 		return convertClassicMenu( classicMenu.id, classicMenu.name, 'draft' );
@@ -413,40 +512,6 @@ function Navigation( {
 	] );
 
 	useEffect( () => {
-		if ( ! enableContrastChecking ) {
-			return;
-		}
-		detectColors(
-			navRef.current,
-			setDetectedColor,
-			setDetectedBackgroundColor
-		);
-
-		const subMenuElement = navRef.current?.querySelector(
-			'[data-type="core/navigation-submenu"] [data-type="core/navigation-link"]'
-		);
-
-		if ( ! subMenuElement ) {
-			return;
-		}
-
-		// Only detect submenu overlay colors if they have previously been explicitly set.
-		// This avoids the contrast checker from reporting on inherited submenu colors and
-		// showing the contrast warning twice.
-		if ( overlayTextColor.color || overlayBackgroundColor.color ) {
-			detectColors(
-				subMenuElement,
-				setDetectedOverlayColor,
-				setDetectedOverlayBackgroundColor
-			);
-		}
-	}, [
-		enableContrastChecking,
-		overlayTextColor.color,
-		overlayBackgroundColor.color,
-	] );
-
-	useEffect( () => {
 		if ( ! isSelected && ! isInnerBlockSelected ) {
 			hideNavigationMenuPermissionsNotice();
 		}
@@ -493,7 +558,7 @@ function Navigation( {
 	const hasManagePermissions =
 		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
-	const overlayMenuPreviewClasses = classnames(
+	const overlayMenuPreviewClasses = clsx(
 		'wp-block-navigation__overlay-menu-preview',
 		{ open: overlayMenuPreview }
 	);
@@ -518,7 +583,6 @@ function Navigation( {
 		`overlay-menu-preview`
 	);
 
-	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
@@ -634,58 +698,25 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			{ colorGradientSettings.hasColorsOrGradients && (
-				<InspectorControls group="color">
-					<ColorGradientSettingsDropdown
-						__experimentalIsRenderedInSidebar
-						settings={ [
-							{
-								colorValue: textColor.color,
-								label: __( 'Text' ),
-								onColorChange: setTextColor,
-								resetAllFilter: () => setTextColor(),
-							},
-							{
-								colorValue: backgroundColor.color,
-								label: __( 'Background' ),
-								onColorChange: setBackgroundColor,
-								resetAllFilter: () => setBackgroundColor(),
-							},
-							{
-								colorValue: overlayTextColor.color,
-								label: __( 'Submenu & overlay text' ),
-								onColorChange: setOverlayTextColor,
-								resetAllFilter: () => setOverlayTextColor(),
-							},
-							{
-								colorValue: overlayBackgroundColor.color,
-								label: __( 'Submenu & overlay background' ),
-								onColorChange: setOverlayBackgroundColor,
-								resetAllFilter: () =>
-									setOverlayBackgroundColor(),
-							},
-						] }
-						panelId={ clientId }
-						{ ...colorGradientSettings }
-						gradients={ [] }
-						disableCustomGradients
-					/>
-					{ enableContrastChecking && (
-						<>
-							<ContrastChecker
-								backgroundColor={ detectedBackgroundColor }
-								textColor={ detectedColor }
-							/>
-							<ContrastChecker
-								backgroundColor={
-									detectedOverlayBackgroundColor
-								}
-								textColor={ detectedOverlayColor }
-							/>
-						</>
-					) }
-				</InspectorControls>
-			) }
+			<InspectorControls group="color">
+				{ /*
+				 * Avoid useMultipleOriginColorsAndGradients and detectColors
+				 * on block mount. InspectorControls only mounts this component
+				 * when the block is selected.
+				 * */ }
+				<ColorTools
+					textColor={ textColor }
+					setTextColor={ setTextColor }
+					backgroundColor={ backgroundColor }
+					setBackgroundColor={ setBackgroundColor }
+					overlayTextColor={ overlayTextColor }
+					setOverlayTextColor={ setOverlayTextColor }
+					overlayBackgroundColor={ overlayBackgroundColor }
+					setOverlayBackgroundColor={ setOverlayBackgroundColor }
+					clientId={ clientId }
+					navRef={ navRef }
+				/>
+			</InspectorControls>
 		</>
 	);
 
@@ -847,7 +878,7 @@ function Navigation( {
 										replaceInnerBlocks( clientId, [] );
 										showNavigationMenuStatusNotice(
 											__(
-												'Navigation menu successfully deleted.'
+												'Navigation Menu successfully deleted.'
 											)
 										);
 									} }

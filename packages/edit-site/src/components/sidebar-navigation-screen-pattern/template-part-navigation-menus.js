@@ -10,7 +10,9 @@ import TemplatePartNavigationMenu from './template-part-navigation-menu';
 import TemplatePartNavigationMenuList from './template-part-navigation-menu-list';
 
 export default function TemplatePartNavigationMenus( { menus } ) {
-	if ( ! menus.length ) return null;
+	if ( ! menus.length ) {
+		return null;
+	}
 
 	// if there is a single menu then render TemplatePartNavigationMenu
 	if ( menus.length === 1 ) {

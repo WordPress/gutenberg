@@ -15,7 +15,6 @@ import {
 	__experimentalVStack as VStack,
 	Flex,
 	Notice,
-	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -49,6 +48,7 @@ function InstalledFonts() {
 		fontFamiliesHasChanges,
 		notice,
 		setNotice,
+		fontFamilies,
 	} = useContext( FontLibraryContext );
 	const [ isConfirmDeleteOpen, setIsConfirmDeleteOpen ] = useState( false );
 	const customFontFamilyId =
@@ -113,162 +113,199 @@ function InstalledFonts() {
 	return (
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
-				<HStack align="center">
-					<Spacer />
-					<Spinner />
-					<Spacer />
-				</HStack>
+				<div className="font-library-modal__loading">
+					<ProgressBar />
+				</div>
 			) }
 
-			<NavigatorProvider
-				initialPath={ libraryFontSelected ? '/fontFamily' : '/' }
-			>
-				<NavigatorScreen path="/">
-					{ notice && (
-						<>
-							<Spacer margin={ 1 } />
-							<Notice
-								status={ notice.type }
-								onRemove={ () => setNotice( null ) }
-							>
-								{ notice.message }
-							</Notice>
-							<Spacer margin={ 1 } />
-						</>
-					) }
-					{ baseCustomFonts.length > 0 && (
-						<>
-							<Text className="font-library-modal__subtitle">
-								{ __( 'Installed Fonts' ) }
-							</Text>
-							<Spacer margin={ 2 } />
-							{ baseCustomFonts.map( ( font ) => (
-								<FontCard
-									font={ font }
-									key={ font.slug }
-									navigatorPath={ '/fontFamily' }
-									variantsText={ getFontCardVariantsText(
-										font
-									) }
-									onClick={ () => {
-										handleSetLibraryFontSelected( font );
-									} }
-								/>
-							) ) }
-							<Spacer margin={ 8 } />
-						</>
-					) }
-
-					{ baseThemeFonts.length > 0 && (
-						<>
-							<Text className="font-library-modal__subtitle">
-								{ __( 'Theme Fonts' ) }
-							</Text>
-							<Spacer margin={ 2 } />
-							{ baseThemeFonts.map( ( font ) => (
-								<FontCard
-									font={ font }
-									key={ font.slug }
-									navigatorPath={ '/fontFamily' }
-									variantsText={ getFontCardVariantsText(
-										font
-									) }
-									onClick={ () => {
-										handleSetLibraryFontSelected( font );
-									} }
-								/>
-							) ) }
-						</>
-					) }
-					<Spacer margin={ 16 } />
-				</NavigatorScreen>
-
-				<NavigatorScreen path="/fontFamily">
-					<ConfirmDeleteDialog
-						font={ libraryFontSelected }
-						isOpen={ isConfirmDeleteOpen }
-						setIsOpen={ setIsConfirmDeleteOpen }
-						setNotice={ setNotice }
-						uninstallFontFamily={ uninstallFontFamily }
-						handleSetLibraryFontSelected={
-							handleSetLibraryFontSelected
+			{ ! isResolvingLibrary && (
+				<>
+					<NavigatorProvider
+						initialPath={
+							libraryFontSelected ? '/fontFamily' : '/'
 						}
-					/>
-
-					<Flex justify="flex-start">
-						<NavigatorToParentButton
-							icon={ chevronLeft }
-							size="small"
-							onClick={ () => {
-								handleSetLibraryFontSelected( null );
-							} }
-							label={ __( 'Back' ) }
-						/>
-						<Heading
-							level={ 2 }
-							size={ 13 }
-							className="edit-site-global-styles-header"
-						>
-							{ libraryFontSelected?.name }
-						</Heading>
-					</Flex>
-					{ notice && (
-						<>
-							<Spacer margin={ 1 } />
-							<Notice
-								status={ notice.type }
-								onRemove={ () => setNotice( null ) }
-							>
-								{ notice.message }
-							</Notice>
-							<Spacer margin={ 1 } />
-						</>
-					) }
-					<Spacer margin={ 4 } />
-					<Text>
-						{ __(
-							'Choose font variants. Keep in mind that too many variants could make your site slower.'
-						) }
-					</Text>
-					<Spacer margin={ 4 } />
-					<VStack spacing={ 0 }>
-						<Spacer margin={ 8 } />
-						{ getFontFacesToDisplay( libraryFontSelected ).map(
-							( face, i ) => (
-								<LibraryFontVariant
-									font={ libraryFontSelected }
-									face={ face }
-									key={ `face${ i }` }
-								/>
-							)
-						) }
-					</VStack>
-				</NavigatorScreen>
-			</NavigatorProvider>
-
-			<HStack
-				justify="flex-end"
-				className="font-library-modal__tabpanel-layout__footer"
-			>
-				{ isInstalling && <ProgressBar /> }
-				{ shouldDisplayDeleteButton && (
-					<Button
-						isDestructive
-						variant="tertiary"
-						onClick={ handleUninstallClick }
 					>
-						{ __( 'Delete' ) }
-					</Button>
-				) }
-				<Button
-					variant="primary"
-					onClick={ saveFontFamilies }
-					disabled={ ! fontFamiliesHasChanges }
-					__experimentalIsFocusable
-				>
-					{ __( 'Update' ) }
-				</Button>
-			</HStack>
+						<NavigatorScreen path="/">
+							<VStack spacing="8">
+								{ notice && (
+									<Notice
+										status={ notice.type }
+										onRemove={ () => setNotice( null ) }
+									>
+										{ notice.message }
+									</Notice>
+								) }
+								{ baseCustomFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Installed Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseCustomFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
+															font
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+								{ baseThemeFonts.length > 0 && (
+									<VStack>
+										<h2 className="font-library-modal__fonts-title">
+											{ __( 'Theme Fonts' ) }
+										</h2>
+										{ /*
+										 * Disable reason: The `list` ARIA role is redundant but
+										 * Safari+VoiceOver won't announce the list otherwise.
+										 */
+										/* eslint-disable jsx-a11y/no-redundant-roles */ }
+										<ul
+											role="list"
+											className="font-library-modal__fonts-list"
+										>
+											{ baseThemeFonts.map( ( font ) => (
+												<li
+													key={ font.slug }
+													className="font-library-modal__fonts-list-item"
+												>
+													<FontCard
+														font={ font }
+														navigatorPath={
+															'/fontFamily'
+														}
+														variantsText={ getFontCardVariantsText(
+															font
+														) }
+														onClick={ () => {
+															handleSetLibraryFontSelected(
+																font
+															);
+														} }
+													/>
+												</li>
+											) ) }
+										</ul>
+										{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
+									</VStack>
+								) }
+							</VStack>
+						</NavigatorScreen>
+
+						<NavigatorScreen path="/fontFamily">
+							<ConfirmDeleteDialog
+								font={ libraryFontSelected }
+								isOpen={ isConfirmDeleteOpen }
+								setIsOpen={ setIsConfirmDeleteOpen }
+								setNotice={ setNotice }
+								uninstallFontFamily={ uninstallFontFamily }
+								handleSetLibraryFontSelected={
+									handleSetLibraryFontSelected
+								}
+							/>
+
+							<Flex justify="flex-start">
+								<NavigatorToParentButton
+									icon={ chevronLeft }
+									size="small"
+									onClick={ () => {
+										handleSetLibraryFontSelected( null );
+									} }
+									label={ __( 'Back' ) }
+								/>
+								<Heading
+									level={ 2 }
+									size={ 13 }
+									className="edit-site-global-styles-header"
+								>
+									{ libraryFontSelected?.name }
+								</Heading>
+							</Flex>
+							{ notice && (
+								<>
+									<Spacer margin={ 1 } />
+									<Notice
+										status={ notice.type }
+										onRemove={ () => setNotice( null ) }
+									>
+										{ notice.message }
+									</Notice>
+									<Spacer margin={ 1 } />
+								</>
+							) }
+							<Spacer margin={ 4 } />
+							<Text>
+								{ __(
+									'Choose font variants. Keep in mind that too many variants could make your site slower.'
+								) }
+							</Text>
+							<Spacer margin={ 4 } />
+							<VStack spacing={ 0 }>
+								<Spacer margin={ 8 } />
+								{ getFontFacesToDisplay(
+									libraryFontSelected
+								).map( ( face, i ) => (
+									<LibraryFontVariant
+										font={ libraryFontSelected }
+										face={ face }
+										key={ `face${ i }` }
+									/>
+								) ) }
+							</VStack>
+						</NavigatorScreen>
+					</NavigatorProvider>
+
+					<HStack
+						justify="flex-end"
+						className="font-library-modal__tabpanel-layout__footer"
+					>
+						{ isInstalling && <ProgressBar /> }
+						{ shouldDisplayDeleteButton && (
+							<Button
+								isDestructive
+								variant="tertiary"
+								onClick={ handleUninstallClick }
+							>
+								{ __( 'Delete' ) }
+							</Button>
+						) }
+						<Button
+							variant="primary"
+							onClick={ () => {
+								saveFontFamilies( fontFamilies );
+							} }
+							disabled={ ! fontFamiliesHasChanges }
+							__experimentalIsFocusable
+						>
+							{ __( 'Update' ) }
+						</Button>
+					</HStack>
+				</>
+			) }
 		</div>
 	);
 }
