@@ -346,7 +346,15 @@ function BackgroundSizeToolsPanelItem( {
 		inheritedValue?.background?.backgroundSize;
 	const repeatValue =
 		style?.background?.backgroundRepeat ||
-		inheritedValue?.background?.backgroundRepeat;
+		/*
+		 * Edge case where theme.json has a backgroundSize value of 'cover'
+		 * and a backgroundRepeat value. If a user backgroundSize is set,
+		 * ignore the inherited backgroundRepeat value as style?.background?.backgroundRepeat
+		 * is deliberately set to undefined in updateBackgroundSize().
+		 */
+		( !! style?.background?.backgroundSize
+			? undefined
+			: inheritedValue?.background?.backgroundRepeat );
 	const imageValue =
 		style?.background?.backgroundImage?.url ||
 		inheritedValue?.background?.backgroundImage?.url;
