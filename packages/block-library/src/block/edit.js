@@ -214,10 +214,11 @@ function ReusableBlockEdit( {
 		),
 	} );
 
+	// Use `blocks` variable until `innerBlocks` is populated, which has the proper clientIds.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: 'contentOnly',
 		layout,
-		value: blocks,
+		value: innerBlocks.length > 0 ? innerBlocks : blocks,
 		onInput,
 		onChange,
 		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
