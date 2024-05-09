@@ -416,6 +416,7 @@
 			opacity: 0;
 		}
 
+		&:focus-within,
 		&.is-hovered,
 		&:hover {
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
