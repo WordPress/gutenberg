@@ -786,7 +786,7 @@
 	}
 }
 
-@container (max-width: 430px) {
+@container (max-width: 430px) { /* stylelint-disable */
 	.dataviews-pagination,
 	.dataviews-filters__view-actions {
 		padding: $grid-unit-20 $grid-unit-30;
