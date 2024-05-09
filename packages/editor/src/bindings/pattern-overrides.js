@@ -33,23 +33,33 @@ export default {
 		]?.[ attributeName ];
 	},
 	setValue( { registry, clientId, attributeName, value } ) {
-		const { getBlockAttributes, getBlockParents, getBlockName } =
+		const { getBlockAttributes, getBlockParents, getBlockName, getBlocks } =
 			registry.select( blockEditorStore );
+		const currentBlockAttributes = getBlockAttributes( clientId );
 		const parents = getBlockParents( clientId, true );
 		const patternClientId = parents.find(
 			( id ) => getBlockName( id ) === 'core/block'
 		);
-		// If there is no pattern client ID, set attributes as normal.
+		// If there is no pattern client ID, sync blocks with the same name and same attributes.
 		if ( ! patternClientId ) {
-			registry
-				.dispatch( blockEditorStore )
-				.updateBlockAttributes( clientId, {
-					[ attributeName ]: value,
-				} );
+			const blockName = currentBlockAttributes?.metadata?.name;
+			const syncBlocksWithSameName = ( blocks ) => {
+				for ( const block of blocks ) {
+					if ( block.attributes?.metadata?.name === blockName ) {
+						registry
+							.dispatch( blockEditorStore )
+							.updateBlockAttributes( block.clientId, {
+								[ attributeName ]: value,
+							} );
+					}
+					syncBlocksWithSameName( block.innerBlocks );
+				}
+			};
+
+			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
 
-		const currentBlockAttributes = getBlockAttributes( clientId );
 		const blockName = currentBlockAttributes?.metadata?.name;
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
