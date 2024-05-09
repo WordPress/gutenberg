@@ -23,9 +23,6 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 );
 
 export default function Variation( { variation, children, isPill } ) {
-	// @TODO _links need to be merged as well somehow so that
-	// they are always returned in "mergedConfig" in the global-styles-provider.
-	// console.log( 'variation', variation );
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -33,6 +30,7 @@ export default function Variation( { variation, children, isPill } ) {
 			user: {
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
+				_links: variation._links ?? {},
 			},
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
@@ -45,6 +43,7 @@ export default function Variation( { variation, children, isPill } ) {
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
+			_links: variation._links,
 		} ) );
 	};
 

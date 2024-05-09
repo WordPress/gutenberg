@@ -38,6 +38,7 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { getThemeFileURI } from './set-theme-file-uris';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -191,6 +192,7 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -301,7 +303,7 @@ function BackgroundImageToolsPanelItem( {
 						<InspectorImagePreview
 							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ url }
+							url={ getThemeFileURI( url, themeFileURIs ) }
 						/>
 					}
 					variant="secondary"
@@ -340,6 +342,7 @@ function BackgroundSizeToolsPanelItem( {
 	style,
 	inheritedValue,
 	defaultValues,
+	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -468,7 +471,7 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ imageValue }
+				url={ getThemeFileURI( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
@@ -553,6 +556,7 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background image' ),
+	themeFileURIs,
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -577,6 +581,7 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
+				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
 				<BackgroundSizeToolsPanelItem
@@ -586,6 +591,7 @@ export default function BackgroundPanel( {
 					style={ value }
 					inheritedValue={ inheritedValue }
 					defaultValues={ defaultValues }
+					themeFileURIs={ themeFileURIs }
 				/>
 			) }
 		</Wrapper>

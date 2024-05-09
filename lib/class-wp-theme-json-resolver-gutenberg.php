@@ -777,21 +777,19 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return array An array of resolved paths.
 	 */
 	public static function get_resolved_theme_uris( $theme_json ) {
-		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
-			return $theme_json;
-		}
-
-		$theme_json_data     = $theme_json->get_raw_data();
 		$resolved_theme_uris = array();
 
-		/*
-		 * Styles backgrounds.
-		 * Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
-		 * Blocks, elements, and block variations are not yet supported.
-		 */
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg || empty( $theme_json ) ) {
+			return $resolved_theme_uris;
+		}
+
+		$theme_json_data = $theme_json->get_raw_data();
+
+		// Top level styles.
 		if (
 			isset( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
 			is_string( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
+			// Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
 			! isset( wp_parse_url( $theme_json_data['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
 				$resolved_theme_uris[] = array(
 					'file' => $theme_json_data['styles']['background']['backgroundImage']['url'],
@@ -805,7 +803,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	// @TODO used in gutenberg_get_global_stylesheet to ensure global stylesheet URIs are resolved.
 	// Try to harmonize with the above function
 	public static function resolve_theme_file_uris( $theme_json ) {
-		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg || empty( $theme_json ) ) {
 			return $theme_json;
 		}
 

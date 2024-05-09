@@ -366,8 +366,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$raw_config                       = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
+		$theme_json                       = array();
 		if ( $is_global_styles_user_theme_json ) {
-			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
+			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
+			$config     = $theme_json->get_raw_data();
 		}
 
 		// Base fields for every post.
@@ -409,6 +411,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $post->ID );
+			// Only return resolved URIs for get requests to user theme JSON.
+			if ( $is_global_styles_user_theme_json ) {
+				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
+				if ( ! empty( $resolved_theme_uris ) ) {
+					$links['theme_file_uris'] = $resolved_theme_uris;
+				}
+			}
 			$response->add_links( $links );
 			if ( ! empty( $links['self']['href'] ) ) {
 				$actions = $this->get_available_actions();
@@ -607,34 +616,31 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
-		$theme               = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
-		$data                = array();
-		$fields              = $this->get_fields_for_response( $request );
-		$resolved_theme_uris = array();
+		$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
+		$data   = array();
+		$fields = $this->get_fields_for_response( $request );
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
 			$data['settings'] = $theme->get_settings();
 		}
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
-			$raw_data            = $theme->get_raw_data();
-			$data['styles']      = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
-			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
+			$raw_data       = $theme->get_raw_data();
+			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
-
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = array(
+			$links               = array(
 				'self' => array(
 					'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
 				),
 			);
-
+			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
 			if ( ! empty( $resolved_theme_uris ) ) {
 				$links['theme_file_uris'] = $resolved_theme_uris;
 			}

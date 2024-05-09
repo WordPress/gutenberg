@@ -35,7 +35,7 @@ import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import useGetThemeFileUris from './use-get-theme-file-uris';
+import setThemeFileUris from './set-theme-file-uris';
 
 // List of block support features that can have their related styles
 // generated under their own feature level selector rather than the block's.
@@ -1218,7 +1218,10 @@ export function processCSSNesting( css, blockSelector ) {
  */
 export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
-	const withResolvedThemeURIs = useGetThemeFileUris( mergedConfig );
+	mergedConfig = setThemeFileUris(
+		mergedConfig,
+		mergedConfig?._links?.theme_file_uris
+	);
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.
 	const disableLayoutStyles = useSelect( ( select ) => {
@@ -1233,15 +1236,10 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const { getBlockStyles } = useSelect( blocksStore );
 
 	return useMemo( () => {
-		if (
-			! withResolvedThemeURIs?.styles ||
-			! withResolvedThemeURIs?.settings
-		) {
+		if ( ! mergedConfig?.styles || ! mergedConfig?.settings ) {
 			return [];
 		}
-		const updatedConfig = updateConfigWithSeparator(
-			withResolvedThemeURIs
-		);
+		const updatedConfig = updateConfigWithSeparator( mergedConfig );
 
 		const blockSelectors = getBlockSelectors(
 			getBlockTypes(),
@@ -1304,7 +1302,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	}, [
 		hasBlockGapSupport,
 		hasFallbackGapSupport,
-		withResolvedThemeURIs,
+		mergedConfig,
 		disableLayoutStyles,
 		isTemplate,
 		getBlockStyles,

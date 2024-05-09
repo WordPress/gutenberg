@@ -39,9 +39,14 @@ export default function BackgroundPanel() {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
 		shouldDecodeEncode: false,
 	} );
-	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
-		shouldDecodeEncode: false,
-	} );
+	const [ inheritedStyle, setStyle, _links ] = useGlobalStyle(
+		'',
+		undefined,
+		'all',
+		{
+			shouldDecodeEncode: false,
+		}
+	);
 	const [ settings ] = useGlobalSetting( '' );
 
 	const defaultControls = {
@@ -60,6 +65,7 @@ export default function BackgroundPanel() {
 			headerLabel={ __( 'Image' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			defaultControls={ defaultControls }
+			themeFileURIs={ _links?.theme_file_uris }
 		/>
 	);
 }
