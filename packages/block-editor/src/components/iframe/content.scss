@@ -24,7 +24,7 @@
 .block-editor-iframe__html.is-zoomed-out {
 	$scale: var(--wp-block-editor-iframe-zoom-out-scale);
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
-	$iframe-height: var(--wp-block-editor-iframe-zoom-out-iframe-height);
+	$inner-height: var(--wp-block-editor-iframe-zoom-out-iframe-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
 
 	transform: scale(#{$scale});
@@ -43,7 +43,7 @@
 	margin-bottom: calc(-1 * #{$total-height});
 
 	body {
-		min-height: calc((#{$iframe-height} - #{$total-frame-height}) / #{$scale});
+		min-height: calc((#{$inner-height} - #{$total-frame-height}) / #{$scale});
 		display: flex;
 		flex-direction: column;
 
