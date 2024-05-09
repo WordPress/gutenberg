@@ -38,7 +38,11 @@ function BlockPatternsTab( {
 	);
 
 	if ( isResolvingPatterns ) {
-		return <Spinner />;
+		return (
+			<div className="block-editor-inserter__patterns-loading">
+				<Spinner />
+			</div>
+		);
 	}
 
 	if ( ! categories.length ) {
