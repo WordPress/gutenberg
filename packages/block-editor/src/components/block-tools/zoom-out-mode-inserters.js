@@ -60,7 +60,6 @@ function ZoomOutModeInserters() {
 				key={ index }
 				previousClientId={ clientId }
 				nextClientId={ blockOrder[ index ] }
-				className="block-editor-button-pattern-inserter"
 			>
 				{ insertionPoint.insertionIndex === index && (
 					<div
