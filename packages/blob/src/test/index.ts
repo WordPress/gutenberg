@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isBlobURL, getBlobTypeByURL, downloadBlob } from '../';
+import { isBlobURL, getBlobTypeByURL, downloadBlob } from '..';
 
 describe( 'isBlobURL', () => {
 	it( 'returns true if the url starts with "blob:"', () => {
@@ -13,6 +13,8 @@ describe( 'isBlobURL', () => {
 	} );
 
 	it( 'returns false if the url is not defined', () => {
+		// calling isBlobURL without a URL is not type compliant, so ignore it
+		// @ts-ignore
 		expect( isBlobURL() ).toBe( false );
 	} );
 } );
@@ -23,6 +25,8 @@ describe( 'getBlobTypeByURL', () => {
 	} );
 
 	it( 'returns undefined if the url is not defined', () => {
+		// calling getBlobTypeByURL without a URL is not type compliant, so ignore it
+		// @ts-ignore
 		expect( getBlobTypeByURL() ).toBe( undefined );
 	} );
 } );
@@ -36,17 +40,18 @@ describe( 'downloadBlob', () => {
 	const createElementSpy = jest
 		.spyOn( global.document, 'createElement' )
 		.mockReturnValue( mockAnchorElement );
+
 	const mockBlob = jest.fn();
-	const blobSpy = jest.spyOn( window, 'Blob' ).mockReturnValue( mockBlob );
+	const blobSpy = jest
+		.spyOn( window, 'Blob' )
+		.mockReturnValue( mockBlob as unknown as Blob );
 	jest.spyOn( document.body, 'appendChild' );
 	jest.spyOn( document.body, 'removeChild' );
 	beforeEach( () => {
 		// Can't seem to spy on these static methods. They are `undefined`.
 		// Possibly overwritten: https://github.com/WordPress/gutenberg/blob/trunk/packages/jest-preset-default/scripts/setup-globals.js#L5
-		window.URL = {
-			createObjectURL,
-			revokeObjectURL,
-		};
+		window.URL.createObjectURL = createObjectURL;
+		window.URL.revokeObjectURL = revokeObjectURL;
 	} );
 
 	afterAll( () => {
