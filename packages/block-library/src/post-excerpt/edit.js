@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -71,7 +71,7 @@ export default function PostExcerptEditor( {
 		userCanEdit && ! isDescendentOfQueryLoop && postTypeSupportsExcerpts;
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -141,7 +141,7 @@ export default function PostExcerptEditor( {
 			withoutInteractiveFormatting
 		/>
 	);
-	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+	const excerptClassName = clsx( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 

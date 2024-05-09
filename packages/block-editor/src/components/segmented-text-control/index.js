@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ export default function SegmentedTextControl( {
 } ) {
 	return (
 		<fieldset
-			className={ classnames(
+			className={ clsx(
 				'block-editor-segmented-text-control',
 				className
 			) }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -82,7 +82,7 @@ function ListViewBlockSelectButton(
 
 	return (
 		<Button
-			className={ classnames(
+			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
 			) }

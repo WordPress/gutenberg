@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,12 +44,9 @@ export default function DataViewItem( {
 	return (
 		<HStack
 			justify="flex-start"
-			className={ classnames(
-				'edit-site-sidebar-dataviews-dataview-item',
-				{
-					'is-selected': isActive,
-				}
-			) }
+			className={ clsx( 'edit-site-sidebar-dataviews-dataview-item', {
+				'is-selected': isActive,
+			} ) }
 		>
 			<SidebarNavigationItem
 				icon={ iconToUse }

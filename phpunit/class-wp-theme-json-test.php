@@ -4812,8 +4812,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'core/paragraph' => array(
 							'background' => array(
 								'backgroundImage'    => array(
-									'url'    => 'http://example.org/image.png',
-									'source' => 'file',
+									'url' => 'http://example.org/image.png',
 								),
 								'backgroundSize'     => 'cover',
 								'backgroundRepeat'   => 'no-repeat',

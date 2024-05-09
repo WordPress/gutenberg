@@ -3,7 +3,6 @@
  *
  * @async
  * @param {Array} newHead The head elements of the new page.
- *
  */
 export const updateHead = async ( newHead ) => {
 	// Helper to get the tag id store in the cache.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -37,13 +37,13 @@ import {
 	PaletteActionsContainer,
 	PaletteEditStyles,
 	PaletteHeading,
-	PaletteHStackHeader,
 	IndicatorStyled,
 	PaletteItem,
 	NameContainer,
 	NameInputControl,
 	DoneButton,
 	RemoveButton,
+	PaletteEditContents,
 } from './styles';
 import { NavigableMenu } from '../navigable-container';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
@@ -130,7 +130,7 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 				resize: false,
 				placement: 'left-start',
 				...receivedPopoverProps,
-				className: classnames(
+				className: clsx(
 					'components-palette-edit__popover',
 					receivedPopoverProps?.className
 				),
@@ -410,7 +410,7 @@ export function PaletteEdit( {
 
 	return (
 		<PaletteEditStyles>
-			<PaletteHStackHeader>
+			<HStack>
 				<PaletteHeading level={ paletteLabelHeadingLevel }>
 					{ paletteLabel }
 				</PaletteHeading>
@@ -542,9 +542,9 @@ export function PaletteEdit( {
 							</DropdownMenu>
 						) }
 				</PaletteActionsContainer>
-			</PaletteHStackHeader>
+			</HStack>
 			{ hasElements && (
-				<>
+				<PaletteEditContents>
 					{ isEditing && (
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
@@ -602,9 +602,11 @@ export function PaletteEdit( {
 								disableCustomColors
 							/>
 						) ) }
-				</>
+				</PaletteEditContents>
 			) }
-			{ ! hasElements && emptyMessage }
+			{ ! hasElements && emptyMessage && (
+				<PaletteEditContents>{ emptyMessage }</PaletteEditContents>
+			) }
 		</PaletteEditStyles>
 	);
 }

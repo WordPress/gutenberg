@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -277,42 +277,55 @@ function Iframe( {
 			? scale( contentWidth, contentHeight )
 			: scale;
 
+	const isZoomedOut = scale !== 1;
+
 	useEffect( () => {
-		if ( ! iframeDocument ) {
+		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
 
-		if ( scale !== 1 ) {
-			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
+		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-			iframeDocument.body.classList.add( 'is-zoomed-out' );
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			`${ scale }`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-frame-size',
+			`${ frameSize }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-inner-height',
+			`${ iframeWindowInnerHeight }px`
+		);
 
-			iframeDocument.documentElement.style.transform = `scale( ${ scale } )`;
-			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
-			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
-			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * scale ) {
-				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
-				) }px`;
-			}
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
 
-			return () => {
-				iframeDocument.body.classList.remove( 'is-zoomed-out' );
-				iframeDocument.documentElement.style.transform = '';
-				iframeDocument.documentElement.style.marginTop = '';
-				iframeDocument.documentElement.style.marginBottom = '';
-				iframeDocument.body.style.minHeight = '';
-			};
-		}
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-frame-size'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-content-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inner-height'
+			);
+		};
 	}, [
 		scale,
 		frameSize,
 		iframeDocument,
-		contentHeight,
 		iframeWindowInnerHeight,
-		contentWidth,
+		contentHeight,
+		isZoomedOut,
 	] );
 
 	// Make sure to not render the before and after focusable div elements in view
@@ -376,7 +389,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses

@@ -5,17 +5,17 @@ import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
-import { sidebars } from '../settings-sidebar';
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { sidebars } from './constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SettingsHeader = ( _, ref ) => {
+const SidebarHeader = ( _, ref ) => {
 	const { documentLabel } = useSelect( ( select ) => {
 		const { getPostTypeLabel } = select( editorStore );
 
@@ -46,4 +46,4 @@ const SettingsHeader = ( _, ref ) => {
 	);
 };
 
-export default forwardRef( SettingsHeader );
+export default forwardRef( SidebarHeader );

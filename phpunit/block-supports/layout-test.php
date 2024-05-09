@@ -411,6 +411,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 * @param string $expected_output The expected output.
 	 */
 	public function test_layout_support_flag_renders_classnames_on_wrapper( $args, $expected_output ) {
+		switch_theme( 'default' );
 		$actual_output = gutenberg_render_layout_support_flag( $args['block_content'], $args['block'] );
 		$this->assertEquals( $expected_output, $actual_output );
 	}
@@ -480,6 +481,27 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 				'expected_output' => '<div class="wp-block-group"><div class="wp-block-group__inner-wrapper is-layout-flow wp-block-group-is-layout-flow"></div></div>',
+			),
+			'block with child layout'                      => array(
+				'args'            => array(
+					'block_content' => '<p>Some text.</p>',
+					'block'         => array(
+						'blockName'    => 'core/paragraph',
+						'attrs'        => array(
+							'style' => array(
+								'layout' => array(
+									'columnSpan' => '2',
+								),
+							),
+						),
+						'innerBlocks'  => array(),
+						'innerHTML'    => '<p>Some text.</p>',
+						'innerContent' => array(
+							'<p>Some text.</p>',
+						),
+					),
+				),
+				'expected_output' => '<p class="wp-container-content-1">Some text.</p>', // The generated classname number assumes `wp_unique_id` will not have run previously in this test.
 			),
 		);
 	}

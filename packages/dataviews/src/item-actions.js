@@ -47,11 +47,22 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 	);
 }
 
-function ActionWithModal( { action, item, ActionTrigger } ) {
+export function ActionWithModal( {
+	action,
+	items,
+	ActionTrigger,
+	onActionStart,
+	onActionPerformed,
+	isBusy,
+} ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
-		onClick: () => setIsModalOpen( true ),
+		onClick: () => {
+			setIsModalOpen( true );
+		},
+		items,
+		isBusy,
 	};
 	const { RenderModal, hideModalHeader } = action;
 	return (
@@ -69,8 +80,10 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 					) }` }
 				>
 					<RenderModal
-						items={ [ item ] }
+						items={ items }
 						closeModal={ () => setIsModalOpen( false ) }
+						onActionStart={ onActionStart }
+						onActionPerformed={ onActionPerformed }
 					/>
 				</Modal>
 			) }
@@ -87,7 +100,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 						<ActionWithModal
 							key={ action.id }
 							action={ action }
-							item={ item }
+							items={ [ item ] }
 							ActionTrigger={ DropdownMenuItemTrigger }
 						/>
 					);
@@ -139,7 +152,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 							<ActionWithModal
 								key={ action.id }
 								action={ action }
-								item={ item }
+								items={ [ item ] }
 								ActionTrigger={ ButtonTrigger }
 							/>
 						);
