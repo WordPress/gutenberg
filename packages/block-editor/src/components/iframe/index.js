@@ -319,7 +319,7 @@ function Iframe( {
 			`${ contentHeight }px`
 		);
 		iframeDocument.documentElement.style.setProperty(
-			'--wp-block-editor-iframe-zoom-out-iframe-height',
+			'--wp-block-editor-iframe-zoom-out-inner-height',
 			`${ iframeWindowInnerHeight }px`
 		);
 
@@ -336,7 +336,7 @@ function Iframe( {
 				'--wp-block-editor-iframe-zoom-out-content-height'
 			);
 			iframeDocument.documentElement.style.removeProperty(
-				'--wp-block-editor-iframe-zoom-out-iframe-height'
+				'--wp-block-editor-iframe-zoom-out-inner-height'
 			);
 		};
 	}, [
