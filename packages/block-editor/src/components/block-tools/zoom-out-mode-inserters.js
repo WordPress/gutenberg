@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { _x } from '@wordpress/i18n';
@@ -40,7 +40,13 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
+	const isMounted = useRef( false );
+
 	useEffect( () => {
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
 		// reset insertion point when the block order changes
 		setInserterIsOpened( true );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
