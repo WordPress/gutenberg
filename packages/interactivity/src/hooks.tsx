@@ -261,6 +261,12 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	if ( ! namespace ) {
+		warn(
+			`The "namespace" cannot be "{}", "null" or an emtpy string. Path: ${ path }`
+		);
+		return;
+	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
@@ -272,8 +278,13 @@ const resolve = ( path, namespace ) => {
 		context: getScope().context[ namespace ],
 	};
 	try {
+		// TODO: Support lazy/dynamically initialized stores
 		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {}
+	} catch ( e ) {
+		warn(
+			`The path "${ path }" could not be resolved in the "${ namespace }" store.`
+		);
+	}
 };
 
 // Generate the evaluate function.
@@ -283,12 +294,6 @@ export const getEvaluate: GetEvaluate =
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
-		}
-		if ( ! namespace ) {
-			// TODO: Support lazy/dynamically initialized stores
-			warn(
-				`The "namespace" cannot be "{}", "null" or an emtpy string. Path: ${ path }`
-			);
 		}
 		// If path starts with !, remove it and save a flag.
 		const hasNegationOperator =
