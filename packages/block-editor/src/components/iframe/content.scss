@@ -10,7 +10,7 @@
 }
 
 .block-editor-iframe__scale-container.is-zoomed-out {
-	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100%);
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
 	width: 100vw;
 	margin-left: calc(-1 * (100vw - #{$container-width}) / 2);
 }
