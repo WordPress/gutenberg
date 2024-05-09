@@ -11,6 +11,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { store as blockEditorStore } from '../store';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -124,9 +125,18 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 								binding.source === 'core/pattern-overrides'
 						)
 					) {
-						for ( const attributeName in nextAttributes ) {
-							if ( ! bindings[ attributeName ] ) {
-								delete keptAttributes[ attributeName ];
+						// Don't update non-bound attribute only when using the pattern and not when editing the original one.
+						const { getBlockParents, getBlockName } =
+							registry.select( blockEditorStore );
+						const parents = getBlockParents( clientId, true );
+						const patternClientId = parents.find(
+							( id ) => getBlockName( id ) === 'core/block'
+						);
+						if ( patternClientId ) {
+							for ( const attributeName in nextAttributes ) {
+								if ( ! bindings[ attributeName ] ) {
+									delete keptAttributes[ attributeName ];
+								}
 							}
 						}
 					}
