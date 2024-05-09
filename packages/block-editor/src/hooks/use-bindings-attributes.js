@@ -25,7 +25,7 @@ import { unlock } from '../lock-unlock';
 const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
-	'core/image': [ 'url', 'title', 'alt' ],
+	'core/image': [ 'id', 'url', 'title', 'alt' ],
 	'core/button': [ 'url', 'text', 'linkTarget' ],
 };
 
@@ -115,9 +115,25 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 					const keptAttributes = { ...nextAttributes };
 
+					// Don't update non-bound attributes if block is connected to pattern overrides.
+					// Ad-hoc fix for pattern overrides until we figure out what users really want.
+					// This could be needed not only for pattern overrides but all sources.
+					if (
+						Object.values( bindings ).some(
+							( binding ) =>
+								binding.source === 'core/pattern-overrides'
+						)
+					) {
+						for ( const attributeName in nextAttributes ) {
+							if ( ! bindings[ attributeName ] ) {
+								delete keptAttributes[ attributeName ];
+							}
+						}
+					}
+
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(
-						nextAttributes
+						keptAttributes
 					) ) {
 						if (
 							! bindings[ attributeName ] ||
