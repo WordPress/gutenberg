@@ -5,13 +5,13 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const { EXCLUDED_PATTERN_SOURCES, PATTERN_TYPES } =
 	unlock( patternsPrivateApis );
@@ -84,22 +84,31 @@ function preparePatterns( patterns, currentThemeStylesheet ) {
 }
 
 export function useAvailablePatterns( template ) {
-	const { blockPatterns, currentThemeStylesheet } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
+		useSelect( ( select ) => {
+			const { getEditorSettings } = select( editorStore );
+			const settings = getEditorSettings();
 
-		return {
-			blockPatterns: getSettings().__experimentalBlockPatterns,
-			currentThemeStylesheet:
-				select( coreStore ).getCurrentTheme().stylesheet,
-		};
-	}, [] );
+			return {
+				blockPatterns:
+					settings.__experimentalAdditionalBlockPatterns ??
+					settings.__experimentalBlockPatterns,
+				restBlockPatterns: select( coreStore ).getBlockPatterns(),
+				currentThemeStylesheet:
+					select( coreStore ).getCurrentTheme().stylesheet,
+			};
+		}, [] );
 
 	return useMemo( () => {
-		const filteredPatterns = filterPatterns( blockPatterns, template );
+		const mergedPatterns = [
+			...( blockPatterns || [] ),
+			...( restBlockPatterns || [] ),
+		];
+		const filteredPatterns = filterPatterns( mergedPatterns, template );
 		return preparePatterns(
 			filteredPatterns,
 			template,
 			currentThemeStylesheet
 		);
-	}, [ blockPatterns, template, currentThemeStylesheet ] );
+	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
 }

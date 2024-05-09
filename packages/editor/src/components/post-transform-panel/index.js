@@ -56,7 +56,6 @@ function PostTransform() {
 			content: serialize( selectedTemplate.blocks ),
 		} );
 	};
-
 	if ( ! availablePatterns?.length ) {
 		return null;
 	}
@@ -91,7 +90,7 @@ export default function PostTransformPanel() {
 	}, [] );
 
 	if (
-		[ TEMPLATE_PART_POST_TYPE, TEMPLATE_POST_TYPE ].includes( postType )
+		! [ TEMPLATE_PART_POST_TYPE, TEMPLATE_POST_TYPE ].includes( postType )
 	) {
 		return null;
 	}
