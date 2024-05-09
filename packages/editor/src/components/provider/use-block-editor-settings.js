@@ -268,11 +268,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
 			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) => {
-				const { isResolving, getBlockPatternsForPostType } = unlock(
-					select( coreStore )
-				);
+				const { hasFinishedResolution, getBlockPatternsForPostType } =
+					unlock( select( coreStore ) );
 				const patterns = getBlockPatternsForPostType( postType );
-				return isResolving( 'getBlockPatterns' ) ? undefined : patterns;
+				return hasFinishedResolution( 'getBlockPatterns' )
+					? patterns
+					: undefined;
 			},
 			[ unlock( privateApis ).reusableBlocksSelectKey ]:
 				__experimentalReusableBlocksSelect,
