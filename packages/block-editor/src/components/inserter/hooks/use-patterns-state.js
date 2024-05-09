@@ -13,6 +13,17 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '../../../store';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 
+function useStartPatterns() {
+	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
+	// and it has no postTypes declared and the current post type is page or if
+	// the current post type is part of the postTypes declared.
+	return useSelect( ( select ) =>
+		select( blockEditorStore ).getPatternsByBlockTypes(
+			'core/post-content'
+		)
+	);
+}
+
 /**
  * Retrieves the block patterns inserter state.
  *
@@ -38,6 +49,29 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 			};
 		},
 		[ rootClientId ]
+	);
+
+	const starterPatterns = useStartPatterns();
+	const starterPatternsNames = starterPatterns.map(
+		( pattern ) => pattern.name
+	);
+	const newPatterns = useMemo(
+		() =>
+			patterns.map( ( pattern ) => {
+				if ( starterPatternsNames.includes( pattern.name ) ) {
+					// TODO - I'm not sure why we can't just use the pattern?
+					return {
+						...pattern,
+						categories: [
+							...( pattern.categories ?? [] ),
+							'core/content',
+						],
+					};
+				}
+
+				return pattern;
+			} ),
+		[ patterns, starterPatterns ]
 	);
 
 	const allCategories = useMemo( () => {
@@ -94,7 +128,7 @@ const usePatternsState = ( onInsert, rootClientId, selectedCategory ) => {
 		[ createSuccessNotice, onInsert, selectedCategory ]
 	);
 
-	return [ patterns, allCategories, onClickPattern ];
+	return [ newPatterns, allCategories, onClickPattern ];
 };
 
 export default usePatternsState;

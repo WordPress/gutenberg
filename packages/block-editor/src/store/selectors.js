@@ -2426,10 +2426,23 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			if ( ! blockNames ) {
 				return EMPTY_ARRAY;
 			}
-			const patterns =
-				select( STORE_NAME ).__experimentalGetAllowedPatterns(
-					rootClientId
-				);
+			let patterns;
+
+			if ( rootClientId ) {
+				patterns =
+					select( STORE_NAME ).__experimentalGetAllowedPatterns(
+						rootClientId
+					);
+			} else {
+				const {
+					getAllPatterns,
+					__experimentalGetParsedPattern: getParsedPattern,
+				} = unlock( select( STORE_NAME ) );
+				patterns = getAllPatterns()
+					.filter( ( { inserter = true } ) => !! inserter )
+					.map( ( { name } ) => getParsedPattern( name ) );
+			}
+
 			const normalizedBlockNames = Array.isArray( blockNames )
 				? blockNames
 				: [ blockNames ];
@@ -2444,7 +2457,11 @@ export const getPatternsByBlockTypes = createRegistrySelector( ( select ) =>
 			return filteredPatterns;
 		},
 		( state, blockNames, rootClientId ) =>
-			getAllowedPatternsDependants( select )( state, rootClientId )
+			! rootClientId
+				? unlock( select( STORE_NAME ) ).getAllPatterns()
+				: select( STORE_NAME ).__experimentalGetAllowedPatterns(
+						rootClientId
+				  )
 	)
 );
 

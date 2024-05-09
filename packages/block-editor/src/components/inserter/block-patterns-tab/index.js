@@ -13,7 +13,6 @@ import { useSelect } from '@wordpress/data';
 import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
 import { PatternCategoryPreviews } from './pattern-category-previews';
-import { usePatternCategories } from './use-pattern-categories';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
 import { store as blockEditorStore } from '../../../store';
@@ -22,14 +21,12 @@ import { unlock } from '../../../lock-unlock';
 function BlockPatternsTab( {
 	onSelectCategory,
 	selectedCategory,
+	categories,
 	onInsert,
 	rootClientId,
 	children,
 } ) {
 	const [ showPatternsExplorer, setShowPatternsExplorer ] = useState( false );
-
-	const categories = usePatternCategories( rootClientId );
-
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const isResolvingPatterns = useSelect(
 		( select ) =>

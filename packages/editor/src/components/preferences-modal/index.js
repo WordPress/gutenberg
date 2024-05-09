@@ -11,6 +11,7 @@ import {
 	privateApis as preferencesPrivateApis,
 } from '@wordpress/preferences';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -26,7 +27,6 @@ import PageAttributesCheck from '../page-attributes/check';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useStartPatterns } from '../start-page-options';
 
 const {
 	PreferencesModal,
@@ -34,6 +34,17 @@ const {
 	PreferencesModalSection,
 	PreferenceToggleControl,
 } = unlock( preferencesPrivateApis );
+
+function useStartPatterns() {
+	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
+	// and it has no postTypes declared and the current post type is page or if
+	// the current post type is part of the postTypes declared.
+	return useSelect( ( select ) =>
+		select( blockEditorStore ).getPatternsByBlockTypes(
+			'core/post-content'
+		)
+	);
+}
 
 export default function EditorPreferencesModal( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
