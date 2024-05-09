@@ -1256,6 +1256,10 @@ _Returns_
 
 Undocumented declaration.
 
+### useGlobalStylesData
+
+Undocumented declaration.
+
 ### usePostScheduleLabel
 
 Undocumented declaration.

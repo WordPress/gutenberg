@@ -24,7 +24,7 @@ import inserterMediaCategories from '../media-categories';
 import { mediaUpload } from '../../utils';
 import { store as editorStore } from '../../store';
 import { lock, unlock } from '../../lock-unlock';
-import { useStyles } from '../use-styles';
+import { useGlobalStylesData } from '../use-global-styles-data';
 
 const EMPTY_BLOCKS_LIST = [];
 
@@ -174,8 +174,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	// get the styles from the global styles
-	const { styles } = useStyles();
+	const globalStylesData = useGlobalStylesData();
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0
@@ -255,6 +254,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
+	const { globalStylesDataKey, selectBlockPatternsKey } =
+		unlock( privateApis );
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -263,7 +264,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					BLOCK_EDITOR_SETTINGS.includes( key )
 				)
 			),
-			__experimentalStyles: styles,
+			[ globalStylesDataKey ]: globalStylesData,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -272,7 +273,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
+			[ selectBlockPatternsKey ]: ( select ) =>
 				unlock( select( coreStore ) ).getBlockPatternsForPostType(
 					postType
 				),
@@ -332,7 +333,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		postType,
 		setIsInserterOpened,
 		sectionRootClientId,
-		styles,
+		globalStylesData,
+		globalStylesDataKey,
+		selectBlockPatternsKey,
 	] );
 }
 
