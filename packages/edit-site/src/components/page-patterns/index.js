@@ -48,7 +48,6 @@ import {
 } from '../../utils/constants';
 import {
 	exportJSONaction,
-	renameAction,
 	resetAction,
 	deleteAction,
 	duplicatePatternAction,
@@ -391,30 +390,32 @@ export default function DataviewsPatterns() {
 		},
 		[ history, categoryId, type ]
 	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		type,
+	const templatePartActions = usePostActions(
+		TEMPLATE_PART_POST_TYPE,
+		onActionPerformed
+	);
+	const patternActions = usePostActions(
+		PATTERN_TYPES.user,
 		onActionPerformed
 	);
 
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
-				editAction,
-				renameAction,
+				...templatePartActions,
 				duplicateTemplatePartAction,
-				viewRevisionsAction,
 				resetAction,
 				deleteAction,
 			].filter( Boolean );
 		}
 		return [
-			renameAction,
+			...patternActions,
 			duplicatePatternAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
 		].filter( Boolean );
-	}, [ type, editAction, viewRevisionsAction ] );
+	}, [ type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {
