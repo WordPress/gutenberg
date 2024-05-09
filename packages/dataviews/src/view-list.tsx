@@ -191,7 +191,7 @@ function ListItem( {
 						</HStack>
 					</CompositeItem>
 				</div>
-				{ actions && (
+				{ actions?.length > 0 && (
 					<HStack
 						spacing={ 1 }
 						justify="flex-end"
