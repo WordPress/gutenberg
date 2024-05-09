@@ -116,8 +116,7 @@ $block-inserter-tabs-height: 44px;
 	overflow: hidden;
 
 	.block-editor-inserter__tablist {
-		// Make room for the close button
-		width: calc(100% - #{$grid-unit-60});
+		width: 100%;
 
 		button[role="tab"] {
 			flex-grow: 1;
@@ -136,7 +135,6 @@ $block-inserter-tabs-height: 44px;
 		flex-grow: 1;
 		flex-direction: column;
 		overflow-y: auto;
-		border-top: $border-width solid $gray-300;
 	}
 }
 
@@ -702,12 +700,9 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 }
 
-.is-zoom-out {
-	.block-editor-inserter__menu {
-		display: flex;
-	}
-
-	.show-panel::after {
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
 		// Makes space for the inserter flyout panel
 		@include break-medium {
 			content: "";

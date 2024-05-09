@@ -317,10 +317,14 @@
 	border-radius: $radius-round;
 	width: $radio-input-size-sm;
 	height: $radio-input-size-sm;
+	min-width: $radio-input-size-sm;
+	max-width: $radio-input-size-sm;
 
 	@include break-small() {
 		height: $radio-input-size;
 		width: $radio-input-size;
+		min-width: $radio-input-size;
+		max-width: $radio-input-size;
 	}
 
 	&:checked::before {

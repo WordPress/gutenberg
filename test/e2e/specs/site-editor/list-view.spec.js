@@ -106,7 +106,7 @@ test.describe( 'Site Editor List View', () => {
 
 		// Focus should now be on the list view toggle button.
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// Open List View.
@@ -129,7 +129,7 @@ test.describe( 'Site Editor List View', () => {
 		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).toBeHidden();
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 	} );
 } );

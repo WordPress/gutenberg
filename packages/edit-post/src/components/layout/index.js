@@ -45,7 +45,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -63,6 +62,7 @@ const {
 	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
+	Sidebar,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -160,6 +160,8 @@ function Layout( { initialPost } ) {
 		documentLabel,
 		hasHistory,
 		hasBlockBreadcrumbs,
+		blockEditorMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -195,6 +197,10 @@ function Layout( { initialPost } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			blockEditorMode:
+				select( blockEditorStore ).__unstableGetEditorMode(),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
@@ -342,6 +348,7 @@ function Layout( { initialPost } ) {
 					! isMobileViewport &&
 					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
+					blockEditorMode !== 'zoom-out' &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb rootLabelText={ documentLabel } />
@@ -368,7 +375,13 @@ function Layout( { initialPost } ) {
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && <SettingsSidebar /> }
+			{ ! isDistractionFree && (
+				<Sidebar
+					extraPanels={
+						! isEditingTemplate && <MetaBoxes location="side" />
+					}
+				/>
+			) }
 		</>
 	);
 }
