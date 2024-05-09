@@ -1,9 +1,10 @@
 <?php
 /**
- * Post Excerpt rendering tests.
+ * Tests for the gutenberg_render_block_core_post_excerpt() function.
  *
  * @package WordPress
  * @subpackage Blocks
+ *
  * @covers ::gutenberg_render_block_core_post_excerpt
  * @group blocks
  */
@@ -67,49 +68,44 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	 * Test gutenberg_render_block_core_post_excerpt() method
 	 * with empty data.
 	 */
-	public function test_gutenberg_render_block_core_post_excerpt_empty() {
+	public function test_should_render_empty_string_when_excerpt_is_empty() {
 		$block = new stdClass();
 
 		// call render method with block context.
 		$rendered = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
-		$this->assertEmpty( $rendered, 'Failed to assert that $rendered is empty.' );
+		$this->assertSame( '', $rendered, 'Failed to assert that $rendered is an empty string.' );
 	}
 
 	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method.
 	 */
-	public function test_gutenberg_render_block_core_post_excerpt() {
+	public function test_should_render_correct_exceprt() {
 
 		$block           = new stdClass();
 		$GLOBALS['post'] = self::$post;
 		$block->context  = array( 'postId' => self::$post->ID );
 
 		$rendered = gutenberg_render_block_core_post_excerpt( self::$attributes, '', $block );
-		$this->assertNotEmpty( $rendered, 'Failed to assert the $rendered is not empty.' );
+		$this->assertNotEmpty( $rendered, 'Failed to assert that $rendered is not empty.' );
 		$this->assertStringContainsString(
 			'Post Expert content',
 			$rendered,
-			'Failed to assert that $rendered contain expected string.'
+			'Failed to assert that $rendered contain the expected string.'
 		);
 		$this->assertStringContainsString(
 			'</p',
 			$rendered,
-			'Failed to assert that $rendered contain html paragraph tag.'
-		);
-		$this->assertStringContainsString(
-			'</p>',
-			$rendered,
-			'Failed to assert that $rendered contain html paragraph tag.'
+			'Failed to assert that $rendered contains a closing html paragraph tag.'
 		);
 		$this->assertStringContainsString(
 			'wp-block-post-excerpt__excerpt',
 			$rendered,
-			'Failed to assert that $rendered contain expected string.'
+			'Failed to assert that $rendered contain the "wp-block-post-excerpt__excerpt" string.'
 		);
 		$this->assertStringNotContainsString(
 			'has-text-align',
 			$rendered,
-			'Failed to assert that $rendered doest not contain text align class.'
+			'Failed to assert that $rendered  does not contain the has-text-align class.'
 		);
 
 		self::$attributes['textAlign'] = 'left';
@@ -118,7 +114,7 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'has-text-align-left',
 			$rendered,
-			'Failed to assert that $rendered contain text align class.'
+			'Failed to assert that $rendered contains the "has-text-align-left" class.'
 		);
 
 		self::$attributes = array(
@@ -130,7 +126,7 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'wp-block-post-excerpt__more-link',
 			$rendered,
-			'Failed to assert that $rendered contain expected string.'
+			'Failed to assert that $rendered contains the expected string.'
 		);
 
 		self::$attributes = array(
@@ -140,12 +136,12 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'wp-block-post-excerpt__more-link',
 			$rendered,
-			'Failed to assert that $rendered contain expected string.'
+			'Failed to assert that $rendered contains the expected string.'
 		);
 		$this->assertStringContainsString(
 			get_permalink( self::$post->ID ),
 			$rendered,
-			'Failed to assert that $rendered contain expected post url.'
+			'Failed to assert that $rendered contain expected post the expected post URL.'
 		);
 	}
 }
