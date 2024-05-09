@@ -76,7 +76,8 @@ const trashPostAction = {
 					<Button
 						variant="tertiary"
 						onClick={ closeModal }
-						isDisabled={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -179,6 +180,8 @@ const trashPostAction = {
 							closeModal();
 						} }
 						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -757,7 +760,8 @@ const resetTemplateAction = {
 					<Button
 						variant="tertiary"
 						onClick={ closeModal }
-						isDisabled={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -774,6 +778,8 @@ const resetTemplateAction = {
 							isBusy( false );
 						} }
 						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -840,7 +846,8 @@ const deleteTemplateAction = {
 					<Button
 						variant="tertiary"
 						onClick={ closeModal }
-						isDisabled={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Cancel' ) }
 					</Button>
@@ -859,6 +866,8 @@ const deleteTemplateAction = {
 							closeModal();
 						} }
 						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Delete' ) }
 					</Button>

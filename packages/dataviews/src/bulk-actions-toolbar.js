@@ -47,7 +47,7 @@ function ActionTrigger( { action, onClick, isBusy } ) {
 			size="compact"
 			onClick={ onClick }
 			isBusy={ isBusy }
-			isDisabled={ isBusy }
+			__experimentalIsFocusable
 			tooltipPosition="top"
 		/>
 	);
@@ -142,7 +142,7 @@ function renderToolbarContent(
 					showTooltip
 					tooltipPosition="top"
 					label={ __( 'Cancel' ) }
-					isDisabled={ !! actionInProgress }
+					disabled={ !! actionInProgress }
 					onClick={ () => {
 						setSelection( EMPTY_ARRAY );
 					} }
