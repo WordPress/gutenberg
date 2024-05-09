@@ -18,6 +18,16 @@ export default {
 			( id ) => getBlockName( id ) === 'core/block'
 		);
 
+		const overridableValue =
+			getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
+				currentBlockAttributes?.metadata?.name
+			]?.[ attributeName ];
+
+		// If there is no pattern client ID, or it is not overwritten, return the default value.
+		if ( ! patternClientId || ! overridableValue ) {
+			return currentBlockAttributes[ attributeName ];
+		}
+
 		return getBlockAttributes( patternClientId )?.[ CONTENT ]?.[
 			currentBlockAttributes?.metadata?.name
 		]?.[ attributeName ];
@@ -32,7 +42,13 @@ export default {
 		);
 		const blockName = currentBlockAttributes?.metadata?.name;
 
+		// If there is no pattern client ID, set attributes as normal.
 		if ( ! patternClientId ) {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, {
+					[ attributeName ]: value,
+				} );
 			return;
 		}
 
