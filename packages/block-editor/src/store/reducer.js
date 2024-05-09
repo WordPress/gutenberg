@@ -592,16 +592,31 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
 		const newState = {
 			...state,
-			byClientId: new Map(
-				getFlattenedBlocksWithoutAttributes( action.blocks )
-			),
-			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
-			order: mapBlockOrder( action.blocks ),
-			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: {},
+			byClientId: new Map( state?.byClientId ),
+			attributes: new Map( state?.attributes ),
+			order: new Map( state?.order ),
+			parents: new Map( state?.parents ),
+			tree: new Map( state?.tree ),
+			controlledInnerBlocks: state?.controlledInnerBlocks ?? {},
 		};
-
-		newState.tree = new Map( state?.tree );
+		for ( const [ key, value ] of getFlattenedBlocksWithoutAttributes(
+			action.blocks
+		) ) {
+			newState.byClientId.set( key, value );
+		}
+		for ( const [ key, value ] of getFlattenedBlockAttributes(
+			action.blocks
+		) ) {
+			newState.attributes.set( key, value );
+		}
+		for ( const [ key, value ] of mapBlockOrder( action.blocks ) ) {
+			if ( ! newState.controlledInnerBlocks[ key ] ) {
+				newState.order.set( key, value );
+			}
+		}
+		for ( const [ key, value ] of mapBlockParents( action.blocks ) ) {
+			newState.parents.set( key, value );
+		}
 		updateBlockTreeForBlocks( newState, action.blocks );
 		newState.tree.set( '', {
 			innerBlocks: action.blocks.map( ( subBlock ) =>
