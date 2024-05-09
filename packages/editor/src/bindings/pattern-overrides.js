@@ -63,17 +63,19 @@ export default {
 		const blockName = currentBlockAttributes?.metadata?.name;
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
-		registry
-			.dispatch( blockEditorStore )
-			.updateBlockAttributes( patternClientId, {
-				[ CONTENT ]: {
-					...currentBindingValue,
-					[ blockName ]: {
-						...currentBindingValue?.[ blockName ],
-						[ attributeName ]: value,
-					},
+		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
+			registry.dispatch( blockEditorStore );
+		updateBlockAttributes( patternClientId, {
+			[ CONTENT ]: {
+				...currentBindingValue,
+				[ blockName ]: {
+					...currentBindingValue?.[ blockName ],
+					[ attributeName ]: value,
 				},
-			} );
+			},
+		} );
+
+		__unstableMarkLastChangeAsPersistent();
 	},
 	lockAttributesEditing: false,
 };
