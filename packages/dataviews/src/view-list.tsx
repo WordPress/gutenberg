@@ -221,40 +221,38 @@ function ListItem( {
 																true
 															)
 														}
-													>
-														{ isModalOpen && (
-															<Modal
-																title={
-																	action.modalHeader ||
-																	action.label
-																}
-																__experimentalHideHeader={
-																	!! action.hideModalHeader
-																}
-																onRequestClose={ () =>
-																	setIsModalOpen(
-																		false
-																	)
-																}
-																overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-																	action.id
-																) }` }
-															>
-																<action.RenderModal
-																	items={ [
-																		item,
-																	] }
-																	closeModal={ () =>
-																		setIsModalOpen(
-																			false
-																		)
-																	}
-																/>
-															</Modal>
-														) }
-													</Button>
+													/>
 												}
-											/>
+											>
+												{ isModalOpen && (
+													<Modal
+														title={
+															action.modalHeader ||
+															action.label
+														}
+														__experimentalHideHeader={
+															!! action.hideModalHeader
+														}
+														onRequestClose={ () =>
+															setIsModalOpen(
+																false
+															)
+														}
+														overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+															action.id
+														) }` }
+													>
+														<action.RenderModal
+															items={ [ item ] }
+															closeModal={ () =>
+																setIsModalOpen(
+																	false
+																)
+															}
+														/>
+													</Modal>
+												) }
+											</CompositeItem>
 										</div>
 									);
 								}
