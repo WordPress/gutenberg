@@ -115,11 +115,15 @@ export const convertSyncedPatternToStatic =
 			} );
 		}
 
+		const patternInnerBlocks = registry
+			.select( blockEditorStore )
+			.getBlocks( patternBlock.clientId );
+
 		registry
 			.dispatch( blockEditorStore )
 			.replaceBlocks(
 				patternBlock.clientId,
-				cloneBlocksAndRemoveBindings( patternBlock.innerBlocks )
+				cloneBlocksAndRemoveBindings( patternInnerBlocks )
 			);
 	};
 
