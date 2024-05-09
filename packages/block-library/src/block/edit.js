@@ -149,6 +149,7 @@ function ReusableBlockEdit( {
 	const { setBlockEditingMode } = useDispatch( blockEditorStore );
 
 	const {
+		innerBlocks,
 		userCanEdit,
 		onNavigateToEntityRecord,
 		editingMode,
@@ -156,13 +157,17 @@ function ReusableBlockEdit( {
 	} = useSelect(
 		( select ) => {
 			const { canUser } = select( coreStore );
-			const { getSettings, getBlockEditingMode: _getBlockEditingMode } =
-				select( blockEditorStore );
+			const {
+				getBlocks,
+				getSettings,
+				getBlockEditingMode: _getBlockEditingMode,
+			} = select( blockEditorStore );
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
 			const canEdit = canUser( 'update', 'blocks', ref );
 
 			// For editing link to the site editor if the theme and user permissions support it.
 			return {
+				innerBlocks: getBlocks( patternClientId ),
 				userCanEdit: canEdit,
 				getBlockEditingMode: _getBlockEditingMode,
 				onNavigateToEntityRecord:
@@ -180,7 +185,7 @@ function ReusableBlockEdit( {
 	useEffect( () => {
 		setBlockEditMode(
 			setBlockEditingMode,
-			blocks,
+			innerBlocks,
 			// Disable editing if the pattern itself is disabled.
 			editingMode === 'disabled' || ! hasPatternOverridesSource
 				? 'disabled'
@@ -188,7 +193,7 @@ function ReusableBlockEdit( {
 		);
 	}, [
 		editingMode,
-		blocks,
+		innerBlocks,
 		setBlockEditingMode,
 		hasPatternOverridesSource,
 	] );
