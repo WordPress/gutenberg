@@ -5,7 +5,7 @@ import AdvancedControls from './advanced-controls-panel';
 import PositionControls from './position-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import SettingsTabHint from './settings-tab-hint';
-import { BindingsPanel } from '../inspector-controls/bindings-panel';
+import { BindingsPanel } from '../block-bindings-panel';
 
 function SettingsTab( { showAdvancedControls = false, block } ) {
 	const hasBindings = block?.attributes?.metadata?.bindings

@@ -31,7 +31,7 @@ import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
-import { BindingsPanel } from '../inspector-controls/bindings-panel';
+import { BindingsPanel } from '../block-bindings-panel';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(

@@ -23,15 +23,18 @@ export const BindingsPanel = ( { block } ) => {
 	);
 
 	return (
-		<PanelBody title={ __( 'Bindings' ) }>
+		<PanelBody
+			title={ __( 'Bindings' ) }
+			className="components-panel__block-bindings-panel"
+		>
 			<ItemGroup isBordered isSeparated size="large">
 				{ Object.keys( bindings ).map( ( key, index ) => {
 					return (
 						<Item key={ index }>
-							<div>
-								{ key } :{ ' ' }
+							<span>{ key }</span>
+							<span className="components-item__block-bindings-source">
 								{ sources[ bindings[ key ].source ].label }
-							</div>
+							</span>
 						</Item>
 					);
 				} ) }

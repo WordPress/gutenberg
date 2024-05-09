@@ -1,0 +1,12 @@
+.components-panel__block-bindings-panel {
+
+	.components-item {
+		display: flex;
+		justify-content: space-between;
+
+		.components-item__block-bindings-source {
+			color: $gray-700;
+		}
+	}
+
+}
