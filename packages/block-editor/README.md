@@ -209,7 +209,9 @@ Undocumented declaration.
 
 ### BlockPopover
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
 
 ### BlockPreview
 
