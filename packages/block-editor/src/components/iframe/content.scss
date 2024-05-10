@@ -40,7 +40,7 @@
 	// so we need to adjust the height of the content to match the scale by using negative margins.
 	$extra-content-height: calc(#{$content-height} * (1 - #{$scale}));
 	$total-frame-height: calc(2 * #{$frame-size});
-	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px); // TODO: Why 2px?
+	$total-height: calc(#{$extra-content-height} + #{$total-frame-height} + 2px);
 	margin-bottom: calc(-1 * #{$total-height});
 
 	body {
