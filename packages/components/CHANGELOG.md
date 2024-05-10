@@ -5,6 +5,7 @@
 ### Internal
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+-   Zoom Out: Show a preview when dragging and dropping patterns from the inserter. ([#61511](https://github.com/WordPress/gutenberg/pull/61511))
 
 ### Enhancements
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
