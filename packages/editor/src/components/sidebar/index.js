@@ -39,6 +39,11 @@ import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-side
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import {
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../store/constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -50,10 +55,10 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
-	isEditingTemplate,
 	renderingMode,
 	onActionPerformed,
 	extraPanels,
+	showSummary = true,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -117,7 +122,7 @@ const SidebarContent = ( {
 							/>
 						}
 					/>
-					{ ! isEditingTemplate && <PostSummary /> }
+					{ showSummary && <PostSummary /> }
 					<PluginDocumentSettingPanel.Slot />
 					{ renderingMode !== 'post-only' && (
 						<TemplateContentPanel />
@@ -140,8 +145,8 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, isEditingTemplate, renderingMode } =
-		useSelect( ( select ) => {
+	const { tabName, keyboardShortcut, showSummary, renderingMode } = useSelect(
+		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
 			).getShortcutRepresentation( 'core/editor/toggle-sidebar' );
@@ -164,12 +169,16 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
-				isEditingTemplate:
-					select( editorStore ).getCurrentPostType() ===
-					'wp_template',
+				showSummary: ! [
+					TEMPLATE_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+					NAVIGATION_POST_TYPE,
+				].includes( select( editorStore ).getCurrentPostType() ),
 				renderingMode: select( editorStore ).getRenderingMode(),
 			};
-		}, [] );
+		},
+		[]
+	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
@@ -191,7 +200,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 			<SidebarContent
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
-				isEditingTemplate={ isEditingTemplate }
+				showSummary={ showSummary }
 				renderingMode={ renderingMode }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }

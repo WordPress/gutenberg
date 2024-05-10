@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	PanelBody,
 } from '@wordpress/components';
@@ -25,7 +24,6 @@ import PostStatusPanel from '../post-status';
 import PostStickyPanel from '../post-sticky';
 import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
-import PostTrashPanel from '../post-trash/panel';
 import PostURLPanel from '../post-url/panel';
 import { store as editorStore } from '../../store';
 
@@ -105,13 +103,6 @@ export default function PostSummary() {
 						<PostSlugPanel />
 						<PostAuthorPanel />
 						{ fills }
-						<HStack
-							style={ {
-								marginTop: '16px',
-							} }
-						>
-							<PostTrashPanel />
-						</HStack>
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>
