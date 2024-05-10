@@ -13,7 +13,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { average, median, variance, round } from '../utils';
+import { quartiles, round } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -90,6 +90,25 @@ export interface WPPerformanceResults {
 	wpDbQueries?: number;
 }
 
+function stats( values: number[] ) {
+	if ( ! values || values.length === 0 ) {
+		return undefined;
+	}
+	const { q25, q50, q75 } = quartiles( values );
+	const iqr = q75 - q25;
+	const out = values.filter(
+		( v ) => v > q75 + 1.5 * iqr || v < q25 - 1.5 * iqr
+	);
+	const cnt = values.length;
+	return {
+		q25: round( q25 ),
+		q50: round( q50 ),
+		q75: round( q75 ),
+		out: out.map( ( n ) => round( n ) ),
+		cnt,
+	};
+}
+
 /**
  * Curate the raw performance results.
  *
@@ -101,62 +120,37 @@ export function curateResults(
 	results: WPRawPerformanceResults
 ): WPPerformanceResults {
 	const output = {
-		timeToFirstByte: average( results.timeToFirstByte ),
-		timeToFirstByteV: variance( results.timeToFirstByte ),
-		largestContentfulPaint: average( results.largestContentfulPaint ),
-		largestContentfulPaintV: variance( results.largestContentfulPaint ),
-		lcpMinusTtfb: average( results.lcpMinusTtfb ),
-		lcpMinusTtfbV: variance( results.lcpMinusTtfb ),
-		serverResponse: average( results.serverResponse ),
-		serverResponseV: variance( results.serverResponse ),
-		firstPaint: average( results.firstPaint ),
-		firstPaintV: variance( results.firstPaint ),
-		domContentLoaded: average( results.domContentLoaded ),
-		domContentLoadedV: variance( results.domContentLoaded ),
-		loaded: average( results.loaded ),
-		loadedV: variance( results.loaded ),
-		firstContentfulPaint: average( results.firstContentfulPaint ),
-		firstContentfulPaintV: variance( results.firstContentfulPaint ),
-		firstBlock: average( results.firstBlock ),
-		firstBlockV: variance( results.firstBlock ),
-		type: average( results.type ),
-		typeV: variance( results.type ),
-		typeWithoutInspector: average( results.typeWithoutInspector ),
-		typeWithoutInspectorV: variance( results.typeWithoutInspector ),
-		typeWithTopToolbar: average( results.typeWithTopToolbar ),
-		typeWithTopToolbarV: variance( results.typeWithTopToolbar ),
-		typeContainer: average( results.typeContainer ),
-		typeContainerV: variance( results.typeContainer ),
-		focus: average( results.focus ),
-		focusV: variance( results.focus ),
-		inserterOpen: average( results.inserterOpen ),
-		inserterOpenV: variance( results.inserterOpen ),
-		inserterSearch: average( results.inserterSearch ),
-		inserterSearchV: variance( results.inserterSearch ),
-		inserterHover: average( results.inserterHover ),
-		inserterHoverV: variance( results.inserterHover ),
-		loadPatterns: average( results.loadPatterns ),
-		loadPatternsV: variance( results.loadPatterns ),
-		listViewOpen: average( results.listViewOpen ),
-		navigate: median( results.navigate ),
-		wpBeforeTemplate: median( results.wpBeforeTemplate ),
-		wpTemplate: median( results.wpTemplate ),
-		wpTotal: median( results.wpTotal ),
-		wpMemoryUsage: median( results.wpMemoryUsage ),
-		wpDbQueries: median( results.wpDbQueries ),
+		timeToFirstByte: stats( results.timeToFirstByte ),
+		largestContentfulPaint: stats( results.largestContentfulPaint ),
+		lcpMinusTtfb: stats( results.lcpMinusTtfb ),
+		serverResponse: stats( results.serverResponse ),
+		firstPaint: stats( results.firstPaint ),
+		domContentLoaded: stats( results.domContentLoaded ),
+		loaded: stats( results.loaded ),
+		firstContentfulPaint: stats( results.firstContentfulPaint ),
+		firstBlock: stats( results.firstBlock ),
+		type: stats( results.type ),
+		typeWithoutInspector: stats( results.typeWithoutInspector ),
+		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
+		typeContainer: stats( results.typeContainer ),
+		focus: stats( results.focus ),
+		inserterOpen: stats( results.inserterOpen ),
+		inserterSearch: stats( results.inserterSearch ),
+		inserterHover: stats( results.inserterHover ),
+		loadPatterns: stats( results.loadPatterns ),
+		listViewOpen: stats( results.listViewOpen ),
+		navigate: stats( results.navigate ),
+		wpBeforeTemplate: stats( results.wpBeforeTemplate ),
+		wpTemplate: stats( results.wpTemplate ),
+		wpTotal: stats( results.wpTotal ),
+		wpMemoryUsage: stats( results.wpMemoryUsage ),
+		wpDbQueries: stats( results.wpDbQueries ),
 	};
 
-	return (
+	return Object.fromEntries(
 		Object.entries( output )
 			// Reduce the output to contain taken metrics only.
-			.filter( ( [ _, value ] ) => typeof value === 'number' )
-			.reduce(
-				( acc, [ key, value ] ) => ( {
-					...acc,
-					[ key ]: round( value ),
-				} ),
-				{}
-			)
+			.filter( ( [ _, value ] ) => value !== undefined )
 	);
 }
 class PerformanceReporter implements Reporter {
@@ -192,13 +186,21 @@ class PerformanceReporter implements Reporter {
 
 			const curatedResults = curateResults( JSON.parse( resultsBody ) );
 
+			// For now, to keep back compat, save only the medians, not the full stats.
+			const savedResults = Object.fromEntries(
+				Object.entries( curatedResults ).map( ( [ key, value ] ) => [
+					key,
+					value.q50,
+				] )
+			);
+
 			// Save curated results to file.
 			writeFileSync(
 				path.join(
 					resultsPath,
 					`${ resultsId }.performance-results.json`
 				),
-				JSON.stringify( curatedResults, null, 2 )
+				JSON.stringify( savedResults, null, 2 )
 			);
 
 			this.results[ testSuite ] = curatedResults;
@@ -219,7 +221,19 @@ class PerformanceReporter implements Reporter {
 			const printableResults: Record< string, { value: string } > = {};
 
 			for ( const [ key, value ] of Object.entries( results ) ) {
-				printableResults[ key ] = { value: `${ value } ms` };
+				const p = value.q75 - value.q50;
+				const pp = round( ( 100 * p ) / value.q50 );
+				const m = value.q50 - value.q25;
+				const mp = round( ( 100 * m ) / value.q50 );
+				const outs =
+					value.out.length > 0
+						? ' [' + value.out.join( ', ' ) + ']'
+						: '';
+				printableResults[ key ] = {
+					value: `${ value.q50 } ±${ round( p ) }/${ round(
+						m
+					) } ms (±${ pp }/${ mp }%)${ outs } (${ value.cnt })`,
+				};
 			}
 
 			// eslint-disable-next-line no-console
