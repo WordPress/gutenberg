@@ -67,7 +67,7 @@ function ZoomOutModeInserters() {
 			return;
 		}
 		// reset insertion point when the block order changes
-		setInserterIsOpened( true );
+		setInserterIsOpened( { tab: 'patterns' } );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ blockOrder ] );
 
