@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add RTL support when building CSS styles with `build` and `start` scripts ([#61540](https://github.com/WordPress/gutenberg/pull/61540)).
+
 ## 27.8.0 (2024-05-02)
 
 ## 27.7.0 (2024-04-19)

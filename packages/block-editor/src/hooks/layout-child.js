@@ -135,13 +135,17 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 
 function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	const parentLayout = useLayout() || {};
+	const {
+		type: parentLayoutType = 'default',
+		allowSizingOnChildren = false,
+	} = parentLayout;
 	const rootClientId = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlockRootClientId( clientId );
 		},
 		[ clientId ]
 	);
-	if ( parentLayout.type !== 'grid' ) {
+	if ( parentLayoutType !== 'grid' ) {
 		return null;
 	}
 	if ( ! window.__experimentalEnableGridInteractivity ) {
@@ -150,21 +154,23 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 	return (
 		<>
 			<GridVisualizer clientId={ rootClientId } />
-			<GridItemResizer
-				clientId={ clientId }
-				onChange={ ( { columnSpan, rowSpan } ) => {
-					setAttributes( {
-						style: {
-							...style,
-							layout: {
-								...style?.layout,
-								columnSpan,
-								rowSpan,
+			{ allowSizingOnChildren && (
+				<GridItemResizer
+					clientId={ clientId }
+					onChange={ ( { columnSpan, rowSpan } ) => {
+						setAttributes( {
+							style: {
+								...style,
+								layout: {
+									...style?.layout,
+									columnSpan,
+									rowSpan,
+								},
 							},
-						},
-					} );
-				} }
-			/>
+						} );
+					} }
+				/>
+			) }
 		</>
 	);
 }

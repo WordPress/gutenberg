@@ -53,7 +53,7 @@ If true, the label will only be visible to screen readers.
 
 ### help
 
-Additional description for the control. It is preferable to use plain text for `help`, as it can be accessibly associated with the control using `aria-describedby`. When the `help` contains links, or otherwise non-plain text content, it will be associated with the control using `aria-details`.
+Additional description for the control. The element containing the description will be programmatically associated to the BaseControl by the means of an `aria-describedby` attribute.
 
 -   Type: `ReactNode`
 -   Required: No
