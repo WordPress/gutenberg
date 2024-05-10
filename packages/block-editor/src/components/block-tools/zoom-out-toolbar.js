@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import { dragHandle, trash } from '@wordpress/icons';
 import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -31,7 +28,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			const {
 				getBlock,
 				hasBlockMovingClientId,
-				getBlockListSettings,
 				getNextBlockClientId,
 				getPreviousBlockClientId,
 				canRemoveBlock,
@@ -41,8 +37,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 				select( blocksStore );
 			const { name, attributes } = getBlock( clientId );
 			const blockType = getBlockType( name );
-			const orientation =
-				getBlockListSettings( rootClientId )?.orientation;
 			const match = getActiveBlockVariation( name, attributes );
 			const isBlockTemplatePart =
 				blockType?.name === 'core/template-part';
@@ -79,7 +73,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 	);
 
 	const {
-		label,
 		icon,
 		blockMovingMode,
 		isBlockTemplatePart,
@@ -88,6 +81,8 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 		canRemove,
 		canMove,
 	} = selected;
+
+	const { removeBlock } = useDispatch( blockEditorStore );
 
 	const classNames = clsx( 'zoom-out-toolbar', {
 		'is-block-moving-mode': !! blockMovingMode,
@@ -102,6 +97,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
 			variant={ undefined }
+			orientation="vertical"
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ showBlockDraggable && (

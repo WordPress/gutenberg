@@ -210,6 +210,7 @@ export default function NavigableToolbar( {
 	shouldUseKeyboardFocusShortcut = true,
 	__experimentalInitialIndex: initialIndex,
 	__experimentalOnIndexChange: onIndexChange,
+	orientation = 'horizontal',
 	...props
 } ) {
 	const toolbarRef = useRef();
@@ -230,6 +231,7 @@ export default function NavigableToolbar( {
 			<Toolbar
 				label={ props[ 'aria-label' ] }
 				ref={ toolbarRef }
+				orientation={ orientation }
 				{ ...props }
 			>
 				{ children }
