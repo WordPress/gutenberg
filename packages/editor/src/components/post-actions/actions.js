@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { external, trash, edit, backup } from '@wordpress/icons';
+import { external, trash, backup } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
@@ -21,7 +21,12 @@ import {
 /**
  * Internal dependencies
  */
-import { TEMPLATE_ORIGINS, TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_ORIGINS,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
@@ -457,20 +462,6 @@ const viewPostAction = {
 	},
 };
 
-const editPostAction = {
-	id: 'edit-post',
-	label: __( 'Edit' ),
-	isPrimary: true,
-	icon: edit,
-	isEligible( { status } ) {
-		return status !== 'trash';
-	},
-	callback( posts, onActionPerformed ) {
-		if ( onActionPerformed ) {
-			onActionPerformed( posts );
-		}
-	},
-};
 const postRevisionsAction = {
 	id: 'view-post-revisions',
 	label: __( 'View revisions' ),
@@ -997,95 +988,96 @@ const renameTemplateAction = {
 	},
 };
 
-export function usePostActions( onActionPerformed, actionIds = null ) {
+export function usePostActions( postType, onActionPerformed ) {
+	const { postTypeObject } = useSelect(
+		( select ) => {
+			const { getPostType } = select( coreStore );
+			return {
+				postTypeObject: getPostType( postType ),
+			};
+		},
+		[ postType ]
+	);
+
 	const permanentlyDeletePostAction = usePermanentlyDeletePostAction();
 	const restorePostAction = useRestorePostAction();
-	return useMemo(
-		() => {
-			// By default, return all actions...
-			const defaultActions = [
-				editPostAction,
-				resetTemplateAction,
-				viewPostAction,
-				restorePostAction,
-				deleteTemplateAction,
-				permanentlyDeletePostAction,
-				postRevisionsAction,
-				duplicatePostAction,
-				renamePostAction,
-				renameTemplateAction,
-				trashPostAction,
-			];
+	const isTemplateOrTemplatePart = [
+		TEMPLATE_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+	].includes( postType );
+	const isPattern = postType === PATTERN_POST_TYPE;
+	const isLoaded = !! postTypeObject;
+	return useMemo( () => {
+		if ( ! isLoaded ) {
+			return [];
+		}
 
-			// ... unless `actionIds` was specified, in which case we find the
-			// actions matching the given IDs.
-			const actions = actionIds
-				? actionIds.map( ( actionId ) =>
-						defaultActions.find( ( { id } ) => actionId === id )
-				  )
-				: defaultActions;
+		const actions = [
+			isTemplateOrTemplatePart && resetTemplateAction,
+			postTypeObject?.viewable && viewPostAction,
+			! isTemplateOrTemplatePart && restorePostAction,
+			isTemplateOrTemplatePart && deleteTemplateAction,
+			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			postRevisionsAction,
+			process.env.IS_GUTENBERG_PLUGIN
+				? ! isTemplateOrTemplatePart &&
+				  ! isPattern &&
+				  duplicatePostAction
+				: false,
+			! isTemplateOrTemplatePart && renamePostAction,
+			isTemplateOrTemplatePart && renameTemplateAction,
+			! isTemplateOrTemplatePart && trashPostAction,
+		].filter( Boolean );
 
-			if ( onActionPerformed ) {
-				for ( let i = 0; i < actions.length; ++i ) {
-					if ( actions[ i ].callback ) {
-						const existingCallback = actions[ i ].callback;
-						actions[ i ] = {
-							...actions[ i ],
-							callback: ( items, _onActionPerformed ) => {
-								existingCallback( items, ( _items ) => {
-									if ( _onActionPerformed ) {
-										_onActionPerformed( _items );
-									}
-									onActionPerformed(
-										actions[ i ].id,
-										_items
-									);
-								} );
-							},
-						};
-					}
-					if ( actions[ i ].RenderModal ) {
-						const ExistingRenderModal = actions[ i ].RenderModal;
-						actions[ i ] = {
-							...actions[ i ],
-							RenderModal: ( props ) => {
-								return (
-									<ExistingRenderModal
-										{ ...props }
-										onActionPerformed={ ( _items ) => {
-											if ( props.onActionPerformed ) {
-												props.onActionPerformed(
-													_items
-												);
-											}
-											onActionPerformed(
-												actions[ i ].id,
-												_items
-											);
-										} }
-									/>
-								);
-							},
-						};
-					}
+		if ( onActionPerformed ) {
+			for ( let i = 0; i < actions.length; ++i ) {
+				if ( actions[ i ].callback ) {
+					const existingCallback = actions[ i ].callback;
+					actions[ i ] = {
+						...actions[ i ],
+						callback: ( items, _onActionPerformed ) => {
+							existingCallback( items, ( _items ) => {
+								if ( _onActionPerformed ) {
+									_onActionPerformed( _items );
+								}
+								onActionPerformed( actions[ i ].id, _items );
+							} );
+						},
+					};
+				}
+				if ( actions[ i ].RenderModal ) {
+					const ExistingRenderModal = actions[ i ].RenderModal;
+					actions[ i ] = {
+						...actions[ i ],
+						RenderModal: ( props ) => {
+							return (
+								<ExistingRenderModal
+									{ ...props }
+									onActionPerformed={ ( _items ) => {
+										if ( props.onActionPerformed ) {
+											props.onActionPerformed( _items );
+										}
+										onActionPerformed(
+											actions[ i ].id,
+											_items
+										);
+									} }
+								/>
+							);
+						},
+					};
 				}
 			}
-			return actions;
-		},
+		}
 
-		// Disable reason: if provided, `actionIds` is a shallow array of
-		// strings, and the strings themselves should be part of the useMemo
-		// dependencies. Two different disable statements are needed, as the
-		// first flags what it thinks are missing dependencies, and the second
-		// flags the array spread operation.
-		//
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-		[
-			// eslint-disable-next-line react-hooks/exhaustive-deps
-			...( actionIds || [] ),
-			permanentlyDeletePostAction,
-			restorePostAction,
-			onActionPerformed,
-		]
-	);
+		return actions;
+	}, [
+		isTemplateOrTemplatePart,
+		isPattern,
+		postTypeObject?.viewable,
+		permanentlyDeletePostAction,
+		restorePostAction,
+		onActionPerformed,
+		isLoaded,
+	] );
 }
