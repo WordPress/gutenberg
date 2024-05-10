@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { autop, removep } from '..';
+import { autop, removep } from '../';
 
 test( 'empty string', () => {
 	expect( autop( '' ) ).toBe( '' );
