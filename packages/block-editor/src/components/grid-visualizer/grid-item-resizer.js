@@ -50,10 +50,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 	] );
 
 	/*
-	 * Resizer dummy is an empty div that exists only so we can
-	 * get the bounding client rect of the resizer element. This is
-	 * necessary because the resizer exists outside of the iframe, so
-	 * its bounding client rect isn't the same as the block element's.
+	 * This ref is necessary get the bounding client rect of the resizer,
+	 * because it exists outside of the iframe, so its bounding client
+	 * rect isn't the same as the block element's.
 	 */
 	const resizerRef = useRef( null );
 
