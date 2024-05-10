@@ -160,7 +160,7 @@ const PublicBlockPopover = ( {
 	children,
 	...props
 } ) => (
-	<BlockPopover
+	<PrivateBlockPopover
 		{ ...props }
 		bottomClientId={ bottomClientId }
 		clientId={ clientId }
@@ -168,10 +168,10 @@ const PublicBlockPopover = ( {
 		__unstablePopoverSlot={ undefined }
 	>
 		{ children }
-	</BlockPopover>
+	</PrivateBlockPopover>
 );
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md
  */
-export default forwardRef( PublicBlockPopover );
+export default PublicBlockPopover;
