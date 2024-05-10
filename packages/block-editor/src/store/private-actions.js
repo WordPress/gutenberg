@@ -392,6 +392,11 @@ export function expandBlock( clientId ) {
 	};
 }
 
+/**
+ * Temporarily modify/unlock the content-only block for editions.
+ *
+ * @param {string} clientId The client id of the block.
+ */
 export const modifyContentLockBlock =
 	( clientId ) =>
 	( { select, dispatch } ) => {
