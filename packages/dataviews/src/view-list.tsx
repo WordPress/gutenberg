@@ -145,7 +145,10 @@ function ListItem( {
 			onMouseEnter={ handleMouseEnter }
 			onMouseLeave={ handleMouseLeave }
 		>
-			<HStack className="dataviews-view-list__item-wrapper">
+			<HStack
+				className="dataviews-view-list__item-wrapper"
+				alignment="top"
+			>
 				<div role="gridcell">
 					<CompositeItem
 						store={ store }
