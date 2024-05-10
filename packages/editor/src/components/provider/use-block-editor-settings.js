@@ -267,10 +267,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			keepCaretInsideBlock,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalBlockPatterns: blockPatterns,
-			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) =>
-				unlock( select( coreStore ) ).getBlockPatternsForPostType(
-					postType
-				),
+			[ unlock( privateApis ).selectBlockPatternsKey ]: ( select ) => {
+				const { hasFinishedResolution, getBlockPatternsForPostType } =
+					unlock( select( coreStore ) );
+				const patterns = getBlockPatternsForPostType( postType );
+				return hasFinishedResolution( 'getBlockPatterns' )
+					? patterns
+					: undefined;
+			},
 			[ unlock( privateApis ).reusableBlocksSelectKey ]:
 				__experimentalReusableBlocksSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
