@@ -174,7 +174,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
-	const globalStylesData = useGlobalStylesData();
+	const { styles: globalStylesData } = useGlobalStylesData();
 
 	const settingsBlockPatterns =
 		settings.__experimentalAdditionalBlockPatterns ?? // WP 6.0

@@ -72,8 +72,6 @@ export function useGlobalStylesData() {
 
 	return {
 		isReady: isBaseStylesReady && isUserStylesReady,
-		base: baseStyles ?? DEFAULT_STYLES,
-		user: userStyles ?? DEFAULT_STYLES,
-		merged: mergedStyles,
+		styles: mergedStyles,
 	};
 }
