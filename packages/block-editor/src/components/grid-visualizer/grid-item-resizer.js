@@ -15,6 +15,26 @@ export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
 
+	if ( ! blockElement || ! rootBlockElement ) {
+		return null;
+	}
+
+	return (
+		<GridItemResizerInner
+			clientId={ clientId }
+			blockElement={ blockElement }
+			rootBlockElement={ rootBlockElement }
+			onChange={ onChange }
+		/>
+	);
+}
+
+function GridItemResizerInner( {
+	clientId,
+	blockElement,
+	rootBlockElement,
+	onChange,
+} ) {
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
 		top: false,
@@ -25,9 +45,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 
 	useEffect( () => {
 		const observer = new window.ResizeObserver( () => {
-			const blockClientRect = blockElement?.getBoundingClientRect() || {};
+			const blockClientRect = blockElement.getBoundingClientRect();
 			const rootBlockClientRect =
-				rootBlockElement?.getBoundingClientRect() || {};
+				rootBlockElement.getBoundingClientRect();
 			setEnableSide( {
 				top: blockClientRect.top > rootBlockClientRect.top,
 				bottom: blockClientRect.bottom < rootBlockClientRect.bottom,
@@ -81,9 +101,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 		offsetWidth: rootBlockElement.offsetWidth,
 		offsetHeight: rootBlockElement.offsetHeight,
 		getBoundingClientRect: () => {
-			const blockClientRect = blockElement?.getBoundingClientRect() || {};
+			const blockClientRect = blockElement.getBoundingClientRect();
 			const rootBlockClientRect =
-				rootBlockElement?.getBoundingClientRect() || {};
+				rootBlockElement.getBoundingClientRect();
 			const resizerTop = resizerRef.current?.getBoundingClientRect()?.top;
 			// Fallback value of 60 to account for editor top bar height.
 			const heightDifference = resizerTop
@@ -153,19 +173,24 @@ export function GridItemResizer( { clientId, onChange } ) {
 					);
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const gridElement = blockElement.parentElement;
 					const columnGap = parseFloat(
-						getComputedCSS( gridElement, 'column-gap' )
+						getComputedCSS( rootBlockElement, 'column-gap' )
 					);
 					const rowGap = parseFloat(
-						getComputedCSS( gridElement, 'row-gap' )
+						getComputedCSS( rootBlockElement, 'row-gap' )
 					);
 					const gridColumnTracks = getGridTracks(
-						getComputedCSS( gridElement, 'grid-template-columns' ),
+						getComputedCSS(
+							rootBlockElement,
+							'grid-template-columns'
+						),
 						columnGap
 					);
 					const gridRowTracks = getGridTracks(
-						getComputedCSS( gridElement, 'grid-template-rows' ),
+						getComputedCSS(
+							rootBlockElement,
+							'grid-template-rows'
+						),
 						rowGap
 					);
 					const rect = new window.DOMRect(
