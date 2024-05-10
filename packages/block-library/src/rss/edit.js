@@ -59,10 +59,18 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const blockProps = useBlockProps();
 
+	const label = __( 'RSS URL' );
+
 	if ( isEditing ) {
 		return (
 			<div { ...blockProps }>
-				<Placeholder icon={ rss } label="RSS">
+				<Placeholder
+					icon={ rss }
+					label={ label }
+					instructions={ __(
+						'Display entries from any RSS or Atom feed.'
+					) }
+				>
 					<form
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
@@ -70,6 +78,8 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						<HStack wrap>
 							<InputControl
 								__next40pxDefaultSize
+								label={ label }
+								hideLabelFromVision
 								placeholder={ __( 'Enter URL here…' ) }
 								value={ feedURL }
 								onChange={ ( value ) =>
@@ -82,7 +92,7 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 								variant="primary"
 								type="submit"
 							>
-								{ __( 'Use URL' ) }
+								{ __( 'Apply' ) }
 							</Button>
 						</HStack>
 					</form>
