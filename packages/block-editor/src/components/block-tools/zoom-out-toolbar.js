@@ -91,7 +91,7 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
 			// The variant is applied as "toolbar" when undefined, which is the black border style of the dropdown from the toolbar popover.
-			variant={ undefined }
+			variant="unstyled"
 			orientation="vertical"
 		>
 			{ showBlockDraggable && (
@@ -102,6 +102,8 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 							className="block-selection-button_drag-handle"
 							aria-hidden="true"
 							label={ __( 'Drag' ) }
+							iconSize={ 24 }
+							size="compact"
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
@@ -116,6 +118,8 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 					hideDragHandle
 					isBlockMoverUpButtonDisabled={ isPrevBlockTemplatePart }
 					isBlockMoverDownButtonDisabled={ isNextBlockTemplatePart }
+					iconSize={ 24 }
+					size="compact"
 				/>
 			) }
 			{ canMove && canRemove && (
