@@ -112,9 +112,17 @@ const trashPostAction = {
 										__( '"%s" moved to the Trash.' ),
 										getItemTitle( posts[ 0 ] )
 									);
+								} else if ( posts[ 0 ].type === 'page' ) {
+									successMessage = sprintf(
+										/* translators: The number of pages. */
+										__( '%s pages moved to the Trash.' ),
+										posts.length
+									);
 								} else {
-									successMessage = __(
-										'Pages moved to the Trash.'
+									successMessage = sprintf(
+										/* translators: The number of posts. */
+										__( '%s posts moved to the Trash.' ),
+										posts.length
 									);
 								}
 								createSuccessNotice( successMessage, {
@@ -343,23 +351,30 @@ function useRestorePostAction() {
 						( { status } ) => status === 'fulfilled'
 					)
 				) {
-					createSuccessNotice(
-						posts.length > 1
-							? sprintf(
-									/* translators: The number of posts. */
-									__( '%d posts have been restored.' ),
-									posts.length
-							  )
-							: sprintf(
-									/* translators: The number of posts. */
-									__( '"%s" has been restored.' ),
-									getItemTitle( posts[ 0 ] )
-							  ),
-						{
-							type: 'snackbar',
-							id: 'restore-post-action',
-						}
-					);
+					let successMessage;
+					if ( posts.length === 1 ) {
+						successMessage = sprintf(
+							/* translators: The number of posts. */
+							__( '"%s" has been restored.' ),
+							getItemTitle( posts[ 0 ] )
+						);
+					} else if ( posts[ 0 ].type === 'page' ) {
+						successMessage = sprintf(
+							/* translators: The number of posts. */
+							__( '%d pages have been restored.' ),
+							posts.length
+						);
+					} else {
+						successMessage = sprintf(
+							/* translators: The number of posts. */
+							__( '%d posts have been restored.' ),
+							posts.length
+						);
+					}
+					createSuccessNotice( successMessage, {
+						type: 'snackbar',
+						id: 'restore-post-action',
+					} );
 					if ( onActionPerformed ) {
 						onActionPerformed( posts );
 					}
