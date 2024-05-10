@@ -58,7 +58,7 @@ function BlockPattern( {
 	// When we have a selected category and the pattern is draggable, we need to update the
 	// pattern's categories in metadata to only contain the selected category, and pass this to
 	// InserterDraggableBlocks component. We do that because we use this information for pattern
-	// suffling and makes more sense to show only the ones form the initially selected category during insertion.
+	// shuffling and it makes more sense to show only the ones from the initially selected category during insertion.
 	const patternBlocks = useMemo( () => {
 		if ( ! category || ! isDraggable ) {
 			return blocks;
