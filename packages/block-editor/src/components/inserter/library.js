@@ -20,6 +20,8 @@ function InserterLibrary(
 		showInserterHelpPanel,
 		showMostUsedBlocks = false,
 		__experimentalInsertionIndex,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 		__experimentalFilterValue,
 		__experimentalOnPatternCategorySelection,
 		onSelect = noop,
@@ -53,6 +55,8 @@ function InserterLibrary(
 			__experimentalOnPatternCategorySelection={
 				__experimentalOnPatternCategorySelection
 			}
+			__experimentalInitialTab={ __experimentalInitialTab }
+			__experimentalInitialCategory={ __experimentalInitialCategory }
 			shouldFocusBlock={ shouldFocusBlock }
 			ref={ ref }
 			onClose={ onClose }

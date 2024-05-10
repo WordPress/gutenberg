@@ -187,7 +187,8 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 }
 
-.block-editor-inserter__no-results {
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
 	text-align: center;
 }

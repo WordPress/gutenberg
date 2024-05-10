@@ -48,6 +48,8 @@ function InserterMenu(
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
 		onClose,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 	},
 	ref
 ) {
@@ -59,12 +61,15 @@ function InserterMenu(
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] =
-		useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		__experimentalInitialCategory
+	);
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( 'blocks' );
+	const [ selectedTab, setSelectedTab ] = useState(
+		__experimentalInitialTab
+	);
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -106,21 +111,13 @@ function InserterMenu(
 		[ onToggleInsertionPoint ]
 	);
 
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView;
 	const onClickPatternCategory = useCallback(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			if ( isZoomedOutViewExperimentEnabled ) {
-				__experimentalOnPatternCategorySelection();
-			}
+			__experimentalOnPatternCategorySelection();
 		},
-		[
-			setSelectedPatternCategory,
-			__experimentalOnPatternCategorySelection,
-			isZoomedOutViewExperimentEnabled,
-		]
+		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -306,6 +303,7 @@ function InserterMenu(
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
 					onClose={ onClose }
+					selectedTab={ selectedTab }
 				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&

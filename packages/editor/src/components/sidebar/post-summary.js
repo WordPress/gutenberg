@@ -8,40 +8,33 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	PluginPostStatusInfo,
-	PostAuthorPanel,
-	PostSchedulePanel,
-	PostSyncStatus,
-	PostURLPanel,
-	PostTemplatePanel,
-	PostFeaturedImagePanel,
-	store as editorStore,
-	privateApis as editorPrivateApis,
-} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import PostTrash from '../post-trash';
-import PostSticky from '../post-sticky';
-import PostSlug from '../post-slug';
-import PostFormat from '../post-format';
-import { unlock } from '../../../lock-unlock';
-
-const {
-	PostStatus: PostStatusPanel,
-	PrivatePostExcerptPanel,
-	PostContentInformation,
-	PostLastEditedPanel,
-} = unlock( editorPrivateApis );
+import PluginPostStatusInfo from '../plugin-post-status-info';
+import PostAuthorPanel from '../post-author/panel';
+import PostContentInformation from '../post-content-information';
+import { PrivatePostExcerptPanel as PostExcerptPanel } from '../post-excerpt/panel';
+import PostFeaturedImagePanel from '../post-featured-image/panel';
+import PostFormatPanel from '../post-format/panel';
+import PostLastEditedPanel from '../post-last-edited-panel';
+import PostSchedulePanel from '../post-schedule/panel';
+import PostSlugPanel from '../post-slug/panel';
+import PostStatusPanel from '../post-status';
+import PostStickyPanel from '../post-sticky';
+import PostSyncStatus from '../post-sync-status';
+import PostTemplatePanel from '../post-template/panel';
+import PostTrashPanel from '../post-trash/panel';
+import PostURLPanel from '../post-url/panel';
+import { store as editorStore } from '../../store';
 
 /**
  * Module Constants
  */
 const PANEL_NAME = 'post-status';
 
-export default function PostStatus() {
+export default function PostSummary() {
 	const { isOpened, isRemoved, showPostContentPanels } = useSelect(
 		( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
@@ -74,7 +67,6 @@ export default function PostStatus() {
 
 	return (
 		<PanelBody
-			className="edit-post-post-status"
 			title={ __( 'Summary' ) }
 			opened={ isOpened }
 			onToggle={ () => toggleEditorPanelOpened( PANEL_NAME ) }
@@ -91,7 +83,7 @@ export default function PostStatus() {
 								<PostFeaturedImagePanel
 									withPanelBody={ false }
 								/>
-								<PrivatePostExcerptPanel />
+								<PostExcerptPanel />
 								<VStack spacing={ 1 }>
 									<PostContentInformation />
 									<PostLastEditedPanel />
@@ -108,9 +100,9 @@ export default function PostStatus() {
 							<PostURLPanel />
 							<PostSyncStatus />
 						</VStack>
-						<PostSticky />
-						<PostFormat />
-						<PostSlug />
+						<PostStickyPanel />
+						<PostFormatPanel />
+						<PostSlugPanel />
 						<PostAuthorPanel />
 						{ fills }
 						<HStack
@@ -118,7 +110,7 @@ export default function PostStatus() {
 								marginTop: '16px',
 							} }
 						>
-							<PostTrash />
+							<PostTrashPanel />
 						</HStack>
 					</>
 				) }

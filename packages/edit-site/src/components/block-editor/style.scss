@@ -21,6 +21,7 @@
 .edit-site-visual-editor {
 	position: relative;
 	height: 100%;
+	overflow: hidden;
 	display: block;
 	background-color: $gray-300;
 	// Centralize the editor horizontally (flex-direction is column).
