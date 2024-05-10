@@ -22,6 +22,10 @@ export function useZoomOut( zoomOut = true ) {
 	const mode = __unstableGetEditorMode();
 
 	useEffect( () => {
+		originalEditingMode.current = mode;
+	}, [ mode ] );
+
+	useEffect( () => {
 		// Only set this on mount so we know what to return to when we unmount.
 		if ( ! originalEditingMode.current ) {
 			originalEditingMode.current = mode;
@@ -42,5 +46,5 @@ export function useZoomOut( zoomOut = true ) {
 		} else if ( ! zoomOut && originalEditingMode.current !== mode ) {
 			__unstableSetEditorMode( originalEditingMode.current );
 		}
-	}, [ __unstableSetEditorMode, zoomOut, mode ] );
+	}, [ __unstableSetEditorMode, zoomOut ] );
 }

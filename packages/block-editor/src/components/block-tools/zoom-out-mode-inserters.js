@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
@@ -16,6 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
+	const registry = useRegistry();
 	const {
 		blockOrder,
 		sectionRootClientId,
@@ -47,9 +48,18 @@ function ZoomOutModeInserters() {
 
 	useEffect( () => {
 		if ( selectedClientId && ! blockOrder.includes( selectedClientId ) ) {
-			setInserterIsOpened( { tab: 'blocks' } );
+			const { tab } = unlock(
+				registry.select( 'core/editor' )
+			).getInsertionPoint();
+			if ( tab ) {
+				setInserterIsOpened( { tab: 'blocks' } );
+			} else {
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableSetEditorMode( 'edit' );
+			}
 		}
-	}, [ selectedClientId, blockOrder, setInserterIsOpened ] );
+	}, [ selectedClientId, blockOrder, setInserterIsOpened, registry ] );
 
 	useEffect( () => {
 		if ( ! isMounted.current ) {
