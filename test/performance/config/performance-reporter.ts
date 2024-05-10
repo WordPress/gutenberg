@@ -43,54 +43,43 @@ export interface WPRawPerformanceResults {
 	wpDbQueries: number[];
 }
 
+type PerformanceStats = {
+	q25: number;
+	q50: number;
+	q75: number;
+	out: number[]; // outliers
+	cnt: number; // number of data points
+};
+
 export interface WPPerformanceResults {
-	timeToFirstByte?: number;
-	timeToFirstByteV?: number;
-	largestContentfulPaint?: number;
-	largestContentfulPaintV?: number;
-	lcpMinusTtfb?: number;
-	lcpMinusTtfbV?: number;
-	serverResponse?: number;
-	serverResponseV?: number;
-	firstPaint?: number;
-	firstPaintV?: number;
-	domContentLoaded?: number;
-	domContentLoadedV?: number;
-	loaded?: number;
-	loadedV?: number;
-	firstContentfulPaint?: number;
-	firstContentfulPaintV?: number;
-	firstBlock?: number;
-	firstBlockV?: number;
-	type?: number;
-	typeV?: number;
-	typeWithoutInspector?: number;
-	typeWithoutInspectorV?: number;
-	typeWithTopToolbar?: number;
-	typeWithTopToolbarV?: number;
-	typeContainer?: number;
-	typeContainerV?: number;
-	focus?: number;
-	focusV?: number;
-	inserterOpen?: number;
-	inserterOpenV?: number;
-	inserterSearch?: number;
-	inserterSearchV?: number;
-	inserterHover?: number;
-	inserterHoverV?: number;
-	loadPatterns?: number;
-	loadPatternsV?: number;
-	listViewOpen?: number;
-	listViewOpenV?: number;
-	navigate?: number;
-	wpBeforeTemplate?: number;
-	wpTemplate?: number;
-	wpTotal?: number;
-	wpMemoryUsage?: number;
-	wpDbQueries?: number;
+	timeToFirstByte?: PerformanceStats;
+	largestContentfulPaint?: PerformanceStats;
+	lcpMinusTtfb?: PerformanceStats;
+	serverResponse?: PerformanceStats;
+	firstPaint?: PerformanceStats;
+	domContentLoaded?: PerformanceStats;
+	loaded?: PerformanceStats;
+	firstContentfulPaint?: PerformanceStats;
+	firstBlock?: PerformanceStats;
+	type?: PerformanceStats;
+	typeWithoutInspector?: PerformanceStats;
+	typeWithTopToolbar?: PerformanceStats;
+	typeContainer?: PerformanceStats;
+	focus?: PerformanceStats;
+	inserterOpen?: PerformanceStats;
+	inserterSearch?: PerformanceStats;
+	inserterHover?: PerformanceStats;
+	loadPatterns?: PerformanceStats;
+	listViewOpen?: PerformanceStats;
+	navigate?: PerformanceStats;
+	wpBeforeTemplate?: PerformanceStats;
+	wpTemplate?: PerformanceStats;
+	wpTotal?: PerformanceStats;
+	wpMemoryUsage?: PerformanceStats;
+	wpDbQueries?: PerformanceStats;
 }
 
-function stats( values: number[] ) {
+function stats( values: number[] ): PerformanceStats | undefined {
 	if ( ! values || values.length === 0 ) {
 		return undefined;
 	}
@@ -112,9 +101,8 @@ function stats( values: number[] ) {
 /**
  * Curate the raw performance results.
  *
- * @param {WPRawPerformanceResults} results
- *
- * @return {WPPerformanceResults} Curated Performance results.
+ * @param results Raw results.
+ * @return Curated statistics for the results.
  */
 export function curateResults(
 	results: WPRawPerformanceResults
