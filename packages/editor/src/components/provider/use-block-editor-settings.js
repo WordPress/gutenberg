@@ -41,7 +41,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalBlockDirectory',
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
-	'__experimentalStyles',
 	'__experimentalGlobalStylesBaseStyles',
 	'__unstableGalleryWithImageBlocks',
 	'alignWide',
