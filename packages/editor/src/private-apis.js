@@ -30,6 +30,10 @@ import SavePublishPanels from './components/save-publish-panels';
 import PostContentInformation from './components/post-content-information';
 import PostLastEditedPanel from './components/post-last-edited-panel';
 import Sidebar from './components/sidebar';
+import {
+	mergeBaseAndUserConfigs,
+	GlobalStylesProvider,
+} from './components/global-styles-provider';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -38,9 +42,11 @@ lock( privateApis, {
 	EditorCanvas,
 	ExperimentalEditorProvider,
 	EntitiesSavedStatesExtensible,
+	GlobalStylesProvider,
 	Header,
 	InserterSidebar,
 	ListViewSidebar,
+	mergeBaseAndUserConfigs,
 	PatternOverridesPanel,
 	PluginPostExcerpt,
 	PostActions,
