@@ -1,13 +1,9 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -33,33 +29,23 @@ const mediaTab = {
 	title: __( 'Media' ),
 };
 
-function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
+function InserterTabs( { onSelect, children, selectedTab }, ref ) {
 	const tabs = [ blocksTab, patternsTab, mediaTab ];
 
 	return (
 		<div className="block-editor-inserter__tabs" ref={ ref }>
 			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
-				<div className="block-editor-inserter-sidebar__header">
-					<Button
-						className="block-editor-inserter-sidebar__close-button"
-						icon={ closeSmall }
-						label={ __( 'Close block inserter' ) }
-						onClick={ () => onClose() }
-						size="small"
-					/>
-
-					<Tabs.TabList className="block-editor-inserter__tablist">
-						{ tabs.map( ( tab ) => (
-							<Tabs.Tab
-								key={ tab.name }
-								tabId={ tab.name }
-								className="block-editor-inserter__tab"
-							>
-								{ tab.title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</div>
+				<Tabs.TabList className="block-editor-inserter__tablist">
+					{ tabs.map( ( tab ) => (
+						<Tabs.Tab
+							key={ tab.name }
+							tabId={ tab.name }
+							className="block-editor-inserter__tab"
+						>
+							{ tab.title }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.TabList>
 				{ tabs.map( ( tab ) => (
 					<Tabs.TabPanel
 						key={ tab.name }

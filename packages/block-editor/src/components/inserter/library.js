@@ -26,7 +26,6 @@ function InserterLibrary(
 		__experimentalOnPatternCategorySelection,
 		onSelect = noop,
 		shouldFocusBlock = false,
-		onClose,
 	},
 	ref
 ) {
@@ -59,7 +58,6 @@ function InserterLibrary(
 			__experimentalInitialCategory={ __experimentalInitialCategory }
 			shouldFocusBlock={ shouldFocusBlock }
 			ref={ ref }
-			onClose={ onClose }
 		/>
 	);
 }

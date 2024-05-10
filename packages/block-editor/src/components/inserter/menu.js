@@ -47,7 +47,6 @@ function InserterMenu(
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
-		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
 	},
@@ -302,7 +301,6 @@ function InserterMenu(
 				<InserterTabs
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
-					onClose={ onClose }
 					selectedTab={ selectedTab }
 				>
 					{ inserterSearch }

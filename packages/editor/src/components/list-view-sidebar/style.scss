@@ -27,6 +27,8 @@
 	.editor-list-view-sidebar__close-button {
 		background: transparent;
 		color: $gray-600;
+		position: relative;
+		z-index: 2; // allow the close button focus ring to be visible
 	}
 
 	.editor-list-view-sidebar__tabs {

@@ -10,7 +10,9 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
-
+import { __ } from '@wordpress/i18n';
+import { closeSmall } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -73,6 +75,18 @@ export default function InserterSidebar( {
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div onKeyDown={ closeOnEscape } className="editor-inserter-sidebar">
+			<div className="block-editor-inserter-sidebar__header">
+				<span className="block-editor-inserter-sidebar__header-title">
+					{ __( 'Insert' ) }
+				</span>
+				<Button
+					className="block-editor-inserter-sidebar__close-button"
+					icon={ closeSmall }
+					label={ __( 'Close block inserter' ) }
+					onClick={ () => setIsInserterOpened( false ) }
+					size="small"
+				/>
+			</div>
 			<div className="editor-inserter-sidebar__content">
 				<Library
 					showMostUsedBlocks={ showMostUsedBlocks }
@@ -91,7 +105,6 @@ export default function InserterSidebar( {
 						isRightSidebarOpen ? closeGeneralSidebar : undefined
 					}
 					ref={ libraryRef }
-					onClose={ closeInserterSidebar }
 				/>
 			</div>
 		</div>

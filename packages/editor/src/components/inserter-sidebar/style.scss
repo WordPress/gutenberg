@@ -7,15 +7,26 @@
 }
 
 .block-editor-inserter-sidebar__header {
-	border-bottom: $border-width solid $gray-300;
-	padding-right: $grid-unit-10;
 	display: flex;
 	justify-content: space-between;
+	padding: $grid-unit-05 $grid-unit-05 0 $grid-unit-20;
+	background-color: $gray-100;
+}
 
-	.block-editor-inserter-sidebar__close-button {
-		order: 1;
-		align-self: center;
-	}
+.block-editor-inserter-sidebar__header-title {
+	font-size: 12px;
+	font-weight: 500;
+	color: $gray-600;
+	text-transform: uppercase;
+	position: relative;
+	top: $grid-unit-10;
+}
+
+.block-editor-inserter-sidebar__close-button {
+	background: transparent;
+	color: $gray-600;
+	position: relative;
+	z-index: 2; // allow the close button focus ring to be visible
 }
 
 .editor-inserter-sidebar__content {
