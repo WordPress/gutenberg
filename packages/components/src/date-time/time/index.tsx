@@ -13,8 +13,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BaseControl from '../../base-control';
-import Button from '../../button';
-import ButtonGroup from '../../button-group';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimePickerProps } from '../types';
@@ -41,6 +39,10 @@ import {
 } from '../../input-control/reducer/actions';
 import { inputToDate } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
+import {
+	ToggleGroupControl,
+	ToggleGroupControlOption,
+} from '../../toggle-group-control';
 
 function from12hTo24h( hours: number, isPm: boolean ) {
 	return isPm ? ( ( hours % 12 ) + 12 ) % 24 : hours % 12;
@@ -294,30 +296,30 @@ export function TimePicker( {
 						/>
 					</TimeWrapper>
 					{ is12Hour && (
-						<ButtonGroup
+						<ToggleGroupControl
 							className="components-datetime__time-field components-datetime__time-field-am-pm" // Unused, for backwards compatibility.
+							label={ __( 'Select AM or PM' ) }
+							hideLabelFromVision
+							onChange={ function noRefCheck() {} }
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							isBlock
 						>
-							<Button
+							<ToggleGroupControlOption
 								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
-								variant={
-									am === 'AM' ? 'primary' : 'secondary'
-								}
-								__next40pxDefaultSize
+								aria-label="AM"
 								onClick={ buildAmPmChangeCallback( 'AM' ) }
-							>
-								{ __( 'AM' ) }
-							</Button>
-							<Button
+								value="horizontal"
+								label={ __( 'AM' ) }
+							/>
+							<ToggleGroupControlOption
 								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
-								variant={
-									am === 'PM' ? 'primary' : 'secondary'
-								}
-								__next40pxDefaultSize
+								aria-label="PM"
 								onClick={ buildAmPmChangeCallback( 'PM' ) }
-							>
-								{ __( 'PM' ) }
-							</Button>
-						</ButtonGroup>
+								value="vertical"
+								label={ __( 'PM' ) }
+							/>
+						</ToggleGroupControl>
 					) }
 					<Spacer />
 					<TimeZone />
