@@ -14,7 +14,11 @@ import { useState } from '@wordpress/element';
  */
 import UncontrolledCustomSelectControl from '..';
 
-const customClass = 'amber-skies';
+const className = 'amber-skies';
+const style = {
+	backgroundColor: 'rgb(127, 255, 212)',
+	rotate: '13deg',
+};
 
 const legacyProps = {
 	label: 'label!',
@@ -26,7 +30,7 @@ const legacyProps = {
 		{
 			key: 'flower2',
 			name: 'crimson clover',
-			className: customClass,
+			className,
 		},
 		{
 			key: 'flower3',
@@ -35,15 +39,18 @@ const legacyProps = {
 		{
 			key: 'color1',
 			name: 'amber',
-			className: customClass,
+			className,
 		},
 		{
 			key: 'color2',
 			name: 'aquamarine',
-			style: {
-				backgroundColor: 'rgb(127, 255, 212)',
-				rotate: '13deg',
-			},
+			style,
+		},
+		{
+			key: 'aquarela-key',
+			name: 'aquarela',
+			className,
+			style,
 		},
 	],
 };
@@ -148,7 +155,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).toHaveClass(
-				customClass
+				className
 			)
 		);
 
@@ -160,7 +167,7 @@ describe.each( [
 		// assert against filtered array
 		itemsWithoutClass.map( ( { name } ) =>
 			expect( screen.getByRole( 'option', { name } ) ).not.toHaveClass(
-				customClass
+				className
 			)
 		);
 	} );
@@ -286,7 +293,7 @@ describe.each( [
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
-				selectedItem: { key: 'violets', name: 'violets' },
+				selectedItem: { key: 'flower1', name: 'violets' },
 				type: '',
 			} )
 		);
@@ -302,8 +309,13 @@ describe.each( [
 			expect.objectContaining( {
 				inputValue: '',
 				isOpen: false,
+
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
+					style: {
+						backgroundColor: 'rgb(127, 255, 212)',
+						rotate: '13deg',
+					},
 				} ),
 				type: '',
 			} )
@@ -328,7 +340,7 @@ describe.each( [
 		await type( 'p' );
 		await press.Enter();
 
-		expect( mockOnChange ).toHaveReturnedWith( 'poppy' );
+		expect( mockOnChange ).toHaveReturnedWith( 'flower1' );
 	} );
 
 	describe( 'Keyboard behavior and accessibility', () => {
@@ -456,5 +468,40 @@ describe.each( [
 				} )
 			).toBeVisible();
 		} );
+	} );
+
+	// V1 styles items via a `style` or `className` metadata property in the option item object. Some consumers still expect it, e.g:
+	//
+	// - https://github.com/WordPress/gutenberg/blob/trunk/packages/block-editor/src/components/font-appearance-control/index.js#L216
+	//
+	// Returning these properties as part of the item object was not tested as part of the V1 test. Possibly this was an accidental API?
+	// or was it intentional? If intentional, we might need to implement something similar in V2, too? The alternative is to rely on the
+	// `key` attriute for the item and get the actual data from some dictionary in a store somewhere, which would require refactoring
+	// consumers that rely on the self-contained `style` and `className` attributes.
+	it( 'Should return style metadata as part of the selected option from onChange', async () => {
+		const mockOnChange = jest.fn();
+
+		render( <Component { ...legacyProps } onChange={ mockOnChange } /> );
+
+		await click(
+			screen.getByRole( 'combobox', {
+				expanded: false,
+			} )
+		);
+
+		await click(
+			screen.getByRole( 'option', {
+				name: 'aquarela',
+			} )
+		);
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				selectedItem: expect.objectContaining( {
+					className,
+					style,
+				} ),
+			} )
+		);
 	} );
 } );

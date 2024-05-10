@@ -30,7 +30,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	// Forward props + store from v2 implementation
 	const store = Ariakit.useSelectStore( {
 		async setValue( nextValue ) {
-			if ( ! onChange ) return;
+			if ( ! onChange ) {
+				return;
+			}
 
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
@@ -48,6 +50,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				selectedItem: option!,
 				type: '',
 			};
+
 			onChange( changeObject );
 		},
 	} );
@@ -131,7 +134,6 @@ export default CustomSelectControl;
 
 // for backwards compatibility
 export function ClassicCustomSelectControl( props: LegacyCustomSelectProps ) {
-	console.debug( props );
 	return (
 		<CustomSelectControl
 			{ ...props }
