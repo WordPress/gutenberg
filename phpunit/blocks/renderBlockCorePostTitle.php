@@ -17,11 +17,18 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	protected static $post;
 
 	/**
-	 * Array of Attributes.
+	 * Array of attributes.
 	 *
 	 * @var int
 	 */
 	protected static $attributes;
+
+	/**
+	 * Block object.
+	 *
+	 * @var object
+	 */
+	protected static $block;
 
 	/**
 	 * Setup method.
@@ -39,7 +46,9 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 			'rel'        => '',
 		);
 
-		$block = array(
+		self::$block = new stdClass();
+
+		$block_args = array(
 			'blockName'    => 'core/post-title',
 			'attrs'        => array(
 				'textColor' => 'red',
@@ -50,7 +59,7 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 		);
 
 		WP_Block_Supports::init();
-		WP_Block_Supports::$block_to_render = $block;
+		WP_Block_Supports::$block_to_render = $block_args;
 	}
 
 	/**
@@ -63,102 +72,100 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 	/**
 	 * Test gutenberg_render_block_core_post_title() method.
 	 */
-	public function test_gutenberg_render_block_core_post_title_without_post() {
-		$block = new stdClass();
+	public function test_should_render_empty_string_when_title_is_empty() {
 
 		// call render method with block context.
-		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
+		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
 		$this->assertEmpty( $rendered );
 
-		$block->context = array( 'postId' => 0 );
-		$rendered       = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
+		self::$block->context = array( 'postId' => 0 );
+		$rendered             = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
 		$this->assertEmpty( $rendered );
 	}
 
 	/**
 	 * Test gutenberg_render_block_core_post_title() method.
 	 */
-	public function test_gutenberg_render_block_core_post_title() {
+	public function test_should_render_correct_title() {
 
-		$block           = new stdClass();
-		$GLOBALS['post'] = self::$post;
-		$block->context  = array( 'postId' => self::$post->ID );
+		$GLOBALS['post']      = self::$post;
+		self::$block->context = array( 'postId' => self::$post->ID );
 
-		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
-		$this->assertNotNull(
+		$rendered = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
+		$this->assertNotEmpty(
 			$rendered,
-			'Passed $rendered is null.'
+			'Failed to assert that $rendered is an non-empty string.'
 		);
 		$this->assertStringContainsString(
 			'Post title block Unit Test',
 			$rendered,
-			'Passed $rendered does not contain the post title string.'
+			'Failed to assert that $rendered contain the post title string.'
 		);
 		$this->assertStringContainsString(
 			'</h2>',
 			$rendered,
-			'Passed $rendered does not contain a closing html heading tag.'
+			'Failed to assert that $rendered contain a closing html heading tag.'
 		);
 		$this->assertStringNotContainsString(
 			get_permalink( self::$post->ID ),
 			$rendered,
-			'Passed $rendered contain the post link.'
+			'Failed to assert that $rendered does not contain the post link.'
 		);
 		$this->assertStringNotContainsString(
 			'<a href=',
 			$rendered,
-			'Passed $rendered contain a html anchor tag.'
+			'Failed to assert that $rendered does not contain a html anchor tag.'
 		);
 		$this->assertStringNotContainsString(
 			'has-text-align-left',
 			$rendered,
-			'Passed $rendered contain the has-text-align-left class.'
+			'Failed to assert that $rendered does not contain the has-text-align-left class.'
 		);
 
 		self::$attributes['level'] = '1';
-		$rendered                  = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
+		$rendered                  = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
 		$this->assertStringContainsString(
 			'<h1',
 			$rendered,
-			'Passed $rendered does not contain HTML heading tag.'
+			'Failed to assert that $rendered contain the HTML heading tag.'
 		);
 		$this->assertStringContainsString(
 			'</h1>',
 			$rendered,
-			'Passed $rendered does not contain a closing HTML heading tag.'
+			'Failed to assert that $rendered contain a closing HTML heading tag.'
 		);
 
 		self::$attributes['textAlign'] = 'left';
-		$rendered                      = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
+		$rendered                      = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
 		$this->assertStringContainsString(
 			'has-text-align-left',
 			$rendered,
-			'Passed $rendered does not contain the has-text-align-left class.'
+			'Failed to assert that $rendered contain the has-text-align-left class.'
 		);
 
 		self::$attributes['isLink']     = true;
 		self::$attributes['linkTarget'] = '_blank';
 		self::$attributes['rel']        = 'no-relative';
-		$rendered                       = gutenberg_render_block_core_post_title( self::$attributes, '', $block );
+		$rendered                       = gutenberg_render_block_core_post_title( self::$attributes, '', self::$block );
 		$this->assertStringContainsString(
 			get_permalink( self::$post->ID ),
 			$rendered,
-			'Passed $rendered does not contain post link.'
+			'Failed to assert that $rendered contain the post link.'
 		);
 		$this->assertStringContainsString(
 			'<a href=',
 			$rendered,
-			'Passed $rendered does not contain html anchor tag.'
+			'Failed to assert that $rendered contain html anchor tag.'
 		);
 		$this->assertStringContainsString(
 			'_blank',
 			$rendered,
-			'Passed $rendered does not contain the link target attribute.'
+			'Failed to assert that $rendered contain the link target attribute.'
 		);
 		$this->assertStringContainsString(
 			'no-relative',
 			$rendered,
-			'Passed $rendered does not contain the link relation attribute.'
+			'Failed to assert that $rendered contain the link relation attribute.'
 		);
 	}
 }
