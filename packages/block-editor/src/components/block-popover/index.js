@@ -154,18 +154,17 @@ function BlockPopover(
 
 export const PrivateBlockPopover = forwardRef( BlockPopover );
 
-const PublicBlockPopover = ( {
-	clientId,
-	bottomClientId,
-	children,
-	...props
-} ) => (
+const PublicBlockPopover = (
+	{ clientId, bottomClientId, children, ...props },
+	ref
+) => (
 	<PrivateBlockPopover
 		{ ...props }
 		bottomClientId={ bottomClientId }
 		clientId={ clientId }
 		__unstableContentRef={ undefined }
 		__unstablePopoverSlot={ undefined }
+		ref={ ref }
 	>
 		{ children }
 	</PrivateBlockPopover>
@@ -174,4 +173,4 @@ const PublicBlockPopover = ( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md
  */
-export default PublicBlockPopover;
+export default forwardRef( PublicBlockPopover );
