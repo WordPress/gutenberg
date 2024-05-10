@@ -6,6 +6,7 @@
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
 -   Upgrade `@use-gesture/react` package to `^10.3.1` ([#61503](https://github.com/WordPress/gutenberg/pull/61503)).
+-   Upgrade `framer-motion` package to version `^11.1.9` ([#61572](https://github.com/WordPress/gutenberg/pull/61572)).
 
 ### Enhancements
 
