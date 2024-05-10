@@ -155,28 +155,22 @@ export function GridItemResizer( { clientId, onChange } ) {
 						getComputedCSS( gridElement, 'grid-template-rows' ),
 						rowGap
 					);
+					const rect = new window.DOMRect(
+						blockElement.offsetLeft + boxElement.offsetLeft,
+						blockElement.offsetTop + boxElement.offsetTop,
+						boxElement.offsetWidth,
+						boxElement.offsetHeight
+					);
 					const columnStart =
-						getClosestTrack(
-							gridColumnTracks,
-							blockElement.offsetLeft
-						) + 1;
+						getClosestTrack( gridColumnTracks, rect.left ) + 1;
 					const rowStart =
-						getClosestTrack(
-							gridRowTracks,
-							blockElement.offsetTop
-						) + 1;
+						getClosestTrack( gridRowTracks, rect.top ) + 1;
 					const columnEnd =
-						getClosestTrack(
-							gridColumnTracks,
-							blockElement.offsetLeft + boxElement.offsetWidth,
-							'end'
-						) + 1;
+						getClosestTrack( gridColumnTracks, rect.right, 'end' ) +
+						1;
 					const rowEnd =
-						getClosestTrack(
-							gridRowTracks,
-							blockElement.offsetTop + boxElement.offsetHeight,
-							'end'
-						) + 1;
+						getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
+						1;
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
