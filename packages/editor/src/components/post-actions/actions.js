@@ -700,10 +700,19 @@ export const duplicatePostAction = {
 	},
 };
 
+const isTemplatePartRevertable = ( item ) => {
+	const hasThemeFile = item.templatePart.has_theme_file;
+	return canDeleteOrReset( item ) && hasThemeFile;
+};
+
 const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
-	isEligible: isTemplateRevertable,
+	isEligible: ( item ) => {
+		return item.type === TEMPLATE_PART_POST_TYPE
+			? isTemplatePartRevertable( item )
+			: isTemplateRevertable( item );
+	},
 	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -714,40 +723,47 @@ const resetTemplateAction = {
 		onActionPerformed,
 	} ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
-		const { revertTemplate } = unlock( useDispatch( editorStore ) );
+		const { revertTemplate, removeTemplates } = unlock(
+			useDispatch( editorStore )
+		);
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const onConfirm = async () => {
 			try {
-				for ( const template of items ) {
-					await revertTemplate( template, {
-						allowUndo: false,
-					} );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
+				if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
+					await removeTemplates( items );
+				} else {
+					for ( const template of items ) {
+						if ( template.type === TEMPLATE_POST_TYPE ) {
+							await revertTemplate( template, {
+								allowUndo: false,
+							} );
+							await saveEditedEntityRecord(
+								'postType',
+								template.type,
+								template.id
+							);
+						}
+					}
+					createSuccessNotice(
+						items.length > 1
+							? sprintf(
+									/* translators: The number of items. */
+									__( '%s items reset.' ),
+									items.length
+							  )
+							: sprintf(
+									/* translators: The template/part's name. */
+									__( '"%s" reset.' ),
+									decodeEntities( getItemTitle( items[ 0 ] ) )
+							  ),
+						{
+							type: 'snackbar',
+							id: 'revert-template-action',
+						}
 					);
 				}
-
-				createSuccessNotice(
-					items.length > 1
-						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
-								items.length
-						  )
-						: sprintf(
-								/* translators: The template/part's name. */
-								__( '"%s" reset.' ),
-								decodeEntities( items[ 0 ].title.rendered )
-						  ),
-					{
-						type: 'snackbar',
-						id: 'revert-template-action',
-					}
-				);
 			} catch ( error ) {
 				let fallbackErrorMessage;
 				if ( items[ 0 ].type === TEMPLATE_POST_TYPE ) {
@@ -1229,7 +1245,7 @@ export function usePostActions( postType, onActionPerformed ) {
 		}
 
 		const actions = [
-			isTemplateOrTemplatePart && resetTemplateAction,
+			( isTemplateOrTemplatePart || isPattern ) && resetTemplateAction,
 			postTypeObject?.viewable && viewPostAction,
 			! isTemplateOrTemplatePart && restorePostAction,
 			isTemplateOrTemplatePart && deleteTemplateAction,
