@@ -99,20 +99,22 @@
 }
 
 .edit-site-sidebar-navigation-screen__content .edit-site-global-styles-variations_item {
+
+	// Use a white outline to provide contrast with the dark background.
 	.edit-site-global-styles-variations_item-preview {
-		box-shadow: 0 0 0 $border-width $gray-900;
+		outline-color: rgba($white, 0.05);
 	}
 
-	&:focus .edit-site-global-styles-variations_item-preview,
+	&:not(.is-active):hover .edit-site-global-styles-variations_item-preview {
+		outline-color: rgba($white, 0.15);
+	}
+
 	&.is-active .edit-site-global-styles-variations_item-preview {
-		box-shadow: inset 0 0 0 $border-width $gray-900, 0 0 0 var(--wp-admin-border-width-focus) $white;
+		outline-color: $white;
+	}
 
-		// Shown in Windows 10 high contrast mode.
-		outline-width: 3px;
-
-		&::after {
-			box-shadow: inset 0 0 0 1px $gray-900;
-		}
+	&:focus-visible .edit-site-global-styles-variations_item-preview {
+		outline-color: var(--wp-admin-theme-color);
 	}
 }
 

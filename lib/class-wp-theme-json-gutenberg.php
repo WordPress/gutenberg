@@ -123,9 +123,19 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0 Replaced `override` with `prevent_override` and updated the
 	 *              `prevent_override` value for `color.duotone` to use `color.defaultDuotone`.
 	 * @since 6.2.0 Added 'shadow' presets.
+	 * @since 6.6.0 Added `aspectRatios`.
 	 * @var array
 	 */
 	const PRESETS_METADATA = array(
+		array(
+			'path'              => array( 'dimensions', 'aspectRatios' ),
+			'prevent_override'  => array( 'dimensions', 'defaultAspectRatios' ),
+			'use_default_names' => false,
+			'value_key'         => 'ratio',
+			'css_vars'          => '--wp--preset--aspect-ratio--$slug',
+			'classes'           => array(),
+			'properties'        => array( 'aspect-ratio' ),
+		),
 		array(
 			'path'              => array( 'color', 'palette' ),
 			'prevent_override'  => array( 'color', 'defaultPalette' ),
@@ -310,7 +320,6 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'background-image' => array(
 			array( 'background', 'backgroundImage', 'url' ),
-			array( 'background', 'backgroundImage', 'source' ),
 		),
 	);
 
@@ -397,8 +406,10 @@ class WP_Theme_JSON_Gutenberg {
 		),
 		'custom'                        => null,
 		'dimensions'                    => array(
-			'aspectRatio' => null,
-			'minHeight'   => null,
+			'aspectRatio'         => null,
+			'aspectRatios'        => null,
+			'defaultAspectRatios' => null,
+			'minHeight'           => null,
 		),
 		'layout'                        => array(
 			'contentSize'                   => null,
@@ -483,7 +494,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *              updated `blockGap` to be allowed at any level.
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
 	 * @since 6.6.0 Added `background` sub properties to top-level only.
-	 *
+	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(

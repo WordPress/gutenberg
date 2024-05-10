@@ -209,6 +209,9 @@ $z-layers: (
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
+
+	// Ensure quick actions toolbar appear above pagination
+	".dataviews-bulk-actions": 2,
 );
 
 @function z-index( $key ) {

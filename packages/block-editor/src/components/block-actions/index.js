@@ -31,10 +31,12 @@ export default function BlockActions( {
 				getDirectInsertBlock,
 				canMoveBlocks,
 				canRemoveBlocks,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 
 			const blocks = getBlocksByClientId( clientIds );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+			const rootBlockEditingMode = getBlockEditingMode( rootClientId );
 			const canInsertDefaultBlock = canInsertBlockType(
 				getDefaultBlockName(),
 				rootClientId
@@ -46,7 +48,9 @@ export default function BlockActions( {
 			return {
 				canMove: canMoveBlocks( clientIds, rootClientId ),
 				canRemove: canRemoveBlocks( clientIds, rootClientId ),
-				canInsertBlock: canInsertDefaultBlock || !! directInsertBlock,
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					rootBlockEditingMode === 'default',
 				canCopyStyles: blocks.every( ( block ) => {
 					return (
 						!! block &&
