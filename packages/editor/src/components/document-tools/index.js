@@ -16,7 +16,7 @@ import {
 } from '@wordpress/block-editor';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
-import { useRef, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -38,7 +38,6 @@ function DocumentTools( {
 	// This is a temporary prop until the list view is fully unified between post and site editors.
 	listViewLabel = __( 'Document Overview' ),
 } ) {
-	const inserterButton = useRef();
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
@@ -46,14 +45,19 @@ function DocumentTools( {
 		isInserterOpened,
 		isListViewOpen,
 		listViewShortcut,
+		inserterSidebarToggleRef,
 		listViewToggleRef,
 		hasFixedToolbar,
 		showIconLabels,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
-		const { isListViewOpened, getListViewToggleRef, getEditorMode } =
-			unlock( select( editorStore ) );
+		const {
+			isListViewOpened,
+			getEditorMode,
+			getInserterSidebarToggleRef,
+			getListViewToggleRef,
+		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 
@@ -63,6 +67,7 @@ function DocumentTools( {
 			listViewShortcut: getShortcutRepresentation(
 				'core/editor/toggle-list-view'
 			),
+			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
 			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
@@ -83,17 +88,10 @@ function DocumentTools( {
 		[ setIsListViewOpened, isListViewOpen ]
 	);
 
-	const toggleInserter = useCallback( () => {
-		if ( isInserterOpened ) {
-			// Focusing the inserter button should close the inserter popover.
-			// However, there are some cases it won't close when the focus is lost.
-			// See https://github.com/WordPress/gutenberg/issues/43090 for more details.
-			inserterButton.current.focus();
-			setIsInserterOpened( false );
-		} else {
-			setIsInserterOpened( true );
-		}
-	}, [ isInserterOpened, setIsInserterOpened ] );
+	const toggleInserter = useCallback(
+		() => setIsInserterOpened( ! isInserterOpened ),
+		[ isInserterOpened, setIsInserterOpened ]
+	);
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
@@ -119,7 +117,7 @@ function DocumentTools( {
 			<div className="editor-document-tools__left">
 				{ ! isDistractionFree && (
 					<ToolbarItem
-						ref={ inserterButton }
+						ref={ inserterSidebarToggleRef }
 						as={ Button }
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"

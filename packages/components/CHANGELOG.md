@@ -12,6 +12,10 @@
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
 
+### Bug Fix
+
+-   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
+
 ## 27.5.0 (2024-05-02)
 
 ### Enhancements
@@ -26,6 +30,7 @@
 
 ### Bug Fix
 
+-   `BaseControl`, `InputControl`: Remove usage of aria-details from InputControl and BaseControl ([#61203](https://github.com/WordPress/gutenberg/pull/61203)).
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
 -   `Panel`: Fix issue with collapsing panel header ([#61319](https://github.com/WordPress/gutenberg/pull/61319)).
 

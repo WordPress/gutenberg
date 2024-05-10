@@ -30,7 +30,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
-import { computeIFrameScale } from './utils';
 
 const {
 	LayoutStyle,
@@ -324,15 +323,12 @@ function EditorCanvas( {
 		} ),
 	] );
 
-	const frameSize = isZoomOutMode ? 20 : undefined;
-	const scale = isZoomOutMode
-		? ( contentWidth ) =>
-				computeIFrameScale(
-					{ width: 1000, scale: 0.55 },
-					{ width: 400, scale: 0.9 },
-					contentWidth
-				)
-		: undefined;
+	const zoomOutProps = isZoomOutMode
+		? {
+				scale: 'default',
+				frameSize: '20px',
+		  }
+		: {};
 
 	return (
 		<BlockCanvas
@@ -347,12 +343,11 @@ function EditorCanvas( {
 					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
+				...zoomOutProps,
 				style: {
 					...iframeProps?.style,
 					...deviceStyles,
 				},
-				scale,
-				frameSize,
 			} }
 		>
 			{ themeSupportsLayout &&

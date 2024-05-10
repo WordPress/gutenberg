@@ -5,16 +5,17 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from '../../components/global-styles/global-styles-provider';
 import cloneDeep from '../../utils/clone-deep';
 import { unlock } from '../../lock-unlock';
 
 const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 /**
  * Removes all instances of a property from an object.
