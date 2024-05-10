@@ -131,7 +131,11 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 	);
 	const blockDisplayInformation =
 		useBlockDisplayInformation( contentLockingParent );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	// Disable reason: We're using a hook here so it has to be on top-level.
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { modifyContentLockBlock, selectBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	if ( ! blockDisplayInformation?.title ) {
 		return null;
@@ -156,15 +160,14 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 			</BlockSettingsMenuFirstItem>
 			<MenuItem
 				onClick={ () => {
-					updateBlockAttributes( contentLockingParent, {
-						templateLock: undefined,
-					} );
+					selectBlock( contentLockingParent );
+					modifyContentLockBlock( contentLockingParent );
 					onClose();
 				} }
 			>
 				{ sprintf(
 					// translators: %s: block's title.
-					__( 'Unlock "%s"' ),
+					__( 'Modify "%s"' ),
 					blockDisplayInformation.title
 				) }
 			</MenuItem>
