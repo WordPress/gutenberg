@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,7 +14,40 @@ import { getComputedCSS } from './utils';
 export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
+
+	const blockClientRect = blockElement?.getBoundingClientRect() || {};
+	const rootBlockClientRect = rootBlockElement?.getBoundingClientRect() || {};
+
 	const [ resizeDirection, setResizeDirection ] = useState( null );
+	const [ enableSide, setEnableSide ] = useState( {
+		top: false,
+		bottom: false,
+		left: false,
+		right: false,
+	} );
+
+	useEffect( () => {
+		const observer = new window.ResizeObserver( () => {
+			setEnableSide( {
+				top: blockClientRect.top > rootBlockClientRect.top,
+				bottom: blockClientRect.bottom < rootBlockClientRect.bottom,
+				left: blockClientRect.left > rootBlockClientRect.left,
+				right: blockClientRect.right < rootBlockClientRect.right,
+			} );
+		} );
+		observer.observe( blockElement );
+		return () => observer.disconnect();
+	}, [
+		blockClientRect.bottom,
+		blockClientRect.left,
+		blockClientRect.right,
+		blockClientRect.top,
+		blockElement,
+		rootBlockClientRect.bottom,
+		rootBlockClientRect.left,
+		rootBlockClientRect.right,
+		rootBlockClientRect.top,
+	] );
 
 	/*
 	 * Resizer dummy is an empty div that exists only so we can
@@ -50,9 +83,6 @@ export function GridItemResizer( { clientId, onChange } ) {
 		} ),
 	};
 
-	const blockClientRect = blockElement.getBoundingClientRect();
-	const rootBlockClientRect = rootBlockElement.getBoundingClientRect();
-
 	/*
 	 * The bounding element is equivalent to the root block element, but
 	 * its bounding client rect is modified to account for the resizer
@@ -80,15 +110,6 @@ export function GridItemResizer( { clientId, onChange } ) {
 		},
 	};
 
-	/*
-	 * Only enable resizing to a side if that side is not on the
-	 * edge of the grid.
-	 */
-	const enableTop = blockClientRect.top > rootBlockClientRect.top;
-	const enableBottom = blockClientRect.bottom < rootBlockClientRect.bottom;
-	const enableLeft = blockClientRect.left > rootBlockClientRect.left;
-	const enableRight = blockClientRect.right < rootBlockClientRect.right;
-
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
@@ -104,12 +125,12 @@ export function GridItemResizer( { clientId, onChange } ) {
 					height: '100%',
 				} }
 				enable={ {
-					bottom: enableBottom,
+					bottom: enableSide.bottom,
 					bottomLeft: false,
 					bottomRight: false,
-					left: enableLeft,
-					right: enableRight,
-					top: enableTop,
+					left: enableSide.left,
+					right: enableSide.right,
+					top: enableSide.top,
 					topLeft: false,
 					topRight: false,
 				} }
