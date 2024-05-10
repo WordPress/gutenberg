@@ -11,8 +11,9 @@
 
 .block-editor-iframe__scale-container.is-zoomed-out {
 	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width, 100vw);
-	width: calc(100vw - 350px);
-	margin-left: calc(-1 * ((100vw - 350px) - #{$container-width}) / 2);
+	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width, 100vw);
+	width: $prev-container-width;
+	margin-left: calc(-1 * (#{$prev-container-width} - #{$container-width}) / 2);
 }
 
 .block-editor-iframe__html {
@@ -26,7 +27,7 @@
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
-	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width);
+	$prev-container-width: var(--wp-block-editor-iframe-zoom-out-prev-container-width);
 
 	transform: scale(#{$scale});
 

@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -121,6 +122,7 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
+	const prevContainerWidth = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -239,6 +241,12 @@ function Iframe( {
 
 	const isZoomedOut = scale !== 1;
 
+	useEffect( () => {
+		if ( ! isZoomedOut ) {
+			prevContainerWidth.current = containerWidth;
+		}
+	}, [ containerWidth, isZoomedOut ] );
+
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -302,7 +310,7 @@ function Iframe( {
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
 				? Math.min( containerWidth, maxWidth ) /
-						( windowInnerWidth - 350 )
+						prevContainerWidth.current
 				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
@@ -319,7 +327,11 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-container-width',
-			`${ containerWidth - 350 }px`
+			`${ containerWidth }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-prev-container-width',
+			`${ prevContainerWidth.current }px`
 		);
 
 		return () => {
@@ -339,6 +351,9 @@ function Iframe( {
 			);
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-container-width'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-prev-container-width'
 			);
 		};
 	}, [
@@ -442,6 +457,8 @@ function Iframe( {
 				style={ {
 					'--wp-block-editor-iframe-zoom-out-container-width':
 						isZoomedOut && `${ containerWidth }px`,
+					'--wp-block-editor-iframe-zoom-out-prev-container-width':
+						isZoomedOut && `${ prevContainerWidth.current }px`,
 				} }
 			>
 				{ iframe }
