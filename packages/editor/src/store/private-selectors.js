@@ -75,6 +75,9 @@ export const getInsertionPoint = createRegistrySelector( ( select ) =>
 export function getListViewToggleRef( state ) {
 	return state.listViewToggleRef;
 }
+export function getInserterSidebarToggleRef( state ) {
+	return state.inserterSidebarToggleRef;
+}
 const CARD_ICONS = {
 	wp_block: symbol,
 	wp_navigation: navigation,
