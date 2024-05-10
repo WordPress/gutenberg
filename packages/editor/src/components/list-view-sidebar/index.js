@@ -130,6 +130,9 @@ export default function ListViewSidebar() {
 				defaultTabId="list-view"
 			>
 				<div className="editor-list-view-sidebar__header">
+					<span className="editor-list-view-sidebar__header-title">
+						{ __( 'Document Overview' ) }
+					</span>
 					<Button
 						className="editor-list-view-sidebar__close-button"
 						icon={ closeSmall }
@@ -137,6 +140,8 @@ export default function ListViewSidebar() {
 						onClick={ closeListView }
 						size="small"
 					/>
+				</div>
+				<div className="editor-list-view-sidebar__tabs">
 					<Tabs.TabList
 						className="editor-list-view-sidebar__tabs-tablist"
 						ref={ tabsRef }
