@@ -47,7 +47,13 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 	);
 }
 
-export function ActionModal( { action, item, closeModal, onActionStart, onActionPerformed } ) {
+export function ActionModal( {
+	action,
+	items,
+	closeModal,
+	onActionStart,
+	onActionPerformed,
+} ) {
 	return (
 		<Modal
 			title={ action.modalHeader || action.label }
@@ -57,13 +63,24 @@ export function ActionModal( { action, item, closeModal, onActionStart, onAction
 				action.id
 			) }` }
 		>
-			<action.RenderModal items={ [ item ] } closeModal={ closeModal } onActionStart={ onActionStart } onActionPerformed={ onActionPerformed }
-/>
+			<action.RenderModal
+				items={ items }
+				closeModal={ closeModal }
+				onActionStart={ onActionStart }
+				onActionPerformed={ onActionPerformed }
+			/>
 		</Modal>
 	);
 }
 
-function ActionWithModal( { action, item, ActionTrigger, onActionStart, onActionPerformed, isBusy } ) {
+export function ActionWithModal( {
+	action,
+	items,
+	ActionTrigger,
+	onActionStart,
+	onActionPerformed,
+	isBusy,
+} ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -79,10 +96,10 @@ function ActionWithModal( { action, item, ActionTrigger, onActionStart, onAction
 			{ isModalOpen && (
 				<ActionModal
 					action={ action }
-					item={ item }
+					items={ items }
 					closeModal={ () => setIsModalOpen( false ) }
 					onActionStart={ onActionStart }
-					onActionPerformed={ onActionPerformed}
+					onActionPerformed={ onActionPerformed }
 				/>
 			) }
 		</>

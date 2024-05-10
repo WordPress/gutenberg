@@ -234,10 +234,12 @@ function ListItem( {
 									{ isModalOpen && (
 										<ActionModal
 											action={ primaryAction }
-											item={ item }
+											items={ [ item ] }
 											closeModal={ () =>
 												setIsModalOpen( false )
 											}
+											onActionStart={ () => {} }
+											onActionPerformed={ () => {} }
 										/>
 									) }
 								</CompositeItem>
