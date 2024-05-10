@@ -27,7 +27,7 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 		<BlockPopover
 			clientId={ capturingClientId || clientId }
 			bottomClientId={ lastClientId }
-			className={ clsx( 'zoom-out-toolbar', {
+			className={ clsx( 'zoom-out-toolbar-popover', {
 				'is-insertion-point-visible': isInsertionPointVisible,
 			} ) }
 			resize={ false }

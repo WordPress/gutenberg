@@ -102,7 +102,7 @@
 	height: $block-toolbar-height;
 
 	//Vertical block toolbar on zoomed out view
-	.block-editor-block-list__block-popover.is-vertical & {
+	.zoom-out-toolbar-popover {
 		background-color: transparent;
 
 		.block-editor-block-list__block-selection-button__content {

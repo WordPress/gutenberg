@@ -11,6 +11,7 @@ import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -84,11 +85,19 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 
 	const { removeBlock } = useDispatch( blockEditorStore );
 
-	const classNames = clsx( 'zoom-out-toolbar', {
-		'is-block-moving-mode': !! blockMovingMode,
-	} );
+	const classNames = clsx(
+		'block-editor-block-contextual-toolbar',
+		'zoom-out-toolbar',
+		{
+			'is-block-moving-mode': !! blockMovingMode,
+		}
+	);
+
+	const innerClasses = clsx( 'block-editor-block-toolbar' );
 
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
+
+	const toolbarWrapperRef = useRef( null );
 
 	return (
 		<NavigableToolbar
@@ -99,43 +108,47 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			variant={ undefined }
 			orientation="vertical"
 		>
-			<BlockIcon icon={ icon } showColors />
-			{ showBlockDraggable && (
-				<BlockDraggable clientIds={ [ clientId ] }>
-					{ ( draggableProps ) => (
-						<Button
-							icon={ dragHandle }
-							className="block-selection-button_drag-handle"
-							aria-hidden="true"
-							label={ __( 'Drag' ) }
-							// Should not be able to tab to drag handle as this
-							// button can only be used with a pointer device.
-							tabIndex="-1"
-							{ ...draggableProps }
-						/>
-					) }
-				</BlockDraggable>
-			) }
-			{ ! isBlockTemplatePart && (
-				<BlockMover
-					clientIds={ [ clientId ] }
-					hideDragHandle
-					isBlockMoverUpButtonDisabled={ isPrevBlockTemplatePart }
-					isBlockMoverDownButtonDisabled={ isNextBlockTemplatePart }
-				/>
-			) }
-			{ canMove && canRemove && (
-				<Shuffle clientId={ clientId } as={ Button } />
-			) }
-			{ canRemove && ! isBlockTemplatePart && (
-				<ToolbarButton
-					icon={ trash }
-					label="Delete"
-					onClick={ () => {
-						removeBlock( clientId );
-					} }
-				/>
-			) }
+			<div ref={ toolbarWrapperRef } className={ innerClasses }>
+				<BlockIcon icon={ icon } showColors />
+				{ showBlockDraggable && (
+					<BlockDraggable clientIds={ [ clientId ] }>
+						{ ( draggableProps ) => (
+							<Button
+								icon={ dragHandle }
+								className="block-selection-button_drag-handle"
+								aria-hidden="true"
+								label={ __( 'Drag' ) }
+								// Should not be able to tab to drag handle as this
+								// button can only be used with a pointer device.
+								tabIndex="-1"
+								{ ...draggableProps }
+							/>
+						) }
+					</BlockDraggable>
+				) }
+				{ ! isBlockTemplatePart && (
+					<BlockMover
+						clientIds={ [ clientId ] }
+						hideDragHandle
+						isBlockMoverUpButtonDisabled={ isPrevBlockTemplatePart }
+						isBlockMoverDownButtonDisabled={
+							isNextBlockTemplatePart
+						}
+					/>
+				) }
+				{ canMove && canRemove && (
+					<Shuffle clientId={ clientId } as={ Button } />
+				) }
+				{ canRemove && ! isBlockTemplatePart && (
+					<ToolbarButton
+						icon={ trash }
+						label="Delete"
+						onClick={ () => {
+							removeBlock( clientId );
+						} }
+					/>
+				) }
+			</div>
 		</NavigableToolbar>
 	);
 }
