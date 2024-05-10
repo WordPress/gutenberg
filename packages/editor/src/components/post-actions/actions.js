@@ -1245,7 +1245,7 @@ export function usePostActions( postType, onActionPerformed ) {
 		}
 
 		const actions = [
-			( isTemplateOrTemplatePart || isPattern ) && resetTemplateAction,
+			isTemplateOrTemplatePart && resetTemplateAction,
 			postTypeObject?.viewable && viewPostAction,
 			! isTemplateOrTemplatePart && restorePostAction,
 			isTemplateOrTemplatePart && deleteTemplateAction,
