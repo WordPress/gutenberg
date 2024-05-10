@@ -10,7 +10,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalText as Text, MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -81,38 +81,30 @@ function ContentOnlySettingsMenuItems( { clientId, onClose } ) {
 	return (
 		<>
 			<BlockSettingsMenuFirstItem>
-				<Text
-					variant="muted"
-					as="p"
-					className="editor-content-only-settings-menu__description"
+				<MenuItem
+					onClick={ () => {
+						onNavigateToEntityRecord( {
+							postId: entity.id,
+							postType: entity.type,
+						} );
+					} }
 				>
-					{ isPattern
-						? sprintf(
-								// translators: %s: pattern's title.
-								__(
-									'This block is part of the pattern: "%s". Edit the pattern to move or delete it.'
-								),
-								entity.title.raw
-						  )
-						: sprintf(
-								// translators: %s: template's title.
-								__(
-									'This block is part of the template: "%s". Edit the template to move or delete it.'
-								),
-								entity.title.rendered
-						  ) }
-				</Text>
+					{ isPattern ? __( 'Edit pattern' ) : __( 'Edit template' ) }
+				</MenuItem>
 			</BlockSettingsMenuFirstItem>
-			<MenuItem
-				onClick={ () => {
-					onNavigateToEntityRecord( {
-						postId: entity.id,
-						postType: entity.type,
-					} );
-				} }
+			<Text
+				variant="muted"
+				as="p"
+				className="editor-content-only-settings-menu__description"
 			>
-				{ isPattern ? __( 'Edit pattern' ) : __( 'Edit template' ) }
-			</MenuItem>
+				{ isPattern
+					? __(
+							'Edit the pattern to move, delete, or make further changes to this block.'
+					  )
+					: __(
+							'Edit the template to move, delete, or make further changes to this block.'
+					  ) }
+			</Text>
 		</>
 	);
 }
@@ -144,33 +136,25 @@ function TemplateLockContentOnlyMenuItems( { clientId, onClose } ) {
 	return (
 		<>
 			<BlockSettingsMenuFirstItem>
-				<Text
-					variant="muted"
-					as="p"
-					className="editor-content-only-settings-menu__description"
+				<MenuItem
+					onClick={ () => {
+						selectBlock( contentLockingParent );
+						modifyContentLockBlock( contentLockingParent );
+						onClose();
+					} }
 				>
-					{ sprintf(
-						// translators: %s: block's title.
-						__(
-							'The parent "%s" block is partially locked, preventing the movement or deletion of child blocks, as well as the addition of any inner blocks.'
-						),
-						blockDisplayInformation.title
-					) }
-				</Text>
+					{ __( 'Unlock' ) }
+				</MenuItem>
 			</BlockSettingsMenuFirstItem>
-			<MenuItem
-				onClick={ () => {
-					selectBlock( contentLockingParent );
-					modifyContentLockBlock( contentLockingParent );
-					onClose();
-				} }
+			<Text
+				variant="muted"
+				as="p"
+				className="editor-content-only-settings-menu__description"
 			>
-				{ sprintf(
-					// translators: %s: block's title.
-					__( 'Modify "%s"' ),
-					blockDisplayInformation.title
+				{ __(
+					'Temporarily unlock the parent block to edit, delete or make further changes to this block.'
 				) }
-			</MenuItem>
+			</Text>
 		</>
 	);
 }
