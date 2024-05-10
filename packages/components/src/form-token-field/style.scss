@@ -187,8 +187,7 @@
 		color: $gray-600;
 
 		&.is-selected {
-			color: $gray-100; // fallback
-			color: rgba(255, 255, 255, 0.5);
+			background-color: $components-color-accent-transparent-40;
 		}
 	}
 }
