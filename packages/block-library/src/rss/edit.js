@@ -14,7 +14,6 @@ import {
 	RangeControl,
 	ToggleControl,
 	ToolbarGroup,
-	__experimentalHStack as HStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -75,26 +74,24 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<HStack wrap>
-							<InputControl
-								__next40pxDefaultSize
-								label={ label }
-								hideLabelFromVision
-								placeholder={ __( 'Enter URL here…' ) }
-								value={ feedURL }
-								onChange={ ( value ) =>
-									setAttributes( { feedURL: value } )
-								}
-								className="wp-block-rss__placeholder-input"
-							/>
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								type="submit"
-							>
-								{ __( 'Apply' ) }
-							</Button>
-						</HStack>
+						<InputControl
+							__next40pxDefaultSize
+							label={ label }
+							hideLabelFromVision
+							placeholder={ __( 'Enter URL here…' ) }
+							value={ feedURL }
+							onChange={ ( value ) =>
+								setAttributes( { feedURL: value } )
+							}
+							className="wp-block-rss__placeholder-input"
+						/>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Apply' ) }
+						</Button>
 					</form>
 				</Placeholder>
 			</div>
