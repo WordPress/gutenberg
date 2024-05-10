@@ -21,8 +21,10 @@ function ZoomOutModeInserters() {
 		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
+		selectedClientId,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockOrder } = select( blockEditorStore );
+		const { getSettings, getBlockOrder, getSelectedBlockClientId } =
+			select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
 		// Or we perhaps we should move the insertion point state to the
@@ -37,10 +39,17 @@ function ZoomOutModeInserters() {
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
+			selectedClientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 
 	const isMounted = useRef( false );
+
+	useEffect( () => {
+		if ( selectedClientId && ! blockOrder.includes( selectedClientId ) ) {
+			setInserterIsOpened( { tab: 'blocks' } );
+		}
+	}, [ selectedClientId, blockOrder, setInserterIsOpened ] );
 
 	useEffect( () => {
 		if ( ! isMounted.current ) {
