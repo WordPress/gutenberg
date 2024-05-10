@@ -122,6 +122,9 @@ function GridItemResizerInner( {
 		},
 	};
 
+	// Controller to remove event listener on resize stop.
+	const controller = new AbortController();
+
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
@@ -161,7 +164,8 @@ function GridItemResizerInner( {
 					 * isn't directly above the handle, so we try to detect if it happens
 					 * outside the grid and dispatch a mouseup event on the handle.
 					 */
-					const rootElementParent = rootBlockElement.parentElement;
+					const rootElementParent =
+						rootBlockElement.closest( 'body' );
 					rootElementParent.addEventListener(
 						'mouseup',
 						() => {
@@ -169,7 +173,7 @@ function GridItemResizerInner( {
 								new Event( 'mouseup', { bubbles: true } )
 							);
 						},
-						true
+						{ signal: controller.signal, capture: true }
 					);
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
@@ -213,6 +217,8 @@ function GridItemResizerInner( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
 					} );
+					// Removes event listener added in onResizeStart.
+					controller.abort();
 				} }
 			/>
 		</BlockPopoverCover>
