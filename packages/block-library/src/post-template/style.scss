@@ -5,10 +5,6 @@
 	list-style: none;
 	padding: 0;
 
-	// Unset background colors that can be inherited from Global Styles with extra specificity.
-	&.wp-block-post-template {
-		background: none;
-	}
 	// These rules no longer apply but should be kept for backwards compatibility.
 	&.is-flex-container {
 		flex-direction: row;
