@@ -11,37 +11,6 @@
 	}
 }
 
-.edit-site-layout__hub {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: calc(100vw - #{$canvas-padding * 2});
-	height: $header-height;
-	z-index: z-index(".edit-site-layout__hub");
-
-	@include break-medium {
-		width: calc(#{$nav-sidebar-width} - #{$grid-unit-15});
-	}
-
-	.edit-site-layout.is-full-canvas & {
-		padding-right: 0;
-		border-radius: 0;
-		width: $header-height;
-		box-shadow: none;
-	}
-}
-
-.edit-site-layout__header-container:has(+ .edit-site-layout__content > .edit-site-layout__mobile>.edit-site-page) {
-	margin-bottom: $header-height;
-	@include break-medium {
-		margin-bottom: 0;
-	}
-}
-
-.edit-site-layout__header-container {
-	z-index: z-index(".edit-site-layout__header-container");
-}
-
 .edit-site-layout__content {
 	height: 100%;
 	flex-grow: 1;
@@ -241,33 +210,6 @@
 
 	@include break-medium {
 		border-left: $border-width solid $gray-300;
-	}
-}
-
-.edit-site-layout.is-distraction-free {
-	.edit-site-layout__header-container {
-		height: $header-height;
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		z-index: z-index(".edit-site-layout__header-container");
-		width: 100%;
-
-		// We need ! important because we override inline styles
-		// set by the motion component.
-		&:focus-within {
-			opacity: 1 !important;
-			div {
-				transform: translateX(0) translateY(0) translateZ(0) !important;
-			}
-		}
-	}
-
-	.edit-site-site-hub {
-		position: absolute;
-		top: 0;
-		z-index: z-index(".edit-site-layout__hub");
 	}
 }
 
