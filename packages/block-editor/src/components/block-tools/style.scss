@@ -199,11 +199,6 @@
 				margin-left: 0;
 			}
 		}
-
-		&[aria-orientation="vertical"] .block-editor-block-parent-selector {
-			left: 0;
-			top: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
-		}
 	}
 
 	.block-editor-block-toolbar {

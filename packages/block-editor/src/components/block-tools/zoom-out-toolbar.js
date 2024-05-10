@@ -11,12 +11,10 @@ import { Button, ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
 import BlockMover from '../block-mover';
@@ -34,11 +32,9 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 				canRemoveBlock,
 				canMoveBlock,
 			} = select( blockEditorStore );
-			const { getActiveBlockVariation, getBlockType } =
-				select( blocksStore );
-			const { name, attributes } = getBlock( clientId );
+			const { getBlockType } = select( blocksStore );
+			const { name } = getBlock( clientId );
 			const blockType = getBlockType( name );
-			const match = getActiveBlockVariation( name, attributes );
 			const isBlockTemplatePart =
 				blockType?.name === 'core/template-part';
 
@@ -62,7 +58,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 
 			return {
 				blockMovingMode: hasBlockMovingClientId(),
-				icon: match?.icon || blockType.icon,
 				isBlockTemplatePart,
 				isNextBlockTemplatePart,
 				isPrevBlockTemplatePart,
@@ -74,7 +69,6 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 	);
 
 	const {
-		icon,
 		blockMovingMode,
 		isBlockTemplatePart,
 		isNextBlockTemplatePart,
@@ -85,19 +79,11 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 
 	const { removeBlock } = useDispatch( blockEditorStore );
 
-	const classNames = clsx(
-		'block-editor-block-contextual-toolbar',
-		'zoom-out-toolbar',
-		{
-			'is-block-moving-mode': !! blockMovingMode,
-		}
-	);
-
-	const innerClasses = clsx( 'block-editor-block-toolbar' );
+	const classNames = clsx( 'zoom-out-toolbar', {
+		'is-block-moving-mode': !! blockMovingMode,
+	} );
 
 	const showBlockDraggable = canMove && ! isBlockTemplatePart;
-
-	const toolbarWrapperRef = useRef( null );
 
 	return (
 		<NavigableToolbar
@@ -108,47 +94,42 @@ export default function ZoomOutToolbar( { clientId, rootClientId } ) {
 			variant={ undefined }
 			orientation="vertical"
 		>
-			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				<BlockIcon icon={ icon } showColors />
-				{ showBlockDraggable && (
-					<BlockDraggable clientIds={ [ clientId ] }>
-						{ ( draggableProps ) => (
-							<Button
-								icon={ dragHandle }
-								className="block-selection-button_drag-handle"
-								aria-hidden="true"
-								label={ __( 'Drag' ) }
-								// Should not be able to tab to drag handle as this
-								// button can only be used with a pointer device.
-								tabIndex="-1"
-								{ ...draggableProps }
-							/>
-						) }
-					</BlockDraggable>
-				) }
-				{ ! isBlockTemplatePart && (
-					<BlockMover
-						clientIds={ [ clientId ] }
-						hideDragHandle
-						isBlockMoverUpButtonDisabled={ isPrevBlockTemplatePart }
-						isBlockMoverDownButtonDisabled={
-							isNextBlockTemplatePart
-						}
-					/>
-				) }
-				{ canMove && canRemove && (
-					<Shuffle clientId={ clientId } as={ Button } />
-				) }
-				{ canRemove && ! isBlockTemplatePart && (
-					<ToolbarButton
-						icon={ trash }
-						label="Delete"
-						onClick={ () => {
-							removeBlock( clientId );
-						} }
-					/>
-				) }
-			</div>
+			{ showBlockDraggable && (
+				<BlockDraggable clientIds={ [ clientId ] }>
+					{ ( draggableProps ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-selection-button_drag-handle"
+							aria-hidden="true"
+							label={ __( 'Drag' ) }
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							{ ...draggableProps }
+						/>
+					) }
+				</BlockDraggable>
+			) }
+			{ ! isBlockTemplatePart && (
+				<BlockMover
+					clientIds={ [ clientId ] }
+					hideDragHandle
+					isBlockMoverUpButtonDisabled={ isPrevBlockTemplatePart }
+					isBlockMoverDownButtonDisabled={ isNextBlockTemplatePart }
+				/>
+			) }
+			{ canMove && canRemove && (
+				<Shuffle clientId={ clientId } as={ Button } />
+			) }
+			{ canRemove && ! isBlockTemplatePart && (
+				<ToolbarButton
+					icon={ trash }
+					label="Delete"
+					onClick={ () => {
+						removeBlock( clientId );
+					} }
+				/>
+			) }
 		</NavigableToolbar>
 	);
 }
