@@ -132,10 +132,7 @@ export function PatternCategoryPreviews( {
 
 	return (
 		<>
-			<VStack
-				spacing={ 2 }
-				className="block-editor-inserter__patterns-category-panel-header"
-			>
+			<VStack className="block-editor-inserter__patterns-category-panel-header">
 				<HStack>
 					<NavigatorBackButton
 						style={
@@ -174,24 +171,23 @@ export function PatternCategoryPreviews( {
 						{ __( 'No results found' ) }
 					</Text>
 				) }
+				{ currentCategoryPatterns.length > 0 && (
+					<BlockPatternsList
+						ref={ scrollContainerRef }
+						shownPatterns={ pagingProps.categoryPatternsAsyncList }
+						blockPatterns={ pagingProps.categoryPatterns }
+						onClickPattern={ onClickPattern }
+						onHover={ onHover }
+						label={ category.label }
+						orientation="vertical"
+						category={ category.name }
+						isDraggable
+						showTitlesAsTooltip={ showTitlesAsTooltip }
+						patternFilter={ patternSourceFilter }
+						pagingProps={ pagingProps }
+					/>
+				) }
 			</VStack>
-
-			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternsList
-					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
-					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHover }
-					label={ category.label }
-					orientation="vertical"
-					category={ category.name }
-					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternSourceFilter }
-					pagingProps={ pagingProps }
-				/>
-			) }
 		</>
 	);
 }
