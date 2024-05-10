@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,7 @@ export default function PostDateEdit( {
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 			[ `wp-block-post-date__modified-date` ]: displayType === 'modified',
 		} ),

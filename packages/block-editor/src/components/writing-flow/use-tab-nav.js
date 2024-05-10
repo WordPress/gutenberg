@@ -45,7 +45,16 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			getLastFocus()?.current.focus();
+			if ( getLastFocus()?.current ) {
+				getLastFocus().current.focus();
+			} else {
+				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
+				container.current
+					.querySelector(
+						`[data-block="${ getSelectedBlockClientId() }"]`
+					)
+					.focus();
+			}
 		} else {
 			setNavigationMode( true );
 
@@ -118,7 +127,9 @@ export default function useTabNav() {
 				// do it again here because after clearing block selection,
 				// focus land on the writing flow container and pressing Tab
 				// will no longer send focus through the focus capture element.
-				if ( event.target === node ) setNavigationMode( true );
+				if ( event.target === node ) {
+					setNavigationMode( true );
+				}
 				return;
 			}
 

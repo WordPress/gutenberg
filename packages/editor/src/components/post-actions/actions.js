@@ -6,7 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
 
@@ -43,7 +43,13 @@ const trashPostAction = {
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: posts, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items: posts,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
@@ -67,12 +73,21 @@ const trashPostAction = {
 						  ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( posts );
+							}
 							const promiseResult = await Promise.allSettled(
 								posts.map( ( post ) => {
 									return deleteEntityRecord(
@@ -161,8 +176,12 @@ const trashPostAction = {
 							if ( onActionPerformed ) {
 								onActionPerformed( posts );
 							}
+							setIsBusy( false );
 							closeModal();
 						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -296,9 +315,9 @@ function useRestorePostAction() {
 				return status === 'trash';
 			},
 			async callback( posts, onActionPerformed ) {
-				try {
-					for ( const post of posts ) {
-						await editEntityRecord(
+				await Promise.allSettled(
+					posts.map( ( post ) => {
+						return editEntityRecord(
 							'postType',
 							post.type,
 							post.id,
@@ -306,14 +325,24 @@ function useRestorePostAction() {
 								status: 'draft',
 							}
 						);
-						await saveEditedEntityRecord(
+					} )
+				);
+				const promiseResult = await Promise.allSettled(
+					posts.map( ( post ) => {
+						return saveEditedEntityRecord(
 							'postType',
 							post.type,
 							post.id,
 							{ throwOnError: true }
 						);
-					}
+					} )
+				);
 
+				if (
+					promiseResult.every(
+						( { status } ) => status === 'fulfilled'
+					)
+				) {
 					createSuccessNotice(
 						posts.length > 1
 							? sprintf(
@@ -334,25 +363,56 @@ function useRestorePostAction() {
 					if ( onActionPerformed ) {
 						onActionPerformed( posts );
 					}
-				} catch ( error ) {
+				} else {
+					// If there was at lease one failure.
 					let errorMessage;
-					if (
-						error.message &&
-						error.code !== 'unknown_error' &&
-						error.message
-					) {
-						errorMessage = error.message;
-					} else if ( posts.length > 1 ) {
-						errorMessage = __(
-							'An error occurred while restoring the posts.'
-						);
+					// If we were trying to move a single post to the trash.
+					if ( promiseResult.length === 1 ) {
+						if ( promiseResult[ 0 ].reason?.message ) {
+							errorMessage = promiseResult[ 0 ].reason.message;
+						} else {
+							errorMessage = __(
+								'An error occurred while restoring the post.'
+							);
+						}
+						// If we were trying to move multiple posts to the trash
 					} else {
-						errorMessage = __(
-							'An error occurred while restoring the post.'
+						const errorMessages = new Set();
+						const failedPromises = promiseResult.filter(
+							( { status } ) => status === 'rejected'
 						);
+						for ( const failedPromise of failedPromises ) {
+							if ( failedPromise.reason?.message ) {
+								errorMessages.add(
+									failedPromise.reason.message
+								);
+							}
+						}
+						if ( errorMessages.size === 0 ) {
+							errorMessage = __(
+								'An error occurred while restoring the posts.'
+							);
+						} else if ( errorMessages.size === 1 ) {
+							errorMessage = sprintf(
+								/* translators: %s: an error message */
+								__(
+									'An error occurred while restoring the posts: %s'
+								),
+								[ ...errorMessages ][ 0 ]
+							);
+						} else {
+							errorMessage = sprintf(
+								/* translators: %s: a list of comma separated error messages */
+								__(
+									'Some errors occurred while restoring the posts: %s'
+								),
+								[ ...errorMessages ].join( ',' )
+							);
+						}
 					}
-
-					createErrorNotice( errorMessage, { type: 'snackbar' } );
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
 				}
 			},
 		} ),
@@ -500,13 +560,134 @@ const renamePostAction = {
 	},
 };
 
+export const duplicatePostAction = {
+	id: 'duplicate-post',
+	label: _x( 'Duplicate', 'action label' ),
+	isEligible( { status } ) {
+		return status !== 'trash';
+	},
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+		const [ item ] = items;
+		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+		const [ title, setTitle ] = useState(
+			sprintf(
+				/* translators: %s: Existing item title */
+				__( '%s (Copy)' ),
+				getItemTitle( item )
+			)
+		);
+
+		const { saveEntityRecord } = useDispatch( coreStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		async function createPage( event ) {
+			event.preventDefault();
+
+			if ( isCreatingPage ) {
+				return;
+			}
+			setIsCreatingPage( true );
+			try {
+				const newItem = await saveEntityRecord(
+					'postType',
+					item.type,
+					{
+						status: 'draft',
+						title,
+						slug: title || __( 'No title' ),
+						author: item.author,
+						comment_status: item.comment_status,
+						content:
+							typeof item.content === 'string'
+								? item.content
+								: item.content.raw,
+						excerpt: item.excerpt.raw,
+						meta: item.meta,
+						parent: item.parent,
+						password: item.password,
+						template: item.template,
+						format: item.format,
+						featured_media: item.featured_media,
+						menu_order: item.menu_order,
+						ping_status: item.ping_status,
+						categories: item.categories,
+						tags: item.tags,
+					},
+					{ throwOnError: true }
+				);
+
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: Title of the created template e.g: "Category".
+						__( '"%s" successfully created.' ),
+						newItem.title?.rendered || title
+					),
+					{
+						id: 'duplicate-post-action',
+						type: 'snackbar',
+					}
+				);
+
+				if ( onActionPerformed ) {
+					onActionPerformed( [ newItem ] );
+				}
+			} catch ( error ) {
+				const errorMessage =
+					error.message && error.code !== 'unknown_error'
+						? error.message
+						: __( 'An error occurred while duplicating the page.' );
+
+				createErrorNotice( errorMessage, {
+					type: 'snackbar',
+				} );
+			} finally {
+				setIsCreatingPage( false );
+				closeModal();
+			}
+		}
+		return (
+			<form onSubmit={ createPage }>
+				<VStack spacing={ 3 }>
+					<TextControl
+						label={ __( 'Title' ) }
+						onChange={ setTitle }
+						placeholder={ __( 'No title' ) }
+						value={ title }
+					/>
+					<HStack spacing={ 2 } justify="end">
+						<Button variant="tertiary" onClick={ closeModal }>
+							{ __( 'Cancel' ) }
+						</Button>
+						<Button
+							variant="primary"
+							type="submit"
+							isBusy={ isCreatingPage }
+							aria-disabled={ isCreatingPage }
+						>
+							{ _x( 'Duplicate', 'action label' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		);
+	},
+};
+
 const resetTemplateAction = {
 	id: 'reset-template',
 	label: __( 'Reset' ),
 	isEligible: isTemplateRevertable,
+	icon: backup,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 		const { saveEditedEntityRecord } = useDispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
@@ -576,16 +757,29 @@ const resetTemplateAction = {
 					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( items );
+							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
 							closeModal();
+							isBusy( false );
 						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Reset' ) }
 					</Button>
@@ -616,9 +810,16 @@ const deleteTemplateAction = {
 	id: 'delete-template',
 	label: __( 'Delete' ),
 	isEligible: isTemplateRemovable,
+	icon: trash,
 	supportsBulk: true,
 	hideModalHeader: true,
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
+	RenderModal: ( {
+		items: templates,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	} ) => {
+		const [ isBusy, setIsBusy ] = useState( false );
 		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 		return (
 			<VStack spacing="5">
@@ -642,18 +843,31 @@ const deleteTemplateAction = {
 						  ) }
 				</Text>
 				<HStack justify="right">
-					<Button variant="tertiary" onClick={ closeModal }>
+					<Button
+						variant="tertiary"
+						onClick={ closeModal }
+						disabled={ isBusy }
+						__experimentalIsFocusable
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
 						variant="primary"
 						onClick={ async () => {
+							setIsBusy( true );
+							if ( onActionStart ) {
+								onActionStart( templates );
+							}
 							await removeTemplates( templates, {
 								allowUndo: false,
 							} );
 							onActionPerformed?.( templates );
+							setIsBusy( false );
 							closeModal();
 						} }
+						isBusy={ isBusy }
+						disabled={ isBusy }
+						__experimentalIsFocusable
 					>
 						{ __( 'Delete' ) }
 					</Button>
@@ -782,6 +996,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 				deleteTemplateAction,
 				permanentlyDeletePostAction,
 				postRevisionsAction,
+				duplicatePostAction,
 				renamePostAction,
 				renameTemplateAction,
 				trashPostAction,
@@ -821,8 +1036,7 @@ export function usePostActions( onActionPerformed, actionIds = null ) {
 							RenderModal: ( props ) => {
 								return (
 									<ExistingRenderModal
-										items={ props.items }
-										closeModal={ props.closeModal }
+										{ ...props }
 										onActionPerformed={ ( _items ) => {
 											if ( props.onActionPerformed ) {
 												props.onActionPerformed(

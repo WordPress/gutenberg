@@ -27,7 +27,7 @@ export function usePaddingAppender() {
 					return;
 				}
 
-				// only handle clicks under the last child
+				// Only handle clicks under the last child.
 				const lastChild = node.lastElementChild;
 				if ( ! lastChild ) {
 					return;
@@ -44,6 +44,12 @@ export function usePaddingAppender() {
 					.select( blockEditorStore )
 					.getBlockOrder( '' );
 				const lastBlockClientId = blockOrder[ blockOrder.length - 1 ];
+
+				// Do nothing when only default block appender is present.
+				if ( ! lastBlockClientId ) {
+					return;
+				}
+
 				const lastBlock = registry
 					.select( blockEditorStore )
 					.getBlock( lastBlockClientId );

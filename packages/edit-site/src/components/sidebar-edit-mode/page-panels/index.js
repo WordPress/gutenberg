@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { PanelBody } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { __, sprintf } from '@wordpress/i18n';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	PluginDocumentSettingPanel,
@@ -12,6 +12,7 @@ import {
 } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -48,20 +49,57 @@ export default function PagePanels() {
 				renderingMode: getRenderingMode(),
 			};
 		}, [] );
-
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
 		( actionId, items ) => {
-			if ( actionId === 'move-to-trash' ) {
-				history.push( {
-					path: '/' + items[ 0 ].type,
-					postId: undefined,
-					postType: undefined,
-					canvas: 'view',
-				} );
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						history.push( {
+							path: '/' + items[ 0 ].type,
+							postId: undefined,
+							postType: undefined,
+							canvas: 'view',
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.push( {
+												path: undefined,
+												postId: newItem.id,
+												postType: newItem.type,
+												canvas: 'edit',
+											} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
 			}
 		},
-		[ history ]
+		[ history, createSuccessNotice ]
 	);
 
 	if ( ! hasResolved ) {

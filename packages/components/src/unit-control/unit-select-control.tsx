@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef } from 'react';
 
 /**
@@ -47,7 +47,7 @@ function UnitSelectControl(
 		onChange?.( unitValue, { event, data } );
 	};
 
-	const classes = classnames( 'components-unit-control__select', className );
+	const classes = clsx( 'components-unit-control__select', className );
 
 	return (
 		<UnitSelect

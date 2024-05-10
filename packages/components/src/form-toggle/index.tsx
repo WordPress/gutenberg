@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -48,7 +48,7 @@ export function FormToggle(
 		onChange = noop,
 		...additionalProps
 	} = props;
-	const wrapperClasses = classnames( 'components-form-toggle', className, {
+	const wrapperClasses = clsx( 'components-form-toggle', className, {
 		'is-checked': checked,
 		'is-disabled': disabled,
 	} );

@@ -13,7 +13,6 @@
 @import "./components/page-templates/style.scss";
 @import "./components/table/style.scss";
 @import "./components/sidebar-edit-mode/style.scss";
-@import "./components/sidebar-edit-mode/page-panels/style.scss";
 @import "./components/sidebar-edit-mode/settings-header/style.scss";
 @import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
@@ -85,16 +84,6 @@ body.js.site-editor-php {
 
 	.interface-interface-skeleton {
 		top: 0;
-	}
-
-	// Todo: Remove this rule when edit site gets support
-	// for opening unpinned sidebar items.
-	.interface-complementary-area__pin-unpin-item.components-button {
-		display: none;
-	}
-
-	.interface-interface-skeleton__content {
-		background-color: $gray-300;
 	}
 }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,7 @@ const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children } ) {
+export default function Variation( { variation, children, isPill } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -69,12 +69,9 @@ export default function Variation( { variation, children } ) {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
+				className={ clsx( 'edit-site-global-styles-variations_item', {
+					'is-active': isActive,
+				} ) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
@@ -84,7 +81,12 @@ export default function Variation( { variation, children } ) {
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
-				<div className="edit-site-global-styles-variations_item-preview">
+				<div
+					className={ clsx(
+						'edit-site-global-styles-variations_item-preview',
+						{ 'is-pill': isPill }
+					) }
+				>
 					{ children( isFocused ) }
 				</div>
 			</div>

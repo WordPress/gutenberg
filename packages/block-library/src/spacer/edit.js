@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ const ResizableSpacer = ( {
 
 	return (
 		<ResizableBox
-			className={ classnames( 'block-library-spacer__resize-container', {
+			className={ clsx( 'block-library-spacer__resize-container', {
 				'resize-horizontal': orientation === 'horizontal',
 				'is-resizing': isResizing,
 				'is-selected': isSelected,
@@ -346,7 +346,7 @@ const SpacerEdit = ( {
 			<View
 				{ ...useBlockProps( {
 					style,
-					className: classnames( className, {
+					className: clsx( className, {
 						'custom-sizes-disabled': disableCustomSpacingSizes,
 					} ),
 				} ) }
