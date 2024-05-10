@@ -112,34 +112,26 @@ function ListViewBlock( {
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { block, blockName, blockEditingMode, allowRightClickOverrides } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlock,
-					getBlockName,
-					getBlockEditingMode,
-					getSettings,
-				} = select( blockEditorStore );
+	const { block, blockName, allowRightClickOverrides } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } =
+				select( blockEditorStore );
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					blockEditingMode: getBlockEditingMode( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+			};
+		},
+		[ clientId ]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
-		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
-		// Don't show the settings menu if block is disabled or content only.
-		blockEditingMode === 'default';
+		hasBlockSupport( blockName, '__experimentalToolbar', true );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 

@@ -63,6 +63,7 @@ export function BlockSettingsDropdown( {
 		previousBlockClientId,
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
+		isContentOnly,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -73,6 +74,7 @@ export function BlockSettingsDropdown( {
 				getSelectedBlockClientIds,
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
+				getBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -96,6 +98,8 @@ export function BlockSettingsDropdown( {
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
+				isContentOnly:
+					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 			};
 		},
 		[ firstBlockClientId ]
@@ -231,11 +235,15 @@ export function BlockSettingsDropdown( {
 										clientId={ firstBlockClientId }
 									/>
 								) }
-								<CopyMenuItem
-									clientIds={ clientIds }
-									onCopy={ onCopy }
-									shortcut={ displayShortcut.primary( 'c' ) }
-								/>
+								{ ! isContentOnly && (
+									<CopyMenuItem
+										clientIds={ clientIds }
+										onCopy={ onCopy }
+										shortcut={ displayShortcut.primary(
+											'c'
+										) }
+									/>
+								) }
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ pipe(
@@ -271,7 +279,7 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 							</MenuGroup>
-							{ canCopyStyles && (
+							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>
 									<CopyMenuItem
 										clientIds={ clientIds }
