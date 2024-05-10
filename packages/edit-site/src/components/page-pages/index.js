@@ -337,11 +337,11 @@ export default function PagePages() {
 		[ authors, view.type ]
 	);
 
-	const postTypActions = usePostActions( 'page' );
+	const postTypeActions = usePostActions( 'page' );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
-		() => [ editAction, ...postTypActions ],
-		[ postTypActions, editAction ]
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
 
 	const onChangeView = useCallback(

@@ -323,11 +323,11 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypActions = usePostActions( TEMPLATE_POST_TYPE );
+	const postTypeActions = usePostActions( TEMPLATE_POST_TYPE );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
-		() => [ editAction, ...postTypActions ],
-		[ postTypActions, editAction ]
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
 
 	const onChangeView = useCallback(
