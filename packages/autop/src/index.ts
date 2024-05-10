@@ -3,7 +3,7 @@
  *
  * @type {RegExp}
  */
-const htmlSplitRegex = ( () => {
+const htmlSplitRegex: RegExp = ( () => {
 	/* eslint-disable no-multi-spaces */
 	const comments =
 		'!' + // Start of comment, after the <.
@@ -55,7 +55,7 @@ const htmlSplitRegex = ( () => {
  *
  * @return {string[]} The formatted text.
  */
-function htmlSplit( input ) {
+function htmlSplit( input: string ): string[] {
 	const parts = [];
 	let workingInput = input;
 
@@ -65,7 +65,7 @@ function htmlSplit( input ) {
 		// If the `g` flag is omitted, `index` is included.
 		// `htmlSplitRegex` does not have the `g` flag so we can assert it will have an index number.
 		// Assert `match.index` is a number.
-		const index = /** @type {number} */ ( match.index );
+		const index = match.index!;
 
 		parts.push( workingInput.slice( 0, index ) );
 		parts.push( match[ 0 ] );
@@ -87,7 +87,10 @@ function htmlSplit( input ) {
  *
  * @return {string} The formatted text.
  */
-function replaceInHtmlTags( haystack, replacePairs ) {
+function replaceInHtmlTags(
+	haystack: string,
+	replacePairs: Record< string, string >
+): string {
 	// Find all elements.
 	const textArr = htmlSplit( haystack );
 	let changed = false;
@@ -137,8 +140,8 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  *
  * @return {string} Text which has been converted into paragraph tags.
  */
-export function autop( text, br = true ) {
-	const preTags = [];
+export function autop( text: string, br: boolean = true ): string {
+	const preTags: Array< [ string, string ] > = [];
 
 	if ( text.trim() === '' ) {
 		return '';
@@ -340,13 +343,12 @@ export function autop( text, br = true ) {
  *
  * @return {string} The content with stripped paragraph tags.
  */
-export function removep( html ) {
+export function removep( html: string ) {
 	const blocklist =
 		'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';
 	const blocklist1 = blocklist + '|div|p';
 	const blocklist2 = blocklist + '|pre';
-	/** @type {string[]} */
-	const preserve = [];
+	const preserve: string[] = [];
 	let preserveLinebreaks = false;
 	let preserveBr = false;
 
@@ -480,7 +482,7 @@ export function removep( html ) {
 	// Restore preserved tags.
 	if ( preserve.length ) {
 		html = html.replace( /<wp-preserve>/g, () => {
-			return /** @type {string} */ ( preserve.shift() );
+			return preserve.shift()!;
 		} );
 	}
 
