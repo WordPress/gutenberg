@@ -15,6 +15,7 @@ import {
 } from '../components/global-styles';
 import { useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
+import { globalStylesDataKey } from '../store/private-keys';
 
 function getVariationNameFromClass( className ) {
 	const match = className?.match( /\bis-style-(?!default)(\S+)\b/ );
@@ -25,15 +26,12 @@ function useBlockSyleVariation( name, variation, clientId ) {
 	// Prefer global styles data in GlobalStylesContext, which are available
 	// if in the site editor. Otherwise fall back to whatever is in the
 	// editor settings and available in the post editor.
-	// This can be updated once the global styles data is consistently
-	// available across the editors.
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
-		const { __experimentalFeatures, __experimentalStyles } =
-			select( blockEditorStore ).getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return {
-			globalSettings: __experimentalFeatures,
-			globalStyles: __experimentalStyles,
+			globalSettings: settings.__experimentalFeatures,
+			globalStyles: settings[ globalStylesDataKey ],
 		};
 	}, [] );
 
