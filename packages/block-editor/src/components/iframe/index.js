@@ -301,7 +301,8 @@ function Iframe( {
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
 			scale === 'default'
-				? Math.min( containerWidth, maxWidth ) / windowInnerWidth
+				? Math.min( containerWidth, maxWidth ) /
+						( windowInnerWidth - 350 )
 				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
@@ -318,7 +319,7 @@ function Iframe( {
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-container-width',
-			`${ containerWidth }px`
+			`${ containerWidth - 350 }px`
 		);
 
 		return () => {
