@@ -2898,9 +2898,9 @@ export const getBlockEditingMode = createRegistrySelector(
 					sectionRootClientId
 				);
 				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return getBlockParents( state, clientId ).some(
-						( parentClientId ) =>
-							isBlockSelected( state, parentClientId )
+					return isBlockSelected(
+						state,
+						getBlockRootClientId( state, clientId )
 					)
 						? 'default'
 						: 'disabled';
