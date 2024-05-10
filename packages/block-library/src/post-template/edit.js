@@ -248,7 +248,10 @@ export default function PostTemplateEdit( {
 			icon: list,
 			title: __( 'List view' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
-			isActive: layoutType === 'default' || layoutType === 'constrained',
+			isActive:
+				'undefined' === typeof layout ||
+				layoutType === 'default' ||
+				layoutType === 'constrained',
 		},
 		{
 			icon: grid,
