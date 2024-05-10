@@ -5,8 +5,10 @@ html.interface-interface-skeleton__html-container {
 	width: 100%;
 
 	@include break-medium() {
-		position: initial;
-		width: initial;
+		&:not(:has(.is-zoom-out)) {
+			position: initial;
+			width: initial;
+		}
 	}
 }
 

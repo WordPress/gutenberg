@@ -161,13 +161,17 @@ function EditorCanvas( {
 		hasRootPaddingAwareAlignments,
 		themeHasDisabledLayoutStyles,
 		themeSupportsLayout,
+		isZoomOutMode,
 	} = useSelect( ( select ) => {
-		const _settings = select( blockEditorStore ).getSettings();
+		const { getSettings, __unstableGetEditorMode } =
+			select( blockEditorStore );
+		const _settings = getSettings();
 		return {
 			themeHasDisabledLayoutStyles: _settings.disableLayoutStyles,
 			themeSupportsLayout: _settings.supportsLayout,
 			hasRootPaddingAwareAlignments:
 				_settings.__experimentalFeatures?.useRootPaddingAwareAlignments,
+			isZoomOutMode: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
@@ -319,6 +323,13 @@ function EditorCanvas( {
 		} ),
 	] );
 
+	const zoomOutProps = isZoomOutMode
+		? {
+				scale: 'default',
+				frameSize: '20px',
+		  }
+		: {};
+
 	return (
 		<BlockCanvas
 			shouldIframe={
@@ -332,6 +343,7 @@ function EditorCanvas( {
 					'has-editor-padding': showEditorPadding,
 				} ),
 				...iframeProps,
+				...zoomOutProps,
 				style: {
 					...iframeProps?.style,
 					...deviceStyles,

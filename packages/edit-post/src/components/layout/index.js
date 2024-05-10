@@ -28,7 +28,7 @@ import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -45,7 +45,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -63,6 +62,7 @@ const {
 	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
+	Sidebar,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -135,13 +135,11 @@ function Layout( { initialPost } ) {
 	useCommonCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -160,6 +158,8 @@ function Layout( { initialPost } ) {
 		documentLabel,
 		hasHistory,
 		hasBlockBreadcrumbs,
+		blockEditorMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -195,6 +195,10 @@ function Layout( { initialPost } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			blockEditorMode:
+				select( blockEditorStore ).__unstableGetEditorMode(),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
@@ -205,18 +209,6 @@ function Layout( { initialPost } ) {
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	// Inserter and Sidebars are mutually exclusive
-	useEffect( () => {
-		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpened( false );
-		}
-	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
-	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
-			closeGeneralSidebar();
-		}
-	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -342,6 +334,7 @@ function Layout( { initialPost } ) {
 					! isMobileViewport &&
 					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
+					blockEditorMode !== 'zoom-out' &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb rootLabelText={ documentLabel } />
@@ -368,7 +361,13 @@ function Layout( { initialPost } ) {
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && <SettingsSidebar /> }
+			{ ! isDistractionFree && (
+				<Sidebar
+					extraPanels={
+						! isEditingTemplate && <MetaBoxes location="side" />
+					}
+				/>
+			) }
 		</>
 	);
 }

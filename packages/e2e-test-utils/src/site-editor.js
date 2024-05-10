@@ -97,9 +97,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
  * Toggles the global styles sidebar (opens it if closed and closes it if open).
  */
 export async function toggleGlobalStyles() {
-	await page.click(
-		'.edit-site-header-edit-mode__actions button[aria-label="Styles"]'
-	);
+	await page.click( '.editor-header__settings button[aria-label="Styles"]' );
 }
 
 /**

@@ -4,7 +4,8 @@
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
 import { switchToBlockType } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ function ConvertToGroupButton( {
 	groupingBlockName,
 	onClose = () => {},
 } ) {
+	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
 		// Activate the `transform` on the Grouping Block which does the conversion.
@@ -52,10 +54,17 @@ function ConvertToGroupButton( {
 		return null;
 	}
 
+	const selectedBlockClientIds = getSelectedBlockClientIds();
+
 	return (
 		<>
 			{ isGroupable && (
 				<MenuItem
+					shortcut={
+						selectedBlockClientIds.length > 1
+							? displayShortcut.primary( 'g' )
+							: undefined
+					}
 					onClick={ () => {
 						onConvertToGroup();
 						onClose();
