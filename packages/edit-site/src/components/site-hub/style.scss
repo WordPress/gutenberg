@@ -15,10 +15,6 @@
 	width: $header-height;
 	flex-shrink: 0;
 
-	.edit-site-layout__view-mode-toggle-icon {
-		background: $gray-900;
-	}
-
 	&.has-transparent-background .edit-site-layout__view-mode-toggle-icon {
 		background: transparent;
 	}
