@@ -15,9 +15,6 @@ export function GridItemResizer( { clientId, onChange } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
 
-	const blockClientRect = blockElement?.getBoundingClientRect() || {};
-	const rootBlockClientRect = rootBlockElement?.getBoundingClientRect() || {};
-
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
 		top: false,
@@ -28,6 +25,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 
 	useEffect( () => {
 		const observer = new window.ResizeObserver( () => {
+			const blockClientRect = blockElement?.getBoundingClientRect() || {};
+			const rootBlockClientRect =
+				rootBlockElement?.getBoundingClientRect() || {};
 			setEnableSide( {
 				top: blockClientRect.top > rootBlockClientRect.top,
 				bottom: blockClientRect.bottom < rootBlockClientRect.bottom,
@@ -37,17 +37,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 		} );
 		observer.observe( blockElement );
 		return () => observer.disconnect();
-	}, [
-		blockClientRect.bottom,
-		blockClientRect.left,
-		blockClientRect.right,
-		blockClientRect.top,
-		blockElement,
-		rootBlockClientRect.bottom,
-		rootBlockClientRect.left,
-		rootBlockClientRect.right,
-		rootBlockClientRect.top,
-	] );
+	}, [ blockElement, rootBlockElement ] );
 
 	/*
 	 * This ref is necessary get the bounding client rect of the resizer,
@@ -91,6 +81,9 @@ export function GridItemResizer( { clientId, onChange } ) {
 		offsetWidth: rootBlockElement.offsetWidth,
 		offsetHeight: rootBlockElement.offsetHeight,
 		getBoundingClientRect: () => {
+			const blockClientRect = blockElement?.getBoundingClientRect() || {};
+			const rootBlockClientRect =
+				rootBlockElement?.getBoundingClientRect() || {};
 			const resizerTop = resizerRef.current?.getBoundingClientRect()?.top;
 			// Fallback value of 60 to account for editor top bar height.
 			const heightDifference = resizerTop
