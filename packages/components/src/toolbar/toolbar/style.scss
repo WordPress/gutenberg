@@ -16,6 +16,23 @@
 		}
 
 	}
+
+	&[aria-orientation="vertical"] {
+		.block-editor-block-toolbar,
+		.components-toolbar-group,
+		.block-editor-block-toolbar__slot {
+			flex-direction: column;
+			align-items: center;
+		}
+		& .block-editor-block-toolbar {
+			.components-toolbar-group {
+				border-right: none;
+			}
+			& > .components-toolbar-group:last-child:not(.is-unstyled) {
+				border-top: $border-width solid $gray-900;
+			}
+		}
+	}
 }
 
 .components-accessible-toolbar,

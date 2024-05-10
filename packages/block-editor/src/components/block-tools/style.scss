@@ -105,12 +105,18 @@
 	.block-editor-block-list__block-popover.is-vertical & {
 		background-color: transparent;
 
+		.block-editor-block-list__block-selection-button__content {
+			flex-direction: column;
+		}
+
 		.block-editor-block-icon {
 			color: $gray-900;
+			height: $grid-unit-40;
 		}
 
 		.components-button {
 			color: $gray-900;
+			height: $grid-unit-40;
 			&:active,
 			&[aria-disabled="true"]:hover {
 				color: $gray-900;
@@ -215,6 +221,11 @@
 			.show-icon-labels & {
 				margin-left: 0;
 			}
+		}
+
+		&[aria-orientation="vertical"] .block-editor-block-parent-selector {
+			left: 0;
+			top: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
 		}
 	}
 
