@@ -35,7 +35,7 @@ export default function SidebarNavigationItem( {
 	...props
 } ) {
 	const history = useHistory();
-	const navigate = useContext( SidebarNavigationContext );
+	const { navigate } = useContext( SidebarNavigationContext );
 
 	// If there is no custom click handler, create one that navigates to `path`.
 	function handleClick( e ) {

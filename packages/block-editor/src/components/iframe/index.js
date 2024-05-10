@@ -221,44 +221,6 @@ function Iframe( {
 
 	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
 
-	const scaleRef = useRefEffect(
-		( body ) => {
-			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - scale );
-
-			const { documentElement } = body.ownerDocument;
-
-			body.classList.add( 'is-zoomed-out' );
-
-			documentElement.style.transform = `scale( ${ scale } )`;
-			documentElement.style.marginTop = `${ frameSize }px`;
-			// TODO: `marginBottom` doesn't work in Firefox. We need another way
-			// to do this.
-			documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * scale ) {
-				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / scale
-				) }px`;
-			}
-
-			return () => {
-				body.classList.remove( 'is-zoomed-out' );
-				documentElement.style.transform = '';
-				documentElement.style.marginTop = '';
-				documentElement.style.marginBottom = '';
-				body.style.minHeight = '';
-			};
-		},
-		[
-			scale,
-			frameSize,
-			iframeDocument,
-			contentHeight,
-			iframeWindowInnerHeight,
-			contentWidth,
-		]
-	);
-
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
@@ -270,7 +232,6 @@ function Iframe( {
 		// unnecessary re-renders when animating the iframe width, or when
 		// expanding preview iframes.
 		scale === 1 ? null : windowResizeRef,
-		scale === 1 ? null : scaleRef,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -315,6 +276,57 @@ function Iframe( {
 		typeof scale === 'function'
 			? scale( contentWidth, contentHeight )
 			: scale;
+
+	const isZoomedOut = scale !== 1;
+
+	useEffect( () => {
+		if ( ! iframeDocument || ! isZoomedOut ) {
+			return;
+		}
+
+		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
+
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			`${ scale }`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-frame-size',
+			`${ frameSize }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-inner-height',
+			`${ iframeWindowInnerHeight }px`
+		);
+
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
+
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-frame-size'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-content-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inner-height'
+			);
+		};
+	}, [
+		scale,
+		frameSize,
+		iframeDocument,
+		iframeWindowInnerHeight,
+		contentHeight,
+		isZoomedOut,
+	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
