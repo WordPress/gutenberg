@@ -241,7 +241,7 @@ export default function NavigableToolbar( {
 
 	return (
 		<NavigableMenu
-			orientation="horizontal"
+			orientation={ orientation }
 			role="toolbar"
 			ref={ toolbarRef }
 			{ ...props }
