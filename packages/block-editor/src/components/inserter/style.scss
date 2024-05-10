@@ -412,8 +412,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__quick-inserter-patterns {
 	.block-editor-block-patterns-list {
-		display: grid;
-		grid-template-columns: 1fr;
+		display: flex;
+		flex-direction: column;
 		grid-gap: $grid-unit-10;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
