@@ -104,7 +104,7 @@ function Iframe( {
 	contentRef,
 	children,
 	tabIndex = 0,
-	scale: scaleProp = 1,
+	scale = 1,
 	frameSize = 0,
 	readonly,
 	forwardedRef: ref,
@@ -237,15 +237,6 @@ function Iframe( {
 		};
 	}, [] );
 
-	const scale = useMemo( () => {
-		return typeof scaleProp === 'function'
-			? scaleProp( {
-					containerWidth,
-					windowInnerWidth,
-			  } )
-			: scaleProp;
-	}, [ scaleProp, containerWidth, windowInnerWidth ] );
-
 	const isZoomedOut = scale !== 1;
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
@@ -306,13 +297,16 @@ function Iframe( {
 
 		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
+		const maxWidth = 800;
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-scale',
-			`${ scale }`
+			scale === 'default'
+				? Math.min( containerWidth, maxWidth ) / windowInnerWidth
+				: scale
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-frame-size',
-			`${ frameSize }px`
+			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
 		);
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-content-height',
@@ -321,6 +315,10 @@ function Iframe( {
 		iframeDocument.documentElement.style.setProperty(
 			'--wp-block-editor-iframe-zoom-out-inner-height',
 			`${ iframeWindowInnerHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-container-width',
+			`${ containerWidth }px`
 		);
 
 		return () => {
@@ -338,6 +336,9 @@ function Iframe( {
 			iframeDocument.documentElement.style.removeProperty(
 				'--wp-block-editor-iframe-zoom-out-inner-height'
 			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-container-width'
+			);
 		};
 	}, [
 		scale,
@@ -345,6 +346,8 @@ function Iframe( {
 		iframeDocument,
 		iframeWindowInnerHeight,
 		contentHeight,
+		containerWidth,
+		windowInnerWidth,
 		isZoomedOut,
 	] );
 

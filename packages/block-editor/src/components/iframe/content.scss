@@ -26,6 +26,7 @@
 	$frame-size: var(--wp-block-editor-iframe-zoom-out-frame-size);
 	$inner-height: var(--wp-block-editor-iframe-zoom-out-inner-height);
 	$content-height: var(--wp-block-editor-iframe-zoom-out-content-height);
+	$container-width: var(--wp-block-editor-iframe-zoom-out-container-width);
 
 	transform: scale(#{$scale});
 
