@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	switchToBlockType,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -25,6 +29,7 @@ import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -85,6 +90,7 @@ function ListViewBlock( {
 		toggleBlockHighlight,
 		duplicateBlocks,
 		multiSelect,
+		replaceBlocks,
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
@@ -100,7 +106,9 @@ function ListViewBlock( {
 		getBlockParents,
 		getBlocksByClientId,
 		canRemoveBlocks,
+		isGroupable,
 	} = useSelect( blockEditorStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
@@ -324,6 +332,23 @@ function ListViewBlock( {
 			collapseAll();
 			// Expand all parents of the current block.
 			expand( blockParents );
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( blocksToUpdate );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
+				replaceBlocks( blocksToUpdate, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
+				const newlySelectedBlocks = getSelectedBlockClientIds();
+				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+				setOpenedBlockSettingsMenu( undefined );
+				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+			}
 		}
 	}
 
