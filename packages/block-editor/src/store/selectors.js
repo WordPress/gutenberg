@@ -2898,12 +2898,14 @@ export const getBlockEditingMode = createRegistrySelector(
 					sectionRootClientId
 				);
 				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return isBlockSelected(
-						state,
-						getBlockRootClientId( state, clientId )
-					)
-						? 'default'
-						: 'disabled';
+					if (
+						! isBlockSelected(
+							state,
+							getBlockRootClientId( state, clientId )
+						)
+					) {
+						return 'disabled';
+					}
 				}
 			}
 
