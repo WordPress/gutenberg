@@ -343,7 +343,7 @@ export function autop( text: string, br: boolean = true ): string {
  *
  * @return {string} The content with stripped paragraph tags.
  */
-export function removep( html: string ) {
+export function removep( html: string ): string {
 	const blocklist =
 		'blockquote|ul|ol|li|dl|dt|dd|table|thead|tbody|tfoot|tr|th|td|h[1-6]|fieldset|figure';
 	const blocklist1 = blocklist + '|div|p';
