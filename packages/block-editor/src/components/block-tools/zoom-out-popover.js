@@ -31,8 +31,8 @@ export default function ZoomOutPopover( { clientId, __unstableContentRef } ) {
 				'is-insertion-point-visible': isInsertionPointVisible,
 			} ) }
 			resize={ false }
-			placement="left-start"
 			{ ...popoverProps }
+			placement="left-start"
 		>
 			<ZoomOutToolbar
 				clientId={ clientId }
