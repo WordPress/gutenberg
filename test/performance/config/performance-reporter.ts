@@ -13,7 +13,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { quartiles, round } from '../utils';
+import { stats, round } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -47,7 +47,6 @@ type PerformanceStats = {
 	q25: number;
 	q50: number;
 	q75: number;
-	out: number[]; // outliers
 	cnt: number; // number of data points
 };
 
@@ -77,25 +76,6 @@ export interface WPPerformanceResults {
 	wpTotal?: PerformanceStats;
 	wpMemoryUsage?: PerformanceStats;
 	wpDbQueries?: PerformanceStats;
-}
-
-function stats( values: number[] ): PerformanceStats | undefined {
-	if ( ! values || values.length === 0 ) {
-		return undefined;
-	}
-	const { q25, q50, q75 } = quartiles( values );
-	const iqr = q75 - q25;
-	const out = values.filter(
-		( v ) => v > q75 + 1.5 * iqr || v < q25 - 1.5 * iqr
-	);
-	const cnt = values.length;
-	return {
-		q25: round( q25 ),
-		q50: round( q50 ),
-		q75: round( q75 ),
-		out: out.map( ( n ) => round( n ) ),
-		cnt,
-	};
 }
 
 /**
@@ -174,21 +154,13 @@ class PerformanceReporter implements Reporter {
 
 			const curatedResults = curateResults( JSON.parse( resultsBody ) );
 
-			// For now, to keep back compat, save only the medians, not the full stats.
-			const savedResults = Object.fromEntries(
-				Object.entries( curatedResults ).map( ( [ key, value ] ) => [
-					key,
-					value.q50,
-				] )
-			);
-
 			// Save curated results to file.
 			writeFileSync(
 				path.join(
 					resultsPath,
 					`${ resultsId }.performance-results.json`
 				),
-				JSON.stringify( savedResults, null, 2 )
+				JSON.stringify( curatedResults, null, 2 )
 			);
 
 			this.results[ testSuite ] = curatedResults;
@@ -209,18 +181,12 @@ class PerformanceReporter implements Reporter {
 			const printableResults: Record< string, { value: string } > = {};
 
 			for ( const [ key, value ] of Object.entries( results ) ) {
-				const p = value.q75 - value.q50;
-				const pp = round( ( 100 * p ) / value.q50 );
-				const m = value.q50 - value.q25;
-				const mp = round( ( 100 * m ) / value.q50 );
-				const outs =
-					value.out.length > 0
-						? ' [' + value.out.join( ', ' ) + ']'
-						: '';
+				const p = round( value.q75 - value.q50 );
+				const pp = round( 100 * ( p / value.q50 ) );
+				const m = round( value.q50 - value.q25 );
+				const mp = round( 100 * ( m / value.q50 ) );
 				printableResults[ key ] = {
-					value: `${ value.q50 } ±${ round( p ) }/${ round(
-						m
-					) } ms (±${ pp }/${ mp }%)${ outs } (${ value.cnt })`,
+					value: `${ value.q50 } ±${ p }/${ m } ms (±${ pp }/${ mp }%) (${ value.cnt })`,
 				};
 			}
 

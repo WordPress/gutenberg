@@ -79,6 +79,20 @@ export function quartiles( array ) {
 	return { q25, q50, q75 };
 }
 
+export function stats( values ) {
+	if ( ! values || values.length === 0 ) {
+		return undefined;
+	}
+	const { q25, q50, q75 } = quartiles( values );
+	const cnt = values.length;
+	return {
+		q25: round( q25 ),
+		q50: round( q50 ),
+		q75: round( q75 ),
+		cnt,
+	};
+}
+
 export function minimum( array ) {
 	if ( ! array || ! array.length ) {
 		return undefined;
