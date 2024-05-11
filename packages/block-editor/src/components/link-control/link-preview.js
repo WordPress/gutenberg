@@ -24,6 +24,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import { ViewerSlot } from './viewer-slot';
+import trimLongURL from './trim-long-url';
 
 import useRichUrlData from './use-rich-url-data';
 
@@ -51,6 +52,8 @@ export default function LinkPreview( {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
 		'';
+
+	const trimmedURL = trimLongURL( displayURL );
 
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
@@ -114,8 +117,8 @@ export default function LinkPreview( {
 								</ExternalLink>
 								{ value?.url && displayTitle !== displayURL && (
 									<span className="block-editor-link-control__search-item-info">
-										<Truncate numberOfLines={ 1 }>
-											{ displayURL }
+										<Truncate numberOfLines={ 4 }>
+											{ trimmedURL }
 										</Truncate>
 									</span>
 								) }
