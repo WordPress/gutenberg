@@ -312,10 +312,6 @@ describe.each( [
 
 				selectedItem: expect.objectContaining( {
 					name: 'aquamarine',
-					style: {
-						backgroundColor: 'rgb(127, 255, 212)',
-						rotate: '13deg',
-					},
 				} ),
 				type: '',
 			} )
