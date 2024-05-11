@@ -15,7 +15,7 @@ import {
 	OPERATOR_IS_NOT_ALL,
 } from './constants';
 import { normalizeFields } from './normalize-fields';
-import type { Data, Field, View } from './types';
+import type { Data, Field, Item, View } from './types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
@@ -32,14 +32,14 @@ const EMPTY_ARRAY: Data = [];
  *
  * @return Filtered, sorted and paginated data.
  */
-export function filterSortAndPaginate(
-	data: Data,
+export function filterSortAndPaginate< T extends Item >(
+	data: T[],
 	view: View,
-	fields: Field[]
+	fields: Field< T >[]
 ): { data: Data; paginationInfo: { totalItems: number; totalPages: number } } {
 	if ( ! data ) {
 		return {
-			data: EMPTY_ARRAY,
+			data: EMPTY_ARRAY as T[],
 			paginationInfo: { totalItems: 0, totalPages: 0 },
 		};
 	}
@@ -100,7 +100,9 @@ export function filterSortAndPaginate(
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return filter.value.every( ( value: any ) => {
-							return field.getValue( { item } ).includes( value );
+							return field
+								.getValue( { item } )
+								?.includes( value );
 						} );
 					} );
 				} else if (
@@ -111,7 +113,7 @@ export function filterSortAndPaginate(
 						return filter.value.every( ( value: any ) => {
 							return ! field
 								.getValue( { item } )
-								.includes( value );
+								?.includes( value );
 						} );
 					} );
 				} else if ( filter.operator === OPERATOR_IS ) {

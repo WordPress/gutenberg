@@ -3,13 +3,38 @@
  */
 import type { ReactElement, ReactNode } from 'react';
 
-interface Option {
-	value: any;
+export type SortDirection = 'asc' | 'desc';
+
+/**
+ * Type of view UI.
+ */
+export type ViewType = 'table' | 'grid' | 'list';
+
+/**
+ * Type of field.
+ */
+export type FieldType = 'enumeration';
+
+/**
+ * Generic option type.
+ */
+interface Option< Value extends any = any > {
+	value: Value;
 	label: string;
 }
 
-interface filterByConfig {
+interface FilterByConfig {
+	/**
+	 * The list of operators supported by the field.
+	 */
 	operators?: Operator[];
+
+	/**
+	 * Whether it is a primary filter.
+	 *
+	 * A primary filter is always visible and is not listed in the "Add filter" component,
+	 * except for the list layout where it behaves like a secondary filter.
+	 */
 	isPrimary?: boolean;
 }
 
@@ -17,7 +42,10 @@ type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
 
 export type Item = Record< string, any >;
 
-export interface Field {
+/**
+ * A dataview field for a specific property of a data type.
+ */
+export interface Field< T extends Item > {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -32,58 +60,67 @@ export interface Field {
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
 	 */
-	getValue?: ( { item }: { item: Item } ) => any;
+	getValue?: ( args: { item: T } ) => string | undefined;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( { item }: { item: Item } ) => ReactNode;
+	render?: ( args: { item: T } ) => ReactNode;
 
 	/**
 	 * The width of the field column.
 	 */
-	width: string | number | undefined;
+	width?: string | number;
 
 	/**
 	 * The minimum width of the field column.
 	 */
-	maxWidth: string | number | undefined;
+	maxWidth?: string | number;
 
 	/**
 	 * The maximum width of the field column.
 	 */
-	minWidth: string | number | undefined;
+	minWidth?: string | number;
 
 	/**
 	 * Whether the field is sortable.
 	 */
-	enableSorting: boolean | undefined;
+	enableSorting?: boolean;
 
 	/**
 	 * Whether the field is searchable.
 	 */
-	enableGlobalSearch: boolean | undefined;
+	enableGlobalSearch?: boolean;
 
 	/**
 	 * Whether the field is filterable.
 	 */
-	enableHiding: boolean | undefined;
+	enableHiding?: boolean;
 
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements: Option[] | undefined;
+	elements?: Option[];
 
 	/**
 	 * Filter config for the field.
 	 */
-	filterBy: filterByConfig | undefined;
+	filterBy?: FilterByConfig | undefined;
 }
 
-export type NormalizedField = Required< Field >;
+export type NormalizedField< T extends Item > = Field< T > &
+	Required< Pick< Field< T >, 'header' | 'getValue' | 'render' > >;
+
+/**
+ * A collection of dataview fields for a data type.
+ */
+export type Fields< T extends Item > = Field< T >[];
 
 export type Data = Item[];
 
+/**
+ * The filters applied to the dataset.
+ */
 export interface Filter {
 	/**
 	 * The field to filter by.
@@ -105,7 +142,7 @@ interface ViewBase {
 	/**
 	 * The layout of the view.
 	 */
-	type: string;
+	type: ViewType;
 
 	/**
 	 * The global search term.
@@ -129,7 +166,7 @@ interface ViewBase {
 		/**
 		 * The direction to sort by.
 		 */
-		direction: string;
+		direction: SortDirection;
 	};
 
 	/**
@@ -147,6 +184,7 @@ interface ViewBase {
 	 */
 	hiddenFields: string[];
 }
+
 export interface ViewList extends ViewBase {
 	type: 'list';
 
