@@ -146,7 +146,7 @@ function formatValue( metric, value ) {
 function printStats( m, s ) {
 	const pp = fixed( ( 100 * ( s.q75 - s.q50 ) ) / s.q50 );
 	const mp = fixed( ( 100 * ( s.q50 - s.q25 ) ) / s.q50 );
-	return `${ formatValue( m, s.q50 ) } ms (±${ pp }/${ mp }%)`;
+	return `${ formatValue( m, s.q50 ) } +${ pp }% -${ mp }% (${ s.cnt })`;
 }
 
 /**
