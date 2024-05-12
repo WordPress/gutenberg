@@ -3,7 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
-import { useLayoutEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -33,7 +33,7 @@ export default function useLayoutAreas() {
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params;
 
-	useLayoutEffect( () => {
+	useEffect( () => {
 		// `/wp_template_part/all` path is no longer used and redirects to
 		// Patterns page for backward compatibility.
 		if ( path === '/wp_template_part/all' ) {
