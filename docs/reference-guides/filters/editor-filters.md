@@ -4,7 +4,7 @@ WordPress exposes several APIs that allow you to modify the editor experience.
 
 ## Editor settings
 
-One of the most common ways to modify the Editor is through [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) PHP filter, which is applied before settings are sent to the initialized Editor. This filter allows plugin and theme authors extensive control over how the Editor behaves.
+One of the most common ways to modify the Editor is through the [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) PHP filter, which is applied before settings are sent to the initialized Editor. This filter allows plugin and theme authors extensive control over how the Editor behaves.
 
 <div class="callout callout-warning">
 	Before WordPress 5.8, this hook was known as <code>block_editor_settings</code>, which is now deprecated. If you need to support older versions of WordPress, you might need a way to detect which filter should be used. The recommended way to proceed is to check if the <code>WP_Block_Editor_Context</code> class exists.
@@ -18,9 +18,9 @@ The `block_editor_settings_all` hook passes two parameters to the callback funct
 The following example modifies the maximum upload file size. Add this to a plugin or your theme's `functions.php` file to test it.
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_filter_block_editor_settings_when_post_provided', 10, 2 );
+add_filter( 'block_editor_settings_all', 'example_filter_block_editor_settings_when_post_provided', 10, 2 );
 
-function pluginslug_filter_block_editor_settings_when_post_provided( $editor_settings, $editor_context ) {
+function example_filter_block_editor_settings_when_post_provided( $editor_settings, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		$editor_settings['maxUploadFileSize'] = 12345;
 	}
@@ -41,9 +41,9 @@ The `codeEditingEnabled`, which defaults to `true`, controls whether the user ca
 If this setting is set to `false`, the user will not be able to switch between visual and code editor. The option in the settings menu will not be available, and the keyboard shortcut for switching editor types will not fire. Here's an example:
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_restrict_code_editor' );
+add_filter( 'block_editor_settings_all', 'example_restrict_code_editor' );
 
-function pluginslug_restrict_code_editor( $settings ) {
+function example_restrict_code_editor( $settings ) {
 	$can_active_plugins = current_user_can( 'activate_plugins' );
 
 	// Disable the Code Editor for users that cannot activate plugins (Administrators).
@@ -66,9 +66,9 @@ The setting defaults to the returned value of the [`user_can_richedit`](https://
 Images are set to the `large` image size by default in the Editor. You can modify this using the `imageDefaultSize` setting, which is especially useful if you have configured your own custom image sizes. The following example changes the default image size to `medium`.
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_set_default_image_size' );
+add_filter( 'block_editor_settings_all', 'example_set_default_image_size' );
 
-function pluginslug_set_default_image_size( $settings ) {
+function example_set_default_image_size( $settings ) {
 	$settings['imageDefaultSize'] = 'medium';
 	return $settings;
 }
@@ -79,9 +79,9 @@ function pluginslug_set_default_image_size( $settings ) {
 The [Openverse](https://openverse.org/) integration is enabled for all WordPress sites by default and is controlled by the `enableOpenverseMediaCategory` setting. To disable Openverse, apply the following filter:
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_disable_openverse' );
+add_filter( 'block_editor_settings_all', 'example_disable_openverse' );
 
-function pluginslug_disable_openverse( $settings ) {
+function example_disable_openverse( $settings ) {
 	$settings['enableOpenverseMediaCategory'] = false;
 	return $settings;
 }
@@ -92,9 +92,9 @@ function pluginslug_disable_openverse( $settings ) {
 The Font Library allows users to install new fonts on their site, which is enabled by default and is controlled by the `fontLibraryEnabled` setting. To disable the Font Library, apply the following filter:
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_disable_font_library' );
+add_filter( 'block_editor_settings_all', 'example_disable_font_library' );
 
-function pluginslug_disable_font_library( $settings ) {
+function example_disable_font_library( $settings ) {
 	$settings['fontLibraryEnabled'] = false;
 	return $settings;
 }
@@ -105,9 +105,9 @@ function pluginslug_disable_font_library( $settings ) {
 Most blocks display [two tabs](https://make.wordpress.org/core/2023/03/07/introduction-of-block-inspector-tabs/) in the Inspector, one for Settings and another for Styles. You can disable these tabs using the `blockInspectorTabs` setting.
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_disable_inspector_tabs_by_default' );
+add_filter( 'block_editor_settings_all', 'example_disable_inspector_tabs_by_default' );
 
-function pluginslug_disable_inspector_tabs_by_default( $settings ) {
+function example_disable_inspector_tabs_by_default( $settings ) {
 	$settings['blockInspectorTabs'] = array( 'default' => false );
 	return $settings;
 }
@@ -116,9 +116,9 @@ function pluginslug_disable_inspector_tabs_by_default( $settings ) {
 You can also modify which blocks have inspector tabs. Here's an example that disables tabs for a specific block.
 
 ```php
-add_filter( 'block_editor_settings_all', 'pluginslug_disable_tabs_for_my_custom_block' );
+add_filter( 'block_editor_settings_all', 'example_disable_tabs_for_my_custom_block' );
 
-function pluginslug_disable_tabs_for_my_custom_block( $settings ) {
+function example_disable_tabs_for_my_custom_block( $settings ) {
 	$current_tab_settings = _wp_array_get( $settings, array( 'blockInspectorTabs' ), array() );
 	$settings['blockInspectorTabs'] = array_merge(
 		$current_tab_settings,
@@ -214,9 +214,9 @@ addFilter(
 You can use [`block_editor_rest_api_preload_paths`](https://developer.wordpress.org/reference/hooks/block_editor_rest_api_preload_paths/) to filter the array of REST API paths that will be used to preload common data to use with the block editor. Here's an example:
 
 ```php
-add_filter( 'block_editor_rest_api_preload_paths', 'pluginslug_filter_block_editor_rest_api_preload_paths_when_post_provided', 10, 2 );
+add_filter( 'block_editor_rest_api_preload_paths', 'example_filter_block_editor_rest_api_preload_paths_when_post_provided', 10, 2 );
 
-function pluginslug_filter_block_editor_rest_api_preload_paths_when_post_provided( $preload_paths, $editor_context ) {
+function example_filter_block_editor_rest_api_preload_paths_when_post_provided( $preload_paths, $editor_context ) {
 	if ( ! empty( $editor_context->post ) ) {
 		array_push( $preload_paths, array( '/wp/v2/blocks', 'OPTIONS' ) );
 	}
