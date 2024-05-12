@@ -14,7 +14,8 @@ import __unstableEscapeGreaterThan from './escape-greater';
  *
  * @type {RegExp}
  */
-const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
+const REGEXP_INVALID_ATTRIBUTE_NAME: RegExp =
+	/[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
 
 /**
  * Returns a string with ampersands escaped. Note that this is an imperfect
@@ -30,7 +31,7 @@ const REGEXP_INVALID_ATTRIBUTE_NAME = /[\u007F-\u009F "'>/="\uFDD0-\uFDEF]/;
  *
  * @return {string} Escaped string.
  */
-export function escapeAmpersand( value ) {
+export function escapeAmpersand( value: string ): string {
 	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
 }
 
@@ -41,7 +42,7 @@ export function escapeAmpersand( value ) {
  *
  * @return {string} Escaped string.
  */
-export function escapeQuotationMark( value ) {
+export function escapeQuotationMark( value: string ): string {
 	return value.replace( /"/g, '&quot;' );
 }
 
@@ -52,7 +53,7 @@ export function escapeQuotationMark( value ) {
  *
  * @return {string} Escaped string.
  */
-export function escapeLessThan( value ) {
+export function escapeLessThan( value: string ): string {
 	return value.replace( /</g, '&lt;' );
 }
 
@@ -76,7 +77,7 @@ export function escapeLessThan( value ) {
  *
  * @return {string} Escaped attribute value.
  */
-export function escapeAttribute( value ) {
+export function escapeAttribute( value: string ): string {
 	return __unstableEscapeGreaterThan(
 		escapeQuotationMark( escapeAmpersand( value ) )
 	);
@@ -94,7 +95,7 @@ export function escapeAttribute( value ) {
  *
  * @return {string} Escaped HTML element value.
  */
-export function escapeHTML( value ) {
+export function escapeHTML( value: string ): string {
 	return escapeLessThan( escapeAmpersand( value ) );
 }
 
@@ -107,7 +108,7 @@ export function escapeHTML( value ) {
  *
  * @return {string} Escaped HTML element value.
  */
-export function escapeEditableHTML( value ) {
+export function escapeEditableHTML( value: string ): string {
 	return escapeLessThan( value.replace( /&/g, '&amp;' ) );
 }
 
@@ -118,6 +119,6 @@ export function escapeEditableHTML( value ) {
  *
  * @return {boolean} Whether attribute is valid.
  */
-export function isValidAttributeName( name ) {
+export function isValidAttributeName( name: string ): boolean {
 	return ! REGEXP_INVALID_ATTRIBUTE_NAME.test( name );
 }

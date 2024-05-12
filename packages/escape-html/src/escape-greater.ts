@@ -10,6 +10,6 @@
  *
  * @return {string} Escaped string.
  */
-export default function __unstableEscapeGreaterThan( value ) {
+export default function __unstableEscapeGreaterThan( value: string ): string {
 	return value.replace( />/g, '&gt;' );
 }
