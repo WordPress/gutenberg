@@ -3,7 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
-
+import { useLayoutEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -32,6 +32,14 @@ export default function useLayoutAreas() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params;
+
+	useLayoutEffect( () => {
+		// `/wp_template_part/all` path is no longer used and redirects to
+		// Patterns page for backward compatibility.
+		if ( path === '/wp_template_part/all' ) {
+			history.replace( { path: '/patterns' } );
+		}
+	}, [ history, path ] );
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -141,7 +149,9 @@ export default function useLayoutAreas() {
 	}
 
 	// Patterns
-	if ( path === '/patterns' ) {
+	// `/wp_template_part/all` path is no longer used and redirects to
+	// Patterns page for backward compatibility.
+	if ( path === '/patterns' || path === '/wp_template_part/all' ) {
 		return {
 			key: 'patterns',
 			areas: {

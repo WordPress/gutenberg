@@ -38,22 +38,6 @@ export function RouterProvider( { children } ) {
 	);
 
 	useEffect( () => {
-		// `/wp_template_part/all` path is no longer used and redirects to
-		// Patterns page for backward compatibility.
-		const { path } = location?.params;
-
-		if ( path === '/wp_template_part/all' ) {
-			history.push( {
-				path: '/patterns',
-			} );
-			setLocation( {
-				...location,
-				params: {
-					path: '/patterns',
-				},
-			} );
-		}
-
 		return history.listen( ( { location: updatedLocation } ) => {
 			setLocation( getLocationWithParams( updatedLocation ) );
 		} );
