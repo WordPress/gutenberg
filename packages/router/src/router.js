@@ -41,7 +41,7 @@ export function RouterProvider( { children } ) {
 		return history.listen( ( { location: updatedLocation } ) => {
 			setLocation( getLocationWithParams( updatedLocation ) );
 		} );
-	}, [ location ] );
+	}, [] );
 
 	return (
 		<HistoryContext.Provider value={ history }>
