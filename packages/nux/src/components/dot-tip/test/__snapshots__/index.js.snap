@@ -7,7 +7,7 @@ exports[`DotTip should render correctly 1`] = `
   data-wp-c16t="true"
   data-wp-component="Popover"
   role="dialog"
-  style="position: absolute; top: 0px; left: 0px; opacity: 1; transform: none; transform-origin: 0% 50% 0;"
+  style="position: absolute; top: 0px; left: 0px; opacity: 1; transform: translateX(0px) translateY(0px) translateX(0em) scale(1) translateZ(0); transform-origin: 0% 50% 0;"
   tabindex="-1"
 >
   <div

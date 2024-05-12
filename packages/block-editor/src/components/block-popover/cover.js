@@ -10,7 +10,14 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopover from '.';
 
 function BlockPopoverCover(
-	{ clientId, bottomClientId, children, shift = false, ...props },
+	{
+		clientId,
+		bottomClientId,
+		children,
+		shift = false,
+		additionalStyles,
+		...props
+	},
 	ref
 ) {
 	bottomClientId ??= clientId;
@@ -26,7 +33,10 @@ function BlockPopoverCover(
 			{ ...props }
 		>
 			{ selectedElement && clientId === bottomClientId ? (
-				<CoverContainer selectedElement={ selectedElement }>
+				<CoverContainer
+					selectedElement={ selectedElement }
+					additionalStyles={ additionalStyles }
+				>
 					{ children }
 				</CoverContainer>
 			) : (
@@ -36,7 +46,11 @@ function BlockPopoverCover(
 	);
 }
 
-function CoverContainer( { selectedElement, children } ) {
+function CoverContainer( {
+	selectedElement,
+	additionalStyles = {},
+	children,
+} ) {
 	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
 	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
 
@@ -54,8 +68,9 @@ function CoverContainer( { selectedElement, children } ) {
 			position: 'absolute',
 			width,
 			height,
+			...additionalStyles,
 		};
-	}, [ width, height ] );
+	}, [ width, height, additionalStyles ] );
 
 	return <div style={ style }>{ children }</div>;
 }

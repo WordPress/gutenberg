@@ -439,7 +439,7 @@ function BackgroundSizeToolsPanelItem( {
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : undefined
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
 			)
 		);
 

@@ -5,6 +5,18 @@
 ### Internal
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+-   Upgrade `@use-gesture/react` package to `^10.3.1` ([#61503](https://github.com/WordPress/gutenberg/pull/61503)).
+-   Upgrade `framer-motion` package to version `^11.1.9` ([#61572](https://github.com/WordPress/gutenberg/pull/61572)).
+
+### Enhancements
+
+-   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
+-   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+-   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
+
+### Bug Fix
+
+-   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
 
 ## 27.5.0 (2024-05-02)
 
@@ -15,16 +27,14 @@
 -   `View`: Fix prop types ([#60919](https://github.com/WordPress/gutenberg/pull/60919)).
 -   `Placeholder`: Unify appearance across. ([#59275](https://github.com/WordPress/gutenberg/pull/59275)).
 -   `Toolbar`: Adjust top toolbar to use same metrics as block toolbar ([#61126](https://github.com/WordPress/gutenberg/pull/61126)).
+-   `DropZone`: Avoid a media query on mount [#60546](https://github.com/WordPress/gutenberg/pull/60546)).
+-   `ComboboxControl`: Simplify string normalization ([#60893](https://github.com/WordPress/gutenberg/pull/60893)).
 
 ### Bug Fix
 
+-   `BaseControl`, `InputControl`: Remove usage of aria-details from InputControl and BaseControl ([#61203](https://github.com/WordPress/gutenberg/pull/61203)).
 -   `SlotFill`: fixed missing `getServerSnapshot` parameter in slot map ([#60943](https://github.com/WordPress/gutenberg/pull/60943)).
 -   `Panel`: Fix issue with collapsing panel header ([#61319](https://github.com/WordPress/gutenberg/pull/61319)).
-
-### Enhancements
-
--   `DropZone`: Avoid a media query on mount [#60546](https://github.com/WordPress/gutenberg/pull/60546)).
--   `ComboboxControl`: Simplify string normalization ([#60893](https://github.com/WordPress/gutenberg/pull/60893)).
 
 ### Internal
 

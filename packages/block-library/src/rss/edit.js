@@ -14,7 +14,6 @@ import {
 	RangeControl,
 	ToggleControl,
 	ToolbarGroup,
-	__experimentalHStack as HStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -59,32 +58,40 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 
 	const blockProps = useBlockProps();
 
+	const label = __( 'RSS URL' );
+
 	if ( isEditing ) {
 		return (
 			<div { ...blockProps }>
-				<Placeholder icon={ rss } label="RSS">
+				<Placeholder
+					icon={ rss }
+					label={ label }
+					instructions={ __(
+						'Display entries from any RSS or Atom feed.'
+					) }
+				>
 					<form
 						onSubmit={ onSubmitURL }
 						className="wp-block-rss__placeholder-form"
 					>
-						<HStack wrap>
-							<InputControl
-								__next40pxDefaultSize
-								placeholder={ __( 'Enter URL here…' ) }
-								value={ feedURL }
-								onChange={ ( value ) =>
-									setAttributes( { feedURL: value } )
-								}
-								className="wp-block-rss__placeholder-input"
-							/>
-							<Button
-								__next40pxDefaultSize
-								variant="primary"
-								type="submit"
-							>
-								{ __( 'Use URL' ) }
-							</Button>
-						</HStack>
+						<InputControl
+							__next40pxDefaultSize
+							label={ label }
+							hideLabelFromVision
+							placeholder={ __( 'Enter URL here…' ) }
+							value={ feedURL }
+							onChange={ ( value ) =>
+								setAttributes( { feedURL: value } )
+							}
+							className="wp-block-rss__placeholder-input"
+						/>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							type="submit"
+						>
+							{ __( 'Apply' ) }
+						</Button>
 					</form>
 				</Placeholder>
 			</div>

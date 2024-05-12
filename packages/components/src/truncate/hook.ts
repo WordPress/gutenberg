@@ -57,7 +57,7 @@ export default function useTruncate(
 		// breaks even when it contains 'unbreakable' content such as long URLs.
 		// See https://github.com/WordPress/gutenberg/issues/60860.
 		const truncateLines = css`
-			word-break: break-all;
+			${ numberOfLines === 1 ? 'word-break: break-all;' : '' }
 			-webkit-box-orient: vertical;
 			-webkit-line-clamp: ${ numberOfLines };
 			display: -webkit-box;
