@@ -225,6 +225,11 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>/</kbd></td>
 		</tr>
 		<tr>
+			<td>Create a group block from the selected multiple blocks.</td>
+			<td><kbd>Ctrl</kbd>+<kbd>G</kbd></td>
+			<td><kbd>⌘</kbd><kbd>⇧</kbd><kbd>G</kbd></td>
+		</tr>
+		<tr>
 			<td>Remove multiple selected blocks.</td>
 			<td><kbd>del</kbd><kbd>backspace</kbd></td>
 			<td><kbd>del</kbd><kbd>backspace</kbd></td>

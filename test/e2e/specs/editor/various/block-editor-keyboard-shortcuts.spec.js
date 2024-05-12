@@ -217,4 +217,68 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 			] );
 		} );
 	} );
+
+	test.describe( 'create a group block from the selected blocks', () => {
+		test( 'should propagate properly if multiple blocks are selected.', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await addTestParagraphBlocks( { editor, page } );
+
+			// Multiselect via keyboard.
+			await pageUtils.pressKeys( 'primary+a', { times: 2 } );
+
+			await pageUtils.pressKeys( 'primary+g' ); // Keyboard shortcut for Insert before.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: { content: '1st' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: '2nd' },
+						},
+						{
+							name: 'core/paragraph',
+							attributes: { content: '3rd' },
+						},
+					],
+				},
+			] );
+		} );
+
+		test( 'should prevent if a single block is selected.', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await addTestParagraphBlocks( { editor, page } );
+			const firstParagraphBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.first();
+			await editor.selectBlocks( firstParagraphBlock );
+			await pageUtils.pressKeys( 'primary+g' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '1st' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: '2nd' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: '3rd' },
+				},
+			] );
+		} );
+	} );
 } );

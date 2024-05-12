@@ -18,10 +18,6 @@ const POPOVER_PROPS = {
 /**
  * Internal dependencies
  */
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -68,9 +64,6 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: attributes.type,
 						postId: attributes.id,
-						...( isPreviewingTheme() && {
-							wp_theme_preview: currentlyPreviewingTheme(),
-						} ),
 					},
 					{
 						backPath: params,
@@ -82,9 +75,6 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: 'page',
 						postId: attributes.id,
-						...( isPreviewingTheme() && {
-							wp_theme_preview: currentlyPreviewingTheme(),
-						} ),
 					},
 					{
 						backPath: params,
