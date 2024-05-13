@@ -14,8 +14,8 @@
 		@include reduce-motion("transition");
 
 		&.is-pill {
-			height: $button-size-next-default-40px;
-			border-radius: 100px;
+			height: $button-size-compact;
+			border-radius: $radius-block-ui;
 			overflow: hidden;
 		}
 	}
