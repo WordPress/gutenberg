@@ -37,7 +37,7 @@ export default function ResetOverridesControl( props ) {
 				return;
 			}
 
-			return !! overrides[ name ];
+			return overrides.hasOwnProperty( name );
 		},
 		[ props.clientId, name ]
 	);
@@ -63,8 +63,16 @@ export default function ResetOverridesControl( props ) {
 		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
 			registry.dispatch( blockEditorStore );
 		__unstableMarkLastChangeAsPersistent();
+
+		let newOverrides = { ...overrides };
+		delete newOverrides[ name ];
+
+		if ( ! Object.keys( newOverrides ).length ) {
+			newOverrides = undefined;
+		}
+
 		updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: { ...overrides, [ name ]: undefined },
+			[ CONTENT ]: newOverrides,
 		} );
 	}
 
