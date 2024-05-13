@@ -18,10 +18,11 @@ ruleTester.run( 'wp-global-usage', rule, {
 	valid: [
 		{ code: "const text = 'SCRIPT_DEBUG'" },
 		{ code: 'const config = { SCRIPT_DEBUG: true }' },
-		{ code: `if ( globalThis.IS_GUTENBERG_PLUGIN ) {}` },
-		{ code: `if ( globalThis.IS_WORDPRESS_CORE ) {}` },
-		{ code: `if ( globalThis.SCRIPT_DEBUG ) {}` },
-		{ code: `if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {}` },
+		{ code: 'if ( globalThis.IS_GUTENBERG_PLUGIN ) {}' },
+		{ code: 'if ( globalThis.IS_WORDPRESS_CORE ) {}' },
+		{ code: 'if ( globalThis.SCRIPT_DEBUG ) {}' },
+		{ code: 'if ( process.env.SCRIPT_DEBUG ) {}' },
+		{ code: 'if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {}' },
 		{
 			// Ensure whitespace is ok.
 			code: `if (
@@ -29,8 +30,8 @@ ruleTester.run( 'wp-global-usage', rule, {
 				IS_GUTENBERG_PLUGIN
 			) {}`,
 		},
-		{ code: `const test = globalThis.IS_GUTENBERG_PLUGIN ? foo : bar` },
-		{ code: `const test = ! globalThis.IS_GUTENBERG_PLUGIN ? bar : foo` },
+		{ code: 'const test = globalThis.IS_GUTENBERG_PLUGIN ? foo : bar' },
+		{ code: 'const test = ! globalThis.IS_GUTENBERG_PLUGIN ? bar : foo' },
 		{
 			// Ensure whitespace is ok.
 			code: `const test = ! globalThis.
@@ -89,7 +90,7 @@ ruleTester.run( 'wp-global-usage', rule, {
 			output: 'if ( globalThis.IS_GUTENBERG_PLUGIN ) {}',
 		},
 		{
-			code: `if ( true ) { globalThis.IS_GUTENBERG_PLUGIN === 2 }`,
+			code: 'if ( true ) { globalThis.IS_GUTENBERG_PLUGIN === 2 }',
 			errors: [
 				{
 					messageId: 'usedOutsideConditional',
@@ -98,7 +99,7 @@ ruleTester.run( 'wp-global-usage', rule, {
 			],
 		},
 		{
-			code: `if ( globalThis.IS_GUTENBERG_PLUGIN === 2 ) {}`,
+			code: 'if ( globalThis.IS_GUTENBERG_PLUGIN === 2 ) {}',
 			errors: [
 				{
 					messageId: 'usedOutsideConditional',
@@ -107,7 +108,7 @@ ruleTester.run( 'wp-global-usage', rule, {
 			],
 		},
 		{
-			code: `if ( true || globalThis.IS_GUTENBERG_PLUGIN === 2 ) {}`,
+			code: 'if ( true || globalThis.IS_GUTENBERG_PLUGIN === 2 ) {}',
 			errors: [
 				{
 					messageId: 'usedOutsideConditional',
@@ -116,7 +117,7 @@ ruleTester.run( 'wp-global-usage', rule, {
 			],
 		},
 		{
-			code: `const isFeatureActive = globalThis.IS_GUTENBERG_PLUGIN;`,
+			code: 'const isFeatureActive = globalThis.IS_GUTENBERG_PLUGIN;',
 			errors: [
 				{
 					messageId: 'usedOutsideConditional',
