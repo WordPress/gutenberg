@@ -1,4 +1,4 @@
-# WordPress globals usage (wp-globals-usage)
+# WordPress global usage (wp-global-usage)
 
 To enable the use of feature flags in Gutenberg some globals are used, such as `IS_GUTENBERG_PLUGIN` and `SCRIPT_DEBUG`.
 
