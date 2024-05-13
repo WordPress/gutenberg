@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `@wordpress/is-gutenberg-plugin` rule has been replaced by `@wordpress/wp-global-usage` ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/wp-process-env` rule has been added and included in the recommended configurations ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+
 ## 18.1.0 (2024-05-16)
 
 ### Internal
