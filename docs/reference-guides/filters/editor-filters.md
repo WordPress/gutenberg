@@ -7,7 +7,7 @@ WordPress exposes several APIs that allow you to modify the editor experience.
 One of the most common ways to modify the Editor is through the [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) PHP filter, which is applied before settings are sent to the initialized Editor. This filter allows plugin and theme authors extensive control over how the Editor behaves.
 
 <div class="callout callout-warning">
-	Before WordPress 5.8, this hook was known as <code>block_editor_settings</code>, which is now deprecated. If you need to support older versions of WordPress, you might need a way to detect which filter should be used. The recommended way to proceed is to check if the <code>WP_Block_Editor_Context</code> class exists.
+	Before WordPress 5.8, this hook was known as <code>block_editor_settings</code>, which is now deprecated. If you need to support older versions of WordPress, you might need a way to detect which filter should be used. You can check if <code>block_editor_settings</code> is safe to use by seeing if the <code>WP_Block_Editor_Context</code> class exists, which was introduced in 5.8.
 </div>
 
 The `block_editor_settings_all` hook passes two parameters to the callback function:
@@ -239,8 +239,9 @@ addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
 	( error ) => {
-		// Error is the exception's error object.
-		ErrorCaptureTool.captureError( error );
+		// Error is the exception's error object. 
+		// You can console.log it or send it to an external error-tracking tool.
+		console.log ( error );
 	}
 );
 ```
