@@ -846,4 +846,61 @@ test.describe( 'Pattern Overrides', () => {
 			await expect( secondParagraph ).toHaveText( 'overriden content' );
 		} );
 	} );
+
+	// A Undo/Redo bug found when implementing and fixing https://github.com/WordPress/gutenberg/pull/60721.
+	// This could be merged into an existing test after we fully test it.
+	test( 'undo/redo should not lose focuses', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+		pageUtils,
+	} ) => {
+		const paragraphName = 'Editable paragraph';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const paragraphBlock = patternBlock.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+
+		// Make an edit to the paragraph.
+		await paragraphBlock.focus();
+		// Move the text cursor to the end.
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '123', { delay: 1000 } );
+
+		const getSelectionStart = async () => {
+			return await editor.canvas.locator( 'body' ).evaluate(
+				// Disable reason: It's a test in a controlled environment.
+				// eslint-disable-next-line @wordpress/no-unguarded-get-range-at
+				() => document.getSelection().getRangeAt( 0 ).startOffset
+			);
+		};
+
+		await expect.poll( getSelectionStart ).toBe( 12 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph12' );
+		await expect.poll( getSelectionStart ).toBe( 11 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph1' );
+		await expect.poll( getSelectionStart ).toBe( 10 );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph' );
+	} );
 } );
