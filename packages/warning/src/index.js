@@ -4,6 +4,7 @@
 import { logged } from './utils';
 
 function isDev() {
+	// eslint-disable-next-line @wordpress/wp-global-usage
 	return globalThis.SCRIPT_DEBUG === true;
 }
 
