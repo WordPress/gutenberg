@@ -11,7 +11,6 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-import { store as blockEditorStore } from '../store';
 
 /** @typedef {import('@wordpress/compose').WPHigherOrderComponent} WPHigherOrderComponent */
 /** @typedef {import('@wordpress/blocks').WPBlockSettings} WPBlockSettings */
@@ -111,35 +110,11 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			( nextAttributes ) => {
 				registry.batch( () => {
 					if ( ! bindings ) {
-						return setAttributes( nextAttributes );
+						setAttributes( nextAttributes );
+						return;
 					}
 
 					const keptAttributes = { ...nextAttributes };
-
-					// Don't update non-bound attributes if block is connected to pattern overrides.
-					// Ad-hoc fix for pattern overrides until we figure out what users really want.
-					// This could be needed not only for pattern overrides but all sources.
-					if (
-						Object.values( bindings ).some(
-							( binding ) =>
-								binding.source === 'core/pattern-overrides'
-						)
-					) {
-						// Don't update non-bound attribute only when using the pattern and not when editing the original one.
-						const { getBlockParents, getBlockName } =
-							registry.select( blockEditorStore );
-						const parents = getBlockParents( clientId, true );
-						const patternClientId = parents.find(
-							( id ) => getBlockName( id ) === 'core/block'
-						);
-						if ( patternClientId ) {
-							for ( const attributeName in nextAttributes ) {
-								if ( ! bindings[ attributeName ] ) {
-									delete keptAttributes[ attributeName ];
-								}
-							}
-						}
-					}
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(

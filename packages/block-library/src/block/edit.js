@@ -109,6 +109,8 @@ function RecursionWarning() {
 	);
 }
 
+const NOOP = () => {};
+
 // Wrap the main Edit function for the pattern block with a recursion wrapper
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
@@ -139,11 +141,9 @@ function ReusableBlockEdit( {
 		'wp_block',
 		ref
 	);
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_block',
-		{ id: ref }
-	);
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: ref,
+	} );
 	const isMissing = hasResolved && ! record;
 
 	const { setBlockEditingMode } = useDispatch( blockEditorStore );
@@ -219,8 +219,8 @@ function ReusableBlockEdit( {
 		templateLock: 'contentOnly',
 		layout,
 		value: innerBlocks.length > 0 ? innerBlocks : blocks,
-		onInput,
-		onChange,
+		onInput: NOOP,
+		onChange: NOOP,
 		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
 	} );
 
