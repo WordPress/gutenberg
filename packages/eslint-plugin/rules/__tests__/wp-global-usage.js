@@ -17,6 +17,7 @@ const ruleTester = new RuleTester( {
 ruleTester.run( 'wp-global-usage', rule, {
 	valid: [
 		{ code: "const text = 'SCRIPT_DEBUG'" },
+		{ code: 'const config = { SCRIPT_DEBUG: true }' },
 		{ code: `if ( globalThis.IS_GUTENBERG_PLUGIN ) {}` },
 		{ code: `if ( globalThis.IS_WORDPRESS ) {}` },
 		{ code: `if ( globalThis.SCRIPT_DEBUG ) {}` },

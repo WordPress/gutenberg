@@ -69,6 +69,10 @@ module.exports = {
 					return;
 				}
 
+				if ( node.parent.type === 'Property' ) {
+					return;
+				}
+
 				if (
 					node.parent?.type !== 'MemberExpression' ||
 					node.parent.object.type !== 'Identifier' ||
