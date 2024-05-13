@@ -60,15 +60,9 @@ function PostDiscussionToggle( { isOpen, onClick } ) {
 	}, [] );
 	let label;
 	if ( commentStatus === 'open' ) {
-		label =
-			pingStatus === 'open'
-				? __( 'Open, Pingbacks & Trackbacks enabled' )
-				: __( 'Open, Pingbacks & Trackbacks disabled' );
+		label = pingStatus === 'open' ? __( 'Open' ) : __( 'Comments only' );
 	} else {
-		label =
-			pingStatus === 'open'
-				? __( 'Closed, Pingbacks & Trackbacks enabled' )
-				: __( 'Closed, Pingbacks & Trackbacks disabled' );
+		label = pingStatus === 'open' ? __( 'Pings only' ) : __( 'Closed' );
 	}
 	return (
 		<Button
