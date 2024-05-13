@@ -56,20 +56,24 @@
 		margin: revert;
 	}
 
-	ul,
-	ol {
+	// These resets ignore the social links block without increasing
+	// specificity as the block library styles include their own reset. This
+	// allows the block to have zero specificity styles and remain compatible
+	// with global styles for block themes.
+	ul:where(:not([class*="wp-block"])),
+	ol:where(:not([class*="wp-block"])) {
 		margin: revert;
 		padding: revert;
 		list-style-type: revert;
 		box-sizing: border-box;
 
 		// Remove bottom margin from nested lists.
-		ul,
-		ol {
+		ul:where(:not([class*="wp-block"])),
+		ol:where(:not([class*="wp-block"])) {
 			margin: revert;
 		}
 
-		li {
+		li:where(:not([class*="wp-block"])) {
 			margin: revert;
 		}
 	}
