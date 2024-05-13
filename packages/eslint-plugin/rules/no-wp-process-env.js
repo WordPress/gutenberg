@@ -61,8 +61,8 @@ module.exports = {
 					messageId: 'useGlobalThis',
 					data: { name: propertyNameOrValue },
 					fix( fixer ) {
-						return fixer.replaceTextRange(
-							node.range,
+						return fixer.replaceText(
+							node,
 							`globalThis.${ propertyNameOrValue }`
 						);
 					},
