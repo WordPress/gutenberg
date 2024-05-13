@@ -1,4 +1,4 @@
-const VARIABLES = new Set(
+const NAMES = new Set(
 	/** @type {const} */ ( [
 		'GUTENBERG_PHASE',
 		'IS_GUTENBERG_PLUGIN',
@@ -12,6 +12,7 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
+		fixable: true,
 		messages: {
 			message:
 				'`{{ name }}` should not be accessed from process.env. Use `globalThis.{{name}}`.',
@@ -24,7 +25,7 @@ module.exports = {
 				if ( ! propertyNameOrValue ) {
 					return;
 				}
-				if ( ! VARIABLES.has( propertyNameOrValue ) ) {
+				if ( ! NAMES.has( propertyNameOrValue ) ) {
 					return;
 				}
 
@@ -49,6 +50,12 @@ module.exports = {
 					node,
 					messageId: 'message',
 					data: { name: propertyNameOrValue },
+					fix( fixer ) {
+						return fixer.replaceTextRange(
+							[ obj.range[ 0 ], node.range[ 1 ] ],
+							`globalThis.${ propertyNameOrValue }`
+						);
+					},
 				} );
 			},
 		};
