@@ -280,11 +280,7 @@ const resolve = ( path, namespace ) => {
 	try {
 		// TODO: Support lazy/dynamically initialized stores
 		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {
-		warn(
-			`The path "${ path }" could not be resolved in the "${ namespace }" store.`
-		);
-	}
+	} catch ( e ) {}
 };
 
 // Generate the evaluate function.
