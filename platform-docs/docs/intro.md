@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Getting Started
 
-Let's discover how to use the **Gutenberg Block Editor** to build your own block editor in less than 10 minutes\*\*.
+Let's discover how to use the **Gutenberg Block Editor** to build your own block editor in less than 10 minutes.
 
 ## What you'll need
 
@@ -13,9 +13,11 @@ Let's discover how to use the **Gutenberg Block Editor** to build your own block
 
 ## Preparing the SPA powered by Vite.
 
-First bootstrap a vite project using `npm create vite@latest` and pick `Vanilla` variant and `JavaScript` as a language.
+First bootstrap a vite project using `npm create vite@latest` and pick `React` variant and `JavaScript` as a language.
 
-Once done, you can navigate to your application folder and run it locally using `npm run dev`. Open the displayed local URL in a browser.
+Once done, you can navigate to your application folder, install dependencies
+using `npm install` and run it locally using `npm run dev`. Open the displayed local URL in a
+browser.
 
 ## Installing dependencies
 
@@ -40,13 +42,16 @@ WordPress Core.
 For our purposes, as we're building a standalone block editor that is completely
 separate from WordPress, we want to set this variable to `false`.
 
-When using Vite, we can do it by creating a `vite.config.js` file:
+When using Vite, we can do it by updating the `vite.config.js` file. It should
+now look like this:
 
 ```js
-// vite.config.js
 import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
+// https://vitejs.dev/config/
 export default defineConfig( {
+	plugins: [ react() ],
 	define: {
 		'process.env.IS_GUTENBERG_PLUGIN': JSON.stringify( false ),
 	},
@@ -59,12 +64,13 @@ same thing.
 
 ## Bootstrap your block editor
 
-It's time to render our first block editor. Update your `index.jsx` file with the following code:
+It's time to render our first block editor. Update your `main.jsx` file with the following code:
 
 ```jsx
-import React, { useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Editor } from './Editor.jsx';
+
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 // Default styles that are needed for the editor.
@@ -79,7 +85,20 @@ import '@wordpress/block-library/build-style/editor.css';
 // Register the default core block types.
 registerCoreBlocks();
 
-function Editor() {
+ReactDOM.createRoot( document.getElementById( 'root' ) ).render(
+	<React.StrictMode>
+		<Editor />
+	</React.StrictMode>
+);
+```
+
+Next, create an `Editor.jsx` file and add the following code:
+
+```jsx
+import { useState } from 'react';
+import { BlockEditorProvider, BlockCanvas } from '@wordpress/block-editor';
+
+export function Editor() {
 	const [ blocks, setBlocks ] = useState( [] );
 	return (
 		/*
@@ -99,10 +118,10 @@ function Editor() {
 		</BlockEditorProvider>
 	);
 }
-
-// Render your React component instead
-const root = createRoot( document.getElementById( 'app' ) );
-root.render( <Editor /> );
 ```
 
-That's it! You now have a very basic block editor with several block types included by default: paragraphs, headings, lists, quotes, images...
+You can remove all the other files in the `src` directory, we only need
+`main.jsx` and `Editor.jsx`.
+
+That's it! You now have a very basic block editor with several block types
+included by default: paragraphs, headings, lists, quotes, images...
