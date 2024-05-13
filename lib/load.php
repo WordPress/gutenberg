@@ -48,12 +48,12 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 6.6 compat.
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-global-styles-revisions-controller-6-6.php';
-    require_once __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-edit-site-export-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
 	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
 
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental.
@@ -205,6 +205,7 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/interactivity-api.php';
+require __DIR__ . '/block-template-utils.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 	require __DIR__ . '/experimental/full-page-client-side-navigation.php';
 }

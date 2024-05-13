@@ -1,25 +1,21 @@
 <?php
 /**
-* REST API: WP_REST_Edit_Site_Export_Controller class
-*
-* @package    WordPress
-* @subpackage REST_API
-*/
+ * Controller which provides REST endpoint for exporting current templates
+ * and template parts.
+ *
+ * This class extension exists so that theme exporting takes into account any updates/changes to
+ * WP_Theme_JSON_Gutenberg or WP_Theme_JSON_Resolver_Gutenberg or related.
+ *
+ * @package    gutenberg
+ * @subpackage REST_API
+ * @since 5.9.0
+ */
 
-/**
-* Controller which provides REST endpoint for exporting current templates
-* and template parts.
-*
-* @since 5.9.0
-*
-* @see WP_REST_Controller
-*/
-
-if ( class_exists( 'Gutenberg_REST_Edit_Site_Export_Controller_6_6' ) ) {
+if ( class_exists( 'WP_REST_Edit_Site_Export_Controller_Gutenberg' ) ) {
 	return;
 }
 
-class Gutenberg_REST_Edit_Site_Export_Controller_6_6 extends WP_REST_Edit_Site_Export_Controller {
+class WP_REST_Edit_Site_Export_Controller_Gutenberg extends WP_REST_Edit_Site_Export_Controller {
 	/**
 	 * Output a ZIP file with an export of the current templates
 	 * and template parts from the site editor, and close the connection.
