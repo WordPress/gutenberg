@@ -19,7 +19,7 @@ ruleTester.run( 'wp-global-usage', rule, {
 		{ code: "const text = 'SCRIPT_DEBUG'" },
 		{ code: 'const config = { SCRIPT_DEBUG: true }' },
 		{ code: `if ( globalThis.IS_GUTENBERG_PLUGIN ) {}` },
-		{ code: `if ( globalThis.IS_WORDPRESS ) {}` },
+		{ code: `if ( globalThis.IS_WORDPRESS_CORE ) {}` },
 		{ code: `if ( globalThis.SCRIPT_DEBUG ) {}` },
 		{ code: `if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {}` },
 		{
@@ -67,6 +67,16 @@ ruleTester.run( 'wp-global-usage', rule, {
 				},
 			],
 			output: 'if ( globalThis.SCRIPT_DEBUG ) {}',
+		},
+		{
+			code: 'if ( IS_WORDPRESS_CORE ) {}',
+			errors: [
+				{
+					messageId: 'usedWithoutGlobalThis',
+					data: { name: 'IS_WORDPRESS_CORE' },
+				},
+			],
+			output: 'if ( globalThis.IS_WORDPRESS_CORE ) {}',
 		},
 		{
 			code: "if ( window[ 'IS_GUTENBERG_PLUGIN' ] ) {}",

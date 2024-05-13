@@ -40,9 +40,9 @@ ruleTester.run( 'no-wp-process-env', rule, {
 			output: 'globalThis.SCRIPT_DEBUG',
 		},
 		{
-			code: 'process.env.IS_WORDPRESS',
+			code: 'process.env.IS_WORDPRESS_CORE',
 			errors: [ { messageId: 'useGlobalThis' } ],
-			output: 'globalThis.IS_WORDPRESS',
+			output: 'globalThis.IS_WORDPRESS_CORE',
 		},
 		{
 			code: `process['env']["IS_GUTENBERG_PLUGIN"]`,
