@@ -703,88 +703,34 @@ test.describe( 'Pattern Overrides', () => {
 		).toBeHidden();
 	} );
 
-	test( 'create a pattern with synced blocks', async ( {
+	test( 'blocks with the same name should be synced', async ( {
 		page,
 		admin,
+		requestUtils,
 		editor,
 	} ) => {
 		let patternId;
 		const sharedName = 'Shared Name';
 
-		await test.step( 'create a pattern with synced blocks', async () => {
-			await admin.visitSiteEditor( { path: '/patterns' } );
-
-			await page
-				.getByRole( 'region', { name: 'Navigation' } )
-				.getByRole( 'button', { name: 'Create pattern' } )
-				.click();
-
-			await page
-				.getByRole( 'menu', { name: 'Create pattern' } )
-				.getByRole( 'menuitem', { name: 'Create pattern' } )
-				.click();
-
-			const createPatternDialog = page.getByRole( 'dialog', {
-				name: 'Create pattern',
+		await test.step( 'create a pattern with synced blocks with the same name', async () => {
+			const { id } = await requestUtils.createBlock( {
+				title: 'Blocks with the same name',
+				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<h2>default name</h2>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<p>default content</p>
+			<!-- /wp:paragraph -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<p>default content</p>
+			<!-- /wp:paragraph -->`,
+				status: 'publish',
 			} );
-			await createPatternDialog
-				.getByRole( 'textbox', { name: 'Name' } )
-				.fill( 'Pattern with synced values' );
-			await createPatternDialog
-				.getByRole( 'checkbox', { name: 'Synced' } )
-				.setChecked( true );
-			await createPatternDialog
-				.getByRole( 'button', { name: 'Create' } )
-				.click();
-
-			await editor.canvas.locator( 'body' ).click();
-
-			// Insert heading with shared name.
-			await editor.insertBlock( {
-				name: 'core/heading',
-				attributes: {
-					content: 'default content',
-					metadata: {
-						name: sharedName,
-						bindings: {
-							content: {
-								source: 'core/pattern-overrides',
-							},
-						},
-					},
-				},
-			} );
-
-			// Insert first paragraph with shared name.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'default content',
-					metadata: {
-						name: sharedName,
-						bindings: {
-							content: {
-								source: 'core/pattern-overrides',
-							},
-						},
-					},
-				},
-			} );
-
-			// Insert second paragraph with shared name.
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: {
-					content: 'default content',
-					metadata: {
-						name: sharedName,
-						bindings: {
-							content: {
-								source: 'core/pattern-overrides',
-							},
-						},
-					},
-				},
+			await admin.visitSiteEditor( {
+				postId: id,
+				postType: 'wp_block',
+				categoryType: 'pattern',
+				canvas: 'edit',
 			} );
 
 			const headingBlock = editor.canvas.getByRole( 'document', {
@@ -801,10 +747,17 @@ test.describe( 'Pattern Overrides', () => {
 				} )
 				.last();
 
-			await firstParagraph.fill( 'updated content' );
-			await expect( headingBlock ).toHaveText( 'updated content' );
-			await expect( firstParagraph ).toHaveText( 'updated content' );
-			await expect( secondParagraph ).toHaveText( 'updated content' );
+			// Update the content of one of the blocks.
+			await headingBlock.fill( 'updated content' );
+
+			// Check that every content has been updated.
+			for ( const block of [
+				headingBlock,
+				firstParagraph,
+				secondParagraph,
+			] ) {
+				await expect( block ).toHaveText( 'updated content' );
+			}
 
 			await page
 				.getByRole( 'region', { name: 'Editor top bar' } )
