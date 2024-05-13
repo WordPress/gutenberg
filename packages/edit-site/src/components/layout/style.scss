@@ -140,6 +140,9 @@
 	view-transition-name: toggle;
 }
 /* stylelint-enable */
+.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
+	display: none;
+}
 
 .edit-site-layout__view-mode-toggle.components-button {
 	position: relative;
