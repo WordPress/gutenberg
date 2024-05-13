@@ -47,9 +47,6 @@ import {
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
-	exportJSONaction,
-	resetAction,
-	deleteAction,
 	duplicatePatternAction,
 	duplicateTemplatePartAction,
 } from './dataviews-pattern-actions';
@@ -383,20 +380,13 @@ export default function DataviewsPatterns() {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
-				...templatePartActions,
 				duplicateTemplatePartAction,
-				resetAction,
-				deleteAction,
+				...templatePartActions,
 			].filter( Boolean );
 		}
-		return [
-			editAction,
-			...patternActions,
-			duplicatePatternAction,
-			exportJSONaction,
-			resetAction,
-			deleteAction,
-		].filter( Boolean );
+		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
+			Boolean
+		);
 	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {
