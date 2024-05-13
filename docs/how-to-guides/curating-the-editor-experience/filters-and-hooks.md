@@ -8,7 +8,7 @@ One of the most common ways to modify the Editor is through the [`block_editor_s
 
 The `block_editor_settings_all` hook passes two parameters to the callback function:
 
-- `$settings` – An array of configurable settings for the Editor.
+- `$settings` – An array of [configurable settings](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#editor-settings) for the Editor.
 - `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
 
 The following example disables the Code Editor for users who cannot activate plugins (Administrators). Add this to a plugin or your theme's `functions.php` file to test it.
