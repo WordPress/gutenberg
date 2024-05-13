@@ -60,7 +60,7 @@ const SiteHub = memo( ( { isTransparent } ) => {
 						href={ dashboardLink }
 						label={ __( 'Go to the Dashboard' ) }
 						className="edit-site-layout__view-mode-toggle"
-						style={ { transform: 'scale(0.5)' } }
+						style={ { transform: 'scale(0.5)', borderRadius: 4 } }
 					>
 						<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 					</Button>
