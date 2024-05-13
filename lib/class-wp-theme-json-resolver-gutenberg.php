@@ -723,6 +723,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links`.
 	 *
 	 * @return array
 	 */
@@ -757,6 +758,16 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				if ( empty( $variation['title'] ) ) {
 					$variation['title'] = basename( $path, '.json' );
 				}
+				/*
+				 * @TODO this needs to be added to the WP REST API schema.
+				 * E.g., $links['https://api.w.org/theme-file-uris']. ??
+				 */
+				/*
+				 * @TODO I'm not sure if we can/should add `_links` to collection items.
+				 * It should be part of the response object, but given that
+				 * WP_REST_Global_Styles_Controller_Gutenberg::get_theme_items
+				 * returns a collection ([{}]) and not a response object ({}) it's not possible.
+				 */
 				if ( ! empty( $resolved_theme_uris ) ) {
 					$variation['_links']['wp:theme-file-uris'] = $resolved_theme_uris;
 				}

@@ -11,6 +11,7 @@
  * Core class used to access global styles revisions via the REST API.
  *
  * @since 6.3.0
+ * @since 6.6.0 Added custom relative theme file URIs to `_links`.
  *
  * @see WP_REST_Controller
  */
@@ -88,8 +89,10 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_6 extends Gutenberg_RE
 		$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 		if ( ! empty( $resolved_theme_uris ) ) {
 			/*
-			 * @TODO this needs to be added to the WP REST API schema.
-			 * E.g., $links['https://api.w.org/theme-file-uris'].
+			 * @TODO I'm not sure if we can/should add `_links` to collection items.
+			 * It should be part of the response object, but given that
+			 * WP_REST_Global_Styles_Revisions_Controller::get_items
+			 * returns a collection ([{}]) and not a response object ({}) it's not possible.
 			 */
 			$links['wp:theme-file-uris'] = $resolved_theme_uris;
 		}
