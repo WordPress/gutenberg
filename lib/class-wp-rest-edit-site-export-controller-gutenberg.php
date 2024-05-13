@@ -4,7 +4,7 @@
  * and template parts.
  *
  * This class extension exists so that theme exporting takes into account any updates/changes to
- * WP_Theme_JSON_Gutenberg or WP_Theme_JSON_Resolver_Gutenberg or related.
+ * WP_Theme_JSON_Gutenberg, WP_Theme_JSON_Resolver_Gutenberg or related classes.
  *
  * @package    gutenberg
  * @subpackage REST_API
