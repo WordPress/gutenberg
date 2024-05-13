@@ -2,6 +2,9 @@
  * External dependencies
  */
 import clsx from 'clsx';
+// Import CompositeStore type, which is not exported from @wordpress/components.
+// eslint-disable-next-line no-restricted-imports
+import type { CompositeStore } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -40,15 +43,14 @@ import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
 interface Action {
 	callback: ( items: Item[] ) => void;
-	hideModalHeader: any;
 	icon: any;
 	id: string;
 	isDestructive: boolean | undefined;
-	isEligible: any;
-	isPrimary: boolean;
+	isEligible: ( item: Item ) => boolean | undefined;
+	isPrimary: boolean | undefined;
 	label: string;
 	modalHeader: string;
-	RenderModal: any;
+	RenderModal: ( props: any ) => JSX.Element;
 }
 
 interface ListViewProps {
@@ -71,7 +73,7 @@ interface ListViewItemProps {
 	mediaField?: NormalizedField;
 	onSelect: ( item: Item ) => void;
 	primaryField?: NormalizedField;
-	store: any;
+	store: CompositeStore;
 	visibleFields: NormalizedField[];
 }
 
@@ -281,7 +283,7 @@ function ListItem( {
 												className="dataviews-all-actions-button"
 												onKeyDown={ ( event: {
 													key: string;
-													preventDefault: () => any;
+													preventDefault: () => void;
 												} ) => {
 													if (
 														event.key ===
