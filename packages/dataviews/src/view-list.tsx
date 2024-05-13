@@ -279,6 +279,30 @@ function ListItem( {
 												label={ __( 'Actions' ) }
 												disabled={ ! actions.length }
 												className="dataviews-all-actions-button"
+												onKeyDown={ ( event: {
+													key: string;
+													preventDefault: () => any;
+												} ) => {
+													if (
+														event.key ===
+														'ArrowDown'
+													) {
+														// Prevent the default behaviour (open dropdown menu) and go down.
+														event.preventDefault();
+														store.move(
+															store.down()
+														);
+													}
+													if (
+														event.key === 'ArrowUp'
+													) {
+														// Prevent the default behavior (open dropdown menu) and go up.
+														event.preventDefault();
+														store.move(
+															store.up()
+														);
+													}
+												} }
 											/>
 										}
 									/>
