@@ -31,28 +31,32 @@ ruleTester.run( 'no-wp-process-env', rule, {
 	invalid: [
 		{
 			code: 'process.env.IS_GUTENBERG_PLUGIN',
-			errors: [ { messageId: 'message' } ],
+			errors: [ { messageId: 'useGlobalThis' } ],
 			output: 'globalThis.IS_GUTENBERG_PLUGIN',
 		},
 		{
 			code: 'process.env.SCRIPT_DEBUG',
-			errors: [ { messageId: 'message' } ],
+			errors: [ { messageId: 'useGlobalThis' } ],
 			output: 'globalThis.SCRIPT_DEBUG',
 		},
 		{
 			code: 'process.env.IS_WORDPRESS',
-			errors: [ { messageId: 'message' } ],
+			errors: [ { messageId: 'useGlobalThis' } ],
 			output: 'globalThis.IS_WORDPRESS',
 		},
 		{
 			code: `process['env']["IS_GUTENBERG_PLUGIN"]`,
-			errors: [ { messageId: 'message' } ],
+			errors: [ { messageId: 'useGlobalThis' } ],
 			output: 'globalThis.IS_GUTENBERG_PLUGIN',
 		},
 		{
 			code: 'process[`env`][`IS_GUTENBERG_PLUGIN`]',
-			errors: [ { messageId: 'message' } ],
+			errors: [ { messageId: 'useGlobalThis' } ],
 			output: 'globalThis.IS_GUTENBERG_PLUGIN',
+		},
+		{
+			code: 'process.env.GUTENBERG_PHASE',
+			errors: [ { messageId: 'noGutenbergPhase' } ],
 		},
 	],
 } );

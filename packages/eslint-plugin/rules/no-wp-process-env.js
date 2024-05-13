@@ -14,8 +14,10 @@ module.exports = {
 		schema: [],
 		fixable: true,
 		messages: {
-			message:
+			useGlobalThis:
 				'`{{ name }}` should not be accessed from process.env. Use `globalThis.{{name}}`.',
+			noGutenbergPhase:
+				'The GUTENBERG_PHASE environement variable is no longer available. Use IS_GUTENBERG_PLUGIN (boolean).',
 		},
 	},
 	create( context ) {
@@ -46,13 +48,21 @@ module.exports = {
 					return;
 				}
 
+				if ( propertyNameOrValue === 'GUTENBERG_PHASE' ) {
+					context.report( {
+						node,
+						messageId: 'noGutenbergPhase',
+					} );
+					return;
+				}
+
 				context.report( {
 					node,
-					messageId: 'message',
+					messageId: 'useGlobalThis',
 					data: { name: propertyNameOrValue },
 					fix( fixer ) {
 						return fixer.replaceTextRange(
-							[ obj.range[ 0 ], node.range[ 1 ] ],
+							node.range,
 							`globalThis.${ propertyNameOrValue }`
 						);
 					},
