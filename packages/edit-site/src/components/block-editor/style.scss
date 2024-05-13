@@ -4,3 +4,16 @@
 		outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
 	}
 }
+
+/* stylelint-disable */
+::view-transition-old(frame),
+::view-transition-new(frame) {
+  animation-duration: 0;
+}
+/* stylelint-enable */
+
+.edit-site-visual-editor__editor-canvas {
+	/* stylelint-disable */
+	view-transition-name: frame;
+	/* stylelint-enable */
+}

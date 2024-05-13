@@ -216,14 +216,16 @@ export default function EditSiteEditor( { isLoading } ) {
 						! isEditingPage && <PluginTemplateSettingPanel.Slot />
 					}
 				>
-					<BackButton>
-						<Button
-							className="edit-site-layout__view-mode-toggle"
-							onClick={ () => setCanvasMode( 'view' ) }
-						>
-							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
-						</Button>
-					</BackButton>
+					{ isEditMode && (
+						<BackButton>
+							<Button
+								className="edit-site-layout__view-mode-toggle"
+								onClick={ () => setCanvasMode( 'view' ) }
+							>
+								<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
+							</Button>
+						</BackButton>
+					) }
 					<SiteEditorMoreMenu />
 					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 				</Editor>
