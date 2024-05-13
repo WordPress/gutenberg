@@ -30,7 +30,7 @@ export default {
 
 		return overridableValue === '' ? undefined : overridableValue;
 	},
-	setValue( { registry, clientId, attributeName, value } ) {
+	setValues( { registry, clientId, attributes } ) {
 		const { getBlockAttributes, getBlockParents, getBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
@@ -46,9 +46,10 @@ export default {
 					if ( block.attributes?.metadata?.name === blockName ) {
 						registry
 							.dispatch( blockEditorStore )
-							.updateBlockAttributes( block.clientId, {
-								[ attributeName ]: value,
-							} );
+							.updateBlockAttributes(
+								block.clientId,
+								attributes
+							);
 					}
 					syncBlocksWithSameName( block.innerBlocks );
 				}
@@ -57,23 +58,20 @@ export default {
 			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
-
 		const blockName = currentBlockAttributes?.metadata?.name;
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
-		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
-			registry.dispatch( blockEditorStore );
-		updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: {
-				...currentBindingValue,
-				[ blockName ]: {
-					...currentBindingValue?.[ blockName ],
-					[ attributeName ]: value || '',
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( patternClientId, {
+				[ CONTENT ]: {
+					...currentBindingValue,
+					[ blockName ]: {
+						...currentBindingValue?.[ blockName ],
+						...attributes,
+					},
 				},
-			},
-		} );
-
-		__unstableMarkLastChangeAsPersistent();
+			} );
 	},
 	lockAttributesEditing: false,
 };

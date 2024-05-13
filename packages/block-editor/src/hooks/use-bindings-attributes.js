@@ -115,6 +115,7 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 					}
 
 					const keptAttributes = { ...nextAttributes };
+					const updatesBySource = new Map();
 
 					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 					for ( const [ attributeName, newValue ] of Object.entries(
@@ -129,18 +130,44 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 
 						const source =
 							sources[ bindings[ attributeName ].source ];
-						if ( ! source?.setValue ) {
+						if ( ! source?.setValue && ! source?.setValues ) {
 							continue;
 						}
-						source.setValue( {
-							registry,
-							context,
-							clientId,
-							attributeName,
-							args: bindings[ attributeName ].args,
-							value: newValue,
+						updatesBySource.set( source, {
+							...updatesBySource.get( source ),
+							[ attributeName ]: newValue,
 						} );
 						delete keptAttributes[ attributeName ];
+					}
+
+					if ( updatesBySource.size ) {
+						for ( const [
+							source,
+							attributes,
+						] of updatesBySource ) {
+							if ( source.setValues ) {
+								source.setValues( {
+									registry,
+									context,
+									clientId,
+									attributes,
+								} );
+							} else {
+								for ( const [
+									attributeName,
+									value,
+								] of Object.entries( attributes ) ) {
+									source.setValue( {
+										registry,
+										context,
+										clientId,
+										attributeName,
+										args: bindings[ attributeName ].args,
+										value,
+									} );
+								}
+							}
+						}
 					}
 
 					if ( Object.keys( keptAttributes ).length ) {
