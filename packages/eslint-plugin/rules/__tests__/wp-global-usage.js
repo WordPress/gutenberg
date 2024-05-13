@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../is-gutenberg-plugin';
+import rule from '../wp-global-usage';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,8 +14,9 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'is-gutenberg-plugin', rule, {
+ruleTester.run( 'wp-global-usage', rule, {
 	valid: [
+		{ code: "const text = 'SCRIPT_DEBUG'" },
 		{ code: `if ( globalThis.IS_GUTENBERG_PLUGIN ) {}` },
 		{ code: `if ( globalThis.IS_WORDPRESS ) {}` },
 		{ code: `if ( globalThis.SCRIPT_DEBUG ) {}` },

@@ -105,7 +105,7 @@ module.exports = {
 		'jest/expect-expect': 'off',
 		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/is-gutenberg-plugin': 'error',
+		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
