@@ -113,7 +113,7 @@ describe( 'blockStyles', () => {
 
 		let state = blockStyles( original, {
 			type: 'ADD_BLOCK_STYLES',
-			blockNames: blockName,
+			blockNames: [ blockName ],
 			styles: [ { name: 'fancy' } ],
 		} );
 
@@ -123,7 +123,7 @@ describe( 'blockStyles', () => {
 
 		state = blockStyles( state, {
 			type: 'ADD_BLOCK_STYLES',
-			blockNames: blockName,
+			blockNames: [ blockName ],
 			styles: [ { name: 'lightbox' } ],
 		} );
 
