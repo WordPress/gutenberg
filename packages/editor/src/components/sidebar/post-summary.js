@@ -59,7 +59,7 @@ export default function PostSummary( { onActionPerformed } ) {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<VStack spacing={ 3 }>
+						<VStack spacing={ 4 }>
 							<PostCardPanel
 								actions={
 									<PostActions
@@ -74,7 +74,7 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ ! isRemovedPostStatusPanel && (
-								<>
+								<VStack spacing={ 2 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
 										<PostSchedulePanel />
@@ -91,7 +91,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										! isTemplate &&
 										! isTemplatePart &&
 										! isNavigation && <PostTrashPanel /> }
-								</>
+								</VStack>
 							) }
 						</VStack>
 					</>
