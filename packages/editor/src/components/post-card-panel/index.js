@@ -38,7 +38,6 @@ export default function PostCardPanel( { actions } ) {
 			__experimentalGetTemplateInfo( _record );
 		return {
 			title: _templateInfo?.title || getEditedPostAttribute( 'title' ),
-			id: _id,
 			icon: unlock( select( editorStore ) ).getPostIcon( _type, {
 				area: _record?.area,
 			} ),
