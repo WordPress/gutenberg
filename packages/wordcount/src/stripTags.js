@@ -7,5 +7,5 @@
  * @return {string} The manipulated text.
  */
 export default function stripTags( settings, text ) {
-	return text.replace( settings.HTMLRegExp, '\n' );
+	return text?.replace( settings.HTMLRegExp, '\n' );
 }

@@ -7,5 +7,5 @@
  * @return {string} The manipulated text.
  */
 export default function stripHTMLComments( settings, text ) {
-	return text.replace( settings.HTMLcommentRegExp, '' );
+	return text?.replace( settings.HTMLcommentRegExp, '' );
 }
