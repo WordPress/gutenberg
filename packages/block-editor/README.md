@@ -207,6 +207,12 @@ _Related_
 
 Undocumented declaration.
 
+### BlockPopover
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
+
 ### BlockPreview
 
 BlockPreview renders a preview of a block or array of blocks.
