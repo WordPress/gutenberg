@@ -54,6 +54,7 @@ module.exports = {
 	meta: {
 		type: 'problem',
 		schema: [],
+		fixable: true,
 		messages: {
 			usedOutsideConditional:
 				'`globalThis.{{ name }}` should only be used as the condition in an if statement or ternary expression.',
@@ -82,6 +83,12 @@ module.exports = {
 						node,
 						messageId: 'usedWithoutGlobalThis',
 						data: { name: node.name },
+						fix( fixer ) {
+							return fixer.replaceText(
+								node,
+								`globalThis.${ node.name }`
+							);
+						},
 					} );
 				} else if ( ! isUsedInConditional( node ) ) {
 					context.report( {

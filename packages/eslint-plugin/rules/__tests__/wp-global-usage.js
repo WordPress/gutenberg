@@ -39,22 +39,24 @@ ruleTester.run( 'wp-global-usage', rule, {
 	],
 	invalid: [
 		{
-			code: `if ( IS_GUTENBERG_PLUGIN ) {}`,
+			code: 'if ( IS_GUTENBERG_PLUGIN ) {}',
 			errors: [
 				{
 					messageId: 'usedWithoutGlobalThis',
 					data: { name: 'IS_GUTENBERG_PLUGIN' },
 				},
 			],
+			output: 'if ( globalThis.IS_GUTENBERG_PLUGIN ) {}',
 		},
 		{
-			code: `if ( SCRIPT_DEBUG ) {}`,
+			code: 'if ( SCRIPT_DEBUG ) {}',
 			errors: [
 				{
 					messageId: 'usedWithoutGlobalThis',
 					data: { name: 'SCRIPT_DEBUG' },
 				},
 			],
+			output: 'if ( globalThis.SCRIPT_DEBUG ) {}',
 		},
 		{
 			code: `if ( window[ 'IS_GUTENBERG_PLUGIN' ] ) {}`,
