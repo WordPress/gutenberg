@@ -41,6 +41,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
 	NAVIGATION_POST_TYPE,
+	PATTERN_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
@@ -173,6 +174,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
+					PATTERN_POST_TYPE,
 				].includes( select( editorStore ).getCurrentPostType() ),
 				renderingMode: select( editorStore ).getRenderingMode(),
 			};
