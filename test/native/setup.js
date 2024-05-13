@@ -281,6 +281,15 @@ jest.mock( '@wordpress/compose', () => {
 	};
 } );
 
+/**
+ * client-zip is meant to be used in a browser and is therefore released as an ES6 module only,
+ * in order to use it in node environment, we need to mock it.
+ * See: https://github.com/Touffy/client-zip/issues/28
+ */
+jest.mock( 'client-zip', () => ( {
+	downloadZip: jest.fn(),
+} ) );
+
 jest.spyOn( Image, 'getSize' ).mockImplementation( ( url, success ) =>
 	success( 0, 0 )
 );
