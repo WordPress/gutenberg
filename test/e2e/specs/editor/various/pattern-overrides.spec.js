@@ -577,6 +577,70 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( resetButton ).toBeDisabled();
 	} );
 
+	// A Undo/Redo bug found when implementing and fixing https://github.com/WordPress/gutenberg/pull/60721.
+	// This could be merged into an existing test after we fully test it.
+	test( 'resets overrides immediately should not break undo/redo', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphName = 'Editable paragraph';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const paragraphBlock = patternBlock.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const resetButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Reset' } );
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+
+		// Make an edit to the paragraph.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.type( '*' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph*' );
+
+		// Reset immediately after making the edit.
+		await editor.selectBlocks( paragraphBlock );
+		await editor.showBlockToolbar();
+		await expect( resetButton ).toBeEnabled();
+		await resetButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Paragraph' );
+
+		// Undo/Redo should work
+		await undoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Heading*' );
+		await redoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Heading' );
+	} );
+
 	// Fix https://github.com/WordPress/gutenberg/issues/58708.
 	test( 'overridden empty images should not have upload button', async ( {
 		page,
