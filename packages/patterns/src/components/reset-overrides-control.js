@@ -6,19 +6,18 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 const CONTENT = 'content';
 
 export default function ResetOverridesControl( props ) {
 	const name = props.attributes.metadata?.name;
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
-	const { isOverriden, resetOverrides } = useSelect(
+	const registry = useRegistry();
+	const isOverriden = useSelect(
 		( select ) => {
 			if ( ! name ) {
-				return undefined;
+				return;
 			}
 
 			const { getBlockAttributes, getBlockParents, getBlockName } =
@@ -28,30 +27,51 @@ export default function ResetOverridesControl( props ) {
 				( id ) => getBlockName( id ) === 'core/block'
 			);
 
-			const patternAttributes = getBlockAttributes( patternClientId );
-			const existingOverrides = patternAttributes?.[ CONTENT ];
+			if ( ! patternClientId ) {
+				return;
+			}
 
-			return {
-				isOverriden: !! existingOverrides?.[ name ],
-				resetOverrides: async () => {
-					// If all overrides are undefined, reset the whole content attribute.
-					const newObject = existingOverrides.hasOwnProperty( name )
-						? undefined
-						: { ...existingOverrides, [ name ]: undefined };
-					updateBlockAttributes( patternClientId, {
-						[ CONTENT ]: newObject,
-					} );
-				},
-			};
+			const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+
+			if ( ! overrides ) {
+				return;
+			}
+
+			return !! overrides[ name ];
 		},
 		[ props.clientId, name ]
 	);
+
+	function onClick() {
+		const { getBlockAttributes, getBlockParents, getBlockName } =
+			registry.select( blockEditorStore );
+		const parents = getBlockParents( props.clientId, true );
+		const patternClientId = parents.find(
+			( id ) => getBlockName( id ) === 'core/block'
+		);
+
+		if ( ! patternClientId ) {
+			return;
+		}
+
+		const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
+		// If all overrides are undefined, reset the whole content attribute.
+		const newObject = overrides.hasOwnProperty( name )
+			? undefined
+			: { ...overrides, [ name ]: undefined };
+		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
+			registry.dispatch( blockEditorStore );
+		__unstableMarkLastChangeAsPersistent();
+		updateBlockAttributes( patternClientId, {
+			[ CONTENT ]: newObject,
+		} );
+	}
 
 	return (
 		<BlockControls group="other">
 			<ToolbarGroup>
 				<ToolbarButton
-					onClick={ resetOverrides }
+					onClick={ onClick }
 					disabled={ ! isOverriden }
 					__experimentalIsFocusable
 				>
