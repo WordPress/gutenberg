@@ -146,7 +146,8 @@ function ReusableBlockEdit( {
 	} );
 	const isMissing = hasResolved && ! record;
 
-	const { setBlockEditingMode } = useDispatch( blockEditorStore );
+	const { setBlockEditingMode, __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 
 	const {
 		innerBlocks,
@@ -233,6 +234,8 @@ function ReusableBlockEdit( {
 
 	const resetContent = () => {
 		if ( content ) {
+			// Make sure any previous changes are persisted before resetting.
+			__unstableMarkLastChangeAsPersistent();
 			setAttributes( { content: undefined } );
 		}
 	};
