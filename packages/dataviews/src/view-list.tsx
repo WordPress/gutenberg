@@ -343,6 +343,24 @@ export default function ViewList( props: ListViewProps ) {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
 
+	// Manage focused item, when the active one is removed from the list.
+	const isActiveIdInList = store.useState(
+		( state: { items: any[]; activeId: any } ) =>
+			state.items.some(
+				( item: { id: any } ) => item.id === state.activeId
+			)
+	);
+	useEffect( () => {
+		if ( ! isActiveIdInList ) {
+			// Prefer going down, except if there is no item below (last item), then go up (last item in list).
+			if ( store.down() ) {
+				store.move( store.down() );
+			} else if ( store.up() ) {
+				store.move( store.up() );
+			}
+		}
+	}, [ isActiveIdInList ] );
+
 	const hasData = data?.length;
 	if ( ! hasData ) {
 		return (
