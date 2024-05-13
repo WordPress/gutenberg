@@ -68,7 +68,13 @@ export default {
 					...currentBindingValue,
 					[ blockName ]: {
 						...currentBindingValue?.[ blockName ],
-						...attributes,
+						...Object.entries( attributes ).reduce(
+							( acc, [ key, value ] ) => {
+								acc[ key ] = value === undefined ? '' : value;
+								return acc;
+							},
+							{}
+						),
 					},
 				},
 			} );
