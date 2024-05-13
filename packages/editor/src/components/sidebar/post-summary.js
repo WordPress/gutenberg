@@ -39,13 +39,13 @@ import TemplateAreas from '../template-areas';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPannel, postType } = useSelect( ( select ) => {
+	const { isRemovedPostStatusPanel, postType } = useSelect( ( select ) => {
 		// We use isEditorPanelRemoved to hide the panel if it was programatically removed. We do
 		// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 		const { isEditorPanelRemoved, getCurrentPostType } =
 			select( editorStore );
 		return {
-			isRemovedPostStatusPannel: isEditorPanelRemoved( PANEL_NAME ),
+			isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
 			postType: getCurrentPostType(),
 		};
 	}, [] );
@@ -73,7 +73,7 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostContentInformation />
 								<PostLastEditedPanel />
 							</VStack>
-							{ ! isRemovedPostStatusPannel && (
+							{ ! isRemovedPostStatusPanel && (
 								<>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />
