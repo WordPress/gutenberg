@@ -55,15 +55,16 @@ export default function ResetOverridesControl( props ) {
 		}
 
 		const overrides = getBlockAttributes( patternClientId )[ CONTENT ];
-		// If all overrides are undefined, reset the whole content attribute.
-		const newObject = overrides.hasOwnProperty( name )
-			? undefined
-			: { ...overrides, [ name ]: undefined };
+
+		if ( ! overrides.hasOwnProperty( name ) ) {
+			return;
+		}
+
 		const { updateBlockAttributes, __unstableMarkLastChangeAsPersistent } =
 			registry.dispatch( blockEditorStore );
 		__unstableMarkLastChangeAsPersistent();
 		updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: newObject,
+			[ CONTENT ]: { ...overrides, [ name ]: undefined },
 		} );
 	}
 
