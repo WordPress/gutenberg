@@ -636,9 +636,9 @@ test.describe( 'Pattern Overrides', () => {
 
 		// Undo/Redo should work
 		await undoButton.click();
-		await expect( paragraphBlock ).toHaveText( 'Heading*' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph*' );
 		await redoButton.click();
-		await expect( paragraphBlock ).toHaveText( 'Heading' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph' );
 	} );
 
 	// Fix https://github.com/WordPress/gutenberg/issues/58708.
