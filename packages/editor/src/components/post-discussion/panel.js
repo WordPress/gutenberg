@@ -12,6 +12,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -51,18 +52,33 @@ function ModalContents( { onClose } ) {
 }
 
 function PostDiscussionToggle( { isOpen, onClick } ) {
-	const { commentStatus, pingStatus } = useSelect( ( select ) => {
+	const {
+		commentStatus,
+		pingStatus,
+		commentsSupported,
+		trackbacksSupported,
+	} = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			commentStatus: getEditedPostAttribute( 'comment_status' ) ?? 'open',
 			pingStatus: getEditedPostAttribute( 'ping_status' ) ?? 'open',
+			commentsSupported: !! postType.supports.comments,
+			trackbacksSupported: !! postType.supports.trackbacks,
 		};
 	}, [] );
 	let label;
 	if ( commentStatus === 'open' ) {
-		label = pingStatus === 'open' ? __( 'Open' ) : __( 'Comments only' );
+		if ( pingStatus === 'open' ) {
+			label = __( 'Open' );
+		} else {
+			label = trackbacksSupported ? __( 'Comments only' ) : __( 'Open' );
+		}
+	} else if ( pingStatus === 'open' ) {
+		label = commentsSupported ? __( 'Pings only' ) : __( 'Pings enabled' );
 	} else {
-		label = pingStatus === 'open' ? __( 'Pings only' ) : __( 'Closed' );
+		label = __( 'Closed' );
 	}
 	return (
 		<Button

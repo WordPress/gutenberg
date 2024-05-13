@@ -81,7 +81,7 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostSchedulePanel />
 										<PostTemplatePanel />
 										<PostURLPanel />
-							<PostDiscussionPanel />
+										<PostDiscussionPanel />
 										<PostSyncStatus />
 									</VStack>
 									<PostStickyPanel />
