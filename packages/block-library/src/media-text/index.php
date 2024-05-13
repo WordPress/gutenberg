@@ -48,6 +48,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
+	$processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
 
 	$content = $processor->get_updated_html();
 

@@ -1,13 +1,9 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
+import { createSelector } from '..';
 import createReduxStore from '../redux-store';
 
 const getElementCount = createRegistrySelector( ( select ) => () => {

@@ -20,7 +20,9 @@ const hasVariableWithName = ( node, name ) =>
 	node.declarations.some( ( declaration ) => {
 		if ( declaration.id.type === 'ObjectPattern' ) {
 			return declaration.id.properties.some(
-				( property ) => property.key.name === name
+				( property ) =>
+					property.key?.name === name ||
+					property.argument?.name === name
 			);
 		}
 		return declaration.id.name === name;

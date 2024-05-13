@@ -207,7 +207,7 @@ function gutenberg_get_global_styles_base_custom_css() {
  *
  * @since 6.6.0
  *
- *  @global WP_Styles $wp_styles
+ * @global WP_Styles $wp_styles
  */
 function gutenberg_add_global_styles_block_custom_css() {
 	global $wp_styles;
@@ -247,9 +247,9 @@ function gutenberg_add_global_styles_block_custom_css() {
 /**
  * Adds global style rules to the inline style for each block.
  *
- * @return void
- *
  * @global WP_Styles $wp_styles
+ *
+ * @return void
  */
 function gutenberg_add_global_styles_for_blocks() {
 	global $wp_styles;

@@ -205,21 +205,21 @@ const cssStringToObject = ( val ) => {
  * @param {string} type 'window' or 'document'
  * @return {void}
  */
-const getGlobalEventDirective =
-	( type ) =>
-	( { directives, evaluate } ) => {
+const getGlobalEventDirective = ( type ) => {
+	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
 			.forEach( ( entry ) => {
+				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
 					const cb = ( event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
-					globalVar.addEventListener( entry.suffix, cb );
-					return () =>
-						globalVar.removeEventListener( entry.suffix, cb );
+					globalVar.addEventListener( eventName, cb );
+					return () => globalVar.removeEventListener( eventName, cb );
 				}, [] );
 			} );
 	};
+};
 
 export default () => {
 	// data-wp-context
@@ -241,6 +241,17 @@ export default () => {
 			const contextStack = useMemo( () => {
 				if ( defaultEntry ) {
 					const { namespace, value } = defaultEntry;
+					// Check that the value is a JSON object. Send a console warning if not.
+					if (
+						typeof SCRIPT_DEBUG !== 'undefined' &&
+						SCRIPT_DEBUG === true &&
+						! isPlainObject( value )
+					) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							`The value of data-wp-context in "${ namespace }" store must be a valid stringified JSON object.`
+						);
+					}
 					updateSignals( currentValue.current, {
 						[ namespace ]: deepClone( value ),
 					} );
@@ -270,13 +281,24 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
+		const events = new Map();
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
-				element.props[ `on${ entry.suffix }` ] = ( event ) => {
-					evaluate( entry, event );
-				};
+				const event = entry.suffix.split( '--' )[ 0 ];
+				if ( ! events.has( event ) ) {
+					events.set( event, new Set() );
+				}
+				events.get( event ).add( entry );
 			}
 		);
+
+		events.forEach( ( entries, eventType ) => {
+			element.props[ `on${ eventType }` ] = ( event ) => {
+				entries.forEach( ( entry ) => {
+					evaluate( entry, event );
+				} );
+			};
+		} );
 	} );
 
 	// data-wp-on-window--[event]
@@ -298,14 +320,15 @@ export default () => {
 						`(^|\\s)${ className }(\\s|$)`,
 						'g'
 					);
-					if ( ! result )
+					if ( ! result ) {
 						element.props.class = currentClass
 							.replace( classFinder, ' ' )
 							.trim();
-					else if ( ! classFinder.test( currentClass ) )
+					} else if ( ! classFinder.test( currentClass ) ) {
 						element.props.class = currentClass
 							? `${ currentClass } ${ className }`
 							: className;
+					}
 
 					useInit( () => {
 						/*
@@ -331,12 +354,16 @@ export default () => {
 				const styleProp = entry.suffix;
 				const result = evaluate( entry );
 				element.props.style = element.props.style || {};
-				if ( typeof element.props.style === 'string' )
+				if ( typeof element.props.style === 'string' ) {
 					element.props.style = cssStringToObject(
 						element.props.style
 					);
-				if ( ! result ) delete element.props.style[ styleProp ];
-				else element.props.style[ styleProp ] = result;
+				}
+				if ( ! result ) {
+					delete element.props.style[ styleProp ];
+				} else {
+					element.props.style[ styleProp ] = result;
+				}
 
 				useInit( () => {
 					/*
@@ -375,8 +402,9 @@ export default () => {
 					 * logic: https://github.com/preactjs/preact/blob/ea49f7a0f9d1ff2c98c0bdd66aa0cbc583055246/src/diff/props.js#L110-L129
 					 */
 					if ( attribute === 'style' ) {
-						if ( typeof result === 'string' )
+						if ( typeof result === 'string' ) {
 							el.style.cssText = result;
+						}
 						return;
 					} else if (
 						attribute !== 'width' &&
@@ -476,7 +504,9 @@ export default () => {
 			element,
 			evaluate,
 		} ) => {
-			if ( element.type !== 'template' ) return;
+			if ( element.type !== 'template' ) {
+				return;
+			}
 
 			const { Provider } = inheritedContext;
 			const inheritedValue = useContext( inheritedContext );

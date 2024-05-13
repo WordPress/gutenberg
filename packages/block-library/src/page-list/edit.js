@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -170,7 +170,7 @@ export default function PageListEdit( {
 	}, [ pages ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
+		className: clsx( 'wp-block-page-list', {
 			'has-text-color': !! context.textColor,
 			[ getColorClassName( 'color', context.textColor ) ]:
 				!! context.textColor,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,9 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, createInterpolateElement } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { ENTER, SPACE } from '@wordpress/keycodes';
+
+const ENTER = 'Enter';
+const SPACE = ' ';
 
 /**
  * Internal dependencies
@@ -218,7 +220,7 @@ export default function FilterSummary( {
 						placement="top"
 					>
 						<div
-							className={ classnames(
+							className={ clsx(
 								'dataviews-filter-summary__chip',
 								{
 									'has-reset': canResetOrRemove,
@@ -229,9 +231,7 @@ export default function FilterSummary( {
 							tabIndex={ 0 }
 							onClick={ onToggle }
 							onKeyDown={ ( event ) => {
-								if (
-									[ ENTER, SPACE ].includes( event.keyCode )
-								) {
+								if ( [ ENTER, SPACE ].includes( event.key ) ) {
 									onToggle();
 									event.preventDefault();
 								}
@@ -253,7 +253,7 @@ export default function FilterSummary( {
 							placement="top"
 						>
 							<button
-								className={ classnames(
+								className={ clsx(
 									'dataviews-filter-summary__chip-remove',
 									{ 'has-values': hasValues }
 								) }

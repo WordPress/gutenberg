@@ -40,6 +40,7 @@ import ScreenStyleVariations from './screen-style-variations';
 import StyleBook from '../style-book';
 import ScreenCSS from './screen-css';
 import ScreenRevisions from './screen-revisions';
+import ScreenBackground from './screen-background';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
@@ -75,7 +76,11 @@ function GlobalStylesActionMenu() {
 
 	return (
 		<GlobalStylesMenuFill>
-			<DropdownMenu icon={ moreVertical } label={ __( 'More' ) }>
+			<DropdownMenu
+				icon={ moreVertical }
+				label={ __( 'More' ) }
+				toggleProps={ { size: 'compact' } }
+			>
 				{ ( { onClose } ) => (
 					<>
 						<MenuGroup>
@@ -342,6 +347,10 @@ function GlobalStylesUI() {
 
 			<GlobalStylesNavigationScreen path={ '/revisions' }>
 				<ScreenRevisions />
+			</GlobalStylesNavigationScreen>
+
+			<GlobalStylesNavigationScreen path={ '/background' }>
+				<ScreenBackground />
 			</GlobalStylesNavigationScreen>
 
 			{ blocks.map( ( block ) => (

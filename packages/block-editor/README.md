@@ -17,9 +17,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import { useState } from 'react';
 import {
+	BlockCanvas,
 	BlockEditorProvider,
 	BlockList,
-	WritingFlow,
 } from '@wordpress/block-editor';
 
 function MyEditorComponent() {
@@ -206,6 +206,12 @@ _Related_
 ### BlockNavigationDropdown
 
 Undocumented declaration.
+
+### BlockPopover
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
 
 ### BlockPreview
 
@@ -1027,6 +1033,14 @@ _Parameters_
 _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
+
+### useZoomOut
+
+A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+
+_Parameters_
+
+-   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
 
 ### Warning
 

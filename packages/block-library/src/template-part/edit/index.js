@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { serialize } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
@@ -11,8 +12,15 @@ import {
 	useHasRecursion,
 	InspectorControls,
 	__experimentalBlockPatternsList as BlockPatternsList,
+	BlockControls,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner, Modal, MenuItem } from '@wordpress/components';
+import {
+	PanelBody,
+	Spinner,
+	Modal,
+	MenuItem,
+	ToolbarButton,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -27,28 +35,26 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
-import { mapTemplatePartToBlockPattern } from './utils/map-template-part-to-block-pattern';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
-	useCreateTemplatePartFromBlocks,
 } from './utils/hooks';
 
 function ReplaceButton( {
 	isEntityAvailable,
 	area,
-	clientId,
 	templatePartId,
 	isTemplatePartSelectionOpen,
 	setIsTemplatePartSelectionOpen,
 } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
 	const { templateParts } = useAlternativeTemplateParts(
 		area,
 		templatePartId
 	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
+	const hasReplacements = !! templateParts.length;
 	const canReplace =
 		isEntityAvailable &&
 		hasReplacements &&
@@ -71,20 +77,30 @@ function ReplaceButton( {
 	);
 }
 
-function TemplatesList( { availableTemplates, onSelect } ) {
-	const shownTemplates = useAsyncList( availableTemplates );
+function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
+	// This hook fetches patterns, so don't run it unconditionally in the main
+	// edit function!
+	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const canReplace =
+		isEntityAvailable &&
+		!! blockPatterns.length &&
+		( area === 'header' || area === 'footer' );
+	const shownTemplates = useAsyncList( blockPatterns );
 
-	if ( ! availableTemplates ) {
+	if ( ! canReplace ) {
 		return null;
 	}
 
 	return (
-		<BlockPatternsList
-			label={ __( 'Templates' ) }
-			blockPatterns={ availableTemplates }
-			shownPatterns={ shownTemplates }
-			onClickPattern={ onSelect }
-		/>
+		<PanelBody title={ __( 'Design' ) }>
+			<BlockPatternsList
+				label={ __( 'Templates' ) }
+				blockPatterns={ blockPatterns }
+				shownPatterns={ shownTemplates }
+				onClickPattern={ onSelect }
+				showTitle={ false }
+			/>
+		</PanelBody>
 	);
 }
 
@@ -94,6 +110,7 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
@@ -104,11 +121,19 @@ export default function TemplatePartEdit( {
 	const [ isTemplatePartSelectionOpen, setIsTemplatePartSelectionOpen ] =
 		useState( false );
 
-	const { isResolved, hasInnerBlocks, isMissing, area } = useSelect(
+	const {
+		isResolved,
+		hasInnerBlocks,
+		isMissing,
+		area,
+		onNavigateToEntityRecord,
+		title,
+		canEditTemplate,
+	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount } = select( blockEditorStore );
+			const { getBlockCount, getSettings } = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -126,6 +151,9 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
+			const _canEditTemplate =
+				select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				isResolved: hasResolvedEntity,
@@ -134,32 +162,42 @@ export default function TemplatePartEdit( {
 					( ! entityRecord ||
 						Object.keys( entityRecord ).length === 0 ),
 				area: _area,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
+				title: entityRecord?.title,
+				canEditTemplate: _canEditTemplate,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
 	);
 
-	const { templateParts } = useAlternativeTemplateParts(
-		area,
-		templatePartId
-	);
-	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
-	const hasReplacements = !! templateParts.length || !! blockPatterns.length;
 	const areaObject = useTemplatePartArea( area );
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || areaObject.tagName;
 
-	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
-
-	const createFromBlocks = useCreateTemplatePartFromBlocks(
-		area,
-		setAttributes
-	);
+	const onPatternSelect = async ( pattern ) => {
+		await editEntityRecord(
+			'postType',
+			'wp_template_part',
+			templatePartId,
+			{
+				blocks: pattern.blocks,
+				content: serialize( pattern.blocks ),
+			}
+		);
+		createSuccessNotice(
+			sprintf(
+				/* translators: %s: template part title. */
+				__( 'Template Part "%s" updated.' ),
+				title || slug
+			),
+			{
+				type: 'snackbar',
+			}
+		);
+	};
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -192,31 +230,25 @@ export default function TemplatePartEdit( {
 		);
 	}
 
-	const partsAsPatterns = templateParts.map( ( templatePart ) =>
-		mapTemplatePartToBlockPattern( templatePart )
-	);
-
-	const onTemplatePartSelect = ( templatePart ) => {
-		setAttributes( {
-			slug: templatePart.slug,
-			theme: templatePart.theme,
-			area: undefined,
-		} );
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: template part title. */
-				__( 'Template Part "%s" replaced.' ),
-				templatePart.title?.rendered || templatePart.slug
-			),
-			{
-				type: 'snackbar',
-			}
-		);
-	};
-
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
+				{ isEntityAvailable &&
+					onNavigateToEntityRecord &&
+					canEditTemplate && (
+						<BlockControls group="other">
+							<ToolbarButton
+								onClick={ () =>
+									onNavigateToEntityRecord( {
+										postId: templatePartId,
+										postType: 'wp_template_part',
+									} )
+								}
+							>
+								{ __( 'Edit' ) }
+							</ToolbarButton>
+						</BlockControls>
+					) }
 				<InspectorControls group="advanced">
 					<TemplatePartAdvancedControls
 						tagName={ tagName }
@@ -268,31 +300,14 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				{ canReplace &&
-					( partsAsPatterns.length > 0 ||
-						blockPatterns.length > 0 ) && (
-						<InspectorControls>
-							<PanelBody title={ __( 'Replace' ) }>
-								<TemplatesList
-									availableTemplates={ partsAsPatterns }
-									onSelect={ ( pattern ) => {
-										onTemplatePartSelect(
-											pattern.templatePart
-										);
-									} }
-								/>
-								<TemplatesList
-									availableTemplates={ blockPatterns }
-									onSelect={ ( pattern, blocks ) => {
-										createFromBlocks(
-											blocks,
-											pattern.title
-										);
-									} }
-								/>
-							</PanelBody>
-						</InspectorControls>
-					) }
+				<InspectorControls>
+					<TemplatesList
+						area={ area }
+						clientId={ clientId }
+						isEntityAvailable={ isEntityAvailable }
+						onSelect={ ( pattern ) => onPatternSelect( pattern ) }
+					/>
+				</InspectorControls>
 
 				{ isEntityAvailable && (
 					<TemplatePartInnerBlocks

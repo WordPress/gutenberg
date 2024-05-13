@@ -5,10 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
@@ -48,13 +45,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
-		return (
-			<NavigatorButton
-				{ ...props }
-				as={ SidebarNavigationItem }
-				path="/wp_global_styles"
-			/>
-		);
+		return <SidebarNavigationItem { ...props } path="/wp_global_styles" />;
 	}
 	return (
 		<SidebarNavigationItem
@@ -80,6 +71,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 
 	const colorVariations = useColorVariations();
 	const typographyVariations = useTypographyVariations();
+	const gap = 3;
 
 	// Wrap in a BlockEditorProvider to ensure that the Iframe's dependencies are
 	// loaded. This is necessary because the Iframe component waits until
@@ -96,29 +88,22 @@ function SidebarNavigationScreenGlobalStylesContent() {
 				spacing={ 10 }
 				className="edit-site-global-styles-variation-container"
 			>
-				<StyleVariationsContainer />
+				<StyleVariationsContainer gap={ gap } />
 				{ colorVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Colors' ) }
-						</h3>
-						<ColorVariations />
-					</div>
+					<ColorVariations title={ __( 'Colors' ) } gap={ gap } />
 				) }
 				{ typographyVariations?.length && (
-					<div>
-						<h3 className="edit-site-global-styles-variation-title">
-							{ __( 'Typography' ) }
-						</h3>
-						<TypographyVariations />
-					</div>
+					<TypographyVariations
+						title={ __( 'Typography' ) }
+						gap={ gap }
+					/>
 				) }
 			</VStack>
 		</BlockEditorProvider>
 	);
 }
 
-export default function SidebarNavigationScreenGlobalStyles() {
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -194,6 +179,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (

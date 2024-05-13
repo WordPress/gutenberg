@@ -46,6 +46,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/compat/wordpress-6.5/class-gutenberg-rest-global-styles-revisions-controller-6-5.php';
 	require_once __DIR__ . '/compat/wordpress-6.5/rest-api.php';
 
+	// WordPress 6.6 compat.
+	require __DIR__ . '/compat/wordpress-6.6/class-gutenberg-rest-templates-controller-6-6.php';
+	require __DIR__ . '/compat/wordpress-6.6/rest-api.php';
+
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
@@ -125,8 +129,12 @@ require __DIR__ . '/compat/wordpress-6.5/block-bindings/post-meta.php';
 require __DIR__ . '/compat/wordpress-6.5/script-loader.php';
 
 // WordPress 6.6 compat.
+require __DIR__ . '/compat/wordpress-6.6/compat.php';
+require __DIR__ . '/compat/wordpress-6.6/resolve-patterns.php';
 require __DIR__ . '/compat/wordpress-6.6/block-bindings/pattern-overrides.php';
+require __DIR__ . '/compat/wordpress-6.6/block-template-utils.php';
 require __DIR__ . '/compat/wordpress-6.6/option.php';
+require __DIR__ . '/compat/wordpress-6.6/post.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -195,6 +203,9 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/interactivity-api.php';
+if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
+	require __DIR__ . '/experimental/full-page-client-side-navigation.php';
+}
 
 // Copied package PHP files.
 if ( is_dir( __DIR__ . '/../build/style-engine' ) ) {

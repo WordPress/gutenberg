@@ -3,32 +3,24 @@
  */
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useCallback,
 	useRef,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	__experimentalUseDialog as useDialog,
 	useInstanceId,
 } from '@wordpress/compose';
-import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
-
-const PUBLISH_ON_SAVE_ENTITIES = [
-	{
-		kind: 'postType',
-		name: 'wp_navigation',
-	},
-];
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function identity( values ) {
 	return values;
@@ -55,25 +47,13 @@ export function EntitiesSavedStatesExtensible( {
 	saveEnabled: saveEnabledProp = undefined,
 	saveLabel = __( 'Save' ),
 	renderDialog = undefined,
-
 	dirtyEntityRecords,
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
 } ) {
 	const saveButtonRef = useRef();
-	const {
-		editEntityRecord,
-		saveEditedEntityRecord,
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
-
-	const { __unstableMarkLastChangeAsPersistent } =
-		useDispatch( blockEditorStore );
-
-	const { createSuccessNotice, createErrorNotice, removeNotice } =
-		useDispatch( noticesStore );
-
+	const { saveDirtyEntities } = unlock( useDispatch( editorStore ) );
 	// To group entities by type.
 	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
 		const { name } = record;
@@ -99,94 +79,6 @@ export function EntitiesSavedStatesExtensible( {
 	].filter( Array.isArray );
 
 	const saveEnabled = saveEnabledProp ?? isDirty;
-
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
-	}, [] );
-
-	const saveCheckedEntities = () => {
-		const saveNoticeId = 'site-editor-save-success';
-		removeNotice( saveNoticeId );
-		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
-				return ! unselectedEntities.some(
-					( elt ) =>
-						elt.kind === kind &&
-						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
-				);
-			}
-		);
-
-		close( entitiesToSave );
-
-		const siteItemsToSave = [];
-		const pendingSavedRecords = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				if (
-					PUBLISH_ON_SAVE_ENTITIES.some(
-						( typeToPublish ) =>
-							typeToPublish.kind === kind &&
-							typeToPublish.name === name
-					)
-				) {
-					editEntityRecord( kind, name, key, { status: 'publish' } );
-				}
-
-				pendingSavedRecords.push(
-					saveEditedEntityRecord( kind, name, key )
-				);
-			}
-		} );
-		if ( siteItemsToSave.length ) {
-			pendingSavedRecords.push(
-				saveSpecifiedEntityEdits(
-					'root',
-					'site',
-					undefined,
-					siteItemsToSave
-				)
-			);
-		}
-
-		__unstableMarkLastChangeAsPersistent();
-
-		Promise.all( pendingSavedRecords )
-			.then( ( values ) => {
-				return onSave( values );
-			} )
-			.then( ( values ) => {
-				if (
-					values.some( ( value ) => typeof value === 'undefined' )
-				) {
-					createErrorNotice( __( 'Saving failed.' ) );
-				} else {
-					createSuccessNotice( __( 'Site updated.' ), {
-						type: 'snackbar',
-						id: saveNoticeId,
-						actions: [
-							{
-								label: __( 'View site' ),
-								url: homeUrl,
-							},
-						],
-					} );
-				}
-			} )
-			.catch( ( error ) =>
-				createErrorNotice( `${ __( 'Saving failed.' ) } ${ error }` )
-			);
-	};
-
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
@@ -217,7 +109,14 @@ export function EntitiesSavedStatesExtensible( {
 					variant="primary"
 					disabled={ ! saveEnabled }
 					__experimentalIsFocusable
-					onClick={ saveCheckedEntities }
+					onClick={ () =>
+						saveDirtyEntities( {
+							onSave,
+							dirtyEntityRecords,
+							entitiesToSkip: unselectedEntities,
+							close,
+						} )
+					}
 					className="editor-entities-saved-states__save-button"
 				>
 					{ saveLabel }

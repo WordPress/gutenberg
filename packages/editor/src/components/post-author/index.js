@@ -13,6 +13,11 @@ import { AUTHORS_QUERY } from './constants';
 
 const minimumUsersForCombobox = 25;
 
+/**
+ * Renders the component for selecting the post author.
+ *
+ * @return {Component} The component to be rendered.
+ */
 function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {
 		const authors = select( coreStore ).getUsers( AUTHORS_QUERY );

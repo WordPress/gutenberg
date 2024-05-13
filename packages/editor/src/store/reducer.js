@@ -360,6 +360,29 @@ export function listViewToggleRef( state = { current: null } ) {
 	return state;
 }
 
+/**
+ * This reducer does nothing aside initializing a ref to the inserter sidebar toggle.
+ * We will have a unique ref per "editor" instance.
+ *
+ * @param {Object} state
+ * @return {Object} Reference to the inserter sidebar toggle button.
+ */
+export function inserterSidebarToggleRef( state = { current: null } ) {
+	return state;
+}
+
+export function publishSidebarActive( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_PUBLISH_SIDEBAR':
+			return true;
+		case 'CLOSE_PUBLISH_SIDEBAR':
+			return false;
+		case 'TOGGLE_PUBLISH_SIDEBAR':
+			return ! state;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -375,6 +398,8 @@ export default combineReducers( {
 	deviceType,
 	removedPanels,
 	blockInserterPanel,
+	inserterSidebarToggleRef,
 	listViewPanel,
 	listViewToggleRef,
+	publishSidebarActive,
 } );

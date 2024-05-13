@@ -16,7 +16,7 @@ The tutorial assumes you have an existing plugin setup and are ready to add PHP 
 
 ### Step 1: Get a sidebar up and running
 
-The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/edit-post/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/edit-post`, and `react` packages, respectively.
+The first step is to tell the editor that there is a new plugin that will have its own sidebar. Use the [registerPlugin](/packages/plugins/README.md), [PluginSidebar](/packages/editor/README.md#pluginsidebar), and [createElement](/packages/element/README.md) utilities provided by the `@wordpress/plugins`, `@wordpress/editor`, and `react` packages, respectively.
 
 Add the following code to a JavaScript file called `plugin-sidebar.js` and save it within your plugin's directory:
 
@@ -24,7 +24,7 @@ Add the following code to a JavaScript file called `plugin-sidebar.js` and save 
 ( function ( wp, React ) {
 	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebar = wp.editor.PluginSidebar;
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function () {
@@ -57,7 +57,7 @@ function sidebar_plugin_register() {
 	wp_register_script(
 		'plugin-sidebar-js',
 		plugins_url( 'plugin-sidebar.js', __FILE__ ),
-		array( 'wp-plugins', 'wp-edit-post', 'react' )
+		array( 'wp-plugins', 'wp-editor', 'react' )
 	);
 }
 add_action( 'init', 'sidebar_plugin_register' );
@@ -82,7 +82,7 @@ To visualize and edit the meta field value you'll use an input component. The `@
 ( function ( wp ) {
 	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 
 	registerPlugin( 'my-plugin-sidebar', {
@@ -144,7 +144,7 @@ function sidebar_plugin_register() {
 		array(
 			'react',
 			'wp-plugins',
-			'wp-edit-post',
+			'wp-editor',
 			'wp-components'
 		)
 	);
@@ -202,7 +202,7 @@ With the field available in the editor store, it can now be surfaced to the UI. 
 ( function ( wp ) {
 	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 
 	var MetaBlockField = function () {
@@ -243,7 +243,7 @@ The `useSelect` function is used to fetch data when the component loads and will
 ( function ( wp ) {
 	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var Text = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 
@@ -306,7 +306,7 @@ The `useDispatch` function takes a store name as its only argument and returns m
 ( function ( wp ) {
 	var el = React.createElement;
 	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
+	var PluginSidebar = wp.editor.PluginSidebar;
 	var TextControl = wp.components.TextControl;
 	var useSelect = wp.data.useSelect;
 	var useDispatch = wp.data.useDispatch;

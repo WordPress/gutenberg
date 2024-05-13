@@ -45,7 +45,6 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			__next40pxDefaultSize
-			className="edit-post-post-template__toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={ __( 'Template options' ) }

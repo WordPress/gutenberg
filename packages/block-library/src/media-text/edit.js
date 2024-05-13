@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -227,7 +227,7 @@ function MediaTextEdit( {
 		setTemporaryMediaWidth( null );
 	};
 
-	const classNames = classnames( {
+	const classNames = clsx( {
 		'has-media-on-the-right': 'right' === mediaPosition,
 		'is-selected': isSelected,
 		'is-stacked-on-mobile': isStackedOnMobile,
@@ -318,11 +318,11 @@ function MediaTextEdit( {
 						onDrag={ imperativeFocalPointPreview }
 					/>
 				) }
-			{ mediaType === 'image' && ( mediaUrl || featuredImageURL ) && (
+			{ mediaType === 'image' && mediaUrl && ! useFeaturedImage && (
 				<TextareaControl
 					__nextHasNoMarginBottom
 					label={ __( 'Alternative text' ) }
-					value={ mediaAlt || featuredImageAlt }
+					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={
 						<>

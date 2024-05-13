@@ -144,7 +144,7 @@ if ( ! class_exists( 'WP_REST_Font_Collections_Controller' ) ) {
 			$slug       = $request->get_param( 'slug' );
 			$collection = WP_Font_Library::get_instance()->get_font_collection( $slug );
 
-			// @TODO: remove `is_wp_error` check once WP trunk is updated to return null when a collection is not found.
+			// @todo remove `is_wp_error` check once WP trunk is updated to return null when a collection is not found.
 			if ( ! $collection || is_wp_error( $collection ) ) {
 				return new WP_Error( 'rest_font_collection_not_found', __( 'Font collection not found.' ), array( 'status' => 404 ) );
 			}

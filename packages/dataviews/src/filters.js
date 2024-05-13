@@ -10,12 +10,7 @@ import FilterSummary from './filter-summary';
 import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
-import {
-	ENUMERATION_TYPE,
-	ALL_OPERATORS,
-	OPERATOR_IS,
-	OPERATOR_IS_NOT,
-} from './constants';
+import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 
 const Filters = memo( function Filters( {
@@ -28,7 +23,7 @@ const Filters = memo( function Filters( {
 	const addFilterRef = useRef();
 	const filters = [];
 	fields.forEach( ( field ) => {
-		if ( ! field.type ) {
+		if ( ! field.elements?.length ) {
 			return;
 		}
 
@@ -37,31 +32,24 @@ const Filters = memo( function Filters( {
 			return;
 		}
 
-		switch ( field.type ) {
-			case ENUMERATION_TYPE:
-				if ( ! field.elements?.length ) {
-					return;
-				}
-
-				const isPrimary = !! field.filterBy?.isPrimary;
-				filters.push( {
-					field: field.id,
-					name: field.header,
-					elements: field.elements,
-					singleSelection: operators.some( ( op ) =>
-						[ OPERATOR_IS, OPERATOR_IS_NOT ].includes( op )
-					),
-					operators,
-					isVisible:
-						isPrimary ||
-						view.filters.some(
-							( f ) =>
-								f.field === field.id &&
-								ALL_OPERATORS.includes( f.operator )
-						),
-					isPrimary,
-				} );
-		}
+		const isPrimary = !! field.filterBy?.isPrimary;
+		filters.push( {
+			field: field.id,
+			name: field.header,
+			elements: field.elements,
+			singleSelection: operators.some( ( op ) =>
+				[ OPERATOR_IS, OPERATOR_IS_NOT ].includes( op )
+			),
+			operators,
+			isVisible:
+				isPrimary ||
+				view.filters.some(
+					( f ) =>
+						f.field === field.id &&
+						ALL_OPERATORS.includes( f.operator )
+				),
+			isPrimary,
+		} );
 	} );
 	// Sort filters by primary property. We need the primary filters to be first.
 	// Then we sort by name.

@@ -30,3 +30,10 @@
 		margin-bottom: $grid-unit-05;
 	}
 }
+
+.edit-post-layout,
+.edit-site-editor__interface-skeleton {
+	.entities-saved-states__panel-header {
+		height: $header-height + $border-width;
+	}
+}

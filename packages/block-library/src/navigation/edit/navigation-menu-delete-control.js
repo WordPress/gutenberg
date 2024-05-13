@@ -43,7 +43,7 @@ export default function NavigationMenuDeleteControl( { onDelete } ) {
 					confirmButtonText={ __( 'Delete' ) }
 				>
 					{ __(
-						'Are you sure you want to delete this Navigation menu?'
+						'Are you sure you want to delete this Navigation Menu?'
 					) }
 				</ConfirmDialog>
 			) }

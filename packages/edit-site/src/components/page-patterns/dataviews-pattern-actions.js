@@ -7,22 +7,19 @@ import { downloadZip } from 'client-zip';
 /**
  * WordPress dependencies
  */
-import { getQueryArgs } from '@wordpress/url';
 import { downloadBlob } from '@wordpress/blob';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
-	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as editorStore } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
@@ -38,7 +35,7 @@ import {
 } from '../../utils/constants';
 import { CreateTemplatePartModalContents } from '../create-template-part-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 const { CreatePatternModalContents, useDuplicatePatternProps } =
 	unlock( patternsPrivateApis );
 
@@ -91,92 +88,6 @@ export const exportJSONaction = {
 	},
 };
 
-export const renameAction = {
-	id: 'rename-pattern',
-	label: __( 'Rename' ),
-	isEligible: ( item ) => {
-		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-		const isUserPattern = item.type === PATTERN_TYPES.user;
-		const isCustomPattern =
-			isUserPattern || ( isTemplatePart && item.isCustom );
-		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
-		return isCustomPattern && ! hasThemeFile;
-	},
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => item.title );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		async function onRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord( 'postType', item.type, item.id, {
-					title,
-				} );
-				// Update state before saving rerenders the list.
-				setTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveEditedEntityRecord( 'postType', item.type, item.id, {
-					throwOnError: true,
-				} );
-				createSuccessNotice(
-					item.type === TEMPLATE_PART_POST_TYPE
-						? __( 'Template part renamed.' )
-						: __( 'Pattern renamed.' ),
-					{ type: 'snackbar' }
-				);
-			} catch ( error ) {
-				const fallbackErrorMessage =
-					item.type === TEMPLATE_PART_POST_TYPE
-						? __(
-								'An error occurred while renaming the template part.'
-						  )
-						: __( 'An error occurred while renaming the pattern.' );
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-		return (
-			<form onSubmit={ onRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
-		);
-	},
-};
-
 const canDeleteOrReset = ( item ) => {
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const isUserPattern = item.type === PATTERN_TYPES.user;
@@ -198,7 +109,7 @@ export const deleteAction = {
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
 			useDispatch( noticesStore );
-		const { removeTemplates } = unlock( useDispatch( editSiteStore ) );
+		const { removeTemplates } = unlock( useDispatch( editorStore ) );
 
 		const deletePattern = async () => {
 			const promiseResult = await Promise.allSettled(
@@ -326,7 +237,7 @@ export const deleteAction = {
 
 export const resetAction = {
 	id: 'reset-action',
-	label: __( 'Clear customizations' ),
+	label: __( 'Reset' ),
 	isEligible: ( item ) => {
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
@@ -339,9 +250,7 @@ export const resetAction = {
 		return (
 			<VStack spacing="5">
 				<Text>
-					{ __(
-						'Are you sure you want to clear these customizations?'
-					) }
+					{ __( 'Reset to default and clear all customizations?' ) }
 				</Text>
 				<HStack justify="right">
 					<Button variant="tertiary" onClick={ closeModal }>
@@ -351,7 +260,7 @@ export const resetAction = {
 						variant="primary"
 						onClick={ () => removeTemplate( item ) }
 					>
-						{ __( 'Clear' ) }
+						{ __( 'Reset' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -366,9 +275,9 @@ export const duplicatePatternAction = {
 	modalHeader: _x( 'Duplicate pattern', 'action label' ),
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const history = useHistory();
 		function onPatternSuccess( { pattern } ) {
@@ -402,11 +311,11 @@ export const duplicateTemplatePartAction = {
 	RenderModal: ( { items, closeModal } ) => {
 		const [ item ] = items;
 		const { createSuccessNotice } = useDispatch( noticesStore );
-		const { categoryId = PATTERN_DEFAULT_CATEGORY } = getQueryArgs(
-			window.location.href
-		);
+		const {
+			params: { categoryId = PATTERN_DEFAULT_CATEGORY },
+		} = useLocation();
 		const history = useHistory();
-		async function onTemplatePartSuccess( templatePart ) {
+		function onTemplatePartSuccess( templatePart ) {
 			createSuccessNotice(
 				sprintf(
 					// translators: %s: The new template part's title e.g. 'Call to action (copy)'.

@@ -16,7 +16,7 @@ function gutenberg_reregister_interactivity_script_modules() {
 
 	wp_register_script_module(
 		'@wordpress/interactivity',
-		gutenberg_url( '/build/interactivity/index.min.js' ),
+		gutenberg_url( '/build/interactivity/' . ( SCRIPT_DEBUG ? 'debug.min.js' : 'index.min.js' ) ),
 		array(),
 		$default_version
 	);

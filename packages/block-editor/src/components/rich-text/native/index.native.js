@@ -873,6 +873,17 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { clearCurrentSelectionOnUnmount } = this.props;
+
+		// There are cases when the component is unmounted e.g. scrolling in a
+		// long post due to virtualization, so the block selection needs to be cleared
+		// so it doesn't auto-focus when it's added back.
+		if ( this._editor?.isFocused() ) {
+			clearCurrentSelectionOnUnmount?.();
+		}
+	}
+
 	getHtmlToRender( record, tagName ) {
 		// Save back to HTML from React tree.
 		let value = this.valueToFormat( record );
@@ -1222,8 +1233,8 @@ export class RichText extends Component {
 					ref={ ( ref ) => {
 						this._editor = ref;
 
-						if ( this.props.setRef ) {
-							this.props.setRef( ref );
+						if ( this.props.nativeEditorRef ) {
+							this.props.nativeEditorRef( ref );
 						}
 					} }
 					style={ {

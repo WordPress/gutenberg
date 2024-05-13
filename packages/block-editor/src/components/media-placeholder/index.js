@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -81,7 +81,7 @@ const URLSelectionUI = ( {
 				className="block-editor-media-placeholder__button"
 				onClick={ openURLInput }
 				isPressed={ isURLInputVisible }
-				variant="tertiary"
+				variant="secondary"
 			>
 				{ __( 'Insert from URL' ) }
 			</Button>
@@ -349,7 +349,7 @@ export function MediaPlaceholder( {
 			}
 		}
 
-		const placeholderClassName = classnames(
+		const placeholderClassName = clsx(
 			'block-editor-media-placeholder',
 			className,
 			{
@@ -422,7 +422,7 @@ export function MediaPlaceholder( {
 					<Button
 						className="block-editor-media-placeholder__button"
 						onClick={ onToggleFeaturedImage }
-						variant="tertiary"
+						variant="secondary"
 					>
 						{ __( 'Use featured image' ) }
 					</Button>
@@ -435,7 +435,7 @@ export function MediaPlaceholder( {
 		const defaultButton = ( { open } ) => {
 			return (
 				<Button
-					variant="tertiary"
+					variant="secondary"
 					onClick={ () => {
 						open();
 					} }
@@ -475,7 +475,7 @@ export function MediaPlaceholder( {
 								<>
 									<Button
 										variant="primary"
-										className={ classnames(
+										className={ clsx(
 											'block-editor-media-placeholder__button',
 											'block-editor-media-placeholder__upload-button'
 										) }
@@ -502,7 +502,7 @@ export function MediaPlaceholder( {
 					{ renderDropZone() }
 					<FormFileUpload
 						variant="primary"
-						className={ classnames(
+						className={ clsx(
 							'block-editor-media-placeholder__button',
 							'block-editor-media-placeholder__upload-button'
 						) }

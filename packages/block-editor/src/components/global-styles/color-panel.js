@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -123,10 +123,11 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
@@ -226,7 +227,7 @@ function ColorPanelDropdown( {
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const toggleProps = {
 						onClick: onToggle,
-						className: classnames(
+						className: clsx(
 							'block-editor-panel-color-gradient-settings__dropdown',
 							{ 'is-open': isOpen }
 						),
@@ -544,7 +545,7 @@ export default function ColorPanel( {
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
-					label: __( 'Solid' ),
+					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
@@ -586,7 +587,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background

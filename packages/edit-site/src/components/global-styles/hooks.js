@@ -9,18 +9,19 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { getFontFamilies } from './utils';
 import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { useGlobalSetting, useGlobalStyle, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
 );
@@ -65,6 +66,13 @@ export function useStylesPreviewColors() {
 	const [ headingColor = textColor ] = useGlobalStyle(
 		'elements.h1.color.text'
 	);
+	const [ linkColor = headingColor ] = useGlobalStyle(
+		'elements.link.color.text'
+	);
+
+	const [ buttonBackgroundColor = linkColor ] = useGlobalStyle(
+		'elements.button.color.background'
+	);
 	const [ coreColors ] = useGlobalSetting( 'color.palette.core' );
 	const [ themeColors ] = useGlobalSetting( 'color.palette.theme' );
 	const [ customColors ] = useGlobalSetting( 'color.palette.custom' );
@@ -72,10 +80,20 @@ export function useStylesPreviewColors() {
 	const paletteColors = ( themeColors ?? [] )
 		.concat( customColors ?? [] )
 		.concat( coreColors ?? [] );
-	const highlightedColors = paletteColors
+
+	const textColorObject = paletteColors.filter(
+		( { color } ) => color === textColor
+	);
+	const buttonBackgroundColorObject = paletteColors.filter(
+		( { color } ) => color === buttonBackgroundColor
+	);
+
+	const highlightedColors = textColorObject
+		.concat( buttonBackgroundColorObject )
+		.concat( paletteColors )
 		.filter(
-			// we exclude these two colors because they are already visible in the preview.
-			( { color } ) => color !== backgroundColor && color !== headingColor
+			// we exclude these background color because it is already visible in the preview.
+			( { color } ) => color !== backgroundColor
 		)
 		.slice( 0, 2 );
 

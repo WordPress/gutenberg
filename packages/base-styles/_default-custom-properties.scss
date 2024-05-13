@@ -5,5 +5,7 @@
 	@include admin-scheme(#007cba);
 	--wp-block-synced-color: #7a00df;
 	--wp-block-synced-color--rgb: #{hex-to-rgb(#7a00df)};
-	--wp-bound-block-color: #9747ff;
+	// This CSS variable is not used in Gutenberg project,
+	// but is maintained for backwards compatibility.
+	--wp-bound-block-color: var(--wp-block-synced-color);
 }

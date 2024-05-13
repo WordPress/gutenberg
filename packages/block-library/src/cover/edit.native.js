@@ -10,7 +10,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -248,6 +248,12 @@ const Cover = ( {
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
 
+	const onAddMediaButtonPress = useCallback( () => {
+		if ( openMediaOptionsRef?.current ) {
+			openMediaOptionsRef.current();
+		}
+	}, [] );
+
 	function setColor( color ) {
 		const colorValue = getColorObjectByColorValue( colorsDefault, color );
 
@@ -292,7 +298,7 @@ const Cover = ( {
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
 		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
-			const className = classnames( attributes.className, {
+			const className = clsx( attributes.className, {
 				'is-light': false,
 			} );
 			setAttributes( {
@@ -352,7 +358,7 @@ const Cover = ( {
 			accessibilityHint={ accessibilityHint }
 			accessibilityLabel={ __( 'Add image or video' ) }
 			accessibilityRole="button"
-			onPress={ openMediaOptionsRef.current }
+			onPress={ onAddMediaButtonPress }
 		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>

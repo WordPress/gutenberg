@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type {
 	ComponentPropsWithoutRef,
 	ForwardedRef,
@@ -44,7 +44,7 @@ function useDeprecatedProps( {
 	let computedVariant = variant;
 
 	const newProps: { 'aria-pressed'?: boolean } = {
-		// @TODO Mark `isPressed` as deprecated
+		// @todo Mark `isPressed` as deprecated
 		'aria-pressed': isPressed,
 	};
 
@@ -141,7 +141,7 @@ export function UnforwardedButton(
 		'mixed',
 	];
 
-	const classes = classnames( 'components-button', className, {
+	const classes = clsx( 'components-button', className, {
 		'is-next-40px-default-size': __next40pxDefaultSize,
 		'is-secondary': variant === 'secondary',
 		'is-primary': variant === 'primary',

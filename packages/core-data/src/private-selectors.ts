@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 
 /**
  * Internal dependencies

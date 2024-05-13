@@ -262,3 +262,11 @@
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
 }
+
+.components-popover.block-editor-block-popover__inbetween .block-editor-button-pattern-inserter__button {
+	pointer-events: all;
+	position: absolute;
+	transform: translateX(-50%) translateY(-50%);
+	top: 50%;
+	left: 50%;
+}

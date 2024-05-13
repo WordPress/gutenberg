@@ -2,17 +2,22 @@
  * WordPress dependencies
  */
 import { createRegistry } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '..';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 function createRegistryWithStores() {
 	// Create a registry and register used stores.
@@ -40,7 +45,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/edit-post' )
+				.getActiveComplementaryArea( 'core' )
 		).toBe( 'test/sidebar' );
 
 		registry
@@ -49,7 +54,7 @@ describe( 'actions', () => {
 		expect(
 			registry
 				.select( interfaceStore )
-				.getActiveComplementaryArea( 'core/edit-post' )
+				.getActiveComplementaryArea( 'core' )
 		).toBeNull();
 	} );
 
@@ -74,15 +79,11 @@ describe( 'actions', () => {
 		// Sidebars are pinned by default.
 		// @See https://github.com/WordPress/gutenberg/pull/21645
 		expect(
-			registry
-				.select( interfaceStore )
-				.isItemPinned( editPostStore.name, 'rigatoni' )
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
 		).toBe( false );
 		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
 		expect(
-			registry
-				.select( interfaceStore )
-				.isItemPinned( editPostStore.name, 'rigatoni' )
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
 		).toBe( true );
 	} );
 

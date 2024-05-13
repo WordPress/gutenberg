@@ -356,7 +356,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'Backspace' );
 		await expect.poll( editor.getEditedPostContent ).toBe( `<!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li></li>
 <!-- /wp:list-item --></ul>
 <!-- /wp:list -->` );
@@ -1173,7 +1173,7 @@ class WritingFlowUtils {
 			.locator( 'role=button[name="Two columns; equal split"i]' )
 			.click();
 		await this.editor.canvas
-			.locator( 'role=button[name="Add block"i]' )
+			.locator( '.is-selected >> role=button[name="Add block"i]' )
 			.click();
 		await this.page.click(
 			'role=listbox[name="Blocks"i] >> role=option[name="Paragraph"i]'

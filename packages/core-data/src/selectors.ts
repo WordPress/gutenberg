@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import createSelector from 'rememo';
-
-/**
  * WordPress dependencies
  */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -624,9 +619,13 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query.per_page === -1 ) return 1;
+	if ( query.per_page === -1 ) {
+		return 1;
+	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
-	if ( ! totalItems ) return totalItems;
+	if ( ! totalItems ) {
+		return totalItems;
+	}
 	// If `per_page` is not set and the query relies on the defaults of the
 	// REST endpoint, get the info from query's meta.
 	if ( ! query.per_page ) {
@@ -851,10 +850,21 @@ export const getEditedEntityRecord = createSelector(
 		kind: string,
 		name: string,
 		recordId: EntityRecordKey
-	): ET.Updatable< EntityRecord > | undefined => ( {
-		...getRawEntityRecord( state, kind, name, recordId ),
-		...getEntityRecordEdits( state, kind, name, recordId ),
-	} ),
+	): ET.Updatable< EntityRecord > | false => {
+		const raw = getRawEntityRecord( state, kind, name, recordId );
+		const edited = getEntityRecordEdits( state, kind, name, recordId );
+		// Never return a non-falsy empty object. Unfortunately we can't return
+		// undefined or null because we were previously returning an empty
+		// object, so trying to read properties from the result would throw.
+		// Using false here is a workaround to avoid breaking changes.
+		if ( ! raw && ! edited ) {
+			return false;
+		}
+		return {
+			...raw,
+			...edited,
+		};
+	},
 	(
 		state: State,
 		kind: string,
@@ -1269,7 +1279,7 @@ export function getReferenceByDistinctEdits( state ) {
 export function __experimentalGetTemplateForLink(
 	state: State,
 	link: string
-): Optional< ET.Updatable< ET.WpTemplate > > | null {
+): Optional< ET.Updatable< ET.WpTemplate > > | null | false {
 	const records = getEntityRecords< ET.WpTemplate >(
 		state,
 		'postType',

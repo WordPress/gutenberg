@@ -11,8 +11,11 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
+import { normalizeFields } from './normalize-fields';
+import BulkActionsToolbar from './bulk-actions-toolbar';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
@@ -40,8 +43,6 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
-	onDetailsChange = null,
-	deferredRendering = false,
 } ) {
 	const [ selection, setSelection ] = useState( [] );
 	const [ openedFilter, setOpenedFilter ] = useState( null );
@@ -76,18 +77,7 @@ export default function DataViews( {
 	const ViewComponent = VIEW_LAYOUTS.find(
 		( v ) => v.type === view.type
 	).component;
-	const _fields = useMemo( () => {
-		return fields.map( ( field ) => {
-			const getValue =
-				field.getValue || ( ( { item } ) => item[ field.id ] );
-
-			return {
-				...field,
-				getValue,
-				render: field.render || getValue,
-			};
-		} );
-	}, [ fields ] );
+	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
 		actions,
@@ -146,9 +136,7 @@ export default function DataViews( {
 				getItemId={ getItemId }
 				isLoading={ isLoading }
 				onSelectionChange={ onSetSelection }
-				onDetailsChange={ onDetailsChange }
 				selection={ selection }
-				deferredRendering={ deferredRendering }
 				setOpenedFilter={ setOpenedFilter }
 			/>
 			<Pagination
@@ -156,6 +144,16 @@ export default function DataViews( {
 				onChangeView={ onChangeView }
 				paginationInfo={ paginationInfo }
 			/>
+			{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+				hasPossibleBulkAction && (
+					<BulkActionsToolbar
+						data={ data }
+						actions={ actions }
+						selection={ selection }
+						setSelection={ setSelection }
+						getItemId={ getItemId }
+					/>
+				) }
 		</div>
 	);
 }
