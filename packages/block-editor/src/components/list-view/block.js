@@ -30,6 +30,7 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
+import { isTextField } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -178,6 +179,11 @@ function ListViewBlock( {
 	 */
 	async function onKeyDown( event ) {
 		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		// Retain the default behavior for text fields.
+		if ( isTextField( event.target ) ) {
 			return;
 		}
 
