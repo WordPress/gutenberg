@@ -23,7 +23,7 @@ const NAMES = new Set(
  */
 function isUsedInConditional( node ) {
 	/** @type {import('estree').Node|undefined} */
-	let current = node.parent;
+	let current = node;
 
 	// Simple negation is the only expresion allowed in the conditional:
 	// if ( ! globalThis.SCRIPT_DEBUG ) {}
@@ -74,11 +74,7 @@ module.exports = {
 					return;
 				}
 
-				if (
-					node.parent?.type !== 'MemberExpression' ||
-					node.parent.object.type !== 'Identifier' ||
-					node.parent.object.name !== 'globalThis'
-				) {
+				if ( node.parent.type !== 'MemberExpression' ) {
 					context.report( {
 						node,
 						messageId: 'usedWithoutGlobalThis',
@@ -90,7 +86,37 @@ module.exports = {
 							);
 						},
 					} );
-				} else if ( ! isUsedInConditional( node ) ) {
+
+					if ( ! isUsedInConditional( node ) ) {
+						context.report( {
+							node,
+							messageId: 'usedOutsideConditional',
+							data: {
+								name: node.name,
+							},
+						} );
+					}
+					return;
+				}
+
+				if (
+					node.parent.object.type === 'Identifier' &&
+					node.parent.object.name !== 'globalThis'
+				) {
+					context.report( {
+						node,
+						messageId: 'usedWithoutGlobalThis',
+						data: { name: node.name },
+						fix( fixer ) {
+							if ( node.parent.object.name === 'window' ) {
+								return fixer.replaceText(
+									node.parent,
+									`globalThis.${ node.name }`
+								);
+							}
+						},
+					} );
+				} else if ( ! isUsedInConditional( node.parent ) ) {
 					context.report( {
 						node,
 						messageId: 'usedOutsideConditional',
@@ -113,15 +139,23 @@ module.exports = {
 				}
 
 				if (
-					node.parent.object.type !== 'Identifier' ||
+					node.parent.object.type === 'Identifier' &&
 					node.parent.object.name !== 'globalThis'
 				) {
 					context.report( {
 						node,
 						messageId: 'usedWithoutGlobalThis',
 						data: { name: node.value },
+						fix( fixer ) {
+							if ( node.parent.object.name === 'window' ) {
+								return fixer.replaceText(
+									node.parent,
+									`globalThis.${ node.value }`
+								);
+							}
+						},
 					} );
-				} else if ( ! isUsedInConditional( node ) ) {
+				} else if ( ! isUsedInConditional( node.parent ) ) {
 					context.report( {
 						node,
 						messageId: 'usedOutsideConditional',
