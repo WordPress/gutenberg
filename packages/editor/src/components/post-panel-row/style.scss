@@ -18,4 +18,10 @@
 	min-height: $grid-unit-40;
 	display: flex;
 	align-items: center;
+
+	// This needs specificity.
+	.components-button.components-button {
+		text-wrap: pretty;
+	}
+
 }
