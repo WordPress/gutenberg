@@ -8,7 +8,7 @@
  */
 export default function stripShortcodes( settings, text ) {
 	if ( settings.shortcodesRegExp ) {
-		return text?.replace( settings.shortcodesRegExp, '\n' );
+		return text.replace( settings.shortcodesRegExp, '\n' );
 	}
 	return text;
 }
