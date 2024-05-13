@@ -133,6 +133,9 @@
 }
 
 /* stylelint-disable */
+::view-transition-group(toggle) {
+  animation-delay: 250ms;
+}
 .edit-site-layout:not(.is-full-canvas) .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
 	view-transition-name: toggle;
 }
