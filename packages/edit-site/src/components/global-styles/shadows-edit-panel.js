@@ -10,6 +10,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
+	__experimentalItem as Item,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
 	__experimentalInputControl as InputControl,
@@ -29,6 +30,7 @@ import {
 	ColorPalette,
 	Modal,
 	privateApis as componentsPrivateApis,
+	Tooltip,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -156,7 +158,6 @@ export default function ShadowsEditPanel() {
 						<DropdownMenu
 							trigger={
 								<Button
-									variant="tertiary"
 									size="small"
 									icon={ moreVertical }
 									label={ __( 'Menu' ) }
@@ -353,53 +354,54 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 	return (
 		<Dropdown
 			popoverProps={ popoverProps }
-			className="block-editor-tools-panel-color-gradient-settings__dropdown"
+			className="edit-site-global-styles__shadow-editor__dropdown"
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleProps = {
 					onClick: onToggle,
 					className: clsx(
-						'block-editor-panel-color-gradient-settings__dropdown',
+						'edit-site-global-styles__shadow-editor__dropdown-toggle',
 						{ 'is-open': isOpen }
 					),
 				};
 
 				return (
-					<Button { ...toggleProps }>
-						<HStack align="center" justify="flex-start">
-							<FlexItem
-								display="flex"
-								style={ {
-									marginLeft: '-4px',
-								} }
-							>
-								<Icon icon={ shadowIcon } />
+					<HStack align="center" justify="flex-start" spacing={ 0 }>
+						<FlexItem style={ { flexGrow: 1 } }>
+							<Item role="button" { ...toggleProps }>
+								<HStack justify="flex-start">
+									<Icon icon={ shadowIcon } size={ 24 } />
+									<FlexItem>
+										{ shadowObj.inset
+											? __( 'Inner shadow' )
+											: __( 'Drop shadow' ) }
+									</FlexItem>
+								</HStack>
+							</Item>
+						</FlexItem>
+						{ canRemove && (
+							<FlexItem>
+								<Tooltip text={ __( 'Remove shadow' ) }>
+									<Item
+										role="button"
+										onClick={ onRemove }
+										className="edit-site-global-styles__shadow-editor__remove-button"
+									>
+										<HStack justify="flex-start">
+											<Icon
+												icon={ lineSolid }
+												size={ 24 }
+											/>
+										</HStack>
+									</Item>
+								</Tooltip>
 							</FlexItem>
-							<FlexItem style={ { flexGrow: 1 } }>
-								{ shadowObj.inset
-									? __( 'Inner shadow' )
-									: __( 'Drop shadow' ) }
-							</FlexItem>
-							{ canRemove && (
-								<FlexItem
-									display="flex"
-									style={ {
-										marginRight: '-4px',
-									} }
-									onClick={ ( e ) => {
-										e.stopPropagation();
-										onRemove();
-									} }
-								>
-									<Icon icon={ lineSolid } />
-								</FlexItem>
-							) }
-						</HStack>
-					</Button>
+						) }
+					</HStack>
 				);
 			} }
 			renderContent={ () => (
 				<DropdownContentWrapper paddingSize="none">
-					<div className="block-editor-panel-color-gradient-settings__dropdown-content">
+					<div className="edit-site-global-styles__shadow-editor__dropdown-content">
 						<ShadowPopover
 							shadowObj={ shadowObj }
 							onChange={ onShadowChange }

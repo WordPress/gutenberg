@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { Icon, plus, shadow as shadowIcon } from '@wordpress/icons';
+import { plus, shadow as shadowIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -129,18 +129,9 @@ function ShadowItem( { shadow, category } ) {
 				// translators: %s: name of the shadow
 				sprintf( 'Edit shadow %s', shadow.name )
 			}
+			icon={ shadowIcon }
 		>
-			<HStack justify="flex-start">
-				<FlexItem
-					className="edit-site-global-styles-screen-typography__indicator"
-					style={ {
-						marginLeft: '-4px',
-					} }
-				>
-					<Icon icon={ shadowIcon } />
-				</FlexItem>
-				<FlexItem>{ shadow.name }</FlexItem>
-			</HStack>
+			{ shadow.name }
 		</NavigationButtonAsItem>
 	);
 }
