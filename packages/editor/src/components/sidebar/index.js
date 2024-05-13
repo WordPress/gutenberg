@@ -13,11 +13,9 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { isRTL, __, sprintf } from '@wordpress/i18n';
+import { isRTL, __ } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { addQueryArgs } from '@wordpress/url';
-import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -34,11 +32,18 @@ import PostDiscussionPanel from '../post-discussion/panel';
 import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
+import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
+import TemplateContentPanel from '../template-content-panel';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import {
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../store/constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -50,8 +55,10 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
-	isEditingTemplate,
+	renderingMode,
+	onActionPerformed,
 	extraPanels,
+	showSummary = true,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -85,56 +92,6 @@ const SidebarContent = ( {
 			selectedTabElement?.focus();
 		}
 	}, [ tabName ] );
-	const { createSuccessNotice } = useDispatch( noticesStore );
-
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			switch ( actionId ) {
-				case 'move-to-trash':
-					{
-						const postType = items[ 0 ].type;
-						document.location.href = addQueryArgs( 'edit.php', {
-							post_type: postType,
-						} );
-					}
-					break;
-				case 'duplicate-post':
-					{
-						const newItem = items[ 0 ];
-						const title =
-							typeof newItem.title === 'string'
-								? newItem.title
-								: newItem.title?.rendered;
-						createSuccessNotice(
-							sprintf(
-								// translators: %s: Title of the created post e.g: "Post 1".
-								__( '"%s" successfully created.' ),
-								title
-							),
-							{
-								type: 'snackbar',
-								id: 'duplicate-post-action',
-								actions: [
-									{
-										label: __( 'Edit' ),
-										onClick: () => {
-											const postId = newItem.id;
-											document.location.href =
-												addQueryArgs( 'post.php', {
-													post: postId,
-													action: 'edit',
-												} );
-										},
-									},
-								],
-							}
-						);
-					}
-					break;
-			}
-		},
-		[ createSuccessNotice ]
-	);
 
 	return (
 		<PluginSidebar
@@ -165,8 +122,12 @@ const SidebarContent = ( {
 							/>
 						}
 					/>
-					{ ! isEditingTemplate && <PostSummary /> }
+					{ showSummary && <PostSummary /> }
 					<PluginDocumentSettingPanel.Slot />
+					{ renderingMode !== 'post-only' && (
+						<TemplateContentPanel />
+					) }
+					<PostTransformPanel />
 					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
 					<PostDiscussionPanel />
@@ -182,9 +143,9 @@ const SidebarContent = ( {
 	);
 };
 
-const Sidebar = ( { extraPanels } ) => {
+const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, isEditingTemplate } = useSelect(
+	const { tabName, keyboardShortcut, showSummary, renderingMode } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
@@ -208,9 +169,12 @@ const Sidebar = ( { extraPanels } ) => {
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
-				isEditingTemplate:
-					select( editorStore ).getCurrentPostType() ===
-					'wp_template',
+				showSummary: ! [
+					TEMPLATE_POST_TYPE,
+					TEMPLATE_PART_POST_TYPE,
+					NAVIGATION_POST_TYPE,
+				].includes( select( editorStore ).getCurrentPostType() ),
+				renderingMode: select( editorStore ).getRenderingMode(),
 			};
 		},
 		[]
@@ -236,7 +200,9 @@ const Sidebar = ( { extraPanels } ) => {
 			<SidebarContent
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
-				isEditingTemplate={ isEditingTemplate }
+				showSummary={ showSummary }
+				renderingMode={ renderingMode }
+				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 			/>
 		</Tabs>

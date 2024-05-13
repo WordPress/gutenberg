@@ -5,16 +5,16 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store';
-import {
-	EXCLUDED_PATTERN_SOURCES,
-	PATTERN_TYPES,
-} from '../../../utils/constants';
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
+
+const { EXCLUDED_PATTERN_SOURCES, PATTERN_TYPES } =
+	unlock( patternsPrivateApis );
 
 function injectThemeAttributeInBlockTemplateContent(
 	block,
@@ -67,7 +67,7 @@ function filterPatterns( patterns, template ) {
 	} );
 }
 
-function preparePatterns( patterns, template, currentThemeStylesheet ) {
+function preparePatterns( patterns, currentThemeStylesheet ) {
 	return patterns.map( ( pattern ) => ( {
 		...pattern,
 		keywords: pattern.keywords || [],
@@ -86,8 +86,8 @@ function preparePatterns( patterns, template, currentThemeStylesheet ) {
 export function useAvailablePatterns( template ) {
 	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
 		useSelect( ( select ) => {
-			const { getSettings } = unlock( select( editSiteStore ) );
-			const settings = getSettings();
+			const { getEditorSettings } = select( editorStore );
+			const settings = getEditorSettings();
 
 			return {
 				blockPatterns:
