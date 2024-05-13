@@ -3,6 +3,11 @@
  */
 import { isURL, isValidPath } from '@wordpress/url';
 
+/**
+ * Internal dependencies
+ */
+import { getValueFromObjectPath } from '../../utils/object';
+
 function isRelativePath( url ) {
 	return isValidPath( url ) && ! isURL( url );
 }
@@ -14,41 +19,39 @@ function isRelativePath( url ) {
  * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
  * @return {string?} A resolved theme file URI, if one is found in the themeFileURIs collection.
  */
-export function getThemeFileURI( file, themeFileURIs = [] ) {
+export function getResolvedThemeFilePath( file, themeFileURIs = [] ) {
 	if ( ! isRelativePath( file ) ) {
 		return file;
 	}
 
 	const uri = themeFileURIs.find(
-		( themeFileUri ) => themeFileUri.file === file
+		( themeFileUri ) => themeFileUri.name === file
 	);
 
 	return uri?.href;
 }
 
 /**
- * Houses logic of where to look for unresolved theme file paths.
+ * Mutates an object by settings a value at the provided path.
  *
- * @param {Object}        styles        A styles object.
- * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
- * @return {Object} Returns mutated styles object.
+ * @param {Object}              object Object to set a value in.
+ * @param {number|string|Array} path   Path in the object to modify.
+ * @param {*}                   value  New value to set.
+ * @return {Object} Object with the new value set.
  */
-function setUnresolvedThemeFilePaths( styles, themeFileURIs ) {
-	// Top level styles.
-	if (
-		!! styles?.background?.backgroundImage?.url &&
-		isRelativePath( styles?.background?.backgroundImage?.url )
-	) {
-		const backgroundImageUrl = getThemeFileURI(
-			styles?.background?.backgroundImage?.url,
-			themeFileURIs
-		);
-		if ( backgroundImageUrl ) {
-			styles.background.backgroundImage.url = backgroundImageUrl;
-		}
+function setMutably( object, path, value ) {
+	path = Array.isArray( path ) ? [ ...path ] : [ path ];
+	const finalValueKey = path.pop();
+	let prev = object;
+
+	for ( const key of path ) {
+		const current = prev[ key ];
+		prev = current;
 	}
 
-	return styles;
+	prev[ finalValueKey ] = value;
+
+	return object;
 }
 
 /**
@@ -65,8 +68,19 @@ export default function setThemeFileUris( themeJson, themeFileURIs ) {
 		return themeJson;
 	}
 
-	// Mutating function.
-	setUnresolvedThemeFilePaths( themeJson.styles, themeFileURIs );
+	themeFileURIs.forEach( ( { name, href, path } ) => {
+		const value = getValueFromObjectPath( themeJson, path );
+		if ( value === name ) {
+			/*
+			 * The object must not be updated immutably here because the
+			 * themeJson is a reference to the global styles tree used as a dependency in the
+			 * useGlobalStylesOutputWithConfig() hook. If we mutate the object,
+			 * the hook will detect the change and re-render the component, resulting
+			 * in a maximum depth exceeded error.
+			 */
+			themeJson = setMutably( themeJson, path, href );
+		}
+	} );
 
 	return themeJson;
 }

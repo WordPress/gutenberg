@@ -1220,7 +1220,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	mergedConfig = setThemeFileUris(
 		mergedConfig,
-		mergedConfig?._links?.theme_file_uris
+		mergedConfig?._links?.[ 'wp:theme-file-uris' ]
 	);
 	const hasBlockGapSupport = blockGap !== null;
 	const hasFallbackGapSupport = ! hasBlockGapSupport; // This setting isn't useful yet: it exists as a placeholder for a future explicit fallback styles support.

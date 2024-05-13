@@ -38,7 +38,7 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
-import { getThemeFileURI } from './set-theme-file-uris';
+import { getResolvedThemeFilePath } from './set-theme-file-uris';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -303,7 +303,10 @@ function BackgroundImageToolsPanelItem( {
 						<InspectorImagePreview
 							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ getThemeFileURI( url, themeFileURIs ) }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
 						/>
 					}
 					variant="secondary"
@@ -471,7 +474,7 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ getThemeFileURI( imageValue, themeFileURIs ) }
+				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>

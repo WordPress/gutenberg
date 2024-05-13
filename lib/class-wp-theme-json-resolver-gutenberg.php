@@ -758,7 +758,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					$variation['title'] = basename( $path, '.json' );
 				}
 				if ( ! empty( $resolved_theme_uris ) ) {
-					$variation['_links']['theme_file_uris'] = $resolved_theme_uris;
+					$variation['_links']['wp:theme-file-uris'] = $resolved_theme_uris;
 				}
 				$variations[] = $variation;
 			}
@@ -775,9 +775,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 *
 	 * @param WP_Theme_JSON_Gutenberg  $theme_json A theme json instance.
 	 * @return array An array of resolved paths.
-	 * @return array Options.
 	 */
-	public static function get_resolved_theme_uris( $theme_json, $options = array() ) {
+	public static function get_resolved_theme_uris( $theme_json ) {
 		$resolved_theme_uris = array();
 
 		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg || empty( $theme_json ) ) {
@@ -792,13 +791,11 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			is_string( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
 			// Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
 			! isset( wp_parse_url( $theme_json_data['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
-				$resolved_theme_uri = array(
-					'file' => $theme_json_data['styles']['background']['backgroundImage']['url'],
+				$resolved_theme_uri    = array(
+					'name' => $theme_json_data['styles']['background']['backgroundImage']['url'],
 					'href' => esc_url( get_theme_file_uri( $theme_json_data['styles']['background']['backgroundImage']['url'] ) ),
+					'path' => array( 'styles', 'background', 'backgroundImage', 'url' ),
 				);
-				if ( ! empty( $options['include_paths'] ) ) {
-					$resolved_theme_uri['path'] = array( 'styles', 'background', 'backgroundImage', 'url' );
-				}
 				$resolved_theme_uris[] = $resolved_theme_uri;
 		}
 
@@ -815,12 +812,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * @return WP_Theme_JSON_Gutenberg Theme merged with resolved paths, if any found.
 	 */
 	public static function resolve_theme_file_uris( $theme_json ) {
-		$resolved_urls = static::get_resolved_theme_uris(
-			$theme_json,
-			array(
-				'include_paths' => true,
-			)
-		);
+		$resolved_urls = static::get_resolved_theme_uris( $theme_json );
 		if ( empty( $resolved_urls ) ) {
 			return $theme_json;
 		}
