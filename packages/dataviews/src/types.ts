@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import type { IconType } from '@wordpress/components';
-
-/**
  * External dependencies
  */
 import type { ReactElement, ReactNode } from 'react';
@@ -183,8 +178,10 @@ interface ActionBase {
 
 	/**
 	 * The icon of the action. (Either a string or an SVG element)
+	 * This should be IconType from the components package
+	 * but that import is breaking typescript build for the moment.
 	 */
-	icon?: IconType;
+	icon?: any;
 
 	/**
 	 * Whether the action is disabled.
