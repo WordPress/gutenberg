@@ -797,4 +797,45 @@ test.describe( 'Pattern Overrides', () => {
 			await expect( secondParagraph ).toHaveText( 'overriden content' );
 		} );
 	} );
+
+	// https://github.com/WordPress/gutenberg/issues/61610.
+	test( 'unsynced patterns should not be able to enable overrides', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const pattern = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph -->
+<p>paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+			meta: {
+				wp_pattern_sync_status: 'unsynced',
+			},
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: pattern.id,
+			postType: 'wp_block',
+			canvas: 'edit',
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.click();
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Enable overrides' } )
+		).toBeHidden();
+	} );
 } );
