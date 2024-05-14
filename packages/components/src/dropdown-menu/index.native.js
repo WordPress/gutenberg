@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { Platform } from 'react-native';
 /**
  * WordPress dependencies
@@ -23,10 +23,7 @@ function mergeProps( defaultProps = {}, props = {} ) {
 	};
 
 	if ( props.className && defaultProps.className ) {
-		mergedProps.className = classnames(
-			props.className,
-			defaultProps.className
-		);
+		mergedProps.className = clsx( props.className, defaultProps.className );
 	}
 
 	return mergedProps;
@@ -72,17 +69,14 @@ function DropdownMenu( {
 
 	return (
 		<Dropdown
-			className={ classnames( 'components-dropdown-menu', className ) }
+			className={ clsx( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const mergedToggleProps = mergeProps(
 					{
-						className: classnames(
-							'components-dropdown-menu__toggle',
-							{
-								'is-opened': isOpen,
-							}
-						),
+						className: clsx( 'components-dropdown-menu__toggle', {
+							'is-opened': isOpen,
+						} ),
 					},
 					toggleProps
 				);

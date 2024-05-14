@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,6 @@ import {
 } from '../../utils/constants';
 import {
 	exportJSONaction,
-	renameAction,
 	resetAction,
 	deleteAction,
 	duplicatePatternAction,
@@ -60,12 +59,13 @@ import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -177,12 +177,9 @@ function Author( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -378,45 +375,29 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const history = useHistory();
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					categoryId,
-					categoryType: type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history, categoryId, type ]
-	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
+	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
+	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const editAction = useEditPostAction();
+
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
-				renameAction,
+				...templatePartActions,
 				duplicateTemplatePartAction,
-				viewRevisionsAction,
 				resetAction,
 				deleteAction,
-			];
+			].filter( Boolean );
 		}
 		return [
-			renameAction,
+			editAction,
+			...patternActions,
 			duplicatePatternAction,
 			exportJSONaction,
 			resetAction,
 			deleteAction,
-		];
-	}, [ type, editAction, viewRevisionsAction ] );
+		].filter( Boolean );
+	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

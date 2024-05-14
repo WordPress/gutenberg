@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -257,7 +257,7 @@ function TableRow( {
 
 	return (
 		<tr
-			className={ classnames( 'dataviews-view-table__row', {
+			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -327,7 +327,7 @@ function TableRow( {
 					} }
 				>
 					<div
-						className={ classnames(
+						className={ clsx(
 							'dataviews-view-table__cell-content-wrapper',
 							{
 								'dataviews-view-table__primary-field':
@@ -362,16 +362,16 @@ function TableRow( {
 }
 
 function ViewTable( {
-	view,
-	onChangeView,
-	fields,
 	actions,
 	data,
+	fields,
 	getItemId,
 	isLoading = false,
-	selection,
+	onChangeView,
 	onSelectionChange,
+	selection,
 	setOpenedFilter,
+	view,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
@@ -516,7 +516,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classnames( {
+				className={ clsx( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

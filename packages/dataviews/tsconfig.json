@@ -3,7 +3,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"skipLibCheck": true,
+		"checkJs": false
 	},
 	"references": [
 		{ "path": "../a11y" },
@@ -16,5 +18,5 @@
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" }
 	],
-	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
+	"include": [ "src" ]
 }

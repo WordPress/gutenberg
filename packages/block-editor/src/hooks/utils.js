@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -610,7 +610,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),

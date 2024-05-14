@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
-
-type Item = Record< string, any >;
+import type { ReactElement, ReactNode } from 'react';
 
 interface Option {
 	value: any;
@@ -16,6 +14,8 @@ interface filterByConfig {
 }
 
 type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
+
+export type Item = Record< string, any >;
 
 export interface Field {
 	/**
@@ -101,7 +101,7 @@ export interface Filter {
 	value: any;
 }
 
-export interface View {
+interface ViewBase {
 	/**
 	 * The layout of the view.
 	 */
@@ -141,4 +141,101 @@ export interface View {
 	 * The number of items per page
 	 */
 	perPage?: number;
+
+	/**
+	 * The hidden fields.
+	 */
+	hiddenFields: string[];
 }
+export interface ViewList extends ViewBase {
+	type: 'list';
+
+	layout: {
+		/**
+		 * The field to use as the primary field.
+		 */
+		primaryField: string;
+
+		/**
+		 * The field to use as the media field.
+		 */
+		mediaField: string;
+	};
+}
+
+export type View = ViewList | ViewBase;
+
+interface ActionBase {
+	/**
+	 * The unique identifier of the action.
+	 */
+	id: string;
+
+	/**
+	 * The label of the action.
+	 */
+	label: string;
+
+	/**
+	 * The icon of the action. (Either a string or an SVG element)
+	 * This should be IconType from the components package
+	 * but that import is breaking typescript build for the moment.
+	 */
+	icon?: any;
+
+	/**
+	 * Whether the action is disabled.
+	 */
+	disabled?: boolean;
+
+	/**
+	 * Whether the action is destructive.
+	 */
+	isDestructive?: boolean;
+
+	/**
+	 * Whether the action is a primary action.
+	 */
+	isPrimary?: boolean;
+
+	/**
+	 * Whether the item passed as an argument supports the current action.
+	 */
+	isEligible?: ( item: Item ) => boolean;
+}
+
+export interface ActionModal extends ActionBase {
+	/**
+	 * Modal to render when the action is triggered.
+	 */
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	}: {
+		items: Item[];
+		closeModal?: () => void;
+		onActionStart?: ( items: Item[] ) => void;
+		onActionPerformed?: ( items: Item[] ) => void;
+	} ) => ReactElement;
+
+	/**
+	 * Whether to hide the modal header.
+	 */
+	hideModalHeader?: boolean;
+
+	/**
+	 * The header of the modal.
+	 */
+	modalHeader?: string;
+}
+
+export interface ActionButton extends ActionBase {
+	/**
+	 * The callback to execute when the action is triggered.
+	 */
+	callback: ( items: Item[] ) => void;
+}
+
+export type Action = ActionModal | ActionButton;

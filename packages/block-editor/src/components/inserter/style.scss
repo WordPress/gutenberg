@@ -116,7 +116,7 @@ $block-inserter-tabs-height: 44px;
 	overflow: hidden;
 
 	.block-editor-inserter__tablist {
-		border-bottom: $border-width solid $gray-300;
+		width: 100%;
 
 		button[role="tab"] {
 			flex-grow: 1;
@@ -187,7 +187,8 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 }
 
-.block-editor-inserter__no-results {
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
 	text-align: center;
 }
@@ -700,12 +701,9 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 }
 
-.is-zoom-out {
-	.block-editor-inserter__menu {
-		display: flex;
-	}
-
-	.show-panel::after {
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
 		// Makes space for the inserter flyout panel
 		@include break-medium {
 			content: "";
