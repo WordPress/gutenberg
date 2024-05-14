@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { MouseEventHandler, ReactElement } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -15,6 +20,7 @@ import { moreVertical } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import type { Action, ActionModal as ActionModalType, Item } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -24,7 +30,48 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-function ButtonTrigger( { action, onClick } ) {
+interface ButtonTriggerProps {
+	action: Action;
+	onClick: MouseEventHandler;
+}
+
+interface DropdownMenuItemTriggerProps {
+	action: Action;
+	onClick: MouseEventHandler;
+}
+
+interface ActionModalProps {
+	action: ActionModalType;
+	items: Item[];
+	closeModal?: () => void;
+	onActionStart?: ( items: Item[] ) => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface ActionWithModalProps extends ActionModalProps {
+	ActionTrigger: (
+		props: ButtonTriggerProps | DropdownMenuItemTriggerProps
+	) => ReactElement;
+	isBusy?: boolean;
+}
+
+interface ActionsDropdownMenuGroupProps {
+	actions: Action[];
+	item: Item;
+}
+
+interface ItemActionsProps {
+	item: Item;
+	actions: Action[];
+	isCompact: boolean;
+}
+
+interface CompactItemActionsProps {
+	item: Item;
+	actions: Action[];
+}
+
+function ButtonTrigger( { action, onClick }: ButtonTriggerProps ) {
 	return (
 		<Button
 			label={ action.label }
@@ -36,11 +83,14 @@ function ButtonTrigger( { action, onClick } ) {
 	);
 }
 
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( {
+	action,
+	onClick,
+}: DropdownMenuItemTriggerProps ) {
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
-			hideOnClick={ ! action.RenderModal }
+			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
 			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
 		</DropdownMenuItem>
@@ -53,12 +103,12 @@ export function ActionModal( {
 	closeModal,
 	onActionStart,
 	onActionPerformed,
-} ) {
+}: ActionModalProps ) {
 	return (
 		<Modal
 			title={ action.modalHeader || action.label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
-			onRequestClose={ closeModal }
+			onRequestClose={ closeModal ?? ( () => {} ) }
 			overlayClassName={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
 				action.id
 			) }` }
@@ -80,7 +130,7 @@ export function ActionWithModal( {
 	onActionStart,
 	onActionPerformed,
 	isBusy,
-} ) {
+}: ActionWithModalProps ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -106,11 +156,14 @@ export function ActionWithModal( {
 	);
 }
 
-export function ActionsDropdownMenuGroup( { actions, item } ) {
+export function ActionsDropdownMenuGroup( {
+	actions,
+	item,
+}: ActionsDropdownMenuGroupProps ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
-				if ( !! action.RenderModal ) {
+				if ( 'RenderModal' in action ) {
 					return (
 						<ActionWithModal
 							key={ action.id }
@@ -132,7 +185,11 @@ export function ActionsDropdownMenuGroup( { actions, item } ) {
 	);
 }
 
-export default function ItemActions( { item, actions, isCompact } ) {
+export default function ItemActions( {
+	item,
+	actions,
+	isCompact,
+}: ItemActionsProps ) {
 	const { primaryActions, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
@@ -162,7 +219,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 		>
 			{ !! primaryActions.length &&
 				primaryActions.map( ( action ) => {
-					if ( !! action.RenderModal ) {
+					if ( 'RenderModal' in action ) {
 						return (
 							<ActionWithModal
 								key={ action.id }
@@ -185,7 +242,7 @@ export default function ItemActions( { item, actions, isCompact } ) {
 	);
 }
 
-function CompactItemActions( { item, actions } ) {
+function CompactItemActions( { item, actions }: CompactItemActionsProps ) {
 	return (
 		<DropdownMenu
 			trigger={

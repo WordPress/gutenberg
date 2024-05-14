@@ -33,6 +33,7 @@ import { moreVertical } from '@wordpress/icons';
  */
 import { unlock } from './lock-unlock';
 import type {
+	Action,
 	Data,
 	Item,
 	NormalizedField,
@@ -40,18 +41,6 @@ import type {
 } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
-
-interface Action {
-	callback: ( items: Item[] ) => void;
-	icon: any;
-	id: string;
-	isDestructive: boolean | undefined;
-	isEligible: ( item: Item ) => boolean | undefined;
-	isPrimary: boolean | undefined;
-	label: string;
-	modalHeader: string;
-	RenderModal: ( props: any ) => JSX.Element;
-}
 
 interface ListViewProps {
 	actions: Action[];
@@ -215,7 +204,7 @@ function ListItem( {
 							width: 'auto',
 						} }
 					>
-						{ primaryAction && !! primaryAction.RenderModal && (
+						{ primaryAction && 'RenderModal' in primaryAction && (
 							<div role="gridcell">
 								<CompositeItem
 									store={ store }
@@ -247,28 +236,29 @@ function ListItem( {
 								</CompositeItem>
 							</div>
 						) }
-						{ primaryAction && ! primaryAction.RenderModal && (
-							<div role="gridcell" key={ primaryAction.id }>
-								<CompositeItem
-									store={ store }
-									render={
-										<Button
-											label={ primaryAction.label }
-											icon={ primaryAction.icon }
-											isDestructive={
-												primaryAction.isDestructive
-											}
-											size="compact"
-											onClick={ () =>
-												primaryAction.callback( [
-													item,
-												] )
-											}
-										/>
-									}
-								/>
-							</div>
-						) }
+						{ primaryAction &&
+							! ( 'RenderModal' in primaryAction ) && (
+								<div role="gridcell" key={ primaryAction.id }>
+									<CompositeItem
+										store={ store }
+										render={
+											<Button
+												label={ primaryAction.label }
+												icon={ primaryAction.icon }
+												isDestructive={
+													primaryAction.isDestructive
+												}
+												size="compact"
+												onClick={ () =>
+													primaryAction.callback( [
+														item,
+													] )
+												}
+											/>
+										}
+									/>
+								</div>
+							) }
 						<div role="gridcell">
 							<DropdownMenu
 								trigger={
