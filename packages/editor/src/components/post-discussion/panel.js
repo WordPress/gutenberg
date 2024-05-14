@@ -7,7 +7,6 @@ import {
 	Button,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
-	ExternalLink,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -32,19 +31,12 @@ function ModalContents( { onClose } ) {
 				title={ __( 'Discussion' ) }
 				onClose={ onClose }
 			/>
-			<VStack spacing={ 3 }>
+			<VStack spacing={ 4 }>
 				<PostTypeSupportCheck supportKeys="comments">
 					<PostComments />
 				</PostTypeSupportCheck>
 				<PostTypeSupportCheck supportKeys="trackbacks">
 					<PostPingbacks />
-					<ExternalLink
-						href={ __(
-							'https://wordpress.org/documentation/article/trackbacks-and-pingbacks/'
-						) }
-					>
-						{ __( 'Learn more about pingbacks & trackbacks' ) }
-					</ExternalLink>
 				</PostTypeSupportCheck>
 			</VStack>
 		</div>
