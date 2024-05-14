@@ -76,7 +76,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Inserter"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			'Heading'
 		);
 
@@ -139,7 +139,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Inserter"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			'Heading'
 		);
 
@@ -197,7 +197,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const PATTERN_NAME = 'Social links with a shared background color';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Inserter"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			PATTERN_NAME
 		);
 
@@ -286,7 +286,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Inserter"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			PATTERN_NAME
 		);
 		await page.hover(
@@ -353,7 +353,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const PATTERN_NAME = 'Social links with a shared background color';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Inserter"i] >> role=searchbox[name="Search for blocks and patterns"i]',
 			PATTERN_NAME
 		);
 
