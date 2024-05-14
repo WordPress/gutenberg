@@ -515,7 +515,7 @@ class SinceTagSniff implements Sniff {
 			}
 
 			if ( T_ATTRIBUTE_END === $tokens[ $comment_end ]['code']
-			     && isset( $tokens[ $comment_end ]['attribute_opener'] )
+				&& isset( $tokens[ $comment_end ]['attribute_opener'] )
 			) {
 				$comment_end = $tokens[ $comment_end ]['attribute_opener'];
 				continue;
