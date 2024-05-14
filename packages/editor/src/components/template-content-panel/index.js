@@ -6,11 +6,13 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { PanelBody } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../../lock-unlock';
+import { unlock } from '../../lock-unlock';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
@@ -20,10 +22,15 @@ const PAGE_CONTENT_BLOCKS = [
 	'core/post-title',
 ];
 
-export default function PageContent() {
+export default function TemplateContentPanel() {
 	const clientIds = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
 		return getBlocksByName( PAGE_CONTENT_BLOCKS );
 	}, [] );
-	return <BlockQuickNavigation clientIds={ clientIds } />;
+
+	return (
+		<PanelBody title={ __( 'Content' ) }>
+			<BlockQuickNavigation clientIds={ clientIds } />
+		</PanelBody>
+	);
 }

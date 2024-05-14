@@ -119,6 +119,11 @@
 	.editor-post-visibility__dialog-legend {
 		display: none;
 	}
+
+	.components-panel__body-title .components-button {
+		align-items: flex-start;
+		text-wrap: pretty;
+	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {

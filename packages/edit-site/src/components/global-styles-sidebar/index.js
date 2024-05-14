@@ -21,12 +21,12 @@ import {
 /**
  * Internal dependencies
  */
-import DefaultSidebar from './default-sidebar';
 import { GlobalStylesUI } from '../global-styles';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesMenuSlot } from '../global-styles/ui';
 import { unlock } from '../../lock-unlock';
 import { store as coreStore } from '@wordpress/core-data';
+import DefaultSidebar from './default-sidebar';
 
 const { interfaceStore } = unlock( editorPrivateApis );
 

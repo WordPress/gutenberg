@@ -39,6 +39,7 @@ import {
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { PrivateBlockPopover } from './components/block-popover';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -78,4 +79,5 @@ lock( privateApis, {
 	requiresWrapperOnCopy,
 	PrivateRichText,
 	reusableBlocksSelectKey,
+	PrivateBlockPopover,
 } );

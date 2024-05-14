@@ -35,6 +35,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -273,6 +274,57 @@ function Layout( { initialPost } ) {
 		);
 	}
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						const postType = items[ 0 ].type;
+						document.location.href = addQueryArgs( 'edit.php', {
+							post_type: postType,
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											const postId = newItem.id;
+											document.location.href =
+												addQueryArgs( 'post.php', {
+													post: postId,
+													action: 'edit',
+												} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ createSuccessNotice ]
+	);
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -363,6 +415,7 @@ function Layout( { initialPost } ) {
 			<PluginArea onError={ onPluginAreaError } />
 			{ ! isDistractionFree && (
 				<Sidebar
+					onActionPerformed={ onActionPerformed }
 					extraPanels={
 						! isEditingTemplate && <MetaBoxes location="side" />
 					}

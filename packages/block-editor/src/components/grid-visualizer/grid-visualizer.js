@@ -2,19 +2,28 @@
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
+import { store as blockEditorStore } from '../../store';
 import { getComputedCSS } from './utils';
 
 export function GridVisualizer( { clientId } ) {
+	const isDistractionFree = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().isDistractionFree,
+		[]
+	);
 	const blockElement = useBlockElement( clientId );
-	if ( ! blockElement ) {
+
+	if ( isDistractionFree || ! blockElement ) {
 		return null;
 	}
+
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-visualizer"

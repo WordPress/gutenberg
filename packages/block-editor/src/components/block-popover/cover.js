@@ -7,7 +7,7 @@ import { useEffect, useState, useMemo, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopover from '.';
+import { PrivateBlockPopover } from '.';
 
 function BlockPopoverCover(
 	{
@@ -25,7 +25,7 @@ function BlockPopoverCover(
 	const selectedElement = useBlockElement( clientId );
 
 	return (
-		<BlockPopover
+		<PrivateBlockPopover
 			ref={ ref }
 			clientId={ clientId }
 			bottomClientId={ bottomClientId }
@@ -42,7 +42,7 @@ function BlockPopoverCover(
 			) : (
 				children
 			) }
-		</BlockPopover>
+		</PrivateBlockPopover>
 	);
 }
 

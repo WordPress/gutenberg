@@ -97,6 +97,79 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 }
 
 /**
+ * Formats an array of objects as a Markdown table.
+ *
+ * For example, this array:
+ *
+ * [
+ * 	{
+ * 	    foo: 123,
+ * 	    bar: 456,
+ * 	    baz: 'Yes',
+ * 	},
+ * 	{
+ * 	    foo: 777,
+ * 	    bar: 999,
+ * 	    baz: 'No',
+ * 	}
+ * ]
+ *
+ * Will result in the following table:
+ *
+ * | foo | bar | baz |
+ * |-----|-----|-----|
+ * | 123 | 456 | Yes |
+ * | 777 | 999 | No  |
+ *
+ * @param {Array<Object>} rows Table rows.
+ * @return {string} Markdown table content.
+ */
+function formatAsMarkdownTable( rows ) {
+	let result = '';
+
+	if ( ! rows.length ) {
+		return result;
+	}
+
+	const headers = Object.keys( rows[ 0 ] );
+	for ( const header of headers ) {
+		result += `| ${ header } `;
+	}
+	result += '|\n';
+	for ( let i = 0; i < headers.length; i++ ) {
+		result += '| ------ ';
+	}
+	result += '|\n';
+
+	for ( const row of rows ) {
+		for ( const value of Object.values( row ) ) {
+			result += `| ${ value } `;
+		}
+		result += '|\n';
+	}
+
+	return result;
+}
+
+/**
+ * Nicely formats a given value.
+ *
+ * @param {string} metric Metric.
+ * @param {number} value
+ */
+function formatValue( metric, value ) {
+	if ( 'wpMemoryUsage' === metric ) {
+		return `${ ( value / Math.pow( 10, 6 ) ).toFixed( 2 ) } MB`;
+	}
+
+	if ( 'wpDbQueries' === metric ) {
+		return value.toString();
+	}
+
+	return `${ value } ms`;
+}
+
+/**
  * Runs the performances tests on an array of branches and output the result.
  *
  * @param {string[]}                    branches Branches to compare
@@ -387,7 +460,7 @@ async function runPerformanceTests( branches, options ) {
 					return readJSONFile( file );
 				} );
 
-			const metrics = Object.keys( resultsRounds[ 0 ] );
+			const metrics = Object.keys( resultsRounds[ 0 ] ?? {} );
 			results[ testSuite ][ branch ] = {};
 
 			for ( const metric of metrics ) {
@@ -401,6 +474,7 @@ async function runPerformanceTests( branches, options ) {
 				}
 			}
 		}
+
 		const calculatedResultsPath = path.join(
 			ARTIFACTS_PATH,
 			testSuite + RESULTS_FILE_SUFFIX
@@ -424,6 +498,10 @@ async function runPerformanceTests( branches, options ) {
 		)
 	);
 
+	let summaryMarkdown = `## Performance Test Results\n\n`;
+
+	summaryMarkdown += `Please note that client side metrics **exclude** the server response time.\n\n`;
+
 	for ( const testSuite of testSuites ) {
 		logAtIndent( 0, formats.success( testSuite ) );
 
@@ -435,7 +513,10 @@ async function runPerformanceTests( branches, options ) {
 		) ) {
 			for ( const [ metric, value ] of Object.entries( metrics ) ) {
 				invertedResult[ metric ] = invertedResult[ metric ] || {};
-				invertedResult[ metric ][ branch ] = `${ value } ms`;
+				invertedResult[ metric ][ branch ] = formatValue(
+					metric,
+					value
+				);
 			}
 		}
 
@@ -457,7 +538,37 @@ async function runPerformanceTests( branches, options ) {
 
 		// Print the results.
 		console.table( invertedResult );
+
+		// Use yet another structure to generate a Markdown table.
+
+		const rows = [];
+
+		for ( const [ metric, resultBranches ] of Object.entries(
+			invertedResult
+		) ) {
+			/**
+			 * @type {Record< string, string >}
+			 */
+			const row = {
+				Metric: metric,
+			};
+
+			for ( const [ branch, value ] of Object.entries(
+				resultBranches
+			) ) {
+				row[ branch ] = value;
+			}
+			rows.push( row );
+		}
+
+		summaryMarkdown += `**${ testSuite }**\n\n`;
+		summaryMarkdown += `${ formatAsMarkdownTable( rows ) }\n`;
 	}
+
+	fs.writeFileSync(
+		path.join( ARTIFACTS_PATH, 'summary.md' ),
+		summaryMarkdown
+	);
 }
 
 module.exports = {
