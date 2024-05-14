@@ -263,7 +263,7 @@ export const directive = (
 const resolve = ( path, namespace ) => {
 	if ( ! namespace ) {
 		warn(
-			`The "namespace" cannot be "{}", "null" or an emtpy string. Path: ${ path }`
+			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
 		);
 		return;
 	}
