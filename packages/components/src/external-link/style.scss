@@ -7,6 +7,10 @@
 }
 
 .components-external-link__icon {
-	margin-left: 0.5ch;
-	font-weight: 400;
+	// These styles exist to override plugins that incorrectly style this component.
+	&.components-external-link__icon {
+		vertical-align: initial;
+		margin: 0;
+		margin-left: 0.5ch;
+	}
 }
