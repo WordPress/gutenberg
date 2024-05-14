@@ -412,14 +412,14 @@
 			}
 		}
 
-		.dataviews-item-actions .components-button {
+		.dataviews-view-list__item-actions .components-button {
 			opacity: 0;
 		}
 
 		&.is-selected,
 		&.is-hovered,
 		&:focus-within {
-			.dataviews-item-actions .components-button {
+			.dataviews-view-list__item-actions .components-button {
 				opacity: 1;
 			}
 		}
@@ -527,7 +527,7 @@
 		}
 	}
 
-	.dataviews-item-actions {
+	.dataviews-view-list__item-actions {
 		padding-top: $grid-unit-20;
 		padding-right: $grid-unit-40;
 	}

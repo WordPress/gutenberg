@@ -209,7 +209,7 @@ function ListItem( {
 					<HStack
 						spacing={ 1 }
 						justify="flex-end"
-						className="dataviews-item-actions"
+						className="dataviews-view-list__item-actions"
 						style={ {
 							flexShrink: '0',
 							width: 'auto',
@@ -280,7 +280,6 @@ function ListItem( {
 												icon={ moreVertical }
 												label={ __( 'Actions' ) }
 												disabled={ ! actions.length }
-												className="dataviews-all-actions-button"
 												onKeyDown={ ( event: {
 													key: string;
 													preventDefault: () => void;
