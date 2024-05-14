@@ -13,7 +13,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { average, median, minimum, maximum, round } from '../utils';
+import { average, median, round } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -36,6 +36,11 @@ export interface WPRawPerformanceResults {
 	loadPatterns: number[];
 	listViewOpen: number[];
 	navigate: number[];
+	wpBeforeTemplate: number[];
+	wpTemplate: number[];
+	wpTotal: number[];
+	wpMemoryUsage: number[];
+	wpDbQueries: number[];
 }
 
 export interface WPPerformanceResults {
@@ -59,6 +64,11 @@ export interface WPPerformanceResults {
 	loadPatterns?: number;
 	listViewOpen?: number;
 	navigate?: number;
+	wpBeforeTemplate?: number;
+	wpTemplate?: number;
+	wpTotal?: number;
+	wpMemoryUsage?: number;
+	wpDbQueries?: number;
 }
 
 /**
@@ -92,6 +102,11 @@ export function curateResults(
 		loadPatterns: average( results.loadPatterns ),
 		listViewOpen: average( results.listViewOpen ),
 		navigate: median( results.navigate ),
+		wpBeforeTemplate: median( results.wpBeforeTemplate ),
+		wpTemplate: median( results.wpTemplate ),
+		wpTotal: median( results.wpTotal ),
+		wpMemoryUsage: median( results.wpMemoryUsage ),
+		wpDbQueries: median( results.wpDbQueries ),
 	};
 
 	return (

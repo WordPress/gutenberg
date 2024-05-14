@@ -11,14 +11,11 @@ import { downloadBlob } from '@wordpress/blob';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import {
 	Button,
-	TextControl,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -87,92 +84,6 @@ export const exportJSONaction = {
 			__( 'patterns-export' ) + '.zip',
 			await downloadZip( filesToZip ).blob(),
 			'application/zip'
-		);
-	},
-};
-
-export const renameAction = {
-	id: 'rename-pattern',
-	label: __( 'Rename' ),
-	isEligible: ( item ) => {
-		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-		const isUserPattern = item.type === PATTERN_TYPES.user;
-		const isCustomPattern =
-			isUserPattern || ( isTemplatePart && item.isCustom );
-		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
-		return isCustomPattern && ! hasThemeFile;
-	},
-	RenderModal: ( { items, closeModal } ) => {
-		const [ item ] = items;
-		const [ title, setTitle ] = useState( () => item.title );
-		const { editEntityRecord, saveEditedEntityRecord } =
-			useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		async function onRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord( 'postType', item.type, item.id, {
-					title,
-				} );
-				// Update state before saving rerenders the list.
-				setTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveEditedEntityRecord( 'postType', item.type, item.id, {
-					throwOnError: true,
-				} );
-				createSuccessNotice(
-					item.type === TEMPLATE_PART_POST_TYPE
-						? __( 'Template part renamed.' )
-						: __( 'Pattern renamed.' ),
-					{ type: 'snackbar' }
-				);
-			} catch ( error ) {
-				const fallbackErrorMessage =
-					item.type === TEMPLATE_PART_POST_TYPE
-						? __(
-								'An error occurred while renaming the template part.'
-						  )
-						: __( 'An error occurred while renaming the pattern.' );
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-		return (
-			<form onSubmit={ onRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ () => {
-								closeModal();
-							} }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							type="submit"
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
 		);
 	},
 };

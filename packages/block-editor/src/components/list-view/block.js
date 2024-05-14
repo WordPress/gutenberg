@@ -181,6 +181,8 @@ function ListViewBlock( {
 			return;
 		}
 
+		const isDeleteKey = [ BACKSPACE, DELETE ].includes( event.keyCode );
+
 		// If multiple blocks are selected, deselect all blocks when the user
 		// presses the escape key.
 		if (
@@ -191,10 +193,15 @@ function ListViewBlock( {
 			event.preventDefault();
 			selectBlock( event, undefined );
 		} else if (
-			event.keyCode === BACKSPACE ||
-			event.keyCode === DELETE ||
+			isDeleteKey ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
+			// Do not handle single-key block deletion shortcuts when events come from modals;
+			// retain the default behavior for these keys.
+			if ( isDeleteKey && event.target.closest( '[role=dialog]' ) ) {
+				return;
+			}
+
 			const {
 				blocksToUpdate: blocksToDelete,
 				firstBlockClientId,

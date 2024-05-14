@@ -411,18 +411,16 @@ test.describe( 'Change detection', () => {
 		await editor.openDocumentSettingsSidebar();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Move to trash' } )
+			.getByRole( 'button', { name: 'Actions' } )
+			.click();
+		await page
+			.getByRole( 'menu' )
+			.getByRole( 'menuitem', { name: 'Move to Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Move to trash' } )
+			.getByRole( 'button', { name: 'Delete' } )
 			.click();
-
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'saved' } )
-		).toBeDisabled();
 
 		await expect( page ).toHaveURL( '/wp-admin/edit.php?post_type=post' );
 	} );

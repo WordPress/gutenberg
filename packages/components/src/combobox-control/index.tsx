@@ -78,10 +78,12 @@ const getIndexOfMatchingSuggestion = (
  * 	{
  * 		value: 'normal',
  * 		label: 'Normal',
+ * 		disabled: true,
  * 	},
  * 	{
  * 		value: 'large',
  * 		label: 'Large',
+ * 		disabled: false,
  * 	},
  * ];
  *
@@ -165,6 +167,10 @@ function ComboboxControl( props: ComboboxControlProps ) {
 	const onSuggestionSelected = (
 		newSelectedSuggestion: ComboboxControlOption
 	) => {
+		if ( newSelectedSuggestion.disabled ) {
+			return;
+		}
+
 		setValue( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );

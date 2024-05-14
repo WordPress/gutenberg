@@ -3,6 +3,7 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -134,29 +135,36 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 }
 
 function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
-	const parentLayout = useLayout() || {};
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
-	} = parentLayout;
+	} = useLayout() || {};
+
 	const rootClientId = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlockRootClientId( clientId );
 		},
 		[ clientId ]
 	);
+
+	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
+	const [ resizerBounds, setResizerBounds ] = useState();
+
 	if ( parentLayoutType !== 'grid' ) {
 		return null;
 	}
-	if ( ! window.__experimentalEnableGridInteractivity ) {
-		return null;
-	}
+
 	return (
 		<>
-			<GridVisualizer clientId={ rootClientId } />
+			<GridVisualizer
+				clientId={ rootClientId }
+				contentRef={ setResizerBounds }
+			/>
 			{ allowSizingOnChildren && (
 				<GridItemResizer
 					clientId={ clientId }
+					// Don't allow resizing beyond the grid visualizer.
+					bounds={ resizerBounds }
 					onChange={ ( { columnSpan, rowSpan } ) => {
 						setAttributes( {
 							style: {

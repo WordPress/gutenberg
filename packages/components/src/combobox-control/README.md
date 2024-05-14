@@ -77,7 +77,7 @@ If this property is added, a help text will be generated using help property as 
 
 The options that can be chosen from.
 
--   Type: `Array<{ value: string, label: string }>`
+-   Type: `Array<{ value: string, label: string, disabled?: boolean }>`
 -   Required: Yes
 
 #### onFilterValueChange
