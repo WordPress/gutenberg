@@ -13,7 +13,7 @@ This SlotFill allows registering a UI to edit Document settings.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/editor';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 const PluginDocumentSettingPanelDemo = () => (
 	<PluginDocumentSettingPanel
@@ -49,7 +49,7 @@ To programmatically toggle panels, use the following:
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/edit-post';
 
 const Example = () => {
 	const { toggleEditorPanelOpened } = useDispatch( editorStore );
@@ -76,7 +76,7 @@ It is also possible to remove panels from the admin using the `removeEditorPanel
 
 ```js
 import { useDispatch } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+import { store as editorStore } from '@wordpress/edit-post';
 
 const Example = () => {
 	const { removeEditorPanel } = useDispatch( editorStore );
