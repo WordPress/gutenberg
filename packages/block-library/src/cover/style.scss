@@ -1,11 +1,7 @@
-// Lowest specificity styles are used to ensure that the default styles for the cover block can be overridden by global styles.
-:root :where(.wp-block-cover-image, .wp-block-cover) {
-	min-height: 430px;
-	padding: 1em;
-}
-
 .wp-block-cover-image,
 .wp-block-cover {
+	min-height: 430px;
+	padding: 1em;
 	position: relative;
 	background-position: center center;
 	display: flex;
