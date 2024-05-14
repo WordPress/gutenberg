@@ -50,7 +50,7 @@ interface ListViewProps {
 	id: string;
 	isLoading: boolean;
 	onSelectionChange: ( selection: Item[] ) => void;
-	selection: Item[];
+	selection: string[];
 	view: ViewListType;
 }
 
