@@ -165,10 +165,8 @@ function GridItemResizerInner( {
 					 * isn't directly above the handle, so we try to detect if it happens
 					 * outside the grid and dispatch a mouseup event on the handle.
 					 */
-					const rootElementParent = rootBlockElement.closest(
-						'.editor-styles-wrapper'
-					);
-					rootElementParent.addEventListener(
+					controller.abort();
+					event.target.ownerDocument.addEventListener(
 						'mouseup',
 						() => {
 							event.target.dispatchEvent(
