@@ -191,7 +191,33 @@ export interface ViewList extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewBase;
+export interface ViewGrid extends ViewBase {
+	type: 'grid';
+
+	layout: {
+		/**
+		 * The field to use as the primary field.
+		 */
+		primaryField: string;
+
+		/**
+		 * The field to use as the media field.
+		 */
+		mediaField: string;
+
+		/**
+		 * The fields to use as columns.
+		 */
+		columnFields: string[];
+
+		/**
+		 * The fields to use as badge fields.
+		 */
+		badgeFields: string[];
+	};
+}
+
+export type View = ViewList | ViewGrid | ViewBase;
 
 interface ActionBase< Item extends AnyItem > {
 	/**

@@ -21,8 +21,39 @@ import { __ } from '@wordpress/i18n';
  */
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
-
 import { useHasAPossibleBulkAction } from './bulk-actions';
+import type {
+	Action,
+	Data,
+	Item,
+	NormalizedField,
+	ViewGrid as ViewGridType,
+} from './types';
+
+interface GridItemProps {
+	selection: string[];
+	data: Data;
+	onSelectionChange: ( items: Item[] ) => void;
+	getItemId: ( item: Item ) => string;
+	item: Item;
+	actions: Action[];
+	mediaField?: NormalizedField;
+	primaryField?: NormalizedField;
+	visibleFields: NormalizedField[];
+	badgeFields: NormalizedField[];
+	columnFields: string[];
+}
+
+interface ViewGridProps {
+	actions: Action[];
+	data: Data;
+	fields: NormalizedField[];
+	getItemId: ( item: Item ) => string;
+	isLoading: boolean;
+	onSelectionChange: ( items: Item[] ) => void;
+	selection: string[];
+	view: ViewGridType;
+}
 
 function GridItem( {
 	selection,
@@ -36,7 +67,7 @@ function GridItem( {
 	visibleFields,
 	badgeFields,
 	columnFields,
-} ) {
+}: GridItemProps ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -86,7 +117,6 @@ function GridItem( {
 				className="dataviews-view-grid__title-actions"
 			>
 				<SingleSelectionCheckbox
-					id={ id }
 					item={ item }
 					selection={ selection }
 					onSelectionChange={ onSelectionChange }
@@ -105,7 +135,7 @@ function GridItem( {
 					className="dataviews-view-grid__badge-fields"
 					spacing={ 2 }
 					wrap
-					align="top"
+					alignment="top"
 					justify="flex-start"
 				>
 					{ badgeFields.map( ( field ) => {
@@ -183,7 +213,7 @@ export default function ViewGrid( {
 	onSelectionChange,
 	selection,
 	view,
-} ) {
+}: ViewGridProps ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -191,7 +221,7 @@ export default function ViewGrid( {
 		( field ) => field.id === view.layout.primaryField
 	);
 	const { visibleFields, badgeFields } = fields.reduce(
-		( accumulator, field ) => {
+		( accumulator: Record< string, NormalizedField[] >, field ) => {
 			if (
 				view.hiddenFields.includes( field.id ) ||
 				[ view.layout.mediaField, view.layout.primaryField ].includes(
