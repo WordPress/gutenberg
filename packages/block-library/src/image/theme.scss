@@ -2,6 +2,6 @@
 	@include caption-style-theme();
 }
 
-:where(.wp-block-image) {
+:root :where(.wp-block-image) {
 	margin: 0 0 1em 0;
 }
