@@ -50,7 +50,7 @@ export interface Field< Item extends AnyItem > {
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
 	 */
-	getValue?: ( args: { item: Item } ) => string | undefined;
+	getValue?: ( args: { item: Item } ) => any;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
