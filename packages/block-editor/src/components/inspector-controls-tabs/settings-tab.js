@@ -5,16 +5,10 @@ import AdvancedControls from './advanced-controls-panel';
 import PositionControls from './position-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import SettingsTabHint from './settings-tab-hint';
-import { BlockBindingsPanel } from '../block-bindings-panel';
 
-function SettingsTab( { showAdvancedControls = false, block } ) {
-	const hasBindings = block?.attributes?.metadata?.bindings
-		? Object.keys( block.attributes.metadata.bindings ).length > 0
-		: false;
-
+function SettingsTab( { showAdvancedControls = false } ) {
 	return (
 		<>
-			{ hasBindings && <BlockBindingsPanel block={ block } /> }
 			<InspectorControls.Slot />
 			<PositionControls />
 			{ showAdvancedControls && (

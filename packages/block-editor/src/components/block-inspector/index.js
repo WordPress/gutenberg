@@ -31,7 +31,6 @@ import BlockQuickNavigation from '../block-quick-navigation';
 import { useBorderPanelLabel } from '../../hooks/border';
 
 import { unlock } from '../../lock-unlock';
-import { BlockBindingsPanel } from '../block-bindings-panel';
 
 function BlockInspectorLockedBlocks( { topLevelLockedBlock } ) {
 	const contentClientIds = useSelect(
@@ -248,9 +247,6 @@ const AnimatedContainer = ( {
 const BlockInspectorSingleBlock = ( { clientId, blockName, block } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
 	const showTabs = availableTabs?.length > 1;
-	const hasBindings = block?.attributes?.metadata?.bindings
-		? Object.keys( block.attributes.metadata.bindings ).length > 0
-		: false;
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
@@ -290,7 +286,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName, block } ) => {
 					) }
 					<InspectorControls.Slot />
 					<InspectorControls.Slot group="list" />
-					{ hasBindings && <BlockBindingsPanel block={ block } /> }
 					<InspectorControls.Slot
 						group="color"
 						label={ __( 'Color' ) }
