@@ -15,6 +15,11 @@
 function gutenberg_change_patterns_link_and_remove_template_parts_submenu_item() {
 	if ( ! wp_is_block_theme() ) {
 		global $submenu;
+
+		if ( empty( $submenu['themes.php'] ) ) {
+			return;
+		}
+
 		foreach ( $submenu['themes.php'] as $key => $item ) {
 			if ( 'edit.php?post_type=wp_block' === $item[2] ) {
 				$submenu['themes.php'][ $key ][2] = 'site-editor.php?path=/patterns';

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -71,7 +71,7 @@ export default function PostCardPanel( { className, actions } ) {
 	return (
 		<PanelBody>
 			<div
-				className={ classnames( 'editor-post-card-panel', className, {
+				className={ clsx( 'editor-post-card-panel', className, {
 					'has-description': showPostContentPanels,
 				} ) }
 			>

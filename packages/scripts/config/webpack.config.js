@@ -9,6 +9,7 @@ const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
+const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
@@ -382,6 +383,10 @@ const scriptConfig = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// RtlCssPlugin to generate RTL CSS files.
+		new RtlCssPlugin( {
+			filename: `[name]-rtl.css`,
+		} ),
 		// React Fast Refresh.
 		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get

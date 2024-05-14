@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
 
 /**
@@ -665,7 +665,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		);
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		className,
 		'components-form-token-field__input-container',
 		{
@@ -694,12 +694,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div { ...tokenFieldProps }>
-			<StyledLabel
-				htmlFor={ `components-form-token-input-${ instanceId }` }
-				className="components-form-token-field__label"
-			>
-				{ label }
-			</StyledLabel>
+			{ label && (
+				<StyledLabel
+					htmlFor={ `components-form-token-input-${ instanceId }` }
+					className="components-form-token-field__label"
+				>
+					{ label }
+				</StyledLabel>
+			) }
 			<div
 				ref={ tokensAndInput }
 				className={ classes }
