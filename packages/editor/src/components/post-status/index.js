@@ -10,7 +10,7 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
@@ -203,6 +203,11 @@ export default function PostStatus() {
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
+							aria-label={ sprintf(
+								// translators: %s: Current post status.
+								__( 'Change post status: %s' ),
+								labels[ status ]
+							) }
 						>
 							{ labels[ status ] }
 						</Button>
