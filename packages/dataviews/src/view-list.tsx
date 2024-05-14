@@ -229,8 +229,6 @@ function ListItem( {
 											closeModal={ () =>
 												setIsModalOpen( false )
 											}
-											onActionStart={ () => {} }
-											onActionPerformed={ () => {} }
 										/>
 									) }
 								</CompositeItem>

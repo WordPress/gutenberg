@@ -44,8 +44,6 @@ interface ActionModalProps {
 	action: ActionModalType;
 	items: Item[];
 	closeModal?: () => void;
-	onActionStart?: ( items: Item[] ) => void;
-	onActionPerformed?: ( items: Item[] ) => void;
 }
 
 interface ActionWithModalProps extends ActionModalProps {
@@ -97,13 +95,7 @@ function DropdownMenuItemTrigger( {
 	);
 }
 
-export function ActionModal( {
-	action,
-	items,
-	closeModal,
-	onActionStart,
-	onActionPerformed,
-}: ActionModalProps ) {
+export function ActionModal( { action, items, closeModal }: ActionModalProps ) {
 	return (
 		<Modal
 			title={ action.modalHeader || action.label }
@@ -116,8 +108,8 @@ export function ActionModal( {
 			<action.RenderModal
 				items={ items }
 				closeModal={ closeModal }
-				onActionStart={ onActionStart }
-				onActionPerformed={ onActionPerformed }
+				onActionStart={ action.onActionStart }
+				onActionPerformed={ action.onActionPerformed }
 			/>
 		</Modal>
 	);
@@ -127,8 +119,6 @@ export function ActionWithModal( {
 	action,
 	items,
 	ActionTrigger,
-	onActionStart,
-	onActionPerformed,
 	isBusy,
 }: ActionWithModalProps ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -148,8 +138,6 @@ export function ActionWithModal( {
 					action={ action }
 					items={ items }
 					closeModal={ () => setIsModalOpen( false ) }
-					onActionStart={ onActionStart }
-					onActionPerformed={ onActionPerformed }
 				/>
 			) }
 		</>
