@@ -7,19 +7,19 @@ import { CheckboxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import type { Data, Field, Item } from './types';
+import type { Field, AnyItem } from './types';
 
-interface SingleSelectionCheckboxProps {
+interface SingleSelectionCheckboxProps< Item extends AnyItem > {
 	selection: string[];
 	onSelectionChange: ( selection: Item[] ) => void;
 	item: Item;
-	data: Data;
+	data: Item[];
 	getItemId: ( item: Item ) => string;
-	primaryField?: Field;
+	primaryField?: Field< Item >;
 	disabled: boolean;
 }
 
-export default function SingleSelectionCheckbox( {
+export default function SingleSelectionCheckbox< Item extends AnyItem >( {
 	selection,
 	onSelectionChange,
 	item,
@@ -27,7 +27,7 @@ export default function SingleSelectionCheckbox( {
 	getItemId,
 	primaryField,
 	disabled,
-}: SingleSelectionCheckboxProps ) {
+}: SingleSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;

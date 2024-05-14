@@ -15,13 +15,13 @@ import {
 	OPERATOR_IS_NOT_ALL,
 } from './constants';
 import { normalizeFields } from './normalize-fields';
-import type { Data, Field, Item, View } from './types';
+import type { Field, AnyItem, View } from './types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-const EMPTY_ARRAY: Data = [];
+const EMPTY_ARRAY: [] = [];
 
 /**
  * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
@@ -32,14 +32,17 @@ const EMPTY_ARRAY: Data = [];
  *
  * @return Filtered, sorted and paginated data.
  */
-export function filterSortAndPaginate< T extends Item >(
-	data: T[],
+export function filterSortAndPaginate< Item extends AnyItem >(
+	data: Item[],
 	view: View,
-	fields: Field< T >[]
-): { data: Data; paginationInfo: { totalItems: number; totalPages: number } } {
+	fields: Field< Item >[]
+): {
+	data: Item[];
+	paginationInfo: { totalItems: number; totalPages: number };
+} {
 	if ( ! data ) {
 		return {
-			data: EMPTY_ARRAY as T[],
+			data: EMPTY_ARRAY,
 			paginationInfo: { totalItems: 0, totalPages: 0 },
 		};
 	}

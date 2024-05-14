@@ -6,16 +6,6 @@ import type { ReactElement, ReactNode } from 'react';
 export type SortDirection = 'asc' | 'desc';
 
 /**
- * Type of view UI.
- */
-export type ViewType = 'table' | 'grid' | 'list';
-
-/**
- * Type of field.
- */
-export type FieldType = 'enumeration';
-
-/**
  * Generic option type.
  */
 interface Option< Value extends any = any > {
@@ -40,12 +30,12 @@ interface FilterByConfig {
 
 type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
 
-export type Item = Record< string, any >;
+export type AnyItem = Record< string, any >;
 
 /**
  * A dataview field for a specific property of a data type.
  */
-export interface Field< T extends Item > {
+export interface Field< Item extends AnyItem > {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -60,12 +50,12 @@ export interface Field< T extends Item > {
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
 	 */
-	getValue?: ( args: { item: T } ) => string | undefined;
+	getValue?: ( args: { item: Item } ) => string | undefined;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( args: { item: T } ) => ReactNode;
+	render?: ( args: { item: Item } ) => ReactNode;
 
 	/**
 	 * The width of the field column.
@@ -108,15 +98,15 @@ export interface Field< T extends Item > {
 	filterBy?: FilterByConfig | undefined;
 }
 
-export type NormalizedField< T extends Item > = Field< T > &
-	Required< Pick< Field< T >, 'header' | 'getValue' | 'render' > >;
+export type NormalizedField< Item extends AnyItem > = Field< Item > &
+	Required< Pick< Field< Item >, 'header' | 'getValue' | 'render' > >;
 
 /**
  * A collection of dataview fields for a data type.
  */
-export type Fields< T extends Item > = Field< T >[];
+export type Fields< Item extends AnyItem > = Field< Item >[];
 
-export type Data = Item[];
+export type Data< Item extends AnyItem > = Item[];
 
 /**
  * The filters applied to the dataset.
@@ -142,7 +132,7 @@ interface ViewBase {
 	/**
 	 * The layout of the view.
 	 */
-	type: ViewType;
+	type: string;
 
 	/**
 	 * The global search term.
@@ -203,7 +193,7 @@ export interface ViewList extends ViewBase {
 
 export type View = ViewList | ViewBase;
 
-interface ActionBase {
+interface ActionBase< Item extends AnyItem > {
 	/**
 	 * The unique identifier of the action.
 	 */
@@ -247,7 +237,8 @@ interface ActionBase {
 	supportsBulk?: boolean;
 }
 
-export interface ActionModal extends ActionBase {
+export interface ActionModal< Item extends AnyItem >
+	extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action has finished.
 	 */
@@ -284,11 +275,14 @@ export interface ActionModal extends ActionBase {
 	modalHeader?: string;
 }
 
-export interface ActionButton extends ActionBase {
+export interface ActionButton< Item extends AnyItem >
+	extends ActionBase< AnyItem > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
 	callback: ( items: Item[] ) => void;
 }
 
-export type Action = ActionModal | ActionButton;
+export type Action< Item extends AnyItem > =
+	| ActionModal< Item >
+	| ActionButton< Item >;
