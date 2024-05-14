@@ -90,49 +90,49 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 *     function wp_get_navigation( $slug ) { ... }
 	 * }
 	 *
-	 * @param File $phpcsFile     The file being scanned.
+	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position of the current token in the stack passed in $tokens.
 	 */
-	private function process_function_token( File $phpcsFile, $stack_pointer ) {
-		$tokens        = $phpcsFile->getTokens();
-		$functionToken = $phpcsFile->findNext( T_STRING, $stack_pointer );
+	private function process_function_token( File $phpcs_file, $stack_pointer ) {
+		$tokens         = $phpcs_file->getTokens();
+		$function_token = $phpcs_file->findNext( T_STRING, $stack_pointer );
 
-		$wrappingTokensToCheck = array(
+		$wrapping_tokens_to_check = array(
 			T_CLASS,
 			T_INTERFACE,
 			T_TRAIT,
 		);
 
-		foreach ( $wrappingTokensToCheck as $wrappingTokenToCheck ) {
-			if ( false !== $phpcsFile->getCondition( $functionToken, $wrappingTokenToCheck, false ) ) {
+		foreach ( $wrapping_tokens_to_check as $wrapping_token_to_check ) {
+			if ( false !== $phpcs_file->getCondition( $function_token, $wrapping_token_to_check, false ) ) {
 				// This sniff only processes functions, not class methods.
 				return;
 			}
 		}
 
-		$name = $tokens[ $functionToken ]['content'];
-		foreach ( $this->functionsWhiteList as $functionRegExp ) {
-			if ( preg_match( $functionRegExp, $name ) ) {
+		$name = $tokens[ $function_token ]['content'];
+		foreach ( $this->functionsWhiteList as $function_reg_exp ) {
+			if ( preg_match( $function_reg_exp, $name ) ) {
 				// Ignore whitelisted function names.
 				return;
 			}
 		}
 
-		$errorMessage = sprintf( 'The "%s()" function should be guarded against redeclaration.', $name );
+		$error_message = sprintf( 'The "%s()" function should be guarded against redeclaration.', $name );
 
-		$wrappingIfToken = $phpcsFile->getCondition( $functionToken, T_IF, false );
-		if ( false === $wrappingIfToken ) {
-			$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNotGuardedAgainstRedeclaration' );
+		$wrapping_if_token = $phpcs_file->getCondition( $function_token, T_IF, false );
+		if ( false === $wrapping_if_token ) {
+			$phpcs_file->addError( $error_message, $function_token, 'FunctionNotGuardedAgainstRedeclaration' );
 
 			return;
 		}
 
-		$content = $phpcsFile->getTokensAsString( $wrappingIfToken, $functionToken - $wrappingIfToken );
+		$content = $phpcs_file->getTokensAsString( $wrapping_if_token, $function_token - $wrapping_if_token );
 
 		$regexp = sprintf( '/if\s*\(\s*!\s*function_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $name, '/' ) );
 		$result = preg_match( $regexp, $content );
 		if ( 1 !== $result ) {
-			$phpcsFile->addError( $errorMessage, $functionToken, 'FunctionNotGuardedAgainstRedeclaration' );
+			$phpcs_file->addError( $error_message, $function_token, 'FunctionNotGuardedAgainstRedeclaration' );
 		}
 	}
 
@@ -143,68 +143,64 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 *    class WP_Navigation { ... }
 	 * }
 	 *
-	 * @param File $phpcsFile    The file being scanned.
-	 * @param int  $stack_pointer The position of the current token
-	 *                           in the stack passed in $tokens.
-	 *
-	 * @return void
+	 * @param File $phpcs_file    The file being scanned.
+	 * @param int  $stack_pointer The position of the current token in the stack passed in $tokens.
 	 */
-	private function process_class_token( File $phpcsFile, $stack_pointer ) {
-		$tokens     = $phpcsFile->getTokens();
-		$classToken = $phpcsFile->findNext( T_STRING, $stack_pointer );
-		$className  = $tokens[ $classToken ]['content'];
+	private function process_class_token( File $phpcs_file, $stack_pointer ) {
+		$tokens      = $phpcs_file->getTokens();
+		$class_token = $phpcs_file->findNext( T_STRING, $stack_pointer );
+		$class_name  = $tokens[ $class_token ]['content'];
 
-		foreach ( $this->classesWhiteList as $classnameRegExp ) {
-			if ( preg_match( $classnameRegExp, $className ) ) {
+		foreach ( $this->classesWhiteList as $class_name_reg_exp ) {
+			if ( preg_match( $class_name_reg_exp, $class_name ) ) {
 				// Ignore whitelisted class names.
 				return;
 			}
 		}
 
-		$errorMessage = sprintf( 'The "%s" class should be guarded against redeclaration.', $className );
+		$error_message = sprintf( 'The "%s" class should be guarded against redeclaration.', $class_name );
 
-		$wrappingIfToken = $phpcsFile->getCondition( $classToken, T_IF, false );
-		if ( false !== $wrappingIfToken ) {
-			$endOfWrappingIfToken = $phpcsFile->findEndOfStatement( $wrappingIfToken );
-			$content              = $phpcsFile->getTokensAsString( $wrappingIfToken, $endOfWrappingIfToken - $wrappingIfToken );
-			$regexp               = sprintf( '/if\s*\(\s*!\s*class_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $className, '/' ) );
-			$result               = preg_match( $regexp, $content );
+		$wrapping_if_token = $phpcs_file->getCondition( $class_token, T_IF, false );
+		if ( false !== $wrapping_if_token ) {
+			$end_of_wrapping_if_token = $phpcs_file->findEndOfStatement( $wrapping_if_token );
+			$content                  = $phpcs_file->getTokensAsString( $wrapping_if_token, $end_of_wrapping_if_token - $wrapping_if_token );
+			$regexp                   = sprintf( '/if\s*\(\s*!\s*class_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $class_name, '/' ) );
+			$result                   = preg_match( $regexp, $content );
 			if ( 1 === $result ) {
 				return;
 			}
 		}
 
-		$previousIfToken = $phpcsFile->findPrevious( T_IF, $classToken );
-		if ( false === $previousIfToken ) {
-			$phpcsFile->addError( $errorMessage, $classToken, 'ClassNotGuardedAgainstRedeclaration' );
+		$previous_if_token = $phpcs_file->findPrevious( T_IF, $class_token );
+		if ( false === $previous_if_token ) {
+			$phpcs_file->addError( $error_message, $class_token, 'ClassNotGuardedAgainstRedeclaration' );
 
 			return;
 		}
 
-		$endOfPreviousIfToken = $phpcsFile->findEndOfStatement( $previousIfToken );
-		$content              = $phpcsFile->getTokensAsString( $previousIfToken, $endOfPreviousIfToken - $previousIfToken );
-		$regexp               = sprintf( '/if\s*\(\s*class_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $className, '/' ) );
-		$result               = preg_match( $regexp, $content );
+		$end_of_previous_if_token = $phpcs_file->findEndOfStatement( $previous_if_token );
+		$content                  = $phpcs_file->getTokensAsString( $previous_if_token, $end_of_previous_if_token - $previous_if_token );
+		$regexp                   = sprintf( '/if\s*\(\s*class_exists\s*\(\s*(\'|")%s(\'|")/', preg_quote( $class_name, '/' ) );
+		$result                   = preg_match( $regexp, $content );
 
 		if ( 1 === $result ) {
-			$notProperlyGuardedErrorMessage = sprintf(
+			$not_properly_guarded_error_message = sprintf(
 				'The class "%s" is not properly guarded against redeclaration. Please ensure the entire class body is wrapped within an "if ( ! class_exists( \'%s\' ) ) {" statement.',
-				$className,
-				$className
+				$class_name,
+				$class_name
 			);
 
-			$phpcsFile->addError( $notProperlyGuardedErrorMessage, $classToken, 'ClassNotProperlyGuardedAgainstRedeclaration' );
+			$phpcs_file->addError( $not_properly_guarded_error_message, $class_token, 'ClassNotProperlyGuardedAgainstRedeclaration' );
 			return;
 		}
 
-		$phpcsFile->addError( $errorMessage, $classToken, 'ClassNotGuardedAgainstRedeclaration' );
+		$phpcs_file->addError( $error_message, $class_token, 'ClassNotGuardedAgainstRedeclaration' );
 	}
 
-	public function process_load_php_file_include_token( File $phpcsFile, $stack_pointer ) {
-		$tokens = $phpcsFile->getTokens();
+	public function process_load_php_file_include_token( File $phpcs_file, $stack_pointer ) {
+		$tokens = $phpcs_file->getTokens();
 		$token  = $tokens[ $stack_pointer ];
 	}
-
 
 	/**
 	 * The purpose of this method is to sanitize the input data
