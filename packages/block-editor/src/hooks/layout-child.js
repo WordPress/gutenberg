@@ -154,10 +154,6 @@ function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
 		return null;
 	}
 
-	if ( ! window.__experimentalEnableGridInteractivity ) {
-		return null;
-	}
-
 	return (
 		<>
 			<GridVisualizer
