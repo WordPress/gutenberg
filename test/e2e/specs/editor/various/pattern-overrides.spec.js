@@ -439,11 +439,9 @@ test.describe( 'Pattern Overrides', () => {
 		// Check it renders correctly.
 		const headingBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Heading',
-			includeHidden: true,
 		} );
 		const paragraphBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
-			includeHidden: true,
 		} );
 		await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
 		await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
