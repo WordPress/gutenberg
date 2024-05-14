@@ -46,7 +46,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
 	} );
 
-	test( 'Navigates from items list to preview via TAB, and viceversa', async ( {
+	test( 'Navigates from items list to preview via TAB, and vice versa', async ( {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
