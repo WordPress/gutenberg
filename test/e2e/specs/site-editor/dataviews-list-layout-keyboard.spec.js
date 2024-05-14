@@ -41,7 +41,7 @@ test.describe( 'Dataviews List Layout', () => {
 		).toBeFocused();
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await page.getByRole( 'grid' ).waitFor();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
 	} );
@@ -58,7 +58,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await page.getByRole( 'grid' ).waitFor();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
 
@@ -87,7 +87,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await page.getByRole( 'grid' ).waitFor();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use arrow up/down to move through the list.
@@ -110,7 +110,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await page.getByRole( 'grid' ).waitFor();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use right/left arrow keys to move horizontally.
@@ -151,7 +151,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Make sure the items have loaded before reaching for the 1st item in the list.
-		await page.getByRole( 'grid' ).waitFor();
+		await expect( page.getByRole( 'grid' ) ).toBeVisible();
 		await page.keyboard.press( 'Tab' );
 
 		// Use arrow up/down to move through the list from the edit primary action button.
