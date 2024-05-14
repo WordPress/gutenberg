@@ -35,7 +35,6 @@ const mergeConfigs = require( './merge-configs' );
  * @typedef WPRootConfigOptions
  * @property {number}                               port                          The port to use in the development environment.
  * @property {number}                               testsPort                     The port to use in the tests environment.
- * @property {number|null}                          testsMysqlPort                The port to use in the tests MySQL environment.
  * @property {Object.<string, string|null>}         lifecycleScripts              The scripts to run at certain points in the command lifecycle.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterStart   The script to run after the "start" command has completed.
  * @property {Object.<string, string|null>}         lifecycleScripts.afterClean   The script to run after the "clean" command has completed.
@@ -87,7 +86,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
-	testsMysqlPort: null,
+	mysqlPort: null,
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -279,13 +278,16 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.development.port = overrides.port;
 	}
 
+	if ( overrides.mysqlPort ) {
+		overrideConfig.env.development.mysqlPort = overrides.mysqlPort;
+	}
+
 	if ( overrides.testsPort ) {
 		overrideConfig.testsPort = overrides.testsPort;
 		overrideConfig.env.tests.port = overrides.testsPort;
 	}
 
 	if ( overrides.testsMysqlPort ) {
-		overrideConfig.testsMysqlPort = overrides.testsMysqlPort;
 		overrideConfig.env.tests.mysqlPort = overrides.testsMysqlPort;
 	}
 
@@ -423,7 +425,6 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
-			case 'testsMysqlPort':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
@@ -446,6 +447,10 @@ async function parseEnvironmentConfig(
 	if ( config.port !== undefined ) {
 		checkPort( configFile, `${ environmentPrefix }port`, config.port );
 		parsedConfig.port = config.port;
+	}
+
+	if ( config.mysqlPort !== undefined ) {
+		parsedConfig.mysqlPort = config.mysqlPort;
 	}
 
 	if ( config.phpVersion !== undefined ) {

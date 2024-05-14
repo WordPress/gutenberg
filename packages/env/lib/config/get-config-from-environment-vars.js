@@ -17,6 +17,7 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  *
  * @typedef WPEnvironmentVariableConfig
  * @property {?number}                  port             An override for the development environment's port.
+ * @property {?number}                  mysqlPort        An override for the development environment's MySQL port.
  * @property {?number}                  testsPort        An override for the testing environment's port.
  * @property {?number}                  testsMysqlPort   An override for the testing environment's MySQL port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
@@ -34,8 +35,11 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
 module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 	const environmentConfig = {
 		port: getPortFromEnvironmentVariable( 'WP_ENV_PORT' ),
+		mysqlPort: getPortFromEnvironmentVariable( 'WP_ENV_MYSQL_PORT' ),
 		testsPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_PORT' ),
-		testsMysqlPort: getPortFromEnvironmentVariable( 'WP_ENV_TESTS_MYSQL_PORT' ),
+		testsMysqlPort: getPortFromEnvironmentVariable(
+			'WP_ENV_TESTS_MYSQL_PORT'
+		),
 		lifecycleScripts: getLifecycleScriptOverrides(),
 	};
 
