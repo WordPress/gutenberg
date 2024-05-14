@@ -319,9 +319,11 @@ export function store(
 }
 
 export const parseInitialData = ( dom = document ) => {
-	const jsonDataScriptTag = dom.getElementById(
-		'wp-scriptmodule-data_@wordpress/interactivity'
-	);
+	const jsonDataScriptTag =
+		// Preferred Script Module data passing form
+		dom.getElementById( 'wp-scriptmodule-data_@wordpress/interactivity' ) ??
+		// Legacy form
+		dom.getElementById( 'wp-interactivity-data' );
 	if ( jsonDataScriptTag?.textContent ) {
 		try {
 			return JSON.parse( jsonDataScriptTag.textContent );
