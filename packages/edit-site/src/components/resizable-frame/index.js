@@ -12,7 +12,7 @@ import {
 	Tooltip,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -86,6 +86,7 @@ function ResizableFrame( {
 	defaultSize,
 	innerContentStyle,
 } ) {
+	const disableMotion = useReducedMotion();
 	const [ frameSize, setFrameSize ] = useState( INITIAL_FRAME_SIZE );
 	// The width of the resizable frame when a new resize gesture starts.
 	const [ startingWidth, setStartingWidth ] = useState();
@@ -230,6 +231,17 @@ function ResizableFrame( {
 					setFrameSize( { width: '100%', height: '100%' } );
 				}
 			} }
+			whileHover={
+				canvasMode === 'view'
+					? {
+							scale: 1.005,
+							transition: {
+								duration: disableMotion ? 0 : 0.5,
+								ease: 'easeOut',
+							},
+					  }
+					: {}
+			}
 			transition={ FRAME_TRANSITION }
 			size={ frameSize }
 			enable={ {
