@@ -350,9 +350,6 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
-	if ( rawConfig.testsMysqlPort !== undefined ) {
-		parsedConfig.testsMysqlPort = rawConfig.testsMysqlPort;
-	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
 		checkObjectWithValues(
