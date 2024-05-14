@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -194,15 +189,13 @@ function PrivateExcerpt() {
 			ref={ setPopoverAnchor }
 			renderToggle={ ( { onToggle } ) => (
 				<Button
-					className={ clsx(
-						'editor-post-excerpt__dropdown__trigger',
-						{ 'has-excerpt': !! excerpt }
-					) }
+					className="editor-post-excerpt__dropdown__trigger"
 					onClick={ onToggle }
 					label={
 						!! excerptText ? triggerEditLabel : excerptPlaceholder
 					}
 					showTooltip={ !! excerptText }
+					variant="link"
 				>
 					{ excerptText || excerptPlaceholder }
 				</Button>
