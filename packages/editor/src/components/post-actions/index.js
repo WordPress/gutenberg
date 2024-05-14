@@ -9,6 +9,10 @@ import {
 	Button,
 	Modal,
 } from '@wordpress/components';
+import {
+	useResourcePermissions,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { moreVertical } from '@wordpress/icons';
 
 /**
@@ -28,20 +32,28 @@ const {
 
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, postType } = useSelect( ( select ) => {
+	const { item, postType, resource } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPost } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const _postType = getCurrentPostType();
+		const _resource = getPostType( _postType )?.rest_base;
+
 		return {
 			item: getCurrentPost(),
-			postType: getCurrentPostType(),
+			postType: _postType,
+			resource: _resource,
 		};
 	}, [] );
 	const allActions = usePostActions( postType, onActionPerformed );
+	const permissions = useResourcePermissions( resource, item.id );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
-			return ! action.isEligible || action.isEligible( item );
+			return (
+				! action.isEligible || action.isEligible( item, permissions )
+			);
 		} );
-	}, [ allActions, item ] );
+	}, [ allActions, item, permissions ] );
 
 	return (
 		<DropdownMenu

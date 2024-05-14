@@ -43,8 +43,8 @@ const trashPostAction = {
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
 	icon: trash,
-	isEligible( { status } ) {
-		return status !== 'trash';
+	isEligible( item, permissions ) {
+		return item.status !== 'trash' && !! permissions?.canDelete;
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
