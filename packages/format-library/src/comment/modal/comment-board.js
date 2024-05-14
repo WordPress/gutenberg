@@ -112,7 +112,7 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 							className="block-editor-format-toolbar__comment-button"
 							variant="primary"
 							text={
-								blockComments.length
+								blockComments.length === 0
 									? __( 'Comment' )
 									: __( 'Reply' )
 							}
