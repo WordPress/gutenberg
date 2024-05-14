@@ -20,11 +20,12 @@ export default function ResetOverridesControl( props ) {
 				return;
 			}
 
-			const { getBlockAttributes, getBlockParents, getBlockName } =
+			const { getBlockAttributes, getBlockParentsByBlockName } =
 				select( blockEditorStore );
-			const parents = getBlockParents( props.clientId, true );
-			const patternClientId = parents.find(
-				( id ) => getBlockName( id ) === 'core/block'
+			const [ patternClientId ] = getBlockParentsByBlockName(
+				props.clientId,
+				'core/block',
+				true
 			);
 
 			if ( ! patternClientId ) {
@@ -43,11 +44,12 @@ export default function ResetOverridesControl( props ) {
 	);
 
 	function onClick() {
-		const { getBlockAttributes, getBlockParents, getBlockName } =
+		const { getBlockAttributes, getBlockParentsByBlockName } =
 			registry.select( blockEditorStore );
-		const parents = getBlockParents( props.clientId, true );
-		const patternClientId = parents.find(
-			( id ) => getBlockName( id ) === 'core/block'
+		const [ patternClientId ] = getBlockParentsByBlockName(
+			props.clientId,
+			'core/block',
+			true
 		);
 
 		if ( ! patternClientId ) {

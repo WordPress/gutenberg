@@ -10,12 +10,13 @@ export default {
 	name: 'core/pattern-overrides',
 	label: _x( 'Pattern Overrides', 'block bindings source' ),
 	getValue( { registry, clientId, attributeName } ) {
-		const { getBlockAttributes, getBlockParents, getBlockName } =
+		const { getBlockAttributes, getBlockParentsByBlockName } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
-		const parents = getBlockParents( clientId, true );
-		const patternClientId = parents.find(
-			( id ) => getBlockName( id ) === 'core/block'
+		const [ patternClientId ] = getBlockParentsByBlockName(
+			clientId,
+			'core/block',
+			true
 		);
 
 		const overridableValue =
@@ -31,12 +32,13 @@ export default {
 		return overridableValue === '' ? undefined : overridableValue;
 	},
 	setValues( { registry, clientId, attributes } ) {
-		const { getBlockAttributes, getBlockParents, getBlockName, getBlocks } =
+		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
-		const parents = getBlockParents( clientId, true );
-		const patternClientId = parents.find(
-			( id ) => getBlockName( id ) === 'core/block'
+		const [ patternClientId ] = getBlockParentsByBlockName(
+			clientId,
+			'core/block',
+			true
 		);
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.
 		if ( ! patternClientId ) {
