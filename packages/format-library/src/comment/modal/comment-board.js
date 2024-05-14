@@ -24,22 +24,20 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 	} );
 
 	// State to manage the comment input.
-	const [ comment, setComment ] = useState( '' );
+	const [ inputComment, setInputComment ] = useState( '' );
 
-	// Get the current user and block comments.
-	const { currentUser, blockComments } = useSelect(
-		( select ) => {
-			const { getCurrentUser, getBlockAttributes } =
-				select( blockEditorStore );
+	// Fetch current user.
+	const currentUser = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getCurrentUser } = select( 'core' );
+		return getCurrentUser()?.name;
+	} );
 
-			return {
-				currentUser: getCurrentUser()?.name,
-				blockComments:
-					getBlockAttributes( clientId )?.blockComments || [],
-			};
-		},
-		[ clientId ]
-	);
+	// Fetch blockComments.
+	const blockComments = useSelect( ( select ) => {
+		const { getBlockAttributes } = select( blockEditorStore );
+		return getBlockAttributes( clientId )?.blockComments || [];
+	} );
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -50,13 +48,13 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 				...blockComments,
 				{
 					userName: currentUser,
-					comment,
+					comment: inputComment,
 					date: Date.now(),
 				},
 			],
 		} );
 
-		setComment( '' );
+		setInputComment( '' );
 	};
 
 	// Get the date time format from WordPress settings.
@@ -70,34 +68,27 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 		>
 			<VStack spacing="3">
 				{ blockComments.length &&
-					blockComments.map(
-						( { userName, inputComment, timestamp } ) => (
-							<VStack
-								spacing="2"
-								key={ timestamp }
-								className="comment-board__comment"
-							>
-								<HStack alignment="left" spacing="1">
-									<Icon icon={ userIcon } size={ 35 } />
-									<VStack spacing="1">
-										<span>{ userName }</span>
-										<time
-											dateTime={ format(
-												'c',
-												timestamp
-											) }
-										>
-											{ dateI18n(
-												dateTimeFormat,
-												timestamp
-											) }
-										</time>
-									</VStack>
-								</HStack>
-								<p>{ inputComment }</p>
-							</VStack>
-						)
-					) }
+					blockComments.map( ( { userName, comment, timestamp } ) => (
+						<VStack
+							spacing="2"
+							key={ timestamp }
+							className="comment-board__comment"
+						>
+							<HStack alignment="left" spacing="1">
+								<Icon icon={ userIcon } size={ 35 } />
+								<VStack spacing="1">
+									<span>{ userName }</span>
+									<time dateTime={ format( 'c', timestamp ) }>
+										{ dateI18n(
+											dateTimeFormat,
+											timestamp
+										) }
+									</time>
+								</VStack>
+							</HStack>
+							<p>{ comment }</p>
+						</VStack>
+					) ) }
 				<VStack spacing="2">
 					{ blockComments.length === 0 && (
 						<HStack alignment="left" spacing="1">
@@ -106,8 +97,8 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 						</HStack>
 					) }
 					<TextControl
-						value={ comment }
-						onChange={ ( val ) => setComment( val ) }
+						value={ inputComment }
+						onChange={ ( val ) => setInputComment( val ) }
 						placeholder={ __( 'Comment or add others with @' ) }
 					/>
 					<HStack alignment="right" spacing="1">
@@ -125,7 +116,7 @@ const CommentBoard = ( { onClose, contentRef, clientId } ) => {
 									? __( 'Comment' )
 									: __( 'Reply' )
 							}
-							disabled={ comment.length === 0 }
+							disabled={ inputComment.length === 0 }
 							onClick={ () => saveComment() }
 						/>
 					</HStack>
