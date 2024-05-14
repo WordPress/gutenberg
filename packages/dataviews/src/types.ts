@@ -202,6 +202,11 @@ interface ActionBase {
 	 * Whether the item passed as an argument supports the current action.
 	 */
 	isEligible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether the action can be used as a bulk action.
+	 */
+	supportsBulk?: boolean;
 }
 
 export interface ActionModal extends ActionBase {

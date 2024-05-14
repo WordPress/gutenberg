@@ -104,7 +104,7 @@ export const deleteAction = {
 	},
 	hideModalHeader: true,
 	supportsBulk: true,
-	RenderModal: ( { items, closeModal, onPerform } ) => {
+	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const { __experimentalDeleteReusableBlock } =
 			useDispatch( reusableBlocksStore );
 		const { createErrorNotice, createSuccessNotice } =
@@ -191,8 +191,8 @@ export const deleteAction = {
 			} else {
 				deletePattern();
 			}
-			if ( onPerform ) {
-				onPerform();
+			if ( onActionPerformed ) {
+				onActionPerformed();
 			}
 			closeModal();
 		};
