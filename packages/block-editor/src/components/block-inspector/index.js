@@ -243,6 +243,7 @@ const AnimatedContainer = ( {
 const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
 	const showTabs = availableTabs?.length > 1;
+
 	const hasBlockStyles = useSelect(
 		( select ) => {
 			const { getBlockStyles } = select( blocksStore );
