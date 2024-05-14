@@ -50,6 +50,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 ];
 
 function styleToAttributes( style ) {
+	debugger;
 	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
@@ -117,6 +118,7 @@ export function TypographyPanel( { clientId, name, setAttributes, settings } ) {
 		return { style, fontFamily, fontSize };
 	}
 	const { style, fontFamily, fontSize } = useSelect( selector, [ clientId ] );
+	debugger;
 	const isEnabled = useHasTypographyPanel( settings );
 	const value = useMemo(
 		() => attributesToStyle( { style, fontFamily, fontSize } ),

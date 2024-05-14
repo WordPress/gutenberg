@@ -34,6 +34,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				return;
 			}
 
+			console.debug( nextValue );
+
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
 			await Promise.resolve();
