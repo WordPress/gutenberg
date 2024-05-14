@@ -24,7 +24,6 @@ export const BlockBindingsPanel = () => {
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
-			selectedBlockClientId: _selectedBlockClientId,
 			block: getBlock( _selectedBlockClientId ),
 		};
 	}, [] );
