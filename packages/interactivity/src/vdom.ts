@@ -6,6 +6,7 @@ import { h } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
+import { warn } from './utils/warn';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -124,17 +125,7 @@ export function toVdom( root ) {
 					const directiveMatch =
 						directiveParser.exec( directiveName );
 					if ( directiveMatch === null ) {
-						if (
-							// @ts-expect-error This is a debug-only warning.
-							typeof SCRIPT_DEBUG !== 'undefined' &&
-							// @ts-expect-error This is a debug-only warning.
-							SCRIPT_DEBUG === true
-						) {
-							// eslint-disable-next-line no-console
-							console.warn(
-								`Invalid directive: ${ directiveName }.`
-							);
-						}
+						warn( `Invalid directive: ${ name }.` );
 						return obj;
 					}
 					// Splitting the directive name into directive type and input.

@@ -10,13 +10,14 @@ import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { unlock } from '../../../lock-unlock';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );

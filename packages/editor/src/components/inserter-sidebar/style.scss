@@ -6,19 +6,24 @@
 	flex-direction: column;
 }
 
-.editor-inserter-sidebar__header {
-	position: relative;
+.block-editor-inserter-sidebar__header {
+	border-bottom: $border-width solid $gray-300;
+	padding-right: $grid-unit-10;
 	display: flex;
-	justify-content: flex-end;
-	z-index: z-index(".editor-inserter-sidebar__header");
-}
+	justify-content: space-between;
 
-.editor-inserter-sidebar__close-button {
-	position: absolute;
-	top: $grid-unit-15;
-	right: $grid-unit-15;
+	.block-editor-inserter-sidebar__close-button {
+		/* stylelint-disable-next-line property-disallowed-list -- This should be refactored to avoid order if possible */
+		order: 1;
+		align-self: center;
+	}
 }
 
 .editor-inserter-sidebar__content {
-	height: 100%;
+	// Leave space for the close button
+	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
+	@include break-medium() {
+		height: 100%;
+	}
 }

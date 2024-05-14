@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 interface Option {
 	value: any;
@@ -164,3 +164,78 @@ export interface ViewList extends ViewBase {
 }
 
 export type View = ViewList | ViewBase;
+
+interface ActionBase {
+	/**
+	 * The unique identifier of the action.
+	 */
+	id: string;
+
+	/**
+	 * The label of the action.
+	 */
+	label: string;
+
+	/**
+	 * The icon of the action. (Either a string or an SVG element)
+	 * This should be IconType from the components package
+	 * but that import is breaking typescript build for the moment.
+	 */
+	icon?: any;
+
+	/**
+	 * Whether the action is disabled.
+	 */
+	disabled?: boolean;
+
+	/**
+	 * Whether the action is destructive.
+	 */
+	isDestructive?: boolean;
+
+	/**
+	 * Whether the action is a primary action.
+	 */
+	isPrimary?: boolean;
+
+	/**
+	 * Whether the item passed as an argument supports the current action.
+	 */
+	isEligible?: ( item: Item ) => boolean;
+}
+
+export interface ActionModal extends ActionBase {
+	/**
+	 * Modal to render when the action is triggered.
+	 */
+	RenderModal: ( {
+		items,
+		closeModal,
+		onActionStart,
+		onActionPerformed,
+	}: {
+		items: Item[];
+		closeModal?: () => void;
+		onActionStart?: ( items: Item[] ) => void;
+		onActionPerformed?: ( items: Item[] ) => void;
+	} ) => ReactElement;
+
+	/**
+	 * Whether to hide the modal header.
+	 */
+	hideModalHeader?: boolean;
+
+	/**
+	 * The header of the modal.
+	 */
+	modalHeader?: string;
+}
+
+export interface ActionButton extends ActionBase {
+	/**
+	 * The callback to execute when the action is triggered.
+	 */
+	callback: ( items: Item[] ) => void;
+}
+
+export type Action = ActionModal | ActionButton;

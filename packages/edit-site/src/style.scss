@@ -6,15 +6,13 @@
 @import "./components/code-editor/style.scss";
 @import "./components/global-styles/style.scss";
 @import "./components/global-styles/screen-revisions/style.scss";
+@import "./components/global-styles-sidebar/style.scss";
 @import "./components/header-edit-mode/style.scss";
 @import "./components/page/style.scss";
 @import "./components/page-pages/style.scss";
 @import "./components/page-patterns/style.scss";
 @import "./components/page-templates/style.scss";
 @import "./components/table/style.scss";
-@import "./components/sidebar-edit-mode/style.scss";
-@import "./components/sidebar-edit-mode/settings-header/style.scss";
-@import "./components/sidebar-edit-mode/template-panel/style.scss";
 @import "./components/editor/style.scss";
 @import "./components/create-template-part-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
@@ -85,13 +83,6 @@ body.js.site-editor-php {
 	.interface-interface-skeleton {
 		top: 0;
 	}
-
-	// Todo: Remove this rule when edit site gets support
-	// for opening unpinned sidebar items.
-	.interface-complementary-area__pin-unpin-item.components-button {
-		display: none;
-	}
-
 }
 
 /**

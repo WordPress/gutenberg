@@ -20,6 +20,17 @@ const countries = [
 	{ name: 'Albania', code: 'AL' },
 	{ name: 'Algeria', code: 'DZ' },
 	{ name: 'American Samoa', code: 'AS' },
+	{ name: 'Andorra', code: 'AD' },
+	{ name: 'Angola', code: 'AO' },
+	{ name: 'Anguilla', code: 'AI' },
+	{ name: 'Antarctica', code: 'AQ' },
+	{ name: 'Antigua and Barbuda', code: 'AG' },
+	{ name: 'Argentina', code: 'AR' },
+	{ name: 'Armenia', code: 'AM' },
+	{ name: 'Aruba', code: 'AW' },
+	{ name: 'Australia', code: 'AU' },
+	{ name: 'Austria', code: 'AT' },
+	{ name: 'Azerbaijan', code: 'AZ' },
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
@@ -110,4 +121,21 @@ WithCustomRenderItem.args = {
 			</div>
 		);
 	},
+};
+
+/**
+ * You can disable options in the list
+ * by setting the `disabled` property to true
+ * for individual items in the option object.
+ */
+export const WithDisabledOptions = Template.bind( {} );
+const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
+	...option,
+	disabled: index % 3 === 0, // Disable options at index 0, 3, 6, etc.
+} ) );
+
+WithDisabledOptions.args = {
+	allowReset: false,
+	label: 'Select a country',
+	options: optionsWithDisabledOptions,
 };

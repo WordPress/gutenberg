@@ -82,7 +82,8 @@ const ImageWrapper = ( { href, children } ) => {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
 				// Restore cursor style so it doesn't appear 'clickable'
-				// Safari needs the display property.
+				// and remove pointer events. Safari needs the display property.
+				pointerEvents: 'none',
 				cursor: 'default',
 				display: 'inline',
 			} }
@@ -105,6 +106,7 @@ export default function Image( {
 	context,
 	clientId,
 	blockEditingMode,
+	parentLayoutType,
 } ) {
 	const {
 		url = '',
@@ -180,7 +182,8 @@ export default function Image( {
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport;
+		isLargeViewport &&
+		parentLayoutType !== 'grid';
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url

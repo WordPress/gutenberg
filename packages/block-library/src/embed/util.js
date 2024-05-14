@@ -177,7 +177,7 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	if ( ! existingClassNames ) {
 		// Avoids extraneous work and also, by returning the same value as
 		// received, ensures the post is not dirtied by a change of the block
-		// attribute from `undefined` to an emtpy string.
+		// attribute from `undefined` to an empty string.
 		return existingClassNames;
 	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
