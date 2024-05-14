@@ -128,7 +128,10 @@ test.describe( 'Synced pattern', () => {
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: { content: 'A useful paragraph to reuse' },
+			attributes: {
+				anchor: 'reused-paragraph',
+				content: 'A useful paragraph to reuse',
+			},
 		} );
 
 		// Create a synced pattern from the paragraph block.
@@ -157,27 +160,17 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'button', { name: 'Create' } )
 			.click();
 
-		// Wait until the pattern is inserted.
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Pattern',
-			} )
-			.waitFor();
-
-		const [ syncedPattern ] = await editor.getBlocks();
-		const patternRecord = await getPatternRecord(
-			page,
-			syncedPattern?.attributes?.ref
-		);
-
-		expect( patternRecord?.content ).toBe(
-			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
-		);
-
+		// Check the pattern is focused.
 		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
 		} );
 		await expect( patternBlock ).toBeFocused();
+
+		// Check that only the pattern block is present.
+		const existingBlocks = await editor.getBlocks();
+		expect(
+			existingBlocks.every( ( block ) => block.name === 'core/block' )
+		).toBe( true );
 
 		// Check that the new pattern is available in the inserter.
 		await page.getByLabel( 'Toggle block inserter' ).click();
@@ -195,27 +188,26 @@ test.describe( 'Synced pattern', () => {
 
 		const [ firstSyncedPattern, secondSyncedPattern ] =
 			await editor.getBlocks();
-		const firstSyncedPatternRecord = await getPatternRecord(
-			page,
-			firstSyncedPattern?.attributes?.ref
+		// Check they are both patterns.
+		expect( firstSyncedPattern.name ).toBe( 'core/block' );
+		expect( secondSyncedPattern.name ).toBe( 'core/block' );
+		// Check they have the same ref.
+		expect( firstSyncedPattern.attributes.ref ).toEqual(
+			secondSyncedPattern.attributes.ref
 		);
-		const secondSyncedPatternRecord = await getPatternRecord(
-			page,
-			secondSyncedPattern?.attributes?.ref
+
+		// Check that the frontend shows the content of the pattern.
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const [ firstParagraph, secondParagraph ] = await page
+			.locator( '#reused-paragraph' )
+			.all();
+
+		await expect( firstParagraph ).toHaveText(
+			'A useful paragraph to reuse'
 		);
-		// Check first pattern is "My synced pattern".
-		expect( firstSyncedPatternRecord?.title ).toEqual(
-			'My synced pattern'
-		);
-		expect( firstSyncedPatternRecord?.content ).toEqual(
-			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
-		);
-		// Check second pattern is "My synced pattern".
-		expect( secondSyncedPatternRecord?.title ).toEqual(
-			'My synced pattern'
-		);
-		expect( secondSyncedPatternRecord?.content ).toEqual(
-			'<!-- wp:paragraph -->\n<p>A useful paragraph to reuse</p>\n<!-- /wp:paragraph -->'
+		await expect( secondParagraph ).toHaveText(
+			'A useful paragraph to reuse'
 		);
 	} );
 
