@@ -687,7 +687,10 @@ const duplicatePostAction = {
 };
 
 const isTemplatePartRevertable = ( item ) => {
-	const hasThemeFile = item.templatePart.has_theme_file;
+	if ( ! item ) {
+		return false;
+	}
+	const hasThemeFile = item.templatePart?.has_theme_file;
 	return canDeleteOrReset( item ) && hasThemeFile;
 };
 
@@ -1020,8 +1023,12 @@ export const deletePatternAction = {
 	id: 'delete-pattern',
 	label: __( 'Delete' ),
 	isEligible: ( item ) => {
+		if ( ! item ) {
+			return false;
+		}
 		const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
-		const hasThemeFile = isTemplatePart && item.templatePart.has_theme_file;
+		const hasThemeFile =
+			isTemplatePart && item.templatePart?.has_theme_file;
 		return canDeleteOrReset( item ) && ! hasThemeFile;
 	},
 	hideModalHeader: true,

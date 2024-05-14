@@ -36,7 +36,12 @@ export const exportPatternAsJSONAction = {
 	id: 'export-pattern',
 	label: __( 'Export as JSON' ),
 	supportsBulk: true,
-	isEligible: ( item ) => item.type === PATTERN_TYPES.user,
+	isEligible: ( item ) => {
+		if ( ! item.type ) {
+			return false;
+		}
+		return item.type === PATTERN_TYPES.user;
+	},
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {
 			return downloadBlob(

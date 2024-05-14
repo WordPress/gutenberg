@@ -270,15 +270,6 @@ jest.mock( 'react-native/Libraries/Components/Switch/Switch', () => {
 	};
 } );
 
-/**
- * client-zip is meant to be used in a browser and is therefore released as an ES6 module only,
- * in order to use it in node environment, we need to mock it.
- * See: https://github.com/Touffy/client-zip/issues/28
- */
-jest.mock( 'client-zip', () => ( {
-	downloadZip: jest.fn(),
-} ) );
-
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
