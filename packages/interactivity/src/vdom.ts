@@ -119,25 +119,22 @@ export function toVdom( root ) {
 		if ( directives.length ) {
 			// Reduce the directives array to build the __directives object.
 			props.__directives = directives.reduce(
-				// The reducer function accumulates the __directives object.
 				( obj, [ directiveName, namespace, inputValue ] ) => {
-					// Check if the directive name matches the expected format.
 					const directiveMatch =
 						directiveParser.exec( directiveName );
 					if ( directiveMatch === null ) {
 						warn( `Invalid directive: ${ name }.` );
 						return obj;
 					}
-					// Splitting the directive name into directive type and input.
-					const directiveType = directiveMatch[ 1 ] || '';
-					const directiveInput = directiveMatch[ 2 ] || 'default';
 
-					// Creating or updating the array for the specific directive type in the directives object.
-					obj[ directiveType ] = obj[ directiveType ] || [];
-					obj[ directiveType ].push( {
+					const directive = directiveMatch[ 1 ] || '';
+					const directiveEvent = directiveMatch[ 2 ] || 'default';
+
+					obj[ directive ] = obj[ directive ] || [];
+					obj[ directive ].push( {
 						namespace: namespace ?? currentNamespace(),
 						input: inputValue,
-						directiveInput,
+						directiveEvent,
 					} );
 					return obj;
 				},
