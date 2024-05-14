@@ -28,6 +28,10 @@ export function getResolvedThemeFilePath( file, themeFileURIs = [] ) {
 		( themeFileUri ) => themeFileUri.name === file
 	);
 
+	if ( ! uri?.href ) {
+		return file;
+	}
+
 	return uri?.href;
 }
 
