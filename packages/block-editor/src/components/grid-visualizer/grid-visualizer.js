@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -12,7 +12,7 @@ import BlockPopoverCover from '../block-popover/cover';
 import { store as blockEditorStore } from '../../store';
 import { getComputedCSS } from './utils';
 
-export function GridVisualizer( { clientId } ) {
+export function GridVisualizer( { clientId, contentRef } ) {
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
@@ -30,12 +30,15 @@ export function GridVisualizer( { clientId } ) {
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
 		>
-			<GridVisualizerGrid blockElement={ blockElement } />
+			<GridVisualizerGrid
+				ref={ contentRef }
+				blockElement={ blockElement }
+			/>
 		</BlockPopoverCover>
 	);
 }
 
-function GridVisualizerGrid( { blockElement } ) {
+const GridVisualizerGrid = forwardRef( ( { blockElement }, ref ) => {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( blockElement )
 	);
@@ -56,6 +59,7 @@ function GridVisualizerGrid( { blockElement } ) {
 	}, [ blockElement ] );
 	return (
 		<div
+			ref={ ref }
 			className="block-editor-grid-visualizer__grid"
 			style={ gridInfo.style }
 		>
@@ -64,7 +68,7 @@ function GridVisualizerGrid( { blockElement } ) {
 			) ) }
 		</div>
 	);
-}
+} );
 
 function getGridInfo( blockElement ) {
 	const gridTemplateColumns = getComputedCSS(

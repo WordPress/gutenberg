@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,7 +11,7 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
-export function GridItemResizer( { clientId, onChange } ) {
+export function GridItemResizer( { clientId, bounds, onChange } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
 
@@ -22,6 +22,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 	return (
 		<GridItemResizerInner
 			clientId={ clientId }
+			bounds={ bounds }
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
@@ -31,6 +32,7 @@ export function GridItemResizer( { clientId, onChange } ) {
 
 function GridItemResizerInner( {
 	clientId,
+	bounds,
 	blockElement,
 	rootBlockElement,
 	onChange,
@@ -59,19 +61,6 @@ function GridItemResizerInner( {
 		return () => observer.disconnect();
 	}, [ blockElement, rootBlockElement ] );
 
-	/*
-	 * This ref is necessary get the bounding client rect of the resizer,
-	 * because it exists outside of the iframe, so its bounding client
-	 * rect isn't the same as the block element's.
-	 * It needs to be added to a dummy element because we can't be sure if
-	 * the popover or the resizer are on the page when we need them.
-	 */
-	const resizerRef = useRef( null );
-
-	if ( ! blockElement ) {
-		return null;
-	}
-
 	const justification = {
 		right: 'flex-start',
 		left: 'flex-end',
@@ -92,36 +81,6 @@ function GridItemResizerInner( {
 		...( alignment[ resizeDirection ] && {
 			alignItems: alignment[ resizeDirection ],
 		} ),
-	};
-
-	/*
-	 * The bounding element is equivalent to the root block element, but
-	 * its bounding client rect is modified to account for the resizer
-	 * being outside of the editor iframe.
-	 */
-	const boundingElement = {
-		offsetWidth: rootBlockElement.offsetWidth,
-		offsetHeight: rootBlockElement.offsetHeight,
-		getBoundingClientRect: () => {
-			const blockClientRect = blockElement.getBoundingClientRect();
-			const rootBlockClientRect =
-				rootBlockElement.getBoundingClientRect();
-			const resizerTop = resizerRef.current?.getBoundingClientRect()?.top;
-			// Fallback value of 60 to account for editor top bar height.
-			const heightDifference = resizerTop
-				? resizerTop - blockClientRect.top
-				: 60;
-			return {
-				bottom: rootBlockClientRect.bottom + heightDifference,
-				height: rootBlockElement.offsetHeight,
-				left: rootBlockClientRect.left,
-				right: rootBlockClientRect.right,
-				top: rootBlockClientRect.top + heightDifference,
-				width: rootBlockClientRect.width,
-				x: rootBlockClientRect.x,
-				y: rootBlockClientRect.y + heightDifference,
-			};
-		},
 	};
 
 	// Controller to remove event listener on resize stop.
@@ -150,7 +109,7 @@ function GridItemResizerInner( {
 					topLeft: false,
 					topRight: false,
 				} }
-				bounds={ boundingElement }
+				bounds={ bounds }
 				boundsByDirection
 				onResizeStart={ ( event, direction ) => {
 					/*
@@ -221,10 +180,6 @@ function GridItemResizerInner( {
 					controller.abort();
 				} }
 			/>
-			<div
-				className="block-editor-grid-item-resizer__dummy"
-				ref={ resizerRef }
-			></div>
 		</BlockPopoverCover>
 	);
 }
