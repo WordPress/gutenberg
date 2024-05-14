@@ -11,6 +11,7 @@ namespace GutenbergCS\Gutenberg\Sniffs\CodeAnalysis;
 
 use PHP_CodeSniffer\Files\File;
 use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * The sniff implements the Gutenberg coding standard to verify whether functions and classes
@@ -47,7 +48,7 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 * @return array
 	 */
 	public function register() {
-		$this->onRegisterEvent();
+		$this->on_register_event();
 
 		return array( T_FUNCTION, T_CLASS );
 	}
@@ -66,12 +67,19 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$token  = $tokens[ $stackPtr ];
 
 		if ( 'T_FUNCTION' === $token['type'] ) {
-			$this->processFunctionToken( $phpcsFile, $stackPtr );
+			$this->process_function_token( $phpcsFile, $stackPtr );
 			return;
 		}
 
 		if ( 'T_CLASS' === $token['type'] ) {
-			$this->processClassToken( $phpcsFile, $stackPtr );
+			$this->process_class_token( $phpcsFile, $stackPtr );
+		}
+
+		$ds               = DIRECTORY_SEPARATOR;
+		$is_load_php_file = str_ends_with( $phpcsFile->getFilename(), 'gutenberg' . $ds . 'lib' . $ds . 'load.php' );
+
+		if ( in_array( Tokens::$includeTokens, $token['code'], true ) && $is_load_php_file ) {
+			$this->process_load_php_file_include_token( $phpcsFile, $stackPtr );
 		}
 	}
 
@@ -82,15 +90,12 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 *     function wp_get_navigation( $slug ) { ... }
 	 * }
 	 *
-	 * @param File $phpcsFile    The file being scanned.
-	 * @param int  $stackPointer The position of the current token
-	 *                           in the stack passed in $tokens.
-	 *
-	 * @return void
+	 * @param File $phpcsFile     The file being scanned.
+	 * @param int  $stack_pointer The position of the current token in the stack passed in $tokens.
 	 */
-	private function processFunctionToken( File $phpcsFile, $stackPointer ) {
+	private function process_function_token( File $phpcsFile, $stack_pointer ) {
 		$tokens        = $phpcsFile->getTokens();
-		$functionToken = $phpcsFile->findNext( T_STRING, $stackPointer );
+		$functionToken = $phpcsFile->findNext( T_STRING, $stack_pointer );
 
 		$wrappingTokensToCheck = array(
 			T_CLASS,
@@ -139,14 +144,14 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 * }
 	 *
 	 * @param File $phpcsFile    The file being scanned.
-	 * @param int  $stackPointer The position of the current token
+	 * @param int  $stack_pointer The position of the current token
 	 *                           in the stack passed in $tokens.
 	 *
 	 * @return void
 	 */
-	private function processClassToken( File $phpcsFile, $stackPointer ) {
+	private function process_class_token( File $phpcsFile, $stack_pointer ) {
 		$tokens     = $phpcsFile->getTokens();
-		$classToken = $phpcsFile->findNext( T_STRING, $stackPointer );
+		$classToken = $phpcsFile->findNext( T_STRING, $stack_pointer );
 		$className  = $tokens[ $classToken ]['content'];
 
 		foreach ( $this->classesWhiteList as $classnameRegExp ) {
@@ -195,11 +200,17 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$phpcsFile->addError( $errorMessage, $classToken, 'ClassNotGuardedAgainstRedeclaration' );
 	}
 
+	public function process_load_php_file_include_token( File $phpcsFile, $stack_pointer ) {
+		$tokens = $phpcsFile->getTokens();
+		$token  = $tokens[ $stack_pointer ];
+	}
+
+
 	/**
 	 * The purpose of this method is to sanitize the input data
 	 * after the properties have been set.
 	 */
-	private function onRegisterEvent() {
+	private function on_register_event() {
 		$this->functionsWhiteList = self::sanitize( $this->functionsWhiteList );
 		$this->classesWhiteList   = self::sanitize( $this->classesWhiteList );
 	}
