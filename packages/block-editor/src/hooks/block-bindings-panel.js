@@ -18,27 +18,22 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 
 export const BlockBindingsPanel = () => {
-	const { block } = useSelect( ( select ) => {
+	const { bindings } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId, getBlock } =
 			select( blockEditorStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
-			block: getBlock( _selectedBlockClientId ),
+			bindings: getBlock( _selectedBlockClientId ).attributes?.metadata
+				?.bindings,
 		};
 	}, [] );
-
-	const bindings = block?.attributes?.metadata?.bindings;
 
 	const sources = useSelect( ( select ) =>
 		unlock( select( blocksStore ) ).getAllBlockBindingsSources()
 	);
 
-	const hasBindings = block?.attributes?.metadata?.bindings
-		? Object.keys( block.attributes.metadata.bindings ).length > 0
-		: false;
-
-	if ( ! hasBindings ) {
+	if ( ! bindings ) {
 		return null;
 	}
 
