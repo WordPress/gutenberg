@@ -52,6 +52,11 @@ const Template: StoryFn< typeof Guide > = ( { onFinish, ...props } ) => {
 export const Default = Template.bind( {} );
 Default.args = {
 	pages: Array.from( { length: 3 } ).map( ( _, page ) => ( {
-		content: <p>{ `Page ${ page + 1 }` }</p>,
+		content: (
+			<>
+				<h1>{ `Title ${ page + 1 }` }</h1>
+				<p>{ `Page ${ page + 1 }` }</p>
+			</>
+		),
 	} ) ),
 };
