@@ -81,12 +81,12 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostSchedulePanel />
 										<PostTemplatePanel />
 										<PostURLPanel />
+										<PostAuthorPanel />
 										<PostDiscussionPanel />
 										<PostSyncStatus />
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									<PostAuthorPanel />
 									{ isTemplate && <TemplateAreas /> }
 									{ fills }
 									{ ! isPattern &&
