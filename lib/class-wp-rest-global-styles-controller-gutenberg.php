@@ -416,7 +416,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			if ( $is_global_styles_user_theme_json ) {
 				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 				if ( ! empty( $resolved_theme_uris ) ) {
-					$links['wp:theme-file-uris'] = $resolved_theme_uris;
+					$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
 				}
 			}
 			$response->add_links( $links );
@@ -643,11 +643,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
 			if ( ! empty( $resolved_theme_uris ) ) {
-				/*
-				 * @TODO this needs to be added to the WP REST API schema.
-				 * E.g., $links['https://api.w.org/theme-file-uris'].
-				 */
-				$links['wp:theme-file-uris'] = $resolved_theme_uris;
+				$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
 			}
 
 			$response->add_links( $links );

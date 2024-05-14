@@ -40,7 +40,7 @@ export function getResolvedThemeFilePath( file, themeFileURIs = [] ) {
  * @return {Object} Object with the new value set.
  */
 function setMutably( object, path, value ) {
-	path = Array.isArray( path ) ? [ ...path ] : [ path ];
+	path = path.split( '.' );
 	const finalValueKey = path.pop();
 	let prev = object;
 
@@ -68,8 +68,8 @@ export default function setThemeFileUris( themeJson, themeFileURIs ) {
 		return themeJson;
 	}
 
-	themeFileURIs.forEach( ( { name, href, path } ) => {
-		const value = getValueFromObjectPath( themeJson, path );
+	themeFileURIs.forEach( ( { name, href, target } ) => {
+		const value = getValueFromObjectPath( themeJson, target );
 		if ( value === name ) {
 			/*
 			 * The object must not be updated immutably here because the
@@ -78,7 +78,7 @@ export default function setThemeFileUris( themeJson, themeFileURIs ) {
 			 * the hook will detect the change and re-render the component, resulting
 			 * in a maximum depth exceeded error.
 			 */
-			themeJson = setMutably( themeJson, path, href );
+			themeJson = setMutably( themeJson, target, href );
 		}
 	} );
 

@@ -780,7 +780,8 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 
 	/**
 	 * Resolves relative paths in theme.json styles to theme absolute paths
-	 * and returns them in an array that can be embedded in a REST response.
+	 * and returns them in an array that can be embedded
+	 * as the value of `_link` object in REST API responses.
 	 *
 	 * @since 6.6.0
 	 *
@@ -794,19 +795,24 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $resolved_theme_uris;
 		}
 
-		$theme_json_data = $theme_json->get_raw_data();
+		$theme_json_data      = $theme_json->get_raw_data();
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 
 		// Top level styles.
 		if (
-			isset( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
-			is_string( $theme_json_data['styles']['background']['backgroundImage']['url'] ) &&
+			isset( $background_image_url ) &&
+			is_string( $background_image_url ) &&
 			// Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
-			! isset( wp_parse_url( $theme_json_data['styles']['background']['backgroundImage']['url'] )['host'] ) ) {
-				$resolved_theme_uri    = array(
-					'name' => $theme_json_data['styles']['background']['backgroundImage']['url'],
-					'href' => esc_url( get_theme_file_uri( $theme_json_data['styles']['background']['backgroundImage']['url'] ) ),
-					'path' => array( 'styles', 'background', 'backgroundImage', 'url' ),
+			! isset( wp_parse_url( $background_image_url )['host'] ) ) {
+				$file_type          = wp_check_filetype( $background_image_url );
+				$resolved_theme_uri = array(
+					'name'   => $background_image_url,
+					'href'   => esc_url( get_theme_file_uri( $background_image_url ) ),
+					'target' => 'styles.background.backgroundImage.url',
 				);
+				if ( isset( $file_type['type'] ) ) {
+					$resolved_theme_uri['type'] = $file_type['type'];
+				}
 				$resolved_theme_uris[] = $resolved_theme_uri;
 		}
 
@@ -828,13 +834,13 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $theme_json;
 		}
 
-		$theme_json_data          = $theme_json->get_raw_data();
 		$resolved_theme_json_data = array(
 			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 		);
 
 		foreach ( $resolved_urls as $resolved_url ) {
-			_wp_array_set( $resolved_theme_json_data, $resolved_url['path'], $resolved_url['href'] );
+			$path = explode( '.', $resolved_url['target'] );
+			_wp_array_set( $resolved_theme_json_data, $path, $resolved_url['href'] );
 		}
 
 		if ( ! empty( $resolved_theme_json_data ) ) {
