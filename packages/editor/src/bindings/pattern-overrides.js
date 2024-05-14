@@ -35,14 +35,19 @@ export default {
 		const { getBlockAttributes, getBlockParentsByBlockName, getBlocks } =
 			registry.select( blockEditorStore );
 		const currentBlockAttributes = getBlockAttributes( clientId );
+		const blockName = currentBlockAttributes?.metadata?.name;
+		if ( ! blockName ) {
+			return;
+		}
+
 		const [ patternClientId ] = getBlockParentsByBlockName(
 			clientId,
 			'core/block',
 			true
 		);
+
 		// If there is no pattern client ID, sync blocks with the same name and same attributes.
 		if ( ! patternClientId ) {
-			const blockName = currentBlockAttributes?.metadata?.name;
 			const syncBlocksWithSameName = ( blocks ) => {
 				for ( const block of blocks ) {
 					if ( block.attributes?.metadata?.name === blockName ) {
@@ -60,7 +65,6 @@ export default {
 			syncBlocksWithSameName( getBlocks() );
 			return;
 		}
-		const blockName = currentBlockAttributes?.metadata?.name;
 		const currentBindingValue =
 			getBlockAttributes( patternClientId )?.[ CONTENT ];
 		registry
