@@ -381,7 +381,7 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		// // Wait until the pattern is created and inserted.
+		// Wait until the pattern is created and inserted.
 		await editor.canvas.locator( 'text=Hello there!' ).waitFor();
 
 		const [ syncedPattern ] = await editor.getBlocks();
