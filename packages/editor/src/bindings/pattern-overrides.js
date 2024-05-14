@@ -76,6 +76,10 @@ export default {
 						...currentBindingValue?.[ blockName ],
 						...Object.entries( attributes ).reduce(
 							( acc, [ key, value ] ) => {
+								// TODO: We need a way to represent `undefined` in the serialized overrides.
+								// Also see: https://github.com/WordPress/gutenberg/pull/57249#discussion_r1452987871
+								// We use an empty string to represent undefined for now until
+								// we support a richer format for overrides and the block bindings API.
 								acc[ key ] = value === undefined ? '' : value;
 								return acc;
 							},
