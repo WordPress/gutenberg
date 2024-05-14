@@ -118,6 +118,7 @@ test.describe( 'Synced pattern', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -220,7 +221,7 @@ test.describe( 'Synced pattern', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Alternative greeting block',
 			content:
-				'<!-- wp:paragraph -->\n<p>Guten Tag!</p>\n<!-- /wp:paragraph -->',
+				'<!-- wp:paragraph -->\n<p id="reused-paragraph">Guten Tag!</p>\n<!-- /wp:paragraph -->',
 			status: 'publish',
 		} );
 
@@ -229,7 +230,7 @@ test.describe( 'Synced pattern', () => {
 			attributes: { ref: id },
 		} );
 
-		await editor.publishPost();
+		const postId = await editor.publishPost();
 
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
@@ -268,17 +269,10 @@ test.describe( 'Synced pattern', () => {
 			.filter( { hasText: 'Pattern updated.' } )
 			.click();
 
-		// Go back to the post.
-		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
-
-		const [ syncedPattern ] = await editor.getBlocks();
-		const patternRecord = await getPatternRecord(
-			page,
-			syncedPattern?.attributes?.ref
-		);
-
-		expect( patternRecord?.content ).toBe(
-			'<!-- wp:paragraph -->\n<p>Einen Guten Tag!</p>\n<!-- /wp:paragraph -->'
+		// Check that the frontend shows the updated content.
+		await page.goto( `/?p=${ postId }` );
+		await expect( page.locator( '#reused-paragraph' ) ).toHaveText(
+			'Einen Guten Tag!'
 		);
 	} );
 
