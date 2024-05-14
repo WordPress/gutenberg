@@ -860,7 +860,7 @@ export const toStyles = (
 						( [ cssSelector, declarations ] ) => {
 							if ( declarations.length ) {
 								const rules = declarations.join( ';' );
-								ruleset += `:where(${ cssSelector }){${ rules };}`;
+								ruleset += `:root :where(${ cssSelector }){${ rules };}`;
 							}
 						}
 					);
@@ -955,7 +955,7 @@ export const toStyles = (
 					disableRootPadding
 				);
 				if ( declarations?.length ) {
-					ruleset += `:where(${ selector }){${ declarations.join(
+					ruleset += `:root :where(${ selector }){${ declarations.join(
 						';'
 					) };}`;
 				}

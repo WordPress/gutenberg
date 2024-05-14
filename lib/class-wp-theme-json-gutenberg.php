@@ -2745,7 +2745,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// 2. Generate and append the rules that use the general selector.
-		$block_rules .= static::to_ruleset( ":where($selector)", $declarations );
+		$block_rules .= static::to_ruleset( ":root :where($selector)", $declarations );
 
 		// 3. Generate and append the rules that use the duotone selector.
 		if ( isset( $block_metadata['duotone'] ) && ! empty( $declarations_duotone ) ) {
@@ -2762,7 +2762,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 5. Generate and append the feature level rulesets.
 		foreach ( $feature_declarations as $feature_selector => $individual_feature_declarations ) {
-			$block_rules .= static::to_ruleset( ":where($feature_selector)", $individual_feature_declarations );
+			$block_rules .= static::to_ruleset( ":root :where($feature_selector)", $individual_feature_declarations );
 		}
 
 		// 6. Generate and append the style variation rulesets.
