@@ -13,6 +13,7 @@ import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import type { Action, ActionModal, Data, Item } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -21,19 +22,55 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-export function useHasAPossibleBulkAction( actions, item ) {
+interface ActionWithModalProps {
+	action: ActionModal;
+	selectedItems: Item[];
+	setActionWithModal: ( action?: ActionModal ) => void;
+	onMenuOpenChange: ( isOpen: boolean ) => void;
+}
+
+interface BulkActionsItemProps {
+	action: Action;
+	selectedItems: Item[];
+	setActionWithModal: ( action?: ActionModal ) => void;
+}
+
+interface ActionsMenuGroupProps {
+	actions: Action[];
+	selectedItems: Item[];
+	setActionWithModal: ( action?: ActionModal ) => void;
+}
+
+interface BulkActionsProps {
+	data: Data;
+	actions: Action[];
+	selection: string[];
+	onSelectionChange: ( selection: Item[] ) => void;
+	getItemId: ( item: Item ) => string;
+}
+
+export function useHasAPossibleBulkAction( actions: Action[], item: Item ) {
 	return useMemo( () => {
 		return actions.some( ( action ) => {
-			return action.supportsBulk && action.isEligible( item );
+			return (
+				action.supportsBulk &&
+				( ! action.isEligible || action.isEligible( item ) )
+			);
 		} );
 	}, [ actions, item ] );
 }
 
-export function useSomeItemHasAPossibleBulkAction( actions, data ) {
+export function useSomeItemHasAPossibleBulkAction(
+	actions: Action[],
+	data: Data
+) {
 	return useMemo( () => {
 		return data.some( ( item ) => {
 			return actions.some( ( action ) => {
-				return action.supportsBulk && action.isEligible( item );
+				return (
+					action.supportsBulk &&
+					( ! action.isEligible || action.isEligible( item ) )
+				);
 			} );
 		} );
 	}, [ actions, data ] );
@@ -44,9 +81,11 @@ function ActionWithModal( {
 	selectedItems,
 	setActionWithModal,
 	onMenuOpenChange,
-} ) {
+}: ActionWithModalProps ) {
 	const eligibleItems = useMemo( () => {
-		return selectedItems.filter( ( item ) => action.isEligible( item ) );
+		return selectedItems.filter(
+			( item ) => ! action.isEligible || action.isEligible( item )
+		);
 	}, [ action, selectedItems ] );
 	const { RenderModal, hideModalHeader } = action;
 	const onCloseModal = useCallback( () => {
@@ -54,7 +93,7 @@ function ActionWithModal( {
 	}, [ setActionWithModal ] );
 	return (
 		<Modal
-			title={ ! hideModalHeader && action.label }
+			title={ ! hideModalHeader ? action.label : undefined }
 			__experimentalHideHeader={ !! hideModalHeader }
 			onRequestClose={ onCloseModal }
 			overlayClassName="dataviews-action-modal"
@@ -62,18 +101,24 @@ function ActionWithModal( {
 			<RenderModal
 				items={ eligibleItems }
 				closeModal={ onCloseModal }
-				onPerform={ () => onMenuOpenChange( false ) }
+				onActionPerformed={ () => onMenuOpenChange( false ) }
 			/>
 		</Modal>
 	);
 }
 
-function BulkActionItem( { action, selectedItems, setActionWithModal } ) {
+function BulkActionItem( {
+	action,
+	selectedItems,
+	setActionWithModal,
+}: BulkActionsItemProps ) {
 	const eligibleItems = useMemo( () => {
-		return selectedItems.filter( ( item ) => action.isEligible( item ) );
+		return selectedItems.filter(
+			( item ) => ! action.isEligible || action.isEligible( item )
+		);
 	}, [ action, selectedItems ] );
 
-	const shouldShowModal = !! action.RenderModal;
+	const shouldShowModal = 'RenderModal' in action;
 
 	return (
 		<DropdownMenuItem
@@ -96,7 +141,11 @@ function BulkActionItem( { action, selectedItems, setActionWithModal } ) {
 	);
 }
 
-function ActionsMenuGroup( { actions, selectedItems, setActionWithModal } ) {
+function ActionsMenuGroup( {
+	actions,
+	selectedItems,
+	setActionWithModal,
+}: ActionsMenuGroupProps ) {
 	return (
 		<>
 			<DropdownMenuGroup>
@@ -120,16 +169,20 @@ export default function BulkActions( {
 	selection,
 	onSelectionChange,
 	getItemId,
-} ) {
+}: BulkActionsProps ) {
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
-	const [ actionWithModal, setActionWithModal ] = useState();
+	const [ actionWithModal, setActionWithModal ] = useState<
+		ActionModal | undefined
+	>();
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
-			return bulkActions.some( ( action ) => action.isEligible( item ) );
+			return bulkActions.some(
+				( action ) => ! action.isEligible || action.isEligible( item )
+			);
 		} );
 	}, [ data, bulkActions ] );
 
