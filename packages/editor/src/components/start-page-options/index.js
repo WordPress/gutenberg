@@ -115,13 +115,10 @@ export default function StartPageOptions() {
 			isEditedPostEmpty,
 			getCurrentPostType,
 			getCurrentPostId,
-			getEditorSettings,
 		} = select( editorStore );
-		const { __unstableIsPreviewMode: isPreviewMode } = getEditorSettings();
 
 		return {
-			shouldEnableModal:
-				! isPreviewMode && ! isEditedPostDirty() && isEditedPostEmpty(),
+			shouldEnableModal: ! isEditedPostDirty() && isEditedPostEmpty(),
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 		};
