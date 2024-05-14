@@ -19,10 +19,8 @@ import InspectorControls from '../components/inspector-controls';
 
 export const BlockBindingsPanel = () => {
 	const { block } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } = unlock(
-			select( blockEditorStore )
-		);
-
+		const { getSelectedBlockClientId, getBlock } =
+			select( blockEditorStore );
 		const _selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
