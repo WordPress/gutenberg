@@ -63,6 +63,8 @@ function GridItemResizerInner( {
 	 * This ref is necessary get the bounding client rect of the resizer,
 	 * because it exists outside of the iframe, so its bounding client
 	 * rect isn't the same as the block element's.
+	 * It needs to be added to a dummy element because we can't be sure if
+	 * the popover or the resizer are on the page when we need them.
 	 */
 	const resizerRef = useRef( null );
 
@@ -131,7 +133,6 @@ function GridItemResizerInner( {
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
 			additionalStyles={ styles }
-			__unstableContentRef={ resizerRef }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"
@@ -164,8 +165,9 @@ function GridItemResizerInner( {
 					 * isn't directly above the handle, so we try to detect if it happens
 					 * outside the grid and dispatch a mouseup event on the handle.
 					 */
-					const rootElementParent =
-						rootBlockElement.closest( 'body' );
+					const rootElementParent = rootBlockElement.closest(
+						'.editor-styles-wrapper'
+					);
 					rootElementParent.addEventListener(
 						'mouseup',
 						() => {
@@ -221,6 +223,10 @@ function GridItemResizerInner( {
 					controller.abort();
 				} }
 			/>
+			<div
+				className="block-editor-grid-item-resizer__dummy"
+				ref={ resizerRef }
+			></div>
 		</BlockPopoverCover>
 	);
 }
