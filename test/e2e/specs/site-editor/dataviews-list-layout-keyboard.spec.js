@@ -7,11 +7,22 @@ test.describe( 'Dataviews List Layout', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Activate a theme with permissions to access the site editor.
 		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.createPage( {
+			title: 'Privacy Policy',
+			status: 'publish',
+		} );
+		await requestUtils.createPage( {
+			title: 'Sample Page',
+			status: 'publish',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test.beforeEach( async ( { admin, page } ) => {
