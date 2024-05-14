@@ -4,6 +4,21 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { CheckboxControl } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import type { Data, Field, Item } from './types';
+
+interface SingleSelectionCheckboxProps {
+	selection: string[];
+	onSelectionChange: ( selection: Item[] ) => void;
+	item: Item;
+	data: Data;
+	getItemId: ( item: Item ) => string;
+	primaryField?: Field;
+	disabled: boolean;
+}
+
 export default function SingleSelectionCheckbox( {
 	selection,
 	onSelectionChange,
@@ -12,7 +27,7 @@ export default function SingleSelectionCheckbox( {
 	getItemId,
 	primaryField,
 	disabled,
-} ) {
+}: SingleSelectionCheckboxProps ) {
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
 	let selectionLabel;
