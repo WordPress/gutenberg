@@ -73,7 +73,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 		selectedBlockClientId,
 		blockType,
 		topLevelLockedBlock,
-		block,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlockClientId,
@@ -81,7 +80,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			getBlockName,
 			getContentLockingParent,
 			getTemplateLock,
-			getBlock,
 		} = unlock( select( blockEditorStore ) );
 
 		const _selectedBlockClientId = getSelectedBlockClientId();
@@ -101,7 +99,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
 					: undefined ),
-			block: getBlock( _selectedBlockClientId ),
 		};
 	}, [] );
 
@@ -202,7 +199,6 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			<BlockInspectorSingleBlock
 				clientId={ selectedBlockClientId }
 				blockName={ blockType.name }
-				block={ block }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
@@ -244,7 +240,7 @@ const AnimatedContainer = ( {
 	);
 };
 
-const BlockInspectorSingleBlock = ( { clientId, blockName, block } ) => {
+const BlockInspectorSingleBlock = ( { clientId, blockName } ) => {
 	const availableTabs = useInspectorControlsTabs( blockName );
 	const showTabs = availableTabs?.length > 1;
 	const hasBlockStyles = useSelect(
@@ -272,7 +268,6 @@ const BlockInspectorSingleBlock = ( { clientId, blockName, block } ) => {
 					clientId={ clientId }
 					blockName={ blockName }
 					tabs={ availableTabs }
-					block={ block }
 				/>
 			) }
 			{ ! showTabs && (
