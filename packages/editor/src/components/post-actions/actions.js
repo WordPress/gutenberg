@@ -32,7 +32,7 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import isTemplateRevertable from '../../store/utils/is-template-revertable';
-import { exportPatternAsJSONAction } from './export-pattern-as-json-action';
+import { exportPatternAsJSONAction } from './export-pattern-action';
 
 // Patterns.
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
