@@ -320,7 +320,7 @@ export function store(
 
 export const parseInitialData = ( dom = document ) => {
 	const jsonDataScriptTag = dom.getElementById(
-		'gb-scriptmodule-data_@wordpress/interactivity'
+		'wp-scriptmodule-data_@wordpress/interactivity'
 	);
 	if ( jsonDataScriptTag?.textContent ) {
 		try {

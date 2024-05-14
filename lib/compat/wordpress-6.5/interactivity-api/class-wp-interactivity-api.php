@@ -196,7 +196,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function add_hooks() {
-			add_filter( 'gb_scriptmoduledata_@wordpress/interactivity', array( $this, 'print_client_interactivity_data' ) );
+			add_filter( 'scriptmoduledata_@wordpress/interactivity', array( $this, 'print_client_interactivity_data' ) );
 		}
 
 		/**
