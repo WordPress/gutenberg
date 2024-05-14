@@ -93,9 +93,6 @@ export default {
 		);
 	},
 	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
-		if ( ! window.__experimentalEnableGridInteractivity ) {
-			return null;
-		}
 		return <GridVisualizer clientId={ clientId } />;
 	},
 	getLayoutStyle: function getLayoutStyle( {
