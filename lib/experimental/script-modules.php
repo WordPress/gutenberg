@@ -197,3 +197,36 @@ function gutenberg_dequeue_module( $module_identifier ) {
 	_deprecated_function( __FUNCTION__, 'Gutenberg 17.6.0', 'wp_dequeue_script_module' );
 	wp_script_modules()->dequeue( $module_identifier );
 }
+
+
+/**
+ * @since 18.4.0
+ */
+function gutenberg_print_script_module_data(): void {
+	$get_marked_for_enqueue = new ReflectionMethod( 'WP_Script_Modules', 'get_marked_for_enqueue' );
+	$get_import_map         = new ReflectionMethod( 'WP_Script_Modules', 'get_import_map' );
+
+	$modules = array();
+	foreach ( array_keys( $get_marked_for_enqueue->invoke( wp_script_modules() ) ) as $id ) {
+		$modules[ $id ] = true;
+	}
+	foreach ( array_keys( $get_import_map->invoke( wp_script_modules() )['imports'] ) as $id ) {
+		$modules[ $id ] = true;
+	}
+
+	foreach ( array_keys( $modules ) as $module_id ) {
+		$config = apply_filters( 'gb_scriptmoduledata_' . $module_id, array() );
+		if ( ! empty( $config ) ) {
+			wp_print_inline_script_tag(
+				wp_json_encode( $config, JSON_HEX_TAG | JSON_HEX_AMP ),
+				array(
+					'type' => 'application/json',
+					'id'   => 'gb-scriptmodule-data_' . $module_id,
+				)
+			);
+		}
+	}
+}
+
+add_action( 'wp_footer', 'gutenberg_print_script_module_data' );
+add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_data' );

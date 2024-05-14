@@ -167,18 +167,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 				$interactivity_data['state'] = $state;
 			}
 
-			if ( ! empty( $interactivity_data ) ) {
-				wp_print_inline_script_tag(
-					wp_json_encode(
-						$interactivity_data,
-						JSON_HEX_TAG | JSON_HEX_AMP
-					),
-					array(
-						'type' => 'application/json',
-						'id'   => 'wp-interactivity-data',
-					)
-				);
-			}
+			return $interactivity_data;
 		}
 
 		/**
@@ -207,8 +196,7 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		 * @since 6.5.0
 		 */
 		public function add_hooks() {
-			add_action( 'wp_enqueue_scripts', array( $this, 'register_script_modules' ) );
-			add_action( 'wp_footer', array( $this, 'print_client_interactivity_data' ) );
+			add_filter( 'gb_scriptmoduledata_@wordpress/interactivity', array( $this, 'print_client_interactivity_data' ) );
 		}
 
 		/**

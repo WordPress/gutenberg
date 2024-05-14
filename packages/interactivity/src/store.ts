@@ -319,15 +319,13 @@ export function store(
 }
 
 export const parseInitialData = ( dom = document ) => {
-	const storeTag = dom.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
+	const jsonDataScriptTag = dom.getElementById(
+		'gb-scriptmodule-data_@wordpress/interactivity'
 	);
-	if ( storeTag?.textContent ) {
+	if ( jsonDataScriptTag?.textContent ) {
 		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
+			return JSON.parse( jsonDataScriptTag.textContent );
+		} catch {}
 	}
 	return {};
 };
