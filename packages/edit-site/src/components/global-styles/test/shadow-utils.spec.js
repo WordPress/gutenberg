@@ -64,13 +64,15 @@ const validShadowFormats = {
 	insetColorXYBlurSpread: 'inset {color} {x} {y} {blur} {spread}',
 
 	multipleSpaces: '{x}  {y}   {blur} {spread}',
+	upperInset: 'INSET {x} {y} {blur} {spread} {color}',
 };
 
 const invalidShadowFormats = {
-	invalidShadow1: '{x}',
-	// invalidShadow2: '{x} {color} {y}',
-	// invalidShadow3: '{x} {y} {color} {blur}',
-	// invalidShadow4: '{x} {y} {blur} {spread} {color} 5px',
+	oneLength: '{x}',
+	multipleLengthGroups1: '{x} {y} {color} {blur}',
+	multipleLengthGroups2: '{x} {y} {blur} {spread} {color} 5px',
+	multipleInsets: 'inset inset {x} {y} {blur} {spread} {color}',
+	multipleColors: '{x} {y} {blur} {spread} {color} {color}',
 };
 
 const combinedShadows = {
@@ -126,10 +128,10 @@ describe( 'getShadowParts', () => {
 							{ length: shadowCount },
 							() =>
 								getShadowString( shadow, {
-									x: shadowUnits.px,
-									y: shadowUnits.px,
-									blur: shadowUnits.px,
-									spread: shadowUnits.px,
+									x: '1px',
+									y: '2px',
+									blur: '3px',
+									spread: '4px',
 									color,
 								} )
 						);
@@ -169,22 +171,22 @@ describe( 'shadowStringToObject', () => {
 				const hasBlur = shadow.includes( '{blur}' );
 				const hasSpread = shadow.includes( '{spread}' );
 				const hasColor = shadow.includes( '{color}' );
-				const hasInset = shadow.includes( 'inset' );
+				const hasInset = shadow.toLowerCase().includes( 'inset' );
 
 				const shadowString = getShadowString( shadow, {
-					x: shadowUnits.px,
-					y: shadowUnits.px,
-					blur: shadowUnits.px,
-					spread: shadowUnits.px,
+					x: '1px',
+					y: '2px',
+					blur: '3px',
+					spread: '4px',
 					color,
 				} );
 
 				const input = shadowString;
 				const output = {
-					x: hasX ? shadowUnits.px : defaultShadow.x,
-					y: hasY ? shadowUnits.px : defaultShadow.y,
-					blur: hasBlur ? shadowUnits.px : defaultShadow.blur,
-					spread: hasSpread ? shadowUnits.px : defaultShadow.spread,
+					x: hasX ? '1px' : defaultShadow.x,
+					y: hasY ? '2px' : defaultShadow.y,
+					blur: hasBlur ? '3px' : defaultShadow.blur,
+					spread: hasSpread ? '4px' : defaultShadow.spread,
 					color: hasColor ? color : defaultShadow.color,
 					inset: hasInset,
 				};
@@ -202,10 +204,10 @@ describe( 'shadowStringToObject', () => {
 		Object.entries( invalidShadowFormats ).forEach(
 			( [ shadowKey, shadow ] ) => {
 				const shadowString = getShadowString( shadow, {
-					x: shadowUnits.px,
-					y: shadowUnits.px,
-					blur: shadowUnits.px,
-					spread: shadowUnits.px,
+					x: '1px',
+					y: '2px',
+					blur: '3px',
+					spread: '4px',
 					color,
 				} );
 
