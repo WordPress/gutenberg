@@ -143,6 +143,21 @@
 
 .edit-site-global-styles__shadow-editor__dropdown {
 	width: 100%;
+
+	.edit-site-global-styles__shadow-editor__dropdown-toggle,
+	.edit-site-global-styles__shadow-editor__remove-button {
+		width: 100%;
+		height: auto;
+		padding-top: $grid-unit;
+		padding-bottom: $grid-unit;
+		text-align: left;
+		border-radius: inherit;
+
+		&.is-open {
+			background: $gray-100;
+			color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
 .edit-site-global-styles-screen-css {

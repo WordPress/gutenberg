@@ -10,7 +10,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
-	__experimentalItem as Item,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHeading as Heading,
 	__experimentalInputControl as InputControl,
@@ -30,15 +29,13 @@ import {
 	ColorPalette,
 	Modal,
 	privateApis as componentsPrivateApis,
-	Tooltip,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
-	Icon,
 	plus,
 	shadow as shadowIcon,
-	lineSolid,
+	reset,
 	settings,
 	moreVertical,
 } from '@wordpress/icons';
@@ -207,7 +204,7 @@ export default function ShadowsEditPanel() {
 				>
 					{ sprintf(
 						// translators: %s: name of the shadow
-						'Are you sure you want to delete the shadow "%s"?',
+						'Are you sure you want to delete "%s"?',
 						selectedShadow.name
 					) }
 				</ConfirmDialog>
@@ -362,38 +359,36 @@ function ShadowItem( { shadow, onChange, canRemove, onRemove } ) {
 						'edit-site-global-styles__shadow-editor__dropdown-toggle',
 						{ 'is-open': isOpen }
 					),
+					ariaExpanded: isOpen,
+					ariaLabel: shadowObj.inset
+						? __( 'Inner shadow' )
+						: __( 'Drop shadow' ),
+				};
+				const removeButtonProps = {
+					onClick: onRemove,
+					className: clsx(
+						'edit-site-global-styles__shadow-editor__remove-button',
+						{ 'is-open': isOpen }
+					),
+					ariaLabel: __( 'Remove shadow' ),
+					tooltip: __( 'Remove shadow' ),
 				};
 
 				return (
 					<HStack align="center" justify="flex-start" spacing={ 0 }>
 						<FlexItem style={ { flexGrow: 1 } }>
-							<Item role="button" { ...toggleProps }>
-								<HStack justify="flex-start">
-									<Icon icon={ shadowIcon } size={ 24 } />
-									<FlexItem>
-										{ shadowObj.inset
-											? __( 'Inner shadow' )
-											: __( 'Drop shadow' ) }
-									</FlexItem>
-								</HStack>
-							</Item>
+							<Button icon={ shadowIcon } { ...toggleProps }>
+								{ shadowObj.inset
+									? __( 'Inner shadow' )
+									: __( 'Drop shadow' ) }
+							</Button>
 						</FlexItem>
 						{ canRemove && (
 							<FlexItem>
-								<Tooltip text={ __( 'Remove shadow' ) }>
-									<Item
-										role="button"
-										onClick={ onRemove }
-										className="edit-site-global-styles__shadow-editor__remove-button"
-									>
-										<HStack justify="flex-start">
-											<Icon
-												icon={ lineSolid }
-												size={ 24 }
-											/>
-										</HStack>
-									</Item>
-								</Tooltip>
+								<Button
+									icon={ reset }
+									{ ...removeButtonProps }
+								/>
 							</FlexItem>
 						) }
 					</HStack>
@@ -448,6 +443,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					onChange={ ( value ) =>
 						onShadowChange( 'inset', value === 'inset' )
 					}
+					__next40pxDefaultSize
 				>
 					<ToggleGroupControlOption
 						value="outset"
@@ -526,6 +522,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 				<UnitControl
 					label={ label }
 					hideLabelFromVision
+					__next40pxDefaultSize
 					value={ value }
 					onChange={ onValueChange }
 				/>
@@ -534,6 +531,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 					value={ parsedQuantity ?? 0 }
 					onChange={ sliderOnChange }
 					withInputField={ false }
+					__next40pxDefaultSize
 					min={
 						hasNegativeRange
 							? -(
