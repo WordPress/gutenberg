@@ -35,15 +35,7 @@ import isTemplateRevertable from '../../store/utils/is-template-revertable';
 import { exportPatternAsJSONAction } from './export-pattern-as-json-action';
 
 // Patterns.
-export const {
-	PATTERN_TYPES,
-	PATTERN_DEFAULT_CATEGORY,
-	PATTERN_USER_CATEGORY,
-	EXCLUDED_PATTERN_SOURCES,
-	PATTERN_SYNC_TYPES,
-	CreatePatternModalContents,
-	useDuplicatePatternProps,
-} = unlock( patternsPrivateApis );
+const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
 function getItemTitle( item ) {
 	if ( typeof item.title === 'string' ) {

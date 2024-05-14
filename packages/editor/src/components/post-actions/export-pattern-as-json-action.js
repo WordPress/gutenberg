@@ -17,7 +17,7 @@ import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { unlock } from '../../lock-unlock';
 
 // Patterns.
-export const { PATTERN_TYPES } = unlock( patternsPrivateApis );
+const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
 function getJsonFromItem( item ) {
 	return JSON.stringify(
