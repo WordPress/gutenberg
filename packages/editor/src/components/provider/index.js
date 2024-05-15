@@ -29,6 +29,7 @@ import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ContentOnlySettingsMenu from '../block-settings-menu/content-only-settings-menu';
+import StartTemplateOptions from '../start-template-options';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -275,6 +276,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 									<KeyboardShortcutHelpModal />
 									<BlockRemovalWarnings />
 									<StartPageOptions />
+									<StartTemplateOptions />
 								</>
 							) }
 						</BlockEditorProviderComponent>

@@ -13,7 +13,7 @@ import { useMemo, useState, useCallback, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import type { Action, ActionModal, Data, Item } from './types';
+import type { Action, ActionModal, AnyItem } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -22,34 +22,37 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-interface ActionWithModalProps {
-	action: ActionModal;
+interface ActionWithModalProps< Item extends AnyItem > {
+	action: ActionModal< Item >;
 	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal ) => void;
+	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 	onMenuOpenChange: ( isOpen: boolean ) => void;
 }
 
-interface BulkActionsItemProps {
-	action: Action;
+interface BulkActionsItemProps< Item extends AnyItem > {
+	action: Action< Item >;
 	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal ) => void;
+	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface ActionsMenuGroupProps {
-	actions: Action[];
+interface ActionsMenuGroupProps< Item extends AnyItem > {
+	actions: Action< Item >[];
 	selectedItems: Item[];
-	setActionWithModal: ( action?: ActionModal ) => void;
+	setActionWithModal: ( action?: ActionModal< Item > ) => void;
 }
 
-interface BulkActionsProps {
-	data: Data;
-	actions: Action[];
+interface BulkActionsProps< Item extends AnyItem > {
+	data: Item[];
+	actions: Action< Item >[];
 	selection: string[];
 	onSelectionChange: ( selection: Item[] ) => void;
 	getItemId: ( item: Item ) => string;
 }
 
-export function useHasAPossibleBulkAction( actions: Action[], item: Item ) {
+export function useHasAPossibleBulkAction< Item extends AnyItem >(
+	actions: Action< Item >[],
+	item: Item
+) {
 	return useMemo( () => {
 		return actions.some( ( action ) => {
 			return (
@@ -60,9 +63,9 @@ export function useHasAPossibleBulkAction( actions: Action[], item: Item ) {
 	}, [ actions, item ] );
 }
 
-export function useSomeItemHasAPossibleBulkAction(
-	actions: Action[],
-	data: Data
+export function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+	actions: Action< Item >[],
+	data: Item[]
 ) {
 	return useMemo( () => {
 		return data.some( ( item ) => {
@@ -76,12 +79,12 @@ export function useSomeItemHasAPossibleBulkAction(
 	}, [ actions, data ] );
 }
 
-function ActionWithModal( {
+function ActionWithModal< Item extends AnyItem >( {
 	action,
 	selectedItems,
 	setActionWithModal,
 	onMenuOpenChange,
-}: ActionWithModalProps ) {
+}: ActionWithModalProps< Item > ) {
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -107,11 +110,11 @@ function ActionWithModal( {
 	);
 }
 
-function BulkActionItem( {
+function BulkActionItem< Item extends AnyItem >( {
 	action,
 	selectedItems,
 	setActionWithModal,
-}: BulkActionsItemProps ) {
+}: BulkActionsItemProps< Item > ) {
 	const eligibleItems = useMemo( () => {
 		return selectedItems.filter(
 			( item ) => ! action.isEligible || action.isEligible( item )
@@ -141,11 +144,11 @@ function BulkActionItem( {
 	);
 }
 
-function ActionsMenuGroup( {
+function ActionsMenuGroup< Item extends AnyItem >( {
 	actions,
 	selectedItems,
 	setActionWithModal,
-}: ActionsMenuGroupProps ) {
+}: ActionsMenuGroupProps< Item > ) {
 	return (
 		<>
 			<DropdownMenuGroup>
@@ -163,20 +166,20 @@ function ActionsMenuGroup( {
 	);
 }
 
-export default function BulkActions( {
+export default function BulkActions< Item extends AnyItem >( {
 	data,
 	actions,
 	selection,
 	onSelectionChange,
 	getItemId,
-}: BulkActionsProps ) {
+}: BulkActionsProps< Item > ) {
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
 	const [ isMenuOpen, onMenuOpenChange ] = useState( false );
 	const [ actionWithModal, setActionWithModal ] = useState<
-		ActionModal | undefined
+		ActionModal< Item > | undefined
 	>();
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {

@@ -44,7 +44,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
 import WelcomeGuide from '../welcome-guide';
-import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
@@ -289,7 +288,6 @@ export default function Editor( { isLoading, onClick } ) {
 					settings={ settings }
 					useSubRegistry={ false }
 				>
-					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }

@@ -1,7 +1,7 @@
 $actions-height: 92px;
 
-.edit-site-start-template-options__modal {
-	.edit-site-start-template-options__modal__actions {
+.editor-start-template-options__modal {
+	.editor-start-template-options__modal__actions {
 		position: absolute;
 		bottom: 0;
 		width: 100%;
@@ -12,7 +12,7 @@ $actions-height: 92px;
 		padding-left: $grid-unit-40;
 		padding-right: $grid-unit-40;
 		border-top: 1px solid $gray-300;
-		z-index: z-index(".edit-site-start-template-options__modal__actions");
+		z-index: z-index(".editor-start-template-options__modal__actions");
 	}
 
 	.block-editor-block-patterns-list {
@@ -25,7 +25,7 @@ $actions-height: 92px;
 	}
 }
 
-.edit-site-start-template-options__modal-content .block-editor-block-patterns-list {
+.editor-start-template-options__modal-content .block-editor-block-patterns-list {
 	column-count: 2;
 	column-gap: $grid-unit-30;
 
