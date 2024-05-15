@@ -200,7 +200,15 @@ function gutenberg_dequeue_module( $module_identifier ) {
 
 
 /**
- * @since 18.4.0
+ * Print data associated with Script Modules in Script tags.
+ *
+ * This embeds data in the page HTML so that it is available on page load.
+ *
+ * Data can be associated with a given Script Module by using the
+ * `scriptmoduledata_{$module_id}` filter.
+ *
+ * The data for a given Script Module will be JSON serialized in a script tag with an ID
+ * like `wp-scriptmodule-data_{$module_id}`.
  */
 function gutenberg_print_script_module_data(): void {
 	$get_marked_for_enqueue = new ReflectionMethod( 'WP_Script_Modules', 'get_marked_for_enqueue' );
@@ -215,7 +223,26 @@ function gutenberg_print_script_module_data(): void {
 	}
 
 	foreach ( array_keys( $modules ) as $module_id ) {
+		/**
+		 * Filters data associated with a given Script Module.
+		 *
+		 * Script Modules may require data that is required for initialization or is essential to
+		 * have immediately available on page load. These are suitable use cases for this data.
+		 *
+		 * This is best suited to a minimal set of data and is not intended to replace the REST API.
+		 *
+		 * If the filter returns no data (an empty array), nothing will be embedded in the page.
+		 *
+		 * The data for a given Script Module, if provided, will be JSON serialized in a script tag
+		 * with an ID like `wp-scriptmodule-data_{$module_id}`.
+		 *
+		 * The dynamic portion of the hook name, `$module_id`, refers to the Script Module ID that
+		 * the data is associated with.
+		 *
+		 * @param array $data The data that should be associated with the array.
+		 */
 		$data = apply_filters( "scriptmoduledata_{$module_id}", array() );
+
 		if ( ! empty( $data ) ) {
 			/*
 			 * This data will be printed as JSON inside a script tag like this:
@@ -264,7 +291,7 @@ function gutenberg_print_script_module_data(): void {
 				wp_json_encode( $data, $json_encode_flags ),
 				array(
 					'type' => 'application/json',
-					'id'   => 'wp-scriptmodule-data_' . $module_id,
+					'id'   => "wp-scriptmodule-data_{$module_id}",
 				)
 			);
 		}
