@@ -2,7 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { ReactNode, Ref } from 'react';
+import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 
 /**
  * WordPress dependencies
@@ -110,7 +110,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 const sortArrows = { asc: '↑', desc: '↓' };
 const sortValues = { asc: 'ascending', desc: 'descending' } as const;
 
-const HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
+const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 	{
 		field,
 		view,
@@ -246,6 +246,12 @@ const HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 		</DropdownMenu>
 	);
 } );
+
+// @ts-expect-error Lift the `Item` type argument through the forwardRef.
+const HeaderMenu: < Item extends AnyItem >(
+	props: PropsWithoutRef< HeaderMenuProps< Item > > &
+		RefAttributes< HTMLButtonElement >
+) => ReturnType< typeof _HeaderMenu > = _HeaderMenu;
 
 function BulkSelectionCheckbox< Item extends AnyItem >( {
 	selection,
