@@ -29,10 +29,10 @@ export function convertAliasBlockNameAndAttributes( name, attributes ) {
 	let newAttributes = { ...otherAttributes };
 
 	// TODO: Tidy up a bit more. Replace with attribute inference (in serializer)?
-	if ( canonicalBlockName ) {
+	if ( blockVariation ) {
 		newAttributes = {
 			...otherAttributes,
-			metadata: { ...metadata, canonical: canonicalBlockName },
+			metadata: { ...metadata, variation: blockVariation },
 		};
 	}
 
