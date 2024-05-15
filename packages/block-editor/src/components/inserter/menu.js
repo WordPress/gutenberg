@@ -79,13 +79,27 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
+	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
 			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
 			onSelect();
+
+			// Check for focus loss due to filtering blocks by selected block type
+			window.requestAnimationFrame( () => {
+				if (
+					! shouldFocusBlock &&
+					! blockTypesTabRef?.current.contains(
+						ref.current.ownerDocument.activeElement
+					)
+				) {
+					// There has been a focus loss, so focus the first button in the block types tab
+					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+				}
+			} );
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -188,6 +202,7 @@ function InserterMenu(
 			<>
 				<div className="block-editor-inserter__block-list">
 					<BlockTypesTab
+						ref={ blockTypesTabRef }
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsert }
 						onHover={ onHover }

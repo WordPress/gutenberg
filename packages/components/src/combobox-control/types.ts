@@ -6,6 +6,7 @@ import type { BaseControlProps } from '../base-control/types';
 export type ComboboxControlOption = {
 	label: string;
 	value: string;
+	disabled?: boolean;
 	[ key: string ]: any;
 };
 

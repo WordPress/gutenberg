@@ -23,13 +23,17 @@ test.describe( 'Hybrid theme', () => {
 		).toBeVisible();
 	} );
 
-	test( 'should show Patterns page when accessing template parts list page', async ( {
+	test( 'should redirect to Patterns page when accessing template parts list page', async ( {
 		admin,
 		page,
 	} ) => {
 		await admin.visitAdminPage(
 			'site-editor.php',
 			'path=/wp_template_part/all'
+		);
+
+		await expect( page ).toHaveURL(
+			'/wp-admin/site-editor.php?path=%2Fpatterns'
 		);
 
 		await expect(

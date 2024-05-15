@@ -566,7 +566,7 @@ const renamePostAction = {
 	},
 };
 
-export const duplicatePostAction = {
+const duplicatePostAction = {
 	id: 'duplicate-post',
 	label: _x( 'Duplicate', 'action label' ),
 	isEligible( { status } ) {

@@ -103,6 +103,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -385,6 +386,7 @@ export function ImageEdit( {
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }
