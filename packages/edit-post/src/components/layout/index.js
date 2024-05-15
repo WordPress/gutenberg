@@ -281,9 +281,10 @@ function Layout( { initialPost } ) {
 			switch ( actionId ) {
 				case 'move-to-trash':
 					{
-						const postType = items[ 0 ].type;
 						document.location.href = addQueryArgs( 'edit.php', {
-							post_type: postType,
+							trashed: 1,
+							post_type: items[ 0 ].type,
+							ids: items[ 0 ].id,
 						} );
 					}
 					break;
