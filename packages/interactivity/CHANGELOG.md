@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Strict type checking. ([#59865] (https://github.com/WordPress/gutenberg/pull/59865/))
+-   Strict type checking: fix some missing nulls in published types ([#59865](https://github.com/WordPress/gutenberg/pull/59865/)).
 
 ### Bug Fixes
 
