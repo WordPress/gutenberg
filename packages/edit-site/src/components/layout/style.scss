@@ -118,7 +118,7 @@
 		justify-content: flex-end;
 	}
 
-	& > div {
+	.edit-site-resizable-frame__inner {
 		color: $gray-900;
 	}
 
@@ -143,10 +143,6 @@
 		top: 0;
 		bottom: 0;
 		width: 100%;
-
-		& > div {
-			border-radius: 0;
-		}
 	}
 }
 
