@@ -98,7 +98,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					const regexResult = nsPathRegExp.exec(
 						attributes[ i ].value
 					)?.groups;
-					const namespace = regexResult?.nameSpace ?? null;
+					const namespace = regexResult?.namespace ?? null;
 					let value: any =
 						regexResult?.value ?? attributes[ i ].value;
 					try {
