@@ -108,7 +108,7 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 }
 
 const sortArrows = { asc: '↑', desc: '↓' };
-const sortValues = { asc: 'ascending', desc: 'descending' };
+const sortValues = { asc: 'ascending', desc: 'descending' } as const;
 
 const HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 	{
