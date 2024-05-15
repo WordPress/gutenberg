@@ -97,7 +97,6 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
-	debugger;
 
 	// Combines both font style and weight options into a single dropdown.
 	const combineOptions = () => {
@@ -168,7 +167,6 @@ export default function FontAppearanceControl( props ) {
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.
-	debugger;
 	const currentSelection =
 		selectOptions.find(
 			( option ) =>
@@ -215,7 +213,6 @@ export default function FontAppearanceControl( props ) {
 				options={ selectOptions }
 				value={ currentSelection }
 				onChange={ ( { selectedItem } ) => {
-					debugger;
 					onChange( selectedItem.style );
 				} }
 			/>

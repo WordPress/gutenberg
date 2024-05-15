@@ -182,7 +182,6 @@ export default function TypographyPanel( {
 		const slug = mergedFontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
-		debugger;
 		onChange(
 			setImmutably(
 				value,
@@ -221,7 +220,6 @@ export default function TypographyPanel( {
 	// Appearance
 	const hasAppearanceControl = useHasAppearanceControl( settings );
 	const appearanceControlLabel = useAppearanceControlLabel( settings );
-	debugger;
 	const hasFontStyles = settings?.typography?.fontStyle;
 	const hasFontWeights = settings?.typography?.fontWeight;
 	const fontStyle = decodeValue( inheritedValue?.typography?.fontStyle );
@@ -230,7 +228,6 @@ export default function TypographyPanel( {
 		fontStyle: newFontStyle,
 		fontWeight: newFontWeight,
 	} ) => {
-		debugger;
 		onChange( {
 			...value,
 			typography: {
@@ -401,9 +398,6 @@ export default function TypographyPanel( {
 					isShownByDefault={ defaultControls.fontAppearance }
 					panelId={ panelId }
 				>
-					{ ( () => {
-						debugger;
-					} )() }
 					<FontAppearanceControl
 						value={ {
 							fontStyle,

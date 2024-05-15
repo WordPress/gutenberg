@@ -6,7 +6,7 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -34,7 +34,8 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				return;
 			}
 
-			console.debug( nextValue );
+			// @todo add test to verify that a value passed programmatically is
+			// selected
 
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
@@ -44,7 +45,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 			const option = options.find( ( item ) => item.name === nextValue );
 
 			const changeObject = {
-				highlightedIndex: state.renderedItems.findIndex(
+				highlightedIndex: state.items.findIndex(
 					( item ) => item.value === nextValue
 				),
 				inputValue: '',
@@ -55,6 +56,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 
 			onChange( changeObject );
 		},
+	} );
+
+	useEffect( () => {
+		// This is a workaround for selecting the right item upon mount
+		store.setValue( value?.name! );
 	} );
 
 	const children = options.map(
