@@ -1,6 +1,6 @@
-const logged = new Set();
+const logged: Set< string > = new Set();
 
-export const warn = ( message ) => {
+export const warn = ( message: string ): void => {
 	// @ts-expect-error
 	if ( typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true ) {
 		if ( logged.has( message ) ) {
