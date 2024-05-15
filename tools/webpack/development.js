@@ -60,7 +60,18 @@ module.exports = [
 		},
 		plugins: [
 			new DependencyExtractionWebpackPlugin( {
+				injectPolyfill: false,
 				useDefaults: false,
+				requestToExternal: ( request ) => {
+					if ( request === 'react' ) {
+						return 'React';
+					}
+				},
+				requestToHandle: ( request ) => {
+					if ( request === 'react' ) {
+						return 'react';
+					}
+				},
 			} ),
 		],
 	},
