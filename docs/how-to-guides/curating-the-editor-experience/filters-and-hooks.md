@@ -2,6 +2,39 @@
 
 The Editor provides numerous filters and hooks that allow you to modify the editing experience. Here are a few.
 
+## Editor settings
+
+One of the most common ways to modify the Editor is through the [`block_editor_settings_all`](https://developer.wordpress.org/reference/hooks/block_editor_settings_all/) PHP filter, which is applied before settings are sent to the initialized Editor. 
+
+The `block_editor_settings_all` hook passes two parameters to the callback function:
+
+- `$settings` – An array of [configurable settings](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#editor-settings) for the Editor.
+- `$context` – An instance of [`WP_Block_Editor_Context`](https://developer.wordpress.org/reference/classes/wp_block_editor_context/), an object that contains information about the current Editor.
+
+The following example disables the Code Editor for users who cannot activate plugins (Administrators). Add this to a plugin or your theme's `functions.php` file to test it.
+
+```php
+add_filter( 'block_editor_settings_all', 'example_restrict_code_editor' );
+
+function example_restrict_code_editor( $settings ) {
+	$can_active_plugins = current_user_can( 'activate_plugins' );
+
+	// Disable the Code Editor for users that cannot activate plugins (Administrators).
+	if ( ! $can_active_plugins ) {
+		$settings[ 'codeEditingEnabled' ] = false;
+	}
+
+	return $settings;
+}
+```
+
+For more examples, check out the [Editor Hooks](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/) documentation that includes the following use cases: 
+
+- [Set a default image size](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#set-a-default-image-size)
+- [Disable Openverse](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-openverse)
+- [Disable the Font Library](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-the-font-library)
+- [Disable block inspector tabs](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#disable-block-inspector-tabs)
+
 ## Server-side theme.json filters
 
 The theme.json file is a great way to control interface options, but it only allows for global or block-level modifications, which can be limiting in some scenarios.
