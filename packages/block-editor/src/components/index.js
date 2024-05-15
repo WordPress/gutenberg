@@ -161,7 +161,6 @@ export { default as __experimentalBlockPatternsList } from './block-patterns-lis
 export { default as __experimentalPublishDateTimePicker } from './publish-date-time-picker';
 export { default as __experimentalInspectorPopoverHeader } from './inspector-popover-header';
 export { useBlockEditingMode } from './block-editing-mode';
-export { InlineCommentToolbar as __experimentalInlineComment } from './inline-comment';
 
 /*
  * State Related Components

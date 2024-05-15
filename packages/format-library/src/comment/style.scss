@@ -1,0 +1,14 @@
+.block-editor-format-toolbar__comment-board {
+	max-width: 300px;
+	min-width: auto;
+	width: 90vw;
+
+	.components-popover__content {
+		width: auto;
+		padding: 1rem;
+	}
+
+	.comment-board__comment {
+		border-bottom: 1px solid $gray-300;
+	}
+}
