@@ -1,12 +1,10 @@
 // eslint-disable-next-line eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
 
-/* @jsx createElement */
-
 /**
  * External dependencies
  */
-import { h as createElement, type RefObject } from 'preact';
+import { type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 
