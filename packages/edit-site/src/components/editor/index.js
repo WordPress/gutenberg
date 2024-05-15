@@ -345,7 +345,7 @@ export default function Editor( { isLoading, onClick } ) {
 								}
 							/>
 						}
-						notices={ <EditorSnackbars /> }
+						notices={ isEditMode && <EditorSnackbars /> }
 						content={
 							<>
 								<GlobalStylesRenderer />
