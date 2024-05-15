@@ -65,7 +65,7 @@ In WordPress core, the `globalThis.IS_GUTENBERG_PLUGIN` variable is replaced wit
 
 ```js
 if ( undefined ) {
-	// Wepack has replaced `globalThis.IS_GUTENBERG_PLUGIN` with `undefined`
+	// Webpack has replaced `globalThis.IS_GUTENBERG_PLUGIN` with `undefined`
 	pluginOnlyFeature();
 }
 ```
