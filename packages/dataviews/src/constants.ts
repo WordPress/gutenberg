@@ -50,7 +50,7 @@ export const OPERATORS = {
 export const SORTING_DIRECTIONS = {
 	asc: { label: __( 'Sort ascending' ) },
 	desc: { label: __( 'Sort descending' ) },
-};
+} as const;
 
 // View layouts.
 export const LAYOUT_TABLE = 'table';

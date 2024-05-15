@@ -160,7 +160,11 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 				{ isSortable && (
 					<DropdownMenuGroup>
 						{ Object.entries( SORTING_DIRECTIONS ).map(
-							( [ direction, info ] ) => {
+							// @ts-expect-error Object.entries does not respect our known keys unfortunately, direction would be type `string`
+							( [ direction, info ]: [
+								keyof typeof SORTING_DIRECTIONS,
+								( typeof SORTING_DIRECTIONS )[ keyof typeof SORTING_DIRECTIONS ],
+							] ) => {
 								const isChecked =
 									view.sort &&
 									isSorted &&
