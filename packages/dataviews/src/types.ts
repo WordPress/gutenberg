@@ -28,7 +28,15 @@ interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
+type DeprecatedOperator = 'in' | 'notIn';
+type Operator =
+	| 'is'
+	| 'isNot'
+	| 'isAny'
+	| 'isNone'
+	| 'isAll'
+	| 'isNotAll'
+	| DeprecatedOperator;
 
 export type AnyItem = Record< string, any >;
 
@@ -173,6 +181,22 @@ interface ViewBase {
 	 * The hidden fields.
 	 */
 	hiddenFields: string[];
+}
+
+export interface ViewTable extends ViewBase {
+	type: 'table';
+
+	layout: {
+		/**
+		 * The field to use as the primary field.
+		 */
+		primaryField: string;
+
+		/**
+		 * The field to use as the media field.
+		 */
+		mediaField: string;
+	};
 }
 
 export interface ViewList extends ViewBase {

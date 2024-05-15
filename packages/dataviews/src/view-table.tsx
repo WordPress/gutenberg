@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ReactNode, Ref } from 'react';
 
 /**
  * WordPress dependencies
@@ -38,6 +39,12 @@ import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
 } from './bulk-actions';
+import type {
+	Action,
+	AnyItem,
+	NormalizedField,
+	ViewTable as ViewTableType,
+} from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -48,7 +55,48 @@ const {
 	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 } = unlock( componentsPrivateApis );
 
-function WithDropDownMenuSeparators( { children } ) {
+interface HeaderMenuProps< Item extends AnyItem > {
+	field: NormalizedField< Item >;
+	view: ViewTableType;
+	onChangeView: ( view: ViewTableType ) => void;
+	onHide: ( field: NormalizedField< Item > ) => void;
+	setOpenedFilter: ( fieldId: string ) => void;
+}
+
+interface BulkSelectionCheckboxProps< Item extends AnyItem > {
+	selection: string[];
+	onSelectionChange: ( items: Item[] ) => void;
+	data: Item[];
+	actions: Action< Item >[];
+}
+
+interface TableRowProps< Item extends AnyItem > {
+	hasBulkActions: boolean;
+	item: Item;
+	actions: Action< Item >[];
+	id: string;
+	visibleFields: NormalizedField< Item >[];
+	primaryField?: NormalizedField< Item >;
+	selection: string[];
+	getItemId: ( item: Item ) => string;
+	onSelectionChange: ( items: Item[] ) => void;
+	data: Item[];
+}
+
+interface ViewTableProps< Item extends AnyItem > {
+	actions: Action< Item >[];
+	data: Item[];
+	fields: NormalizedField< Item >[];
+	getItemId: ( item: Item ) => string;
+	isLoading?: boolean;
+	onChangeView: ( view: ViewTableType ) => void;
+	onSelectionChange: ( items: Item[] ) => void;
+	selection: string[];
+	setOpenedFilter: ( fieldId: string ) => void;
+	view: ViewTableType;
+}
+
+function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 	return Children.toArray( children )
 		.filter( Boolean )
 		.map( ( child, i ) => (
@@ -60,10 +108,17 @@ function WithDropDownMenuSeparators( { children } ) {
 }
 
 const sortArrows = { asc: '↑', desc: '↓' };
+const sortValues = { asc: 'ascending', desc: 'descending' };
 
-const HeaderMenu = forwardRef( function HeaderMenu(
-	{ field, view, onChangeView, onHide, setOpenedFilter },
-	ref
+const HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
+	{
+		field,
+		view,
+		onChangeView,
+		onHide,
+		setOpenedFilter,
+	}: HeaderMenuProps< Item >,
+	ref: Ref< HTMLButtonElement >
 ) {
 	const isHidable = field.enableHiding !== false;
 	const isSortable = field.enableSorting !== false;
@@ -92,9 +147,9 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 					variant="tertiary"
 				>
 					{ field.header }
-					{ isSorted && (
+					{ view.sort && isSorted && (
 						<span aria-hidden="true">
-							{ isSorted && sortArrows[ view.sort.direction ] }
+							{ sortArrows[ view.sort.direction ] }
 						</span>
 					) }
 				</Button>
@@ -107,6 +162,7 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 						{ Object.entries( SORTING_DIRECTIONS ).map(
 							( [ direction, info ] ) => {
 								const isChecked =
+									view.sort &&
 									isSorted &&
 									view.sort.direction === direction;
 
@@ -191,16 +247,18 @@ const HeaderMenu = forwardRef( function HeaderMenu(
 	);
 } );
 
-function BulkSelectionCheckbox( {
+function BulkSelectionCheckbox< Item extends AnyItem >( {
 	selection,
 	onSelectionChange,
 	data,
 	actions,
-} ) {
+}: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return actions.some(
-				( action ) => action.supportsBulk && action.isEligible( item )
+				( action ) =>
+					action.supportsBulk &&
+					( ! action.isEligible || action.isEligible( item ) )
 			);
 		} );
 	}, [ data, actions ] );
@@ -210,7 +268,7 @@ function BulkSelectionCheckbox( {
 			className="dataviews-view-table-selection-checkbox"
 			__nextHasNoMarginBottom
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && selection.length }
+			indeterminate={ ! areAllSelected && !! selection.length }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					onSelectionChange( [] );
@@ -225,7 +283,7 @@ function BulkSelectionCheckbox( {
 	);
 }
 
-function TableRow( {
+function TableRow< Item extends AnyItem >( {
 	hasBulkActions,
 	item,
 	actions,
@@ -236,7 +294,7 @@ function TableRow( {
 	getItemId,
 	onSelectionChange,
 	data,
-} ) {
+}: TableRowProps< Item > ) {
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = selection.includes( id );
 
@@ -270,7 +328,7 @@ function TableRow( {
 			onClick={ () => {
 				if (
 					! isTouchDevice.current &&
-					document.getSelection().type !== 'Range'
+					document.getSelection()?.type !== 'Range'
 				) {
 					if ( ! isSelected ) {
 						onSelectionChange(
@@ -305,7 +363,6 @@ function TableRow( {
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
 						<SingleSelectionCheckbox
-							id={ id }
 							item={ item }
 							selection={ selection }
 							onSelectionChange={ onSelectionChange }
@@ -361,7 +418,7 @@ function TableRow( {
 	);
 }
 
-function ViewTable( {
+function ViewTable< Item extends AnyItem >( {
 	actions,
 	data,
 	fields,
@@ -372,10 +429,13 @@ function ViewTable( {
 	selection,
 	setOpenedFilter,
 	view,
-} ) {
-	const headerMenuRefs = useRef( new Map() );
-	const headerMenuToFocusRef = useRef();
-	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] = useState();
+}: ViewTableProps< Item > ) {
+	const headerMenuRefs = useRef<
+		Map< string, { node: HTMLButtonElement; fallback: string } >
+	>( new Map() );
+	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
+	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
+		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
 
 	useEffect( () => {
@@ -393,13 +453,15 @@ function ViewTable( {
 		// Clearing out the focus directive is necessary to make sure
 		// future renders don't cause unexpected focus jumps.
 		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
-		setNextHeaderMenuToFocus();
+		setNextHeaderMenuToFocus( undefined );
 		return;
 	}
 
-	const onHide = ( field ) => {
+	const onHide = ( field: NormalizedField< Item > ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
-		const fallback = headerMenuRefs.current.get( hidden.fallback );
+		const fallback = hidden
+			? headerMenuRefs.current.get( hidden.fallback )
+			: undefined;
 		setNextHeaderMenuToFocus( fallback?.node );
 	};
 	const visibleFields = fields.filter(
@@ -408,7 +470,6 @@ function ViewTable( {
 			! [ view.layout.mediaField ].includes( field.id )
 	);
 	const hasData = !! data?.length;
-	const sortValues = { asc: 'ascending', desc: 'descending' };
 
 	const primaryField = fields.find(
 		( field ) => field.id === view.layout.primaryField
@@ -450,8 +511,9 @@ function ViewTable( {
 								} }
 								data-field-id={ field.id }
 								aria-sort={
-									view.sort?.field === field.id &&
-									sortValues[ view.sort.direction ]
+									view.sort?.field === field.id
+										? sortValues[ view.sort.direction ]
+										: undefined
 								}
 								scope="col"
 							>
@@ -504,7 +566,7 @@ function ViewTable( {
 								item={ item }
 								hasBulkActions={ hasBulkActions }
 								actions={ actions }
-								id={ getItemId( item ) || index }
+								id={ getItemId( item ) || index.toString() }
 								visibleFields={ visibleFields }
 								primaryField={ primaryField }
 								selection={ selection }
