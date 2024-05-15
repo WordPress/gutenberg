@@ -46,11 +46,22 @@ export const OPERATORS = {
 	},
 };
 
-// Sorting
-export const SORTING_DIRECTIONS = {
-	asc: { label: __( 'Sort ascending' ) },
-	desc: { label: __( 'Sort descending' ) },
-} as const;
+export type SORTING_DIRECTION = 'asc' | 'desc';
+
+// This shouldn't live in the constants file, I know.
+export function sortingDirectionLabel( direction: SORTING_DIRECTION ) {
+	switch ( direction ) {
+		case 'asc':
+			return __( 'Sort ascending' );
+		case 'desc':
+			return __( 'Sort descending' );
+
+		// This section uses the type system to confirm it cannot be reached
+		default:
+			direction satisfies never;
+			throw new Error( 'unreachable' );
+	}
+}
 
 // View layouts.
 export const LAYOUT_TABLE = 'table';

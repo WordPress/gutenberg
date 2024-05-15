@@ -34,7 +34,7 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
-import { SORTING_DIRECTIONS } from './constants';
+import { type SORTING_DIRECTION, sortingDirectionLabel } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -159,12 +159,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
-						{ Object.entries( SORTING_DIRECTIONS ).map(
-							// @ts-expect-error Object.entries does not respect our known keys unfortunately, direction would be type `string`
-							( [ direction, info ]: [
-								keyof typeof SORTING_DIRECTIONS,
-								( typeof SORTING_DIRECTIONS )[ keyof typeof SORTING_DIRECTIONS ],
-							] ) => {
+						{ ( [ 'asc', 'desc' ] as const ).map(
+							( direction: SORTING_DIRECTION ) => {
 								const isChecked =
 									view.sort &&
 									isSorted &&
@@ -194,7 +190,9 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 										} }
 									>
 										<DropdownMenuItemLabel>
-											{ info.label }
+											{ sortingDirectionLabel(
+												direction
+											) }
 										</DropdownMenuItemLabel>
 									</DropdownMenuRadioItem>
 								);
