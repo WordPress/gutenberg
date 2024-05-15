@@ -43,6 +43,9 @@ describe( 'ProgressBar', () => {
 		expect( indicator ).toHaveStyle( {
 			width: `${ INDETERMINATE_TRACK_WIDTH }%`,
 		} );
+		expect( indicator ).not.toHaveStyle( {
+			'--indicator-width': expect.any( String ),
+		} );
 	} );
 
 	it( 'should use `value`% as width for determinate progress bar', () => {

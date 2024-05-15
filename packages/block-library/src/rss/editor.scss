@@ -2,20 +2,6 @@
 	display: inline;
 }
 
-.wp-block-rss__placeholder-form {
-	> * {
-		margin-bottom: $grid-unit-10;
-	}
-
-	@include break-medium() {
-		> * {
-			margin-bottom: 0;
-		}
-	}
-
-	.wp-block-rss__placeholder-input {
-		flex: 1;
-		min-width: 80%;
-	}
+.wp-block-rss__placeholder-form .wp-block-rss__placeholder-input {
+	flex: 1 1 auto;
 }
-

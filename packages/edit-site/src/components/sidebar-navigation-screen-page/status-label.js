@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -58,7 +58,7 @@ export default function StatusLabel( { status, date, short } ) {
 
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				'edit-site-sidebar-navigation-screen-page__status',
 				{
 					[ `has-status has-${ status }-status` ]: !! status,

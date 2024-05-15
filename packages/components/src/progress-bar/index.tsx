@@ -28,7 +28,9 @@ function UnforwardedProgressBar(
 			<ProgressBarStyled.Indicator
 				style={
 					{
-						'--indicator-width': `${ value }%`,
+						'--indicator-width': ! isIndeterminate
+							? `${ value }%`
+							: undefined,
 					} as CSSProperties
 				}
 				isIndeterminate={ isIndeterminate }

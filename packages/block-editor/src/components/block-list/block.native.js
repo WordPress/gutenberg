@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -73,7 +73,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (
@@ -674,7 +674,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect, initialPosition ) {
+		onReplace( blocks, indexToSelect, initialPosition, meta ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
@@ -685,7 +685,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				[ ownProps.clientId ],
 				blocks,
 				indexToSelect,
-				initialPosition
+				initialPosition,
+				meta
 			);
 		},
 		toggleSelection( selectionEnabled ) {

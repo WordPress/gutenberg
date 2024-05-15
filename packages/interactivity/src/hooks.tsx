@@ -16,6 +16,7 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
+import { warn } from './utils/warn';
 interface DirectiveEntry {
 	value: string | Object;
 	namespace: string;
@@ -112,8 +113,9 @@ const immutableHandlers = {
 	deleteProperty: immutableError,
 };
 const deepImmutable = < T extends Object = {} >( target: T ): T => {
-	if ( ! immutableMap.has( target ) )
+	if ( ! immutableMap.has( target ) ) {
 		immutableMap.set( target, new Proxy( target, immutableHandlers ) );
+	}
 	return immutableMap.get( target );
 };
 
@@ -259,18 +261,26 @@ export const directive = (
 
 // Resolve the path to some property of the store object.
 const resolve = ( path, namespace ) => {
+	if ( ! namespace ) {
+		warn(
+			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
+		);
+		return;
+	}
 	let resolvedStore = stores.get( namespace );
 	if ( typeof resolvedStore === 'undefined' ) {
 		resolvedStore = store( namespace, undefined, {
 			lock: universalUnlock,
 		} );
 	}
-	let current = {
+	const current = {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
-	path.split( '.' ).forEach( ( p ) => ( current = current[ p ] ) );
-	return current;
+	try {
+		// TODO: Support lazy/dynamically initialized stores
+		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {}
 };
 
 // Generate the evaluate function.
@@ -359,7 +369,9 @@ const Directives = ( {
 
 	for ( const directiveName of currentPriorityLevel ) {
 		const wrapper = directiveCallbacks[ directiveName ]?.( directiveArgs );
-		if ( wrapper !== undefined ) props.children = wrapper;
+		if ( wrapper !== undefined ) {
+			props.children = wrapper;
+		}
 	}
 
 	resetScope();
@@ -373,10 +385,11 @@ options.vnode = ( vnode: VNode< any > ) => {
 	if ( vnode.props.__directives ) {
 		const props = vnode.props;
 		const directives = props.__directives;
-		if ( directives.key )
+		if ( directives.key ) {
 			vnode.key = directives.key.find(
 				( { suffix } ) => suffix === 'default'
 			).value;
+		}
 		delete props.__directives;
 		const priorityLevels = getPriorityLevels( directives );
 		if ( priorityLevels.length > 0 ) {
@@ -392,5 +405,7 @@ options.vnode = ( vnode: VNode< any > ) => {
 		}
 	}
 
-	if ( old ) old( vnode );
+	if ( old ) {
+		old( vnode );
+	}
 };

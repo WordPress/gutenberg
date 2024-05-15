@@ -22,7 +22,6 @@ import {
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
 } from '../sidebar-dataviews/default-views';
 import {
-	ENUMERATION_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -33,11 +32,10 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
 const EMPTY_ARRAY = [];
 
 function useView( postType ) {
@@ -253,7 +251,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -306,7 +304,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -319,7 +316,6 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
-				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {
@@ -340,20 +336,14 @@ export default function PagePages() {
 		],
 		[ authors, view.type ]
 	);
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+
+	const postTypeActions = usePostActions( 'page' );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
-	const actions = usePostActions( onActionPerformed );
+
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -218,7 +218,9 @@ function BulkSelectionCheckbox( {
 					onSelectionChange( selectableItems );
 				}
 			} }
-			label={ areAllSelected ? __( 'Deselect all' ) : __( 'Select all' ) }
+			aria-label={
+				areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
+			}
 		/>
 	);
 }
@@ -255,7 +257,7 @@ function TableRow( {
 
 	return (
 		<tr
-			className={ classnames( 'dataviews-view-table__row', {
+			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'is-hovered': isHovered,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -298,8 +300,7 @@ function TableRow( {
 				<td
 					className="dataviews-view-table__checkbox-column"
 					style={ {
-						width: 20,
-						minWidth: 20,
+						width: '1%',
 					} }
 				>
 					<div className="dataviews-view-table__cell-content-wrapper">
@@ -326,7 +327,7 @@ function TableRow( {
 					} }
 				>
 					<div
-						className={ classnames(
+						className={ clsx(
 							'dataviews-view-table__cell-content-wrapper',
 							{
 								'dataviews-view-table__primary-field':
@@ -361,16 +362,16 @@ function TableRow( {
 }
 
 function ViewTable( {
-	view,
-	onChangeView,
-	fields,
 	actions,
 	data,
+	fields,
 	getItemId,
 	isLoading = false,
-	selection,
+	onChangeView,
 	onSelectionChange,
+	selection,
 	setOpenedFilter,
+	view,
 } ) {
 	const headerMenuRefs = useRef( new Map() );
 	const headerMenuToFocusRef = useRef();
@@ -426,8 +427,7 @@ function ViewTable( {
 							<th
 								className="dataviews-view-table__checkbox-column"
 								style={ {
-									width: 20,
-									minWidth: 20,
+									width: '1%',
 								} }
 								data-field-id="selection"
 								scope="col"
@@ -516,7 +516,7 @@ function ViewTable( {
 				</tbody>
 			</table>
 			<div
-				className={ classnames( {
+				className={ clsx( {
 					'dataviews-loading': isLoading,
 					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }

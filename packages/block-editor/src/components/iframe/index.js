@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	forwardRef,
 	useMemo,
 	useEffect,
+	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -121,13 +122,14 @@ function Iframe( {
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
 	const [ iframeDocument, setIframeDocument ] = useState();
+	const prevContainerWidth = useRef();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const clearerRef = useBlockSelectionClearer();
 	const [ before, writingFlowRef, after ] = useWritingFlow();
-	const [
-		contentResizeListener,
-		{ height: contentHeight, width: contentWidth },
-	] = useResizeObserver();
+	const [ contentResizeListener, { height: contentHeight } ] =
+		useResizeObserver();
+	const [ containerResizeListener, { width: containerWidth } ] =
+		useResizeObserver();
 
 	const setRef = useRefEffect( ( node ) => {
 		node._load = () => {
@@ -141,13 +143,6 @@ function Iframe( {
 		function onLoad() {
 			const { contentDocument, ownerDocument } = node;
 			const { documentElement } = contentDocument;
-			// Get any CSS classes the iframe document body may initially have
-			// to re-apply them later together with the ones of the main document
-			// body. This is necessary for some CSS classes for example the
-			// `is-dark-theme` class added by useDarkThemeBodyClassName.
-			const initialIframeBodyClasses = Array.from(
-				contentDocument.body.classList
-			);
 			iFrameDocument = contentDocument;
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
@@ -158,15 +153,12 @@ function Iframe( {
 			// be added in the editor too, which we'll somehow have to get from
 			// the server in the future (which will run the PHP filters).
 			setBodyClasses(
-				Array.from( ownerDocument.body.classList )
-					.concat( initialIframeBodyClasses )
-					.filter(
-						( name ) =>
-							name.startsWith( 'admin-color-' ) ||
-							name.startsWith( 'post-type-' ) ||
-							name === 'wp-embed-responsive' ||
-							name === 'is-dark-theme'
-					)
+				Array.from( ownerDocument.body.classList ).filter(
+					( name ) =>
+						name.startsWith( 'admin-color-' ) ||
+						name.startsWith( 'post-type-' ) ||
+						name === 'wp-embed-responsive'
+				)
 			);
 
 			contentDocument.dir = ownerDocument.dir;
@@ -217,9 +209,12 @@ function Iframe( {
 		};
 	}, [] );
 
-	const windowResizeRef = useRefEffect( ( node ) => {
+	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+
+	const iframeResizeRef = useRefEffect( ( node ) => {
 		const nodeWindow = node.ownerDocument.defaultView;
 
+		setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		const onResize = () => {
 			setIframeWindowInnerHeight( nodeWindow.innerHeight );
 		};
@@ -229,7 +224,28 @@ function Iframe( {
 		};
 	}, [] );
 
-	const [ iframeWindowInnerHeight, setIframeWindowInnerHeight ] = useState();
+	const [ windowInnerWidth, setWindowInnerWidth ] = useState();
+
+	const windowResizeRef = useRefEffect( ( node ) => {
+		const nodeWindow = node.ownerDocument.defaultView;
+
+		setWindowInnerWidth( nodeWindow.innerWidth );
+		const onResize = () => {
+			setWindowInnerWidth( nodeWindow.innerWidth );
+		};
+		nodeWindow.addEventListener( 'resize', onResize );
+		return () => {
+			nodeWindow.removeEventListener( 'resize', onResize );
+		};
+	}, [] );
+
+	const isZoomedOut = scale !== 1;
+
+	useEffect( () => {
+		if ( ! isZoomedOut ) {
+			prevContainerWidth.current = containerWidth;
+		}
+	}, [ containerWidth, isZoomedOut ] );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 	const bodyRef = useMergeRefs( [
@@ -238,7 +254,10 @@ function Iframe( {
 		clearerRef,
 		writingFlowRef,
 		disabledRef,
-		windowResizeRef,
+		// Avoid resize listeners when not needed, these will trigger
+		// unnecessary re-renders when animating the iframe width, or when
+		// expanding preview iframes.
+		isZoomedOut ? iframeResizeRef : null,
 	] );
 
 	// Correct doctype is required to enable rendering in standards
@@ -280,53 +299,79 @@ function Iframe( {
 	useEffect( () => cleanup, [ cleanup ] );
 
 	useEffect( () => {
-		if ( ! iframeDocument ) {
+		if ( ! iframeDocument || ! isZoomedOut ) {
 			return;
 		}
 
-		const _scale =
-			typeof scale === 'function'
-				? scale( contentWidth, contentHeight )
-				: scale;
+		iframeDocument.documentElement.classList.add( 'is-zoomed-out' );
 
-		if ( _scale !== 1 ) {
-			// Hack to get proper margins when scaling the iframe document.
-			const bottomFrameSize = frameSize - contentHeight * ( 1 - _scale );
+		const maxWidth = 800;
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-scale',
+			scale === 'default'
+				? Math.min( containerWidth, maxWidth ) /
+						prevContainerWidth.current
+				: scale
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-frame-size',
+			typeof frameSize === 'number' ? `${ frameSize }px` : frameSize
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-content-height',
+			`${ contentHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-inner-height',
+			`${ iframeWindowInnerHeight }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-container-width',
+			`${ containerWidth }px`
+		);
+		iframeDocument.documentElement.style.setProperty(
+			'--wp-block-editor-iframe-zoom-out-prev-container-width',
+			`${ prevContainerWidth.current }px`
+		);
 
-			iframeDocument.body.classList.add( 'is-zoomed-out' );
+		return () => {
+			iframeDocument.documentElement.classList.remove( 'is-zoomed-out' );
 
-			iframeDocument.documentElement.style.transform = `scale( ${ _scale } )`;
-			iframeDocument.documentElement.style.marginTop = `${ frameSize }px`;
-			// TODO: `marginBottom` doesn't work in Firefox. We need another way to do this.
-			iframeDocument.documentElement.style.marginBottom = `${ bottomFrameSize }px`;
-			if ( iframeWindowInnerHeight > contentHeight * _scale ) {
-				iframeDocument.body.style.minHeight = `${ Math.floor(
-					( iframeWindowInnerHeight - 2 * frameSize ) / _scale
-				) }px`;
-			}
-
-			return () => {
-				iframeDocument.body.classList.remove( 'is-zoomed-out' );
-				iframeDocument.documentElement.style.transform = '';
-				iframeDocument.documentElement.style.marginTop = '';
-				iframeDocument.documentElement.style.marginBottom = '';
-				iframeDocument.body.style.minHeight = '';
-			};
-		}
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-scale'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-frame-size'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-content-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-inner-height'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-container-width'
+			);
+			iframeDocument.documentElement.style.removeProperty(
+				'--wp-block-editor-iframe-zoom-out-prev-container-width'
+			);
+		};
 	}, [
 		scale,
 		frameSize,
 		iframeDocument,
-		contentHeight,
 		iframeWindowInnerHeight,
-		contentWidth,
+		contentHeight,
+		containerWidth,
+		windowInnerWidth,
+		isZoomedOut,
 	] );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
 	const shouldRenderFocusCaptureElements = tabIndex >= 0 && ! isPreviewMode;
 
-	return (
+	const iframe = (
 		<>
 			{ shouldRenderFocusCaptureElements && before }
 			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
@@ -359,7 +404,15 @@ function Iframe( {
 						event.currentTarget.ownerDocument !==
 						event.target.ownerDocument
 					) {
+						// We should only stop propagation of the React event,
+						// the native event should further bubble inside the
+						// iframe to the document and window.
+						// Alternatively, we could consider redispatching the
+						// native event in the iframe.
+						const { stopPropagation } = event.nativeEvent;
+						event.nativeEvent.stopPropagation = () => {};
 						event.stopPropagation();
+						event.nativeEvent.stopPropagation = stopPropagation;
 						bubbleEvent(
 							event,
 							window.KeyboardEvent,
@@ -375,7 +428,7 @@ function Iframe( {
 						/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
 						<body
 							ref={ bodyRef }
-							className={ classnames(
+							className={ clsx(
 								'block-editor-iframe__body',
 								'editor-styles-wrapper',
 								...bodyClasses
@@ -391,6 +444,26 @@ function Iframe( {
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
 		</>
+	);
+
+	return (
+		<div className="block-editor-iframe__container" ref={ windowResizeRef }>
+			{ containerResizeListener }
+			<div
+				className={ clsx(
+					'block-editor-iframe__scale-container',
+					isZoomedOut && 'is-zoomed-out'
+				) }
+				style={ {
+					'--wp-block-editor-iframe-zoom-out-container-width':
+						isZoomedOut && `${ containerWidth }px`,
+					'--wp-block-editor-iframe-zoom-out-prev-container-width':
+						isZoomedOut && `${ prevContainerWidth.current }px`,
+				} }
+			>
+				{ iframe }
+			</div>
+		</div>
 	);
 }
 

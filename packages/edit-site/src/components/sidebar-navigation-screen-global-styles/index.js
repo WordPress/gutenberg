@@ -5,10 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { edit, seen } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	__experimentalNavigatorButton as NavigatorButton,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
@@ -48,13 +45,7 @@ export function SidebarNavigationItemGlobalStyles( props ) {
 		[]
 	);
 	if ( hasGlobalStyleVariations ) {
-		return (
-			<NavigatorButton
-				{ ...props }
-				as={ SidebarNavigationItem }
-				path="/wp_global_styles"
-			/>
-		);
+		return <SidebarNavigationItem { ...props } path="/wp_global_styles" />;
 	}
 	return (
 		<SidebarNavigationItem
@@ -112,7 +103,7 @@ function SidebarNavigationScreenGlobalStylesContent() {
 	);
 }
 
-export default function SidebarNavigationScreenGlobalStyles() {
+export default function SidebarNavigationScreenGlobalStyles( { backPath } ) {
 	const { revisions, isLoading: isLoadingRevisions } =
 		useGlobalStylesRevisions();
 	const { openGeneralSidebar } = useDispatch( editSiteStore );
@@ -188,6 +179,7 @@ export default function SidebarNavigationScreenGlobalStyles() {
 				description={ __(
 					'Choose a different style combination for the theme styles.'
 				) }
+				backPath={ backPath }
 				content={ <SidebarNavigationScreenGlobalStylesContent /> }
 				footer={
 					shouldShowGlobalStylesFooter && (

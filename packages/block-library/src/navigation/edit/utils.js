@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -91,7 +91,7 @@ export function getColors( context, isSubMenu ) {
 
 export function getNavigationChildBlockProps( innerBlocksColors ) {
 	return {
-		className: classnames( 'wp-block-navigation__submenu-container', {
+		className: clsx( 'wp-block-navigation__submenu-container', {
 			'has-text-color': !! (
 				innerBlocksColors.textColor || innerBlocksColors.customTextColor
 			),

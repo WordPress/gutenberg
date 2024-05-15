@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -75,7 +75,7 @@ const EditWithGeneratedProps = ( props ) => {
 	const generatedClassName = hasBlockSupport( blockType, 'className', true )
 		? getBlockDefaultClassName( name )
 		: null;
-	const className = classnames(
+	const className = clsx(
 		generatedClassName,
 		attributes.className,
 		props.className

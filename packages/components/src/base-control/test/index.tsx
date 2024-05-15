@@ -31,7 +31,7 @@ describe( 'BaseControl', () => {
 		).toBeInTheDocument();
 	} );
 
-	it( 'should render help as aria-details when not plain text', () => {
+	it( 'should still render help as aria-describedby when not plain text', () => {
 		render(
 			<MyBaseControl
 				label="Text"
@@ -44,10 +44,10 @@ describe( 'BaseControl', () => {
 			name: 'My help text',
 		} );
 
-		expect( textarea ).toHaveAttribute( 'aria-details' );
+		expect( textarea ).toHaveAttribute( 'aria-describedby' );
 		expect(
 			// eslint-disable-next-line testing-library/no-node-access
-			help.closest( `#${ textarea.getAttribute( 'aria-details' ) }` )
+			help.closest( `#${ textarea.getAttribute( 'aria-describedby' ) }` )
 		).toBeVisible();
 	} );
 } );
