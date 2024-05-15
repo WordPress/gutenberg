@@ -17,6 +17,7 @@ import { __unstableSerializeAndClean } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 function useStartPatterns() {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
@@ -115,14 +116,15 @@ export default function StartPageOptions() {
 			isEditedPostEmpty,
 			getCurrentPostType,
 			getCurrentPostId,
-			getEditorSettings,
 		} = select( editorStore );
-		const { __unstableIsPreviewMode: isPreviewMode } = getEditorSettings();
+		const _postType = getCurrentPostType();
 
 		return {
 			shouldEnableModal:
-				! isPreviewMode && ! isEditedPostDirty() && isEditedPostEmpty(),
-			postType: getCurrentPostType(),
+				! isEditedPostDirty() &&
+				isEditedPostEmpty() &&
+				TEMPLATE_POST_TYPE !== _postType,
+			postType: _postType,
 			postId: getCurrentPostId(),
 		};
 	}, [] );
