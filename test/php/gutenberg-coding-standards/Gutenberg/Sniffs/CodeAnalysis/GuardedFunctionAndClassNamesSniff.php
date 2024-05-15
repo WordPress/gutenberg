@@ -50,7 +50,10 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	public function register() {
 		$this->on_register_event();
 
-		return array( T_FUNCTION, T_CLASS );
+		return array_merge(
+			array( T_FUNCTION, T_CLASS ),
+			Tokens::$includeTokens
+		);
 	}
 
 	/**
@@ -66,6 +69,14 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 		$tokens = $phpcsFile->getTokens();
 		$token  = $tokens[ $stackPtr ];
 
+		$ds               = DIRECTORY_SEPARATOR;
+		$is_load_php_file = str_ends_with( $phpcsFile->getFilename(), 'gutenberg' . $ds . 'lib' . $ds . 'load.php' );
+
+		if ( in_array( $token['code'], Tokens::$includeTokens, true ) && $is_load_php_file ) {
+			$this->process_load_php_file_include_token( $phpcsFile, $stackPtr );
+			return;
+		}
+
 		if ( 'T_FUNCTION' === $token['type'] ) {
 			$this->process_function_token( $phpcsFile, $stackPtr );
 			return;
@@ -73,13 +84,6 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 
 		if ( 'T_CLASS' === $token['type'] ) {
 			$this->process_class_token( $phpcsFile, $stackPtr );
-		}
-
-		$ds               = DIRECTORY_SEPARATOR;
-		$is_load_php_file = str_ends_with( $phpcsFile->getFilename(), 'gutenberg' . $ds . 'lib' . $ds . 'load.php' );
-
-		if ( in_array( Tokens::$includeTokens, $token['code'], true ) && $is_load_php_file ) {
-			$this->process_load_php_file_include_token( $phpcsFile, $stackPtr );
 		}
 	}
 
@@ -200,6 +204,7 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	public function process_load_php_file_include_token( File $phpcs_file, $stack_pointer ) {
 		$tokens = $phpcs_file->getTokens();
 		$token  = $tokens[ $stack_pointer ];
+		$a = 5;
 	}
 
 	/**

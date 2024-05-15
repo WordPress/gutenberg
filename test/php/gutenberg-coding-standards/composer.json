@@ -21,7 +21,8 @@
 		"ext-tokenizer": "*",
 		"ext-xmlreader": "*",
 		"squizlabs/php_codesniffer": "^3.7.2",
-		"phpcsstandards/phpcsutils": "^1.0.8"
+		"phpcsstandards/phpcsutils": "^1.0.8",
+		"yoast/phpunit-polyfills": "^1.0"
 	},
 	"require-dev": {
 		"phpcompatibility/php-compatibility": "^9.0",
