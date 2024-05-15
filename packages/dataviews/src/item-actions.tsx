@@ -30,14 +30,10 @@ const {
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-interface ButtonTriggerProps< Item extends AnyItem > {
+export interface ActionTriggerProps< Item extends AnyItem > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
-}
-
-interface DropdownMenuItemTriggerProps< Item extends AnyItem > {
-	action: Action< Item >;
-	onClick: MouseEventHandler;
+	isBusy?: boolean;
 }
 
 interface ActionModalProps< Item extends AnyItem > {
@@ -48,9 +44,7 @@ interface ActionModalProps< Item extends AnyItem > {
 
 interface ActionWithModalProps< Item extends AnyItem >
 	extends ActionModalProps< Item > {
-	ActionTrigger: (
-		props: ButtonTriggerProps< Item > | DropdownMenuItemTriggerProps< Item >
-	) => ReactElement;
+	ActionTrigger: ( props: ActionTriggerProps< Item > ) => ReactElement;
 	isBusy?: boolean;
 }
 
@@ -73,7 +67,7 @@ interface CompactItemActionsProps< Item extends AnyItem > {
 function ButtonTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
-}: ButtonTriggerProps< Item > ) {
+}: ActionTriggerProps< Item > ) {
 	return (
 		<Button
 			label={ action.label }
@@ -88,7 +82,7 @@ function ButtonTrigger< Item extends AnyItem >( {
 function DropdownMenuItemTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
-}: DropdownMenuItemTriggerProps< Item > ) {
+}: ActionTriggerProps< Item > ) {
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
