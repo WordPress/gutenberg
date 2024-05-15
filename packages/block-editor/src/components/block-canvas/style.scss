@@ -2,11 +2,9 @@ iframe[name="editor-canvas"] {
 	width: 100%;
 	height: 100%;
 	display: block;
+	background-color: $gray-300;
 }
 
-iframe[name="editor-canvas"]:not(.has-editor-padding) {
-	background-color: $white;
-}
 
 iframe[name="editor-canvas"].has-editor-padding {
 	padding: $grid-unit-30 $grid-unit-30 0;

@@ -252,10 +252,11 @@ function InlineLinkUI( {
 	return (
 		<Popover
 			anchor={ popoverAnchor }
+			animate={ false }
 			onClose={ stopAddingLink }
 			onFocusOutside={ onFocusOutside }
 			placement="bottom"
-			offset={ 10 }
+			offset={ 8 }
 			shift
 			focusOnMount={ focusOnMount }
 			constrainTabbing

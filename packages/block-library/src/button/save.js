@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -42,7 +42,7 @@ export default function save( { attributes, className } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
-	const buttonClasses = classnames(
+	const buttonClasses = clsx(
 		'wp-block-button__link',
 		colorProps.className,
 		borderProps.className,
@@ -65,7 +65,7 @@ export default function save( { attributes, className } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
-	const wrapperClasses = classnames( className, {
+	const wrapperClasses = clsx( className, {
 		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
 		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );

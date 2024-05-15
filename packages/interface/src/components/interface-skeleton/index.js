@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,14 +10,22 @@ import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	__unstableUseNavigateRegions as useNavigateRegions,
 	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useReducedMotion,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import NavigableRegion from '../navigable-region';
+
+const ANIMATION_DURATION = 0.25;
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -62,8 +70,16 @@ function InterfaceSkeleton(
 	},
 	ref
 ) {
+	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
+		useResizeObserver();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const disableMotion = useReducedMotion();
+	const defaultTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
 	const navigateRegionsProps = useNavigateRegions( shortcuts );
-
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -90,7 +106,7 @@ function InterfaceSkeleton(
 				ref,
 				enableRegionNavigation ? navigateRegionsProps.ref : undefined,
 			] ) }
-			className={ classnames(
+			className={ clsx(
 				className,
 				'interface-interface-skeleton',
 				navigateRegionsProps.className,
@@ -134,14 +150,40 @@ function InterfaceSkeleton(
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
-					{ !! secondarySidebar && (
-						<NavigableRegion
-							className="interface-interface-skeleton__secondary-sidebar"
-							ariaLabel={ mergedLabels.secondarySidebar }
-						>
-							{ secondarySidebar }
-						</NavigableRegion>
-					) }
+					<AnimatePresence initial={ false }>
+						{ !! secondarySidebar && (
+							<NavigableRegion
+								className="interface-interface-skeleton__secondary-sidebar"
+								ariaLabel={ mergedLabels.secondarySidebar }
+								as={ motion.div }
+								initial="closed"
+								animate={
+									isMobileViewport ? 'mobileOpen' : 'open'
+								}
+								exit="closed"
+								variants={ {
+									open: { width: secondarySidebarSize.width },
+									closed: { width: 0 },
+									mobileOpen: { width: '100vw' },
+								} }
+								transition={ defaultTransition }
+							>
+								<div
+									style={ {
+										position: 'absolute',
+										width: isMobileViewport
+											? '100vw'
+											: 'fit-content',
+										height: '100%',
+										right: 0,
+									} }
+								>
+									{ secondarySidebarResizeListener }
+									{ secondarySidebar }
+								</div>
+							</NavigableRegion>
+						) }
+					</AnimatePresence>
 					{ !! notices && (
 						<div className="interface-interface-skeleton__notices">
 							{ notices }

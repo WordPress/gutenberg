@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Controller } from '@react-spring/web';
+import { Controller, easings } from '@react-spring/web';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ function getAbsolutePosition( element ) {
 	};
 }
 
-const ANIMATION_DURATION = 250;
+const ANIMATION_DURATION = 400;
 
 /**
  * Hook used to compute the styles required to move a div into a new position.
@@ -65,7 +65,10 @@ function useMovingAnimation( { triggerAnimationOnChange } ) {
 			y: 0,
 			width: prevRect.width,
 			height: prevRect.height,
-			config: { duration: ANIMATION_DURATION },
+			config: {
+				duration: ANIMATION_DURATION,
+				easing: easings.easeInOutQuint,
+			},
 			onChange( { value } ) {
 				if ( ! ref.current ) {
 					return;

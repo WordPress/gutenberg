@@ -39,6 +39,7 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
+const EMPTY_ARRAY = [];
 const getCurrentValue = ( filterDefinition, currentFilter ) => {
 	if ( filterDefinition.singleSelection ) {
 		return currentFilter?.value;
@@ -52,7 +53,7 @@ const getCurrentValue = ( filterDefinition, currentFilter ) => {
 		return [ currentFilter.value ];
 	}
 
-	return [];
+	return EMPTY_ARRAY;
 };
 
 const getNewValue = ( filterDefinition, currentFilter, value ) => {
@@ -198,7 +199,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	}, [ filter.elements, deferredSearchValue ] );
 	return (
 		<Ariakit.ComboboxProvider
-			value={ searchValue }
+			resetValueOnSelect={ false }
 			selectedValue={ currentValue }
 			setSelectedValue={ ( value ) => {
 				const newFilters = currentFilter

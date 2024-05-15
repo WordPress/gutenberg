@@ -3,18 +3,31 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Component handles the keyboard shortcuts for the editor.
+ *
+ * It provides functionality for various keyboard shortcuts such as toggling editor mode,
+ * toggling distraction-free mode, undo/redo, saving the post, toggling list view,
+ * and toggling the sidebar.
+ */
 export default function EditorKeyboardShortcuts() {
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =
 			select( editorStore ).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
+	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const { getActiveComplementaryArea } = useSelect( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
 	const {
 		redo,
 		undo,
@@ -83,6 +96,25 @@ export default function EditorKeyboardShortcuts() {
 		if ( ! isListViewOpened() ) {
 			event.preventDefault();
 			setIsListViewOpened( true );
+		}
+	} );
+
+	useShortcut( 'core/editor/toggle-sidebar', ( event ) => {
+		// This shortcut has no known clashes, but use preventDefault to prevent any
+		// obscure shortcuts from triggering.
+		event.preventDefault();
+		const isEditorSidebarOpened = [
+			'edit-post/document',
+			'edit-post/block',
+		].includes( getActiveComplementaryArea( 'core' ) );
+
+		if ( isEditorSidebarOpened ) {
+			disableComplementaryArea( 'core' );
+		} else {
+			const sidebarToOpen = getBlockSelectionStart()
+				? 'edit-post/block'
+				: 'edit-post/document';
+			enableComplementaryArea( 'core', sidebarToOpen );
 		}
 	} );
 

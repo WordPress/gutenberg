@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import type { ChangeEvent } from 'react';
+import type { ChangeEvent, ForwardedRef } from 'react';
 import { css } from '@emotion/react';
 
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -41,15 +42,18 @@ import { space } from '../utils/space';
  * };
  * ```
  */
-export function ToggleControl( {
-	__nextHasNoMarginBottom,
-	label,
-	checked,
-	help,
-	className,
-	onChange,
-	disabled,
-}: WordPressComponentProps< ToggleControlProps, 'input', false > ) {
+export function ToggleControl(
+	{
+		__nextHasNoMarginBottom,
+		label,
+		checked,
+		help,
+		className,
+		onChange,
+		disabled,
+	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
+	ref: ForwardedRef< HTMLInputElement >
+) {
 	function onChangeToggle( event: ChangeEvent< HTMLInputElement > ) {
 		onChange( event.target.checked );
 	}
@@ -94,6 +98,7 @@ export function ToggleControl( {
 					onChange={ onChangeToggle }
 					aria-describedby={ describedBy }
 					disabled={ disabled }
+					ref={ ref }
 				/>
 				<FlexBlock
 					as="label"
@@ -107,4 +112,4 @@ export function ToggleControl( {
 	);
 }
 
-export default ToggleControl;
+export default forwardRef( ToggleControl );

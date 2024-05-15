@@ -18,17 +18,12 @@ const POPOVER_PROPS = {
 /**
  * Internal dependencies
  */
-import {
-	isPreviewingTheme,
-	currentlyPreviewingTheme,
-} from '../../utils/is-previewing-theme';
 import { unlock } from '../../lock-unlock';
-import { getPathFromURL } from '../sync-state-with-url/use-sync-path-with-url';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export default function LeafMoreMenu( props ) {
-	const location = useLocation();
+	const { params } = useLocation();
 	const history = useHistory();
 	const { block } = props;
 	const { clientId } = block;
@@ -69,12 +64,9 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: attributes.type,
 						postId: attributes.id,
-						...( isPreviewingTheme() && {
-							wp_theme_preview: currentlyPreviewingTheme(),
-						} ),
 					},
 					{
-						backPath: getPathFromURL( location.params ),
+						backPath: params,
 					}
 				);
 			}
@@ -83,17 +75,14 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: 'page',
 						postId: attributes.id,
-						...( isPreviewingTheme() && {
-							wp_theme_preview: currentlyPreviewingTheme(),
-						} ),
 					},
 					{
-						backPath: getPathFromURL( location.params ),
+						backPath: params,
 					}
 				);
 			}
 		},
-		[ history ]
+		[ history, params ]
 	);
 
 	return (

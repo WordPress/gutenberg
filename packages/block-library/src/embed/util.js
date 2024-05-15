@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 import memoize from 'memize';
 
 /**
@@ -97,7 +97,9 @@ export const createUpgradedEmbedBlock = (
 	const { preview, attributes = {} } = props;
 	const { url, providerNameSlug, type, ...restAttributes } = attributes;
 
-	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
+	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) {
+		return;
+	}
 
 	const matchedBlock = findMoreSuitableBlock( url );
 
@@ -175,17 +177,21 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
 	if ( ! existingClassNames ) {
 		// Avoids extraneous work and also, by returning the same value as
 		// received, ensures the post is not dirtied by a change of the block
-		// attribute from `undefined` to an emtpy string.
+		// attribute from `undefined` to an empty string.
 		return existingClassNames;
 	}
 	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
 		( accumulator, { className } ) => {
-			accumulator[ className ] = false;
+			accumulator.push( className );
 			return accumulator;
 		},
-		{ 'wp-has-aspect-ratio': false }
+		[ 'wp-has-aspect-ratio' ]
 	);
-	return classnames( existingClassNames, aspectRatioClassNames );
+	let outputClassNames = existingClassNames;
+	for ( const className of aspectRatioClassNames ) {
+		outputClassNames = outputClassNames.replace( className, '' );
+	}
+	return outputClassNames.trim();
 };
 
 /**
@@ -228,7 +234,7 @@ export function getClassNames(
 					return removeAspectRatioClasses( existingClassNames );
 				}
 				// Close aspect ratio match found.
-				return classnames(
+				return clsx(
 					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
 					'wp-has-aspect-ratio'

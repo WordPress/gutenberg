@@ -17,13 +17,11 @@ test.describe( 'Post visibility', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
-			await page.click(
-				'role=button[name="Select visibility: Public"i]'
+			const postStatusButton = page.locator(
+				'.editor-post-status-trigger'
 			);
-
-			await page.click( 'role=radio[name="Private"i]' );
-
-			await page.click( 'role=button[name="OK"i]' );
+			await postStatusButton.click();
+			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
 			const currentStatus = await page.evaluate( () => {
 				return window.wp.data
@@ -32,41 +30,6 @@ test.describe( 'Post visibility', () => {
 			} );
 
 			expect( currentStatus ).toBe( 'private' );
-		} );
-
-		test( `can be canceled when the viewport is ${ viewport }`, async ( {
-			page,
-			pageUtils,
-			admin,
-			editor,
-		} ) => {
-			await pageUtils.setBrowserViewport( viewport );
-
-			await admin.createNewPost();
-
-			await editor.openDocumentSettingsSidebar();
-
-			const initialStatus = await page.evaluate( () => {
-				return window.wp.data
-					.select( 'core/editor' )
-					.getEditedPostAttribute( 'status' );
-			} );
-
-			await page.click(
-				'role=button[name="Select visibility: Public"i]'
-			);
-
-			await page.click( 'role=radio[name="Private"i]' );
-
-			await page.click( 'role=button[name="Cancel"i]' );
-
-			const currentStatus = await page.evaluate( () => {
-				return window.wp.data
-					.select( 'core/editor' )
-					.getEditedPostAttribute( 'status' );
-			} );
-
-			expect( initialStatus ).toBe( currentStatus );
 		} );
 	} );
 
@@ -95,11 +58,16 @@ test.describe( 'Post visibility', () => {
 				name: 'Close',
 			} )
 			.click();
-		await page.click( 'role=button[name="Select visibility: Public"i]' );
-
-		await page.click( 'role=radio[name="Private"i]' );
-
-		await page.click( 'role=button[name="OK"i]' );
+		const postStatusButton = page.locator( '.editor-post-status-trigger' );
+		await postStatusButton.click();
+		await page.getByRole( 'radio', { name: 'Private' } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Save',
+				exact: true,
+			} )
+			.click();
 
 		const currentStatus = await page.evaluate( () => {
 			return window.wp.data

@@ -6,6 +6,7 @@ import { h } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
+import { warn } from './utils/warn';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -50,7 +51,9 @@ export function toVdom( root ) {
 	function walk( node ) {
 		const { attributes, nodeType, localName } = node;
 
-		if ( nodeType === 3 ) return [ node.data ];
+		if ( nodeType === 3 ) {
+			return [ node.data ];
+		}
 		if ( nodeType === 4 ) {
 			const next = treeWalker.nextSibling();
 			node.replaceWith( new window.Text( node.nodeValue ) );
@@ -100,7 +103,7 @@ export function toVdom( root ) {
 			props[ n ] = attributes[ i ].value;
 		}
 
-		if ( ignore && ! island )
+		if ( ignore && ! island ) {
 			return [
 				h( localName, {
 					...props,
@@ -108,14 +111,23 @@ export function toVdom( root ) {
 					__directives: { ignore: true },
 				} ),
 			];
-		if ( island ) hydratedIslands.add( node );
+		}
+		if ( island ) {
+			hydratedIslands.add( node );
+		}
 
 		if ( directives.length ) {
 			props.__directives = directives.reduce(
 				( obj, [ name, ns, value ] ) => {
-					const [ , prefix, suffix = 'default' ] =
-						directiveParser.exec( name );
-					if ( ! obj[ prefix ] ) obj[ prefix ] = [];
+					const directiveMatch = directiveParser.exec( name );
+					if ( directiveMatch === null ) {
+						warn( `Invalid directive: ${ name }.` );
+						return obj;
+					}
+					const prefix = directiveMatch[ 1 ] || '';
+					const suffix = directiveMatch[ 2 ] || 'default';
+
+					obj[ prefix ] = obj[ prefix ] || [];
 					obj[ prefix ].push( {
 						namespace: ns ?? currentNamespace(),
 						value,
@@ -136,7 +148,9 @@ export function toVdom( root ) {
 			if ( child ) {
 				while ( child ) {
 					const [ vnode, nextChild ] = walk( child );
-					if ( vnode ) children.push( vnode );
+					if ( vnode ) {
+						children.push( vnode );
+					}
 					child = nextChild || treeWalker.nextSibling();
 				}
 				treeWalker.parentNode();
@@ -144,7 +158,9 @@ export function toVdom( root ) {
 		}
 
 		// Restore previous namespace.
-		if ( island ) namespaces.pop();
+		if ( island ) {
+			namespaces.pop();
+		}
 
 		return [ h( localName, props, children ) ];
 	}
