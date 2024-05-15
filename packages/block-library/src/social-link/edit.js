@@ -198,7 +198,7 @@ const SocialLinkEdit = ( {
 					<SocialLinkURLPopover
 						url={ url }
 						setAttributes={ setAttributes }
-						setPopover={ setPopoverAnchor }
+						onClose={ setShowPopover }
 						popoverAnchor={ popoverAnchor }
 						clientId={ clientId }
 					/>
