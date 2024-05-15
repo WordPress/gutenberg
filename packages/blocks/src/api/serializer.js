@@ -323,8 +323,16 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
-	const [ correctBlockName, correctedAttributes ] =
-		convertAliasBlockNameAndAttributes( rawBlockName, attributes );
+	const variation = attributes?.metadata?.variation;
+
+	const correctBlockName = variation
+		? `${ rawBlockName }/${ variation }`
+		: rawBlockName;
+	const correctedAttributes = { ...attributes };
+
+	if ( variation ) {
+		delete correctedAttributes.metadata.variation;
+	}
 
 	const serializedAttributes =
 		correctedAttributes && Object.entries( correctedAttributes ).length
