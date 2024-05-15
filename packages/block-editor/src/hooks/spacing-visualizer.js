@@ -7,6 +7,7 @@ import {
 	useLayoutEffect,
 	useEffect,
 	useReducer,
+	memo,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -77,7 +78,11 @@ function getComputedCSS( element, property ) {
 		.getPropertyValue( property );
 }
 
-export function MarginVisualizer( { clientId, value, forceShow } ) {
+export const MarginVisualizer = memo( function ( {
+	clientId,
+	value,
+	forceShow,
+} ) {
 	return (
 		<SpacingVisualizer
 			clientId={ clientId }
@@ -101,9 +106,13 @@ export function MarginVisualizer( { clientId, value, forceShow } ) {
 			forceShow={ forceShow }
 		/>
 	);
-}
+} );
 
-export function PaddingVisualizer( { clientId, value, forceShow } ) {
+export const PaddingVisualizer = memo( function ( {
+	clientId,
+	value,
+	forceShow,
+} ) {
 	return (
 		<SpacingVisualizer
 			clientId={ clientId }
@@ -123,4 +132,4 @@ export function PaddingVisualizer( { clientId, value, forceShow } ) {
 			forceShow={ forceShow }
 		/>
 	);
-}
+} );

@@ -6,7 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	Platform,
+	useState,
+	useEffect,
+	useCallback,
+	useDeferredValue,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -75,6 +81,7 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 			select( blockEditorStore ).getBlockAttributes( clientId )?.style,
 		[ clientId ]
 	);
+	const deferredValue = useDeferredValue( value );
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const onChange = ( newStyle ) => {
 		setAttributes( {
@@ -114,14 +121,14 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 				<PaddingVisualizer
 					forceShow={ visualizedProperty === 'padding' }
 					clientId={ clientId }
-					value={ value }
+					value={ deferredValue }
 				/>
 			) }
 			{ !! settings?.spacing?.margin && (
 				<MarginVisualizer
 					forceShow={ visualizedProperty === 'margin' }
 					clientId={ clientId }
-					value={ value }
+					value={ deferredValue }
 				/>
 			) }
 		</>
