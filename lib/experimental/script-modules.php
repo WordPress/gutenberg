@@ -255,36 +255,24 @@ function gutenberg_print_script_module_data(): void {
 			 *   - JSON_HEX_TAG: All < and > are converted to \u003C and \u003E.
 			 *   - JSON_UNESCAPED_SLASHES: Don't escape /.
 			 *
+			 * If the page will use UTF-8 encoding, it's safe to print unescaped unicode:
+			 *
+			 *   - JSON_UNESCAPED_UNICODE: Encode multibyte Unicode characters literally (instead of as `\uXXXX`).
+			 *   - JSON_UNESCAPED_LINE_TERMINATORS: The line terminators are kept unescaped when
+			 *     JSON_UNESCAPED_UNICODE is supplied. It uses the same behaviour as it was
+			 *     before PHP 7.1 without this constant. Available as of PHP 7.1.0.
+			 *
+			 * The JSON specification requires encoding in UTF-8, so if the generated HTML page
+			 * is not encoded in UTF-8 then it's not safe to include those literals. They must
+			 * be escaped to avoid encoding issues.
+			 *
+			 * @see https://www.rfc-editor.org/rfc/rfc8259.html for details on encoding requirements.
 			 * @see https://www.php.net/manual/en/json.constants.php for details on these constants.
-			 * @see https://html.spec.whatwg.org/#script-data-state for details on script
-			 *      tag parsing.
+			 * @see https://html.spec.whatwg.org/#script-data-state for details on script tag parsing.
 			 */
-			$json_encode_flags = JSON_HEX_TAG | JSON_UNESCAPED_SLASHES;
-			if ( 'UTF-8' === get_option( 'blog_charset' ) ) {
-				/*
-				 * If the page will use UTF-8 encoding, it's safe to print unescaped unicode in
-				 * JSON. Set the following flags:
-				 *
-				 * - JSON_UNESCAPED_UNICODE: Encode multibyte Unicode characters literally
-				 *   (default is to escape as \uXXXX).
-				 * - JSON_UNESCAPED_LINE_TERMINATORS: The line terminators are kept unescaped when
-				 *   JSON_UNESCAPED_UNICODE is supplied. It uses the same behaviour as it was
-				 *   before PHP 7.1 without this constant. Available as of PHP 7.1.0.
-				 *
-				 * The JSON specification does not specify a character encoding, RFC-8259
-				 * suggests that UTF-8 be used everywhere. It's risky to print unicode if the page
-				 * uses any other encoding.
-				 *
-				 * > JSON text exchanged between systems that are not part of a closed ecosystem
-				 * > MUST be encoded using UTF-8. Previous specifications of JSON have not required
-				 * > the use of UTF-8 when transmitting JSON text.  However, the vast majority of
-				 * > JSON- based software implementations have chosen to use the UTF-8 encoding,
-				 * > to the extent that it is the only encoding that achieves interoperability.
-				 *
-				 * @see https://www.rfc-editor.org/rfc/rfc8259.html
-				 *
-				 */
-				$json_encode_flags |= JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS;
+			$json_encode_flags = JSON_HEX_TAG | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_LINE_TERMINATORS;
+			if ( 'UTF-8' !== get_option( 'blog_charset' ) ) {
+				$json_encode_flags = JSON_HEX_TAG | JSON_UNESCAPED_SLASHES;
 			}
 
 			wp_print_inline_script_tag(
