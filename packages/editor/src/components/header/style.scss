@@ -43,6 +43,7 @@
 	flex-grow: 1;
 	display: flex;
 	justify-content: center;
+	min-width: 0;
 
 	&.is-collapsed {
 		display: none;
