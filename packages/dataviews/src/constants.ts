@@ -46,7 +46,8 @@ export const OPERATORS = {
 	},
 };
 
-export type SORTING_DIRECTION = 'asc' | 'desc';
+export const SORTING_DIRECTIONS = [ 'asc', 'desc' ] as const;
+export type SORTING_DIRECTION = ( typeof SORTING_DIRECTIONS )[ number ];
 
 // This shouldn't live in the constants file, I know.
 export function sortingDirectionLabel( direction: SORTING_DIRECTION ) {

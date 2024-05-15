@@ -34,7 +34,7 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
-import { type SORTING_DIRECTION, sortingDirectionLabel } from './constants';
+import { SORTING_DIRECTIONS, sortingDirectionLabel } from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -159,45 +159,41 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 			<WithDropDownMenuSeparators>
 				{ isSortable && (
 					<DropdownMenuGroup>
-						{ ( [ 'asc', 'desc' ] as const ).map(
-							( direction: SORTING_DIRECTION ) => {
-								const isChecked =
-									view.sort &&
-									isSorted &&
-									view.sort.direction === direction;
+						{ SORTING_DIRECTIONS.map( ( direction ) => {
+							const isChecked =
+								view.sort &&
+								isSorted &&
+								view.sort.direction === direction;
 
-								const value = `${ field.id }-${ direction }`;
+							const value = `${ field.id }-${ direction }`;
 
-								return (
-									<DropdownMenuRadioItem
-										key={ value }
-										// All sorting radio items share the same name, so that
-										// selecting a sorting option automatically deselects the
-										// previously selected one, even if it is displayed in
-										// another submenu. The field and direction are passed via
-										// the `value` prop.
-										name="view-table-sorting"
-										value={ value }
-										checked={ isChecked }
-										onChange={ () => {
-											onChangeView( {
-												...view,
-												sort: {
-													field: field.id,
-													direction,
-												},
-											} );
-										} }
-									>
-										<DropdownMenuItemLabel>
-											{ sortingDirectionLabel(
-												direction
-											) }
-										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
-								);
-							}
-						) }
+							return (
+								<DropdownMenuRadioItem
+									key={ value }
+									// All sorting radio items share the same name, so that
+									// selecting a sorting option automatically deselects the
+									// previously selected one, even if it is displayed in
+									// another submenu. The field and direction are passed via
+									// the `value` prop.
+									name="view-table-sorting"
+									value={ value }
+									checked={ isChecked }
+									onChange={ () => {
+										onChangeView( {
+											...view,
+											sort: {
+												field: field.id,
+												direction,
+											},
+										} );
+									} }
+								>
+									<DropdownMenuItemLabel>
+										{ sortingDirectionLabel( direction ) }
+									</DropdownMenuItemLabel>
+								</DropdownMenuRadioItem>
+							);
+						} ) }
 					</DropdownMenuGroup>
 				) }
 				{ canAddFilter && (
