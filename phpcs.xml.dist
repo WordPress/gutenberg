@@ -43,7 +43,7 @@
 	<arg name="cache" value=".cache/phpcs.json"/>
 
 	<!-- Check up to 20 files simultaneously. -->
-	<arg name="parallel" value="1"/>
+	<arg name="parallel" value="20"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
