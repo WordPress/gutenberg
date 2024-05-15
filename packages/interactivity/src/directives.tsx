@@ -4,7 +4,7 @@
 /**
  * External dependencies
  */
-import { type RefObject } from 'preact';
+import { h as createElement, type RefObject } from 'preact';
 import { useContext, useMemo, useRef } from 'preact/hooks';
 import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 
@@ -231,6 +231,7 @@ export default () => {
 	// data-wp-context
 	directive(
 		'context',
+		// @ts-ignore-next-line
 		( {
 			directives: { context },
 			props: { children },
@@ -260,7 +261,7 @@ export default () => {
 				return proxifyContext( currentValue.current, inheritedValue );
 			}, [ defaultEntry, inheritedValue ] );
 
-			return <Provider value={ contextStack }>{ children }</Provider>;
+			return createElement( Provider, { value: contextStack }, children );
 		},
 		{ priority: 5 }
 	);
@@ -481,12 +482,10 @@ export default () => {
 		} ) => {
 			// Preserve the initial inner HTML.
 			const cached = useMemo( () => innerHTML, [] );
-			return (
-				<Type
-					dangerouslySetInnerHTML={ { __html: cached } }
-					{ ...rest }
-				/>
-			);
+			return createElement( Type, {
+				dangerouslySetInnerHTML: { __html: cached },
+				...rest,
+			} );
 		}
 	);
 
@@ -549,10 +548,10 @@ export default () => {
 					? getEvaluate( { scope } )( eachKey[ 0 ] )
 					: item;
 
-				return (
-					<Provider value={ mergedContext } key={ key }>
-						{ element.props.content }
-					</Provider>
+				return createElement(
+					Provider,
+					{ value: mergedContext, key },
+					element.props.content
 				);
 			} );
 		},
