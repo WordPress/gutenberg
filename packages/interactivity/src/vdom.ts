@@ -1,19 +1,17 @@
 /**
  * External dependencies
  */
-import { h, type VNode, type JSX } from 'preact';
+import { h } from 'preact';
 /**
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
 import { warn } from './utils/warn';
 
-type TreeWalkerReturn = string | Node | VNode< any > | null;
-
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
-const namespaces: Array< string > = [];
+const namespaces = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
 
 // Regular expression for directive parsing.
@@ -41,49 +39,35 @@ export const hydratedIslands = new WeakSet();
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  *
- * @param root The root element or node to start traversing on.
- * @return The resulting vDOM tree.
+ * @param {Node} root The root element or node to start traversing on.
+ * @return {import('preact').VNode[]} The resulting vDOM tree.
  */
-export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
+export function toVdom( root ) {
 	const treeWalker = document.createTreeWalker(
 		root,
 		205 // ELEMENT + TEXT + COMMENT + CDATA_SECTION + PROCESSING_INSTRUCTION
 	);
 
-	function walk( node: Node ): [ string | VNode | null, Node | null ] {
-		const { nodeType } = node;
+	function walk( node ) {
+		const { attributes, nodeType, localName } = node;
 
-		// TEXT_NODE (3)
 		if ( nodeType === 3 ) {
-			return [ ( node as Text ).data, null ];
+			return [ node.data ];
 		}
-
-		// CDATA_SECTION_NODE (4)
 		if ( nodeType === 4 ) {
 			const next = treeWalker.nextSibling();
-			( node as CDATASection ).replaceWith(
-				new window.Text( ( node as CDATASection ).nodeValue ?? '' )
-			);
+			node.replaceWith( new window.Text( node.nodeValue ) );
 			return [ node.nodeValue, next ];
 		}
-
-		// COMMENT_NODE (8) || PROCESSING_INSTRUCTION_NODE (7)
 		if ( nodeType === 8 || nodeType === 7 ) {
 			const next = treeWalker.nextSibling();
-			( node as Comment | ProcessingInstruction ).remove();
+			node.remove();
 			return [ null, next ];
 		}
 
-		const elementNode = node as HTMLElement;
-
-		const attributes = elementNode.attributes;
-		const localName = elementNode.localName as keyof JSX.IntrinsicElements;
-
 		const props: Record< string, any > = {};
-		const children: Array< TreeWalkerReturn > = [];
-		const directives: Array<
-			[ name: string, namespace: string | null, value: unknown ]
-		> = [];
+		const children = [];
+		const directives = [];
 		let ignore = false;
 		let island = false;
 
@@ -100,14 +84,14 @@ export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 						.exec( attributes[ i ].value )
 						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
 					try {
-						value = JSON.parse( value as string );
+						value = JSON.parse( value );
 					} catch ( e ) {}
 					if ( n === islandAttr ) {
 						island = true;
 						namespaces.push(
 							typeof value === 'string'
 								? value
-								: ( value as any )?.namespace ?? null
+								: value?.namespace ?? null
 						);
 					} else {
 						directives.push( [ n, ns, value ] );
@@ -121,16 +105,15 @@ export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 
 		if ( ignore && ! island ) {
 			return [
-				h< any, any >( localName, {
+				h( localName, {
 					...props,
-					innerHTML: elementNode.innerHTML,
+					innerHTML: node.innerHTML,
 					__directives: { ignore: true },
 				} ),
-				null,
 			];
 		}
 		if ( island ) {
-			hydratedIslands.add( elementNode );
+			hydratedIslands.add( node );
 		}
 
 		if ( directives.length ) {
@@ -156,11 +139,10 @@ export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 			);
 		}
 
-		// @ts-expect-error Fixed in upcoming preact release https://github.com/preactjs/preact/pull/4334
 		if ( localName === 'template' ) {
-			props.content = [
-				...( elementNode as HTMLTemplateElement ).content.childNodes,
-			].map( ( childNode ) => toVdom( childNode ) );
+			props.content = [ ...node.content.childNodes ].map( ( childNode ) =>
+				toVdom( childNode )
+			);
 		} else {
 			let child = treeWalker.firstChild();
 			if ( child ) {
@@ -180,7 +162,7 @@ export function toVdom( root: Node ): [ string | VNode | null, Node | null ] {
 			namespaces.pop();
 		}
 
-		return [ h( localName, props, children ), null ];
+		return [ h( localName, props, children ) ];
 	}
 
 	return walk( treeWalker.currentNode );
