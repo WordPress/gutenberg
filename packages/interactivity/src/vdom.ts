@@ -32,7 +32,7 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^([\w-_\/]+)::(.+)$/;
+const nsPathRegExp = /^(?:(?<namespace>[\w_\/-]+)::)(?<value>.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -95,25 +95,27 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const [ ns, value ] = nsPathRegExp
-						.exec( attributes[ i ].value )
-						?.slice( 1 ) ?? [ null, attributes[ i ].value ];
-					let parsedValue: Record< string, unknown > | null = null;
+					const regexResult = nsPathRegExp.exec(
+						attributes[ i ].value
+					)?.groups;
+					const namespace = regexResult?.nameSpace ?? null;
+					let value: any =
+						regexResult?.value ?? attributes[ i ].value;
 					try {
-						parsedValue = value ? JSON.parse( value ) : null;
+						value = value && JSON.parse( value );
 					} catch ( e ) {}
 					if ( attributeName === islandAttr ) {
 						island = true;
-						const namespace =
+						const islandNamespace =
 							// eslint-disable-next-line no-nested-ternary
-							typeof parsedValue?.namespace === 'string'
-								? parsedValue.namespace
-								: typeof value === 'string'
+							typeof value === 'string'
 								? value
+								: typeof value?.namespace === 'string'
+								? value.namespace
 								: null;
-						namespaces.push( namespace );
+						namespaces.push( islandNamespace );
 					} else {
-						directives.push( [ attributeName, ns, value ] );
+						directives.push( [ attributeName, namespace, value ] );
 					}
 				}
 			} else if ( attributeName === 'ref' ) {
