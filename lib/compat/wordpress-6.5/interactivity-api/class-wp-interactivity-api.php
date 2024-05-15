@@ -131,21 +131,20 @@ if ( ! class_exists( 'WP_Interactivity_API' ) ) {
 		}
 
 		/**
-		 * Prints the serialized client-side interactivity data.
+		 * Adds interactivity data to filtered data to be passed to the client.
 		 *
-		 * Encodes the config and initial state into JSON and prints them inside a
-		 * script tag of type "application/json". Once in the browser, the state will
-		 * be parsed and used to hydrate the client-side interactivity stores and the
-		 * configuration will be available using a `getConfig` utility.
+		 * Once in the browser, the state will be parsed and used to hydrate the client-side
+		 * interactivity stores and the configuration will be available using a `getConfig` utility.
 		 *
 		 * @since 6.5.0
+		 *
+		 * @param array $interactivity_data Interactivity data.
+		 * @return array $interactivity_data Interactivity data with store data added (if it exists).
 		 */
-		public function print_client_interactivity_data() {
+		public function print_client_interactivity_data( $interactivity_data ) {
 			if ( empty( $this->state_data ) && empty( $this->config_data ) ) {
-				return;
+				return $interactivity_data;
 			}
-
-			$interactivity_data = array();
 
 			$config = array();
 			foreach ( $this->config_data as $key => $value ) {
