@@ -32,5 +32,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"scripts": {
+		"build": "webpack --config webpack.config.js"
 	}
 }
