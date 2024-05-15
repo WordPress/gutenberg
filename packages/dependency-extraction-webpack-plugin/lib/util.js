@@ -42,6 +42,9 @@ function defaultRequestToExternal( request ) {
 
 		case 'react-dom':
 			return 'ReactDOM';
+
+		case 'react/jsx-runtime':
+			return 'ReactJSXRuntime';
 	}
 
 	if ( request.includes( 'react-refresh/runtime' ) ) {
@@ -117,6 +120,9 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react/jsx-runtime':
+			return 'react-jsx-runtime';
 	}
 
 	if ( request.includes( 'react-refresh/runtime' ) ) {

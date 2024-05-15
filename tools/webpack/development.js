@@ -46,4 +46,22 @@ module.exports = [
 			} ),
 		],
 	},
+	{
+		...sharedConfig,
+		name: 'react-jsx-runtime',
+		entry: {
+			'react-jsx-runtime': {
+				import: 'react/jsx-runtime',
+				library: {
+					name: 'ReactJSXRuntime',
+					type: 'window',
+				},
+			},
+		},
+		plugins: [
+			new DependencyExtractionWebpackPlugin( {
+				useDefaults: false,
+			} ),
+		],
+	},
 ];
