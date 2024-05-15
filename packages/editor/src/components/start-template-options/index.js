@@ -3,19 +3,18 @@
  */
 import { Modal, Flex, FlexItem, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useAsyncList } from '@wordpress/compose';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../store';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 function useFallbackTemplateContent( slug, isCustom = false ) {
 	return useSelect(
@@ -38,10 +37,10 @@ function useFallbackTemplateContent( slug, isCustom = false ) {
 
 function useStartPatterns( fallbackContent ) {
 	const { slug, patterns } = useSelect( ( select ) => {
-		const { getEditedPostType, getEditedPostId } = select( editSiteStore );
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 		const { getEntityRecord, getBlockPatterns } = select( coreStore );
-		const postId = getEditedPostId();
-		const postType = getEditedPostType();
+		const postId = getCurrentPostId();
+		const postType = getCurrentPostType();
 		const record = getEntityRecord( 'postType', postType, postId );
 		return {
 			slug: record.slug,
@@ -132,14 +131,14 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 	}
 	return (
 		<Modal
-			className="edit-site-start-template-options__modal"
+			className="editor-start-template-options__modal"
 			title={ __( 'Choose a pattern' ) }
 			closeLabel={ __( 'Cancel' ) }
 			focusOnMount="firstElement"
 			onRequestClose={ onClose }
 			isFullScreen
 		>
-			<div className="edit-site-start-template-options__modal-content">
+			<div className="editor-start-template-options__modal-content">
 				<PatternSelection
 					fallbackContent={ fallbackContent }
 					slug={ slug }
@@ -151,7 +150,7 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 				/>
 			</div>
 			<Flex
-				className="edit-site-start-template-options__modal__actions"
+				className="editor-start-template-options__modal__actions"
 				justify="flex-end"
 				expanded={ false }
 			>
@@ -165,56 +164,47 @@ function StartModal( { slug, isCustom, onClose, postType } ) {
 	);
 }
 
-const START_TEMPLATE_MODAL_STATES = {
-	INITIAL: 'INITIAL',
-	CLOSED: 'CLOSED',
-};
-
 export default function StartTemplateOptions() {
-	const [ modalState, setModalState ] = useState(
-		START_TEMPLATE_MODAL_STATES.INITIAL
-	);
-	const { shouldOpenModal, slug, isCustom, postType } = useSelect(
+	const [ isClosed, setIsClosed ] = useState( false );
+	const { shouldOpenModal, slug, isCustom, postType, postId } = useSelect(
 		( select ) => {
-			const { getEditedPostType, getEditedPostId } =
-				select( editSiteStore );
-			const _postType = getEditedPostType();
-			const postId = getEditedPostId();
+			const { getCurrentPostType, getCurrentPostId } =
+				select( editorStore );
+			const _postType = getCurrentPostType();
+			const _postId = getCurrentPostId();
 			const { getEditedEntityRecord, hasEditsForEntityRecord } =
 				select( coreStore );
 			const templateRecord = getEditedEntityRecord(
 				'postType',
 				_postType,
-				postId
+				_postId
 			);
 			const hasEdits = hasEditsForEntityRecord(
 				'postType',
 				_postType,
-				postId
+				_postId
 			);
 
 			return {
 				shouldOpenModal:
 					! hasEdits &&
 					'' === templateRecord.content &&
-					TEMPLATE_POST_TYPE === _postType &&
-					! select( preferencesStore ).get(
-						'core/edit-site',
-						'welcomeGuide'
-					),
+					TEMPLATE_POST_TYPE === _postType,
 				slug: templateRecord.slug,
 				isCustom: templateRecord.is_custom,
 				postType: _postType,
+				postId: _postId,
 			};
 		},
 		[]
 	);
 
-	if (
-		( modalState === START_TEMPLATE_MODAL_STATES.INITIAL &&
-			! shouldOpenModal ) ||
-		modalState === START_TEMPLATE_MODAL_STATES.CLOSED
-	) {
+	useEffect( () => {
+		// Should reset the modal state when navigating to a new page/post.
+		setIsClosed( false );
+	}, [ postType, postId ] );
+
+	if ( ! shouldOpenModal || isClosed ) {
 		return null;
 	}
 
@@ -223,9 +213,7 @@ export default function StartTemplateOptions() {
 			slug={ slug }
 			isCustom={ isCustom }
 			postType={ postType }
-			onClose={ () =>
-				setModalState( START_TEMPLATE_MODAL_STATES.CLOSED )
-			}
+			onClose={ () => setIsClosed( true ) }
 		/>
 	);
 }

@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { grid, list, edit, rss } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { prependHTTP } from '@wordpress/url';
 import ServerSideRender from '@wordpress/server-side-render';
 
@@ -106,13 +106,13 @@ export default function RSSEdit( { attributes, setAttributes } ) {
 		},
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'list' } ),
 			isActive: blockLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'grid' } ),
 			isActive: blockLayout === 'grid',
 		},
