@@ -121,6 +121,19 @@ export function curateResults(
 			.filter( ( [ _, value ] ) => value !== undefined )
 	);
 }
+
+function formatValue( metric: string, value: number ) {
+	if ( 'wpMemoryUsage' === metric ) {
+		return `${ ( value / Math.pow( 10, 6 ) ).toFixed( 2 ) } MB`;
+	}
+
+	if ( 'wpDbQueries' === metric ) {
+		return value.toString();
+	}
+
+	return `${ value } ms`;
+}
+
 class PerformanceReporter implements Reporter {
 	private results: Record< string, WPPerformanceResults >;
 
@@ -180,13 +193,16 @@ class PerformanceReporter implements Reporter {
 		for ( const [ testSuite, results ] of Object.entries( this.results ) ) {
 			const printableResults: Record< string, { value: string } > = {};
 
-			for ( const [ key, value ] of Object.entries( results ) ) {
-				const p = round( value.q75 - value.q50 );
-				const pp = round( 100 * ( p / value.q50 ) );
-				const m = round( value.q50 - value.q25 );
-				const mp = round( 100 * ( m / value.q50 ) );
-				printableResults[ key ] = {
-					value: `${ value.q50 } ±${ p }/${ m } ms (±${ pp }/${ mp }%) (${ value.cnt })`,
+			for ( const [ metric, value ] of Object.entries( results ) ) {
+				const valueStr = formatValue( metric, value.q50 );
+				const pp = round(
+					( 100 * ( value.q75 - value.q50 ) ) / value.q50
+				);
+				const mp = round(
+					( 100 * ( value.q50 - value.q25 ) ) / value.q50
+				);
+				printableResults[ metric ] = {
+					value: `${ valueStr } +${ pp }% -${ mp }%`,
 				};
 			}
 
