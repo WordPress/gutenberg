@@ -3,21 +3,39 @@
  */
 import type { ReactElement, ReactNode } from 'react';
 
-interface Option {
-	value: any;
+export type SortDirection = 'asc' | 'desc';
+
+/**
+ * Generic option type.
+ */
+interface Option< Value extends any = any > {
+	value: Value;
 	label: string;
 }
 
-interface filterByConfig {
+interface FilterByConfig {
+	/**
+	 * The list of operators supported by the field.
+	 */
 	operators?: Operator[];
+
+	/**
+	 * Whether it is a primary filter.
+	 *
+	 * A primary filter is always visible and is not listed in the "Add filter" component,
+	 * except for the list layout where it behaves like a secondary filter.
+	 */
 	isPrimary?: boolean;
 }
 
 type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
 
-export type Item = Record< string, any >;
+export type AnyItem = Record< string, any >;
 
-export interface Field {
+/**
+ * A dataview field for a specific property of a data type.
+ */
+export interface Field< Item extends AnyItem > {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -32,58 +50,67 @@ export interface Field {
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
 	 */
-	getValue?: ( { item }: { item: Item } ) => any;
+	getValue?: ( args: { item: Item } ) => any;
 
 	/**
 	 * Callback used to render the field. Defaults to `field.getValue`.
 	 */
-	render?: ( { item }: { item: Item } ) => ReactNode;
+	render?: ( args: { item: Item } ) => ReactNode;
 
 	/**
 	 * The width of the field column.
 	 */
-	width: string | number | undefined;
+	width?: string | number;
 
 	/**
 	 * The minimum width of the field column.
 	 */
-	maxWidth: string | number | undefined;
+	maxWidth?: string | number;
 
 	/**
 	 * The maximum width of the field column.
 	 */
-	minWidth: string | number | undefined;
+	minWidth?: string | number;
 
 	/**
 	 * Whether the field is sortable.
 	 */
-	enableSorting: boolean | undefined;
+	enableSorting?: boolean;
 
 	/**
 	 * Whether the field is searchable.
 	 */
-	enableGlobalSearch: boolean | undefined;
+	enableGlobalSearch?: boolean;
 
 	/**
 	 * Whether the field is filterable.
 	 */
-	enableHiding: boolean | undefined;
+	enableHiding?: boolean;
 
 	/**
 	 * The list of options to pick from when using the field as a filter.
 	 */
-	elements: Option[] | undefined;
+	elements?: Option[];
 
 	/**
 	 * Filter config for the field.
 	 */
-	filterBy: filterByConfig | undefined;
+	filterBy?: FilterByConfig | undefined;
 }
 
-export type NormalizedField = Required< Field >;
+export type NormalizedField< Item extends AnyItem > = Field< Item > &
+	Required< Pick< Field< Item >, 'header' | 'getValue' | 'render' > >;
 
-export type Data = Item[];
+/**
+ * A collection of dataview fields for a data type.
+ */
+export type Fields< Item extends AnyItem > = Field< Item >[];
 
+export type Data< Item extends AnyItem > = Item[];
+
+/**
+ * The filters applied to the dataset.
+ */
 export interface Filter {
 	/**
 	 * The field to filter by.
@@ -129,7 +156,7 @@ interface ViewBase {
 		/**
 		 * The direction to sort by.
 		 */
-		direction: string;
+		direction: SortDirection;
 	};
 
 	/**
@@ -147,6 +174,7 @@ interface ViewBase {
 	 */
 	hiddenFields: string[];
 }
+
 export interface ViewList extends ViewBase {
 	type: 'list';
 
@@ -165,7 +193,7 @@ export interface ViewList extends ViewBase {
 
 export type View = ViewList | ViewBase;
 
-interface ActionBase {
+interface ActionBase< Item extends AnyItem > {
 	/**
 	 * The unique identifier of the action.
 	 */
@@ -209,7 +237,8 @@ interface ActionBase {
 	supportsBulk?: boolean;
 }
 
-export interface ActionModal extends ActionBase {
+export interface ActionModal< Item extends AnyItem >
+	extends ActionBase< Item > {
 	/**
 	 * The callback to execute when the action has finished.
 	 */
@@ -246,11 +275,14 @@ export interface ActionModal extends ActionBase {
 	modalHeader?: string;
 }
 
-export interface ActionButton extends ActionBase {
+export interface ActionButton< Item extends AnyItem >
+	extends ActionBase< AnyItem > {
 	/**
 	 * The callback to execute when the action is triggered.
 	 */
 	callback: ( items: Item[] ) => void;
 }
 
-export type Action = ActionModal | ActionButton;
+export type Action< Item extends AnyItem > =
+	| ActionModal< Item >
+	| ActionButton< Item >;
