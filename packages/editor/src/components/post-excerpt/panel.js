@@ -181,47 +181,46 @@ function PrivateExcerpt() {
 		? __( 'Edit description' )
 		: __( 'Edit excerpt' );
 	return (
-		<Dropdown
-			className="editor-post-excerpt__dropdown"
-			contentClassName="editor-post-excerpt__dropdown__content"
-			popoverProps={ popoverProps }
-			focusOnMount
-			ref={ setPopoverAnchor }
-			renderToggle={ ( { onToggle } ) => (
-				<Button
-					className="editor-post-excerpt__dropdown__trigger"
-					onClick={ onToggle }
-					label={
-						!! excerptText ? triggerEditLabel : excerptPlaceholder
-					}
-					showTooltip={ !! excerptText }
-					variant="link"
-				>
-					{ excerptText || excerptPlaceholder }
-				</Button>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<>
-					<InspectorPopoverHeader
-						title={ label }
-						onClose={ onClose }
-					/>
+		<VStack>
+			{ excerptText }
+			<Dropdown
+				className="editor-post-excerpt__dropdown"
+				contentClassName="editor-post-excerpt__dropdown__content"
+				popoverProps={ popoverProps }
+				focusOnMount
+				ref={ setPopoverAnchor }
+				renderToggle={ ( { onToggle } ) => (
+					<Button
+						className="editor-post-excerpt__dropdown__trigger"
+						onClick={ onToggle }
+						variant="link"
+					>
+						{ excerptText ? triggerEditLabel : excerptPlaceholder }
+					</Button>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<>
+						<InspectorPopoverHeader
+							title={ label }
+							onClose={ onClose }
+						/>
 
-					<VStack spacing={ 4 }>
-						<PluginPostExcerpt.Slot>
-							{ ( fills ) => (
-								<>
-									<PostExcerptForm
-										hideLabelFromVision
-										updateOnBlur
-									/>
-									{ fills }
-								</>
-							) }
-						</PluginPostExcerpt.Slot>
-					</VStack>
-				</>
-			) }
-		/>
+						<VStack spacing={ 4 }>
+							<PluginPostExcerpt.Slot>
+								{ ( fills ) => (
+									<>
+										<PostExcerptForm
+											hideLabelFromVision
+											updateOnBlur
+										/>
+										{ fills }
+									</>
+								) }
+							</PluginPostExcerpt.Slot>
+						</VStack>
+					</>
+				) }
+			/>
+		</VStack>
 	);
 }
