@@ -590,6 +590,14 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array( 'react' ),
 		'18'
 	);
+
+	gutenberg_override_script(
+		$scripts,
+		'react-jsx-runtime',
+		gutenberg_url( 'build/react-jsx-runtime/index.min.js' ),
+		array(),
+		'18'
+	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
