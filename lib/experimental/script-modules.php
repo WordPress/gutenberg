@@ -215,7 +215,7 @@ function gutenberg_print_script_module_data(): void {
 	}
 
 	foreach ( array_keys( $modules ) as $module_id ) {
-		$data = apply_filters( 'scriptmoduledata_' . $module_id, array() );
+		$data = apply_filters( "scriptmoduledata_{$module_id}", array() );
 		if ( ! empty( $data ) ) {
 			/*
 			 * This data will be printed as JSON inside a script tag like this:
