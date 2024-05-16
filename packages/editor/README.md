@@ -1138,7 +1138,15 @@ _Returns_
 
 ### PostURL
 
-Undocumented declaration.
+Renders the Post URL.
+
+_Parameters_
+
+-   _onClose_ `Function`: Callback function to be executed when the popover is closed.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostURLCheck
 
