@@ -32,7 +32,7 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^(?<namespace>[\w_\/-]+)::(?<value>.+)$/;
+const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -88,6 +88,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 
 		for ( let i = 0; i < attributes.length; i++ ) {
 			const attributeName = attributes[ i ].name;
+			const attributeValue = attributes[ i ].value;
 			if (
 				attributeName[ fullPrefix.length ] &&
 				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
@@ -95,12 +96,9 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const regexCaptureGroups = nsPathRegExp.exec(
-						attributes[ i ].value
-					)?.groups;
-					const namespace = regexCaptureGroups?.namespace ?? null;
-					let value: any =
-						regexCaptureGroups?.value ?? attributes[ i ].value;
+					const regexResult = nsPathRegExp.exec( attributeValue );
+					const namespace = regexResult?.[ 1 ] ?? null;
+					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
 						value = value && JSON.parse( value );
 					} catch ( e ) {}
@@ -121,7 +119,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributes[ i ].value;
+			props[ attributeName ] = attributeValue;
 		}
 
 		if ( ignore && ! island ) {
