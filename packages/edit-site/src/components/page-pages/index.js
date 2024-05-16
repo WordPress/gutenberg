@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { dateI18n, getDate, getSettings } from '@wordpress/date';
+import { dateI18n, getDate, getSettings, isInTheFuture } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
@@ -37,6 +37,12 @@ import { useEditPostAction } from '../dataviews-actions';
 const { usePostActions } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const EMPTY_ARRAY = [];
+
+const getFormattedDate = ( dateToDisplay ) =>
+	dateI18n(
+		getSettings().formats.datetimeAbbreviated,
+		getDate( dateToDisplay )
+	);
 
 function useView( postType ) {
 	const { params } = useLocation();
@@ -328,20 +334,23 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					const isModified =
 						getDate( item.date ) < getDate( item.modified );
-					const dateToDisplay = isModified
-						? item.modified
-						: item.date;
-
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( dateToDisplay )
-					);
-
 					if ( isModified ) {
 						return (
 							<p>
 								{ __( 'Modified: ' ) }
-								<time>{ formattedDate }</time>
+								<time>
+									{ getFormattedDate( item.modified ) }
+								</time>
+							</p>
+						);
+					}
+
+					const isScheduled = isInTheFuture( item.date );
+					if ( isScheduled ) {
+						return (
+							<p>
+								{ __( 'Scheduled: ' ) }
+								<time>{ getFormattedDate( item.date ) }</time>
 							</p>
 						);
 					}
@@ -349,7 +358,7 @@ export default function PagePages() {
 					return (
 						<p>
 							{ __( 'Published: ' ) }
-							<time>{ formattedDate }</time>
+							<time>{ getFormattedDate( item.date ) }</time>
 						</p>
 					);
 				},
