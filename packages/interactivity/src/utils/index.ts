@@ -21,7 +21,7 @@ import {
 	getNamespace,
 	setNamespace,
 	resetNamespace,
-} from './hooks';
+} from '../hooks';
 
 interface Flusher {
 	readonly flush: () => void;
