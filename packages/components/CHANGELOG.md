@@ -17,6 +17,7 @@
 -   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
 -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
 -   `Placeholder`: Tweak placeholder style ([#61590](https://github.com/WordPress/gutenberg/pull/61590)).
+-   `Combobox`: Introduce Combobox expandOnFocus property ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
 
 ### Bug Fix
 
