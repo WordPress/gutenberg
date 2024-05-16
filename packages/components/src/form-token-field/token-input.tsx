@@ -27,6 +27,7 @@ export function UnForwardedTokenInput(
 		className,
 		onChange,
 		onFocus,
+		onClick,
 		onBlur,
 		...restProps
 	} = props;
@@ -53,6 +54,10 @@ export function UnForwardedTokenInput(
 		onBlur?.( e );
 	};
 
+	const onClickHandler: any = ( event: any ) => {
+		onClick?.( event );
+	};
+
 	return (
 		<input
 			ref={ ref }
@@ -62,6 +67,7 @@ export function UnForwardedTokenInput(
 			value={ value || '' }
 			onChange={ onChangeHandler }
 			onFocus={ onFocusHandler }
+			onClick={ onClickHandler }
 			onBlur={ onBlurHandler }
 			size={ size }
 			className={ clsx(
