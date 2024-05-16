@@ -53,7 +53,7 @@ export default function DocumentBar() {
 	const {
 		postType,
 		documentTitle,
-		isResolving,
+		isNotFound,
 		isUnsyncedPattern,
 		templateIcon,
 		templateTitle,
@@ -78,12 +78,14 @@ export default function DocumentBar() {
 		return {
 			postType: _postType,
 			documentTitle: _document.title,
-			isResolving: isResolvingSelector(
-				'getEditedEntityRecord',
-				'postType',
-				_postType,
-				_postId
-			),
+			isNotFound:
+				! _document &&
+				! isResolvingSelector(
+					'getEditedEntityRecord',
+					'postType',
+					_postType,
+					_postId
+				),
 			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
 			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
@@ -100,7 +102,6 @@ export default function DocumentBar() {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const isNotFound = ! documentTitle && ! isResolving;
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
