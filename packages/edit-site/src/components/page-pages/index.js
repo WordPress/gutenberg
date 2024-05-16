@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -300,23 +300,6 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
-					let suffix = '';
-					if ( item.id === frontPageId ) {
-						suffix = (
-							<span className="edit-site-page-pages__title-badge">
-								{ __( 'Front Page' ) }
-							</span>
-						);
-					}
-
-					if ( item.id === postsPageId ) {
-						suffix = (
-							<span className="edit-site-page-pages__title-badge">
-								{ __( 'Posts Page' ) }
-							</span>
-						);
-					}
-
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 						item.status !== 'trash';
@@ -330,17 +313,33 @@ export default function PagePages() {
 						>
 							{ decodeEntities( item.title?.rendered ) ||
 								__( '(no title)' ) }
-							{ suffix }
 						</Link>
 					) : (
-						<>
-							{ decodeEntities( item.title?.rendered ) ||
-								__( '(no title)' ) }
-							{ suffix }
-						</>
+						decodeEntities( item.title?.rendered ) ||
+						__( '(no title)' )
 					);
 
-					return title;
+					let suffix = '';
+					if ( item.id === frontPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Front Page' ) }
+							</span>
+						);
+					} else if ( item.id === postsPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Posts Page' ) }
+							</span>
+						);
+					}
+
+					return (
+						<HStack justify="stretch">
+							{ title }
+							{ suffix }
+						</HStack>
+					);
 				},
 				maxWidth: 300,
 				enableHiding: false,
