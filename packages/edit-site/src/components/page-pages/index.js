@@ -332,31 +332,14 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
-					const isDraftOrPrivate = [ 'draft', 'private' ].some(
-						( status ) => status === item.status
+					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
+						item.status
 					);
 					if ( isDraftOrPrivate ) {
 						return (
 							<>
 								{ __( 'Modified: ' ) }
 								<time>{ getFormattedDate( item.date ) }</time>
-							</>
-						);
-					}
-
-					const isPending = item.status === 'pending';
-					if ( isPending ) {
-						const isModified =
-							getDate( item.modified ) > getDate( item.date );
-						const dateToDisplay = isModified
-							? item.modified
-							: item.date;
-						return (
-							<>
-								{ __( 'Modified: ' ) }
-								<time>
-									{ getFormattedDate( dateToDisplay ) }
-								</time>
 							</>
 						);
 					}
@@ -371,13 +354,26 @@ export default function PagePages() {
 						);
 					}
 
-					const isPublished = item.status === 'publish';
-					if ( isPublished ) {
-						const isModified =
-							getDate( item.modified ) > getDate( item.modified );
-						const dateToDisplay = isModified
+					// Pending & Published posts show the modified date if it's newer.
+					const dateToDisplay =
+						getDate( item.modified ) > getDate( item.date )
 							? item.modified
 							: item.date;
+
+					const isPending = item.status === 'pending';
+					if ( isPending ) {
+						return (
+							<>
+								{ __( 'Modified: ' ) }
+								<time>
+									{ getFormattedDate( dateToDisplay ) }
+								</time>
+							</>
+						);
+					}
+
+					const isPublished = item.status === 'publish';
+					if ( isPublished ) {
 						return (
 							<>
 								{ __( 'Published: ' ) }
