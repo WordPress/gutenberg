@@ -85,62 +85,60 @@ export default function DataViews( {
 	);
 	return (
 		<div className="dataviews-wrapper">
-			<div className="dataviews-records">
+			<HStack
+				alignment="top"
+				justify="start"
+				className="dataviews-filters__view-actions"
+			>
 				<HStack
-					alignment="top"
 					justify="start"
-					className="dataviews-filters__view-actions"
+					className="dataviews-filters__container"
+					wrap
 				>
-					<HStack
-						justify="start"
-						className="dataviews-filters__container"
-						wrap
-					>
-						{ search && (
-							<Search
-								label={ searchLabel }
-								view={ view }
-								onChangeView={ onChangeView }
-							/>
-						) }
-						<Filters
-							fields={ _fields }
+					{ search && (
+						<Search
+							label={ searchLabel }
 							view={ view }
 							onChangeView={ onChangeView }
-							openedFilter={ openedFilter }
-							setOpenedFilter={ setOpenedFilter }
 						/>
-					</HStack>
-					{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
-						hasPossibleBulkAction && (
-							<BulkActions
-								actions={ actions }
-								data={ data }
-								onSelectionChange={ onSetSelection }
-								selection={ selection }
-								getItemId={ getItemId }
-							/>
-						) }
-					<ViewActions
+					) }
+					<Filters
 						fields={ _fields }
 						view={ view }
 						onChangeView={ onChangeView }
-						supportedLayouts={ supportedLayouts }
+						openedFilter={ openedFilter }
+						setOpenedFilter={ setOpenedFilter }
 					/>
 				</HStack>
-				<ViewComponent
-					actions={ actions }
-					data={ data }
+				{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+					hasPossibleBulkAction && (
+						<BulkActions
+							actions={ actions }
+							data={ data }
+							onSelectionChange={ onSetSelection }
+							selection={ selection }
+							getItemId={ getItemId }
+						/>
+					) }
+				<ViewActions
 					fields={ _fields }
-					getItemId={ getItemId }
-					isLoading={ isLoading }
-					onChangeView={ onChangeView }
-					onSelectionChange={ onSetSelection }
-					selection={ selection }
-					setOpenedFilter={ setOpenedFilter }
 					view={ view }
+					onChangeView={ onChangeView }
+					supportedLayouts={ supportedLayouts }
 				/>
-			</div>
+			</HStack>
+			<ViewComponent
+				actions={ actions }
+				data={ data }
+				fields={ _fields }
+				getItemId={ getItemId }
+				isLoading={ isLoading }
+				onChangeView={ onChangeView }
+				onSelectionChange={ onSetSelection }
+				selection={ selection }
+				setOpenedFilter={ setOpenedFilter }
+				view={ view }
+			/>
 			<Pagination
 				view={ view }
 				onChangeView={ onChangeView }

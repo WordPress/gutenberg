@@ -3,9 +3,6 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
 }
 
 .dataviews-filters__view-actions {
