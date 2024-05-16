@@ -345,10 +345,11 @@ export default function PagePages() {
 						return createInterpolateElement(
 							sprintf(
 								/* translators: %s: page creation date */
-								__( 'Modified: <time>%s</time>' ),
+								__( '<span>Modified: <time>%s</time></span>' ),
 								getFormattedDate( item.date )
 							),
 							{
+								span: <span />,
 								time: <time />,
 							}
 						);
@@ -359,10 +360,11 @@ export default function PagePages() {
 						return createInterpolateElement(
 							sprintf(
 								/* translators: %s: page creation date */
-								__( 'Scheduled: <time>%s</time>' ),
+								__( '<span>Scheduled: <time>%s</time></span>' ),
 								getFormattedDate( item.date )
 							),
 							{
+								span: <span />,
 								time: <time />,
 							}
 						);
@@ -379,10 +381,11 @@ export default function PagePages() {
 						return createInterpolateElement(
 							sprintf(
 								/* translators: %s: the newest of created or modified date for the page */
-								__( 'Modified: <time>%s</time>' ),
+								__( '<span>Modified: <time>%s</time></span>' ),
 								getFormattedDate( dateToDisplay )
 							),
 							{
+								span: <span />,
 								time: <time />,
 							}
 						);
@@ -393,10 +396,11 @@ export default function PagePages() {
 						return createInterpolateElement(
 							sprintf(
 								/* translators: %s: the newest of created or modified date for the page */
-								__( 'Published: <time>%s</time>' ),
+								__( '<span>Published: <time>%s</time></span>' ),
 								getFormattedDate( dateToDisplay )
 							),
 							{
+								span: <span />,
 								time: <time />,
 							}
 						);
