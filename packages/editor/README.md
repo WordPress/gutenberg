@@ -326,7 +326,19 @@ _Returns_
 
 ### EditorNotices
 
-Undocumented declaration.
+EditorNotices component.
+
+This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
+
+_Usage_
+
+```jsx
+<EditorNotices />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### EditorProvider
 
