@@ -20,7 +20,7 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils/warn';
+import { warn } from './utils';
 interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
