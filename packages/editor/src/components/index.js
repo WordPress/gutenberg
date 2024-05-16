@@ -25,6 +25,7 @@ export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesPanel } from './page-attributes/panel';
 export { default as PageAttributesParent } from './page-attributes/parent';
+export { default as PluginPageAttributesPanel } from './plugin-page-attributes-panel';
 export { default as PageTemplate } from './post-template/classic-theme';
 export { default as PluginDocumentSettingPanel } from './plugin-document-setting-panel';
 export { default as PluginBlockSettingsMenuItem } from './block-settings-menu/plugin-block-settings-menu-item';

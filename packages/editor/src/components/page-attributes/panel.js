@@ -14,6 +14,7 @@ import { store as editorStore } from '../../store';
 import PageAttributesCheck from './check';
 import PageAttributesOrder from './order';
 import PageAttributesParent from './parent';
+import PluginPageAttributesPanel from '../plugin-page-attributes-panel';
 
 const PANEL_NAME = 'page-attributes';
 
@@ -54,6 +55,7 @@ export function PageAttributesPanel() {
 				<PanelRow>
 					<PageAttributesOrder />
 				</PanelRow>
+				<PluginPageAttributesPanel.Slot />
 			</PanelBody>
 		</PageAttributesCheck>
 	);
