@@ -168,8 +168,7 @@ export default function AddNewPattern() {
 							params.categoryId !== 'my-patterns'
 						) {
 							history.push( {
-								path: `/patterns`,
-								categoryType: PATTERN_TYPES.theme,
+								postType: PATTERN_TYPES.theme,
 								categoryId: PATTERN_DEFAULT_CATEGORY,
 							} );
 						}

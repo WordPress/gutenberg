@@ -153,8 +153,6 @@ function useManipulateDocumentCommands() {
 						__( 'Delete template part: %s' ),
 						decodeEntities( template.title )
 				  );
-		const path =
-			template.type === TEMPLATE_POST_TYPE ? '/wp_template' : '/patterns';
 		commands.push( {
 			name: 'core/remove-template',
 			label,
@@ -163,7 +161,7 @@ function useManipulateDocumentCommands() {
 				removeTemplate( template );
 				// Navigate to the template list
 				history.push( {
-					path,
+					postType: template.type,
 				} );
 				close();
 			},

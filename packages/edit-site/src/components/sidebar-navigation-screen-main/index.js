@@ -37,34 +37,39 @@ export default function SidebarNavigationScreenMain() {
 				<>
 					<ItemGroup>
 						<SidebarNavigationItem
-							path="/navigation"
+							uid="navigation-navigation-item"
+							params={ { postType: 'wp_navigation' } }
 							withChevron
 							icon={ navigation }
 						>
 							{ __( 'Navigation' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItemGlobalStyles
+							uid="styles-navigation-item"
 							withChevron
 							icon={ styles }
 						>
 							{ __( 'Styles' ) }
 						</SidebarNavigationItemGlobalStyles>
 						<SidebarNavigationItem
-							path="/page"
+							uid="page-navigation-item"
+							params={ { postType: 'page' } }
 							withChevron
 							icon={ page }
 						>
 							{ __( 'Pages' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItem
-							path="/wp_template"
+							uid="template-navigation-item"
+							params={ { postType: 'wp_template' } }
 							withChevron
 							icon={ layout }
 						>
 							{ __( 'Templates' ) }
 						</SidebarNavigationItem>
 						<SidebarNavigationItem
-							path="/patterns"
+							uid="patterns-navigation-item"
+							params={ { postType: 'wp_block' } }
 							withChevron
 							icon={ symbol }
 						>

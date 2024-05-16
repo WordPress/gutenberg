@@ -26,7 +26,7 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 function AddNewItemModalContent( { type, setIsAdding } ) {
 	const {
-		params: { path },
+		params: { postType },
 	} = useLocation();
 	const history = useHistory();
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -69,7 +69,7 @@ function AddNewItemModalContent( { type, setIsAdding } ) {
 					}
 				);
 				history.push( {
-					path,
+					postType,
 					activeView: savedRecord.id,
 					isCustom: 'true',
 				} );

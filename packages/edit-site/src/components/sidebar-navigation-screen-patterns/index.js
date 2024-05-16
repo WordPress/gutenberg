@@ -31,7 +31,6 @@ import { unlock } from '../../lock-unlock';
 const { useLocation } = unlock( routerPrivateApis );
 
 function CategoriesGroup( {
-	path,
 	templatePartAreas,
 	patternCategories,
 	currentCategory,
@@ -43,7 +42,6 @@ function CategoriesGroup( {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 			<CategoryItem
 				key="all"
-				path={ path }
 				count={ Object.values( templatePartAreas )
 					.map( ( { templateParts } ) => templateParts?.length || 0 )
 					.reduce( ( acc, val ) => acc + val, 0 ) }
@@ -60,7 +58,6 @@ function CategoriesGroup( {
 				( [ area, { label, templateParts } ] ) => (
 					<CategoryItem
 						key={ area }
-						path={ path }
 						count={ templateParts?.length }
 						icon={ getTemplatePartIcon( area ) }
 						label={ label }
@@ -77,12 +74,11 @@ function CategoriesGroup( {
 			{ allPatterns && (
 				<CategoryItem
 					key={ allPatterns.name }
-					path={ path }
 					count={ allPatterns.count }
 					label={ allPatterns.label }
 					icon={ file }
 					id={ allPatterns.name }
-					type="pattern"
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ allPatterns.name }` &&
 						( currentType === PATTERN_TYPES.theme ||
@@ -93,12 +89,11 @@ function CategoriesGroup( {
 			{ otherPatterns.map( ( category ) => (
 				<CategoryItem
 					key={ category.name }
-					path={ path }
 					count={ category.count }
 					label={ category.label }
 					icon={ file }
 					id={ category.name }
-					type="pattern"
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ category.name }` &&
 						( currentType === PATTERN_TYPES.theme ||
@@ -112,10 +107,10 @@ function CategoriesGroup( {
 
 export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		params: { categoryType, categoryId, path },
+		params: { postType, categoryId },
 	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = categoryType || PATTERN_TYPES.theme;
+	const currentType = postType || PATTERN_TYPES.theme;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
@@ -145,7 +140,6 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								</ItemGroup>
 							) }
 							<CategoriesGroup
-								path={ path }
 								templatePartAreas={ templatePartAreas }
 								patternCategories={ patternCategories }
 								currentCategory={ currentCategory }

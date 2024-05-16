@@ -11,11 +11,9 @@ export default function CategoryItem( {
 	isActive,
 	label,
 	type,
-	path = '/patterns',
 } ) {
 	const linkInfo = useLink( {
-		path,
-		categoryType: type,
+		postType: type,
 		categoryId: id,
 	} );
 
