@@ -2,10 +2,16 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -336,21 +342,29 @@ export default function PagePages() {
 						item.status
 					);
 					if ( isDraftOrPrivate ) {
-						return (
-							<>
-								{ __( 'Modified: ' ) }
-								<time>{ getFormattedDate( item.date ) }</time>
-							</>
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation date */
+								__( 'Modified: <time>%s</time>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								time: <time />,
+							}
 						);
 					}
 
 					const isScheduled = item.status === 'future';
 					if ( isScheduled ) {
-						return (
-							<>
-								{ __( 'Scheduled: ' ) }
-								<time>{ getFormattedDate( item.date ) }</time>
-							</>
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation date */
+								__( 'Scheduled: <time>%s</time>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								time: <time />,
+							}
 						);
 					}
 
@@ -362,25 +376,29 @@ export default function PagePages() {
 
 					const isPending = item.status === 'pending';
 					if ( isPending ) {
-						return (
-							<>
-								{ __( 'Modified: ' ) }
-								<time>
-									{ getFormattedDate( dateToDisplay ) }
-								</time>
-							</>
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: the newest of created or modified date for the page */
+								__( 'Modified: <time>%s</time>' ),
+								getFormattedDate( dateToDisplay )
+							),
+							{
+								time: <time />,
+							}
 						);
 					}
 
 					const isPublished = item.status === 'publish';
 					if ( isPublished ) {
-						return (
-							<>
-								{ __( 'Published: ' ) }
-								<time>
-									{ getFormattedDate( dateToDisplay ) }
-								</time>
-							</>
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: the newest of created or modified date for the page */
+								__( 'Published: <time>%s</time>' ),
+								getFormattedDate( dateToDisplay )
+							),
+							{
+								time: <time />,
+							}
 						);
 					}
 
