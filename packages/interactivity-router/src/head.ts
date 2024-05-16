@@ -6,15 +6,15 @@
  */
 export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 	// Helper to get the tag id store in the cache.
-	const getTagId = ( tag ) => tag.id || tag.outerHTML;
+	const getTagId = ( tag: Element ) => tag.id || tag.outerHTML;
 
 	// Map incoming head tags by their content.
-	const newHeadMap = new Map();
+	const newHeadMap = new Map< string, Element >();
 	for ( const child of newHead ) {
 		newHeadMap.set( getTagId( child ), child );
 	}
 
-	const toRemove = [];
+	const toRemove: Element[] = [];
 
 	// Detect nodes that should be added or removed.
 	for ( const child of document.head.children ) {
