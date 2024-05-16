@@ -27,7 +27,11 @@ import type {
 	AnyItem,
 	NormalizedField,
 	ViewGrid as ViewGridType,
+	ViewProps,
 } from './types';
+
+interface ViewGridProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewGridType > {}
 
 interface GridItemProps< Item extends AnyItem > {
 	selection: string[];
@@ -41,17 +45,6 @@ interface GridItemProps< Item extends AnyItem > {
 	visibleFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
 	columnFields: string[];
-}
-
-interface ViewGridProps< Item extends AnyItem > {
-	actions: Action< Item >[];
-	data: Item[];
-	fields: NormalizedField< Item >[];
-	getItemId: ( item: Item ) => string;
-	isLoading: boolean;
-	onSelectionChange: ( items: Item[] ) => void;
-	selection: string[];
-	view: ViewGridType;
 }
 
 function GridItem< Item extends AnyItem >( {

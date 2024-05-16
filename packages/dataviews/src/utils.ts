@@ -8,8 +8,11 @@ import {
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 } from './constants';
+import type { AnyItem, NormalizedField } from './types';
 
-export const sanitizeOperators = ( field ) => {
+export function sanitizeOperators< Item extends AnyItem >(
+	field: NormalizedField< Item >
+) {
 	let operators = field.filterBy?.operators;
 
 	// Assign default values.
@@ -45,4 +48,4 @@ export const sanitizeOperators = ( field ) => {
 	}
 
 	return operators;
-};
+}
