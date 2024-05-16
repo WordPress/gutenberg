@@ -95,10 +95,11 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const attrValue = attributes[ i ].value;
-					const namespaceAndPath = nsPathRegExp.exec( attrValue );
+					const attributeValue = attributes[ i ].value;
+					const namespaceAndPath =
+						nsPathRegExp.exec( attributeValue );
 					const namespace = namespaceAndPath?.[ 1 ] ?? null;
-					let value: any = namespaceAndPath?.[ 2 ] ?? attrValue;
+					let value: any = namespaceAndPath?.[ 2 ] ?? attributeValue;
 					try {
 						value = value && JSON.parse( value );
 					} catch ( e ) {}
