@@ -187,10 +187,10 @@ export default function CustomSelectControl( props ) {
 							items.map( ( item, index ) => (
 								// eslint-disable-next-line react/jsx-key
 								<li
+									key={ item.key }
 									{ ...getItemProps( {
 										item,
 										index,
-										key: item.key,
 										className: clsx(
 											item.className,
 											'components-custom-select-control__item',
