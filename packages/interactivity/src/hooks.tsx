@@ -271,7 +271,7 @@ export const directive = (
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
-			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
+			`Namespace missing for "${ path }". The value for that path won't be resolved.`
 		);
 		return;
 	}
