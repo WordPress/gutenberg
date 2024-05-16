@@ -25,8 +25,7 @@ module.exports = {
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename:
-			'./packages/interactivity/standalone/[name]-standalone.min.js',
+		filename: './packages/interactivity/dist/[name]-standalone.min.js',
 		library: {
 			type: 'module',
 		},

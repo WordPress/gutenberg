@@ -51,5 +51,5 @@ test/gutenberg-test-themes/twentytwentythree
 test/gutenberg-test-themes/twentytwentyfour
 packages/react-native-editor/src/setup-local.js
 
-# Interactivity API
-standalone
+# Interactivity API standalone build
+dist
