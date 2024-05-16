@@ -47,7 +47,12 @@ export const OPERATORS = {
 };
 
 export const SORTING_DIRECTIONS = [ 'asc', 'desc' ] as const;
-export type SORTING_DIRECTION = ( typeof SORTING_DIRECTIONS )[ number ];
+export const sortArrows = { asc: '↑', desc: '↓' };
+export const sortValues = { asc: 'ascending', desc: 'descending' } as const;
+export const sortLabels = {
+	asc: __( 'Sort ascending' ),
+	desc: __( 'Sort descending' ),
+};
 
 // View layouts.
 export const LAYOUT_TABLE = 'table';

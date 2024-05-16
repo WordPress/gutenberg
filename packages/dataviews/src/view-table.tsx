@@ -34,7 +34,12 @@ import SingleSelectionCheckbox from './single-selection-checkbox';
 import { unlock } from './lock-unlock';
 import ItemActions from './item-actions';
 import { sanitizeOperators } from './utils';
-import { SORTING_DIRECTIONS } from './constants';
+import {
+	SORTING_DIRECTIONS,
+	sortArrows,
+	sortLabels,
+	sortValues,
+} from './constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
 	useHasAPossibleBulkAction,
@@ -107,13 +112,6 @@ function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 			</Fragment>
 		) );
 }
-
-const sortArrows = { asc: '↑', desc: '↓' };
-const sortValues = { asc: 'ascending', desc: 'descending' } as const;
-const sortLabels = {
-	asc: __( 'Sort ascending' ),
-	desc: __( 'Sort descending' ),
-};
 
 const _HeaderMenu = forwardRef( function HeaderMenu< Item extends AnyItem >(
 	{
