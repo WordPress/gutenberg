@@ -330,7 +330,12 @@ export default function PagePages() {
 						getSettings().formats.datetimeAbbreviated,
 						getDate( item.date )
 					);
-					return <time>{ formattedDate }</time>;
+					return (
+						<p>
+							{ 'Published: ' }
+							<time>{ formattedDate }</time>
+						</p>
+					);
 				},
 			},
 		],
