@@ -50,7 +50,7 @@ export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
  */
 export const fetchHeadAssets = async (
 	doc: Document,
-	headElements: Map< string, { tag: Element; text: string } >
+	headElements: Map< string, { tag: HTMLElement; text: string } >
 ): Promise< HTMLElement[] > => {
 	const headTags = [];
 	const assets = [
@@ -63,7 +63,9 @@ export const fetchHeadAssets = async (
 	];
 	for ( const asset of assets ) {
 		const { tagName, selector, attribute } = asset;
-		const tags = doc.querySelectorAll( selector );
+		const tags = doc.querySelectorAll<
+			HTMLScriptElement | HTMLStyleElement
+		>( selector );
 
 		// Use Promise.all to wait for fetch to complete
 		await Promise.all(
