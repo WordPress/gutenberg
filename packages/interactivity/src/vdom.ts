@@ -6,7 +6,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
-import { warn } from './utils/warn';
+import { warn } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
