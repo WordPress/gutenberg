@@ -966,7 +966,13 @@ Undocumented declaration.
 
 ### PostFormat
 
-Undocumented declaration.
+`PostFormat` is a React component that provides a dropdown selector for post formats. It fetches the current post format, suggested post format, and supported formats from the store. It filters the post formats based on the supported formats and the current post format. It also provides a suggestion for the post format if it's different from the current post format.
+
+_Usage_
+
+```jsx
+<PostFormat />
+```
 
 ### PostFormatCheck
 
