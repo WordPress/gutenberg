@@ -1,5 +1,6 @@
 /*
- * THIS FILE IS USED ONLY FOR BUILDING THE INTERACTIVITY PACKAGE FOR CDN.
+ * THIS FILE IS USED ONLY FOR BUILDING THE STANDALONE VERSION OF THE
+ * INTERACTIVITY PACKAGE FOR USE ON A CDN OR IN A NON-WP ENVIRONMENT.
  */
 
 /**
@@ -14,7 +15,7 @@ const { baseConfig } = require( '../../tools/webpack/shared' );
 
 module.exports = {
 	...baseConfig,
-	name: 'interactivity-cdn',
+	name: 'interactivity-standalone',
 	entry: {
 		index: './src/index',
 		debug: './src/debug',
@@ -24,7 +25,8 @@ module.exports = {
 	},
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './packages/interactivity/build-cdn/[name]-standalone.min.js',
+		filename:
+			'./packages/interactivity/standalone/[name]-standalone.min.js',
 		library: {
 			type: 'module',
 		},

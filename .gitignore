@@ -52,4 +52,4 @@ test/gutenberg-test-themes/twentytwentyfour
 packages/react-native-editor/src/setup-local.js
 
 # Interactivity API
-build-cdn
+standalone
