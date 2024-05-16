@@ -326,13 +326,29 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
+					const isModified =
+						getDate( item.date ) < getDate( item.modified );
+					const dateToDisplay = isModified
+						? item.modified
+						: item.date;
+
 					const formattedDate = dateI18n(
 						getSettings().formats.datetimeAbbreviated,
-						getDate( item.date )
+						getDate( dateToDisplay )
 					);
+
+					if ( isModified ) {
+						return (
+							<p>
+								{ __( 'Modified: ' ) }
+								<time>{ formattedDate }</time>
+							</p>
+						);
+					}
+
 					return (
 						<p>
-							{ 'Published: ' }
+							{ __( 'Published: ' ) }
 							<time>{ formattedDate }</time>
 						</p>
 					);
