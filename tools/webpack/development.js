@@ -48,6 +48,10 @@ module.exports = [
 	},
 	{
 		...sharedConfig,
+		mode:
+			process.env.NODE_ENV === 'production'
+				? 'production'
+				: 'development',
 		name: 'react-jsx-runtime',
 		entry: {
 			'react-jsx-runtime': {
