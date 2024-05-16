@@ -60,7 +60,9 @@ const ControlledCustomSelectControl = ( {
 	onChange,
 	...restProps
 }: React.ComponentProps< typeof UncontrolledCustomSelectControl > ) => {
+	const { value: overrideValue } = restProps;
 	const [ value, setValue ] = useState( options[ 0 ] );
+	const initialValue = overrideValue ?? value;
 	return (
 		<UncontrolledCustomSelectControl
 			{ ...restProps }
@@ -70,7 +72,7 @@ const ControlledCustomSelectControl = ( {
 				setValue( args.selectedItem );
 			} }
 			value={ options.find(
-				( option: any ) => option.key === value.key
+				( option: any ) => option.key === initialValue.key
 			) }
 		/>
 	);
@@ -499,5 +501,23 @@ describe.each( [
 				} ),
 			} )
 		);
+	} );
+
+	it( 'Should display the initial value passed as the selected value', async () => {
+		const initialSelectedItem = legacyProps.options[ 5 ];
+
+		const testProps = {
+			...legacyProps,
+			value: initialSelectedItem,
+		};
+
+		render( <Component { ...testProps } /> );
+
+		const currentSelectedItem = await screen.findByRole( 'combobox', {
+			expanded: false,
+		} );
+
+		// Verify the initial selected value
+		expect( currentSelectedItem ).toHaveTextContent( 'aquarela' );
 	} );
 } );

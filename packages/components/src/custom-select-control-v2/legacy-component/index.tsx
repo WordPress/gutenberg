@@ -34,12 +34,10 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 				return;
 			}
 
-			// @todo add test to verify that a value passed programmatically is
-			// selected
-
 			// Executes the logic in a microtask after the popup is closed.
 			// This is simply to ensure the isOpen state matches that in Downshift.
 			await Promise.resolve();
+
 			const state = store.getState();
 
 			const option = options.find( ( item ) => item.name === nextValue );
@@ -60,8 +58,11 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 
 	useEffect( () => {
 		// This is a workaround for selecting the right item upon mount
-		store.setValue( value?.name! );
-	} );
+		if ( value ) {
+			store.setValue( value.name );
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 
 	const children = options.map(
 		( { name, key, __experimentalHint, ...rest } ) => {
