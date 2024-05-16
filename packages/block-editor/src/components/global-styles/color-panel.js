@@ -28,7 +28,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
 import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
-import { setImmutably } from '../../utils/object';
+import { setImmutably, omit } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
@@ -715,7 +715,7 @@ export default function ColorPanel( {
 			{ items.map( ( item ) => (
 				<ColorPanelDropdown
 					key={ item.key }
-					{ ...item }
+					{ ...omit( item, [ 'key' ] ) }
 					colorGradientControlSettings={ {
 						colors,
 						disableCustomColors: ! areCustomSolidsEnabled,
