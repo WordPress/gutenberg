@@ -47,7 +47,7 @@
 	},
 	"scripts": {
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
-		"lint": "phpcs --standard=phpcs.xml.dist",
+		"lint": "bash ./scripts/lint-php.sh",
 		"test": "phpunit",
 		"test:watch": "phpunit-watcher watch < /dev/tty"
 	}

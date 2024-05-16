@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <ruleset name="WordPress Coding Standards for the Time to Read Block plugin">
-	<description>Includes sniffs for Gutenberg, with minor modifications needed for this plugin.</description>
+	<description>Includes shared sniffs for Gutenberg, with modifications.</description>
 
-	<rule ref="../../phpcs.xml.dist"/>
+	<!-- Import shared rules for monorepo -->
+	<rule ref="../../phpcs.xml.shared"/>
+
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
@@ -10,4 +12,6 @@
 			</property>
 		</properties>
 	</rule>
+
+	<file>./</file>
 </ruleset>

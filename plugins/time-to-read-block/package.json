@@ -1,9 +1,19 @@
 {
+	"private": true,
 	"name": "time-to-read-block",
 	"version": "1.0.0",
 	"description": "Block to display the minutes required to finish reading a post.",
-	"author": "WordPress.org",
+	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/trunk/plugins/time-to-read-block",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "plugins/time-to-read-block"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
 	"main": "build/index.js",
 	"scripts": {
 		"build": "wp-scripts build",
@@ -14,17 +24,14 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start"
 	},
-	"devDependencies": {
-		"@wordpress/scripts": "27.7.0"
-	},
 	"dependencies": {
-		"@wordpress/block-editor": "^12.24.0",
+		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/blocks": "^12.33.0",
-		"@wordpress/components": "^27.4.0",
-		"@wordpress/core-data": "^6.33.0",
-		"@wordpress/element": "^5.33.0",
-		"@wordpress/i18n": "^4.56.0",
-		"@wordpress/wordcount": "^3.56.0",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/core-data": "file:../../packages/core-data",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/wordcount": "file:../../packages/wordcount",
 		"clsx": "^2.1.1"
 	}
 }
