@@ -96,10 +96,9 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const namespaceAndPath =
-						nsPathRegExp.exec( attributeValue );
-					const namespace = namespaceAndPath?.[ 1 ] ?? null;
-					let value: any = namespaceAndPath?.[ 2 ] ?? attributeValue;
+					const regexResult = nsPathRegExp.exec( attributeValue );
+					const namespace = regexResult?.[ 1 ] ?? null;
+					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
 						value = value && JSON.parse( value );
 					} catch ( e ) {}
