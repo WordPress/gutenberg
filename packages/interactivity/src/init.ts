@@ -12,10 +12,13 @@ import { directivePrefix } from './constants';
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
 export const getRegionRootFragment = ( region: Element ): ContainerNode => {
+	if ( ! region.parentElement ) {
+		throw Error( 'The passed region should be an element with a parent.' );
+	}
 	if ( ! regionRootFragments.has( region ) ) {
 		regionRootFragments.set(
 			region,
-			createRootFragment( region.parentElement!, region )
+			createRootFragment( region.parentElement, region )
 		);
 	}
 	return regionRootFragments.get( region );
