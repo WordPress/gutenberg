@@ -98,6 +98,8 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	border-radius: 2px;
 	background: ${ COLORS.theme.background };
 	border: 1px solid ${ COLORS.theme.foreground };
+	z-index: 9999; // Ensure the popover is on top
+	position: absolute !important;
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`
