@@ -335,7 +335,8 @@ export default function PagePages() {
 					const isModified =
 						getDate( item.date ) < getDate( item.modified );
 					const isDraft = item.status === 'draft';
-					if ( isModified || isDraft ) {
+					const isPending = item.status === 'pending';
+					if ( isModified || isDraft || isPending ) {
 						return (
 							<>
 								{ __( 'Modified: ' ) }
