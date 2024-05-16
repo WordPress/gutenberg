@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { dateI18n, getDate, getSettings, isInTheFuture } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { DataViews } from '@wordpress/dataviews';
@@ -334,9 +334,12 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					const isModified =
 						getDate( item.date ) < getDate( item.modified );
-					const isDraft = item.status === 'draft';
-					const isPending = item.status === 'pending';
-					if ( isModified || isDraft || isPending ) {
+					const isNotPublished = [
+						'draft',
+						'pending',
+						'private',
+					].some( ( status ) => status === item.status );
+					if ( isModified || isNotPublished ) {
 						return (
 							<>
 								{ __( 'Modified: ' ) }
@@ -347,7 +350,7 @@ export default function PagePages() {
 						);
 					}
 
-					const isScheduled = isInTheFuture( item.date );
+					const isScheduled = item.status === 'future';
 					if ( isScheduled ) {
 						return (
 							<>
