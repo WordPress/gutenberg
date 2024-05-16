@@ -2802,7 +2802,7 @@ export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
 				sectionRootClientId
 			);
 			if ( sectionClientIds?.includes( clientId ) ) {
-				return true;
+				return ! isBlockSelected( state, clientId );
 			}
 		} else if ( clientId && ! getBlockRootClientId( state, clientId ) ) {
 			return true;
@@ -2900,7 +2900,14 @@ export const getBlockEditingMode = createRegistrySelector(
 					sectionRootClientId
 				);
 				if ( ! sectionsClientIds?.includes( clientId ) ) {
-					return 'disabled';
+					if (
+						! isBlockSelected(
+							state,
+							getBlockRootClientId( state, clientId )
+						)
+					) {
+						return 'disabled';
+					}
 				}
 			}
 

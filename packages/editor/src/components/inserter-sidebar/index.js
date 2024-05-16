@@ -85,6 +85,9 @@ export default function InserterSidebar( {
 						insertionPoint.insertionIndex
 					}
 					__experimentalInitialTab={ insertionPoint.tab }
+					__experimentalSetTab={ ( tab ) => {
+						setIsInserterOpened( { tab } );
+					} }
 					__experimentalInitialCategory={ insertionPoint.category }
 					__experimentalFilterValue={ insertionPoint.filterValue }
 					__experimentalOnPatternCategorySelection={

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
@@ -16,13 +16,16 @@ import { unlock } from '../../lock-unlock';
 
 function ZoomOutModeInserters() {
 	const [ isReady, setIsReady ] = useState( false );
+	const registry = useRegistry();
 	const {
 		blockOrder,
 		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
+		selectedClientId,
 	} = useSelect( ( select ) => {
-		const { getSettings, getBlockOrder } = select( blockEditorStore );
+		const { getSettings, getBlockOrder, getSelectedBlockClientId } =
+			select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
 		// To do: move ZoomOutModeInserters to core/editor.
 		// Or we perhaps we should move the insertion point state to the
@@ -37,10 +40,26 @@ function ZoomOutModeInserters() {
 			sectionRootClientId: root,
 			setInserterIsOpened:
 				getSettings().__experimentalSetIsInserterOpened,
+			selectedClientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 
 	const isMounted = useRef( false );
+
+	useEffect( () => {
+		if ( selectedClientId && ! blockOrder.includes( selectedClientId ) ) {
+			const { tab } = unlock(
+				registry.select( 'core/editor' )
+			).getInsertionPoint();
+			if ( tab ) {
+				setInserterIsOpened( { tab: 'blocks' } );
+			} else {
+				registry
+					.dispatch( blockEditorStore )
+					.__unstableSetEditorMode( 'edit' );
+			}
+		}
+	}, [ selectedClientId, blockOrder, setInserterIsOpened, registry ] );
 
 	useEffect( () => {
 		if ( ! isMounted.current ) {
@@ -48,7 +67,7 @@ function ZoomOutModeInserters() {
 			return;
 		}
 		// reset insertion point when the block order changes
-		setInserterIsOpened( true );
+		setInserterIsOpened( { tab: 'patterns' } );
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ blockOrder ] );
 

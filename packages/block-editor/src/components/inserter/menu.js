@@ -48,7 +48,8 @@ function InserterMenu(
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
 		onClose,
-		__experimentalInitialTab,
+		__experimentalInitialTab: selectedTab = 'blocks',
+		__experimentalSetTab: setSelectedTab,
 		__experimentalInitialCategory,
 	},
 	ref
@@ -67,9 +68,6 @@ function InserterMenu(
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState(
-		__experimentalInitialTab
-	);
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
