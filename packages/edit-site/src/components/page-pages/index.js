@@ -315,8 +315,10 @@ export default function PagePages() {
 								__( '(no title)' ) }
 						</Link>
 					) : (
-						decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' )
+						<span>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</span>
 					);
 
 					let suffix = '';
@@ -335,7 +337,10 @@ export default function PagePages() {
 					}
 
 					return (
-						<HStack justify="stretch">
+						<HStack
+							className="edit-site-page-pages-title"
+							justify="stretch"
+						>
 							{ title }
 							{ suffix }
 						</HStack>
