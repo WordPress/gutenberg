@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.7.0 (2024-05-16)
+
 ### Enhancements
 
 -   Strict type checking: fix some missing nulls in published types ([#59865](https://github.com/WordPress/gutenberg/pull/59865/)).
