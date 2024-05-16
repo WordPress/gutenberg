@@ -1150,7 +1150,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'background' => array(
 						'backgroundImage' => array(
-							'url' => 'example/img/image.png',
+							'url' => 'file:./example/img/image.png',
 						),
 					),
 				),
@@ -1195,7 +1195,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 				'styles'  => array(
 					'background' => array(
 						'backgroundImage' => array(
-							'url' => 'example/img/image.png',
+							'url' => 'file:./example/img/image.png',
 						),
 					),
 				),
@@ -1204,7 +1204,7 @@ class WP_Theme_JSON_Resolver_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected_data = array(
 			array(
-				'name'   => 'example/img/image.png',
+				'name'   => 'file:./example/img/image.png',
 				'href'   => 'https://example.org/wp-content/themes/example-theme/example/img/image.png',
 				'target' => 'styles.background.backgroundImage.url',
 				'type'   => 'image/png',

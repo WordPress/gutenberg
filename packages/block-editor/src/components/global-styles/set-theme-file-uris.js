@@ -1,16 +1,7 @@
 /**
- * WordPress dependencies
- */
-import { isURL, isValidPath } from '@wordpress/url';
-
-/**
  * Internal dependencies
  */
 import { getValueFromObjectPath } from '../../utils/object';
-
-function isRelativePath( url ) {
-	return isValidPath( url ) && ! isURL( url );
-}
 
 /**
  * Looks up a theme file URI based on a relative path.
@@ -20,10 +11,6 @@ function isRelativePath( url ) {
  * @return {string?} A resolved theme file URI, if one is found in the themeFileURIs collection.
  */
 export function getResolvedThemeFilePath( file, themeFileURIs = [] ) {
-	if ( ! isRelativePath( file ) ) {
-		return file;
-	}
-
 	const uri = themeFileURIs.find(
 		( themeFileUri ) => themeFileUri.name === file
 	);

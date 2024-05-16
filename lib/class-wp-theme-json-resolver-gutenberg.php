@@ -723,7 +723,6 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	 * Returns the style variations defined by the theme (parent and child).
 	 *
 	 * @since 6.2.0 Returns parent theme variations if theme is a child.
-	 * @since 6.6.0 Added custom relative theme file URIs to `_links`.
 	 *
 	 * @return array
 	 */
@@ -751,25 +750,10 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		foreach ( $variation_files as $path => $file ) {
 			$decoded_file = wp_json_file_decode( $path, array( 'associative' => true ) );
 			if ( is_array( $decoded_file ) ) {
-				$translated           = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
-				$variation_theme_json = new WP_Theme_JSON_Gutenberg( $translated );
-				$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
-				$variation            = $variation_theme_json->get_raw_data();
+				$translated = static::translate( $decoded_file, wp_get_theme()->get( 'TextDomain' ) );
+				$variation  = ( new WP_Theme_JSON_Gutenberg( $translated ) )->get_raw_data();
 				if ( empty( $variation['title'] ) ) {
 					$variation['title'] = basename( $path, '.json' );
-				}
-				/*
-				 * @TODO this needs to be added to the WP REST API schema.
-				 * E.g., $links['https://api.w.org/theme-file-uris']. ??
-				 */
-				/*
-				 * @TODO I'm not sure if we can/should add `_links` to collection items.
-				 * It should be part of the response object, but given that
-				 * WP_REST_Global_Styles_Controller_Gutenberg::get_theme_items
-				 * returns a collection ([{}]) and not a response object ({}) it's not possible.
-				 */
-				if ( ! empty( $resolved_theme_uris ) ) {
-					$variation['_links']['wp:theme-file-uris'] = $resolved_theme_uris;
 				}
 				$variations[] = $variation;
 			}
@@ -795,19 +779,22 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			return $resolved_theme_uris;
 		}
 
-		$theme_json_data      = $theme_json->get_raw_data();
-		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
+		$theme_json_data = $theme_json->get_raw_data();
 
 		// Top level styles.
+		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
+		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
+		$placeholder          = 'file:./';
 		if (
 			isset( $background_image_url ) &&
 			is_string( $background_image_url ) &&
-			// Where a URL is not absolute (has no host fragment), it is assumed to be relative to the theme directory.
-			! isset( wp_parse_url( $background_image_url )['host'] ) ) {
-				$file_type          = wp_check_filetype( $background_image_url );
+			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
+			str_starts_with( $background_image_url, $placeholder ) ) {
+				$file_type = wp_check_filetype( $background_image_url );
+				$src_url   = str_replace( $placeholder, '', $background_image_url );
 				$resolved_theme_uri = array(
 					'name'   => $background_image_url,
-					'href'   => esc_url( get_theme_file_uri( $background_image_url ) ),
+					'href'   => esc_url( get_theme_file_uri( $src_url ) ),
 					'target' => 'styles.background.backgroundImage.url',
 				);
 				if ( isset( $file_type['type'] ) ) {

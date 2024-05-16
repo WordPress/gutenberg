@@ -685,6 +685,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @since 6.0.0
 	 * @since 6.2.0 Returns parent theme variations, if they exist.
 	 * @since 6.4.0 Removed unnecessary local variable.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links` for each item.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 *
@@ -700,9 +701,25 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
+		$response   = array();
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
-		return rest_ensure_response( $variations );
+		// Add resolved theme asset links.
+		foreach ( $variations as $variation ) {
+			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
+			$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
+			$data                 = rest_ensure_response( $variation );
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$data->add_links(
+					array(
+						'https://api.w.org/theme-file-uris' => $resolved_theme_uris,
+					)
+				);
+			}
+			$response[] = $this->prepare_response_for_collection( $data );
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
