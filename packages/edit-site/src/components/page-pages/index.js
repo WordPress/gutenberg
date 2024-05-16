@@ -339,7 +339,8 @@ export default function PagePages() {
 					return (
 						<HStack
 							className="edit-site-page-pages-title"
-							justify="stretch"
+							alignment="center"
+							justify="flex-start"
 						>
 							{ title }
 							{ suffix }
