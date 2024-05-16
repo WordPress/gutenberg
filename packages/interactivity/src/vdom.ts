@@ -88,6 +88,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 
 		for ( let i = 0; i < attributes.length; i++ ) {
 			const attributeName = attributes[ i ].name;
+			const attributeValue = attributes[ i ].value;
 			if (
 				attributeName[ fullPrefix.length ] &&
 				attributeName.slice( 0, fullPrefix.length ) === fullPrefix
@@ -95,7 +96,6 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const attributeValue = attributes[ i ].value;
 					const namespaceAndPath =
 						nsPathRegExp.exec( attributeValue );
 					const namespace = namespaceAndPath?.[ 1 ] ?? null;
@@ -120,7 +120,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 			} else if ( attributeName === 'ref' ) {
 				continue;
 			}
-			props[ attributeName ] = attributes[ i ].value;
+			props[ attributeName ] = attributeValue;
 		}
 
 		if ( ignore && ! island ) {
