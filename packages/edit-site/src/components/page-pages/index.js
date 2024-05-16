@@ -32,11 +32,10 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
 const EMPTY_ARRAY = [];
 
 function useView( postType ) {
@@ -188,29 +187,6 @@ function FeaturedImage( { item, viewType } ) {
 	);
 }
 
-let PAGE_ACTIONS = [
-	'edit-post',
-	'view-post',
-	'restore',
-	'permanently-delete',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
-	PAGE_ACTIONS = [
-		'edit-post',
-		'view-post',
-		'restore',
-		'permanently-delete',
-		'view-post-revisions',
-		'duplicate-post',
-		'rename-post',
-		'move-to-trash',
-	];
-}
-
 export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
@@ -360,20 +336,14 @@ export default function PagePages() {
 		],
 		[ authors, view.type ]
 	);
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+
+	const postTypeActions = usePostActions( 'page' );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
-	const actions = usePostActions( onActionPerformed, PAGE_ACTIONS );
+
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

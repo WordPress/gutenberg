@@ -72,7 +72,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/toggle-list-view',
 			category: 'global',
-			description: __( 'Open the block list view.' ),
+			description: __( 'Open the List View.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',

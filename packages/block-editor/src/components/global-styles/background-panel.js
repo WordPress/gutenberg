@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -147,7 +147,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 			<HStack justify={ imgUrl ? 'flex-start' : 'center' } as="span">
 				{ imgUrl && (
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
 							{
 								'has-image': imgUrl,
@@ -439,7 +439,7 @@ function BackgroundSizeToolsPanelItem( {
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : undefined
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
 			)
 		);
 

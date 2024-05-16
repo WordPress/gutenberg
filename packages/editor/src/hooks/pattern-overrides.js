@@ -19,6 +19,7 @@ const {
 	ResetOverridesControl,
 	PATTERN_TYPES,
 	PARTIAL_SYNCING_SUPPORTED_BLOCKS,
+	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
 /**
@@ -51,18 +52,23 @@ const withPatternOverrideControls = createHigherOrderComponent(
 // on every block.
 function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
-	const { hasPatternOverridesSource, isEditingPattern } = useSelect(
+	const { hasPatternOverridesSource, isEditingSyncedPattern } = useSelect(
 		( select ) => {
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const { getCurrentPostType, getEditedPostAttribute } =
+				select( editorStore );
 
 			return {
 				// For editing link to the site editor if the theme and user permissions support it.
 				hasPatternOverridesSource: !! getBlockBindingsSource(
 					'core/pattern-overrides'
 				),
-				isEditingPattern:
-					select( editorStore ).getCurrentPostType() ===
-					PATTERN_TYPES.user,
+				isEditingSyncedPattern:
+					getCurrentPostType() === PATTERN_TYPES.user &&
+					getEditedPostAttribute( 'meta' )?.wp_pattern_sync_status !==
+						PATTERN_SYNC_TYPES.unsynced &&
+					getEditedPostAttribute( 'wp_pattern_sync_status' ) !==
+						PATTERN_SYNC_TYPES.unsynced,
 			};
 		},
 		[]
@@ -76,9 +82,9 @@ function ControlsWithStoreSubscription( props ) {
 		);
 
 	const shouldShowPatternOverridesControls =
-		isEditingPattern && blockEditingMode === 'default';
+		isEditingSyncedPattern && blockEditingMode === 'default';
 	const shouldShowResetOverridesControl =
-		! isEditingPattern &&
+		! isEditingSyncedPattern &&
 		!! props.attributes.metadata?.name &&
 		blockEditingMode !== 'disabled' &&
 		hasPatternBindings;

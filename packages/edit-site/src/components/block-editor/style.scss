@@ -21,6 +21,7 @@
 .edit-site-visual-editor {
 	position: relative;
 	height: 100%;
+	overflow: hidden;
 	display: block;
 	background-color: $gray-300;
 	// Centralize the editor horizontally (flex-direction is column).
@@ -47,7 +48,6 @@
 		}
 
 		.edit-site-visual-editor__editor-canvas {
-			border-radius: $radius-block-ui;
 			max-height: 100%;
 		}
 
@@ -58,7 +58,7 @@
 		}
 	}
 
-	.components-resizable-box__container {
+	& > .components-resizable-box__container {
 		margin: 0 auto;
 	}
 

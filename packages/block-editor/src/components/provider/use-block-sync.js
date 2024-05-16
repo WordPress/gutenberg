@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
@@ -82,6 +82,15 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
+	const isControlled = useSelect(
+		( select ) => {
+			return (
+				! clientId ||
+				select( blockEditorStore ).areInnerBlocksControlled( clientId )
+			);
+		},
+		[ clientId ]
+	);
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
 	const subscribed = useRef( false );
@@ -176,6 +185,23 @@ export default function useBlockSync( {
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
+
+	const isMounted = useRef( false );
+
+	useEffect( () => {
+		// On mount, controlled blocks are already set in the effect above.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+
+		// When the block becomes uncontrolled, it means its inner state has been reset
+		// we need to take the blocks again from the external value property.
+		if ( ! isControlled ) {
+			pendingChanges.current.outgoing = [];
+			setControlledBlocks();
+		}
+	}, [ isControlled ] );
 
 	useEffect( () => {
 		const {

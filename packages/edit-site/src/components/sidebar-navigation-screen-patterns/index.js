@@ -110,7 +110,7 @@ function CategoriesGroup( {
 	);
 }
 
-export default function SidebarNavigationScreenPatterns() {
+export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
 		params: { categoryType, categoryId, path },
 	} = useLocation();
@@ -125,18 +125,6 @@ export default function SidebarNavigationScreenPatterns() {
 		[]
 	);
 
-	/**
-	 * This sidebar needs to temporarily accomodate two different "URLs":
-	 *
-	 * 1. path = /patterns
-	 *    Block based themes. Also classic themes can access this URL, though it's not linked anywhere.
-	 *
-	 * 2. path = /wp_template_part/all
-	 *    Classic themes with support for block-template-parts. We need to list only Template Parts in this case.
-	 *    The URL is accessible from the Appearance > Template Parts menu.
-	 *
-	 * This is temporary. We aim to consolidate to /patterns.
-	 */
 	return (
 		<SidebarNavigationScreen
 			isRoot={ ! isBlockBasedTheme }
@@ -144,6 +132,7 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			backPath={ backPath }
 			actions={ <AddNewPattern /> }
 			content={
 				<>

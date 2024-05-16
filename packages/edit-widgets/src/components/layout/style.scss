@@ -18,7 +18,7 @@
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
 
-	.block-editor-inserter__tab {
+	.block-editor-inserter-sidebar__header {
 		display: none;
 	}
 

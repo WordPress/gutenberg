@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -207,7 +207,7 @@ const MediaReplaceFlow = ( {
 					{ onSelectURL && (
 						// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 						<form
-							className={ classnames(
+							className={ clsx(
 								'block-editor-media-flow__url-input',
 								{
 									'has-siblings':

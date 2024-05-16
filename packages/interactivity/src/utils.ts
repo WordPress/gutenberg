@@ -62,8 +62,8 @@ const afterNextFrame = ( callback: () => void ) => {
  * @return The Flusher object with `flush` and `dispose` properties.
  */
 function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
-	let flush: () => void;
-	const dispose = effect( function () {
+	let flush: () => void = () => undefined;
+	const dispose = effect( function ( this: any ) {
 		flush = this.c.bind( this );
 		this.x = compute;
 		this.c = notify;
@@ -82,7 +82,7 @@ function createFlusher( compute: () => unknown, notify: () => void ): Flusher {
  */
 export function useSignalEffect( callback: () => unknown ) {
 	_useEffect( () => {
-		let eff = null;
+		let eff: Flusher | null = null;
 		let isExecuting = false;
 
 		const notify = async () => {
@@ -273,7 +273,7 @@ export const createRootFragment = (
 	parent: Element,
 	replaceNode: Node | Node[]
 ) => {
-	replaceNode = [].concat( replaceNode );
+	replaceNode = ( [] as Node[] ).concat( replaceNode );
 	const sibling = replaceNode[ replaceNode.length - 1 ].nextSibling;
 	function insert( child: any, root: any ) {
 		parent.insertBefore( child, root || sibling );

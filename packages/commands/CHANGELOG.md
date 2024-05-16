@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.29.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
 ## 0.28.0 (2024-05-02)
 
 ## 0.27.0 (2024-04-19)
