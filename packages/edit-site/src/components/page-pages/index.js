@@ -300,6 +300,23 @@ export default function PagePages() {
 				id: 'title',
 				getValue: ( { item } ) => item.title?.rendered,
 				render: ( { item } ) => {
+					let suffix = '';
+					if ( item.id === frontPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Front Page' ) }
+							</span>
+						);
+					}
+
+					if ( item.id === postsPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Posts Page' ) }
+							</span>
+						);
+					}
+
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 						item.status !== 'trash';
@@ -313,33 +330,15 @@ export default function PagePages() {
 						>
 							{ decodeEntities( item.title?.rendered ) ||
 								__( '(no title)' ) }
+							{ suffix }
 						</Link>
 					) : (
-						decodeEntities( item.title?.rendered ) ||
-						__( '(no title)' )
+						<>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+							{ suffix }
+						</>
 					);
-
-					if ( item.id === frontPageId ) {
-						return (
-							<>
-								{ title }
-								<span className="edit-site-page-pages__title-badge">
-									{ __( 'Front Page' ) }
-								</span>
-							</>
-						);
-					}
-
-					if ( item.id === postsPageId ) {
-						return (
-							<>
-								{ title }
-								<span className="edit-site-page-pages__title-badge">
-									{ __( 'Posts Page' ) }
-								</span>
-							</>
-						);
-					}
 
 					return title;
 				},
