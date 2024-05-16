@@ -31,7 +31,7 @@ export default function AutoBlockUninstaller() {
 				unregisterBlockType( blockType.name );
 			} );
 		}
-	}, [ shouldRemoveBlockTypes ] );
+	}, [ shouldRemoveBlockTypes, uninstallBlockType, unusedBlockTypes ] );
 
 	return null;
 }

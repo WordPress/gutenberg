@@ -32,7 +32,7 @@ function BlockListItemCell( { children, item: clientId, onLayout } ) {
 				shouldRemove: true,
 			} );
 		};
-	}, [] );
+	}, [ blocksLayouts, clientId, updateBlocksLayouts ] );
 
 	const onCellLayout = useCallback(
 		( event ) => {
@@ -49,7 +49,7 @@ function BlockListItemCell( { children, item: clientId, onLayout } ) {
 				onLayout( event );
 			}
 		},
-		[ clientId, rootClientId, updateBlocksLayouts, onLayout ]
+		[ updateBlocksLayouts, blocksLayouts, clientId, rootClientId, onLayout ]
 	);
 
 	return (

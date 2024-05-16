@@ -78,7 +78,7 @@ function Root( { className, ...settings } ) {
 					updates[ id ] = isIntersecting;
 				} );
 			setBlockVisibility( updates );
-		}, [ registry ] ),
+		}, [ registry, setBlockVisibility ] ),
 		300,
 		{
 			trailing: true,
@@ -103,7 +103,7 @@ function Root( { className, ...settings } ) {
 			}
 			delayedBlockVisibilityUpdates();
 		} );
-	}, [] );
+	}, [ delayedBlockVisibilityUpdates, registry ] );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			ref: useMergeRefs( [
