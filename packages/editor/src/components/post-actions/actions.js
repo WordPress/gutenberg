@@ -723,35 +723,35 @@ const resetTemplateAction = {
 				if ( items[ 0 ].type === TEMPLATE_PART_POST_TYPE ) {
 					await removeTemplates( items );
 				} else {
-				for ( const template of items ) {
+					for ( const template of items ) {
 						if ( template.type === TEMPLATE_POST_TYPE ) {
-					await revertTemplate( template, {
-						allowUndo: false,
-					} );
-					await saveEditedEntityRecord(
-						'postType',
-						template.type,
-						template.id
-					);
-				}
+							await revertTemplate( template, {
+								allowUndo: false,
+							} );
+							await saveEditedEntityRecord(
+								'postType',
+								template.type,
+								template.id
+							);
+						}
 					}
-				createSuccessNotice(
-					items.length > 1
-						? sprintf(
-								/* translators: The number of items. */
-								__( '%s items reset.' ),
-								items.length
-						  )
-						: sprintf(
-								/* translators: The template/part's name. */
-								__( '"%s" reset.' ),
+					createSuccessNotice(
+						items.length > 1
+							? sprintf(
+									/* translators: The number of items. */
+									__( '%s items reset.' ),
+									items.length
+							  )
+							: sprintf(
+									/* translators: The template/part's name. */
+									__( '"%s" reset.' ),
 									decodeEntities( getItemTitle( items[ 0 ] ) )
-						  ),
-					{
-						type: 'snackbar',
-						id: 'revert-template-action',
-					}
-				);
+							  ),
+						{
+							type: 'snackbar',
+							id: 'revert-template-action',
+						}
+					);
 				}
 			} catch ( error ) {
 				let fallbackErrorMessage;
