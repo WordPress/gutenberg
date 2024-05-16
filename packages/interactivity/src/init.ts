@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { hydrate } from 'preact';
+import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
 /**
  * Internal dependencies
  */
@@ -11,11 +11,11 @@ import { directivePrefix } from './constants';
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
-export const getRegionRootFragment = ( region ) => {
+export const getRegionRootFragment = ( region: Element ): ContainerNode => {
 	if ( ! regionRootFragments.has( region ) ) {
 		regionRootFragments.set(
 			region,
-			createRootFragment( region.parentElement, region )
+			createRootFragment( region.parentElement!, region )
 		);
 	}
 	return regionRootFragments.get( region );
@@ -29,7 +29,7 @@ function yieldToMain() {
 }
 
 // Initial vDOM regions associated with its DOM element.
-export const initialVdom = new WeakMap();
+export const initialVdom = new WeakMap< Element, ComponentChild[] >();
 
 // Initialize the router with the initial DOM.
 export const init = async () => {
