@@ -1,5 +1,9 @@
 .editor-post-status {
 	max-width: 100%;
+
+	&.is-read-only {
+		padding: 6px 12px;
+	}
 }
 
 .editor-change-status__password-fieldset {
