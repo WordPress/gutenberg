@@ -82,7 +82,6 @@ export default function BlockThemeControl( { id } ) {
 			label={ __( 'Template options' ) }
 			text={ decodeEntities( template.title ) }
 			icon={ null }
-			className="editor-post-template__panel-dropdown"
 		>
 			{ ( { onClose } ) => (
 				<>

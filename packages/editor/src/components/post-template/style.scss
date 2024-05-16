@@ -50,18 +50,3 @@
 .editor-post-template__classic-theme-dropdown {
 	padding: $grid-unit-10;
 }
-
-.editor-post-template__panel-dropdown,
-.editor-post-template__classic-panel-dropdown {
-	width: 100%;
-}
-
-.editor-post-template__panel-dropdown .components-dropdown-menu__toggle,
-.editor-post-template__classic-panel-dropdown .editor-post-template__classic-panel-toggle {
-	display: block;
-	max-width: 100%;
-	overflow: hidden;
-	text-align: left;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}

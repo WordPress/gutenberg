@@ -49,7 +49,6 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			aria-label={ __( 'Template options' ) }
 			onClick={ onClick }
-			className="editor-post-template__classic-panel-toggle"
 		>
 			{ templateTitle ?? __( 'Default template' ) }
 		</Button>
@@ -206,7 +205,6 @@ function ClassicThemeControl() {
 	return (
 		<Dropdown
 			popoverProps={ POPOVER_PROPS }
-			className="editor-post-template__classic-panel-dropdown"
 			focusOnMount
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<PostTemplateToggle isOpen={ isOpen } onClick={ onToggle } />
