@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -34,7 +34,7 @@ function UnforwardedExternalLink(
 			].filter( Boolean )
 		),
 	].join( ' ' );
-	const classes = classnames( 'components-external-link', className );
+	const classes = clsx( 'components-external-link', className );
 	/* Anchor links are perceived as external links.
 	This constant helps check for on page anchor links,
 	to prevent them from being opened in the editor. */

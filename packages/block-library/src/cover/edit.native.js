@@ -10,7 +10,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -298,7 +298,7 @@ const Cover = ( {
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
 		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
-			const className = classnames( attributes.className, {
+			const className = clsx( attributes.className, {
 				'is-light': false,
 			} );
 			setAttributes( {

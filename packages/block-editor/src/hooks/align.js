@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -199,7 +199,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 		hasWideBlockSupport
 	).includes( align );
 	if ( isAlignValid ) {
-		props.className = classnames( `align${ align }`, props.className );
+		props.className = clsx( `align${ align }`, props.className );
 	}
 
 	return props;

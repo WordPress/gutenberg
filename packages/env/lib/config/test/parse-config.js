@@ -1,5 +1,4 @@
 'use strict';
-/* eslint-disable jest/no-conditional-expect */
 /**
  * Internal dependencies
  */
@@ -319,16 +318,13 @@ describe( 'parseConfig', () => {
 	it( 'throws when latest WordPress version needed but not found', async () => {
 		getLatestWordPressVersion.mockResolvedValue( null );
 
-		expect.assertions( 1 );
-		try {
-			await parseConfig( '/test/gutenberg', '/cache' );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					'Could not find the latest WordPress version. There may be a network issue.'
-				)
-			);
-		}
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				'Could not find the latest WordPress version. There may be a network issue.'
+			)
+		);
 	} );
 
 	it( 'throws for unknown config options', async () => {
@@ -346,16 +342,13 @@ describe( 'parseConfig', () => {
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		expect.assertions( 1 );
-		try {
-			await parseConfig( '/test/gutenberg', '/cache' );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					`Invalid /test/gutenberg/.wp-env.json: "test" is not a configuration option.`
-				)
-			);
-		}
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "test" is not a configuration option.`
+			)
+		);
 	} );
 
 	it( 'throws for root-only config options', async () => {
@@ -378,16 +371,12 @@ describe( 'parseConfig', () => {
 			throw new Error( 'Invalid File: ' + configFile );
 		} );
 
-		expect.assertions( 1 );
-		try {
-			await parseConfig( '/test/gutenberg', '/cache' );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
-				)
-			);
-		}
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
+			)
+		);
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

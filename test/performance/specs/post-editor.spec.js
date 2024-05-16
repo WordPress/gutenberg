@@ -89,6 +89,15 @@ test.describe( 'Post Editor Performance', () => {
 							}
 						}
 					);
+
+					const serverTiming = await metrics.getServerTiming();
+
+					for ( const [ key, value ] of Object.entries(
+						serverTiming
+					) ) {
+						results[ key ] ??= [];
+						results[ key ].push( value );
+					}
 				}
 			} );
 		}
@@ -659,7 +668,7 @@ test.describe( 'Post Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page.getByText( 'Test' ).click();
+				await page.getByRole( 'tab', { name: 'Test' } ).click();
 
 				await Promise.all(
 					testPatterns.map( async ( pattern ) => {

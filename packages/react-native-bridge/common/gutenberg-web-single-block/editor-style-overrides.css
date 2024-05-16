@@ -64,17 +64,17 @@
 }
 
 /* Remove tabs from sidebar panel, leaving the \'x\' button */
-.edit-post-sidebar__panel-tabs {
+.editor-sidebar__panel-tabs {
     display: none;
 }
 
 /* Remove \'(no-title)\' string from sidebar header */
-.edit-post-sidebar-header__title {
+.editor-sidebar-header__title {
     display: none;
 }
 
 /* Move \'x\' close button to the end on sidebar header */
-.edit-post-sidebar-header__small {
+.editor-sidebar-header__small {
     justify-content: flex-end;
 }
 

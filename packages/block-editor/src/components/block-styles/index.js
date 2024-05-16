@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -68,7 +68,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 					return (
 						<Button
 							__next40pxDefaultSize
-							className={ classnames(
+							className={ clsx(
 								'block-editor-block-styles__item',
 								{
 									'is-active':

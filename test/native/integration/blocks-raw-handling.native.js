@@ -187,7 +187,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -212,7 +212,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -309,7 +309,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should treat single list item as inline text', () => {
 		const filtered = pasteHandler( {
-			HTML: '<ul><li>Some <strong>bold</strong> text.</li></ul>',
+			HTML: '<ul class="wp-block-list"><li>Some <strong>bold</strong> text.</li></ul>',
 			plainText: 'Some <strong>bold</strong> text.\n',
 			mode: 'AUTO',
 		} );
@@ -320,7 +320,7 @@ describe( 'Blocks raw handling', () => {
 
 	it( 'should treat multiple list items as a block', () => {
 		const filtered = pasteHandler( {
-			HTML: '<ul><li>One</li><li>Two</li><li>Three</li></ul>',
+			HTML: '<ul class="wp-block-list"><li>One</li><li>Two</li><li>Three</li></ul>',
 			plainText: 'One\nTwo\nThree\n',
 			mode: 'AUTO',
 		} )
@@ -328,7 +328,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 

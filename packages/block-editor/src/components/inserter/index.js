@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -207,10 +207,9 @@ class PrivateInserter extends Component {
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName={ classnames(
-					'block-editor-inserter__popover',
-					{ 'is-quick': isQuick }
-				) }
+				contentClassName={ clsx( 'block-editor-inserter__popover', {
+					'is-quick': isQuick,
+				} ) }
 				popoverProps={ { position, shift: true } }
 				onToggle={ this.onToggle }
 				expandOnMobile

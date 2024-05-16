@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -150,7 +150,7 @@ function RevisionsButtons( {
 
 				return (
 					<li
-						className={ classnames(
+						className={ clsx(
 							'edit-site-global-styles-screen-revisions__revision-item',
 							{
 								'is-selected': isSelected,

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -67,7 +67,7 @@ function ToolbarGroup( {
 		return null;
 	}
 
-	const finalClassName = classnames(
+	const finalClassName = clsx(
 		// Unfortunately, there's legacy code referencing to `.components-toolbar`
 		// So we can't get rid of it
 		accessibleToolbarState
