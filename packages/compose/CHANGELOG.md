@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.35.0 (2024-05-16)
+
 ## 6.34.0 (2024-05-02)
 
 -   Added new `observableMap` data structure and `useObservableValue` React hook ([#60945](https://github.com/WordPress/gutenberg/pull/60945)).
