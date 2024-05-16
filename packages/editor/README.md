@@ -1154,15 +1154,43 @@ Undocumented declaration.
 
 ### PostVisibility
 
-Undocumented declaration.
+PostVisibility component.
+
+Allows users to set the visibility of a post.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.onClose_ `Function`: Function to call when the popover is closed.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityCheck
 
-Undocumented declaration.
+PostVisibilityCheck component.
+
+Determines if the current post can be edited (published) and passes this information to the provided render function.
+
+_Parameters_
+
+-   _props_ `Object`: - Component properties.
+-   _props.render_ `Function`: - Function to render the component. Receives an object with a `canEdit` property.
+
+_Returns_
+
+-   `JSX.Element`: Rendered component.
 
 ### PostVisibilityLabel
 
-Undocumented declaration.
+PostVisibilityLabel component.
+
+Returns the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### privateApis
 
@@ -1266,7 +1294,11 @@ Undocumented declaration.
 
 ### usePostVisibilityLabel
 
-Undocumented declaration.
+Get the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### userAutocompleter
 
