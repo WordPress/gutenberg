@@ -594,7 +594,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_override_script(
 		$scripts,
 		'react-jsx-runtime',
-		gutenberg_url( 'build/react-jsx-runtime/index.min.js' ),
+		gutenberg_url( 'build/vendors/react-jsx-runtime' . $extension ),
 		array( 'react' ),
 		'18'
 	);

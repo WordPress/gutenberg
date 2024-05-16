@@ -46,37 +46,4 @@ module.exports = [
 			} ),
 		],
 	},
-	{
-		...sharedConfig,
-		mode:
-			process.env.NODE_ENV === 'production'
-				? 'production'
-				: 'development',
-		name: 'react-jsx-runtime',
-		entry: {
-			'react-jsx-runtime': {
-				import: 'react/jsx-runtime',
-				library: {
-					name: 'ReactJSXRuntime',
-					type: 'window',
-				},
-			},
-		},
-		plugins: [
-			new DependencyExtractionWebpackPlugin( {
-				injectPolyfill: false,
-				useDefaults: false,
-				requestToExternal: ( request ) => {
-					if ( request === 'react' ) {
-						return 'React';
-					}
-				},
-				requestToHandle: ( request ) => {
-					if ( request === 'react' ) {
-						return 'react';
-					}
-				},
-			} ),
-		],
-	},
 ];
