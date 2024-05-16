@@ -42,10 +42,8 @@ import type {
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ViewListProps< Item extends AnyItem > extends ViewProps< Item > {
-	onChangeView: ( view: ViewListType ) => void;
-	view: ViewListType;
-}
+interface ViewListProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewListType > {}
 
 interface ListViewItemProps< Item extends AnyItem > {
 	actions: Action< Item >[];

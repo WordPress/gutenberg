@@ -90,10 +90,8 @@ interface TableRowProps< Item extends AnyItem > {
 	data: Item[];
 }
 
-interface ViewTableProps< Item extends AnyItem > extends ViewProps< Item > {
-	onChangeView: ( view: ViewTableType ) => void;
-	view: ViewTableType;
-}
+interface ViewTableProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewTableType > {}
 
 function WithDropDownMenuSeparators( { children }: { children: ReactNode } ) {
 	return Children.toArray( children )

@@ -30,10 +30,8 @@ import type {
 	ViewProps,
 } from './types';
 
-interface ViewGridProps< Item extends AnyItem > extends ViewProps< Item > {
-	onChangeView: ( view: ViewGridType ) => void;
-	view: ViewGridType;
-}
+interface ViewGridProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewGridType > {}
 
 interface GridItemProps< Item extends AnyItem > {
 	selection: string[];
