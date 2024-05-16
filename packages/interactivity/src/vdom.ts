@@ -32,7 +32,7 @@ const directiveParser = new RegExp(
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
-const nsPathRegExp = /^(?<namespace>[\w_\/-]+)::(?<value>.+)$/;
+const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
 
 export const hydratedIslands = new WeakSet();
 
@@ -95,12 +95,10 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				if ( attributeName === ignoreAttr ) {
 					ignore = true;
 				} else {
-					const regexCaptureGroups = nsPathRegExp.exec(
-						attributes[ i ].value
-					)?.groups;
-					const namespace = regexCaptureGroups?.namespace ?? null;
-					let value: any =
-						regexCaptureGroups?.value ?? attributes[ i ].value;
+					const attrValue = attributes[ i ].value;
+					const namespaceAndPath = nsPathRegExp.exec( attrValue );
+					const namespace = namespaceAndPath?.[ 1 ] ?? null;
+					let value: any = namespaceAndPath?.[ 2 ] ?? attrValue;
 					try {
 						value = value && JSON.parse( value );
 					} catch ( e ) {}
