@@ -362,7 +362,7 @@ export default function PagePages() {
 					if ( isPublished && isModified ) {
 						return (
 							<>
-								{ __( 'Modified: ' ) }
+								{ __( 'Published: ' ) }
 								<time>
 									{ getFormattedDate( item.modified ) }
 								</time>
