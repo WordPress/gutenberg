@@ -41,7 +41,7 @@ interface VdomParams {
 
 interface Page {
 	regions: Record< string, any >;
-	head: HTMLElement[];
+	head: HTMLHeadElement[];
 	title: string;
 	initialData: any;
 }
@@ -54,7 +54,7 @@ const navigationMode: 'regionBased' | 'fullPage' =
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
 const pages = new Map< string, Promise< Page | false > >();
-const headElements = new Map();
+const headElements = new Map< string, { tag: HTMLElement; text: string } >();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.

@@ -4,7 +4,7 @@
  * @async
  * @param {Array} newHead The head elements of the new page.
  */
-export const updateHead = async ( newHead ) => {
+export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 	// Helper to get the tag id store in the cache.
 	const getTagId = ( tag ) => tag.id || tag.outerHTML;
 
@@ -41,12 +41,17 @@ export const updateHead = async ( newHead ) => {
  * Fetches and processes head assets (stylesheets and scripts) from a specified document.
  *
  * @async
- * @param {Document} doc          The document from which to fetch head assets. It should support standard DOM querying methods.
- * @param {Map}      headElements A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
+ * @param {Document} doc               The document from which to fetch head assets. It should support standard DOM querying methods.
+ * @param {Map}      headElements      A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
+ * @param            headElements.tag
+ * @param            headElements.text
  *
  * @return {Promise<HTMLElement[]>} Returns an array of HTML elements representing the head assets.
  */
-export const fetchHeadAssets = async ( doc, headElements ) => {
+export const fetchHeadAssets = async (
+	doc: Document,
+	headElements: Map< string, { tag: Element; text: string } >
+): Promise< HTMLElement[] > => {
 	const headTags = [];
 	const assets = [
 		{
