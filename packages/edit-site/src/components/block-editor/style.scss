@@ -61,10 +61,6 @@
 	& > .components-resizable-box__container {
 		margin: 0 auto;
 	}
-
-	&.is-view-mode {
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
-	}
 }
 
 .resizable-editor__drag-handle {
