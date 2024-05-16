@@ -334,32 +334,33 @@ export default function PagePages() {
 				render: ( { item } ) => {
 					const isModified =
 						getDate( item.date ) < getDate( item.modified );
-					if ( isModified ) {
+					const isDraft = item.status === 'draft';
+					if ( isModified || isDraft ) {
 						return (
-							<p>
+							<>
 								{ __( 'Modified: ' ) }
 								<time>
 									{ getFormattedDate( item.modified ) }
 								</time>
-							</p>
+							</>
 						);
 					}
 
 					const isScheduled = isInTheFuture( item.date );
 					if ( isScheduled ) {
 						return (
-							<p>
+							<>
 								{ __( 'Scheduled: ' ) }
 								<time>{ getFormattedDate( item.date ) }</time>
-							</p>
+							</>
 						);
 					}
 
 					return (
-						<p>
+						<>
 							{ __( 'Published: ' ) }
 							<time>{ getFormattedDate( item.date ) }</time>
-						</p>
+						</>
 					);
 				},
 			},
