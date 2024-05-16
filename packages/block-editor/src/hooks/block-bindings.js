@@ -13,22 +13,23 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
+import {
+	blockBindingsKey,
+	useBlockEditContext,
+} from '../components/block-edit/context';
 
 export const BlockBindingsPanel = () => {
-	const { bindings, sources } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlock } =
-			select( blockEditorStore );
-		const _selectedBlockClientId = getSelectedBlockClientId();
+	const blockEditContext = useBlockEditContext();
+	const bindings = blockEditContext[ blockBindingsKey ];
+
+	const { sources } = useSelect( ( select ) => {
 		const _sources = unlock(
 			select( blocksStore )
 		).getAllBlockBindingsSources();
 
 		return {
-			bindings: getBlock( _selectedBlockClientId ).attributes?.metadata
-				?.bindings,
 			sources: _sources,
 		};
 	}, [] );
