@@ -299,12 +299,15 @@ function ShadowEditor( { shadow, onChange } ) {
 
 	return (
 		<>
-			<VStack spacing={ 8 }>
+			<VStack spacing={ 2 }>
 				<HStack justify="space-between">
-					<FlexItem>
+					<Flex
+						align="center"
+						className="edit-site-global-styles__shadows-panel__title"
+					>
 						<Subtitle level={ 3 }>{ 'Shadows' }</Subtitle>
-					</FlexItem>
-					<FlexItem>
+					</Flex>
+					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button
 							size="small"
 							icon={ plus }
@@ -422,7 +425,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 
 	return (
 		<div className="edit-site-global-styles__shadow-editor-panel">
-			<VStack>
+			<VStack spacing={ 2 }>
 				<Heading level={ 5 }>{ __( 'Shadow' ) }</Heading>
 				<div className="edit-site-global-styles__shadow-editor-color-palette">
 					<ColorPalette
@@ -443,6 +446,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 					onChange={ ( value ) =>
 						onShadowChange( 'inset', value === 'inset' )
 					}
+					hideLabelFromVision
 					__next40pxDefaultSize
 				>
 					<ToggleGroupControlOption
@@ -454,7 +458,7 @@ function ShadowPopover( { shadowObj, onChange } ) {
 						label={ __( 'Inset' ) }
 					/>
 				</ToggleGroupControl>
-				<Grid columns={ 2 } gap={ 6 } rowGap={ 2 }>
+				<Grid columns={ 2 } gap={ 4 }>
 					<ShadowInputControl
 						label={ __( 'X Position' ) }
 						value={ shadowObj.x }
@@ -532,6 +536,7 @@ function ShadowInputControl( { label, value, onChange, hasNegativeRange } ) {
 					onChange={ sliderOnChange }
 					withInputField={ false }
 					__next40pxDefaultSize
+					__nextHasNoMarginBottom
 					min={
 						hasNegativeRange
 							? -(

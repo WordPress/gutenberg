@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalItemGroup as ItemGroup,
 	Button,
+	Flex,
 	FlexItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -22,7 +23,7 @@ import ScreenHeader from './header';
 
 const { useGlobalSetting } = unlock( blockEditorPrivateApis );
 
-export const defaultShadow = '6px 6px #000';
+export const defaultShadow = '6px 6px 9px rgba(0, 0, 0, 0.2)';
 
 export default function ShadowsPanel() {
 	const [ defaultShadows ] = useGlobalSetting( 'shadow.presets.default' );
@@ -48,7 +49,7 @@ export default function ShadowsPanel() {
 			/>
 			<div className="edit-site-global-styles-screen">
 				<VStack
-					className="edit-site-global-styles-shadows-panel"
+					className="edit-site-global-styles__shadows-panel"
 					spacing={ 7 }
 				>
 					{ defaultShadowsEnabled && (
@@ -88,13 +89,16 @@ function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 	};
 
 	return (
-		<VStack spacing={ 3 }>
+		<VStack spacing={ 2 }>
 			<HStack justify="space-between">
-				<FlexItem>
+				<Flex
+					align="center"
+					className="edit-site-global-styles__shadows-panel__title"
+				>
 					<Subtitle level={ 3 }>{ label }</Subtitle>
-				</FlexItem>
-				<FlexItem>
-					{ canCreate && (
+				</Flex>
+				{ canCreate && (
+					<FlexItem className="edit-site-global-styles__shadows-panel__options-container">
 						<Button
 							size="small"
 							icon={ plus }
@@ -103,8 +107,8 @@ function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 								handleAddShadow();
 							} }
 						/>
-					) }
-				</FlexItem>
+					</FlexItem>
+				) }
 			</HStack>
 			{ shadows.length > 0 && (
 				<ItemGroup isBordered isSeparated>
