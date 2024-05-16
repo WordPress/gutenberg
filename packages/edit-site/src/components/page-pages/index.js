@@ -332,20 +332,16 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
-					const isModified =
-						getDate( item.date ) < getDate( item.modified );
 					const isNotPublished = [
 						'draft',
 						'pending',
 						'private',
 					].some( ( status ) => status === item.status );
-					if ( isModified || isNotPublished ) {
+					if ( isNotPublished ) {
 						return (
 							<>
 								{ __( 'Modified: ' ) }
-								<time>
-									{ getFormattedDate( item.modified ) }
-								</time>
+								<time>{ getFormattedDate( item.date ) }</time>
 							</>
 						);
 					}
@@ -356,6 +352,20 @@ export default function PagePages() {
 							<>
 								{ __( 'Scheduled: ' ) }
 								<time>{ getFormattedDate( item.date ) }</time>
+							</>
+						);
+					}
+
+					const isPublished = item.status === 'publish';
+					const isModified =
+						getDate( item.date ) < getDate( item.modified );
+					if ( isPublished && isModified ) {
+						return (
+							<>
+								{ __( 'Modified: ' ) }
+								<time>
+									{ getFormattedDate( item.modified ) }
+								</time>
 							</>
 						);
 					}
