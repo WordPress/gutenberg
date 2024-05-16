@@ -218,6 +218,21 @@ const Cover = ( {
 		} );
 	};
 
+	const onUpdateMediaProgress = useCallback(
+		( payload ) => {
+			const { mediaUrl, state } = payload;
+
+			setIsUploadInProgress( true );
+
+			if ( isUploadInProgress && isImage && mediaUrl && ! state ) {
+				setAttributes( {
+					url: mediaUrl,
+				} );
+			}
+		},
+		[ isImage, isUploadInProgress, setAttributes ]
+	);
+
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -447,9 +462,7 @@ const Cover = ( {
 					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
+					onUpdateMediaProgress={ onUpdateMediaProgress }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,
