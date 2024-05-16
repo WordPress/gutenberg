@@ -332,16 +332,31 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
-					const isNotPublished = [
-						'draft',
-						'pending',
-						'private',
-					].some( ( status ) => status === item.status );
-					if ( isNotPublished ) {
+					const isDraftOrPrivate = [ 'draft', 'private' ].some(
+						( status ) => status === item.status
+					);
+					if ( isDraftOrPrivate ) {
 						return (
 							<>
 								{ __( 'Modified: ' ) }
 								<time>{ getFormattedDate( item.date ) }</time>
+							</>
+						);
+					}
+
+					const isPending = item.status === 'pending';
+					if ( isPending ) {
+						const isModified =
+							getDate( item.modified ) > getDate( item.date );
+						const dateToDisplay = isModified
+							? item.modified
+							: item.date;
+						return (
+							<>
+								{ __( 'Modified: ' ) }
+								<time>
+									{ getFormattedDate( dateToDisplay ) }
+								</time>
 							</>
 						);
 					}
@@ -357,25 +372,24 @@ export default function PagePages() {
 					}
 
 					const isPublished = item.status === 'publish';
-					const isModified =
-						getDate( item.date ) < getDate( item.modified );
-					if ( isPublished && isModified ) {
+					if ( isPublished ) {
+						const isModified =
+							getDate( item.modified ) > getDate( item.modified );
+						const dateToDisplay = isModified
+							? item.modified
+							: item.date;
 						return (
 							<>
 								{ __( 'Published: ' ) }
 								<time>
-									{ getFormattedDate( item.modified ) }
+									{ getFormattedDate( dateToDisplay ) }
 								</time>
 							</>
 						);
 					}
 
-					return (
-						<>
-							{ __( 'Published: ' ) }
-							<time>{ getFormattedDate( item.date ) }</time>
-						</>
-					);
+					// Unknow status.
+					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
 		],
