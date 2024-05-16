@@ -186,7 +186,7 @@ export function RichTextWrapper(
 					);
 					if (
 						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing
+						blockBindingsSource.lockAttributesEditing()
 					) {
 						_disableBoundBlocks = true;
 						break;
