@@ -21,7 +21,7 @@ function gutenberg_replace_pattern_blocks( $blocks, &$inner_content = null ) {
 				continue;
 			}
 
-			$content = render_block( $blocks[ $i ] );
+			$content            = render_block( $blocks[ $i ] );
 			$blocks_to_insert   = parse_blocks( $content );
 			$seen_refs[ $slug ] = true;
 			$blocks_to_insert   = gutenberg_replace_pattern_blocks( $blocks_to_insert );
