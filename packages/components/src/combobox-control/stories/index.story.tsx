@@ -139,3 +139,17 @@ WithDisabledOptions.args = {
 	label: 'Select a country',
 	options: optionsWithDisabledOptions,
 };
+
+/**
+ * By default, the combobox expands when focused.
+ * You can disable this behavior by setting the `expandOnFocus` prop to `false`.
+ * This is useful when you want to show the suggestions only when the user interacts with the input.
+ */
+export const NotExpandOnFocus = Template.bind( {} );
+
+NotExpandOnFocus.args = {
+	allowReset: false,
+	label: 'Select a country',
+	options: countryOptions,
+	expandOnFocus: false,
+};

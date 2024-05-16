@@ -74,4 +74,11 @@ export type ComboboxControlProps = Pick<
 	 * The current value of the control.
 	 */
 	value?: string | null;
+
+	/**
+	 * Automatically expand the dropdown when the control is focused.
+	 *
+	 * @default true
+	 */
+	expandOnFocus?: boolean;
 };
