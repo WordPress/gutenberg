@@ -241,7 +241,7 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewBase;
+export type View = ViewList | ViewGrid | ViewTable;
 
 interface ActionBase< Item extends AnyItem > {
 	/**
@@ -336,3 +336,16 @@ export interface ActionButton< Item extends AnyItem >
 export type Action< Item extends AnyItem > =
 	| ActionModal< Item >
 	| ActionButton< Item >;
+
+export interface ViewProps< Item extends AnyItem > {
+	actions: Action< Item >[];
+	data: Item[];
+	fields: NormalizedField< Item >[];
+	getItemId: ( item: Item ) => string;
+	isLoading?: boolean;
+	onChangeView: ( view: ViewBase ) => void;
+	onSelectionChange: ( items: Item[] ) => void;
+	selection: string[];
+	setOpenedFilter: ( fieldId: string ) => void;
+	view: ViewBase;
+}

@@ -49,6 +49,7 @@ import type {
 	AnyItem,
 	NormalizedField,
 	SortDirection,
+	ViewProps,
 	ViewTable as ViewTableType,
 } from './types';
 
@@ -89,16 +90,8 @@ interface TableRowProps< Item extends AnyItem > {
 	data: Item[];
 }
 
-interface ViewTableProps< Item extends AnyItem > {
-	actions: Action< Item >[];
-	data: Item[];
-	fields: NormalizedField< Item >[];
-	getItemId: ( item: Item ) => string;
-	isLoading?: boolean;
+interface ViewTableProps< Item extends AnyItem > extends ViewProps< Item > {
 	onChangeView: ( view: ViewTableType ) => void;
-	onSelectionChange: ( items: Item[] ) => void;
-	selection: string[];
-	setOpenedFilter: ( fieldId: string ) => void;
 	view: ViewTableType;
 }
 
