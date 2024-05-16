@@ -41,7 +41,9 @@ export default function PostSchedulePanel() {
 			// move around when the label changes.
 			anchor: popoverAnchor,
 			'aria-label': __( 'Change publish date' ),
-			placement: 'bottom-end',
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
 		} ),
 		[ popoverAnchor ]
 	);
