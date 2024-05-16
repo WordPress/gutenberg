@@ -140,7 +140,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 				( obj, [ name, ns, value ] ) => {
 					const directiveMatch = directiveParser.exec( name );
 					if ( directiveMatch === null ) {
-						warn( `Invalid directive: ${ name }.` );
+						warn( `Found malformed directive name: ${ name }.` );
 						return obj;
 					}
 					const prefix = directiveMatch[ 1 ] || '';
