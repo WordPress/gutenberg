@@ -273,6 +273,16 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
+	const { frontPageId, postsPageId } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+
+		return {
+			frontPageId: siteSettings?.page_on_front,
+			postsPageId: siteSettings?.page_for_posts,
+		};
+	} );
+
 	const fields = useMemo(
 		() => [
 			{
@@ -293,7 +303,7 @@ export default function PagePages() {
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 						item.status !== 'trash';
-					return addLink ? (
+					const title = addLink ? (
 						<Link
 							params={ {
 								postId: item.id,
@@ -306,8 +316,32 @@ export default function PagePages() {
 						</Link>
 					) : (
 						decodeEntities( item.title?.rendered ) ||
-							__( '(no title)' )
+						__( '(no title)' )
 					);
+
+					if ( item.id === frontPageId ) {
+						return (
+							<>
+								{ title }
+								<span className="edit-site-page-pages__title-badge">
+									{ __( 'Front Page' ) }
+								</span>
+							</>
+						);
+					}
+
+					if ( item.id === postsPageId ) {
+						return (
+							<>
+								{ title }
+								<span className="edit-site-page-pages__title-badge">
+									{ __( 'Posts Page' ) }
+								</span>
+							</>
+						);
+					}
+
+					return title;
 				},
 				maxWidth: 300,
 				enableHiding: false,
@@ -411,7 +445,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view.type ]
+		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
 	const postTypeActions = usePostActions( 'page' );
