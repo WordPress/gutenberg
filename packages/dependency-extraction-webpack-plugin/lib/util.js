@@ -44,6 +44,7 @@ function defaultRequestToExternal( request ) {
 			return 'ReactDOM';
 
 		case 'react/jsx-runtime':
+		case 'react/jsx-dev-runtime':
 			return 'ReactJSXRuntime';
 	}
 
