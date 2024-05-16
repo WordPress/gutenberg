@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -149,7 +149,9 @@ export function useStyleOverride( {
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
 
 		const _id = id || fallbackId;
 		const override = {
@@ -608,7 +610,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),
