@@ -103,6 +103,7 @@ export default function DocumentBar() {
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
 	const title = isTemplate ? templateTitle : document.title;
+	const isUnsyncedPattern = document?.wp_pattern_sync_status === 'unsynced';
 
 	const mounted = useRef( false );
 	useEffect( () => {
@@ -113,7 +114,7 @@ export default function DocumentBar() {
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'is-global': isGlobalEntity,
+				'is-global': isGlobalEntity && ! isUnsyncedPattern,
 			} ) }
 		>
 			<AnimatePresence>
