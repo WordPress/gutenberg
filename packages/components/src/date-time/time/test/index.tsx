@@ -165,7 +165,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const pmButton = screen.getByText( 'PM' );
+		const pmButton = screen.getByLabelText( 'PM', { selector: 'button' } );
 
 		await user.click( pmButton );
 
@@ -185,7 +185,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const amButton = screen.getByText( 'AM' );
+		const amButton = screen.getByLabelText( 'AM', { selector: 'button' } );
 
 		await user.click( amButton );
 
@@ -205,7 +205,7 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const pmButton = screen.getByText( 'PM' );
+		const pmButton = screen.getByLabelText( 'PM', { selector: 'button' } );
 		await user.click( pmButton );
 
 		const hoursInput = screen.getByLabelText( 'Hours' );
