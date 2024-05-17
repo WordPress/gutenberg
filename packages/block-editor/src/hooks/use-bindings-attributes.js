@@ -37,7 +37,10 @@ const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
  * @return {boolean} Whether it is possible to bind the block to sources.
  */
 export function canBindBlock( blockName ) {
-	return blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS;
+	return (
+		window.__experimentalBlockBindingsEditorAPIs?.allowAnyBlock ||
+		blockName in BLOCK_BINDINGS_ALLOWED_BLOCKS
+	);
 }
 
 /**
@@ -50,8 +53,11 @@ export function canBindBlock( blockName ) {
  */
 export function canBindAttribute( blockName, attributeName ) {
 	return (
-		canBindBlock( blockName ) &&
-		BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes( attributeName )
+		window.__experimentalBlockBindingsEditorAPIs?.allowAnyBlock ||
+		( canBindBlock( blockName ) &&
+			BLOCK_BINDINGS_ALLOWED_BLOCKS[ blockName ].includes(
+				attributeName
+			) )
 	);
 }
 

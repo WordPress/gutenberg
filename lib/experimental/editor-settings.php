@@ -28,6 +28,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalFullPageClientSideNavigation = true', 'before' );
 	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-expose-block-bindings-editor-apis' ) ) {
+		wp_add_inline_script( 'wp-block-library', 'window.__experimentalBlockBindingsEditorAPIs = { allowAnyBlock: true }', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

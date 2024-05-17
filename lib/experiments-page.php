@@ -127,6 +127,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-expose-block-bindings-editor-apis',
+		__( 'Expose block bindings editor APIs', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Expose block bindings editor APIs, including supporting any block. Server support should be handled independtenly of this experiment', 'gutenberg' ),
+			'id'    => 'gutenberg-expose-block-bindings-editor-apis',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

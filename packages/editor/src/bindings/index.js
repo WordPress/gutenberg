@@ -16,3 +16,8 @@ registerBlockBindingsSource( postMeta );
 if ( process.env.IS_GUTENBERG_PLUGIN ) {
 	registerBlockBindingsSource( patternOverrides );
 }
+
+if ( window.__experimentalBlockBindingsEditorAPIs ) {
+	window.__experimentalBlockBindingsEditorAPIs.registerBlockBindingsSource =
+		registerBlockBindingsSource;
+}
