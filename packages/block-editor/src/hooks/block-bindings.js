@@ -46,14 +46,10 @@ export const BlockBindingsPanel = ( { metadata } ) => {
 								<HStack>
 									<span>{ key }</span>
 									<span className="components-item__block-bindings-source">
-										{ sources[ bindings[ key ].source ] ? (
-											sources[ bindings[ key ].source ]
-												.label
-										) : (
-											<span className="error">
-												Error: Unknown Source
-											</span>
-										) }
+										{ sources[ bindings[ key ].source ]
+											? sources[ bindings[ key ].source ]
+													.label
+											: bindings[ key ].source }
 									</span>
 								</HStack>
 							</Item>
