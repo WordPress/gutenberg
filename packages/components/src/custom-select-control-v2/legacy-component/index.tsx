@@ -3,6 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -65,9 +66,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	}, [] );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, ...rest } ) => {
+		( { name, key, __experimentalHint, className, ...rest } ) => {
 			const withHint = (
-				<Styled.WithHintWrapper>
+				<Styled.WithHintWrapper style={ { display: 'grid' } }>
 					<span>{ name }</span>
 					<Styled.ExperimentalHintItem className="components-custom-select-control__item-hint">
 						{ __experimentalHint }
@@ -80,6 +81,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 					key={ key }
 					value={ name }
 					children={ __experimentalHint ? withHint : name }
+					className={ clsx( className, {
+						'has-hint': __experimentalHint,
+					} ) }
 					{ ...rest }
 				/>
 			);
