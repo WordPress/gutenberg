@@ -21,6 +21,7 @@ const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 export default function StyleVariationsContainer( { gap = 2 } ) {
 	const { user } = useContext( GlobalStylesContext );
 	const [ currentUserStyles ] = useState( { ...user } );
+	const userStyles = currentUserStyles?.styles;
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -46,36 +47,29 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				const blockStyles = { ...variation?.styles?.blocks } || {};
 				// We need to copy any user custom CSS to the variation to prevent it being lost
 				// when switching variations.
-				if ( currentUserStyles?.styles?.blocks ) {
-					Object.keys( currentUserStyles.styles.blocks ).forEach(
-						( blockName ) => {
-							if (
-								currentUserStyles.styles.blocks[ blockName ].css
-							) {
-								blockStyles[ blockName ] = {
-									...( blockStyles[ blockName ]
-										? blockStyles[ blockName ]
-										: {} ),
-									css: `${
-										blockStyles[ blockName ]?.css || ''
-									} ${
-										currentUserStyles.styles.blocks[
-											blockName
-										].css
-									}`,
-								};
-							}
+				if ( userStyles?.blocks ) {
+					Object.keys( userStyles.blocks ).forEach( ( blockName ) => {
+						// First get any block specific custom CSS from the current user styles and merge with any custom CSS for
+						// that block in the variation.
+						if ( userStyles.blocks[ blockName ].css ) {
+							blockStyles[ blockName ] = {
+								...( blockStyles[ blockName ]
+									? blockStyles[ blockName ]
+									: {} ),
+								css: `${
+									blockStyles[ blockName ]?.css || ''
+								} ${ userStyles.blocks[ blockName ].css }`,
+							};
 						}
-					);
+					} );
 				}
-
+				// Now merge any global custom CSS from current user styles with global custom CSS in the variation.
 				const styles = {
 					...variation.styles,
-					...( currentUserStyles?.styles?.css ||
-					variation?.styles?.css
+					...( userStyles?.css || variation.styles?.css
 						? {
 								css: `${ variation.styles?.css || '' } ${
-									currentUserStyles.styles.css
+									userStyles?.css
 								}`,
 						  }
 						: {} ),
@@ -90,11 +84,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				};
 			} ),
 		];
-	}, [
-		multiplePropertyVariations,
-		currentUserStyles.styles.blocks,
-		currentUserStyles.styles.css,
-	] );
+	}, [ multiplePropertyVariations, userStyles.blocks, userStyles?.css ] );
 
 	return (
 		<Grid
