@@ -30,8 +30,8 @@ function PostFormatCheck( { children } ) {
 /**
  * Component check if there are any post formats.
  *
- * @param {Object}  props          - The component props.
- * @param {Element} props.children - The child elements to render.
+ * @param {Object}  props          The component props.
+ * @param {Element} props.children The child elements to render.
  *
  * @return {Component|null} The rendered component or null if post formats are disabled.
  */

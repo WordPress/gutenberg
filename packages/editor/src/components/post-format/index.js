@@ -39,18 +39,14 @@ export const POST_FORMATS = [
 } );
 
 /**
- * `PostFormat` is a React component that provides a dropdown selector for post formats.
- * It fetches the current post format, suggested post format, and supported formats from the store.
- * It filters the post formats based on the supported formats and the current post format.
- * It also provides a suggestion for the post format if it's different from the current post format.
+ * `PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
  *
- * @component
  * @example
  * ```jsx
  * <PostFormat />
  * ```
  *
- * @returns {React.Element} The rendered PostFormat component.
+ * @return {JSX.Element} The rendered PostFormat component.
  */
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
