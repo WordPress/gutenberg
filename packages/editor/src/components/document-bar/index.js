@@ -52,8 +52,9 @@ const MotionButton = motion( Button );
 export default function DocumentBar() {
 	const {
 		postType,
-		document,
-		isResolving,
+		documentTitle,
+		isNotFound,
+		isUnsyncedPattern,
 		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
@@ -76,13 +77,16 @@ export default function DocumentBar() {
 		const _templateInfo = getTemplateInfo( _document );
 		return {
 			postType: _postType,
-			document: _document,
-			isResolving: isResolvingSelector(
-				'getEditedEntityRecord',
-				'postType',
-				_postType,
-				_postId
-			),
+			documentTitle: _document.title,
+			isNotFound:
+				! _document &&
+				! isResolvingSelector(
+					'getEditedEntityRecord',
+					'postType',
+					_postType,
+					_postId
+				),
+			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
 			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
 				{
@@ -98,11 +102,10 @@ export default function DocumentBar() {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const isNotFound = ! document && ! isResolving;
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const title = isTemplate ? templateTitle : document.title;
+	const title = isTemplate ? templateTitle : documentTitle;
 
 	const mounted = useRef( false );
 	useEffect( () => {
@@ -113,7 +116,7 @@ export default function DocumentBar() {
 		<div
 			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'is-global': isGlobalEntity,
+				'is-global': isGlobalEntity && ! isUnsyncedPattern,
 			} ) }
 		>
 			<AnimatePresence>

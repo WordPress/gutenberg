@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { ResizableBox } from '@wordpress/components';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,16 +11,84 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS } from './utils';
 
-export function GridItemResizer( { clientId, onChange } ) {
+export function GridItemResizer( { clientId, bounds, onChange } ) {
 	const blockElement = useBlockElement( clientId );
-	if ( ! blockElement ) {
+	const rootBlockElement = blockElement?.parentElement;
+
+	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
 	}
+
+	return (
+		<GridItemResizerInner
+			clientId={ clientId }
+			bounds={ bounds }
+			blockElement={ blockElement }
+			rootBlockElement={ rootBlockElement }
+			onChange={ onChange }
+		/>
+	);
+}
+
+function GridItemResizerInner( {
+	clientId,
+	bounds,
+	blockElement,
+	rootBlockElement,
+	onChange,
+} ) {
+	const [ resizeDirection, setResizeDirection ] = useState( null );
+	const [ enableSide, setEnableSide ] = useState( {
+		top: false,
+		bottom: false,
+		left: false,
+		right: false,
+	} );
+
+	useEffect( () => {
+		const observer = new window.ResizeObserver( () => {
+			const blockClientRect = blockElement.getBoundingClientRect();
+			const rootBlockClientRect =
+				rootBlockElement.getBoundingClientRect();
+			setEnableSide( {
+				top: blockClientRect.top > rootBlockClientRect.top,
+				bottom: blockClientRect.bottom < rootBlockClientRect.bottom,
+				left: blockClientRect.left > rootBlockClientRect.left,
+				right: blockClientRect.right < rootBlockClientRect.right,
+			} );
+		} );
+		observer.observe( blockElement );
+		return () => observer.disconnect();
+	}, [ blockElement, rootBlockElement ] );
+
+	const justification = {
+		right: 'flex-start',
+		left: 'flex-end',
+	};
+
+	const alignment = {
+		top: 'flex-end',
+		bottom: 'flex-start',
+	};
+
+	const styles = {
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		...( justification[ resizeDirection ] && {
+			justifyContent: justification[ resizeDirection ],
+		} ),
+		...( alignment[ resizeDirection ] && {
+			alignItems: alignment[ resizeDirection ],
+		} ),
+	};
+
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
+			additionalStyles={ styles }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"
@@ -28,53 +97,77 @@ export function GridItemResizer( { clientId, onChange } ) {
 					height: '100%',
 				} }
 				enable={ {
-					bottom: true,
+					bottom: enableSide.bottom,
 					bottomLeft: false,
 					bottomRight: false,
-					left: false,
-					right: true,
-					top: false,
+					left: enableSide.left,
+					right: enableSide.right,
+					top: enableSide.top,
 					topLeft: false,
 					topRight: false,
 				} }
+				bounds={ bounds }
+				boundsByDirection
+				onResizeStart={ ( event, direction ) => {
+					/*
+					 * The container justification and alignment need to be set
+					 * according to the direction the resizer is being dragged in,
+					 * so that it resizes in the right direction.
+					 */
+					setResizeDirection( direction );
+
+					/*
+					 * The mouseup event on the resize handle doesn't trigger if the mouse
+					 * isn't directly above the handle, so we try to detect if it happens
+					 * outside the grid and dispatch a mouseup event on the handle.
+					 */
+					blockElement.ownerDocument.addEventListener(
+						'mouseup',
+						() => {
+							event.target.dispatchEvent(
+								new Event( 'mouseup', { bubbles: true } )
+							);
+						},
+						{ once: true }
+					);
+				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const gridElement = blockElement.parentElement;
 					const columnGap = parseFloat(
-						getComputedCSS( gridElement, 'column-gap' )
+						getComputedCSS( rootBlockElement, 'column-gap' )
 					);
 					const rowGap = parseFloat(
-						getComputedCSS( gridElement, 'row-gap' )
+						getComputedCSS( rootBlockElement, 'row-gap' )
 					);
 					const gridColumnTracks = getGridTracks(
-						getComputedCSS( gridElement, 'grid-template-columns' ),
+						getComputedCSS(
+							rootBlockElement,
+							'grid-template-columns'
+						),
 						columnGap
 					);
 					const gridRowTracks = getGridTracks(
-						getComputedCSS( gridElement, 'grid-template-rows' ),
+						getComputedCSS(
+							rootBlockElement,
+							'grid-template-rows'
+						),
 						rowGap
 					);
+					const rect = new window.DOMRect(
+						blockElement.offsetLeft + boxElement.offsetLeft,
+						blockElement.offsetTop + boxElement.offsetTop,
+						boxElement.offsetWidth,
+						boxElement.offsetHeight
+					);
 					const columnStart =
-						getClosestTrack(
-							gridColumnTracks,
-							blockElement.offsetLeft
-						) + 1;
+						getClosestTrack( gridColumnTracks, rect.left ) + 1;
 					const rowStart =
-						getClosestTrack(
-							gridRowTracks,
-							blockElement.offsetTop
-						) + 1;
+						getClosestTrack( gridRowTracks, rect.top ) + 1;
 					const columnEnd =
-						getClosestTrack(
-							gridColumnTracks,
-							blockElement.offsetLeft + boxElement.offsetWidth,
-							'end'
-						) + 1;
+						getClosestTrack( gridColumnTracks, rect.right, 'end' ) +
+						1;
 					const rowEnd =
-						getClosestTrack(
-							gridRowTracks,
-							blockElement.offsetTop + boxElement.offsetHeight,
-							'end'
-						) + 1;
+						getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
+						1;
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,

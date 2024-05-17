@@ -47,10 +47,6 @@ import {
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
-	exportJSONaction,
-	renameAction,
-	resetAction,
-	deleteAction,
 	duplicatePatternAction,
 	duplicateTemplatePartAction,
 } from './dataviews-pattern-actions';
@@ -60,12 +56,13 @@ import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -375,45 +372,22 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const history = useHistory();
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					categoryId,
-					categoryType: type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history, categoryId, type ]
-	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
+	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
+	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const editAction = useEditPostAction();
+
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
-				renameAction,
 				duplicateTemplatePartAction,
-				viewRevisionsAction,
-				resetAction,
-				deleteAction,
-			];
+				...templatePartActions,
+			].filter( Boolean );
 		}
-		return [
-			renameAction,
-			duplicatePatternAction,
-			exportJSONaction,
-			resetAction,
-			deleteAction,
-		];
-	}, [ type, editAction, viewRevisionsAction ] );
+		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
+			Boolean
+		);
+	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

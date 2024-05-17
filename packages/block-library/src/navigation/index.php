@@ -7,16 +7,22 @@
 
 /**
  * Helper functions used to render the navigation block.
+ *
+ * @since 6.5.0
  */
 class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Used to determine whether or not a navigation has submenus.
+	 *
+	 * @since 6.5.0
 	 */
 	private static $has_submenus = false;
 
 	/**
 	 * Used to determine which blocks need an <li> wrapper.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @var array
 	 */
@@ -29,12 +35,16 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Keeps track of all the navigation names that have been seen.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @var array
 	 */
 	private static $seen_menu_names = array();
 
 	/**
 	 * Returns whether or not this is responsive navigation.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array $attributes The block attributes.
 	 * @return bool Returns whether or not this is responsive navigation.
@@ -50,6 +60,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Returns whether or not a navigation has a submenu.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return bool Returns whether or not a navigation has a submenu and also sets the member variable.
@@ -88,6 +100,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Determine whether the navigation blocks is interactive.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return bool Returns whether or not to load the view script.
@@ -100,6 +114,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Returns whether or not a block needs a list item wrapper.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param WP_Block $block The block.
 	 * @return bool Returns whether or not a block needs a list item wrapper.
@@ -127,6 +143,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the markup for a single inner block.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param WP_Block $inner_block The inner block.
 	 * @return string Returns the markup for a single inner block.
 	 */
@@ -143,6 +161,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Returns the html for the inner blocks of the navigation block.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
@@ -201,6 +221,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the inner blocks for the navigation block from the navigation post.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
@@ -236,6 +258,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the inner blocks for the navigation block from the fallback.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return WP_Block_List Returns the inner blocks for the navigation block.
 	 */
@@ -252,6 +276,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Gets the inner blocks for the navigation block.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param WP_Block $block The parsed block.
@@ -311,6 +337,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Gets the name of the current navigation, if it has one.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return string Returns the name of the navigation.
 	 */
@@ -346,6 +374,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the layout class for the navigation block.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return string Returns the layout class for the navigation block.
 	 */
@@ -377,6 +407,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Return classes for the navigation block.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return string Returns the classes for the navigation block.
 	 */
@@ -404,6 +436,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Get styles for the navigation block.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array $attributes The block attributes.
 	 * @return string Returns the styles for the navigation block.
 	 */
@@ -416,6 +450,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Get the responsive container markup
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array         $attributes The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
@@ -515,6 +551,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Get the wrapper attributes
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array         $attributes    The block attributes.
 	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
 	 * @return string Returns the navigation block markup.
@@ -543,6 +581,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Gets the nav element directives.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param bool $is_interactive Whether the block is interactive.
 	 * @return string the directives for the navigation element.
@@ -574,6 +614,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Handle view script module loading.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block      $block        The parsed block.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
@@ -598,6 +640,8 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns the markup for the navigation block.
 	 *
+	 * @since 6.5.0
+	 *
 	 * @param array         $attributes The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return string Returns the navigation wrapper markup.
@@ -612,6 +656,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Returns a unique name for the navigation.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array $attributes The block attributes.
 	 * @return string Returns a unique name for the navigation.
@@ -631,6 +677,8 @@ class WP_Navigation_Block_Renderer {
 
 	/**
 	 * Renders the navigation block.
+	 *
+	 * @since 6.5.0
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content    The saved content.
@@ -1604,7 +1652,9 @@ function block_core_navigation_insert_hooked_blocks_into_rest_response( $respons
 	// Remove mock Navigation block wrapper.
 	$content = block_core_navigation_remove_serialized_parent_block( $content );
 
-	$response->data['content']['raw']      = $content;
+	$response->data['content']['raw'] = $content;
+
+	/** This filter is documented in wp-includes/post-template.php */
 	$response->data['content']['rendered'] = apply_filters( 'the_content', $content );
 
 	return $response;

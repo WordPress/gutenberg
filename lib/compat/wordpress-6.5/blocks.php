@@ -99,13 +99,10 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
 			}
 			$amended_content->set_attribute( $block_type->attributes[ $attribute_name ]['attribute'], $source_value );
 			return $amended_content->get_updated_html();
-		break;
 
 		default:
 			return $block_content;
-		break;
 	}
-	return;
 }
 
 /**
@@ -114,6 +111,7 @@ function gutenberg_block_bindings_replace_html( $block_content, $block_name, str
  * @param string   $block_content Block Content.
  * @param array    $parsed_block  The full block, including name and attributes.
  * @param WP_Block $block_instance The block instance.
+ * @return string  Block content with the bind applied.
  */
 function gutenberg_process_block_bindings( $block_content, $parsed_block, $block_instance ) {
 	$supported_block_attrs = array(

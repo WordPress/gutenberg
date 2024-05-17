@@ -144,7 +144,7 @@ public class Gutenberg: UIResponder {
         bridgeModule.sendEvent(withName: event.rawValue, body: body)
     }
 
-    public func mediaUploadUpdate(id: Int32, state: MediaUploadState, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:]) {
+    public func mediaUploadUpdate(id: Int32, state: MediaUploadState? = nil, progress: Float? = nil, url: URL?, serverID: Int32? = nil, metadata: [String: Any] = [:]) {
         mediaUpdate(event: .mediaUpload, id: id, state: state, progress: progress, url: url, serverID: serverID, metadata: metadata)
     }
 
@@ -169,8 +169,15 @@ public class Gutenberg: UIResponder {
         ])
     }
 
-    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State, progress: Float, url: URL?, serverID: Int32?, metadata: [String: Any] = [:])  {
-        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress, "metadata": metadata ];
+    private func mediaUpdate<State: MediaState>(event: RNReactNativeGutenbergBridge.EventName, id: Int32, state: State?, progress: Float?, url: URL?, serverID: Int32?, metadata: [String: Any] = [:])  {
+        var data: [String: Any] = ["mediaId": id, "metadata": metadata ];
+        
+        if let state = state {
+            data["state"] = state.rawValue
+        }
+        if let progress = progress {
+            data["progress"] = progress
+        }
         if let url = url {
             data["mediaUrl"] = url.absoluteString
         }

@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -246,13 +246,13 @@ export default function PostTemplateEdit( {
 	const displayLayoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Post template block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {
 					type: 'grid',
