@@ -100,8 +100,8 @@ dependencies {
     implementation "com.facebook.react:react-android"
     implementation("com.facebook.react:flipper-integration")
 
-    implementation "com.github.wordpress-mobile:react-native-video:update~android-14-SNAPSHOT"
-    implementation "com.github.wordpress-mobile:react-native-slider:update~android-14-SNAPSHOT"
+    implementation "com.github.wordpress-mobile:react-native-video:${extractPackageVersion(packageJson, 'react-native-video', 'dependencies')}"
+    implementation "com.github.wordpress-mobile:react-native-slider:${extractPackageVersion(packageJson, '@react-native-community/slider', 'dependencies')}"
 
     // Published by `wordpress-mobile/react-native-libraries-publisher`
     // See the documentation for this value in `build.gradle.kts` of `wordpress-mobile/react-native-libraries-publisher`
