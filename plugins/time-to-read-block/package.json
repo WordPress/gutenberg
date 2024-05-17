@@ -5,6 +5,10 @@
 	"description": "Block to display the minutes required to finish reading a post.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"blocks",
+		"wordpress"
+	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/trunk/plugins/time-to-read-block",
 	"repository": {
 		"type": "git",
@@ -15,15 +19,6 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "build/index.js",
-	"scripts": {
-		"build": "wp-scripts build",
-		"format": "wp-scripts format",
-		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
-		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start"
-	},
 	"dependencies": {
 		"@wordpress/block-editor": "file:../../packages/block-editor",
 		"@wordpress/blocks": "^12.33.0",
@@ -33,5 +28,17 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/wordcount": "file:../../packages/wordcount",
 		"clsx": "^2.1.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"packages-update": "wp-scripts packages-update",
+		"plugin-zip": "wp-scripts plugin-zip",
+		"start": "wp-scripts start"
 	}
 }
