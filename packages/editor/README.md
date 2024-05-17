@@ -966,7 +966,7 @@ Undocumented declaration.
 
 ### PostFormat
 
-`PostFormat` is a React component that provides a dropdown selector for post formats. It fetches the current post format, suggested post format, and supported formats from the store. It filters the post formats based on the supported formats and the current post format. It also provides a suggestion for the post format if it's different from the current post format.
+`PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
 
 _Usage_
 
@@ -974,14 +974,18 @@ _Usage_
 <PostFormat />
 ```
 
+_Returns_
+
+-   `JSX.Element`: The rendered PostFormat component.
+
 ### PostFormatCheck
 
 Component check if there are any post formats.
 
 _Parameters_
 
--   _props_ `Object`: - The component props.
--   _props.children_ `Element`: - The child elements to render.
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child elements to render.
 
 _Returns_
 
