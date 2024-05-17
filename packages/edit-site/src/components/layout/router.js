@@ -43,7 +43,7 @@ function useRedirectOldPaths() {
 			history.replace( { postType: 'template_part' } );
 		}
 
-		const allParmsButPath = {
+		const allParamsButPath = {
 			postId,
 			layout,
 			isCustom,
@@ -54,28 +54,28 @@ function useRedirectOldPaths() {
 		if ( path === '/page' ) {
 			history.replace( {
 				postType: 'page',
-				...allParmsButPath,
+				...allParamsButPath,
 			} );
 		}
 
 		if ( path === '/wp_template' ) {
 			history.replace( {
 				postType: 'wp_template',
-				...allParmsButPath,
+				...allParamsButPath,
 			} );
 		}
 
 		if ( path === '/patterns' ) {
 			history.replace( {
 				postType: categoryType ?? 'wp_block',
-				...allParmsButPath,
+				...allParamsButPath,
 			} );
 		}
 
 		if ( path === '/navigation' ) {
 			history.replace( {
 				postType: 'wp_navigation',
-				...allParmsButPath,
+				...allParamsButPath,
 			} );
 		}
 	}, [ history, params ] );
