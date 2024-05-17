@@ -15,15 +15,9 @@ import { useSelect } from '@wordpress/data';
  */
 import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
-import {
-	blockBindingsKey,
-	useBlockEditContext,
-} from '../components/block-edit/context';
 
-export const BlockBindingsPanel = () => {
-	const blockEditContext = useBlockEditContext();
-	const bindings = blockEditContext[ blockBindingsKey ];
-
+export const BlockBindingsPanel = ( { metadata } ) => {
+	const { bindings } = metadata || {};
 	const { sources } = useSelect( ( select ) => {
 		const _sources = unlock(
 			select( blocksStore )
