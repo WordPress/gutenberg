@@ -5,9 +5,6 @@
 	<!-- Import shared rules for monorepo -->
 	<rule ref="phpcs.xml.shared" />
 
-	<!-- Check up to 20 files simultaneously. -->
-	<arg name="parallel" value="20"/>
-
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
 	<file>./lib</file>

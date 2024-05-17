@@ -42,6 +42,9 @@
 	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
 	<arg name="cache" value=".cache/phpcs.json"/>
 
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
+
 	<!-- Exclude generated files -->
 	<exclude-pattern>/packages/block-serialization-spec-parser/parser\.php$</exclude-pattern>
 	<exclude-pattern>/node_modules/*</exclude-pattern>
