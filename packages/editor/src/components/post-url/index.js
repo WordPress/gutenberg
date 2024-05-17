@@ -25,11 +25,16 @@ import { usePostURLLabel } from './label';
 import { store as editorStore } from '../../store';
 
 /**
- * Renders the Post URL.
+ * Renders the `PostURL` component.
+ *
+ * @example
+ * ```jsx
+ * <PostURL />
+ * ```
  *
  * @param {Function} onClose Callback function to be executed when the popover is closed.
  *
- * @return {Component} The component to be rendered.
+ * @return {Component} The rendered PostURL component.
  */
 export default function PostURL( { onClose } ) {
 	const { isEditable, postSlug, postLink, permalinkPrefix, permalinkSuffix } =
