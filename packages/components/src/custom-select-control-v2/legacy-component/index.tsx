@@ -143,10 +143,9 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	);
 }
 
-export default CustomSelectControl;
-
-// for backwards compatibility
-export function ClassicCustomSelectControl( props: LegacyCustomSelectProps ) {
+export function ClassicCustomSelectControlV2Adapter(
+	props: LegacyCustomSelectProps
+) {
 	return (
 		<CustomSelectControl
 			{ ...props }
@@ -154,3 +153,5 @@ export function ClassicCustomSelectControl( props: LegacyCustomSelectProps ) {
 		/>
 	);
 }
+
+export default ClassicCustomSelectControlV2Adapter;

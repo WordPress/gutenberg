@@ -63,8 +63,7 @@ export {
 	useCompositeState as __unstableUseCompositeState,
 } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
-export { ClassicCustomSelectControl as CustomSelectControl } from './custom-select-control-v2/legacy-component';
-//export { StableCustomSelectControl as CustomSelectControl } from './custom-select-control';
+export { ClassicCustomSelectControlV2Adapter as CustomSelectControl } from './custom-select-control-v2/legacy-component';
 export { default as CustomSelectControlV2 } from './custom-select-control-v2';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
