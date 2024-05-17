@@ -6,7 +6,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { React, forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -209,11 +209,13 @@ function PostTitle( _, forwardedRef ) {
 		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
 }
+
 /**
- * Renders the post title component.
+ * Renders the `PostTitle` component.
  *
- * @param {Object}    _            - Unused parameter.
- * @param {React.Ref} forwardedRef - Reference to the component's DOM node.
- * @return	{React.Element} 	The rendered post title component which is able to receive a ref prop.
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
  */
 export default forwardRef( PostTitle );
