@@ -254,8 +254,6 @@ _Returns_
 
 ### DocumentBar
 
-DocumentBar component.
-
 This component renders a navigation bar at the top of the editor. It displays the title of the current document, a back button (if applicable), and a command center button. It also handles different states of the document, such as "not found" or "unsynced".
 
 _Usage_
