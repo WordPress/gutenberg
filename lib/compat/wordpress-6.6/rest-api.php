@@ -31,7 +31,7 @@ if ( ! function_exists( 'wp_api_template_access_controller' ) ) {
 add_filter( 'register_post_type_args', 'wp_api_template_access_controller', 10, 2 );
 
 /**
- * Registers additional fields for search result rest api.
+ * Callback for the `label` field in `WP_REST_Search_Controller`.
  *
  * @access private
  * @internal
@@ -71,7 +71,7 @@ function _gutenberg_get_search_result_label_field( $result_object, $field_name, 
 }
 
 /**
- * Registers additional fields for search result rest api.
+ * Register new field `label` for the `WP_REST_Search_Controller`.
  *
  * @access private
  * @internal
