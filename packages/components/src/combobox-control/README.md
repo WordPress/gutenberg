@@ -101,6 +101,15 @@ The current value of the control.
 -   Type: `string | null`
 -   Required: No
 
+#### expandOnFocus
+
+Automatically expand the dropdown when the control is focused.
+If the control is clicked, the dropdown will expand regardless of this prop.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
 #### __experimentalRenderItem
 
 Custom renderer invoked for each option in the suggestion list. The render prop receives as its argument an object containing, under the `item` key, the single option's data (directly from the array of data passed to the `options` prop).
