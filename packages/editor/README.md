@@ -1154,13 +1154,11 @@ Undocumented declaration.
 
 ### PostVisibility
 
-PostVisibility component.
-
 Allows users to set the visibility of a post.
 
 _Parameters_
 
--   _props_ `Object`: Component properties.
+-   _props_ `Object`: The component props.
 -   _props.onClose_ `Function`: Function to call when the popover is closed.
 
 _Returns_
@@ -1169,22 +1167,18 @@ _Returns_
 
 ### PostVisibilityCheck
 
-PostVisibilityCheck component.
-
 Determines if the current post can be edited (published) and passes this information to the provided render function.
 
 _Parameters_
 
--   _props_ `Object`: - Component properties.
--   _props.render_ `Function`: - Function to render the component. Receives an object with a `canEdit` property.
+-   _props_ `Object`: The component props.
+-   _props.render_ `Function`: Function to render the component. Receives an object with a `canEdit` property.
 
 _Returns_
 
--   `JSX.Element`: Rendered component.
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityLabel
-
-PostVisibilityLabel component.
 
 Returns the label for the current post visibility setting.
 
