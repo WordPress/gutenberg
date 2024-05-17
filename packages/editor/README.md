@@ -350,8 +350,6 @@ _Returns_
 
 ### EditorProvider
 
-EditorProvider component.
-
 This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
 
 It supports a large number of post types, including post, page, templates, custom post types, patterns, template parts.
@@ -372,15 +370,15 @@ _Usage_
 
 _Parameters_
 
--   _props_ `Object`: - The component props.
--   _props.post_ `[Object]`: - The post object to edit. This is required.
--   _props.\_\_unstableTemplate_ `[Object]`: - The template object wrapper the edited post. This is optional and can only be used when the post type supports templates (like posts and pages).
--   _props.settings_ `[Object]`: - The settings object to use for the editor. This is optional and can be used to override the default settings.
--   _props.children_ `[Element]`: - Children elements for which the BlockEditorProvider context should apply. This is optional.
+-   _props_ `Object`: The component props.
+-   _props.post_ `[Object]`: The post object to edit. This is required.
+-   _props.\_\_unstableTemplate_ `[Object]`: The template object wrapper the edited post. This is optional and can only be used when the post type supports templates (like posts and pages).
+-   _props.settings_ `[Object]`: The settings object to use for the editor. This is optional and can be used to override the default settings.
+-   _props.children_ `[Element]`: Children elements for which the BlockEditorProvider context should apply. This is optional.
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `JSX.Element`: The rendered EditorProvider component.
 
 ### EditorSnackbars
 
