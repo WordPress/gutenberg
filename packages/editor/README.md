@@ -1031,19 +1031,49 @@ _Returns_
 
 ### PostSchedule
 
-Undocumented declaration.
+Renders the PostSchedule component. It allows the user to schedule a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onClose_ `Function`: Function to close the component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostScheduleCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a publish action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: - The component to be rendered or null if there is no publish action.
 
 ### PostScheduleLabel
 
-Undocumented declaration.
+Renders the PostScheduleLabel component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSchedulePanel
 
-Undocumented declaration.
+Renders the Post Schedule Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlug
 
@@ -1258,7 +1288,16 @@ Undocumented declaration.
 
 ### usePostScheduleLabel
 
-Undocumented declaration.
+Custom hook to get the label for post schedule.
+
+_Parameters_
+
+-   _options_ `Object`: Options for the hook.
+-   _options.full_ `boolean`: Whether to get the full label or not. Default is false.
+
+_Returns_
+
+-   `string`: The label for post schedule.
 
 ### usePostURLLabel
 
