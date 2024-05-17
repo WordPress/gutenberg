@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { store as blocksStore } from '@wordpress/blocks';
 import {
 	PanelBody,
+	__experimentalHStack as HStack,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
@@ -42,16 +43,19 @@ export const BlockBindingsPanel = ( { metadata } ) => {
 					{ Object.keys( bindings ).map( ( key ) => {
 						return (
 							<Item key={ key }>
-								<span>{ key }</span>
-								<span className="components-item__block-bindings-source">
-									{ sources[ bindings[ key ].source ] ? (
-										sources[ bindings[ key ].source ].label
-									) : (
-										<span className="error">
-											Error: Unknown Source
-										</span>
-									) }
-								</span>
+								<HStack>
+									<span>{ key }</span>
+									<span className="components-item__block-bindings-source">
+										{ sources[ bindings[ key ].source ] ? (
+											sources[ bindings[ key ].source ]
+												.label
+										) : (
+											<span className="error">
+												Error: Unknown Source
+											</span>
+										) }
+									</span>
+								</HStack>
 							</Item>
 						);
 					} ) }

@@ -1,16 +1,8 @@
-.components-panel__block-bindings-panel {
+.components-panel__block-bindings-panel .components-item__block-bindings-source {
 
-	.components-item {
-		display: flex;
-		justify-content: space-between;
+	color: $gray-700;
 
-		.components-item__block-bindings-source {
-			color: $gray-700;
-
-			.error {
-				color: $alert-red;
-			}
-		}
+	.error {
+		color: $alert-red;
 	}
-
 }
