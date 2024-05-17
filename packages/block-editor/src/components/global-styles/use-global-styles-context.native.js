@@ -8,26 +8,27 @@ import { colord } from 'colord';
 /**
  * WordPress dependencies
  */
-import {
-	useSettings,
-	useMultipleOriginColorsAndGradients,
-	SETTINGS_DEFAULTS,
-} from '@wordpress/block-editor';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { createContext, useContext } from '@wordpress/element';
+import { getPxFromCssUnit } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { default as getPxFromCssUnit } from '../utils/get-px-from-css-unit';
-import { useGlobalStyles } from './index.native';
+import useMultipleOriginColorsAndGradients from '../colors-gradients/use-multiple-origin-colors-and-gradients';
+import { useSettings } from '../use-settings';
+import { SETTINGS_DEFAULTS } from '../../store/defaults';
 
-export const BLOCK_STYLE_ATTRIBUTES = [
+const BLOCK_STYLE_ATTRIBUTES = [
 	'textColor',
 	'backgroundColor',
 	'style',
 	'color',
 	'fontSize',
 ];
+
+export const GlobalStylesContext = createContext( { style: {} } );
+GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES = BLOCK_STYLE_ATTRIBUTES;
 
 // Mapping style properties name to native.
 const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
@@ -141,7 +142,7 @@ export function getBlockColors(
 	return blockStyles;
 }
 
-export function getBlockTypography(
+function getBlockTypography(
 	blockStyleAttributes,
 	fontSizes,
 	blockName,
@@ -310,7 +311,7 @@ export function parseStylesVariables( styles, mappedValues, customValues ) {
 	return JSON.parse( stylesBase );
 }
 
-export function getMappedValues( features, palette ) {
+function getMappedValues( features, palette ) {
 	const typography = features?.typography;
 	const colors = [
 		...( palette?.theme || [] ),
@@ -471,6 +472,81 @@ export function getGlobalStyles( rawStyles, rawFeatures ) {
 		__experimentalGlobalStylesBaseStyles: globalStyles,
 	};
 }
+
+export const getMergedGlobalStyles = (
+	baseGlobalStyles,
+	globalStyle,
+	wrapperPropsStyle,
+	blockAttributes,
+	defaultColors,
+	blockName,
+	fontSizes
+) => {
+	// Current support for general styles and blocks.
+	const baseGlobalColors = {
+		baseColors: {
+			color: baseGlobalStyles?.color,
+			typography: baseGlobalStyles?.typography,
+			elements: {
+				link: baseGlobalStyles?.elements?.link,
+			},
+			blocks: {
+				'core/button': baseGlobalStyles?.blocks?.[ 'core/button' ],
+			},
+		},
+	};
+
+	const blockStyleAttributes = Object.fromEntries(
+		Object.entries( blockAttributes ?? {} ).filter( ( [ key ] ) =>
+			BLOCK_STYLE_ATTRIBUTES.includes( key )
+		)
+	);
+
+	// This prevents certain wrapper styles from being applied to blocks that
+	// don't support them yet.
+	const wrapperPropsStyleFiltered = Object.fromEntries(
+		Object.entries( wrapperPropsStyle ?? {} ).filter( ( [ key ] ) =>
+			BLOCK_STYLE_ATTRIBUTES.includes( key )
+		)
+	);
+
+	const mergedStyle = {
+		...baseGlobalColors,
+		...globalStyle,
+		...wrapperPropsStyleFiltered,
+	};
+	const blockColors = getBlockColors(
+		blockStyleAttributes,
+		defaultColors,
+		blockName,
+		baseGlobalStyles
+	);
+	const blockPaddings = getBlockPaddings(
+		mergedStyle,
+		wrapperPropsStyle,
+		blockStyleAttributes,
+		blockColors
+	);
+	const blockTypography = getBlockTypography(
+		blockStyleAttributes,
+		fontSizes,
+		blockName,
+		baseGlobalStyles
+	);
+
+	return {
+		...mergedStyle,
+		...blockPaddings,
+		...blockColors,
+		...blockTypography,
+	};
+};
+
+export const useGlobalStyles = () => {
+	const globalStyles = useContext( GlobalStylesContext );
+
+	return globalStyles;
+};
 
 /**
  * Determine and apply appropriate color scheme based on global styles or device's light/dark mode.

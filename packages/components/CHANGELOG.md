@@ -2,7 +2,13 @@
 
 ## Unreleased
 
+### Internal
+
 -   Replaced `ButtonGroup` with `ToggleGroupControl` component for "AM/PM" selector in DateTime component ([#61562](https://github.com/WordPress/gutenberg/pull/61562)).
+
+### Enhancements
+
+-   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
 
 ## 27.6.0 (2024-05-16)
 

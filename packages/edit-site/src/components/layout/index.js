@@ -30,7 +30,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -261,6 +264,8 @@ export default function Layout() {
 							</AnimatePresence>
 						</NavigableRegion>
 					) }
+
+					<EditorSnackbars />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

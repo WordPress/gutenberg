@@ -14,7 +14,7 @@ import { default as VideoPlayer } from 'react-native-video';
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-import { Icon, useEditorColorScheme } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { audio, warning } from '@wordpress/icons';
@@ -30,6 +30,7 @@ import { useState } from '@wordpress/element';
  */
 import styles from './styles.scss';
 import { parseAudioUrl } from './audio-url-parser.native';
+import { useEditorColorScheme } from '../global-styles/use-global-styles-context';
 
 const isIOS = Platform.OS === 'ios';
 
