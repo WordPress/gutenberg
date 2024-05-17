@@ -31,7 +31,7 @@ export function useBlockVariations( name ) {
 		},
 		[ name ]
 	);
-	const [ variations ] = useGlobalStyle( 'variations', name, 'base' );
+	const [ variations ] = useGlobalStyle( 'variations', name );
 	const variationNames = Object.keys( variations ?? {} );
 
 	return getFilteredBlockStyles( blockStyles, variationNames );
