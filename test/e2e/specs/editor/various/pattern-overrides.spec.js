@@ -35,7 +35,7 @@ test.describe( 'Pattern Overrides', () => {
 		const editableParagraphName = 'Editable Paragraph';
 
 		await test.step( 'Create a synced pattern and assign blocks to allow overrides', async () => {
-			await admin.visitSiteEditor( { path: '/patterns' } );
+			await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 			await page
 				.getByRole( 'region', { name: 'Navigation' } )
@@ -727,7 +727,6 @@ test.describe( 'Pattern Overrides', () => {
 			await admin.visitSiteEditor( {
 				postId: id,
 				postType: 'wp_block',
-				categoryType: 'pattern',
 				canvas: 'edit',
 			} );
 
