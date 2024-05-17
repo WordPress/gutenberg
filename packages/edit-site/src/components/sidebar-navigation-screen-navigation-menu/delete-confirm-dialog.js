@@ -17,7 +17,7 @@ export default function DeleteConfirmDialog( { onClose, onConfirm } ) {
 			onCancel={ onClose }
 			confirmButtonText={ __( 'Delete' ) }
 		>
-			{ __( 'Are you sure you want to delete this Navigation menu?' ) }
+			{ __( 'Are you sure you want to delete this Navigation Menu?' ) }
 		</ConfirmDialog>
 	);
 }

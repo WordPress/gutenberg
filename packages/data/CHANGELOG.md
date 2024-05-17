@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.28.0 (2024-05-16)
+
+## 9.27.0 (2024-05-02)
+
+## 9.26.0 (2024-04-19)
+
 - Add new `createSelector` function for creating memoized store selectors ([#60370](https://github.com/WordPress/gutenberg/pull/60370)).
 
 ## 9.25.0 (2024-04-03)

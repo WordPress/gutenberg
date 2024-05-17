@@ -10,14 +10,12 @@
 }
 
 .editor-post-schedule__dialog-toggle.components-button {
-	display: block;
-	max-width: 100%;
 	overflow: hidden;
 	text-align: left;
 	white-space: unset;
 	height: auto;
+	min-height: $button-size-compact;
 
 	// The line height + the padding should be the same as the button size.
-	padding: math.div($button-size - $grid-unit-20, 2) 12px;
-	line-height: $grid-unit-20;
+	line-height: inherit;
 }

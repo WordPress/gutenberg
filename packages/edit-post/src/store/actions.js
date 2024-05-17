@@ -2,9 +2,11 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
 import { addFilter } from '@wordpress/hooks';
 
@@ -12,8 +14,9 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-import { store as editPostStore } from '.';
 import { unlock } from '../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -25,7 +28,7 @@ export const openGeneralSidebar =
 	( { registry } ) => {
 		registry
 			.dispatch( interfaceStore )
-			.enableComplementaryArea( editPostStore.name, name );
+			.enableComplementaryArea( 'core', name );
 	};
 
 /**
@@ -34,9 +37,7 @@ export const openGeneralSidebar =
 export const closeGeneralSidebar =
 	() =>
 	( { registry } ) =>
-		registry
-			.dispatch( interfaceStore )
-			.disableComplementaryArea( editPostStore.name );
+		registry.dispatch( interfaceStore ).disableComplementaryArea( 'core' );
 
 /**
  * Returns an action object used in signalling that the user opened a modal.
@@ -219,14 +220,11 @@ export const togglePinnedPluginItem =
 	( { registry } ) => {
 		const isPinned = registry
 			.select( interfaceStore )
-			.isItemPinned( 'core/edit-post', pluginName );
+			.isItemPinned( 'core', pluginName );
 
 		registry
 			.dispatch( interfaceStore )
-			[ isPinned ? 'unpinItem' : 'pinItem' ](
-				'core/edit-post',
-				pluginName
-			);
+			[ isPinned ? 'unpinItem' : 'pinItem' ]( 'core', pluginName );
 	};
 
 /**

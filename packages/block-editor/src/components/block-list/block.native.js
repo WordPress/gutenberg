@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	getMergedGlobalStyles,
-	useMobileGlobalStylesColors,
-	useGlobalStyles,
-	withFilters,
-} from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 	getBlockType,
@@ -51,6 +45,12 @@ import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockCrashWarning from './block-crash-warning';
+import {
+	getMergedGlobalStyles,
+	GlobalStylesContext,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
+} from '../global-styles/use-global-styles-context';
 
 const EMPTY_ARRAY = [];
 
@@ -73,7 +73,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (

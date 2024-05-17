@@ -15,7 +15,7 @@ import {
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
 import BlockInfo from './components/block-info-slot-fill';
-import { useShowBlockTools } from './components/block-tools/use-show-block-tools';
+import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject, useStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
@@ -23,6 +23,7 @@ import { BlockRemovalWarningModal } from './components/block-removal-warning-mod
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
+import TextAlignmentControl from './components/text-alignment-control';
 import {
 	default as ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
@@ -34,9 +35,11 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	globalStylesDataKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { PrivateBlockPopover } from './components/block-popover';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -56,7 +59,7 @@ lock( privateApis, {
 	PrivateListView,
 	ResizableBoxPopover,
 	BlockInfo,
-	useShowBlockTools,
+	useHasBlockToolbar,
 	cleanEmptyObject,
 	useStyleOverride,
 	BlockQuickNavigation,
@@ -66,12 +69,15 @@ lock( privateApis, {
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
+	TextAlignmentControl,
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
+	globalStylesDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
 	reusableBlocksSelectKey,
+	PrivateBlockPopover,
 } );

@@ -1,20 +1,18 @@
 /**
- * External dependencies
- */
-import { proxyMap } from 'valtio/utils';
-/**
  * WordPress dependencies
  */
 import { createContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
+import { observableMap } from '@wordpress/compose';
+
 /**
  * Internal dependencies
  */
 import type { SlotFillBubblesVirtuallyContext } from '../types';
 
 const initialContextValue: SlotFillBubblesVirtuallyContext = {
-	slots: proxyMap(),
-	fills: proxyMap(),
+	slots: observableMap(),
+	fills: observableMap(),
 	registerSlot: () => {
 		warning(
 			'Components must be wrapped within `SlotFillProvider`. ' +

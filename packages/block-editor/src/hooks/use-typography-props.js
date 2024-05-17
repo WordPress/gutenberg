@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -45,9 +45,12 @@ export function getTypographyClassesAndStyles( attributes, settings ) {
 	const fontFamilyClassName = !! attributes?.fontFamily
 		? `has-${ kebabCase( attributes.fontFamily ) }-font-family`
 		: '';
-
-	const className = classnames(
+	const textAlignClassName = !! attributes?.style?.typography?.textAlign
+		? `has-text-align-${ attributes?.style?.typography?.textAlign }`
+		: '';
+	const className = clsx(
 		fontFamilyClassName,
+		textAlignClassName,
 		getFontSizeClass( attributes?.fontSize )
 	);
 

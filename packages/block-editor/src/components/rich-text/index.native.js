@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -118,6 +118,7 @@ export function RichTextWrapper(
 			getBlock,
 			isMultiSelecting,
 			hasMultiSelection,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 
 		const selectionStart = getSelectionStart();
@@ -156,6 +157,7 @@ export function RichTextWrapper(
 			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
 			undo,
+			getSelectedBlockClientId,
 			...extraProps,
 		};
 	};
@@ -167,6 +169,7 @@ export function RichTextWrapper(
 		selectionEnd,
 		isSelected,
 		isCompactMode,
+		getSelectedBlockClientId,
 		didAutomaticChange,
 		disabled,
 		undo,
@@ -178,6 +181,7 @@ export function RichTextWrapper(
 		exitFormattedText,
 		selectionChange,
 		__unstableMarkAutomaticChange,
+		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -211,6 +215,12 @@ export function RichTextWrapper(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ clientId, identifier ]
 	);
+
+	const clearCurrentSelectionOnUnmount = useCallback( () => {
+		if ( getSelectedBlockClientId() === clientId ) {
+			clearSelectedBlock();
+		}
+	}, [ clearSelectedBlock, clientId, getSelectedBlockClientId ] );
 
 	const onDelete = useCallback(
 		( { value, isReverse } ) => {
@@ -593,6 +603,7 @@ export function RichTextWrapper(
 			disableSuggestions={ disableSuggestions }
 			disableAutocorrection={ disableAutocorrection }
 			containerWidth={ containerWidth }
+			clearCurrentSelectionOnUnmount={ clearCurrentSelectionOnUnmount }
 			// Props to be set on the editable container are destructured on the
 			// element itself for web (see below), but passed through rich text
 			// for native.
@@ -637,7 +648,7 @@ export function RichTextWrapper(
 										  }
 										: editableProps.style
 								}
-								className={ classnames(
+								className={ clsx(
 									classes,
 									props.className,
 									editableProps.className
