@@ -21,7 +21,7 @@ const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';
- * import { PluginPostPublishPanel } from '@wordpress/edit-post';
+ * import { PluginPostPublishPanel } from '@wordpress/editor';
  *
  * const MyPluginPostPublishPanel = () => (
  * 	<PluginPostPublishPanel

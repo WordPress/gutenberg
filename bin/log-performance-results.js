@@ -50,7 +50,7 @@ const data = new TextEncoder().encode(
 						performanceResults[ index ][ hash ] ?? {}
 					).map( ( [ key, value ] ) => [
 						metricsPrefix + key,
-						value,
+						typeof value === 'object' ? value.q50 : value,
 					] )
 				),
 			};
@@ -64,7 +64,7 @@ const data = new TextEncoder().encode(
 							performanceResults[ index ][ baseHash ] ?? {}
 						).map( ( [ key, value ] ) => [
 							metricsPrefix + key,
-							value,
+							typeof value === 'object' ? value.q50 : value,
 						] )
 					),
 				};

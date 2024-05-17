@@ -16,7 +16,6 @@ const meta: Meta< typeof ProgressBar > = {
 	},
 	tags: [ 'status-private' ],
 	parameters: {
-		badges: [ 'private' ],
 		controls: {
 			expanded: true,
 		},

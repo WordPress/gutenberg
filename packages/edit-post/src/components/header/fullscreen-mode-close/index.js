@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -83,7 +83,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
-	const classes = classnames( {
+	const classes = clsx( {
 		'edit-post-fullscreen-mode-close': true,
 		'has-icon': siteIconUrl,
 	} );

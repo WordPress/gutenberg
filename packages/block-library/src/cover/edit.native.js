@@ -10,7 +10,7 @@ import {
 	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -221,6 +221,21 @@ const Cover = ( {
 		} );
 	};
 
+	const onUpdateMediaProgress = useCallback(
+		( payload ) => {
+			const { mediaUrl, state } = payload;
+
+			setIsUploadInProgress( true );
+
+			if ( isUploadInProgress && isImage && mediaUrl && ! state ) {
+				setAttributes( {
+					url: mediaUrl,
+				} );
+			}
+		},
+		[ isImage, isUploadInProgress, setAttributes ]
+	);
+
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -301,7 +316,7 @@ const Cover = ( {
 
 		// Ensure that "is-light" is removed from "className" attribute if cover background is dark.
 		if ( isCoverDark && attributes.className?.includes( 'is-light' ) ) {
-			const className = classnames( attributes.className, {
+			const className = clsx( attributes.className, {
 				'is-light': false,
 			} );
 			setAttributes( {
@@ -450,9 +465,7 @@ const Cover = ( {
 					toolbarControls( openMediaOptionsRef.current ) }
 				<MediaUploadProgress
 					mediaId={ id }
-					onUpdateMediaProgress={ () => {
-						setIsUploadInProgress( true );
-					} }
+					onUpdateMediaProgress={ onUpdateMediaProgress }
 					onFinishMediaUploadWithSuccess={ ( {
 						mediaServerId,
 						mediaUrl,

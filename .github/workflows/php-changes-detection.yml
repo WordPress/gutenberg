@@ -10,17 +10,19 @@ jobs:
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         steps:
             - name: Check out code
-              uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
+              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
               with:
                   fetch-depth: 0
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
 
             - name: Get changed PHP files
               id: changed-files-php
-              uses: tj-actions/changed-files@0874344d6ebbaa00a27da73276ae7162fadcaf69 # v44.3.0
+              uses: tj-actions/changed-files@a29e8b565651ce417abb5db7164b4a2ad8b6155c # v44.4.0
               with:
                   files: |
-                      **.{php}
+                      lib/**
+                      packages/**/*.php
+                      phpunit/**
 
             - name: List all changed files
               if: steps.changed-files-php.outputs.any_changed == 'true'

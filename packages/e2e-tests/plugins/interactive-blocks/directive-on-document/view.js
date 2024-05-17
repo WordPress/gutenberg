@@ -25,6 +25,8 @@ const { state } = store( 'directive-on-document', {
 		counter: 0,
 		isVisible: true,
 		isEventAttached: 'no',
+		keydownHandler: 'no',
+		keydownSecondHandler: 'no',
 	},
 	callbacks: {
 		keydownHandler() {
@@ -39,5 +41,11 @@ const { state } = store( 'directive-on-document', {
 			state.isEventAttached = 'no';
 			state.isVisible = ! state.isVisible;
 		},
+		keydownHandler: () => {
+			state.keydownHandler = 'yes';
+		},
+		keydownSecondHandler: () => {
+			state.keydownSecondHandler = 'yes';
+		}
 	}
 } );

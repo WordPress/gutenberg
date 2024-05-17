@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -527,7 +527,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.padding ?? DEFAULT_CONTROLS.padding
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -567,7 +567,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.margin ?? DEFAULT_CONTROLS.margin
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }
@@ -609,7 +609,7 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.blockGap ?? DEFAULT_CONTROLS.blockGap
 					}
-					className={ classnames( {
+					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
 					} ) }
 					panelId={ panelId }

@@ -147,7 +147,9 @@ function ToggleGroupControlOptionBase(
 								{ ...commonProps }
 								onFocus={ ( event ) => {
 									onFocusProp?.( event );
-									if ( event.defaultPrevented ) return;
+									if ( event.defaultPrevented ) {
+										return;
+									}
 									toggleGroupControlContext.setValue( value );
 								} }
 							/>

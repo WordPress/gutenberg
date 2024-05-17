@@ -82,9 +82,15 @@ function ColorPicker( {
 	const currentColor = combineToHex();
 
 	const updateColor = ( { hue: h, saturation: s, value: v } ) => {
-		if ( h !== undefined ) setHue( h );
-		if ( s !== undefined ) setSaturation( s );
-		if ( v !== undefined ) setValue( v );
+		if ( h !== undefined ) {
+			setHue( h );
+		}
+		if ( s !== undefined ) {
+			setSaturation( s );
+		}
+		if ( v !== undefined ) {
+			setValue( v );
+		}
 		setColor( combineToHex( h, s, v ) );
 	};
 

@@ -51,7 +51,9 @@ export function getGradientAngle( gradientValue ) {
 		}
 	} else if ( angleType === 'angle' ) {
 		return parseFloat( angle );
-	} else return 4 * angleBase;
+	} else {
+		return 4 * angleBase;
+	}
 }
 
 export function getGradientColorGroup( gradientValue ) {

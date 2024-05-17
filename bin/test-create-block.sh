@@ -69,7 +69,7 @@ status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
 status "Verifying build..."
-expected=7
+expected=9
 actual=$( find build -maxdepth 1 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`build\` directory, but found $actual."
