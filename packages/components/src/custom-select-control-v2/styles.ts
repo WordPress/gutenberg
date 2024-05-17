@@ -102,6 +102,7 @@ export const SelectPopover = styled( Ariakit.SelectPopover )`
 	position: absolute !important;
 	max-height: 400px;
 	overflow: auto;
+	min-width: 100%;
 `;
 
 export const SelectItem = styled( Ariakit.SelectItem )`
