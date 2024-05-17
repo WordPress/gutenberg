@@ -33,6 +33,7 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 import TemplateAreas from '../template-areas';
+import SiteSettingsPanel from '../site-settings-panel';
 
 /**
  * Module Constants
@@ -87,7 +88,12 @@ export default function PostSummary( { onActionPerformed } ) {
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									{ isTemplate && <TemplateAreas /> }
+									{ isTemplate && (
+										<>
+											<SiteSettingsPanel />
+											<TemplateAreas />
+										</>
+									) }
 									{ fills }
 									{ ! isPattern &&
 										! isTemplate &&

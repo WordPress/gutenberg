@@ -1,0 +1,28 @@
+.editor-site-settings-dropdown__content {
+	.components-popover__content {
+		min-width: 320px;
+		padding: $grid-unit-20;
+	}
+}
+
+.editor-comment-status__options {
+	// TODO: it's not great to override component styles.. This might be resolved
+	// by the new radio control component.
+	.components-radio-control__option {
+		align-items: flex-start;
+	}
+
+	label {
+		.components-text {
+			display: block;
+			margin-top: $grid-unit-05;
+		}
+	}
+}
+
+.editor-site-settings-panel {
+	.editor-post-panel__row-label {
+		width: 38%;
+	}
+}
+
