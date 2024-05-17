@@ -125,8 +125,6 @@ function useBlockEditorProps( post, template, mode ) {
 }
 
 /**
- * ExperimentalEditorProvider component.
- *
  * This component provides the editor context and manages the state of the block editor.
  *
  * @param {Object}  props                                The component props.
@@ -150,7 +148,7 @@ function useBlockEditorProps( post, template, mode ) {
  *   { children }
  * </ExperimentalEditorProvider>
  *
- * @return {Object} The rendered component.
+ * @return {Object} The rendered ExperimentalEditorProvider component.
  */
 export const ExperimentalEditorProvider = withRegistryProvider(
 	( {
@@ -328,8 +326,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 );
 
 /**
- * EditorProvider component.
- *
  * This component establishes a new post editing context, and serves as the entry point for a new post editor (or post with template editor).
  *
  * It supports a large number of post types, including post, page, templates,
@@ -337,13 +333,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
  *
  * All modification and changes are performed to the `@wordpress/core-data` store.
  *
- * @param {Object}  props                      - The component props.
- * @param {Object}  [props.post]               - The post object to edit. This is required.
- * @param {Object}  [props.__unstableTemplate] - The template object wrapper the edited post.
+ * @param {Object}  props                      The component props.
+ * @param {Object}  [props.post]               The post object to edit. This is required.
+ * @param {Object}  [props.__unstableTemplate] The template object wrapper the edited post.
  *                                             This is optional and can only be used when the post type supports templates (like posts and pages).
- * @param {Object}  [props.settings]           - The settings object to use for the editor.
+ * @param {Object}  [props.settings]           The settings object to use for the editor.
  *                                             This is optional and can be used to override the default settings.
- * @param {Element} [props.children]           - Children elements for which the BlockEditorProvider context should apply.
+ * @param {Element} [props.children]           Children elements for which the BlockEditorProvider context should apply.
  *                                             This is optional.
  *
  * @example
@@ -357,7 +353,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
  * </EditorProvider>
  * ```
  *
- * @return {JSX.Element} The rendered component.
+ * @return {JSX.Element} The rendered EditorProvider component.
  */
 export function EditorProvider( props ) {
 	return (
