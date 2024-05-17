@@ -50,7 +50,13 @@ export const BlockBindingsPanel = () => {
 							<Item key={ index }>
 								<span>{ key }</span>
 								<span className="components-item__block-bindings-source">
-									{ sources[ bindings[ key ].source ].label }
+									{ sources[ bindings[ key ].source ] ? (
+										sources[ bindings[ key ].source ].label
+									) : (
+										<span className="error">
+											Error: Unknown Source
+										</span>
+									) }
 								</span>
 							</Item>
 						);

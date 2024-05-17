@@ -6,6 +6,10 @@
 
 		.components-item__block-bindings-source {
 			color: $gray-700;
+
+			.error {
+				color: $alert-red;
+			}
 		}
 	}
 
