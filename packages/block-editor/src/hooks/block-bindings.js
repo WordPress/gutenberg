@@ -45,9 +45,9 @@ export const BlockBindingsPanel = () => {
 				className="components-panel__block-bindings-panel"
 			>
 				<ItemGroup isBordered isSeparated size="large">
-					{ Object.keys( bindings ).map( ( key, index ) => {
+					{ Object.keys( bindings ).map( ( key ) => {
 						return (
-							<Item key={ index }>
+							<Item key={ key }>
 								<span>{ key }</span>
 								<span className="components-item__block-bindings-source">
 									{ sources[ bindings[ key ].source ] ? (
