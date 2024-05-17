@@ -3,9 +3,10 @@
  */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { __experimentalGrid as Grid } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -13,8 +14,13 @@ import { __ } from '@wordpress/i18n';
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 import { isVariationWithSingleProperty } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { unlock } from '../../lock-unlock';
+
+const { GlobalStylesContext } = unlock( blockEditorPrivateApis );
 
 export default function StyleVariationsContainer( { gap = 2 } ) {
+	const { user } = useContext( GlobalStylesContext );
+	const [ currentUserStyles ] = useState( { ...user } );
 	const variations = useSelect( ( select ) => {
 		return select(
 			coreStore
@@ -36,13 +42,59 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 				settings: {},
 				styles: {},
 			},
-			...( multiplePropertyVariations ?? [] ).map( ( variation ) => ( {
-				...variation,
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-			} ) ),
+			...( multiplePropertyVariations ?? [] ).map( ( variation ) => {
+				const blockStyles = { ...variation?.styles?.blocks } || {};
+				// We need to copy any user custom CSS to the variation to prevent it being lost
+				// when switching variations.
+				if ( currentUserStyles?.styles?.blocks ) {
+					Object.keys( currentUserStyles.styles.blocks ).forEach(
+						( blockName ) => {
+							if (
+								currentUserStyles.styles.blocks[ blockName ].css
+							) {
+								blockStyles[ blockName ] = {
+									...( blockStyles[ blockName ]
+										? blockStyles[ blockName ]
+										: {} ),
+									css: `${
+										blockStyles[ blockName ]?.css || ''
+									} ${
+										currentUserStyles.styles.blocks[
+											blockName
+										].css
+									}`,
+								};
+							}
+						}
+					);
+				}
+
+				const styles = {
+					...variation.styles,
+					...( currentUserStyles?.styles?.css ||
+					variation?.styles?.css
+						? {
+								css: `${ variation.styles?.css || '' } ${
+									currentUserStyles.styles.css
+								}`,
+						  }
+						: {} ),
+					blocks: {
+						...blockStyles,
+					},
+				};
+				return {
+					...variation,
+					settings: variation.settings ?? {},
+					styles: styles ?? {},
+				};
+			} ),
 		];
-	}, [ multiplePropertyVariations ] );
+	}, [
+		multiplePropertyVariations,
+		currentUserStyles.styles.blocks,
+		currentUserStyles.styles.css,
+	] );
 
 	return (
 		<Grid
