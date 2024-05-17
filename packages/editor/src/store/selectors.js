@@ -1796,7 +1796,3 @@ export const getPostTypeLabel = createRegistrySelector(
 export function isPublishSidebarOpened( state ) {
 	return state.publishSidebarActive;
 }
-
-export const __experimentalIsAdminUser = createRegistrySelector(
-	( select ) => () => select( coreStore ).canUser( 'delete', 'settings' )
-);
