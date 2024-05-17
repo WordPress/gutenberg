@@ -326,8 +326,6 @@ _Returns_
 
 ### EditorNotices
 
-EditorNotices component.
-
 This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
 
 _Usage_
@@ -338,7 +336,7 @@ _Usage_
 
 _Returns_
 
--   `JSX.Element`: The rendered component.
+-   `JSX.Element`: The rendered EditorNotices component.
 
 ### EditorProvider
 
