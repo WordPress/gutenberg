@@ -669,7 +669,7 @@ _Returns_
 
 ### PluginPageAttributesPanel
 
-Renders a row in the Summary panel of the Document sidebar. It should be noted that this is named and implemented around the function it serves and not its location, which may change in future iterations.
+Renders a row in the Page Attributes panel of the Document sidebar.
 
 _Usage_
 

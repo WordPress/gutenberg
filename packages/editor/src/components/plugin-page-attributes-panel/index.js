@@ -1,5 +1,5 @@
 /**
- * Defines as extensibility slot for the Summary panel.
+ * Defines as extensibility slot for the Page Attributes panel.
  */
 
 /**
@@ -10,9 +10,7 @@ import { createSlotFill, PanelRow } from '@wordpress/components';
 const { Fill, Slot } = createSlotFill( 'PluginPageAttributesPanel' );
 
 /**
- * Renders a row in the Summary panel of the Document sidebar.
- * It should be noted that this is named and implemented around the function it serves
- * and not its location, which may change in future iterations.
+ * Renders a row in the Page Attributes panel of the Document sidebar.
  *
  * @param {Object}  props             Component properties.
  * @param {string}  [props.className] An optional class name added to the row.
