@@ -9,7 +9,7 @@ interface NewPostOptions {
 	content?: string;
 	excerpt?: string;
 	showWelcomeGuide?: boolean;
-	fullscreenMode?: boolean
+	fullscreenMode?: boolean;
 }
 
 /**
