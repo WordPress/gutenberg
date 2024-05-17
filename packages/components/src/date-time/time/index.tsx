@@ -304,19 +304,20 @@ export function TimePicker( {
 							__next40pxDefaultSize
 							__nextHasNoMarginBottom
 							isBlock
+							value={ am }
 						>
 							<ToggleGroupControlOption
 								className="components-datetime__time-am-button" // Unused, for backwards compatibility.
 								aria-label="AM"
 								onClick={ buildAmPmChangeCallback( 'AM' ) }
-								value="horizontal"
+								value="AM"
 								label={ __( 'AM' ) }
 							/>
 							<ToggleGroupControlOption
 								className="components-datetime__time-pm-button" // Unused, for backwards compatibility.
 								aria-label="PM"
 								onClick={ buildAmPmChangeCallback( 'PM' ) }
-								value="vertical"
+								value="PM"
 								label={ __( 'PM' ) }
 							/>
 						</ToggleGroupControl>
