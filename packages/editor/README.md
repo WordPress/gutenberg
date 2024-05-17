@@ -1108,16 +1108,16 @@ Undocumented declaration.
 
 ### PostTitle
 
-Renders the post title component.
+Renders the `PostTitle` component.
 
 _Parameters_
 
--   \_\_\_ `Object`: - Unused parameter.
--   _forwardedRef_ `React.Ref`: - Reference to the component's DOM node.
+-   \_\_\_ `Object`: Unused parameter.
+-   _forwardedRef_ `Element`: Forwarded ref for the component.
 
 _Returns_
 
--   `React.Element`: The rendered post title component which is able to receive a ref prop.
+-   `Component`: The rendered PostTitle component.
 
 ### PostTitleRaw
 
