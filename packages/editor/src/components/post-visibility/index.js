@@ -18,11 +18,9 @@ import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
 
 /**
- * PostVisibility component.
- *
  * Allows users to set the visibility of a post.
  *
- * @param {Object}   props         Component properties.
+ * @param {Object}   props         The component props.
  * @param {Function} props.onClose Function to call when the popover is closed.
  * @return {JSX.Element} The rendered component.
  */
@@ -142,18 +140,6 @@ export default function PostVisibility( { onClose } ) {
 	);
 }
 
-/**
- * PostVisibilityChoice component.
- *
- * Renders a visibility choice option.
- *
- * @param {Object} props            - Component properties.
- * @param {number} props.instanceId - Unique instance ID for the component.
- * @param {string} props.value      - The value of the visibility option.
- * @param {string} props.label      - The label for the visibility option.
- * @param {string} props.info       - Additional information about the visibility option.
- * @return {JSX.Element} The rendered component.
- */
 function PostVisibilityChoice( { instanceId, value, label, info, ...props } ) {
 	return (
 		<div className="editor-post-visibility__choice">

@@ -10,8 +10,6 @@ import { visibilityOptions } from './utils';
 import { store as editorStore } from '../../store';
 
 /**
- * PostVisibilityLabel component.
- *
  * Returns the label for the current post visibility setting.
  *
  * @return {string} Post visibility label.
