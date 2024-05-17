@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -273,6 +273,16 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
+	const { frontPageId, postsPageId } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+
+		return {
+			frontPageId: siteSettings?.page_on_front,
+			postsPageId: siteSettings?.page_for_posts,
+		};
+	} );
+
 	const fields = useMemo(
 		() => [
 			{
@@ -293,7 +303,7 @@ export default function PagePages() {
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 						item.status !== 'trash';
-					return addLink ? (
+					const title = addLink ? (
 						<Link
 							params={ {
 								postId: item.id,
@@ -305,8 +315,36 @@ export default function PagePages() {
 								__( '(no title)' ) }
 						</Link>
 					) : (
-						decodeEntities( item.title?.rendered ) ||
-							__( '(no title)' )
+						<span>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</span>
+					);
+
+					let suffix = '';
+					if ( item.id === frontPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Front Page' ) }
+							</span>
+						);
+					} else if ( item.id === postsPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Posts Page' ) }
+							</span>
+						);
+					}
+
+					return (
+						<HStack
+							className="edit-site-page-pages-title"
+							alignment="center"
+							justify="flex-start"
+						>
+							{ title }
+							{ suffix }
+						</HStack>
 					);
 				},
 				maxWidth: 300,
@@ -411,7 +449,7 @@ export default function PagePages() {
 				},
 			},
 		],
-		[ authors, view.type ]
+		[ authors, view.type, frontPageId, postsPageId ]
 	);
 
 	const postTypeActions = usePostActions( 'page' );

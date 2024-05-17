@@ -1,10 +1,20 @@
-export const DEFAULT_COLORS = [
+/**
+ * Internal dependencies
+ */
+import {
+	getBlockPaddings,
+	getBlockColors,
+	parseStylesVariables,
+	getGlobalStyles,
+} from '../use-global-styles-context';
+
+const DEFAULT_COLORS = [
 	{ color: '#cd2653', name: 'Accent Color', slug: 'accent' },
 	{ color: '#000000', name: 'Primary', slug: 'primary' },
 	{ color: '#6d6d6d', name: 'Secondary', slug: 'secondary' },
 ];
 
-export const GLOBAL_STYLES_PALETTE = [
+const GLOBAL_STYLES_PALETTE = [
 	{
 		slug: 'green',
 		color: '#D1E4DD',
@@ -27,7 +37,7 @@ export const GLOBAL_STYLES_PALETTE = [
 	},
 ];
 
-export const GLOBAL_STYLES_GRADIENTS = {
+const GLOBAL_STYLES_GRADIENTS = {
 	default: [
 		{
 			name: 'Vivid cyan blue to vivid purple',
@@ -58,7 +68,7 @@ export const GLOBAL_STYLES_GRADIENTS = {
 	],
 };
 
-export const DEFAULT_GLOBAL_STYLES = {
+const DEFAULT_GLOBAL_STYLES = {
 	color: {
 		background: 'var(--wp--preset--color--green)',
 		text: 'var(--wp--preset--color--blue)',
@@ -104,7 +114,7 @@ export const DEFAULT_GLOBAL_STYLES = {
 	},
 };
 
-export const PARSED_GLOBAL_STYLES = {
+const PARSED_GLOBAL_STYLES = {
 	color: {
 		background: '#D1E4DD',
 		text: '#D1DFE4',
@@ -150,7 +160,7 @@ export const PARSED_GLOBAL_STYLES = {
 	},
 };
 
-export const RAW_FEATURES = {
+const RAW_FEATURES = {
 	color: {
 		palette: {
 			default: [
@@ -262,7 +272,7 @@ export const RAW_FEATURES = {
 	},
 };
 
-export const MAPPED_VALUES = {
+const MAPPED_VALUES = {
 	color: {
 		values: GLOBAL_STYLES_PALETTE,
 		slug: 'color',
@@ -272,3 +282,153 @@ export const MAPPED_VALUES = {
 		slug: 'size',
 	},
 };
+
+describe( 'getBlockPaddings', () => {
+	const PADDING = 12;
+
+	it( 'returns no paddings for a block without background color', () => {
+		const paddings = getBlockPaddings(
+			{ color: 'red' },
+			{ backgroundColor: 'red' },
+			{ textColor: 'primary' }
+		);
+		expect( paddings ).toEqual( expect.objectContaining( {} ) );
+	} );
+
+	it( 'returns paddings for a block with background color', () => {
+		const paddings = getBlockPaddings(
+			{ color: 'red' },
+			{},
+			{ backgroundColor: 'red', textColor: 'primary' }
+		);
+		expect( paddings ).toEqual(
+			expect.objectContaining( { padding: PADDING } )
+		);
+	} );
+
+	it( 'returns no paddings for an inner block without background color within a parent block with background color', () => {
+		const paddings = getBlockPaddings(
+			{ backgroundColor: 'blue', color: 'yellow', padding: PADDING },
+			{},
+			{ textColor: 'primary' }
+		);
+
+		expect( paddings ).toEqual(
+			expect.not.objectContaining( { padding: PADDING } )
+		);
+	} );
+} );
+
+describe( 'getBlockColors', () => {
+	it( 'returns the theme colors correctly', () => {
+		const blockColors = getBlockColors(
+			{ backgroundColor: 'accent', textColor: 'secondary' },
+			DEFAULT_COLORS
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( {
+				backgroundColor: '#cd2653',
+				color: '#6d6d6d',
+			} )
+		);
+	} );
+
+	it( 'returns custom background color correctly', () => {
+		const blockColors = getBlockColors(
+			{ backgroundColor: '#222222', textColor: 'accent' },
+			DEFAULT_COLORS
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( {
+				backgroundColor: '#222222',
+				color: '#cd2653',
+			} )
+		);
+	} );
+
+	it( 'returns custom text color correctly', () => {
+		const blockColors = getBlockColors(
+			{ textColor: '#4ddddd' },
+			DEFAULT_COLORS
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( {
+				color: '#4ddddd',
+			} )
+		);
+	} );
+} );
+
+describe( 'parseStylesVariables', () => {
+	it( 'returns the parsed preset values correctly', () => {
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
+			MAPPED_VALUES
+		);
+		const blockColors = parseStylesVariables(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			MAPPED_VALUES,
+			customValues
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		);
+	} );
+
+	it( 'returns the parsed custom color values correctly', () => {
+		const defaultStyles = {
+			...DEFAULT_GLOBAL_STYLES,
+			color: {
+				text: 'var(--wp--custom--color--blue)',
+				background: 'var(--wp--custom--color--green)',
+			},
+		};
+		const customValues = parseStylesVariables(
+			JSON.stringify( RAW_FEATURES.custom ),
+			MAPPED_VALUES
+		);
+		const styles = parseStylesVariables(
+			JSON.stringify( defaultStyles ),
+			MAPPED_VALUES,
+			customValues
+		);
+		expect( styles ).toEqual(
+			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		);
+	} );
+} );
+
+describe( 'getGlobalStyles', () => {
+	it( 'returns the global styles data correctly', () => {
+		const rawFeatures = JSON.stringify( RAW_FEATURES );
+		const gradients = parseStylesVariables(
+			JSON.stringify( GLOBAL_STYLES_GRADIENTS ),
+			MAPPED_VALUES
+		);
+
+		const globalStyles = getGlobalStyles(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			rawFeatures
+		);
+
+		expect( globalStyles ).toEqual(
+			expect.objectContaining( {
+				__experimentalFeatures: {
+					color: {
+						palette: RAW_FEATURES.color.palette,
+						gradients,
+						text: true,
+						background: true,
+						defaultPalette: true,
+						defaultGradients: true,
+					},
+					typography: {
+						fontSizes: RAW_FEATURES.typography.fontSizes,
+						customLineHeight: RAW_FEATURES.custom[ 'line-height' ],
+					},
+				},
+				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,
+			} )
+		);
+	} );
+} );
