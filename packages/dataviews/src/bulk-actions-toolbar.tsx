@@ -17,6 +17,30 @@ import { useReducedMotion } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ActionWithModal } from './item-actions';
+import type { Action, AnyItem } from './types';
+import type { ActionTriggerProps } from './item-actions';
+
+interface ActionButtonProps< Item extends AnyItem > {
+	action: Action< Item >;
+	selectedItems: Item[];
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
+}
+
+interface ToolbarContentProps< Item extends AnyItem > {
+	selection: string[];
+	actionsToShow: Action< Item >[];
+	selectedItems: Item[];
+	setSelection: ( selection: Item[] ) => void;
+}
+
+interface BulkActionsToolbarProps< Item extends AnyItem > {
+	data: Item[];
+	selection: string[];
+	actions: Action< Item >[];
+	setSelection: ( selection: Item[] ) => void;
+	getItemId: ( item: Item ) => string;
+}
 
 const SNACKBAR_VARIANTS = {
 	init: {
@@ -37,7 +61,11 @@ const SNACKBAR_VARIANTS = {
 	},
 };
 
-function ActionTrigger( { action, onClick, isBusy } ) {
+function ActionTrigger< Item extends AnyItem >( {
+	action,
+	onClick,
+	isBusy,
+}: ActionTriggerProps< Item > ) {
 	return (
 		<ToolbarButton
 			disabled={ isBusy }
@@ -53,32 +81,26 @@ function ActionTrigger( { action, onClick, isBusy } ) {
 	);
 }
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: [] = [];
 
-function ActionButton( {
+function ActionButton< Item extends AnyItem >( {
 	action,
 	selectedItems,
 	actionInProgress,
 	setActionInProgress,
-} ) {
+}: ActionButtonProps< Item > ) {
 	const selectedEligibleItems = useMemo( () => {
 		return selectedItems.filter( ( item ) => {
-			return action.isEligible( item );
+			return ! action.isEligible || action.isEligible( item );
 		} );
 	}, [ action, selectedItems ] );
-	if ( !! action.RenderModal ) {
+	if ( 'RenderModal' in action ) {
 		return (
 			<ActionWithModal
 				key={ action.id }
 				action={ action }
 				items={ selectedEligibleItems }
 				ActionTrigger={ ActionTrigger }
-				onActionStart={ () => {
-					setActionInProgress( action.id );
-				} }
-				onActionPerformed={ () => {
-					setActionInProgress( null );
-				} }
 			/>
 		);
 	}
@@ -86,25 +108,22 @@ function ActionButton( {
 		<ActionTrigger
 			key={ action.id }
 			action={ action }
-			items={ selectedItems }
 			onClick={ () => {
 				setActionInProgress( action.id );
-				action.callback( selectedItems, () => {
-					setActionInProgress( action.id );
-				} );
+				action.callback( selectedItems );
 			} }
 			isBusy={ actionInProgress === action.id }
 		/>
 	);
 }
 
-function renderToolbarContent(
-	selection,
-	actionsToShow,
-	selectedItems,
-	actionInProgress,
-	setActionInProgress,
-	setSelection
+function renderToolbarContent< Item extends AnyItem >(
+	selection: string[],
+	actionsToShow: Action< Item >[],
+	selectedItems: Item[],
+	actionInProgress: string | null,
+	setActionInProgress: ( actionId: string | null ) => void,
+	setSelection: ( selection: Item[] ) => void
 ) {
 	return (
 		<>
@@ -152,14 +171,16 @@ function renderToolbarContent(
 	);
 }
 
-function ToolbarContent( {
+function ToolbarContent< Item extends AnyItem >( {
 	selection,
 	actionsToShow,
 	selectedItems,
 	setSelection,
-} ) {
-	const [ actionInProgress, setActionInProgress ] = useState( null );
-	const buttons = useRef( null );
+}: ToolbarContentProps< Item > ) {
+	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
+		null
+	);
+	const buttons = useRef< JSX.Element | null >( null );
 	if ( ! actionInProgress ) {
 		if ( buttons.current ) {
 			buttons.current = null;
@@ -185,13 +206,13 @@ function ToolbarContent( {
 	return buttons.current;
 }
 
-export default function BulkActionsToolbar( {
+export default function BulkActionsToolbar< Item extends AnyItem >( {
 	data,
 	selection,
 	actions = EMPTY_ARRAY,
 	setSelection,
 	getItemId,
-} ) {
+}: BulkActionsToolbarProps< Item > ) {
 	const isReducedMotion = useReducedMotion();
 	const selectedItems = useMemo( () => {
 		return data.filter( ( item ) =>
@@ -205,7 +226,10 @@ export default function BulkActionsToolbar( {
 				return (
 					action.supportsBulk &&
 					action.icon &&
-					selectedItems.some( ( item ) => action.isEligible( item ) )
+					selectedItems.some(
+						( item ) =>
+							! action.isEligible || action.isEligible( item )
+					)
 				);
 			} ),
 		[ actions, selectedItems ]

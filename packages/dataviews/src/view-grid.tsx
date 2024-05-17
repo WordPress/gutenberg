@@ -21,10 +21,33 @@ import { __ } from '@wordpress/i18n';
  */
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
-
 import { useHasAPossibleBulkAction } from './bulk-actions';
+import type {
+	Action,
+	AnyItem,
+	NormalizedField,
+	ViewGrid as ViewGridType,
+	ViewProps,
+} from './types';
 
-function GridItem( {
+interface ViewGridProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewGridType > {}
+
+interface GridItemProps< Item extends AnyItem > {
+	selection: string[];
+	data: Item[];
+	onSelectionChange: ( items: Item[] ) => void;
+	getItemId: ( item: Item ) => string;
+	item: Item;
+	actions: Action< Item >[];
+	mediaField?: NormalizedField< Item >;
+	primaryField?: NormalizedField< Item >;
+	visibleFields: NormalizedField< Item >[];
+	badgeFields: NormalizedField< Item >[];
+	columnFields: string[];
+}
+
+function GridItem< Item extends AnyItem >( {
 	selection,
 	data,
 	onSelectionChange,
@@ -36,7 +59,7 @@ function GridItem( {
 	visibleFields,
 	badgeFields,
 	columnFields,
-} ) {
+}: GridItemProps< Item > ) {
 	const hasBulkAction = useHasAPossibleBulkAction( actions, item );
 	const id = getItemId( item );
 	const isSelected = selection.includes( id );
@@ -86,7 +109,6 @@ function GridItem( {
 				className="dataviews-view-grid__title-actions"
 			>
 				<SingleSelectionCheckbox
-					id={ id }
 					item={ item }
 					selection={ selection }
 					onSelectionChange={ onSelectionChange }
@@ -105,7 +127,7 @@ function GridItem( {
 					className="dataviews-view-grid__badge-fields"
 					spacing={ 2 }
 					wrap
-					align="top"
+					alignment="top"
 					justify="flex-start"
 				>
 					{ badgeFields.map( ( field ) => {
@@ -174,7 +196,7 @@ function GridItem( {
 	);
 }
 
-export default function ViewGrid( {
+export default function ViewGrid< Item extends AnyItem >( {
 	actions,
 	data,
 	fields,
@@ -183,7 +205,7 @@ export default function ViewGrid( {
 	onSelectionChange,
 	selection,
 	view,
-} ) {
+}: ViewGridProps< Item > ) {
 	const mediaField = fields.find(
 		( field ) => field.id === view.layout.mediaField
 	);
@@ -191,7 +213,7 @@ export default function ViewGrid( {
 		( field ) => field.id === view.layout.primaryField
 	);
 	const { visibleFields, badgeFields } = fields.reduce(
-		( accumulator, field ) => {
+		( accumulator: Record< string, NormalizedField< Item >[] >, field ) => {
 			if (
 				view.hiddenFields.includes( field.id ) ||
 				[ view.layout.mediaField, view.layout.primaryField ].includes(

@@ -17,7 +17,7 @@ import {
 } from './hooks';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	item && typeof item === 'object' && item.constructor === Object;
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -338,12 +338,12 @@ export const populateInitialData = ( data?: {
 	config?: Record< string, unknown >;
 } ) => {
 	if ( isObject( data?.state ) ) {
-		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			store( namespace, { state }, { lock: universalUnlock } );
 		} );
 	}
 	if ( isObject( data?.config ) ) {
-		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
 			storeConfigs.set( namespace, config );
 		} );
 	}

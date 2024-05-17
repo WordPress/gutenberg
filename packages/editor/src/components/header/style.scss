@@ -43,6 +43,11 @@
 	flex-grow: 1;
 	display: flex;
 	justify-content: center;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
 
 	&.is-collapsed {
 		display: none;

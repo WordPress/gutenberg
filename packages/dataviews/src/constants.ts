@@ -46,10 +46,12 @@ export const OPERATORS = {
 	},
 };
 
-// Sorting
-export const SORTING_DIRECTIONS = {
-	asc: { label: __( 'Sort ascending' ) },
-	desc: { label: __( 'Sort descending' ) },
+export const SORTING_DIRECTIONS = [ 'asc', 'desc' ] as const;
+export const sortArrows = { asc: '↑', desc: '↓' };
+export const sortValues = { asc: 'ascending', desc: 'descending' } as const;
+export const sortLabels = {
+	asc: __( 'Sort ascending' ),
+	desc: __( 'Sort descending' ),
 };
 
 // View layouts.

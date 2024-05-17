@@ -34,36 +34,27 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import type {
 	Action,
-	Data,
-	Item,
+	AnyItem,
 	NormalizedField,
 	ViewList as ViewListType,
+	ViewProps,
 } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewProps {
-	actions: Action[];
-	data: Data;
-	fields: NormalizedField[];
-	getItemId: ( item: Item ) => string;
-	id: string;
-	isLoading: boolean;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: Item[];
-	view: ViewListType;
-}
+interface ViewListProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewListType > {}
 
-interface ListViewItemProps {
-	actions: Action[];
+interface ListViewItemProps< Item extends AnyItem > {
+	actions: Action< Item >[];
 	id?: string;
 	isSelected: boolean;
 	item: Item;
-	mediaField?: NormalizedField;
+	mediaField?: NormalizedField< Item >;
 	onSelect: ( item: Item ) => void;
-	primaryField?: NormalizedField;
+	primaryField?: NormalizedField< Item >;
 	store: CompositeStore;
-	visibleFields: NormalizedField[];
+	visibleFields: NormalizedField< Item >[];
 }
 
 const {
@@ -74,7 +65,7 @@ const {
 	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function ListItem( {
+function ListItem< Item extends AnyItem >( {
 	actions,
 	id,
 	isSelected,
@@ -84,7 +75,7 @@ function ListItem( {
 	primaryField,
 	store,
 	visibleFields,
-}: ListViewItemProps ) {
+}: ListViewItemProps< Item > ) {
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
@@ -223,14 +214,12 @@ function ListItem( {
 									}
 								>
 									{ isModalOpen && (
-										<ActionModal
+										<ActionModal< Item >
 											action={ primaryAction }
 											items={ [ item ] }
 											closeModal={ () =>
 												setIsModalOpen( false )
 											}
-											onActionStart={ () => {} }
-											onActionPerformed={ () => {} }
 										/>
 									) }
 								</CompositeItem>
@@ -313,7 +302,9 @@ function ListItem( {
 	);
 }
 
-export default function ViewList( props: ListViewProps ) {
+export default function ViewList< Item extends AnyItem >(
+	props: ViewListProps< Item >
+) {
 	const {
 		actions,
 		data,

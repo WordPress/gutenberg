@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 27.6.0 (2024-05-16)
+
 ### Internal
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
@@ -20,6 +22,7 @@
 ### Bug Fix
 
 -   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
+-   Fix an issue where types used a synthetic default import ([#61679](https://github.com/WordPress/gutenberg/pull/61679)).
 
 ## 27.5.0 (2024-05-02)
 
