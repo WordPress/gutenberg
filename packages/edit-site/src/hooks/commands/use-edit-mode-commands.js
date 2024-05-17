@@ -32,7 +32,7 @@ import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
 import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
-import { TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { PATTERN_TYPES, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -235,7 +235,7 @@ function usePatternCommands() {
 
 	const commands = [];
 
-	if ( pattern?.type === 'wp_block' ) {
+	if ( pattern?.type === PATTERN_TYPES.user ) {
 		commands.push( {
 			name: 'core/rename-pattern',
 			label: __( 'Rename pattern' ),

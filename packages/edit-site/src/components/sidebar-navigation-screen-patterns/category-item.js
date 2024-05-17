@@ -3,6 +3,7 @@
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { useLink } from '../routes/link';
+import { TEMPLATE_PART_POST_TYPE, PATTERN_TYPES } from '../../utils/constants';
 
 export default function CategoryItem( {
 	count,
@@ -13,8 +14,11 @@ export default function CategoryItem( {
 	type,
 } ) {
 	const linkInfo = useLink( {
-		postType: type,
 		categoryId: id,
+		categoryType:
+			type === TEMPLATE_PART_POST_TYPE
+				? TEMPLATE_PART_POST_TYPE
+				: PATTERN_TYPES.theme,
 	} );
 
 	if ( ! count ) {

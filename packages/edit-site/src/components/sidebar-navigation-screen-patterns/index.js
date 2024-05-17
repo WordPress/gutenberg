@@ -78,7 +78,7 @@ function CategoriesGroup( {
 					label={ allPatterns.label }
 					icon={ file }
 					id={ allPatterns.name }
-					type={ PATTERN_TYPES.user }
+					type={ PATTERN_TYPES.theme }
 					isActive={
 						currentCategory === `${ allPatterns.name }` &&
 						( currentType === PATTERN_TYPES.theme ||
@@ -93,7 +93,7 @@ function CategoriesGroup( {
 					label={ category.label }
 					icon={ file }
 					id={ category.name }
-					type={ PATTERN_TYPES.user }
+					type={ PATTERN_TYPES.theme }
 					isActive={
 						currentCategory === `${ category.name }` &&
 						( currentType === PATTERN_TYPES.theme ||
@@ -107,10 +107,10 @@ function CategoriesGroup( {
 
 export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		params: { postType, categoryId },
+		params: { categoryType, categoryId },
 	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = postType || PATTERN_TYPES.theme;
+	const currentType = categoryType || PATTERN_TYPES.theme;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();

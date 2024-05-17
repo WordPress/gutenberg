@@ -242,7 +242,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 					icon: symbolFilled,
 					callback: ( { close } ) => {
 						const args = {
-							path: '/patterns',
 							categoryType: 'wp_template_part',
 							categoryId: 'all-parts',
 						};

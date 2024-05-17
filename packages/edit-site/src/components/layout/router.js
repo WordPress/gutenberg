@@ -21,6 +21,12 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
+import {
+	NAVIGATION_POST_TYPE,
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -40,7 +46,7 @@ function useRedirectOldPaths() {
 		} = params;
 
 		if ( path === '/wp_template_part/all' ) {
-			history.replace( { postType: 'template_part' } );
+			history.replace( { postType: TEMPLATE_PART_POST_TYPE } );
 		}
 
 		const allParamsButPath = {
@@ -60,21 +66,21 @@ function useRedirectOldPaths() {
 
 		if ( path === '/wp_template' ) {
 			history.replace( {
-				postType: 'wp_template',
+				postType: TEMPLATE_POST_TYPE,
 				...allParamsButPath,
 			} );
 		}
 
 		if ( path === '/patterns' ) {
 			history.replace( {
-				postType: categoryType ?? 'wp_block',
+				postType: categoryType ?? PATTERN_TYPES.theme,
 				...allParamsButPath,
 			} );
 		}
 
 		if ( path === '/navigation' ) {
 			history.replace( {
-				postType: 'wp_navigation',
+				postType: NAVIGATION_POST_TYPE,
 				...allParamsButPath,
 			} );
 		}
@@ -85,7 +91,8 @@ export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params;
+	const { postType, postId, path, layout, isCustom, canvas, categoryType } =
+		params;
 	useRedirectOldPaths();
 
 	// Page list
@@ -128,7 +135,7 @@ export default function useLayoutAreas() {
 	}
 
 	// Templates
-	if ( postType === 'wp_template' ) {
+	if ( postType === TEMPLATE_POST_TYPE ) {
 		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
 			key: 'templates',
@@ -149,7 +156,12 @@ export default function useLayoutAreas() {
 	}
 
 	// Patterns
-	if ( postType === 'wp_template_part' || postType === 'wp_block' ) {
+	if (
+		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.theme ].includes(
+			categoryType
+		) ||
+		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.user ].includes( postType )
+	) {
 		return {
 			key: 'patterns',
 			areas: {
@@ -180,14 +192,14 @@ export default function useLayoutAreas() {
 	}
 
 	// Navigation
-	if ( postType === 'wp_navigation' ) {
+	if ( postType === NAVIGATION_POST_TYPE ) {
 		if ( postId ) {
 			return {
 				key: 'navigation',
 				areas: {
 					sidebar: (
 						<SidebarNavigationScreenNavigationMenu
-							backPath={ { postType: 'wp_navigation' } }
+							backPath={ { postType: NAVIGATION_POST_TYPE } }
 						/>
 					),
 					preview: <Editor isLoading={ isSiteEditorLoading } />,
