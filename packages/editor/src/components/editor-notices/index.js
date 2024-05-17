@@ -11,8 +11,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import TemplateValidationNotice from '../template-validation-notice';
 
 /**
- * EditorNotices component.
- *
  * This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
  *
  * @example
@@ -20,7 +18,7 @@ import TemplateValidationNotice from '../template-validation-notice';
  * <EditorNotices />
  * ```
  *
- * @return {JSX.Element} The rendered component.
+ * @return {JSX.Element} The rendered EditorNotices component.
  */
 export function EditorNotices() {
 	const { notices } = useSelect(
