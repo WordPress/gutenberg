@@ -13,6 +13,7 @@ import {
 	file,
 	home,
 	verse,
+	media,
 } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
@@ -24,6 +25,7 @@ const ICONS_MAP = {
 	post_tag: tag,
 	category,
 	attachment: file,
+	media,
 };
 
 function SearchItemIcon( { isURL, suggestion } ) {
