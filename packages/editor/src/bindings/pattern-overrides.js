@@ -89,5 +89,7 @@ export default {
 				},
 			} );
 	},
-	lockAttributesEditing: false,
+	lockAttributesEditing() {
+		return false;
+	},
 };
