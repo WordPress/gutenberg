@@ -31,12 +31,13 @@ export const ExperimentalHintItem = styled.span`
 	margin-inline-end: ${ space( 1 ) };
 `;
 
-export const SelectLabel = styled( Ariakit.SelectLabel )`
+export const SelectLabel = styled.label`
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;
 	text-transform: uppercase;
 	margin-bottom: ${ space( 2 ) };
+	display: block;
 `;
 
 export const Select = styled( Ariakit.Select, {

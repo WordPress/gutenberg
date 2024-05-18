@@ -1,9 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo } from '@wordpress/element';
+import { createContext, useMemo, useId } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Icon, chevronDown } from '@wordpress/icons';
+
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import * as Ariakit from '@ariakit/react';
 
 /**
  * Internal dependencies
@@ -100,16 +106,27 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 		...restProps
 	} = props;
 
+	const selectId = useId();
+
 	return (
 		<>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
-				<Styled.SelectLabel store={ store }>
-					{ label }
-				</Styled.SelectLabel>
+				<Ariakit.SelectLabel
+					store={ store }
+					render={ () => (
+						<Styled.SelectLabel htmlFor={ selectId }>
+							{ label }
+						</Styled.SelectLabel>
+					) }
+				/>
 			) }
-			<CustomSelectButton { ...restProps } store={ store } />
+			<CustomSelectButton
+				{ ...restProps }
+				store={ store }
+				id={ selectId }
+			/>
 			<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
 				<CustomSelectContext.Provider value={ { store } }>
 					{ children }
