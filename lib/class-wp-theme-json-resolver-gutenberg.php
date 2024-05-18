@@ -775,7 +775,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 	public static function get_resolved_theme_uris( $theme_json ) {
 		$resolved_theme_uris = array();
 
-		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg || empty( $theme_json ) ) {
+		if ( ! $theme_json instanceof WP_Theme_JSON_Gutenberg ) {
 			return $resolved_theme_uris;
 		}
 
