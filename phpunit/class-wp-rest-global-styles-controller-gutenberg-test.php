@@ -173,7 +173,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 		wp_recursive_ksort( $data );
 		wp_recursive_ksort( $expected );
-		var_dump( $data );
+
 		$this->assertSameSets( $expected, $data, 'Theme item should match expected schema' );
 	}
 
