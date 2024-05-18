@@ -22,6 +22,7 @@ export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
 	flex: 1;
+	flex-wrap: wrap;
 `;
 
 export const SelectedExperimentalHintItem = styled.span`
@@ -35,7 +36,7 @@ export const ExperimentalHintItem = styled.span`
 	margin-inline-end: ${ space( 1 ) };
 `;
 
-export const SelectLabel = styled.label`
+export const SelectLabel = styled( Ariakit.SelectLabel )`
 	font-size: 11px;
 	font-weight: 500;
 	line-height: 1.4;

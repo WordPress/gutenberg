@@ -65,7 +65,7 @@ function CustomSelectControl( props: LegacyCustomSelectProps ) {
 	}, [] );
 
 	const children = options.map(
-		( { name, key, __experimentalHint, className, ...rest } ) => {
+		( { name, key, __experimentalHint, ...rest } ) => {
 			const withHint = (
 				<Styled.WithHintWrapper>
 					<span>{ name }</span>
@@ -144,8 +144,8 @@ export function ClassicCustomSelectControlV2Adapter(
 ) {
 	return (
 		<CustomSelectControl
-			{ ...props }
 			__experimentalShowSelectedHint={ false }
+			{ ...props }
 		/>
 	);
 }
