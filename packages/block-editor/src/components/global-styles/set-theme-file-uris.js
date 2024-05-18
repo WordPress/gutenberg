@@ -65,7 +65,7 @@ export default function setThemeFileUris( themeJson, themeFileURIs ) {
 			/*
 			 * The object must not be updated immutably here because the
 			 * themeJson is a reference to the global styles tree used as a dependency in the
-			 * useGlobalStylesOutputWithConfig() hook. If we mutate the object,
+			 * useGlobalStylesOutputWithConfig() hook. If we don't mutate the object,
 			 * the hook will detect the change and re-render the component, resulting
 			 * in a maximum depth exceeded error.
 			 */

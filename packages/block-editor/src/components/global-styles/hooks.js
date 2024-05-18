@@ -209,6 +209,11 @@ export function useGlobalStyle(
 	return [ result, setStyle, _links ];
 }
 
+export function useGlobalStyleLinks() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return mergedConfig?._links;
+}
+
 /**
  * React hook that overrides a global settings object with block and element specific settings.
  *
