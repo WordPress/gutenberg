@@ -367,7 +367,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$raw_config                       = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
-		$theme_json                       = array();
+		$theme_json                       = null;
 		if ( $is_global_styles_user_theme_json ) {
 			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
 			$config     = $theme_json->get_raw_data();
@@ -413,7 +413,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $post->ID );
 			// Only return resolved URIs for get requests to user theme JSON.
-			if ( $is_global_styles_user_theme_json ) {
+			if ( $theme_json ) {
 				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 				if ( ! empty( $resolved_theme_uris ) ) {
 					$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
