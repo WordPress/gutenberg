@@ -212,9 +212,9 @@ export default function FontAppearanceControl( props ) {
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
 				value={ currentSelection }
-				onChange={ ( { selectedItem } ) => {
-					onChange( selectedItem.style );
-				} }
+				onChange={ ( { selectedItem } ) =>
+					onChange( selectedItem.style )
+				}
 			/>
 		)
 	);
