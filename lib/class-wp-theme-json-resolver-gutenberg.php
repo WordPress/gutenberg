@@ -794,7 +794,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 				$src_url            = str_replace( $placeholder, '', $background_image_url );
 				$resolved_theme_uri = array(
 					'name'   => $background_image_url,
-					'href'   => esc_url( get_theme_file_uri( $src_url ) ),
+					'href'   => sanitize_url( get_theme_file_uri( $src_url ) ),
 					'target' => 'styles.background.backgroundImage.url',
 				);
 				if ( isset( $file_type['type'] ) ) {
