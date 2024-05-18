@@ -109,7 +109,7 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 	const selectId = useId();
 
 	return (
-		<>
+		<Styled.SelectWrapper>
 			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
 				<VisuallyHidden as="label">{ label }</VisuallyHidden>
 			) : (
@@ -132,7 +132,7 @@ function _CustomSelect( props: _CustomSelectProps & CustomSelectStore ) {
 					{ children }
 				</CustomSelectContext.Provider>
 			</Styled.SelectPopover>
-		</>
+		</Styled.SelectWrapper>
 	);
 }
 

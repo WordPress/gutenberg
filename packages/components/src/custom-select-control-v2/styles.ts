@@ -14,6 +14,10 @@ import type { CustomSelectButtonProps } from './types';
 
 const ITEM_PADDING = space( 2 );
 
+export const SelectWrapper = styled.div`
+	display: block;
+`;
+
 export const WithHintWrapper = styled.div`
 	display: flex;
 	justify-content: space-between;
