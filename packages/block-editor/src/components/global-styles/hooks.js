@@ -178,7 +178,7 @@ export function useGlobalStyle(
 			)
 		);
 	};
-	// @TODO _links isn't a great name. styleMeta? themeMeta?
+
 	let rawResult, result, _links;
 	switch ( source ) {
 		case 'all':
