@@ -830,9 +830,7 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 			_wp_array_set( $resolved_theme_json_data, $path, $resolved_url['href'] );
 		}
 
-		if ( ! empty( $resolved_theme_json_data ) ) {
-			$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
-		}
+		$theme_json->merge( new WP_Theme_JSON_Gutenberg( $resolved_theme_json_data ) );
 
 		return $theme_json;
 	}
