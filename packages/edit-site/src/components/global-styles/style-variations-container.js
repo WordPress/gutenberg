@@ -36,13 +36,14 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		);
 	} );
 
+	multiplePropertyVariations.unshift( {
+		title: __( 'Default' ),
+		settings: {},
+		styles: {},
+	} );
+
 	const withEmptyVariation = useMemo( () => {
 		return [
-			{
-				title: __( 'Default' ),
-				settings: {},
-				styles: {},
-			},
 			...( multiplePropertyVariations ?? [] ).map( ( variation ) => {
 				const blockStyles = { ...variation?.styles?.blocks } || {};
 				// We need to copy any user custom CSS to the variation to prevent it being lost
@@ -52,10 +53,11 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 						// First get any block specific custom CSS from the current user styles and merge with any custom CSS for
 						// that block in the variation.
 						if ( userStyles.blocks[ blockName ].css ) {
+							const variationBlockStyles =
+								blockStyles[ blockName ] || {};
+
 							blockStyles[ blockName ] = {
-								...( blockStyles[ blockName ]
-									? blockStyles[ blockName ]
-									: {} ),
+								...variationBlockStyles,
 								css: `${
 									blockStyles[ blockName ]?.css || ''
 								} ${ userStyles.blocks[ blockName ].css }`,
@@ -64,15 +66,16 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 					} );
 				}
 				// Now merge any global custom CSS from current user styles with global custom CSS in the variation.
+				const globalCustomCSS =
+					userStyles?.css || variation.styles?.css
+						? `${ variation.styles?.css || '' } ${
+								userStyles?.css || ''
+						  }`
+						: '';
+
 				const styles = {
 					...variation.styles,
-					...( userStyles?.css || variation.styles?.css
-						? {
-								css: `${ variation.styles?.css || '' } ${
-									userStyles?.css
-								}`,
-						  }
-						: {} ),
+					css: globalCustomCSS,
 					blocks: {
 						...blockStyles,
 					},
