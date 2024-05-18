@@ -784,14 +784,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		// Top level styles.
 		$background_image_url = $theme_json_data['styles']['background']['backgroundImage']['url'] ?? null;
 		// Using the same file convention when registering web fonts. See: WP_Font_Face_Resolver:: to_theme_file_uri.
-		$placeholder          = 'file:./';
+		$placeholder = 'file:./';
 		if (
 			isset( $background_image_url ) &&
 			is_string( $background_image_url ) &&
 			// Skip if the src doesn't start with the placeholder, as there's nothing to replace.
 			str_starts_with( $background_image_url, $placeholder ) ) {
-				$file_type = wp_check_filetype( $background_image_url );
-				$src_url   = str_replace( $placeholder, '', $background_image_url );
+				$file_type          = wp_check_filetype( $background_image_url );
+				$src_url            = str_replace( $placeholder, '', $background_image_url );
 				$resolved_theme_uri = array(
 					'name'   => $background_image_url,
 					'href'   => esc_url( get_theme_file_uri( $src_url ) ),
