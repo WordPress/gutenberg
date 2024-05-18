@@ -122,6 +122,23 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$data     = $response->get_data();
 		$expected = array(
 			array(
+				'_links'   => array(
+					'curies'             => array(
+						array(
+							'name'      => 'wp',
+							'href'      => 'https://api.w.org/{rel}',
+							'templated' => true,
+						),
+					),
+					'wp:theme-file-uris' => array(
+						array(
+							'href'   => 'http://localhost:8889/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg',
+							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
+							'target' => 'styles.background.backgroundImage.url',
+							'type'   => 'image/jpeg',
+						),
+					),
+				),
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'color' => array(
@@ -133,16 +150,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 									'name'  => 'Foreground',
 								),
 							),
-						),
-					),
-				),
-				'_links'   => array(
-					'wp:theme-file-uris' => array(
-						array(
-							'href'   => 'http://localhost:8889/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg',
-							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
-							'target' => 'styles.background.backgroundImage.url',
-							'type'   => 'image/jpeg',
 						),
 					),
 				),
@@ -166,7 +173,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 		wp_recursive_ksort( $data );
 		wp_recursive_ksort( $expected );
-
+		var_dump( $data );
 		$this->assertSameSets( $expected, $data, 'Theme item should match expected schema' );
 	}
 
