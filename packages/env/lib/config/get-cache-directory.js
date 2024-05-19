@@ -29,7 +29,7 @@ module.exports = async function getCacheDirectory( configFilePath = null ) {
 	 */
 	if ( configFilePath ) {
 		const rawConfig = await readRawConfigFile( configFilePath );
-		if ( rawConfig.config.WP_ENV_HOME ) {
+		if ( rawConfig?.config?.WP_ENV_HOME ) {
 			return path.resolve( rawConfig.config.WP_ENV_HOME );
 		}
 	}
