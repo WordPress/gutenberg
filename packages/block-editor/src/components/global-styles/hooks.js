@@ -179,25 +179,22 @@ export function useGlobalStyle(
 		);
 	};
 
-	let rawResult, result, _links;
+	let rawResult, result;
 	switch ( source ) {
 		case 'all':
 			rawResult = getValueFromObjectPath( mergedConfig, finalPath );
-			_links = mergedConfig?._links;
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'user':
 			rawResult = getValueFromObjectPath( userConfig, finalPath );
-			_links = userConfig?._links;
 			result = shouldDecodeEncode
 				? getValueFromVariable( mergedConfig, blockName, rawResult )
 				: rawResult;
 			break;
 		case 'base':
 			rawResult = getValueFromObjectPath( baseConfig, finalPath );
-			_links = baseConfig?._links;
 			result = shouldDecodeEncode
 				? getValueFromVariable( baseConfig, blockName, rawResult )
 				: rawResult;
@@ -206,12 +203,7 @@ export function useGlobalStyle(
 			throw 'Unsupported source';
 	}
 
-	return [ result, setStyle, _links ];
-}
-
-export function useGlobalStyleLinks() {
-	const { merged: mergedConfig } = useContext( GlobalStylesContext );
-	return mergedConfig?._links;
+	return [ result, setStyle ];
 }
 
 /**
