@@ -36,15 +36,17 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 		);
 	} );
 
-	multiplePropertyVariations.unshift( {
-		title: __( 'Default' ),
-		settings: {},
-		styles: {},
-	} );
-
-	const withEmptyVariation = useMemo( () => {
+	const themeVariations = useMemo( () => {
+		const withEmptyVariation = [
+			{
+				title: __( 'Default' ),
+				settings: {},
+				styles: {},
+			},
+			...( multiplePropertyVariations ?? [] ),
+		];
 		return [
-			...( multiplePropertyVariations ?? [] ).map( ( variation ) => {
+			...withEmptyVariation.map( ( variation ) => {
 				const blockStyles = { ...variation?.styles?.blocks } || {};
 				// We need to copy any user custom CSS to the variation to prevent it being lost
 				// when switching variations.
@@ -95,7 +97,7 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 			className="edit-site-global-styles-style-variations-container"
 			gap={ gap }
 		>
-			{ withEmptyVariation.map( ( variation, index ) => (
+			{ themeVariations.map( ( variation, index ) => (
 				<Variation key={ index } variation={ variation }>
 					{ ( isFocused ) => (
 						<PreviewStyles
