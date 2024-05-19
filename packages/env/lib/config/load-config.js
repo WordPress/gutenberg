@@ -43,7 +43,7 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	const configFilePath = getConfigFilePath( configDirectoryPath );
 
 	const cacheDirectoryPath = path.resolve(
-		await getCacheDirectory(),
+		await getCacheDirectory( configFilePath ),
 		md5( configFilePath )
 	);
 

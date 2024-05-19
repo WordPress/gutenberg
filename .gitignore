@@ -32,6 +32,7 @@ yarn.lock
 # Operating system specific files
 .DS_Store
 Thumbs.db
+.idea/
 
 # Report generated from jest-junit
 junit.xml
