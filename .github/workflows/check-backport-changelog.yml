@@ -31,7 +31,7 @@ jobs:
             - name: 'Fetch relevant history from origin'
               run: git fetch origin ${{ github.event.pull_request.base.ref }}
             - name: Check CHANGELOG status
-              if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core sync required') }}
+              if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core sync required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
               env:
                   PR_NUMBER: ${{ github.event.number }}
               run: |
