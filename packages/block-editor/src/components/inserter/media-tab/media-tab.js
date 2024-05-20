@@ -8,7 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { MediaCategoryPanel } from './media-panel';
 import { useMediaCategories } from './hooks';
-import MobileTabNavigation from '../mobile-tab-navigation';
+import InserterContentNavigator from '../inserter-content-navigator';
 import InserterNoResults from '../no-results';
 
 function MediaTab( { rootClientId, onInsert } ) {
@@ -27,7 +27,7 @@ function MediaTab( { rootClientId, onInsert } ) {
 	}
 
 	return (
-		<MobileTabNavigation categories={ categories }>
+		<InserterContentNavigator categories={ categories }>
 			{ ( category ) => (
 				<MediaCategoryPanel
 					onInsert={ onInsert }
@@ -35,7 +35,7 @@ function MediaTab( { rootClientId, onInsert } ) {
 					category={ category }
 				/>
 			) }
-		</MobileTabNavigation>
+		</InserterContentNavigator>
 	);
 }
 

@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import PatternsExplorerModal from '../block-patterns-explorer';
-import MobileTabNavigation from '../mobile-tab-navigation';
+import InserterContentNavigator from '../inserter-content-navigator';
 import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
 import InserterNoResults from '../no-results';
@@ -44,7 +44,7 @@ function BlockPatternsTab( { selectedCategory, onInsert, rootClientId } ) {
 
 	return (
 		<>
-			<MobileTabNavigation categories={ categories }>
+			<InserterContentNavigator categories={ categories }>
 				{ ( category ) => (
 					<div className="block-editor-inserter__category-panel">
 						<PatternCategoryPreviews
@@ -56,7 +56,7 @@ function BlockPatternsTab( { selectedCategory, onInsert, rootClientId } ) {
 						/>
 					</div>
 				) }
-			</MobileTabNavigation>
+			</InserterContentNavigator>
 			{ ! isMobile && (
 				<Button
 					className="block-editor-inserter__patterns-explore-button"

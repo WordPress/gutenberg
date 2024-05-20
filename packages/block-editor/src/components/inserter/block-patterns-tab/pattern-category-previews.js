@@ -166,23 +166,23 @@ export function PatternCategoryPreviews( {
 						{ __( 'No results found' ) }
 					</Text>
 				) }
-				{ currentCategoryPatterns.length > 0 && (
-					<BlockPatternsList
-						ref={ scrollContainerRef }
-						shownPatterns={ pagingProps.categoryPatternsAsyncList }
-						blockPatterns={ pagingProps.categoryPatterns }
-						onClickPattern={ onClickPattern }
-						onHover={ onHover }
-						label={ category.label }
-						orientation="vertical"
-						category={ category.name }
-						isDraggable
-						showTitlesAsTooltip={ showTitlesAsTooltip }
-						patternFilter={ patternSourceFilter }
-						pagingProps={ pagingProps }
-					/>
-				) }
 			</VStack>
+			{ currentCategoryPatterns.length > 0 && (
+				<BlockPatternsList
+					ref={ scrollContainerRef }
+					shownPatterns={ pagingProps.categoryPatternsAsyncList }
+					blockPatterns={ pagingProps.categoryPatterns }
+					onClickPattern={ onClickPattern }
+					onHover={ onHover }
+					label={ category.label }
+					orientation="vertical"
+					category={ category.name }
+					isDraggable
+					showTitlesAsTooltip={ showTitlesAsTooltip }
+					patternFilter={ patternSourceFilter }
+					pagingProps={ pagingProps }
+				/>
+			) }
 		</>
 	);
 }

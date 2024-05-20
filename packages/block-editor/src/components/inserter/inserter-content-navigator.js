@@ -13,7 +13,7 @@ import {
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
-export default function MobileTabNavigation( { categories, children } ) {
+export default function InserterContentNavigator( { categories, children } ) {
 	return (
 		<NavigatorProvider
 			initialPath="/"

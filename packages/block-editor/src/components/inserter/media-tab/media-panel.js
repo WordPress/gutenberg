@@ -32,32 +32,35 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 	const baseCssClass = 'block-editor-inserter__media-panel';
 	const searchLabel = category.labels.search_items || __( 'Search' );
 	return (
-		<VStack className={ baseCssClass }>
-			<HStack>
-				<NavigatorBackButton
-					icon={ isRTL() ? chevronRight : chevronLeft }
-					size="small"
-					label={ __( 'Back' ) }
+		<>
+			<VStack className={ baseCssClass }>
+				<HStack>
+					<NavigatorBackButton
+						icon={ isRTL() ? chevronRight : chevronLeft }
+						size="small"
+						label={ __( 'Back' ) }
+					/>
+					<FlexBlock>
+						<Heading level={ 4 } as="div">
+							{ category.label }
+						</Heading>
+					</FlexBlock>
+				</HStack>
+				<SearchControl
+					__nextHasNoMarginBottom
+					className="block-editor-inserter__search"
+					onChange={ setSearch }
+					value={ search }
+					label={ searchLabel }
+					placeholder={ searchLabel }
 				/>
-				<FlexBlock>
-					<Heading level={ 4 } as="div">
-						{ category.label }
-					</Heading>
-				</FlexBlock>
-			</HStack>
-			<SearchControl
-				className={ `${ baseCssClass }-search` }
-				onChange={ setSearch }
-				value={ search }
-				label={ searchLabel }
-				placeholder={ searchLabel }
-			/>
-			{ isLoading && (
-				<div className={ `${ baseCssClass }-spinner` }>
-					<Spinner />
-				</div>
-			) }
-			{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
+				{ isLoading && (
+					<div className={ `${ baseCssClass }-spinner` }>
+						<Spinner />
+					</div>
+				) }
+				{ ! isLoading && ! mediaList?.length && <InserterNoResults /> }
+			</VStack>
 			{ ! isLoading && !! mediaList?.length && (
 				<MediaList
 					rootClientId={ rootClientId }
@@ -66,6 +69,6 @@ export function MediaCategoryPanel( { rootClientId, onInsert, category } ) {
 					category={ category }
 				/>
 			) }
-		</VStack>
+		</>
 	);
 }
