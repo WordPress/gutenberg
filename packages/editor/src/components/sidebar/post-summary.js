@@ -25,6 +25,9 @@ import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
 import PostTrashPanel from '../post-trash/panel';
 import PostURLPanel from '../post-url/panel';
+import BlogTitle from '../blog-title';
+import PostsPerPage from '../posts-per-page';
+import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import {
 	NAVIGATION_POST_TYPE,
@@ -33,7 +36,6 @@ import {
 	TEMPLATE_POST_TYPE,
 } from '../../store/constants';
 import TemplateAreas from '../template-areas';
-import SiteSettingsPanel from '../site-settings-panel';
 
 /**
  * Module Constants
@@ -88,7 +90,9 @@ export default function PostSummary( { onActionPerformed } ) {
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									<SiteSettingsPanel />
+									<BlogTitle />
+									<PostsPerPage />
+									<SiteDiscussion />
 									<TemplateAreas />
 									{ fills }
 									{ ! isPattern &&

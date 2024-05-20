@@ -9,31 +9,29 @@ import {
 	Dropdown,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import { store as editorStore } from '../../store';
 import PostPanelRow from '../post-panel-row';
 
 export default function PostsPerPage() {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const postsPerPage = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		return siteSettings?.posts_per_page;
+	const { postsPerPage, isTemplate, postSlug } = useSelect( ( select ) => {
+		const { getEditedPostAttribute, getCurrentPostType } =
+			select( editorStore );
+		const { getEditedEntityRecord } = select( coreStore );
+		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		return {
+			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+			postSlug: getEditedPostAttribute( 'slug' ),
+			postsPerPage: siteSettings?.posts_per_page || 1,
+		};
 	}, [] );
-	const [ postsCountValue, setPostsCountValue ] = useState( 1 );
-
-	/*
-	 * This hook serves to set the server-retrieved postsPerPage
-	 * value to local state.
-	 */
-	useEffect( () => {
-		setPostsCountValue( postsPerPage );
-	}, [ postsPerPage ] );
-
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -49,8 +47,11 @@ export default function PostsPerPage() {
 		} ),
 		[ popoverAnchor ]
 	);
+
+	if ( ! isTemplate || ! [ 'home', 'index' ].includes( postSlug ) ) {
+		return null;
+	}
 	const setPostsPerPage = ( newValue ) => {
-		setPostsCountValue( newValue );
 		editEntityRecord( 'root', 'site', undefined, {
 			posts_per_page: newValue,
 		} );
@@ -69,7 +70,7 @@ export default function PostsPerPage() {
 						aria-label={ __( 'Change posts per page' ) }
 						onClick={ onToggle }
 					>
-						{ postsCountValue }
+						{ postsPerPage }
 					</Button>
 				) }
 				renderContent={ ( { onClose } ) => (
@@ -80,7 +81,7 @@ export default function PostsPerPage() {
 						/>
 						<NumberControl
 							placeholder={ 0 }
-							value={ postsCountValue }
+							value={ postsPerPage }
 							size={ '__unstable-large' }
 							spinControls="custom"
 							step="1"

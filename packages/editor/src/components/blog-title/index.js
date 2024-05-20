@@ -11,43 +11,43 @@ import {
 	Dropdown,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
 
 const EMPTY_OBJECT = {};
 
 export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { postsPageTitle, postsPageId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		const _postsPageRecord = siteSettings?.page_for_posts
-			? getEntityRecord(
-					'postType',
-					'page',
-					siteSettings?.page_for_posts
-			  )
-			: EMPTY_OBJECT;
-		return {
-			postsPageId: _postsPageRecord?.id,
-			postsPageTitle: _postsPageRecord?.title?.rendered,
-		};
-	}, [] );
-	const [ postsPageTitleValue, setPostsPageTitleValue ] = useState( '' );
-
-	/*
-	 * This hook serves to set the server-retrieved postsPageTitle
-	 * value to local state.
-	 */
-	useEffect( () => {
-		setPostsPageTitleValue( postsPageTitle );
-	}, [ postsPageTitle ] );
-
+	const { postsPageTitle, postsPageId, isTemplate, postSlug } = useSelect(
+		( select ) => {
+			const { getEntityRecord, getEditedEntityRecord } =
+				select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			const _postsPageRecord = siteSettings?.page_for_posts
+				? getEditedEntityRecord(
+						'postType',
+						'page',
+						siteSettings?.page_for_posts
+				  )
+				: EMPTY_OBJECT;
+			const { getEditedPostAttribute, getCurrentPostType } =
+				select( editorStore );
+			return {
+				postsPageId: _postsPageRecord?.id,
+				postsPageTitle: _postsPageRecord?.title,
+				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+				postSlug: getEditedPostAttribute( 'slug' ),
+			};
+		},
+		[]
+	);
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -64,12 +64,15 @@ export default function BlogTitle() {
 		[ popoverAnchor ]
 	);
 
-	if ( ! postsPageId ) {
+	if (
+		! isTemplate ||
+		! [ 'home', 'index' ].includes( postSlug ) ||
+		! postsPageId
+	) {
 		return null;
 	}
 
 	const setPostsPageTitle = ( newValue ) => {
-		setPostsPageTitleValue( newValue );
 		editEntityRecord( 'postType', 'page', postsPageId, {
 			title: newValue,
 		} );
@@ -105,7 +108,7 @@ export default function BlogTitle() {
 						<InputControl
 							placeholder={ __( 'No Title' ) }
 							size={ '__unstable-large' }
-							value={ postsPageTitleValue }
+							value={ postsPageTitle }
 							onChange={ debounce( setPostsPageTitle, 300 ) }
 							label={ __( 'Blog title' ) }
 							help={ __(

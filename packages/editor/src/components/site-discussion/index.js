@@ -11,13 +11,15 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { useState, useEffect, useMemo } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import { store as editorStore } from '../../store';
 
 const COMMENT_OPTIONS = [
 	{
@@ -49,21 +51,21 @@ const COMMENT_OPTIONS = [
 
 export default function SiteDiscussion() {
 	const { editEntityRecord } = useDispatch( coreStore );
-	const allowCommentsOnNewPosts = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
-		return siteSettings?.default_comment_status || '';
-	}, [] );
-	const [ commentsOnNewPostsValue, setCommentsOnNewPostsValue ] =
-		useState( '' );
-	/*
-	 * This hook serves to set the server-retrieved allowCommentsOnNewPosts
-	 * value to local state.
-	 */
-	useEffect( () => {
-		setCommentsOnNewPostsValue( allowCommentsOnNewPosts );
-	}, [ allowCommentsOnNewPosts ] );
-
+	const { allowCommentsOnNewPosts, isTemplate, postSlug } = useSelect(
+		( select ) => {
+			const { getEditedPostAttribute, getCurrentPostType } =
+				select( editorStore );
+			const { getEditedEntityRecord } = select( coreStore );
+			const siteSettings = getEditedEntityRecord( 'root', 'site' );
+			return {
+				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+				postSlug: getEditedPostAttribute( 'slug' ),
+				allowCommentsOnNewPosts:
+					siteSettings?.default_comment_status || '',
+			};
+		},
+		[]
+	);
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -79,8 +81,11 @@ export default function SiteDiscussion() {
 		} ),
 		[ popoverAnchor ]
 	);
+
+	if ( ! isTemplate || ! [ 'home', 'index' ].includes( postSlug ) ) {
+		return null;
+	}
 	const setAllowCommentsOnNewPosts = ( newValue ) => {
-		setCommentsOnNewPostsValue( newValue );
 		editEntityRecord( 'root', 'site', undefined, {
 			default_comment_status: newValue ? 'open' : null,
 		} );
@@ -99,7 +104,7 @@ export default function SiteDiscussion() {
 						aria-label={ __( 'Change discussion settings' ) }
 						onClick={ onToggle }
 					>
-						{ commentsOnNewPostsValue
+						{ allowCommentsOnNewPosts
 							? __( 'Comments open' )
 							: __( 'Comments closed' ) }
 					</Button>
@@ -122,7 +127,7 @@ export default function SiteDiscussion() {
 								label={ __( 'Comment status' ) }
 								options={ COMMENT_OPTIONS }
 								onChange={ setAllowCommentsOnNewPosts }
-								selected={ commentsOnNewPostsValue }
+								selected={ allowCommentsOnNewPosts }
 							/>
 						</VStack>
 					</>
