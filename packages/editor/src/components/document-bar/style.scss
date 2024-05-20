@@ -1,6 +1,5 @@
 .editor-document-bar {
 	display: flex;
-	align-items: center;
 	height: $button-size-compact;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
@@ -8,21 +7,24 @@
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
-	background: $gray-100;
 	border-radius: $grid-unit-05;
 	width: min(100%, 416px);
 
-	&:hover {
-		background-color: $gray-200;
-	}
-
 	.components-button {
-		border-radius: $grid-unit-05;
+		background: $gray-100;
+
 		transition: all 0.1s ease-out;
 		@include reduce-motion("transition");
-
-		&:hover {
-			background: $gray-200;
+	}
+	&:not(.has-back-button) .components-button {
+		border-radius: $grid-unit-05;
+	}
+	&.has-back-button {
+		> .components-button {
+			border-radius: $grid-unit-05 0 0 $grid-unit-05;
+		}
+		.editor-document-bar__core .components-button {
+			border-radius: 0 $grid-unit-05 $grid-unit-05 0;
 		}
 	}
 
@@ -31,24 +33,37 @@
 	}
 }
 
-.editor-document-bar__command {
+.editor-document-bar__core {
+	position: relative;
+	display: flex;
 	flex-grow: 1;
-	color: var(--wp-block-synced-color);
-	overflow: hidden;
+
+	button {
+		max-width: 100%;
+		position: absolute;
+		inset: 0;
+		justify-content: flex-end;
+	}
 }
 
 .editor-document-bar__title {
 	flex-grow: 1;
-	overflow: hidden;
 	color: $gray-900;
 	gap: $grid-unit-05;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	max-width: 100%;
+	pointer-events: none;
 
-	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
+	// Ensures centered alignment and prevents overlapping of the contents.
 	@include break-medium() {
-		padding-left: $grid-unit-30;
+		// Offsets by the width of the command shortcut label plus its spacing from the side and the gap.
+		padding-inline: $grid-unit-30 + $grid-unit-15 + $grid-unit-05;
+		.has-back-button & {
+			// Offsets by the width of the back button.
+			padding-inline: 0 74px;
+		}
 	}
 
 	.editor-document-bar.is-global & {
@@ -56,6 +71,7 @@
 	}
 
 	.block-editor-block-icon {
+		fill: currentColor;
 		min-width: $grid-unit-30;
 		flex-shrink: 0;
 	}
@@ -84,11 +100,12 @@
 	flex-shrink: 0;
 	color: $gray-700;
 	gap: 0;
-	z-index: 1;
-	position: absolute;
 
+	&:focus {
+		// Ensure the focus ring is in front of the adjacent button.
+		z-index: 1;
+	}
 	&:hover {
 		color: $gray-900;
-		background-color: transparent;
 	}
 }

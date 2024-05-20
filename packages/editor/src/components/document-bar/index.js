@@ -118,6 +118,8 @@ export default function DocumentBar() {
 		mounted.current = true;
 	}, [] );
 
+	const transition = { duration: isReducedMotion ? 0 : 5.233 };
+
 	return (
 		<div
 			className={ clsx( 'editor-document-bar', {
@@ -128,6 +130,7 @@ export default function DocumentBar() {
 			<AnimatePresence>
 				{ hasBackButton && (
 					<MotionButton
+						key="back-button"
 						className="editor-document-bar__back"
 						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 						onClick={ ( event ) => {
@@ -135,16 +138,11 @@ export default function DocumentBar() {
 							onNavigateToPreviousEntityRecord();
 						} }
 						size="compact"
-						initial={
-							mounted.current
-								? { opacity: 0, transform: 'translateX(15%)' }
-								: false // Don't show entry animation when DocumentBar mounts.
-						}
-						animate={ { opacity: 1, transform: 'translateX(0%)' } }
-						exit={ { opacity: 0, transform: 'translateX(15%)' } }
-						transition={
-							isReducedMotion ? { duration: 0 } : undefined
-						}
+						variant="tertiary"
+						initial={ { opacity: 0, x: 12 } }
+						animate={ { opacity: 1, x: 0 } }
+						exit={ { opacity: 0, x: 12 } }
+						transition={ transition }
 					>
 						{ __( 'Back' ) }
 					</MotionButton>
@@ -153,32 +151,27 @@ export default function DocumentBar() {
 			{ isNotFound ? (
 				<Text>{ __( 'Document not found' ) }</Text>
 			) : (
-				<Button
-					className="editor-document-bar__command"
-					onClick={ () => openCommandCenter() }
-					size="compact"
-				>
+				<div className="editor-document-bar__core">
+					<Button
+						onClick={ () => openCommandCenter() }
+						size="compact"
+						variant="tertiary"
+					>
+						<span className="editor-document-bar__shortcut">
+							{ displayShortcut.primary( 'k' ) }
+						</span>
+					</Button>
 					<motion.div
 						className="editor-document-bar__title"
 						// Force entry animation when the back button is added or removed.
 						key={ hasBackButton }
 						initial={
-							mounted.current
-								? {
-										opacity: 0,
-										transform: hasBackButton
-											? 'translateX(15%)'
-											: 'translateX(-15%)',
-								  }
+							mounted.current || hasBackButton
+								? { opacity: 0, x: hasBackButton ? 12 : -12 }
 								: false // Don't show entry animation when DocumentBar mounts.
 						}
-						animate={ {
-							opacity: 1,
-							transform: 'translateX(0%)',
-						} }
-						transition={
-							isReducedMotion ? { duration: 0 } : undefined
-						}
+						animate={ { opacity: 1, x: 0 } }
+						transition={ transition }
 					>
 						<BlockIcon icon={ templateIcon } />
 						<Text
@@ -196,10 +189,7 @@ export default function DocumentBar() {
 								: __( 'No Title' ) }
 						</Text>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
-						{ displayShortcut.primary( 'k' ) }
-					</span>
-				</Button>
+				</div>
 			) }
 		</div>
 	);
