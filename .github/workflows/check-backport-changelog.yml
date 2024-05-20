@@ -36,7 +36,7 @@ jobs:
                     exit 1
                   fi
 
-                  pr_link_grep_pattern="https://github\.com/WordPress/gutenberg/pull/\([0-9]\+\) for https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
+                  pr_link_grep_pattern="https://github\.com/WordPress/wordpress-develop/pull/\([0-9]\+\) for https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
 
                   # Confirm that the CHANGELOG has an entry for the current PR
                   if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
