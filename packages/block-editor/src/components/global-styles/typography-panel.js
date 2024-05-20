@@ -174,7 +174,7 @@ export default function TypographyPanel( {
 	const fontFamilies = settings?.typography?.fontFamilies;
 	const mergedFontFamilies = useMemo( () => {
 		return [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => fontFamilies[ key ] ?? []
+			( key ) => fontFamilies?.[ key ] ?? []
 		);
 	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
