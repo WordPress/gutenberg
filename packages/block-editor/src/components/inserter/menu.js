@@ -31,7 +31,6 @@ import { MediaTab, MediaCategoryPanel } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
-import { useZoomOut } from '../../hooks/use-zoom-out';
 import { store as blockEditorStore } from '../../store';
 
 const NOOP = () => {};
@@ -281,9 +280,6 @@ function InserterMenu(
 		setSelectedMediaCategory,
 		showMediaPanel,
 	] );
-
-	// When the pattern panel is showing, we want to use zoom out mode
-	useZoomOut( showPatternPanel );
 
 	const handleSetSelectedTab = ( value ) => {
 		// If no longer on patterns tab remove the category setting.
