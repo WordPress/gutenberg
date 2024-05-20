@@ -13,6 +13,7 @@ interface EditPostOptions {
  *
  * @param this
  * @param postId Post ID to visit.
+ * @param options Editor options for edit post.
  */
 export async function editPost( this: Admin, postId: string | number, options: EditPostOptions = {}) {
 	const query = new URLSearchParams();
