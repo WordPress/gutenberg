@@ -11,6 +11,9 @@ on:
             - 'phpunit/**'
             - '!phpunit/experimental/**'
             - '!phpunit/blocks/**'
+            - 'packages/**/*.php'
+            - '!packages/block-library/**'
+            - '!packages/e2e-tests/**'
 jobs:
     check:
         name: Check CHANGELOG diff
