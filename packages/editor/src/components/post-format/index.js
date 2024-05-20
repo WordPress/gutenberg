@@ -38,6 +38,16 @@ export const POST_FORMATS = [
 	return 0;
 } );
 
+/**
+ * `PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
+ *
+ * @example
+ * ```jsx
+ * <PostFormat />
+ * ```
+ *
+ * @return {JSX.Element} The rendered PostFormat component.
+ */
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
 	const postFormatSelectorId = `post-format-selector-${ instanceId }`;

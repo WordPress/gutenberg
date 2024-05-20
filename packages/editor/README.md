@@ -966,11 +966,30 @@ Undocumented declaration.
 
 ### PostFormat
 
-Undocumented declaration.
+`PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
+
+_Usage_
+
+```jsx
+<PostFormat />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostFormat component.
 
 ### PostFormatCheck
 
-Undocumented declaration.
+Component check if there are any post formats.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child elements to render.
+
+_Returns_
+
+-   `Component|null`: The rendered component or null if post formats are disabled.
 
 ### PostLastRevision
 
