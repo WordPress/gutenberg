@@ -5,9 +5,12 @@ on:
         types: [opened, synchronize]
         paths:
             - 'lib/**'
+            - '!lib/load.php'
+            - '!lib/experiments-page.php'
             - '!lib/experimental/**'
-            - 'packages/**/*.php'
             - 'phpunit/**'
+            - '!phpunit/experimental/**'
+            - '!phpunit/blocks/**'
 jobs:
     check:
         name: Check CHANGELOG diff
