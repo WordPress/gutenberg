@@ -21,23 +21,50 @@ const {
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
+interface NavigateOptions {
+	force?: boolean;
+	html?: string;
+	replace?: boolean;
+	timeout?: number;
+	loadingAnimation?: boolean;
+	screenReaderAnnouncement?: boolean;
+}
+
+interface PrefetchOptions {
+	force?: boolean;
+	html?: string;
+}
+
+interface VdomParams {
+	vdom?: typeof initialVdom;
+}
+
+interface Page {
+	regions: Record< string, any >;
+	head: HTMLHeadElement[];
+	title: string;
+	initialData: any;
+}
+
+type RegionsToVdom = ( dom: Document, params?: VdomParams ) => Promise< Page >;
+
 // Check if the navigation mode is full page or region based.
-const navigationMode =
+const navigationMode: 'regionBased' | 'fullPage' =
 	getConfig( 'core/router' ).navigationMode ?? 'regionBased';
 
 // The cache of visited and prefetched pages, stylesheets and scripts.
-const pages = new Map();
-const headElements = new Map();
+const pages = new Map< string, Promise< Page | false > >();
+const headElements = new Map< string, { tag: HTMLElement; text: string } >();
 
 // Helper to remove domain and hash from the URL. We are only interesting in
 // caching the path and the query.
-const getPagePath = ( url ) => {
-	const u = new URL( url, window.location );
+const getPagePath = ( url: string ) => {
+	const u = new URL( url, window.location.href );
 	return u.pathname + u.search;
 };
 
 // Fetch a new page and convert it to a static virtual DOM.
-const fetchPage = async ( url, { html } ) => {
+const fetchPage = async ( url: string, { html }: { html: string } ) => {
 	try {
 		if ( ! html ) {
 			const res = await window.fetch( url );
@@ -55,9 +82,10 @@ const fetchPage = async ( url, { html } ) => {
 
 // Return an object with VDOM trees of those HTML regions marked with a
 // `router-region` directive.
-const regionsToVdom = async ( dom, { vdom } = {} ) => {
-	const regions = {};
-	let head;
+const regionsToVdom: RegionsToVdom = async ( dom, { vdom } = {} ) => {
+	const regions = { body: undefined };
+	let head: HTMLElement[];
+	// @ts-ignore
 	if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		if ( navigationMode === 'fullPage' ) {
 			head = await fetchHeadAssets( dom, headElements );
@@ -81,8 +109,9 @@ const regionsToVdom = async ( dom, { vdom } = {} ) => {
 };
 
 // Render all interactive regions contained in the given page.
-const renderRegions = ( page ) => {
+const renderRegions = ( page: Page ) => {
 	batch( () => {
+		// @ts-ignore
 		if ( process.env.IS_GUTENBERG_PLUGIN ) {
 			if ( navigationMode === 'fullPage' ) {
 				// Once this code is tested and more mature, the head should be updated for region based navigation as well.
@@ -115,10 +144,10 @@ const renderRegions = ( page ) => {
  * potential feedback indicating that the navigation has finished while the new
  * page is being loaded.
  *
- * @param {string} href The page href.
- * @return {Promise} Promise that never resolves.
+ * @param href The page href.
+ * @return Promise that never resolves.
  */
-const forcePageReload = ( href ) => {
+const forcePageReload = ( href: string ) => {
 	window.location.assign( href );
 	return new Promise( () => {} );
 };
@@ -126,7 +155,7 @@ const forcePageReload = ( href ) => {
 // Listen to the back and forward buttons and restore the page if it's in the
 // cache.
 window.addEventListener( 'popstate', async () => {
-	const pagePath = getPagePath( window.location ); // Remove hash.
+	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
 		renderRegions( page );
@@ -138,7 +167,9 @@ window.addEventListener( 'popstate', async () => {
 } );
 
 // Initialize the router and cache the initial page using the initial vDOM.
-// Once this code is tested and more mature, the head should be updated for region based navigation as well.
+// Once this code is tested and more mature, the head should be updated for
+// region based navigation as well.
+// @ts-ignore
 if ( process.env.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Cache the scripts. Has to be called before fetching the assets.
@@ -152,12 +183,12 @@ if ( process.env.IS_GUTENBERG_PLUGIN ) {
 	}
 }
 pages.set(
-	getPagePath( window.location ),
+	getPagePath( window.location.href ),
 	Promise.resolve( regionsToVdom( document, { vdom: initialVdom } ) )
 );
 
 // Check if the link is valid for client-side navigation.
-const isValidLink = ( ref ) =>
+const isValidLink = ( ref: HTMLAnchorElement ) =>
 	ref &&
 	ref instanceof window.HTMLAnchorElement &&
 	ref.href &&
@@ -169,7 +200,7 @@ const isValidLink = ( ref ) =>
 	! new URL( ref.href ).searchParams.has( '_wpnonce' );
 
 // Check if the event is valid for client-side navigation.
-const isValidEvent = ( event ) =>
+const isValidEvent = ( event: MouseEvent ) =>
 	event &&
 	event.button === 0 && // Left clicks only.
 	! event.metaKey && // Open in new tab (Mac).
@@ -187,7 +218,11 @@ export const { state, actions } = store( 'core/router', {
 		navigation: {
 			hasStarted: false,
 			hasFinished: false,
-			texts: {},
+			texts: {
+				loading: '',
+				loaded: '',
+			},
+			message: '',
 		},
 	},
 	actions: {
@@ -198,18 +233,18 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href                               The page href.
-		 * @param {Object}  [options]                          Options object.
-		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
-		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
-		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
-		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
-		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param href                               The page href.
+		 * @param [options]                          Options object.
+		 * @param [options.force]                    If true, it forces re-fetching the URL.
+		 * @param [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
-		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
+		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
-		*navigate( href, options = {} ) {
+		*navigate( href: string, options: NavigateOptions = {} ) {
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				yield forcePageReload( href );
@@ -228,7 +263,7 @@ export const { state, actions } = store( 'core/router', {
 
 			// Create a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
-			const timeoutPromise = new Promise( ( resolve ) =>
+			const timeoutPromise = new Promise< void >( ( resolve ) =>
 				setTimeout( resolve, timeout )
 			);
 
@@ -294,7 +329,7 @@ export const { state, actions } = store( 'core/router', {
 				}
 
 				// Scroll to the anchor if exits in the link.
-				const { hash } = new URL( href, window.location );
+				const { hash } = new URL( href, window.location.href );
 				if ( hash ) {
 					document.querySelector( hash )?.scrollIntoView();
 				}
@@ -309,12 +344,12 @@ export const { state, actions } = store( 'core/router', {
 		 * The function normalizes the URL and stores internally the fetch
 		 * promise, to avoid triggering a second fetch for an ongoing request.
 		 *
-		 * @param {string}  url             The page URL.
-		 * @param {Object}  [options]       Options object.
-		 * @param {boolean} [options.force] Force fetching the URL again.
-		 * @param {string}  [options.html]  HTML string to be used instead of fetching the requested URL.
+		 * @param url             The page URL.
+		 * @param [options]       Options object.
+		 * @param [options.force] Force fetching the URL again.
+		 * @param [options.html]  HTML string to be used instead of fetching the requested URL.
 		 */
-		prefetch( url, options = {} ) {
+		prefetch( url: string, options: PrefetchOptions = {} ) {
 			const { clientNavigationDisabled } = getConfig();
 			if ( clientNavigationDisabled ) {
 				return;
@@ -322,20 +357,24 @@ export const { state, actions } = store( 'core/router', {
 
 			const pagePath = getPagePath( url );
 			if ( options.force || ! pages.has( pagePath ) ) {
-				pages.set( pagePath, fetchPage( pagePath, options ) );
+				pages.set(
+					pagePath,
+					fetchPage( pagePath, { html: options.html } )
+				);
 			}
 		},
 	},
 } );
 
 // Add click and prefetch to all links.
+// @ts-ignore
 if ( process.env.IS_GUTENBERG_PLUGIN ) {
 	if ( navigationMode === 'fullPage' ) {
 		// Navigate on click.
 		document.addEventListener(
 			'click',
 			function ( event ) {
-				const ref = event.target.closest( 'a' );
+				const ref = ( event.target as Element ).closest( 'a' );
 				if ( isValidLink( ref ) && isValidEvent( event ) ) {
 					event.preventDefault();
 					actions.navigate( ref.href );
@@ -347,8 +386,8 @@ if ( process.env.IS_GUTENBERG_PLUGIN ) {
 		document.addEventListener(
 			'mouseenter',
 			function ( event ) {
-				if ( event.target?.nodeName === 'A' ) {
-					const ref = event.target.closest( 'a' );
+				if ( ( event.target as Element )?.nodeName === 'A' ) {
+					const ref = ( event.target as Element ).closest( 'a' );
 					if ( isValidLink( ref ) && isValidEvent( event ) ) {
 						actions.prefetch( ref.href );
 					}
