@@ -566,5 +566,14 @@ module.exports = {
 				'react/react-in-jsx-scope': 'error',
 			},
 		},
+		{
+			files: [
+				'packages/dependency-extraction-webpack-plugin/test/**',
+				'packages/interactivity-router/src/index.js',
+			],
+			rules: {
+				'react-compiler/react-compiler': 'off',
+			},
+		},
 	],
 };
