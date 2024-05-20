@@ -39,12 +39,18 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	modalTitle = __( 'Add Template Part' ),
+	modalTitle,
 	...restProps
 } ) {
+	const defaultModalTitle = useSelect(
+		( select ) =>
+			select( coreStore ).getPostType( TEMPLATE_PART_POST_TYPE )?.labels
+				?.add_new_item,
+		[]
+	);
 	return (
 		<Modal
-			title={ modalTitle }
+			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.closeModal }
 			overlayClassName="edit-site-create-template-part-modal"
 		>
