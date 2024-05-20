@@ -88,7 +88,7 @@ class Gutenberg_REST_Global_Styles_Revisions_Controller_6_6 extends Gutenberg_RE
 		$links               = array();
 		$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 		if ( ! empty( $resolved_theme_uris ) ) {
-			$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
+			$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
 		}
 		$response->add_links( $links );
 

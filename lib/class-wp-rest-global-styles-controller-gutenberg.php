@@ -416,7 +416,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			if ( $theme_json ) {
 				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
 				if ( ! empty( $resolved_theme_uris ) ) {
-					$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
+					$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
 				}
 			}
 			$response->add_links( $links );
@@ -643,7 +643,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
 			if ( ! empty( $resolved_theme_uris ) ) {
-				$links['https://api.w.org/theme-file-uris'] = $resolved_theme_uris;
+				$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
 			}
 
 			$response->add_links( $links );
@@ -712,7 +712,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			if ( ! empty( $resolved_theme_uris ) ) {
 				$data->add_links(
 					array(
-						'https://api.w.org/theme-file-uris' => $resolved_theme_uris,
+						'https://api.w.org/theme-file' => $resolved_theme_uris,
 					)
 				);
 			}

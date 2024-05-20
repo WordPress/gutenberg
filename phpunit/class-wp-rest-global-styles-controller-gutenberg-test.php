@@ -123,14 +123,14 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 		$expected = array(
 			array(
 				'_links'   => array(
-					'curies'             => array(
+					'curies'        => array(
 						array(
 							'name'      => 'wp',
 							'href'      => 'https://api.w.org/{rel}',
 							'templated' => true,
 						),
 					),
-					'wp:theme-file-uris' => array(
+					'wp:theme-file' => array(
 						array(
 							'href'   => 'http://localhost:8889/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg',
 							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',

@@ -62,7 +62,7 @@ export default function BackgroundPanel() {
 			headerLabel={ __( 'Image' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			defaultControls={ defaultControls }
-			themeFileURIs={ _links?.[ 'wp:theme-file-uris' ] }
+			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);
 }

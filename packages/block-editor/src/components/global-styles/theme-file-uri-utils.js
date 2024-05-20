@@ -54,7 +54,7 @@ function setMutably( object, path, value ) {
  * @param {Array<Object>} themeFileURIs A collection of absolute theme file URIs and their corresponding file paths.
  * @return {Object} Returns mutated object.
  */
-export default function setThemeFileUris( themeJson, themeFileURIs ) {
+export function setThemeFileUris( themeJson, themeFileURIs ) {
 	if ( ! themeJson?.styles || ! themeFileURIs ) {
 		return themeJson;
 	}

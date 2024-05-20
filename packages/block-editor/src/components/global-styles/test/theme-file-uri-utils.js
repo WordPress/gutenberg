@@ -1,9 +1,10 @@
 /**
  * Internal dependencies
  */
-import setThemeFileUris, {
+import {
+	setThemeFileUris,
 	getResolvedThemeFilePath,
-} from '../set-theme-file-uris';
+} from '../theme-file-uri-utils';
 
 const themeFileURIs = [
 	{
