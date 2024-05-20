@@ -81,8 +81,6 @@ export { default as PostTaxonomiesPanel } from './post-taxonomies/panel';
 export { default as PostTextEditor } from './post-text-editor';
 export { default as PostTitle } from './post-title';
 export { default as PostTitleRaw } from './post-title/post-title-raw';
-export { default as PostTrash } from './post-trash';
-export { default as PostTrashCheck } from './post-trash/check';
 export { default as PostTypeSupportCheck } from './post-type-support-check';
 export { default as PostURL } from './post-url';
 export { default as PostURLCheck } from './post-url/check';
