@@ -3,6 +3,8 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
+	display: flex;
+	flex-direction: column;
 }
 
 .dataviews-filters__view-actions {
@@ -68,6 +70,7 @@
 	border-collapse: collapse;
 	position: relative;
 	color: $gray-700;
+	margin-bottom: auto;
 
 	a {
 		text-decoration: none;
@@ -278,10 +281,10 @@
 }
 
 .dataviews-view-grid {
-	margin-bottom: $grid-unit-30;
+	margin-bottom: auto;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 $grid-unit-40;
+	padding: 0 $grid-unit-40 $grid-unit-30;
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -396,7 +399,7 @@
 }
 
 .dataviews-view-list {
-	margin: 0;
+	margin: 0 0 auto;
 
 	li {
 		margin: 0;
