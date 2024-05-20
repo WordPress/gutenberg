@@ -32,25 +32,29 @@ jobs:
 
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_folder"; then
-                    echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
-                    echo "If changes are related to an existing, open core PR, you may use that PR."
+                    echo "Please create a core backport PR and add a file with the name <core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
+                    echo "If changes are related to an existing, open core PR, you may add this PR URL to the core PR's file."
                     exit 1
                   fi
 
-                  changelog_file=$(find "${changelog_folder}" -type f -name "${PR_NUMBER}.md" | head -n 1)
+                  # Find any changelog file that contains the Gutenberg PR link
+                  gutenberg_pr_url="https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
+                  changelog_file=$(grep -rl "[-*] ${gutenberg_pr_url}" "${changelog_folder}" | head -n 1)
 
-                  # Confirm that there is an entry.
+                  # Confirm that there is an entry containing the Gutenberg PR link
                   if [[ -z "${changelog_file}" ]]; then
-                    echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
-                    echo "If changes are related to an existing, open core PR, you may use that PR."
+                    echo "Please create a core backport PR and add a file with the name <core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
+                    echo "If changes are related to an existing, open core PR, you may add this PR URL to the core PR's file."
                     exit 1
                   fi
 
-                  pr_link_grep_pattern="https://github\.com/WordPress/wordpress-develop/pull/\([0-9]\+\)"
+                  core_pr_number=$(basename "${changelog_file}" .md)
+                  core_pr_url="https://github\.com/WordPress/wordpress-develop/pull/${core_pr_number}"
 
-                  # Confirm that the entry has a core backport PR URL.
-                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_file}"; then
-                    echo "Please add a CORE PR URL to $changelog_file."
-                    echo "If changes are related to an existing, open core PR, you may use that PR."
+                  # Confirm that the entry has the correct core backport PR URL.
+                  if ! grep -q -e "${core_pr_url}" "${changelog_file}"; then
+                    echo "Please update the content of ${changelog_file} to include the core backport PR URL."
+                    echo "Make sure the core backport PR number matches the file name."
+                    echo "There should only be one core backport PR URL per file."
                     exit 1
                   fi
