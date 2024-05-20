@@ -2351,7 +2351,7 @@
 									"description": "Sets the `background-image` CSS property.",
 									"oneOf": [
 										{
-											"description": "A valid CSS value for the background-image property.",
+											"description": "A valid CSS value for the background-image property, or a path to a file relative to the theme root directory, and prefixed with `file:`, e.g., 'file:./path/to/file.png'.",
 											"type": "string"
 										},
 										{

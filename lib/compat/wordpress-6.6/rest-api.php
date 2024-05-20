@@ -76,3 +76,14 @@ function gutenberg_add_class_list_to_public_post_types() {
 	}
 }
 add_action( 'rest_api_init', 'gutenberg_add_class_list_to_public_post_types' );
+
+
+/**
+ * Registers the Global Styles Revisions REST API routes.
+ */
+function gutenberg_register_global_styles_revisions_endpoints() {
+	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_6();
+	$global_styles_revisions_controller->register_routes();
+}
+
+add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
