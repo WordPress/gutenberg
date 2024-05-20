@@ -23,17 +23,18 @@ export function useHistory() {
 	return useContext( HistoryContext );
 }
 
-const locationCache = new WeakMap();
+const locationCache = new Map();
 function getLocationWithParams( location ) {
-	if ( locationCache.get( location ) ) {
-		return locationCache.get( location );
+	if ( locationCache.get( location.search ) ) {
+		return locationCache.get( location.search );
 	}
 	const searchParams = new URLSearchParams( location.search );
 	const ret = {
 		...location,
 		params: Object.fromEntries( searchParams.entries() ),
 	};
-	locationCache.set( location, ret );
+	locationCache.clear();
+	locationCache.set( location.search, ret );
 
 	return ret;
 }
