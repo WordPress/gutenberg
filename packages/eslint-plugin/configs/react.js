@@ -10,7 +10,12 @@ module.exports = {
 			version: 'detect',
 		},
 	},
-	plugins: [ '@wordpress', 'react', 'react-hooks' ],
+	plugins: [
+		'@wordpress',
+		'eslint-plugin-react-compiler',
+		'react',
+		'react-hooks',
+	],
 	rules: {
 		'@wordpress/no-unused-vars-before-return': [
 			'error',
@@ -34,6 +39,7 @@ module.exports = {
 		'react/no-children-prop': 'off',
 		'react/prop-types': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'react-compiler/react-compiler': 'error',
 		'react-hooks/exhaustive-deps': [
 			'warn',
 			{
