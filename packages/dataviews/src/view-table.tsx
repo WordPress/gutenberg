@@ -552,11 +552,9 @@ function ViewTable< Item extends AnyItem >( {
 								data-field-id="actions"
 								className="dataviews-view-table__actions-column"
 							>
-								<span className="dataviews-view-table-header">
-									<VisuallyHidden>
-										{ __( 'Actions' ) }
-									</VisuallyHidden>
-								</span>
+								<VisuallyHidden>
+									{ __( 'Actions' ) }
+								</VisuallyHidden>
 							</th>
 						) }
 					</tr>
