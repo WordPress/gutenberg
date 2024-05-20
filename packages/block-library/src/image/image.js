@@ -463,7 +463,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing ),
+						urlBindingSource?.lockAttributesEditing() ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
@@ -475,7 +475,7 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing ),
+						altBindingSource?.lockAttributesEditing() ),
 				lockAltControlsMessage: altBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -486,7 +486,7 @@ export default function Image( {
 				lockTitleControls:
 					!! titleBinding &&
 					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing ),
+						titleBindingSource?.lockAttributesEditing() ),
 				lockTitleControlsMessage: titleBindingSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */

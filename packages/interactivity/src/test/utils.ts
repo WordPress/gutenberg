@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { kebabToCamelCase } from '../kebab-to-camelcase';
+import { kebabToCamelCase } from '../utils';
 
 describe( 'kebabToCamelCase', () => {
 	it( 'should work exactly as the PHP version', async () => {

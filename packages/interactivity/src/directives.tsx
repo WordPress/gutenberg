@@ -13,10 +13,8 @@ import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { useWatch, useInit } from './utils';
+import { useWatch, useInit, kebabToCamelCase, warn } from './utils';
 import { directive, getScope, getEvaluate } from './hooks';
-import { kebabToCamelCase } from './utils/kebab-to-camelcase';
-import { warn } from './utils/warn';
 
 // Assigned objects should be ignore during proxification.
 const contextAssignedObjects = new WeakMap();

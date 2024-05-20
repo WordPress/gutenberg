@@ -37,21 +37,13 @@ import type {
 	AnyItem,
 	NormalizedField,
 	ViewList as ViewListType,
+	ViewProps,
 } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewProps< Item extends AnyItem > {
-	actions: Action< Item >[];
-	data: Item[];
-	fields: NormalizedField< Item >[];
-	getItemId: ( item: Item ) => string;
-	id: string;
-	isLoading: boolean;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: string[];
-	view: ViewListType;
-}
+interface ViewListProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewListType > {}
 
 interface ListViewItemProps< Item extends AnyItem > {
 	actions: Action< Item >[];
@@ -311,7 +303,7 @@ function ListItem< Item extends AnyItem >( {
 }
 
 export default function ViewList< Item extends AnyItem >(
-	props: ListViewProps< Item >
+	props: ViewListProps< Item >
 ) {
 	const {
 		actions,

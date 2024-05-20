@@ -27,7 +27,6 @@ import {
 	EditorKeyboardShortcutsRegister,
 	EditorKeyboardShortcuts,
 	EditorNotices,
-	EditorSnackbars,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -345,7 +344,6 @@ export default function Editor( { isLoading, onClick } ) {
 								}
 							/>
 						}
-						notices={ <EditorSnackbars /> }
 						content={
 							<>
 								<GlobalStylesRenderer />

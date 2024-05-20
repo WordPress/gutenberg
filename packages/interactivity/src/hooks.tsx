@@ -20,7 +20,7 @@ import type { VNode, Context, RefObject } from 'preact';
  * Internal dependencies
  */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils/warn';
+import { warn } from './utils';
 interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
@@ -271,7 +271,7 @@ export const directive = (
 const resolve = ( path: string, namespace: string ) => {
 	if ( ! namespace ) {
 		warn(
-			`The "namespace" cannot be "{}", "null" or an empty string. Path: ${ path }`
+			`Namespace missing for "${ path }". The value for that path won't be resolved.`
 		);
 		return;
 	}

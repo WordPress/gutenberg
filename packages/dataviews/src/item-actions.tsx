@@ -56,7 +56,7 @@ interface ActionsDropdownMenuGroupProps< Item extends AnyItem > {
 interface ItemActionsProps< Item extends AnyItem > {
 	item: Item;
 	actions: Action< Item >[];
-	isCompact: boolean;
+	isCompact?: boolean;
 }
 
 interface CompactItemActionsProps< Item extends AnyItem > {

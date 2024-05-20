@@ -28,7 +28,15 @@ interface FilterByConfig {
 	isPrimary?: boolean;
 }
 
-type Operator = 'is' | 'isNot' | 'isAny' | 'isNone' | 'isAll' | 'isNotAll';
+type DeprecatedOperator = 'in' | 'notIn';
+type Operator =
+	| 'is'
+	| 'isNot'
+	| 'isAny'
+	| 'isNone'
+	| 'isAll'
+	| 'isNotAll'
+	| DeprecatedOperator;
 
 export type AnyItem = Record< string, any >;
 
@@ -175,6 +183,22 @@ interface ViewBase {
 	hiddenFields: string[];
 }
 
+export interface ViewTable extends ViewBase {
+	type: 'table';
+
+	layout: {
+		/**
+		 * The field to use as the primary field.
+		 */
+		primaryField: string;
+
+		/**
+		 * The field to use as the media field.
+		 */
+		mediaField: string;
+	};
+}
+
 export interface ViewList extends ViewBase {
 	type: 'list';
 
@@ -217,7 +241,7 @@ export interface ViewGrid extends ViewBase {
 	};
 }
 
-export type View = ViewList | ViewGrid | ViewBase;
+export type View = ViewList | ViewGrid | ViewTable;
 
 interface ActionBase< Item extends AnyItem > {
 	/**
@@ -312,3 +336,16 @@ export interface ActionButton< Item extends AnyItem >
 export type Action< Item extends AnyItem > =
 	| ActionModal< Item >
 	| ActionButton< Item >;
+
+export interface ViewProps< Item extends AnyItem, ViewType extends ViewBase > {
+	actions: Action< Item >[];
+	data: Item[];
+	fields: NormalizedField< Item >[];
+	getItemId: ( item: Item ) => string;
+	isLoading?: boolean;
+	onChangeView( view: ViewType ): void;
+	onSelectionChange: ( items: Item[] ) => void;
+	selection: string[];
+	setOpenedFilter: ( fieldId: string ) => void;
+	view: ViewType;
+}

@@ -966,11 +966,30 @@ Undocumented declaration.
 
 ### PostFormat
 
-Undocumented declaration.
+`PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
+
+_Usage_
+
+```jsx
+<PostFormat />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostFormat component.
 
 ### PostFormatCheck
 
-Undocumented declaration.
+Component check if there are any post formats.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child elements to render.
+
+_Returns_
+
+-   `Component|null`: The rendered component or null if post formats are disabled.
 
 ### PostLastRevision
 
@@ -1031,19 +1050,49 @@ _Returns_
 
 ### PostSchedule
 
-Undocumented declaration.
+Renders the PostSchedule component. It allows the user to schedule a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onClose_ `Function`: Function to close the component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostScheduleCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a publish action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: - The component to be rendered or null if there is no publish action.
 
 ### PostScheduleLabel
 
-Undocumented declaration.
+Renders the PostScheduleLabel component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSchedulePanel
 
-Undocumented declaration.
+Renders the Post Schedule Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlug
 
@@ -1154,15 +1203,37 @@ Undocumented declaration.
 
 ### PostVisibility
 
-Undocumented declaration.
+Allows users to set the visibility of a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.onClose_ `Function`: Function to call when the popover is closed.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityCheck
 
-Undocumented declaration.
+Determines if the current post can be edited (published) and passes this information to the provided render function.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.render_ `Function`: Function to render the component. Receives an object with a `canEdit` property.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityLabel
 
-Undocumented declaration.
+Returns the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### privateApis
 
@@ -1258,7 +1329,16 @@ Undocumented declaration.
 
 ### usePostScheduleLabel
 
-Undocumented declaration.
+Custom hook to get the label for post schedule.
+
+_Parameters_
+
+-   _options_ `Object`: Options for the hook.
+-   _options.full_ `boolean`: Whether to get the full label or not. Default is false.
+
+_Returns_
+
+-   `string`: The label for post schedule.
 
 ### usePostURLLabel
 
@@ -1266,7 +1346,11 @@ Undocumented declaration.
 
 ### usePostVisibilityLabel
 
-Undocumented declaration.
+Get the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### userAutocompleter
 
