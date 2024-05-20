@@ -22,23 +22,7 @@ module.exports = ( api ) => {
 					[
 						'@babel/plugin-transform-react-jsx',
 						{
-							pragma: 'createElement',
-							pragmaFrag: 'Fragment',
-						},
-					],
-				],
-				exclude: /node_modules\/react-native/,
-			},
-			{
-				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found.
-				plugins: [
-					[
-						'../../packages/babel-plugin-import-jsx-pragma',
-						{
-							scopeVariable: 'createElement',
-							scopeVariableFrag: 'Fragment',
-							source: '@wordpress/element',
-							isDefault: false,
+							runtime: 'automatic',
 						},
 					],
 				],
