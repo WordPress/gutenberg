@@ -64,7 +64,7 @@ export default function PatternsHeader( {
 					{ title }
 				</Heading>
 				<HStack expanded={ false }>
-					<AddNewPattern showTextButton />
+					<AddNewPattern />
 					{ !! patternCategory?.id && (
 						<DropdownMenu
 							icon={ moreVertical }

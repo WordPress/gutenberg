@@ -25,7 +25,7 @@ import { unlock } from '../lock-unlock';
 
 export default function CreatePatternModal( {
 	className = 'patterns-menu-items__convert-modal',
-	modalTitle = __( 'Create pattern' ),
+	modalTitle = __( 'Add pattern' ),
 	...restProps
 } ) {
 	return (
@@ -40,7 +40,7 @@ export default function CreatePatternModal( {
 }
 
 export function CreatePatternModalContents( {
-	confirmLabel = __( 'Create' ),
+	confirmLabel = __( 'Add' ),
 	defaultCategories = [],
 	content,
 	onClose,

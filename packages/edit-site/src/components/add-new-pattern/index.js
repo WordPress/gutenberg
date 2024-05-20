@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, Button } from '@wordpress/components';
+import { DropdownMenu } from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { plus, symbol, symbolFilled, upload } from '@wordpress/icons';
+import { symbol, symbolFilled, upload } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import {
@@ -18,7 +18,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import CreateTemplatePartModal from '../create-template-part-modal';
-import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -31,7 +30,7 @@ const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
-export default function AddNewPattern( { showTextButton } ) {
+export default function AddNewPattern() {
 	const history = useHistory();
 	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
@@ -41,10 +40,17 @@ export default function AddNewPattern( { showTextButton } ) {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	const patternUploadInputRef = useRef();
-	const isBlockBasedTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-		[]
-	);
+	const { isBlockBasedTheme, addNewPatternLabel, addNewTemplatePartLabel } =
+		useSelect( ( select ) => {
+			const { getCurrentTheme, getPostType } = select( coreStore );
+			return {
+				isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+				addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+					?.add_new_item,
+				addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+					?.labels?.add_new_item,
+			};
+		}, [] );
 
 	function handleCreatePattern( { pattern, categoryId } ) {
 		setShowPatternModal( false );
@@ -74,19 +80,19 @@ export default function AddNewPattern( { showTextButton } ) {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [];
-
-	controls.push( {
-		icon: symbol,
-		onClick: () => setShowPatternModal( true ),
-		title: __( 'Create pattern' ),
-	} );
+	const controls = [
+		{
+			icon: symbol,
+			onClick: () => setShowPatternModal( true ),
+			title: addNewPatternLabel,
+		},
+	];
 
 	if ( isBlockBasedTheme ) {
 		controls.push( {
 			icon: symbolFilled,
 			onClick: () => setShowTemplatePartModal( true ),
-			title: __( 'Create template part' ),
+			title: addNewTemplatePartLabel,
 		} );
 	}
 
@@ -95,22 +101,20 @@ export default function AddNewPattern( { showTextButton } ) {
 		onClick: () => {
 			patternUploadInputRef.current.click();
 		},
-		title: __( 'Import pattern from JSON' ),
+		title: __( 'Import from JSON' ),
 	} );
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
 	return (
 		<>
-			<DropdownMenu
-				controls={ controls }
-				toggleProps={ {
-					as: showTextButton ? Button : SidebarButton,
-					variant: showTextButton ? 'secondary' : undefined,
-				} }
-				icon={ showTextButton ? null : plus }
-				label={ showTextButton ? undefined : __( 'Add new pattern' ) }
-				text={ showTextButton ? __( 'Add new pattern' ) : undefined }
-			/>
+			{ addNewPatternLabel && (
+				<DropdownMenu
+					controls={ controls }
+					icon={ null }
+					toggleProps={ { variant: 'primary' } }
+					text={ addNewPatternLabel }
+				/>
+			) }
 			{ showPatternModal && (
 				<CreatePatternModal
 					onClose={ () => setShowPatternModal( false ) }

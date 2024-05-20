@@ -39,7 +39,7 @@ import {
 } from '../../utils/template-part-create';
 
 export default function CreateTemplatePartModal( {
-	modalTitle = __( 'Create template part' ),
+	modalTitle = __( 'Add Template Part' ),
 	...restProps
 } ) {
 	return (
@@ -56,7 +56,7 @@ export default function CreateTemplatePartModal( {
 export function CreateTemplatePartModalContents( {
 	defaultArea = TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	blocks = [],
-	confirmLabel = __( 'Create' ),
+	confirmLabel = __( 'Add' ),
 	closeModal,
 	onCreate,
 	onError,
