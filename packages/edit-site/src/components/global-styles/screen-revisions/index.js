@@ -81,11 +81,7 @@ function ScreenRevisions() {
 	};
 
 	const restoreRevision = ( revision ) => {
-		setUserConfig( () => ( {
-			styles: revision?.styles,
-			settings: revision?.settings,
-			_links: revision?._links,
-		} ) );
+		setUserConfig( () => revision );
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
 	};
@@ -134,11 +130,7 @@ function ScreenRevisions() {
 		 * See: https://github.com/WordPress/gutenberg/issues/55866
 		 */
 		if ( shouldSelectFirstItem ) {
-			setCurrentlySelectedRevision( {
-				styles: firstRevision?.styles || {},
-				settings: firstRevision?.settings || {},
-				id: firstRevision?.id,
-			} );
+			setCurrentlySelectedRevision( firstRevision );
 		}
 	}, [ shouldSelectFirstItem, firstRevision ] );
 

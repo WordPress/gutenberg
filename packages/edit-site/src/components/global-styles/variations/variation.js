@@ -27,11 +27,7 @@ export default function Variation( { variation, children, isPill } ) {
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
 		() => ( {
-			user: {
-				settings: variation.settings ?? {},
-				styles: variation.styles ?? {},
-				_links: variation._links ?? {},
-			},
+			user: variation,
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
 			setUserConfig: () => {},
@@ -39,13 +35,7 @@ export default function Variation( { variation, children, isPill } ) {
 		[ variation, base ]
 	);
 
-	const selectVariation = () => {
-		setUserConfig( () => ( {
-			settings: variation.settings,
-			styles: variation.styles,
-			_links: variation._links,
-		} ) );
-	};
+	const selectVariation = () => setUserConfig( () => variation );
 
 	const selectOnEnter = ( event ) => {
 		if ( event.keyCode === ENTER ) {
