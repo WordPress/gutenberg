@@ -3,13 +3,18 @@
  */
 import type { Admin } from '.';
 
+interface EditPostOptions {
+	showWelcomeGuide?: boolean;
+	fullscreenMode?: boolean;
+}
+
 /**
  * Open the post with given ID in the editor.
  *
  * @param this
  * @param postId Post ID to visit.
  */
-export async function editPost( this: Admin, postId: string | number ) {
+export async function editPost( this: Admin, postId: string | number, options: EditPostOptions = {}) {
 	const query = new URLSearchParams();
 
 	query.set( 'post', String( postId ) );
@@ -18,7 +23,7 @@ export async function editPost( this: Admin, postId: string | number ) {
 	await this.visitAdminPage( 'post.php', query.toString() );
 
 	await this.editor.setPreferences( 'core/edit-post', {
-		welcomeGuide: false,
-		fullscreenMode: false,
+		welcomeGuide: options.showWelcomeGuide ?? false,
+		fullscreenMode: options.fullscreenMode ?? false,
 	} );
 }
