@@ -173,13 +173,6 @@ export default function TypographyPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 } ) {
-	// If `panelId` has a value, it means this panel will be rendered inside
-	// the block sidebar. The text alignment UI for individual blocks is rendered
-	// in the block toolbar, so disable support if it's not in the global style.
-	if ( panelId ) {
-		settings.typography.textAlign = false;
-	}
-
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 
