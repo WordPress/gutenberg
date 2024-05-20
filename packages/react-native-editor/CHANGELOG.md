@@ -11,6 +11,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 -   [internal] Remove circular dependencies within the components package [#61102]
+-   [internal] Upgrade target sdk version to Android API 34 [#61727]
 
 ## 1.118.0
 -   [*] Fix a crash when pasting file images and special comment markup [#60476]
