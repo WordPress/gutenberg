@@ -3,11 +3,6 @@
  */
 const { join } = require( 'path' );
 
-/**
- * WordPress dependencies
- */
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
-
 const importedVendors = {
 	react: { import: 'react', global: 'React' },
 	'react-dom': { import: 'react-dom', global: 'ReactDOM' },
@@ -40,22 +35,12 @@ module.exports = [
 					},
 				},
 
-				plugins: [
-					new DependencyExtractionWebpackPlugin( {
-						injectPolyfill: false,
-						useDefaults: false,
-						requestToExternal: ( request ) => {
-							if ( name !== 'react' && request === 'react' ) {
-								return 'React';
-							}
-						},
-						requestToHandle: ( request ) => {
-							if ( name !== 'react' && request === 'react' ) {
-								return 'react';
-							}
-						},
-					} ),
-				],
+				externals:
+					name === 'react'
+						? {}
+						: {
+								react: 'React',
+						  },
 			};
 		} );
 	} ),
