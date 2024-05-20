@@ -78,11 +78,10 @@ function CategoriesGroup( {
 					label={ allPatterns.label }
 					icon={ file }
 					id={ allPatterns.name }
-					type={ PATTERN_TYPES.theme }
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ allPatterns.name }` &&
-						( currentType === PATTERN_TYPES.theme ||
-							currentType === PATTERN_TYPES.user )
+						currentType === PATTERN_TYPES.user
 					}
 				/>
 			) }
@@ -93,11 +92,10 @@ function CategoriesGroup( {
 					label={ category.label }
 					icon={ file }
 					id={ category.name }
-					type={ PATTERN_TYPES.theme }
+					type={ PATTERN_TYPES.user }
 					isActive={
 						currentCategory === `${ category.name }` &&
-						( currentType === PATTERN_TYPES.theme ||
-							currentType === PATTERN_TYPES.user )
+						currentType === PATTERN_TYPES.user
 					}
 				/>
 			) ) }
@@ -107,10 +105,10 @@ function CategoriesGroup( {
 
 export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		params: { categoryType, categoryId },
+		params: { postType, categoryId },
 	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = categoryType || PATTERN_TYPES.theme;
+	const currentType = postType || PATTERN_TYPES.user;
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();

@@ -15,10 +15,10 @@ export default function CategoryItem( {
 } ) {
 	const linkInfo = useLink( {
 		categoryId: id,
-		categoryType:
+		postType:
 			type === TEMPLATE_PART_POST_TYPE
 				? TEMPLATE_PART_POST_TYPE
-				: PATTERN_TYPES.theme,
+				: PATTERN_TYPES.user,
 	} );
 
 	if ( ! count ) {

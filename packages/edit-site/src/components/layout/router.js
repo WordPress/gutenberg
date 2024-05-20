@@ -73,7 +73,10 @@ function useRedirectOldPaths() {
 
 		if ( path === '/patterns' ) {
 			history.replace( {
-				postType: categoryType ?? PATTERN_TYPES.theme,
+				postType:
+					categoryType === TEMPLATE_PART_POST_TYPE
+						? TEMPLATE_PART_POST_TYPE
+						: PATTERN_TYPES.user,
 				...allParamsButPath,
 			} );
 		}
@@ -91,8 +94,7 @@ export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas, categoryType } =
-		params;
+	const { postType, postId, path, layout, isCustom, canvas } = params;
 	useRedirectOldPaths();
 
 	// Page list
@@ -157,9 +159,6 @@ export default function useLayoutAreas() {
 
 	// Patterns
 	if (
-		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.theme ].includes(
-			categoryType
-		) ||
 		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.user ].includes( postType )
 	) {
 		return {

@@ -74,7 +74,7 @@ export default function SidebarNavigationScreenMain() {
 						</SidebarNavigationItem>
 						<SidebarNavigationItem
 							uid="patterns-navigation-item"
-							params={ { categoryType: PATTERN_TYPES.theme } }
+							params={ { postType: PATTERN_TYPES.user } }
 							withChevron
 							icon={ symbol }
 						>

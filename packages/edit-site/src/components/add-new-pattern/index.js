@@ -46,14 +46,12 @@ export default function AddNewPattern() {
 		[]
 	);
 
-	function handleCreatePattern( { pattern, categoryId } ) {
+	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
 
 		history.push( {
 			postId: pattern.id,
 			postType: PATTERN_TYPES.user,
-			categoryType: PATTERN_TYPES.theme,
-			categoryId,
 			canvas: 'edit',
 		} );
 	}
@@ -139,7 +137,7 @@ export default function AddNewPattern() {
 						let currentCategoryId;
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
-						if ( params.categoryType !== TEMPLATE_PART_POST_TYPE ) {
+						if ( params.postType !== TEMPLATE_PART_POST_TYPE ) {
 							const currentCategory = categoryMap
 								.values()
 								.find(
@@ -168,7 +166,7 @@ export default function AddNewPattern() {
 							params.categoryId !== 'my-patterns'
 						) {
 							history.push( {
-								postType: PATTERN_TYPES.theme,
+								postType: PATTERN_TYPES.user,
 								categoryId: PATTERN_DEFAULT_CATEGORY,
 							} );
 						}

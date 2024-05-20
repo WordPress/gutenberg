@@ -44,7 +44,7 @@ export default function PatternsHeader( {
 		description =
 			templatePartArea?.description ||
 			__( 'Includes every template part defined for any area.' );
-	} else if ( type === PATTERN_TYPES.theme ) {
+	} else if ( type === PATTERN_TYPES.user && !! categoryId ) {
 		patternCategory = patternCategories.find(
 			( category ) => category.name === categoryId
 		);

@@ -242,7 +242,7 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 					icon: symbolFilled,
 					callback: ( { close } ) => {
 						const args = {
-							categoryType: 'wp_template_part',
+							postType: 'wp_template_part',
 							categoryId: 'all-parts',
 						};
 						const targetUrl = addQueryArgs(
