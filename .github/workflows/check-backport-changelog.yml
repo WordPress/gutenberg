@@ -31,7 +31,7 @@ jobs:
 
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
-                    echo "Please add a CORE PR LINK (in Markdown) to $changelog_path"
+                    echo "Please add a CORE PR LINK to $changelog_path. Use the format: - link-to-core-pr for link-to-gutenberg-pr"
                     echo "If changes are related to an existing, open PR, you may use that PR"
                     exit 1
                   fi
@@ -40,7 +40,7 @@ jobs:
 
                   # Confirm that the CHANGELOG has an entry for the current PR
                   if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
-                      echo "Please add a CORE PR LINK to $changelog_path. Make sure it is linked in Markdown."
-                      echo "If changes are related to an existing, open PR, you may use that PR"
-                      exit 1
+                    echo "Please add a CORE PR LINK to $changelog_path. Use the format: - link-to-core-pr for link-to-gutenberg-pr"
+                    echo "If changes are related to an existing, open PR, you may use that PR"
+                    exit 1
                   fi
