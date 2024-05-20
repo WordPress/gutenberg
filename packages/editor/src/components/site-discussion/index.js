@@ -47,7 +47,7 @@ const COMMENT_OPTIONS = [
 	},
 ];
 
-export default function DiscussionPanel() {
+export default function SiteDiscussion() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const allowCommentsOnNewPosts = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
@@ -89,7 +89,7 @@ export default function DiscussionPanel() {
 		<PostPanelRow label={ __( 'Discussion' ) } ref={ setPopoverAnchor }>
 			<Dropdown
 				popoverProps={ popoverProps }
-				contentClassName="editor-site-settings-dropdown__content"
+				contentClassName="editor-site-discussion-dropdown__content"
 				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<Button
@@ -117,7 +117,7 @@ export default function DiscussionPanel() {
 								) }
 							</Text>
 							<RadioControl
-								className="editor-comment-status__options"
+								className="editor-site-discussion__options"
 								hideLabelFromVision
 								label={ __( 'Comment status' ) }
 								options={ COMMENT_OPTIONS }

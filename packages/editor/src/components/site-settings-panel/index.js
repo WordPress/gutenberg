@@ -7,24 +7,29 @@ import { __experimentalVStack as VStack } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlogTitlePanel from './blog-title-panel';
-import PostsPerPagePanel from './posts-per-page-panel';
-import DiscussionPanel from './discussion-panel';
+import BlogTitle from '../blog-title';
+import PostsPerPage from '../posts-per-page';
+import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 export default function SiteSettingsPanel() {
-	const postSlug = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'slug' ),
-		[]
-	);
-	if ( ! [ 'home', 'index' ].includes( postSlug ) ) {
+	const { isTemplate, postSlug } = useSelect( ( select ) => {
+		const { getEditedPostAttribute, getCurrentPostType } =
+			select( editorStore );
+		return {
+			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
+			postSlug: getEditedPostAttribute( 'slug' ),
+		};
+	}, [] );
+	if ( ! isTemplate || ! [ 'home', 'index' ].includes( postSlug ) ) {
 		return null;
 	}
 	return (
 		<VStack spacing={ 1 } className="editor-site-settings-panel">
-			<BlogTitlePanel />
-			<PostsPerPagePanel />
-			<DiscussionPanel />
+			<BlogTitle />
+			<PostsPerPage />
+			<SiteDiscussion />
 		</VStack>
 	);
 }

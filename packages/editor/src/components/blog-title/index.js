@@ -21,7 +21,7 @@ import PostPanelRow from '../post-panel-row';
 
 const EMPTY_OBJECT = {};
 
-export default function BlogTitlePanel() {
+export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const { postsPageTitle, postsPageId } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
@@ -79,7 +79,7 @@ export default function BlogTitlePanel() {
 		<PostPanelRow label={ __( 'Blog title' ) } ref={ setPopoverAnchor }>
 			<Dropdown
 				popoverProps={ popoverProps }
-				contentClassName="editor-site-settings-dropdown__content"
+				contentClassName="editor-blog-title-dropdown__content"
 				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<Button

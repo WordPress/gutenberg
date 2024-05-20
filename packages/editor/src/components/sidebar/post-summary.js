@@ -88,12 +88,8 @@ export default function PostSummary( { onActionPerformed } ) {
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									{ isTemplate && (
-										<>
-											<SiteSettingsPanel />
-											<TemplateAreas />
-										</>
-									) }
+									<SiteSettingsPanel />
+									<TemplateAreas />
 									{ fills }
 									{ ! isPattern &&
 										! isTemplate &&

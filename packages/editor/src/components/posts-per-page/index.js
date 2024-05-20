@@ -17,7 +17,7 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
  */
 import PostPanelRow from '../post-panel-row';
 
-export default function PostsPerPagePanel() {
+export default function PostsPerPage() {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const postsPerPage = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
@@ -59,7 +59,7 @@ export default function PostsPerPagePanel() {
 		<PostPanelRow label={ __( 'Posts per page' ) } ref={ setPopoverAnchor }>
 			<Dropdown
 				popoverProps={ popoverProps }
-				contentClassName="editor-site-settings-dropdown__content"
+				contentClassName="editor-posts-per-page-dropdown__content"
 				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<Button
