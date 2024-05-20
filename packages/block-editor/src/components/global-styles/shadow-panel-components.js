@@ -33,9 +33,9 @@ import { unlock } from '../../lock-unlock';
  */
 const EMPTY_ARRAY = [];
 const {
+	CompositeItemV2: CompositeItem,
 	CompositeV2: Composite,
 	useCompositeStoreV2: useCompositeStore,
-	CompositeItemV2: CompositeItem,
 } = unlock( componentsPrivateApis );
 
 export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
