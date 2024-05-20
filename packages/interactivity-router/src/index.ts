@@ -144,10 +144,10 @@ const renderRegions = ( page: Page ) => {
  * potential feedback indicating that the navigation has finished while the new
  * page is being loaded.
  *
- * @param {string} href The page href.
- * @return {Promise} Promise that never resolves.
+ * @param href The page href.
+ * @return Promise that never resolves.
  */
-const forcePageReload = ( href ) => {
+const forcePageReload = ( href: string ) => {
 	window.location.assign( href );
 	return new Promise( () => {} );
 };
@@ -233,16 +233,16 @@ export const { state, actions } = store( 'core/router', {
 		 * needed, and updates any interactive regions whose contents have
 		 * changed. It also creates a new entry in the browser session history.
 		 *
-		 * @param {string}  href                               The page href.
-		 * @param {Object}  [options]                          Options object.
-		 * @param {boolean} [options.force]                    If true, it forces re-fetching the URL.
-		 * @param {string}  [options.html]                     HTML string to be used instead of fetching the requested URL.
-		 * @param {boolean} [options.replace]                  If true, it replaces the current entry in the browser session history.
-		 * @param {number}  [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
-		 * @param {boolean} [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
-		 * @param {boolean} [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
+		 * @param href                               The page href.
+		 * @param [options]                          Options object.
+		 * @param [options.force]                    If true, it forces re-fetching the URL.
+		 * @param [options.html]                     HTML string to be used instead of fetching the requested URL.
+		 * @param [options.replace]                  If true, it replaces the current entry in the browser session history.
+		 * @param [options.timeout]                  Time until the navigation is aborted, in milliseconds. Default is 10000.
+		 * @param [options.loadingAnimation]         Whether an animation should be shown while navigating. Default to `true`.
+		 * @param [options.screenReaderAnnouncement] Whether a message for screen readers should be announced while navigating. Default to `true`.
 		 *
-		 * @return {Promise} Promise that resolves once the navigation is completed or aborted.
+		 * @return  Promise that resolves once the navigation is completed or aborted.
 		 */
 		*navigate( href: string, options: NavigateOptions = {} ) {
 			const { clientNavigationDisabled } = getConfig();
@@ -344,10 +344,10 @@ export const { state, actions } = store( 'core/router', {
 		 * The function normalizes the URL and stores internally the fetch
 		 * promise, to avoid triggering a second fetch for an ongoing request.
 		 *
-		 * @param {string}  url             The page URL.
-		 * @param {Object}  [options]       Options object.
-		 * @param {boolean} [options.force] Force fetching the URL again.
-		 * @param {string}  [options.html]  HTML string to be used instead of fetching the requested URL.
+		 * @param url             The page URL.
+		 * @param [options]       Options object.
+		 * @param [options.force] Force fetching the URL again.
+		 * @param [options.html]  HTML string to be used instead of fetching the requested URL.
 		 */
 		prefetch( url: string, options: PrefetchOptions = {} ) {
 			const { clientNavigationDisabled } = getConfig();
