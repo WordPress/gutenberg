@@ -128,16 +128,16 @@ export default function DataViews( {
 				/>
 			</HStack>
 			<ViewComponent
-				fields={ _fields }
-				view={ view }
-				onChangeView={ onChangeView }
 				actions={ actions }
 				data={ data }
+				fields={ _fields }
 				getItemId={ getItemId }
 				isLoading={ isLoading }
+				onChangeView={ onChangeView }
 				onSelectionChange={ onSetSelection }
 				selection={ selection }
 				setOpenedFilter={ setOpenedFilter }
+				view={ view }
 			/>
 			<Pagination
 				view={ view }

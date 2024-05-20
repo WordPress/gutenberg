@@ -13,9 +13,9 @@ import {
 	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
-	AudioPlayer,
 } from '@wordpress/components';
 import {
+	AudioPlayer,
 	BlockCaption,
 	BlockControls,
 	BlockIcon,

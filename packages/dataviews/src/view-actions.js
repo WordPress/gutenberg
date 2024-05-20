@@ -13,7 +13,7 @@ import { settings } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
-import { SORTING_DIRECTIONS } from './constants';
+import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
 
 const {
@@ -206,43 +206,41 @@ function SortMenu( { fields, view, onChangeView } ) {
 							minWidth: '220px',
 						} }
 					>
-						{ Object.entries( SORTING_DIRECTIONS ).map(
-							( [ direction, info ] ) => {
-								const isChecked =
-									currentSortedField !== undefined &&
-									sortedDirection === direction &&
-									field.id === currentSortedField.id;
+						{ SORTING_DIRECTIONS.map( ( direction ) => {
+							const isChecked =
+								currentSortedField !== undefined &&
+								sortedDirection === direction &&
+								field.id === currentSortedField.id;
 
-								const value = `${ field.id }-${ direction }`;
+							const value = `${ field.id }-${ direction }`;
 
-								return (
-									<DropdownMenuRadioItem
-										key={ value }
-										// All sorting radio items share the same name, so that
-										// selecting a sorting option automatically deselects the
-										// previously selected one, even if it is displayed in
-										// another submenu. The field and direction are passed via
-										// the `value` prop.
-										name="view-actions-sorting"
-										value={ value }
-										checked={ isChecked }
-										onChange={ () => {
-											onChangeView( {
-												...view,
-												sort: {
-													field: field.id,
-													direction,
-												},
-											} );
-										} }
-									>
-										<DropdownMenuItemLabel>
-											{ info.label }
-										</DropdownMenuItemLabel>
-									</DropdownMenuRadioItem>
-								);
-							}
-						) }
+							return (
+								<DropdownMenuRadioItem
+									key={ value }
+									// All sorting radio items share the same name, so that
+									// selecting a sorting option automatically deselects the
+									// previously selected one, even if it is displayed in
+									// another submenu. The field and direction are passed via
+									// the `value` prop.
+									name="view-actions-sorting"
+									value={ value }
+									checked={ isChecked }
+									onChange={ () => {
+										onChangeView( {
+											...view,
+											sort: {
+												field: field.id,
+												direction,
+											},
+										} );
+									} }
+								>
+									<DropdownMenuItemLabel>
+										{ sortLabels[ direction ] }
+									</DropdownMenuItemLabel>
+								</DropdownMenuRadioItem>
+							);
+						} ) }
 					</DropdownMenu>
 				);
 			} ) }

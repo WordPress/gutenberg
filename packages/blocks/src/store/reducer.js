@@ -379,8 +379,12 @@ export function blockBindingsSources( state = {}, action ) {
 				label: action.sourceLabel,
 				getValue: action.getValue,
 				setValue: action.setValue,
+				setValues: action.setValues,
 				getPlaceholder: action.getPlaceholder,
-				lockAttributesEditing: action.lockAttributesEditing ?? true,
+				lockAttributesEditing: () =>
+					action.lockAttributesEditing
+						? action.lockAttributesEditing()
+						: true,
 			},
 		};
 	}

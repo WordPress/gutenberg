@@ -1,7 +1,7 @@
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill } from '../slot-fill';
 
 const { Fill, Slot } = createSlotFill( '__unstableAutocompletionItemsSlot' );
 

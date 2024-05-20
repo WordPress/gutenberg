@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -12,7 +12,7 @@ import BlockPopoverCover from '../block-popover/cover';
 import { store as blockEditorStore } from '../../store';
 import { getComputedCSS } from './utils';
 
-export function GridVisualizer( { clientId } ) {
+export function GridVisualizer( { clientId, contentRef } ) {
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
@@ -30,12 +30,15 @@ export function GridVisualizer( { clientId } ) {
 			clientId={ clientId }
 			__unstablePopoverSlot="block-toolbar"
 		>
-			<GridVisualizerGrid blockElement={ blockElement } />
+			<GridVisualizerGrid
+				ref={ contentRef }
+				blockElement={ blockElement }
+			/>
 		</BlockPopoverCover>
 	);
 }
 
-function GridVisualizerGrid( { blockElement } ) {
+const GridVisualizerGrid = forwardRef( ( { blockElement }, ref ) => {
 	const [ gridInfo, setGridInfo ] = useState( () =>
 		getGridInfo( blockElement )
 	);
@@ -56,15 +59,22 @@ function GridVisualizerGrid( { blockElement } ) {
 	}, [ blockElement ] );
 	return (
 		<div
+			ref={ ref }
 			className="block-editor-grid-visualizer__grid"
 			style={ gridInfo.style }
 		>
 			{ Array.from( { length: gridInfo.numItems }, ( _, i ) => (
-				<div key={ i } className="block-editor-grid-visualizer__item" />
+				<div
+					key={ i }
+					className="block-editor-grid-visualizer__item"
+					style={ {
+						boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ gridInfo.currentColor } 20%, #0000)`,
+					} }
+				/>
 			) ) }
 		</div>
 	);
-}
+} );
 
 function getGridInfo( blockElement ) {
 	const gridTemplateColumns = getComputedCSS(
@@ -80,6 +90,7 @@ function getGridInfo( blockElement ) {
 	const numItems = numColumns * numRows;
 	return {
 		numItems,
+		currentColor: getComputedCSS( blockElement, 'color' ),
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,13 +10,12 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
-import { Icon, chevronDownSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,42 +29,14 @@ import {
 import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
-function PostStatusLabel( { canEdit } ) {
-	const status = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
-		[]
-	);
-	let statusLabel;
-	switch ( status ) {
-		case 'publish':
-			statusLabel = __( 'Published' );
-			break;
-		case 'future':
-			statusLabel = __( 'Scheduled' );
-			break;
-		case 'draft':
-		case 'auto-draft':
-			statusLabel = __( 'Draft' );
-			break;
-		case 'pending':
-			statusLabel = __( 'Pending' );
-			break;
-		case 'private':
-			statusLabel = __( 'Private' );
-			break;
-	}
-	return (
-		<Text
-			className={ clsx( 'editor-post-status-label', {
-				[ ` has-status-${ status }` ]: !! status,
-				'has-icon': canEdit,
-			} ) }
-		>
-			{ statusLabel }
-			{ canEdit && <Icon icon={ chevronDownSmall } /> }
-		</Text>
-	);
-}
+const labels = {
+	'auto-draft': __( 'Draft' ),
+	draft: __( 'Draft' ),
+	pending: __( 'Pending' ),
+	private: __( 'Private' ),
+	future: __( 'Scheduled' ),
+	publish: __( 'Published' ),
+};
 
 const STATUS_OPTIONS = [
 	{
@@ -234,10 +200,16 @@ export default function PostStatus() {
 					focusOnMount
 					renderToggle={ ( { onToggle } ) => (
 						<Button
-							className="editor-post-status-trigger"
+							variant="tertiary"
+							size="compact"
 							onClick={ onToggle }
+							aria-label={ sprintf(
+								// translators: %s: Current post status.
+								__( 'Change post status: %s' ),
+								labels[ status ]
+							) }
 						>
-							<PostStatusLabel canEdit={ canEdit } />
+							{ labels[ status ] }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -309,8 +281,8 @@ export default function PostStatus() {
 					) }
 				/>
 			) : (
-				<div className="editor-post-status">
-					<PostStatusLabel />
+				<div className="editor-post-status is-read-only">
+					{ labels[ status ] }
 				</div>
 			) }
 		</PostPanelRow>

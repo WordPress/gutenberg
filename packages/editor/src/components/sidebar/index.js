@@ -26,9 +26,6 @@ import PageAttributesPanel from '../page-attributes/panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
-import PostActions from '../post-actions';
-import PostCardPanel from '../post-card-panel';
-import PostDiscussionPanel from '../post-discussion/panel';
 import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
@@ -58,7 +55,6 @@ const SidebarContent = ( {
 	renderingMode,
 	onActionPerformed,
 	extraPanels,
-	showSummary = true,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -115,14 +111,7 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostCardPanel
-						actions={
-							<PostActions
-								onActionPerformed={ onActionPerformed }
-							/>
-						}
-					/>
-					{ showSummary && <PostSummary /> }
+					<PostSummary onActionPerformed={ onActionPerformed } />
 					<PluginDocumentSettingPanel.Slot />
 					{ renderingMode !== 'post-only' && (
 						<TemplateContentPanel />
@@ -130,7 +119,6 @@ const SidebarContent = ( {
 					<PostTransformPanel />
 					<PostLastRevisionPanel />
 					<PostTaxonomiesPanel />
-					<PostDiscussionPanel />
 					<PageAttributesPanel />
 					<PatternOverridesPanel />
 					{ extraPanels }

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ComboboxControl`: Introduce Combobox expandOnFocus prop ([#61705](https://github.com/WordPress/gutenberg/pull/61705)).
+
+## 27.6.0 (2024-05-16)
+
 ### Internal
 
 -   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
@@ -12,11 +18,14 @@
 
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
+-   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
 -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
+-   `Placeholder`: Tweak placeholder style ([#61590](https://github.com/WordPress/gutenberg/pull/61590)).
 
 ### Bug Fix
 
 -   `ToolsPanel`: Fix sticking “Reset” option ([#60621](https://github.com/WordPress/gutenberg/pull/60621)).
+-   Fix an issue where types used a synthetic default import ([#61679](https://github.com/WordPress/gutenberg/pull/61679)).
 
 ## 27.5.0 (2024-05-02)
 

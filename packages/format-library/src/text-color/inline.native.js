@@ -11,12 +11,9 @@ import {
 	getColorClassName,
 	getColorObjectByColorValue,
 	useMultipleOriginColorsAndGradients,
-} from '@wordpress/block-editor';
-import {
-	BottomSheet,
-	ColorSettings,
 	useMobileGlobalStylesColors,
-} from '@wordpress/components';
+} from '@wordpress/block-editor';
+import { BottomSheet, ColorSettings } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -108,6 +105,7 @@ function ColorPicker( { name, value, onChange, contentRef } ) {
 	const property = 'color';
 	const colors = useMobileGlobalStylesColors();
 	const colorSettings = useMultipleOriginColorsAndGradients();
+	colorSettings.allAvailableColors = colors;
 
 	const onColorChange = useCallback(
 		( color ) => {
