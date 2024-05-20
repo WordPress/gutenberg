@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ChangeEvent } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -15,6 +20,7 @@ import { settings } from '@wordpress/icons';
 import { unlock } from './lock-unlock';
 import { SORTING_DIRECTIONS, sortLabels } from './constants';
 import { VIEW_LAYOUTS } from './layouts';
+import type { AnyItem, NormalizedField, View } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -25,7 +31,41 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
+interface ViewTypeMenuProps {
+	view: View;
+	onChangeView: ( view: View ) => void;
+	supportedLayouts?: string[];
+}
+
+interface PageSizeMenuProps {
+	view: View;
+	onChangeView: ( view: View ) => void;
+}
+
+interface FieldsVisibilityMenuProps< Item extends AnyItem > {
+	view: View;
+	onChangeView: ( view: View ) => void;
+	fields: NormalizedField< Item >[];
+}
+
+interface SortMenuProps< Item extends AnyItem > {
+	fields: NormalizedField< Item >[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+}
+
+interface ViewActionsProps< Item extends AnyItem > {
+	fields: NormalizedField< Item >[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+	supportedLayouts?: string[];
+}
+
+function ViewTypeMenu( {
+	view,
+	onChangeView,
+	supportedLayouts,
+}: ViewTypeMenuProps ) {
 	let _availableViews = VIEW_LAYOUTS;
 	if ( supportedLayouts ) {
 		_availableViews = _availableViews.filter( ( _view ) =>
@@ -41,7 +81,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 			trigger={
 				<DropdownMenuItem
 					suffix={
-						<span aria-hidden="true">{ activeView.label }</span>
+						<span aria-hidden="true">{ activeView?.label }</span>
 					}
 				>
 					<DropdownMenuItemLabel>
@@ -58,11 +98,18 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 						name="view-actions-available-view"
 						checked={ availableView.type === view.type }
 						hideOnClick
-						onChange={ ( e ) => {
-							onChangeView( {
-								...view,
-								type: e.target.value,
-							} );
+						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
+							switch ( e.target.value ) {
+								case 'list':
+								case 'grid':
+								case 'table':
+									return onChangeView( {
+										...view,
+										type: e.target.value,
+										layout: {},
+									} );
+							}
+							throw new Error( 'Invalid dataview' );
 						} }
 					>
 						<DropdownMenuItemLabel>
@@ -76,7 +123,7 @@ function ViewTypeMenu( { view, onChangeView, supportedLayouts } ) {
 }
 
 const PAGE_SIZE_VALUES = [ 10, 20, 50, 100 ];
-function PageSizeMenu( { view, onChangeView } ) {
+function PageSizeMenu( { view, onChangeView }: PageSizeMenuProps ) {
 	return (
 		<DropdownMenu
 			trigger={
@@ -114,7 +161,11 @@ function PageSizeMenu( { view, onChangeView } ) {
 	);
 }
 
-function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
+function FieldsVisibilityMenu< Item extends AnyItem >( {
+	view,
+	onChangeView,
+	fields,
+}: FieldsVisibilityMenuProps< Item > ) {
 	const hidableFields = fields.filter(
 		( field ) =>
 			field.enableHiding !== false && field.id !== view.layout.mediaField
@@ -164,7 +215,11 @@ function FieldsVisibilityMenu( { view, onChangeView, fields } ) {
 	);
 }
 
-function SortMenu( { fields, view, onChangeView } ) {
+function SortMenu< Item extends AnyItem >( {
+	fields,
+	view,
+	onChangeView,
+}: SortMenuProps< Item > ) {
 	const sortableFields = fields.filter(
 		( field ) => field.enableSorting !== false
 	);
@@ -248,12 +303,12 @@ function SortMenu( { fields, view, onChangeView } ) {
 	);
 }
 
-const ViewActions = memo( function ViewActions( {
+const ViewActions = memo( function ViewActions< Item extends AnyItem >( {
 	fields,
 	view,
 	onChangeView,
 	supportedLayouts,
-} ) {
+}: ViewActionsProps< Item > ) {
 	return (
 		<DropdownMenu
 			trigger={

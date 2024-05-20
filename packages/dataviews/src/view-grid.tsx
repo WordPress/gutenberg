@@ -44,7 +44,7 @@ interface GridItemProps< Item extends AnyItem > {
 	primaryField?: NormalizedField< Item >;
 	visibleFields: NormalizedField< Item >[];
 	badgeFields: NormalizedField< Item >[];
-	columnFields: string[];
+	columnFields?: string[];
 }
 
 function GridItem< Item extends AnyItem >( {
