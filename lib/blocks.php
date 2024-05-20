@@ -7,7 +7,7 @@
 
 /**
  * Substitutes the implementation of a core-registered block type, if exists,
- * with the built result from the plugin.
+ * with the built result from the plugin..
  */
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.

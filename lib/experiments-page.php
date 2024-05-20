@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstrapping the Gutenberg experiments page..
+ * Bootstrapping the Gutenberg experiments page.
  *
  * @package gutenberg
  */
