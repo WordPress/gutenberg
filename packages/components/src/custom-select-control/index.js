@@ -185,7 +185,6 @@ export default function CustomSelectControl( props ) {
 					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
 						{ isOpen &&
 							items.map( ( item, index ) => (
-								// eslint-disable-next-line react/jsx-key
 								<li
 									key={ item.key }
 									{ ...getItemProps( {
