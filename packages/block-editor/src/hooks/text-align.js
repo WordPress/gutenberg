@@ -43,6 +43,7 @@ const TEXT_ALIGNMENT_OPTIONS = [
 ];
 
 const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
+const NO_TEXT_ALIGNMENTS = [];
 
 /**
  * Returns the valid text alignments.
@@ -54,19 +55,13 @@ const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
  * @return {string[]} Valid text alignments.
  */
 export function getValidTextAlignments( blockTextAlign ) {
-	let validTextAlignments;
 	if ( Array.isArray( blockTextAlign ) ) {
-		validTextAlignments = VALID_TEXT_ALIGNMENTS.filter( ( textAlign ) =>
+		return VALID_TEXT_ALIGNMENTS.filter( ( textAlign ) =>
 			blockTextAlign.includes( textAlign )
 		);
-	} else if ( blockTextAlign === true ) {
-		// `true` includes all alignments...
-		validTextAlignments = [ ...VALID_TEXT_ALIGNMENTS ];
-	} else {
-		validTextAlignments = [];
 	}
 
-	return validTextAlignments;
+	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
 }
 
 function BlockEditTextAlignmentToolbarControlsPure( {
