@@ -107,8 +107,7 @@
 		th:first-child {
 			padding-left: $grid-unit-40;
 
-			.dataviews-view-table-header-button,
-			.dataviews-view-table-header {
+			.dataviews-view-table-header-button {
 				margin-left: - #{$grid-unit-10};
 			}
 		}
@@ -222,10 +221,6 @@
 				display: none;
 			}
 		}
-	}
-
-	.dataviews-view-table-header {
-		padding-left: $grid-unit-05;
 	}
 
 	.dataviews-view-table__actions-column {
