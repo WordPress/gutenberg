@@ -99,15 +99,17 @@ function ViewTypeMenu( {
 						checked={ availableView.type === view.type }
 						hideOnClick
 						onChange={ ( e: ChangeEvent< HTMLInputElement > ) => {
-							const type = e.target.value as
-								| 'list'
-								| 'grid'
-								| 'table';
-							onChangeView( {
-								...view,
-								type,
-								layout: {},
-							} );
+							switch ( e.target.value ) {
+								case 'list':
+								case 'grid':
+								case 'table':
+									return onChangeView( {
+										...view,
+										type: e.target.value,
+										layout: {},
+									} );
+							}
+							throw new Error( 'Invalid dataview' );
 						} }
 					>
 						<DropdownMenuItemLabel>
