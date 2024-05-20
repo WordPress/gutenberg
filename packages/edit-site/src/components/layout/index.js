@@ -30,7 +30,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -72,7 +75,6 @@ export default function Layout() {
 
 	const {
 		isDistractionFree,
-		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
@@ -104,9 +106,6 @@ export default function Layout() {
 				'core',
 				'showBlockBreadcrumbs'
 			),
-			isZoomOutMode:
-				select( blockEditorStore ).__unstableGetEditorMode() ===
-				'zoom-out',
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
@@ -186,7 +185,6 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
-						'is-zoom-out': isZoomOutMode,
 						'has-block-breadcrumbs':
 							hasBlockBreadcrumbs &&
 							! isDistractionFree &&
@@ -266,6 +264,8 @@ export default function Layout() {
 							</AnimatePresence>
 						</NavigableRegion>
 					) }
+
+					<EditorSnackbars />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

@@ -6,7 +6,11 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	switchToBlockType,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	__experimentalTreeGridCell as TreeGridCell,
 	__experimentalTreeGridItem as TreeGridItem,
@@ -25,6 +29,7 @@ import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -85,6 +90,7 @@ function ListViewBlock( {
 		toggleBlockHighlight,
 		duplicateBlocks,
 		multiSelect,
+		replaceBlocks,
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
@@ -100,38 +106,32 @@ function ListViewBlock( {
 		getBlockParents,
 		getBlocksByClientId,
 		canRemoveBlocks,
+		isGroupable,
 	} = useSelect( blockEditorStore );
+	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 
-	const { block, blockName, blockEditingMode, allowRightClickOverrides } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlock,
-					getBlockName,
-					getBlockEditingMode,
-					getSettings,
-				} = select( blockEditorStore );
+	const { block, blockName, allowRightClickOverrides } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } =
+				select( blockEditorStore );
 
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					blockEditingMode: getBlockEditingMode( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+			};
+		},
+		[ clientId ]
+	);
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
 		// since that menu is part of the toolbar in the editor canvas.
 		// List View respects this by also hiding the block settings menu.
-		hasBlockSupport( blockName, '__experimentalToolbar', true ) &&
-		// Don't show the settings menu if block is disabled or content only.
-		blockEditingMode === 'default';
+		hasBlockSupport( blockName, '__experimentalToolbar', true );
 	const instanceId = useInstanceId( ListViewBlock );
 	const descriptionId = `list-view-block-select-button__description-${ instanceId }`;
 
@@ -181,6 +181,8 @@ function ListViewBlock( {
 			return;
 		}
 
+		const isDeleteKey = [ BACKSPACE, DELETE ].includes( event.keyCode );
+
 		// If multiple blocks are selected, deselect all blocks when the user
 		// presses the escape key.
 		if (
@@ -191,10 +193,15 @@ function ListViewBlock( {
 			event.preventDefault();
 			selectBlock( event, undefined );
 		} else if (
-			event.keyCode === BACKSPACE ||
-			event.keyCode === DELETE ||
+			isDeleteKey ||
 			isMatch( 'core/block-editor/remove', event )
 		) {
+			// Do not handle single-key block deletion shortcuts when events come from modals;
+			// retain the default behavior for these keys.
+			if ( isDeleteKey && event.target.closest( '[role=dialog]' ) ) {
+				return;
+			}
+
 			const {
 				blocksToUpdate: blocksToDelete,
 				firstBlockClientId,
@@ -324,6 +331,23 @@ function ListViewBlock( {
 			collapseAll();
 			// Expand all parents of the current block.
 			expand( blockParents );
+		} else if ( isMatch( 'core/block-editor/group', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( blocksToUpdate );
+				const groupingBlockName = getGroupingBlockName();
+				const newBlocks = switchToBlockType(
+					blocks,
+					groupingBlockName
+				);
+				replaceBlocks( blocksToUpdate, newBlocks );
+				speak( __( 'Selected blocks are grouped.' ) );
+				const newlySelectedBlocks = getSelectedBlockClientIds();
+				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
+				setOpenedBlockSettingsMenu( undefined );
+				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
+			}
 		}
 	}
 

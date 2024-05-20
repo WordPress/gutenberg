@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 5.7.0 (2024-05-16)
+
+### Enhancements
+
+-   Strict type checking: fix some missing nulls in published types ([#59865](https://github.com/WordPress/gutenberg/pull/59865/)).
+
+### Bug Fixes
+
+-	Allow multiple event handlers for the same type with `data-wp-on-document` and `data-wp-on-window`. ([#61009](https://github.com/WordPress/gutenberg/pull/61009))
+-	Prevent wrong written directives from killing the runtime ([#61249](https://github.com/WordPress/gutenberg/pull/61249))
+-	Prevent empty namespace or different namespaces from killing the runtime ([#61409](https://github.com/WordPress/gutenberg/pull/61409))
+
 ## 5.6.0 (2024-05-02)
 
 ## 5.5.0 (2024-04-19)

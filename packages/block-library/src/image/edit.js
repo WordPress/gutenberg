@@ -103,6 +103,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -317,7 +318,7 @@ export function ImageEdit( {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+						blockBindingsSource?.lockAttributesEditing() ),
 				lockUrlControlsMessage: blockBindingsSource?.label
 					? sprintf(
 							/* translators: %s: Label of the bindings source. */
@@ -385,6 +386,7 @@ export function ImageEdit( {
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 27.9.0 (2024-05-16)
+
+### New Features
+
+-   Add RTL support when building CSS styles with `build` and `start` scripts ([#61540](https://github.com/WordPress/gutenberg/pull/61540)).
+
 ## 27.8.0 (2024-05-02)
 
 ## 27.7.0 (2024-04-19)
@@ -334,7 +340,7 @@
 ### New Features
 
 -   Added a new `plugin-zip` command to create a zip file for a WordPress plugin ([#37687](https://github.com/WordPress/gutenberg/pull/37687)).
--   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://wordpress.org/documentation/article/debugging-in-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
+-   Added optional support for React Fast Refresh in the `start` command. It can be activated with `--hot` CLI argument ([#28273](https://github.com/WordPress/gutenberg/pull/28273)). For now, it requires that WordPress has the [`SCRIPT_DEBUG`](https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#script_debug) flag enabled and the [Gutenberg](https://wordpress.org/plugins/gutenberg/) plugin installed.
 -   Automatically copy `block.json` files located in the `src` folder and its subfolders to the output folder (`build` by default) ([#37612](https://github.com/WordPress/gutenberg/pull/37612)).
 -   Scan the `src` directory for `block.json` files to detect defined scripts to use them as entry points with the `start` and `build` commands. ([#37661](https://github.com/WordPress/gutenberg/pull/37661)).
 

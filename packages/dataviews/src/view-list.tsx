@@ -2,6 +2,9 @@
  * External dependencies
  */
 import clsx from 'clsx';
+// Import CompositeStore type, which is not exported from @wordpress/components.
+// eslint-disable-next-line no-restricted-imports
+import type { CompositeStore } from '@ariakit/react';
 
 /**
  * WordPress dependencies
@@ -10,43 +13,48 @@ import { useInstanceId } from '@wordpress/compose';
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	Button,
 	privateApis as componentsPrivateApis,
 	Spinner,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { moreVertical } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
 import type {
-	Data,
-	Item,
+	Action,
+	AnyItem,
 	NormalizedField,
 	ViewList as ViewListType,
+	ViewProps,
 } from './types';
 
-interface ListViewProps {
-	view: ViewListType;
-	fields: NormalizedField[];
-	data: Data;
-	isLoading: boolean;
-	getItemId: ( item: Item ) => string;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: Item[];
-	id: string;
-}
+import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewItemProps {
-	id: string;
-	item: Item;
+interface ViewListProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewListType > {}
+
+interface ListViewItemProps< Item extends AnyItem > {
+	actions: Action< Item >[];
+	id?: string;
 	isSelected: boolean;
+	item: Item;
+	mediaField?: NormalizedField< Item >;
 	onSelect: ( item: Item ) => void;
-	mediaField?: NormalizedField;
-	primaryField?: NormalizedField;
-	visibleFields: NormalizedField[];
+	primaryField?: NormalizedField< Item >;
+	store: CompositeStore;
+	visibleFields: NormalizedField< Item >[];
 }
 
 const {
@@ -54,20 +62,31 @@ const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	CompositeRowV2: CompositeRow,
+	DropdownMenuV2: DropdownMenu,
 } = unlock( componentsPrivateApis );
 
-function ListItem( {
+function ListItem< Item extends AnyItem >( {
+	actions,
 	id,
-	item,
 	isSelected,
-	onSelect,
+	item,
 	mediaField,
+	onSelect,
 	primaryField,
+	store,
 	visibleFields,
-}: ListViewItemProps ) {
+}: ListViewItemProps< Item > ) {
 	const itemRef = useRef< HTMLElement >( null );
 	const labelId = `${ id }-label`;
 	const descriptionId = `${ id }-description`;
+
+	const [ isHovered, setIsHovered ] = useState( false );
+	const handleMouseEnter = () => {
+		setIsHovered( true );
+	};
+	const handleMouseLeave = () => {
+		setIsHovered( false );
+	};
 
 	useEffect( () => {
 		if ( isSelected ) {
@@ -79,6 +98,23 @@ function ListItem( {
 		}
 	}, [ isSelected ] );
 
+	const { primaryAction, eligibleActions } = useMemo( () => {
+		// If an action is eligible for all items, doesn't need
+		// to provide the `isEligible` function.
+		const _eligibleActions = actions.filter(
+			( action ) => ! action.isEligible || action.isEligible( item )
+		);
+		const _primaryActions = _eligibleActions.filter(
+			( action ) => action.isPrimary && !! action.icon
+		);
+		return {
+			primaryAction: _primaryActions?.[ 0 ],
+			eligibleActions: _eligibleActions,
+		};
+	}, [ actions, item ] );
+
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
 	return (
 		<CompositeRow
 			ref={ itemRef }
@@ -86,11 +122,18 @@ function ListItem( {
 			role="row"
 			className={ clsx( {
 				'is-selected': isSelected,
+				'is-hovered': isHovered,
 			} ) }
+			onMouseEnter={ handleMouseEnter }
+			onMouseLeave={ handleMouseLeave }
 		>
-			<HStack className="dataviews-view-list__item-wrapper">
+			<HStack
+				className="dataviews-view-list__item-wrapper"
+				alignment="top"
+			>
 				<div role="gridcell">
 					<CompositeItem
+						store={ store }
 						render={ <div /> }
 						role="button"
 						id={ id }
@@ -142,23 +185,137 @@ function ListItem( {
 						</HStack>
 					</CompositeItem>
 				</div>
+				{ actions?.length > 0 && (
+					<HStack
+						spacing={ 1 }
+						justify="flex-end"
+						className="dataviews-view-list__item-actions"
+						style={ {
+							flexShrink: '0',
+							width: 'auto',
+						} }
+					>
+						{ primaryAction && 'RenderModal' in primaryAction && (
+							<div role="gridcell">
+								<CompositeItem
+									store={ store }
+									render={
+										<Button
+											label={ primaryAction.label }
+											icon={ primaryAction.icon }
+											isDestructive={
+												primaryAction.isDestructive
+											}
+											size="compact"
+											onClick={ () =>
+												setIsModalOpen( true )
+											}
+										/>
+									}
+								>
+									{ isModalOpen && (
+										<ActionModal< Item >
+											action={ primaryAction }
+											items={ [ item ] }
+											closeModal={ () =>
+												setIsModalOpen( false )
+											}
+										/>
+									) }
+								</CompositeItem>
+							</div>
+						) }
+						{ primaryAction &&
+							! ( 'RenderModal' in primaryAction ) && (
+								<div role="gridcell" key={ primaryAction.id }>
+									<CompositeItem
+										store={ store }
+										render={
+											<Button
+												label={ primaryAction.label }
+												icon={ primaryAction.icon }
+												isDestructive={
+													primaryAction.isDestructive
+												}
+												size="compact"
+												onClick={ () =>
+													primaryAction.callback( [
+														item,
+													] )
+												}
+											/>
+										}
+									/>
+								</div>
+							) }
+						<div role="gridcell">
+							<DropdownMenu
+								trigger={
+									<CompositeItem
+										store={ store }
+										render={
+											<Button
+												size="compact"
+												icon={ moreVertical }
+												label={ __( 'Actions' ) }
+												disabled={ ! actions.length }
+												onKeyDown={ ( event: {
+													key: string;
+													preventDefault: () => void;
+												} ) => {
+													if (
+														event.key ===
+														'ArrowDown'
+													) {
+														// Prevent the default behaviour (open dropdown menu) and go down.
+														event.preventDefault();
+														store.move(
+															store.down()
+														);
+													}
+													if (
+														event.key === 'ArrowUp'
+													) {
+														// Prevent the default behavior (open dropdown menu) and go up.
+														event.preventDefault();
+														store.move(
+															store.up()
+														);
+													}
+												} }
+											/>
+										}
+									/>
+								}
+								placement="bottom-end"
+							>
+								<ActionsDropdownMenuGroup
+									actions={ eligibleActions }
+									item={ item }
+								/>
+							</DropdownMenu>
+						</div>
+					</HStack>
+				) }
 			</HStack>
 		</CompositeRow>
 	);
 }
 
-export default function ViewList( props: ListViewProps ) {
+export default function ViewList< Item extends AnyItem >(
+	props: ViewListProps< Item >
+) {
 	const {
-		view,
-		fields,
+		actions,
 		data,
-		isLoading,
+		fields,
 		getItemId,
+		isLoading,
 		onSelectionChange,
 		selection,
-		id: preferredId,
+		view,
 	} = props;
-	const baseId = useInstanceId( ViewList, 'view-list', preferredId );
+	const baseId = useInstanceId( ViewList, 'view-list' );
 	const selectedItem = data?.findLast( ( item ) =>
 		selection.includes( item.id )
 	);
@@ -183,13 +340,32 @@ export default function ViewList( props: ListViewProps ) {
 	);
 
 	const getItemDomId = useCallback(
-		( item?: Item ) => ( item ? `${ baseId }-${ getItemId( item ) }` : '' ),
+		( item?: Item ) =>
+			item ? `${ baseId }-${ getItemId( item ) }` : undefined,
 		[ baseId, getItemId ]
 	);
 
 	const store = useCompositeStore( {
 		defaultActiveId: getItemDomId( selectedItem ),
 	} );
+
+	// Manage focused item, when the active one is removed from the list.
+	const isActiveIdInList = store.useState(
+		( state: { items: any[]; activeId: any } ) =>
+			state.items.some(
+				( item: { id: any } ) => item.id === state.activeId
+			)
+	);
+	useEffect( () => {
+		if ( ! isActiveIdInList ) {
+			// Prefer going down, except if there is no item below (last item), then go up (last item in list).
+			if ( store.down() ) {
+				store.move( store.down() );
+			} else if ( store.up() ) {
+				store.move( store.up() );
+			}
+		}
+	}, [ isActiveIdInList ] );
 
 	const hasData = data?.length;
 	if ( ! hasData ) {
@@ -221,11 +397,13 @@ export default function ViewList( props: ListViewProps ) {
 					<ListItem
 						key={ id }
 						id={ id }
+						actions={ actions }
 						item={ item }
 						isSelected={ item === selectedItem }
 						onSelect={ onSelect }
 						mediaField={ mediaField }
 						primaryField={ primaryField }
+						store={ store }
 						visibleFields={ visibleFields }
 					/>
 				);

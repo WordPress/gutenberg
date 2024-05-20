@@ -24,6 +24,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { useResizeObserver } from '@wordpress/compose';
 import { useMemo, useState, memo, useContext } from '@wordpress/element';
@@ -34,7 +35,6 @@ import { ENTER, SPACE } from '@wordpress/keycodes';
  */
 import { unlock } from '../../lock-unlock';
 import EditorCanvasContainer from '../editor-canvas-container';
-import { mergeBaseAndUserConfigs } from '../global-styles/global-styles-provider';
 
 const {
 	ExperimentalBlockEditorProvider,
@@ -42,6 +42,7 @@ const {
 	GlobalStylesContext,
 	useGlobalStylesOutputWithConfig,
 } = unlock( blockEditorPrivateApis );
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 
 const {
 	CompositeV2: Composite,

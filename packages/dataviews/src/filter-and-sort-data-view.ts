@@ -15,13 +15,13 @@ import {
 	OPERATOR_IS_NOT_ALL,
 } from './constants';
 import { normalizeFields } from './normalize-fields';
-import type { Data, Field, View } from './types';
+import type { Field, AnyItem, View } from './types';
 
 function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-const EMPTY_ARRAY: Data = [];
+const EMPTY_ARRAY: [] = [];
 
 /**
  * Applies the filtering, sorting and pagination to the raw data based on the view configuration.
@@ -32,11 +32,14 @@ const EMPTY_ARRAY: Data = [];
  *
  * @return Filtered, sorted and paginated data.
  */
-export function filterSortAndPaginate(
-	data: Data,
+export function filterSortAndPaginate< Item extends AnyItem >(
+	data: Item[],
 	view: View,
-	fields: Field[]
-): { data: Data; paginationInfo: { totalItems: number; totalPages: number } } {
+	fields: Field< Item >[]
+): {
+	data: Item[];
+	paginationInfo: { totalItems: number; totalPages: number };
+} {
 	if ( ! data ) {
 		return {
 			data: EMPTY_ARRAY,
@@ -100,7 +103,9 @@ export function filterSortAndPaginate(
 				) {
 					filteredData = filteredData.filter( ( item ) => {
 						return filter.value.every( ( value: any ) => {
-							return field.getValue( { item } ).includes( value );
+							return field
+								.getValue( { item } )
+								?.includes( value );
 						} );
 					} );
 				} else if (
@@ -111,7 +116,7 @@ export function filterSortAndPaginate(
 						return filter.value.every( ( value: any ) => {
 							return ! field
 								.getValue( { item } )
-								.includes( value );
+								?.includes( value );
 						} );
 					} );
 				} else if ( filter.operator === OPERATOR_IS ) {

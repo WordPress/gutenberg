@@ -44,6 +44,7 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
+const { kebabCase } = unlock( componentsPrivateApis );
 
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
@@ -69,8 +70,6 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Array<Object>} An array of style declarations.
  */
 function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
-
 	return PRESET_METADATA.reduce(
 		( declarations, { path, valueKey, valueFunc, cssVarInfix } ) => {
 			const presetByOrigin = getValueFromObjectPath(
@@ -115,8 +114,6 @@ function getPresetsDeclarations( blockPresets = {}, mergedSettings ) {
  * @return {string} CSS declarations for the preset classes.
  */
 function getPresetsClasses( blockSelector = '*', blockPresets = {} ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
-
 	return PRESET_METADATA.reduce(
 		( declarations, { path, cssVarInfix, classes } ) => {
 			if ( ! classes ) {
@@ -181,7 +178,6 @@ function getPresetsSvgFilters( blockPresets = {} ) {
 }
 
 function flattenTree( input = {}, prefix, token ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	let result = [];
 	Object.keys( input ).forEach( ( key ) => {
 		const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
@@ -323,7 +319,6 @@ export function getStylesDeclarations(
 	tree = {},
 	isTemplate = true
 ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
 		(

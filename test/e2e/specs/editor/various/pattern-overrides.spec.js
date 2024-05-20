@@ -148,6 +148,8 @@ test.describe( 'Pattern Overrides', () => {
 			const paragraphs = patternBlocks.first().getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			// Ensure the first pattern is selected.
+			await patternBlocks.first().selectText();
 			await expect( paragraphs.first() ).not.toHaveAttribute(
 				'inert',
 				'true'
@@ -164,6 +166,8 @@ test.describe( 'Pattern Overrides', () => {
 			await paragraphs.first().selectText();
 			await page.keyboard.type( 'I would word it this way' );
 
+			// Ensure the second pattern is selected.
+			await patternBlocks.last().selectText();
 			await patternBlocks
 				.last()
 				.getByRole( 'document', {
@@ -417,7 +421,7 @@ test.describe( 'Pattern Overrides', () => {
 
 		const postId = await editor.publishPost();
 
-		// Check it renders correctly.
+		// Check the pattern has the correct attributes.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/block',
@@ -429,41 +433,20 @@ test.describe( 'Pattern Overrides', () => {
 						},
 					},
 				},
-				innerBlocks: [
-					{
-						name: 'core/heading',
-						attributes: { content: 'Outer heading (edited)' },
-					},
-					{
-						name: 'core/block',
-						attributes: {
-							ref: innerPattern.id,
-							content: {
-								[ paragraphName ]: {
-									content: 'Inner paragraph (edited)',
-								},
-							},
-						},
-						innerBlocks: [
-							{
-								name: 'core/paragraph',
-								attributes: {
-									content: 'Inner paragraph (edited)',
-								},
-							},
-						],
-					},
-				],
+				innerBlocks: [],
 			},
 		] );
-
-		await expect(
-			editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-				includeHidden: true,
-			} ),
-			'The inner paragraph should not be editable'
-		).toHaveAttribute( 'inert', 'true' );
+		// Check it renders correctly.
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		const paragraphBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( headingBlock ).toHaveText( 'Outer heading (edited)' );
+		await expect( headingBlock ).not.toHaveAttribute( 'inert', 'true' );
+		await expect( paragraphBlock ).toHaveText( 'Inner paragraph (edited)' );
+		await expect( paragraphBlock ).toHaveAttribute( 'inert', 'true' );
 
 		// Edit the outer pattern.
 		await editor.selectBlocks(
@@ -478,11 +461,16 @@ test.describe( 'Pattern Overrides', () => {
 			.click();
 
 		// The inner paragraph should be editable in the pattern focus mode.
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.first()
+		);
 		await expect(
 			editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} ),
-			'The inner paragraph should not be editable'
+			'The inner paragraph should be editable'
 		).not.toHaveAttribute( 'inert', 'true' );
 
 		// Visit the post on the frontend.
@@ -587,6 +575,70 @@ test.describe( 'Pattern Overrides', () => {
 		await expect( resetButton ).toBeDisabled();
 	} );
 
+	// A Undo/Redo bug found when implementing and fixing https://github.com/WordPress/gutenberg/pull/60721.
+	// This could be merged into an existing test after we fully test it.
+	test( 'resets overrides immediately should not break undo/redo', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const paragraphName = 'Editable paragraph';
+		const { id } = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+<p>Paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		const paragraphBlock = patternBlock.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const resetButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Reset' } );
+		const documentTools = page.getByRole( 'toolbar', {
+			name: 'Document tools',
+		} );
+		const undoButton = documentTools.getByRole( 'button', {
+			name: 'Undo',
+		} );
+		const redoButton = documentTools.getByRole( 'button', {
+			name: 'Redo',
+		} );
+
+		// Make an edit to the paragraph.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.type( '*' );
+		await expect( paragraphBlock ).toHaveText( 'Paragraph*' );
+
+		// Reset immediately after making the edit.
+		await editor.selectBlocks( paragraphBlock );
+		await editor.showBlockToolbar();
+		await expect( resetButton ).toBeEnabled();
+		await resetButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Paragraph' );
+
+		// Undo/Redo should work
+		await undoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Paragraph*' );
+		await redoButton.click();
+		await expect( paragraphBlock ).toHaveText( 'Paragraph' );
+	} );
+
 	// Fix https://github.com/WordPress/gutenberg/issues/58708.
 	test( 'overridden empty images should not have upload button', async ( {
 		page,
@@ -646,6 +698,144 @@ test.describe( 'Pattern Overrides', () => {
 			blockToolbar.getByRole( 'button', {
 				name: 'Upload to Media Library',
 			} )
+		).toBeHidden();
+	} );
+
+	test( 'blocks with the same name should be synced', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		let patternId;
+		const sharedName = 'Shared Name';
+
+		await test.step( 'create a pattern with synced blocks with the same name', async () => {
+			const { id } = await requestUtils.createBlock( {
+				title: 'Blocks with the same name',
+				content: `<!-- wp:heading {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<h2>default name</h2>
+			<!-- /wp:heading -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<p>default content</p>
+			<!-- /wp:paragraph -->
+			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
+			<p>default content</p>
+			<!-- /wp:paragraph -->`,
+				status: 'publish',
+			} );
+			await admin.visitSiteEditor( {
+				postId: id,
+				postType: 'wp_block',
+				categoryType: 'pattern',
+				canvas: 'edit',
+			} );
+
+			const headingBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			const firstParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.first();
+			const secondParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.last();
+
+			// Update the content of one of the blocks.
+			await headingBlock.fill( 'updated content' );
+
+			// Check that every content has been updated.
+			for ( const block of [
+				headingBlock,
+				firstParagraph,
+				secondParagraph,
+			] ) {
+				await expect( block ).toHaveText( 'updated content' );
+			}
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
+				.click();
+
+			await expect(
+				page.getByRole( 'button', { name: 'Dismiss this notice' } )
+			).toBeVisible();
+
+			patternId = new URL( page.url() ).searchParams.get( 'postId' );
+		} );
+
+		await test.step( 'create a post and insert the pattern with synced values', async () => {
+			await admin.createNewPost();
+
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: patternId },
+			} );
+
+			const headingBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Heading',
+			} );
+			const firstParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.first();
+			const secondParagraph = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+				.last();
+
+			await firstParagraph.fill( 'overriden content' );
+			await expect( headingBlock ).toHaveText( 'overriden content' );
+			await expect( firstParagraph ).toHaveText( 'overriden content' );
+			await expect( secondParagraph ).toHaveText( 'overriden content' );
+		} );
+	} );
+
+	// https://github.com/WordPress/gutenberg/issues/61610.
+	test( 'unsynced patterns should not be able to enable overrides', async ( {
+		page,
+		admin,
+		requestUtils,
+		editor,
+	} ) => {
+		const pattern = await requestUtils.createBlock( {
+			title: 'Pattern',
+			content: `<!-- wp:paragraph -->
+<p>paragraph</p>
+<!-- /wp:paragraph -->`,
+			status: 'publish',
+			meta: {
+				wp_pattern_sync_status: 'unsynced',
+			},
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: pattern.id,
+			postType: 'wp_block',
+			canvas: 'edit',
+		} );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraph );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await editorSettings
+			.getByRole( 'button', { name: 'Advanced' } )
+			.click();
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Enable overrides' } )
 		).toBeHidden();
 	} );
 } );

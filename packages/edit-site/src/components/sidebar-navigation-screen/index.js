@@ -32,32 +32,6 @@ import { SidebarNavigationContext } from '../sidebar';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
-function getBackPath( params ) {
-	// Navigation Menus are not currently part of a data view.
-	// Therefore when navigating back from a navigation menu
-	// the target path is the navigation listing view.
-	if ( params.path === '/navigation' && params.postId ) {
-		return { path: '/navigation' };
-	}
-
-	// From a data view path we navigate back to root
-	if ( params.path ) {
-		return {};
-	}
-
-	// From edit screen for a post we navigate back to post-type specific data view
-	if ( params.postType === 'page' ) {
-		return { path: '/page', postId: params.postId };
-	} else if ( params.postType === 'wp_template' ) {
-		return { path: '/wp_template', postId: params.postId };
-	} else if ( params.postType === 'wp_navigation' ) {
-		return { path: '/navigation', postId: params.postId };
-	}
-
-	// Go back to root by default
-	return {};
-}
-
 export default function SidebarNavigationScreen( {
 	isRoot,
 	title,
@@ -88,8 +62,10 @@ export default function SidebarNavigationScreen( {
 	);
 	const location = useLocation();
 	const history = useHistory();
-	const navigate = useContext( SidebarNavigationContext );
+	const { navigate } = useContext( SidebarNavigationContext );
+	const backPath = backPathProp ?? location.state?.backPath;
 	const icon = isRTL() ? chevronRight : chevronLeft;
+
 	return (
 		<>
 			<VStack
@@ -107,10 +83,6 @@ export default function SidebarNavigationScreen( {
 					{ ! isRoot && (
 						<SidebarButton
 							onClick={ () => {
-								const backPath =
-									backPathProp ??
-									location.state?.backPath ??
-									getBackPath( location.params );
 								history.push( backPath );
 								navigate( 'back' );
 							} }

@@ -17,6 +17,7 @@ import {
 import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 import { useZoomOut } from '../../hooks/use-zoom-out';
+import { store as blockEditorStore } from '../../store';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -45,18 +47,29 @@ function InserterMenu(
 		__experimentalFilterValue = '',
 		shouldFocusBlock = true,
 		__experimentalOnPatternCategorySelection = NOOP,
+		onClose,
+		__experimentalInitialTab,
+		__experimentalInitialCategory,
 	},
 	ref
 ) {
+	const isZoomOutMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetEditorMode() === 'zoom-out',
+		[]
+	);
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] =
-		useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		__experimentalInitialCategory
+	);
 	const [ patternFilter, setPatternFilter ] = useState( 'all' );
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
-	const [ selectedTab, setSelectedTab ] = useState( 'blocks' );
+	const [ selectedTab, setSelectedTab ] = useState(
+		__experimentalInitialTab
+	);
 
 	const [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ] =
 		useInsertionPoint( {
@@ -66,13 +79,27 @@ function InserterMenu(
 			insertionIndex: __experimentalInsertionIndex,
 			shouldFocusBlock,
 		} );
+	const blockTypesTabRef = useRef();
 
 	const onInsert = useCallback(
 		( blocks, meta, shouldForceFocusBlock ) => {
 			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
 			onSelect();
+
+			// Check for focus loss due to filtering blocks by selected block type
+			window.requestAnimationFrame( () => {
+				if (
+					! shouldFocusBlock &&
+					! blockTypesTabRef?.current.contains(
+						ref.current.ownerDocument.activeElement
+					)
+				) {
+					// There has been a focus loss, so focus the first button in the block types tab
+					blockTypesTabRef?.current.querySelector( 'button' ).focus();
+				}
+			} );
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, onSelect, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -98,21 +125,13 @@ function InserterMenu(
 		[ onToggleInsertionPoint ]
 	);
 
-	const isZoomedOutViewExperimentEnabled =
-		window?.__experimentalEnableZoomedOutView;
 	const onClickPatternCategory = useCallback(
 		( patternCategory, filter ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
-			if ( isZoomedOutViewExperimentEnabled ) {
-				__experimentalOnPatternCategorySelection();
-			}
+			__experimentalOnPatternCategorySelection();
 		},
-		[
-			setSelectedPatternCategory,
-			__experimentalOnPatternCategorySelection,
-			isZoomedOutViewExperimentEnabled,
-		]
+		[ setSelectedPatternCategory, __experimentalOnPatternCategorySelection ]
 	);
 
 	const showPatternPanel =
@@ -183,6 +202,7 @@ function InserterMenu(
 			<>
 				<div className="block-editor-inserter__block-list">
 					<BlockTypesTab
+						ref={ blockTypesTabRef }
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsert }
 						onHover={ onHover }
@@ -289,11 +309,17 @@ function InserterMenu(
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
 				'show-panel': showPatternPanel || showMediaPanel,
+				'is-zoom-out': isZoomOutMode,
 			} ) }
 			ref={ ref }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterTabs ref={ tabsRef } onSelect={ handleSetSelectedTab }>
+				<InserterTabs
+					ref={ tabsRef }
+					onSelect={ handleSetSelectedTab }
+					onClose={ onClose }
+					selectedTab={ selectedTab }
+				>
 					{ inserterSearch }
 					{ selectedTab === 'blocks' &&
 						! delayedFilterValue &&

@@ -205,10 +205,13 @@ $z-layers: (
 	".edit-site-sidebar-navigation-screen__title-icon": 1,
 
 	// Ensure modal footer actions appear above modal contents
-	".edit-site-start-template-options__modal__actions": 1,
+	".editor-start-template-options__modal__actions": 1,
 
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
+
+	// Ensure quick actions toolbar appear above pagination
+	".dataviews-bulk-actions": 2,
 );
 
 @function z-index( $key ) {

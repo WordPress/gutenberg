@@ -286,6 +286,32 @@
 							"type": "boolean",
 							"default": false
 						},
+						"defaultAspectRatios": {
+							"description": "Allow users to choose aspect ratios from the default set of aspect ratios.",
+							"type": "boolean",
+							"default": true
+						},
+						"aspectRatios": {
+							"description": "Allow users to define aspect ratios for some blocks.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the aspect ratio preset.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the aspect ratio preset.",
+										"type": "string"
+									},
+									"ratio": {
+										"description": "Aspect ratio expressed as a division or decimal.",
+										"type": "string"
+									}
+								}
+							}
+						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
 							"type": "boolean",
