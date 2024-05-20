@@ -30,21 +30,15 @@ jobs:
               run: |
                   changelog_folder="backport-changelog"
 
-                  # Fail if the PR doesn't touch the changelog
-                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_folder"; then
-                    echo "Please create a core backport PR and add a file with the name <core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
-                    echo "If changes are related to an existing, open core PR, you may add this PR URL to the core PR's file."
-                    exit 1
-                  fi
-
                   # Find any changelog file that contains the Gutenberg PR link
                   gutenberg_pr_url="https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
                   changelog_file=$(grep -rl "[-*] ${gutenberg_pr_url}" "${changelog_folder}" | head -n 1)
 
                   # Confirm that there is an entry containing the Gutenberg PR link
                   if [[ -z "${changelog_file}" ]]; then
-                    echo "Please create a core backport PR and add a file with the name <core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
+                    echo "Please create a core backport PR and add a file with the path <wp-release-number>/<core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
                     echo "If changes are related to an existing, open core PR, you may add this PR URL to the core PR's file."
+                    echo "See $changelog_folder/readme.md for more information."
                     exit 1
                   fi
 
