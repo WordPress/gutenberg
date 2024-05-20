@@ -216,12 +216,14 @@ function BlockListBlock( {
 	}
 
 	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
-
-	restWrapperProps.className = clsx(
-		restWrapperProps.className,
-		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-		! ( dataAlign && isSticky ) && className
-	);
+	const updatedWrapperProps = {
+		...restWrapperProps,
+		className: clsx(
+			restWrapperProps.className,
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			! ( dataAlign && isSticky ) && className
+		),
+	};
 
 	// We set a new context with the adjusted and filtered wrapperProps (through
 	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
@@ -234,7 +236,7 @@ function BlockListBlock( {
 	return (
 		<PrivateBlockContext.Provider
 			value={ {
-				wrapperProps: restWrapperProps,
+				wrapperProps: updatedWrapperProps,
 				isAligned,
 				...context,
 			} }
