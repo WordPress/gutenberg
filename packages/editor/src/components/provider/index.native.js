@@ -21,6 +21,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 	subscribeShowEditorHelp,
+	subscribeVoiceToContent,
 } from '@wordpress/react-native-bridge';
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -30,6 +31,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	createBlock,
+	pasteHandler,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -82,6 +84,7 @@ class NativeEditorProvider extends Component {
 		);
 
 		this.onHardwareBackPress = this.onHardwareBackPress.bind( this );
+		this.onVoiceToContent = this.onVoiceToContent.bind( this );
 
 		this.getEditorSettings = memize(
 			( settings, capabilities ) => ( {
@@ -200,6 +203,12 @@ class NativeEditorProvider extends Component {
 			this.onHardwareBackPress
 		);
 
+		this.subscriptionOnVoiceToContent = subscribeVoiceToContent(
+			( content ) => {
+				this.onVoiceToContent( content );
+			}
+		);
+
 		// Request current block impressions from native app.
 		requestBlockTypeImpressions( ( storedImpressions ) => {
 			const impressions = { ...NEW_BLOCK_TYPES, ...storedImpressions };
@@ -263,6 +272,10 @@ class NativeEditorProvider extends Component {
 		if ( this.hardwareBackPressListener ) {
 			this.hardwareBackPressListener.remove();
 		}
+
+		if ( this.subscriptionOnVoiceToContent ) {
+			this.subscriptionOnVoiceToContent.remove();
+		}
 	}
 
 	getThemeColors( { rawStyles, rawFeatures } ) {
@@ -301,6 +314,17 @@ class NativeEditorProvider extends Component {
 			return true;
 		}
 		return false;
+	}
+
+	onVoiceToContent( { content } ) {
+		const { insertBlocks } = this.props;
+		const blocks = pasteHandler( {
+			plainText: content,
+		} );
+
+		if ( blocks ) {
+			insertBlocks( blocks, undefined, undefined, false );
+		}
 	}
 
 	serializeToNativeAction() {
@@ -428,6 +452,7 @@ const ComposedNativeProvider = compose( [
 			clearSelectedBlock,
 			updateSettings,
 			insertBlock,
+			insertBlocks,
 			replaceBlock,
 		} = dispatch( blockEditorStore );
 		const { addEntities, receiveEntityRecords } = dispatch( coreStore );
@@ -439,6 +464,7 @@ const ComposedNativeProvider = compose( [
 			updateEditorSettings,
 			addEntities,
 			insertBlock,
+			insertBlocks,
 			createSuccessNotice,
 			createErrorNotice,
 			clearSelectedBlock,
