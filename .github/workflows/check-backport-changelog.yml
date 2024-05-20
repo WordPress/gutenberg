@@ -33,7 +33,7 @@ jobs:
                   # Fail if the PR doesn't touch the changelog
                   if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_folder"; then
                     echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
-                    echo "If changes are related to an existing, open PR, you may use that PR."
+                    echo "If changes are related to an existing, open core PR, you may use that PR."
                     exit 1
                   fi
 
@@ -42,7 +42,7 @@ jobs:
                   # Confirm that there is an entry.
                   if [[ -z "${changelog_file}" ]]; then
                     echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
-                    echo "If changes are related to an existing, open PR, you may use that PR."
+                    echo "If changes are related to an existing, open core PR, you may use that PR."
                     exit 1
                   fi
 
@@ -51,6 +51,6 @@ jobs:
                   # Confirm that the entry has a core backport PR URL.
                   if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_file}"; then
                     echo "Please add a CORE PR URL to $changelog_file."
-                    echo "If changes are related to an existing, open PR, you may use that PR."
+                    echo "If changes are related to an existing, open core PR, you may use that PR."
                     exit 1
                   fi
