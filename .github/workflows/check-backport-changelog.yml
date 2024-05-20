@@ -53,8 +53,6 @@ jobs:
 
                   # Confirm that the entry has the correct core backport PR URL.
                   if ! grep -q -e "${core_pr_url}" "${changelog_file}"; then
-                    echo "Please update the content of ${changelog_file} to include the core backport PR URL."
-                    echo "Make sure the core backport PR number matches the file name."
-                    echo "There should only be one core backport PR URL per file."
+                    echo "Please update the content of ${changelog_file} to include the core backport PR URL, or update the file name to match the core backport PR number."
                     exit 1
                   fi
