@@ -12,10 +12,14 @@ interface EditPostOptions {
  * Open the post with given ID in the editor.
  *
  * @param this
- * @param postId Post ID to visit.
+ * @param postId  Post ID to visit.
  * @param options Editor options for edit post.
  */
-export async function editPost( this: Admin, postId: string | number, options: EditPostOptions = {}) {
+export async function editPost(
+	this: Admin,
+	postId: string | number,
+	options: EditPostOptions = {}
+) {
 	const query = new URLSearchParams();
 
 	query.set( 'post', String( postId ) );
