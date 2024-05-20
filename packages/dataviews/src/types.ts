@@ -190,12 +190,12 @@ export interface ViewTable extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 	};
 }
 
@@ -206,12 +206,12 @@ export interface ViewList extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 	};
 }
 
@@ -222,22 +222,22 @@ export interface ViewGrid extends ViewBase {
 		/**
 		 * The field to use as the primary field.
 		 */
-		primaryField: string;
+		primaryField?: string;
 
 		/**
 		 * The field to use as the media field.
 		 */
-		mediaField: string;
+		mediaField?: string;
 
 		/**
 		 * The fields to use as columns.
 		 */
-		columnFields: string[];
+		columnFields?: string[];
 
 		/**
 		 * The fields to use as badge fields.
 		 */
-		badgeFields: string[];
+		badgeFields?: string[];
 	};
 }
 
