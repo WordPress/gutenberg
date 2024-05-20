@@ -217,9 +217,7 @@ export default function Editor( { isLoading, onClick } ) {
 				case 'move-to-trash':
 					{
 						history.push( {
-							postId: undefined,
 							postType: items[ 0 ].type,
-							canvas: 'view',
 						} );
 					}
 					break;

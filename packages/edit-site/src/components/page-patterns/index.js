@@ -291,7 +291,7 @@ export default function DataviewsPatterns() {
 			},
 		];
 
-		if ( type === PATTERN_TYPES.user && ! categoryId ) {
+		if ( type === PATTERN_TYPES.user ) {
 			_fields.push( {
 				header: __( 'Sync status' ),
 				id: 'sync-status',

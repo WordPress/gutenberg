@@ -64,6 +64,7 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: attributes.type,
 						postId: attributes.id,
+						canvas: 'edit',
 					},
 					{
 						backPath: params,
@@ -75,6 +76,7 @@ export default function LeafMoreMenu( props ) {
 					{
 						postType: 'page',
 						postId: attributes.id,
+						canvas: 'edit',
 					},
 					{
 						backPath: params,
