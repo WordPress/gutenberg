@@ -27,6 +27,8 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
+const authorizedPostTypes = [ 'page' ];
+
 function useResolveEditedEntityAndContext( { postId, postType } ) {
 	const {
 		hasLoadedAllDependencies,
@@ -171,8 +173,13 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 				return undefined;
 			}
 
-			// If we're rendering a specific page, post... we need to resolve its template.
-			if ( postType && postId ) {
+			// If we're rendering a specific page, we need to resolve its template.
+			// The site editor only supports pages for now, not other CPTs.
+			if (
+				postType &&
+				postId &&
+				authorizedPostTypes.includes( postType )
+			) {
 				return resolveTemplateForPostTypeAndId( postType, postId );
 			}
 
@@ -203,7 +210,7 @@ function useResolveEditedEntityAndContext( { postId, postType } ) {
 			return {};
 		}
 
-		if ( postType && postId ) {
+		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
 		}
 
