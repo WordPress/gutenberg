@@ -135,11 +135,6 @@ export function PatternCategoryPreviews( {
 			<VStack className="block-editor-inserter__patterns-category-panel-header">
 				<HStack>
 					<NavigatorBackButton
-						style={
-							// TODO: This style override is also used in ToolsPanelHeader.
-							// It should be supported out-of-the-box by Button.
-							{ minWidth: 24, padding: 0 }
-						}
 						icon={ isRTL() ? chevronRight : chevronLeft }
 						size="small"
 						label={ __( 'Back' ) }
