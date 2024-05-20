@@ -20,7 +20,12 @@ import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TEXT_ALIGN_SUPPORT_KEY } from './text-align';
 import { cleanEmptyObject } from './utils';
 import { store as blockEditorStore } from '../store';
-import { omit } from '../utils/object';
+
+function omit( object, keys ) {
+	return Object.fromEntries(
+		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
+	);
+}
 
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
 const TEXT_TRANSFORM_SUPPORT_KEY = 'typography.__experimentalTextTransform';

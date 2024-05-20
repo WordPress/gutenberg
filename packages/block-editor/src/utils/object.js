@@ -65,17 +65,3 @@ export function uniqByProperty( array, property ) {
 		return seen.has( value ) ? false : seen.add( value );
 	} );
 }
-
-/**
- * Helper to omit keys from a given object.
- *
- * @param {Object}   object Object.
- * @param {string[]} keys   Keys to omit.
- *
- * @return {Object} Object without the omitted keys.
- */
-export function omit( object, keys ) {
-	return Object.fromEntries(
-		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
-}
