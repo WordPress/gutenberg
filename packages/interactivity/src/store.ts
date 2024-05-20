@@ -177,7 +177,7 @@ const handlers = {
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = ( namespace: string ) =>
+export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 interface StoreOptions {
