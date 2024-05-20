@@ -5,6 +5,7 @@ on:
         types: [opened, synchronize]
         paths:
             - 'lib/**'
+            - '!lib/experimental/**'
             - 'packages/**/*.php'
             - 'phpunit/**'
 jobs:
@@ -27,20 +28,29 @@ jobs:
               env:
                   PR_NUMBER: ${{ github.event.number }}
               run: |
-                  changelog_path="backport-changelog.md"
+                  changelog_folder="backport-changelog"
 
                   # Fail if the PR doesn't touch the changelog
-                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_path"; then
-                    echo "Please add a CORE PR LINK to $changelog_path. Use the format: - link-to-core-pr for link-to-gutenberg-pr"
-                    echo "If changes are related to an existing, open PR, you may use that PR"
+                  if git diff --quiet ${{ github.event.pull_request.base.sha }} HEAD -- "$changelog_folder"; then
+                    echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
+                    echo "If changes are related to an existing, open PR, you may use that PR."
                     exit 1
                   fi
 
-                  pr_link_grep_pattern="https://github\.com/WordPress/wordpress-develop/pull/\([0-9]\+\) for https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
+                  changelog_file=$(find "${changelog_folder}" -type f -name "${PR_NUMBER}.md" | head -n 1)
 
-                  # Confirm that the CHANGELOG has an entry for the current PR
-                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_path}"; then
-                    echo "Please add a CORE PR LINK to $changelog_path. Use the format: - link-to-core-pr for link-to-gutenberg-pr"
-                    echo "If changes are related to an existing, open PR, you may use that PR"
+                  # Confirm that there is an entry.
+                  if [[ -z "${changelog_file}" ]]; then
+                    echo "Please create a file with the name ${PR_NUMBER}.md in the $changelog_folder folder with the core backport PR URL as content."
+                    echo "If changes are related to an existing, open PR, you may use that PR."
+                    exit 1
+                  fi
+
+                  pr_link_grep_pattern="https://github\.com/WordPress/wordpress-develop/pull/\([0-9]\+\)"
+
+                  # Confirm that the entry has a core backport PR URL.
+                  if ! grep -nq -e "${pr_link_grep_pattern}" "${changelog_file}"; then
+                    echo "Please add a CORE PR URL to $changelog_file."
+                    echo "If changes are related to an existing, open PR, you may use that PR."
                     exit 1
                   fi
