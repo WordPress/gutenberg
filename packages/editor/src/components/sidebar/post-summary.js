@@ -87,12 +87,12 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostAuthorPanel />
 										<PostDiscussionPanel />
 										<PostSyncStatus />
+										<BlogTitle />
+										<PostsPerPage />
+										<SiteDiscussion />
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									<BlogTitle />
-									<PostsPerPage />
-									<SiteDiscussion />
 									<TemplateAreas />
 									{ fills }
 									{ ! isPattern &&
