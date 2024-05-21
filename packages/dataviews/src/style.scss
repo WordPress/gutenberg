@@ -14,7 +14,7 @@
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
-	transition: padding ease-out 0.2s;
+	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
 
 	.components-search-control {
@@ -51,7 +51,7 @@
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
-	transition: padding ease-out 0.2s;
+	transition: padding ease-out 0.1s;
 	@include reduce-motion("transition");
 }
 
@@ -104,6 +104,14 @@
 
 		.dataviews-view-table-header-button {
 			gap: $grid-unit-05;
+		}
+
+		th, td {
+			&:first-child,
+			&:last-child {
+				transition: padding ease-out 0.1s;
+				@include reduce-motion("transition");
+			}
 		}
 
 		td:first-child,
@@ -283,6 +291,8 @@
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
 	padding: 0 $grid-unit-60 $grid-unit-30;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -550,6 +560,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 }
 
 .dataviews-view-table-selection-checkbox {
