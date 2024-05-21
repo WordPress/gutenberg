@@ -101,7 +101,7 @@ export default function AddNewPattern() {
 		onClick: () => {
 			patternUploadInputRef.current.click();
 		},
-		title: __( 'Import from JSON' ),
+		title: __( 'Import pattern from JSON' ),
 	} );
 
 	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
