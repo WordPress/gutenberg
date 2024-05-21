@@ -317,7 +317,10 @@ const logged: Set< string > = new Set();
  */
 export const warn = ( message: string ): void => {
 	// @ts-expect-error
-	if ( typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true ) {
+	if (
+		typeof globalThis.SCRIPT_DEBUG !== 'undefined' &&
+		globalThis.SCRIPT_DEBUG === true
+	) {
 		if ( logged.has( message ) ) {
 			return;
 		}
