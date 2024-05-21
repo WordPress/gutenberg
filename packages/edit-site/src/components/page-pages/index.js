@@ -273,13 +273,13 @@ export default function PagePages() {
 		[ totalItems, totalPages ]
 	);
 
-	const { frontPageId, postsPageId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( coreStore );
+	const { frontPageId, postsPageId, addNewLabel } = useSelect( ( select ) => {
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const siteSettings = getEntityRecord( 'root', 'site' );
-
 		return {
 			frontPageId: siteSettings?.page_on_front,
 			postsPageId: siteSettings?.page_for_posts,
+			addNewLabel: getPostType( 'page' )?.labels?.add_new_item,
 		};
 	} );
 
@@ -488,22 +488,23 @@ export default function PagePages() {
 		closeModal();
 	};
 
-	// TODO: we need to handle properly `data={ data || EMPTY_ARRAY }` for when `isLoading`.
 	return (
 		<Page
 			title={ __( 'Pages' ) }
 			actions={
-				<>
-					<Button variant="primary" onClick={ openModal }>
-						{ __( 'Add new page' ) }
-					</Button>
-					{ showAddPageModal && (
-						<AddNewPageModal
-							onSave={ handleNewPage }
-							onClose={ closeModal }
-						/>
-					) }
-				</>
+				addNewLabel && (
+					<>
+						<Button variant="primary" onClick={ openModal }>
+							{ addNewLabel }
+						</Button>
+						{ showAddPageModal && (
+							<AddNewPageModal
+								onSave={ handleNewPage }
+								onClose={ closeModal }
+							/>
+						) }
+					</>
+				)
 			}
 		>
 			<DataViews
