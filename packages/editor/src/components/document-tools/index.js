@@ -14,7 +14,7 @@ import {
 	ToolSelector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -27,6 +27,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
+import PreferencesAwareButton from '../preferences-aware-button';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -118,7 +119,7 @@ function DocumentTools( {
 				{ ! isDistractionFree && (
 					<ToolbarItem
 						ref={ inserterSidebarToggleRef }
-						as={ Button }
+						as={ PreferencesAwareButton }
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpened }
@@ -158,7 +159,7 @@ function DocumentTools( {
 						/>
 						{ ! isDistractionFree && (
 							<ToolbarItem
-								as={ Button }
+								as={ PreferencesAwareButton }
 								className="editor-document-tools__document-overview-toggle"
 								icon={ listView }
 								disabled={ disableBlockTools }

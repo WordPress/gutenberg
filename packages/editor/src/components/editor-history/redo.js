@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
@@ -12,6 +11,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import PreferencesAwareButton from '../preferences-aware-button';
 
 function EditorHistoryRedo( props, ref ) {
 	const shortcut = isAppleOS()
@@ -24,7 +24,7 @@ function EditorHistoryRedo( props, ref ) {
 	);
 	const { redo } = useDispatch( editorStore );
 	return (
-		<Button
+		<PreferencesAwareButton
 			{ ...props }
 			ref={ ref }
 			icon={ ! isRTL() ? redoIcon : undoIcon }
