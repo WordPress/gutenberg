@@ -1047,15 +1047,32 @@ _Returns_
 
 ### PostLastRevision
 
-Undocumented declaration.
+Renders the component for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLastRevisionCheck
 
-Undocumented declaration.
+Wrapper component that renders its children if the post has more than one revision.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: Rendered child components if post has more than one revision, otherwise null.
 
 ### PostLastRevisionPanel
 
-Undocumented declaration.
+Renders the panel for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLockedModal
 
