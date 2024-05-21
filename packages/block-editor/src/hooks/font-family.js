@@ -14,6 +14,7 @@ import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { unlock } from '../lock-unlock';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -68,7 +69,6 @@ function addSaveProps( props, blockType, attributes ) {
 
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
-	const { kebabCase } = unlock( componentsPrivateApis );
 	classes.add( `has-${ kebabCase( attributes?.fontFamily ) }-font-family` );
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;

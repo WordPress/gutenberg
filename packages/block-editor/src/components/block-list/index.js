@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -56,10 +56,11 @@ function Root( { className, ...settings } ) {
 			getSettings,
 			__unstableGetEditorMode,
 			getTemporarilyEditingAsBlocks,
+			isTyping,
 		} = unlock( select( blockEditorStore ) );
 		const { outlineMode, focusMode } = getSettings();
 		return {
-			isOutlineMode: outlineMode,
+			isOutlineMode: outlineMode && ! isTyping(),
 			isFocusMode: focusMode,
 			editorMode: __unstableGetEditorMode(),
 			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
@@ -110,7 +111,7 @@ function Root( { className, ...settings } ) {
 				useInBetweenInserter(),
 				useTypingObserver(),
 			] ),
-			className: classnames( 'is-root-container', className, {
+			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode && isLargeViewport,
 				'is-navigate-mode': editorMode === 'navigation',
@@ -204,11 +205,10 @@ function Items( {
 					visibleBlocks: __unstableGetVisibleBlocks(),
 					shouldRenderAppender:
 						hasAppender &&
+						__unstableGetEditorMode() !== 'zoom-out' &&
 						( hasCustomAppender
 							? ! getTemplateLock( rootClientId ) &&
-							  getBlockEditingMode( rootClientId ) !==
-									'disabled' &&
-							  __unstableGetEditorMode() !== 'zoom-out'
+							  getBlockEditingMode( rootClientId ) !== 'disabled'
 							: rootClientId === selectedBlockClientId ||
 							  ( ! rootClientId &&
 									! selectedBlockClientId &&

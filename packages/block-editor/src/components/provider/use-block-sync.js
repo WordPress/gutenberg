@@ -186,7 +186,15 @@ export default function useBlockSync( {
 		}
 	}, [ controlledBlocks, clientId ] );
 
+	const isMounted = useRef( false );
+
 	useEffect( () => {
+		// On mount, controlled blocks are already set in the effect above.
+		if ( ! isMounted.current ) {
+			isMounted.current = true;
+			return;
+		}
+
 		// When the block becomes uncontrolled, it means its inner state has been reset
 		// we need to take the blocks again from the external value property.
 		if ( ! isControlled ) {
@@ -216,8 +224,9 @@ export default function useBlockSync( {
 			// the subscription is triggering for a block (`clientId !== null`)
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
-			if ( clientId !== null && getBlockName( clientId ) === null )
+			if ( clientId !== null && getBlockName( clientId ) === null ) {
 				return;
+			}
 
 			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
 			// can reset to uncontrolled, in these situations, it means we need to populate

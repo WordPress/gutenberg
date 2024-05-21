@@ -22,7 +22,6 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Gridicons } from '@wordpress/components';
 import {
 	Icon,
 	cancelCircleFilled as cancelCircleFilledIcon,
@@ -35,6 +34,8 @@ import {
  */
 import allStyles from './style.scss';
 import platformStyles from './platform-style.scss';
+import Button from '../button';
+import Gridicons from '../mobile/gridicons';
 
 // Merge platform specific styles with the default styles.
 const baseStyles = { ...allStyles };

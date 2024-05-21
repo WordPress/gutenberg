@@ -11,9 +11,11 @@ import Pagination from './pagination';
 import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
-import { VIEW_LAYOUTS, LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
+import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
+import BulkActionsToolbar from './bulk-actions-toolbar';
 
 const defaultGetItemId = ( item ) => item.id;
 const defaultOnSelectionChange = () => {};
@@ -126,22 +128,32 @@ export default function DataViews( {
 				/>
 			</HStack>
 			<ViewComponent
-				fields={ _fields }
-				view={ view }
-				onChangeView={ onChangeView }
 				actions={ actions }
 				data={ data }
+				fields={ _fields }
 				getItemId={ getItemId }
 				isLoading={ isLoading }
+				onChangeView={ onChangeView }
 				onSelectionChange={ onSetSelection }
 				selection={ selection }
 				setOpenedFilter={ setOpenedFilter }
+				view={ view }
 			/>
 			<Pagination
 				view={ view }
 				onChangeView={ onChangeView }
 				paginationInfo={ paginationInfo }
 			/>
+			{ [ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
+				hasPossibleBulkAction && (
+					<BulkActionsToolbar
+						data={ data }
+						actions={ actions }
+						selection={ selection }
+						setSelection={ setSelection }
+						getItemId={ getItemId }
+					/>
+				) }
 		</div>
 	);
 }

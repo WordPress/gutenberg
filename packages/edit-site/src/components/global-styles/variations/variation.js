@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,18 +10,19 @@ import { useMemo, useContext, useState } from '@wordpress/element';
 import { ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from '../global-styles-provider';
 import { unlock } from '../../../lock-unlock';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { GlobalStylesContext, areGlobalStyleConfigsEqual } = unlock(
 	blockEditorPrivateApis
 );
 
-export default function Variation( { variation, children } ) {
+export default function Variation( { variation, children, isPill } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { base, user, setUserConfig } = useContext( GlobalStylesContext );
 	const context = useMemo(
@@ -29,6 +30,7 @@ export default function Variation( { variation, children } ) {
 			user: {
 				settings: variation.settings ?? {},
 				styles: variation.styles ?? {},
+				_links: variation._links ?? {},
 			},
 			base,
 			merged: mergeBaseAndUserConfigs( base, variation ),
@@ -41,6 +43,7 @@ export default function Variation( { variation, children } ) {
 		setUserConfig( () => ( {
 			settings: variation.settings,
 			styles: variation.styles,
+			_links: variation._links,
 		} ) );
 	};
 
@@ -69,12 +72,9 @@ export default function Variation( { variation, children } ) {
 	return (
 		<GlobalStylesContext.Provider value={ context }>
 			<div
-				className={ classnames(
-					'edit-site-global-styles-variations_item',
-					{
-						'is-active': isActive,
-					}
-				) }
+				className={ clsx( 'edit-site-global-styles-variations_item', {
+					'is-active': isActive,
+				} ) }
 				role="button"
 				onClick={ selectVariation }
 				onKeyDown={ selectOnEnter }
@@ -84,7 +84,12 @@ export default function Variation( { variation, children } ) {
 				onFocus={ () => setIsFocused( true ) }
 				onBlur={ () => setIsFocused( false ) }
 			>
-				<div className="edit-site-global-styles-variations_item-preview">
+				<div
+					className={ clsx(
+						'edit-site-global-styles-variations_item-preview',
+						{ 'is-pill': isPill }
+					) }
+				>
 					{ children( isFocused ) }
 				</div>
 			</div>

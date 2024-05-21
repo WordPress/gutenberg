@@ -101,6 +101,15 @@ test.describe( 'Site Editor Performance', () => {
 							}
 						}
 					);
+
+					const serverTiming = await metrics.getServerTiming();
+
+					for ( const [ key, value ] of Object.entries(
+						serverTiming
+					) ) {
+						results[ key ] ??= [];
+						results[ key ].push( value );
+					}
 				}
 			} );
 		}
@@ -311,7 +320,7 @@ test.describe( 'Site Editor Performance', () => {
 				}
 
 				// Wait for the browser to be idle before starting the monitoring.
-				// eslint-disable-next-line no-restricted-syntax
+				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
 
 				const startTime = performance.now();

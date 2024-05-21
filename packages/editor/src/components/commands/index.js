@@ -87,6 +87,14 @@ function useEditorCommandLoader() {
 	} );
 
 	commands.push( {
+		name: 'core/open-preferences',
+		label: __( 'Editor preferences' ),
+		callback: () => {
+			openModal( 'editor/preferences' );
+		},
+	} );
+
+	commands.push( {
 		name: 'core/toggle-spotlight-mode',
 		label: __( 'Toggle spotlight' ),
 		callback: ( { close } ) => {

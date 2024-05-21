@@ -25,7 +25,9 @@ test.describe( 'Site editor block removal prompt', () => {
 	} ) => {
 		// Open and focus List View
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
-		await topBar.getByRole( 'button', { name: 'List View' } ).click();
+		await topBar
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
 
 		// Select and try to remove Query Loop block
 		const listView = page.getByRole( 'region', { name: 'List View' } );
@@ -45,7 +47,9 @@ test.describe( 'Site editor block removal prompt', () => {
 	} ) => {
 		// Open and focus List View
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
-		await topBar.getByRole( 'button', { name: 'List View' } ).click();
+		await topBar
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
 
 		// Select and open child blocks of Query Loop block
 		const listView = page.getByRole( 'region', { name: 'List View' } );
@@ -70,7 +74,9 @@ test.describe( 'Site editor block removal prompt', () => {
 	} ) => {
 		// Open and focus List View
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
-		await topBar.getByRole( 'button', { name: 'List View' } ).click();
+		await topBar
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
 
 		// Select Query Loop list item
 		const listView = page.getByRole( 'region', { name: 'List View' } );

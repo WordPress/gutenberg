@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { pipe, useAsyncList } from '@wordpress/compose';
 
 /**
@@ -13,6 +13,7 @@ import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
+import InserterNoResults from './no-results';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -26,12 +27,10 @@ const MAX_SUGGESTED_ITEMS = 6;
  */
 const EMPTY_ARRAY = [];
 
-export function BlockTypesTab( {
-	rootClientId,
-	onInsert,
-	onHover,
-	showMostUsedBlocks,
-} ) {
+export function BlockTypesTab(
+	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
+	ref
+) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert
@@ -102,9 +101,13 @@ export function BlockTypesTab( {
 		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
 
+	if ( ! items.length ) {
+		return <InserterNoResults />;
+	}
+
 	return (
 		<InserterListbox>
-			<div>
+			<div ref={ ref }>
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
@@ -179,4 +182,4 @@ export function BlockTypesTab( {
 	);
 }
 
-export default BlockTypesTab;
+export default forwardRef( BlockTypesTab );

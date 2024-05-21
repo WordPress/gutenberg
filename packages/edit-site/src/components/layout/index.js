@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -72,12 +75,12 @@ export default function Layout() {
 
 	const {
 		isDistractionFree,
-		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
 		previousShortcut,
 		nextShortcut,
+		hasBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
 		const { getAllShortcutKeyCombinations } = select(
 			keyboardShortcutsStore
@@ -86,10 +89,10 @@ export default function Layout() {
 		return {
 			canvasMode: getCanvasMode(),
 			previousShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/previous-region'
+				'core/editor/previous-region'
 			),
 			nextShortcut: getAllShortcutKeyCombinations(
-				'core/edit-site/next-region'
+				'core/editor/next-region'
 			),
 			hasFixedToolbar: select( preferencesStore ).get(
 				'core',
@@ -99,9 +102,10 @@ export default function Layout() {
 				'core',
 				'distractionFree'
 			),
-			isZoomOutMode:
-				select( blockEditorStore ).__unstableGetEditorMode() ===
-				'zoom-out',
+			hasBlockBreadcrumbs: select( preferencesStore ).get(
+				'core',
+				'showBlockBreadcrumbs'
+			),
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
@@ -172,7 +176,7 @@ export default function Layout() {
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
-				className={ classnames(
+				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
@@ -181,7 +185,10 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
-						'is-zoom-out': isZoomOutMode,
+						'has-block-breadcrumbs':
+							hasBlockBreadcrumbs &&
+							! isDistractionFree &&
+							canvasMode === 'edit',
 					}
 				) }
 			>
@@ -258,6 +265,8 @@ export default function Layout() {
 						</NavigableRegion>
 					) }
 
+					<EditorSnackbars />
+
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
 							{ areas.mobile }
@@ -282,7 +291,7 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<div
-									className={ classnames(
+									className={ clsx(
 										'edit-site-layout__canvas',
 										{
 											'is-right-aligned':

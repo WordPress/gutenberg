@@ -3,7 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
-
+import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -12,7 +12,7 @@ import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
-import PageTemplatesTemplateParts from '../page-templates-template-parts';
+import PageTemplates from '../page-templates';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
@@ -24,10 +24,6 @@ import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
@@ -35,7 +31,15 @@ export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
+	const { postType, postId, path, layout, isCustom, canvas } = params;
+
+	useEffect( () => {
+		// `/wp_template_part/all` path is no longer used and redirects to
+		// Patterns page for backward compatibility.
+		if ( path === '/wp_template_part/all' ) {
+			history.replace( { path: '/patterns' } );
+		}
+	}, [ history, path ] );
 
 	// Note: Since "sidebar" is not yet supported here,
 	// returning undefined from "mobile" means show the sidebar.
@@ -49,6 +53,7 @@ export default function useLayoutAreas() {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ __( 'Manage pages' ) }
+						backPath={ {} }
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
@@ -82,13 +87,33 @@ export default function useLayoutAreas() {
 	if ( postType && postId ) {
 		let sidebar;
 		if ( postType === 'wp_template_part' || postType === 'wp_block' ) {
-			sidebar = <SidebarNavigationScreenPattern />;
+			sidebar = (
+				<SidebarNavigationScreenPattern
+					backPath={ {
+						path: '/patterns',
+						categoryId: params.categoryId,
+						categoryType: params.categoryType,
+					} }
+				/>
+			);
 		} else if ( postType === 'wp_template' ) {
-			sidebar = <SidebarNavigationScreenTemplate />;
+			sidebar = (
+				<SidebarNavigationScreenTemplate
+					backPath={ { path: '/wp_template' } }
+				/>
+			);
 		} else if ( postType === 'page' ) {
-			sidebar = <SidebarNavigationScreenPage />;
+			sidebar = (
+				<SidebarNavigationScreenPage
+					backPath={ { path: '/page', postId } }
+				/>
+			);
 		} else {
-			sidebar = <SidebarNavigationScreenNavigationMenu />;
+			sidebar = (
+				<SidebarNavigationScreenNavigationMenu
+					backPath={ { path: '/navigation' } }
+				/>
+			);
 		}
 		return {
 			key: 'page',
@@ -109,50 +134,13 @@ export default function useLayoutAreas() {
 			key: 'templates-list',
 			areas: {
 				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template" />
+					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
 				),
-				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
-				),
+				content: <PageTemplates />,
 				preview: isListLayout && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_POST_TYPE }
-					/>
-				),
-			},
-			widths: {
-				content: isListLayout ? 380 : undefined,
-			},
-		};
-	}
-
-	// Template parts
-	if ( path === '/wp_template_part/all' ) {
-		const isListLayout = isCustom !== 'true' && layout === 'list';
-		return {
-			key: 'template-parts',
-			areas: {
-				sidebar: (
-					<SidebarNavigationScreenTemplatesBrowse postType="wp_template_part" />
-				),
-				content: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
-				preview: isListLayout && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
-				mobile: (
-					<PageTemplatesTemplateParts
-						postType={ TEMPLATE_PART_POST_TYPE }
-					/>
-				),
+				mobile: <PageTemplates />,
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
@@ -161,11 +149,13 @@ export default function useLayoutAreas() {
 	}
 
 	// Patterns
-	if ( path === '/patterns' ) {
+	// `/wp_template_part/all` path is no longer used and redirects to
+	// Patterns page for backward compatibility.
+	if ( path === '/patterns' || path === '/wp_template_part/all' ) {
 		return {
 			key: 'patterns',
 			areas: {
-				sidebar: <SidebarNavigationScreenPatterns />,
+				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
 			},
@@ -177,7 +167,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'styles',
 			areas: {
-				sidebar: <SidebarNavigationScreenGlobalStyles />,
+				sidebar: (
+					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />
@@ -188,10 +180,28 @@ export default function useLayoutAreas() {
 
 	// Navigation
 	if ( path === '/navigation' ) {
+		if ( postId ) {
+			return {
+				key: 'navigation',
+				areas: {
+					sidebar: (
+						<SidebarNavigationScreenNavigationMenu
+							backPath={ { path: '/navigation' } }
+						/>
+					),
+					preview: <Editor isLoading={ isSiteEditorLoading } />,
+					mobile: canvas === 'edit' && (
+						<Editor isLoading={ isSiteEditorLoading } />
+					),
+				},
+			};
+		}
 		return {
-			key: 'styles',
+			key: 'navigation',
 			areas: {
-				sidebar: <SidebarNavigationScreenNavigationMenus />,
+				sidebar: (
+					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />

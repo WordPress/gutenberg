@@ -5,32 +5,33 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { getQueryArgs } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { file } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import AddNewPattern from '../add-new-pattern';
-import SidebarNavigationItem from '../sidebar-navigation-item';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
 	PATTERN_DEFAULT_CATEGORY,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 } from '../../utils/constants';
-import { useLink } from '../routes/link';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
-import { store as editSiteStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useLocation } = unlock( routerPrivateApis );
 
 function CategoriesGroup( {
+	path,
 	templatePartAreas,
 	patternCategories,
 	currentCategory,
@@ -42,15 +43,16 @@ function CategoriesGroup( {
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
 			<CategoryItem
 				key="all"
+				path={ path }
 				count={ Object.values( templatePartAreas )
 					.map( ( { templateParts } ) => templateParts?.length || 0 )
 					.reduce( ( acc, val ) => acc + val, 0 ) }
 				icon={ getTemplatePartIcon() } /* no name, so it provides the fallback icon */
 				label={ __( 'All template parts' ) }
-				id={ 'all-parts' }
+				id={ TEMPLATE_PART_ALL_AREAS_CATEGORY }
 				type={ TEMPLATE_PART_POST_TYPE }
 				isActive={
-					currentCategory === 'all-parts' &&
+					currentCategory === TEMPLATE_PART_ALL_AREAS_CATEGORY &&
 					currentType === TEMPLATE_PART_POST_TYPE
 				}
 			/>
@@ -58,6 +60,7 @@ function CategoriesGroup( {
 				( [ area, { label, templateParts } ] ) => (
 					<CategoryItem
 						key={ area }
+						path={ path }
 						count={ templateParts?.length }
 						icon={ getTemplatePartIcon( area ) }
 						label={ label }
@@ -74,6 +77,7 @@ function CategoriesGroup( {
 			{ allPatterns && (
 				<CategoryItem
 					key={ allPatterns.name }
+					path={ path }
 					count={ allPatterns.count }
 					label={ allPatterns.label }
 					icon={ file }
@@ -89,6 +93,7 @@ function CategoriesGroup( {
 			{ otherPatterns.map( ( category ) => (
 				<CategoryItem
 					key={ category.name }
+					path={ path }
 					count={ category.count }
 					label={ category.label }
 					icon={ file }
@@ -105,9 +110,10 @@ function CategoriesGroup( {
 	);
 }
 
-export default function SidebarNavigationScreenPatterns() {
-	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const { categoryType, categoryId } = getQueryArgs( window.location.href );
+export default function SidebarNavigationScreenPatterns( { backPath } ) {
+	const {
+		params: { categoryType, categoryId, path },
+	} = useLocation();
 	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
 	const currentType = categoryType || PATTERN_TYPES.theme;
 
@@ -118,28 +124,6 @@ export default function SidebarNavigationScreenPatterns() {
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
 		[]
 	);
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-		return !! settings.supportsTemplatePartsMode;
-	}, [] );
-
-	const templatePartsLink = useLink( {
-		path: '/wp_template_part/all',
-		// If a classic theme that supports template parts accessed
-		// the Patterns page directly, preserve that state in the URL.
-		didAccessPatternsPage:
-			! isBlockBasedTheme && isTemplatePartsMode ? 1 : undefined,
-	} );
-
-	const footer = ! isMobileViewport ? (
-		<ItemGroup>
-			{ ( isBlockBasedTheme || isTemplatePartsMode ) && (
-				<SidebarNavigationItem withChevron { ...templatePartsLink }>
-					{ __( 'Manage all template parts' ) }
-				</SidebarNavigationItem>
-			) }
-		</ItemGroup>
-	) : undefined;
 
 	return (
 		<SidebarNavigationScreen
@@ -148,23 +132,20 @@ export default function SidebarNavigationScreenPatterns() {
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			backPath={ backPath }
 			actions={ <AddNewPattern /> }
-			footer={ footer }
 			content={
 				<>
-					{ isLoading && __( 'Loading patterns…' ) }
+					{ isLoading && __( 'Loading items…' ) }
 					{ ! isLoading && (
 						<>
 							{ ! hasTemplateParts && ! hasPatterns && (
 								<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
-									<Item>
-										{ __(
-											'No template parts or patterns found'
-										) }
-									</Item>
+									<Item>{ __( 'No items found' ) }</Item>
 								</ItemGroup>
 							) }
 							<CategoriesGroup
+								path={ path }
 								templatePartAreas={ templatePartAreas }
 								patternCategories={ patternCategories }
 								currentCategory={ currentCategory }
