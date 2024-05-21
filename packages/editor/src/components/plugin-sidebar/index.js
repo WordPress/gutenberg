@@ -42,14 +42,14 @@ import { store as editorStore } from '../../store';
  * 	return el(
  * 			PluginSidebar,
  * 			{
- * 				name: 'my-sidebar',
- * 				title: 'My sidebar title',
+ * 				name: 'my-panel',
+ * 				title: 'My panel title',
  * 				icon: moreIcon,
  * 			},
  * 			el(
  * 				PanelBody,
  * 				{},
- * 				__( 'My sidebar content' )
+ * 				__( 'My panel content' )
  * 			)
  * 	);
  * }
@@ -65,12 +65,12 @@ import { store as editorStore } from '../../store';
  *
  * const MyPluginSidebar = () => (
  * 	<PluginSidebar
- * 		name="my-sidebar"
- * 		title="My sidebar title"
+ * 		name="my-panel"
+ * 		title="My panel title"
  * 		icon={ more }
  * 	>
  * 		<PanelBody>
- * 			{ __( 'My sidebar content' ) }
+ * 			{ __( 'My panel content' ) }
  * 		</PanelBody>
  * 	</PluginSidebar>
  * );

@@ -50,7 +50,7 @@ export default function useCommonCommands() {
 
 	useCommand( {
 		name: 'core/open-settings-sidebar',
-		label: __( 'Toggle settings sidebar' ),
+		label: __( 'Toggle settings panel' ),
 		icon: isRTL() ? drawerLeft : drawerRight,
 		callback: ( { close } ) => {
 			close();
