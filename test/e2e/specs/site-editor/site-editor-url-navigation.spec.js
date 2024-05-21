@@ -87,9 +87,8 @@ test.describe( 'Site editor url navigation', () => {
 			page.getByRole( 'region', { name: 'Editor content' } )
 		).toBeVisible();
 		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
-		await navigation.getByRole( 'button', { name: 'Back' } ).click();
 		await expect(
-			navigation.getByRole( 'button', { name: 'General' } )
-		).toHaveAttribute( 'aria-current', 'true' );
+			navigation.getByRole( 'button', { name: 'All template parts' } )
+		).toBeVisible();
 	} );
 } );

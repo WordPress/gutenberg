@@ -41,8 +41,8 @@ test.describe( 'Block bindings', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await editor.openDocumentSettingsSidebar();
 		} );
 
