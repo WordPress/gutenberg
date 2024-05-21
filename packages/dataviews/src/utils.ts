@@ -20,17 +20,6 @@ export function sanitizeOperators< Item extends AnyItem >(
 		operators = [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ];
 	}
 
-	// Transform legacy in, notIn operators to is, isNot.
-	// To be removed in the future.
-	if ( operators.includes( 'in' ) ) {
-		operators = operators.filter( ( operator ) => operator !== 'is' );
-		operators.push( 'is' );
-	}
-	if ( operators.includes( 'notIn' ) ) {
-		operators = operators.filter( ( operator ) => operator !== 'notIn' );
-		operators.push( 'isNot' );
-	}
-
 	// Make sure only valid operators are used.
 	operators = operators.filter( ( operator ) =>
 		ALL_OPERATORS.includes( operator )

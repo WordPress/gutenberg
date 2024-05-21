@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Ref } from 'react';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,6 +17,7 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import type { NormalizedFilter, View } from './types';
 
 const {
 	DropdownMenuV2: DropdownMenu,
@@ -19,7 +25,17 @@ const {
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
 } = unlock( componentsPrivateApis );
 
-function AddFilter( { filters, view, onChangeView, setOpenedFilter }, ref ) {
+interface AddFilterProps {
+	filters: NormalizedFilter[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+	setOpenedFilter: ( filter: string | null ) => void;
+}
+
+function AddFilter(
+	{ filters, view, onChangeView, setOpenedFilter }: AddFilterProps,
+	ref: Ref< HTMLButtonElement >
+) {
 	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}

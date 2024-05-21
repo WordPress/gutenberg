@@ -4,8 +4,23 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function ResetFilter( { filters, view, onChangeView } ) {
-	const isPrimary = ( field ) =>
+/**
+ * Internal dependencies
+ */
+import type { NormalizedFilter, View } from './types';
+
+interface ResetFilterProps {
+	filters: NormalizedFilter[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+}
+
+export default function ResetFilter( {
+	filters,
+	view,
+	onChangeView,
+}: ResetFilterProps ) {
+	const isPrimary = ( field: string ) =>
 		filters.some(
 			( _filter ) => _filter.field === field && _filter.isPrimary
 		);

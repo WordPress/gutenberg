@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { RefObject } from 'react';
 
 /**
  * WordPress dependencies
@@ -35,8 +36,30 @@ import {
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_NOT_ALL,
 } from './constants';
+import type { Filter, NormalizedFilter, Operator, Option, View } from './types';
 
-const FilterText = ( { activeElements, filterInView, filter } ) => {
+interface FilterTextProps {
+	activeElements: Option[];
+	filterInView?: Filter;
+	filter: NormalizedFilter;
+}
+
+interface OperatorSelectorProps {
+	filter: NormalizedFilter;
+	view: View;
+	onChangeView: ( view: View ) => void;
+}
+
+interface FilterSummaryProps extends OperatorSelectorProps {
+	addFilterRef: RefObject< HTMLButtonElement >;
+	openedFilter: string | null;
+}
+
+const FilterText = ( {
+	activeElements,
+	filterInView,
+	filter,
+}: FilterTextProps ) => {
 	if ( activeElements === undefined || activeElements.length === 0 ) {
 		return filter.name;
 	}
@@ -125,7 +148,11 @@ const FilterText = ( { activeElements, filterInView, filter } ) => {
 	);
 };
 
-function OperatorSelector( { filter, view, onChangeView } ) {
+function OperatorSelector( {
+	filter,
+	view,
+	onChangeView,
+}: OperatorSelectorProps ) {
 	const operatorOptions = filter.operators?.map( ( operator ) => ( {
 		value: operator,
 		label: OPERATORS[ operator ]?.label,
@@ -150,13 +177,14 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 					value={ value }
 					options={ operatorOptions }
 					onChange={ ( newValue ) => {
+						const operator = newValue as Operator;
 						const newFilters = currentFilter
 							? [
 									...view.filters.map( ( _filter ) => {
 										if ( _filter.field === filter.field ) {
 											return {
 												..._filter,
-												operator: newValue,
+												operator,
 											};
 										}
 										return _filter;
@@ -166,7 +194,8 @@ function OperatorSelector( { filter, view, onChangeView } ) {
 									...view.filters,
 									{
 										field: filter.field,
-										operator: newValue,
+										operator,
+										value: undefined,
 									},
 							  ];
 						onChangeView( {
@@ -188,8 +217,8 @@ export default function FilterSummary( {
 	addFilterRef,
 	openedFilter,
 	...commonProps
-} ) {
-	const toggleRef = useRef();
+}: FilterSummaryProps ) {
+	const toggleRef = useRef< HTMLDivElement >( null );
 	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElements = filter.elements.filter( ( element ) => {

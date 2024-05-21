@@ -22,12 +22,19 @@ import { SVG, Circle } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { unlock } from './lock-unlock';
+import type { Filter, NormalizedFilter, View } from './types';
 
 const {
 	CompositeV2: Composite,
 	CompositeItemV2: CompositeItem,
 	useCompositeStoreV2: useCompositeStore,
 } = unlock( componentsPrivateApis );
+
+interface SearchWidgetProps {
+	view: View;
+	filter: NormalizedFilter;
+	onChangeView: ( view: View ) => void;
+}
 
 const radioCheck = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -39,8 +46,11 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-const EMPTY_ARRAY = [];
-const getCurrentValue = ( filterDefinition, currentFilter ) => {
+const EMPTY_ARRAY: [] = [];
+const getCurrentValue = (
+	filterDefinition: NormalizedFilter,
+	currentFilter?: Filter
+) => {
 	if ( filterDefinition.singleSelection ) {
 		return currentFilter?.value;
 	}
@@ -56,7 +66,11 @@ const getCurrentValue = ( filterDefinition, currentFilter ) => {
 	return EMPTY_ARRAY;
 };
 
-const getNewValue = ( filterDefinition, currentFilter, value ) => {
+const getNewValue = (
+	filterDefinition: NormalizedFilter,
+	currentFilter: Filter | undefined,
+	value: any
+) => {
 	if ( filterDefinition.singleSelection ) {
 		return value;
 	}
@@ -70,7 +84,7 @@ const getNewValue = ( filterDefinition, currentFilter, value ) => {
 	return [ value ];
 };
 
-function ListBox( { view, filter, onChangeView } ) {
+function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const compositeStore = useCompositeStore( {
 		virtualFocus: true,
 		focusLoop: true,
@@ -184,7 +198,7 @@ function ListBox( { view, filter, onChangeView } ) {
 	);
 }
 
-function ComboboxList( { view, filter, onChangeView } ) {
+function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const deferredSearchValue = useDeferredValue( searchValue );
 	const currentFilter = view.filters.find(
@@ -234,7 +248,13 @@ function ComboboxList( { view, filter, onChangeView } ) {
 			setValue={ setSearchValue }
 		>
 			<div className="dataviews-search-widget-filter-combobox__wrapper">
-				<Ariakit.ComboboxLabel render={ <VisuallyHidden /> }>
+				<Ariakit.ComboboxLabel
+					render={
+						<VisuallyHidden>
+							{ __( 'Search items' ) }
+						</VisuallyHidden>
+					}
+				>
 					{ __( 'Search items' ) }
 				</Ariakit.ComboboxLabel>
 				<Ariakit.Combobox
@@ -290,7 +310,7 @@ function ComboboxList( { view, filter, onChangeView } ) {
 	);
 }
 
-export default function SearchWidget( props ) {
+export default function SearchWidget( props: SearchWidgetProps ) {
 	const Widget = props.filter.elements.length > 10 ? ComboboxList : ListBox;
 	return <Widget { ...props } />;
 }
