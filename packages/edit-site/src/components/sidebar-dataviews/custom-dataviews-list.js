@@ -82,7 +82,7 @@ function RenameItemModalContent( { dataviewId, currentTitle, setIsRenaming } ) {
 
 function CustomDataViewItem( { dataviewId, isActive } ) {
 	const {
-		params: { path },
+		params: { postType },
 	} = useLocation();
 	const history = useHistory();
 	const { dataview } = useSelect(
@@ -146,7 +146,7 @@ function CustomDataViewItem( { dataviewId, isActive } ) {
 										);
 										if ( isActive ) {
 											history.replace( {
-												path,
+												postType,
 											} );
 										}
 										onClose();

@@ -946,12 +946,12 @@ test.describe( 'Image - Site editor', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
