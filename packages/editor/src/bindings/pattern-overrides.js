@@ -25,7 +25,7 @@ export default {
 				currentBlockAttributes?.metadata?.name
 			];
 		const overridableValue = overriddenAttributes?.[ attributeName ];
-		const defaultValue = overriddenAttributes[ DEFAULT_ATTRIBUTES ];
+		const defaultValue = overriddenAttributes?.[ DEFAULT_ATTRIBUTES ];
 
 		if ( defaultValue !== undefined ) {
 			return defaultValue;

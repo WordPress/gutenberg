@@ -906,25 +906,28 @@ test.describe( 'Pattern Overrides', () => {
 			attributes: { ref: id },
 		} );
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
+		const blocks = await editor.getBlocks( { full: true } );
+		expect( blocks ).toMatchObject( [
 			{
 				name: 'core/block',
 				attributes: { ref: id },
-				innerBlocks: [
-					{
-						name: 'core/image',
-						attributes: {
-							metadata: {
-								name: imageName,
-								bindings: {
-									__default: {
-										source: 'core/pattern-overrides',
-									},
-								},
+			},
+		] );
+		expect(
+			await editor.getBlocks( { clientId: blocks[ 0 ].clientId } )
+		).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					metadata: {
+						name: imageName,
+						bindings: {
+							__default: {
+								source: 'core/pattern-overrides',
 							},
 						},
 					},
-				],
+				},
 			},
 		] );
 
