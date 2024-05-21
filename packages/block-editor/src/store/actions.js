@@ -1506,11 +1506,18 @@ export const insertDefaultBlock =
 	};
 
 /**
- * Action that changes the nested settings of a given block.
+ * @typedef {Object< string, Object >} SettingsByClientId
+ */
+
+/**
+ * Action that changes the nested settings of the given block(s).
  *
- * @param {string} clientId Client ID of the block whose nested setting are
- *                          being received.
- * @param {Object} settings Object with the new settings for the nested block.
+ * @param {string | SettingsByClientId} clientId Client ID of the block whose
+ *                                               nested setting are being
+ *                                               received, or object of settings
+ *                                               by client ID.
+ * @param {Object}                      settings Object with the new settings
+ *                                               for the nested block.
  *
  * @return {Object} Action object
  */
