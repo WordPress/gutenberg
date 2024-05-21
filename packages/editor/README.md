@@ -829,11 +829,11 @@ function MyPluginSidebar() {
 	return el(
 		PluginSidebar,
 		{
-			name: 'my-sidebar',
-			title: 'My sidebar title',
+			name: 'my-panel',
+			title: 'My panel title',
 			icon: moreIcon,
 		},
-		el( PanelBody, {}, __( 'My sidebar content' ) )
+		el( PanelBody, {}, __( 'My panel content' ) )
 	);
 }
 ```
@@ -846,8 +846,8 @@ import { PluginSidebar } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
-	<PluginSidebar name="my-sidebar" title="My sidebar title" icon={ more }>
-		<PanelBody>{ __( 'My sidebar content' ) }</PanelBody>
+	<PluginSidebar name="my-panel" title="My panel title" icon={ more }>
+		<PanelBody>{ __( 'My panel content' ) }</PanelBody>
 	</PluginSidebar>
 );
 ```
@@ -877,10 +877,10 @@ function MySidebarMoreMenuItem() {
 	return React.createElement(
 		PluginSidebarMoreMenuItem,
 		{
-			target: 'my-sidebar',
+			target: 'my-panel',
 			icon: moreIcon,
 		},
-		__( 'My sidebar title' )
+		__( 'My panel title' )
 	);
 }
 ```
@@ -892,8 +892,8 @@ import { PluginSidebarMoreMenuItem } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
-	<PluginSidebarMoreMenuItem target="my-sidebar" icon={ more }>
-		{ __( 'My sidebar title' ) }
+	<PluginSidebarMoreMenuItem target="my-panel" icon={ more }>
+		{ __( 'My panel title' ) }
 	</PluginSidebarMoreMenuItem>
 );
 ```
