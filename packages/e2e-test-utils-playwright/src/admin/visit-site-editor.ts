@@ -45,7 +45,7 @@ export async function visitSiteEditor(
 	 * content underneath the loading overlay should be marked inert until the
 	 * loading is done.
 	 */
-	if ( postId || canvas === 'edit' ) {
+	if ( ! query.size || postId || canvas === 'edit' ) {
 		const canvasLoader = this.page.locator(
 			// Spinner was used instead of the progress bar in an earlier
 			// version of the site editor.
