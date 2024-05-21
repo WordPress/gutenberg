@@ -16,6 +16,8 @@ import { getFontSizeClass } from '../components/font-sizes';
 import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
 import { unlock } from '../lock-unlock';
 
+const { kebabCase } = unlock( componentsPrivateApis );
+
 /*
  * This utility is intended to assist where the serialization of the typography
  * block support is being skipped for a block but the typography related CSS
@@ -31,7 +33,6 @@ import { unlock } from '../lock-unlock';
  * @return {Object} Typography block support derived CSS classes & styles.
  */
 export function getTypographyClassesAndStyles( attributes, settings ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	let typographyStyles = attributes?.style?.typography || {};
 	typographyStyles = {
 		...typographyStyles,

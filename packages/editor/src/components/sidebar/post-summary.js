@@ -25,6 +25,9 @@ import PostSyncStatus from '../post-sync-status';
 import PostTemplatePanel from '../post-template/panel';
 import PostTrashPanel from '../post-trash/panel';
 import PostURLPanel from '../post-url/panel';
+import BlogTitle from '../blog-title';
+import PostsPerPage from '../posts-per-page';
+import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import {
 	NAVIGATION_POST_TYPE,
@@ -81,13 +84,16 @@ export default function PostSummary( { onActionPerformed } ) {
 										<PostSchedulePanel />
 										<PostTemplatePanel />
 										<PostURLPanel />
+										<PostAuthorPanel />
 										<PostDiscussionPanel />
 										<PostSyncStatus />
+										<BlogTitle />
+										<PostsPerPage />
+										<SiteDiscussion />
 									</VStack>
 									<PostStickyPanel />
 									<PostFormatPanel />
-									<PostAuthorPanel />
-									{ isTemplate && <TemplateAreas /> }
+									<TemplateAreas />
 									{ fills }
 									{ ! isPattern &&
 										! isTemplate &&

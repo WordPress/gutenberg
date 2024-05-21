@@ -31,7 +31,7 @@ export function mergeBaseAndUserConfigs( base, user ) {
 }
 
 function useGlobalStylesUserConfig() {
-	const { globalStylesId, isReady, settings, styles } = useSelect(
+	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
@@ -65,6 +65,7 @@ function useGlobalStylesUserConfig() {
 				isReady: hasResolved,
 				settings: record?.settings,
 				styles: record?.styles,
+				_links: record?._links,
 			};
 		},
 		[]
@@ -76,8 +77,9 @@ function useGlobalStylesUserConfig() {
 		return {
 			settings: settings ?? {},
 			styles: styles ?? {},
+			_links: _links ?? {},
 		};
-	}, [ settings, styles ] );
+	}, [ settings, styles, _links ] );
 
 	const setConfig = useCallback(
 		( callback, options = {} ) => {
@@ -86,11 +88,14 @@ function useGlobalStylesUserConfig() {
 				'globalStyles',
 				globalStylesId
 			);
+
 			const currentConfig = {
 				styles: record?.styles ?? {},
 				settings: record?.settings ?? {},
+				_links: record?._links ?? {},
 			};
 			const updatedConfig = callback( currentConfig );
+
 			editEntityRecord(
 				'root',
 				'globalStyles',
@@ -98,6 +103,7 @@ function useGlobalStylesUserConfig() {
 				{
 					styles: cleanEmptyObject( updatedConfig.styles ) || {},
 					settings: cleanEmptyObject( updatedConfig.settings ) || {},
+					_links: cleanEmptyObject( updatedConfig._links ) || {},
 				},
 				options
 			);
@@ -128,6 +134,7 @@ export function useGlobalStylesContext() {
 		}
 		return mergeBaseAndUserConfigs( baseConfig, userConfig );
 	}, [ userConfig, baseConfig ] );
+
 	const context = useMemo( () => {
 		return {
 			isReady: isUserConfigReady && isBaseConfigReady,

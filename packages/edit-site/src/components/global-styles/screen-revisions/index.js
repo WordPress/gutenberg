@@ -84,6 +84,7 @@ function ScreenRevisions() {
 		setUserConfig( () => ( {
 			styles: revision?.styles,
 			settings: revision?.settings,
+			_links: revision?._links,
 		} ) );
 		setIsLoadingRevisionWithUnsavedChanges( false );
 		onCloseRevisions();
@@ -91,8 +92,13 @@ function ScreenRevisions() {
 
 	const selectRevision = ( revision ) => {
 		setCurrentlySelectedRevision( {
+			/*
+			 * The default must be an empty object so that
+			 * `mergeBaseAndUserConfigs()` can merge them correctly.
+			 */
 			styles: revision?.styles || {},
 			settings: revision?.settings || {},
+			_links: revision?._links || {},
 			id: revision?.id,
 		} );
 	};

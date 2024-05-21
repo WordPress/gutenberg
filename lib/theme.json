@@ -304,7 +304,7 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
-			"textAlign": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true,

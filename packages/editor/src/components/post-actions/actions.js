@@ -1189,11 +1189,7 @@ export function usePostActions( postType, onActionPerformed ) {
 		}
 
 		const actions = [
-			isTemplateOrTemplatePart && resetTemplateAction,
 			postTypeObject?.viewable && viewPostAction,
-			! isTemplateOrTemplatePart && restorePostAction,
-			isTemplateOrTemplatePart && deleteTemplateAction,
-			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 			postRevisionsAction,
 			process.env.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
@@ -1203,6 +1199,10 @@ export function usePostActions( postType, onActionPerformed ) {
 			! isTemplateOrTemplatePart && renamePostAction,
 			isTemplateOrTemplatePart && renameTemplateAction,
 			isPattern && exportPatternAsJSONAction,
+			isTemplateOrTemplatePart && resetTemplateAction,
+			! isTemplateOrTemplatePart && restorePostAction,
+			isTemplateOrTemplatePart && deleteTemplateAction,
+			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
 			isPattern && deletePatternAction,
 			! isTemplateOrTemplatePart && trashPostAction,
 		].filter( Boolean );

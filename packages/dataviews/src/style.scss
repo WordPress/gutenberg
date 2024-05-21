@@ -8,6 +8,8 @@
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
 	container: dataviews-wrapper / inline-size; /* stylelint-disable -- '@container' not globally permitted */
+	display: flex;
+	flex-direction: column;
 }
 
 .dataviews-filters__view-actions {
@@ -75,6 +77,7 @@
 	border-collapse: collapse;
 	position: relative;
 	color: $gray-700;
+	margin-bottom: auto;
 
 	a {
 		text-decoration: none;
@@ -111,8 +114,7 @@
 		th:first-child {
 			padding-left: var(--dataviews-padding-x);
 
-			.dataviews-view-table-header-button,
-			.dataviews-view-table-header {
+			.dataviews-view-table-header-button {
 				margin-left: - #{$grid-unit-10};
 			}
 		}
@@ -228,10 +230,6 @@
 		}
 	}
 
-	.dataviews-view-table-header {
-		padding-left: $grid-unit-05;
-	}
-
 	.dataviews-view-table__actions-column {
 		width: 1%;
 	}
@@ -285,10 +283,10 @@
 }
 
 .dataviews-view-grid {
-	margin-bottom: $grid-unit-30;
+	margin-bottom: auto;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 var(--dataviews-padding-x);
+	padding: 0 var(--dataviews-padding-x) $grid-unit-30;
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -403,7 +401,7 @@
 }
 
 .dataviews-view-list {
-	margin: 0;
+	margin: 0 0 auto;
 
 	li {
 		margin: 0;

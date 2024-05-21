@@ -26,7 +26,7 @@ import { useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 const icons = {
 	post,
@@ -160,14 +160,6 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
-		const location = useLocation();
-
-		const isPatternsPage =
-			location?.params?.path === '/patterns' ||
-			location?.params?.postType === 'wp_block';
-		const didAccessPatternsPage =
-			!! location?.params?.didAccessPatternsPage;
-
 		const isBlockBasedTheme = useIsBlockBasedTheme();
 		const { records, isLoading } = useSelect( ( select ) => {
 			const { getEntityRecords } = select( coreStore );
@@ -223,11 +215,6 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 							const args = {
 								postType: templateType,
 								postId: record.id,
-								didAccessPatternsPage:
-									! isBlockBasedTheme &&
-									( isPatternsPage || didAccessPatternsPage )
-										? 1
-										: undefined,
 								...extraArgs,
 							};
 							const targetUrl = addQueryArgs(

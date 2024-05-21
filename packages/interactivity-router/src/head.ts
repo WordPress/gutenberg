@@ -2,19 +2,19 @@
  * Helper to update only the necessary tags in the head.
  *
  * @async
- * @param {Array} newHead The head elements of the new page.
+ * @param newHead The head elements of the new page.
  */
-export const updateHead = async ( newHead ) => {
+export const updateHead = async ( newHead: HTMLHeadElement[] ) => {
 	// Helper to get the tag id store in the cache.
-	const getTagId = ( tag ) => tag.id || tag.outerHTML;
+	const getTagId = ( tag: Element ) => tag.id || tag.outerHTML;
 
 	// Map incoming head tags by their content.
-	const newHeadMap = new Map();
+	const newHeadMap = new Map< string, Element >();
 	for ( const child of newHead ) {
 		newHeadMap.set( getTagId( child ), child );
 	}
 
-	const toRemove = [];
+	const toRemove: Element[] = [];
 
 	// Detect nodes that should be added or removed.
 	for ( const child of document.head.children ) {
@@ -41,12 +41,17 @@ export const updateHead = async ( newHead ) => {
  * Fetches and processes head assets (stylesheets and scripts) from a specified document.
  *
  * @async
- * @param {Document} doc          The document from which to fetch head assets. It should support standard DOM querying methods.
- * @param {Map}      headElements A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
+ * @param doc               The document from which to fetch head assets. It should support standard DOM querying methods.
+ * @param headElements      A map of head elements to modify tracking the URLs of already processed assets to avoid duplicates.
+ * @param headElements.tag
+ * @param headElements.text
  *
- * @return {Promise<HTMLElement[]>} Returns an array of HTML elements representing the head assets.
+ * @return Returns an array of HTML elements representing the head assets.
  */
-export const fetchHeadAssets = async ( doc, headElements ) => {
+export const fetchHeadAssets = async (
+	doc: Document,
+	headElements: Map< string, { tag: HTMLElement; text: string } >
+): Promise< HTMLElement[] > => {
 	const headTags = [];
 	const assets = [
 		{
@@ -58,7 +63,9 @@ export const fetchHeadAssets = async ( doc, headElements ) => {
 	];
 	for ( const asset of assets ) {
 		const { tagName, selector, attribute } = asset;
-		const tags = doc.querySelectorAll( selector );
+		const tags = doc.querySelectorAll<
+			HTMLScriptElement | HTMLStyleElement
+		>( selector );
 
 		// Use Promise.all to wait for fetch to complete
 		await Promise.all(
