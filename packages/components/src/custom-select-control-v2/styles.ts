@@ -118,6 +118,7 @@ export const SelectItem = styled( Ariakit.SelectItem )`
 	padding: ${ ITEM_PADDING };
 	font-size: ${ CONFIG.fontSize };
 	line-height: 2.15rem; // TODO: Remove this in default but keep for back-compat in legacy
+	user-select: none;
 	&[data-active-item] {
 		background-color: ${ COLORS.theme.gray[ 300 ] };
 	}
