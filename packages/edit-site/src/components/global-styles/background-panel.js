@@ -17,8 +17,24 @@ const BACKGROUND_DEFAULT_VALUES = {
 const {
 	useGlobalStyle,
 	useGlobalSetting,
+	useGlobalStyleLinks,
 	BackgroundPanel: StylesBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
+
+/**
+ * Checks if there is a current value in the background image block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background image value set.
+ */
+export function hasBackgroundImageValue( style ) {
+	return (
+		!! style?.background?.backgroundImage?.id ||
+		!! style?.background?.backgroundImage?.url ||
+		typeof style?.background?.backgroundImage === 'string'
+	);
+}
 
 export default function BackgroundPanel() {
 	const [ style ] = useGlobalStyle( '', undefined, 'user', {
@@ -27,13 +43,14 @@ export default function BackgroundPanel() {
 	const [ inheritedStyle, setStyle ] = useGlobalStyle( '', undefined, 'all', {
 		shouldDecodeEncode: false,
 	} );
+	const _links = useGlobalStyleLinks();
 	const [ settings ] = useGlobalSetting( '' );
 
 	const defaultControls = {
 		backgroundImage: true,
 		backgroundSize:
-			!! style?.background?.backgroundImage &&
-			!! inheritedStyle?.background?.backgroundImage,
+			hasBackgroundImageValue( style ) ||
+			hasBackgroundImageValue( inheritedStyle ),
 	};
 
 	return (
@@ -45,6 +62,7 @@ export default function BackgroundPanel() {
 			headerLabel={ __( 'Image' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			defaultControls={ defaultControls }
+			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
 		/>
 	);
 }

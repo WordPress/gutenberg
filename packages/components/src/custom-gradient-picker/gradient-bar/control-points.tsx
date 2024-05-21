@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import { colord } from 'colord';
 
 /**
@@ -66,7 +66,7 @@ function ControlPointButton( {
 				aria-describedby={ descriptionId }
 				aria-haspopup="true"
 				aria-expanded={ isOpen }
-				className={ classnames(
+				className={ clsx(
 					'components-custom-gradient-picker__control-point-button',
 					{
 						'is-active': isOpen,
@@ -102,7 +102,7 @@ function GradientColorPickerDropdown( {
 		[]
 	);
 
-	const mergedClassName = classnames(
+	const mergedClassName = clsx(
 		'components-custom-gradient-picker__control-point-dropdown',
 		className
 	);

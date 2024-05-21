@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import { forwardRef } from '@wordpress/element';
 import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,6 +27,7 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
+import { store as blockEditorStore } from '../../store';
 
 function ListViewBlockSelectButton(
 	{
@@ -51,6 +53,15 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { isContentOnly } = useSelect(
+		( select ) => ( {
+			isContentOnly:
+				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
+				'contentOnly',
+		} ),
+		[ clientId ]
+	);
+	const shouldShowLockIcon = isLocked && ! isContentOnly;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -82,7 +93,7 @@ function ListViewBlockSelectButton(
 
 	return (
 		<Button
-			className={ classnames(
+			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
 			) }
@@ -147,7 +158,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ isLocked && (
+				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />
 					</span>

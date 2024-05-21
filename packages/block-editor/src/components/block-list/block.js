@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -64,7 +64,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (
@@ -177,7 +177,7 @@ function BlockListBlock( {
 	if ( isAligned ) {
 		blockEdit = (
 			<div
-				className={ classnames( 'wp-block', isSticky && className ) }
+				className={ clsx( 'wp-block', isSticky && className ) }
 				data-align={ wrapperProps[ 'data-align' ] }
 			>
 				{ blockEdit }
@@ -216,12 +216,14 @@ function BlockListBlock( {
 	}
 
 	const { 'data-align': dataAlign, ...restWrapperProps } = wrapperProps ?? {};
-
-	restWrapperProps.className = classnames(
-		restWrapperProps.className,
-		dataAlign && themeSupportsLayout && `align${ dataAlign }`,
-		! ( dataAlign && isSticky ) && className
-	);
+	const updatedWrapperProps = {
+		...restWrapperProps,
+		className: clsx(
+			restWrapperProps.className,
+			dataAlign && themeSupportsLayout && `align${ dataAlign }`,
+			! ( dataAlign && isSticky ) && className
+		),
+	};
 
 	// We set a new context with the adjusted and filtered wrapperProps (through
 	// `editor.BlockListBlock`), which the `BlockListBlockProvider` did not have
@@ -234,7 +236,7 @@ function BlockListBlock( {
 	return (
 		<PrivateBlockContext.Provider
 			value={ {
-				wrapperProps: restWrapperProps,
+				wrapperProps: updatedWrapperProps,
 				isAligned,
 				...context,
 			} }

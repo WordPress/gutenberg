@@ -20,7 +20,7 @@ function ManagePatternsMenuItem() {
 		// The site editor and templates both check whether the user has
 		// edit_theme_options capabilities. We can leverage that here and not
 		// display the manage patterns link if the user can't access it.
-		return canUser( 'read', 'templates' ) ? patternsUrl : defaultUrl;
+		return canUser( 'create', 'templates' ) ? patternsUrl : defaultUrl;
 	}, [] );
 
 	return (

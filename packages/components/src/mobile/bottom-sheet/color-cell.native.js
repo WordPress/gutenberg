@@ -3,12 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronRight } from '@wordpress/icons';
-import { ColorIndicator } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import Cell from './cell';
 import styles from './styles.scss';
+import ColorIndicator from '../../color-indicator';
 
 export default function BottomSheetColorCell( props ) {
 	const { color, withColorIndicator = true, disabled, ...cellProps } = props;

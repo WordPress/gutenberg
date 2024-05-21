@@ -391,3 +391,27 @@ export function expandBlock( clientId ) {
 		clientId,
 	};
 }
+
+/**
+ * Temporarily modify/unlock the content-only block for editions.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export const modifyContentLockBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: undefined,
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: false,
+		} );
+		const focusModeToRevert = select.getSettings().focusMode;
+		dispatch.updateSettings( { focusMode: true } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks(
+			clientId,
+			focusModeToRevert
+		);
+	};

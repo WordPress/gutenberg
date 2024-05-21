@@ -30,10 +30,12 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	element.addEventListener( 'copy', onCopy );
-	element.addEventListener( 'cut', onCopy );
+	const { defaultView } = element.ownerDocument;
+
+	defaultView.addEventListener( 'copy', onCopy );
+	defaultView.addEventListener( 'cut', onCopy );
 	return () => {
-		element.removeEventListener( 'copy', onCopy );
-		element.removeEventListener( 'cut', onCopy );
+		defaultView.removeEventListener( 'copy', onCopy );
+		defaultView.removeEventListener( 'cut', onCopy );
 	};
 };

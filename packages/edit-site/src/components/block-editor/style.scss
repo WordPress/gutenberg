@@ -21,6 +21,7 @@
 .edit-site-visual-editor {
 	position: relative;
 	height: 100%;
+	overflow: hidden;
 	display: block;
 	background-color: $gray-300;
 	// Centralize the editor horizontally (flex-direction is column).
@@ -47,7 +48,6 @@
 		}
 
 		.edit-site-visual-editor__editor-canvas {
-			border-radius: $radius-block-ui;
 			max-height: 100%;
 		}
 
@@ -58,12 +58,8 @@
 		}
 	}
 
-	.components-resizable-box__container {
+	& > .components-resizable-box__container {
 		margin: 0 auto;
-	}
-
-	&.is-view-mode {
-		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.8), 0 8px 10px -6px rgba(0, 0, 0, 0.8);
 	}
 }
 
@@ -117,12 +113,12 @@
 
 	&.is-left {
 		// Subtract half of the handle width to properly center.
-		left: -$grid-unit-20 - ($grid-unit-05 / 2);
+		left: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&.is-right {
 		// Subtract half of the handle width to properly center.
-		right: -$grid-unit-20 - ($grid-unit-05 / 2);
+		right: -$grid-unit-20 - math.div($grid-unit-05, 2);
 	}
 
 	&:hover,

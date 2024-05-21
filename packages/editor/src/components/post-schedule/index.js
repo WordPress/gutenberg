@@ -17,6 +17,14 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the PostSchedule component. It allows the user to schedule a post.
+ *
+ * @param {Object}   props         Props.
+ * @param {Function} props.onClose Function to close the component.
+ *
+ * @return {Component} The component to be rendered.
+ */
 export default function PostSchedule( { onClose } ) {
 	const { postDate, postType } = useSelect(
 		( select ) => ( {

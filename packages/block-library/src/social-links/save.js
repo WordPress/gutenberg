@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -18,7 +18,7 @@ export default function save( props ) {
 		},
 	} = props;
 
-	const className = classNames( size, {
+	const className = clsx( size, {
 		'has-visible-labels': showLabels,
 		'has-icon-color': iconColorValue,
 		'has-icon-background-color': iconBackgroundColorValue,

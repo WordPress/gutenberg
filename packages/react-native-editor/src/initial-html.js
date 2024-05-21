@@ -11,7 +11,7 @@ export const textBlocks = `<!-- wp:heading -->
 <!-- /wp:heading -->
 
 <!-- wp:list -->
-<ul><!-- wp:list-item -->
+<ul class="wp-block-list"><!-- wp:list-item -->
 <li>First Item</li>
 <!-- /wp:list-item -->
 

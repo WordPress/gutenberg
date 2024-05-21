@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -351,7 +351,7 @@ function useBlockProps( { name, style } ) {
 	}
 
 	// Attach a `wp-container-` id-based class name.
-	const className = classnames( {
+	const className = clsx( {
 		[ `wp-container-${ id }` ]: allowPositionStyles && !! css, // Only attach a container class if there is generated CSS to be attached.
 		[ `is-position-${ style?.position?.type }` ]:
 			allowPositionStyles && !! css && !! style?.position?.type,

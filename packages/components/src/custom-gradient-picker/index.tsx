@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type gradientParser from 'gradient-parser';
+import { type LinearGradientNode } from 'gradient-parser';
 
 /**
  * WordPress dependencies
@@ -79,7 +79,7 @@ const GradientTypePicker = ( {
 					? undefined
 					: HORIZONTAL_GRADIENT_ORIENTATION,
 				type: 'linear-gradient',
-			} as gradientParser.LinearGradientNode )
+			} satisfies LinearGradientNode )
 		);
 	};
 

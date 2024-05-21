@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -108,7 +108,7 @@ function UnforwardedUnitControl(
 		}
 	}, [ parsedUnit, setUnit ] );
 
-	const classes = classnames(
+	const classes = clsx(
 		'components-unit-control',
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139

@@ -34,8 +34,11 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { store as blockEditorStore } from '@wordpress/block-editor';
-import { getGlobalStyles, getColorsAndGradients } from '@wordpress/components';
+import {
+	store as blockEditorStore,
+	getGlobalStyles,
+	getColorsAndGradients,
+} from '@wordpress/block-editor';
 import { NEW_BLOCK_TYPES } from '@wordpress/block-library';
 import { __ } from '@wordpress/i18n';
 
