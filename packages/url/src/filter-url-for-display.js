@@ -14,7 +14,7 @@
  */
 export function filterURLForDisplay( url, maxLength = null ) {
 	// Remove protocol and www prefixes.
-	let filteredURL = url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
+	let filteredURL = removeProtocol( url );
 
 	// Ends with / and only has that single slash, strip it.
 	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
@@ -52,4 +52,15 @@ export function filterURLForDisplay( url, maxLength = null ) {
 		'…' +
 		truncatedFile
 	);
+}
+
+/**
+ * Removes the protocol from a URL.
+ *
+ * @param {string} url - The URL to remove the protocol from.
+ *
+ * @return {string} The URL without the protocol.
+ */
+export function removeProtocol( url ) {
+	return url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
 }

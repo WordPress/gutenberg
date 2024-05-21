@@ -490,6 +490,18 @@ _Returns_
 
 -   `string`: The updated URL.
 
+### removeProtocol
+
+Removes the protocol from a URL.
+
+_Parameters_
+
+-   _url_ `string`: - The URL to remove the protocol from.
+
+_Returns_
+
+-   `string`: The URL without the protocol.
+
 ### removeQueryArgs
 
 Removes arguments from the query string of the url
