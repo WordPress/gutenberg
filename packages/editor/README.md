@@ -1207,19 +1207,50 @@ _Returns_
 
 ### PostURL
 
-Undocumented declaration.
+Renders the `PostURL` component.
+
+_Usage_
+
+```jsx
+<PostURL />
+```
+
+_Parameters_
+
+-   _onClose_ `Function`: Callback function to be executed when the popover is closed.
+
+_Returns_
+
+-   `Component`: The rendered PostURL component.
 
 ### PostURLCheck
 
-Undocumented declaration.
+Check if the post URL is valid and visible.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component|null`: The child components if the post URL is valid and visible, otherwise null.
 
 ### PostURLLabel
 
-Undocumented declaration.
+Represents a label component for a post URL.
+
+_Returns_
+
+-   `Component`: The PostURLLabel component.
 
 ### PostURLPanel
 
-Undocumented declaration.
+Renders the `PostURLPanel` component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostURLPanel component.
 
 ### PostVisibility
 
@@ -1362,7 +1393,11 @@ _Returns_
 
 ### usePostURLLabel
 
-Undocumented declaration.
+Custom hook to get the label for the post URL.
+
+_Returns_
+
+-   `string`: The filtered and decoded post URL label.
 
 ### usePostVisibilityLabel
 
