@@ -111,8 +111,9 @@ export default function AddNewPattern() {
 				<DropdownMenu
 					controls={ controls }
 					icon={ null }
-					toggleProps={ { variant: 'primary' } }
+					toggleProps={ { variant: 'primary', showTooltip: false } }
 					text={ addNewPatternLabel }
+					label={ addNewPatternLabel }
 				/>
 			) }
 			{ showPatternModal && (
