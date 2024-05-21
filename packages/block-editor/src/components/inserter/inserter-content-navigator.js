@@ -37,7 +37,10 @@ export default function InserterContentNavigator( { categories, children } ) {
 					role="tree"
 					aria-label={ 'Categories' }
 				>
-					<VStack>
+					<VStack
+						spacing={ 1 }
+						className="block-editor-inserter__mobile-tab-navigation-buttons"
+					>
 						{ categories.map( ( category ) => (
 							<CompositeItem
 								key={ category.name }
