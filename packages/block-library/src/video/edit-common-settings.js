@@ -78,7 +78,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 				onChange={ toggleFactory.playsInline }
 				checked={ !! playsInline }
 				help={ __(
-					'Enable video playback within the page on mobile browsers.'
+					'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
 				) }
 			/>
 			<SelectControl
