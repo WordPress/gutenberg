@@ -153,7 +153,7 @@ function ListItem< Item extends AnyItem >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 1 }>
+							<VStack spacing={ 0 }>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
