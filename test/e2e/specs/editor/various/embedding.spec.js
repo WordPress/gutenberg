@@ -69,8 +69,8 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 };
 
 test.use( {
-	embedUtils: async ( { page, editor, pageUtils }, use ) => {
-		await use( new EmbedUtils( { page, editor, pageUtils } ) );
+	embedUtils: async ( { page, editor }, use ) => {
+		await use( new EmbedUtils( { page, editor } ) );
 	},
 } );
 
@@ -263,12 +263,10 @@ class EmbedUtils {
 	#page;
 	/** @type {Editor} */
 	#editor;
-	#pageUtils;
 
-	constructor( { page, editor, pageUtils } ) {
+	constructor( { page, editor } ) {
 		this.#page = page;
 		this.#editor = editor;
-		this.#pageUtils = pageUtils;
 	}
 
 	/**
@@ -303,10 +301,10 @@ class EmbedUtils {
 	async insertEmbed( url ) {
 		await test.step( `Inserting embed ${ url }`, async () => {
 			await this.#editor.insertBlock( { name: 'core/embed' } );
-			// Do not use `fill` here, it's not how the user interacts with the
-			// block.
-			this.#pageUtils.setClipboardData( { plainText: url } );
-			await this.#pageUtils.pressKeys( 'primary+v' );
+			await this.#editor.canvas
+				.getByRole( 'textbox', { name: 'Embed URL' } )
+				.last()
+				.fill( url );
 			await this.#page.keyboard.press( 'Enter' );
 		} );
 	}
