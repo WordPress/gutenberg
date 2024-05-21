@@ -11,7 +11,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	NavigableToolbar,
-	ToolSelector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarItem } from '@wordpress/components';
@@ -27,6 +26,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
+import ToolSelector from '../tool-selector';
 import PreferencesAwareButton from '../preferences-aware-button';
 
 const preventDefault = ( event ) => {
