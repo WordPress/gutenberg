@@ -161,3 +161,10 @@
 		}
 	}
 }
+
+@container (max-width: 430px) { /* stylelint-disable -- '@container' not globally permitted */
+	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
+}
