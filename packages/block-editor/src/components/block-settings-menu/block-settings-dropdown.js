@@ -12,10 +12,7 @@ import { moreVertical } from '@wordpress/icons';
 import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
-import {
-	store as keyboardShortcutsStore,
-	__unstableUseShortcutEventMatch,
-} from '@wordpress/keyboard-shortcuts';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
 
 /**
@@ -66,6 +63,7 @@ export function BlockSettingsDropdown( {
 		previousBlockClientId,
 		selectedBlockClientIds,
 		openedBlockSettingsMenu,
+		isContentOnly,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -76,6 +74,7 @@ export function BlockSettingsDropdown( {
 				getSelectedBlockClientIds,
 				getBlockAttributes,
 				getOpenedBlockSettingsMenu,
+				getBlockEditingMode,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -99,6 +98,8 @@ export function BlockSettingsDropdown( {
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
 				openedBlockSettingsMenu: getOpenedBlockSettingsMenu(),
+				isContentOnly:
+					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 			};
 		},
 		[ firstBlockClientId ]
@@ -125,7 +126,6 @@ export function BlockSettingsDropdown( {
 			),
 		};
 	}, [] );
-	const isMatch = __unstableUseShortcutEventMatch();
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
 	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
@@ -213,52 +213,6 @@ export function BlockSettingsDropdown( {
 					open={ open }
 					onToggle={ onToggle }
 					noIcons
-					menuProps={ {
-						/**
-						 * @param {KeyboardEvent} event
-						 */
-						onKeyDown( event ) {
-							if ( event.defaultPrevented ) return;
-
-							if (
-								isMatch( 'core/block-editor/remove', event ) &&
-								canRemove
-							) {
-								event.preventDefault();
-								onRemove();
-								updateSelectionAfterRemove();
-							} else if (
-								isMatch(
-									'core/block-editor/duplicate',
-									event
-								) &&
-								canDuplicate
-							) {
-								event.preventDefault();
-								updateSelectionAfterDuplicate( onDuplicate() );
-							} else if (
-								isMatch(
-									'core/block-editor/insert-after',
-									event
-								) &&
-								canInsertBlock
-							) {
-								event.preventDefault();
-								setOpenedBlockSettingsMenu( undefined );
-								onInsertAfter();
-							} else if (
-								isMatch(
-									'core/block-editor/insert-before',
-									event
-								) &&
-								canInsertBlock
-							) {
-								event.preventDefault();
-								setOpenedBlockSettingsMenu( undefined );
-								onInsertBefore();
-							}
-						},
-					} }
 					{ ...props }
 				>
 					{ ( { onClose } ) => (
@@ -281,11 +235,15 @@ export function BlockSettingsDropdown( {
 										clientId={ firstBlockClientId }
 									/>
 								) }
-								<CopyMenuItem
-									clientIds={ clientIds }
-									onCopy={ onCopy }
-									shortcut={ displayShortcut.primary( 'c' ) }
-								/>
+								{ ! isContentOnly && (
+									<CopyMenuItem
+										clientIds={ clientIds }
+										onCopy={ onCopy }
+										shortcut={ displayShortcut.primary(
+											'c'
+										) }
+									/>
+								) }
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ pipe(
@@ -321,7 +279,7 @@ export function BlockSettingsDropdown( {
 									</>
 								) }
 							</MenuGroup>
-							{ canCopyStyles && (
+							{ canCopyStyles && ! isContentOnly && (
 								<MenuGroup>
 									<CopyMenuItem
 										clientIds={ clientIds }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -409,7 +409,7 @@ function Navigation( {
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
-		className: classnames(
+		className: clsx(
 			className,
 			{
 				'items-justified-right': justifyContent === 'right',
@@ -558,7 +558,7 @@ function Navigation( {
 	const hasManagePermissions =
 		canUserCreateNavigationMenus || canUserUpdateNavigationMenu;
 
-	const overlayMenuPreviewClasses = classnames(
+	const overlayMenuPreviewClasses = clsx(
 		'wp-block-navigation__overlay-menu-preview',
 		{ open: overlayMenuPreview }
 	);

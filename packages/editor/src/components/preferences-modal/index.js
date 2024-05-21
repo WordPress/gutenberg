@@ -17,6 +17,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import EnablePanelOption from './enable-panel';
 import EnablePluginDocumentSettingPanelOption from './enable-plugin-document-setting-panel';
+import EnablePublishSidebarOption from './enable-publish-sidebar';
 import BlockManager from '../block-manager';
 import PostTaxonomies from '../post-taxonomies';
 import PostFeaturedImageCheck from '../post-featured-image/check';
@@ -69,9 +70,9 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								scope="core"
 								featureName="showListViewByDefault"
 								help={ __(
-									'Opens the block list view sidebar by default.'
+									'Opens the List View sidebar by default.'
 								) }
-								label={ __( 'Always open list view' ) }
+								label={ __( 'Always open List View' ) }
 							/>
 							{ showBlockBreadcrumbsOption && (
 								<PreferenceToggleControl
@@ -87,7 +88,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								scope="core"
 								featureName="allowRightClickOverrides"
 								help={ __(
-									'Allows contextual list view menus via right-click, overriding browser defaults.'
+									'Allows contextual List View menus via right-click, overriding browser defaults.'
 								) }
 								label={ __(
 									'Allow right-click contextual menus'
@@ -136,6 +137,18 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 								/>
 							</PageAttributesCheck>
 						</PreferencesModalSection>
+						{ isLargeViewport && (
+							<PreferencesModalSection
+								title={ __( 'Publishing' ) }
+							>
+								<EnablePublishSidebarOption
+									help={ __(
+										'Review settings, such as visibility and tags.'
+									) }
+									label={ __( 'Enable pre-publish checks' ) }
+								/>
+							</PreferencesModalSection>
+						) }
 						{ extraSections?.general }
 					</>
 				),
@@ -258,6 +271,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 			setIsInserterOpened,
 			setIsListViewOpened,
 			setPreference,
+			isLargeViewport,
 		]
 	);
 

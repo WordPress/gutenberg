@@ -17,7 +17,7 @@ import useEditedEntityRecord from '../use-edited-entity-record';
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import SidebarButton from '../sidebar-button';
-import { useAddedBy } from '../page-templates-template-parts/hooks';
+import { useAddedBy } from '../page-templates/hooks';
 import TemplateActions from '../template-actions';
 import HomeTemplateDetails from './home-template-details';
 import SidebarNavigationScreenDetailsFooter from '../sidebar-navigation-screen-details-footer';
@@ -94,7 +94,7 @@ function useTemplateDetails( postType, postId ) {
 	return { title, description, content, footer };
 }
 
-export default function SidebarNavigationScreenTemplate() {
+export default function SidebarNavigationScreenTemplate( { backPath } ) {
 	const history = useHistory();
 	const {
 		params: { postType, postId },
@@ -108,6 +108,7 @@ export default function SidebarNavigationScreenTemplate() {
 	return (
 		<SidebarNavigationScreen
 			title={ title }
+			backPath={ backPath }
 			actions={
 				<>
 					<TemplateActions

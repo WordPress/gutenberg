@@ -25,8 +25,8 @@ import { unlock } from '../lock-unlock';
 const BLOCK_BINDINGS_ALLOWED_BLOCKS = {
 	'core/paragraph': [ 'content' ],
 	'core/heading': [ 'content' ],
-	'core/image': [ 'url', 'title', 'alt' ],
-	'core/button': [ 'url', 'text', 'linkTarget' ],
+	'core/image': [ 'id', 'url', 'title', 'alt' ],
+	'core/button': [ 'url', 'text', 'linkTarget', 'rel' ],
 };
 
 /**
@@ -110,32 +110,64 @@ export const withBlockBindingSupport = createHigherOrderComponent(
 			( nextAttributes ) => {
 				registry.batch( () => {
 					if ( ! bindings ) {
-						return setAttributes( nextAttributes );
+						setAttributes( nextAttributes );
+						return;
 					}
 
 					const keptAttributes = { ...nextAttributes };
+					const updatesBySource = new Map();
 
-					for ( const [
-						attributeName,
-						boundAttribute,
-					] of Object.entries( bindings ) ) {
-						const source = sources[ boundAttribute.source ];
+					// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
+					for ( const [ attributeName, newValue ] of Object.entries(
+						keptAttributes
+					) ) {
 						if (
-							! source?.setValue ||
+							! bindings[ attributeName ] ||
 							! canBindAttribute( name, attributeName )
 						) {
 							continue;
 						}
 
-						source.setValue( {
-							registry,
-							context,
-							clientId,
-							attributeName,
-							args: boundAttribute.args,
-							value: nextAttributes[ attributeName ],
+						const source =
+							sources[ bindings[ attributeName ].source ];
+						if ( ! source?.setValue && ! source?.setValues ) {
+							continue;
+						}
+						updatesBySource.set( source, {
+							...updatesBySource.get( source ),
+							[ attributeName ]: newValue,
 						} );
 						delete keptAttributes[ attributeName ];
+					}
+
+					if ( updatesBySource.size ) {
+						for ( const [
+							source,
+							attributes,
+						] of updatesBySource ) {
+							if ( source.setValues ) {
+								source.setValues( {
+									registry,
+									context,
+									clientId,
+									attributes,
+								} );
+							} else {
+								for ( const [
+									attributeName,
+									value,
+								] of Object.entries( attributes ) ) {
+									source.setValue( {
+										registry,
+										context,
+										clientId,
+										attributeName,
+										args: bindings[ attributeName ].args,
+										value,
+									} );
+								}
+							}
+						}
 					}
 
 					if ( Object.keys( keptAttributes ).length ) {

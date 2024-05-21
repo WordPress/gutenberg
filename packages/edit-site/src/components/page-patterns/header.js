@@ -52,7 +52,9 @@ export default function PatternsHeader( {
 		description = patternCategory?.description;
 	}
 
-	if ( ! title ) return null;
+	if ( ! title ) {
+		return null;
+	}
 
 	return (
 		<VStack className="edit-site-patterns__section-header">

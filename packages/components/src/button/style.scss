@@ -93,8 +93,7 @@
 		&.is-busy[aria-disabled="true"] {
 			color: $components-color-accent-inverted;
 			background-size: 100px 100%;
-			// Disable reason: This function call looks nicer when each argument is on its own line.
-			/* stylelint-disable */
+			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
 				$components-color-accent 33%,
@@ -163,13 +162,13 @@
 
 		&:hover:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Allow tertiary buttons to use colors from the user admin color scheme. */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 		}
 
 		&:active:not(:disabled, [aria-disabled="true"]) {
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			/* stylelint-disable-next-line declaration-property-value-disallowed-list */
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Allow tertiary buttons to use colors from the user admin color scheme. */
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.08);
 		}
 
@@ -262,8 +261,7 @@
 		}
 		opacity: 1;
 		background-size: 100px 100%;
-		// Disable reason: This function call looks nicer when each argument is on its own line.
-		/* stylelint-disable */
+		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 		background-image: linear-gradient(
 			-45deg,
 			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)

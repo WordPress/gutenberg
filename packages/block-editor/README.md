@@ -17,9 +17,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import { useState } from 'react';
 import {
+	BlockCanvas,
 	BlockEditorProvider,
 	BlockList,
-	WritingFlow,
 } from '@wordpress/block-editor';
 
 function MyEditorComponent() {
@@ -206,6 +206,12 @@ _Related_
 ### BlockNavigationDropdown
 
 Undocumented declaration.
+
+### BlockPopover
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-popover/README.md>
 
 ### BlockPreview
 

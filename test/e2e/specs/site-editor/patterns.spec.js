@@ -84,7 +84,7 @@ test.describe( 'Patterns', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
-		).toContainText( 'Site updated' );
+		).toContainText( 'Pattern updated' );
 
 		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
 		await patterns.navigation

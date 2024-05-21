@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,7 @@ export default function SeparatorEdit( { attributes, setAttributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const className = classnames(
+	const className = clsx(
 		{
 			'has-text-color': backgroundColor || currentColor,
 			[ colorClass ]: colorClass,

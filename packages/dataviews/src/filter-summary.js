@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -220,7 +220,7 @@ export default function FilterSummary( {
 						placement="top"
 					>
 						<div
-							className={ classnames(
+							className={ clsx(
 								'dataviews-filter-summary__chip',
 								{
 									'has-reset': canResetOrRemove,
@@ -253,7 +253,7 @@ export default function FilterSummary( {
 							placement="top"
 						>
 							<button
-								className={ classnames(
+								className={ clsx(
 									'dataviews-filter-summary__chip-remove',
 									{ 'has-values': hasValues }
 								) }

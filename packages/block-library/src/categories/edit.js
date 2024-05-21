@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -146,7 +146,7 @@ export default function CategoriesEdit( {
 			? 'ul'
 			: 'div';
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'wp-block-categories-list':
 			!! categories?.length && ! displayAsDropdown && ! isResolving,
 		'wp-block-categories-dropdown':

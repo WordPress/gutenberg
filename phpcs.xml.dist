@@ -2,8 +2,8 @@
 <ruleset name="WordPress Coding Standards for Gutenberg Plugin">
 	<description>Sniffs for WordPress plugins, with minor modifications for Gutenberg</description>
 
-	<!-- Check for cross-version support for PHP 7.0 and higher. -->
-	<config name="testVersion" value="7.0-"/>
+	<!-- Check for cross-version support for PHP 7.2 and higher. -->
+	<config name="testVersion" value="7.2-"/>
 	<rule ref="PHPCompatibilityWP">
 		<include-pattern>*\.php$</include-pattern>
 	</rule>
@@ -41,6 +41,9 @@
 
 	<!-- Cache the scan results and re-use those for unchanged files on the next scan. -->
 	<arg name="cache" value=".cache/phpcs.json"/>
+
+	<!-- Check up to 20 files simultaneously. -->
+	<arg name="parallel" value="20"/>
 
 	<file>./bin</file>
 	<file>./gutenberg.php</file>
@@ -172,8 +175,11 @@
 			</property>
 		</properties>
 	</rule>
-	<rule ref="Gutenberg.Commenting.FunctionCommentSinceTag">
+	<rule ref="Gutenberg.Commenting.SinceTag">
 		<!-- The sniff ensures that functions have a valid @since tag but skips checking experimental blocks. -->
 		<include-pattern>/packages/block-library/src/.+/*\.php$</include-pattern>
+		<include-pattern>/packages/block-serialization-default-parser/.+/*\.php$</include-pattern>
+		<include-pattern>/packages/widgets/src/blocks/legacy-widget/index\.php$</include-pattern>
+		<include-pattern>/packages/widgets/src/blocks/widget-group/index\.php$</include-pattern>
 	</rule>
 </ruleset>

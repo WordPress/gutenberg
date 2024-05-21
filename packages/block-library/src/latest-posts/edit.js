@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,7 @@ import {
 	ToggleControl,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, getSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -383,7 +383,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			'wp-block-latest-posts__list': true,
 			'is-grid': postLayout === 'grid',
 			'has-dates': displayPostDate,
@@ -416,13 +416,13 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const layoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'list' } ),
 			isActive: postLayout === 'list',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Latest posts block display setting' ),
 			onClick: () => setAttributes( { postLayout: 'grid' } ),
 			isActive: postLayout === 'grid',
 		},
@@ -454,7 +454,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 
 					const { url: imageSourceUrl, alt: featuredImageAlt } =
 						getFeaturedImageDetails( post, featuredImageSizeSlug );
-					const imageClasses = classnames( {
+					const imageClasses = clsx( {
 						'wp-block-latest-posts__featured-image': true,
 						[ `align${ featuredImageAlign }` ]:
 							!! featuredImageAlign,

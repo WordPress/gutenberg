@@ -8,12 +8,13 @@
 		// @see packages/block-editor/src/components/inserter/style.scss
 		width: 350px;
 	}
-	.edit-post-editor__document-overview-panel__header {
+	.editor-list-view-sidebar__header {
 		display: flex;
 		border-bottom: $border-width solid $gray-300;
 	}
 	.editor-list-view-sidebar__close-button {
 		background: $white;
+		/* stylelint-disable-next-line property-disallowed-list -- This should be removed when https://github.com/WordPress/gutenberg/issues/59013 is fixed. */
 		order: 1;
 		align-self: center;
 		margin-right: $grid-unit-15;
@@ -49,7 +50,7 @@
 	scrollbar-gutter: auto;
 
 	// The table cells use an extra pixels of space left and right. We compensate for that here.
-	padding: $grid-unit-10 ($grid-unit-10 - $border-width - $border-width);
+	padding: $grid-unit-05;
 }
 
 .editor-list-view-sidebar__list-view-container {
