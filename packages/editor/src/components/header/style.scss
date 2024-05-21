@@ -80,6 +80,15 @@
 	.components-button.has-icon {
 		width: auto;
 
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+		}
+
 		&[aria-disabled="true"] {
 			background-color: transparent;
 		}
