@@ -926,13 +926,13 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
 
-  const blockProps = useBlockProps(
+  const blockProps = useBlockProps( {
     className: 'my-custom-class',
     style: {
       color: '#222222',
       backgroundColor: '#eeeeee'
     }
-  )
+  } );
 
   return (
     <div { ...blockProps }>
