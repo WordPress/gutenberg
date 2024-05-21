@@ -10,6 +10,7 @@ import { useEffect } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { useIsSiteEditorLoading } from './hooks';
 import Editor from '../editor';
+import PageMedia from '../page-media';
 import PagePages from '../page-pages';
 import PagePatterns from '../page-patterns';
 import PageTemplates from '../page-templates';
@@ -79,6 +80,24 @@ export default function useLayoutAreas() {
 			},
 			widths: {
 				content: isListLayout ? 380 : undefined,
+			},
+		};
+	}
+
+	// Media
+	if ( path === '/media' || path === '/media/all' ) {
+		return {
+			key: 'media-list',
+			areas: {
+				sidebar: (
+					<SidebarNavigationScreen
+						title={ __( 'Media' ) }
+						backPath={ {} }
+						content={ <DataViewsSidebarContent /> }
+					/>
+				),
+				content: <PageMedia />,
+				mobile: <PageMedia />,
 			},
 		};
 	}

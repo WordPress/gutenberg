@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { trash, pages, drafts } from '@wordpress/icons';
+import { trash, pages, drafts, media } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -46,7 +46,49 @@ const DEFAULT_PAGE_BASE = {
 	},
 };
 
+const DEFAULT_MEDIA_BASE = {
+	type: LAYOUT_GRID,
+	search: '',
+	filters: [],
+	page: 1,
+	perPage: 20,
+	sort: {
+		field: 'date',
+		direction: 'desc',
+	},
+	// All fields are visible by default, so it's
+	// better to keep track of the hidden ones.
+	hiddenFields: [ 'date', 'featured-image', 'filesize', 'status', 'type' ],
+	layout: {
+		mediaField: 'featured-image',
+		primaryField: 'title',
+	},
+};
+
 export const DEFAULT_VIEWS = {
+	media: [
+		{
+			title: __( 'All media' ),
+			slug: 'all',
+			icon: media,
+			view: DEFAULT_MEDIA_BASE,
+		},
+		{
+			title: __( 'Trash' ),
+			slug: 'trash',
+			icon: trash,
+			view: {
+				...DEFAULT_MEDIA_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'trash',
+					},
+				],
+			},
+		},
+	],
 	page: [
 		{
 			title: __( 'All pages' ),
