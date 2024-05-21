@@ -8,6 +8,11 @@ import { store as noticesStore } from '@wordpress/notices';
 // Last three notices. Slices from the tail end of the list.
 const MAX_VISIBLE_NOTICES = -3;
 
+/**
+ * Renders the editor snackbars component.
+ *
+ * @return {JSX.Element} The rendered component.
+ */
 export default function EditorSnackbars() {
 	const notices = useSelect(
 		( select ) => select( noticesStore ).getNotices(),

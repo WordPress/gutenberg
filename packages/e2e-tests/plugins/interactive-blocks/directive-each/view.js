@@ -147,9 +147,9 @@ store( 'directive-each', {
 			state
 				.animalBreeds
 				.forEach( ( { name, breeds } ) => {
-					if ( name === 'Dog') breeds.unshift( 'german shepherd' );
-					if ( name === 'Cat') breeds.unshift( 'maine coon' );
-					if ( name === 'Rat') breeds.unshift( 'satin' );
+					if ( name === 'Dog') {breeds.unshift( 'german shepherd' );}
+					if ( name === 'Cat') {breeds.unshift( 'maine coon' );}
+					if ( name === 'Rat') {breeds.unshift( 'satin' );}
 				} );
 		}
 	}

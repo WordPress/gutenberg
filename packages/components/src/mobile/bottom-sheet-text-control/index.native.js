@@ -10,16 +10,14 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import {
-	BottomSheet,
-	PanelBody,
-	FooterMessageControl,
-} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import BottomSheet from '../bottom-sheet';
+import PanelBody from '../../panel/body';
+import FooterMessageControl from '../../footer-message-control';
 
 const BottomSheetTextControl = ( {
 	initialValue,

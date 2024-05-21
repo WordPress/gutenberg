@@ -128,6 +128,7 @@ export default function TemplatePartEdit( {
 		area,
 		onNavigateToEntityRecord,
 		title,
+		canEditTemplate,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
@@ -150,6 +151,9 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
+			const _canEditTemplate =
+				select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+
 			return {
 				hasInnerBlocks: getBlockCount( clientId ) > 0,
 				isResolved: hasResolvedEntity,
@@ -161,6 +165,7 @@ export default function TemplatePartEdit( {
 				onNavigateToEntityRecord:
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
+				canEditTemplate: _canEditTemplate,
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -228,20 +233,22 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
-				{ isEntityAvailable && onNavigateToEntityRecord && (
-					<BlockControls group="other">
-						<ToolbarButton
-							onClick={ () =>
-								onNavigateToEntityRecord( {
-									postId: templatePartId,
-									postType: 'wp_template_part',
-								} )
-							}
-						>
-							{ __( 'Edit' ) }
-						</ToolbarButton>
-					</BlockControls>
-				) }
+				{ isEntityAvailable &&
+					onNavigateToEntityRecord &&
+					canEditTemplate && (
+						<BlockControls group="other">
+							<ToolbarButton
+								onClick={ () =>
+									onNavigateToEntityRecord( {
+										postId: templatePartId,
+										postType: 'wp_template_part',
+									} )
+								}
+							>
+								{ __( 'Edit' ) }
+							</ToolbarButton>
+						</BlockControls>
+					) }
 				<InspectorControls group="advanced">
 					<TemplatePartAdvancedControls
 						tagName={ tagName }

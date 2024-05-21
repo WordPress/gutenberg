@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,6 @@ import {
 } from '@wordpress/editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { NavigableRegion } from '@wordpress/interface';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -26,7 +25,8 @@ import { useActivateTheme } from '../../utils/use-activate-theme';
 import { useActualCurrentTheme } from '../../utils/use-actual-current-theme';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 
-const { EntitiesSavedStatesExtensible } = unlock( privateApis );
+const { EntitiesSavedStatesExtensible, NavigableRegion } =
+	unlock( privateApis );
 
 const EntitiesSavedStatesForPreview = ( { onClose } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
@@ -139,19 +139,19 @@ export default function SavePanel() {
 	const disabled = isSaving || ! activateSaveEnabled;
 	return (
 		<NavigableRegion
-			className={ classnames( 'edit-site-layout__actions', {
+			className={ clsx( 'edit-site-layout__actions', {
 				'is-entity-save-view-open': isSaveViewOpen,
 			} ) }
 			ariaLabel={ __( 'Save panel' ) }
 		>
 			<div
-				className={ classnames( 'edit-site-editor__toggle-save-panel', {
+				className={ clsx( 'edit-site-editor__toggle-save-panel', {
 					'screen-reader-text': isSaveViewOpen,
 				} ) }
 			>
 				<Button
 					variant="secondary"
-					className={ classnames(
+					className={ clsx(
 						'edit-site-editor__toggle-save-panel-button'
 					) }
 					onClick={ () => setIsSaveViewOpened( true ) }

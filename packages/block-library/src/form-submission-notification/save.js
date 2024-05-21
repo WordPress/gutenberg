@@ -6,7 +6,7 @@ import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 export default function save( { attributes } ) {
 	const { type } = attributes;
@@ -15,12 +15,9 @@ export default function save( { attributes } ) {
 		<div
 			{ ...useInnerBlocksProps.save(
 				useBlockProps.save( {
-					className: classnames(
-						'wp-block-form-submission-notification',
-						{
-							[ `form-notification-type-${ type }` ]: type,
-						}
-					),
+					className: clsx( 'wp-block-form-submission-notification', {
+						[ `form-notification-type-${ type }` ]: type,
+					} ),
 				} )
 			) }
 		/>

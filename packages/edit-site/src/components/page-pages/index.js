@@ -1,11 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useMemo,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -22,7 +28,6 @@ import {
 	DEFAULT_CONFIG_PER_VIEW_TYPE,
 } from '../sidebar-dataviews/default-views';
 import {
-	ENUMERATION_TYPE,
 	LAYOUT_GRID,
 	LAYOUT_TABLE,
 	LAYOUT_LIST,
@@ -33,12 +38,17 @@ import {
 import AddNewPageModal from '../add-new-page';
 import Media from '../media';
 import { unlock } from '../../lock-unlock';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { usePostActions } = unlock( editorPrivateApis );
-
 const { useLocation, useHistory } = unlock( routerPrivateApis );
-
 const EMPTY_ARRAY = [];
+
+const getFormattedDate = ( dateToDisplay ) =>
+	dateI18n(
+		getSettings().formats.datetimeAbbreviated,
+		getDate( dateToDisplay )
+	);
 
 function useView( postType ) {
 	const { params } = useLocation();
@@ -253,7 +263,7 @@ export default function PagePages() {
 	} = useEntityRecords( 'postType', postType, queryArgs );
 
 	const { records: authors, isResolving: isLoadingAuthors } =
-		useEntityRecords( 'root', 'user' );
+		useEntityRecords( 'root', 'user', { per_page: -1 } );
 
 	const paginationInfo = useMemo(
 		() => ( {
@@ -262,6 +272,16 @@ export default function PagePages() {
 		} ),
 		[ totalItems, totalPages ]
 	);
+
+	const { frontPageId, postsPageId } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( coreStore );
+		const siteSettings = getEntityRecord( 'root', 'site' );
+
+		return {
+			frontPageId: siteSettings?.page_on_front,
+			postsPageId: siteSettings?.page_for_posts,
+		};
+	} );
 
 	const fields = useMemo(
 		() => [
@@ -283,7 +303,7 @@ export default function PagePages() {
 					const addLink =
 						[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type ) &&
 						item.status !== 'trash';
-					return addLink ? (
+					const title = addLink ? (
 						<Link
 							params={ {
 								postId: item.id,
@@ -295,8 +315,36 @@ export default function PagePages() {
 								__( '(no title)' ) }
 						</Link>
 					) : (
-						decodeEntities( item.title?.rendered ) ||
-							__( '(no title)' )
+						<span>
+							{ decodeEntities( item.title?.rendered ) ||
+								__( '(no title)' ) }
+						</span>
+					);
+
+					let suffix = '';
+					if ( item.id === frontPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Front Page' ) }
+							</span>
+						);
+					} else if ( item.id === postsPageId ) {
+						suffix = (
+							<span className="edit-site-page-pages__title-badge">
+								{ __( 'Posts Page' ) }
+							</span>
+						);
+					}
+
+					return (
+						<HStack
+							className="edit-site-page-pages-title"
+							alignment="center"
+							justify="flex-start"
+						>
+							{ title }
+							{ suffix }
+						</HStack>
 					);
 				},
 				maxWidth: 300,
@@ -306,7 +354,6 @@ export default function PagePages() {
 				header: __( 'Author' ),
 				id: 'author',
 				getValue: ( { item } ) => item._embedded?.author[ 0 ]?.name,
-				type: ENUMERATION_TYPE,
 				elements:
 					authors?.map( ( { id, name } ) => ( {
 						value: id,
@@ -319,7 +366,6 @@ export default function PagePages() {
 				getValue: ( { item } ) =>
 					STATUSES.find( ( { value } ) => value === item.status )
 						?.label ?? item.status,
-				type: ENUMERATION_TYPE,
 				elements: STATUSES,
 				enableSorting: false,
 				filterBy: {
@@ -330,30 +376,89 @@ export default function PagePages() {
 				header: __( 'Date' ),
 				id: 'date',
 				render: ( { item } ) => {
-					const formattedDate = dateI18n(
-						getSettings().formats.datetimeAbbreviated,
-						getDate( item.date )
+					const isDraftOrPrivate = [ 'draft', 'private' ].includes(
+						item.status
 					);
-					return <time>{ formattedDate }</time>;
+					if ( isDraftOrPrivate ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation date */
+								__( '<span>Modified: <time>%s</time></span>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					const isScheduled = item.status === 'future';
+					if ( isScheduled ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: page creation date */
+								__( '<span>Scheduled: <time>%s</time></span>' ),
+								getFormattedDate( item.date )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					// Pending & Published posts show the modified date if it's newer.
+					const dateToDisplay =
+						getDate( item.modified ) > getDate( item.date )
+							? item.modified
+							: item.date;
+
+					const isPending = item.status === 'pending';
+					if ( isPending ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: the newest of created or modified date for the page */
+								__( '<span>Modified: <time>%s</time></span>' ),
+								getFormattedDate( dateToDisplay )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					const isPublished = item.status === 'publish';
+					if ( isPublished ) {
+						return createInterpolateElement(
+							sprintf(
+								/* translators: %s: the newest of created or modified date for the page */
+								__( '<span>Published: <time>%s</time></span>' ),
+								getFormattedDate( dateToDisplay )
+							),
+							{
+								span: <span />,
+								time: <time />,
+							}
+						);
+					}
+
+					// Unknow status.
+					return <time>{ getFormattedDate( item.date ) }</time>;
 				},
 			},
 		],
-		[ authors, view.type ]
+		[ authors, view.type, frontPageId, postsPageId ]
 	);
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history ]
+
+	const postTypeActions = usePostActions( 'page' );
+	const editAction = useEditPostAction();
+	const actions = useMemo(
+		() => [ editAction, ...postTypeActions ],
+		[ postTypeActions, editAction ]
 	);
-	const actions = usePostActions( onActionPerformed );
+
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

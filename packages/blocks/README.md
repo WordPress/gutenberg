@@ -507,7 +507,7 @@ _Parameters_
 
 ### registerBlockStyle
 
-Registers a new block style for the given block.
+Registers a new block style for the given block types.
 
 For more information on connecting the styles with CSS [the official documentation](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/#styles).
 
@@ -536,7 +536,7 @@ const ExampleComponent = () => {
 
 _Parameters_
 
--   _blockName_ `string`: Name of block (example: “core/latest-posts”).
+-   _blockNames_ `string|Array`: Name of blocks e.g. “core/latest-posts” or `["core/group", "core/columns"]`.
 -   _styleVariation_ `Object`: Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
 
 ### registerBlockType
