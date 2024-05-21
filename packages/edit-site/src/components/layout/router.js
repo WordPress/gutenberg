@@ -34,40 +34,23 @@ function useRedirectOldPaths() {
 	const history = useHistory();
 	const { params } = useLocation();
 	useEffect( () => {
-		const {
-			postType,
-			postId,
-			path,
-			layout,
-			isCustom,
-			canvas,
-			categoryType,
-			...rest
-		} = params;
+		const { postType, path, categoryType, ...rest } = params;
 
 		if ( path === '/wp_template_part/all' ) {
 			history.replace( { postType: TEMPLATE_PART_POST_TYPE } );
 		}
 
-		const allParamsButPath = {
-			postId,
-			layout,
-			isCustom,
-			canvas,
-			...rest,
-		};
-
 		if ( path === '/page' ) {
 			history.replace( {
 				postType: 'page',
-				...allParamsButPath,
+				...rest,
 			} );
 		}
 
 		if ( path === '/wp_template' ) {
 			history.replace( {
 				postType: TEMPLATE_POST_TYPE,
-				...allParamsButPath,
+				...rest,
 			} );
 		}
 
@@ -77,14 +60,14 @@ function useRedirectOldPaths() {
 					categoryType === TEMPLATE_PART_POST_TYPE
 						? TEMPLATE_PART_POST_TYPE
 						: PATTERN_TYPES.user,
-				...allParamsButPath,
+				...rest,
 			} );
 		}
 
 		if ( path === '/navigation' ) {
 			history.replace( {
 				postType: NAVIGATION_POST_TYPE,
-				...allParamsButPath,
+				...rest,
 			} );
 		}
 	}, [ history, params ] );
