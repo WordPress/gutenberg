@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { memo, useRef } from '@wordpress/element';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,17 +12,25 @@ import AddFilter from './add-filter';
 import ResetFilters from './reset-filters';
 import { sanitizeOperators } from './utils';
 import { ALL_OPERATORS, OPERATOR_IS, OPERATOR_IS_NOT } from './constants';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import type { AnyItem, NormalizedField, NormalizedFilter, View } from './types';
 
-const Filters = memo( function Filters( {
+interface FiltersProps< Item extends AnyItem > {
+	fields: NormalizedField< Item >[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+	openedFilter: string | null;
+	setOpenedFilter: ( openedFilter: string | null ) => void;
+}
+
+const Filters = memo( function Filters< Item extends AnyItem >( {
 	fields,
 	view,
 	onChangeView,
 	openedFilter,
 	setOpenedFilter,
-} ) {
-	const addFilterRef = useRef();
-	const filters = [];
+}: FiltersProps< Item > ) {
+	const addFilterRef = useRef< HTMLButtonElement >( null );
+	const filters: NormalizedFilter[] = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.elements?.length ) {
 			return;
