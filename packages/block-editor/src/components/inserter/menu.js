@@ -26,8 +26,7 @@ import Tips from './tips';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTab from './block-patterns-tab';
-import { PatternCategoryPreviewPanel } from './block-patterns-tab/pattern-category-preview-panel';
-import { MediaTab, MediaCategoryPanel } from './media-tab';
+import { MediaTab } from './media-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
@@ -133,13 +132,6 @@ function InserterMenu(
 		[ setSelectedPatternCategory, onPatternCategorySelection ]
 	);
 
-	const showPatternPanel =
-		selectedTab === 'patterns' &&
-		! delayedFilterValue &&
-		!! selectedPatternCategory;
-
-	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
-
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -233,18 +225,7 @@ function InserterMenu(
 				onInsert={ onInsertPattern }
 				onSelectCategory={ onClickPatternCategory }
 				selectedCategory={ selectedPatternCategory }
-			>
-				{ showPatternPanel && (
-					<PatternCategoryPreviewPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertPattern }
-						onHover={ onHoverPattern }
-						category={ selectedPatternCategory }
-						patternFilter={ patternFilter }
-						showTitlesAsTooltip
-					/>
-				) }
-			</BlockPatternsTab>
+			/>
 		);
 	}, [
 		destinationRootClientId,
@@ -253,7 +234,6 @@ function InserterMenu(
 		onClickPatternCategory,
 		patternFilter,
 		selectedPatternCategory,
-		showPatternPanel,
 	] );
 
 	const mediaTab = useMemo( () => {
@@ -263,22 +243,13 @@ function InserterMenu(
 				selectedCategory={ selectedMediaCategory }
 				onSelectCategory={ setSelectedMediaCategory }
 				onInsert={ onInsert }
-			>
-				{ showMediaPanel && (
-					<MediaCategoryPanel
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsert }
-						category={ selectedMediaCategory }
-					/>
-				) }
-			</MediaTab>
+			/>
 		);
 	}, [
 		destinationRootClientId,
 		onInsert,
 		selectedMediaCategory,
 		setSelectedMediaCategory,
-		showMediaPanel,
 	] );
 
 	const handleSetSelectedTab = ( value ) => {
@@ -304,7 +275,6 @@ function InserterMenu(
 	return (
 		<div
 			className={ clsx( 'block-editor-inserter__menu', {
-				'show-panel': showPatternPanel || showMediaPanel,
 				'is-zoom-out': isZoomOutMode,
 			} ) }
 			ref={ ref }
