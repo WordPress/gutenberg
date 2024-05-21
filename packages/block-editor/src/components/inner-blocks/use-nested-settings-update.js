@@ -11,7 +11,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  */
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
-import { unlock } from '../../lock-unlock';
 
 /** @typedef {import('../../selectors').WPDirectInsertBlock } WPDirectInsertBlock */
 
@@ -155,18 +154,16 @@ export default function useNestedSettingsUpdate(
 		// we batch all the updatedBlockListSettings in a single "data" batch
 		// which results in a single re-render.
 		if ( ! pendingSettingsUpdates.get( registry ) ) {
-			pendingSettingsUpdates.set( registry, new Map() );
+			pendingSettingsUpdates.set( registry, {} );
 		}
-		pendingSettingsUpdates.get( registry ).set( clientId, newSettings );
+		pendingSettingsUpdates.get( registry )[ clientId ] = newSettings;
 		window.queueMicrotask( () => {
-			if ( pendingSettingsUpdates.get( registry ).size ) {
-				const { batchUpdateBlockListSettings } = unlock(
-					registry.dispatch( blockEditorStore )
-				);
-				batchUpdateBlockListSettings(
-					pendingSettingsUpdates.get( registry )
-				);
-				pendingSettingsUpdates.set( registry, new Map() );
+			const settings = pendingSettingsUpdates.get( registry );
+			if ( Object.keys( settings ).length ) {
+				const { updateBlockListSettings } =
+					registry.dispatch( blockEditorStore );
+				updateBlockListSettings( settings );
+				pendingSettingsUpdates.set( registry, {} );
 			}
 		} );
 	}, [
