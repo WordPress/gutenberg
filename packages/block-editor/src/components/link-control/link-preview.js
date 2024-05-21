@@ -13,7 +13,11 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
+import {
+	filterURLForDisplay,
+	safeDecodeURI,
+	removeProtocol,
+} from '@wordpress/url';
 import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -58,6 +62,9 @@ export default function LinkPreview( {
 	const displayTitle =
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
+
+	const isTitleRedundant =
+		value?.url && removeProtocol( displayTitle ) === displayURL;
 
 	let icon;
 
@@ -112,7 +119,7 @@ export default function LinkPreview( {
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ value?.url && displayTitle !== displayURL && (
+								{ ! isTitleRedundant && (
 									<span className="block-editor-link-control__search-item-info">
 										<Truncate numberOfLines={ 1 }>
 											{ displayURL }
