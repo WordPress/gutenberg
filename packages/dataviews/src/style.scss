@@ -1,3 +1,7 @@
+:root {
+	--dataviews-padding-x: #{$grid-unit-60};
+}
+
 .dataviews-wrapper {
 	height: 100%;
 	overflow: auto;
@@ -8,7 +12,7 @@
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: $grid-unit-20 $grid-unit-60;
+	padding: $grid-unit-20 var(--dataviews-padding-x);
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
@@ -45,7 +49,7 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding: $grid-unit-20 $grid-unit-60;
+	padding: $grid-unit-20 var(--dataviews-padding-x);
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
@@ -105,7 +109,7 @@
 
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-60;
+			padding-left: var(--dataviews-padding-x);
 
 			.dataviews-view-table-header-button,
 			.dataviews-view-table-header {
@@ -115,7 +119,7 @@
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-60;
+			padding-right: var(--dataviews-padding-x);
 		}
 
 		&:last-child {
@@ -284,7 +288,7 @@
 	margin-bottom: $grid-unit-30;
 	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 $grid-unit-60;
+	padding: 0 var(--dataviews-padding-x);
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -547,7 +551,7 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-60;
+	padding: 0 var(--dataviews-padding-x);
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
@@ -806,9 +810,8 @@
 }
 
 @container (max-width: 430px) {
-	.dataviews-pagination,
-	.dataviews-filters__view-actions {
-		padding: $grid-unit-20 $grid-unit-30;
+	* {
+		--dataviews-padding-x: #{$grid-unit-30};
 	}
 
 	.dataviews-filters__view-actions {
@@ -817,19 +820,6 @@
 				max-width: 112px;
 			}
 		}
-	}
-
-	.dataviews-view-table tr td:first-child, .dataviews-view-table tr th:first-child {
-		padding-left: $grid-unit-30;
-	}
-
-	.dataviews-view-table tr td:last-child, .dataviews-view-table tr th:last-child {
-		padding-right: $grid-unit-30;
-	}
-
-	.dataviews-view-grid {
-		padding-left: $grid-unit-30;
-		padding-right: $grid-unit-30;
 	}
 }
 
