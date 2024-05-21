@@ -114,7 +114,7 @@ export function PatternsFilter( {
 					placement: 'right-end',
 				} }
 				label={ __( 'Filter patterns' ) }
-				toggleProps={ { size: 'compact' } }
+				toggleProps={ { size: 'small' } }
 				icon={
 					<Icon
 						icon={
