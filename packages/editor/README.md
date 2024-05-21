@@ -1177,7 +1177,16 @@ Undocumented declaration.
 
 ### PostTitle
 
-Undocumented declaration.
+Renders the `PostTitle` component.
+
+_Parameters_
+
+-   \_\_\_ `Object`: Unused parameter.
+-   _forwardedRef_ `Element`: Forwarded ref for the component.
+
+_Returns_
+
+-   `Component`: The rendered PostTitle component.
 
 ### PostTitleRaw
 

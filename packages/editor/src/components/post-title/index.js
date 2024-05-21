@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-
 /**
  * WordPress dependencies
  */
@@ -211,4 +210,12 @@ function PostTitle( _, forwardedRef ) {
 	);
 }
 
+/**
+ * Renders the `PostTitle` component.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
+ */
 export default forwardRef( PostTitle );
