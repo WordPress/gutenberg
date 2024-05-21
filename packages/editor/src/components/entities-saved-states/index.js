@@ -48,6 +48,7 @@ export function EntitiesSavedStatesExtensible( {
 	saveLabel = __( 'Save' ),
 	renderDialog = undefined,
 	dirtyEntityRecords,
+	metaRecords,
 	isDirty,
 	setUnselectedEntities,
 	unselectedEntities,
@@ -63,6 +64,8 @@ export function EntitiesSavedStatesExtensible( {
 		acc[ name ].push( record );
 		return acc;
 	}, {} );
+
+	partitionedSavables.meta = metaRecords[ 0 ];
 
 	// Sort entity groups.
 	const {

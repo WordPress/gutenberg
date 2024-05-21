@@ -130,6 +130,19 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 	}
 );
 
+export const getPostEntityBlockMetadataChanges = createRegistrySelector(
+	( select ) => ( state ) => {
+		const postEdits =
+			select( coreStore ).__experimentalGetDirtyEntityRecordsEdits();
+
+		const id = getCurrentPostId( state );
+
+		if ( postEdits && postEdits[ id ]?.meta ) {
+			return postEdits[ id ].meta;
+		}
+	}
+);
+
 /**
  * Returns true if there are no unsaved values for the current edit session and
  * if the currently edited post is new (has never been saved before).

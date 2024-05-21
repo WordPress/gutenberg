@@ -6,22 +6,22 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 
 export const useIsDirty = () => {
-	const { editedEntities, siteEdits, siteEntityConfig } = useSelect(
-		( select ) => {
+	const { editedEntities, siteEdits, postEdits, siteEntityConfig } =
+		useSelect( ( select ) => {
 			const {
 				__experimentalGetDirtyEntityRecords,
 				getEntityRecordEdits,
+				__experimentalGetDirtyEntityRecordsEdits,
 				getEntityConfig,
 			} = select( coreStore );
 
 			return {
 				editedEntities: __experimentalGetDirtyEntityRecords(),
 				siteEdits: getEntityRecordEdits( 'root', 'site' ),
+				postEdits: __experimentalGetDirtyEntityRecordsEdits(),
 				siteEntityConfig: getEntityConfig( 'root', 'site' ),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const dirtyEntityRecords = useMemo( () => {
 		// Remove site object and decouple into its edited pieces.
@@ -42,6 +42,20 @@ export const useIsDirty = () => {
 
 		return [ ...editedEntitiesWithoutSite, ...editedSiteEntities ];
 	}, [ editedEntities, siteEdits, siteEntityConfig ] );
+
+	const metaRecords = useMemo( () => {
+		return Object.keys( postEdits ).map( ( key ) => {
+			const post = postEdits[ key ];
+			return Object.keys( post.meta ).map( ( property ) => {
+				return {
+					key: `${ key }_${ property }`,
+					kind: 'postType',
+					name: 'post',
+					title: property,
+				};
+			} );
+		} );
+	}, [ postEdits ] );
 
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
@@ -72,6 +86,7 @@ export const useIsDirty = () => {
 
 	return {
 		dirtyEntityRecords,
+		metaRecords,
 		isDirty,
 		setUnselectedEntities,
 		unselectedEntities,

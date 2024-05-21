@@ -507,6 +507,10 @@ _Returns_
 
 -   `Object`: Object of key value pairs comprising unsaved edits.
 
+### getPostEntityBlockMetadataChanges
+
+Undocumented declaration.
+
 ### getPostLockUser
 
 Returns details about the post lock user.

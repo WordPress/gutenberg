@@ -698,6 +698,24 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 );
 
 /**
+ * Returns the list of dirty entity records.
+ *
+ * @param state State tree.
+ *
+ * @return The list of updated records
+ */
+export const __experimentalGetDirtyEntityRecordsEdits = createSelector(
+	( state: State ): any => {
+		const {
+			entities: { records },
+		} = state;
+		return records.postType.post.edits;
+	},
+	( state ) => [ state.entities.records ]
+);
+
+
+/**
  * Returns the list of entities currently being saved.
  *
  * @param state State tree.
