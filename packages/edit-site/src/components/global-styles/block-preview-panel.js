@@ -6,6 +6,11 @@ import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { __experimentalSpacer as Spacer } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { getVariationClassName } from './utils';
+
 const BlockPreviewPanel = ( { name, variation = '' } ) => {
 	const blockExample = getBlockType( name )?.example;
 	const blocks = useMemo( () => {
@@ -19,7 +24,7 @@ const BlockPreviewPanel = ( { name, variation = '' } ) => {
 				...example,
 				attributes: {
 					...example.attributes,
-					className: 'is-style-' + variation,
+					className: getVariationClassName( variation ),
 				},
 			};
 		}

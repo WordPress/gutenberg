@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,13 +15,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
-import {
-	chevronLeftSmall,
-	chevronRightSmall,
-	page as pageIcon,
-	navigation as navigationIcon,
-	symbol,
-} from '@wordpress/icons';
+import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as commandsStore } from '@wordpress/commands';
@@ -32,6 +26,7 @@ import { useReducedMotion } from '@wordpress/compose';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const TYPE_LABELS = {
 	// translators: 1: Pattern title.
@@ -42,11 +37,6 @@ const TYPE_LABELS = {
 	wp_template: __( 'Editing template: %s' ),
 	// translators: 1: Template part title.
 	wp_template_part: __( 'Editing template part: %s' ),
-};
-
-const ICONS = {
-	wp_block: symbol,
-	wp_navigation: navigationIcon,
 };
 
 const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
@@ -62,8 +52,9 @@ const MotionButton = motion( Button );
 export default function DocumentBar() {
 	const {
 		postType,
-		document,
-		isResolving,
+		documentTitle,
+		isNotFound,
+		isUnsyncedPattern,
 		templateIcon,
 		templateTitle,
 		onNavigateToPreviousEntityRecord,
@@ -74,7 +65,8 @@ export default function DocumentBar() {
 			getEditorSettings,
 			__experimentalGetTemplateInfo: getTemplateInfo,
 		} = select( editorStore );
-		const { getEditedEntityRecord, getIsResolving } = select( coreStore );
+		const { getEditedEntityRecord, isResolving: isResolvingSelector } =
+			select( coreStore );
 		const _postType = getCurrentPostType();
 		const _postId = getCurrentPostId();
 		const _document = getEditedEntityRecord(
@@ -85,14 +77,22 @@ export default function DocumentBar() {
 		const _templateInfo = getTemplateInfo( _document );
 		return {
 			postType: _postType,
-			document: _document,
-			isResolving: getIsResolving(
-				'getEditedEntityRecord',
-				'postType',
+			documentTitle: _document.title,
+			isNotFound:
+				! _document &&
+				! isResolvingSelector(
+					'getEditedEntityRecord',
+					'postType',
+					_postType,
+					_postId
+				),
+			isUnsyncedPattern: _document?.wp_pattern_sync_status === 'unsynced',
+			templateIcon: unlock( select( editorStore ) ).getPostIcon(
 				_postType,
-				_postId
+				{
+					area: _document?.area,
+				}
 			),
-			templateIcon: _templateInfo.icon,
 			templateTitle: _templateInfo.title,
 			onNavigateToPreviousEntityRecord:
 				getEditorSettings().onNavigateToPreviousEntityRecord,
@@ -102,12 +102,10 @@ export default function DocumentBar() {
 	const { open: openCommandCenter } = useDispatch( commandsStore );
 	const isReducedMotion = useReducedMotion();
 
-	const isNotFound = ! document && ! isResolving;
-	const icon = ICONS[ postType ] ?? pageIcon;
 	const isTemplate = TEMPLATE_POST_TYPES.includes( postType );
 	const isGlobalEntity = GLOBAL_POST_TYPES.includes( postType );
 	const hasBackButton = !! onNavigateToPreviousEntityRecord;
-	const title = isTemplate ? templateTitle : document.title;
+	const title = isTemplate ? templateTitle : documentTitle;
 
 	const mounted = useRef( false );
 	useEffect( () => {
@@ -116,9 +114,9 @@ export default function DocumentBar() {
 
 	return (
 		<div
-			className={ classnames( 'editor-document-bar', {
+			className={ clsx( 'editor-document-bar', {
 				'has-back-button': hasBackButton,
-				'is-global': isGlobalEntity,
+				'is-global': isGlobalEntity && ! isUnsyncedPattern,
 			} ) }
 		>
 			<AnimatePresence>
@@ -176,7 +174,7 @@ export default function DocumentBar() {
 							isReducedMotion ? { duration: 0 } : undefined
 						}
 					>
-						<BlockIcon icon={ isTemplate ? templateIcon : icon } />
+						<BlockIcon icon={ templateIcon } />
 						<Text
 							size="body"
 							as="h1"

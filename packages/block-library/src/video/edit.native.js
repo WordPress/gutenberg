@@ -290,8 +290,10 @@ class VideoEdit extends Component {
 						} ) => {
 							const showVideo =
 								isURL( src ) &&
+								getProtocol( attributes.src ) !== 'file:' &&
 								! isUploadInProgress &&
 								! isUploadFailed;
+
 							const icon = this.getIcon(
 								isUploadFailed
 									? ICON_TYPE.RETRY

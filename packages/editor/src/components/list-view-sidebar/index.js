@@ -129,12 +129,13 @@ export default function ListViewSidebar() {
 				// can be rendered internally.
 				defaultTabId="list-view"
 			>
-				<div className="edit-post-editor__document-overview-panel__header">
+				<div className="editor-list-view-sidebar__header">
 					<Button
 						className="editor-list-view-sidebar__close-button"
 						icon={ closeSmall }
 						label={ __( 'Close' ) }
 						onClick={ closeListView }
+						size="small"
 					/>
 					<Tabs.TabList
 						className="editor-list-view-sidebar__tabs-tablist"

@@ -26,7 +26,7 @@ function ScreenHeader( { title, description, onBack } ) {
 							}
 							icon={ isRTL() ? chevronRight : chevronLeft }
 							size="small"
-							aria-label={ __( 'Navigate to the previous view' ) }
+							label={ __( 'Back' ) }
 							onClick={ onBack }
 						/>
 						<Spacer>

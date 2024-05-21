@@ -98,7 +98,7 @@ icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="no
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 
-Besides src the object can contain background and foreground colors, this colors will appear with the icon when they are applicable e.g.: in the inserter.
+Besides src the object can contain background and foreground colors, these colors will appear with the icon when they are applicable e.g.: in the inserter.
 
 ```js
 icon: {
@@ -149,7 +149,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
+Plugins and Themes can also register [custom block styles](/docs/reference-guides/block-api/block-styles.md) for existing blocks.
 
 #### attributes (optional)
 

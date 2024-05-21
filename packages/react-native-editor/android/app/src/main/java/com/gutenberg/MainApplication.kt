@@ -46,6 +46,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergWebViewActivity
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage
+import org.wordpress.mobile.WPAndroidGlue.GutenbergJsException
 import org.wordpress.mobile.WPAndroidGlue.Media
 import org.wordpress.mobile.WPAndroidGlue.MediaOption
 
@@ -218,6 +219,8 @@ class MainApplication : Application(), ReactApplication, GutenbergBridgeInterfac
             override fun requestConnectionStatus(connectionStatusCallback: ConnectionStatusCallback) {
                 connectionStatusCallback.onRequestConnectionStatus(true)
             }
+
+            override fun logException(exception: GutenbergJsException, logExceptionCallback: GutenbergBridgeJS2Parent.LogExceptionCallback) {}
         }, isDarkMode)
     }
 

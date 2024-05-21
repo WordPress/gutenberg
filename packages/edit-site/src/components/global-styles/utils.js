@@ -12,7 +12,7 @@ export function getVariationClassName( variation ) {
 }
 
 function getFontFamilyFromSetting( fontFamilies, setting ) {
-	if ( ! setting ) {
+	if ( ! Array.isArray( fontFamilies ) || ! setting ) {
 		return null;
 	}
 

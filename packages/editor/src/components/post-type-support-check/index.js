@@ -27,7 +27,7 @@ function PostTypeSupportCheck( { children, supportKeys } ) {
 		const { getPostType } = select( coreStore );
 		return getPostType( getEditedPostAttribute( 'type' ) );
 	}, [] );
-	let isSupported = true;
+	let isSupported = !! postType;
 	if ( postType ) {
 		isSupported = (
 			Array.isArray( supportKeys ) ? supportKeys : [ supportKeys ]

@@ -119,6 +119,11 @@
 	.editor-post-visibility__dialog-legend {
 		display: none;
 	}
+
+	.components-panel__body-title .components-button {
+		align-items: flex-start;
+		text-wrap: pretty;
+	}
 }
 
 .post-publish-panel__postpublish .components-panel__body {
@@ -186,5 +191,48 @@
 		.components-button {
 			height: 40px;
 		}
+	}
+}
+
+.edit-post-layout,
+.edit-site-editor__interface-skeleton {
+	.editor-post-publish-panel {
+		position: fixed;
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel");
+		top: $admin-bar-height-big;
+		bottom: 0;
+		right: 0;
+		left: 0;
+		overflow: auto;
+
+		@include break-medium() {
+			z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
+			top: $admin-bar-height;
+			left: auto;
+			width: $sidebar-width + $border-width;
+			border-left: $border-width solid $gray-300;
+			transform: translateX(+100%);
+			animation: editor-post-publish-panel__slide-in-animation 0.1s forwards;
+			@include reduce-motion("animation");
+
+			body.is-fullscreen-mode & {
+				top: 0;
+			}
+
+			// Keep it open on focus to avoid conflict with navigate-regions animation.
+			[role="region"]:focus & {
+				transform: translateX(0%);
+			}
+		}
+	}
+
+	.editor-post-publish-panel__header-publish-button {
+		justify-content: center;
+	}
+}
+
+@keyframes editor-post-publish-panel__slide-in-animation {
+	100% {
+		transform: translateX(0%);
 	}
 }

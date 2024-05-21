@@ -5,7 +5,7 @@ import postcss, { CssSyntaxError } from 'postcss';
 import wrap from 'postcss-prefixwrap';
 import rebaseUrl from 'postcss-urlrebase';
 
-const transformStylesCache = new WeakMap();
+const cacheByWrapperSelector = new Map();
 
 function transformStyle(
 	{ css, ignoredSelectors = [], baseURL },
@@ -18,7 +18,7 @@ function transformStyle(
 	if ( ! wrapperSelector && ! baseURL ) {
 		return css;
 	}
-
+	const postcssFriendlyCSS = css.replace( /:where\(body\)/g, 'body' );
 	try {
 		return postcss(
 			[
@@ -31,7 +31,7 @@ function transformStyle(
 					} ),
 				baseURL && rebaseUrl( { rootUrl: baseURL } ),
 			].filter( Boolean )
-		).process( css, {} ).css; // use sync PostCSS API
+		).process( postcssFriendlyCSS, {} ).css; // use sync PostCSS API
 	} catch ( error ) {
 		if ( error instanceof CssSyntaxError ) {
 			// eslint-disable-next-line no-console
@@ -64,14 +64,18 @@ function transformStyle(
  * @return {Array} converted rules.
  */
 const transformStyles = ( styles, wrapperSelector = '' ) => {
+	let cache = cacheByWrapperSelector.get( wrapperSelector );
+	if ( ! cache ) {
+		cache = new WeakMap();
+		cacheByWrapperSelector.set( wrapperSelector, cache );
+	}
 	return styles.map( ( style ) => {
-		if ( transformStylesCache.has( style ) ) {
-			return transformStylesCache.get( style );
+		let css = cache.get( style );
+		if ( ! css ) {
+			css = transformStyle( style, wrapperSelector );
+			cache.set( style, css );
 		}
-
-		const transformedStyle = transformStyle( style, wrapperSelector );
-		transformStylesCache.set( style, transformedStyle );
-		return transformedStyle;
+		return css;
 	} );
 };
 

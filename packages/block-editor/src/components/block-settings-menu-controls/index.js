@@ -26,20 +26,21 @@ import { BlockRenameControl, useBlockRename } from '../block-rename';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( {
-	fillProps,
-	clientIds = null,
-	__unstableDisplayLocation,
-} ) => {
-	const { selectedBlocks, selectedClientIds } = useSelect(
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+	const { selectedBlocks, selectedClientIds, isContentOnly } = useSelect(
 		( select ) => {
-			const { getBlockNamesByClientId, getSelectedBlockClientIds } =
-				select( blockEditorStore );
+			const {
+				getBlockNamesByClientId,
+				getSelectedBlockClientIds,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
 			return {
 				selectedBlocks: getBlockNamesByClientId( ids ),
 				selectedClientIds: ids,
+				isContentOnly:
+					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
 			};
 		},
 		[ clientIds ]
@@ -47,8 +48,10 @@ const BlockSettingsMenuControlsSlot = ( {
 
 	const { canLock } = useBlockLock( selectedClientIds[ 0 ] );
 	const { canRename } = useBlockRename( selectedBlocks[ 0 ] );
-	const showLockButton = selectedClientIds.length === 1 && canLock;
-	const showRenameButton = selectedClientIds.length === 1 && canRename;
+	const showLockButton =
+		selectedClientIds.length === 1 && canLock && ! isContentOnly;
+	const showRenameButton =
+		selectedClientIds.length === 1 && canRename && ! isContentOnly;
 
 	// Check if current selection of blocks is Groupable or Ungroupable
 	// and pass this props down to ConvertToGroupButton.
@@ -61,7 +64,6 @@ const BlockSettingsMenuControlsSlot = ( {
 		<Slot
 			fillProps={ {
 				...fillProps,
-				__unstableDisplayLocation,
 				selectedBlocks,
 				selectedClientIds,
 			} }
@@ -94,17 +96,19 @@ const BlockSettingsMenuControlsSlot = ( {
 							/>
 						) }
 						{ fills }
-						{ fillProps?.canMove && ! fillProps?.onlyBlock && (
-							<MenuItem
-								onClick={ pipe(
-									fillProps?.onClose,
-									fillProps?.onMoveTo
-								) }
-							>
-								{ __( 'Move to' ) }
-							</MenuItem>
-						) }
-						{ fillProps?.count === 1 && (
+						{ fillProps?.canMove &&
+							! fillProps?.onlyBlock &&
+							! isContentOnly && (
+								<MenuItem
+									onClick={ pipe(
+										fillProps?.onClose,
+										fillProps?.onMoveTo
+									) }
+								>
+									{ __( 'Move to' ) }
+								</MenuItem>
+							) }
+						{ fillProps?.count === 1 && ! isContentOnly && (
 							<BlockModeToggle
 								clientId={ fillProps?.firstBlockClientId }
 								onToggle={ fillProps?.onClose }

@@ -95,21 +95,12 @@ test.describe( 'Meta boxes', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 
-		const documentSettings = page.getByRole( 'region', {
-			name: 'Editor settings',
+		const excerptButton = page.getByRole( 'button', {
+			name: 'Add an excerpt…',
 		} );
-		const excerptButton = documentSettings.getByRole( 'button', {
-			name: 'Excerpt',
-		} );
+		await excerptButton.click();
 
-		// eslint-disable-next-line playwright/no-conditional-in-test
-		if (
-			( await excerptButton.getAttribute( 'aria-expanded' ) ) === 'false'
-		) {
-			await excerptButton.click();
-		}
-
-		await documentSettings
+		await page
 			.getByRole( 'textbox', { name: 'Write an Excerpt' } )
 			.fill( 'Explicitly set excerpt.' );
 

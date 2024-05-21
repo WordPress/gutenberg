@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+## 5.7.0 (2024-05-16)
+
+### Enhancements
+
+-   Strict type checking: fix some missing nulls in published types ([#59865](https://github.com/WordPress/gutenberg/pull/59865/)).
+
+### Bug Fixes
+
+-	Allow multiple event handlers for the same type with `data-wp-on-document` and `data-wp-on-window`. ([#61009](https://github.com/WordPress/gutenberg/pull/61009))
+-	Prevent wrong written directives from killing the runtime ([#61249](https://github.com/WordPress/gutenberg/pull/61249))
+-	Prevent empty namespace or different namespaces from killing the runtime ([#61409](https://github.com/WordPress/gutenberg/pull/61409))
+
+## 5.6.0 (2024-05-02)
+
+## 5.5.0 (2024-04-19)
+
+### Enhancements
+
+-	Improve data-wp-context debugging by validating it as a stringified JSON Object. ([#61045](https://github.com/WordPress/gutenberg/pull/61045))
+
+### Bug Fixes
+
+-   Hooks useMemo and useCallback should return a value. ([#60474](https://github.com/WordPress/gutenberg/pull/60474))
+
+## 5.4.0 (2024-04-03)
+
+## 5.3.0 (2024-03-21)
+
+### Bug Fixes
+
+-   Prevent non-objects from being set in store state. ([#59886](https://github.com/WordPress/gutenberg/pull/59886))
+-   Ensure that stores are available for subscription before hydration. ([#59842](https://github.com/WordPress/gutenberg/pull/59842))
+-   Ensure scope is restored when catching exceptions thrown in async generator actions. ([#59708](https://github.com/WordPress/gutenberg/pull/59708))
+
 ## 5.2.0 (2024-03-06)
 
 ### Bug Fixes

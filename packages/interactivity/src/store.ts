@@ -17,7 +17,7 @@ import {
 } from './hooks';
 
 const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	item && typeof item === 'object' && item.constructor === Object;
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {
@@ -26,7 +26,9 @@ const deepMerge = ( target: any, source: any ) => {
 			if ( typeof getter === 'function' ) {
 				Object.defineProperty( target, key, { get: getter } );
 			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) target[ key ] = {};
+				if ( ! target[ key ] ) {
+					target[ key ] = {};
+				}
 				deepMerge( target[ key ], source[ key ] );
 			} else {
 				try {
@@ -109,7 +111,7 @@ const handlers = {
 				const scope = getScope();
 				const gen: Generator< any > = result( ...args );
 
-				let value: any;
+				let value: unknown;
 				let it: IteratorResult< any >;
 
 				while ( true ) {
@@ -125,10 +127,17 @@ const handlers = {
 					try {
 						value = await it.value;
 					} catch ( e ) {
+						setNamespace( ns );
+						setScope( scope );
 						gen.throw( e );
+					} finally {
+						resetScope();
+						resetNamespace();
 					}
 
-					if ( it.done ) break;
+					if ( it.done ) {
+						break;
+					}
 				}
 
 				return value;
@@ -150,7 +159,9 @@ const handlers = {
 		}
 
 		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) ) return proxify( result, ns );
+		if ( isObject( result ) ) {
+			return proxify( result, ns );
+		}
 
 		return result;
 	},
@@ -166,7 +177,7 @@ const handlers = {
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = ( namespace: string ) =>
+export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 interface StoreOptions {
@@ -197,7 +208,7 @@ interface StoreOptions {
 	lock?: boolean | string;
 }
 
-const universalUnlock =
+export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
 
 /**
@@ -269,7 +280,10 @@ export function store(
 		if ( lock !== universalUnlock ) {
 			storeLocks.set( namespace, lock );
 		}
-		const rawStore = { state: deepSignal( state ), ...block };
+		const rawStore = {
+			state: deepSignal( isObject( state ) ? state : {} ),
+			...block,
+		};
 		const proxiedStore = new Proxy( rawStore, handlers );
 		rawStores.set( namespace, rawStore );
 		stores.set( namespace, proxiedStore );
@@ -324,12 +338,12 @@ export const populateInitialData = ( data?: {
 	config?: Record< string, unknown >;
 } ) => {
 	if ( isObject( data?.state ) ) {
-		Object.entries( data.state ).forEach( ( [ namespace, state ] ) => {
+		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
 			store( namespace, { state }, { lock: universalUnlock } );
 		} );
 	}
 	if ( isObject( data?.config ) ) {
-		Object.entries( data.config ).forEach( ( [ namespace, config ] ) => {
+		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
 			storeConfigs.set( namespace, config );
 		} );
 	}

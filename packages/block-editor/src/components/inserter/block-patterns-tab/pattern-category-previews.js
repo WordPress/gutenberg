@@ -44,7 +44,8 @@ export function PatternCategoryPreviews( {
 } ) {
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
-		rootClientId
+		rootClientId,
+		category?.name
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -128,7 +129,7 @@ export function PatternCategoryPreviews( {
 	);
 
 	return (
-		<div className="block-editor-inserter__patterns-category-panel">
+		<>
 			<VStack
 				spacing={ 2 }
 				className="block-editor-inserter__patterns-category-panel-header"
@@ -174,6 +175,6 @@ export function PatternCategoryPreviews( {
 					pagingProps={ pagingProps }
 				/>
 			) }
-		</div>
+		</>
 	);
 }

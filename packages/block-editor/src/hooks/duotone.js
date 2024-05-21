@@ -291,7 +291,9 @@ function useDuotoneStyles( {
 	const blockElement = useBlockElement( clientId );
 
 	useEffect( () => {
-		if ( ! isValidFilter ) return;
+		if ( ! isValidFilter ) {
+			return;
+		}
 
 		// Safari does not always update the duotone filter when the duotone colors
 		// are changed. When using Safari, force the block element to be repainted by

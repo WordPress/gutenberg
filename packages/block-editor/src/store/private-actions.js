@@ -7,6 +7,8 @@ import { Platform } from '@wordpress/element';
  * Internal dependencies
  */
 import { undoIgnoreBlocks } from './undo-ignore';
+import { store as blockEditorStore } from './index';
+import { unlock } from '../lock-unlock';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -339,9 +341,10 @@ export function setLastFocus( lastFocus = null ) {
  * @param {string} clientId The block's clientId.
  */
 export function stopEditingAsBlocks( clientId ) {
-	return ( { select, dispatch } ) => {
-		const focusModeToRevert =
-			select.__unstableGetTemporarilyEditingFocusModeToRevert();
+	return ( { select, dispatch, registry } ) => {
+		const focusModeToRevert = unlock(
+			registry.select( blockEditorStore )
+		).getTemporarilyEditingFocusModeToRevert();
 		dispatch.__unstableMarkNextChangeAsNotPersistent();
 		dispatch.updateBlockAttributes( clientId, {
 			templateLock: 'contentOnly',
@@ -376,3 +379,39 @@ export function stopDragging() {
 		type: 'STOP_DRAGGING',
 	};
 }
+
+/**
+ * @param {string|null} clientId The block's clientId, or `null` to clear.
+ *
+ * @return  {Object} Action object.
+ */
+export function expandBlock( clientId ) {
+	return {
+		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+		clientId,
+	};
+}
+
+/**
+ * Temporarily modify/unlock the content-only block for editions.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export const modifyContentLockBlock =
+	( clientId ) =>
+	( { select, dispatch } ) => {
+		dispatch.__unstableMarkNextChangeAsNotPersistent();
+		dispatch.updateBlockAttributes( clientId, {
+			templateLock: undefined,
+		} );
+		dispatch.updateBlockListSettings( clientId, {
+			...select.getBlockListSettings( clientId ),
+			templateLock: false,
+		} );
+		const focusModeToRevert = select.getSettings().focusMode;
+		dispatch.updateSettings( { focusMode: true } );
+		dispatch.__unstableSetTemporarilyEditingAsBlocks(
+			clientId,
+			focusModeToRevert
+		);
+	};

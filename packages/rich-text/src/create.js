@@ -144,8 +144,11 @@ export class RichTextData {
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
-	toHTMLString() {
-		return this.originalHTML || toHTMLString( { value: this.#value } );
+	toHTMLString( { preserveWhiteSpace } = {} ) {
+		return (
+			this.originalHTML ||
+			toHTMLString( { value: this.#value, preserveWhiteSpace } )
+		);
 	}
 	valueOf() {
 		return this.toHTMLString();
@@ -529,7 +532,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
-		if ( format ) delete format.formatType;
+		if ( format ) {
+			delete format.formatType;
+		}
 
 		const value = createFromElement( {
 			element: node,

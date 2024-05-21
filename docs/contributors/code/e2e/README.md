@@ -12,30 +12,31 @@ See the dedicated guide if you're working with the previous Jest + Puppeteer fra
 
 ```bash
 # Run all available tests.
-npm run test:e2e:playwright
+npm run test:e2e
 
 # Run in headed mode.
-npm run test:e2e:playwright -- --headed
+npm run test:e2e -- --headed
 
 # Run tests with specific browsers (`chromium`, `firefox`, or `webkit`).
-npm run test:e2e:playwright -- --project=webkit --project=firefox
+npm run test:e2e -- --project=webkit --project=firefox
 
 # Run a single test file.
-npm run test:e2e:playwright -- <path_to_test_file> # E.g., npm run test:e2e:playwright -- site-editor/title.spec.js
+npm run test:e2e -- <path_to_test_file> # E.g., npm run test:e2e -- site-editor/title.spec.js
 
 # Debugging.
-npm run test:e2e:playwright -- --debug
+npm run test:e2e -- --debug
 ```
 
 If you're developing in Linux, it currently requires testing Webkit browsers in headed mode. If you don't want to or can't run it with the GUI (e.g. if you don't have a graphic interface), prepend the command with [`xvfb-run`](https://manpages.ubuntu.com/manpages/xenial/man1/xvfb-run.1.html) to run it in a virtual environment.
 
 ```bash
 # Run all available tests.
-xvfb-run npm run test:e2e:playwright
+xvfb-run npm run test:e2e
 
 # Only run webkit tests.
-xvfb-run -- npm run test:e2e:playwright -- --project=webkit
+xvfb-run -- npm run test:e2e -- --project=webkit
 ```
+If you're already editing in VS Code, you may find the [Playwright extension](https://playwright.dev/docs/getting-started-vscode) helpful for running, writing and debugging tests.
 
 ## Best practices
 

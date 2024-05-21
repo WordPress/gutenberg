@@ -54,7 +54,7 @@ function Tooltip( { children, onPress, style, visible } ) {
 	);
 }
 
-function Label( { align, text, xOffset, yOffset } ) {
+function Label( { align = 'center', text, xOffset = 0, yOffset = 0 } ) {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ dimensions, setDimensions ] = useState( null );
 	const visible = useContext( TooltipContext );
@@ -138,12 +138,6 @@ function Label( { align, text, xOffset, yOffset } ) {
 		</Animated.View>
 	);
 }
-
-Label.defaultProps = {
-	align: 'center',
-	xOffset: 0,
-	yOffset: 0,
-};
 
 Tooltip.Label = Label;
 

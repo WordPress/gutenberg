@@ -1,25 +1,18 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalGrid as Grid,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import Variation from './variation';
 import StylesPreviewColors from '../preview-colors';
-import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
+import { useColorVariations } from '../hooks';
+import Subtitle from '../subtitle';
+import Variation from './variation';
 
-export default function ColorVariations() {
-	const colorVariations = useCurrentMergeThemeStyleVariationsWithUserConfig( {
-		property: 'color',
-		filter: ( variation ) =>
-			variation?.settings?.color &&
-			Object.keys( variation?.settings?.color ).length,
-	} );
+export default function ColorVariations( { title, gap = 2 } ) {
+	const colorVariations = useColorVariations();
 
 	if ( ! colorVariations?.length ) {
 		return null;
@@ -27,13 +20,14 @@ export default function ColorVariations() {
 
 	return (
 		<VStack spacing={ 3 }>
-			<Grid columns={ 3 }>
+			{ title && <Subtitle level={ 3 }>{ title }</Subtitle> }
+			<VStack spacing={ gap }>
 				{ colorVariations.map( ( variation, index ) => (
-					<Variation key={ index } variation={ variation }>
+					<Variation key={ index } variation={ variation } isPill>
 						{ () => <StylesPreviewColors /> }
 					</Variation>
 				) ) }
-			</Grid>
+			</VStack>
 		</VStack>
 	);
 }
