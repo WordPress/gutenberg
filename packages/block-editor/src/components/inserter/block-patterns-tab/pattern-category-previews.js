@@ -34,10 +34,11 @@ import {
 	myPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { useZoomOut } from '../../../hooks/use-zoom-out';
 
 const noop = () => {};
 
-export function PatternCategoryPreviews( {
+function PatternCategoryPreviewsContent( {
 	rootClientId,
 	onInsert,
 	onHover = noop,
@@ -185,4 +186,18 @@ export function PatternCategoryPreviews( {
 			) }
 		</>
 	);
+}
+
+function PatternCategoryPreviewsContentWithZoomOut( props ) {
+	useZoomOut();
+	return <PatternCategoryPreviewsContent { ...props } />;
+}
+
+export function PatternCategoryPreviews( props ) {
+	// When the pattern panel is showing, we want to use zoom out mode
+	if ( window.__experimentalEnableZoomedOutPatternsTab ) {
+		return <PatternCategoryPreviewsContentWithZoomOut { ...props } />;
+	}
+
+	return <PatternCategoryPreviewsContent { ...props } />;
 }
