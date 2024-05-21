@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { useSettings } from '../../use-settings';
+import { RANGE_CONTROL_MAX_SIZE } from '../utils';
 
 export default function useSpacingSizes() {
 	const spacingSizes = [ { name: 0, slug: '0', size: 0 } ];
@@ -16,7 +17,7 @@ export default function useSpacingSizes() {
 		spacingSizes.push( ...settingsSizes );
 	}
 
-	if ( spacingSizes.length > 8 ) {
+	if ( spacingSizes.length > RANGE_CONTROL_MAX_SIZE ) {
 		spacingSizes.unshift( {
 			name: __( 'Default' ),
 			slug: 'default',
