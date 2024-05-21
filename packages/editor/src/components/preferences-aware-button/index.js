@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -15,7 +20,7 @@ export function UnforwardedPreferencesAwareButton( props, ref ) {
 		};
 	}, [] );
 
-	const { icon, label, text, ...restProps } = props;
+	const { icon, label, text, className, ...restProps } = props;
 
 	return (
 		<Button
@@ -23,6 +28,9 @@ export function UnforwardedPreferencesAwareButton( props, ref ) {
 			label={ label }
 			text={ showIconLabels ? label : text }
 			ref={ ref }
+			className={ clsx( 'preferences-aware-button', className, {
+				'is-showing-icon-label': showIconLabels,
+			} ) }
 			{ ...restProps }
 		/>
 	);
