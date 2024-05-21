@@ -2,7 +2,7 @@ name: Verify Core Backport Changlog
 
 on:
     pull_request:
-        types: [opened, synchronize]
+        types: [opened, synchronize, labeled, unlabeled]
         paths:
             - 'lib/**'
             - '!lib/load.php'
@@ -31,6 +31,7 @@ jobs:
             - name: 'Fetch relevant history from origin'
               run: git fetch origin ${{ github.event.pull_request.base.ref }}
             - name: Check CHANGELOG status
+              if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
               env:
                   PR_NUMBER: ${{ github.event.number }}
               run: |
