@@ -218,7 +218,7 @@ export default function FilterSummary( {
 	openedFilter,
 	...commonProps
 }: FilterSummaryProps ) {
-	const toggleRef = useRef< HTMLDivElement | null >( null );
+	const toggleRef = useRef< HTMLDivElement >( null );
 	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters.find( ( f ) => f.field === filter.field );
 	const activeElements = filter.elements.filter( ( element ) => {

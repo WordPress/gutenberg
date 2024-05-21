@@ -29,7 +29,7 @@ const Filters = memo( function Filters< Item extends AnyItem >( {
 	openedFilter,
 	setOpenedFilter,
 }: FiltersProps< Item > ) {
-	const addFilterRef = useRef< HTMLButtonElement | null >( null );
+	const addFilterRef = useRef< HTMLButtonElement >( null );
 	const filters: NormalizedFilter[] = [];
 	fields.forEach( ( field ) => {
 		if ( ! field.elements?.length ) {

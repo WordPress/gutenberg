@@ -46,7 +46,7 @@ function normalizeSearchInput( input = '' ) {
 	return removeAccents( input.trim().toLowerCase() );
 }
 
-const EMPTY_ARRAY = [] as [];
+const EMPTY_ARRAY: [] = [];
 const getCurrentValue = (
 	filterDefinition: NormalizedFilter,
 	currentFilter?: Filter
