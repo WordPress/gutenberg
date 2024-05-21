@@ -38,17 +38,17 @@ test.describe( 'Pattern Overrides', () => {
 			await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 			await page
-				.getByRole( 'region', { name: 'Navigation' } )
-				.getByRole( 'button', { name: 'Create pattern' } )
+				.getByRole( 'region', { name: 'Patterns content' } )
+				.getByRole( 'button', { name: 'add new pattern' } )
 				.click();
 
 			await page
-				.getByRole( 'menu', { name: 'Create pattern' } )
-				.getByRole( 'menuitem', { name: 'Create pattern' } )
+				.getByRole( 'menu', { name: 'add new pattern' } )
+				.getByRole( 'menuitem', { name: 'add new pattern' } )
 				.click();
 
 			const createPatternDialog = page.getByRole( 'dialog', {
-				name: 'Create pattern',
+				name: 'add new pattern',
 			} );
 			await createPatternDialog
 				.getByRole( 'textbox', { name: 'Name' } )
@@ -57,7 +57,7 @@ test.describe( 'Pattern Overrides', () => {
 				.getByRole( 'checkbox', { name: 'Synced' } )
 				.setChecked( true );
 			await createPatternDialog
-				.getByRole( 'button', { name: 'Create' } )
+				.getByRole( 'button', { name: 'Add' } )
 				.click();
 
 			await editor.canvas

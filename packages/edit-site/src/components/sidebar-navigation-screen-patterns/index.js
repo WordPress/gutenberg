@@ -15,7 +15,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 /**
  * Internal dependencies
  */
-import AddNewPattern from '../add-new-pattern';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import CategoryItem from './category-item';
 import {
@@ -126,7 +125,6 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 				'Manage what patterns are available when editing the site.'
 			) }
 			backPath={ backPath }
-			actions={ <AddNewPattern /> }
 			content={
 				<>
 					{ isLoading && __( 'Loading items…' ) }

@@ -37,7 +37,7 @@ test.describe( 'Unsynced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -136,7 +136,7 @@ test.describe( 'Synced pattern', () => {
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -150,7 +150,7 @@ test.describe( 'Synced pattern', () => {
 			.setChecked( true );
 
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
 		// Check the pattern is focused.
@@ -376,7 +376,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -385,7 +385,7 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
 		await admin.createNewPost();
@@ -419,7 +419,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -428,7 +428,7 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
 		// Wait until the pattern is created.
@@ -603,7 +603,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.clickBlockOptionsMenuItem( 'Create pattern' );
 
 		const createPatternDialog = editor.page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -612,7 +612,7 @@ test.describe( 'Synced pattern', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 
 		await expect(
