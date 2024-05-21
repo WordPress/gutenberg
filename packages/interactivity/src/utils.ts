@@ -316,11 +316,7 @@ const logged: Set< string > = new Set();
  * @param message Message to show in the warning.
  */
 export const warn = ( message: string ): void => {
-	// @ts-expect-error
-	if (
-		typeof globalThis.SCRIPT_DEBUG !== 'undefined' &&
-		globalThis.SCRIPT_DEBUG === true
-	) {
+	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( logged.has( message ) ) {
 			return;
 		}
