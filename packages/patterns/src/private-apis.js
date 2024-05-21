@@ -11,11 +11,7 @@ import {
 	default as DuplicatePatternModal,
 	useDuplicatePatternProps,
 } from './components/duplicate-pattern-modal';
-import {
-	isOverridableBlock,
-	hasOverridableBlocks,
-	getOverridableAttributes,
-} from './api';
+import { isOverridableBlock, hasOverridableBlocks } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
 import RenamePatternCategoryModal from './components/rename-pattern-category-modal';
@@ -39,7 +35,6 @@ lock( privateApis, {
 	DuplicatePatternModal,
 	isOverridableBlock,
 	hasOverridableBlocks,
-	getOverridableAttributes,
 	useDuplicatePatternProps,
 	RenamePatternModal,
 	PatternsMenuItems,
