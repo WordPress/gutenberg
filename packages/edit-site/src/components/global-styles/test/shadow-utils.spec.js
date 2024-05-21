@@ -16,9 +16,6 @@ const colorFormats = {
 	hsla: 'hsla(0, 100%, 50%, 0.5)',
 	hslp: 'hsl(0 100% 50% / 50%)',
 	currentcolor: 'currentcolor',
-
-	// invalidColor1: 'invalid',
-	// invalidColor2: 'hwb(0, 0%, 0%)',
 };
 const validShadowFormats = {
 	xy: '{x} {y}',
