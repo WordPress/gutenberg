@@ -15,7 +15,10 @@
 
 		&.is-pill {
 			height: $button-size-compact;
-			overflow: hidden;
+
+			.block-editor-iframe__scale-container {
+				overflow: hidden;
+			}
 		}
 	}
 
