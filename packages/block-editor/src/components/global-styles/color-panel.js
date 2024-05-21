@@ -155,6 +155,8 @@ const popoverProps = {
 	shift: true,
 };
 
+const { Tabs } = unlock( componentsPrivateApis );
+
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<HStack justify="flex-start">
 		<ZStack isLayered={ false } offset={ -8 }>
@@ -207,10 +209,6 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
-	// object, due to circular dependencies.
-	// See https://github.com/WordPress/gutenberg/issues/52692
-	const { Tabs } = unlock( componentsPrivateApis );
 
 	return (
 		<ToolsPanelItem
