@@ -27,9 +27,17 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	* wp_trim_words is used instead.
 	*/
 	$excerpt_length = $attributes['excerptLength'];
-	$excerpt        = get_the_excerpt( $block->context['postId'] );
-	if ( isset( $excerpt_length ) ) {
-		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
+
+	/*
+	* If the post doesn’t have a custom excerpt, get_the_excerpt function function
+	* will use wp_trim_excerpt() to generate an excerpt. wp_trim_excerpt returns
+	* a maximum of 55 words with an ellipsis appended if necessary. That means we
+	* need to override it with excerpt_length
+	*/
+	add_filter( 'excerpt_length', function ( $length ) use ( $excerpt_length ) {
+		return isset( $excerpt_length ) ? $excerpt_length : $length;
+	}, 10, 1 );
+
 	}
 
 	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
