@@ -266,6 +266,21 @@ const applyWithDispatch = withDispatch(
 	}
 );
 
+/**
+ * Renders the component for managing the featured image of a post.
+ *
+ * @param {Object}   props                  Props.
+ * @param {number}   props.currentPostId    ID of the current post.
+ * @param {number}   props.featuredImageId  ID of the featured image.
+ * @param {Function} props.onUpdateImage    Function to call when the image is updated.
+ * @param {Function} props.onRemoveImage    Function to call when the image is removed.
+ * @param {Object}   props.media            The media object representing the featured image.
+ * @param {string}   props.postType         Post type.
+ * @param {Element}  props.noticeUI         UI for displaying notices.
+ * @param {Object}   props.noticeOperations Operations for managing notices.
+ *
+ * @return {Element} Component to be rendered .
+ */
 export default compose(
 	withNotices,
 	applyWithSelect,

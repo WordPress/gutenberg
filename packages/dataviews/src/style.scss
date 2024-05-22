@@ -277,9 +277,13 @@
 
 .dataviews-view-grid {
 	margin-bottom: auto;
-	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
 	padding: 0 $grid-unit-40 $grid-unit-30;
+
+	@include break-mobile() {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
+	}
 
 	@include break-xlarge() {
 		grid-template-columns: repeat(3, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -557,6 +561,11 @@
 	}
 
 	line-height: 0;
+	flex-shrink: 0;
+
+	.components-checkbox-control__input-container {
+		margin: 0;
+	}
 }
 
 .dataviews-filters__custom-menu-radio-item-prefix {
