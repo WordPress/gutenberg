@@ -25,7 +25,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorNotices,
 	privateApis as editorPrivateApis,
 	store as editorStore,
@@ -265,6 +264,15 @@ export default function Editor( { isLoading, onClick } ) {
 
 	return (
 		<>
+			<GlobalStylesRenderer />
+			<EditorKeyboardShortcutsRegister />
+			{ isEditMode && <BlockKeyboardShortcuts /> }
+			{ showVisualEditor && (
+				<>
+					<TemplatePartConverter />
+					<PatternModal />
+				</>
+			) }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
@@ -342,27 +350,15 @@ export default function Editor( { isLoading, onClick } ) {
 						}
 						content={
 							<>
-								<GlobalStylesRenderer />
 								{ isEditMode && <EditorNotices /> }
-								{ showVisualEditor && (
-									<>
-										<TemplatePartConverter />
-										{ ! isLargeViewport && (
-											<BlockToolbar hideDragHandle />
-										) }
-										<SiteEditorCanvas onClick={ onClick } />
-										<PatternModal />
-									</>
-								) }
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && (
-									<>
-										<EditorKeyboardShortcutsRegister />
-										<EditorKeyboardShortcuts />
-										<BlockKeyboardShortcuts />
-									</>
+								{ ! isLargeViewport && showVisualEditor && (
+									<BlockToolbar hideDragHandle />
+								) }
+								{ showVisualEditor && (
+									<SiteEditorCanvas onClick={ onClick } />
 								) }
 							</>
 						}
