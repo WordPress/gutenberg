@@ -712,7 +712,8 @@ export const getDefaultTemplateId =
 		const template = await apiFetch( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
-		if ( template ) {
+		// Endpoint may return an empty object if no template is found.
+		if ( template?.id ) {
 			dispatch.receiveDefaultTemplateId( query, template.id );
 		}
 	};
