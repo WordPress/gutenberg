@@ -119,6 +119,7 @@ function useInsertionPoint( {
 					meta
 				);
 			} else {
+				// Check here to see if we _can_ insert the block in the location?
 				insertBlocks(
 					blocks,
 					destinationIndex,

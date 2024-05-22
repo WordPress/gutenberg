@@ -49,28 +49,52 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		return [ getCategories(), getCollections() ];
 	}, [] );
 
+	const createNewBlock = ( {
+		content,
+		name,
+		initialAttributes,
+		innerBlocks,
+		syncStatus,
+	} ) => {
+		return syncStatus === 'unsynced'
+			? parse( content, {
+					__unstableSkipMigrationLogs: true,
+			  } )
+			: createBlock(
+					name,
+					initialAttributes,
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
+			  );
+	};
+
 	const onSelectItem = useCallback(
 		(
 			{ name, initialAttributes, innerBlocks, syncStatus, content },
 			shouldFocusBlock
 		) => {
-			const insertedBlock =
-				syncStatus === 'unsynced'
-					? parse( content, {
-							__unstableSkipMigrationLogs: true,
-					  } )
-					: createBlock(
-							name,
-							initialAttributes,
-							createBlocksFromInnerBlocksTemplate( innerBlocks )
-					  );
-
-			onInsert( insertedBlock, undefined, shouldFocusBlock );
+			onInsert(
+				createNewBlock( {
+					content,
+					name,
+					initialAttributes,
+					innerBlocks,
+					syncStatus,
+				} ),
+				undefined,
+				shouldFocusBlock
+			);
 		},
 		[ onInsert ]
 	);
 
-	return [ items, categories, collections, onSelectItem, allItems ];
+	return [
+		items,
+		categories,
+		collections,
+		onSelectItem,
+		allItems,
+		createNewBlock,
+	];
 };
 
 export default useBlockTypesState;
