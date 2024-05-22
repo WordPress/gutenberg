@@ -411,15 +411,17 @@
 		}
 
 		.dataviews-view-list__item-actions {
-			display: none;
-			padding-right: $grid-unit-40;
+			visibility: hidden;
+			position: absolute;
 		}
 
 		&.is-selected,
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				display: flex;
+				visibility: visible;
+				position: static;
+				padding-right: $grid-unit-40;
 			}
 
 			.dataviews-view-list__item {

@@ -130,6 +130,7 @@ function ListItem< Item extends AnyItem >( {
 			<HStack
 				className="dataviews-view-list__item-wrapper"
 				alignment="center"
+				spacing={ 0 }
 			>
 				<div role="gridcell">
 					<CompositeItem
