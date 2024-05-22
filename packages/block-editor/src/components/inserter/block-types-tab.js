@@ -14,6 +14,7 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
+import useInsertionPoint from './hooks/use-insertion-point';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -31,10 +32,14 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
-		rootClientId,
-		onInsert
-	);
+	const [ items, categories, collections, onSelectItem, allItems ] =
+		useBlockTypesState( rootClientId, onInsert );
+
+	const [ , onInsertBlocks ] = useInsertionPoint( {} );
+
+	const onSelectGeneralItem = ( blocks, meta, shouldForceFocusBlock ) => {
+		onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+	};
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
@@ -104,6 +109,14 @@ export function BlockTypesTab(
 	if ( ! items.length ) {
 		return <InserterNoResults />;
 	}
+
+	const availableCategories = categories.filter( ( category ) => {
+		const categoryItems = itemsPerCategory[ category.slug ];
+		if ( ! categoryItems || ! categoryItems.length ) {
+			return false;
+		}
+		return category;
+	} );
 
 	return (
 		<InserterListbox>
@@ -176,6 +189,20 @@ export function BlockTypesTab(
 							</InserterPanel>
 						);
 					}
+				) }
+
+				{ ( items.length === 0 ||
+					availableCategories.length === 1 ) && (
+					<div className="block-editor-inserter__tips">
+						<InserterPanel title={ _x( 'All blocks', 'blocks' ) }>
+							<BlockTypesList
+								items={ allItems }
+								onSelect={ onSelectGeneralItem }
+								onHover={ onHover }
+								label={ _x( 'All blocks', 'blocks' ) }
+							/>
+						</InserterPanel>
+					</div>
 				) }
 			</div>
 		</InserterListbox>

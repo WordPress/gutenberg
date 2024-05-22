@@ -30,6 +30,20 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ rootClientId ]
 	);
 
+	const [ allItems ] = useSelect(
+		( select ) => {
+			// get top most block client id
+			const rootBlockClientId =
+				select( blockEditorStore ).getBlockRootClientId( rootClientId );
+			return [
+				select( blockEditorStore ).getInserterItems(
+					rootBlockClientId
+				),
+			];
+		},
+		[ rootClientId ]
+	);
+
 	const [ categories, collections ] = useSelect( ( select ) => {
 		const { getCategories, getCollections } = select( blocksStore );
 		return [ getCategories(), getCollections() ];
@@ -56,7 +70,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ onInsert ]
 	);
 
-	return [ items, categories, collections, onSelectItem ];
+	return [ items, categories, collections, onSelectItem, allItems ];
 };
 
 export default useBlockTypesState;
