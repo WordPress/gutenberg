@@ -93,3 +93,22 @@ In theme.json v2, the default font sizes were only shown when theme sizes were n
 To keep behavior similar to v2 with a v3 theme.json:
 * If you do not have any `fontSizes` defined, `defaultFontSizes` can be left out or set to `true`.
 * If you have some `fontSizes` defined, set `defaultFontSizes` to `false`.
+
+#### `settings.spacing.defaultSpacingSizes`
+
+In theme.json v2, the default spacing sizes were only shown when theme sizes were not defined. A theme providing spacing sizes with the same slugs as the defaults would always override them.
+
+The default `spacingSizes` slugs are: `20`, `30`, `40`, `50`, `60`, `70`, and `80`. They are defined via a default `spacingScale` config with 7 steps.
+
+The new `defaultSpacingSizes` option gives control over showing default font sizes and preventing those defaults from being overridden.
+
+- When set to `true` it will show the default spacing sizes and prevent them from being overridden by the theme.
+- When set to `false` it will hide the default spacing sizes and allow the theme to use the default slugs.
+
+It is `true` by default when switching to v3. This is to be consistent with how other `default*` options work such as `settings.color.defaultPalette`, but differs from the behavior in v2.
+
+In theme.json v2, the default spacing sizes were only shown when theme `spacingSizes` presets and `spacingScale` config were not defined. A theme providing font sizes with the same slugs as the defaults would always override the default ones.
+
+To keep behavior similar to v2 with a v3 theme.json:
+* If you do not have any `spacingSizes` presets or `spacingScale` config defined, `defaultSpacingSizes` can be left out or set to `true`.
+* If you disabled default spacing sizes by setting `spacingScale` to `{ "steps": 0 }`, remove the `spacingScale` config and set `defaultSpacingSizes` to `false`.
