@@ -55,6 +55,9 @@ const LINK_SETTINGS = [
 	{
 		id: 'nofollow',
 		title: __( 'Mark as nofollow' ),
+		help: __(
+			'A "no follow" link tells search engines not to pass SEO value to the linked site.'
+		),
 	},
 ];
 
