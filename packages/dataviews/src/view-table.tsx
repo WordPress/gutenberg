@@ -15,7 +15,6 @@ import {
 	privateApis as componentsPrivateApis,
 	CheckboxControl,
 	Spinner,
-	VisuallyHidden,
 } from '@wordpress/components';
 import {
 	forwardRef,
@@ -552,9 +551,9 @@ function ViewTable< Item extends AnyItem >( {
 								data-field-id="actions"
 								className="dataviews-view-table__actions-column"
 							>
-								<VisuallyHidden>
+								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
-								</VisuallyHidden>
+								</span>
 							</th>
 						) }
 					</tr>
