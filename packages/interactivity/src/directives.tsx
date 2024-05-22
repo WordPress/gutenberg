@@ -12,6 +12,7 @@ import { deepSignal, peek, type DeepSignal } from 'deepsignal';
  * Internal dependencies
  */
 import { useWatch, useInit, kebabToCamelCase, warn } from './utils';
+import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
 
 // Assigned objects should be ignore during proxification.
@@ -281,19 +282,19 @@ export default () => {
 
 	// data-wp-on--[event]
 	directive( 'on', ( { directives: { on }, element, evaluate } ) => {
-		const events = new Map();
+		const events = new Map< string, Set< DirectiveEntry > >();
 		on.filter( ( { suffix } ) => suffix !== 'default' ).forEach(
 			( entry ) => {
 				const event = entry.suffix.split( '--' )[ 0 ];
 				if ( ! events.has( event ) ) {
-					events.set( event, new Set() );
+					events.set( event, new Set< DirectiveEntry >() );
 				}
-				events.get( event ).add( entry );
+				events.get( event )!.add( entry );
 			}
 		);
 
 		events.forEach( ( entries, eventType ) => {
-			element.props[ `on${ eventType }` ] = ( event ) => {
+			element.props[ `on${ eventType }` ] = ( event: Event ) => {
 				entries.forEach( ( entry ) => {
 					evaluate( entry, event );
 				} );
