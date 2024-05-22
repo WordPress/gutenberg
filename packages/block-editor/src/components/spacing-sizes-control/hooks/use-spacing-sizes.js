@@ -39,9 +39,9 @@ export default function useSpacingSizes() {
 
 		const sizesLength =
 			zeroSize.length +
-			( customSizes?.length ?? 0 ) +
-			( themeSizes?.length ?? 0 ) +
-			( defaultSizes?.length ?? 0 );
+			customSizes.length +
+			themeSizes.length +
+			defaultSizes.length;
 
 		const maybeUnsetSize =
 			sizesLength > RANGE_CONTROL_MAX_SIZE
