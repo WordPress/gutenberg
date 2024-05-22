@@ -1,52 +1,46 @@
+// The height (4px greater than compact buttons) is to create room for focus rings of contained buttons.
+$bar-height: $button-size-compact + $grid-unit-05;
+$bar-content-inset: ( $bar-height - $button-size-compact ) * 0.5;
+
 .editor-document-bar {
 	display: flex;
-	height: $button-size-compact;
 	justify-content: space-between;
 	// Flex items will, by default, refuse to shrink below a minimum
 	// intrinsic width. In order to shrink this flexbox item, and
 	// subsequently truncate child text, we set an explicit min-width.
 	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
+	height: $bar-height;
 	border-radius: $grid-unit-05;
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, $border-width-focus-fallback) $gray-100;
+	gap: $bar-content-inset;
+	padding: $bar-content-inset;
 	width: min(100%, 416px);
-
-	.components-button {
-		background: $gray-100;
-
-		transition: all 0.1s ease-out;
-		@include reduce-motion("transition");
-	}
-	&:not(.has-back-button) .components-button {
-		border-radius: $grid-unit-05;
-	}
-	&.has-back-button {
-		> .components-button {
-			border-radius: $grid-unit-05 0 0 $grid-unit-05;
-		}
-		.editor-document-bar__core .components-button {
-			border-radius: 0 $grid-unit-05 $grid-unit-05 0;
-		}
-	}
+	overflow: hidden;
 
 	@include break-large() {
 		width: min(100%, 450px);
 	}
+
 }
 
 .editor-document-bar__core {
 	position: relative;
 	display: flex;
+	align-items: center;
 	flex-grow: 1;
+	max-width: 100%;
 
 	button {
 		max-width: 100%;
 		position: absolute;
-		inset: 0;
+		inset-inline: 0;
 		justify-content: flex-end;
 	}
 }
 
 .editor-document-bar__title {
+	position: relative;
 	flex-grow: 1;
 	color: $gray-900;
 	gap: $grid-unit-05;
@@ -58,10 +52,11 @@
 
 	// Ensures centered alignment and prevents overlapping of the contents.
 	@include break-medium() {
-		// Offsets by the width of the command shortcut label plus its spacing from the side and the gap.
+		// Offsets by the width of the command shortcut label plus its spacing from the side plus the gap.
 		padding-inline: $grid-unit-30 + $grid-unit-15 + $grid-unit-05;
-		.has-back-button & {
-			// Offsets by the width of the back button.
+
+		// Offsets by the width of the back button.
+		:nth-child(2).editor-document-bar__core & {
 			padding-inline: 0 74px;
 		}
 	}
@@ -80,7 +75,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 70%;
 		color: currentColor;
 	}
 }
@@ -96,15 +90,12 @@
 }
 
 .editor-document-bar__back.components-button.has-icon.has-text {
+	align-self: center;
 	min-width: $button-size;
 	flex-shrink: 0;
 	color: $gray-700;
 	gap: 0;
 
-	&:focus {
-		// Ensure the focus ring is in front of the adjacent button.
-		z-index: 1;
-	}
 	&:hover {
 		color: $gray-900;
 	}
