@@ -8,29 +8,9 @@ test.describe( 'Zoom Out', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.beforeEach( async ( { admin, editor, page } ) => {
-		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
-
-		const zoomedOutCheckbox = page.getByLabel(
-			'Enable zoomed out view when selecting a pattern category in the main inserter.'
-		);
-
-		await zoomedOutCheckbox.setChecked( true );
-		await expect( zoomedOutCheckbox ).toBeChecked();
-		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
-
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
-	} );
-
-	test.afterEach( async ( { admin, page } ) => {
-		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
-		const zoomedOutCheckbox = page.getByLabel(
-			'Enable zoomed out view when selecting a pattern category in the main inserter.'
-		);
-		await zoomedOutCheckbox.setChecked( false );
-		await expect( zoomedOutCheckbox ).not.toBeChecked();
-		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
