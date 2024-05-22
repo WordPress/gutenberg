@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Use React's automatic runtime to transform JSX ([#61692](https://github.com/WordPress/gutenberg/pull/61692)).
+
 ## 7.42.0 (2024-05-16)
 
 ## 7.41.0 (2024-05-02)
