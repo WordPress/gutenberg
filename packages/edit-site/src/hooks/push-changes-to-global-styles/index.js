@@ -337,7 +337,7 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
-				variant="primary"
+				variant="secondary"
 				disabled={ changes.length === 0 }
 				onClick={ pushChanges }
 			>
