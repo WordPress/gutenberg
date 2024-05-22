@@ -6,7 +6,10 @@ import {
 	__experimentalLibrary as Library,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	__experimentalUseDialog as useDialog,
+} from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -52,6 +55,10 @@ export default function InserterSidebar( {
 	const { setIsInserterOpened } = useDispatch( editorStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
+		onClose: () => setIsInserterOpened( false ),
+		focusOnMount: true,
+	} );
 	const libraryRef = useRef();
 
 	// When closing the inserter, focus should return to the toggle button.
@@ -70,30 +77,46 @@ export default function InserterSidebar( {
 		[ closeInserterSidebar ]
 	);
 
-	return (
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div onKeyDown={ closeOnEscape } className="editor-inserter-sidebar">
-			<div className="editor-inserter-sidebar__content">
-				<Library
-					showMostUsedBlocks={ showMostUsedBlocks }
-					showInserterHelpPanel
-					shouldFocusBlock={ isMobileViewport }
-					rootClientId={
-						blockSectionRootClientId ?? insertionPoint.rootClientId
-					}
-					__experimentalInsertionIndex={
-						insertionPoint.insertionIndex
-					}
-					__experimentalInitialTab={ insertionPoint.tab }
-					__experimentalInitialCategory={ insertionPoint.category }
-					__experimentalFilterValue={ insertionPoint.filterValue }
-					__experimentalOnPatternCategorySelection={
-						isRightSidebarOpen ? closeGeneralSidebar : undefined
-					}
-					ref={ libraryRef }
-					onClose={ closeInserterSidebar }
-				/>
+	const inserterContents = (
+		<div className="editor-inserter-sidebar__content">
+			<Library
+				showMostUsedBlocks={ showMostUsedBlocks }
+				showInserterHelpPanel
+				shouldFocusBlock={ isMobileViewport }
+				rootClientId={
+					blockSectionRootClientId ?? insertionPoint.rootClientId
+				}
+				__experimentalInsertionIndex={ insertionPoint.insertionIndex }
+				__experimentalInitialTab={ insertionPoint.tab }
+				__experimentalInitialCategory={ insertionPoint.category }
+				__experimentalFilterValue={ insertionPoint.filterValue }
+				__experimentalOnPatternCategorySelection={
+					isRightSidebarOpen ? closeGeneralSidebar : undefined
+				}
+				ref={ libraryRef }
+				onClose={ closeInserterSidebar }
+			/>
+		</div>
+	);
+
+	if ( window.__experimentalEnableZoomedOutPatternsTab ) {
+		return (
+			// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+			<div
+				onKeyDown={ closeOnEscape }
+				className="editor-inserter-sidebar"
+			>
+				{ inserterContents }
 			</div>
+		);
+	}
+	return (
+		<div
+			ref={ inserterDialogRef }
+			{ ...inserterDialogProps }
+			className="editor-inserter-sidebar"
+		>
+			{ inserterContents }
 		</div>
 	);
 }
