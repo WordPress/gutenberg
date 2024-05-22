@@ -24,6 +24,12 @@ test.describe( 'Zoom Out', () => {
 		await page.getByRole( 'button', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Browse styles' } ).click();
 
+		// select the 1st pattern
+		await page
+			.frameLocator( 'iframe[name="editor-canvas"]' )
+			.locator( 'header' )
+			.click();
+
 		await expect( page.getByLabel( 'Add pattern' ) ).toHaveCount( 3 );
 		await page.getByLabel( 'Add pattern' ).first().click();
 		await expect( page.getByLabel( 'Add pattern' ) ).toHaveCount( 2 );
