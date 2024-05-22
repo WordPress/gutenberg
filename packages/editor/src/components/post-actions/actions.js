@@ -518,9 +518,16 @@ const renamePostAction = {
 		// Make necessary checks for template parts and patterns.
 		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
 		const isUserPattern = post.type === PATTERN_TYPES.user;
+		// In patterns list page we map the templates parts to a different object
+		// than the one returned from the endpoint. This is why we need to check for
+		// two props whether is custom or has a theme file.
 		const isCustomPattern =
-			isUserPattern || ( isTemplatePart && post.isCustom );
-		const hasThemeFile = isTemplatePart && post.templatePart.has_theme_file;
+			isUserPattern ||
+			( isTemplatePart &&
+				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
+		const hasThemeFile =
+			isTemplatePart &&
+			( post.templatePart?.has_theme_file || post.has_theme_file );
 		return isCustomPattern && ! hasThemeFile;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
