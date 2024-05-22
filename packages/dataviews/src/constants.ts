@@ -63,3 +63,8 @@ export const sortLabels = {
 export const LAYOUT_TABLE = 'table';
 export const LAYOUT_GRID = 'grid';
 export const LAYOUT_LIST = 'list';
+
+export type LayoutType =
+	| typeof LAYOUT_GRID
+	| typeof LAYOUT_LIST
+	| typeof LAYOUT_TABLE;
