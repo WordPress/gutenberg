@@ -57,12 +57,23 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 						if ( userStyles.blocks[ blockName ].css ) {
 							const variationBlockStyles =
 								blockStyles[ blockName ] || {};
+							const customCSS =
+								blockStyles[ blockName ]?.css ||
+								userStyles.blocks[ blockName ].css
+									? {
+											css: `${
+												blockStyles[ blockName ]?.css ||
+												''
+											} ${
+												userStyles.blocks[ blockName ]
+													.css || ''
+											}`,
+									  }
+									: {};
 
 							blockStyles[ blockName ] = {
 								...variationBlockStyles,
-								css: `${
-									blockStyles[ blockName ]?.css || ''
-								} ${ userStyles.blocks[ blockName ].css }`,
+								...customCSS,
 							};
 						}
 					} );
