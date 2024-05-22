@@ -16,21 +16,46 @@ import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
+import type { Action, AnyItem, Field, View } from './types';
 
-const defaultGetItemId = ( item ) => item.id;
+interface DataViewsProps< Item extends AnyItem > {
+	view: View;
+	onChangeView: ( view: View ) => void;
+	fields: Field< Item >[];
+	search?: boolean;
+	searchLabel?: string;
+	actions?: Action< Item >[];
+	data: Item[];
+	getItemId?: ( item: Item ) => string;
+	isLoading?: boolean;
+	paginationInfo: {
+		totalItems: number;
+		totalPages: number;
+	};
+	supportedLayouts: string[];
+	onSelectionChange?: ( items: Item[] ) => void;
+}
+
+const defaultGetItemId = ( item: AnyItem ) => item.id;
 const defaultOnSelectionChange = () => {};
 
-function useSomeItemHasAPossibleBulkAction( actions, data ) {
+function useSomeItemHasAPossibleBulkAction< Item extends AnyItem >(
+	actions: Action< Item >[],
+	data: Item[]
+) {
 	return useMemo( () => {
 		return data.some( ( item ) => {
 			return actions.some( ( action ) => {
-				return action.supportsBulk && action.isEligible( item );
+				return (
+					action.supportsBulk &&
+					( ! action.isEligible || action.isEligible( item ) )
+				);
 			} );
 		} );
 	}, [ actions, data ] );
 }
 
-export default function DataViews( {
+export default function DataViews< Item extends AnyItem >( {
 	view,
 	onChangeView,
 	fields,
@@ -43,9 +68,9 @@ export default function DataViews( {
 	paginationInfo,
 	supportedLayouts,
 	onSelectionChange = defaultOnSelectionChange,
-} ) {
-	const [ selection, setSelection ] = useState( [] );
-	const [ openedFilter, setOpenedFilter ] = useState( null );
+}: DataViewsProps< Item > ) {
+	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
 
 	useEffect( () => {
 		if (
@@ -67,7 +92,7 @@ export default function DataViews( {
 	}, [ selection, data, getItemId, onSelectionChange ] );
 
 	const onSetSelection = useCallback(
-		( items ) => {
+		( items: Item[] ) => {
 			setSelection( items.map( ( item ) => getItemId( item ) ) );
 			onSelectionChange( items );
 		},
@@ -150,7 +175,7 @@ export default function DataViews( {
 						data={ data }
 						actions={ actions }
 						selection={ selection }
-						setSelection={ setSelection }
+						onSelectionChange={ onSetSelection }
 						getItemId={ getItemId }
 					/>
 				) }
