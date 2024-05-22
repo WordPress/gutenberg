@@ -67,3 +67,7 @@ export function getInsertBlockTypeDependants( state, rootClientId ) {
 		state.blockEditingModes,
 	];
 }
+
+export function getModifyContentLockSnackbarId( clientId ) {
+	return `modify-content-lock-${ clientId }`;
+}

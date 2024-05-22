@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -9,6 +11,7 @@ import { Platform } from '@wordpress/element';
 import { undoIgnoreBlocks } from './undo-ignore';
 import { store as blockEditorStore } from './index';
 import { unlock } from '../lock-unlock';
+import { getModifyContentLockSnackbarId } from './utils';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -399,7 +402,7 @@ export function expandBlock( clientId ) {
  */
 export const modifyContentLockBlock =
 	( clientId ) =>
-	( { select, dispatch } ) => {
+	( { registry, select, dispatch } ) => {
 		dispatch.__unstableMarkNextChangeAsNotPersistent();
 		dispatch.updateBlockAttributes( clientId, {
 			templateLock: undefined,
@@ -414,4 +417,22 @@ export const modifyContentLockBlock =
 			clientId,
 			focusModeToRevert
 		);
+		const snackbarId = getModifyContentLockSnackbarId( clientId );
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Done editing?' ), {
+				type: 'snackbar',
+				id: snackbarId,
+				actions: [
+					{
+						label: __( 'Lock' ),
+						onClick: () => {
+							dispatch.stopEditingAsBlocks( clientId );
+							// Move focus back to the block to prevent focus-loss.
+							dispatch.selectBlock( clientId, -1 );
+						},
+					},
+				],
+			} );
+		return snackbarId;
 	};

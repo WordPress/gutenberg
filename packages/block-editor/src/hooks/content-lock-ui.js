@@ -4,12 +4,13 @@
 import { ToolbarButton, MenuItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../store';
+import { getModifyContentLockSnackbarId } from '../store/utils';
 import { BlockControls, BlockSettingsMenuControls } from '../components';
 import { unlock } from '../lock-unlock';
 
@@ -36,15 +37,19 @@ function ContentLockControlsPure( { clientId, isSelected } ) {
 		[ clientId ]
 	);
 
-	const { stopEditingAsBlocks, modifyContentLockBlock } = unlock(
+	const { stopEditingAsBlocks, modifyContentLockBlock, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const { removeNotice } = useDispatch( noticesStore );
 	const isContentLocked =
 		! isLockedByParent && templateLock === 'contentOnly';
 
-	const stopEditingAsBlockCallback = useCallback( () => {
+	const stopEditingAsBlockCallback = () => {
 		stopEditingAsBlocks( clientId );
-	}, [ clientId, stopEditingAsBlocks ] );
+		removeNotice( getModifyContentLockSnackbarId( clientId ) );
+		// Move focus back to the block to prevent focus-loss.
+		selectBlock( clientId, -1 );
+	};
 
 	if ( ! isContentLocked && ! isEditingAsBlocks ) {
 		return null;
