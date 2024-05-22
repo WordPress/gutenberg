@@ -13,11 +13,11 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -29,6 +29,7 @@ const { useHistory } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
+const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
