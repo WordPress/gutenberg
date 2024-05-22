@@ -12,7 +12,7 @@ import ViewActions from './view-actions';
 import Filters from './filters';
 import Search from './search';
 import { LAYOUT_TABLE, LAYOUT_GRID } from './constants';
-import { VIEW_LAYOUTS, getViewLayout } from './layouts';
+import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
@@ -99,8 +99,9 @@ export default function DataViews< Item extends AnyItem >( {
 		[ setSelection, getItemId, onSelectionChange ]
 	);
 
-	const ViewComponent = getViewLayout( view.type ).component;
-
+	const ViewComponent = VIEW_LAYOUTS.find(
+		( v ) => v.type === view.type
+	).component;
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
