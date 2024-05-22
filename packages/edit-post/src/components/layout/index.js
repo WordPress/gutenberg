@@ -204,7 +204,7 @@ function Layout( { initialPost } ) {
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
-		: 'post-editor-edit';
+		: 'entity-edit';
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();

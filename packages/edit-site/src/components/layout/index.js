@@ -150,7 +150,7 @@ export default function Layout() {
 	let commandContext = 'site-editor';
 
 	if ( canvasMode === 'edit' ) {
-		commandContext = 'site-editor-edit';
+		commandContext = 'entity-edit';
 	}
 	if ( hasBlockSelected ) {
 		commandContext = 'block-selection-edit';

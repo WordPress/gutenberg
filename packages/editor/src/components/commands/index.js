@@ -3,7 +3,14 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { code, listView, external, keyboard } from '@wordpress/icons';
+import {
+	code,
+	edit,
+	listView,
+	external,
+	keyboard,
+	symbol,
+} from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';
@@ -15,6 +22,9 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { PATTERN_POST_TYPE } from '../../store/constants';
+import { modalName as patternRenameModalName } from '../pattern-rename-modal';
+import { modalName as patternDuplicateModalName } from '../pattern-duplicate-modal';
 
 function useEditorCommandLoader() {
 	const {
@@ -221,9 +231,49 @@ function useEditorCommandLoader() {
 	};
 }
 
+function useEditedEntityContextualCommands() {
+	const { postType } = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( editorStore );
+		return {
+			postType: getCurrentPostType(),
+		};
+	}, [] );
+	const { openModal } = useDispatch( interfaceStore );
+	const commands = [];
+
+	if ( postType === PATTERN_POST_TYPE ) {
+		commands.push( {
+			name: 'core/rename-pattern',
+			label: __( 'Rename pattern' ),
+			icon: edit,
+			callback: ( { close } ) => {
+				openModal( patternRenameModalName );
+				close();
+			},
+		} );
+		commands.push( {
+			name: 'core/duplicate-pattern',
+			label: __( 'Duplicate pattern' ),
+			icon: symbol,
+			callback: ( { close } ) => {
+				openModal( patternDuplicateModalName );
+				close();
+			},
+		} );
+	}
+
+	return { isLoading: false, commands };
+}
+
 export default function useCommands() {
 	useCommandLoader( {
 		name: 'core/editor/edit-ui',
 		hook: useEditorCommandLoader,
+	} );
+
+	useCommandLoader( {
+		name: 'core/editor/contextual-commands',
+		hook: useEditedEntityContextualCommands,
+		context: 'entity-edit',
 	} );
 }
