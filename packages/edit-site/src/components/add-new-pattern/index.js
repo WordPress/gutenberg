@@ -25,14 +25,13 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 const { CreatePatternModal, useAddPatternCategory } = unlock(
 	editPatternsPrivateApis
 );
 
 export default function AddNewPattern() {
 	const history = useHistory();
-	const { params } = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
@@ -141,16 +140,17 @@ export default function AddNewPattern() {
 						return;
 					}
 					try {
+						const {
+							params: { postType, categoryId },
+						} = history.getLocationWithParams();
 						let currentCategoryId;
 						// When we're not handling template parts, we should
 						// add or create the proper pattern category.
-						if ( params.postType !== TEMPLATE_PART_POST_TYPE ) {
+						if ( postType !== TEMPLATE_PART_POST_TYPE ) {
 							const currentCategory = categoryMap
 								.values()
-								.find(
-									( term ) => term.name === params.categoryId
-								);
-							if ( !! currentCategory ) {
+								.find( ( term ) => term.name === categoryId );
+							if ( currentCategory ) {
 								currentCategoryId =
 									currentCategory.id ||
 									( await findOrCreateTerm(
@@ -170,7 +170,7 @@ export default function AddNewPattern() {
 						// category.
 						if (
 							! currentCategoryId &&
-							params.categoryId !== 'my-patterns'
+							categoryId !== 'my-patterns'
 						) {
 							history.push( {
 								postType: PATTERN_TYPES.user,

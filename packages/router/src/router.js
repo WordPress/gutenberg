@@ -23,25 +23,11 @@ export function useHistory() {
 	return useContext( HistoryContext );
 }
 
-const locationCache = new Map();
-function getLocationWithParams( location ) {
-	if ( locationCache.get( location.search ) ) {
-		return locationCache.get( location.search );
-	}
-	const searchParams = new URLSearchParams( location.search );
-	const ret = {
-		...location,
-		params: Object.fromEntries( searchParams.entries() ),
-	};
-	locationCache.clear();
-	locationCache.set( location.search, ret );
-
-	return ret;
-}
-
 export function RouterProvider( { children } ) {
-	const location = useSyncExternalStore( history.listen, () =>
-		getLocationWithParams( history.location )
+	const location = useSyncExternalStore(
+		history.listen,
+		history.getLocationWithParams,
+		history.getLocationWithParams
 	);
 
 	return (
