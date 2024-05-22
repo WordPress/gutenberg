@@ -51,8 +51,9 @@ const getFormattedDate = ( dateToDisplay ) =>
 	);
 
 function useView( postType ) {
-	const { params } = useLocation();
-	const { activeView = 'all', isCustom = 'false', layout } = params;
+	const {
+		params: { activeView = 'all', isCustom = 'false', layout },
+	} = useLocation();
 	const history = useHistory();
 	const selectedDefaultView = useMemo( () => {
 		const defaultView =
@@ -128,6 +129,7 @@ function useView( postType ) {
 	const setDefaultViewAndUpdateUrl = useCallback(
 		( viewToSet ) => {
 			if ( viewToSet.type !== view?.type ) {
+				const { params } = history.getLocationWithParams();
 				history.push( {
 					...params,
 					layout: viewToSet.type,
@@ -135,7 +137,7 @@ function useView( postType ) {
 			}
 			setView( viewToSet );
 		},
-		[ params, view?.type, history ]
+		[ history, view?.type ]
 	);
 
 	if ( isCustom === 'false' ) {
@@ -203,19 +205,21 @@ export default function PagePages() {
 	const postType = 'page';
 	const [ view, setView ] = useView( postType );
 	const history = useHistory();
-	const { params } = useLocation();
-	const { isCustom = 'false' } = params;
 
 	const onSelectionChange = useCallback(
 		( items ) => {
-			if ( isCustom === 'false' && view?.type === LAYOUT_LIST ) {
+			const { params } = history.getLocationWithParams();
+			if (
+				( params.isCustom ?? 'false' ) === 'false' &&
+				view?.type === LAYOUT_LIST
+			) {
 				history.push( {
 					...params,
 					postId: items.length === 1 ? items[ 0 ].id : undefined,
 				} );
 			}
 		},
-		[ history, params, view?.type, isCustom ]
+		[ history, view?.type ]
 	);
 
 	const queryArgs = useMemo( () => {
