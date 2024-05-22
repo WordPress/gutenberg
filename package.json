@@ -218,7 +218,7 @@
 		"jest-message-util": "29.6.2",
 		"jest-watch-typeahead": "2.2.2",
 		"lerna": "7.1.4",
-		"lint-staged": "10.0.1",
+		"lint-staged": "10.0.2",
 		"make-dir": "3.0.0",
 		"mkdirp": "3.0.1",
 		"mock-match-media": "0.4.2",
