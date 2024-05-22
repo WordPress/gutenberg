@@ -21,6 +21,7 @@ function ZoomOutModeInserters() {
 		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
+		selectedSection,
 	} = useSelect( ( select ) => {
 		const { getSettings, getBlockOrder } = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
@@ -32,6 +33,7 @@ function ZoomOutModeInserters() {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const editor = select( 'core/editor' );
 		return {
+			selectedSection: editor.getSelectedBlock(),
 			blockOrder: getBlockOrder( root ),
 			insertionPoint: unlock( editor ).getInsertionPoint(),
 			sectionRootClientId: root,
@@ -62,7 +64,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! selectedSection ) {
 		return null;
 	}
 
