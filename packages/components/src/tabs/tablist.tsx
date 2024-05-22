@@ -158,14 +158,6 @@ export const TabList = forwardRef<
 		<Ariakit.TabList
 			ref={ ref }
 			store={ store }
-			style={
-				{
-					'--indicator-left': `${ indicatorPosition.left }px`,
-					'--indicator-top': `${ indicatorPosition.top }px`,
-					'--indicator-width': `${ indicatorPosition.width }px`,
-					'--indicator-height': `${ indicatorPosition.height }px`,
-				} as CSSProperties
-			}
 			render={
 				<TabListWrapper
 					onTransitionEnd={ ( event ) => {
@@ -177,6 +169,15 @@ export const TabList = forwardRef<
 			}
 			onBlur={ onBlur }
 			{ ...otherProps }
+			style={
+				{
+					'--indicator-left': `${ indicatorPosition.left }px`,
+					'--indicator-top': `${ indicatorPosition.top }px`,
+					'--indicator-width': `${ indicatorPosition.width }px`,
+					'--indicator-height': `${ indicatorPosition.height }px`,
+					...otherProps.style,
+				} as CSSProperties
+			}
 			className={ clsx(
 				animationEnabled ? 'is-animation-enabled' : '',
 				otherProps.className
