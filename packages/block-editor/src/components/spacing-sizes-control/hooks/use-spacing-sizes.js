@@ -10,11 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { useSettings } from '../../use-settings';
 import { RANGE_CONTROL_MAX_SIZE } from '../utils';
 
+const EMPTY_ARRAY = [];
+
 export default function useSpacingSizes() {
 	const [
-		customSizes,
-		themeSizes,
-		defaultSizes,
+		customSpacingSizes,
+		themeSpacingSizes,
+		defaultSpacingSizes,
 		defaultSpacingSizesEnabled,
 	] = useSettings(
 		'spacing.spacingSizes.custom',
@@ -23,8 +25,14 @@ export default function useSpacingSizes() {
 		'spacing.defaultSpacingSizes'
 	);
 
-	const maybeDefaultSizes =
-		defaultSpacingSizesEnabled !== false ? defaultSizes : null;
+	const customSizes = customSpacingSizes ?? EMPTY_ARRAY;
+
+	const themeSizes = themeSpacingSizes ?? EMPTY_ARRAY;
+
+	const defaultSizes =
+		defaultSpacingSizes && defaultSpacingSizesEnabled !== false
+			? defaultSpacingSizes
+			: EMPTY_ARRAY;
 
 	return useMemo( () => {
 		const zeroSize = [ { name: 0, slug: '0', size: 0 } ];
@@ -33,7 +41,7 @@ export default function useSpacingSizes() {
 			zeroSize.length +
 			( customSizes?.length ?? 0 ) +
 			( themeSizes?.length ?? 0 ) +
-			( maybeDefaultSizes?.length ?? 0 );
+			( defaultSizes?.length ?? 0 );
 
 		const maybeUnsetSize =
 			sizesLength > RANGE_CONTROL_MAX_SIZE
@@ -44,14 +52,14 @@ export default function useSpacingSizes() {
 							size: undefined,
 						},
 				  ]
-				: null;
+				: EMPTY_ARRAY;
 
 		return [
 			...maybeUnsetSize,
 			...zeroSize,
 			...customSizes,
 			...themeSizes,
-			...maybeDefaultSizes,
+			...defaultSizes,
 		];
-	}, [ customSizes, themeSizes, maybeDefaultSizes ] );
+	}, [ customSizes, themeSizes, defaultSizes ] );
 }
