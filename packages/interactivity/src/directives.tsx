@@ -214,10 +214,10 @@ const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
 	return ( { directives, evaluate } ) => {
 		directives[ `on-${ type }` ]
 			.filter( ( { suffix } ) => suffix !== 'default' )
-			.forEach( ( entry ) => {
+			.forEach( ( entry: DirectiveEntry ) => {
 				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
 				useInit( () => {
-					const cb = ( event ) => evaluate( entry, event );
+					const cb = ( event: Event ) => evaluate( entry, event );
 					const globalVar = type === 'window' ? window : document;
 					globalVar.addEventListener( eventName, cb );
 					return () => globalVar.removeEventListener( eventName, cb );
