@@ -49,8 +49,8 @@ const trashPostAction = {
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
 	icon: trash,
-	isEligible( { status } ) {
-		return status !== 'trash';
+	isEligible( item ) {
+		return ! [ 'auto-draft', 'trash' ].includes( item.status );
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
