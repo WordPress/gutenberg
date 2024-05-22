@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -71,7 +71,7 @@ export default function PostExcerptEditor( {
 		userCanEdit && ! isDescendentOfQueryLoop && postTypeSupportsExcerpts;
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -89,7 +89,9 @@ export default function PostExcerptEditor( {
 	 * excerpt has been produced from the content.
 	 */
 	const strippedRenderedExcerpt = useMemo( () => {
-		if ( ! renderedExcerpt ) return '';
+		if ( ! renderedExcerpt ) {
+			return '';
+		}
 		const document = new window.DOMParser().parseFromString(
 			renderedExcerpt,
 			'text/html'
@@ -139,7 +141,7 @@ export default function PostExcerptEditor( {
 			withoutInteractiveFormatting
 		/>
 	);
-	const excerptClassName = classnames( 'wp-block-post-excerpt__excerpt', {
+	const excerptClassName = clsx( 'wp-block-post-excerpt__excerpt', {
 		'is-inline': ! showMoreOnNewLine,
 	} );
 

@@ -18,17 +18,17 @@ function ScreenColorPalette( { name } ) {
 	return (
 		<>
 			<ScreenHeader
-				title={ __( 'Palette' ) }
+				title={ __( 'Edit palette' ) }
 				description={ __(
-					'Palettes are used to provide default color options for blocks and various design tools. Here you can edit the colors with their labels.'
+					'The combination of colors used across the site and in color pickers.'
 				) }
 			/>
 			<Tabs>
 				<Tabs.TabList>
-					<Tabs.Tab tabId="solid">{ __( 'Solid' ) }</Tabs.Tab>
+					<Tabs.Tab tabId="color">{ __( 'Color' ) }</Tabs.Tab>
 					<Tabs.Tab tabId="gradient">{ __( 'Gradient' ) }</Tabs.Tab>
 				</Tabs.TabList>
-				<Tabs.TabPanel tabId="solid" focusable={ false }>
+				<Tabs.TabPanel tabId="color" focusable={ false }>
 					<ColorPalettePanel name={ name } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId="gradient" focusable={ false }>

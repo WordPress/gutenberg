@@ -20,7 +20,8 @@
 		"ext-libxml": "*",
 		"ext-tokenizer": "*",
 		"ext-xmlreader": "*",
-		"squizlabs/php_codesniffer": "^3.7.2"
+		"squizlabs/php_codesniffer": "^3.7.2",
+		"phpcsstandards/phpcsutils": "^1.0.8"
 	},
 	"require-dev": {
 		"phpcompatibility/php-compatibility": "^9.0",

@@ -1,0 +1,26 @@
+.editor-post-discussion__panel-dialog .editor-post-discussion {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+
+	.components-radio-control__option {
+		align-items: flex-start;
+	}
+
+	.components-radio-control__label .components-text {
+		display: block;
+		margin-top: $grid-unit-05;
+	}
+}
+.editor-post-discussion__panel-toggle {
+	&.components-button {
+		height: auto;
+	}
+	.components-text {
+		color: inherit;
+	}
+}
+
+.editor-post-discussion__panel-dialog .components-popover__content {
+	min-width: 320px;
+}

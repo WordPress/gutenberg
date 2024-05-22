@@ -3,7 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	Tooltip,
+	__unstableMotion as motion,
+} from '@wordpress/components';
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
@@ -28,18 +32,33 @@ export default function ResizeHandle( {
 		}
 	}
 
+	const resizeHandleVariants = {
+		active: {
+			opacity: 1,
+			scaleY: 1.3,
+		},
+	};
+
+	const resizableHandleHelpId = `resizable-editor__resize-help-${ direction }`;
+
 	return (
 		<>
-			<button
-				className={ `resizable-editor__drag-handle is-${ direction } is-variation-${ variation }` }
-				aria-label={ __( 'Drag to resize' ) }
-				aria-describedby={ `resizable-editor__resize-help-${ direction }` }
-				onKeyDown={ handleKeyDown }
-				type="button"
-			/>
-			<VisuallyHidden
-				id={ `resizable-editor__resize-help-${ direction }` }
-			>
+			<Tooltip text={ __( 'Drag to resize' ) }>
+				<motion.button
+					className={ `resizable-editor__drag-handle is-${ direction } is-variation-${ variation }` }
+					aria-label={ __( 'Drag to resize' ) }
+					aria-describedby={ resizableHandleHelpId }
+					onKeyDown={ handleKeyDown }
+					variants={ resizeHandleVariants }
+					whileFocus="active"
+					whileHover="active"
+					whileTap="active"
+					key="handle"
+					role="separator"
+					aria-orientation="vertical"
+				/>
+			</Tooltip>
+			<VisuallyHidden id={ resizableHandleHelpId }>
 				{ __( 'Use left and right arrow keys to resize the canvas.' ) }
 			</VisuallyHidden>
 		</>

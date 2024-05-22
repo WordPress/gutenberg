@@ -23,6 +23,7 @@ import { BlockRemovalWarningModal } from './components/block-removal-warning-mod
 import { useLayoutClasses, useLayoutStyles } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
+import TextAlignmentControl from './components/text-alignment-control';
 import {
 	default as ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
@@ -34,9 +35,11 @@ import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
+	globalStylesDataKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
+import { PrivateBlockPopover } from './components/block-popover';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -66,12 +69,15 @@ lock( privateApis, {
 	useLayoutStyles,
 	DimensionsTool,
 	ResolutionTool,
+	TextAlignmentControl,
 	ReusableBlocksRenameHint,
 	useReusableBlocksRenameHint,
 	usesContextKey,
 	useFlashEditableBlocks,
+	globalStylesDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
 	PrivateRichText,
 	reusableBlocksSelectKey,
+	PrivateBlockPopover,
 } );

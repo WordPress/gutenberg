@@ -8,16 +8,11 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import {
-	mergeOrigins,
-	overrideOrigins,
-	hasOriginValue,
-} from '../../store/get-block-settings';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -57,13 +52,18 @@ export function useHasTypographyPanel( settings ) {
 
 function useHasFontSizeControl( settings ) {
 	return (
-		hasOriginValue( settings?.typography?.fontSizes ) ||
+		( settings?.typography?.defaultFontSizes !== false &&
+			settings?.typography?.fontSizes?.default?.length ) ||
+		settings?.typography?.fontSizes?.theme?.length ||
+		settings?.typography?.fontSizes?.custom?.length ||
 		settings?.typography?.customFontSize
 	);
 }
 
 function useHasFontFamilyControl( settings ) {
-	return hasOriginValue( settings?.typography?.fontFamilies );
+	return [ 'default', 'theme', 'custom' ].some(
+		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
+	);
 }
 
 function useHasLineHeightControl( settings ) {
@@ -104,16 +104,21 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
-function getUniqueFontSizesBySlug( settings ) {
-	const fontSizes = settings?.typography?.fontSizes ?? {};
-	const overriddenFontSizes = overrideOrigins( fontSizes ) ?? [];
-	const uniqueSizes = [];
-	for ( const currentSize of overriddenFontSizes ) {
-		if ( ! uniqueSizes.some( ( { slug } ) => slug === currentSize.slug ) ) {
-			uniqueSizes.push( currentSize );
-		}
-	}
-	return uniqueSizes;
+/**
+ * Concatenate all the font sizes into a single list for the font size picker.
+ *
+ * @param {Object} settings The global styles settings.
+ *
+ * @return {Array} The merged font sizes.
+ */
+function getMergedFontSizes( settings ) {
+	const fontSizes = settings?.typography?.fontSizes;
+	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
+	return [
+		...( fontSizes?.custom ?? [] ),
+		...( fontSizes?.theme ?? [] ),
+		...( defaultFontSizesEnabled ? fontSizes?.default ?? [] : [] ),
+	];
 }
 
 function TypographyToolsPanel( {
@@ -166,8 +171,12 @@ export default function TypographyPanel( {
 
 	// Font Family
 	const hasFontFamilyEnabled = useHasFontFamilyControl( settings );
-	const fontFamilies = settings?.typography?.fontFamilies ?? {};
-	const mergedFontFamilies = fontFamilies ? mergeOrigins( fontFamilies ) : [];
+	const fontFamilies = settings?.typography?.fontFamilies;
+	const mergedFontFamilies = useMemo( () => {
+		return [ 'default', 'theme', 'custom' ].flatMap(
+			( key ) => fontFamilies?.[ key ] ?? []
+		);
+	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(
@@ -189,7 +198,7 @@ export default function TypographyPanel( {
 	// Font Size
 	const hasFontSizeEnabled = useHasFontSizeControl( settings );
 	const disableCustomFontSizes = ! settings?.typography?.customFontSize;
-	const mergedFontSizes = getUniqueFontSizesBySlug( settings );
+	const mergedFontSizes = getMergedFontSizes( settings );
 
 	const fontSize = decodeValue( inheritedValue?.typography?.fontSize );
 	const setFontSize = ( newValue, metadata ) => {

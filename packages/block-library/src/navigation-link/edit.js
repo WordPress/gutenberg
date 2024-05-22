@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -247,9 +247,11 @@ export default function NavigationLinkEdit( {
 	const {
 		replaceBlock,
 		__unstableMarkNextChangeAsNotPersistent,
+		selectBlock,
 		selectPreviousBlock,
 	} = useDispatch( blockEditorStore );
-	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	// Have the link editing ui open on mount when lacking a url and selected.
+	const [ isLinkOpen, setIsLinkOpen ] = useState( isSelected && ! url );
 	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
 	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
@@ -304,26 +306,18 @@ export default function NavigationLinkEdit( {
 	 * Transform to submenu block.
 	 */
 	const transformToSubmenu = () => {
-		const innerBlocks = getBlocks( clientId );
+		let innerBlocks = getBlocks( clientId );
+		if ( innerBlocks.length === 0 ) {
+			innerBlocks = [ createBlock( 'core/navigation-link' ) ];
+			selectBlock( innerBlocks[ 0 ].clientId );
+		}
 		const newSubmenu = createBlock(
 			'core/navigation-submenu',
 			attributes,
-			innerBlocks.length > 0
-				? innerBlocks
-				: [ createBlock( 'core/navigation-link' ) ]
+			innerBlocks
 		);
 		replaceBlock( clientId, newSubmenu );
 	};
-
-	useEffect( () => {
-		// Show the LinkControl on mount if the URL is empty
-		// ( When adding a new menu item)
-		// This can't be done in the useState call because it conflicts
-		// with the autofocus behavior of the BlockListBlock component.
-		if ( ! url ) {
-			setIsLinkOpen( true );
-		}
-	}, [ url ] );
 
 	useEffect( () => {
 		// If block has inner blocks, transform to Submenu.
@@ -334,16 +328,6 @@ export default function NavigationLinkEdit( {
 			transformToSubmenu();
 		}
 	}, [ hasChildren ] );
-
-	/**
-	 * The hook shouldn't be necessary but due to a focus loss happening
-	 * when selecting a suggestion in the link popover, we force close on block unselection.
-	 */
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setIsLinkOpen( false );
-		}
-	}, [ isSelected ] );
 
 	// If the LinkControl popover is open and the URL has changed, close the LinkControl and focus the label text.
 	useEffect( () => {
@@ -419,7 +403,7 @@ export default function NavigationLinkEdit( {
 
 	const blockProps = useBlockProps( {
 		ref: useMergeRefs( [ setPopoverAnchor, listItemRef ] ),
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
@@ -456,7 +440,7 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const classes = classnames( 'wp-block-navigation-item__content', {
+	const classes = clsx( 'wp-block-navigation-item__content', {
 		'wp-block-navigation-link__placeholder': ! url || isInvalid || isDraft,
 	} );
 

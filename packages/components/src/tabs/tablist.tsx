@@ -24,7 +24,7 @@ import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
 import type { CSSProperties } from 'react';
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 function useTrackElementOffset(
 	targetElement?: HTMLElement | null,
@@ -46,7 +46,10 @@ function useTrackElementOffset(
 	const observedElementRef = useRef< HTMLElement >();
 	const resizeObserverRef = useRef< ResizeObserver >();
 	useEffect( () => {
-		if ( targetElement === observedElementRef.current ) return;
+		if ( targetElement === observedElementRef.current ) {
+			return;
+		}
+
 		observedElementRef.current = targetElement ?? undefined;
 
 		function updateIndicator( element: HTMLElement ) {
@@ -62,15 +65,18 @@ function useTrackElementOffset(
 		// Set up a ResizeObserver.
 		if ( ! resizeObserverRef.current ) {
 			resizeObserverRef.current = new ResizeObserver( () => {
-				if ( observedElementRef.current )
+				if ( observedElementRef.current ) {
 					updateIndicator( observedElementRef.current );
+				}
 			} );
 		}
 		const { current: resizeObserver } = resizeObserverRef;
 
 		// Unobserve previous element.
 		const { current: observedElement } = observedElementRef;
-		if ( observedElement ) resizeObserver.unobserve( observedElement );
+		if ( observedElement ) {
+			resizeObserver.unobserve( observedElement );
+		}
 
 		// Observe new element.
 		if ( targetElement ) {
@@ -163,14 +169,15 @@ export const TabList = forwardRef<
 			render={
 				<TabListWrapper
 					onTransitionEnd={ ( event ) => {
-						if ( event.pseudoElement === '::after' )
+						if ( event.pseudoElement === '::after' ) {
 							setAnimationEnabled( false );
+						}
 					} }
 				/>
 			}
 			onBlur={ onBlur }
 			{ ...otherProps }
-			className={ classNames(
+			className={ clsx(
 				animationEnabled ? 'is-animation-enabled' : '',
 				otherProps.className
 			) }

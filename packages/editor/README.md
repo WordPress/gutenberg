@@ -128,13 +128,29 @@ Example:
 
 ### AutosaveMonitor
 
-AutosaveMonitor component. Monitors the changes made to the edited post and triggers autosave if necessary.
+Monitors the changes made to the edited post and triggers autosave if necessary.
+
+The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called. The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as the specific way of detecting changes.
+
+There are two caveats:
+
+-   If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+-   The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
 
 _Usage_
 
 ```jsx
 <AutosaveMonitor interval={ 30000 } />
 ```
+
+_Parameters_
+
+-   _props_ `Object`: - The properties passed to the component.
+-   _props.autosave_ `Function`: - The function to call when changes need to be saved.
+-   _props.interval_ `number`: - The maximum time in seconds between an unsaved change and an autosave.
+-   _props.isAutosaveable_ `boolean`: - If false, the check for changes is retried every second.
+-   _props.disableIntervalChecks_ `boolean`: - If true, disables the timer and any change will immediately trigger `props.autosave()`.
+-   _props.isDirty_ `boolean`: - Indicates if there are unsaved changes.
 
 ### BlockAlignmentToolbar
 
@@ -194,7 +210,11 @@ _Usage_
 
 ### CharacterCount
 
-Undocumented declaration.
+Renders the character count of the post content.
+
+_Returns_
+
+-   `number`: The character count.
 
 ### cleanForSlug
 
@@ -234,35 +254,99 @@ _Returns_
 
 ### DocumentBar
 
-Undocumented declaration.
+This component renders a navigation bar at the top of the editor. It displays the title of the current document, a back button (if applicable), and a command center button. It also handles different states of the document, such as "not found" or "unsynced".
+
+_Usage_
+
+```jsx
+<DocumentBar />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered DocumentBar component.
 
 ### DocumentOutline
 
-Undocumented declaration.
+Renders a document outline component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onSelect_ `Function`: Function to be called when an outline item is selected.
+-   _props.isTitleSupported_ `boolean`: Indicates whether the title is supported.
+-   _props.hasOutlineItemsDisabled_ `boolean`: Indicates whether the outline items are disabled.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### DocumentOutlineCheck
 
-Undocumented declaration.
+Component check if there are any headings (core/heading blocks) present in the document.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered or null if there are headings.
 
 ### EditorHistoryRedo
 
-Undocumented declaration.
+Renders the redo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorHistoryUndo
 
-Undocumented declaration.
+Renders the undo button for the editor history.
+
+_Parameters_
+
+-   _props_ `Object`: - Props.
+-   _ref_ `Ref`: - Forwarded ref.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### EditorKeyboardShortcuts
 
-Undocumented declaration.
+Component handles the keyboard shortcuts for the editor.
+
+It provides functionality for various keyboard shortcuts such as toggling editor mode, toggling distraction-free mode, undo/redo, saving the post, toggling list view, and toggling the sidebar.
 
 ### EditorKeyboardShortcutsRegister
 
-Undocumented declaration.
+Component for registering editor keyboard shortcuts.
+
+_Returns_
+
+-   `Element`: The component to be rendered.
 
 ### EditorNotices
 
-Undocumented declaration.
+This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
+
+_Usage_
+
+```jsx
+<EditorNotices />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered EditorNotices component.
 
 ### EditorProvider
 
@@ -270,7 +354,11 @@ Undocumented declaration.
 
 ### EditorSnackbars
 
-Undocumented declaration.
+Renders the editor snackbars component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### EntitiesSavedStates
 
@@ -376,19 +464,40 @@ _Parameters_
 
 ### PageAttributesCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports page attributes.
+
+_Parameters_
+
+-   _props_ `Object`: - The component props.
+-   _props.children_ `Element`: - The child components to render.
+
+_Returns_
+
+-   `Component|null`: The rendered child components or null if page attributes are not supported.
 
 ### PageAttributesOrder
 
-Undocumented declaration.
+Renders the Page Attributes Order component. A number input in an editor interface for setting the order of a given page.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesPanel
 
-Undocumented declaration.
+Renders the Page Attributes Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PageAttributesParent
 
-Undocumented declaration.
+Renders the Page Attributes Parent component. A dropdown menu in an editor interface for selecting the parent page of a given page.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return null if post type is not hierarchical.
 
 ### PageTemplate
 
@@ -587,7 +696,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPostPublishPanel } from '@wordpress/edit-post';
+import { PluginPostPublishPanel } from '@wordpress/editor';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -666,7 +775,7 @@ _Usage_
 ```jsx
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
@@ -733,7 +842,7 @@ function MyPluginSidebar() {
 // Using ESNext syntax
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { PluginSidebar } from '@wordpress/edit-post';
+import { PluginSidebar } from '@wordpress/editor';
 import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
@@ -801,15 +910,32 @@ _Returns_
 
 ### PostAuthor
 
-Undocumented declaration.
+Renders the component for selecting the post author.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostAuthorCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports the author.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return `null` if the post type doesn't supports the author or if there are no authors available.
 
 ### PostAuthorPanel
 
-Undocumented declaration.
+Renders the Post Author Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostComments
 
@@ -821,7 +947,13 @@ Undocumented declaration.
 
 ### PostExcerpt
 
-Undocumented declaration.
+Renders an editable textarea for the post excerpt. Templates, template parts and patterns use the `excerpt` field as a description semantically. Additionally templates and template parts override the `excerpt` field as `description` in REST API. So this component handles proper labeling and updating the edited entity.
+
+_Parameters_
+
+-   _props_ `Object`: - Component props.
+-   _props.hideLabelFromVision_ `[boolean]`: - Whether to visually hide the textarea's label.
+-   _props.updateOnBlur_ `[boolean]`: - Whether to update the post on change or use local state and update on blur.
 
 ### PostExcerptCheck
 
@@ -842,35 +974,105 @@ Undocumented declaration.
 
 ### PostFeaturedImage
 
-Undocumented declaration.
+Renders the component for managing the featured image of a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.currentPostId_ `number`: ID of the current post.
+-   _props.featuredImageId_ `number`: ID of the featured image.
+-   _props.onUpdateImage_ `Function`: Function to call when the image is updated.
+-   _props.onRemoveImage_ `Function`: Function to call when the image is removed.
+-   _props.media_ `Object`: The media object representing the featured image.
+-   _props.postType_ `string`: Post type.
+-   _props.noticeUI_ `Element`: UI for displaying notices.
+-   _props.noticeOperations_ `Object`: Operations for managing notices.
+
+_Returns_
+
+-   `Element`: Component to be rendered .
 
 ### PostFeaturedImageCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if the post type supports a featured image and the theme supports post thumbnails.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostFeaturedImagePanel
 
-Undocumented declaration.
+Renders the panel for the post featured image.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.withPanelBody_ `boolean`: Whether to include the panel body. Default true.
+
+_Returns_
+
+-   `Component|null`: The component to be rendered. Return Null if the editor panel is disabled for featured image.
 
 ### PostFormat
 
-Undocumented declaration.
+`PostFormat` a component that allows changing the post format while also providing a suggestion for the current post.
+
+_Usage_
+
+```jsx
+<PostFormat />
+```
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostFormat component.
 
 ### PostFormatCheck
 
-Undocumented declaration.
+Component check if there are any post formats.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child elements to render.
+
+_Returns_
+
+-   `Component|null`: The rendered component or null if post formats are disabled.
 
 ### PostLastRevision
 
-Undocumented declaration.
+Renders the component for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLastRevisionCheck
 
-Undocumented declaration.
+Wrapper component that renders its children if the post has more than one revision.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component|null`: Rendered child components if post has more than one revision, otherwise null.
 
 ### PostLastRevisionPanel
 
-Undocumented declaration.
+Renders the panel for displaying the last revision of a post.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostLockedModal
 
@@ -919,19 +1121,49 @@ _Returns_
 
 ### PostSchedule
 
-Undocumented declaration.
+Renders the PostSchedule component. It allows the user to schedule a post.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.onClose_ `Function`: Function to close the component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostScheduleCheck
 
-Undocumented declaration.
+Wrapper component that renders its children only if post has a publish action.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `Component`: - The component to be rendered or null if there is no publish action.
 
 ### PostScheduleLabel
 
-Undocumented declaration.
+Renders the PostScheduleLabel component.
+
+_Parameters_
+
+-   _props_ `Object`: Props.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSchedulePanel
 
-Undocumented declaration.
+Renders the Post Schedule Panel component.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
 
 ### PostSlug
 
@@ -996,7 +1228,16 @@ Undocumented declaration.
 
 ### PostTitle
 
-Undocumented declaration.
+Renders the `PostTitle` component.
+
+_Parameters_
+
+-   \_\_\_ `Object`: Unused parameter.
+-   _forwardedRef_ `Element`: Forwarded ref for the component.
+
+_Returns_
+
+-   `Component`: The rendered PostTitle component.
 
 ### PostTitleRaw
 
@@ -1026,31 +1267,84 @@ _Returns_
 
 ### PostURL
 
-Undocumented declaration.
+Renders the `PostURL` component.
+
+_Usage_
+
+```jsx
+<PostURL />
+```
+
+_Parameters_
+
+-   _onClose_ `Function`: Callback function to be executed when the popover is closed.
+
+_Returns_
+
+-   `Component`: The rendered PostURL component.
 
 ### PostURLCheck
 
-Undocumented declaration.
+Check if the post URL is valid and visible.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.children_ `Element`: The child components.
+
+_Returns_
+
+-   `Component|null`: The child components if the post URL is valid and visible, otherwise null.
 
 ### PostURLLabel
 
-Undocumented declaration.
+Represents a label component for a post URL.
+
+_Returns_
+
+-   `Component`: The PostURLLabel component.
 
 ### PostURLPanel
 
-Undocumented declaration.
+Renders the `PostURLPanel` component.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostURLPanel component.
 
 ### PostVisibility
 
-Undocumented declaration.
+Allows users to set the visibility of a post.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.onClose_ `Function`: Function to call when the popover is closed.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityCheck
 
-Undocumented declaration.
+Determines if the current post can be edited (published) and passes this information to the provided render function.
+
+_Parameters_
+
+-   _props_ `Object`: The component props.
+-   _props.render_ `Function`: Function to render the component. Receives an object with a `canEdit` property.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostVisibilityLabel
 
-Undocumented declaration.
+Returns the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### privateApis
 
@@ -1146,15 +1440,32 @@ Undocumented declaration.
 
 ### usePostScheduleLabel
 
-Undocumented declaration.
+Custom hook to get the label for post schedule.
+
+_Parameters_
+
+-   _options_ `Object`: Options for the hook.
+-   _options.full_ `boolean`: Whether to get the full label or not. Default is false.
+
+_Returns_
+
+-   `string`: The label for post schedule.
 
 ### usePostURLLabel
 
-Undocumented declaration.
+Custom hook to get the label for the post URL.
+
+_Returns_
+
+-   `string`: The filtered and decoded post URL label.
 
 ### usePostVisibilityLabel
 
-Undocumented declaration.
+Get the label for the current post visibility setting.
+
+_Returns_
+
+-   `string`: Post visibility label.
 
 ### userAutocompleter
 

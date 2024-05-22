@@ -3,7 +3,7 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
-
+import { useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -17,39 +17,84 @@ import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationScreenGlobalStyles from '../sidebar-navigation-screen-global-styles';
 import SidebarNavigationScreenMain from '../sidebar-navigation-screen-main';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
-import SidebarNavigationScreenPage from '../sidebar-navigation-screen-page';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
-import SidebarNavigationScreenTemplate from '../sidebar-navigation-screen-template';
-import SidebarNavigationScreenPattern from '../sidebar-navigation-screen-pattern';
 import SidebarNavigationScreenPatterns from '../sidebar-navigation-screen-patterns';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import DataViewsSidebarContent from '../sidebar-dataviews';
+import {
+	NAVIGATION_POST_TYPE,
+	PATTERN_TYPES,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
+
+function useRedirectOldPaths() {
+	const history = useHistory();
+	const { params } = useLocation();
+	useEffect( () => {
+		const { postType, path, categoryType, ...rest } = params;
+
+		if ( path === '/wp_template_part/all' ) {
+			history.replace( { postType: TEMPLATE_PART_POST_TYPE } );
+		}
+
+		if ( path === '/page' ) {
+			history.replace( {
+				postType: 'page',
+				...rest,
+			} );
+		}
+
+		if ( path === '/wp_template' ) {
+			history.replace( {
+				postType: TEMPLATE_POST_TYPE,
+				...rest,
+			} );
+		}
+
+		if ( path === '/patterns' ) {
+			history.replace( {
+				postType:
+					categoryType === TEMPLATE_PART_POST_TYPE
+						? TEMPLATE_PART_POST_TYPE
+						: PATTERN_TYPES.user,
+				...rest,
+			} );
+		}
+
+		if ( path === '/navigation' ) {
+			history.replace( {
+				postType: NAVIGATION_POST_TYPE,
+				...rest,
+			} );
+		}
+	}, [ history, params ] );
+}
 
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
 	const history = useHistory();
 	const { params } = useLocation();
-	const { postType, postId, path, layout, isCustom, canvas } = params ?? {};
-
-	// Note: Since "sidebar" is not yet supported here,
-	// returning undefined from "mobile" means show the sidebar.
+	const { postType, postId, path, layout, isCustom, canvas } = params;
+	useRedirectOldPaths();
 
 	// Page list
-	if ( path === '/page' ) {
+	if ( postType === 'page' ) {
 		const isListLayout = layout === 'list' || ! layout;
 		return {
-			key: 'pages-list',
+			key: 'pages',
 			areas: {
 				sidebar: (
 					<SidebarNavigationScreen
 						title={ __( 'Manage pages' ) }
+						backPath={ {} }
 						content={ <DataViewsSidebarContent /> }
 					/>
 				),
 				content: <PagePages />,
-				preview: isListLayout && (
+				preview: ( isListLayout || canvas === 'edit' ) && (
 					<Editor
 						isLoading={ isSiteEditorLoading }
 						onClick={ () =>
@@ -74,39 +119,17 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// Regular other post types
-	if ( postType && postId ) {
-		let sidebar;
-		if ( postType === 'wp_template_part' || postType === 'wp_block' ) {
-			sidebar = <SidebarNavigationScreenPattern />;
-		} else if ( postType === 'wp_template' ) {
-			sidebar = <SidebarNavigationScreenTemplate />;
-		} else if ( postType === 'page' ) {
-			sidebar = <SidebarNavigationScreenPage />;
-		} else {
-			sidebar = <SidebarNavigationScreenNavigationMenu />;
-		}
-		return {
-			key: 'page',
-			areas: {
-				sidebar,
-				preview: <Editor isLoading={ isSiteEditorLoading } />,
-				mobile: canvas === 'edit' && (
-					<Editor isLoading={ isSiteEditorLoading } />
-				),
-			},
-		};
-	}
-
 	// Templates
-	if ( path === '/wp_template' ) {
+	if ( postType === TEMPLATE_POST_TYPE ) {
 		const isListLayout = isCustom !== 'true' && layout === 'list';
 		return {
-			key: 'templates-list',
+			key: 'templates',
 			areas: {
-				sidebar: <SidebarNavigationScreenTemplatesBrowse />,
+				sidebar: (
+					<SidebarNavigationScreenTemplatesBrowse backPath={ {} } />
+				),
 				content: <PageTemplates />,
-				preview: isListLayout && (
+				preview: ( isListLayout || canvas === 'edit' ) && (
 					<Editor isLoading={ isSiteEditorLoading } />
 				),
 				mobile: <PageTemplates />,
@@ -117,32 +140,19 @@ export default function useLayoutAreas() {
 		};
 	}
 
-	// Template parts
-	/*
-	 * This is for legacy reasons, as the template parts are now part of the patterns screen.
-	 * However, hybrid themes (classic themes that support template parts) still access this URL.
-	 * While there are plans to make them use the patterns screen instead, we cannot do it for now.
-	 * See discussion at https://github.com/WordPress/gutenberg/pull/60689
-	 */
-	if ( path === '/wp_template_part/all' ) {
-		return {
-			key: 'template-parts',
-			areas: {
-				sidebar: <SidebarNavigationScreenPatterns />,
-				content: <PagePatterns />,
-				mobile: <PagePatterns />,
-			},
-		};
-	}
-
 	// Patterns
-	if ( path === '/patterns' ) {
+	if (
+		[ TEMPLATE_PART_POST_TYPE, PATTERN_TYPES.user ].includes( postType )
+	) {
 		return {
 			key: 'patterns',
 			areas: {
-				sidebar: <SidebarNavigationScreenPatterns />,
+				sidebar: <SidebarNavigationScreenPatterns backPath={ {} } />,
 				content: <PagePatterns />,
 				mobile: <PagePatterns />,
+				preview: canvas === 'edit' && (
+					<Editor isLoading={ isSiteEditorLoading } />
+				),
 			},
 		};
 	}
@@ -152,7 +162,9 @@ export default function useLayoutAreas() {
 		return {
 			key: 'styles',
 			areas: {
-				sidebar: <SidebarNavigationScreenGlobalStyles />,
+				sidebar: (
+					<SidebarNavigationScreenGlobalStyles backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />
@@ -162,11 +174,29 @@ export default function useLayoutAreas() {
 	}
 
 	// Navigation
-	if ( path === '/navigation' ) {
+	if ( postType === NAVIGATION_POST_TYPE ) {
+		if ( postId ) {
+			return {
+				key: 'navigation',
+				areas: {
+					sidebar: (
+						<SidebarNavigationScreenNavigationMenu
+							backPath={ { postType: NAVIGATION_POST_TYPE } }
+						/>
+					),
+					preview: <Editor isLoading={ isSiteEditorLoading } />,
+					mobile: canvas === 'edit' && (
+						<Editor isLoading={ isSiteEditorLoading } />
+					),
+				},
+			};
+		}
 		return {
-			key: 'styles',
+			key: 'navigation',
 			areas: {
-				sidebar: <SidebarNavigationScreenNavigationMenus />,
+				sidebar: (
+					<SidebarNavigationScreenNavigationMenus backPath={ {} } />
+				),
 				preview: <Editor isLoading={ isSiteEditorLoading } />,
 				mobile: canvas === 'edit' && (
 					<Editor isLoading={ isSiteEditorLoading } />

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,6 @@ import {
 	Tooltip,
 	Flex,
 } from '@wordpress/components';
-import { getQueryArgs } from '@wordpress/url';
 import { __, _x } from '@wordpress/i18n';
 import {
 	useState,
@@ -43,17 +42,11 @@ import {
 	LAYOUT_LIST,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
-	TEMPLATE_PART_ALL_AREAS_CATEGORY,
 	PATTERN_SYNC_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
-	ENUMERATION_TYPE,
 	OPERATOR_IS,
 } from '../../utils/constants';
 import {
-	exportJSONaction,
-	renameAction,
-	resetAction,
-	deleteAction,
 	duplicatePatternAction,
 	duplicateTemplatePartAction,
 } from './dataviews-pattern-actions';
@@ -63,12 +56,13 @@ import usePatterns from './use-patterns';
 import PatternsHeader from './header';
 import { useLink } from '../routes/link';
 import { useAddedBy } from '../page-templates/hooks';
+import { useEditPostAction } from '../dataviews-actions';
 
 const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
 	blockEditorPrivateApis
 );
 const { usePostActions } = unlock( editorPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const defaultConfigPerViewType = {
@@ -126,7 +120,7 @@ function PreviewWrapper( { item, onClick, ariaDescribedBy, children } ) {
 	);
 }
 
-function Preview( { item, categoryId, viewType } ) {
+function Preview( { item, viewType } ) {
 	const descriptionId = useId();
 	const isUserPattern = item.type === PATTERN_TYPES.user;
 	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
@@ -136,8 +130,6 @@ function Preview( { item, categoryId, viewType } ) {
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
-		categoryId,
-		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
 
@@ -180,12 +172,9 @@ function Author( { item, viewType } ) {
 		<HStack alignment="left" spacing={ 1 }>
 			{ withIcon && imageUrl && (
 				<div
-					className={ classnames(
-						'page-templates-author-field__avatar',
-						{
-							'is-loaded': isImageLoaded,
-						}
-					) }
+					className={ clsx( 'page-templates-author-field__avatar', {
+						'is-loaded': isImageLoaded,
+					} ) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -204,14 +193,11 @@ function Author( { item, viewType } ) {
 	);
 }
 
-function Title( { item, categoryId } ) {
+function Title( { item } ) {
 	const isUserPattern = item.type === PATTERN_TYPES.user;
-	const isTemplatePart = item.type === TEMPLATE_PART_POST_TYPE;
 	const { onClick } = useLink( {
 		postType: item.type,
 		postId: isUserPattern ? item.id : item.name,
-		categoryId,
-		categoryType: isTemplatePart ? item.type : PATTERN_TYPES.theme,
 		canvas: 'edit',
 	} );
 	return (
@@ -254,35 +240,19 @@ function Title( { item, categoryId } ) {
 
 export default function DataviewsPatterns() {
 	const {
-		categoryType,
-		categoryId: categoryIdFromURL,
-		path,
-	} = getQueryArgs( window.location.href );
-	const type =
-		categoryType ||
-		( path === '/wp_template_part/all'
-			? TEMPLATE_PART_POST_TYPE
-			: PATTERN_TYPES.theme );
-	const categoryId =
-		categoryIdFromURL ||
-		( path === '/wp_template_part/all'
-			? TEMPLATE_PART_ALL_AREAS_CATEGORY
-			: PATTERN_DEFAULT_CATEGORY );
+		params: { postType, categoryId: categoryIdFromURL },
+	} = useLocation();
+	const type = postType || PATTERN_TYPES.user;
+	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
 	const [ view, setView ] = useState( DEFAULT_VIEW );
-	const isUncategorizedThemePatterns =
-		type === PATTERN_TYPES.theme && categoryId === 'uncategorized';
 	const previousCategoryId = usePrevious( categoryId );
 	const viewSyncStatus = view.filters?.find(
 		( { field } ) => field === 'sync-status'
 	)?.value;
-	const { patterns, isResolving } = usePatterns(
-		type,
-		isUncategorizedThemePatterns ? '' : categoryId,
-		{
-			search: view.search,
-			syncStatus: viewSyncStatus,
-		}
-	);
+	const { patterns, isResolving } = usePatterns( type, categoryId, {
+		search: view.search,
+		syncStatus: viewSyncStatus,
+	} );
 
 	const { records } = useEntityRecords( 'postType', TEMPLATE_PART_POST_TYPE, {
 		per_page: -1,
@@ -307,11 +277,7 @@ export default function DataviewsPatterns() {
 				header: __( 'Preview' ),
 				id: 'preview',
 				render: ( { item } ) => (
-					<Preview
-						item={ item }
-						categoryId={ categoryId }
-						viewType={ view.type }
-					/>
+					<Preview item={ item } viewType={ view.type } />
 				),
 				enableSorting: false,
 				enableHiding: false,
@@ -320,14 +286,12 @@ export default function DataviewsPatterns() {
 			{
 				header: __( 'Title' ),
 				id: 'title',
-				render: ( { item } ) => (
-					<Title item={ item } categoryId={ categoryId } />
-				),
+				render: ( { item } ) => <Title item={ item } />,
 				enableHiding: false,
 			},
 		];
 
-		if ( type === PATTERN_TYPES.theme ) {
+		if ( type === PATTERN_TYPES.user ) {
 			_fields.push( {
 				header: __( 'Sync status' ),
 				id: 'sync-status',
@@ -348,7 +312,6 @@ export default function DataviewsPatterns() {
 						</span>
 					);
 				},
-				type: ENUMERATION_TYPE,
 				elements: SYNC_FILTERS,
 				filterBy: {
 					operators: [ OPERATOR_IS ],
@@ -364,7 +327,6 @@ export default function DataviewsPatterns() {
 				render: ( { item } ) => {
 					return <Author viewType={ view.type } item={ item } />;
 				},
-				type: ENUMERATION_TYPE,
 				elements: authors,
 				filterBy: {
 					isPrimary: true,
@@ -393,45 +355,22 @@ export default function DataviewsPatterns() {
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
 	}, [ patterns, view, fields, type ] );
 
-	const history = useHistory();
-	const onActionPerformed = useCallback(
-		( actionId, items ) => {
-			if ( actionId === 'edit-post' ) {
-				const post = items[ 0 ];
-				history.push( {
-					postId: post.id,
-					postType: post.type,
-					categoryId,
-					categoryType: type,
-					canvas: 'edit',
-				} );
-			}
-		},
-		[ history, categoryId, type ]
-	);
-	const [ editAction, viewRevisionsAction ] = usePostActions(
-		onActionPerformed,
-		[ 'edit-post', 'view-post-revisions' ]
-	);
+	const templatePartActions = usePostActions( TEMPLATE_PART_POST_TYPE );
+	const patternActions = usePostActions( PATTERN_TYPES.user );
+	const editAction = useEditPostAction();
+
 	const actions = useMemo( () => {
 		if ( type === TEMPLATE_PART_POST_TYPE ) {
 			return [
 				editAction,
-				renameAction,
 				duplicateTemplatePartAction,
-				viewRevisionsAction,
-				resetAction,
-				deleteAction,
-			];
+				...templatePartActions,
+			].filter( Boolean );
 		}
-		return [
-			renameAction,
-			duplicatePatternAction,
-			exportJSONaction,
-			resetAction,
-			deleteAction,
-		];
-	}, [ type, editAction, viewRevisionsAction ] );
+		return [ editAction, duplicatePatternAction, ...patternActions ].filter(
+			Boolean
+		);
+	}, [ editAction, type, templatePartActions, patternActions ] );
 	const onChangeView = useCallback(
 		( newView ) => {
 			if ( newView.type !== view.type ) {

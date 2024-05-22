@@ -108,7 +108,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
  * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
  * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
  *
- * @return {WPRootConfig} Parsed config.
+ * @return {Promise<WPRootConfig>} Parsed config.
  */
 async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 	// The local config will be used to override any defaults.

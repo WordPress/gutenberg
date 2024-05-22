@@ -6,16 +6,23 @@
 	flex-direction: column;
 }
 
-.editor-inserter-sidebar__header {
-	padding-top: $grid-unit-10;
+.block-editor-inserter-sidebar__header {
+	border-bottom: $border-width solid $gray-300;
 	padding-right: $grid-unit-10;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-between;
+
+	.block-editor-inserter-sidebar__close-button {
+		/* stylelint-disable-next-line property-disallowed-list -- This should be refactored to avoid order if possible */
+		order: 1;
+		align-self: center;
+	}
 }
 
 .editor-inserter-sidebar__content {
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
+
 	@include break-medium() {
 		height: 100%;
 	}

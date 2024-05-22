@@ -16,16 +16,24 @@ export const setCanvasMode =
 		const isMediumOrBigger =
 			window.matchMedia( '(min-width: 782px)' ).matches;
 		registry.dispatch( blockEditorStore ).__unstableSetEditorMode( 'edit' );
+		const isPublishSidebarOpened = registry
+			.select( editorStore )
+			.isPublishSidebarOpened();
 		dispatch( {
 			type: 'SET_CANVAS_MODE',
 			mode,
 		} );
+		const isEditMode = mode === 'edit';
+		if ( isPublishSidebarOpened && ! isEditMode ) {
+			registry.dispatch( editorStore ).closePublishSidebar();
+		}
+
 		// Check if the block list view should be open by default.
 		// If `distractionFree` mode is enabled, the block list view should not be open.
 		// This behavior is disabled for small viewports.
 		if (
 			isMediumOrBigger &&
-			mode === 'edit' &&
+			isEditMode &&
 			registry
 				.select( preferencesStore )
 				.get( 'core', 'showListViewByDefault' ) &&

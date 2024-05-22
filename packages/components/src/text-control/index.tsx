@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className={ classnames( 'components-text-control__input', {
+				className={ clsx( 'components-text-control__input', {
 					'is-next-40px-default-size': __next40pxDefaultSize,
 				} ) }
 				type={ type }

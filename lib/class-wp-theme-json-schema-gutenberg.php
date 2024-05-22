@@ -38,6 +38,7 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 * Function that migrates a given theme.json structure to the last version.
 	 *
 	 * @since 5.9.0
+	 * @since 6.6.0 Migrate up to v3.
 	 *
 	 * @param array $theme_json The structure to migrate.
 	 *
@@ -50,8 +51,14 @@ class WP_Theme_JSON_Schema_Gutenberg {
 			);
 		}
 
-		if ( 1 === $theme_json['version'] ) {
-			$theme_json = self::migrate_v1_to_v2( $theme_json );
+		// Migrate each version in order starting with the current version.
+		switch ( $theme_json['version'] ) {
+			case 1:
+				$theme_json = self::migrate_v1_to_v2( $theme_json );
+				// no break
+			case 2:
+				$theme_json = self::migrate_v2_to_v3( $theme_json );
+				// no break
 		}
 
 		return $theme_json;
@@ -83,6 +90,56 @@ class WP_Theme_JSON_Schema_Gutenberg {
 
 		// Set the new version.
 		$new['version'] = 2;
+
+		return $new;
+	}
+
+	/**
+	 * Migrates from v2 to v3.
+	 *
+	 * - Sets settings.typography.defaultFontSizes to false.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param array $old Data to migrate.
+	 *
+	 * @return array Data with defaultFontSizes set to false.
+	 */
+	private static function migrate_v2_to_v3( $old ) {
+		// Copy everything.
+		$new = $old;
+
+		// Set the new version.
+		$new['version'] = 3;
+
+		/*
+		 * Remaining changes do not need to be applied to the custom origin,
+		 * as they should take on the value of the theme origin.
+		 */
+		if (
+			isset( $new['isGlobalStylesUserThemeJSON'] ) &&
+			true === $new['isGlobalStylesUserThemeJSON']
+		) {
+			return $new;
+		}
+
+		/*
+		 * Even though defaultFontSizes is a new setting, we need to migrate
+		 * it as it controls the PRESETS_METADATA prevent_override which was
+		 * previously hardcoded to false. This only needs to happen when the
+		 * theme provided font sizes as they could match the default ones and
+		 * affect the generated CSS. And in v2 we provided default font sizes
+		 * when the theme did not provide any.
+		 */
+		if ( isset( $new['settings']['typography']['fontSizes'] ) ) {
+			if ( ! isset( $new['settings'] ) ) {
+				$new['settings'] = array();
+			}
+			if ( ! isset( $new['settings']['typography'] ) ) {
+				$new['settings']['typography'] = array();
+			}
+			$new['settings']['typography']['defaultFontSizes'] = false;
+		}
 
 		return $new;
 	}

@@ -9,18 +9,19 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { mergeBaseAndUserConfigs } from './global-styles-provider';
 import { useCurrentMergeThemeStyleVariationsWithUserConfig } from '../../hooks/use-theme-style-variations/use-theme-style-variations-by-property';
 import { getFontFamilies } from './utils';
 import { unlock } from '../../lock-unlock';
 import { useSelect } from '@wordpress/data';
 
+const { mergeBaseAndUserConfigs } = unlock( editorPrivateApis );
 const { useGlobalSetting, useGlobalStyle, GlobalStylesContext } = unlock(
 	blockEditorPrivateApis
 );

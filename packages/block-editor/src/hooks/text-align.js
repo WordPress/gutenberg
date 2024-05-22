@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,11 @@ import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
  */
 import { AlignmentControl, BlockControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import {
+	cleanEmptyObject,
+	shouldSkipSerialization,
+	useBlockSettings,
+} from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 
 export const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
@@ -39,6 +43,7 @@ const TEXT_ALIGNMENT_OPTIONS = [
 ];
 
 const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
+const NO_TEXT_ALIGNMENTS = [];
 
 /**
  * Returns the valid text alignments.
@@ -50,19 +55,13 @@ const VALID_TEXT_ALIGNMENTS = [ 'left', 'center', 'right' ];
  * @return {string[]} Valid text alignments.
  */
 export function getValidTextAlignments( blockTextAlign ) {
-	let validTextAlignments;
 	if ( Array.isArray( blockTextAlign ) ) {
-		validTextAlignments = VALID_TEXT_ALIGNMENTS.filter( ( textAlign ) =>
+		return VALID_TEXT_ALIGNMENTS.filter( ( textAlign ) =>
 			blockTextAlign.includes( textAlign )
 		);
-	} else if ( blockTextAlign === true ) {
-		// `true` includes all alignments...
-		validTextAlignments = [ ...VALID_TEXT_ALIGNMENTS ];
-	} else {
-		validTextAlignments = [];
 	}
 
-	return validTextAlignments;
+	return blockTextAlign === true ? VALID_TEXT_ALIGNMENTS : NO_TEXT_ALIGNMENTS;
 }
 
 function BlockEditTextAlignmentToolbarControlsPure( {
@@ -70,11 +69,18 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 	name: blockName,
 	setAttributes,
 } ) {
+	const settings = useBlockSettings( blockName );
+	const hasTextAlignControl = settings?.typography?.textAlign;
+	const blockEditingMode = useBlockEditingMode();
+
+	if ( ! hasTextAlignControl || blockEditingMode !== 'default' ) {
+		return null;
+	}
+
 	const validTextAlignments = getValidTextAlignments(
 		getBlockSupport( blockName, TEXT_ALIGN_SUPPORT_KEY )
 	);
-	const blockEditingMode = useBlockEditingMode();
-	if ( ! validTextAlignments.length || blockEditingMode !== 'default' ) {
+	if ( ! validTextAlignments.length ) {
 		return null;
 	}
 
@@ -136,7 +142,7 @@ function useBlockProps( { name, style } ) {
 
 	const textAlign = style.typography.textAlign;
 
-	const className = classnames( {
+	const className = clsx( {
 		[ `has-text-align-${ textAlign }` ]: textAlign,
 	} );
 	return { className };
@@ -169,7 +175,7 @@ export function addAssignedTextAlign( props, blockType, attributes ) {
 			'textAlign'
 		)
 	) {
-		props.className = classnames(
+		props.className = clsx(
 			`has-text-align-${ textAlign }`,
 			props.className
 		);

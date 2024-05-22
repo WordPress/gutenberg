@@ -90,7 +90,9 @@ export const BlockMover = ( {
 		const option = blockPageMoverOptions.find(
 			( el ) => el.value === value
 		);
-		if ( option && option.onSelect ) option.onSelect();
+		if ( option && option.onSelect ) {
+			option.onSelect();
+		}
 	};
 
 	const onLongPressMoveUp = useCallback(
