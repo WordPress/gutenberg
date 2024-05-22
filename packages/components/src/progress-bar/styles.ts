@@ -25,7 +25,6 @@ export const Track = styled.div`
 	position: relative;
 	overflow: hidden;
 	width: 100%;
-	max-width: 160px;
 	height: ${ CONFIG.borderWidthFocus };
 	/* Text color at 10% opacity */
 	background-color: color-mix(

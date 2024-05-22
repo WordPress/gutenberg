@@ -266,7 +266,7 @@ function FontCollection( { slug } ) {
 		<div className="font-library-modal__tabpanel-layout">
 			{ isLoading && (
 				<div className="font-library-modal__loading">
-					<ProgressBar />
+					<ProgressBar className="font-library-modal__progressbar" />
 				</div>
 			) }
 

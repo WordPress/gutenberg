@@ -16,6 +16,10 @@
 	& > div {
 		width: 160px;
 	}
+
+	& > .edit-site-canvas-loader__progressbar {
+		width: 160px;
+	}
 }
 
 @keyframes edit-site-canvas-loader__fade-in-animation {
