@@ -21,7 +21,6 @@ import { useCopyToClipboard } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { usePostURLLabel } from './label';
 import { store as editorStore } from '../../store';
 
 /**
@@ -62,8 +61,11 @@ export default function PostURL( { onClose } ) {
 	const { editPost } = useDispatch( editorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const [ forceEmptyField, setForceEmptyField ] = useState( false );
-	const postUrlLabel = usePostURLLabel();
-	const copyButtonRef = useCopyToClipboard( postUrlLabel, () => {
+	const permalink = useSelect(
+		( select ) => select( editorStore ).getPermalink(),
+		[]
+	);
+	const copyButtonRef = useCopyToClipboard( permalink, () => {
 		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
