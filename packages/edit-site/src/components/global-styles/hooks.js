@@ -9,7 +9,6 @@ import a11yPlugin from 'colord/plugins/a11y';
  */
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 
 /**
