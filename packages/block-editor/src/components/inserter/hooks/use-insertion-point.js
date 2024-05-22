@@ -42,15 +42,16 @@ function useInsertionPoint( {
 	shouldFocusBlock = true,
 	selectBlockOnInsert = true,
 } ) {
-	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const {
+		getSelectedBlock,
+		getBlockIndex,
+		getBlockOrder,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getBlockRootClientId,
-				getBlockIndex,
-				getBlockOrder,
-			} = select( blockEditorStore );
+			const { getSelectedBlockClientId, getBlockRootClientId } =
+				select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
@@ -119,11 +120,37 @@ function useInsertionPoint( {
 					meta
 				);
 			} else {
-				// Check here to see if we _can_ insert the block in the location?
+				const normalizedBlocks = Array.isArray( blocks )
+					? blocks
+					: [ blocks ];
+
+				let _destinationIndex = destinationIndex;
+				let _destinationRootClientId = destinationRootClientId;
+				// Check if it's possible to insert the block in the current location
+				const canInsertBlocks = normalizedBlocks.every( ( block ) =>
+					canInsertBlockType( block.name, _destinationRootClientId )
+				);
+
+				if ( ! canInsertBlocks ) {
+					// TODO: Find the closest block we can insert from
+					const closestInsertionPoint = false;
+
+					if ( closestInsertionPoint ) {
+						_destinationRootClientId =
+							closestInsertionPoint.clientId;
+						_destinationIndex =
+							getBlockIndex( closestInsertionPoint.clientId ) + 1;
+					} else {
+						// Insert at the end of the root container if we can't find a safe parent to insert after
+						_destinationRootClientId = '';
+						_destinationIndex = getBlockOrder().length;
+					}
+				}
+
 				insertBlocks(
 					blocks,
-					destinationIndex,
-					destinationRootClientId,
+					_destinationIndex,
+					_destinationRootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
 					meta

@@ -3,20 +3,17 @@
  */
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { pipe, useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
 import BlockTypesList from '../block-types-list';
 import InserterPanel from './panel';
 import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
-import useInsertionPoint from './hooks/use-insertion-point';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -34,38 +31,8 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	const [
-		items,
-		categories,
-		collections,
-		onSelectItem,
-		allItems,
-		createNewBlock,
-	] = useBlockTypesState( rootClientId, onInsert );
-
-	const insertionIndex = useSelect( ( select ) => {
-		const { getBlockOrder } = select( blockEditorStore );
-
-		// Last item.
-		return getBlockOrder().length;
-	} );
-
-	const [ , onInsertBlocks ] = useInsertionPoint( { insertionIndex } );
-
-	const onSelectGeneralItem = (
-		{ name, initialAttributes, innerBlocks, syncStatus, content },
-		shouldFocusBlock
-	) => {
-		const newBlock = createNewBlock( {
-			content,
-			name,
-			initialAttributes,
-			innerBlocks,
-			syncStatus,
-		} );
-
-		onInsertBlocks( newBlock, undefined, shouldFocusBlock );
-	};
+	const [ items, categories, collections, onSelectItem, allItems ] =
+		useBlockTypesState( rootClientId, onInsert );
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
@@ -223,7 +190,7 @@ export function BlockTypesTab(
 						<InserterPanel title={ _x( 'All blocks', 'blocks' ) }>
 							<BlockTypesList
 								items={ allItems }
-								onSelect={ onSelectGeneralItem }
+								onSelect={ onSelectItem }
 								onHover={ onHover }
 								label={ _x( 'All blocks', 'blocks' ) }
 							/>
