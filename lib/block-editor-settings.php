@@ -146,6 +146,8 @@ function gutenberg_get_block_editor_settings( $settings ) {
 			);
 	}
 
+	$settings['defaultRenderingMode'] = 'post-only';
+
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
