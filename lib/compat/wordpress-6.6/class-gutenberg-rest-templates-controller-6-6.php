@@ -113,7 +113,8 @@ class Gutenberg_REST_Templates_Controller_6_6 extends Gutenberg_REST_Templates_C
 			array_shift( $hierarchy );
 		} while ( ! empty( $hierarchy ) && empty( $fallback_template->content ) );
 
-		$response = $this->prepare_item_for_response( $fallback_template, $request );
+		// To maintain original behavior, return an empty object rather than a 404 error when no template is found.
+		$response = $fallback_template ? $this->prepare_item_for_response( $fallback_template, $request ) : new stdClass();
 
 		return rest_ensure_response( $response );
 	}
