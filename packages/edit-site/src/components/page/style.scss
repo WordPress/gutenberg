@@ -2,7 +2,8 @@
 	color: $gray-800;
 	background: $white;
 	height: 100%;
-	container: edit-site-page / inline-size; /* stylelint-disable -- '@container' not globally permitted */
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: edit-site-page / inline-size;
 	transition: width ease-out 0.2s;
 	@include reduce-motion("transition");
 }
@@ -28,6 +29,7 @@
 	}
 }
 
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.edit-site-page-header {
 		padding: $grid-unit-20 $grid-unit-30;

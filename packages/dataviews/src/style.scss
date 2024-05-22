@@ -3,7 +3,8 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
-	container: dataviews-wrapper / inline-size; /* stylelint-disable -- '@container' not globally permitted */
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: dataviews-wrapper / inline-size;
 	display: flex;
 	flex-direction: column;
 }
@@ -106,7 +107,8 @@
 			gap: $grid-unit-05;
 		}
 
-		th, td {
+		th,
+		td {
 			&:first-child,
 			&:last-child {
 				transition: padding ease-out 0.1s;
@@ -815,6 +817,7 @@
 	}
 }
 
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
 @container (max-width: 430px) {
 	.dataviews-pagination,
 	.dataviews-filters__view-actions {
@@ -829,11 +832,13 @@
 		}
 	}
 
-	.dataviews-view-table tr td:first-child, .dataviews-view-table tr th:first-child {
+	.dataviews-view-table tr td:first-child,
+	.dataviews-view-table tr th:first-child {
 		padding-left: $grid-unit-30;
 	}
 
-	.dataviews-view-table tr td:last-child, .dataviews-view-table tr th:last-child {
+	.dataviews-view-table tr td:last-child,
+	.dataviews-view-table tr th:last-child {
 		padding-right: $grid-unit-30;
 	}
 

@@ -162,7 +162,8 @@
 	}
 }
 
-@container (max-width: 430px) { /* stylelint-disable -- '@container' not globally permitted */
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
 	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
 		padding-left: $grid-unit-30;
 		padding-right: $grid-unit-30;
