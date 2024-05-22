@@ -29,7 +29,6 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 		return;
 	}
 
-	$wp_admin_bar->remove_node( 'site-editor' );
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'site-editor',
@@ -45,5 +44,5 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 		)
 	);
 }
-
+remove_action( 'admin_bar_menu', 'wp_admin_bar_edit_site_menu', 40 );
 add_action( 'admin_bar_menu', 'gutenberg_admin_bar_edit_site_menu', 41 );
