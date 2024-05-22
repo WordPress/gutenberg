@@ -133,6 +133,18 @@ module.exports = {
 			return `webpack://${ info.namespace }/${ info.resourcePath }`;
 		},
 	},
+	resolve: {
+		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
+		fallback: {
+			crypto: false,
+			path: false,
+			util: false,
+			zlib: false,
+			assert: false,
+			stream: false,
+			fs: false,
+		},
+	},
 	performance: {
 		hints: false, // disable warnings about package sizes
 	},

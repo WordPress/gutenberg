@@ -5,6 +5,8 @@ import apiFetch from '@wordpress/api-fetch';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
 
+import { maybeTranscodeHeifImage } from './heif';
+
 const noop = () => {};
 
 /**
@@ -171,7 +173,7 @@ export async function uploadMedia( {
 	}
 
 	for ( let idx = 0; idx < validFiles.length; ++idx ) {
-		const mediaFile = validFiles[ idx ];
+		const mediaFile = await maybeTranscodeHeifImage( validFiles[ idx ] );
 		try {
 			const savedMedia = await createMediaFromFile(
 				mediaFile,
