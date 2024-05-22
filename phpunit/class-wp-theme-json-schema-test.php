@@ -264,14 +264,14 @@ class WP_Theme_JSON_Schema_Gutenberg_Test extends WP_UnitTestCase {
 					'defaultSpacingSizes' => false,
 					'spacingSizes'        => array(
 						array(
-							'name'  => 'Small',
-							'slug'  => 20,
-							'size'  => '20px',
+							'name' => 'Small',
+							'slug' => 20,
+							'size' => '20px',
 						),
 						array(
-							'name'  => 'Large',
-							'slug'  => 80,
-							'size'  => '80px',
+							'name' => 'Large',
+							'slug' => 80,
+							'size' => '80px',
 						),
 					),
 				),
