@@ -4276,10 +4276,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'spacingScale' => $spacing_scale,
 					),
 				),
-			)
+			),
+			'default'
 		);
 
-		$theme_json->set_spacing_sizes();
 		$this->assertSame( $expected_output, _wp_array_get( $theme_json->get_raw_data(), array( 'settings', 'spacing', 'spacingSizes', 'default' ) ) );
 	}
 
@@ -4558,17 +4558,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->expectException( Exception::class );
 		$this->expectExceptionMessage( 'Some of the theme.json settings.spacing.spacingScale values are invalid' );
 
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'settings' => array(
-					'spacing' => array(
-						'spacingScale' => $spacing_scale,
-					),
-				),
-			)
-		);
-
 		// Ensure PHPUnit 10 compatibility.
 		set_error_handler(
 			static function ( $errno, $errstr ) {
@@ -4578,7 +4567,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			E_ALL
 		);
 
-		$theme_json->set_spacing_sizes();
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'spacingScale' => $spacing_scale,
+					),
+				),
+			),
+			'default'
+		);
+
 		$this->assertSame( $expected_output, _wp_array_get( $theme_json->get_raw_data(), array( 'settings', 'spacing', 'spacingSizes', 'default' ) ) );
 	}
 
