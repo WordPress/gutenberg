@@ -72,17 +72,18 @@ function useTrackElementOffset(
 		}
 		const { current: resizeObserver } = resizeObserverRef;
 
-		// Unobserve previous element.
-		const { current: observedElement } = observedElementRef;
-		if ( observedElement ) {
-			resizeObserver.unobserve( observedElement );
-		}
-
 		// Observe new element.
 		if ( targetElement ) {
 			updateIndicator( targetElement );
 			resizeObserver.observe( targetElement );
 		}
+
+		return () => {
+			// Unobserve previous element.
+			if ( observedElementRef.current ) {
+				resizeObserver.unobserve( observedElementRef.current );
+			}
+		};
 	}, [ targetElement ] );
 
 	return indicatorPosition;
