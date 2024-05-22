@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { CSSProperties, ForwardedRef } from 'react';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
@@ -26,13 +26,11 @@ function UnforwardedProgressBar(
 	return (
 		<ProgressBarStyled.Track className={ className }>
 			<ProgressBarStyled.Indicator
-				style={
-					{
-						'--indicator-width': ! isIndeterminate
-							? `${ value }%`
-							: undefined,
-					} as CSSProperties
-				}
+				style={ {
+					'--indicator-width': ! isIndeterminate
+						? `${ value }%`
+						: undefined,
+				} }
 				isIndeterminate={ isIndeterminate }
 			/>
 			<ProgressBarStyled.ProgressElement
