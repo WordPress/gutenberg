@@ -522,10 +522,10 @@ export function getLayoutStyles( {
 							} else {
 								combinedSelector =
 									selector === ROOT_BLOCK_SELECTOR
-										? `:where(.${ className })${
+										? `.${ className }${
 												spacingStyle?.selector || ''
 										  }`
-										: `:where(${ selector }-${ className })${
+										: `${ selector }-${ className }${
 												spacingStyle?.selector || ''
 										  }`;
 							}
@@ -1018,13 +1018,13 @@ export const toStyles = (
 			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
-			`:where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
+			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
+			':root :where(.wp-site-blocks) > :first-child { margin-block-start: 0; }';
 		ruleset =
 			ruleset +
-			':where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
+			':root :where(.wp-site-blocks) > :last-child { margin-block-end: 0; }';
 	}
 
 	if ( options.presets ) {
