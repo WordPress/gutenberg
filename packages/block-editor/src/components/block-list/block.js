@@ -264,6 +264,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 		__unstableMarkLastChangeAsPersistent,
 		moveBlocksToPosition,
 		removeBlock,
+		selectBlock,
 	} = dispatch( blockEditorStore );
 
 	// Do not add new properties here, use `useDispatch` instead to avoid
@@ -471,6 +472,14 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					);
 					if ( replacement && replacement.length ) {
 						replaceBlocks( clientId, replacement );
+					}
+				} else {
+					const nextBlockClientId = getNextBlockClientId( clientId );
+					if ( nextBlockClientId ) {
+						registry.batch( () => {
+							removeBlock( clientId );
+							selectBlock( nextBlockClientId );
+						} );
 					}
 				}
 			}
