@@ -283,14 +283,7 @@ export default function Editor( { isLoading, onClick } ) {
 				</Notice>
 			) }
 			{ isReady && (
-				<EditorProvider
-					post={ postWithTemplate ? contextPost : editedPost }
-					__unstableTemplate={
-						postWithTemplate ? editedPost : undefined
-					}
-					settings={ settings }
-					useSubRegistry={ false }
-				>
+				<>
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
@@ -349,7 +342,16 @@ export default function Editor( { isLoading, onClick } ) {
 							/>
 						}
 						content={
-							<>
+							<EditorProvider
+								post={
+									postWithTemplate ? contextPost : editedPost
+								}
+								__unstableTemplate={
+									postWithTemplate ? editedPost : undefined
+								}
+								settings={ settings }
+								useSubRegistry={ false }
+							>
 								{ isEditMode && <EditorNotices /> }
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
@@ -360,7 +362,7 @@ export default function Editor( { isLoading, onClick } ) {
 								{ showVisualEditor && (
 									<SiteEditorCanvas onClick={ onClick } />
 								) }
-							</>
+							</EditorProvider>
 						}
 						secondarySidebar={
 							isEditMode &&
@@ -399,7 +401,7 @@ export default function Editor( { isLoading, onClick } ) {
 						}
 					/>
 					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
-				</EditorProvider>
+				</>
 			) }
 		</>
 	);
