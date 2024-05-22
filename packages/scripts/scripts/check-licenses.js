@@ -179,8 +179,8 @@ const child = spawn.sync(
 		'--json',
 		'--long',
 		'--all',
-		...( prod ? [ '--prod' ] : [] ),
-		...( dev ? [ '--dev' ] : [] ),
+		...( prod ? [ '--omit=dev' ] : [] ),
+		...( dev ? [ '--include=dev' ] : [] ),
 	],
 	/*
 	 * Set the max buffer to ~157MB, since the output size for
