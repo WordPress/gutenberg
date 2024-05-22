@@ -79,19 +79,24 @@ export default function StyleVariationsContainer( { gap = 2 } ) {
 					} );
 				}
 				// Now merge any global custom CSS from current user styles with global custom CSS in the variation.
-				const globalCustomCSS =
+				const css =
 					userStyles?.css || variation.styles?.css
-						? `${ variation.styles?.css || '' } ${
-								userStyles?.css || ''
-						  }`
-						: '';
+						? {
+								css: `${ variation.styles?.css || '' } ${
+									userStyles?.css || ''
+								}`,
+						  }
+						: {};
+
+				const blocks =
+					Object.keys( blockStyles ).length > 0
+						? { blocks: blockStyles }
+						: {};
 
 				const styles = {
 					...variation.styles,
-					css: globalCustomCSS,
-					blocks: {
-						...blockStyles,
-					},
+					...css,
+					...blocks,
 				};
 				return {
 					...variation,
