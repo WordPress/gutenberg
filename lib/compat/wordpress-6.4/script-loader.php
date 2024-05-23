@@ -11,6 +11,9 @@
  * @since 6.0.0
  * @access private
  *
+ * @global WP_Styles $wp_styles
+ * @global WP_Scripts $wp_scripts
+ *
  * @return array {
  *     The block editor assets.
  *

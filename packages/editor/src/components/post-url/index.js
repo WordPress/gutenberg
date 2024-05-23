@@ -24,6 +24,18 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import { usePostURLLabel } from './label';
 import { store as editorStore } from '../../store';
 
+/**
+ * Renders the `PostURL` component.
+ *
+ * @example
+ * ```jsx
+ * <PostURL />
+ * ```
+ *
+ * @param {Function} onClose Callback function to be executed when the popover is closed.
+ *
+ * @return {Component} The rendered PostURL component.
+ */
 export default function PostURL( { onClose } ) {
 	const { isEditable, postSlug, postLink, permalinkPrefix, permalinkSuffix } =
 		useSelect( ( select ) => {

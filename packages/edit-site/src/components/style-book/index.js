@@ -190,7 +190,7 @@ function StyleBook( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ textColor ] = useGlobalStyle( 'color.text' );
 	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const examples = useMemo( getExamples, [] );
+	const [ examples ] = useState( getExamples );
 	const tabs = useMemo(
 		() =>
 			getCategories()
