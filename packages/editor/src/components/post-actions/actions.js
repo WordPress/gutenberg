@@ -9,7 +9,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useMemo, useState } from '@wordpress/element';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 
 import {
@@ -110,19 +109,6 @@ const deletePostAction = {
 		const { createSuccessNotice, createErrorNotice } =
 			useDispatch( noticesStore );
 		const { deleteEntityRecord } = useDispatch( coreStore );
-		const { __experimentalDeleteReusableBlock } =
-			useDispatch( reusableBlocksStore );
-		const isPattern = items[ 0 ].type === PATTERN_POST_TYPE;
-		const deleteItem = isPattern
-			? ( item ) => __experimentalDeleteReusableBlock( item.id )
-			: ( item ) =>
-					deleteEntityRecord(
-						'postType',
-						item.type,
-						item.id,
-						{},
-						{ throwOnError: true }
-					);
 		return (
 			<VStack spacing="5">
 				<Text>
@@ -159,7 +145,15 @@ const deletePostAction = {
 								onActionStart( items );
 							}
 							const promiseResult = await Promise.allSettled(
-								items.map( deleteItem )
+								items.map( ( item ) =>
+									deleteEntityRecord(
+										'postType',
+										item.type,
+										item.id,
+										{},
+										{ throwOnError: true }
+									)
+								)
 							);
 							// If all the promises were fulfilled with success.
 							if (

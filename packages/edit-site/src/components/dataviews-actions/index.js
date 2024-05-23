@@ -26,16 +26,8 @@ export const useEditPostAction = () => {
 				if ( post.status === 'trash' ) {
 					return false;
 				}
-				// It's eligible for all post types except patterns.
-				if (
-					! [ ...Object.values( PATTERN_TYPES ) ].includes(
-						post.type
-					)
-				) {
-					return true;
-				}
-				// We can only edit user patterns.
-				return post.type === PATTERN_TYPES.user;
+				// It's eligible for all post types except theme patterns.
+				return post.type !== PATTERN_TYPES.theme;
 			},
 			callback( items ) {
 				const post = items[ 0 ];
