@@ -815,7 +815,7 @@ export const toStyles = (
 		 */
 		ruleset += ':where(body) {margin: 0;';
 
-		// Root padding styles should only be output for full templates, not patterns or template parts.
+		// Root padding styles should be output for full templates, patterns and template parts.
 		if ( options.rootPadding && useRootPaddingAlign ) {
 			/*
 			 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
