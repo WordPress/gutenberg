@@ -11,7 +11,13 @@ import { deepSignal, peek, type DeepSignal } from 'deepsignal';
 /**
  * Internal dependencies
  */
-import { useWatch, useInit, kebabToCamelCase, warn } from './utils';
+import {
+	useWatch,
+	useInit,
+	kebabToCamelCase,
+	warn,
+	yieldToMain,
+} from './utils';
 import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
 
@@ -226,6 +232,33 @@ const getGlobalEventDirective = ( type: 'window' | 'document' ) => {
 	};
 };
 
+/**
+ * Creates a directive that adds an async event listener to the global window or
+ * document object.
+ *
+ * @param type 'window' or 'document'
+ */
+const getGlobalAsyncEventDirective = ( type: 'window' | 'document' ) => {
+	return ( { directives, evaluate } ) => {
+		directives[ `on-async-${ type }` ]
+			.filter( ( { suffix } ) => suffix !== 'default' )
+			.forEach( ( entry: DirectiveEntry ) => {
+				const eventName = entry.suffix.split( '--', 1 )[ 0 ];
+				useInit( () => {
+					const cb = async ( event: Event ) => {
+						await yieldToMain();
+						evaluate( entry, event );
+					};
+					const globalVar = type === 'window' ? window : document;
+					globalVar.addEventListener( eventName, cb, {
+						passive: true,
+					} );
+					return () => globalVar.removeEventListener( eventName, cb );
+				} );
+			} );
+	};
+};
+
 export default () => {
 	// data-wp-context
 	directive(
@@ -294,18 +327,60 @@ export default () => {
 		);
 
 		events.forEach( ( entries, eventType ) => {
+			const existingHandler = element.props[ `on${ eventType }` ];
 			element.props[ `on${ eventType }` ] = ( event: Event ) => {
 				entries.forEach( ( entry ) => {
+					if ( existingHandler ) {
+						existingHandler( event );
+					}
 					evaluate( entry, event );
 				} );
 			};
 		} );
 	} );
 
+	// data-wp-on-async--[event]
+	directive(
+		'on-async',
+		( { directives: { 'on-async': onAsync }, element, evaluate } ) => {
+			const events = new Map< string, Set< DirectiveEntry > >();
+			onAsync
+				.filter( ( { suffix } ) => suffix !== 'default' )
+				.forEach( ( entry ) => {
+					const event = entry.suffix.split( '--' )[ 0 ];
+					if ( ! events.has( event ) ) {
+						events.set( event, new Set< DirectiveEntry >() );
+					}
+					events.get( event )!.add( entry );
+				} );
+
+			events.forEach( ( entries, eventType ) => {
+				const existingHandler = element.props[ `on${ eventType }` ];
+				element.props[ `on${ eventType }` ] = ( event: Event ) => {
+					if ( existingHandler ) {
+						existingHandler( event );
+					}
+					entries.forEach( async ( entry ) => {
+						await yieldToMain();
+						evaluate( entry, event );
+					} );
+				};
+			} );
+		}
+	);
+
 	// data-wp-on-window--[event]
 	directive( 'on-window', getGlobalEventDirective( 'window' ) );
 	// data-wp-on-document--[event]
 	directive( 'on-document', getGlobalEventDirective( 'document' ) );
+
+	// data-wp-on-async-window--[event]
+	directive( 'on-async-window', getGlobalAsyncEventDirective( 'window' ) );
+	// data-wp-on-async-document--[event]
+	directive(
+		'on-async-document',
+		getGlobalAsyncEventDirective( 'document' )
+	);
 
 	// data-wp-class--[classname]
 	directive(
