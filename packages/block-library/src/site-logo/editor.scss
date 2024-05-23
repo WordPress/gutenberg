@@ -17,16 +17,29 @@
 		&:focus {
 			box-shadow: none;
 		}
-
-		&.is-transient img {
-			opacity: 0.3;
-		}
 	}
 
 	img {
 		display: block;
 		height: auto;
 		max-width: 100%;
+	}
+
+	&.is-transient {
+		position: relative;
+
+		img {
+			opacity: 0.3;
+		}
+
+		// Shown while image is being uploaded.
+		.components-spinner {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			margin: 0;
+		}
 	}
 }
 
@@ -75,6 +88,7 @@
 		// Style the upload button.
 		.components-button.components-button {
 			padding: 0;
+			margin: auto;
 			display: flex;
 			justify-content: center;
 			align-items: center;

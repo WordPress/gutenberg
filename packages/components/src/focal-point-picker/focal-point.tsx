@@ -6,7 +6,7 @@ import { PointerCircle } from './styles/focal-point-style';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { FocalPointProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -15,9 +15,7 @@ export default function FocalPoint( {
 	top = '50%',
 	...props
 }: WordPressComponentProps< FocalPointProps, 'div' > ) {
-	const classes = classnames(
-		'components-focal-point-picker__icon_container'
-	);
+	const classes = clsx( 'components-focal-point-picker__icon_container' );
 
 	const style = { left, top };
 

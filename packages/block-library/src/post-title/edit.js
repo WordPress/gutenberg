@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -27,7 +27,7 @@ export default function PostTitleEdit( {
 	context: { postType, postId, queryId },
 	insertBlocksAfter,
 } ) {
-	const TagName = 'h' + level;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useSelect(
 		( select ) => {
@@ -61,7 +61,7 @@ export default function PostTitleEdit( {
 		insertBlocksAfter( createBlock( getDefaultBlockName() ) );
 	};
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

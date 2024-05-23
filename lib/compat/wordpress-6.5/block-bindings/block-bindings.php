@@ -53,7 +53,7 @@ if ( ! function_exists( 'register_block_bindings_source' ) ) {
  * @since 6.5.0
  *
  * @param string $source_name Block bindings source name including namespace.
- * @return WP_Block_Bindings_Source|false The unregistred block bindings source on success and `false` otherwise.
+ * @return WP_Block_Bindings_Source|false The unregistered block bindings source on success and `false` otherwise.
  */
 if ( ! function_exists( 'unregister_block_bindings_source' ) ) {
 	function unregister_block_bindings_source( string $source_name ) {

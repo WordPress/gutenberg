@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,8 +38,13 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { getResolvedThemeFilePath } from './theme-file-uri-utils';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
+const DEFAULT_CONTROLS = {
+	backgroundImage: true,
+	backgroundSize: false,
+};
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -135,28 +140,30 @@ export const backgroundPositionToCoords = ( value ) => {
 };
 
 function InspectorImagePreview( { label, filename, url: imgUrl } ) {
-	const imgLabel = label || getFilename( imgUrl );
+	const imgLabel =
+		label || getFilename( imgUrl ) || __( 'Add background image' );
+
 	return (
 		<ItemGroup as="span">
-			<HStack justify="flex-start" as="span">
-				<span
-					className={ classnames(
-						'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
-						{
-							'has-image': imgUrl,
-						}
-					) }
-					aria-hidden
-				>
-					{ imgUrl && (
+			<HStack justify={ imgUrl ? 'flex-start' : 'center' } as="span">
+				{ imgUrl && (
+					<span
+						className={ clsx(
+							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
+							{
+								'has-image': imgUrl,
+							}
+						) }
+						aria-hidden
+					>
 						<span
 							className="block-editor-global-styles-background-panel__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
 						/>
-					) }
-				</span>
+					</span>
+				) }
 				<FlexItem as="span">
 					<Truncate
 						numberOfLines={ 1 }
@@ -185,6 +192,7 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -247,7 +255,7 @@ function BackgroundImageToolsPanelItem( {
 
 	const onFilesDrop = ( filesList ) => {
 		mediaUpload( {
-			allowedTypes: [ 'image' ],
+			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
@@ -269,9 +277,7 @@ function BackgroundImageToolsPanelItem( {
 		};
 	}, [] );
 
-	const hasValue =
-		hasBackgroundImageValue( style ) ||
-		hasBackgroundImageValue( inheritedValue );
+	const hasValue = hasBackgroundImageValue( style );
 
 	return (
 		<ToolsPanelItem
@@ -295,9 +301,12 @@ function BackgroundImageToolsPanelItem( {
 					onSelect={ onSelectMedia }
 					name={
 						<InspectorImagePreview
-							label={ __( 'Background image' ) }
+							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ url }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
 						/>
 					}
 					variant="secondary"
@@ -336,6 +345,7 @@ function BackgroundSizeToolsPanelItem( {
 	style,
 	inheritedValue,
 	defaultValues,
+	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -435,7 +445,7 @@ function BackgroundSizeToolsPanelItem( {
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : undefined
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
 			)
 		);
 
@@ -464,7 +474,7 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ imageValue }
+				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
@@ -518,6 +528,7 @@ function BackgroundToolsPanel( {
 	value,
 	panelId,
 	children,
+	headerLabel,
 } ) {
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -527,8 +538,8 @@ function BackgroundToolsPanel( {
 	return (
 		<VStack
 			as={ ToolsPanel }
-			spacing={ 6 }
-			label={ __( 'Background' ) }
+			spacing={ 4 }
+			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
@@ -537,11 +548,6 @@ function BackgroundToolsPanel( {
 		</VStack>
 	);
 }
-
-const DEFAULT_CONTROLS = {
-	backgroundImage: true,
-	backgroundSize: true,
-};
 
 export default function BackgroundPanel( {
 	as: Wrapper = BackgroundToolsPanel,
@@ -552,6 +558,8 @@ export default function BackgroundPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
+	headerLabel = __( 'Background image' ),
+	themeFileURIs,
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -568,6 +576,7 @@ export default function BackgroundPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			headerLabel={ headerLabel }
 		>
 			<BackgroundImageToolsPanelItem
 				onChange={ onChange }
@@ -575,6 +584,7 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
+				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
 				<BackgroundSizeToolsPanelItem
@@ -584,6 +594,7 @@ export default function BackgroundPanel( {
 					style={ value }
 					inheritedValue={ inheritedValue }
 					defaultValues={ defaultValues }
+					themeFileURIs={ themeFileURIs }
 				/>
 			) }
 		</Wrapper>

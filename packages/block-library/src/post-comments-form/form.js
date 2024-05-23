@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ const CommentsFormPlaceholder = () => {
 					<input
 						name="submit"
 						type="submit"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }

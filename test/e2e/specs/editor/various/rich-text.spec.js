@@ -492,19 +492,11 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'a' },
+				attributes: { content: 'a1' },
 			},
 			{
 				name: 'core/paragraph',
-				attributes: { content: '1' },
-			},
-			{
-				name: 'core/paragraph',
-				attributes: { content: '2' },
-			},
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'b' },
+				attributes: { content: '2b' },
 			},
 		] );
 	} );

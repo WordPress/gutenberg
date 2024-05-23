@@ -18,7 +18,7 @@ This guide shows how to create a block that prompts a user for a single value, a
 
 This guide assumes you are already familiar with WordPress plugins, post meta, and basic JavaScript. Review the [Getting started with JavaScript tutorial](/docs/getting-started/fundamentals/javascript-in-the-block-editor.md) for an introduction.
 
-The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/devenv/get-started-with-create-block.md) for a deeper understanding of creating custom blocks.
+The guide will walk through creating a basic block, but recommended to go through the [Create Block tutorial](/docs/getting-started/tutorial.md) for a deeper understanding of creating custom blocks.
 
 You will need:
 
@@ -107,8 +107,7 @@ registerBlockType( 'myguten/meta-block', {
 } );
 ```
 
-Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by
-saving and reloading your draft, the form will still be filled in on reload.
+Confirm this works by creating a post and add the Meta Block. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by saving and reloading your draft, the form will still be filled in on reload.
 
 You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
 
@@ -259,3 +258,7 @@ Most PHP meta boxes should continue to work in the block editor, but some meta b
 -   Plugins making updates to their DOM on "submit" or on "save".
 
 Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as _meta boxes overlaying the editor_ or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.
+
+## Additional resources
+
+- [Creating a custom block that stores post meta](https://developer.wordpress.org/news/2023/03/03/creating-a-custom-block-that-stores-post-meta/)

@@ -6,7 +6,6 @@ import { TouchableWithoutFeedback, View, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,6 +14,7 @@ import { __ } from '@wordpress/i18n';
 import { MediaEdit } from '../media-edit';
 import SvgIconCustomize from './icon-customize';
 import styles from './style.scss';
+import Icon from '../../icon';
 
 const accessibilityHint =
 	Platform.OS === 'ios'

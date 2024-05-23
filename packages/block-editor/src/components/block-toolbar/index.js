@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -140,11 +140,11 @@ export function PrivateBlockToolbar( {
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
 	// Shifts the toolbar to make room for the parent block selector.
-	const classes = classnames( 'block-editor-block-contextual-toolbar', {
+	const classes = clsx( 'block-editor-block-contextual-toolbar', {
 		'has-parent': showParentSelector,
 	} );
 
-	const innerClasses = classnames( 'block-editor-block-toolbar', {
+	const innerClasses = clsx( 'block-editor-block-toolbar', {
 		'is-synced': isSynced,
 	} );
 
