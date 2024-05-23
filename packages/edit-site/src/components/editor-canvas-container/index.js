@@ -124,25 +124,27 @@ function EditorCanvasContainer( {
 
 	return (
 		<EditorCanvasContainerFill>
-			<ResizableEditor enableResizing={ enableResizing }>
-				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-				<section
-					className="edit-site-editor-canvas-container"
-					ref={ shouldShowCloseButton ? focusOnMountRef : null }
-					onKeyDown={ closeOnEscape }
-					aria-label={ title }
-				>
-					{ shouldShowCloseButton && (
-						<Button
-							className="edit-site-editor-canvas-container__close-button"
-							icon={ closeSmall }
-							label={ closeButtonLabel || __( 'Close' ) }
-							onClick={ onCloseContainer }
-						/>
-					) }
-					{ childrenWithProps }
-				</section>
-			</ResizableEditor>
+			<div className="edit-site-editor-canvas-container">
+				<ResizableEditor enableResizing={ enableResizing }>
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<section
+						className="edit-site-editor-canvas-container__section"
+						ref={ shouldShowCloseButton ? focusOnMountRef : null }
+						onKeyDown={ closeOnEscape }
+						aria-label={ title }
+					>
+						{ shouldShowCloseButton && (
+							<Button
+								className="edit-site-editor-canvas-container__close-button"
+								icon={ closeSmall }
+								label={ closeButtonLabel || __( 'Close' ) }
+								onClick={ onCloseContainer }
+							/>
+						) }
+						{ childrenWithProps }
+					</section>
+				</ResizableEditor>
+			</div>
 		</EditorCanvasContainerFill>
 	);
 }

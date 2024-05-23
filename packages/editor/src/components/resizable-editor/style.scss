@@ -1,4 +1,11 @@
-.resizable-editor__resize-handle {
+// To hide the horizontal scrollbar and show the drag handle on the
+// left and right of the container.
+.editor-resizable-editor.is-resizable {
+	overflow: visible;
+	margin: 0 auto;
+}
+
+.editor-resizable-editor__resize-handle {
 	position: absolute;
 	top: 0;
 	bottom: 0;

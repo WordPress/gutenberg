@@ -41,7 +41,7 @@ export default function ResizeHandle( { direction, resizeWidthBy } ) {
 		<>
 			<Tooltip text={ __( 'Drag to resize' ) }>
 				<motion.button
-					className={ `resizable-editor__resize-handle is-${ direction }` }
+					className={ `editor-resizable-editor__resize-handle is-${ direction }` }
 					aria-label={ __( 'Drag to resize' ) }
 					aria-describedby={ resizableHandleHelpId }
 					onKeyDown={ handleKeyDown }

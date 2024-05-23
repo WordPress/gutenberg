@@ -3,13 +3,6 @@
 
 	&.is-resizable {
 		max-height: 100%;
-
-		// To hide the horizontal scrollbar and show the drag handle on the
-		// left and right of the container.
-		.components-resizable-box__container {
-			overflow: visible;
-			margin: 0 auto;
-		}
 	}
 
 	&.has-padding {

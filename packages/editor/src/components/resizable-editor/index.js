@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useState, useRef, useCallback } from '@wordpress/element';
@@ -32,7 +37,9 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 	}, [] );
 	return (
 		<ResizableBox
-			className={ className }
+			className={ clsx( 'editor-resizable-editor', className, {
+				'is-resizable': enableResizing,
+			} ) }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
 			} }
