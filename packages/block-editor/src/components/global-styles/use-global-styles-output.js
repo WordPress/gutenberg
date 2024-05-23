@@ -892,7 +892,7 @@ export const toStyles = (
 													);
 												const rules =
 													declarations.join( ';' );
-												ruleset += `${ cssSelector }{${ rules };}`;
+												ruleset += `:root :where(${ cssSelector }){${ rules };}`;
 											}
 										}
 									);
@@ -907,7 +907,7 @@ export const toStyles = (
 										tree
 									);
 								if ( styleVariationDeclarations.length ) {
-									ruleset += `${ styleVariationSelector }{${ styleVariationDeclarations.join(
+									ruleset += `:root :where(${ styleVariationSelector }){${ styleVariationDeclarations.join(
 										';'
 									) };}`;
 								}
