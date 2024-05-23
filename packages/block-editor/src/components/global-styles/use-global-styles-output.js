@@ -33,7 +33,6 @@ import { getGapCSSValue } from '../../hooks/gap';
 import { store as blockEditorStore } from '../../store';
 import { LAYOUT_DEFINITIONS } from '../../layouts/definitions';
 import { getValueFromObjectPath, setImmutably } from '../../utils/object';
-import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 import { setThemeFileUris } from './theme-file-uri-utils';
 
@@ -310,7 +309,7 @@ const getFeatureDeclarations = ( selectors, styles ) => {
  *
  * @param {Object}  tree                A theme.json tree containing layout definitions.
  *
- * @param {boolean} isTemplate          Whether the entity being edited is a full template or a pattern.
+ * @param {boolean} disableRootPadding  Whether to force disable the root padding styles.
  * @return {Array} An array of style declarations.
  */
 export function getStylesDeclarations(
@@ -318,7 +317,7 @@ export function getStylesDeclarations(
 	selector = '',
 	useRootPaddingAlign,
 	tree = {},
-	isTemplate = true
+	disableRootPadding = false
 ) {
 	const isRoot = ROOT_BLOCK_SELECTOR === selector;
 	const output = Object.entries( STYLE_PROPERTY ).reduce(
@@ -394,7 +393,7 @@ export function getStylesDeclarations(
 		// Don't output padding properties if padding variables are set or if we're not editing a full template.
 		if (
 			isRoot &&
-			( useRootPaddingAlign || ! isTemplate ) &&
+			( useRootPaddingAlign || disableRootPadding ) &&
 			rule.key.startsWith( 'padding' )
 		) {
 			return;
@@ -772,7 +771,7 @@ export const toStyles = (
 	hasBlockGapSupport,
 	hasFallbackGapSupport,
 	disableLayoutStyles = false,
-	isTemplate = true,
+	disableRootPadding = false,
 	styleOptions = undefined
 ) => {
 	// These allow opting out of certain sets of styles.
@@ -817,7 +816,11 @@ export const toStyles = (
 		ruleset += ':where(body) {margin: 0;';
 
 		// Root padding styles should only be output for full templates, not patterns or template parts.
-		if ( options.rootPadding && useRootPaddingAlign && isTemplate ) {
+		if (
+			options.rootPadding &&
+			useRootPaddingAlign &&
+			! disableRootPadding
+		) {
 			/*
 			 * These rules reproduce the ones from https://github.com/WordPress/gutenberg/blob/79103f124925d1f457f627e154f52a56228ed5ad/lib/class-wp-theme-json-gutenberg.php#L2508
 			 * almost exactly, but for the selectors that target block wrappers in the front end. This code only runs in the editor, so it doesn't need those selectors.
@@ -949,7 +952,7 @@ export const toStyles = (
 					selector,
 					useRootPaddingAlign,
 					tree,
-					isTemplate
+					disableRootPadding
 				);
 				if ( declarations?.length ) {
 					ruleset += `:where(${ selector }){${ declarations.join(
@@ -1208,10 +1211,15 @@ export function processCSSNesting( css, blockSelector ) {
  * The use case for a custom config is to generate bespoke styles
  * and settings for previews, or other out-of-editor experiences.
  *
- * @param {Object} mergedConfig Global styles configuration.
+ * @param {Object}  mergedConfig       Global styles configuration.
+ * @param {boolean} disableRootPadding Disable root padding styles.
+ *
  * @return {Array} Array of stylesheets and settings.
  */
-export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
+export function useGlobalStylesOutputWithConfig(
+	mergedConfig = {},
+	disableRootPadding
+) {
 	const [ blockGap ] = useGlobalSetting( 'spacing.blockGap' );
 	mergedConfig = setThemeFileUris(
 		mergedConfig,
@@ -1223,10 +1231,6 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		const { getSettings } = select( blockEditorStore );
 		return !! getSettings().disableLayoutStyles;
 	} );
-
-	const blockContext = useContext( BlockContext );
-
-	const isTemplate = blockContext?.templateSlug !== undefined;
 
 	const { getBlockStyles } = useSelect( blocksStore );
 
@@ -1252,7 +1256,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 			hasBlockGapSupport,
 			hasFallbackGapSupport,
 			disableLayoutStyles,
-			isTemplate
+			disableRootPadding
 		);
 		const svgs = toSvgFilters( updatedConfig, blockSelectors );
 
@@ -1299,7 +1303,7 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
-		isTemplate,
+		disableRootPadding,
 		getBlockStyles,
 	] );
 }
@@ -1307,9 +1311,11 @@ export function useGlobalStylesOutputWithConfig( mergedConfig = {} ) {
 /**
  * Returns the global styles output based on the current state of global styles config loaded in the editor context.
  *
+ * @param {boolean} disableRootPadding Disable root padding styles.
+ *
  * @return {Array} Array of stylesheets and settings.
  */
-export function useGlobalStylesOutput() {
+export function useGlobalStylesOutput( disableRootPadding = false ) {
 	const { merged: mergedConfig } = useContext( GlobalStylesContext );
-	return useGlobalStylesOutputWithConfig( mergedConfig );
+	return useGlobalStylesOutputWithConfig( mergedConfig, disableRootPadding );
 }
