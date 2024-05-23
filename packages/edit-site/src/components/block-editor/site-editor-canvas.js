@@ -40,9 +40,7 @@ export default function SiteEditorCanvas() {
 							'is-view-mode': isViewMode,
 						} ) }
 					>
-						<EditorCanvas
-							settings={ settings }
-						/>
+						<EditorCanvas settings={ settings } />
 					</div>
 				)
 			}
