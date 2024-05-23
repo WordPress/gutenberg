@@ -81,7 +81,7 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 };
 
 /**
- * Control to display unified font style and weight options.
+ * Control to display font style and weight options of the active font.
  *
  * @param {Object} props Component props.
  *
@@ -103,6 +103,7 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
+
 	let fontWeights = [];
 	let fontStyles = [];
 
@@ -122,8 +123,13 @@ export default function FontAppearanceControl( props ) {
 					( style ) => style.value === face.fontStyle
 				) === -1
 			) {
+				let styleName = face.fontStyle;
+				if ( face.fontStyle === 'normal' ) {
+					styleName = _x( 'Regular', 'font style' );
+				}
+
 				fontStyles.push( {
-					name: face.fontStyle,
+					name: styleName,
 					value: face.fontStyle,
 				} );
 			}
