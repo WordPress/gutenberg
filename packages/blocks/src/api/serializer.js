@@ -325,7 +325,7 @@ export function getCommentDelimitedContent(
 ) {
 	const variation = getActiveBlockVariation( rawBlockName, attributes );
 
-	const blockName = variation
+	let blockName = variation
 		? `${ rawBlockName }/${ variation.name }`
 		: rawBlockName;
 
@@ -335,9 +335,9 @@ export function getCommentDelimitedContent(
 			: '';
 
 	// Strip core blocks of their namespace prefix.
-	// blockName = blockName?.startsWith( 'core/' )
-	// 	? blockName.slice( 5 )
-	// 	: blockName;
+	blockName = blockName?.startsWith( 'core/' )
+		? blockName.slice( 5 )
+		: blockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 
