@@ -31,8 +31,31 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	const [ items, categories, collections, onSelectItem, allItems ] =
-		useBlockTypesState( rootClientId, onInsert );
+	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
+		rootClientId,
+		onInsert
+	);
+
+	// TODO: Split this into its own component that has all items?
+	const [ allItems, allCategories ] = useBlockTypesState( '', () => {} );
+
+	const allItemsPerCategory = useMemo( () => {
+		return pipe(
+			( itemList ) =>
+				itemList.filter(
+					( item ) => item.category && item.category !== 'reusable'
+				),
+			( itemList ) =>
+				itemList.reduce( ( acc, item ) => {
+					const { category } = item;
+					if ( ! acc[ category ] ) {
+						acc[ category ] = [];
+					}
+					acc[ category ].push( item );
+					return acc;
+				}, {} )
+		)( allItems );
+	}, [ allItems ] );
 
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
@@ -133,7 +156,11 @@ export function BlockTypesTab(
 					return (
 						<InserterPanel
 							key={ category.slug }
-							title={ category.title }
+							title={
+								categoryItems.length === 1
+									? __( 'Allowed' ) // Maybe check the parent block name and use that instead, like "List Block"?
+									: category.title
+							}
 							icon={ category.icon }
 						>
 							<BlockTypesList
@@ -186,15 +213,25 @@ export function BlockTypesTab(
 
 				{ ( items.length === 0 ||
 					availableCategories.length === 1 ) && (
-					<div className="block-editor-inserter__tips">
-						<InserterPanel title={ _x( 'All blocks', 'blocks' ) }>
-							<BlockTypesList
-								items={ allItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ _x( 'All blocks', 'blocks' ) }
-							/>
-						</InserterPanel>
+					<div className="block-editor-inserter__all-blocks">
+						{ allCategories.map( ( category ) => {
+							const categoryItems =
+								allItemsPerCategory[ category.slug ];
+							return (
+								<InserterPanel
+									key={ category.slug }
+									title={ category.title }
+									icon={ category.icon }
+								>
+									<BlockTypesList
+										items={ categoryItems }
+										onSelect={ onSelectItem }
+										onHover={ onHover }
+										label={ category.title }
+									/>
+								</InserterPanel>
+							);
+						} ) }
 					</div>
 				) }
 			</div>
