@@ -209,7 +209,7 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -251,7 +251,8 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									keu={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
