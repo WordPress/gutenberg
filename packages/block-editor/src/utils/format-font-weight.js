@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { _x } from '@wordpress/i18n';
+
+/**
  * Formats font weights to human readable names.
  *
  * @param {string} fontWeight font weight string
@@ -17,31 +22,31 @@ export function formatFontWeight( fontWeight ) {
 
 	switch ( fontWeight ) {
 		case '100':
-			name = 'Thin';
+			name = _x( 'Thin', 'font weight' );
 			break;
 		case '200':
-			name = 'Extra Light';
+			name = _x( 'Extra Light', 'font weight' );
 			break;
 		case '300':
-			name = 'Light';
+			name = _x( 'Light', 'font weight' );
 			break;
 		case '400':
-			name = 'Regular';
+			name = _x( 'Regular', 'font weight' );
 			break;
 		case '500':
-			name = 'Medium';
+			name = _x( 'Medium', 'font weight' );
 			break;
 		case '600':
-			name = 'Semi Bold';
+			name = _x( 'Semi Bold', 'font weight' );
 			break;
 		case '700':
-			name = 'Bold';
+			name = _x( 'Bold', 'font weight' );
 			break;
 		case '800':
-			name = 'Extra Bold';
+			name = _x( 'Extra Bold', 'font weight' );
 			break;
 		case '900':
-			name = 'Black';
+			name = _x( 'Black', 'font weight' );
 			break;
 
 		default:
