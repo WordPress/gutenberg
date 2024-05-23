@@ -22,7 +22,6 @@ import {
 } from './registration';
 import { serializeRawBlock } from './parser/serialize-raw-block';
 import { isUnmodifiedDefaultBlock, normalizeBlockType } from './utils';
-import { convertAliasBlockNameAndAttributes } from './parser/convert-alias-block';
 
 /** @typedef {import('./parser').WPBlock} WPBlock */
 
