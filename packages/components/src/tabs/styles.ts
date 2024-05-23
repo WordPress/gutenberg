@@ -44,6 +44,9 @@ export const TabListWrapper = styled.div`
 			${ COLORS.theme.accent };
 	}
 	&[aria-orientation='vertical']::after {
+		/* Temporarily hidden, context: https://github.com/WordPress/gutenberg/pull/60560#issuecomment-2126670072 */
+		opacity: 0;
+
 		right: 0;
 		top: var( --indicator-top );
 		height: var( --indicator-height );
