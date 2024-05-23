@@ -33,7 +33,7 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
-import ResizableEditor from './resizable-editor';
+import ResizableEditor from '../resizable-editor';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
 import {
 	NAVIGATION_POST_TYPE,
