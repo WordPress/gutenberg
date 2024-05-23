@@ -24,7 +24,7 @@ import { usePaddingAppender } from './use-padding-appender';
 
 const { EditorCanvas } = unlock( editorPrivateApis );
 
-const isGutenbergPlugin = process.env.IS_GUTENBERG_PLUGIN ? true : false;
+const isGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN ? true : false;
 
 export default function VisualEditor( { styles } ) {
 	const {

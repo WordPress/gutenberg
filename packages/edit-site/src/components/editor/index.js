@@ -25,7 +25,6 @@ import {
 } from '@wordpress/block-editor';
 import {
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorNotices,
 	privateApis as editorPrivateApis,
 	store as editorStore,
@@ -49,7 +48,6 @@ import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
@@ -85,7 +83,7 @@ const interfaceLabels = {
 
 const ANIMATION_DURATION = 0.25;
 
-export default function Editor( { isLoading, onClick } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -265,6 +263,10 @@ export default function Editor( { isLoading, onClick } ) {
 
 	return (
 		<>
+			<GlobalStylesRenderer />
+			<EditorKeyboardShortcutsRegister />
+			{ isEditMode && <BlockKeyboardShortcuts /> }
+			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
@@ -342,28 +344,14 @@ export default function Editor( { isLoading, onClick } ) {
 						}
 						content={
 							<>
-								<GlobalStylesRenderer />
 								{ isEditMode && <EditorNotices /> }
-								{ showVisualEditor && (
-									<>
-										<TemplatePartConverter />
-										{ ! isLargeViewport && (
-											<BlockToolbar hideDragHandle />
-										) }
-										<SiteEditorCanvas onClick={ onClick } />
-										<PatternModal />
-									</>
-								) }
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && (
-									<>
-										<EditorKeyboardShortcutsRegister />
-										<EditorKeyboardShortcuts />
-										<BlockKeyboardShortcuts />
-									</>
+								{ ! isLargeViewport && showVisualEditor && (
+									<BlockToolbar hideDragHandle />
 								) }
+								{ showVisualEditor && <SiteEditorCanvas /> }
 							</>
 						}
 						secondarySidebar={
