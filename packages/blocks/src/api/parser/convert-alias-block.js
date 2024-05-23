@@ -5,23 +5,18 @@ import { getBlockVariations, getBlockType } from '../registration';
 
 /**
  * Convert alias blocks to their canonical form. This function is used
- * both in the parser level for previous content and to convert such blocks
- * used in Custom Post Types templates.
+ * at the parser level for previous content.
  *
- * @param {string} name       The block's name
- * @param {Object} attributes The block's attributes
+ * @param {string} name The block's name, possibly with a variation suffix.
  *
- * @return {[string, Object]} The block's name and attributes, changed accordingly if a match was found
+ * @return {string} The block's canonical name, with the variation suffix removed.
  */
-export function convertAliasBlockNameAndAttributes( name, attributes ) {
-	let canonicalBlockName = name;
-
+export function stripBlockVariationSuffixFromBlockName( name ) {
 	const blockVariation = name.split( '/' )?.[ 2 ];
 	if ( blockVariation ) {
-		// FIXME: Stabler way of extracting canonical block name.
-		canonicalBlockName = name.replace( `/${ blockVariation }`, '' );
+		return name.replace( `/${ blockVariation }`, '' );
 		// const variations = getBlockVariations( canonicalBlockName );
 		// TODO: Validate. (Check if variation exists in variations array.)
 	}
-	return [ canonicalBlockName, attributes ];
+	return name;
 }

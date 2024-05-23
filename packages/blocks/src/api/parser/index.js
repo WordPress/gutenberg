@@ -16,7 +16,7 @@ import { getSaveContent } from '../serializer';
 import { validateBlock } from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
-import { convertAliasBlockNameAndAttributes } from './convert-alias-block';
+import { stripBlockVariationSuffixFromBlockName } from './convert-alias-block';
 import { serializeRawBlock } from './serialize-raw-block';
 import { getBlockAttributes } from './get-block-attributes';
 import { applyBlockDeprecatedVersions } from './apply-block-deprecated-versions';
@@ -81,26 +81,19 @@ function convertLegacyBlocks( rawBlock ) {
 
 /**
  * Convert alias blocks to their canonical form. This function is used
- * both in the parser level for previous content and to convert such blocks
- * used in Custom Post Types templates.
- *
- * We are swapping the alias value with the block name depending on whether we are serializing or parsing.
- * This is because the alias is used to serialize the block name, but when parsing, we need to convert the alias to the block name.
+ * at the parser level for previous content.
  *
  * @param {WPRawBlock} rawBlock
  *
  * @return {WPRawBlock} The block's name and attributes, changed accordingly if a match was found
  */
 function convertAliasBlocks( rawBlock ) {
-	const [ correctName, correctedAttributes ] =
-		convertAliasBlockNameAndAttributes(
-			rawBlock.blockName,
-			rawBlock.attrs
-		);
+	const correctName = stripBlockVariationSuffixFromBlockName(
+		rawBlock.blockName
+	);
 	return {
 		...rawBlock,
 		blockName: correctName,
-		attrs: correctedAttributes,
 	};
 }
 
