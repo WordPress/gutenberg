@@ -51,10 +51,7 @@ function useInsertionPoint( {
 	} = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getBlockRootClientId: _getBlockRootClientId,
-			} = select( blockEditorStore );
+			const { getSelectedBlockClientId } = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
@@ -67,7 +64,7 @@ function useInsertionPoint( {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
 			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = _getBlockRootClientId(
+				_destinationRootClientId = getBlockRootClientId(
 					selectedBlockClientId
 				);
 				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
@@ -81,7 +78,6 @@ function useInsertionPoint( {
 			return {
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
-				getBlockRootClientId: _getBlockRootClientId,
 			};
 		},
 		[ rootClientId, insertionIndex, clientId, isAppender ]
