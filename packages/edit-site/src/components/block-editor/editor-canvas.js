@@ -28,13 +28,7 @@ import {
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( {
-	enableResizing,
-	settings,
-	children,
-	onClick,
-	...props
-} ) {
+function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 	const {
 		hasBlocks,
 		isFocusMode,
@@ -88,11 +82,7 @@ function EditorCanvas( {
 			}
 		},
 		onClick: () => {
-			if ( !! onClick ) {
-				onClick();
-			} else {
-				setCanvasMode( 'edit' );
-			}
+			setCanvasMode( 'edit' );
 		},
 		onClickCapture: ( event ) => {
 			if ( currentPostIsTrashed ) {
