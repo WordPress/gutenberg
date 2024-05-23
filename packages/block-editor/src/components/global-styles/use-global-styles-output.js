@@ -1185,7 +1185,7 @@ export function processCSSNesting( css, blockSelector ) {
 		const isRootCss = ! part.includes( '{' );
 		if ( isRootCss ) {
 			// If the part doesn't contain braces, it applies to the root level.
-			processedCSS += `${ blockSelector }{${ part.trim() }}`;
+			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
 			const splittedPart = part.replace( '}', '' ).split( '{' );
@@ -1198,7 +1198,7 @@ export function processCSSNesting( css, blockSelector ) {
 				? scopeSelector( blockSelector, nestedSelector )
 				: appendToSelector( blockSelector, nestedSelector );
 
-			processedCSS += `${ combinedSelector }{${ cssValue.trim() }}`;
+			processedCSS += `:root :where(${ combinedSelector }){${ cssValue.trim() }}`;
 		}
 	} );
 	return processedCSS;

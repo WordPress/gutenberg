@@ -997,7 +997,7 @@ describe( 'global styles renderer', () => {
 		it( 'should return processed CSS without any nested selectors', () => {
 			expect(
 				processCSSNesting( 'color: red; margin: auto;', '.foo' )
-			).toEqual( '.foo{color: red; margin: auto;}' );
+			).toEqual( ':root :where(.foo){color: red; margin: auto;}' );
 		} );
 		it( 'should return processed CSS with nested selectors', () => {
 			expect(
@@ -1006,7 +1006,7 @@ describe( 'global styles renderer', () => {
 					'.foo'
 				)
 			).toEqual(
-				'.foo{color: red; margin: auto;}.foo.one{color: blue;}.foo .two{color: green;}'
+				':root :where(.foo){color: red; margin: auto;}:root :where(.foo.one){color: blue;}:root :where(.foo .two){color: green;}'
 			);
 		} );
 		it( 'should return processed CSS with pseudo elements', () => {
@@ -1016,7 +1016,7 @@ describe( 'global styles renderer', () => {
 					'.foo'
 				)
 			).toEqual(
-				'.foo{color: red; margin: auto;}.foo::before{color: blue;}.foo ::before{color: green;}.foo.one::before{color: yellow;}.foo .two::before{color: purple;}'
+				':root :where(.foo){color: red; margin: auto;}:root :where(.foo::before){color: blue;}:root :where(.foo ::before){color: green;}:root :where(.foo.one::before){color: yellow;}:root :where(.foo .two::before){color: purple;}'
 			);
 		} );
 		it( 'should return processed CSS with multiple root selectors', () => {
@@ -1026,7 +1026,7 @@ describe( 'global styles renderer', () => {
 					'.foo, .bar'
 				)
 			).toEqual(
-				'.foo, .bar{color: red; margin: auto;}.foo.one, .bar.one{color: blue;}.foo .two, .bar .two{color: green;}.foo::before, .bar::before{color: yellow;}.foo ::before, .bar ::before{color: purple;}.foo.three::before, .bar.three::before{color: orange;}.foo .four::before, .bar .four::before{color: skyblue;}'
+				':root :where(.foo, .bar){color: red; margin: auto;}:root :where(.foo.one, .bar.one){color: blue;}:root :where(.foo .two, .bar .two){color: green;}:root :where(.foo::before, .bar::before){color: yellow;}:root :where(.foo ::before, .bar ::before){color: purple;}:root :where(.foo.three::before, .bar.three::before){color: orange;}:root :where(.foo .four::before, .bar .four::before){color: skyblue;}'
 			);
 		} );
 	} );
