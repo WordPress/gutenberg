@@ -163,7 +163,7 @@ export default function useThemeStyleVariationsByProperty( {
 
 				// Remove variations that are empty once the property is filtered out.
 				if (
-					variation.title !== 'Default' &&
+					variation.title !== __( 'Default' ) &&
 					Object.keys( variationFilteredByProperty ).length === 0
 				) {
 					return accumulator;
