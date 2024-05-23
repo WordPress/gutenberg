@@ -45,13 +45,16 @@ function useInsertionPoint( {
 	const {
 		getSelectedBlock,
 		getBlockIndex,
+		getBlockRootClientId,
 		getBlockOrder,
 		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getBlockRootClientId } =
-				select( blockEditorStore );
+			const {
+				getSelectedBlockClientId,
+				getBlockRootClientId: _getBlockRootClientId,
+			} = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 
 			let _destinationRootClientId = rootClientId;
@@ -64,7 +67,7 @@ function useInsertionPoint( {
 				// Insert after a specific client ID.
 				_destinationIndex = getBlockIndex( clientId );
 			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = getBlockRootClientId(
+				_destinationRootClientId = _getBlockRootClientId(
 					selectedBlockClientId
 				);
 				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
@@ -78,6 +81,7 @@ function useInsertionPoint( {
 			return {
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
+				getBlockRootClientId: _getBlockRootClientId,
 			};
 		},
 		[ rootClientId, insertionIndex, clientId, isAppender ]
@@ -131,19 +135,18 @@ function useInsertionPoint( {
 					canInsertBlockType( block.name, _destinationRootClientId )
 				);
 
-				if ( ! canInsertBlocks ) {
-					// TODO: Find the closest block we can insert from
-					const closestInsertionPoint = false;
-
-					if ( closestInsertionPoint ) {
-						_destinationRootClientId =
-							closestInsertionPoint.clientId;
+				if ( ! canInsertBlocks && normalizedBlocks.length === 1 ) {
+					while (
+						! canInsertBlockType(
+							normalizedBlocks[ 0 ].name,
+							_destinationRootClientId
+						)
+					) {
 						_destinationIndex =
-							getBlockIndex( closestInsertionPoint.clientId ) + 1;
-					} else {
-						// Insert at the end of the root container if we can't find a safe parent to insert after
-						_destinationRootClientId = '';
-						_destinationIndex = getBlockOrder().length;
+							getBlockIndex( _destinationRootClientId ) + 1;
+						_destinationRootClientId = getBlockRootClientId(
+							_destinationRootClientId
+						);
 					}
 				}
 
