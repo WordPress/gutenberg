@@ -35,8 +35,8 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"change-case": "^4.1.2",
 		"is-plain-object": "^5.0.0",
-		"react": "^19.0.0-beta-6946ebe620-20240508",
-		"react-dom": "^19.0.0-beta-6946ebe620-20240508"
+		"react": "^19.0.0-rc-f994737d14-20240522",
+		"react-dom": "^19.0.0-rc-f994737d14-20240522"
 	},
 	"publishConfig": {
 		"access": "public"
