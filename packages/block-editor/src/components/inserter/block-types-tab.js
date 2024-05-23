@@ -31,13 +31,17 @@ export function BlockTypesTab(
 	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
 	ref
 ) {
-	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
-		rootClientId,
-		onInsert
-	);
+	// Find the root of what we _can_ insert into for this block.
+	// const { rootContentBlockId } = useSelect( ( select ) => {
+	// 	// Try the empty root first.
+	// 	const { getAllowedBlockTypes } = select( 'core/block-editor' );
 
-	// TODO: Split this into its own component that has all items?
-	const [ allItems, allCategories ] = useBlockTypesState( '', () => {} );
+	// 	select( 'core/block-editor' ).getInserterItems( rootClientId );
+
+	// }, [] );
+
+	const [ allItems, items, categories, collections, onSelectItem ] =
+		useBlockTypesState( rootClientId, onInsert );
 
 	const allItemsPerCategory = useMemo( () => {
 		return pipe(
@@ -122,10 +126,6 @@ export function BlockTypesTab(
 		didRenderAllCategories ? collectionEntries : EMPTY_ARRAY
 	);
 
-	if ( ! items.length ) {
-		return <InserterNoResults />;
-	}
-
 	const availableCategories = categories.filter( ( category ) => {
 		const categoryItems = itemsPerCategory[ category.slug ];
 		if ( ! categoryItems || ! categoryItems.length ) {
@@ -137,6 +137,7 @@ export function BlockTypesTab(
 	return (
 		<InserterListbox>
 			<div ref={ ref }>
+				{ ! items.length && ! allItems.length && <InserterNoResults /> }
 				{ showMostUsedBlocks && !! suggestedItems.length && (
 					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
 						<BlockTypesList
@@ -214,7 +215,7 @@ export function BlockTypesTab(
 				{ ( items.length === 0 ||
 					availableCategories.length === 1 ) && (
 					<div className="block-editor-inserter__all-blocks">
-						{ allCategories.map( ( category ) => {
+						{ categories.map( ( category ) => {
 							const categoryItems =
 								allItemsPerCategory[ category.slug ];
 							return (

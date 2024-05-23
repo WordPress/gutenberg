@@ -23,6 +23,26 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
+	const [ allItems ] = useSelect( ( select ) => {
+		const { getBlocksByName, getInserterItems } =
+			select( blockEditorStore );
+
+		// Try the empty root first.
+		const rootInserterItems = getInserterItems( '' );
+		if ( rootInserterItems.length ) {
+			return [ rootInserterItems ];
+		}
+
+		const postContentBlock = getBlocksByName( 'core/post-content' );
+
+		if ( postContentBlock.length ) {
+			return [ getInserterItems( postContentBlock[ 0 ] ) ];
+		}
+
+		// Failsafe
+		return [ [] ];
+	}, [] );
+
 	const [ items ] = useSelect(
 		( select ) => [
 			select( blockEditorStore ).getInserterItems( rootClientId ),
@@ -57,7 +77,7 @@ const useBlockTypesState = ( rootClientId, onInsert ) => {
 		[ onInsert ]
 	);
 
-	return [ items, categories, collections, onSelectItem ];
+	return [ allItems, items, categories, collections, onSelectItem ];
 };
 
 export default useBlockTypesState;

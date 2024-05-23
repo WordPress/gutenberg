@@ -44,6 +44,7 @@ function useInsertionPoint( {
 } ) {
 	const {
 		getSelectedBlock,
+		getBlocksByName,
 		getBlockIndex,
 		getBlockRootClientId,
 		getBlockOrder,
@@ -142,9 +143,17 @@ function useInsertionPoint( {
 						_destinationRootClientId
 					);
 
-					// If we are at the root, there's nothing more to check
 					if ( _destinationRootClientId === null ) {
-						break;
+						// If we are at the root, try to find a post content block
+						const postContentBlock =
+							getBlocksByName( 'core/post-content' );
+						if ( postContentBlock.length ) {
+							_destinationRootClientId = postContentBlock[ 0 ];
+							// Insert at the end of the post content block.
+							_destinationIndex = getBlockOrder(
+								postContentBlock[ 0 ]
+							).length;
+						}
 					}
 				}
 
@@ -181,6 +190,10 @@ function useInsertionPoint( {
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
+			setLastFocus,
+			canInsertBlockType,
+			getBlockOrder,
+			getBlocksByName,
 		]
 	);
 
