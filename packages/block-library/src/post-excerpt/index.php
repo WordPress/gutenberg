@@ -39,7 +39,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	};
 	add_filter( 'excerpt_length', $filter_excerpt_length );
 
-	$excerpt        = get_the_excerpt( $block->context['postId'] );
+	$excerpt = get_the_excerpt( $block->context['postId'] );
 	if ( isset( $excerpt_length ) ) {
 		$excerpt = wp_trim_words( $excerpt, $excerpt_length );
 	}
