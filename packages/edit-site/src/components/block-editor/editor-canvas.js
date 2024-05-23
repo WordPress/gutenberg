@@ -28,7 +28,7 @@ import {
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
-function EditorCanvas( { enableResizing, settings, children, ...props } ) {
+function EditorCanvas( { settings, children } ) {
 	const {
 		hasBlocks,
 		isFocusMode,
@@ -109,11 +109,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 
-				css: `.is-root-container{display:flow-root;${
-					// Some themes will have `min-height: 100vh` for the root container,
-					// which isn't a requirement in auto resize mode.
-					enableResizing ? 'min-height:0!important;' : ''
-				}}body{position:relative; ${
+				css: `body{${
 					canvasMode === 'view'
 						? `min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
@@ -122,7 +118,7 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				}}}`,
 			},
 		],
-		[ settings.styles, enableResizing, canvasMode, currentPostIsTrashed ]
+		[ settings.styles, canvasMode, currentPostIsTrashed ]
 	);
 
 	return (
@@ -136,7 +132,6 @@ function EditorCanvas( { enableResizing, settings, children, ...props } ) {
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
 					'is-focused': isFocused && canvasMode === 'view',
 				} ),
-				...props,
 				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
 		>

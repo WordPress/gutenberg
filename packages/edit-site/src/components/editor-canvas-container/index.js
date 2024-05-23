@@ -13,14 +13,18 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { store as editorStore } from '@wordpress/editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import ResizableEditor from '../block-editor/resizable-editor';
+
+const { ResizableEditor } = unlock( editorPrivateApis );
 
 /**
  * Returns a translated string for the title of the editor canvas container.
@@ -120,25 +124,27 @@ function EditorCanvasContainer( {
 
 	return (
 		<EditorCanvasContainerFill>
-			<ResizableEditor enableResizing={ enableResizing }>
-				{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-				<section
-					className="edit-site-editor-canvas-container"
-					ref={ shouldShowCloseButton ? focusOnMountRef : null }
-					onKeyDown={ closeOnEscape }
-					aria-label={ title }
-				>
-					{ shouldShowCloseButton && (
-						<Button
-							className="edit-site-editor-canvas-container__close-button"
-							icon={ closeSmall }
-							label={ closeButtonLabel || __( 'Close' ) }
-							onClick={ onCloseContainer }
-						/>
-					) }
-					{ childrenWithProps }
-				</section>
-			</ResizableEditor>
+			<div className="edit-site-editor-canvas-container">
+				<ResizableEditor enableResizing={ enableResizing }>
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<section
+						className="edit-site-editor-canvas-container__section"
+						ref={ shouldShowCloseButton ? focusOnMountRef : null }
+						onKeyDown={ closeOnEscape }
+						aria-label={ title }
+					>
+						{ shouldShowCloseButton && (
+							<Button
+								className="edit-site-editor-canvas-container__close-button"
+								icon={ closeSmall }
+								label={ closeButtonLabel || __( 'Close' ) }
+								onClick={ onCloseContainer }
+							/>
+						) }
+						{ childrenWithProps }
+					</section>
+				</ResizableEditor>
+			</div>
 		</EditorCanvasContainerFill>
 	);
 }

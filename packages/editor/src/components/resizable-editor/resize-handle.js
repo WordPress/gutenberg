@@ -11,11 +11,7 @@ import {
 
 const DELTA_DISTANCE = 20; // The distance to resize per keydown in pixels.
 
-export default function ResizeHandle( {
-	variation = 'default',
-	direction,
-	resizeWidthBy,
-} ) {
+export default function ResizeHandle( { direction, resizeWidthBy } ) {
 	function handleKeyDown( event ) {
 		const { keyCode } = event;
 
@@ -45,7 +41,7 @@ export default function ResizeHandle( {
 		<>
 			<Tooltip text={ __( 'Drag to resize' ) }>
 				<motion.button
-					className={ `resizable-editor__drag-handle is-${ direction } is-variation-${ variation }` }
+					className={ `editor-resizable-editor__resize-handle is-${ direction }` }
 					aria-label={ __( 'Drag to resize' ) }
 					aria-describedby={ resizableHandleHelpId }
 					onKeyDown={ handleKeyDown }
