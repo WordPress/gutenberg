@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEntityRecord } from '@wordpress/core-data';
+import { useEntityRecord, store as coreStore } from '@wordpress/core-data';
 import { check } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -51,6 +51,11 @@ export default function BlockThemeControl( { id } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { setRenderingMode } = useDispatch( editorStore );
 
+	const canCreateTemplate = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', 'templates' ) ?? false
+	);
+
 	if ( ! hasResolved ) {
 		return null;
 	}
@@ -71,8 +76,9 @@ export default function BlockThemeControl( { id } ) {
 			popoverProps={ POPOVER_PROPS }
 			focusOnMount
 			toggleProps={ {
-				__next40pxDefaultSize: true,
+				size: 'compact',
 				variant: 'tertiary',
+				tooltipPosition: 'middle left',
 			} }
 			label={ __( 'Template options' ) }
 			text={ decodeEntities( template.title ) }
@@ -81,30 +87,34 @@ export default function BlockThemeControl( { id } ) {
 			{ ( { onClose } ) => (
 				<>
 					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								onNavigateToEntityRecord( {
-									postId: template.id,
-									postType: 'wp_template',
-								} );
-								onClose();
-								createSuccessNotice(
-									__(
-										'Editing template. Changes made here affect all posts and pages that use the template.'
-									),
-									{
-										type: 'snackbar',
-										actions: notificationAction,
-									}
-								);
-							} }
-						>
-							{ __( 'Edit template' ) }
-						</MenuItem>
+						{ canCreateTemplate && (
+							<MenuItem
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: template.id,
+										postType: 'wp_template',
+									} );
+									onClose();
+									createSuccessNotice(
+										__(
+											'Editing template. Changes made here affect all posts and pages that use the template.'
+										),
+										{
+											type: 'snackbar',
+											actions: notificationAction,
+										}
+									);
+								} }
+							>
+								{ __( 'Edit template' ) }
+							</MenuItem>
+						) }
 
 						<SwapTemplateButton onClick={ onClose } />
 						<ResetDefaultTemplate onClick={ onClose } />
-						<CreateNewTemplate onClick={ onClose } />
+						{ canCreateTemplate && (
+							<CreateNewTemplate onClick={ onClose } />
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
@@ -119,7 +129,7 @@ export default function BlockThemeControl( { id } ) {
 								);
 							} }
 						>
-							{ __( 'Template preview' ) }
+							{ __( 'Show template' ) }
 						</MenuItem>
 					</MenuGroup>
 				</>

@@ -55,11 +55,11 @@ function example_enqueue_editor_content_assets() {
     if ( is_admin() ) {
         wp_enqueue_script(
             'example-editor-content-scripts',
-            plugins_url( 'constent-scripts.css', __FILE__ )
+            plugins_url( 'content-scripts.js', __FILE__ )
         );
         wp_enqueue_style(
             'example-editor-content-styles',
-            plugins_url( 'constent-styles.css', __FILE__ )
+            plugins_url( 'content-styles.css', __FILE__ )
         );
     }
 }

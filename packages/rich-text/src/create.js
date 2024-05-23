@@ -144,8 +144,11 @@ export class RichTextData {
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
-	toHTMLString() {
-		return this.originalHTML || toHTMLString( { value: this.#value } );
+	toHTMLString( { preserveWhiteSpace } = {} ) {
+		return (
+			this.originalHTML ||
+			toHTMLString( { value: this.#value, preserveWhiteSpace } )
+		);
 	}
 	valueOf() {
 		return this.toHTMLString();
@@ -472,11 +475,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		if (
 			isEditableTree &&
-			// Ignore any placeholders.
-			( node.getAttribute( 'data-rich-text-placeholder' ) ||
-				// Ignore any line breaks that are not inserted by us.
-				( tagName === 'br' &&
-					! node.getAttribute( 'data-rich-text-line-break' ) ) )
+			// Ignore any line breaks that are not inserted by us.
+			tagName === 'br' &&
+			! node.getAttribute( 'data-rich-text-line-break' )
 		) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
@@ -531,7 +532,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 			continue;
 		}
 
-		if ( format ) delete format.formatType;
+		if ( format ) {
+			delete format.formatType;
+		}
 
 		const value = createFromElement( {
 			element: node,
@@ -541,7 +544,9 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		accumulateSelection( accumulator, node, range, value );
 
-		if ( ! format ) {
+		// Ignore any placeholders, but keep their content since the browser
+		// might insert text inside them when the editable element is flex.
+		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {

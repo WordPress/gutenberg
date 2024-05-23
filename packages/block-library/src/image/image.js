@@ -33,7 +33,7 @@ import { useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { getFilename } from '@wordpress/url';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -43,7 +43,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
-import useClientWidth from './use-client-width';
 import { isExternalImage } from './edit';
 import { Caption } from '../utils/caption';
 
@@ -78,7 +77,7 @@ const ImageWrapper = ( { href, children } ) => {
 		<a
 			href={ href }
 			onClick={ ( event ) => event.preventDefault() }
-			aria-disabled={ true }
+			aria-disabled
 			style={ {
 				// When the Image block is linked,
 				// it's wrapped with a disabled <a /> tag.
@@ -104,10 +103,10 @@ export default function Image( {
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
-	containerRef,
 	context,
 	clientId,
 	blockEditingMode,
+	parentLayoutType,
 } ) {
 	const {
 		url = '',
@@ -177,14 +176,14 @@ export default function Image( {
 	] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
 		! isWideAligned &&
-		isLargeViewport;
+		isLargeViewport &&
+		parentLayoutType !== 'grid';
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -204,7 +203,9 @@ export default function Image( {
 			return;
 		}
 
-		if ( externalBlob ) return;
+		if ( externalBlob ) {
+			return;
+		}
 
 		window
 			// Avoid cache, which seems to help avoid CORS problems.
@@ -264,6 +265,22 @@ export default function Image( {
 				lightbox: { enabled: true },
 			} );
 		} else if ( ! enable && lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	}
+
+	function resetLightbox() {
+		// When deleting a link from an image while lightbox settings
+		// are enabled by default, we should disable the lightbox,
+		// otherwise the resulting UX looks like a mistake.
+		// See https://github.com/WordPress/gutenberg/pull/59890/files#r1532286123.
+		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
 			setAttributes( {
 				lightbox: { enabled: false },
 			} );
@@ -348,7 +365,10 @@ export default function Image( {
 	const [ lightboxSetting ] = useSettings( 'lightbox' );
 
 	const showLightboxSetting =
-		!! lightbox || lightboxSetting?.allowEditing === true;
+		// If a block-level override is set, we should give users the option to
+		// remove that override, even if the lightbox UI is disabled in the settings.
+		( !! lightbox && lightbox?.enabled !== lightboxSetting?.enabled ) ||
+		lightboxSetting?.allowEditing;
 
 	const lightboxChecked =
 		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
@@ -410,16 +430,19 @@ export default function Image( {
 		lockUrlControls = false,
 		lockHrefControls = false,
 		lockAltControls = false,
+		lockAltControlsMessage,
 		lockTitleControls = false,
+		lockTitleControlsMessage,
 		lockCaption = false,
 	} = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
-
-			const { getBlockBindingsSource, getBlockParentsByBlockName } =
-				unlock( select( blockEditorStore ) );
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			const { getBlockParentsByBlockName } = unlock(
+				select( blockEditorStore )
+			);
 			const {
 				url: urlBinding,
 				alt: altBinding,
@@ -440,7 +463,7 @@ export default function Image( {
 				lockUrlControls:
 					!! urlBinding &&
 					( ! urlBindingSource ||
-						urlBindingSource?.lockAttributesEditing ),
+						urlBindingSource?.lockAttributesEditing() ),
 				lockHrefControls:
 					// Disable editing the link of the URL if the image is inside a pattern instance.
 					// This is a temporary solution until we support overriding the link on the frontend.
@@ -452,11 +475,25 @@ export default function Image( {
 				lockAltControls:
 					!! altBinding &&
 					( ! altBindingSource ||
-						altBindingSource?.lockAttributesEditing ),
+						altBindingSource?.lockAttributesEditing() ),
+				lockAltControlsMessage: altBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							altBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 				lockTitleControls:
 					!! titleBinding &&
 					( ! titleBindingSource ||
-						titleBindingSource?.lockAttributesEditing ),
+						titleBindingSource?.lockAttributesEditing() ),
+				lockTitleControlsMessage: titleBindingSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							titleBindingSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ clientId, isSingleSelected, metadata?.bindings ]
@@ -481,6 +518,7 @@ export default function Image( {
 							showLightboxSetting={ showLightboxSetting }
 							lightboxEnabled={ lightboxChecked }
 							onSetLightbox={ onSetLightbox }
+							resetLightbox={ resetLightbox }
 						/>
 					) }
 				{ allowCrop && (
@@ -556,11 +594,7 @@ export default function Image( {
 								disabled={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -606,11 +640,7 @@ export default function Image( {
 								disabled={ lockTitleControls }
 								help={
 									lockTitleControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockTitleControlsMessage }</>
 									) : (
 										<>
 											{ __(
@@ -638,7 +668,7 @@ export default function Image( {
 					{ isSingleSelected && (
 						<ToolsPanelItem
 							label={ __( 'Alternative text' ) }
-							isShownByDefault={ true }
+							isShownByDefault
 							hasValue={ () => !! alt }
 							onDeselect={ () =>
 								setAttributes( { alt: undefined } )
@@ -651,11 +681,7 @@ export default function Image( {
 								readOnly={ lockAltControls }
 								help={
 									lockAltControls ? (
-										<>
-											{ __(
-												'Connected to a custom field'
-											) }
-										</>
+										<>{ lockAltControlsMessage }</>
 									) : (
 										<>
 											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
@@ -687,13 +713,14 @@ export default function Image( {
 			<InspectorControls group="advanced">
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Title attribute' ) }
 					value={ title || '' }
 					onChange={ onSetTitle }
 					readOnly={ lockTitleControls }
 					help={
 						lockTitleControls ? (
-							<>{ __( 'Connected to a custom field' ) }</>
+							<>{ lockTitleControlsMessage }</>
 						) : (
 							<>
 								{ __(
@@ -763,10 +790,6 @@ export default function Image( {
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
 
-	// clientWidth needs to be a number for the image Cropper to work, but sometimes it's 0
-	// So we try using the imageRef width first and fallback to clientWidth.
-	const fallbackClientWidth = imageRef.current?.width || clientWidth;
-
 	if ( canEditImage && isEditingImage ) {
 		img = (
 			<ImageWrapper href={ href }>
@@ -775,7 +798,6 @@ export default function Image( {
 					url={ url }
 					width={ numericWidth }
 					height={ numericHeight }
-					clientWidth={ fallbackClientWidth }
 					naturalHeight={ naturalHeight }
 					naturalWidth={ naturalWidth }
 					onSaveImage={ ( imageAttributes ) =>
@@ -908,9 +930,7 @@ export default function Image( {
 
 	return (
 		<>
-			{ /* Hide controls during upload to avoid component remount,
-				which causes duplicated image upload. */ }
-			{ ! temporaryURL && controls }
+			{ controls }
 			{ img }
 
 			<Caption
@@ -920,7 +940,7 @@ export default function Image( {
 				insertBlocksAfter={ insertBlocksAfter }
 				label={ __( 'Image caption text' ) }
 				showToolbarButton={ isSingleSelected && hasNonContentControls }
-				disableEditing={ lockCaption }
+				readOnly={ lockCaption }
 			/>
 		</>
 	);

@@ -1,9 +1,11 @@
-.wp-block-pullquote {
+:where(.wp-block-pullquote) {
 	border-top: 4px solid currentColor;
 	border-bottom: 4px solid currentColor;
 	margin-bottom: 1.75em;
 	color: currentColor;
+}
 
+.wp-block-pullquote {
 	cite,
 	footer,
 	&__citation {

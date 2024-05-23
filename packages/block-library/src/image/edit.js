@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -19,7 +20,7 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -27,6 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
 
 /**
@@ -101,6 +103,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
@@ -115,7 +118,9 @@ export function ImageEdit( {
 		align,
 		metadata,
 	} = attributes;
-	const [ temporaryURL, setTemporaryURL ] = useState();
+	const [ temporaryURL, setTemporaryURL ] = useState( () => {
+		return isTemporaryImage( id, url ) ? url : undefined;
+	} );
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -142,7 +147,6 @@ export function ImageEdit( {
 		}
 	}, [ align ] );
 
-	const ref = useRef();
 	const { getSettings } = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
@@ -266,44 +270,12 @@ export function ImageEdit( {
 		}
 	}
 
-	let isTemp = isTemporaryImage( id, url );
-
-	// Upload a temporary image on mount.
-	useEffect( () => {
-		if ( ! isTemp ) {
-			return;
-		}
-
-		const file = getBlobByURL( url );
-
-		if ( file ) {
-			const { mediaUpload } = getSettings();
-			if ( ! mediaUpload ) {
-				return;
-			}
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ img ] ) => {
-					onSelectImage( img );
-				},
-				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: ( message ) => {
-					isTemp = false;
-					onUploadError( message );
-				},
-			} );
-		}
-	}, [] );
-
-	// If an image is temporary, revoke the Blob url when it is uploaded (and is
-	// no longer temporary).
-	useEffect( () => {
-		if ( isTemp ) {
-			setTemporaryURL( url );
-			return;
-		}
-		revokeBlobURL( temporaryURL );
-	}, [ isTemp, url ] );
+	useUploadMediaFromBlobURL( {
+		url,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectImage,
+		onError: onUploadError,
+	} );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -319,7 +291,7 @@ export function ImageEdit( {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
@@ -329,27 +301,31 @@ export function ImageEdit( {
 				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	const blockProps = useBlockProps( {
-		ref,
-		className: classes,
-	} );
+	const blockProps = useBlockProps( { className: classes } );
 
 	// Much of this description is duplicated from MediaPlaceholder.
-	const { lockUrlControls = false } = useSelect(
+	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
 		( select ) => {
 			if ( ! isSingleSelected ) {
 				return {};
 			}
 
 			const blockBindingsSource = unlock(
-				select( blockEditorStore )
+				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
 
 			return {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+						blockBindingsSource?.lockAttributesEditing() ),
+				lockUrlControlsMessage: blockBindingsSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							blockBindingsSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
 			};
 		},
 		[ isSingleSelected ]
@@ -357,11 +333,11 @@ export function ImageEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames( 'block-editor-media-placeholder', {
+				className={ clsx( 'block-editor-media-placeholder', {
 					[ borderProps.className ]:
 						!! borderProps.className && ! isSingleSelected,
 				} ) }
-				withIllustration={ true }
+				withIllustration
 				icon={ lockUrlControls ? pluginsIcon : icon }
 				label={ __( 'Image' ) }
 				instructions={
@@ -386,7 +362,7 @@ export function ImageEdit( {
 					<span
 						className={ 'block-bindings-media-placeholder-message' }
 					>
-						{ __( 'Connected to a custom field' ) }
+						{ lockUrlControlsMessage }
 					</span>
 				) : (
 					content
@@ -407,10 +383,10 @@ export function ImageEdit( {
 				onSelectImage={ onSelectImage }
 				onSelectURL={ onSelectURL }
 				onUploadError={ onUploadError }
-				containerRef={ ref }
 				context={ context }
 				clientId={ clientId }
 				blockEditingMode={ blockEditingMode }
+				parentLayoutType={ parentLayout?.type }
 			/>
 			<MediaPlaceholder
 				icon={ <BlockIcon icon={ icon } /> }

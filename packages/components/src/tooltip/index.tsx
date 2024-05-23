@@ -87,10 +87,7 @@ function UnforwardedTooltip(
 	}
 	computedPlacement = computedPlacement || 'bottom';
 
-	// Removing the `Ariakit` namespace from the hook name allows ESLint to
-	// properly identify the hook, and apply the correct linting rules.
-	const useAriakitTooltipStore = Ariakit.useTooltipStore;
-	const tooltipStore = useAriakitTooltipStore( {
+	const tooltipStore = Ariakit.useTooltipStore( {
 		placement: computedPlacement,
 		showTimeout: delay,
 	} );

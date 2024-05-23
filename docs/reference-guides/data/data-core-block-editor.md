@@ -515,7 +515,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPDirectInsertBlock`: The block type to be directly inserted.
+-   `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
 
 _Type Definition_
 
@@ -1841,11 +1841,11 @@ _Returns_
 
 ### updateBlockListSettings
 
-Action that changes the nested settings of a given block.
+Action that changes the nested settings of the given block(s).
 
 _Parameters_
 
--   _clientId_ `string`: Client ID of the block whose nested setting are being received.
+-   _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
 -   _settings_ `Object`: Object with the new settings for the nested block.
 
 _Returns_

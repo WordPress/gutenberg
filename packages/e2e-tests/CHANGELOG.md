@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+
+## 7.29.0 (2024-05-16)
+
+## 7.28.0 (2024-05-02)
+
+## 7.27.0 (2024-04-19)
+
+## 7.26.0 (2024-04-03)
+
+## 7.25.0 (2024-03-21)
+
+## 7.24.0 (2024-03-06)
+
 ## 7.23.0 (2024-02-21)
 
 ## 7.22.0 (2024-02-09)
@@ -52,7 +68,7 @@
 
 ### Breaking Changes
 
--  Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
+-   Started requiring Jest v29 instead of v27 as a peer dependency. See [breaking changes in Jest 28](https://jestjs.io/blog/2022/04/25/jest-28) and [in jest 29](https://jestjs.io/blog/2022/08/25/jest-29) ([#47388](https://github.com/WordPress/gutenberg/pull/47388))
 
 ## 6.5.0 (2023-03-01)
 

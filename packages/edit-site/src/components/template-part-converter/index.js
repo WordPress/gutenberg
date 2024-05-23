@@ -27,11 +27,24 @@ export default function TemplatePartConverter() {
 }
 
 function TemplatePartConverterMenuItem( { clientIds, onClose } ) {
-	const blocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlocksByClientId( clientIds ),
+	const { isContentOnly, blocks } = useSelect(
+		( select ) => {
+			const { getBlocksByClientId, getBlockEditingMode } =
+				select( blockEditorStore );
+			return {
+				blocks: getBlocksByClientId( clientIds ),
+				isContentOnly:
+					clientIds.length === 1 &&
+					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly',
+			};
+		},
 		[ clientIds ]
 	);
+
+	// Do not show the convert button if the block is in content-only mode.
+	if ( isContentOnly ) {
+		return null;
+	}
 
 	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {

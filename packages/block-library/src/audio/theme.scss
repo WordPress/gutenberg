@@ -2,6 +2,6 @@
 	@include caption-style-theme();
 }
 
-.wp-block-audio {
+:where(.wp-block-audio) {
 	margin: 0 0 1em 0;
 }

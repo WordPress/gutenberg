@@ -16,6 +16,7 @@ import { useState } from '@wordpress/element';
 
 const meta: Meta< typeof RadioGroup > = {
 	title: 'Components (Deprecated)/RadioGroup',
+	id: 'components-radiogroup',
 	component: RadioGroup,
 	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { Radio },

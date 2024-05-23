@@ -164,7 +164,7 @@ class PostTitle extends Component {
 				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText.Raw
-					setRef={ this.setRef }
+					ref={ this.setRef }
 					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
@@ -175,7 +175,7 @@ class PostTitle extends Component {
 					fontSize={ 24 }
 					lineHeight={ 1 }
 					fontWeight={ 'bold' }
-					deleteEnter={ true }
+					deleteEnter
 					onChange={ ( value ) => {
 						this.props.onUpdate( value );
 					} }
@@ -184,7 +184,7 @@ class PostTitle extends Component {
 					value={ title }
 					onSelectionChange={ () => {} }
 					onEnter={ this.props.onEnterPress }
-					disableEditingMenu={ true }
+					disableEditingMenu
 					__unstableIsSelected={ this.props.isSelected }
 					__unstableOnCreateUndoLevel={ () => {} }
 				/>

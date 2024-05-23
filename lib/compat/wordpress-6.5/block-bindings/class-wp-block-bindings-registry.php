@@ -12,7 +12,7 @@
 /**
  * Class used for interacting with block bindings sources.
  *
- *  @since 6.5.0
+ * @since 6.5.0
  */
 if ( ! class_exists( 'WP_Block_Bindings_Registry' ) ) {
 	final class WP_Block_Bindings_Registry {

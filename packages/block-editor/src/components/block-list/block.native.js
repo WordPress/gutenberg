@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Pressable, View } from 'react-native';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,7 @@ import {
 	useRef,
 	memo,
 } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	getMergedGlobalStyles,
-	useMobileGlobalStylesColors,
-	useGlobalStyles,
-	withFilters,
-} from '@wordpress/components';
+import { withFilters } from '@wordpress/components';
 import {
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 	getBlockType,
@@ -49,6 +43,14 @@ import { useLayout } from './layout';
 import useScrollUponInsertion from './use-scroll-upon-insertion';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
+import BlockCrashBoundary from './block-crash-boundary';
+import BlockCrashWarning from './block-crash-warning';
+import {
+	getMergedGlobalStyles,
+	GlobalStylesContext,
+	useGlobalStyles,
+	useMobileGlobalStylesColors,
+} from '../global-styles/use-global-styles-context';
 
 const EMPTY_ARRAY = [];
 
@@ -71,7 +73,7 @@ function mergeWrapperProps( propsA, propsB ) {
 		propsA?.hasOwnProperty( 'className' ) &&
 		propsB?.hasOwnProperty( 'className' )
 	) {
-		newProps.className = classnames( propsA.className, propsB.className );
+		newProps.className = clsx( propsA.className, propsB.className );
 	}
 
 	if (
@@ -93,7 +95,6 @@ function BlockWrapper( {
 	draggingEnabled,
 	hasInnerBlocks,
 	isDescendentBlockSelected,
-	isRootList,
 	isSelected,
 	isTouchable,
 	marginHorizontal,
@@ -137,18 +138,22 @@ function BlockWrapper( {
 			<BlockOutline
 				blockCategory={ blockCategory }
 				hasInnerBlocks={ hasInnerBlocks }
-				isRootList={ isRootList }
 				isSelected={ isSelected }
 				name={ name }
 			/>
-			<BlockDraggable
-				clientId={ clientId }
-				draggingClientId={ draggingClientId }
-				enabled={ draggingEnabled }
-				testID="draggable-trigger-content"
+			<BlockCrashBoundary
+				blockName={ name }
+				fallback={ <BlockCrashWarning /> }
 			>
-				{ children }
-			</BlockDraggable>
+				<BlockDraggable
+					clientId={ clientId }
+					draggingClientId={ draggingClientId }
+					enabled={ draggingEnabled }
+					testID="draggable-trigger-content"
+				>
+					{ children }
+				</BlockDraggable>
+			</BlockCrashBoundary>
 		</Pressable>
 	);
 }
@@ -361,7 +366,6 @@ function BlockListBlock( {
 			hasInnerBlocks={ hasInnerBlocks }
 			isDescendentBlockSelected={ isDescendentBlockSelected }
 			isFocused={ isFocused }
-			isRootList={ ! rootClientId }
 			isSelected={ isSelected }
 			isStackedHorizontally={ isStackedHorizontally }
 			isTouchable={ isTouchable }
@@ -670,7 +674,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				}
 			}
 		},
-		onReplace( blocks, indexToSelect, initialPosition ) {
+		onReplace( blocks, indexToSelect, initialPosition, meta ) {
 			if (
 				blocks.length &&
 				! isUnmodifiedDefaultBlock( blocks[ blocks.length - 1 ] )
@@ -681,7 +685,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				[ ownProps.clientId ],
 				blocks,
 				indexToSelect,
-				initialPosition
+				initialPosition,
+				meta
 			);
 		},
 		toggleSelection( selectionEnabled ) {

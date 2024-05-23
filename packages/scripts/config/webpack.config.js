@@ -9,6 +9,7 @@ const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
+const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
@@ -306,7 +307,8 @@ const scriptConfig = {
 	plugins: [
 		new webpack.DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-			SCRIPT_DEBUG: ! isProduction,
+			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
 
 		// If we run a modules build, the 2 compilations can "clean" each other's output
@@ -382,6 +384,10 @@ const scriptConfig = {
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
 		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		// RtlCssPlugin to generate RTL CSS files.
+		new RtlCssPlugin( {
+			filename: `[name]-rtl.css`,
+		} ),
 		// React Fast Refresh.
 		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
@@ -451,7 +457,8 @@ if ( hasExperimentalModulesFlag ) {
 		plugins: [
 			new webpack.DefinePlugin( {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-				SCRIPT_DEBUG: ! isProduction,
+				'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+				SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 			} ),
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.

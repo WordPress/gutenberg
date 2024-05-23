@@ -3,6 +3,7 @@ export {
 	useGlobalSetting,
 	useGlobalStyle,
 	useSettingsForBlockElement,
+	useGlobalStyleLinks,
 } from './hooks';
 export { getBlockCSSSelector } from './get-block-css-selector';
 export {
@@ -19,7 +20,11 @@ export {
 	default as DimensionsPanel,
 	useHasDimensionsPanel,
 } from './dimensions-panel';
-export { default as BorderPanel, useHasBorderPanel } from './border-panel';
+export {
+	default as BorderPanel,
+	useHasBorderPanel,
+	useHasBorderPanelControls,
+} from './border-panel';
 export { default as ColorPanel, useHasColorPanel } from './color-panel';
 export { default as FiltersPanel, useHasFiltersPanel } from './filters-panel';
 export {
@@ -27,5 +32,9 @@ export {
 	useHasImageSettingsPanel,
 } from './image-settings-panel';
 export { default as AdvancedPanel } from './advanced-panel';
+export {
+	default as BackgroundPanel,
+	useHasBackgroundPanel,
+} from './background-panel';
 export { areGlobalStyleConfigsEqual } from './utils';
 export { default as getGlobalStylesChanges } from './get-global-styles-changes';

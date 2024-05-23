@@ -1,0 +1,34 @@
+// TODO: Specificity hacks to get rid of all these darn !importants.
+
+.block-editor-grid-visualizer {
+	z-index: z-index(".block-editor-grid-visualizer") !important;
+}
+
+.block-editor-grid-visualizer .components-popover__content * {
+	pointer-events: none !important;
+}
+
+.block-editor-grid-visualizer__grid {
+	display: grid;
+}
+
+.block-editor-grid-visualizer__item {
+	outline: 1px solid transparent;
+	border-radius: $radius-block-ui;
+}
+
+.block-editor-grid-item-resizer {
+	z-index: z-index(".block-editor-grid-visualizer") !important;
+}
+
+.block-editor-grid-item-resizer .components-popover__content * {
+	pointer-events: none !important;
+}
+
+.block-editor-grid-item-resizer__box {
+	border: $border-width solid var(--wp-admin-theme-color);
+
+	.components-resizable-box__handle {
+		pointer-events: all !important;
+	}
+}

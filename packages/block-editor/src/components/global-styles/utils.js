@@ -6,32 +6,12 @@ import fastDeepEqual from 'fast-deep-equal/es6';
 /**
  * Internal dependencies
  */
-import {
-	getTypographyFontSizeValue,
-	getFluidTypographyOptionsFromSettings,
-} from './typography-utils';
+import { getTypographyFontSizeValue } from './typography-utils';
 import { getValueFromObjectPath } from '../../utils/object';
 
 /* Supporting data. */
-export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
-export const ROOT_BLOCK_SUPPORTS = [
-	'background',
-	'backgroundColor',
-	'color',
-	'linkColor',
-	'captionColor',
-	'buttonColor',
-	'headingColor',
-	'fontFamily',
-	'fontSize',
-	'fontStyle',
-	'fontWeight',
-	'lineHeight',
-	'textDecoration',
-	'textTransform',
-	'padding',
-];
+export const ROOT_CSS_PROPERTIES_SELECTOR = ':root';
 
 export const PRESET_METADATA = [
 	{
@@ -77,10 +57,7 @@ export const PRESET_METADATA = [
 	{
 		path: [ 'typography', 'fontSizes' ],
 		valueFunc: ( preset, settings ) =>
-			getTypographyFontSizeValue(
-				preset,
-				getFluidTypographyOptionsFromSettings( settings )
-			),
+			getTypographyFontSizeValue( preset, settings ),
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
@@ -387,6 +364,10 @@ export function getValueFromVariable( features, blockName, variable ) {
  * @return {string} Scoped selector.
  */
 export function scopeSelector( scope, selector ) {
+	if ( ! scope || ! selector ) {
+		return selector;
+	}
+
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
@@ -398,6 +379,57 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Scopes a collection of selectors for features and subfeatures.
+ *
+ * @example
+ * ```js
+ * const scope = '.custom-scope';
+ * const selectors = {
+ *     color: '.wp-my-block p',
+ *     typography: { fontSize: '.wp-my-block caption' },
+ * };
+ * const result = scopeFeatureSelector( scope, selectors );
+ * // result is {
+ * //     color: '.custom-scope .wp-my-block p',
+ * //     typography: { fonSize: '.custom-scope .wp-my-block caption' },
+ * // }
+ * ```
+ *
+ * @param {string} scope     Selector to scope collection of selectors with.
+ * @param {Object} selectors Collection of feature selectors e.g.
+ *
+ * @return {Object|undefined} Scoped collection of feature selectors.
+ */
+export function scopeFeatureSelectors( scope, selectors ) {
+	if ( ! scope || ! selectors ) {
+		return;
+	}
+
+	const featureSelectors = {};
+
+	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
+		if ( typeof selector === 'string' ) {
+			featureSelectors[ feature ] = scopeSelector( scope, selector );
+		}
+
+		if ( typeof selector === 'object' ) {
+			featureSelectors[ feature ] = {};
+
+			Object.entries( selector ).forEach(
+				( [ subfeature, subfeatureSelector ] ) => {
+					featureSelectors[ feature ][ subfeature ] = scopeSelector(
+						scope,
+						subfeatureSelector
+					);
+				}
+			);
+		}
+	} );
+
+	return featureSelectors;
 }
 
 /**

@@ -90,7 +90,9 @@ export const BlockMover = ( {
 		const option = blockPageMoverOptions.find(
 			( el ) => el.value === value
 		);
-		if ( option && option.onSelect ) option.onSelect();
+		if ( option && option.onSelect ) {
+			option.onSelect();
+		}
 	};
 
 	const onLongPressMoveUp = useCallback(
@@ -133,7 +135,7 @@ export const BlockMover = ( {
 				options={ blockPageMoverOptions }
 				onChange={ onPickerSelect }
 				title={ __( 'Change block position' ) }
-				leftAlign={ true }
+				leftAlign
 				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
 		</ToolbarGroup>

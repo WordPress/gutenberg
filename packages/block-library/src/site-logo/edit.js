@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,6 @@ import {
 	createInterpolateElement,
 	useEffect,
 	useState,
-	useRef,
 } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import {
@@ -50,11 +49,6 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import useClientWidth from '../image/use-client-width';
-
-/**
- * Module constants
- */
 import { MIN_SIZE } from '../image/constants';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -63,7 +57,6 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
-	containerRef,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -74,16 +67,13 @@ const SiteLogo = ( {
 	setIcon,
 	canUserEdit,
 } ) => {
-	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = classnames( 'custom-logo-link', {
-		'is-transient': isBlobURL( logoUrl ),
-	} );
+	const classes = clsx( 'custom-logo-link' );
 	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
@@ -121,17 +111,20 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-		<img
-			className="custom-logo"
-			src={ logoUrl }
-			alt={ alt }
-			onLoad={ ( event ) => {
-				setNaturalSize( {
-					naturalWidth: event.target.naturalWidth,
-					naturalHeight: event.target.naturalHeight,
-				} );
-			} }
-		/>
+		<>
+			<img
+				className="custom-logo"
+				src={ logoUrl }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize( {
+						naturalWidth: event.target.naturalWidth,
+						naturalHeight: event.target.naturalHeight,
+					} );
+				} }
+			/>
+			{ isBlobURL( logoUrl ) && <Spinner /> }
+		</>
 	);
 
 	let imgWrapper = img;
@@ -154,14 +147,7 @@ const SiteLogo = ( {
 		);
 	}
 
-	let imageWidthWithinContainer;
-
-	if ( clientWidth && naturalWidth && naturalHeight ) {
-		const exceedMaxWidth = naturalWidth > clientWidth;
-		imageWidthWithinContainer = exceedMaxWidth ? clientWidth : naturalWidth;
-	}
-
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
+	if ( ! isResizable || ! naturalWidth || ! naturalHeight ) {
 		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
@@ -227,7 +213,6 @@ const SiteLogo = ( {
 				url={ logoUrl }
 				width={ currentWidth }
 				height={ currentHeight }
-				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
 				onSaveImage={ ( imageAttributes ) => {
@@ -268,6 +253,14 @@ const SiteLogo = ( {
 			</ResizableBox>
 		);
 
+	// Support the previous location for the Site Icon settings. To be removed
+	// when the required WP core version for Gutenberg is >= 6.5.0.
+	const shouldUseNewUrl = ! window?.__experimentalUseCustomizerSiteLogoUrl;
+
+	const siteIconSettingsUrl = shouldUseNewUrl
+		? siteUrl + '/wp-admin/options-general.php'
+		: siteUrl + '/wp-admin/customize.php?autofocus[section]=title_tagline';
+
 	const syncSiteIconHelpText = createInterpolateElement(
 		__(
 			'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. To use a custom icon that is different from your site logo, use the <a>Site Icon settings</a>.'
@@ -276,10 +269,7 @@ const SiteLogo = ( {
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
-					href={
-						siteUrl +
-						'/wp-admin/customize.php?autofocus[section]=title_tagline'
-					}
+					href={ siteIconSettingsUrl }
 					target="_blank"
 					rel="noopener noreferrer"
 				/>
@@ -331,7 +321,7 @@ const SiteLogo = ( {
 						<>
 							<ToggleControl
 								__nextHasNoMarginBottom
-								label={ __( 'Use as site icon' ) }
+								label={ __( 'Use as Site Icon' ) }
 								onChange={ ( value ) => {
 									setAttributes( { shouldSyncIcon: value } );
 									setIcon( value ? logoId : undefined );
@@ -403,7 +393,6 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
-	const ref = useRef();
 
 	const {
 		siteLogoId,
@@ -446,6 +435,7 @@ export default function LogoEdit( {
 		};
 	}, [] );
 	const { getSettings } = useSelect( blockEditorStore );
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const { editEntityRecord } = useDispatch( coreStore );
 
@@ -492,6 +482,7 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image.
+			setTemporaryURL( media.url );
 			setLogo( undefined );
 			return;
 		}
@@ -507,6 +498,7 @@ export default function LogoEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 	};
 
 	const onFilesDrop = ( filesList ) => {
@@ -515,6 +507,7 @@ export default function LogoEdit( {
 			filesList,
 			onFileChange( [ image ] ) {
 				if ( isBlobURL( image?.url ) ) {
+					setTemporaryURL( image.url );
 					return;
 				}
 				onInitialSelectLogo( image );
@@ -529,7 +522,7 @@ export default function LogoEdit( {
 		onError: onUploadError,
 		onRemoveLogo,
 	};
-	const controls = canUserEdit && logoUrl && (
+	const controls = canUserEdit && logoUrl && ! temporaryURL && (
 		<BlockControls group="other">
 			<SiteLogoReplaceFlow { ...mediaReplaceFlowProps } />
 		</BlockControls>
@@ -540,27 +533,36 @@ export default function LogoEdit( {
 	if ( isLoading ) {
 		logoImage = <Spinner />;
 	}
-	if ( !! logoUrl ) {
+
+	// Reset temporary url when logoUrl is available.
+	useEffect( () => {
+		if ( logoUrl && temporaryURL ) {
+			setTemporaryURL();
+		}
+	}, [ logoUrl, temporaryURL ] );
+
+	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (
-			<SiteLogo
-				alt={ alt }
-				attributes={ attributes }
-				className={ className }
-				containerRef={ ref }
-				isSelected={ isSelected }
-				setAttributes={ setAttributes }
-				logoUrl={ logoUrl }
-				setLogo={ setLogo }
-				logoId={ mediaItemData?.id || siteLogoId }
-				siteUrl={ url }
-				setIcon={ setIcon }
-				iconId={ siteIconId }
-				canUserEdit={ canUserEdit }
-			/>
+			<>
+				<SiteLogo
+					alt={ alt }
+					attributes={ attributes }
+					className={ className }
+					isSelected={ isSelected }
+					setAttributes={ setAttributes }
+					logoUrl={ temporaryURL || logoUrl }
+					setLogo={ setLogo }
+					logoId={ mediaItemData?.id || siteLogoId }
+					siteUrl={ url }
+					setIcon={ setIcon }
+					iconId={ siteIconId }
+					canUserEdit={ canUserEdit }
+				/>
+			</>
 		);
 	}
 	const placeholder = ( content ) => {
-		const placeholderClassName = classnames(
+		const placeholderClassName = clsx(
 			'block-editor-media-placeholder',
 			className
 		);
@@ -569,7 +571,7 @@ export default function LogoEdit( {
 			<Placeholder
 				className={ placeholderClassName }
 				preview={ logoImage }
-				withIllustration={ true }
+				withIllustration
 				style={ {
 					width,
 				} }
@@ -579,14 +581,12 @@ export default function LogoEdit( {
 		);
 	};
 
-	const classes = classnames( className, {
+	const classes = clsx( className, {
 		'is-default-size': ! width,
+		'is-transient': temporaryURL,
 	} );
 
-	const blockProps = useBlockProps( {
-		ref,
-		className: classes,
-	} );
+	const blockProps = useBlockProps( { className: classes } );
 
 	const label = __( 'Add a site logo' );
 
@@ -647,8 +647,8 @@ export default function LogoEdit( {
 		<div { ...blockProps }>
 			{ controls }
 			{ mediaInspectorPanel }
-			{ !! logoUrl && logoImage }
-			{ ! logoUrl && ! canUserEdit && (
+			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
+			{ ! temporaryURL && ! logoUrl && ! canUserEdit && (
 				<Placeholder className="site-logo_placeholder">
 					{ !! isLoading && (
 						<span className="components-placeholder__preview">
@@ -657,7 +657,7 @@ export default function LogoEdit( {
 					) }
 				</Placeholder>
 			) }
-			{ ! logoUrl && canUserEdit && (
+			{ ! temporaryURL && ! logoUrl && canUserEdit && (
 				<MediaPlaceholder
 					onSelect={ onInitialSelectLogo }
 					accept={ ACCEPT_MEDIA_STRING }

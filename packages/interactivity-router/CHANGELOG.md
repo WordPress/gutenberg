@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+
+## 1.8.0 (2024-05-16)
+
+## 1.7.0 (2024-05-02)
+
+## 1.6.0 (2024-04-19)
+
+## 1.5.0 (2024-04-03)
+
+## 1.4.0 (2024-03-21)
+
+## 1.3.0 (2024-03-06)
+
+### Bug Fixes
+
+-   Fix navigate() issues related to initial state merges. ([#57134](https://github.com/WordPress/gutenberg/pull/57134))
+
 ## 1.2.0 (2024-02-21)
 
 ## 1.1.0 (2024-02-09)

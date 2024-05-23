@@ -1,6 +1,7 @@
 // Provide special styling for the placeholder.
-// @todo: this particular minimal style of placeholder could be componentized further.
+// @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-image.wp-block-image {
+
 	// Show Placeholder style on-select.
 	&.is-selected .components-placeholder {
 		// Block UI appearance.
@@ -12,7 +13,7 @@
 		// Disable any duotone filter applied in the selected state.
 		filter: none !important;
 
-		// @todo: this should eventually be overridden by a custom border-radius set in the inspector.
+		// @todo this should eventually be overridden by a custom border-radius set in the inspector.
 		border-radius: $radius-block-ui;
 
 		> svg {
@@ -140,13 +141,19 @@ figure.wp-block-image:not(.wp-block) {
 	width: 100%;
 	overflow: hidden;
 
-	// This removes the border from the img within the image cropper so it
-	// can be applied to the cropper itself. This then allows the image to be
-	// cropped within the visual border providing more accurate editing and
-	// smoother UX.
-	.reactEasyCrop_Container .reactEasyCrop_Image {
-		border: none;
-		border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+	.reactEasyCrop_Container {
+		// The linked Image block has `pointer-events: none` applied. Override it
+		// here to enable the crop action.
+		pointer-events: auto;
+
+		// This removes the border from the img within the image cropper so it
+		// can be applied to the cropper itself. This then allows the image to be
+		// cropped within the visual border providing more accurate editing and
+		// smoother UX.
+		.reactEasyCrop_Image {
+			border: none;
+			border-radius: 0; // Prevent's theme.json radius bleeding into cropper.
+		}
 	}
 }
 

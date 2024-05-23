@@ -101,7 +101,7 @@ test.describe( 'Style Revisions', () => {
 		const confirm = page.getByRole( 'dialog' );
 		await expect( confirm ).toBeVisible();
 		await expect( confirm ).toHaveText(
-			/^Any unsaved changes will be lost when you apply this revision./
+			/^Are you sure you want to apply this revision\? Any unsaved changes will be lost./
 		);
 
 		// This is to make sure there are no lingering unsaved changes.
@@ -190,6 +190,38 @@ test.describe( 'Style Revisions', () => {
 		await expect(
 			page.getByLabel( 'Global styles revisions list' )
 		).toBeHidden();
+	} );
+
+	test( 'should close revisions panel and leave style book open if activated', async ( {
+		page,
+		editor,
+		userGlobalStylesRevisions,
+	} ) => {
+		await editor.canvas.locator( 'body' ).click();
+		await userGlobalStylesRevisions.openStylesPanel();
+		const revisionsButton = page.getByRole( 'button', {
+			name: 'Revisions',
+		} );
+		const styleBookButton = page.getByRole( 'button', {
+			name: 'Style Book',
+		} );
+		await revisionsButton.click();
+		await styleBookButton.click();
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		await page.click( 'role=button[name="Back"]' );
+
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeHidden();
+
+		// The site editor canvas has been restored.
+		await expect(
+			page.locator( 'iframe[name="style-book-canvas"]' )
+		).toBeVisible();
 	} );
 
 	test( 'should paginate', async ( {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -123,10 +123,11 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Color' ) }
+			label={ __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
+			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
@@ -153,6 +154,8 @@ const popoverProps = {
 	offset: 36,
 	shift: true,
 };
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 const LabeledColorIndicators = ( { indicators, label } ) => (
 	<HStack justify="flex-start">
@@ -206,10 +209,6 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-	// Unlocking `Tabs` too early causes the `unlock` method to receive an empty
-	// object, due to circular dependencies.
-	// See https://github.com/WordPress/gutenberg/issues/52692
-	const { Tabs } = unlock( componentsPrivateApis );
 
 	return (
 		<ToolsPanelItem
@@ -226,7 +225,7 @@ function ColorPanelDropdown( {
 				renderToggle={ ( { onToggle, isOpen } ) => {
 					const toggleProps = {
 						onClick: onToggle,
-						className: classnames(
+						className: clsx(
 							'block-editor-panel-color-gradient-settings__dropdown',
 							{ 'is-open': isOpen }
 						),
@@ -544,7 +543,7 @@ export default function ColorPanel( {
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
-					label: __( 'Solid' ),
+					label: __( 'Color' ),
 					inheritedValue: backgroundColor,
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
@@ -586,7 +585,9 @@ export default function ColorPanel( {
 	].filter( Boolean );
 
 	elements.forEach( ( { name, label, showPanel } ) => {
-		if ( ! showPanel ) return;
+		if ( ! showPanel ) {
+			return;
+		}
 
 		const elementBackgroundColor = decodeValue(
 			inheritedValue?.elements?.[ name ]?.color?.background
@@ -709,19 +710,22 @@ export default function ColorPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ items.map( ( item ) => (
-				<ColorPanelDropdown
-					key={ item.key }
-					{ ...item }
-					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
-						gradients,
-						disableCustomGradients: ! areCustomGradientsEnabled,
-					} }
-					panelId={ panelId }
-				/>
-			) ) }
+			{ items.map( ( item ) => {
+				const { key, ...restItem } = item;
+				return (
+					<ColorPanelDropdown
+						key={ key }
+						{ ...restItem }
+						colorGradientControlSettings={ {
+							colors,
+							disableCustomColors: ! areCustomSolidsEnabled,
+							gradients,
+							disableCustomGradients: ! areCustomGradientsEnabled,
+						} }
+						panelId={ panelId }
+					/>
+				);
+			} ) }
 			{ children }
 		</Wrapper>
 	);

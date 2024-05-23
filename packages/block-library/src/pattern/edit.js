@@ -43,7 +43,7 @@ const PatternEdit = ( { attributes, clientId } ) => {
 	const [ hasRecursionError, setHasRecursionError ] = useState( false );
 	const parsePatternDependencies = useParsePatternDependencies();
 
-	// Duplicated in packages/edit-site/src/components/start-template-options/index.js.
+	// Duplicated in packages/editor/src/components/start-template-options/index.js.
 	function injectThemeAttributeInBlockTemplateContent( block ) {
 		if (
 			block.innerBlocks.find(
@@ -97,6 +97,24 @@ const PatternEdit = ( { attributes, clientId } ) => {
 						injectThemeAttributeInBlockTemplateContent( block )
 					)
 				);
+				// If the pattern has a single block and categories, we should add the
+				// categories of the pattern to the block's metadata.
+				if (
+					clonedBlocks.length === 1 &&
+					selectedPattern.categories?.length > 0
+				) {
+					clonedBlocks[ 0 ].attributes = {
+						...clonedBlocks[ 0 ].attributes,
+						metadata: {
+							...clonedBlocks[ 0 ].attributes.metadata,
+							categories: selectedPattern.categories,
+							patternName: selectedPattern.name,
+							name:
+								clonedBlocks[ 0 ].attributes.metadata.name ||
+								selectedPattern.title,
+						},
+					};
+				}
 				const rootEditingMode = getBlockEditingMode( rootClientId );
 				registry.batch( () => {
 					// Temporarily set the root block to default mode to allow replacing the pattern.

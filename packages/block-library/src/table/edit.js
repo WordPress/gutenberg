@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -419,7 +419,7 @@ function TableEdit( {
 								scope={ CellTag === 'th' ? scope : undefined }
 								colSpan={ colspan }
 								rowSpan={ rowspan }
-								className={ classnames(
+								className={ clsx(
 									{
 										[ `has-text-align-${ align }` ]: align,
 									},
@@ -505,7 +505,7 @@ function TableEdit( {
 			</InspectorControls>
 			{ ! isEmpty && (
 				<table
-					className={ classnames(
+					className={ clsx(
 						colorProps.className,
 						borderProps.className,
 						{

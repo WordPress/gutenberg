@@ -64,9 +64,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -85,9 +83,7 @@ test.describe( 'Copy/cut/paste', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -489,6 +485,7 @@ test.describe( 'Copy/cut/paste', () => {
 	} ) => {
 		pageUtils.setClipboardData( {
 			html: '<pre>x</pre>',
+			plainText: 'x',
 		} );
 		await editor.insertBlock( { name: 'core/list' } );
 		await pageUtils.pressKeys( 'primary+v' );
@@ -596,6 +593,49 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'movie: b',
+				},
+			},
+		] );
+	} );
+
+	test( 'should inherit existing block type on paste', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'A',
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'b',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+c' );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '[]' );
+		await page.keyboard.press( 'ArrowLeft' );
+
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '[A',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'b]',
 				},
 			},
 		] );

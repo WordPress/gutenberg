@@ -4,7 +4,7 @@
 	"type": "object",
 	"definitions": {
 		"fontFace": {
-			"description": "Font face theme.json settings, with added preview property.",
+			"description": "Font face settings, with added preview property.",
 			"type": "object",
 			"properties": {
 				"preview": {
@@ -100,14 +100,6 @@
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
-		"name": {
-			"type": "string",
-			"description": "Name of the font collection."
-		},
-		"description": {
-			"type": "string",
-			"description": "Description of the font collection."
-		},
 		"font_families": {
 			"type": "array",
 			"description": "Array of font families ready to be installed.",
@@ -115,7 +107,7 @@
 				"type": "object",
 				"properties": {
 					"font_family_settings": {
-						"description": "Font family theme.json settings, with added preview property.",
+						"description": "Font family settings, with added preview property.",
 						"type": "object",
 						"properties": {
 							"name": {
@@ -146,6 +138,7 @@
 								}
 							}
 						},
+						"required": [ "name", "fontFamily", "slug" ],
 						"additionalProperties": false
 					},
 					"categories": {
@@ -159,25 +152,8 @@
 				"required": [ "font_family_settings" ],
 				"additionalProperties": false
 			}
-		},
-		"categories": {
-			"type": "array",
-			"description": "Array of category objects.",
-			"items": {
-				"type": "object",
-				"properties": {
-					"slug": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					}
-				},
-				"required": [ "slug", "name" ],
-				"additionalProperties": false
-			}
 		}
 	},
 	"additionalProperties": false,
-	"required": [ "$schema", "slug", "name", "font_families" ]
+	"required": [ "font_families" ]
 }
