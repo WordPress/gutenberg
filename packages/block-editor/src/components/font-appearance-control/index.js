@@ -130,13 +130,8 @@ export default function FontAppearanceControl( props ) {
 		}
 	} );
 
-	if ( fontWeights.length === 0 ) {
-		fontWeights = FONT_WEIGHTS;
-	}
-
-	if ( fontStyles.length === 0 ) {
-		fontStyles = FONT_STYLES;
-	}
+	fontWeights = fontWeights.length === 0 ? FONT_WEIGHTS : fontWeights;
+	fontStyles = fontStyles.length === 0 ? FONT_STYLES : fontStyles;
 
 	// Combines both font style and weight options into a single dropdown.
 	const combineOptions = () => {
