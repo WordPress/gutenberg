@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507]((https://github.com/WordPress/gutenberg/pull/60607)).
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   Upgraded the @types/react and @types/react-dom packages ([#60796](https://github.com/WordPress/gutenberg/pull/60796)).
@@ -45,7 +46,6 @@
 
 ### Enhancements
 
--   `FontSizePicker`: Add `vw` and `vh` units to the font size picker ([#60507]((https://github.com/WordPress/gutenberg/pull/60607)).
 -   `Tooltip`: Make tests faster ([#60897](https://github.com/WordPress/gutenberg/pull/60897)).
 -   `ExternalLink`: Use unicode arrow instead of svg icon ([#60255](https://github.com/WordPress/gutenberg/pull/60255)).
 -   `ProgressBar`: Move the indicator width styles from emotion to a CSS variable ([#60388](https://github.com/WordPress/gutenberg/pull/60388)).
