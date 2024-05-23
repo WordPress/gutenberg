@@ -51,4 +51,24 @@ wp_enqueue_script_module( 'directive-on-view' );
 			data-wp-on--click="actions.clickHandler"
 		>Click me!</button>
 	</div>
+	<div data-wp-context='{"clicked":false,"clickCount":0,"isOpen":true}'>
+		<p
+			data-wp-text="context.clicked"
+			data-testid="multiple handlers clicked"
+		>false</p>
+		<p
+			data-wp-text="context.clickCount"
+			data-testid="multiple handlers clickCount"
+		>0</p>
+		<p
+			data-wp-text="context.isOpen"
+			data-testid="multiple handlers isOpen"
+		>true</p>
+		<button
+			data-testid="multiple handlers button"
+			data-wp-on--click="actions.setClicked"
+			data-wp-on--click--counter="actions.countClick"
+			data-wp-on--click--toggle="actions.toggle"
+		>Click me!</button>
+	</div>
 </div>
