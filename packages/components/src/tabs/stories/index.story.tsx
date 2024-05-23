@@ -68,6 +68,20 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 
 export const Default = Template.bind( {} );
 
+const VerticalTemplate: StoryFn< typeof Tabs > = ( props ) => {
+	return (
+		<Tabs orientation="vertical" { ...props }>
+			<Tabs.TabList style={ { maxWidth: '10rem' } }>
+				<Tabs.Tab tabId="tab1">Tab 1</Tabs.Tab>
+				<Tabs.Tab tabId="tab2">Tab 2</Tabs.Tab>
+				<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
+			</Tabs.TabList>
+		</Tabs>
+	);
+};
+
+export const Vertical = VerticalTemplate.bind( {} );
+
 const DisabledTabTemplate: StoryFn< typeof Tabs > = ( props ) => {
 	return (
 		<Tabs { ...props }>
