@@ -43,7 +43,7 @@ function PageAttributesOrder() {
 					label={ __( 'Order' ) }
 					value={ value }
 					onChange={ setUpdatedOrder }
-					labelPosition="side"
+					hideLabelFromVision
 					onBlur={ () => {
 						setOrderInput( null );
 					} }

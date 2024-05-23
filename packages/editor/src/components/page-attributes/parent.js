@@ -173,6 +173,7 @@ export function PageAttributesParent() {
 			options={ parentOptions }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
+			hideLabelFromVision
 		/>
 	);
 }
