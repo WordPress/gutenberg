@@ -23,7 +23,6 @@ import type { TabListProps } from './types';
 import { useTabsContext } from './context';
 import { TabListWrapper } from './styles';
 import type { WordPressComponentProps } from '../context';
-import type { CSSProperties } from 'react';
 import clsx from 'clsx';
 
 function useTrackElementOffset(
@@ -170,15 +169,13 @@ export const TabList = forwardRef<
 			}
 			onBlur={ onBlur }
 			{ ...otherProps }
-			style={
-				{
-					'--indicator-left': `${ indicatorPosition.left }px`,
-					'--indicator-top': `${ indicatorPosition.top }px`,
-					'--indicator-width': `${ indicatorPosition.width }px`,
-					'--indicator-height': `${ indicatorPosition.height }px`,
-					...otherProps.style,
-				} as CSSProperties
-			}
+			style={ {
+				'--indicator-left': `${ indicatorPosition.left }px`,
+				'--indicator-top': `${ indicatorPosition.top }px`,
+				'--indicator-width': `${ indicatorPosition.width }px`,
+				'--indicator-height': `${ indicatorPosition.height }px`,
+				...otherProps.style,
+			} }
 			className={ clsx(
 				animationEnabled ? 'is-animation-enabled' : '',
 				otherProps.className
