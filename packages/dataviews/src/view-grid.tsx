@@ -22,16 +22,7 @@ import { __ } from '@wordpress/i18n';
 import ItemActions from './item-actions';
 import SingleSelectionCheckbox from './single-selection-checkbox';
 import { useHasAPossibleBulkAction } from './bulk-actions';
-import type {
-	Action,
-	AnyItem,
-	NormalizedField,
-	ViewGrid as ViewGridType,
-	ViewProps,
-} from './types';
-
-interface ViewGridProps< Item extends AnyItem >
-	extends ViewProps< Item, ViewGridType > {}
+import type { Action, AnyItem, NormalizedField, ViewGridProps } from './types';
 
 interface GridItemProps< Item extends AnyItem > {
 	selection: string[];

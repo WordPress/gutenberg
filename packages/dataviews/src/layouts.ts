@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import type { ComponentType } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
@@ -21,7 +16,6 @@ import ViewTable from './view-table';
 import ViewGrid from './view-grid';
 import ViewList from './view-list';
 import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from './constants';
-import { ViewProps } from './types';
 
 export const VIEW_LAYOUTS = [
 	{

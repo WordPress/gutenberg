@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
@@ -16,7 +21,7 @@ import { VIEW_LAYOUTS } from './layouts';
 import BulkActions from './bulk-actions';
 import { normalizeFields } from './normalize-fields';
 import BulkActionsToolbar from './bulk-actions-toolbar';
-import type { Action, AnyItem, Field, View } from './types';
+import type { Action, AnyItem, Field, View, ViewBaseProps } from './types';
 
 interface DataViewsProps< Item extends AnyItem > {
 	view: View;
@@ -99,9 +104,8 @@ export default function DataViews< Item extends AnyItem >( {
 		[ setSelection, getItemId, onSelectionChange ]
 	);
 
-	const ViewComponent = VIEW_LAYOUTS.find(
-		( v ) => v.type === view.type
-	).component;
+	const ViewComponent = VIEW_LAYOUTS.find( ( v ) => v.type === view.type )
+		?.component as ComponentType< ViewBaseProps< Item > >;
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
 
 	const hasPossibleBulkAction = useSomeItemHasAPossibleBulkAction(
