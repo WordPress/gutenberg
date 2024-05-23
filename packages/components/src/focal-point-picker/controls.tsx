@@ -38,7 +38,9 @@ export default function FocalPointPickerControls( {
 		value: Parameters< UnitControlOnChangeCallback >[ 0 ],
 		axis: FocalPointAxis
 	) => {
-		if ( value === undefined ) return;
+		if ( value === undefined ) {
+			return;
+		}
 
 		const num = parseInt( value, 10 );
 

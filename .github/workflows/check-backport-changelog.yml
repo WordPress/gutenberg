@@ -1,0 +1,59 @@
+name: Verify Core Backport Changlog
+
+on:
+    pull_request:
+        types: [opened, synchronize, labeled, unlabeled]
+        paths:
+            - 'lib/**'
+            - '!lib/load.php'
+            - '!lib/experiments-page.php'
+            - '!lib/experimental/**'
+            - 'phpunit/**'
+            - '!phpunit/experimental/**'
+            - '!phpunit/blocks/**'
+            - 'packages/**/*.php'
+            - '!packages/block-library/**'
+            - '!packages/e2e-tests/**'
+jobs:
+    check:
+        name: Check CHANGELOG diff
+        runs-on: ubuntu-latest
+        steps:
+            - name: 'Get PR commit count'
+              run: echo "PR_COMMIT_COUNT=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
+            - name: Checkout code
+              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+              with:
+                  ref: ${{ github.event.pull_request.head.ref }}
+                  repository: ${{ github.event.pull_request.head.repo.full_name }}
+                  fetch-depth: ${{ env.PR_COMMIT_COUNT }}
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+            - name: 'Fetch relevant history from origin'
+              run: git fetch origin ${{ github.event.pull_request.base.ref }}
+            - name: Check CHANGELOG status
+              if: ${{ !contains(github.event.pull_request.labels.*.name, 'No Core Sync Required') && !contains(github.event.pull_request.labels.*.name, 'Backport from WordPress Core') }}
+              env:
+                  PR_NUMBER: ${{ github.event.number }}
+              run: |
+                  changelog_folder="backport-changelog"
+
+                  # Find any changelog file that contains the Gutenberg PR link
+                  gutenberg_pr_url="https://github\.com/WordPress/gutenberg/pull/${PR_NUMBER}"
+                  changelog_file=$(grep -rl "[-*] ${gutenberg_pr_url}" "${changelog_folder}" | head -n 1)
+
+                  # Confirm that there is an entry containing the Gutenberg PR link
+                  if [[ -z "${changelog_file}" ]]; then
+                    echo "Please create a core backport PR and add a file with the path <wp-release-number>/<core-pr-number>.md in the $changelog_folder folder with the core backport PR URL and a list item with this PR URL."
+                    echo "If changes are related to an existing, open core PR, you may add this PR URL to the core PR's file."
+                    echo "See $changelog_folder/readme.md for more information."
+                    exit 1
+                  fi
+
+                  core_pr_number=$(basename "${changelog_file}" .md)
+                  core_pr_url="https://github\.com/WordPress/wordpress-develop/pull/${core_pr_number}"
+
+                  # Confirm that the entry has the correct core backport PR URL.
+                  if ! grep -q -e "${core_pr_url}" "${changelog_file}"; then
+                    echo "Please update the content of ${changelog_file} to include the core backport PR URL, or update the file name to match the core backport PR number."
+                    exit 1
+                  fi

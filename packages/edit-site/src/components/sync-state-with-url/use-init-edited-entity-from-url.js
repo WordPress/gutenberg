@@ -27,43 +27,51 @@ const postTypesWithoutParentTemplate = [
 	PATTERN_TYPES.user,
 ];
 
-function useResolveEditedEntityAndContext( { path, postId, postType } ) {
-	const { hasLoadedAllDependencies, homepageId, url, frontPageTemplateId } =
-		useSelect( ( select ) => {
-			const { getSite, getUnstableBase, getEntityRecords } =
-				select( coreDataStore );
-			const siteData = getSite();
-			const base = getUnstableBase();
-			const templates = getEntityRecords(
-				'postType',
-				TEMPLATE_POST_TYPE,
-				{
-					per_page: -1,
-				}
-			);
-			let _frontPateTemplateId;
-			if ( templates ) {
-				const frontPageTemplate = templates.find(
-					( t ) => t.slug === 'front-page'
-				);
-				_frontPateTemplateId = frontPageTemplate
-					? frontPageTemplate.id
-					: false;
-			}
+const authorizedPostTypes = [ 'page' ];
 
-			return {
-				hasLoadedAllDependencies: !! base && !! siteData,
-				homepageId:
-					siteData?.show_on_front === 'page' &&
-					[ 'number', 'string' ].includes(
-						typeof siteData.page_on_front
-					)
-						? siteData.page_on_front.toString()
-						: null,
-				url: base?.home,
-				frontPageTemplateId: _frontPateTemplateId,
-			};
-		}, [] );
+function useResolveEditedEntityAndContext( { postId, postType } ) {
+	const {
+		hasLoadedAllDependencies,
+		homepageId,
+		postsPageId,
+		url,
+		frontPageTemplateId,
+	} = useSelect( ( select ) => {
+		const { getSite, getUnstableBase, getEntityRecords } =
+			select( coreDataStore );
+		const siteData = getSite();
+		const base = getUnstableBase();
+		const templates = getEntityRecords( 'postType', TEMPLATE_POST_TYPE, {
+			per_page: -1,
+		} );
+		const _homepageId =
+			siteData?.show_on_front === 'page' &&
+			[ 'number', 'string' ].includes( typeof siteData.page_on_front ) &&
+			!! +siteData.page_on_front // We also need to check if it's not zero(`0`).
+				? siteData.page_on_front.toString()
+				: null;
+		const _postsPageId =
+			siteData?.show_on_front === 'page' &&
+			[ 'number', 'string' ].includes( typeof siteData.page_for_posts )
+				? siteData.page_for_posts.toString()
+				: null;
+		let _frontPageTemplateId;
+		if ( templates ) {
+			const frontPageTemplate = templates.find(
+				( t ) => t.slug === 'front-page'
+			);
+			_frontPageTemplateId = frontPageTemplate
+				? frontPageTemplate.id
+				: false;
+		}
+		return {
+			hasLoadedAllDependencies: !! base && !! siteData,
+			homepageId: _homepageId,
+			postsPageId: _postsPageId,
+			url: base?.home,
+			frontPageTemplateId: _frontPageTemplateId,
+		};
+	}, [] );
 
 	/**
 	 * This is a hook that recreates the logic to resolve a template for a given WordPress postID postTypeId
@@ -75,7 +83,10 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		( select ) => {
 			// If we're rendering a post type that doesn't have a template
 			// no need to resolve its template.
-			if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+			if (
+				postTypesWithoutParentTemplate.includes( postType ) &&
+				postId
+			) {
 				return undefined;
 			}
 
@@ -113,6 +124,14 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 				);
 				if ( ! editedEntity ) {
 					return undefined;
+				}
+				// Check if the current page is the posts page.
+				if (
+					postTypeToResolve === 'page' &&
+					postsPageId === postIdToResolve
+				) {
+					return __experimentalGetTemplateForLink( editedEntity.link )
+						?.id;
 				}
 				// First see if the post/page has an assigned template and fetch it.
 				const currentTemplateSlug = editedEntity.template;
@@ -154,14 +173,14 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 				return undefined;
 			}
 
-			// If we're rendering a specific page, post... we need to resolve its template.
-			if ( postType && postId ) {
+			// If we're rendering a specific page, we need to resolve its template.
+			// The site editor only supports pages for now, not other CPTs.
+			if (
+				postType &&
+				postId &&
+				authorizedPostTypes.includes( postType )
+			) {
 				return resolveTemplateForPostTypeAndId( postType, postId );
-			}
-
-			// Some URLs in list views are different
-			if ( path === '/page' && postId ) {
-				return resolveTemplateForPostTypeAndId( 'page', postId );
 			}
 
 			// If we're rendering the home page, and we have a static home page, resolve its template.
@@ -177,27 +196,22 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		},
 		[
 			homepageId,
+			postsPageId,
 			hasLoadedAllDependencies,
 			url,
 			postId,
 			postType,
-			path,
 			frontPageTemplateId,
 		]
 	);
 
 	const context = useMemo( () => {
-		if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+		if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 			return {};
 		}
 
-		if ( postType && postId ) {
+		if ( postType && postId && authorizedPostTypes.includes( postType ) ) {
 			return { postType, postId };
-		}
-
-		// Some URLs in list views are different
-		if ( path === '/page' && postId ) {
-			return { postType: 'page', postId };
 		}
 
 		if ( homepageId ) {
@@ -205,17 +219,9 @@ function useResolveEditedEntityAndContext( { path, postId, postType } ) {
 		}
 
 		return {};
-	}, [ homepageId, postType, postId, path ] );
+	}, [ homepageId, postType, postId ] );
 
-	if ( path === '/wp_template' && postId ) {
-		return { isReady: true, postType: 'wp_template', postId, context };
-	}
-
-	if ( path === '/wp_template_part/all' && postId ) {
-		return { isReady: true, postType: 'wp_template_part', postId, context };
-	}
-
-	if ( postTypesWithoutParentTemplate.includes( postType ) ) {
+	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
 		return { isReady: true, postType, postId, context };
 	}
 

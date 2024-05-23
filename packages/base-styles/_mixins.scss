@@ -284,9 +284,8 @@
 			display: inline-block;
 			vertical-align: middle;
 			width: 16px;
-			/* stylelint-disable */
+			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
 			font: normal 30px/1 dashicons;
-			/* stylelint-enable */
 			speak: none;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -317,10 +316,14 @@
 	border-radius: $radius-round;
 	width: $radio-input-size-sm;
 	height: $radio-input-size-sm;
+	min-width: $radio-input-size-sm;
+	max-width: $radio-input-size-sm;
 
 	@include break-small() {
 		height: $radio-input-size;
 		width: $radio-input-size;
+		min-width: $radio-input-size;
+		max-width: $radio-input-size;
 	}
 
 	&:checked::before {
@@ -518,12 +521,9 @@
 
 // Deprecated from UI, kept for back-compat.
 @mixin gradient-colors-deprecated() {
-	/*
-	 * Our classes uses the same values we set for gradient value attributes,
-	 * and we can not use spacing because of WP multi site kses rule.
-	 */
+	// Our classes uses the same values we set for gradient value attributes.
 
-	/* stylelint-disable function-comma-space-after */
+	/* stylelint-disable function-comma-space-after -- We can not use spacing because of WP multi site kses rule. */
 	.has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background {
 		background: linear-gradient(135deg,rgba(0,208,132,1) 0%,rgba(6,147,227,1) 100%);
 	}

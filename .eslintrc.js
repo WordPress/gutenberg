@@ -76,6 +76,11 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
 ];
 
 module.exports = {
@@ -401,6 +406,24 @@ module.exports = {
 								name: '@wordpress/core-data',
 								message:
 									"block-editor is a generic package that doesn't depend on a server or WordPress backend. To provide WordPress integration, consider passing settings to the BlockEditorProvider components.",
+							},
+						],
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					{
+						paths: [
+							...restrictedImports,
+							{
+								name: '@wordpress/interface',
+								message:
+									'The edit-post and edit-site package should not directly import the interface package. They should import them from the private APIs of the editor package instead.',
 							},
 						],
 					},

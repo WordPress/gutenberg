@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -185,7 +184,7 @@ function PostTitle( _, forwardedRef ) {
 
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
-	const className = classnames( DEFAULT_CLASSNAMES, {
+	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
 		'has-fixed-toolbar': hasFixedToolbar,
 	} );
@@ -211,4 +210,12 @@ function PostTitle( _, forwardedRef ) {
 	);
 }
 
+/**
+ * Renders the `PostTitle` component.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Forwarded ref for the component.
+ *
+ * @return {Component} The rendered PostTitle component.
+ */
 export default forwardRef( PostTitle );

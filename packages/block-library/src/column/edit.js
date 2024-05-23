@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,20 +24,36 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
+function ColumnInspectorControls( { width, setAttributes } ) {
+	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const units = useCustomUnits( {
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
+	return (
+		<PanelBody title={ __( 'Settings' ) }>
+			<UnitControl
+				label={ __( 'Width' ) }
+				labelPosition="edge"
+				__unstableInputWidth="80px"
+				value={ width || '' }
+				onChange={ ( nextWidth ) => {
+					nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+					setAttributes( { width: nextWidth } );
+				} }
+				units={ units }
+			/>
+		</PanelBody>
+	);
+}
+
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
-	const classes = classnames( 'block-core-columns', {
+	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
-	const [ availableUnits ] = useSettings( 'spacing.units' );
-	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
-	} );
-
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } =
@@ -103,20 +119,10 @@ function ColumnEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						labelPosition="edge"
-						__unstableInputWidth="80px"
-						value={ width || '' }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							setAttributes( { width: nextWidth } );
-						} }
-						units={ units }
-					/>
-				</PanelBody>
+				<ColumnInspectorControls
+					width={ width }
+					setAttributes={ setAttributes }
+				/>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>

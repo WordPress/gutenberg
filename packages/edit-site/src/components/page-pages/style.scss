@@ -51,3 +51,18 @@
 		outline: 2px solid transparent;
 	}
 }
+
+.edit-site-page-pages-title span {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.edit-site-page-pages__title-badge {
+	background: $gray-100;
+	color: $gray-700;
+	padding: $grid-unit-05 $grid-unit-10;
+	border-radius: $radius-block-ui;
+	font-size: 12px;
+	font-weight: 400;
+	flex-shrink: 0;
+}

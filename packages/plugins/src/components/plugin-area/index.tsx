@@ -113,7 +113,11 @@ function PluginArea( {
 		};
 	}, [ scope ] );
 
-	const plugins = useSyncExternalStore( store.subscribe, store.getValue );
+	const plugins = useSyncExternalStore(
+		store.subscribe,
+		store.getValue,
+		store.getValue
+	);
 
 	return (
 		<div style={ { display: 'none' } }>

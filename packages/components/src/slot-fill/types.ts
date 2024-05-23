@@ -3,6 +3,11 @@
  */
 import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
 
+/**
+ * WordPress dependencies
+ */
+import type { ObservableMap } from '@wordpress/compose';
+
 export type DistributiveOmit< T, K extends keyof any > = T extends any
 	? Omit< T, K >
 	: never;
@@ -109,14 +114,14 @@ export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
 } >;
 
 export type SlotFillBubblesVirtuallyContext = {
-	slots: Map<
+	slots: ObservableMap<
 		SlotKey,
 		{
 			ref: SlotFillBubblesVirtuallySlotRef;
 			fillProps: FillProps;
 		}
 	>;
-	fills: Map< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
+	fills: ObservableMap< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
 	registerSlot: (
 		name: SlotKey,
 		ref: SlotFillBubblesVirtuallySlotRef,

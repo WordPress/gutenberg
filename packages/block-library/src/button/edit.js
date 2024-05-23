@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -247,7 +247,7 @@ function ButtonEdit( props ) {
 				lockUrlControls:
 					!! metadata?.bindings?.url &&
 					( ! blockBindingsSource ||
-						blockBindingsSource?.lockAttributesEditing ),
+						blockBindingsSource?.lockAttributesEditing() ),
 			};
 		},
 		[ isSelected ]
@@ -257,7 +257,7 @@ function ButtonEdit( props ) {
 		<>
 			<div
 				{ ...blockProps }
-				className={ classnames( blockProps.className, {
+				className={ clsx( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]:
 						width,
 					[ `has-custom-font-size` ]: blockProps.style.fontSize,
@@ -274,7 +274,7 @@ function ButtonEdit( props ) {
 						} )
 					}
 					withoutInteractiveFormatting
-					className={ classnames(
+					className={ clsx(
 						className,
 						'wp-block-button__link',
 						colorProps.className,
@@ -293,12 +293,6 @@ function ButtonEdit( props ) {
 						...spacingProps.style,
 						...shadowProps.style,
 					} }
-					onSplit={ ( value ) =>
-						createBlock( 'core/button', {
-							...attributes,
-							text: value,
-						} )
-					}
 					onReplace={ onReplace }
 					onMerge={ mergeBlocks }
 					identifier="text"

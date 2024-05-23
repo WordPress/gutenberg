@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -80,7 +80,7 @@ const renderToggle =
 
 		const toggleProps = {
 			onClick: onToggle,
-			className: classnames(
+			className: clsx(
 				'block-editor-panel-color-gradient-settings__dropdown',
 				{ 'is-open': isOpen }
 			),

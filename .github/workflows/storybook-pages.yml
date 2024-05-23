@@ -12,7 +12,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@9bb56186c3b09b4f86b1c65136769dd318469633 # v4.1.2
+              uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -24,7 +24,7 @@ jobs:
               run: npm run storybook:build
 
             - name: Deploy
-              uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
+              uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: ./storybook/build

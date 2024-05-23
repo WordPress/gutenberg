@@ -108,8 +108,12 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 				const compareByModuleIdentifier = ( m1, m2 ) => {
 					const i1 = m1.identifier();
 					const i2 = m2.identifier();
-					if ( i1 < i2 ) return -1;
-					if ( i1 > i2 ) return 1;
+					if ( i1 < i2 ) {
+						return -1;
+					}
+					if ( i1 > i2 ) {
+						return 1;
+					}
 					return 0;
 				};
 
