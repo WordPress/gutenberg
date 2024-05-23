@@ -15,6 +15,7 @@ import { removep } from '@wordpress/autop';
  * Internal dependencies
  */
 import {
+	getActiveBlockVariation,
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
@@ -323,26 +324,21 @@ export function getCommentDelimitedContent(
 	attributes,
 	content
 ) {
-	const variation = attributes?.metadata?.variation;
+	const variation = getActiveBlockVariation( rawBlockName, attributes );
 
-	const correctBlockName = variation
-		? `${ rawBlockName }/${ variation }`
+	const blockName = variation
+		? `${ rawBlockName }/${ variation.name }`
 		: rawBlockName;
-	const correctedAttributes = { ...attributes };
-
-	if ( variation ) {
-		delete correctedAttributes.metadata.variation;
-	}
 
 	const serializedAttributes =
-		correctedAttributes && Object.entries( correctedAttributes ).length
-			? serializeAttributes( correctedAttributes ) + ' '
+		attributes && Object.entries( attributes ).length
+			? serializeAttributes( attributes ) + ' '
 			: '';
 
 	// Strip core blocks of their namespace prefix.
-	const blockName = correctBlockName?.startsWith( 'core/' )
-		? correctBlockName.slice( 5 )
-		: correctBlockName;
+	// blockName = blockName?.startsWith( 'core/' )
+	// 	? blockName.slice( 5 )
+	// 	: blockName;
 
 	// @todo make the `wp:` prefix potentially configurable.
 

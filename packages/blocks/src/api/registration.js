@@ -690,6 +690,14 @@ export const getBlockVariations = ( blockName, scope ) => {
 	return select( blocksStore ).getBlockVariations( blockName, scope );
 };
 
+export const getActiveBlockVariation = ( blockName, attributes, scope ) => {
+	return select( blocksStore ).getActiveBlockVariation(
+		blockName,
+		attributes,
+		scope
+	);
+};
+
 /**
  * Registers a new block variation for the given block type.
  *

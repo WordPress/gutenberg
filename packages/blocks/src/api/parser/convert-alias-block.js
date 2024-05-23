@@ -23,18 +23,5 @@ export function convertAliasBlockNameAndAttributes( name, attributes ) {
 		// const variations = getBlockVariations( canonicalBlockName );
 		// TODO: Validate. (Check if variation exists in variations array.)
 	}
-
-	const { metadata = {}, ...otherAttributes } = attributes;
-
-	let newAttributes = { ...otherAttributes };
-
-	// TODO: Tidy up a bit more. Replace with attribute inference (in serializer)?
-	if ( blockVariation ) {
-		newAttributes = {
-			...otherAttributes,
-			metadata: { ...metadata, variation: blockVariation },
-		};
-	}
-
-	return [ canonicalBlockName, newAttributes ];
+	return [ canonicalBlockName, attributes ];
 }
