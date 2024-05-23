@@ -78,7 +78,8 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 				( usedLayout?.inherit ||
 					usedLayout?.contentSize ||
 					usedLayout?.type === 'constrained' ||
-					blockAttributes?.align === 'full' ) &&
+					( blockAttributes?.align === 'full' &&
+						usedLayout?.type !== 'flex' ) ) &&
 				select( blockEditorStore ).getSettings().__experimentalFeatures
 					?.useRootPaddingAwareAlignments
 			);
