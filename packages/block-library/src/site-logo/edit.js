@@ -267,7 +267,6 @@ const SiteLogo = ( {
 		),
 		{
 			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
 				<a
 					href={ siteIconSettingsUrl }
 					target="_blank"

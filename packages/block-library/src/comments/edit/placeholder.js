@@ -91,10 +91,7 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 										'Commenter avatars come from <a>Gravatar</a>.'
 									),
 									{
-										a: (
-											// eslint-disable-next-line jsx-a11y/anchor-has-content
-											<a href="https://gravatar.com/" />
-										),
+										a: <a href="https://gravatar.com/" />,
 									}
 								) }
 							</p>
