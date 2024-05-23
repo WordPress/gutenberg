@@ -21,7 +21,7 @@ import {
 import type { DirectiveEntry } from './hooks';
 import { directive, getScope, getEvaluate } from './hooks';
 
-// Assigned objects should be ignore during proxification.
+// Assigned objects should be ignored during proxification.
 const contextAssignedObjects = new WeakMap();
 
 // Store the context proxy and fallback for each object in the context.
