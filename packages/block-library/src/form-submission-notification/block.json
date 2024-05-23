@@ -4,7 +4,7 @@
 	"__experimental": true,
 	"name": "core/form-submission-notification",
 	"title": "Form Submission Notification",
-	"category": "common",
+	"category": "design",
 	"ancestor": [ "core/form" ],
 	"description": "Provide a notification message after the form has been submitted.",
 	"keywords": [ "form", "feedback", "notification", "message" ],
