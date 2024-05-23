@@ -60,7 +60,9 @@ export default function PostURL( { onClose } ) {
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
 			permalinkSuffix: permalinkParts?.suffix,
-			permalink: select( editorStore ).getPermalink(),
+			permalink: safeDecodeURIComponent(
+				select( editorStore ).getPermalink()
+			),
 		};
 	}, [] );
 	const { editPost } = useDispatch( editorStore );
