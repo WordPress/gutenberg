@@ -20,6 +20,7 @@ import {
 	requestMediaImport,
 	subscribeMediaAppend,
 	subscribeParentToggleHTMLMode,
+	subscribeVoiceToContent,
 } from '@wordpress/react-native-bridge';
 
 setupCoreBlocks();
@@ -32,6 +33,11 @@ subscribeParentToggleHTMLMode.mockImplementation( ( callback ) => {
 let mediaAppendCallback;
 subscribeMediaAppend.mockImplementation( ( callback ) => {
 	mediaAppendCallback = callback;
+} );
+
+let onVoiceToContentCallback;
+subscribeVoiceToContent.mockImplementation( ( callback ) => {
+	onVoiceToContentCallback = callback;
 } );
 
 const MEDIA = [
@@ -148,5 +154,48 @@ describe( 'Editor', () => {
 		const openBlockSettingsButton =
 			screen.queryAllByLabelText( 'Open Settings' );
 		expect( openBlockSettingsButton.length ).toBe( 0 );
+	} );
+
+	describe( 'on voice to content', () => {
+		it( 'parses markdown into blocks', async () => {
+			// Arrange
+			await initializeEditor();
+
+			// Act
+			act( () => {
+				onVoiceToContentCallback( {
+					content: `# Sample Document\nLorem ipsum dolor sit amet, consectetur adipiscing 
+						elit.\n## Overview\n- Lorem ipsum dolor sit amet\n- Consectetur adipiscing
+						 elit\n- Integer nec odio\n## Details\n1. Sed cursus ante dapibus diam\n2. 
+						 Nulla quis sem at nibh elementum imperdiet\n3. Duis sagittis ipsum\n
+						 ## Mixed Lists\n- Key Points:\n 1. Lorem ipsum dolor sit amet\n 2. 
+						 Consectetur adipiscing elit\n 3. Integer nec odio\n- Additional Info:\n -
+						  Sed cursus ante dapibus diam\n - Nulla quis sem at nibh elementum imperdiet\n`,
+				} );
+			} );
+
+			// Assert
+			// Needed to for the "Processed HTML piece" log.
+			expect( console ).toHaveLogged();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
+
+		it( 'parses standard text into blocks', async () => {
+			// Arrange
+			await initializeEditor();
+
+			// Act
+			act( () => {
+				onVoiceToContentCallback( {
+					content: `Lorem ipsum dolor sit amet. Qui rerum quae sed sciunt
+					 animi rem voluptate quas aut impedit accusamus ut`,
+				} );
+			} );
+
+			// Assert
+			// Needed to for the "Processed HTML piece" log.
+			expect( console ).toHaveLogged();
+			expect( getEditorHtml() ).toMatchSnapshot();
+		} );
 	} );
 } );
