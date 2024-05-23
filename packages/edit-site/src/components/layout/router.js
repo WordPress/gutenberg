@@ -75,7 +75,6 @@ function useRedirectOldPaths() {
 
 export default function useLayoutAreas() {
 	const isSiteEditorLoading = useIsSiteEditorLoading();
-	const history = useHistory();
 	const { params } = useLocation();
 	const { postType, postId, path, layout, isCustom, canvas } = params;
 	useRedirectOldPaths();
@@ -95,16 +94,7 @@ export default function useLayoutAreas() {
 				),
 				content: <PagePages />,
 				preview: ( isListLayout || canvas === 'edit' ) && (
-					<Editor
-						isLoading={ isSiteEditorLoading }
-						onClick={ () =>
-							history.push( {
-								postType: 'page',
-								postId,
-								canvas: 'edit',
-							} )
-						}
-					/>
+					<Editor isLoading={ isSiteEditorLoading } />
 				),
 				mobile:
 					canvas === 'edit' ? (
