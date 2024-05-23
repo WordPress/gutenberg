@@ -178,6 +178,9 @@ export default function TypographyPanel( {
 		);
 	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
+	const fontFamilyFaces = mergedFontFamilies.find(
+		( family ) => family.name === fontFamily
+	)?.fontFace;
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
@@ -406,6 +409,7 @@ export default function TypographyPanel( {
 						onChange={ setFontAppearance }
 						hasFontStyles={ hasFontStyles }
 						hasFontWeights={ hasFontWeights }
+						fontFamilyFaces={ fontFamilyFaces }
 						size="__unstable-large"
 						__nextHasNoMarginBottom
 					/>
