@@ -10,6 +10,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -29,10 +30,16 @@ const {
 export default function PostActions( { onActionPerformed, buttonProps } ) {
 	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
 	const { item, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPost } = select( editorStore );
+		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		const { getEditedEntityRecord } = select( coreStore );
+		const _postType = getCurrentPostType();
 		return {
-			item: getCurrentPost(),
-			postType: getCurrentPostType(),
+			item: getEditedEntityRecord(
+				'postType',
+				_postType,
+				getCurrentPostId()
+			),
+			postType: _postType,
 		};
 	}, [] );
 	const allActions = usePostActions( postType, onActionPerformed );
