@@ -336,7 +336,7 @@ export default function DataviewsPatterns() {
 		}
 
 		return _fields;
-	}, [ view.type, categoryId, type, authors ] );
+	}, [ view.type, type, authors ] );
 
 	// Reset the page number when the category changes.
 	useEffect( () => {
