@@ -979,7 +979,8 @@ export const duplicatePatternAction = {
 		const [ item ] = items;
 		const isThemePattern = item.type === PATTERN_TYPES.theme;
 		const duplicatedProps = useDuplicatePatternProps( {
-			pattern: isThemePattern ? item : item.patternPost,
+			pattern:
+				isThemePattern || ! item.patternPost ? item : item.patternPost,
 			onSuccess: () => closeModal(),
 		} );
 		return (
@@ -1014,7 +1015,7 @@ export const duplicateTemplatePartAction = {
 		return (
 			<CreateTemplatePartModalContents
 				blocks={ item.blocks }
-				defaultArea={ item.templatePart.area }
+				defaultArea={ item.templatePart?.area || item.area }
 				defaultTitle={ sprintf(
 					/* translators: %s: Existing template part title */
 					__( '%s (Copy)' ),
