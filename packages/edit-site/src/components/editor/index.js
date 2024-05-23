@@ -83,7 +83,7 @@ const interfaceLabels = {
 
 const ANIMATION_DURATION = 0.25;
 
-export default function Editor( { isLoading, onClick } ) {
+export default function Editor( { isLoading } ) {
 	const {
 		record: editedPost,
 		getTitle,
@@ -351,9 +351,7 @@ export default function Editor( { isLoading, onClick } ) {
 								{ ! isLargeViewport && showVisualEditor && (
 									<BlockToolbar hideDragHandle />
 								) }
-								{ showVisualEditor && (
-									<SiteEditorCanvas onClick={ onClick } />
-								) }
+								{ showVisualEditor && <SiteEditorCanvas /> }
 							</>
 						}
 						secondarySidebar={
