@@ -105,6 +105,8 @@
 		top: 0;
 		z-index: 2;
 		flex-shrink: 0;
+		transition: padding ease-out 0.1s;
+		@include reduce-motion("transition");
 	}
 
 	.edit-site-patterns__pattern-title {
