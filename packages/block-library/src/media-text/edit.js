@@ -294,6 +294,7 @@ function MediaTextEdit( {
 					focalPoint: undefined,
 					mediaWidth: 50,
 					mediaSizeSlug: undefined,
+					featuredImageLink: false,
 				} );
 			} }
 			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
@@ -415,8 +416,7 @@ function MediaTextEdit( {
 				/>
 			) }
 			{ useFeaturedImage && (
-				<ToggleControl
-					__nextHasNoMarginBottom
+				<ToolsPanelItem
 					label={
 						postTypeName
 							? sprintf(
@@ -426,13 +426,31 @@ function MediaTextEdit( {
 							  )
 							: __( 'Link to post' )
 					}
-					onChange={ () =>
-						setAttributes( {
-							featuredImageLink: ! featuredImageLink,
-						} )
+					isShownByDefault
+					hasValue={ () => featuredImageLink }
+					onDeselect={ () =>
+						setAttributes( { featuredImageLink: false } )
 					}
-					checked={ featuredImageLink }
-				/>
+				>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={
+							postTypeName
+								? sprintf(
+										// translators: %s: Name of the post type e.g: "Page".
+										__( 'Link to %s' ),
+										postTypeName
+								  )
+								: __( 'Link to post' )
+						}
+						onChange={ () =>
+							setAttributes( {
+								featuredImageLink: ! featuredImageLink,
+							} )
+						}
+						checked={ featuredImageLink }
+					/>
+				</ToolsPanelItem>
 			) }
 		</ToolsPanel>
 	);
