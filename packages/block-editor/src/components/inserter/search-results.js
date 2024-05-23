@@ -76,15 +76,19 @@ function InserterSearchResults( {
 		selectBlockOnInsert,
 	} );
 	const [
-		blockTypes,
+		availableBlockTypes,
 		blockTypeCategories,
 		blockTypeCollections,
 		onSelectBlockType,
+		allBlockTypes,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
 	const [ patterns, , onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId
 	);
+
+	const blockTypes =
+		availableBlockTypes.length < 2 ? allBlockTypes : availableBlockTypes;
 
 	const filteredBlockPatterns = useMemo( () => {
 		if ( maxBlockPatterns === 0 ) {
