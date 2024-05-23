@@ -20,7 +20,11 @@ import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMergeRefs } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,7 +33,14 @@ import PostTitle from '../post-title';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import EditTemplateBlocksNotification from './edit-template-blocks-notification';
+import ResizableEditor from './resizable-editor';
 import useSelectNearestEditableBlock from '../../hooks/use-select-nearest-editable-block';
+import {
+	NAVIGATION_POST_TYPE,
+	PATTERN_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+} from '../../store/constants';
 
 const {
 	LayoutStyle,
@@ -44,10 +55,10 @@ const {
  * and they don't apply the layout styles.
  */
 const DESIGN_POST_TYPES = [
-	'wp_block',
-	'wp_template',
-	'wp_navigation',
-	'wp_template_part',
+	PATTERN_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
 ];
 
 /**
@@ -94,8 +105,9 @@ function EditorCanvas( {
 	disableIframe = false,
 	iframeProps,
 	contentRef,
-	children,
 } ) {
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		renderingMode,
 		postContentAttributes,
@@ -103,8 +115,10 @@ function EditorCanvas( {
 		wrapperBlockName,
 		wrapperUniqueId,
 		deviceType,
-		showEditorPadding,
+		isFocusedEntity,
 		isDesignPostType,
+		postType,
+		isPreview,
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostId,
@@ -120,7 +134,7 @@ function EditorCanvas( {
 		const _renderingMode = getRenderingMode();
 		let _wrapperBlockName;
 
-		if ( postTypeSlug === 'wp_block' ) {
+		if ( postTypeSlug === PATTERN_POST_TYPE ) {
 			_wrapperBlockName = 'core/block';
 		} else if ( _renderingMode === 'post-only' ) {
 			_wrapperBlockName = 'core/post-content';
@@ -128,13 +142,13 @@ function EditorCanvas( {
 
 		const editorSettings = getEditorSettings();
 		const supportsTemplateMode = editorSettings.supportsTemplateMode;
-		const postType = getPostType( postTypeSlug );
+		const postTypeObject = getPostType( postTypeSlug );
 		const canEditTemplate = canUser( 'create', 'templates' );
 		const currentTemplateId = getCurrentTemplateId();
 		const template = currentTemplateId
 			? getEditedEntityRecord(
 					'postType',
-					'wp_template',
+					TEMPLATE_POST_TYPE,
 					currentTemplateId
 			  )
 			: undefined;
@@ -146,14 +160,17 @@ function EditorCanvas( {
 			// Post template fetch returns a 404 on classic themes, which
 			// messes with e2e tests, so check it's a block theme first.
 			editedPostTemplate:
-				postType?.viewable && supportsTemplateMode && canEditTemplate
+				postTypeObject?.viewable &&
+				supportsTemplateMode &&
+				canEditTemplate
 					? template
 					: undefined,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 			deviceType: getDeviceType(),
-			showEditorPadding:
-				!! editorSettings.onNavigateToPreviousEntityRecord,
+			isFocusedEntity: !! editorSettings.onNavigateToPreviousEntityRecord,
+			postType: postTypeSlug,
+			isPreview: editorSettings.__unstableIsPreviewMode,
 		};
 	}, [] );
 	const { isCleanNewPost } = useSelect( editorStore );
@@ -293,7 +310,6 @@ function EditorCanvas( {
 		blockListLayout?.type === 'default' && ! hasPostContentAtRootLevel
 			? fallbackLayout
 			: blockListLayout;
-
 	const observeTypingRef = useTypingObserver();
 	const titleRef = useRef();
 	useEffect( () => {
@@ -330,102 +346,152 @@ function EditorCanvas( {
 		  }
 		: {};
 
+	const forceFullHeight = postType === NAVIGATION_POST_TYPE;
+	const enableResizing =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) &&
+		// Disable in previews / view mode.
+		! isPreview &&
+		// Disable resizing in mobile viewport.
+		! isMobileViewport &&
+		// Dsiable resizing in zoomed-out mode.
+		! isZoomOutMode;
+
+	const iframeStyles = useMemo( () => {
+		return [
+			...styles,
+			{
+				css: `.is-root-container{display:flow-root;${
+					// Some themes will have `min-height: 100vh` for the root container,
+					// which isn't a requirement in auto resize mode.
+					enableResizing ? 'min-height:0!important;' : ''
+				}}`,
+			},
+		];
+	}, [ styles, enableResizing ] );
+
 	return (
-		<BlockCanvas
-			shouldIframe={
-				! disableIframe || [ 'Tablet', 'Mobile' ].includes( deviceType )
-			}
-			contentRef={ contentRef }
-			styles={ styles }
-			height="100%"
-			iframeProps={ {
-				className: clsx( 'editor-canvas__iframe', {
-					'has-editor-padding': showEditorPadding,
-				} ),
-				...iframeProps,
-				...zoomOutProps,
-				style: {
-					...iframeProps?.style,
-					...deviceStyles,
-				},
-			} }
+		<div
+			className={ clsx( 'editor-canvas', {
+				'has-padding': isFocusedEntity || enableResizing,
+				'is-resizable': enableResizing,
+			} ) }
 		>
-			{ themeSupportsLayout &&
-				! themeHasDisabledLayoutStyles &&
-				renderingMode === 'post-only' &&
-				! isDesignPostType && (
-					<>
-						<LayoutStyle
-							selector=".editor-editor-canvas__post-title-wrapper"
-							layout={ fallbackLayout }
-						/>
-						<LayoutStyle
-							selector=".block-editor-block-list__layout.is-root-container"
-							layout={ postEditorLayout }
-						/>
-						{ align && <LayoutStyle css={ alignCSS } /> }
-						{ postContentLayoutStyles && (
-							<LayoutStyle
-								layout={ postContentLayout }
-								css={ postContentLayoutStyles }
-							/>
-						) }
-					</>
-				) }
-			{ renderingMode === 'post-only' && ! isDesignPostType && (
-				<div
-					className={ clsx(
-						'editor-editor-canvas__post-title-wrapper',
-						// The following class is only here for backward comapatibility
-						// some themes might be using it to style the post title.
-						'edit-post-visual-editor__post-title-wrapper',
-						{
-							'has-global-padding': hasRootPaddingAwareAlignments,
-						}
-					) }
-					contentEditable={ false }
-					ref={ observeTypingRef }
-					style={ {
-						// This is using inline styles
-						// so it's applied for both iframed and non iframed editors.
-						marginTop: '4rem',
+			<ResizableEditor
+				enableResizing={ enableResizing }
+				height={
+					sizes.height && ! forceFullHeight ? sizes.height : '100%'
+				}
+			>
+				<BlockCanvas
+					shouldIframe={
+						! disableIframe ||
+						[ 'Tablet', 'Mobile' ].includes( deviceType )
+					}
+					contentRef={ contentRef }
+					styles={ iframeStyles }
+					height="100%"
+					iframeProps={ {
+						...iframeProps,
+						...zoomOutProps,
+						style: {
+							...iframeProps?.style,
+							...deviceStyles,
+						},
 					} }
 				>
-					<PostTitle ref={ titleRef } />
-				</div>
-			) }
-			<RecursionProvider
-				blockName={ wrapperBlockName }
-				uniqueId={ wrapperUniqueId }
-			>
-				<BlockList
-					className={ clsx(
-						className,
-						'is-' + deviceType.toLowerCase() + '-preview',
-						renderingMode !== 'post-only' || isDesignPostType
-							? 'wp-site-blocks'
-							: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+					{ themeSupportsLayout &&
+						! themeHasDisabledLayoutStyles &&
+						renderingMode === 'post-only' &&
+						! isDesignPostType && (
+							<>
+								<LayoutStyle
+									selector=".editor-editor-canvas__post-title-wrapper"
+									layout={ fallbackLayout }
+								/>
+								<LayoutStyle
+									selector=".block-editor-block-list__layout.is-root-container"
+									layout={ postEditorLayout }
+								/>
+								{ align && <LayoutStyle css={ alignCSS } /> }
+								{ postContentLayoutStyles && (
+									<LayoutStyle
+										layout={ postContentLayout }
+										css={ postContentLayoutStyles }
+									/>
+								) }
+							</>
+						) }
+					{ renderingMode === 'post-only' && ! isDesignPostType && (
+						<div
+							className={ clsx(
+								'editor-editor-canvas__post-title-wrapper',
+								// The following class is only here for backward comapatibility
+								// some themes might be using it to style the post title.
+								'edit-post-visual-editor__post-title-wrapper',
+								{
+									'has-global-padding':
+										hasRootPaddingAwareAlignments,
+								}
+							) }
+							contentEditable={ false }
+							ref={ observeTypingRef }
+							style={ {
+								// This is using inline styles
+								// so it's applied for both iframed and non iframed editors.
+								marginTop: '4rem',
+							} }
+						>
+							<PostTitle ref={ titleRef } />
+						</div>
 					) }
-					layout={ blockListLayout }
-					dropZoneElement={
-						// When iframed, pass in the html element of the iframe to
-						// ensure the drop zone extends to the edges of the iframe.
-						disableIframe
-							? localRef.current
-							: localRef.current?.parentNode
+					<RecursionProvider
+						blockName={ wrapperBlockName }
+						uniqueId={ wrapperUniqueId }
+					>
+						<BlockList
+							className={ clsx(
+								className,
+								'is-' + deviceType.toLowerCase() + '-preview',
+								renderingMode !== 'post-only' ||
+									isDesignPostType
+									? 'wp-site-blocks'
+									: `${ blockListLayoutClass } wp-block-post-content` // Ensure root level blocks receive default/flow blockGap styling rules.
+							) }
+							layout={ blockListLayout }
+							dropZoneElement={
+								// When iframed, pass in the html element of the iframe to
+								// ensure the drop zone extends to the edges of the iframe.
+								disableIframe
+									? localRef.current
+									: localRef.current?.parentNode
+							}
+							renderAppender={ renderAppender }
+							__unstableDisableDropZone={
+								// In template preview mode, disable drop zones at the root of the template.
+								renderingMode === 'template-locked'
+									? true
+									: false
+							}
+						/>
+						{ renderingMode === 'template-locked' && (
+							<EditTemplateBlocksNotification
+								contentRef={ localRef }
+							/>
+						) }
+					</RecursionProvider>
+					{
+						// Avoid resize listeners when not needed,
+						// these will trigger unnecessary re-renders
+						// when animating the iframe width.
+						enableResizing && resizeObserver
 					}
-					renderAppender={ renderAppender }
-					__unstableDisableDropZone={
-						// In template preview mode, disable drop zones at the root of the template.
-						renderingMode === 'template-locked' ? true : false
-					}
-				/>
-				{ renderingMode === 'template-locked' && (
-					<EditTemplateBlocksNotification contentRef={ localRef } />
-				) }
-			</RecursionProvider>
-			{ children }
-		</BlockCanvas>
+				</BlockCanvas>
+			</ResizableEditor>
+		</div>
 	);
 }
 

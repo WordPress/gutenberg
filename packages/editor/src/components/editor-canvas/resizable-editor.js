@@ -22,7 +22,7 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-function ResizableEditor( { enableResizing, height, children } ) {
+function ResizableEditor( { className, enableResizing, height, children } ) {
 	const [ width, setWidth ] = useState( '100%' );
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
@@ -32,6 +32,7 @@ function ResizableEditor( { enableResizing, height, children } ) {
 	}, [] );
 	return (
 		<ResizableBox
+			className={ className }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
 			} }
