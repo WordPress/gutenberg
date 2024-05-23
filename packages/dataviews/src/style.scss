@@ -411,17 +411,22 @@
 		}
 
 		.dataviews-view-list__item-actions {
-			visibility: hidden;
-			position: absolute;
+			.components-button {
+				opacity: 0;
+				position: fixed;
+			}
 		}
 
 		&.is-selected,
 		&.is-hovered,
 		&:focus-within {
 			.dataviews-view-list__item-actions {
-				visibility: visible;
-				position: static;
 				padding-right: $grid-unit-40;
+
+				.components-button {
+					opacity: 1;
+					position: static;
+				}
 			}
 
 			.dataviews-view-list__item {
