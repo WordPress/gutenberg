@@ -109,7 +109,7 @@ function EditorCanvas( { settings, children } ) {
 				// Forming a "block formatting context" to prevent margin collapsing.
 				// @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
 
-				css: `body{position:relative; ${
+				css: `body{${
 					canvasMode === 'view'
 						? `min-height: 100vh; ${
 								currentPostIsTrashed ? '' : 'cursor: pointer;'
