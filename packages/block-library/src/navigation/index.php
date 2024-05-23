@@ -1618,7 +1618,7 @@ $rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ig
 
 /*
  * Do not add the `block_core_navigation_update_ignore_hooked_blocks_meta` filter in the following cases:
- * - If Core has added the `update_ignored_hooked_blocks_postmeta` filter already (WP >= 6);
+ * - If Core has added the `update_ignored_hooked_blocks_postmeta` filter already (WP >= 6.6);
  * - or if the `set_ignored_hooked_blocks_metadata` function is unavailable (which is required for the filter to work. It was introduced by WP 6.5 but is not present in Gutenberg's WP 6.5 compatibility layer);
  * - or if the `$rest_insert_wp_navigation_core_callback` filter has already been added.
  */
