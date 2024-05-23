@@ -99,7 +99,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 function EditorCanvas( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	className,
 	styles,
 	disableIframe = false,
 	iframeProps,
@@ -453,7 +452,6 @@ function EditorCanvas( {
 					>
 						<BlockList
 							className={ clsx(
-								className,
 								'is-' + deviceType.toLowerCase() + '-preview',
 								renderingMode !== 'post-only' ||
 									isDesignPostType
