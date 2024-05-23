@@ -37,48 +37,47 @@ type ListBoxProps = {
 	Component?: React.ElementType;
 };
 
-export function getAutoCompleterUI( autocompleter: WPCompleter ) {
-	const useItems = autocompleter.useItems
-		? autocompleter.useItems
-		: getDefaultUseItems( autocompleter );
+function ListBox( {
+	items,
+	onSelect,
+	selectedIndex,
+	instanceId,
+	listBoxId,
+	className,
+	Component = 'div',
+}: ListBoxProps ) {
+	return (
+		<Component
+			id={ listBoxId }
+			role="listbox"
+			className="components-autocomplete__results"
+		>
+			{ items.map( ( option, index ) => (
+				<Button
+					key={ option.key }
+					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+					role="option"
+					aria-selected={ index === selectedIndex }
+					disabled={ option.isDisabled }
+					className={ clsx(
+						'components-autocomplete__result',
+						className,
+						{
+							'is-selected': index === selectedIndex,
+						}
+					) }
+					onClick={ () => onSelect( option ) }
+				>
+					{ option.label }
+				</Button>
+			) ) }
+		</Component>
+	);
+}
 
-	function ListBox( {
-		items,
-		onSelect,
-		selectedIndex,
-		instanceId,
-		listBoxId,
-		className,
-		Component = 'div',
-	}: ListBoxProps ) {
-		return (
-			<Component
-				id={ listBoxId }
-				role="listbox"
-				className="components-autocomplete__results"
-			>
-				{ items.map( ( option, index ) => (
-					<Button
-						key={ option.key }
-						id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-						role="option"
-						aria-selected={ index === selectedIndex }
-						disabled={ option.isDisabled }
-						className={ clsx(
-							'components-autocomplete__result',
-							className,
-							{
-								'is-selected': index === selectedIndex,
-							}
-						) }
-						onClick={ () => onSelect( option ) }
-					>
-						{ option.label }
-					</Button>
-				) ) }
-			</Component>
-		);
-	}
+export function getAutoCompleterUI( autocompleter: WPCompleter ) {
+	const useItems =
+		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
 
 	function AutocompleterUI( {
 		filterValue,
@@ -110,7 +109,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 					// If the popover is rendered in a different document than
 					// the content, we need to duplicate the options list in the
 					// content document so that it's available to the screen
-					// readers, which check the DOM ID based aira-* attributes.
+					// readers, which check the DOM ID based aria-* attributes.
 					setNeedsA11yCompat(
 						node.ownerDocument !== contentRef.current.ownerDocument
 					);
