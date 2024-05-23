@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -83,7 +83,7 @@ const v1 = {
 
 		const textClass = getColorClassName( 'color', textColor );
 
-		const className = classnames( {
+		const className = clsx( {
 			[ textClass ]: textClass,
 		} );
 
@@ -119,7 +119,7 @@ const v2 = {
 
 		const textClass = getColorClassName( 'color', textColor );
 
-		const className = classnames( {
+		const className = clsx( {
 			[ textClass ]: textClass,
 			[ `has-text-align-${ align }` ]: align,
 		} );
@@ -157,7 +157,7 @@ const v3 = {
 
 		const textClass = getColorClassName( 'color', textColor );
 
-		const className = classnames( {
+		const className = clsx( {
 			[ textClass ]: textClass,
 			'has-text-color': textColor || customTextColor,
 			[ `has-text-align-${ align }` ]: align,
@@ -200,7 +200,7 @@ const v4 = {
 		const { align, content, level } = attributes;
 		const TagName = 'h' + level;
 
-		const className = classnames( {
+		const className = clsx( {
 			[ `has-text-align-${ align }` ]: align,
 		} );
 
@@ -273,7 +273,7 @@ const v5 = {
 		const { textAlign, content, level } = attributes;
 		const TagName = 'h' + level;
 
-		const className = classnames( {
+		const className = clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} );
 

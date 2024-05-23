@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+
+## 8.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 8.34.0 (2024-05-02)
+
 ## 8.33.0 (2024-04-19)
 
 ## 8.32.0 (2024-04-03)
@@ -31,7 +43,6 @@
 ### Bug Fix
 
 -   Fix Image block lightbox missing alt attribute and improve accessibility. ([#54608](https://github.com/WordPress/gutenberg/pull/55010))
-
 
 ## 8.20.0 (2023-10-05)
 
@@ -77,7 +88,7 @@
 
 ### Breaking Changes
 
--   Updated dependencies to require React 18 ([45235](https://github.com/WordPress/gutenberg/pull/45235))
+-   Updated dependencies to require React 18 ([#45235](https://github.com/WordPress/gutenberg/pull/45235))
 
 ## 7.19.0 (2022-11-16)
 
@@ -186,8 +197,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 2.29.0 (2021-03-17)
 

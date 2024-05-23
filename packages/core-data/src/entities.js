@@ -485,7 +485,7 @@ export const getOrLoadEntitiesConfig =
 
 		if ( configs?.length > 0 && hasConfig ) {
 			if ( window.__experimentalEnableSync ) {
-				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					registerSyncConfigs( configs );
 				}
 			}
@@ -506,7 +506,7 @@ export const getOrLoadEntitiesConfig =
 
 		configs = await loader.loadEntities();
 		if ( window.__experimentalEnableSync ) {
-			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				registerSyncConfigs( configs );
 			}
 		}

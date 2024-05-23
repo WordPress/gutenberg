@@ -17,10 +17,9 @@ test.describe( 'Post visibility', () => {
 
 			await editor.openDocumentSettingsSidebar();
 
-			const postStatusButton = page.locator(
-				'.editor-post-status-trigger'
-			);
-			await postStatusButton.click();
+			await page
+				.getByRole( 'button', { name: 'Change post status:' } )
+				.click();
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
 			const currentStatus = await page.evaluate( () => {
@@ -58,8 +57,9 @@ test.describe( 'Post visibility', () => {
 				name: 'Close',
 			} )
 			.click();
-		const postStatusButton = page.locator( '.editor-post-status-trigger' );
-		await postStatusButton.click();
+		await page
+			.getByRole( 'button', { name: 'Change post status:' } )
+			.click();
 		await page.getByRole( 'radio', { name: 'Private' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

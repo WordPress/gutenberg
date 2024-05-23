@@ -609,10 +609,13 @@ export const getEditedPostTemplate = createRegistrySelector(
 		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
 			slug: slugToCheck,
 		} );
-		return select( coreStore ).getEditedEntityRecord(
-			'postType',
-			'wp_template',
-			defaultTemplateId
-		);
+
+		return defaultTemplateId
+			? select( coreStore ).getEditedEntityRecord(
+					'postType',
+					'wp_template',
+					defaultTemplateId
+			  )
+			: null;
 	}
 );

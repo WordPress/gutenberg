@@ -95,7 +95,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 			blockType: _blockType,
 			topLevelLockedBlock:
 				getContentLockingParent( _selectedBlockClientId ) ||
-				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly'
+				( getTemplateLock( _selectedBlockClientId ) === 'contentOnly' ||
+				_selectedBlockName === 'core/block'
 					? _selectedBlockClientId
 					: undefined ),
 		};
@@ -110,10 +111,8 @@ const BlockInspector = ( { showNoBlockSelectedMessage = true } ) => {
 	// displays based on the relationship between the selected block
 	// and its parent, and only enable it if the parent is controlling
 	// its children blocks.
-	const blockInspectorAnimationSettings = useBlockInspectorAnimationSettings(
-		blockType,
-		selectedBlockClientId
-	);
+	const blockInspectorAnimationSettings =
+		useBlockInspectorAnimationSettings( blockType );
 
 	const borderPanelLabel = useBorderPanelLabel( {
 		blockName: selectedBlockName,

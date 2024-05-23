@@ -76,6 +76,11 @@ const restrictedImports = [
 		message:
 			"edit-widgets is a WordPress top level package that shouldn't be imported into other packages",
 	},
+	{
+		name: 'classnames',
+		message:
+			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
+	},
 ];
 
 module.exports = {
@@ -87,6 +92,7 @@ module.exports = {
 	],
 	globals: {
 		wp: 'off',
+		globalThis: 'readonly',
 	},
 	settings: {
 		jsdoc: {
@@ -99,7 +105,7 @@ module.exports = {
 		'jest/expect-expect': 'off',
 		'react/jsx-boolean-value': 'error',
 		'@wordpress/dependency-group': 'error',
-		'@wordpress/is-gutenberg-plugin': 'error',
+		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',

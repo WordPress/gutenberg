@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -38,6 +38,7 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { getResolvedThemeFilePath } from './theme-file-uri-utils';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -147,7 +148,7 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 			<HStack justify={ imgUrl ? 'flex-start' : 'center' } as="span">
 				{ imgUrl && (
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-global-styles-background-panel__inspector-image-indicator-wrapper',
 							{
 								'has-image': imgUrl,
@@ -191,6 +192,7 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -301,7 +303,10 @@ function BackgroundImageToolsPanelItem( {
 						<InspectorImagePreview
 							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ url }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
 						/>
 					}
 					variant="secondary"
@@ -340,6 +345,7 @@ function BackgroundSizeToolsPanelItem( {
 	style,
 	inheritedValue,
 	defaultValues,
+	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -439,7 +445,7 @@ function BackgroundSizeToolsPanelItem( {
 			setImmutably(
 				style,
 				[ 'background', 'backgroundRepeat' ],
-				repeatCheckedValue === true ? 'no-repeat' : undefined
+				repeatCheckedValue === true ? 'no-repeat' : 'repeat'
 			)
 		);
 
@@ -468,7 +474,7 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ imageValue }
+				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
@@ -553,6 +559,7 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background image' ),
+	themeFileURIs,
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -577,6 +584,7 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
+				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
 				<BackgroundSizeToolsPanelItem
@@ -586,6 +594,7 @@ export default function BackgroundPanel( {
 					style={ value }
 					inheritedValue={ inheritedValue }
 					defaultValues={ defaultValues }
+					themeFileURIs={ themeFileURIs }
 				/>
 			) }
 		</Wrapper>

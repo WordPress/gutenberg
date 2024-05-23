@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -30,7 +30,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import {
+	EditorSnackbars,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -72,7 +75,6 @@ export default function Layout() {
 
 	const {
 		isDistractionFree,
-		isZoomOutMode,
 		hasFixedToolbar,
 		hasBlockSelected,
 		canvasMode,
@@ -104,9 +106,6 @@ export default function Layout() {
 				'core',
 				'showBlockBreadcrumbs'
 			),
-			isZoomOutMode:
-				select( blockEditorStore ).__unstableGetEditorMode() ===
-				'zoom-out',
 			hasBlockSelected:
 				select( blockEditorStore ).getBlockSelectionStart(),
 		};
@@ -151,7 +150,7 @@ export default function Layout() {
 	let commandContext = 'site-editor';
 
 	if ( canvasMode === 'edit' ) {
-		commandContext = 'site-editor-edit';
+		commandContext = 'entity-edit';
 	}
 	if ( hasBlockSelected ) {
 		commandContext = 'block-selection-edit';
@@ -177,7 +176,7 @@ export default function Layout() {
 			<div
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
-				className={ classnames(
+				className={ clsx(
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
@@ -186,7 +185,6 @@ export default function Layout() {
 						'is-full-canvas': canvasMode === 'edit',
 						'has-fixed-toolbar': hasFixedToolbar,
 						'is-block-toolbar-visible': hasBlockSelected,
-						'is-zoom-out': isZoomOutMode,
 						'has-block-breadcrumbs':
 							hasBlockBreadcrumbs &&
 							! isDistractionFree &&
@@ -267,6 +265,8 @@ export default function Layout() {
 						</NavigableRegion>
 					) }
 
+					<EditorSnackbars />
+
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
 							{ areas.mobile }
@@ -291,7 +291,7 @@ export default function Layout() {
 							{ canvasResizer }
 							{ !! canvasSize.width && (
 								<div
-									className={ classnames(
+									className={ clsx(
 										'edit-site-layout__canvas',
 										{
 											'is-right-aligned':

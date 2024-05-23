@@ -5,23 +5,29 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
 import RenameModal from './rename-modal';
 import DeleteConfirmDialog from './delete-confirm-dialog';
+import { unlock } from '../../lock-unlock';
+
+const { useHistory } = unlock( routerPrivateApis );
 
 const POPOVER_PROPS = {
 	position: 'bottom right',
 };
 
 export default function ScreenNavigationMoreMenu( props ) {
-	const { onDelete, onSave, onDuplicate, menuTitle } = props;
+	const { onDelete, onSave, onDuplicate, menuTitle, menuId } = props;
 
 	const [ renameModalOpen, setRenameModalOpen ] = useState( false );
 	const [ deleteConfirmDialogOpen, setDeleteConfirmDialogOpen ] =
 		useState( false );
+
+	const history = useHistory();
 
 	const closeModals = () => {
 		setRenameModalOpen( false );
@@ -49,6 +55,17 @@ export default function ScreenNavigationMoreMenu( props ) {
 								} }
 							>
 								{ __( 'Rename' ) }
+							</MenuItem>
+							<MenuItem
+								onClick={ () => {
+									history.push( {
+										postId: menuId,
+										postType: 'wp_navigation',
+										canvas: 'edit',
+									} );
+								} }
+							>
+								{ __( 'Edit' ) }
 							</MenuItem>
 							<MenuItem
 								onClick={ () => {

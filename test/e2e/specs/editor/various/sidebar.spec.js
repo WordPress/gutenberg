@@ -112,10 +112,8 @@ test.describe( 'Sidebar', () => {
 
 		await expect( documentSettingsPanels ).toHaveText( [
 			'No Title',
-			'Summary',
 			'Categories',
 			'Tags',
-			'Discussion',
 		] );
 		// Also check 'panels' that are not rendered as TabPanels.
 		const postExcerptPanel = page.getByRole( 'button', {
@@ -124,8 +122,17 @@ test.describe( 'Sidebar', () => {
 		const postFeaturedImagePanel = page.getByRole( 'button', {
 			name: 'Set featured image',
 		} );
-		await expect( postExcerptPanel ).toHaveCount( 1 );
-		await expect( postFeaturedImagePanel ).toHaveCount( 1 );
+		const postDiscussionPanel = page.getByRole( 'button', {
+			name: 'Change discussion options',
+		} );
+		const postSummarySection = page.getByRole( 'checkbox', {
+			name: 'Stick to the top of the blog',
+		} );
+
+		await expect( postExcerptPanel ).toBeVisible();
+		await expect( postFeaturedImagePanel ).toBeVisible();
+		await expect( postSummarySection ).toBeVisible();
+		await expect( postDiscussionPanel ).toHaveCount( 1 );
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } =
@@ -140,7 +147,9 @@ test.describe( 'Sidebar', () => {
 		} );
 
 		await expect( documentSettingsPanels ).toHaveCount( 1 );
-		await expect( postExcerptPanel ).toHaveCount( 0 );
-		await expect( postFeaturedImagePanel ).toHaveCount( 0 );
+		await expect( postExcerptPanel ).toBeHidden();
+		await expect( postFeaturedImagePanel ).toBeHidden();
+		await expect( postSummarySection ).toBeHidden();
+		await expect( postDiscussionPanel ).toHaveCount( 0 );
 	} );
 } );

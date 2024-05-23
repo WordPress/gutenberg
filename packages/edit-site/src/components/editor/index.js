@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -22,13 +22,10 @@ import {
 	BlockBreadcrumb,
 	BlockToolbar,
 	store as blockEditorStore,
-	BlockInspector,
 } from '@wordpress/block-editor';
 import {
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorNotices,
-	EditorSnackbars,
 	privateApis as editorPrivateApis,
 	store as editorStore,
 } from '@wordpress/editor';
@@ -36,29 +33,27 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { useState, useCallback } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import {
-	SidebarComplementaryAreaFills,
-	SidebarInspectorFill,
-} from '../sidebar-edit-mode';
 import CodeEditor from '../code-editor';
 import Header from '../header-edit-mode';
 import WelcomeGuide from '../welcome-guide';
-import StartTemplateOptions from '../start-template-options';
 import { store as editSiteStore } from '../../store';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
 import useTitle from '../routes/use-title';
 import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import useEditedEntityRecord from '../use-edited-entity-record';
-import PatternModal from '../pattern-modal';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import SiteEditorCanvas from '../block-editor/site-editor-canvas';
 import TemplatePartConverter from '../template-part-converter';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
+import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
+import GlobalStylesSidebar from '../global-styles-sidebar';
 
 const {
 	ExperimentalEditorProvider: EditorProvider,
@@ -68,8 +63,9 @@ const {
 	ComplementaryArea,
 	interfaceStore,
 	SavePublishPanels,
+	Sidebar,
 } = unlock( editorPrivateApis );
-
+const { useHistory } = unlock( routerPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
 const interfaceLabels = {
@@ -112,14 +108,16 @@ export default function Editor( { isLoading, onClick } ) {
 		showIconLabels,
 		showBlockBreadcrumbs,
 		postTypeLabel,
+		isEditingPage,
+		supportsGlobalStyles,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditedPostContext, getCanvasMode } = unlock(
+		const { getEditedPostContext, getCanvasMode, isPage } = unlock(
 			select( editSiteStore )
 		);
 		const { __unstableGetEditorMode } = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
-		const { getEntityRecord } = select( coreDataStore );
+		const { getEntityRecord, getCurrentTheme } = select( coreDataStore );
 		const {
 			isInserterOpened,
 			isListViewOpened,
@@ -149,6 +147,8 @@ export default function Editor( { isLoading, onClick } ) {
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			postTypeLabel: getPostTypeLabel(),
+			isEditingPage: isPage(),
+			supportsGlobalStyles: getCurrentTheme()?.is_block_theme,
 		};
 	}, [] );
 
@@ -207,6 +207,55 @@ export default function Editor( { isLoading, onClick } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const history = useHistory();
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						history.push( {
+							postType: items[ 0 ].type,
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const _title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								_title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.push( {
+												postId: newItem.id,
+												postType: newItem.type,
+												canvas: 'edit',
+											} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ history, createSuccessNotice ]
+	);
+
 	const isReady =
 		! isLoading &&
 		( ( postWithTemplate && !! contextPost && !! editedPost ) ||
@@ -214,6 +263,10 @@ export default function Editor( { isLoading, onClick } ) {
 
 	return (
 		<>
+			<GlobalStylesRenderer />
+			<EditorKeyboardShortcutsRegister />
+			{ isEditMode && <BlockKeyboardShortcuts /> }
+			{ showVisualEditor && <TemplatePartConverter /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
 			{ isEditMode && <WelcomeGuide /> }
 			{ hasLoadedPost && ! editedPost && (
@@ -232,12 +285,10 @@ export default function Editor( { isLoading, onClick } ) {
 					settings={ settings }
 					useSubRegistry={ false }
 				>
-					<SidebarComplementaryAreaFills />
-					{ isEditMode && <StartTemplateOptions /> }
 					<InterfaceSkeleton
 						isDistractionFree={ isDistractionFree }
 						enableRegionNavigation={ false }
-						className={ classnames(
+						className={ clsx(
 							'edit-site-editor__interface-skeleton',
 							{
 								'show-icon-labels': showIconLabels,
@@ -291,33 +342,17 @@ export default function Editor( { isLoading, onClick } ) {
 								}
 							/>
 						}
-						notices={ <EditorSnackbars /> }
 						content={
 							<>
-								<GlobalStylesRenderer />
 								{ isEditMode && <EditorNotices /> }
-								{ showVisualEditor && (
-									<>
-										<TemplatePartConverter />
-										<SidebarInspectorFill>
-											<BlockInspector />
-										</SidebarInspectorFill>
-										{ ! isLargeViewport && (
-											<BlockToolbar hideDragHandle />
-										) }
-										<SiteEditorCanvas onClick={ onClick } />
-										<PatternModal />
-									</>
-								) }
 								{ editorMode === 'text' && isEditMode && (
 									<CodeEditor />
 								) }
-								{ isEditMode && (
-									<>
-										<EditorKeyboardShortcutsRegister />
-										<EditorKeyboardShortcuts />
-										<BlockKeyboardShortcuts />
-									</>
+								{ ! isLargeViewport && showVisualEditor && (
+									<BlockToolbar hideDragHandle />
+								) }
+								{ showVisualEditor && (
+									<SiteEditorCanvas onClick={ onClick } />
 								) }
 							</>
 						}
@@ -349,6 +384,15 @@ export default function Editor( { isLoading, onClick } ) {
 							secondarySidebar: secondarySidebarLabel,
 						} }
 					/>
+					<Sidebar
+						onActionPerformed={ onActionPerformed }
+						extraPanels={
+							! isEditingPage && (
+								<PluginTemplateSettingPanel.Slot />
+							)
+						}
+					/>
+					{ supportsGlobalStyles && <GlobalStylesSidebar /> }
 				</EditorProvider>
 			) }
 		</>

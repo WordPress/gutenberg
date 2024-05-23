@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,7 +12,6 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	store as editorStore,
 	privateApis as editorPrivateApis,
@@ -24,17 +23,17 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -45,7 +44,6 @@ import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
-import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import { store as editPostStore } from '../../store';
@@ -63,6 +61,7 @@ const {
 	SavePublishPanels,
 	InterfaceSkeleton,
 	interfaceStore,
+	Sidebar,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -135,13 +134,11 @@ function Layout( { initialPost } ) {
 	useCommonCommands();
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 
 	const { closeGeneralSidebar } = useDispatch( editPostStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const { setIsInserterOpened } = useDispatch( editorStore );
 	const {
 		mode,
 		isFullscreenActive,
@@ -160,6 +157,8 @@ function Layout( { initialPost } ) {
 		documentLabel,
 		hasHistory,
 		hasBlockBreadcrumbs,
+		blockEditorMode,
+		isEditingTemplate,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
@@ -195,28 +194,20 @@ function Layout( { initialPost } ) {
 				!! select( blockEditorStore ).getBlockSelectionStart(),
 			hasHistory: !! getEditorSettings().onNavigateToPreviousEntityRecord,
 			hasBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			blockEditorMode:
+				select( blockEditorStore ).__unstableGetEditorMode(),
+			isEditingTemplate:
+				select( editorStore ).getCurrentPostType() === 'wp_template',
 		};
 	}, [] );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
-		: 'post-editor-edit';
+		: 'entity-edit';
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
-
-	// Inserter and Sidebars are mutually exclusive
-	useEffect( () => {
-		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpened( false );
-		}
-	}, [ isHugeViewport, setIsInserterOpened, sidebarIsOpened ] );
-	useEffect( () => {
-		if ( isInserterOpened && ! isHugeViewport ) {
-			closeGeneralSidebar();
-		}
-	}, [ closeGeneralSidebar, isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -240,7 +231,7 @@ function Layout( { initialPost } ) {
 		document.body.classList.remove( 'show-icon-labels' );
 	}
 
-	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
+	const className = clsx( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-metaboxes': hasActiveMetaboxes,
 		'is-distraction-free': isDistractionFree && isWideViewport,
@@ -281,6 +272,58 @@ function Layout( { initialPost } ) {
 		);
 	}
 
+	const { createSuccessNotice } = useDispatch( noticesStore );
+
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'move-to-trash':
+					{
+						document.location.href = addQueryArgs( 'edit.php', {
+							trashed: 1,
+							post_type: items[ 0 ].type,
+							ids: items[ 0 ].id,
+						} );
+					}
+					break;
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post e.g: "Post 1".
+								__( '"%s" successfully created.' ),
+								title
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											const postId = newItem.id;
+											document.location.href =
+												addQueryArgs( 'post.php', {
+													post: postId,
+													action: 'edit',
+												} );
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ createSuccessNotice ]
+	);
+
 	return (
 		<>
 			<FullscreenMode isActive={ isFullscreenActive } />
@@ -290,7 +333,6 @@ function Layout( { initialPost } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<EditorKeyboardShortcuts />
 			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
@@ -322,7 +364,9 @@ function Layout( { initialPost } ) {
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
-						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
+						{ ! isLargeViewport && mode === 'visual' && (
+							<BlockToolbar hideDragHandle />
+						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
@@ -332,9 +376,6 @@ function Layout( { initialPost } ) {
 								<MetaBoxes location="advanced" />
 							</div>
 						) }
-						{ isMobileViewport && sidebarIsOpened && (
-							<ScrollLock />
-						) }
 					</>
 				}
 				footer={
@@ -342,6 +383,7 @@ function Layout( { initialPost } ) {
 					! isMobileViewport &&
 					showBlockBreadcrumbs &&
 					isRichEditingEnabled &&
+					blockEditorMode !== 'zoom-out' &&
 					mode === 'visual' && (
 						<div className="edit-post-layout__footer">
 							<BlockBreadcrumb rootLabelText={ documentLabel } />
@@ -368,7 +410,14 @@ function Layout( { initialPost } ) {
 			<WelcomeGuide />
 			<InitPatternModal />
 			<PluginArea onError={ onPluginAreaError } />
-			{ ! isDistractionFree && <SettingsSidebar /> }
+			{ ! isDistractionFree && (
+				<Sidebar
+					onActionPerformed={ onActionPerformed }
+					extraPanels={
+						! isEditingTemplate && <MetaBoxes location="side" />
+					}
+				/>
+			) }
 		</>
 	);
 }
