@@ -22,6 +22,7 @@
 
 ### Enhancements
 
+-   `FontSizePicker`: Add `vw` and `vh` units to the default units in the font size picker ([#60507]((https://github.com/WordPress/gutenberg/pull/60607)).
 -   `PaletteEdit`: Use consistent spacing and metrics. ([#61368](https://github.com/WordPress/gutenberg/pull/61368)).
 -   `FormTokenField`: Hide label when not defined ([#61336](https://github.com/WordPress/gutenberg/pull/61336)).
 -   `ComboboxControl`: supports disabled items ([#61294](https://github.com/WordPress/gutenberg/pull/61294)).
