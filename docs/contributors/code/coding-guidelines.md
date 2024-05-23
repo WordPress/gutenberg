@@ -141,9 +141,9 @@ An **plugin-only API** is one which is planned for eventual public availability,
 Plugin-only APIs are excluded from WordPress Core and only available in the Gutenberg Plugin:
 
 ```js
-// Using process.env.IS_GUTENBERG_PLUGIN allows Webpack to exclude this
+// Using globalThis.IS_GUTENBERG_PLUGIN allows Webpack to exclude this
 // export from WordPress core:
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	export { doSomethingExciting } from './api';
 }
 ```
@@ -448,8 +448,8 @@ lock( privateApis, { privateEverywhere, privateInCorePublicInPlugin } );
 
 // The privateInCorePublicInPlugin function is explicitly exported,
 // but this export will not be merged into WordPress core thanks to
-// the process.env.IS_GUTENBERG_PLUGIN check.
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+// the globalThis.IS_GUTENBERG_PLUGIN check.
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	export const privateInCorePublicInPlugin =
 		unlock( privateApis ).privateInCorePublicInPlugin;
 }

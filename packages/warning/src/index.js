@@ -4,7 +4,8 @@
 import { logged } from './utils';
 
 function isDev() {
-	return typeof SCRIPT_DEBUG !== 'undefined' && SCRIPT_DEBUG === true;
+	// eslint-disable-next-line @wordpress/wp-global-usage
+	return globalThis.SCRIPT_DEBUG === true;
 }
 
 /**

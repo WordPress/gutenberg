@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+
 ## 12.35.0 (2024-05-16)
 
 ## 12.34.0 (2024-05-02)
@@ -92,7 +96,8 @@
 
 ## 11.17.0 (2022-09-21)
 
-- The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+-   The block attribute sources `children` and `node` have been deprecated. Please use the `html` source instead. See https://developer.wordpress.org/block-editor/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields/ and the core blocks for examples.
+
 ## 11.16.0 (2022-09-13)
 
 ## 11.15.0 (2022-08-24)

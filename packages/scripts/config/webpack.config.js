@@ -307,7 +307,8 @@ const scriptConfig = {
 	plugins: [
 		new webpack.DefinePlugin( {
 			// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-			SCRIPT_DEBUG: ! isProduction,
+			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
 
 		// If we run a modules build, the 2 compilations can "clean" each other's output
@@ -456,7 +457,8 @@ if ( hasExperimentalModulesFlag ) {
 		plugins: [
 			new webpack.DefinePlugin( {
 				// Inject the `SCRIPT_DEBUG` global, used for development features flagging.
-				SCRIPT_DEBUG: ! isProduction,
+				'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
+				SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 			} ),
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.

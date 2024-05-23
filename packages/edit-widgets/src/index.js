@@ -73,7 +73,7 @@ export function initializeEditor( id, settings ) {
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
 	registerLegacyWidgetBlock();
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {
 			enableFSEBlocks: ENABLE_EXPERIMENTAL_FSE_BLOCKS,
 		} );
