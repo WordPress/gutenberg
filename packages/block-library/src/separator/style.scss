@@ -13,7 +13,8 @@
 	// Override any background themes often set on the hr tag for this style.
 	// also override the color set in the editor since it's intended for normal HR
 	background: none !important;
-	border: none;
+	// Important required to ensure dots does not get a border.
+	border: none !important;
 	text-align: center;
 	line-height: 1;
 	height: auto;
