@@ -1621,10 +1621,9 @@ $rest_insert_wp_navigation_core_callback = 'block_core_navigation_' . 'update_ig
  * that are not present in Gutenberg's WP 6.5 compatibility layer.
  */
 if (
-	function_exists( 'set_ignored_hooked_blocks_metadata' ) && (
-		! has_filter( 'rest_pre_insert_wp_navigation', $rest_insert_wp_navigation_core_callback ) ||
-		! has_filter( 'rest_pre_insert_wp_navigation', 'update_ignored_hooked_blocks_postmeta' )
-	)
+	! has_filter( 'rest_pre_insert_wp_navigation', 'update_ignored_hooked_blocks_postmeta' ) &&
+	function_exists( 'set_ignored_hooked_blocks_metadata' ) &&
+	! has_filter( 'rest_pre_insert_wp_navigation', $rest_insert_wp_navigation_core_callback )
 ) {
 	add_filter( 'rest_pre_insert_wp_navigation', 'block_core_navigation_update_ignore_hooked_blocks_meta' );
 }
