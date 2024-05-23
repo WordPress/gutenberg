@@ -50,7 +50,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	$prefix = '';
 	if ( isset( $attributes['prefix'] ) && $attributes['prefix'] ) {
-		$prefix = '<span class="wp-block-post-date__prefix">' . $attributes['prefix'] . '</span>';
+		$prefix = wp_kses_post( '<span class="wp-block-post-date__prefix">' . $attributes['prefix'] . '</span>' );
 	}
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
@@ -59,7 +59,7 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 
 	$suffix = '';
 	if ( isset( $attributes['suffix'] ) && $attributes['suffix'] ) {
-		$suffix = '<span class="wp-block-post-date__suffix">' . $attributes['suffix'] . '</span>';
+		$suffix = wp_kses_post( '<span class="wp-block-post-date__suffix">' . $attributes['suffix'] . '</span>' );
 	}
 
 	return sprintf(
