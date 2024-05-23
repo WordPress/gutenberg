@@ -36,11 +36,16 @@
 
 	.edit-site-visual-editor__editor-canvas {
 		&.is-focused {
-			outline: calc(2 * var(--wp-admin-border-width-focus)) solid var(--wp-admin-theme-color);
-			outline-offset: calc(-2 * var(--wp-admin-border-width-focus));
+			outline-width: var(--wp-admin-border-width-focus);
+			outline-style: solid;
+			outline-color: var(--wp-admin-theme-color);
+			outline-offset: calc(-1.75 * var(--wp-admin-border-width-focus));
+		}
+
+		.edit-site-layout:not(.is-full-canvas) & {
+			border-radius: $radius-block-ui * 4;
 		}
 	}
-
 
 	&.is-focus-mode {
 		.edit-site-layout.is-full-canvas & {
