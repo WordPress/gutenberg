@@ -4,7 +4,9 @@
 		"isValid": true,
 		"attributes": {
 			"isLink": false,
-			"displayType": "date"
+			"displayType": "date",
+			"prefix": "",
+			"suffix": ""
 		},
 		"innerBlocks": []
 	}
