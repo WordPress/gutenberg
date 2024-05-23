@@ -40,6 +40,10 @@ export default function TypographyVariations( { title, gap = 2 } ) {
 								<PreviewIframe
 									label={ variation?.title }
 									isFocused={ isFocused }
+									previewStyles={ {
+										background: '#ffffff',
+										color: '#000000',
+									} }
 								>
 									{ ( { ratio, key } ) => (
 										<HStack

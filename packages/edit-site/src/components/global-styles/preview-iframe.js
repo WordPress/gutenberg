@@ -38,6 +38,7 @@ export default function PreviewIframe( {
 	label,
 	isFocused,
 	withHoverView,
+	previewStyles,
 } ) {
 	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
 	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
@@ -109,6 +110,15 @@ export default function PreviewIframe( {
 	}, [ styles ] );
 	const isReady = !! width;
 
+	const calculatedStyles = {
+		height: normalizedHeight * ratio,
+		width: '100%',
+		background: gradientValue ?? backgroundColor,
+		cursor: withHoverView ? 'pointer' : undefined,
+		// Override these styles with the previewStyles prop.
+		...previewStyles,
+	};
+
 	return (
 		<>
 			<div style={ { position: 'relative' } }>
@@ -126,12 +136,7 @@ export default function PreviewIframe( {
 				>
 					<EditorStyles styles={ editorStyles } />
 					<motion.div
-						style={ {
-							height: normalizedHeight * ratio,
-							width: '100%',
-							background: gradientValue ?? backgroundColor,
-							cursor: withHoverView ? 'pointer' : undefined,
-						} }
+						style={ calculatedStyles }
 						initial="start"
 						animate={
 							( isHovered || isFocused ) &&
