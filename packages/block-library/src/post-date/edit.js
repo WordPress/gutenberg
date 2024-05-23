@@ -13,6 +13,7 @@ import {
 	AlignmentControl,
 	BlockControls,
 	InspectorControls,
+	RichText,
 	useBlockProps,
 	__experimentalDateFormatPicker as DateFormatPicker,
 	__experimentalPublishDateTimePicker as PublishDateTimePicker,
@@ -30,7 +31,7 @@ import { DOWN } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
 export default function PostDateEdit( {
-	attributes: { textAlign, format, isLink, displayType },
+	attributes: { textAlign, format, prefix, suffix, isLink, displayType },
 	context: { postId, postType: postTypeSlug, queryId },
 	setAttributes,
 } ) {
@@ -148,7 +149,6 @@ export default function PostDateEdit( {
 						</ToolbarGroup>
 					) }
 			</BlockControls>
-
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<DateFormatPicker
@@ -188,7 +188,27 @@ export default function PostDateEdit( {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...blockProps }>{ postDate }</div>
+			<div { ...blockProps }>
+				<RichText
+					className="wp-block-post-date__prefix"
+					multiline={ false }
+					aria-label={ __( 'Prefix' ) }
+					placeholder={ __( 'Prefix' ) + ' ' }
+					value={ prefix }
+					onChange={ ( value ) => setAttributes( { prefix: value } ) }
+					tagName="span"
+				/>
+				{ postDate }
+				<RichText
+					className="wp-block-post-terms__suffix"
+					multiline={ false }
+					aria-label={ __( 'Suffix' ) }
+					placeholder={ ' ' + __( 'Suffix' ) }
+					value={ suffix }
+					onChange={ ( value ) => setAttributes( { suffix: value } ) }
+					tagName="span"
+				/>
+			</div>
 		</>
 	);
 }
