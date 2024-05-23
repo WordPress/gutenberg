@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -166,7 +166,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const attachmentPage = media && media.link;
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
@@ -284,7 +284,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 								identifier="downloadButtonText"
 								tagName="div" // Must be block-level or else cursor disappears.
 								aria-label={ __( 'Download button text' ) }
-								className={ classnames(
+								className={ clsx(
 									'wp-block-file__button',
 									__experimentalGetElementClassName(
 										'button'

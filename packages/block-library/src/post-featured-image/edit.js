@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,6 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
-	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	useBlockEditingMode,
@@ -132,22 +131,9 @@ export default function PostFeaturedImageEdit( {
 
 	const mediaUrl = getMediaSourceUrlBySizeSlug( media, sizeSlug );
 
-	const imageSizes = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().imageSizes,
-		[]
-	);
-	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) => {
-			return media?.media_details?.sizes?.[ slug ]?.source_url;
-		} )
-		.map( ( { name, slug } ) => ( {
-			value: slug,
-			label: name,
-		} ) );
-
 	const blockProps = useBlockProps( {
 		style: { width, height, aspectRatio },
-		className: classnames( {
+		className: clsx( {
 			'is-transient': temporaryURL,
 		} ),
 	} );
@@ -158,7 +144,7 @@ export default function PostFeaturedImageEdit( {
 	const placeholder = ( content ) => {
 		return (
 			<Placeholder
-				className={ classnames(
+				className={ clsx(
 					'block-editor-media-placeholder',
 					borderProps.className
 				) }
@@ -200,17 +186,21 @@ export default function PostFeaturedImageEdit( {
 
 	const controls = blockEditingMode === 'default' && (
 		<>
-			<OverlayControls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				clientId={ clientId }
-			/>
-			<DimensionControls
-				clientId={ clientId }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				imageSizeOptions={ imageSizeOptions }
-			/>
+			<InspectorControls group="color">
+				<OverlayControls
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+				/>
+			</InspectorControls>
+			<InspectorControls group="dimensions">
+				<DimensionControls
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					media={ media }
+				/>
+			</InspectorControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl

@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 13.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 13.34.0 (2024-05-02)
+
+## 13.33.0 (2024-04-19)
+
 ## 13.32.0 (2024-04-03)
 
 ## 13.31.0 (2024-03-21)
@@ -120,7 +130,7 @@
 
 ### Deprecations
 
-- Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
+-   Deprecated `cleanForSlug` that is now part of `@wordpress/url`.
 
 ## 12.2.0 (2022-02-10)
 
@@ -134,7 +144,7 @@
 
 ### Deprecations
 
-- the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
+-   the `createUndoLevel` and `refreshPost` actions were marked as deprecated. They were already defunct and acting as noops.
 
 ## 12.1.0 (2022-01-27)
 
@@ -159,8 +169,8 @@
 
 ### Breaking Changes
 
--   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
--   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at <https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/>.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at <https://nodejs.org/en/about/releases/>.
 
 ## 9.26.0 (2021-03-17)
 

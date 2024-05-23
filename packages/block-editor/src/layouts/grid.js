@@ -68,7 +68,6 @@ export default {
 	inspectorControls: function GridLayoutInspectorControls( {
 		layout = {},
 		onChange,
-		clientId,
 		layoutBlockSupport = {},
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
@@ -90,14 +89,11 @@ export default {
 						onChange={ onChange }
 					/>
 				) }
-				{ window.__experimentalEnableGridInteractivity && (
-					<GridVisualizer clientId={ clientId } />
-				) }
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls() {
-		return null;
+	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
+		return <GridVisualizer clientId={ clientId } />;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -136,7 +132,7 @@ export default {
 		} else if ( minimumColumnWidth ) {
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
-				`container-type: inline-size`
+				'container-type: inline-size'
 			);
 		}
 

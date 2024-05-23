@@ -23,7 +23,7 @@ import { unlock } from '../lock-unlock';
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -135,7 +135,13 @@ export function shouldSkipSerialization(
 
 const pendingStyleOverrides = new WeakMap();
 
-export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
+export function useStyleOverride( {
+	id,
+	css,
+	assets,
+	__unstableType,
+	clientId,
+} = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -143,7 +149,9 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	const fallbackId = useId();
 	useEffect( () => {
 		// Unmount if there is CSS and assets are empty.
-		if ( ! css && ! assets ) return;
+		if ( ! css && ! assets ) {
+			return;
+		}
 
 		const _id = id || fallbackId;
 		const override = {
@@ -151,6 +159,7 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 			css,
 			assets,
 			__unstableType,
+			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders
 		// for each style override block included in a tree and optimize initial render.
@@ -187,6 +196,7 @@ export function useStyleOverride( { id, css, assets, __unstableType } = {} ) {
 	}, [
 		id,
 		css,
+		clientId,
 		assets,
 		__unstableType,
 		fallbackId,
@@ -213,6 +223,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -265,6 +276,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'typography.fontFamilies.custom',
 		'typography.fontFamilies.default',
 		'typography.fontFamilies.theme',
+		'typography.defaultFontSizes',
 		'typography.fontSizes.custom',
 		'typography.fontSizes.default',
 		'typography.fontSizes.theme',
@@ -359,6 +371,7 @@ export function useBlockSettings( name, parentLayout ) {
 					theme: themeFontSizes,
 				},
 				customFontSize,
+				defaultFontSizes: defaultFontSizesEnabled,
 				fontStyle,
 				fontWeight,
 				lineHeight,
@@ -398,6 +411,7 @@ export function useBlockSettings( name, parentLayout ) {
 		customFontFamilies,
 		defaultFontFamilies,
 		themeFontFamilies,
+		defaultFontSizesEnabled,
 		customFontSizes,
 		defaultFontSizes,
 		themeFontSizes,
@@ -596,7 +610,7 @@ export function createBlockListBlockFilter( features ) {
 							return {
 								...acc,
 								...wrapperProps,
-								className: classnames(
+								className: clsx(
 									acc.className,
 									wrapperProps.className
 								),

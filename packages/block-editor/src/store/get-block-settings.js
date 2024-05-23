@@ -91,51 +91,6 @@ const removeCustomPrefixes = ( path ) => {
 	return prefixedFlags[ path ] || path;
 };
 
-/**
- * For settings like `color.palette`, which have a value that is an object
- * with `default`, `theme`, `custom`, with field values that are arrays of
- * items, merge these three arrays into one and return it. The calculation
- * is memoized so that identical input values produce identical output.
- * @param {Object} value Object to merge
- * @return {Array} Array of merged items
- */
-export function mergeOrigins( value ) {
-	let result = mergeCache.get( value );
-	if ( ! result ) {
-		result = [ 'default', 'theme', 'custom' ].flatMap(
-			( key ) => value[ key ] ?? []
-		);
-		mergeCache.set( value, result );
-	}
-	return result;
-}
-const mergeCache = new WeakMap();
-
-/**
- * For settings like `color.palette`, which have a value that is an object
- * with `default`, `theme`, `custom`, with field values that are arrays of
- * items, returns the one with the highest priority among these three arrays.
- * @param {Object} value Object to extract from
- * @return {Array} Array of items extracted from the three origins
- */
-export function overrideOrigins( value ) {
-	return value.custom ?? value.theme ?? value.default;
-}
-
-/**
- * For settings like `color.palette`, which have a value that is an object
- * with `default`, `theme`, `custom`, with field values that are arrays of
- * items, see if any of the three origins have values.
- *
- * @param {Object} value Object to check
- * @return {boolean} Whether the object has values in any of the three origins
- */
-export function hasOriginValue( value ) {
-	return [ 'default', 'theme', 'custom' ].some(
-		( key ) => value?.[ key ]?.length
-	);
-}
-
 export function getBlockSettings( state, clientId, ...paths ) {
 	const blockName = getBlockName( state, clientId );
 	const candidates = [];
@@ -215,7 +170,7 @@ export function getBlockSettings( state, clientId, ...paths ) {
 		// Return if the setting was found in either the block instance or the store.
 		if ( result !== undefined ) {
 			if ( PATHS_WITH_OVERRIDE[ normalizedPath ] ) {
-				return overrideOrigins( result );
+				return result.custom ?? result.theme ?? result.default;
 			}
 			return result;
 		}

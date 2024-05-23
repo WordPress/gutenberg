@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -250,7 +250,7 @@ function NewTemplateModal( { onClose } ) {
 	return (
 		<Modal
 			title={ modalTitle }
-			className={ classnames( 'edit-site-add-new-template__modal', {
+			className={ clsx( 'edit-site-add-new-template__modal', {
 				'edit-site-add-new-template__modal_template_list':
 					modalContent === modalContentMap.templatesList,
 				'edit-site-custom-template-modal':

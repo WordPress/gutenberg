@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 
 	const { textColor, backgroundColor, style } = context;
 	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-navigation-item', {
+		className: clsx( 'wp-block-navigation-item', {
 			'has-text-color': !! textColor || !! style?.color?.text,
 			[ `has-${ textColor }-color` ]: !! textColor,
 			'has-background': !! backgroundColor || !! style?.color?.background,

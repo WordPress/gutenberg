@@ -11,16 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Registers the Global Styles Revisions REST API routes.
- */
-function gutenberg_register_global_styles_revisions_endpoints() {
-	$global_styles_revisions_controller = new Gutenberg_REST_Global_Styles_Revisions_Controller_6_5();
-	$global_styles_revisions_controller->register_routes();
-}
-
-add_action( 'rest_api_init', 'gutenberg_register_global_styles_revisions_endpoints' );
-
-/**
  * Registers additional fields for wp_template and wp_template_part rest api.
  *
  * @access private

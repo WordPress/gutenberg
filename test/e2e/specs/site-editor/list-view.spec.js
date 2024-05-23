@@ -12,13 +12,13 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		// Select a template part with a few blocks.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {
@@ -106,7 +106,7 @@ test.describe( 'Site Editor List View', () => {
 
 		// Focus should now be on the list view toggle button.
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 
 		// Open List View.
@@ -129,7 +129,7 @@ test.describe( 'Site Editor List View', () => {
 		await pageUtils.pressKeys( 'access+o' );
 		await expect( listView ).toBeHidden();
 		await expect(
-			page.getByRole( 'button', { name: 'List View' } )
+			page.getByRole( 'button', { name: 'Document Overview' } )
 		).toBeFocused();
 	} );
 } );
