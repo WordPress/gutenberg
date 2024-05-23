@@ -126,23 +126,25 @@ function useInsertionPoint( {
 
 				let _destinationIndex = destinationIndex;
 				let _destinationRootClientId = destinationRootClientId;
-				// Check if it's possible to insert the block in the current location
-				const canInsertBlocks = normalizedBlocks.every( ( block ) =>
-					canInsertBlockType( block.name, _destinationRootClientId )
-				);
 
-				if ( ! canInsertBlocks && normalizedBlocks.length === 1 ) {
-					while (
-						! canInsertBlockType(
-							normalizedBlocks[ 0 ].name,
+				const canInsertBlocks = () =>
+					normalizedBlocks.every( ( block ) =>
+						canInsertBlockType(
+							block.name,
 							_destinationRootClientId
 						)
-					) {
-						_destinationIndex =
-							getBlockIndex( _destinationRootClientId ) + 1;
-						_destinationRootClientId = getBlockRootClientId(
-							_destinationRootClientId
-						);
+					);
+
+				while ( ! canInsertBlocks() ) {
+					_destinationIndex =
+						getBlockIndex( _destinationRootClientId ) + 1;
+					_destinationRootClientId = getBlockRootClientId(
+						_destinationRootClientId
+					);
+
+					// If we are at the root, there's nothing more to check
+					if ( _destinationRootClientId === null ) {
+						break;
 					}
 				}
 
@@ -170,6 +172,8 @@ function useInsertionPoint( {
 		[
 			isAppender,
 			getSelectedBlock,
+			getBlockIndex,
+			getBlockRootClientId,
 			replaceBlocks,
 			insertBlocks,
 			destinationRootClientId,
