@@ -8,6 +8,17 @@ import { useSelect } from '@wordpress/data';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * This component checks the publishing status of the current post.
+ * It uses the data module to select data from the editor store.
+ * If the post is already published or the user doesn't have the capability to publish, it returns null.
+ * Otherwise, it renders the child elements passed as props.
+ *
+ * @param {Object}  props          Component properties.
+ * @param {Element} props.children Children to be rendered.
+ *
+ * @return {JSX.Element|null} The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
+ */
 export function PostPendingStatusCheck( { children } ) {
 	const { hasPublishAction, isPublished } = useSelect( ( select ) => {
 		const { isCurrentPostPublished, getCurrentPost } =
