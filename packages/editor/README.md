@@ -1080,11 +1080,24 @@ Undocumented declaration.
 
 ### PostPendingStatus
 
-Undocumented declaration.
+A component for displaying and toggling the pending status of a post.
+
+_Returns_
+
+-   `JSX.Element`: The rendered component.
 
 ### PostPendingStatusCheck
 
-Undocumented declaration.
+This component checks the publishing status of the current post. It uses the data module to select data from the editor store. If the post is already published or the user doesn't have the capability to publish, it returns null. Otherwise, it renders the child elements passed as props.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `Element`: Children to be rendered.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
 
 ### PostPingbacks
 
