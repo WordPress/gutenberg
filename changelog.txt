@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 18.4.1 =
+
+## Changelog
+
+### Bug fixes
+
+- Writing flow: fix paste for input fields ([61389](https://github.com/WordPress/gutenberg/pull/61389))
+
+
 = 18.4.0 =
 
 ## Changelog
