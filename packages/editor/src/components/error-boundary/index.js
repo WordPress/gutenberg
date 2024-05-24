@@ -75,4 +75,10 @@ class ErrorBoundary extends Component {
 	}
 }
 
+/**
+ * ErrorBoundary component.
+ *
+ * @class ErrorBoundary
+ * @augments Component
+ */
 export default ErrorBoundary;
