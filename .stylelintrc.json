@@ -23,6 +23,10 @@
 		],
 		"rule-empty-line-before": null,
 		"selector-class-pattern": null,
+		"selector-pseudo-class-no-unknown": [
+			true,
+			{ "ignorePseudoClasses": [ "local" ] }
+		],
 		"value-keyword-case": null,
 		"scss/operator-no-unspaced": null,
 		"scss/selector-no-redundant-nesting-selector": null,
