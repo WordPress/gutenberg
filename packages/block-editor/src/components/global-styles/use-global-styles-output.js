@@ -866,6 +866,50 @@ export const toStyles = (
 					);
 				}
 
+				// Process duotone styles.
+				if ( duotoneSelector ) {
+					const duotoneStyles = {};
+					if ( styles?.filter ) {
+						duotoneStyles.filter = styles.filter;
+						delete styles.filter;
+					}
+					const duotoneDeclarations =
+						getStylesDeclarations( duotoneStyles );
+					if ( duotoneDeclarations.length ) {
+						ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
+							';'
+						) };}`;
+					}
+				}
+
+				// Process blockGap and layout styles.
+				if (
+					! disableLayoutStyles &&
+					( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
+				) {
+					ruleset += getLayoutStyles( {
+						style: styles,
+						selector,
+						hasBlockGapSupport,
+						hasFallbackGapSupport,
+						fallbackGapValue,
+					} );
+				}
+
+				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
+				const styleDeclarations = getStylesDeclarations(
+					styles,
+					selector,
+					useRootPaddingAlign,
+					tree,
+					disableRootPadding
+				);
+				if ( styleDeclarations?.length ) {
+					ruleset += `:root :where(${ selector }){${ styleDeclarations.join(
+						';'
+					) };}`;
+				}
+
 				if ( styleVariationSelectors ) {
 					Object.entries( styleVariationSelectors ).forEach(
 						( [ styleVariationName, styleVariationSelector ] ) => {
@@ -914,50 +958,6 @@ export const toStyles = (
 							}
 						}
 					);
-				}
-
-				// Process duotone styles.
-				if ( duotoneSelector ) {
-					const duotoneStyles = {};
-					if ( styles?.filter ) {
-						duotoneStyles.filter = styles.filter;
-						delete styles.filter;
-					}
-					const duotoneDeclarations =
-						getStylesDeclarations( duotoneStyles );
-					if ( duotoneDeclarations.length ) {
-						ruleset += `${ duotoneSelector }{${ duotoneDeclarations.join(
-							';'
-						) };}`;
-					}
-				}
-
-				// Process blockGap and layout styles.
-				if (
-					! disableLayoutStyles &&
-					( ROOT_BLOCK_SELECTOR === selector || hasLayoutSupport )
-				) {
-					ruleset += getLayoutStyles( {
-						style: styles,
-						selector,
-						hasBlockGapSupport,
-						hasFallbackGapSupport,
-						fallbackGapValue,
-					} );
-				}
-
-				// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-				const declarations = getStylesDeclarations(
-					styles,
-					selector,
-					useRootPaddingAlign,
-					tree,
-					disableRootPadding
-				);
-				if ( declarations?.length ) {
-					ruleset += `:root :where(${ selector }){${ declarations.join(
-						';'
-					) };}`;
 				}
 
 				// Check for pseudo selector in `styles` and handle separately.
