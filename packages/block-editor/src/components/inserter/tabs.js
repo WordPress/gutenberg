@@ -39,7 +39,7 @@ function InserterTabs( { onSelect, children, onClose, selectedTab }, ref ) {
 	return (
 		<div className="block-editor-inserter__tabs" ref={ ref }>
 			<Tabs onSelect={ onSelect } selectedTabId={ selectedTab }>
-				<div className="block-editor-inserter__tablist-and-close">
+				<div className="block-editor-inserter__tablist-and-close-button">
 					<Button
 						className="block-editor-inserter__close-button"
 						icon={ closeSmall }
