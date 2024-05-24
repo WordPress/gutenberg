@@ -835,8 +835,8 @@ const resetTemplateAction = {
 							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
+							setIsBusy( false );
 							closeModal();
-							isBusy( false );
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }

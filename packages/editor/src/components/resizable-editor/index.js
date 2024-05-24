@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useState, useRef, useCallback } from '@wordpress/element';
@@ -22,7 +27,7 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-function ResizableEditor( { enableResizing, height, children } ) {
+function ResizableEditor( { className, enableResizing, height, children } ) {
 	const [ width, setWidth ] = useState( '100%' );
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
@@ -32,6 +37,9 @@ function ResizableEditor( { enableResizing, height, children } ) {
 	}, [] );
 	return (
 		<ResizableBox
+			className={ clsx( 'editor-resizable-editor', className, {
+				'is-resizable': enableResizing,
+			} ) }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
 			} }
