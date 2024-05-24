@@ -24,35 +24,9 @@ const meta: Meta< typeof ProgressBar > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => (
-	<ProgressBar { ...args } />
-);
+const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
+	return <ProgressBar { ...args } />;
+};
 
 export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
 Default.args = {};
-
-export const WithDefaultSuggestedWidth: StoryFn = ( {
-	className,
-	...args
-} ) => (
-	<>
-		<style>
-			{ `
-				.progressbar-story-custom-width {
-					width: 160px;
-				}
-			` }
-		</style>
-		<ProgressBar { ...args } className={ className } />
-	</>
-);
-WithDefaultSuggestedWidth.args = {
-	className: 'progressbar-story-custom-width',
-};
-WithDefaultSuggestedWidth.parameters = {
-	docs: {
-		description: {
-			story: 'For most screens with a wide-enough viewport, we recommend a maximum width of 160px. You can set a custom width by passing a CSS class via the `className` prop (depicted below) or by setting the width of the parent container.',
-		},
-	},
-};

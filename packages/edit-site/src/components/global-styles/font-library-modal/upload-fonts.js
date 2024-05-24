@@ -220,7 +220,7 @@ function UploadFonts() {
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library-modal__upload-area">
-							<ProgressBar className="font-library-modal__progressbar" />
+							<ProgressBar />
 						</div>
 					</FlexItem>
 				) }

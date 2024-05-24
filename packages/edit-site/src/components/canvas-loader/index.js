@@ -34,12 +34,7 @@ export default function CanvasLoader( { id } ) {
 	return (
 		<div className="edit-site-canvas-loader">
 			<Theme accent={ indicatorColor } background={ backgroundColor }>
-				<ProgressBar
-					id={ id }
-					max={ total }
-					value={ elapsed }
-					className="edit-site-canvas-loader__progressbar"
-				/>
+				<ProgressBar id={ id } max={ total } value={ elapsed } />
 			</Theme>
 		</div>
 	);

@@ -114,7 +114,7 @@ function InstalledFonts() {
 		<div className="font-library-modal__tabpanel-layout">
 			{ isResolvingLibrary && (
 				<div className="font-library-modal__loading">
-					<ProgressBar className="font-library-modal__progressbar" />
+					<ProgressBar />
 				</div>
 			) }
 
@@ -283,9 +283,7 @@ function InstalledFonts() {
 						justify="flex-end"
 						className="font-library-modal__tabpanel-layout__footer"
 					>
-						{ isInstalling && (
-							<ProgressBar className="font-library-modal__progressbar" />
-						) }
+						{ isInstalling && <ProgressBar /> }
 						{ shouldDisplayDeleteButton && (
 							<Button
 								isDestructive
