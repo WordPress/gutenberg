@@ -10,14 +10,13 @@ import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 const DEFAULT_TEXT = __( 'Read more' );
 
 export default function MoreEdit( {
-	attributes: { customText = '', noTeaser },
+	attributes: { customText, noTeaser },
 	insertBlocksAfter,
 	setAttributes,
 } ) {
 	const onChangeInput = ( event ) => {
 		setAttributes( {
-			customText:
-				event.target.value !== '' ? event.target.value : undefined,
+			customText: event.target.value,
 		} );
 	};
 
