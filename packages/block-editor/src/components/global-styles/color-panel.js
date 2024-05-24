@@ -272,14 +272,17 @@ function ColorPanelDropdown( {
 									</Tabs.TabList>
 
 									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
 											<Tabs.TabPanel
-												key={ tab.key }
-												tabId={ tab.key }
+												key={ tabKey }
+												tabId={ tabKey }
 												focusable={ false }
 											>
 												<ColorPanelTab
-													{ ...tab }
+													key={ tabKey }
+													{ ...restTabProps }
 													colorGradientControlSettings={
 														colorGradientControlSettings
 													}
