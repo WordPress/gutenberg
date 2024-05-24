@@ -18,6 +18,14 @@
 	<a data-wp-bind--href="state.url" data-testid="object namespace"></a>
 </div>
 
+<div data-wp-interactive="null">
+	<a data-wp-bind--href="state.url" data-testid="null namespace"></a>
+</div>
+
+<div data-wp-interactive="2">
+	<a data-wp-bind--href="state.url" data-testid="number namespace"></a>
+</div>
+
 <div data-wp-interactive>
 	<a data-wp-bind--href="other::state.url" data-testid="other namespace"></a>
 </div>

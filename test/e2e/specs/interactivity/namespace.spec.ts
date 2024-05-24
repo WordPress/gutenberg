@@ -28,7 +28,9 @@ test.describe( 'Namespaces', () => {
 		await expect( el ).toHaveAttribute( 'href', '/some-url' );
 	} );
 
-	test( 'An empty object as namespace should work', async ( { page } ) => {
+	test( 'An empty object as namespace should not work', async ( {
+		page,
+	} ) => {
 		const el = page.getByTestId( 'object namespace' );
 		await expect( el ).not.toHaveAttribute( 'href', '/some-url' );
 	} );
@@ -45,5 +47,17 @@ test.describe( 'Namespaces', () => {
 	test( 'A different store namespace should work', async ( { page } ) => {
 		const el = page.getByTestId( 'other namespace' );
 		await expect( el ).toHaveAttribute( 'href', '/other-store-url' );
+	} );
+
+	test( 'A number as a string as namespace should work', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'number namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
+	} );
+
+	test( 'A null as a string as namespace should work', async ( { page } ) => {
+		const el = page.getByTestId( 'null namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
 	} );
 } );

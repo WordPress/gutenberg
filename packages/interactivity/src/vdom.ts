@@ -6,7 +6,7 @@ import { h, type ComponentChild, type JSX } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
-import { warn } from './utils';
+import { warn, isObject } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
@@ -100,7 +100,8 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					const namespace = regexResult?.[ 1 ] ?? null;
 					let value: any = regexResult?.[ 2 ] ?? attributeValue;
 					try {
-						value = value && JSON.parse( value );
+						const parsedValue = JSON.parse( value );
+						value = isObject( parsedValue ) ? parsedValue : value;
 					} catch ( e ) {}
 					if ( attributeName === islandAttr ) {
 						island = true;
