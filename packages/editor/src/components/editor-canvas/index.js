@@ -99,8 +99,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 function EditorCanvas( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	className,
-	renderAppender,
 	styles,
 	disableIframe = false,
 	iframeProps,
@@ -454,7 +452,6 @@ function EditorCanvas( {
 					>
 						<BlockList
 							className={ clsx(
-								className,
 								'is-' + deviceType.toLowerCase() + '-preview',
 								renderingMode !== 'post-only' ||
 									isDesignPostType
@@ -469,7 +466,6 @@ function EditorCanvas( {
 									? localRef.current
 									: localRef.current?.parentNode
 							}
-							renderAppender={ renderAppender }
 							__unstableDisableDropZone={
 								// In template preview mode, disable drop zones at the root of the template.
 								renderingMode === 'template-locked'
