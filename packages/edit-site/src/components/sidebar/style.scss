@@ -3,7 +3,7 @@
 	overflow-y: auto;
 }
 
-@keyframes slide-from-right {
+@keyframes :local(slide-from-right) {
 	from {
 		transform: translateX(50px);
 		opacity: 0;
@@ -14,7 +14,7 @@
 	}
 }
 
-@keyframes slide-from-left {
+@keyframes :local(slide-from-left) {
 	from {
 		transform: translateX(-50px);
 		opacity: 0;
@@ -46,11 +46,11 @@
 		animation-duration: 0s;
 	}
 
-	&.slide-from-left {
+	&.slide-from-left :local {
 		animation-name: slide-from-left;
 	}
 
-	&.slide-from-right {
+	&.slide-from-right :local {
 		animation-name: slide-from-right;
 	}
 
