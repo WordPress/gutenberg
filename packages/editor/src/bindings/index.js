@@ -13,6 +13,6 @@ import postMeta from './post-meta';
 const { registerBlockBindingsSource } = unlock( dispatch( blocksStore ) );
 registerBlockBindingsSource( postMeta );
 
-if ( process.env.IS_GUTENBERG_PLUGIN ) {
+if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 	registerBlockBindingsSource( patternOverrides );
 }

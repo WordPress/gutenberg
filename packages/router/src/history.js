@@ -38,7 +38,24 @@ function replace( params, state ) {
 	return originalHistoryReplace.call( history, { search }, state );
 }
 
+const locationMemo = new WeakMap();
+function getLocationWithParams() {
+	const location = history.location;
+	let locationWithParams = locationMemo.get( location );
+	if ( ! locationWithParams ) {
+		locationWithParams = {
+			...location,
+			params: Object.fromEntries(
+				new URLSearchParams( location.search )
+			),
+		};
+		locationMemo.set( location, locationWithParams );
+	}
+	return locationWithParams;
+}
+
 history.push = push;
 history.replace = replace;
+history.getLocationWithParams = getLocationWithParams;
 
 export default history;

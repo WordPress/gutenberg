@@ -10,8 +10,7 @@ $z-layers: (
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
 	".block-editor-block-list__block-selection-button": 22,
 	".components-form-toggle__input": 1,
-	".edit-post-text-editor__toolbar": 1,
-	".edit-site-code-editor__toolbar": 1,
+	".editor-text-editor__toolbar": 1,
 
 	// These next three share a stacking context
 	".block-library-template-part__selection-search": 2, // higher sticky element

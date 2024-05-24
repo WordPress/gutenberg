@@ -160,8 +160,12 @@ export default function useThemeStyleVariationsByProperty( {
 					cloneDeep( variation ),
 					property
 				);
+
 				// Remove variations that are empty once the property is filtered out.
-				if ( Object.keys( variationFilteredByProperty ).length === 0 ) {
+				if (
+					variation.title !== __( 'Default' ) &&
+					Object.keys( variationFilteredByProperty ).length === 0
+				) {
 					return accumulator;
 				}
 

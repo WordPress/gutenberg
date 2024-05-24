@@ -237,7 +237,7 @@ export default function ViewGrid< Item extends AnyItem >( {
 		<>
 			{ hasData && (
 				<Grid
-					gap={ 6 }
+					gap={ 8 }
 					columns={ 2 }
 					alignment="top"
 					className="dataviews-view-grid"
