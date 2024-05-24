@@ -3,7 +3,6 @@
  */
 import {
 	Dropdown,
-	Button,
 	MenuItemsChoice,
 	SVG,
 	Path,
@@ -13,11 +12,12 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { Icon, edit as editIcon } from '@wordpress/icons';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { store as blockEditorStore } from '../../store';
+import PreferencesAwareButton from '../preferences-aware-button';
 
 const selectIcon = (
 	<SVG
@@ -40,7 +40,7 @@ function ToolSelector( props, ref ) {
 	return (
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
+				<PreferencesAwareButton
 					{ ...props }
 					ref={ ref }
 					icon={ mode === 'navigation' ? selectIcon : editIcon }

@@ -25,6 +25,20 @@
 				transform: rotate(45deg);
 			}
 		}
+
+		&.has-icon {
+			min-width: $button-size-compact;
+			width: $button-size-compact;
+			height: $button-size-compact;
+			padding: 0;
+		}
+
+		.show-icon-labels &.is-showing-icon-label {
+			min-width: $button-size-compact;
+			width: auto;
+			height: $button-size-compact;
+			padding: 0 $grid-unit-10;
+		}
 	}
 
 	// Hide table of contents and list view on mobile.
@@ -39,6 +53,7 @@
 	// The Toolbar component adds different styles to buttons, so we reset them
 	// here to the original button styles
 	.editor-document-tools__left > .components-button.has-icon,
+	.editor-document-tools__left > .components-button.is-showing-icon-label,
 	.editor-document-tools__left > .components-dropdown > .components-button.has-icon {
 		// @todo override toolbar group inherited paddings from components/block-tools/style.scss.
 		// This is best fixed by making the mover control area a proper single toolbar group.
@@ -71,19 +86,6 @@
 	// Some plugins add buttons here despite best practices.
 	// Push them a bit rightwards to fit the top toolbar.
 	margin-right: $grid-unit-10;
-}
-
-.editor-document-tools .editor-document-tools__left > .editor-document-tools__inserter-toggle.has-icon {
-	min-width: $button-size-compact;
-	width: $button-size-compact;
-	height: $button-size-compact;
-	padding: 0;
-
-	.show-icon-labels & {
-		width: auto;
-		height: $button-size-compact;
-		padding: 0 $grid-unit-10;
-	}
 }
 
 .show-icon-labels .editor-document-tools__left > * + * {
