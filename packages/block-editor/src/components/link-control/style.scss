@@ -36,12 +36,18 @@ $block-editor-link-control-number-of-actions: 1;
 		}
 
 		.block-editor-link-control__search-item-top {
-			gap: $grid-unit-10;
+			gap: $grid-unit-05;
+			flex-wrap: wrap;
 
 			.components-button.has-icon {
-				min-width: inherit;
-				width: min-content;
+				width: auto;
+				padding: $grid-unit-05;
 			}
+		}
+
+		.is-preview .block-editor-link-control__search-item-header {
+			min-width: 100%;
+			margin-right: 0;
 		}
 	}
 }
