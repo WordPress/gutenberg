@@ -366,7 +366,7 @@ Undocumented declaration.
 
 ### ErrorBoundary
 
-Undocumented declaration.
+ErrorBoundary component.
 
 ### FontSizePicker
 
