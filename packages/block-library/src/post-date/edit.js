@@ -181,9 +181,7 @@ export default function PostDateEdit( {
 							} )
 						}
 						checked={ displayType === 'modified' }
-						help={ __(
-							'Only shows if the post has been modified'
-						) }
+						help={ __( "Show the post's last modified date" ) }
 					/>
 				</PanelBody>
 			</InspectorControls>
