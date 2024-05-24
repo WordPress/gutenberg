@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Dropdown, Button, PanelRow } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
@@ -44,7 +44,7 @@ function PostParentToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
-			className="editor-post-author__panel-toggle"
+			className="editor-post-parent__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			// translators: %s: Current post parent.
@@ -65,7 +65,7 @@ function PostOrderToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
-			className="editor-post-author__panel-toggle"
+			className="editor-post-order__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			// translators: %s: Current post parent.
