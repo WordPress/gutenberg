@@ -250,7 +250,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					}
 				);
 			}
-		} );
+		}, [] );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
