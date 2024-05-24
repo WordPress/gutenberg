@@ -639,6 +639,7 @@ type DirtyEntityRecord = {
 	key: EntityRecordKey;
 	name: string;
 	kind: string;
+	hasMetaChanges?: boolean;
 };
 /**
  * Returns the list of dirty entity records.
@@ -655,15 +656,46 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 		const dirtyRecords: DirtyEntityRecord[] = [];
 		Object.keys( records ).forEach( ( kind ) => {
 			Object.keys( records[ kind ] ).forEach( ( name ) => {
+				const metadataKeys: string[] = [];
 				const primaryKeys = (
 					Object.keys( records[ kind ][ name ].edits ) as string[]
-				 ).filter(
-					( primaryKey ) =>
-						// The entity record must exist (not be deleted),
-						// and it must have edits.
-						getEntityRecord( state, kind, name, primaryKey ) &&
-						hasEditsForEntityRecord( state, kind, name, primaryKey )
-				);
+				 ).filter( ( primaryKey ) => {
+					// The entity record must exist (not be deleted),
+					// and it must have edits.
+					const entityRecord = getEntityRecord(
+						state,
+						kind,
+						name,
+						primaryKey
+					);
+					const nonTransientEdits = getEntityRecordNonTransientEdits(
+						state,
+						kind,
+						name,
+						primaryKey
+					);
+
+					if ( entityRecord ) {
+						if ( Object.keys( nonTransientEdits ).length > 0 ) {
+							if ( nonTransientEdits.meta ) {
+								metadataKeys.push( primaryKey );
+							}
+							return true;
+						}
+
+						if (
+							isSavingEntityRecord(
+								state,
+								kind,
+								name,
+								primaryKey
+							)
+						) {
+							return true;
+						}
+					}
+					return false;
+				} );
 
 				if ( primaryKeys.length ) {
 					const entityConfig = getEntityConfig( state, kind, name );
@@ -686,6 +718,9 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								entityConfig?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
+							hasMetaChanges: metadataKeys.includes( primaryKey )
+								? true
+								: false,
 						} );
 					} );
 				}
@@ -713,7 +748,6 @@ export const __experimentalGetDirtyEntityRecordsEdits = createSelector(
 	},
 	( state ) => [ state.entities.records ]
 );
-
 
 /**
  * Returns the list of entities currently being saved.

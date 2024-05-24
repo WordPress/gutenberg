@@ -125,21 +125,9 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 			( entityRecord ) =>
 				entityRecord.kind !== 'postType' ||
 				entityRecord.name !== type ||
-				entityRecord.key !== id
+				entityRecord.key !== id ||
+				entityRecord.hasMetaChanges
 		);
-	}
-);
-
-export const getPostEntityBlockMetadataChanges = createRegistrySelector(
-	( select ) => ( state ) => {
-		const postEdits =
-			select( coreStore ).__experimentalGetDirtyEntityRecordsEdits();
-
-		const id = getCurrentPostId( state );
-
-		if ( postEdits && postEdits[ id ]?.meta ) {
-			return postEdits[ id ].meta;
-		}
 	}
 );
 
