@@ -422,7 +422,7 @@ _Returns_
 
 ### LocalAutosaveMonitor
 
-Undocumented declaration.
+LocalAutosaveMonitor component. The component is conditionally exported based on the presence of sessionStorage support.
 
 ### MediaPlaceholder
 
