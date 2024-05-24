@@ -1076,7 +1076,11 @@ _Returns_
 
 ### PostLockedModal
 
-Undocumented declaration.
+A modal component that is displayed when a post is locked for editing by another user. The modal provides information about the lock status and options to take over or exit the editor.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostLockedModal component.
 
 ### PostPendingStatus
 
