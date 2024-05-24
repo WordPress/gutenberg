@@ -33,17 +33,12 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	/*
-	 * If the "Display last modified date" setting is enabled,
-	 * only display the modified date if it is later than the publishing date.
+	 * If the "Display last modified date" setting is enabled.
 	 */
 	if ( isset( $attributes['displayType'] ) && 'modified' === $attributes['displayType'] ) {
-		if ( get_the_modified_date( 'Ymdhi', $post_ID ) > get_the_date( 'Ymdhi', $post_ID ) ) {
-			$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
-			$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
-			$classes[]        = 'wp-block-post-date__modified-date';
-		} else {
-			return '';
-		}
+		$formatted_date   = get_the_modified_date( empty( $attributes['format'] ) ? '' : $attributes['format'], $post_ID );
+		$unformatted_date = esc_attr( get_the_modified_date( 'c', $post_ID ) );
+		$classes[]        = 'wp-block-post-date__modified-date';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
