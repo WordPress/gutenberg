@@ -116,18 +116,6 @@
 		/*rtl:raw: direction: rtl; */
 	}
 
-	p,
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		&:where(:not(.has-text-color)) {
-			color: inherit;
-		}
-	}
-
 	// Position: Top
 	&.is-position-top-left {
 		align-items: flex-start;
@@ -309,4 +297,16 @@ section.wp-block-cover-image > h2,
 :where(.wp-block-cover.is-light:not(.has-text-color)),
 :where(.wp-block-cover-image.is-light:not(.has-text-color)) {
 	color: $black;
+}
+
+:root {
+	:where(.wp-block-cover p:not(.has-text-color)),
+	:where(.wp-block-cover h1:not(.has-text-color)),
+	:where(.wp-block-cover h2:not(.has-text-color)),
+	:where(.wp-block-cover h3:not(.has-text-color)),
+	:where(.wp-block-cover h4:not(.has-text-color)),
+	:where(.wp-block-cover h5:not(.has-text-color)),
+	:where(.wp-block-cover h6:not(.has-text-color)) {
+		color: inherit;
+	}
 }
