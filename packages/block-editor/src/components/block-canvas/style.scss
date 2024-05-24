@@ -3,4 +3,5 @@ iframe[name="editor-canvas"] {
 	height: 100%;
 	display: block;
 	background-color: $gray-300;
+	box-sizing: border-box;
 }
