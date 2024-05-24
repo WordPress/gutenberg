@@ -22,7 +22,7 @@ import { store as editPostStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { usePaddingAppender } from './use-padding-appender';
 
-const { EditorCanvas } = unlock( editorPrivateApis );
+const { VisualEditor: VisualEditorRoot } = unlock( editorPrivateApis );
 
 const isGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN ? true : false;
 const DESIGN_POST_TYPES = [
@@ -105,7 +105,7 @@ export default function VisualEditor( { styles } ) {
 				'has-inline-canvas': ! isToBeIframed,
 			} ) }
 		>
-			<EditorCanvas
+			<VisualEditorRoot
 				disableIframe={ ! isToBeIframed }
 				styles={ styles }
 				// We should auto-focus the canvas (title) on load.

@@ -21,9 +21,9 @@ import {
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
-const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
+const { VisualEditor } = unlock( editorPrivateApis );
 
-function EditorCanvas( { settings, children } ) {
+function EditorCanvas( { settings } ) {
 	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
@@ -95,7 +95,7 @@ function EditorCanvas( { settings, children } ) {
 	);
 
 	return (
-		<EditorCanvasRoot
+		<VisualEditor
 			styles={ styles }
 			iframeProps={ {
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
@@ -103,9 +103,7 @@ function EditorCanvas( { settings, children } ) {
 				} ),
 				...( canvasMode === 'view' ? viewModeIframeProps : {} ),
 			} }
-		>
-			{ children }
-		</EditorCanvasRoot>
+		/>
 	);
 }
 
