@@ -6,7 +6,6 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { useState, useEffect, useMemo } from '@wordpress/element';
@@ -21,32 +20,15 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
-import {
-	FOCUSABLE_ENTITIES,
-	NAVIGATION_POST_TYPE,
-} from '../../utils/constants';
 
 const { EditorCanvas: EditorCanvasRoot } = unlock( editorPrivateApis );
 
 function EditorCanvas( { settings, children } ) {
-	const {
-		hasBlocks,
-		isFocusMode,
-		templateType,
-		canvasMode,
-		currentPostIsTrashed,
-	} = useSelect( ( select ) => {
-		const { getBlockCount } = select( blockEditorStore );
-		const { getEditedPostType, getCanvasMode } = unlock(
-			select( editSiteStore )
-		);
-		const _templateType = getEditedPostType();
+	const { canvasMode, currentPostIsTrashed } = useSelect( ( select ) => {
+		const { getCanvasMode } = unlock( select( editSiteStore ) );
 
 		return {
-			templateType: _templateType,
-			isFocusMode: FOCUSABLE_ENTITIES.includes( _templateType ),
 			canvasMode: getCanvasMode(),
-			hasBlocks: !! getBlockCount(),
 			currentPostIsTrashed:
 				select( editorStore ).getCurrentPostAttribute( 'status' ) ===
 				'trash',
@@ -92,15 +74,6 @@ function EditorCanvas( { settings, children } ) {
 		},
 		readonly: true,
 	};
-	const isTemplateTypeNavigation = templateType === NAVIGATION_POST_TYPE;
-	const isNavigationFocusMode = isTemplateTypeNavigation && isFocusMode;
-	// Hide the appender when:
-	// - In navigation focus mode (should only allow the root Nav block).
-	// - In view mode (i.e. not editing).
-	const showBlockAppender =
-		( isNavigationFocusMode && hasBlocks ) || canvasMode === 'view'
-			? false
-			: undefined;
 
 	const styles = useMemo(
 		() => [
@@ -123,10 +96,6 @@ function EditorCanvas( { settings, children } ) {
 
 	return (
 		<EditorCanvasRoot
-			className={ clsx( 'edit-site-editor-canvas__block-list', {
-				'is-navigation-block': isTemplateTypeNavigation,
-			} ) }
-			renderAppender={ showBlockAppender }
 			styles={ styles }
 			iframeProps={ {
 				className: clsx( 'edit-site-visual-editor__editor-canvas', {
