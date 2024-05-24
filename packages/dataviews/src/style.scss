@@ -3,17 +3,20 @@
 	overflow: auto;
 	box-sizing: border-box;
 	scroll-padding-bottom: $grid-unit-80;
+	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
+	container: dataviews-wrapper / inline-size;
 	display: flex;
 	flex-direction: column;
 }
 
 .dataviews-filters__view-actions {
 	box-sizing: border-box;
-	padding: $grid-unit-15 $grid-unit-40 0;
-	margin-bottom: $grid-unit-15;
+	padding: $grid-unit-20 $grid-unit-60;
 	flex-shrink: 0;
 	position: sticky;
 	left: 0;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 
 	.components-search-control {
 		.components-base-control__field {
@@ -23,8 +26,6 @@
 }
 
 .dataviews-filters__container {
-	padding-right: $grid-unit-40;
-
 	.dataviews-filters__reset-button[aria-disabled="true"] {
 		&,
 		&:hover {
@@ -46,10 +47,12 @@
 	bottom: 0;
 	left: 0;
 	background-color: $white;
-	padding: $grid-unit-15 $grid-unit-40;
+	padding: $grid-unit-15 $grid-unit-60;
 	border-top: $border-width solid $gray-100;
 	color: $gray-700;
 	flex-shrink: 0;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 }
 
 .dataviews-pagination__page-selection {
@@ -103,9 +106,18 @@
 			gap: $grid-unit-05;
 		}
 
+		th,
+		td {
+			&:first-child,
+			&:last-child {
+				transition: padding ease-out 0.1s;
+				@include reduce-motion("transition");
+			}
+		}
+
 		td:first-child,
 		th:first-child {
-			padding-left: $grid-unit-40;
+			padding-left: $grid-unit-60;
 
 			.dataviews-view-table-header-button {
 				margin-left: - #{$grid-unit-10};
@@ -114,7 +126,7 @@
 
 		td:last-child,
 		th:last-child {
-			padding-right: $grid-unit-40;
+			padding-right: $grid-unit-60;
 		}
 
 		&:last-child {
@@ -279,7 +291,9 @@
 	margin-bottom: auto;
 	grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
 	grid-template-rows: max-content;
-	padding: 0 $grid-unit-40 $grid-unit-30;
+	padding: 0 $grid-unit-60 $grid-unit-30;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 
 	@include break-mobile() {
 		grid-template-columns: repeat(2, minmax(0, 1fr)) !important; // Todo: eliminate !important dependency
@@ -459,7 +473,7 @@
 	}
 
 	.dataviews-view-list__item {
-		padding: $grid-unit-20 0 $grid-unit-20 $grid-unit-40;
+		padding: $grid-unit-20 0 $grid-unit-20 $grid-unit-30;
 		width: 100%;
 		scroll-margin: $grid-unit-10 0;
 
@@ -531,7 +545,7 @@
 
 	.dataviews-view-list__item-actions {
 		padding-top: $grid-unit-20;
-		padding-right: $grid-unit-40;
+		padding-right: $grid-unit-30;
 	}
 
 	& + .dataviews-pagination {
@@ -546,11 +560,13 @@
 
 .dataviews-no-results,
 .dataviews-loading {
-	padding: 0 $grid-unit-40;
+	padding: 0 $grid-unit-60;
 	flex-grow: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	transition: padding ease-out 0.1s;
+	@include reduce-motion("transition");
 }
 
 .dataviews-view-table-selection-checkbox {
@@ -809,6 +825,38 @@
 	}
 }
 
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.dataviews-pagination,
+	.dataviews-filters__view-actions {
+		padding: $grid-unit-15 $grid-unit-30;
+	}
+
+	.dataviews-filters__view-actions {
+		.components-search-control {
+			.components-base-control__field {
+				max-width: 112px;
+			}
+		}
+	}
+
+	.dataviews-view-table tr td:first-child,
+	.dataviews-view-table tr th:first-child {
+		padding-left: $grid-unit-30;
+	}
+
+	.dataviews-view-table tr td:last-child,
+	.dataviews-view-table tr th:last-child {
+		padding-right: $grid-unit-30;
+	}
+
+	.dataviews-view-grid,
+	.dataviews-no-results,
+	.dataviews-loading {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
+	}
+}
 
 .dataviews-bulk-actions-toolbar-wrapper {
 	display: flex;

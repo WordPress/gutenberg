@@ -100,11 +100,13 @@
 	.edit-site-patterns__section-header {
 		border-bottom: 1px solid #f0f0f0;
 		min-height: 72px;
-		padding: $grid-unit-20 $grid-unit-40;
+		padding: $grid-unit-30 $grid-unit-60;
 		position: sticky;
 		top: 0;
 		z-index: 2;
 		flex-shrink: 0;
+		transition: padding ease-out 0.1s;
+		@include reduce-motion("transition");
 	}
 
 	.edit-site-patterns__pattern-title {
@@ -159,5 +161,13 @@
 		@include break-small {
 			max-width: 500px;
 		}
+	}
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
 	}
 }
