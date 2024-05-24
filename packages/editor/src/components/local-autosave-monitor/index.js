@@ -192,4 +192,10 @@ function LocalAutosaveMonitor() {
 	);
 }
 
+/**
+ * LocalAutosaveMonitor component.
+ * The component is conditionally exported based on the presence of sessionStorage support.
+ *
+ * @module LocalAutosaveMonitor
+ */
 export default ifCondition( hasSessionStorageSupport )( LocalAutosaveMonitor );
