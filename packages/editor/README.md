@@ -943,7 +943,13 @@ Undocumented declaration.
 
 ### PostDiscussionPanel
 
-Undocumented declaration.
+Uses the `useSelect` hook to determine if the discussion panel is enabled. It also uses the `useState` hook to manage the anchor for the popover dialog and the `useMemo` hook to memoize the popover properties.
+
+If the panel is not enabled, it returns null. Otherwise, it renders a `PostPanelRow` with a `Dropdown` that contains the `PostDiscussionToggle` and `ModalContents` components. The `PostTypeSupportCheck` component is used to ensure that the post type supports comments and pingbacks.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered PostDiscussionPanel component.
 
 ### PostExcerpt
 
