@@ -251,7 +251,7 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									keu={ firstTabKey }
+									key={ firstTabKey }
 									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
