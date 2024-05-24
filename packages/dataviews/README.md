@@ -241,7 +241,8 @@ Collection of operations that can be performed upon each record.
 Each action is an object with the following properties:
 
 -   `id`: string, required. Unique identifier of the action. For example, `move-to-trash`.
--   `label`: string, required. User facing description of the action. For example, `Move to Trash`.
+-   `label`: string, optional. User facing description of the action. For example, `Move to Trash`.
+-   `getLabel` function, optional. Accepts the selected records as input and returns the user facing description of the action. It takes precedence over the `label` prop.
 -   `isPrimary`: boolean, optional. Whether the action should be listed inline (primary) or in hidden in the more actions menu (secondary).
 -   `icon`: icon to show for primary actions. It's required for a primary action, otherwise the action would be considered secondary.
 -   `isEligible`: function, optional. Whether the action can be performed for a given record. If not present, the action is considered to be eligible for all items. It takes the given record as input.

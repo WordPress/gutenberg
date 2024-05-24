@@ -34,6 +34,7 @@ export interface ActionTriggerProps< Item extends AnyItem > {
 	action: Action< Item >;
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
+	items: Item[];
 }
 
 interface ActionModalProps< Item extends AnyItem > {
@@ -67,10 +68,11 @@ interface CompactItemActionsProps< Item extends AnyItem > {
 function ButtonTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
+	items,
 }: ActionTriggerProps< Item > ) {
 	return (
 		<Button
-			label={ action.label }
+			label={ action.getLabel?.( items ) || action.label }
 			icon={ action.icon }
 			isDestructive={ action.isDestructive }
 			size="compact"
@@ -82,13 +84,16 @@ function ButtonTrigger< Item extends AnyItem >( {
 function DropdownMenuItemTrigger< Item extends AnyItem >( {
 	action,
 	onClick,
+	items,
 }: ActionTriggerProps< Item > ) {
 	return (
 		<DropdownMenuItem
 			onClick={ onClick }
 			hideOnClick={ ! ( 'RenderModal' in action ) }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
+			<DropdownMenuItemLabel>
+				{ action.getLabel?.( items ) || action.label }
+			</DropdownMenuItemLabel>
 		</DropdownMenuItem>
 	);
 }
@@ -168,6 +173,7 @@ export function ActionsDropdownMenuGroup< Item extends AnyItem >( {
 						key={ action.id }
 						action={ action }
 						onClick={ () => action.callback( [ item ] ) }
+						items={ [ item ] }
 					/>
 				);
 			} ) }
@@ -224,6 +230,7 @@ export default function ItemActions< Item extends AnyItem >( {
 							key={ action.id }
 							action={ action }
 							onClick={ () => action.callback( [ item ] ) }
+							items={ item[ 0 ] }
 						/>
 					);
 				} ) }
