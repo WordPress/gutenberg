@@ -79,7 +79,7 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 
 	// The following code is only relevant for the Gutenberg plugin.
 	// It's a stand-alone if statement for dead-code elimination.
-	if ( process.env.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		// Convert pattern overrides added during experimental phase.
 		// Only four blocks were supported initially.
 		// These checks can be removed in WordPress 6.6.

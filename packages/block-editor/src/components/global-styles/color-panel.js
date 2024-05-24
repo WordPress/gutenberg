@@ -209,7 +209,7 @@ function ColorPanelDropdown( {
 	panelId,
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
 	return (
 		<ToolsPanelItem
 			className="block-editor-tools-panel-color-gradient-settings__item"
@@ -251,7 +251,8 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									key={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
@@ -271,14 +272,17 @@ function ColorPanelDropdown( {
 									</Tabs.TabList>
 
 									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
 											<Tabs.TabPanel
-												key={ tab.key }
-												tabId={ tab.key }
+												key={ tabKey }
+												tabId={ tabKey }
 												focusable={ false }
 											>
 												<ColorPanelTab
-													{ ...tab }
+													key={ tabKey }
+													{ ...restTabProps }
 													colorGradientControlSettings={
 														colorGradientControlSettings
 													}
@@ -710,19 +714,22 @@ export default function ColorPanel( {
 			onChange={ onChange }
 			panelId={ panelId }
 		>
-			{ items.map( ( item ) => (
-				<ColorPanelDropdown
-					key={ item.key }
-					{ ...item }
-					colorGradientControlSettings={ {
-						colors,
-						disableCustomColors: ! areCustomSolidsEnabled,
-						gradients,
-						disableCustomGradients: ! areCustomGradientsEnabled,
-					} }
-					panelId={ panelId }
-				/>
-			) ) }
+			{ items.map( ( item ) => {
+				const { key, ...restItem } = item;
+				return (
+					<ColorPanelDropdown
+						key={ key }
+						{ ...restItem }
+						colorGradientControlSettings={ {
+							colors,
+							disableCustomColors: ! areCustomSolidsEnabled,
+							gradients,
+							disableCustomGradients: ! areCustomGradientsEnabled,
+						} }
+						panelId={ panelId }
+					/>
+				);
+			} ) }
 			{ children }
 		</Wrapper>
 	);

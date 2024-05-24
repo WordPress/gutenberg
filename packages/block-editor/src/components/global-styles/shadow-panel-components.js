@@ -172,8 +172,11 @@ export function useShadowPresets( settings ) {
 		}
 
 		const defaultPresetsEnabled = settings?.shadow?.defaultPresets;
-		const { default: defaultShadows, theme: themeShadows } =
-			settings?.shadow?.presets ?? {};
+		const {
+			default: defaultShadows,
+			theme: themeShadows,
+			custom: customShadows,
+		} = settings?.shadow?.presets ?? {};
 		const unsetShadow = {
 			name: __( 'Unset' ),
 			slug: 'unset',
@@ -183,6 +186,7 @@ export function useShadowPresets( settings ) {
 		const shadowPresets = [
 			...( ( defaultPresetsEnabled && defaultShadows ) || EMPTY_ARRAY ),
 			...( themeShadows || EMPTY_ARRAY ),
+			...( customShadows || EMPTY_ARRAY ),
 		];
 		if ( shadowPresets.length ) {
 			shadowPresets.unshift( unsetShadow );

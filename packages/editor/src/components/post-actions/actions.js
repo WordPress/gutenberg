@@ -49,8 +49,8 @@ const trashPostAction = {
 	label: __( 'Move to Trash' ),
 	isPrimary: true,
 	icon: trash,
-	isEligible( { status } ) {
-		return status !== 'trash';
+	isEligible( item ) {
+		return ! [ 'auto-draft', 'trash' ].includes( item.status );
 	},
 	supportsBulk: true,
 	hideModalHeader: true,
@@ -498,7 +498,37 @@ const renamePostAction = {
 	id: 'rename-post',
 	label: __( 'Rename' ),
 	isEligible( post ) {
-		return post.status !== 'trash';
+		if ( post.status === 'trash' ) {
+			return false;
+		}
+		// Templates, template parts and patterns have special checks for renaming.
+		if (
+			! [
+				TEMPLATE_POST_TYPE,
+				TEMPLATE_PART_POST_TYPE,
+				...Object.values( PATTERN_TYPES ),
+			].includes( post.type )
+		) {
+			return true;
+		}
+		// In the case of templates, we can only remove custom templates.
+		if ( post.type === TEMPLATE_POST_TYPE ) {
+			return isTemplateRemovable( post ) && post.is_custom;
+		}
+		// Make necessary checks for template parts and patterns.
+		const isTemplatePart = post.type === TEMPLATE_PART_POST_TYPE;
+		const isUserPattern = post.type === PATTERN_TYPES.user;
+		// In patterns list page we map the templates parts to a different object
+		// than the one returned from the endpoint. This is why we need to check for
+		// two props whether is custom or has a theme file.
+		const isCustomPattern =
+			isUserPattern ||
+			( isTemplatePart &&
+				( post.isCustom || post.source === TEMPLATE_ORIGINS.custom ) );
+		const hasThemeFile =
+			isTemplatePart &&
+			( post.templatePart?.has_theme_file || post.has_theme_file );
+		return isCustomPattern && ! hasThemeFile;
 	},
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
@@ -805,8 +835,8 @@ const resetTemplateAction = {
 							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
+							setIsBusy( false );
 							closeModal();
-							isBusy( false );
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
@@ -904,111 +934,6 @@ const deleteTemplateAction = {
 					</Button>
 				</HStack>
 			</VStack>
-		);
-	},
-};
-
-const renameTemplateAction = {
-	id: 'rename-template',
-	label: __( 'Rename' ),
-	isEligible: ( template ) => {
-		// We can only remove templates or template parts that can be removed.
-		// Additionally in the case of templates, we can only remove custom templates.
-		if (
-			! isTemplateRemovable( template ) ||
-			( template.type === TEMPLATE_POST_TYPE && ! template.is_custom )
-		) {
-			return false;
-		}
-		return true;
-	},
-	RenderModal: ( { items: templates, closeModal, onActionPerformed } ) => {
-		const template = templates[ 0 ];
-		const title = decodeEntities( template.title.rendered );
-		const [ editedTitle, setEditedTitle ] = useState( title );
-		const {
-			editEntityRecord,
-			__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-		} = useDispatch( coreStore );
-		const { createSuccessNotice, createErrorNotice } =
-			useDispatch( noticesStore );
-		async function onTemplateRename( event ) {
-			event.preventDefault();
-			try {
-				await editEntityRecord(
-					'postType',
-					template.type,
-					template.id,
-					{
-						title: editedTitle,
-					}
-				);
-				// Update state before saving rerenders the list.
-				setEditedTitle( '' );
-				closeModal();
-				// Persist edited entity.
-				await saveSpecifiedEntityEdits(
-					'postType',
-					template.type,
-					template.id,
-					[ 'title' ], // Only save title to avoid persisting other edits.
-					{
-						throwOnError: true,
-					}
-				);
-				createSuccessNotice(
-					template.type === TEMPLATE_POST_TYPE
-						? __( 'Template renamed.' )
-						: __( 'Template part renamed.' ),
-					{
-						type: 'snackbar',
-					}
-				);
-				onActionPerformed?.( templates );
-			} catch ( error ) {
-				const fallbackErrorMessage =
-					template.type === TEMPLATE_POST_TYPE
-						? __( 'An error occurred while renaming the template.' )
-						: __(
-								'An error occurred while renaming the template part.'
-						  );
-				const errorMessage =
-					error.message && error.code !== 'unknown_error'
-						? error.message
-						: fallbackErrorMessage;
-
-				createErrorNotice( errorMessage, { type: 'snackbar' } );
-			}
-		}
-		return (
-			<form onSubmit={ onTemplateRename }>
-				<VStack spacing="5">
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Name' ) }
-						value={ editedTitle }
-						onChange={ setEditedTitle }
-						required
-					/>
-					<HStack justify="right">
-						<Button
-							variant="tertiary"
-							onClick={ closeModal }
-							__next40pxDefaultSize
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							type="submit"
-							__next40pxDefaultSize
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				</VStack>
-			</form>
 		);
 	},
 };
@@ -1191,18 +1116,17 @@ export function usePostActions( postType, onActionPerformed ) {
 		const actions = [
 			postTypeObject?.viewable && viewPostAction,
 			postRevisionsAction,
-			process.env.IS_GUTENBERG_PLUGIN
+			globalThis.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
 				  ! isPattern &&
 				  duplicatePostAction
 				: false,
-			! isTemplateOrTemplatePart && renamePostAction,
-			isTemplateOrTemplatePart && renameTemplateAction,
+			renamePostAction,
 			isPattern && exportPatternAsJSONAction,
-			isTemplateOrTemplatePart && resetTemplateAction,
-			! isTemplateOrTemplatePart && restorePostAction,
-			isTemplateOrTemplatePart && deleteTemplateAction,
-			! isTemplateOrTemplatePart && permanentlyDeletePostAction,
+			isTemplateOrTemplatePart ? resetTemplateAction : restorePostAction,
+			isTemplateOrTemplatePart
+				? deleteTemplateAction
+				: permanentlyDeletePostAction,
 			isPattern && deletePatternAction,
 			! isTemplateOrTemplatePart && trashPostAction,
 		].filter( Boolean );

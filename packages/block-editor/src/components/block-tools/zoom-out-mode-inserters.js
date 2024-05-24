@@ -21,6 +21,7 @@ function ZoomOutModeInserters() {
 		sectionRootClientId,
 		insertionPoint,
 		setInserterIsOpened,
+		selectedSection,
 	} = useSelect( ( select ) => {
 		const { getSettings, getBlockOrder } = select( blockEditorStore );
 		const { sectionRootClientId: root } = unlock( getSettings() );
@@ -32,6 +33,7 @@ function ZoomOutModeInserters() {
 		// eslint-disable-next-line @wordpress/data-no-store-string-literals
 		const editor = select( 'core/editor' );
 		return {
+			selectedSection: editor.getSelectedBlock(),
 			blockOrder: getBlockOrder( root ),
 			insertionPoint: unlock( editor ).getInsertionPoint(),
 			sectionRootClientId: root,
@@ -49,8 +51,7 @@ function ZoomOutModeInserters() {
 		}
 		// reset insertion point when the block order changes
 		setInserterIsOpened( true );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ blockOrder ] );
+	}, [ blockOrder, setInserterIsOpened ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {
@@ -62,7 +63,7 @@ function ZoomOutModeInserters() {
 		};
 	}, [] );
 
-	if ( ! isReady ) {
+	if ( ! isReady || ! selectedSection ) {
 		return null;
 	}
 

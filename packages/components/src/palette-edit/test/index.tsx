@@ -189,11 +189,13 @@ describe( 'PaletteEdit', () => {
 				name: 'Color options',
 			} )
 		);
-		expect(
-			screen.getByRole( 'button', {
-				name: 'Reset colors',
-			} )
-		).toBeVisible();
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Reset colors',
+				} )
+			).toBeVisible();
+		} );
 	} );
 
 	it( 'does not show a reset colors option when `canReset` is disabled', async () => {
