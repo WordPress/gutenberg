@@ -129,7 +129,8 @@ function ListItem< Item extends AnyItem >( {
 		>
 			<HStack
 				className="dataviews-view-list__item-wrapper"
-				alignment="top"
+				alignment="center"
+				spacing={ 0 }
 			>
 				<div role="gridcell">
 					<CompositeItem
@@ -153,7 +154,7 @@ function ListItem< Item extends AnyItem >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 1 }>
+							<VStack spacing={ 0 }>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
