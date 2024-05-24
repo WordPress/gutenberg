@@ -77,19 +77,12 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 			return (
 				( usedLayout?.inherit ||
 					usedLayout?.contentSize ||
-					usedLayout?.type === 'constrained' ||
-					( blockAttributes?.align === 'full' &&
-						usedLayout?.type !== 'flex' ) ) &&
+					usedLayout?.type === 'constrained' ) &&
 				select( blockEditorStore ).getSettings().__experimentalFeatures
 					?.useRootPaddingAwareAlignments
 			);
 		},
-		[
-			usedLayout?.contentSize,
-			usedLayout?.inherit,
-			usedLayout?.type,
-			blockAttributes?.align,
-		]
+		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
 	);
 
 	if ( hasGlobalPadding ) {
