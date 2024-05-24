@@ -267,6 +267,7 @@ export default function NavigationLinkEdit( {
 	// Change the label using inspector causes rich text to change focus on firefox.
 	// This is a workaround to keep the focus on the label field when label filed is focused we don't render the rich text.
 	const [ isLabelFieldFocused, setIsLabelFieldFocused ] = useState( false );
+
 	const {
 		isAtMaxNesting,
 		isTopLevelLink,
@@ -587,8 +588,6 @@ export default function NavigationLinkEdit( {
 											window.document.activeElement
 										)
 									) {
-										// Where is focus right now? is it within the modal?
-										// get the active focused element
 										// Select the previous block to keep focus nearby
 										selectPreviousBlock( clientId, true );
 									}
