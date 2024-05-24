@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -59,7 +54,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	}, [ context.globals.css ] );
 
 	return (
-		<div className={ clsx( classes ) }>
+		<div className={ classes }>
 			{ externalStyles.map( ( stylesheet ) => (
 				<link key={ stylesheet } rel="stylesheet" href={ stylesheet } />
 			) ) }
