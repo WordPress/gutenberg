@@ -8,7 +8,7 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { CommandMenu } from '@wordpress/commands';
@@ -95,25 +95,23 @@ function Editor( {
 	}
 
 	return (
-		<StrictMode>
-			<SlotFillProvider>
-				<ExperimentalEditorProvider
-					settings={ editorSettings }
-					post={ post }
-					initialEdits={ initialEdits }
-					useSubRegistry={ false }
-					__unstableTemplate={ template }
-					{ ...props }
-				>
-					<ErrorBoundary>
-						<CommandMenu />
-						<EditorInitialization />
-						<Layout initialPost={ initialPost } />
-					</ErrorBoundary>
-					<PostLockedModal />
-				</ExperimentalEditorProvider>
-			</SlotFillProvider>
-		</StrictMode>
+		<SlotFillProvider>
+			<ExperimentalEditorProvider
+				settings={ editorSettings }
+				post={ post }
+				initialEdits={ initialEdits }
+				useSubRegistry={ false }
+				__unstableTemplate={ template }
+				{ ...props }
+			>
+				<ErrorBoundary>
+					<CommandMenu />
+					<EditorInitialization />
+					<Layout initialPost={ initialPost } />
+				</ErrorBoundary>
+				<PostLockedModal />
+			</ExperimentalEditorProvider>
+		</SlotFillProvider>
 	);
 }
 

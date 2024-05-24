@@ -10,7 +10,7 @@ import {
 	store as coreStore,
 	useResourcePermissions,
 } from '@wordpress/core-data';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -112,22 +112,20 @@ export default function WidgetAreasBlockEditorProvider( {
 	);
 
 	return (
-		<StrictMode>
-			<SlotFillProvider>
-				<KeyboardShortcuts.Register />
-				<BlockKeyboardShortcuts />
-				<ExperimentalBlockEditorProvider
-					value={ blocks }
-					onInput={ onInput }
-					onChange={ onChange }
-					settings={ settings }
-					useSubRegistry={ false }
-					{ ...props }
-				>
-					{ children }
-					<PatternsMenuItems rootClientId={ widgetAreaId } />
-				</ExperimentalBlockEditorProvider>
-			</SlotFillProvider>
-		</StrictMode>
+		<SlotFillProvider>
+			<KeyboardShortcuts.Register />
+			<BlockKeyboardShortcuts />
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				onInput={ onInput }
+				onChange={ onChange }
+				settings={ settings }
+				useSubRegistry={ false }
+				{ ...props }
+			>
+				{ children }
+				<PatternsMenuItems rootClientId={ widgetAreaId } />
+			</ExperimentalBlockEditorProvider>
+		</SlotFillProvider>
 	);
 }

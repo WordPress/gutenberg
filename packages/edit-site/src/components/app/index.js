@@ -10,7 +10,6 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { StrictMode } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
@@ -38,16 +37,14 @@ export default function App() {
 	}
 
 	return (
-		<StrictMode>
-			<SlotFillProvider>
-				<GlobalStylesProvider>
-					<UnsavedChangesWarning />
-					<RouterProvider>
-						<Layout />
-						<PluginArea onError={ onPluginAreaError } />
-					</RouterProvider>
-				</GlobalStylesProvider>
-			</SlotFillProvider>
-		</StrictMode>
+		<SlotFillProvider>
+			<GlobalStylesProvider>
+				<UnsavedChangesWarning />
+				<RouterProvider>
+					<Layout />
+					<PluginArea onError={ onPluginAreaError } />
+				</RouterProvider>
+			</GlobalStylesProvider>
+		</SlotFillProvider>
 	);
 }
