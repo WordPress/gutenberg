@@ -6,8 +6,7 @@
 				display: none;
 			}
 			// ... and display labels.
-			// Uses ::before as ::after is already used for active tab styling.
-			&::before {
+			&::after {
 				content: attr(aria-label);
 			}
 		}
