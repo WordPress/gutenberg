@@ -970,7 +970,11 @@ _Returns_
 
 ### PostExcerptPanel
 
-Undocumented declaration.
+`PostExcerptPanel` is a wrapper component that uses the `PostExcerptCheck` component to conditionally render the `ExcerptPanel` component respectively.
+
+_Returns_
+
+-   `JSX.Element`: The rendered PostExcerptPanel component.
 
 ### PostFeaturedImage
 
