@@ -135,6 +135,35 @@ function useInsertionPoint( {
 							_destinationRootClientId
 						)
 					);
+				if ( ! canInsertBlocks && normalizedBlocks.length === 1 ) {
+					// If it's not possible to insert the block in the current location, try to find a new location up the tree
+					while (
+						! canInsertBlockType(
+							normalizedBlocks[ 0 ].name,
+							_destinationRootClientId
+						)
+					) {
+						// save the index of the previous destination root client ID
+						const _previousDestinationRootClientId =
+							_destinationRootClientId;
+						_destinationIndex =
+							getBlockIndex( _previousDestinationRootClientId ) +
+							1;
+
+						// get the parent of the current destination root client ID
+						_destinationRootClientId = getBlockRootClientId(
+							_destinationRootClientId
+						);
+
+						// Break the loop if we searched the whole tree
+						if (
+							_previousDestinationRootClientId ===
+							_destinationRootClientId
+						) {
+							break;
+						}
+					}
+				}
 
 				while ( ! canInsertBlocks() ) {
 					_destinationIndex =

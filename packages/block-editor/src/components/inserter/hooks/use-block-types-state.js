@@ -24,24 +24,23 @@ import { store as blockEditorStore } from '../../../store';
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
 	const [ allItems ] = useSelect( ( select ) => {
-		const { getBlocksByName, getInserterItems } =
-			select( blockEditorStore );
+		let availableItems = select( blockEditorStore ).getInserterItems( '' );
 
-		// Try the empty root first.
-		const rootInserterItems = getInserterItems( '' );
-		if ( rootInserterItems.length ) {
-			return [ rootInserterItems ];
+		// use current selection as root for situations like
+		// template locked mode
+		const rootBlocks = select( blockEditorStore ).getBlocks();
+		while ( availableItems.length === 0 ) {
+			for ( const block of rootBlocks ) {
+				availableItems = select( blockEditorStore ).getInserterItems(
+					block.clientId
+				);
+				if ( availableItems.length ) {
+					break;
+				}
+			}
 		}
-
-		const postContentBlock = getBlocksByName( 'core/post-content' );
-
-		if ( postContentBlock.length ) {
-			return [ getInserterItems( postContentBlock[ 0 ] ) ];
-		}
-
-		// Failsafe
-		return [ [] ];
-	}, [] );
+		return [ availableItems ];
+	} );
 
 	const [ items ] = useSelect(
 		( select ) => [
