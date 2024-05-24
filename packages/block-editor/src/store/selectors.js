@@ -2512,23 +2512,7 @@ export function getBlockListSettings( state, clientId ) {
  * @return {?Object} Block context of the block if set.
  */
 export function getBlockContext( state, clientId ) {
-	let blockContext = { ...state.blockContext[ clientId ] };
-	// TODO: Review if it's necessary to get the context from the parent blocks.
-	getBlockParents( state, clientId ).forEach( ( parent ) => {
-		const block = getBlock( state, parent );
-		const blockType = getBlockType( block.name );
-		if ( blockType?.providesContext ) {
-			Object.keys( blockType.providesContext ).forEach(
-				( attributeName ) => {
-					blockContext = {
-						...blockContext,
-						[ attributeName ]: block.attributes[ attributeName ],
-					};
-				}
-			);
-		}
-	} );
-	return blockContext;
+	return state.blockContext[ clientId ];
 }
 
 /**
