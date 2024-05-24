@@ -1,12 +1,41 @@
 # ProgressBar
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
-
 A simple horizontal progress bar component.
 
 Supports two modes: determinate and indeterminate. A progress bar is determinate when a specific progress value has been specified (from 0 to 100), and indeterminate when a value hasn't been specified.
+
+## Usage
+
+Basic usage:
+
+```jsx
+import { ProgressBar } from '@wordpress/components';
+
+const MyLoadingComponent = () => {
+  return <ProgressBar />
+}
+```
+
+You can also make it controlled by passing a `value` (from 0 to 100) representing the progress:
+
+```jsx
+import { ProgressBar } from '@wordpress/components';
+
+const MyLoadingComponent = ( { progress } ) => {
+  return <ProgressBar value={ progress } />
+}
+```
+
+You can customize its appearance by passing a custom CSS class name to `className`:
+
+
+```jsx
+import { ProgressBar } from '@wordpress/components';
+
+const MyLoadingComponent = () => {
+  return <ProgressBar className='my-custom-css-class' />
+}
+```
 
 ### Props
 
