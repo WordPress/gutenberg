@@ -59,7 +59,7 @@ export default function BackgroundPanel() {
 			value={ style }
 			onChange={ setStyle }
 			settings={ settings }
-			headerLabel={ __( 'Image' ) }
+			headerLabel={ __( 'Background' ) }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
 			defaultControls={ defaultControls }
 			themeFileURIs={ _links?.[ 'wp:theme-file' ] }
