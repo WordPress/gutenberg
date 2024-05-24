@@ -2,7 +2,12 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { createContext, useContext, useMemo } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,7 +40,12 @@ export function BlockContextProvider( { value, children } ) {
 		() => ( { ...context, ...value } ),
 		[ context, value ]
 	);
-	useDispatch( blockEditorStore ).updateBlockContext( nextValue );
+
+	// Synced the block context in the store.
+	const { updateBlockContext } = useDispatch( blockEditorStore );
+	useLayoutEffect( () => {
+		updateBlockContext( nextValue );
+	}, [ nextValue ] );
 
 	return <Context.Provider value={ nextValue } children={ children } />;
 }
