@@ -20,11 +20,11 @@
 	align-items: center;
 
 	.components-button {
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		overflow: hidden;
-		display: inline-block;
 		max-width: 100%;
+		text-align: left;
+		text-wrap: pretty;
+		height: auto;
+		min-height: $button-size-compact;
 	}
 
 	.components-dropdown,
