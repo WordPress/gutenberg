@@ -38,10 +38,9 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
 /**
  * Check if a template is removable.
- * Copy from packages/edit-site/src/utils/is-template-removable.js.
  *
  * @param {Object} template The template entity to check.
- * @return {boolean} Whether the template is revertable.
+ * @return {boolean} Whether the template is removable.
  */
 function isTemplateRemovable( template ) {
 	if ( ! template ) {
