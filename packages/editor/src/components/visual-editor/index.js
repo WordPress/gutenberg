@@ -96,7 +96,7 @@ function checkForPostContentAtRootLevel( blocks ) {
 	return false;
 }
 
-function EditorCanvas( {
+function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
 	styles,
@@ -373,7 +373,7 @@ function EditorCanvas( {
 
 	return (
 		<div
-			className={ clsx( 'editor-canvas', {
+			className={ clsx( 'editor-visual-editor', {
 				'has-padding': isFocusedEntity || enableResizing,
 				'is-resizable': enableResizing,
 			} ) }
@@ -407,7 +407,7 @@ function EditorCanvas( {
 						! isDesignPostType && (
 							<>
 								<LayoutStyle
-									selector=".editor-editor-canvas__post-title-wrapper"
+									selector=".editor-visual-editor__post-title-wrapper"
 									layout={ fallbackLayout }
 								/>
 								<LayoutStyle
@@ -426,7 +426,7 @@ function EditorCanvas( {
 					{ renderingMode === 'post-only' && ! isDesignPostType && (
 						<div
 							className={ clsx(
-								'editor-editor-canvas__post-title-wrapper',
+								'editor-visual-editor__post-title-wrapper',
 								// The following class is only here for backward comapatibility
 								// some themes might be using it to style the post title.
 								'edit-post-visual-editor__post-title-wrapper',
@@ -491,4 +491,4 @@ function EditorCanvas( {
 	);
 }
 
-export default EditorCanvas;
+export default VisualEditor;

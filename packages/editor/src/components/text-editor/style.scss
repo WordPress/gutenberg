@@ -1,4 +1,4 @@
-.edit-post-text-editor {
+.editor-text-editor {
 	position: relative;
 	width: 100%;
 	background-color: $white;
@@ -31,7 +31,7 @@
 	}
 }
 
-.edit-post-text-editor__body {
+.editor-text-editor__body {
 	width: 100%;
 	padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
 	max-width: $break-xlarge;
@@ -44,9 +44,9 @@
 }
 
 // Exit code editor toolbar.
-.edit-post-text-editor__toolbar {
+.editor-text-editor__toolbar {
 	position: sticky;
-	z-index: z-index(".edit-post-text-editor__toolbar");
+	z-index: z-index(".editor-text-editor__toolbar");
 	top: 0;
 	left: 0;
 	right: 0;
