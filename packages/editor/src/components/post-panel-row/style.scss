@@ -18,4 +18,13 @@
 	min-height: $grid-unit-40;
 	display: flex;
 	align-items: center;
+
+	.components-dropdown .components-button {
+		height: auto;
+		line-height: inherit;
+		min-height: 32px;
+		overflow: hidden;
+		text-align: left;
+		white-space: unset;
+	}
 }
