@@ -112,18 +112,16 @@ export default function FontAppearanceControl( props ) {
 	fontFamilyFaces?.forEach( ( face ) => {
 		if ( face.fontWeight ) {
 			if (
-				fontWeights.findIndex(
+				! fontWeights.some(
 					( weight ) => weight.value === face.fontWeight
-				) === -1
+				)
 			) {
 				fontWeights.push( formatFontWeight( face.fontWeight ) );
 			}
 		}
 		if ( face.fontStyle ) {
 			if (
-				fontStyles.findIndex(
-					( style ) => style.value === face.fontStyle
-				) === -1
+				! fontStyles.some( ( style ) => style.value === face.fontStyle )
 			) {
 				fontStyles.push( formatFontStyle( face.fontStyle ) );
 			}
