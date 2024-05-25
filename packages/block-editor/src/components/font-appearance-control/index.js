@@ -9,6 +9,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { formatFontWeight } from '../../utils/format-font-weight';
+import { formatFontStyle } from '../../utils/format-font-style';
 
 const FONT_STYLES = [
 	{
@@ -124,15 +125,7 @@ export default function FontAppearanceControl( props ) {
 					( style ) => style.value === face.fontStyle
 				) === -1
 			) {
-				let styleName = face.fontStyle;
-				if ( face.fontStyle === 'normal' ) {
-					styleName = _x( 'Regular', 'font style' );
-				}
-
-				fontStyles.push( {
-					name: styleName,
-					value: face.fontStyle,
-				} );
+				fontStyles.push( formatFontStyle( face.fontStyle ) );
 			}
 		}
 	} );

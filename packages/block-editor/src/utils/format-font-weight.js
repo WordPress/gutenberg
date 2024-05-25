@@ -21,6 +21,12 @@ export function formatFontWeight( fontWeight ) {
 	let name;
 
 	switch ( fontWeight ) {
+		case 'normal':
+			name = _x( 'Regular', 'font weight' );
+			break;
+		case 'bold':
+			name = _x( 'Bold', 'font weight' );
+			break;
 		case '100':
 			name = _x( 'Thin', 'font weight' );
 			break;
