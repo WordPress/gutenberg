@@ -104,6 +104,7 @@ export default function FontAppearanceControl( props ) {
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
 
+	// Build font style and weight options based on the font family faces.
 	let fontWeights = [];
 	let fontStyles = [];
 
