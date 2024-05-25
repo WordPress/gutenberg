@@ -179,7 +179,7 @@ export default function TypographyPanel( {
 	}, [ fontFamilies ] );
 	const fontFamily = decodeValue( inheritedValue?.typography?.fontFamily );
 	const fontFamilyFaces = mergedFontFamilies.find(
-		( family ) => family.name === fontFamily
+		( family ) => family.fontFamily === fontFamily
 	)?.fontFace;
 	const setFontFamily = ( newValue ) => {
 		const slug = mergedFontFamilies?.find(
