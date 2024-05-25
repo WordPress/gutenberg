@@ -107,7 +107,7 @@ export default function FontAppearanceControl( props ) {
 	let fontWeights = [];
 	let fontStyles = [];
 
-	fontFamilyFaces.forEach( ( face ) => {
+	fontFamilyFaces?.forEach( ( face ) => {
 		if ( face.fontWeight ) {
 			if (
 				fontWeights.findIndex(
