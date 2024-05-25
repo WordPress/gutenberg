@@ -60,25 +60,28 @@ function useView( postType ) {
 			isCustom === 'false' &&
 			DEFAULT_VIEWS[ postType ].find(
 				( { slug } ) => slug === activeView
-			)?.view;
+			);
 		if ( isCustom === 'false' && layout ) {
 			return {
 				...defaultView,
-				type: layout,
-				layout: {
-					...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
+				view: {
+					...defaultView?.view,
+					type: layout,
+					layout: {
+						...( DEFAULT_CONFIG_PER_VIEW_TYPE[ layout ] || {} ),
+					},
 				},
 			};
 		}
 		return defaultView;
 	}, [ isCustom, activeView, layout, postType ] );
-	const [ view, setView ] = useState( selectedDefaultView );
+	const [ view, setView ] = useState( selectedDefaultView?.view );
 
 	useEffect( () => {
-		if ( selectedDefaultView ) {
-			setView( selectedDefaultView );
+		if ( selectedDefaultView?.view ) {
+			setView( selectedDefaultView.view );
 		}
-	}, [ selectedDefaultView ] );
+	}, [ selectedDefaultView?.view ] );
 	const editedViewRecord = useSelect(
 		( select ) => {
 			if ( isCustom !== 'true' ) {
@@ -141,12 +144,16 @@ function useView( postType ) {
 	);
 
 	if ( isCustom === 'false' ) {
-		return [ view, setDefaultViewAndUpdateUrl ];
+		return [ view, setDefaultViewAndUpdateUrl, selectedDefaultView?.title ];
 	} else if ( isCustom === 'true' && customView ) {
-		return [ customView, setCustomView ];
+		return [ customView, setCustomView, selectedDefaultView?.title ];
 	}
 	// Loading state where no the view was not found on custom views or default views.
-	return [ DEFAULT_VIEWS[ postType ][ 0 ].view, setDefaultViewAndUpdateUrl ];
+	return [
+		DEFAULT_VIEWS[ postType ][ 0 ].view,
+		setDefaultViewAndUpdateUrl,
+		DEFAULT_VIEWS[ postType ][ 0 ].title,
+	];
 }
 
 // See https://github.com/WordPress/gutenberg/issues/55886
@@ -203,7 +210,7 @@ function FeaturedImage( { item, viewType } ) {
 
 export default function PagePages() {
 	const postType = 'page';
-	const [ view, setView ] = useView( postType );
+	const [ view, setView, viewTitle ] = useView( postType );
 	const history = useHistory();
 
 	const onSelectionChange = useCallback(
@@ -495,6 +502,7 @@ export default function PagePages() {
 	return (
 		<Page
 			title={ __( 'Pages' ) }
+			subTitle={ viewTitle }
 			actions={
 				addNewLabel && (
 					<>
