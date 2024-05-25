@@ -16,6 +16,7 @@
 
 -   `Autocomplete`: Stabilize rendering of autocomplete items ([#61877](https://github.com/WordPress/gutenberg/pull/61877)).
 -   `TabPanel`: Make the the focus styles consistent with `Tabs`. ([#61317](https://github.com/WordPress/gutenberg/pull/61317)).
+-   `Tabs`: Consider decimal point in indicator style ([#61979](https://github.com/WordPress/gutenberg/pull/61979)).
 
 ### Internal
 
