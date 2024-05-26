@@ -62,6 +62,7 @@ const {
 	getTemplate,
 	getTemplateLock,
 	getBlockListSettings,
+	getBlockContext,
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
@@ -3819,6 +3820,33 @@ describe( 'selectors', () => {
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe(
 				undefined
 			);
+		} );
+	} );
+
+	describe( 'getBlockContext', () => {
+		it( 'should return the context of a block', () => {
+			const state = {
+				blockContext: {
+					chicken: {
+						context1: false,
+					},
+					ribs: {
+						context2: true,
+					},
+				},
+			};
+
+			expect( getBlockContext( state, 'chicken' ) ).toEqual( {
+				context1: false,
+			} );
+		} );
+
+		it( 'should return undefined if context for the block doesn’t exist', () => {
+			const state = {
+				blockContext: {},
+			};
+
+			expect( getBlockContext( state, 'chicken' ) ).toBe( undefined );
 		} );
 	} );
 

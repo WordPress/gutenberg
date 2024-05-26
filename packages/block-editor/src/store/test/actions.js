@@ -51,6 +51,7 @@ const {
 	updateBlock,
 	updateBlockAttributes,
 	updateBlockListSettings,
+	updateBlockContext,
 	updateSettings,
 	validateBlocksToTemplate,
 	registerInserterMediaCategory,
@@ -769,6 +770,26 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: 'chicken',
 				settings: { chicken: 'ribs' },
+			} );
+		} );
+	} );
+
+	describe( 'updateBlockContext', () => {
+		it( 'should return the UPDATE_BLOCK_CONTEXT with undefined context', () => {
+			expect( updateBlockContext( 'chicken' ) ).toEqual( {
+				type: 'UPDATE_BLOCK_CONTEXT',
+				clientId: 'chicken',
+				context: undefined,
+			} );
+		} );
+
+		it( 'should return the UPDATE_BLOCK_CONTEXT action with the passed context', () => {
+			expect(
+				updateBlockContext( 'chicken', { chicken: 'ribs' } )
+			).toEqual( {
+				type: 'UPDATE_BLOCK_CONTEXT',
+				clientId: 'chicken',
+				context: { chicken: 'ribs' },
 			} );
 		} );
 	} );
