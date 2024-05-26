@@ -192,6 +192,10 @@ export default function PageTemplates() {
 		return {
 			...DEFAULT_VIEW,
 			type: usedType,
+			hiddenFields:
+				LAYOUT_LIST === usedType
+					? [ ...DEFAULT_VIEW.hiddenFields, 'description' ]
+					: DEFAULT_VIEW.hiddenFields,
 			layout: defaultConfigPerViewType[ usedType ],
 			filters:
 				activeView !== 'all'
@@ -335,6 +339,10 @@ export default function PageTemplates() {
 			if ( newView.type !== view.type ) {
 				newView = {
 					...newView,
+					hiddenFields:
+						LAYOUT_LIST === newView.type
+							? [ ...newView.hiddenFields, 'description' ]
+							: newView.hiddenFields,
 					layout: {
 						...defaultConfigPerViewType[ newView.type ],
 					},
