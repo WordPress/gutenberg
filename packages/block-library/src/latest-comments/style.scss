@@ -75,3 +75,18 @@ ol.wp-block-latest-comments {
 		font-size: inherit;
 	}
 }
+
+// Enforce line-height when user has made selection at the individual block level.
+.wp-block-latest-comments {
+	&[style*="line-height"] {
+		line-height: inherit;
+
+		ol.wp-block-latest-comments {
+			// Apply parent's line-height to child.
+			line-height: inherit !important;
+
+			// Unset any previously set line-height to avoid conflicts.
+			line-height: unset !important;
+		}
+	}
+}
