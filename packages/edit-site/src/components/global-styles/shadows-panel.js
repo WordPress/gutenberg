@@ -79,12 +79,34 @@ export default function ShadowsPanel() {
 	);
 }
 
+export function getNameAndSlugForShadow( shadows, slugPrefix = 'shadow-' ) {
+	const nameRegex = new RegExp( `^${ slugPrefix }([\\d]+)$` );
+	const position = shadows.reduce( ( previousValue, currentValue ) => {
+		if ( typeof currentValue?.slug === 'string' ) {
+			const matches = currentValue?.slug.match( nameRegex );
+			if ( matches ) {
+				const id = parseInt( matches[ 1 ], 10 );
+				if ( id >= previousValue ) {
+					return id + 1;
+				}
+			}
+		}
+		return previousValue;
+	}, 1 );
+
+	return {
+		name: `Shadow ${ position }`,
+		slug: `${ slugPrefix }${ position }`,
+	};
+}
+
 function ShadowList( { label, shadows, category, canCreate, onCreate } ) {
 	const handleAddShadow = () => {
+		const { name, slug } = getNameAndSlugForShadow( shadows );
 		onCreate( {
-			name: `Shadow ${ shadows.length + 1 }`,
+			name,
 			shadow: defaultShadow,
-			slug: `shadow-${ shadows.length + 1 }`,
+			slug,
 		} );
 	};
 
