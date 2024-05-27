@@ -384,8 +384,7 @@ test.describe( 'Paragraph computed styles', () => {
 			const nestedParagraph1 = paragraphs.nth( 3 );
 			const nestedParagraph2 = paragraphs.nth( 4 );
 			const nestedParagraph3 = paragraphs.nth( 5 );
-			// In a default layout, the margins on left/right apply to the
-			// middle paragraph.
+			// In a default layout, the left/right margins apply.
 			// The first and last block have start/end margin set to zero
 			// by the layout.
 			await expect( nestedParagraph1 ).toHaveCSS(
