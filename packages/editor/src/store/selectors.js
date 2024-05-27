@@ -132,6 +132,22 @@ export const hasNonPostEntityChanges = createRegistrySelector(
 );
 
 /**
+ * Returns true if there are unsaved changes to the
+ * post's meta fields, and false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether there are edits or not.
+ */
+export const hasMetaChanges = createRegistrySelector( ( select ) => () => {
+	const dirtyEntityRecords =
+		select( coreStore ).__experimentalGetDirtyEntityRecords();
+	return dirtyEntityRecords.some(
+		( entityRecord ) => entityRecord.hasMetaChanges
+	);
+} );
+
+/**
  * Returns true if there are no unsaved values for the current edit session and
  * if the currently edited post is new (has never been saved before).
  *
