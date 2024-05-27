@@ -43,12 +43,6 @@
 }
 
 .edit-site-page-patterns-dataviews {
-	margin-top: 60px;
-
-	@include break-medium {
-		margin-top: 0;
-	}
-
 	.page-patterns-preview-field {
 		display: flex;
 		flex-direction: column;
@@ -57,8 +51,17 @@
 
 		&.is-viewtype-grid {
 			.block-editor-block-preview__container {
-				height: 100%;
 				border-radius: 3px 3px 0 0;
+			}
+		}
+
+		&.is-viewtype-table {
+			width: 96px;
+			flex-grow: 0;
+			border-radius: 2px;
+
+			.page-patterns-preview-field__button {
+				border-radius: 2px;
 			}
 		}
 
@@ -78,6 +81,10 @@
 				// Windows High Contrast mode will show this outline, but not the box-shadow.
 				outline: 2px solid transparent;
 			}
+
+			&[aria-disabled="true"] {
+				cursor: default;
+			}
 		}
 	}
 
@@ -93,10 +100,13 @@
 	.edit-site-patterns__section-header {
 		border-bottom: 1px solid #f0f0f0;
 		min-height: 72px;
-		padding: $grid-unit-20 $grid-unit-40;
+		padding: $grid-unit-30 $grid-unit-60;
 		position: sticky;
 		top: 0;
 		z-index: 2;
+		flex-shrink: 0;
+		transition: padding ease-out 0.1s;
+		@include reduce-motion("transition");
 	}
 
 	.edit-site-patterns__pattern-title {
@@ -110,6 +120,13 @@
 
 	.dataviews-pagination {
 		z-index: z-index(".edit-site-patterns__dataviews-list-pagination");
+	}
+
+	.dataviews-view-grid__badge-fields {
+		.dataviews-view-grid__field-value:has(.edit-site-patterns__field-sync-status-fully) {
+			background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+			color: var(--wp-block-synced-color);
+		}
 	}
 }
 
@@ -144,5 +161,13 @@
 		@include break-small {
 			max-width: 500px;
 		}
+	}
+}
+
+/* stylelint-disable-next-line scss/at-rule-no-unknown -- '@container' not globally permitted */
+@container (max-width: 430px) {
+	.edit-site-page-patterns-dataviews .edit-site-patterns__section-header {
+		padding-left: $grid-unit-30;
+		padding-right: $grid-unit-30;
 	}
 }

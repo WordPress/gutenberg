@@ -11,7 +11,7 @@ buildscript {
         espressoVersion = '3.0.1'
 
         // libs
-        aztecVersion = 'fix_gutenberg-backspace-styles-d845fbf4989acc4fbfddc877fd67c7671412fbe0'
+        aztecVersion = 'fix_gutenberg-backspace-styles-fac06be6604f8cb24d34878c9961fa8503fd0e33'
         wordpressUtilsVersion = '3.3.0'
 
         // main
@@ -53,7 +53,7 @@ android {
 
     defaultConfig {
         minSdkVersion 24
-        targetSdkVersion 33
+        targetSdkVersion 34
     }
 
     compileOptions {

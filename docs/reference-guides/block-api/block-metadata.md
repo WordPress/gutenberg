@@ -70,7 +70,7 @@ From a performance perspective, when themes support lazy loading assets, blocks 
 
 Furthermore, because the [Block Type REST API Endpoint](https://developer.wordpress.org/rest-api/reference/block-types/) can only list blocks registered on the server, registering blocks server-side is recommended; using the `block.json` file simplifies this registration.
 
-The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to [submit your block(s) to the Block Directory](/docs/getting-started/create-block/submitting-to-block-directory.md), all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
+The [WordPress Plugins Directory](https://wordpress.org/plugins/) can detect `block.json` files, highlight blocks included in plugins, and extract their metadata. If you wish to submit your block(s) to the Block Directory all blocks contained in your plugin must have a `block.json` file for the Block Directory to recognize them.
 
 Development is improved by using a defined schema definition file. Supported editors can provide help like tooltips, autocomplete, and schema validation. To use the schema, add the following to the top of the `block.json`.
 
@@ -543,7 +543,7 @@ Block type frontend script module definition. They will be enqueued only when vi
 
 It's possible to pass a script module ID registered with the [`wp_register_script_module`](https://developer.wordpress.org/reference/functions/wp_register_script_module/) function, a path to a JavaScript module relative to the `block.json` file, or a list with a mix of both ([learn more](#wpdefinedasset)).
 
-WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. In the future, it will be possible to depend on scripts from script modules.
+WordPress scripts and WordPress script modules are not compatible at the moment. If frontend view assets depend on WordPress scripts, `viewScript` should be used. If they depend on WordPress script modules —the Interactivity API at this time— `viewScriptModule` should be used. [More functionality](https://core.trac.wordpress.org/ticket/60647) will gradually become available to Script Modules.
 
 _Note: Available since WordPress `6.5.0`._
 

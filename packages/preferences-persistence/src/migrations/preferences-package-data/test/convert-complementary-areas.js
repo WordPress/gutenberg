@@ -10,7 +10,7 @@ describe( 'convertComplementaryAreas', () => {
 				complementaryArea: 'edit-post/block',
 			},
 			'core/edit-site': {
-				complementaryArea: 'edit-site/template',
+				complementaryArea: 'edit-post/document',
 			},
 			'core/edit-post': {
 				complementaryArea: 'edit-post/block',

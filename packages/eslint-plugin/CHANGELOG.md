@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `@wordpress/is-gutenberg-plugin` rule has been replaced by `@wordpress/wp-global-usage` ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/wp-process-env` rule has been added and included in the recommended configurations ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   `@wordpress/gutenberg-phase` rule has been removed (deprecated in v10.0.0) ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 18.1.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 18.0.0 (2024-05-02)
+
+### Breaking Changes
+
+-   Enable `curly` eslint rule when using prettier ([#61204](https://github.com/WordPress/gutenberg/pull/61204)).
+
+## 17.13.0 (2024-04-19)
+
+## 17.12.0 (2024-04-03)
+
+## 17.11.0 (2024-03-21)
+
 ## 17.10.0 (2024-03-06)
 
 ## 17.9.0 (2024-02-21)

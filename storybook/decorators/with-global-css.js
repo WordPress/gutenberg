@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
@@ -13,6 +8,11 @@ import { useEffect } from '@wordpress/element';
  */
 import basicStyles from '../global-basic.lazy.scss';
 import wordPressStyles from '../global-wordpress.lazy.scss';
+
+/**
+ * External dependencies
+ */
+import clsx from 'clsx';
 
 /**
  * A Storybook decorator to inject global CSS.
@@ -59,7 +59,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	}, [ context.globals.css ] );
 
 	return (
-		<div className={ classnames( classes ) }>
+		<div className={ clsx( classes ) }>
 			{ externalStyles.map( ( stylesheet ) => (
 				<link key={ stylesheet } rel="stylesheet" href={ stylesheet } />
 			) ) }

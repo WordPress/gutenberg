@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -55,7 +55,7 @@ export default function PostNavigationLinkEdit( {
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
@@ -188,6 +188,7 @@ export default function PostNavigationLinkEdit( {
 				) }
 				<RichText
 					tagName="a"
+					identifier="label"
 					aria-label={ ariaLabel }
 					placeholder={ placeholder }
 					value={ label }

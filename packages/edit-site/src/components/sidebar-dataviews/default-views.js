@@ -29,7 +29,7 @@ export const DEFAULT_CONFIG_PER_VIEW_TYPE = {
 };
 
 const DEFAULT_PAGE_BASE = {
-	type: LAYOUT_TABLE,
+	type: LAYOUT_LIST,
 	search: '',
 	filters: [],
 	page: 1,
@@ -42,7 +42,7 @@ const DEFAULT_PAGE_BASE = {
 	// better to keep track of the hidden ones.
 	hiddenFields: [ 'date', 'featured-image' ],
 	layout: {
-		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_TABLE ],
+		...DEFAULT_CONFIG_PER_VIEW_TYPE[ LAYOUT_LIST ],
 	},
 };
 
@@ -53,6 +53,36 @@ export const DEFAULT_VIEWS = {
 			slug: 'all',
 			icon: pages,
 			view: DEFAULT_PAGE_BASE,
+		},
+		{
+			title: __( 'Published' ),
+			slug: 'published',
+			icon: pages,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'publish',
+					},
+				],
+			},
+		},
+		{
+			title: __( 'Scheduled' ),
+			slug: 'future',
+			icon: pages,
+			view: {
+				...DEFAULT_PAGE_BASE,
+				filters: [
+					{
+						field: 'status',
+						operator: OPERATOR_IS_ANY,
+						value: 'future',
+					},
+				],
+			},
 		},
 		{
 			title: __( 'Drafts' ),

@@ -1,5 +1,16 @@
-$checkbox-input-size: 20px;
-$checkbox-input-size-sm: 24px; // Width & height for small viewports.
+.components-checkbox-control {
+	// Careful, these CSS vars have experimental overrides in Data Views (packages/dataviews/src/style.scss).
+	--checkbox-input-size: 24px; // Width & height for small viewports.
+
+	@include break-small() {
+		--checkbox-input-size: 20px;
+	}
+}
+
+.components-checkbox-control__label {
+	// Ensure label is aligned with checkbox along X axis
+	line-height: var(--checkbox-input-size);
+}
 
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
@@ -14,13 +25,8 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 	padding: 0 !important;
 	text-align: center;
 	vertical-align: top;
-	width: $checkbox-input-size-sm;
-	height: $checkbox-input-size-sm;
-
-	@include break-small() {
-		height: $checkbox-input-size;
-		width: $checkbox-input-size;
-	}
+	width: var(--checkbox-input-size);
+	height: var(--checkbox-input-size);
 
 	appearance: none;
 	transition: 0.1s border-color ease-in-out;
@@ -49,31 +55,34 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 .components-checkbox-control__input-container {
 	position: relative;
 	display: inline-block;
-	margin-right: 12px;
+	margin-right: $grid-unit-15;
 	vertical-align: middle;
-	width: $checkbox-input-size-sm;
-	height: $checkbox-input-size-sm;
-
-	@include break-small() {
-		width: $checkbox-input-size;
-		height: $checkbox-input-size;
-	}
+	width: var(--checkbox-input-size);
+	aspect-ratio: 1;
+	flex-shrink: 0;
 }
 
 svg.components-checkbox-control__checked,
 svg.components-checkbox-control__indeterminate {
+	--checkmark-size: var(--checkbox-input-size);
+
 	fill: $white;
 	cursor: pointer;
 	position: absolute;
-	left: 0;
-	top: 0;
-	width: $button-size-small;
-	height: $button-size-small;
-
-	@include break-small() {
-		left: -2px;
-		top: -2px;
-	}
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: var(--checkmark-size);
+	height: var(--checkmark-size);
 	user-select: none;
 	pointer-events: none;
+
+	@include break-small() {
+		--checkmark-size: calc(var(--checkbox-input-size) + 4px);
+	}
+}
+
+.components-checkbox-control__help {
+	display: inline-block;
+	margin-inline-start: calc(var(--checkbox-input-size) + #{$grid-unit-15});
 }

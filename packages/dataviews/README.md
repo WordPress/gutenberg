@@ -90,7 +90,6 @@ const fields = [
 				<a href="...">{ item.author }</a>
 			);
 		},
-		type: 'enumeration',
 		elements: [
 			{ value: 1, label: 'Admin' }
 			{ value: 2, label: 'User' }
@@ -106,7 +105,6 @@ const fields = [
 		getValue: ( { item } ) =>
 			STATUSES.find( ( { value } ) => value === item.status )
 				?.label ?? item.status,
-		type: 'enumeration',
 		elements: STATUSES,
 		filterBy: {
 			operators: [ 'isAny' ],
@@ -123,7 +121,7 @@ Each field is an object with the following properties:
 -   `getValue`: function that returns the value of the field, defaults to `field[id]`.
 -   `render`: function that renders the field. Optional, `getValue` will be used if `render` is not defined.
 -   `elements`: the set of valid values for the field's value.
--   `type`: the type of the field. Used to generate the proper filters. Only `enumeration` available at the moment. See "Field types".
+-   `type`: the type of the field. See "Field types".
 -   `enableSorting`: whether the data can be sorted by the given field. True by default.
 -   `enableHiding`: whether the field can be hidden. True by default.
 -   `filterBy`: configuration for the filters.
@@ -277,17 +275,9 @@ Whether the data is loading. `false` by default.
 
 Array of layouts supported. By default, all are: `table`, `grid`, `list`.
 
-### `deferredRendering`: `boolean`
-
-Whether the items should be rendered asynchronously. Useful when there's a field that takes a lot of time (e.g.: previews). `false` by default.
-
 ### `onSelectionChange`: `function`
 
 Callback that signals the user selected one of more items, and takes them as parameter. So far, only the `list` view implements it.
-
-### `onDetailsChange`: `function`
-
-Callback that signals the user triggered the details for one of more items, and takes them as paremeter. So far, only the `list` view implements it.
 
 ## Types
 
@@ -299,18 +289,22 @@ Callback that signals the user triggered the details for one of more items, and 
 
 ### Fields
 
-- `enumeration`: the field value should be taken and can be filtered from a closed list of elements.
+> The `enumeration` type was removed as it was deemed redundant with the field.elements metadata. New types will be introduced soon.
 
 ### Operators
 
-Allowed operators for fields of type `enumeration`:
+Allowed operators:
 
-- `is`: whether the item is equal to a single value.
-- `isNot`: whether the item is not equal to a single value.
-- `isAny`: whether the item is present in a list of values.
-- `isNone`: whether the item is not present in a list of values.
+| Operator | Selection | Description | Example |
+| --- | ---  | --- | --- |
+| `is` | Single item | `EQUAL TO`. The item's field is equal to a single value. | Author is Admin |
+| `isNot` | Single item | `NOT EQUAL TO`. The item's field is not equal to a single value. | Author is not Admin |
+| `isAny` | Multiple items | `OR`. The item's field is present in a list of values. | Author is any: Admin, Editor |
+| `isNone` | Multiple items | `NOT OR`. The item's field is not present in a list of values. | Author is none: Admin, Editor |
+| `isAll` | Multiple items | `AND`. The item's field has all of the values in the list. | Category is all: Book, Review, Science Fiction |
+| `isNotAll` | Multiple items | `NOT AND`. The item's field doesn't have all of the values in the list. | Category is not all: Book, Review, Science Fiction |
 
-`is` and `isNot` are single-selection operators, while `isAny` and `isNone` are multi-selection. By default, a filter with no operators declared will support multi-selection. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
+`is` and `isNot` are single-selection operators, while `isAny`, `isNone`, `isAll`, and `isNotALl` are multi-selection. By default, a filter with no operators declared will support the `isAny` and `isNone` multi-selection operators. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded and the filter won't allow selecting more than one item.
 
 > The legacy operators `in` and `notIn` have been deprecated and will be removed soon. In the meantime, they work as `is` and `isNot` operators, respectively.
 

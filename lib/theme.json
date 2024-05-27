@@ -1,6 +1,6 @@
 {
-	"$schema": "https://schemas.wp.org/trunk/theme.json",
-	"version": 2,
+	"$schema": "../schemas/json/theme.json",
+	"version": 3,
 	"settings": {
 		"appearanceTools": false,
 		"useRootPaddingAwareAlignments": false,
@@ -190,8 +190,48 @@
 			],
 			"text": true
 		},
+		"dimensions": {
+			"defaultAspectRatios": true,
+			"aspectRatios": [
+				{
+					"name": "Square - 1:1",
+					"slug": "square",
+					"ratio": "1"
+				},
+				{
+					"name": "Standard - 4:3",
+					"slug": "4-3",
+					"ratio": "4/3"
+				},
+				{
+					"name": "Portrait - 3:4",
+					"slug": "3-4",
+					"ratio": "3/4"
+				},
+				{
+					"name": "Classic - 3:2",
+					"slug": "3-2",
+					"ratio": "3/2"
+				},
+				{
+					"name": "Classic Portrait - 2:3",
+					"slug": "2-3",
+					"ratio": "2/3"
+				},
+				{
+					"name": "Wide - 16:9",
+					"slug": "16-9",
+					"ratio": "16/9"
+				},
+				{
+					"name": "Tall - 9:16",
+					"slug": "9-16",
+					"ratio": "9/16"
+				}
+			]
+		},
 		"shadow": {
-			"defaultPresets": false,
+			"defaultPresets": true,
 			"presets": [
 				{
 					"name": "Natural",
@@ -236,6 +276,7 @@
 		},
 		"typography": {
 			"customFontSize": true,
+			"defaultFontSizes": true,
 			"dropCap": true,
 			"fontSizes": [
 				{
@@ -263,6 +304,7 @@
 			"fontWeight": true,
 			"letterSpacing": true,
 			"lineHeight": false,
+			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
 			"textTransform": true,
@@ -297,7 +339,12 @@
 					"background": "#32373c"
 				},
 				"spacing": {
-					"padding": "calc(0.667em + 2px) calc(1.333em + 2px)"
+					"padding": {
+						"top": "calc(0.667em + 2px)",
+						"right": "calc(1.333em + 2px)",
+						"bottom": "calc(0.667em + 2px)",
+						"left": "calc(1.333em + 2px)"
+					}
 				},
 				"typography": {
 					"fontSize": "inherit",

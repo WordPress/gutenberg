@@ -31,7 +31,8 @@ add_action(
 			// But remove the server directive processing.
 			remove_filter(
 				'render_block_data',
-				'wp_interactivity_process_directives_of_interactive_blocks'
+				'wp_interactivity_process_directives_of_interactive_blocks',
+				100
 			);
 		}
 	}

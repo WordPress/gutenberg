@@ -1,18 +1,20 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { NavigableRegion } from '@wordpress/interface';
-import { EditorSnackbars } from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import Header from './header';
+import { unlock } from '../../lock-unlock';
+
+const { NavigableRegion } = unlock( editorPrivateApis );
 
 export default function Page( {
 	title,
@@ -22,7 +24,7 @@ export default function Page( {
 	className,
 	hideTitleFromUI = false,
 } ) {
-	const classes = classnames( 'edit-site-page', className );
+	const classes = clsx( 'edit-site-page', className );
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ title }>
@@ -36,7 +38,6 @@ export default function Page( {
 				) }
 				{ children }
 			</div>
-			<EditorSnackbars />
 		</NavigableRegion>
 	);
 }

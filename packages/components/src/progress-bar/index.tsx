@@ -26,8 +26,12 @@ function UnforwardedProgressBar(
 	return (
 		<ProgressBarStyled.Track className={ className }>
 			<ProgressBarStyled.Indicator
+				style={ {
+					'--indicator-width': ! isIndeterminate
+						? `${ value }%`
+						: undefined,
+				} }
 				isIndeterminate={ isIndeterminate }
-				value={ value }
 			/>
 			<ProgressBarStyled.ProgressElement
 				max={ 100 }

@@ -134,12 +134,3 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		stroke: $gray-900;
 	}
 }
-
-.components-popover-pointer-events-trap {
-	// Same z-index as popover, but rendered before the popover element
-	// in DOM order = it will display just under the popover
-	z-index: z-index(".components-popover");
-	position: fixed;
-	inset: 0;
-	background-color: transparent;
-}

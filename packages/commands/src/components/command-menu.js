@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,7 +32,7 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 
-const inputLabel = __( 'Search for commands' );
+const inputLabel = __( 'Search commands and settings' );
 
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
@@ -55,7 +55,7 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -126,7 +126,7 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -221,7 +221,9 @@ export function CommandMenu() {
 		/** @type {import('react').KeyboardEventHandler} */
 		( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {
@@ -278,12 +280,12 @@ export function CommandMenu() {
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } onKeyDown={ onKeyDown }>
 					<div className="commands-command-menu__header">
-						<Icon icon={ inputIcon } />
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
+						<Icon icon={ inputIcon } />
 					</div>
 					<Command.List ref={ commandListRef }>
 						{ search && ! isLoading && (

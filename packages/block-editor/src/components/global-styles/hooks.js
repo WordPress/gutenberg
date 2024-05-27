@@ -27,6 +27,7 @@ const VALID_SETTINGS = [
 	'background.backgroundImage',
 	'background.backgroundRepeat',
 	'background.backgroundSize',
+	'background.backgroundPosition',
 	'border.color',
 	'border.radius',
 	'border.style',
@@ -67,6 +68,7 @@ const VALID_SETTINGS = [
 	'spacing.units',
 	'typography.fluid',
 	'typography.customFontSize',
+	'typography.defaultFontSizes',
 	'typography.dropCap',
 	'typography.fontFamilies',
 	'typography.fontSizes',
@@ -204,6 +206,11 @@ export function useGlobalStyle(
 	return [ result, setStyle ];
 }
 
+export function useGlobalStyleLinks() {
+	const { merged: mergedConfig } = useContext( GlobalStylesContext );
+	return mergedConfig?._links;
+}
+
 /**
  * React hook that overrides a global settings object with block and element specific settings.
  *
@@ -239,6 +246,7 @@ export function useSettingsForBlockElement(
 				...updatedSettings.typography,
 				fontSizes: {},
 				customFontSize: false,
+				defaultFontSizes: false,
 			};
 		}
 

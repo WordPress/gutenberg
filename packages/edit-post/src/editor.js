@@ -32,11 +32,14 @@ function Editor( {
 	...props
 } ) {
 	const {
-		initialPost,
 		currentPost,
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-	} = useNavigateToEntityRecord( initialPostId, initialPostType );
+	} = useNavigateToEntityRecord(
+		initialPostId,
+		initialPostType,
+		'post-only'
+	);
 
 	const { post, template } = useSelect(
 		( select ) => {
@@ -55,12 +58,12 @@ function Editor( {
 				getEditorSettings().supportsTemplateMode;
 			const isViewable =
 				getPostType( currentPost.postType )?.viewable ?? false;
-			const canEditTemplate = canUser( 'create', 'templates' );
+			const canViewTemplate = canUser( 'read', 'templates' );
 			return {
 				template:
 					supportsTemplateMode &&
 					isViewable &&
-					canEditTemplate &&
+					canViewTemplate &&
 					currentPost.postType !== 'wp_template'
 						? getEditedPostTemplate()
 						: null,
@@ -79,6 +82,13 @@ function Editor( {
 		} ),
 		[ settings, onNavigateToEntityRecord, onNavigateToPreviousEntityRecord ]
 	);
+
+	const initialPost = useMemo( () => {
+		return {
+			type: initialPostType,
+			id: initialPostId,
+		};
+	}, [ initialPostType, initialPostId ] );
 
 	if ( ! post ) {
 		return null;

@@ -20,6 +20,7 @@ const config = require( '../config' );
 
 const ARTIFACTS_PATH =
 	process.env.WP_ARTIFACTS_PATH || path.join( process.cwd(), 'artifacts' );
+const RAW_RESULTS_FILE_SUFFIX = '.performance-results.raw.json';
 const RESULTS_FILE_SUFFIX = '.performance-results.json';
 
 /**
@@ -56,22 +57,97 @@ function sanitizeBranchName( branch ) {
 }
 
 /**
- * Computes the median number from an array numbers.
- *
- * @param {number[]} array
- *
- * @return {number|undefined} Median value or undefined if array empty.
+ * @param {number} number
  */
-function median( array ) {
-	if ( ! array || ! array.length ) return undefined;
+function fixed( number ) {
+	return Math.round( number * 100 ) / 100;
+}
 
-	const numbers = [ ...array ].sort( ( a, b ) => a - b );
-	const middleIndex = Math.floor( numbers.length / 2 );
+/**
+ * @param {number[]} array
+ */
+function quartiles( array ) {
+	const numbers = array.slice().sort( ( a, b ) => a - b );
 
-	if ( numbers.length % 2 === 0 ) {
-		return ( numbers[ middleIndex - 1 ] + numbers[ middleIndex ] ) / 2;
+	/**
+	 * @param {number} offset
+	 * @param {number} length
+	 */
+	function med( offset, length ) {
+		if ( length % 2 === 0 ) {
+			// even length, average of two middle numbers
+			return (
+				( numbers[ offset + length / 2 - 1 ] +
+					numbers[ offset + length / 2 ] ) /
+				2
+			);
+		}
+
+		// odd length, exact middle point
+		return numbers[ offset + ( length - 1 ) / 2 ];
 	}
-	return numbers[ middleIndex ];
+
+	const q50 = med( 0, numbers.length );
+
+	let q25, q75;
+	if ( numbers.length % 2 === 0 ) {
+		// medians of two exact halves
+		const mid = numbers.length / 2;
+		q25 = med( 0, mid );
+		q75 = med( mid, mid );
+	} else {
+		// quartiles are average of medians of the smaller and bigger slice
+		const midl = ( numbers.length - 1 ) / 2;
+		const midh = ( numbers.length + 1 ) / 2;
+		q25 = ( med( 0, midl ) + med( 0, midh ) ) / 2;
+		q75 = ( med( midl, midh ) + med( midh, midl ) ) / 2;
+	}
+	return { q25, q50, q75 };
+}
+
+/**
+ * @param {number[]|undefined} values
+ */
+function stats( values ) {
+	if ( ! values || values.length === 0 ) {
+		return undefined;
+	}
+	const { q25, q50, q75 } = quartiles( values );
+	const cnt = values.length;
+	return {
+		q25: fixed( q25 ),
+		q50: fixed( q50 ),
+		q75: fixed( q75 ),
+		cnt,
+	};
+}
+
+/**
+ * Nicely formats a given value.
+ *
+ * @param {string} metric Metric.
+ * @param {number} value
+ */
+function formatValue( metric, value ) {
+	if ( 'wpMemoryUsage' === metric ) {
+		return `${ ( value / Math.pow( 10, 6 ) ).toFixed( 2 ) } MB`;
+	}
+
+	if ( 'wpDbQueries' === metric ) {
+		return value.toString();
+	}
+
+	return `${ value } ms`;
+}
+
+/**
+ * @param {string}                 m
+ * @param {Record<string, number>} s
+ */
+function printStats( m, s ) {
+	const pp = fixed( ( 100 * ( s.q75 - s.q50 ) ) / s.q50 );
+	const mp = fixed( ( 100 * ( s.q50 - s.q25 ) ) / s.q50 );
+	return `${ formatValue( m, s.q50 ) } +${ pp }% -${ mp }%`;
 }
 
 /**
@@ -92,6 +168,61 @@ async function runTestSuite( testSuite, testRunnerDir, runKey ) {
 			RESULTS_ID: runKey,
 		}
 	);
+}
+
+/**
+ * Formats an array of objects as a Markdown table.
+ *
+ * For example, this array:
+ *
+ * [
+ * 	{
+ * 	    foo: 123,
+ * 	    bar: 456,
+ * 	    baz: 'Yes',
+ * 	},
+ * 	{
+ * 	    foo: 777,
+ * 	    bar: 999,
+ * 	    baz: 'No',
+ * 	}
+ * ]
+ *
+ * Will result in the following table:
+ *
+ * | foo | bar | baz |
+ * |-----|-----|-----|
+ * | 123 | 456 | Yes |
+ * | 777 | 999 | No  |
+ *
+ * @param {Array<Object>} rows Table rows.
+ * @return {string} Markdown table content.
+ */
+function formatAsMarkdownTable( rows ) {
+	let result = '';
+
+	if ( ! rows.length ) {
+		return result;
+	}
+
+	const headers = Object.keys( rows[ 0 ] );
+	for ( const header of headers ) {
+		result += `| ${ header } `;
+	}
+	result += '|\n';
+	for ( let i = 0; i < headers.length; i++ ) {
+		result += '| ------ ';
+	}
+	result += '|\n';
+
+	for ( const row of rows ) {
+		for ( const value of Object.values( row ) ) {
+			result += `| ${ value } `;
+		}
+		result += '|\n';
+	}
+
+	return result;
 }
 
 /**
@@ -362,9 +493,9 @@ async function runPerformanceTests( branches, options ) {
 	logAtIndent( 0, 'Calculating results' );
 
 	const resultFiles = getFilesFromDir( ARTIFACTS_PATH ).filter( ( file ) =>
-		file.endsWith( RESULTS_FILE_SUFFIX )
+		file.endsWith( RAW_RESULTS_FILE_SUFFIX )
 	);
-	/** @type {Record<string,Record<string, Record<string, number>>>} */
+	/** @type {Record<string,Record<string, Record<string, Record<string, number>>>>} */
 	const results = {};
 
 	// Calculate medians from all rounds.
@@ -385,20 +516,21 @@ async function runPerformanceTests( branches, options ) {
 					return readJSONFile( file );
 				} );
 
-			const metrics = Object.keys( resultsRounds[ 0 ] );
+			const metrics = Object.keys( resultsRounds[ 0 ] ?? {} );
 			results[ testSuite ][ branch ] = {};
 
 			for ( const metric of metrics ) {
-				const values = resultsRounds
-					.map( ( round ) => round[ metric ] )
-					.filter( ( value ) => typeof value === 'number' );
+				const values = resultsRounds.flatMap(
+					( round ) => round[ metric ] ?? []
+				);
 
-				const value = median( values );
+				const value = stats( values );
 				if ( value !== undefined ) {
 					results[ testSuite ][ branch ][ metric ] = value;
 				}
 			}
 		}
+
 		const calculatedResultsPath = path.join(
 			ARTIFACTS_PATH,
 			testSuite + RESULTS_FILE_SUFFIX
@@ -422,24 +554,82 @@ async function runPerformanceTests( branches, options ) {
 		)
 	);
 
+	let summaryMarkdown = `## Performance Test Results\n\n`;
+
+	summaryMarkdown += `Please note that client side metrics **exclude** the server response time.\n\n`;
+
 	for ( const testSuite of testSuites ) {
 		logAtIndent( 0, formats.success( testSuite ) );
 
 		// Invert the results so we can display them in a table.
-		/** @type {Record<string, Record<string, string>>} */
+		/** @type {Record<string, Record<string, Record<string, number>>>} */
 		const invertedResult = {};
 		for ( const [ branch, metrics ] of Object.entries(
 			results[ testSuite ]
 		) ) {
 			for ( const [ metric, value ] of Object.entries( metrics ) ) {
 				invertedResult[ metric ] = invertedResult[ metric ] || {};
-				invertedResult[ metric ][ branch ] = `${ value } ms`;
+				invertedResult[ metric ][ branch ] = value;
+			}
+		}
+
+		/** @type {Record<string, Record<string, string>>} */
+		const printedResult = {};
+		for ( const [ metric, branch ] of Object.entries( invertedResult ) ) {
+			printedResult[ metric ] = {};
+			for ( const [ branchName, data ] of Object.entries( branch ) ) {
+				printedResult[ metric ][ branchName ] = printStats(
+					metric,
+					data
+				);
+			}
+
+			if ( branches.length === 2 ) {
+				const [ branch1, branch2 ] = branches;
+				const value1 = branch[ branch1 ].q50;
+				const value2 = branch[ branch2 ].q50;
+				const percentageChange = fixed(
+					( ( value1 - value2 ) / value2 ) * 100
+				);
+				printedResult[ metric ][
+					'% Change'
+				] = `${ percentageChange }%`;
 			}
 		}
 
 		// Print the results.
-		console.table( invertedResult );
+		console.table( printedResult );
+
+		// Use yet another structure to generate a Markdown table.
+
+		const rows = [];
+
+		for ( const [ metric, resultBranches ] of Object.entries(
+			printedResult
+		) ) {
+			/**
+			 * @type {Record< string, string >}
+			 */
+			const row = {
+				Metric: metric,
+			};
+
+			for ( const [ branch, value ] of Object.entries(
+				resultBranches
+			) ) {
+				row[ branch ] = value;
+			}
+			rows.push( row );
+		}
+
+		summaryMarkdown += `**${ testSuite }**\n\n`;
+		summaryMarkdown += `${ formatAsMarkdownTable( rows ) }\n`;
 	}
+
+	fs.writeFileSync(
+		path.join( ARTIFACTS_PATH, 'summary.md' ),
+		summaryMarkdown
+	);
 }
 
 module.exports = {

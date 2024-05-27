@@ -10,7 +10,7 @@
 	min-width: 0;
 	background: $gray-100;
 	border-radius: $grid-unit-05;
-	width: min(100%, 450px);
+	width: min(100%, 416px);
 
 	&:hover {
 		background-color: $gray-200;
@@ -18,9 +18,10 @@
 
 	.components-button {
 		border-radius: $grid-unit-05;
+		transition: all 0.1s ease-out;
+		@include reduce-motion("transition");
 
 		&:hover {
-			color: var(--wp-block-synced-color);
 			background: $gray-200;
 		}
 	}
@@ -39,19 +40,15 @@
 .editor-document-bar__title {
 	flex-grow: 1;
 	overflow: hidden;
-	color: $gray-800;
+	color: $gray-900;
 	gap: $grid-unit-05;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.
-	@include break-small() {
-		padding-left: $grid-unit-40;
-	}
-
-	&:hover {
-		color: var(--wp-block-synced-color);
+	@include break-medium() {
+		padding-left: $grid-unit-30;
 	}
 
 	.editor-document-bar.is-global & {
@@ -67,14 +64,14 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		max-width: 50%;
+		max-width: 70%;
 		color: currentColor;
 	}
 }
 
 .editor-document-bar__shortcut {
 	color: $gray-800;
-	min-width: $grid-unit-40;
+	min-width: $grid-unit-30;
 	display: none;
 
 	@include break-medium() {
@@ -91,7 +88,7 @@
 	position: absolute;
 
 	&:hover {
-		color: var(--wp-block-synced-color);
+		color: $gray-900;
 		background-color: transparent;
 	}
 }

@@ -18,6 +18,7 @@ module.exports = {
 	name: 'interactivity',
 	entry: {
 		index: './packages/interactivity',
+		debug: './packages/interactivity/src/debug',
 		router: './packages/interactivity-router',
 		navigation: './packages/block-library/src/navigation/view.js',
 		query: './packages/block-library/src/query/view.js',

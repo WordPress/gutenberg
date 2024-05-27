@@ -43,6 +43,7 @@ function AddCustomGenericTemplateModalContent( { onClose, createTemplate } ) {
 		<form onSubmit={ onCreateTemplate }>
 			<VStack spacing={ 6 }>
 				<TextControl
+					__next40pxDefaultSize
 					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
@@ -58,6 +59,7 @@ function AddCustomGenericTemplateModalContent( { onClose, createTemplate } ) {
 					justify="right"
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="tertiary"
 						onClick={ () => {
 							onClose();
@@ -66,6 +68,7 @@ function AddCustomGenericTemplateModalContent( { onClose, createTemplate } ) {
 						{ __( 'Cancel' ) }
 					</Button>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						isBusy={ isBusy }

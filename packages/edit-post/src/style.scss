@@ -1,18 +1,9 @@
-@import "../../interface/src/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
-@import "./components/keyboard-shortcut-help-modal/style.scss";
 @import "./components/layout/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/sidebar/style.scss";
-@import "./components/sidebar/post-format/style.scss";
-@import "./components/sidebar/post-slug/style.scss";
-@import "./components/sidebar/post-visibility/style.scss";
-@import "./components/sidebar/template-summary/style.scss";
-@import "./components/text-editor/style.scss";
 @import "./components/visual-editor/style.scss";
 @import "./components/welcome-guide/style.scss";
-@import "./components/start-page-options/style.scss";
 
 /**
  * Animations
@@ -43,9 +34,9 @@ body.js.block-editor-page {
 }
 
 // Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
-.edit-post-header,
-.edit-post-text-editor,
-.edit-post-sidebar,
+.editor-header,
+.editor-text-editor,
+.editor-sidebar,
 .editor-post-publish-panel {
 	@include reset;
 }
@@ -78,18 +69,3 @@ body.js.block-editor-page {
 }
 
 @include wordpress-admin-schemes();
-
-// The edit-site package adds or removes the sidebar when it's opened or closed.
-// The edit-post package, however, always has the sidebar in the canvas.
-// These edit-post specific rules ensures there isn't a border on the right of
-// the canvas when a sidebar is visually closed.
-.interface-interface-skeleton__sidebar {
-	border-left: none;
-
-	.is-sidebar-opened & {
-		@include break-medium() {
-			border-left: $border-width solid $gray-200;
-			overflow: hidden scroll;
-		}
-	}
-}

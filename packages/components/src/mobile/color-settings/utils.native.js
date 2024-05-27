@@ -28,7 +28,7 @@ export const colorsUtils = {
 		picker: 'Picker',
 		palette: 'Palette',
 	},
-	segments: [ __( 'Solid' ), __( 'Gradient' ) ],
+	segments: [ __( 'Color' ), __( 'Gradient' ) ],
 	gradients,
 	gradientOptions,
 	getGradientType,

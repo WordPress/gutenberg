@@ -11,7 +11,7 @@ const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/HEAD/packages/editor/src/components/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -128,6 +128,14 @@ _Parameters_
 _Returns_
 
 -   Higher-order component.
+
+### observableMap
+
+A constructor (factory) for `ObservableMap`, a map-like key/value data structure where the individual entries are observable: using the `subscribe` method, you can subscribe to updates for a particular keys. Each subscriber always observes one specific key and is not notified about any unrelated changes (for different keys) in the `ObservableMap`.
+
+_Returns_
+
+-   `ObservableMap< K, V >`: A new instance of the `ObservableMap` type.
 
 ### pipe
 
@@ -257,11 +265,11 @@ Helper hook for input fields that need to debounce the value before using it.
 
 _Parameters_
 
--   _defaultValue_ `any`: The default value to use.
+-   _defaultValue_ The default value to use.
 
 _Returns_
 
--   `[string, Function, string]`: The input value, the setter and the debounced input value.
+-   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -441,6 +449,19 @@ _Parameters_
 _Returns_
 
 -   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+
+### useObservableValue
+
+React hook that lets you observe an entry in an `ObservableMap`. The hook returns the current value corresponding to the key, or `undefined` when there is no value stored. It also observes changes to the value and triggers an update of the calling component in case the value changes.
+
+_Parameters_
+
+-   _map_ `ObservableMap< K, V >`: The `ObservableMap` to observe.
+-   _name_ `K`: The map key to observe.
+
+_Returns_
+
+-   `V | undefined`: The value corresponding to the map key requested.
 
 ### usePrevious
 

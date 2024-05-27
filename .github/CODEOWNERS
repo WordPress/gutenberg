@@ -47,7 +47,7 @@
 /packages/block-editor/src/components/link-control  @getdave
 
 # Widgets
-/packages/edit-widgets                          @draganescu @talldan @adamziel @kevin940726
+/packages/edit-widgets                          @draganescu @adamziel @kevin940726
 /packages/customize-widgets
 /packages/widgets
 
@@ -81,7 +81,6 @@
 /packages/prettier-config                       @ntwb @gziolo
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra @ryanwelcher
 /packages/stylelint-config                      @ntwb
-/test/e2e                                       @kevin940726 @Mamaduka
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components

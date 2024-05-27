@@ -14,7 +14,7 @@ import {
 	currentlyPreviewingTheme,
 } from './is-previewing-theme';
 
-const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useHistory } = unlock( routerPrivateApis );
 
 /**
  * This should be refactored to use the REST API, once the REST API can activate themes.
@@ -23,7 +23,6 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
  */
 export function useActivateTheme() {
 	const history = useHistory();
-	const location = useLocation();
 	const { startResolution, finishResolution } = useDispatch( coreStore );
 
 	return async () => {
@@ -36,9 +35,10 @@ export function useActivateTheme() {
 			startResolution( 'activateTheme' );
 			await window.fetch( activationURL );
 			finishResolution( 'activateTheme' );
-			const { wp_theme_preview: themePreview, ...params } =
-				location.params;
-			history.replace( params );
+			// Remove the wp_theme_preview query param: we've finished activating
+			// the queue and are switching to normal Site Editor.
+			const { params } = history.getLocationWithParams();
+			history.replace( { ...params, wp_theme_preview: undefined } );
 		}
 	};
 }

@@ -304,20 +304,15 @@ const withBlockTree =
 					action.blocks
 				);
 				newState.tree = new Map( newState.tree );
-				action.replacedClientIds
-					.concat(
-						// Controlled inner blocks are only removed
-						// if the block doesn't move to another position
-						// otherwise their content will be lost.
-						action.replacedClientIds
-							.filter(
-								( clientId ) => ! inserterClientIds[ clientId ]
-							)
-							.map( ( clientId ) => 'controlled||' + clientId )
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.replacedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					// Controlled inner blocks are only removed
+					// if the block doesn't move to another position
+					// otherwise their content will be lost.
+					if ( ! inserterClientIds[ clientId ] ) {
+						newState.tree.delete( 'controlled||' + clientId );
+					}
+				} );
 
 				updateBlockTreeForBlocks( newState, action.blocks );
 				updateParentInnerBlocksInTree(
@@ -358,15 +353,10 @@ const withBlockTree =
 					}
 				}
 				newState.tree = new Map( newState.tree );
-				action.removedClientIds
-					.concat(
-						action.removedClientIds.map(
-							( clientId ) => 'controlled||' + clientId
-						)
-					)
-					.forEach( ( key ) => {
-						newState.tree.delete( key );
-					} );
+				action.removedClientIds.forEach( ( clientId ) => {
+					newState.tree.delete( clientId );
+					newState.tree.delete( 'controlled||' + clientId );
+				} );
 				updateParentInnerBlocksInTree(
 					newState,
 					parentsOfRemovedBlocks,
@@ -1760,24 +1750,37 @@ export const blockListSettings = ( state = {}, action ) => {
 			);
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const { clientId } = action;
-			if ( ! action.settings ) {
-				if ( state.hasOwnProperty( clientId ) ) {
-					const { [ clientId ]: removedBlock, ...restBlocks } = state;
-					return restBlocks;
+			const updates =
+				typeof action.clientId === 'string'
+					? { [ action.clientId ]: action.settings }
+					: action.clientId;
+
+			// Remove settings that are the same as the current state.
+			for ( const clientId in updates ) {
+				if ( ! updates[ clientId ] ) {
+					if ( ! state[ clientId ] ) {
+						delete updates[ clientId ];
+					}
+				} else if (
+					fastDeepEqual( state[ clientId ], updates[ clientId ] )
+				) {
+					delete updates[ clientId ];
 				}
+			}
 
+			if ( Object.keys( updates ).length === 0 ) {
 				return state;
 			}
 
-			if ( fastDeepEqual( state[ clientId ], action.settings ) ) {
-				return state;
+			const merged = { ...state, ...updates };
+
+			for ( const clientId in updates ) {
+				if ( ! updates[ clientId ] ) {
+					delete merged[ clientId ];
+				}
 			}
 
-			return {
-				...state,
-				[ clientId ]: action.settings,
-			};
+			return merged;
 		}
 	}
 	return state;
@@ -1880,6 +1883,27 @@ export function highlightedBlock( state, action ) {
 			}
 
 			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning current expanded block in the list view.
+ *
+ * @param {string|null} state  Current expanded block.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function expandedBlock( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_BLOCK_EXPANDED_IN_LIST_VIEW':
+			return action.clientId;
 		case 'SELECT_BLOCK':
 			if ( action.clientId !== state ) {
 				return null;
@@ -2064,6 +2088,7 @@ const combinedReducers = combineReducers( {
 	lastFocus,
 	editorMode,
 	hasBlockMovingClientId,
+	expandedBlock,
 	highlightedBlock,
 	lastBlockInserted,
 	temporarilyEditingAsBlocks,

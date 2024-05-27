@@ -3,10 +3,12 @@
  */
 import normaliseBlocks from './normalise-blocks';
 
-export default function blockquoteNormaliser( node ) {
-	if ( node.nodeName !== 'BLOCKQUOTE' ) {
-		return;
-	}
+export default function blockquoteNormaliser( options ) {
+	return ( node ) => {
+		if ( node.nodeName !== 'BLOCKQUOTE' ) {
+			return;
+		}
 
-	node.innerHTML = normaliseBlocks( node.innerHTML );
+		node.innerHTML = normaliseBlocks( node.innerHTML, options );
+	};
 }

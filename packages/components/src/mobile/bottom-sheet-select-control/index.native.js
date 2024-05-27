@@ -10,11 +10,16 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { BottomSheet } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
+import BottomSheet from '../bottom-sheet';
+
+const EMPTY_OPTION = {
+	label: '',
+};
 
 const BottomSheetSelectControl = ( {
 	label,
@@ -34,9 +39,9 @@ const BottomSheetSelectControl = ( {
 		};
 	};
 
-	const selectedOption = items.find(
-		( option ) => option.value === selectedValue
-	);
+	const selectedOption =
+		items.find( ( option ) => option.value === selectedValue ) ??
+		EMPTY_OPTION;
 
 	const goBack = () => {
 		setShowSubSheet( false );

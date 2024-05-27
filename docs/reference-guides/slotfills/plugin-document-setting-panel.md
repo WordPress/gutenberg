@@ -13,7 +13,7 @@ This SlotFill allows registering a UI to edit Document settings.
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 
 const PluginDocumentSettingPanelDemo = () => (
 	<PluginDocumentSettingPanel
@@ -33,7 +33,7 @@ registerPlugin( 'plugin-document-setting-panel-demo', {
 
 ## Accessing a panel programmatically
 
-Core and custom panels can be access programmatically using their panel name. The core panel names are:
+Core and custom panels can be accessed programmatically using their panel name. The core panel names are:
 
 -   Summary Panel: `post-status`
 -   Categories Panel: `taxonomy-panel-category`

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,14 @@ import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 
+/**
+ * Renders a raw post title input field.
+ *
+ * @param {Object}  _            Unused parameter.
+ * @param {Element} forwardedRef Reference to the component's DOM node.
+ *
+ * @return {Component} The rendered component.
+ */
 function PostTitleRaw( _, forwardedRef ) {
 	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -51,7 +59,7 @@ function PostTitleRaw( _, forwardedRef ) {
 
 	// The wp-block className is important for editor styles.
 	// This same block is used in both the visual and the code editor.
-	const className = classnames( DEFAULT_CLASSNAMES, {
+	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'is-raw-text': true,

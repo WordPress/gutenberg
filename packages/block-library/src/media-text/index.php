@@ -8,6 +8,8 @@
 /**
  * Renders the `core/media-text` block on server.
  *
+ * @since 6.6.0
+ *
  * @param array  $attributes The block attributes.
  * @param string $content    The block rendered content.
  *
@@ -46,6 +48,7 @@ function render_block_core_media_text( $attributes, $content ) {
 	}
 	$processor->set_attribute( 'src', esc_url( $current_featured_image ) );
 	$processor->set_attribute( 'class', 'wp-image-' . get_post_thumbnail_id() . ' size-' . $media_size_slug );
+	$processor->set_attribute( 'alt', trim( strip_tags( get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true ) ) ) );
 
 	$content = $processor->get_updated_html();
 
@@ -54,6 +57,8 @@ function render_block_core_media_text( $attributes, $content ) {
 
 /**
  * Registers the `core/media-text` block renderer on server.
+ *
+ * @since 6.6.0
  */
 function register_block_core_media_text() {
 	register_block_type_from_metadata(

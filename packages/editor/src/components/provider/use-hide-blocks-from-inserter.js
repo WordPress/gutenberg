@@ -18,8 +18,9 @@ const POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART = [
  * the template part and post content blocks need to be hidden.
  *
  * @param {string} postType Post Type
+ * @param {string} mode     Rendering mode
  */
-export function useHideBlocksFromInserter( postType ) {
+export function useHideBlocksFromInserter( postType, mode ) {
 	useEffect( () => {
 		/*
 		 * Prevent adding template part in the editor.
@@ -32,7 +33,8 @@ export function useHideBlocksFromInserter( postType ) {
 					! POST_TYPES_ALLOWING_POST_CONTENT_TEMPLATE_PART.includes(
 						postType
 					) &&
-					blockType.name === 'core/template-part'
+					blockType.name === 'core/template-part' &&
+					mode === 'post-only'
 				) {
 					return false;
 				}
@@ -77,5 +79,5 @@ export function useHideBlocksFromInserter( postType ) {
 				'removePostContentFromInserter'
 			);
 		};
-	}, [ postType ] );
+	}, [ postType, mode ] );
 }
