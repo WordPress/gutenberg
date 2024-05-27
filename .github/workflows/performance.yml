@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
     performance:
+        timeout-minutes: 60
         name: Run performance tests
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
