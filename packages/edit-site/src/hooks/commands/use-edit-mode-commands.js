@@ -4,7 +4,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import {
-	edit,
 	trash,
 	rotateLeft,
 	rotateRight,
@@ -13,7 +12,6 @@ import {
 	drawerLeft,
 	drawerRight,
 	blockDefault,
-	symbol,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -30,9 +28,8 @@ import { store as editSiteStore } from '../../store';
 import useEditedEntityRecord from '../../components/use-edited-entity-record';
 import isTemplateRemovable from '../../utils/is-template-removable';
 import isTemplateRevertable from '../../utils/is-template-revertable';
-import { PATTERN_MODALS } from '../../components/pattern-modal';
 import { unlock } from '../../lock-unlock';
-import { PATTERN_TYPES, TEMPLATE_POST_TYPE } from '../../utils/constants';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { useLink } from '../../components/routes/link';
 
 const { interfaceStore } = unlock( editorPrivateApis );
@@ -225,56 +222,16 @@ function useEditUICommands() {
 	};
 }
 
-function usePatternCommands() {
-	const { isLoaded, record: pattern } = useEditedEntityRecord();
-	const { openModal } = useDispatch( interfaceStore );
-
-	if ( ! isLoaded ) {
-		return { isLoading: true, commands: [] };
-	}
-
-	const commands = [];
-
-	if ( pattern?.type === PATTERN_TYPES.user ) {
-		commands.push( {
-			name: 'core/rename-pattern',
-			label: __( 'Rename pattern' ),
-			icon: edit,
-			callback: ( { close } ) => {
-				openModal( PATTERN_MODALS.rename );
-				close();
-			},
-		} );
-		commands.push( {
-			name: 'core/duplicate-pattern',
-			label: __( 'Duplicate pattern' ),
-			icon: symbol,
-			callback: ( { close } ) => {
-				openModal( PATTERN_MODALS.duplicate );
-				close();
-			},
-		} );
-	}
-
-	return { isLoading: false, commands };
-}
-
 export function useEditModeCommands() {
 	useCommandLoader( {
 		name: 'core/edit-site/page-content-focus',
 		hook: usePageContentFocusCommands,
-		context: 'site-editor-edit',
+		context: 'entity-edit',
 	} );
 
 	useCommandLoader( {
 		name: 'core/edit-site/manipulate-document',
 		hook: useManipulateDocumentCommands,
-	} );
-
-	useCommandLoader( {
-		name: 'core/edit-site/patterns',
-		hook: usePatternCommands,
-		context: 'site-editor-edit',
 	} );
 
 	useCommandLoader( {

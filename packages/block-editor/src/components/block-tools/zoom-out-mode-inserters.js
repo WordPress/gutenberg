@@ -51,8 +51,7 @@ function ZoomOutModeInserters() {
 		}
 		// reset insertion point when the block order changes
 		setInserterIsOpened( true );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ blockOrder ] );
+	}, [ blockOrder, setInserterIsOpened ] );
 
 	// Defer the initial rendering to avoid the jumps due to the animation.
 	useEffect( () => {

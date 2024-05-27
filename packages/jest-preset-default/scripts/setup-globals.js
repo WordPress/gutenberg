@@ -1,5 +1,6 @@
 // Run all tests with development tools enabled.
-global.SCRIPT_DEBUG = true;
+// eslint-disable-next-line @wordpress/wp-global-usage
+globalThis.SCRIPT_DEBUG = true;
 
 // These are necessary to load TinyMCE successfully.
 global.URL = window.URL;

@@ -396,7 +396,7 @@ export const editEntityRecord =
 			}, {} ),
 		};
 		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			if ( process.env.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 				const objectId = entityConfig.getSyncObjectId( recordId );
 				getSyncProvider().update(
 					entityConfig.syncObjectType + '--edit',
