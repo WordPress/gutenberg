@@ -42,4 +42,15 @@ function PostPingbacks() {
 	);
 }
 
+/**
+ * A checkbox control for enabling or disabling pingbacks and trackbacks in a WordPress post.
+ *
+ * The checkbox's checked state is determined by the post's current `ping_status` attribute, which is retrieved from the WordPress data store using the `useSelect` hook.
+ *
+ * When the checkbox is toggled, the `onTogglePingback` function is called, which dispatches an `editPost` action to the WordPress data store with the new `ping_status` value. If the current `ping_status` is 'open', it is set to 'closed', and vice versa.
+ *
+ * The checkbox control also includes a help link that directs the user to a WordPress documentation page about pingbacks and trackbacks.
+ *
+ * @module PostPingbacks
+ */
 export default PostPingbacks;
