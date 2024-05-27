@@ -20,7 +20,8 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
@@ -69,7 +70,6 @@
 		"@wordpress/widgets": "file:../widgets",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
-		"client-zip": "^2.4.4",
 		"clsx": "^2.1.1",
 		"colord": "^2.9.2",
 		"fast-deep-equal": "^3.1.3",

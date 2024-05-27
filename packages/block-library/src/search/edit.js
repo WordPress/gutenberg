@@ -112,13 +112,19 @@ export default function SearchEdit( {
 	] );
 
 	const borderRadius = style?.border?.radius;
-	const borderProps = useBorderProps( attributes );
+	let borderProps = useBorderProps( attributes );
 
 	// Check for old deprecated numerical border radius. Done as a separate
 	// check so that a borderRadius style won't overwrite the longhand
 	// per-corner styles.
 	if ( typeof borderRadius === 'number' ) {
-		borderProps.style.borderRadius = `${ borderRadius }px`;
+		borderProps = {
+			...borderProps,
+			style: {
+				...borderProps.style,
+				borderRadius: `${ borderRadius }px`,
+			},
+		};
 	}
 
 	const colorProps = useColorProps( attributes );

@@ -13,7 +13,12 @@ import { addQueryArgs } from '@wordpress/url';
 import PostLastRevisionCheck from './check';
 import { store as editorStore } from '../../store';
 
-function LastRevision() {
+/**
+ * Renders the component for displaying the last revision of a post.
+ *
+ * @return {Component} The component to be rendered.
+ */
+function PostLastRevision() {
 	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
 		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
 			select( editorStore );
@@ -42,4 +47,4 @@ function LastRevision() {
 	);
 }
 
-export default LastRevision;
+export default PostLastRevision;

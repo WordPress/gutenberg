@@ -37,21 +37,13 @@ import type {
 	AnyItem,
 	NormalizedField,
 	ViewList as ViewListType,
+	ViewProps,
 } from './types';
 
 import { ActionsDropdownMenuGroup, ActionModal } from './item-actions';
 
-interface ListViewProps< Item extends AnyItem > {
-	actions: Action< Item >[];
-	data: Item[];
-	fields: NormalizedField< Item >[];
-	getItemId: ( item: Item ) => string;
-	id: string;
-	isLoading: boolean;
-	onSelectionChange: ( selection: Item[] ) => void;
-	selection: string[];
-	view: ViewListType;
-}
+interface ViewListProps< Item extends AnyItem >
+	extends ViewProps< Item, ViewListType > {}
 
 interface ListViewItemProps< Item extends AnyItem > {
 	actions: Action< Item >[];
@@ -137,7 +129,8 @@ function ListItem< Item extends AnyItem >( {
 		>
 			<HStack
 				className="dataviews-view-list__item-wrapper"
-				alignment="top"
+				alignment="center"
+				spacing={ 0 }
 			>
 				<div role="gridcell">
 					<CompositeItem
@@ -161,7 +154,7 @@ function ListItem< Item extends AnyItem >( {
 									<div className="dataviews-view-list__media-placeholder"></div>
 								) }
 							</div>
-							<VStack spacing={ 1 }>
+							<VStack spacing={ 0 }>
 								<span
 									className="dataviews-view-list__primary-field"
 									id={ labelId }
@@ -311,7 +304,7 @@ function ListItem< Item extends AnyItem >( {
 }
 
 export default function ViewList< Item extends AnyItem >(
-	props: ListViewProps< Item >
+	props: ViewListProps< Item >
 ) {
 	const {
 		actions,

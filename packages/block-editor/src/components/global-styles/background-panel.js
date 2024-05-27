@@ -38,6 +38,7 @@ import { TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
+import { getResolvedThemeFilePath } from './theme-file-uri-utils';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 const DEFAULT_CONTROLS = {
@@ -82,6 +83,8 @@ export function hasBackgroundSizeValue( style ) {
 export function hasBackgroundImageValue( style ) {
 	return (
 		!! style?.background?.backgroundImage?.id ||
+		// Supports url() string values in theme.json.
+		'string' === typeof style?.background?.backgroundImage ||
 		!! style?.background?.backgroundImage?.url
 	);
 }
@@ -191,6 +194,7 @@ function BackgroundImageToolsPanelItem( {
 	onChange,
 	style,
 	inheritedValue,
+	themeFileURIs,
 } ) {
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
@@ -277,6 +281,23 @@ function BackgroundImageToolsPanelItem( {
 
 	const hasValue = hasBackgroundImageValue( style );
 
+	const closeAndFocus = () => {
+		const [ toggleButton ] = focus.tabbable.find(
+			replaceContainerRef.current
+		);
+		// Focus the toggle button and close the dropdown menu.
+		// This ensures similar behaviour as to selecting an image, where the dropdown is
+		// closed and focus is redirected to the dropdown toggle button.
+		toggleButton?.focus();
+		toggleButton?.click();
+	};
+
+	const onRemove = () =>
+		onChange(
+			setImmutably( style, [ 'background', 'backgroundImage' ], 'none' )
+		);
+	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+
 	return (
 		<ToolsPanelItem
 			className="single-column"
@@ -301,22 +322,28 @@ function BackgroundImageToolsPanelItem( {
 						<InspectorImagePreview
 							label={ title }
 							filename={ title || __( 'Untitled' ) }
-							url={ url }
+							url={ getResolvedThemeFilePath(
+								url,
+								themeFileURIs
+							) }
 						/>
 					}
 					variant="secondary"
 				>
+					{ canRemove && (
+						<MenuItem
+							onClick={ () => {
+								closeAndFocus();
+								onRemove();
+							} }
+						>
+							{ __( 'Remove' ) }
+						</MenuItem>
+					) }
 					{ hasValue && (
 						<MenuItem
 							onClick={ () => {
-								const [ toggleButton ] = focus.tabbable.find(
-									replaceContainerRef.current
-								);
-								// Focus the toggle button and close the dropdown menu.
-								// This ensures similar behaviour as to selecting an image, where the dropdown is
-								// closed and focus is redirected to the dropdown toggle button.
-								toggleButton?.focus();
-								toggleButton?.click();
+								closeAndFocus();
 								resetBackgroundImage();
 							} }
 						>
@@ -340,6 +367,7 @@ function BackgroundSizeToolsPanelItem( {
 	style,
 	inheritedValue,
 	defaultValues,
+	themeFileURIs,
 } ) {
 	const sizeValue =
 		style?.background?.backgroundSize ||
@@ -468,7 +496,7 @@ function BackgroundSizeToolsPanelItem( {
 			<FocalPointPicker
 				__next40pxDefaultSize
 				label={ __( 'Position' ) }
-				url={ imageValue }
+				url={ getResolvedThemeFilePath( imageValue, themeFileURIs ) }
 				value={ backgroundPositionToCoords( positionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
@@ -553,6 +581,7 @@ export default function BackgroundPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
 	headerLabel = __( 'Background image' ),
+	themeFileURIs,
 } ) {
 	const resetAllFilter = useCallback( ( previousValue ) => {
 		return {
@@ -577,6 +606,7 @@ export default function BackgroundPanel( {
 				isShownByDefault={ defaultControls.backgroundImage }
 				style={ value }
 				inheritedValue={ inheritedValue }
+				themeFileURIs={ themeFileURIs }
 			/>
 			{ shouldShowBackgroundSizeControls && (
 				<BackgroundSizeToolsPanelItem
@@ -586,6 +616,7 @@ export default function BackgroundPanel( {
 					style={ value }
 					inheritedValue={ inheritedValue }
 					defaultValues={ defaultValues }
+					themeFileURIs={ themeFileURIs }
 				/>
 			) }
 		</Wrapper>

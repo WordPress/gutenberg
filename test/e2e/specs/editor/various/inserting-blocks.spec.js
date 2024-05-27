@@ -265,7 +265,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'Create pattern',
+			name: 'add new pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -274,7 +274,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.getByRole( 'checkbox', { name: 'Synced' } )
 			.setChecked( true );
 		await createPatternDialog
-			.getByRole( 'button', { name: 'Create' } )
+			.getByRole( 'button', { name: 'Add' } )
 			.click();
 		const patternBlock = page.getByRole( 'document', {
 			name: 'Block: Pattern',
@@ -636,7 +636,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			page.getByRole( 'region', {
 				name: 'Block Library',
 			} )
-		).toBeVisible();
+		).toBeHidden();
 	} );
 
 	test( 'shows block preview when hovering over block in inserter', async ( {

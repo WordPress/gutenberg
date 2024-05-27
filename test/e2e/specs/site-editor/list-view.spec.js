@@ -12,13 +12,13 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
+	test.beforeEach( async ( { admin } ) => {
 		// Select a template part with a few blocks.
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//header',
 			postType: 'wp_template_part',
+			canvas: 'edit',
 		} );
-		await editor.canvas.locator( 'body' ).click();
 	} );
 
 	test( 'should open by default when preference is enabled', async ( {

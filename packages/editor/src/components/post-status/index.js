@@ -281,7 +281,9 @@ export default function PostStatus() {
 					) }
 				/>
 			) : (
-				<div className="editor-post-status">{ labels[ status ] }</div>
+				<div className="editor-post-status is-read-only">
+					{ labels[ status ] }
+				</div>
 			) }
 		</PostPanelRow>
 	);

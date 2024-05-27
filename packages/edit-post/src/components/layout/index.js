@@ -12,7 +12,6 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
-	EditorKeyboardShortcuts,
 	EditorSnackbars,
 	store as editorStore,
 	privateApis as editorPrivateApis,
@@ -24,7 +23,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ScrollLock } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -40,7 +38,6 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import InitPatternModal from '../init-pattern-modal';
@@ -64,6 +61,7 @@ const {
 	InterfaceSkeleton,
 	interfaceStore,
 	Sidebar,
+	TextEditor,
 } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 
@@ -206,7 +204,7 @@ function Layout( { initialPost } ) {
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
-		: 'post-editor-edit';
+		: 'entity-edit';
 	useCommandContext( commandContext );
 
 	const styles = useEditorStyles();
@@ -335,7 +333,6 @@ function Layout( { initialPost } ) {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
-			<EditorKeyboardShortcuts />
 			<BlockKeyboardShortcuts />
 
 			<InterfaceSkeleton
@@ -367,7 +364,9 @@ function Layout( { initialPost } ) {
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
 						) }
-						{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
+						{ ! isLargeViewport && mode === 'visual' && (
+							<BlockToolbar hideDragHandle />
+						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
 							<VisualEditor styles={ styles } />
 						) }
@@ -376,9 +375,6 @@ function Layout( { initialPost } ) {
 								<MetaBoxes location="normal" />
 								<MetaBoxes location="advanced" />
 							</div>
-						) }
-						{ isMobileViewport && sidebarIsOpened && (
-							<ScrollLock />
 						) }
 					</>
 				}

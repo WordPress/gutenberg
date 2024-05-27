@@ -54,10 +54,10 @@ test.describe( 'Site editor url navigation', () => {
 	} ) => {
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Patterns"i]' );
-		await page.click( 'role=button[name="Create pattern"i]' );
+		await page.click( 'role=button[name="add new pattern"i]' );
 		await page
-			.getByRole( 'menu', { name: 'Create pattern' } )
-			.getByRole( 'menuitem', { name: 'Create template part' } )
+			.getByRole( 'menu', { name: 'add new pattern' } )
+			.getByRole( 'menuitem', { name: 'add new template part' } )
 			.click();
 		// Fill in a name in the dialog that pops up.
 		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Demo' );
@@ -87,9 +87,8 @@ test.describe( 'Site editor url navigation', () => {
 			page.getByRole( 'region', { name: 'Editor content' } )
 		).toBeVisible();
 		await page.getByRole( 'button', { name: 'Open navigation' } ).click();
-		await navigation.getByRole( 'button', { name: 'Back' } ).click();
 		await expect(
-			navigation.getByRole( 'button', { name: 'General' } )
-		).toHaveAttribute( 'aria-current', 'true' );
+			navigation.getByRole( 'button', { name: 'All template parts' } )
+		).toBeVisible();
 	} );
 } );
