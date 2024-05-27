@@ -16,7 +16,7 @@ const MyLoadingComponent = () => {
 }
 ```
 
-You can also make it controlled by passing a `value` (from 0 to 100) representing the progress:
+You can also make it determinate by passing a `value` (from 0 to 100) representing the progress:
 
 ```jsx
 import { ProgressBar } from '@wordpress/components';
