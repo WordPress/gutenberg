@@ -39,3 +39,32 @@ store( '{}', {
 		url: '/other-store-url',
 	},
 } );
+
+store( 'true', {
+	state: {
+		url: '/some-url',
+	},
+} );
+
+store( 'false', {
+	state: {
+		url: '/some-url',
+	},
+} );
+
+store( '[]', {
+	state: {
+		url: '/some-url',
+	},
+} );
+
+store( '"quoted string"', {
+	state: {
+		url: '/some-url',
+	},
+} );
+
+
+
+
+

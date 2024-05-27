@@ -29,3 +29,17 @@
 <div data-wp-interactive>
 	<a data-wp-bind--href="other::state.url" data-testid="other namespace"></a>
 </div>
+
+<div data-wp-interactive="true">
+	<a data-wp-bind--href="state.url" data-testid="true namespace"></a>
+</div>
+
+<div data-wp-interactive="false">
+	<a data-wp-bind--href="state.url" data-testid="false namespace"></a>
+</div>
+<div data-wp-interactive="[]">
+	<a data-wp-bind--href="state.url" data-testid="[] namespace"></a>
+</div>
+<div data-wp-interactive='"quoted string"'>
+	<a data-wp-bind--href="state.url" data-testid="quoted namespace"></a>
+</div>

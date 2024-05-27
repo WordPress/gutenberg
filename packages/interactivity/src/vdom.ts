@@ -102,7 +102,7 @@ export function toVdom( root: Node ): Array< ComponentChild > {
 					try {
 						const parsedValue = JSON.parse( value );
 						value = isObject( parsedValue ) ? parsedValue : value;
-					} catch ( e ) {}
+					} catch {}
 					if ( attributeName === islandAttr ) {
 						island = true;
 						const islandNamespace =

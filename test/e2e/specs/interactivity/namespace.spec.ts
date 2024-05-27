@@ -60,4 +60,28 @@ test.describe( 'Namespaces', () => {
 		const el = page.getByTestId( 'null namespace' );
 		await expect( el ).toHaveAttribute( 'href', '/some-url' );
 	} );
+
+	test( 'A true as a string as namespace should work', async ( { page } ) => {
+		const el = page.getByTestId( 'true namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
+	} );
+
+	test( 'A false as a string as namespace should work', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'false namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
+	} );
+
+	test( 'A [] as a string as namespace should work', async ( { page } ) => {
+		const el = page.getByTestId( '[] namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
+	} );
+
+	test( 'A "quoted string" as a string as namespace should work', async ( {
+		page,
+	} ) => {
+		const el = page.getByTestId( 'quoted namespace' );
+		await expect( el ).toHaveAttribute( 'href', '/some-url' );
+	} );
 } );
