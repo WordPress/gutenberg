@@ -6,13 +6,13 @@ import { store } from '@wordpress/interactivity';
 
 store( '', {
 	state: {
-		url: '/some-url',
+		url: '/empty-string-url',
 	},
 } );
 
 store( 'namespace', {
 	state: {
-		url: '/some-url',
+		url: '/namespace-url',
 	},
 } );
 
@@ -24,43 +24,43 @@ store( 'other', {
 
 store( 'null', {
 	state: {
-		url: '/some-url',
+		url: '/null-url',
 	},
 } );
 
 store( '2', {
 	state: {
-		url: '/some-url',
+		url: '/number-url',
 	},
 } );
 
 store( '{}', {
 	state: {
-		url: '/other-store-url',
+		url: '/object-url',
 	},
 } );
 
 store( 'true', {
 	state: {
-		url: '/some-url',
+		url: '/true-url',
 	},
 } );
 
 store( 'false', {
 	state: {
-		url: '/some-url',
+		url: '/false-url',
 	},
 } );
 
 store( '[]', {
 	state: {
-		url: '/some-url',
+		url: '/array-url',
 	},
 } );
 
 store( '"quoted string"', {
 	state: {
-		url: '/some-url',
+		url: '/quoted-url',
 	},
 } );
 
