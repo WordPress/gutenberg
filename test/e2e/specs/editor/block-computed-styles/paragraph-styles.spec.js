@@ -157,8 +157,8 @@ test.describe( 'Paragraph computed styles', () => {
 	test( 'Typography', async ( { admin, editor, requestUtils } ) => {
 		const globalElementStyles = {
 			typography: {
-				fontWeight: '100',
 				fontSize: '11px',
+				fontWeight: '100',
 				textTransform: 'uppercase',
 				letterSpacing: '1.1px',
 				lineHeight: '1.1',
@@ -182,8 +182,8 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			await expect( block ).toHaveCSS( 'font-weight', '100' );
 			await expect( block ).toHaveCSS( 'font-size', '11px' );
+			await expect( block ).toHaveCSS( 'font-weight', '100' );
 			await expect( block ).toHaveCSS( 'text-transform', 'uppercase' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.1px' );
 			await expect( block ).toHaveCSS( 'line-height', '12.1px' );
@@ -192,8 +192,8 @@ test.describe( 'Paragraph computed styles', () => {
 		await test.step( 'Global block styles', async () => {
 			const styles = {
 				typography: {
-					fontWeight: '200',
 					fontSize: '12px',
+					fontWeight: '200',
 					textTransform: 'lowercase',
 					letterSpacing: '1.2px',
 					textDecoration: 'underline',
@@ -222,8 +222,8 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
-			await expect( block ).toHaveCSS( 'font-weight', '200' );
 			await expect( block ).toHaveCSS( 'font-size', '12px' );
+			await expect( block ).toHaveCSS( 'font-weight', '200' );
 			await expect( block ).toHaveCSS( 'text-transform', 'lowercase' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.2px' );
 			await expect( block ).toHaveCSS(
@@ -236,6 +236,7 @@ test.describe( 'Paragraph computed styles', () => {
 		await test.step( 'Block instance styles', async () => {
 			const style = {
 				typography: {
+					fontSize: '13px',
 					fontWeight: '300',
 					textTransform: 'capitalize',
 					textDecoration: 'line-through',
@@ -250,7 +251,6 @@ test.describe( 'Paragraph computed styles', () => {
 				attributes: {
 					content: 'Hello',
 					style,
-					fontSize: '13px',
 				},
 			} );
 
@@ -258,15 +258,15 @@ test.describe( 'Paragraph computed styles', () => {
 				name: 'Block: Paragraph',
 			} );
 
+			await expect( block ).toHaveCSS( 'font-size', '13px' );
 			await expect( block ).toHaveCSS( 'font-weight', '300' );
-			await expect( block ).toHaveCSS( 'font-size', '12px' );
 			await expect( block ).toHaveCSS( 'text-transform', 'capitalize' );
 			await expect( block ).toHaveCSS( 'letter-spacing', '1.3px' );
 			await expect( block ).toHaveCSS(
 				'text-decoration-line',
 				'line-through'
 			);
-			await expect( block ).toHaveCSS( 'line-height', '15.6px' );
+			await expect( block ).toHaveCSS( 'line-height', '16.9px' );
 		} );
 	} );
 
