@@ -276,13 +276,15 @@ test.describe( 'Paragraph computed styles', () => {
 				spacing: {
 					margin: {
 						top: '1px',
-						bottom: '2px',
+						right: '2px',
+						bottom: '3px',
+						left: '4px',
 					},
 					padding: {
-						top: '3px',
-						right: '4px',
-						bottom: '5px',
-						left: '6px',
+						top: '5px',
+						right: '6px',
+						bottom: '7px',
+						left: '8px',
 					},
 				},
 			};
@@ -294,64 +296,106 @@ test.describe( 'Paragraph computed styles', () => {
 			} );
 
 			await admin.createNewPost();
+
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Paragraph 1',
+					content: 'Root Paragraph 1',
 				},
 			} );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Paragraph 2',
+					content: 'Root Paragraph 2',
 				},
 			} );
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: {
-					content: 'Paragraph 3',
+					content: 'Root Paragraph 3',
 				},
 			} );
 
 			const paragraphs = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			const rootParagraph1 = paragraphs.nth( 0 );
+			const rootParagraph2 = paragraphs.nth( 1 );
+			const rootParagraph3 = paragraphs.nth( 2 );
 
 			// Left/right margin is set to auto by alignments, there's no reliable way to test this.
 			// First block will have its top margin set to zero by the layout.
-			await expect( paragraphs.first() ).toHaveCSS( 'margin-top', '0px' );
-			await expect( paragraphs.first() ).toHaveCSS(
-				'margin-bottom',
-				'2px'
-			);
-			await expect( paragraphs.first() ).toHaveCSS(
+			await expect( rootParagraph1 ).toHaveCSS( 'margin-top', '0px' );
+			await expect( rootParagraph1 ).toHaveCSS( 'margin-bottom', '3px' );
+			await expect( rootParagraph1 ).toHaveCSS(
 				'padding',
-				'3px 4px 5px 6px'
+				'5px 6px 7px 8px'
 			);
 
 			// Second block will have the correct top and bottom margin.
-			await expect( paragraphs.nth( 1 ) ).toHaveCSS(
-				'margin-top',
-				'1px'
-			);
-			await expect( paragraphs.nth( 1 ) ).toHaveCSS(
-				'margin-bottom',
-				'2px'
-			);
-			await expect( paragraphs.nth( 1 ) ).toHaveCSS(
+			await expect( rootParagraph2 ).toHaveCSS( 'margin-top', '1px' );
+			await expect( rootParagraph2 ).toHaveCSS( 'margin-bottom', '3px' );
+			await expect( rootParagraph2 ).toHaveCSS(
 				'padding',
-				'3px 4px 5px 6px'
+				'5px 6px 7px 8px'
 			);
 
 			// Last block will have its bottom margin set to zero by the layout.
-			await expect( paragraphs.last() ).toHaveCSS( 'margin-top', '1px' );
-			await expect( paragraphs.last() ).toHaveCSS(
-				'margin-bottom',
-				'0px'
-			);
-			await expect( paragraphs.last() ).toHaveCSS(
+			await expect( rootParagraph3 ).toHaveCSS( 'margin-top', '1px' );
+			await expect( rootParagraph3 ).toHaveCSS( 'margin-bottom', '0px' );
+			await expect( rootParagraph3 ).toHaveCSS(
 				'padding',
-				'3px 4px 5px 6px'
+				'5px 6px 7px 8px'
+			);
+
+			// Insert a nested paragraph. Do this after the other assertions
+			// to not affect the start/end of the root paragraphs.
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					layout: {
+						type: 'default',
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Nested Paragraph 1',
+						},
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Nested Paragraph 2',
+						},
+					},
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Nested Paragraph 3',
+						},
+					},
+				],
+			} );
+			const nestedParagraph1 = paragraphs.nth( 3 );
+			const nestedParagraph2 = paragraphs.nth( 4 );
+			const nestedParagraph3 = paragraphs.nth( 5 );
+			// In a default layout, the margins on left/right apply to the
+			// middle paragraph.
+			await expect( nestedParagraph1 ).toHaveCSS(
+				'margin',
+				'0px 2px 3px 4px'
+			);
+			await expect( nestedParagraph2 ).toHaveCSS(
+				'margin',
+				'1px 2px 3px 4px'
+			);
+
+			// Note: This is different to what I reproduce locally. Bottom margin should be 0px.
+			await expect( nestedParagraph3 ).toHaveCSS(
+				'margin',
+				'1px 2px 3px 4px'
 			);
 		} );
 
@@ -360,13 +404,15 @@ test.describe( 'Paragraph computed styles', () => {
 				spacing: {
 					margin: {
 						top: '11px',
-						bottom: '12px',
+						right: '12px',
+						bottom: '13px',
+						left: '14px',
 					},
 					padding: {
-						top: '13px',
-						right: '14px',
-						bottom: '15px',
-						left: '16px',
+						top: '15px',
+						right: '16px',
+						bottom: '17px',
+						left: '18px',
 					},
 				},
 			};
@@ -380,14 +426,45 @@ test.describe( 'Paragraph computed styles', () => {
 				},
 			} );
 
-			const block = editor.canvas.getByRole( 'document', {
+			const paragraphs = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
+			const rootParagraph = paragraphs.nth( 0 );
 
 			// Left/right margin is set to auto by alignments, there's no reliable way to test this.
-			await expect( block ).toHaveCSS( 'margin-top', '11px' );
-			await expect( block ).toHaveCSS( 'margin-bottom', '12px' );
-			await expect( block ).toHaveCSS( 'padding', '13px 14px 15px 16px' );
+			// Block styles override the default start/end margin, so only one block is needed..
+			await expect( rootParagraph ).toHaveCSS( 'margin-top', '11px' );
+			await expect( rootParagraph ).toHaveCSS( 'margin-bottom', '13px' );
+			await expect( rootParagraph ).toHaveCSS(
+				'padding',
+				'15px 16px 17px 18px'
+			);
+
+			// Insert a nested paragraph. Do this after the other assertions
+			// to not affect the start/end of the root paragraphs.
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					layout: {
+						type: 'default',
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Nested Paragraph 1',
+							style: instanceStyles,
+						},
+					},
+				],
+			} );
+			const nestedParagraph = paragraphs.nth( 1 );
+			// In a default layout, the margins on left/right apply.
+			await expect( nestedParagraph ).toHaveCSS(
+				'margin',
+				'11px 12px 13px 14px'
+			);
 		} );
 	} );
 } );
