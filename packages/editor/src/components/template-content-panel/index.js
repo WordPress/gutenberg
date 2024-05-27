@@ -13,6 +13,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import { store as editorStore } from '../../store';
 
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
@@ -22,11 +24,25 @@ const PAGE_CONTENT_BLOCKS = [
 	'core/post-title',
 ];
 
-export default function TemplateContentPanel() {
-	const clientIds = useSelect( ( select ) => {
+const TEMPLATE_PART_BLOCK = 'core/template-part';
+
+export default function TemplateContentPanel( renderingMode ) {
+	const { clientIds, postType } = useSelect( ( select ) => {
 		const { getBlocksByName } = select( blockEditorStore );
-		return getBlocksByName( PAGE_CONTENT_BLOCKS );
+		const { getCurrentPostType } = select( editorStore );
+		const _postType = getCurrentPostType();
+		return {
+			postType: _postType,
+			clientIds: getBlocksByName(
+				TEMPLATE_POST_TYPE === _postType
+					? TEMPLATE_PART_BLOCK
+					: PAGE_CONTENT_BLOCKS
+			),
+		};
 	}, [] );
+	if ( renderingMode !== 'post-only' && postType !== TEMPLATE_POST_TYPE ) {
+		return null;
+	}
 
 	return (
 		<PanelBody title={ __( 'Content' ) }>
