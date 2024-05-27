@@ -3,7 +3,13 @@
  */
 import type { RequestUtils } from './index';
 
-// https://developer.wordpress.org/rest-api/reference/themes/#definition
+/**
+ * Get the current user global styles post id.
+ *
+ * @see https://developer.wordpress.org/rest-api/reference/themes/#definition
+ * @param {RequestUtils} this RequestUtils.
+ * @return {Promise<string>} The user global styles post id.
+ */
 async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 	type ThemeItem = {
 		stylesheet: string;
@@ -30,6 +36,13 @@ async function getCurrentThemeGlobalStylesPostId( this: RequestUtils ) {
 	return themeGlobalStylesId;
 }
 
+/**
+ * Update the user's global styles. Note that this overwrites and previously
+ * set styles. Styles that you want to keep should be merged in manually.
+ *
+ * @param {RequestUtils} this   RequestUtils.
+ * @param {Object}       styles A theme.json compatible object.
+ */
 async function updateGlobalStyles( this: RequestUtils, styles: Object ) {
 	const globalStylesPostId = await this.getCurrentThemeGlobalStylesPostId();
 
@@ -45,9 +58,9 @@ async function updateGlobalStyles( this: RequestUtils, styles: Object ) {
 }
 
 /**
- * Deletes all post revisions using the REST API.
+ * List all post revisions using the REST API.
  *
- * @param {}              this     RequestUtils.
+ * @param {RequestUtils}  this     RequestUtils.
  * @param {string|number} parentId Post attributes.
  */
 async function getThemeGlobalStylesRevisions(
