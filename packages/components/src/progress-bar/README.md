@@ -13,7 +13,7 @@ import { ProgressBar } from '@wordpress/components';
 
 const MyLoadingComponent = () => {
 	return <ProgressBar />;
-}
+};
 ```
 
 You can also make it determinate by passing a `value` (from 0 to 100) representing the progress:
