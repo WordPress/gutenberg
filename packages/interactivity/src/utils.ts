@@ -334,6 +334,3 @@ export const warn = ( message: string ): void => {
 		logged.add( message );
 	}
 };
-
-export const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );

@@ -15,7 +15,8 @@ import {
 	setNamespace,
 	resetNamespace,
 } from './hooks';
-import { isObject } from './utils';
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 const deepMerge = ( target: any, source: any ) => {
 	if ( isObject( target ) && isObject( source ) ) {

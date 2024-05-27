@@ -6,13 +6,15 @@ import { h, type ComponentChild, type JSX } from 'preact';
  * Internal dependencies
  */
 import { directivePrefix as p } from './constants';
-import { warn, isObject } from './utils';
+import { warn } from './utils';
 
 const ignoreAttr = `data-${ p }-ignore`;
 const islandAttr = `data-${ p }-interactive`;
 const fullPrefix = `data-${ p }-`;
 const namespaces: Array< string | null > = [];
 const currentNamespace = () => namespaces[ namespaces.length - 1 ] ?? null;
+const isObject = ( item: unknown ): item is Record< string, unknown > =>
+	Boolean( item && typeof item === 'object' && item.constructor === Object );
 
 // Regular expression for directive parsing.
 const directiveParser = new RegExp(
