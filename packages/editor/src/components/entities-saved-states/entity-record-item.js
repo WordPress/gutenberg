@@ -56,7 +56,7 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 							size={ 24 }
 						/>
 						<span className="entities-saved-states__bindings-text">
-							{ __( 'Block Bindings.' ) }
+							{ __( 'Post Meta.' ) }
 						</span>
 					</Flex>
 				</PanelRow>
