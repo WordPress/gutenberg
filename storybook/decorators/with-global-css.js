@@ -10,6 +10,11 @@ import basicStyles from '../global-basic.lazy.scss';
 import wordPressStyles from '../global-wordpress.lazy.scss';
 
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * A Storybook decorator to inject global CSS.
  *
  * This helps test whether our components have sufficient styles to
@@ -54,7 +59,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	}, [ context.globals.css ] );
 
 	return (
-		<div className={ classes }>
+		<div className={ clsx( classes ) }>
 			{ externalStyles.map( ( stylesheet ) => (
 				<link key={ stylesheet } rel="stylesheet" href={ stylesheet } />
 			) ) }

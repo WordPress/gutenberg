@@ -14,9 +14,13 @@ export default function FocalPoint( {
 	top = '50%',
 	...props
 }: WordPressComponentProps< FocalPointProps, 'div' > ) {
-	const classes = 'components-focal-point-picker__icon_container';
-
 	const style = { left, top };
 
-	return <PointerCircle { ...props } className={ classes } style={ style } />;
+	return (
+		<PointerCircle
+			{ ...props }
+			className="components-focal-point-picker__icon_container"
+			style={ style }
+		/>
+	);
 }

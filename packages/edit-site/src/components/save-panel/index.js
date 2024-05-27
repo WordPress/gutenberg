@@ -151,7 +151,7 @@ export default function SavePanel() {
 			>
 				<Button
 					variant="secondary"
-					className={ 'edit-site-editor__toggle-save-panel-button' }
+					className="edit-site-editor__toggle-save-panel-button"
 					onClick={ () => setIsSaveViewOpened( true ) }
 					aria-haspopup={ 'dialog' }
 					disabled={ disabled }
