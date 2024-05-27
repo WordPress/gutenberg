@@ -4,6 +4,8 @@ export * from './utils/create-higher-order-component';
 export * from './utils/debounce';
 // The `throttle` helper and its types.
 export * from './utils/throttle';
+// The `ObservableMap` data structure
+export * from './utils/observable-map';
 
 // The `compose` and `pipe` helpers (inspired by `flowRight` and `flow` from Lodash).
 export { default as compose } from './higher-order/compose';
@@ -39,3 +41,4 @@ export { default as useThrottle } from './hooks/use-throttle';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
 export { default as useRefEffect } from './hooks/use-ref-effect';
 export { default as useNetworkConnectivity } from './hooks/use-network-connectivity';
+export { default as useObservableValue } from './hooks/use-observable-value';

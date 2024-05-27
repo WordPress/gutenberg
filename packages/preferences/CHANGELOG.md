@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+
+## 3.35.0 (2024-05-16)
+
+### Internal
+
+-   Replaced `classnames` package with the faster and smaller `clsx` package ([#61138](https://github.com/WordPress/gutenberg/pull/61138)).
+
+## 3.34.0 (2024-05-02)
+
+## 3.33.0 (2024-04-19)
+
 ## 3.32.0 (2024-04-03)
 
 ## 3.31.0 (2024-03-21)

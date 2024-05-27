@@ -41,8 +41,8 @@ test.describe( 'Block bindings', () => {
 			await admin.visitSiteEditor( {
 				postId: 'emptytheme//index',
 				postType: 'wp_template',
+				canvas: 'edit',
 			} );
-			await editor.canvas.locator( 'body' ).click();
 			await editor.openDocumentSettingsSidebar();
 		} );
 
@@ -1934,7 +1934,7 @@ class BlockBindingsUtils {
 	async updatePost() {
 		await this.page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'Update' } )
+			.getByRole( 'button', { name: 'Save' } )
 			.click();
 		await this.page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )

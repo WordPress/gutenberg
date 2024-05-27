@@ -2,8 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { useMemo, useState, Fragment, Children } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -11,6 +10,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { moreVertical } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -18,102 +18,65 @@ import { moreVertical } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 import { store as editorStore } from '../../store';
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-} from '../../store/constants';
 
 const {
 	DropdownMenuV2: DropdownMenu,
 	DropdownMenuGroupV2: DropdownMenuGroup,
 	DropdownMenuItemV2: DropdownMenuItem,
 	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	DropdownMenuSeparatorV2: DropdownMenuSeparator,
 	kebabCase,
 } = unlock( componentsPrivateApis );
 
-const POST_ACTIONS_WHILE_EDITING = [
-	'view-post',
-	'view-post-revisions',
-	'rename-post',
-	'move-to-trash',
-];
-
-export default function PostActions( { onActionPerformed } ) {
-	const { postType, postId } = useSelect( ( select ) => {
+export default function PostActions( { onActionPerformed, buttonProps } ) {
+	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
+	const { item, postType } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
+		const { getEditedEntityRecord } = select( coreStore );
+		const _postType = getCurrentPostType();
 		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
+			item: getEditedEntityRecord(
+				'postType',
+				_postType,
+				getCurrentPostId()
+			),
+			postType: _postType,
 		};
-	} );
-	const actions = usePostActions(
-		onActionPerformed,
-		POST_ACTIONS_WHILE_EDITING
-	);
-	const item = useSelect(
-		( select ) => {
-			const { getEditedEntityRecord } = select( coreStore );
-			return getEditedEntityRecord( 'postType', postType, postId );
-		},
-		[ postType, postId ]
-	);
+	}, [] );
+	const allActions = usePostActions( postType, onActionPerformed );
 
-	const { primaryActions, secondaryActions } = useMemo( () => {
-		return actions.reduce(
-			( accumulator, action ) => {
-				if ( action.isEligible && ! action.isEligible( item ) ) {
-					return accumulator;
-				}
-				if ( action.isPrimary ) {
-					accumulator.primaryActions.push( action );
-				} else {
-					accumulator.secondaryActions.push( action );
-				}
-				return accumulator;
-			},
-			{ primaryActions: [], secondaryActions: [] }
-		);
-	}, [ actions, item ] );
-	if (
-		[
-			TEMPLATE_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType )
-	) {
-		return null;
-	}
+	const actions = useMemo( () => {
+		return allActions.filter( ( action ) => {
+			return ! action.isEligible || action.isEligible( item );
+		} );
+	}, [ allActions, item ] );
+
 	return (
 		<DropdownMenu
+			open={ isActionsMenuOpen }
 			trigger={
 				<Button
-					size="compact"
+					size="small"
 					icon={ moreVertical }
 					label={ __( 'Actions' ) }
-					disabled={
-						! primaryActions.length && ! secondaryActions.length
-					}
+					disabled={ ! actions.length }
+					__experimentalIsFocusable
 					className="editor-all-actions-button"
+					onClick={ () =>
+						setIsActionsMenuOpen( ! isActionsMenuOpen )
+					}
+					{ ...buttonProps }
 				/>
 			}
+			onOpenChange={ setIsActionsMenuOpen }
 			placement="bottom-end"
 		>
-			<WithDropDownMenuSeparators>
-				{ !! primaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ primaryActions }
-						item={ item }
-					/>
-				) }
-				{ !! secondaryActions.length && (
-					<ActionsDropdownMenuGroup
-						actions={ secondaryActions }
-						item={ item }
-					/>
-				) }
-			</WithDropDownMenuSeparators>
+			<ActionsDropdownMenuGroup
+				actions={ actions }
+				item={ item }
+				onClose={ () => {
+					setIsActionsMenuOpen( false );
+				} }
+			/>
 		</DropdownMenu>
 	);
 }
@@ -136,7 +99,8 @@ function DropdownMenuItemTrigger( { action, onClick } ) {
 }
 
 // Copied as is from packages/dataviews/src/item-actions.js
-function ActionWithModal( { action, item, ActionTrigger } ) {
+// With an added onClose prop.
+function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const actionTriggerProps = {
 		action,
@@ -159,7 +123,10 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 				>
 					<RenderModal
 						items={ [ item ] }
-						closeModal={ () => setIsModalOpen( false ) }
+						closeModal={ () => {
+							setIsModalOpen( false );
+							onClose();
+						} }
 					/>
 				</Modal>
 			) }
@@ -167,20 +134,9 @@ function ActionWithModal( { action, item, ActionTrigger } ) {
 	);
 }
 
-// Copied as is from packages/dataviews/src/view-table.js
-function WithDropDownMenuSeparators( { children } ) {
-	return Children.toArray( children )
-		.filter( Boolean )
-		.map( ( child, i ) => (
-			<Fragment key={ i }>
-				{ i > 0 && <DropdownMenuSeparator /> }
-				{ child }
-			</Fragment>
-		) );
-}
-
 // Copied as is from packages/dataviews/src/item-actions.js
-function ActionsDropdownMenuGroup( { actions, item } ) {
+// With an added onClose prop.
+function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
 	return (
 		<DropdownMenuGroup>
 			{ actions.map( ( action ) => {
@@ -191,6 +147,7 @@ function ActionsDropdownMenuGroup( { actions, item } ) {
 							action={ action }
 							item={ item }
 							ActionTrigger={ DropdownMenuItemTrigger }
+							onClose={ onClose }
 						/>
 					);
 				}

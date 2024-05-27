@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -92,6 +92,7 @@ function ComplementaryAreaFill( {
 						animate={ isMobileViewport ? 'mobileOpen' : 'open' }
 						exit="closed"
 						transition={ transition }
+						className="interface-complementary-area__fill"
 					>
 						<div
 							id={ id }
@@ -290,10 +291,7 @@ function ComplementaryArea( {
 			<ComplementaryAreaFill
 				activeArea={ activeArea }
 				isActive={ isActive }
-				className={ classnames(
-					'interface-complementary-area',
-					className
-				) }
+				className={ clsx( 'interface-complementary-area', className ) }
 				scope={ scope }
 				id={ identifier.replace( '/', ':' ) }
 			>
@@ -304,6 +302,7 @@ function ComplementaryArea( {
 					smallScreenTitle={ smallScreenTitle }
 					toggleButtonProps={ {
 						label: closeLabel,
+						size: 'small',
 						shortcut: toggleShortcut,
 						scope,
 						identifier,
@@ -331,6 +330,7 @@ function ComplementaryArea( {
 									}
 									isPressed={ isPinned }
 									aria-expanded={ isPinned }
+									size="compact"
 								/>
 							) }
 						</>

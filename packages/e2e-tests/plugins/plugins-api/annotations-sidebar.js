@@ -8,8 +8,8 @@
 	const Component = wp.element.Component;
 	const __ = wp.i18n.__;
 	const registerPlugin = wp.plugins.registerPlugin;
-	const PluginSidebar = wp.editPost.PluginSidebar;
-	const PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+	const PluginSidebar = wp.editor.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
 
 	class SidebarContents extends Component {
 		constructor( props ) {

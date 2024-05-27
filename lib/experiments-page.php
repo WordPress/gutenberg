@@ -56,26 +56,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-view',
-		__( 'Zoomed out view ', 'gutenberg' ),
+		'gutenberg-custom-dataviews',
+		__( 'Custom dataviews', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-view',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-dataviews',
-		__( 'New admin views', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the new views for different entities like pages.', 'gutenberg' ),
-			'id'    => 'gutenberg-dataviews',
+			'label' => __( 'Test the custom dataviews in the pages page.', 'gutenberg' ),
+			'id'    => 'gutenberg-custom-dataviews',
 		)
 	);
 
@@ -124,6 +112,30 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
 			'id'    => 'gutenberg-no-tinymce',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-full-page-client-side-navigation',
+		__( 'Enable full page client-side navigation', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable full page client-side navigation using the Interactivity API', 'gutenberg' ),
+			'id'    => 'gutenberg-full-page-client-side-navigation',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-zoomed-out-patterns-tab',
+		__( 'Enable zoomed out view when patterns are browsed in the inserter', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enable zoomed out view when selecting a pattern category in the main inserter.', 'gutenberg' ),
+			'id'    => 'gutenberg-zoomed-out-patterns-tab',
 		)
 	);
 

@@ -3,14 +3,14 @@
  * External dependencies
  */
 import { useSelect } from 'downshift';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { Icon, check } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -101,18 +101,6 @@ export default function CustomSelectControl( props ) {
 		stateReducer,
 	} );
 
-	const [ isFocused, setIsFocused ] = useState( false );
-
-	function handleOnFocus( e ) {
-		setIsFocused( true );
-		onFocus?.( e );
-	}
-
-	function handleOnBlur( e ) {
-		setIsFocused( false );
-		onBlur?.( e );
-	}
-
 	function getDescribedBy() {
 		if ( describedBy ) {
 			return describedBy;
@@ -147,10 +135,7 @@ export default function CustomSelectControl( props ) {
 	}
 	return (
 		<div
-			className={ classnames(
-				'components-custom-select-control',
-				className
-			) }
+			className={ clsx( 'components-custom-select-control', className ) }
 		>
 			{ hideLabelFromVision ? (
 				<VisuallyHidden as="label" { ...getLabelProps() }>
@@ -168,7 +153,6 @@ export default function CustomSelectControl( props ) {
 			) }
 			<InputBase
 				__next40pxDefaultSize={ __next40pxDefaultSize }
-				isFocused={ isOpen || isFocused }
 				size={ size }
 				suffix={ <SelectControlChevronDown /> }
 			>
@@ -176,8 +160,8 @@ export default function CustomSelectControl( props ) {
 					onMouseOver={ onMouseOver }
 					onMouseOut={ onMouseOut }
 					as="button"
-					onFocus={ handleOnFocus }
-					onBlur={ handleOnBlur }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
 					selectSize={ size }
 					__next40pxDefaultSize={ __next40pxDefaultSize }
 					{ ...getToggleButtonProps( {
@@ -196,46 +180,48 @@ export default function CustomSelectControl( props ) {
 							</span>
 						) }
 				</SelectControlSelect>
+				<div className="components-custom-select-control__menu-wrapper">
+					{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
+					<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
+						{ isOpen &&
+							items.map( ( item, index ) => (
+								<li
+									key={ item.key }
+									{ ...getItemProps( {
+										item,
+										index,
+										className: clsx(
+											item.className,
+											'components-custom-select-control__item',
+											{
+												'is-highlighted':
+													index === highlightedIndex,
+												'has-hint':
+													!! item.__experimentalHint,
+												'is-next-40px-default-size':
+													__next40pxDefaultSize,
+											}
+										),
+										style: item.style,
+									} ) }
+								>
+									{ item.name }
+									{ item.__experimentalHint && (
+										<span className="components-custom-select-control__item-hint">
+											{ item.__experimentalHint }
+										</span>
+									) }
+									{ item === selectedItem && (
+										<Icon
+											icon={ check }
+											className="components-custom-select-control__item-icon"
+										/>
+									) }
+								</li>
+							) ) }
+					</ul>
+				</div>
 			</InputBase>
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */ }
-			<ul { ...menuProps } onKeyDown={ onKeyDownHandler }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									item.className,
-									'components-custom-select-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-										'has-hint': !! item.__experimentalHint,
-										'is-next-40px-default-size':
-											__next40pxDefaultSize,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item.name }
-							{ item.__experimentalHint && (
-								<span className="components-custom-select-control__item-hint">
-									{ item.__experimentalHint }
-								</span>
-							) }
-							{ item === selectedItem && (
-								<Icon
-									icon={ check }
-									className="components-custom-select-control__item-icon"
-								/>
-							) }
-						</li>
-					) ) }
-			</ul>
 		</div>
 	);
 }

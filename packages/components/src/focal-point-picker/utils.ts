@@ -34,7 +34,9 @@ export function getExtension( filename = '' ): string {
  * @return Whether the file is a video.
  */
 export function isVideoType( filename: string = '' ): boolean {
-	if ( ! filename ) return false;
+	if ( ! filename ) {
+		return false;
+	}
 	return (
 		filename.startsWith( 'data:video/' ) ||
 		VIDEO_EXTENSIONS.includes( getExtension( filename ) )

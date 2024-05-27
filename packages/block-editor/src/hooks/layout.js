@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,7 @@ import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 
 const layoutBlockSupportKey = 'layout';
+const { kebabCase } = unlock( componentsPrivateApis );
 
 function hasLayoutBlockSupport( blockName ) {
 	return (
@@ -49,7 +50,6 @@ function hasLayoutBlockSupport( blockName ) {
  * @return { Array } Array of CSS classname strings.
  */
 export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const { layout } = blockAttributes;
 	const { default: defaultBlockLayout } =
 		getBlockSupport( blockName, layoutBlockSupportKey ) || {};
@@ -359,6 +359,7 @@ function BlockWithLayoutStyles( {
 	block: BlockListBlock,
 	props,
 	blockGapSupport,
+	layoutClasses,
 } ) {
 	const { name, attributes } = props;
 	const id = useInstanceId( BlockListBlock );
@@ -369,12 +370,10 @@ function BlockWithLayoutStyles( {
 		layout?.inherit || layout?.contentSize || layout?.wideSize
 			? { ...layout, type: 'constrained' }
 			: layout || defaultBlockLayout || {};
-	const layoutClasses = useLayoutClasses( attributes, name );
 
-	const { kebabCase } = unlock( componentsPrivateApis );
 	const selectorPrefix = `wp-container-${ kebabCase( name ) }-is-layout-`;
 	// Higher specificity to override defaults from theme.json.
-	const selector = `.${ selectorPrefix }${ id }.${ selectorPrefix }${ id }`;
+	const selector = `.${ selectorPrefix }${ id }`;
 	const hasBlockGapSupport = blockGapSupport !== null;
 
 	// Get CSS string for the current layout type.
@@ -389,7 +388,7 @@ function BlockWithLayoutStyles( {
 	} );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
-	const layoutClassNames = classnames(
+	const layoutClassNames = clsx(
 		{
 			[ `${ selectorPrefix }${ id }` ]: !! css, // Only attach a container class if there is generated CSS to be attached.
 		},
@@ -415,8 +414,9 @@ function BlockWithLayoutStyles( {
  */
 export const withLayoutStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const { clientId, name } = props;
+		const { clientId, name, attributes } = props;
 		const blockSupportsLayout = hasLayoutBlockSupport( name );
+		const layoutClasses = useLayoutClasses( attributes, name );
 		const extraProps = useSelect(
 			( select ) => {
 				// The callback returns early to avoid block editor subscription.
@@ -444,13 +444,21 @@ export const withLayoutStyles = createHigherOrderComponent(
 		);
 
 		if ( ! extraProps ) {
-			return <BlockListBlock { ...props } />;
+			return (
+				<BlockListBlock
+					{ ...props }
+					__unstableLayoutClassNames={
+						blockSupportsLayout ? layoutClasses : undefined
+					}
+				/>
+			);
 		}
 
 		return (
 			<BlockWithLayoutStyles
 				block={ BlockListBlock }
 				props={ props }
+				layoutClasses={ layoutClasses }
 				{ ...extraProps }
 			/>
 		);

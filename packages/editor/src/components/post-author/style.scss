@@ -5,3 +5,9 @@
 .editor-post-author__panel .editor-post-panel__row-control > div {
 	width: 100%;
 }
+
+.editor-post-author__panel-dialog .editor-post-author {
+	// sidebar width - popover padding - form margin
+	min-width: $sidebar-width - $grid-unit-20 - $grid-unit-20;
+	margin: $grid-unit-10;
+}

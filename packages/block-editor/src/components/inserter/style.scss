@@ -62,7 +62,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__popover .block-editor-inserter__menu {
 	margin: -$grid-unit-15;
 
-	.block-editor-inserter__tabs div[role="tablist"] {
+	.block-editor-inserter__tablist {
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60 - $grid-unit-15;
 	}
 
@@ -115,8 +115,8 @@ $block-inserter-tabs-height: 44px;
 	flex-direction: column;
 	overflow: hidden;
 
-	div[role="tablist"] {
-		border-bottom: $border-width solid $gray-300;
+	.block-editor-inserter__tablist {
+		width: 100%;
 
 		button[role="tab"] {
 			flex-grow: 1;
@@ -130,7 +130,7 @@ $block-inserter-tabs-height: 44px;
 		}
 	}
 
-	div[role="tabpanel"] {
+	.block-editor-inserter__tabpanel {
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -187,7 +187,8 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 }
 
-.block-editor-inserter__no-results {
+.block-editor-inserter__no-results,
+.block-editor-inserter__patterns-loading {
 	padding: $grid-unit-40;
 	text-align: center;
 }
@@ -228,7 +229,7 @@ $block-inserter-tabs-height: 44px;
 		display: block;
 	}
 
-	.block-editor-block-preview__container {
+	.block-editor-inserter__media-list__list-item {
 		height: 100%;
 	}
 
@@ -239,63 +240,81 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__patterns-explore-button.components-button {
-	padding: $grid-unit-20;
-	justify-content: center;
-	margin-top: $grid-unit-20;
-	width: 100%;
-}
-
-.block-editor-inserter__patterns-selected-category.block-editor-inserter__patterns-selected-category {
-	color: var(--wp-admin-theme-color);
-	position: relative;
-
-	.components-flex-item {
-		filter: brightness(0.95);
-	}
-
-	svg {
-		fill: var(--wp-admin-theme-color);
-	}
-
-	&::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		border-radius: $radius-block-ui;
-		opacity: 0.04;
-		background: var(--wp-admin-theme-color);
-	}
-}
-
+.block-editor-inserter__media-tabs-container,
 .block-editor-inserter__block-patterns-tabs-container {
+	padding: $grid-unit-20;
 	height: 100%;
-	nav {
-		height: 100%;
-	}
-}
-
-.block-editor-inserter__block-patterns-tabs {
 	display: flex;
 	flex-direction: column;
-	padding: $grid-unit-20;
-	overflow-y: auto;
-	height: 100%;
+	justify-content: space-between;
+}
+
+.block-editor-inserter__category-tablist {
+	display: flex;
+	flex-direction: column;
+	border: none;
+	margin-bottom: $grid-unit-10;
 	// Push the listitem wrapping the "explore" button to the bottom of the panel.
 	div[role="listitem"]:last-child {
 		margin-top: auto;
 	}
 
-	.block-editor-inserter__patterns-category {
+	.block-editor-inserter__category-tab {
 		// Account for the icon on the right so that it's visually balanced.
-		padding-right: $grid-unit-05;
+		padding: $grid-unit-10 $grid-unit-05 $grid-unit-10 $grid-unit-15;
+		text-align: left;
+		font-weight: inherit;
+		display: block;
+		position: relative;
+		height: auto;
+
+		&[aria-selected="true"] {
+			color: var(--wp-admin-theme-color);
+
+			.components-flex-item {
+				filter: brightness(0.95);
+			}
+
+			svg {
+				fill: var(--wp-admin-theme-color);
+			}
+
+			&::after {
+				content: "";
+				display: block;
+				outline: none;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				border-radius: $radius-block-ui;
+				opacity: 0.04;
+				background: var(--wp-admin-theme-color);
+				height: 100%;
+			}
+		}
+
+		&:focus-visible,
+		&:focus:not(:disabled) {
+			border-radius: 2px;
+			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			// Windows high contrast mode.
+			outline: 2px solid transparent;
+			outline-offset: 0;
+		}
+
+		&::before {
+			display: none;
+		}
+
+		&::after {
+			display: none;
+		}
 	}
 }
 
-.block-editor-inserter__patterns-category-dialog {
+.block-editor-inserter__category-panel {
 	background: $gray-100;
 	border-left: $border-width solid $gray-200;
 	border-right: $border-width solid $gray-200;
@@ -304,35 +323,30 @@ $block-inserter-tabs-height: 44px;
 	left: 0;
 	height: 100%;
 	width: 100%;
-
-	@include break-medium {
-		left: 100%;
-		display: block;
-		width: 300px;
-	}
-
-	.block-editor-block-patterns-list {
-		overflow-y: auto;
-		flex-grow: 1;
-		height: 100%;
-		padding: $grid-unit-20 $grid-unit-30;
-	}
-}
-
-.block-editor-inserter__patterns-category-panel {
 	padding: 0 $grid-unit-20;
 	display: flex;
 	flex-direction: column;
-	height: 100%;
+
 	@include break-medium {
 		padding: 0;
+		left: 100%;
+		width: 300px;
 	}
-	.block-editor-inserter__patterns-category-panel-header {
-		padding: 16px $grid-unit-30;
-	}
-	.block-editor-inserter__patterns-category-no-results {
-		margin-top: $grid-unit-30;
-	}
+}
+
+.block-editor-inserter__patterns-category-panel-header {
+	padding: 16px $grid-unit-30;
+}
+.block-editor-inserter__patterns-category-no-results {
+	margin-top: $grid-unit-30;
+}
+
+.block-editor-inserter__media-list,
+.block-editor-block-patterns-list {
+	overflow-y: auto;
+	flex-grow: 1;
+	height: 100%;
+	padding: $grid-unit-20 $grid-unit-30;
 }
 
 .block-editor-inserter__preview-content {
@@ -392,7 +406,7 @@ $block-inserter-tabs-height: 44px;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
 		}
-		.block-editor-block-preview__container {
+		.block-editor-inserter__media-list__list-item {
 			min-height: 100px;
 		}
 	}
@@ -485,7 +499,7 @@ $block-inserter-tabs-height: 44px;
 			min-height: 240px;
 		}
 
-		.block-editor-block-preview__container {
+		.block-editor-inserter__media-list__list-item {
 			height: inherit;
 			min-height: 100px;
 			max-height: 800px;
@@ -497,88 +511,13 @@ $block-inserter-tabs-height: 44px;
 	font-size: calc(1.25 * 13px);
 }
 
-.block-editor-inserter__media-tabs-container {
-	height: 100%;
-
-	nav {
-		height: 100%;
-	}
-
-	.block-editor-inserter__media-library-button {
+.block-editor-inserter__patterns-explore-button,
+.block-editor-inserter__media-library-button {
+	&.components-button {
 		padding: $grid-unit-20;
 		justify-content: center;
 		margin-top: $grid-unit-20;
 		width: 100%;
-	}
-}
-
-.block-editor-inserter__media-tabs {
-	display: flex;
-	flex-direction: column;
-	padding: $grid-unit-20;
-	overflow-y: auto;
-	height: 100%;
-
-	// Push the listitem wrapping the "open media library" button to the bottom of the panel.
-	div[role="listitem"]:last-child {
-		margin-top: auto;
-	}
-
-	.block-editor-inserter__media-tabs__media-category {
-		// Account for the icon on the right so that it's visually balanced.
-		padding-right: $grid-unit-05;
-
-		&.is-selected {
-			color: var(--wp-admin-theme-color);
-			position: relative;
-
-			.components-flex-item {
-				filter: brightness(0.95);
-			}
-
-			svg {
-				fill: var(--wp-admin-theme-color);
-			}
-
-			&::after {
-				content: "";
-				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
-				right: 0;
-				border-radius: $radius-block-ui;
-				opacity: 0.04;
-				background: var(--wp-admin-theme-color);
-			}
-		}
-	}
-}
-
-.block-editor-inserter__media-dialog {
-	background: $gray-100;
-	border-left: $border-width solid $gray-200;
-	border-right: $border-width solid $gray-200;
-	position: absolute;
-	padding: $grid-unit-20 $grid-unit-30;
-	top: 0;
-	left: 0;
-	height: 100%;
-	width: 100%;
-	overflow-y: auto;
-	scrollbar-gutter: stable both-edges;
-
-	@include break-medium {
-		left: 100%;
-		display: block;
-		width: 300px;
-	}
-
-	.block-editor-block-preview__container {
-		box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-		&:hover {
-			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
-		}
 	}
 }
 
@@ -601,6 +540,7 @@ $block-inserter-tabs-height: 44px;
 	}
 
 	.block-editor-inserter__media-panel-search {
+		padding: $grid-unit-20 $grid-unit-30 0;
 		// TODO: Consider using the Theme component to automatically adapt to a gray background.
 		&:not(:focus-within) {
 			--wp-components-color-background: #{$white};
@@ -608,90 +548,88 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.block-editor-inserter__media-list {
-	margin-top: $grid-unit-20;
-	.block-editor-inserter__media-list__list-item {
-		position: relative;
-		cursor: pointer;
-		margin-bottom: $grid-unit-30;
+.block-editor-inserter__media-list__list-item {
+	position: relative;
+	cursor: pointer;
+	margin-bottom: $grid-unit-30;
+	box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
 
-		&.is-placeholder {
-			min-height: 100px;
+	&.is-placeholder {
+		min-height: 100px;
+	}
+
+	&[draggable="true"] .block-editor-inserter__media-list__list-item {
+		cursor: grab;
+	}
+
+	&.is-hovered {
+		.block-editor-inserter__media-list__item-preview {
+			box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
 		}
 
-		&[draggable="true"] .block-editor-block-preview__container {
-			cursor: grab;
-		}
-
-		&.is-hovered {
-			.block-editor-inserter__media-list__item-preview {
-				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
-			}
-
-			.block-editor-inserter__media-list__item-preview-options > button {
-				display: block;
-			}
-		}
-
-		.block-editor-inserter__media-list__item-preview-options {
-			position: absolute;
-			right: $grid-unit-10;
-			top: $grid-unit-10;
-
-			> button {
-				background: $white;
-				border-radius: $radius-block-ui;
-				display: none;
-
-				// These styles are important so as focus isn't lost
-				// when the button is focused and we hover away.
-				&.is-opened,
-				&:focus {
-					display: block;
-				}
-
-				&:hover {
-					box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-					// Windows High Contrast mode will show this outline, but not the box-shadow.
-					outline: 2px solid transparent;
-				}
-			}
+		.block-editor-inserter__media-list__item-preview-options > button {
+			display: block;
 		}
 	}
 
-	.block-editor-inserter__media-list__item {
-		height: 100%;
+	.block-editor-inserter__media-list__item-preview-options {
+		position: absolute;
+		right: $grid-unit-10;
+		top: $grid-unit-10;
 
-		.block-editor-inserter__media-list__item-preview {
+		> button {
+			background: $white;
+			border-radius: $radius-block-ui;
+			display: none;
+
+			// These styles are important so as focus isn't lost
+			// when the button is focused and we hover away.
+			&.is-opened,
+			&:focus {
+				display: block;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+		}
+	}
+}
+
+.block-editor-inserter__media-list__item {
+	height: 100%;
+
+	.block-editor-inserter__media-list__item-preview {
+		display: flex;
+		align-items: center;
+		overflow: hidden;
+		border-radius: 2px;
+
+		> * {
+			margin: 0 auto;
+			max-width: 100%;
+		}
+
+		.block-editor-inserter__media-list__item-preview-spinner {
 			display: flex;
+			height: 100%;
+			width: 100%;
+			position: absolute;
+			justify-content: center;
+			background: rgba($white, 0.7);
 			align-items: center;
-			overflow: hidden;
-			border-radius: 2px;
-
-			> * {
-				margin: 0 auto;
-				max-width: 100%;
-			}
-
-			.block-editor-inserter__media-list__item-preview-spinner {
-				display: flex;
-				height: 100%;
-				width: 100%;
-				position: absolute;
-				justify-content: center;
-				background: rgba($white, 0.7);
-				align-items: center;
-				pointer-events: none;
-			}
+			pointer-events: none;
 		}
+	}
 
-		&:focus .block-editor-inserter__media-list__item-preview {
-			box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	&:focus .block-editor-inserter__media-list__item-preview {
+		box-shadow: inset 0 0 0 2px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-		}
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 }
 
@@ -758,16 +696,20 @@ $block-inserter-tabs-height: 44px;
 	}
 }
 
-.is-zoom-out {
-	.block-editor-inserter__menu {
-		display: flex;
-	}
+// Only relevant in zoom-out-mode
+.block-editor-inserter__pattern-panel-placeholder {
+	display: none;
+}
 
-	.block-editor-inserter__patterns-category-dialog {
-		position: static;
-	}
-
-	.block-editor-inserter__media-dialog {
-		position: static;
+.block-editor-inserter__menu.is-zoom-out {
+	display: flex;
+	&.show-panel::after {
+		// Makes space for the inserter flyout panel
+		@include break-medium {
+			content: "";
+			display: block;
+			width: 300px;
+			height: 100%;
+		}
 	}
 }

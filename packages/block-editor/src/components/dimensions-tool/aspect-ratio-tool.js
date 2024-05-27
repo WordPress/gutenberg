@@ -6,75 +6,14 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
+/**
+ * Internal dependencies
+ */
+import { useSettings } from '../use-settings';
 
 /**
  * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
  */
-
-/**
- * @type {SelectControlProps[]}
- */
-export const DEFAULT_ASPECT_RATIO_OPTIONS = [
-	{
-		label: _x( 'Original', 'Aspect ratio option for dimensions control' ),
-		value: 'auto',
-	},
-	{
-		label: _x(
-			'Square - 1:1',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '1',
-	},
-	{
-		label: _x(
-			'Standard - 4:3',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '4/3',
-	},
-	{
-		label: _x(
-			'Portrait - 3:4',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '3/4',
-	},
-	{
-		label: _x(
-			'Classic - 3:2',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '3/2',
-	},
-	{
-		label: _x(
-			'Classic Portrait - 2:3',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '2/3',
-	},
-	{
-		label: _x(
-			'Wide - 16:9',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '16/9',
-	},
-	{
-		label: _x(
-			'Tall - 9:16',
-			'Aspect ratio option for dimensions control'
-		),
-		value: '9/16',
-	},
-	{
-		label: _x( 'Custom', 'Aspect ratio option for dimensions control' ),
-		value: 'custom',
-		disabled: true,
-		hidden: true,
-	},
-];
 
 /**
  * @callback AspectRatioToolPropsOnChange
@@ -96,13 +35,47 @@ export default function AspectRatioTool( {
 	panelId,
 	value,
 	onChange = () => {},
-	options = DEFAULT_ASPECT_RATIO_OPTIONS,
-	defaultValue = DEFAULT_ASPECT_RATIO_OPTIONS[ 0 ].value,
+	options,
+	defaultValue = 'auto',
 	hasValue,
 	isShownByDefault = true,
 } ) {
 	// Match the CSS default so if the value is used directly in CSS it will look correct in the control.
 	const displayValue = value ?? 'auto';
+
+	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
+		'dimensions.aspectRatios.default',
+		'dimensions.aspectRatios.theme',
+		'dimensions.defaultAspectRatios'
+	);
+
+	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+		label: name,
+		value: ratio,
+	} ) );
+
+	const aspectRatioOptions = [
+		{
+			label: _x(
+				'Original',
+				'Aspect ratio option for dimensions control'
+			),
+			value: 'auto',
+		},
+		...( showDefaultRatios ? defaultOptions : [] ),
+		...( themeOptions ? themeOptions : [] ),
+		{
+			label: _x( 'Custom', 'Aspect ratio option for dimensions control' ),
+			value: 'custom',
+			disabled: true,
+			hidden: true,
+		},
+	];
 
 	return (
 		<ToolsPanelItem
@@ -117,7 +90,7 @@ export default function AspectRatioTool( {
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
 				value={ displayValue }
-				options={ options }
+				options={ options ?? aspectRatioOptions }
 				onChange={ onChange }
 				size={ '__unstable-large' }
 				__nextHasNoMarginBottom

@@ -15,14 +15,14 @@ import CustomSelectControl from '../legacy-component';
 import * as V1Story from '../../custom-select-control/stories/index.story';
 
 const meta: Meta< typeof CustomSelectControl > = {
-	title: 'Components (Experimental)/CustomSelectControl v2/Legacy',
+	title: 'Components/CustomSelectControl v2/Legacy',
 	component: CustomSelectControl,
 	argTypes: {
 		onChange: { control: { type: null } },
 		value: { control: { type: null } },
 	},
+	tags: [ 'status-wip' ],
 	parameters: {
-		badges: [ 'wip' ],
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: {

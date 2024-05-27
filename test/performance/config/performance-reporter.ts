@@ -13,7 +13,7 @@ import type {
 /**
  * Internal dependencies
  */
-import { average, median, minimum, maximum, round } from '../utils';
+import { stats, round } from '../utils';
 
 export interface WPRawPerformanceResults {
 	timeToFirstByte: number[];
@@ -36,77 +36,104 @@ export interface WPRawPerformanceResults {
 	loadPatterns: number[];
 	listViewOpen: number[];
 	navigate: number[];
+	wpBeforeTemplate: number[];
+	wpTemplate: number[];
+	wpTotal: number[];
+	wpMemoryUsage: number[];
+	wpDbQueries: number[];
 }
 
+type PerformanceStats = {
+	q25: number;
+	q50: number;
+	q75: number;
+	cnt: number; // number of data points
+};
+
 export interface WPPerformanceResults {
-	timeToFirstByte?: number;
-	largestContentfulPaint?: number;
-	lcpMinusTtfb?: number;
-	serverResponse?: number;
-	firstPaint?: number;
-	domContentLoaded?: number;
-	loaded?: number;
-	firstContentfulPaint?: number;
-	firstBlock?: number;
-	type?: number;
-	typeWithoutInspector?: number;
-	typeWithTopToolbar?: number;
-	typeContainer?: number;
-	focus?: number;
-	inserterOpen?: number;
-	inserterSearch?: number;
-	inserterHover?: number;
-	loadPatterns?: number;
-	listViewOpen?: number;
-	navigate?: number;
+	timeToFirstByte?: PerformanceStats;
+	largestContentfulPaint?: PerformanceStats;
+	lcpMinusTtfb?: PerformanceStats;
+	serverResponse?: PerformanceStats;
+	firstPaint?: PerformanceStats;
+	domContentLoaded?: PerformanceStats;
+	loaded?: PerformanceStats;
+	firstContentfulPaint?: PerformanceStats;
+	firstBlock?: PerformanceStats;
+	type?: PerformanceStats;
+	typeWithoutInspector?: PerformanceStats;
+	typeWithTopToolbar?: PerformanceStats;
+	typeContainer?: PerformanceStats;
+	focus?: PerformanceStats;
+	inserterOpen?: PerformanceStats;
+	inserterSearch?: PerformanceStats;
+	inserterHover?: PerformanceStats;
+	loadPatterns?: PerformanceStats;
+	listViewOpen?: PerformanceStats;
+	navigate?: PerformanceStats;
+	wpBeforeTemplate?: PerformanceStats;
+	wpTemplate?: PerformanceStats;
+	wpTotal?: PerformanceStats;
+	wpMemoryUsage?: PerformanceStats;
+	wpDbQueries?: PerformanceStats;
 }
 
 /**
  * Curate the raw performance results.
  *
- * @param {WPRawPerformanceResults} results
- *
- * @return {WPPerformanceResults} Curated Performance results.
+ * @param results Raw results.
+ * @return Curated statistics for the results.
  */
 export function curateResults(
 	results: WPRawPerformanceResults
 ): WPPerformanceResults {
 	const output = {
-		timeToFirstByte: median( results.timeToFirstByte ),
-		largestContentfulPaint: median( results.largestContentfulPaint ),
-		lcpMinusTtfb: median( results.lcpMinusTtfb ),
-		serverResponse: median( results.serverResponse ),
-		firstPaint: median( results.firstPaint ),
-		domContentLoaded: median( results.domContentLoaded ),
-		loaded: median( results.loaded ),
-		firstContentfulPaint: median( results.firstContentfulPaint ),
-		firstBlock: median( results.firstBlock ),
-		type: average( results.type ),
-		typeWithoutInspector: average( results.typeWithoutInspector ),
-		typeWithTopToolbar: average( results.typeWithTopToolbar ),
-		typeContainer: average( results.typeContainer ),
-		focus: average( results.focus ),
-		inserterOpen: average( results.inserterOpen ),
-		inserterSearch: average( results.inserterSearch ),
-		inserterHover: average( results.inserterHover ),
-		loadPatterns: average( results.loadPatterns ),
-		listViewOpen: average( results.listViewOpen ),
-		navigate: median( results.navigate ),
+		timeToFirstByte: stats( results.timeToFirstByte ),
+		largestContentfulPaint: stats( results.largestContentfulPaint ),
+		lcpMinusTtfb: stats( results.lcpMinusTtfb ),
+		serverResponse: stats( results.serverResponse ),
+		firstPaint: stats( results.firstPaint ),
+		domContentLoaded: stats( results.domContentLoaded ),
+		loaded: stats( results.loaded ),
+		firstContentfulPaint: stats( results.firstContentfulPaint ),
+		firstBlock: stats( results.firstBlock ),
+		type: stats( results.type ),
+		typeWithoutInspector: stats( results.typeWithoutInspector ),
+		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
+		typeContainer: stats( results.typeContainer ),
+		focus: stats( results.focus ),
+		inserterOpen: stats( results.inserterOpen ),
+		inserterSearch: stats( results.inserterSearch ),
+		inserterHover: stats( results.inserterHover ),
+		loadPatterns: stats( results.loadPatterns ),
+		listViewOpen: stats( results.listViewOpen ),
+		navigate: stats( results.navigate ),
+		wpBeforeTemplate: stats( results.wpBeforeTemplate ),
+		wpTemplate: stats( results.wpTemplate ),
+		wpTotal: stats( results.wpTotal ),
+		wpMemoryUsage: stats( results.wpMemoryUsage ),
+		wpDbQueries: stats( results.wpDbQueries ),
 	};
 
-	return (
+	return Object.fromEntries(
 		Object.entries( output )
 			// Reduce the output to contain taken metrics only.
-			.filter( ( [ _, value ] ) => typeof value === 'number' )
-			.reduce(
-				( acc, [ key, value ] ) => ( {
-					...acc,
-					[ key ]: round( value ),
-				} ),
-				{}
-			)
+			.filter( ( [ _, value ] ) => value !== undefined )
 	);
 }
+
+function formatValue( metric: string, value: number ) {
+	if ( 'wpMemoryUsage' === metric ) {
+		return `${ ( value / Math.pow( 10, 6 ) ).toFixed( 2 ) } MB`;
+	}
+
+	if ( 'wpDbQueries' === metric ) {
+		return value.toString();
+	}
+
+	return `${ value } ms`;
+}
+
 class PerformanceReporter implements Reporter {
 	private results: Record< string, WPPerformanceResults >;
 
@@ -166,8 +193,17 @@ class PerformanceReporter implements Reporter {
 		for ( const [ testSuite, results ] of Object.entries( this.results ) ) {
 			const printableResults: Record< string, { value: string } > = {};
 
-			for ( const [ key, value ] of Object.entries( results ) ) {
-				printableResults[ key ] = { value: `${ value } ms` };
+			for ( const [ metric, value ] of Object.entries( results ) ) {
+				const valueStr = formatValue( metric, value.q50 );
+				const pp = round(
+					( 100 * ( value.q75 - value.q50 ) ) / value.q50
+				);
+				const mp = round(
+					( 100 * ( value.q50 - value.q25 ) ) / value.q50
+				);
+				printableResults[ metric ] = {
+					value: `${ valueStr } +${ pp }% -${ mp }%`,
+				};
 			}
 
 			// eslint-disable-next-line no-console
