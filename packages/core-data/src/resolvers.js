@@ -81,7 +81,7 @@ export const getEntityRecord =
 				entityConfig.syncConfig &&
 				! query
 			) {
-				if ( process.env.IS_GUTENBERG_PLUGIN ) {
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 					const objectId = entityConfig.getSyncObjectId( key );
 
 					// Loads the persisted document.

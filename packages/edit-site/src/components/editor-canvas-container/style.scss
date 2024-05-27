@@ -1,4 +1,12 @@
 .edit-site-editor-canvas-container {
+	height: 100%;
+
+	.edit-site-layout.is-full-canvas & {
+		padding: $grid-unit-30 $grid-unit-30 0;
+	}
+}
+
+.edit-site-editor-canvas-container__section {
 	background: $white; // Fallback color, overridden by JavaScript.
 	border-radius: $radius-block-ui;
 	bottom: 0;

@@ -835,8 +835,8 @@ const resetTemplateAction = {
 							}
 							await onConfirm( items );
 							onActionPerformed?.( items );
+							setIsBusy( false );
 							closeModal();
-							isBusy( false );
 						} }
 						isBusy={ isBusy }
 						disabled={ isBusy }
@@ -1116,7 +1116,7 @@ export function usePostActions( postType, onActionPerformed ) {
 		const actions = [
 			postTypeObject?.viewable && viewPostAction,
 			postRevisionsAction,
-			process.env.IS_GUTENBERG_PLUGIN
+			globalThis.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
 				  ! isPattern &&
 				  duplicatePostAction

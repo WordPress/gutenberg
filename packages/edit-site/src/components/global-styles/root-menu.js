@@ -6,7 +6,6 @@ import {
 	typography,
 	color,
 	layout,
-	image,
 	shadow as shadowIcon,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
@@ -24,7 +23,6 @@ const {
 	useHasColorPanel,
 	useGlobalSetting,
 	useSettingsForBlockElement,
-	useHasBackgroundPanel,
 } = unlock( blockEditorPrivateApis );
 
 function RootMenu() {
@@ -35,7 +33,6 @@ function RootMenu() {
 	const hasShadowPanel = true; // useHasShadowPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasLayoutPanel = hasDimensionsPanel;
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
 
 	return (
 		<>
@@ -74,15 +71,6 @@ function RootMenu() {
 						aria-label={ __( 'Layout styles' ) }
 					>
 						{ __( 'Layout' ) }
-					</NavigationButtonAsItem>
-				) }
-				{ hasBackgroundPanel && (
-					<NavigationButtonAsItem
-						icon={ image }
-						path="/background"
-						aria-label={ __( 'Background image styles' ) }
-					>
-						{ __( 'Background image' ) }
 					</NavigationButtonAsItem>
 				) }
 			</ItemGroup>
