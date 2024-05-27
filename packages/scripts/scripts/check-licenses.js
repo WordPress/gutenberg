@@ -274,6 +274,8 @@ function detectTypeFromLicenseText( licenseText ) {
 	);
 }
 
+const reportedPackages = new Set();
+
 function checkDepLicense( path ) {
 	if ( ! path ) {
 		return;
@@ -346,6 +348,13 @@ function checkDepLicense( path ) {
 	if ( checkAllCompatible( detectedLicenseTypes, licenses ) ) {
 		return;
 	}
+
+	// Do not report same package twice.
+	if ( reportedPackages.has( packageInfo.name ) ) {
+		return;
+	}
+
+	reportedPackages.add( packageInfo.name );
 
 	process.exitCode = 1;
 	process.stdout.write(
