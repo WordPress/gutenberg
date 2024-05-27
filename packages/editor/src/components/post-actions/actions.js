@@ -1108,6 +1108,7 @@ export function usePostActions( postType, onActionPerformed ) {
 	].includes( postType );
 	const isPattern = postType === PATTERN_POST_TYPE;
 	const isLoaded = !! postTypeObject;
+	const supportsRevisions = !! postTypeObject?.supports?.revisions;
 	return useMemo( () => {
 		if ( ! isLoaded ) {
 			return [];
@@ -1115,7 +1116,7 @@ export function usePostActions( postType, onActionPerformed ) {
 
 		const actions = [
 			postTypeObject?.viewable && viewPostAction,
-			postRevisionsAction,
+			supportsRevisions && postRevisionsAction,
 			globalThis.IS_GUTENBERG_PLUGIN
 				? ! isTemplateOrTemplatePart &&
 				  ! isPattern &&
@@ -1181,5 +1182,6 @@ export function usePostActions( postType, onActionPerformed ) {
 		restorePostAction,
 		onActionPerformed,
 		isLoaded,
+		supportsRevisions,
 	] );
 }
