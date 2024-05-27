@@ -11,6 +11,14 @@ export function getVariationClassName( variation ) {
 	return `is-style-${ variation }`;
 }
 
+/**
+ * Returns a new index based on the presets and slug prefix.
+ *
+ * @param {Array}  presets    The array of presets.
+ * @param {string} slugPrefix The prefix for the slug.
+ *
+ * @return {number} The new index.
+ */
 export function getNewIndexFromPresets( presets, slugPrefix ) {
 	const nameRegex = new RegExp( `^${ slugPrefix }([\\d]+)$` );
 	return presets.reduce( ( previousValue, currentValue ) => {
