@@ -18,12 +18,14 @@ const Search = memo( function Search( { label, view, onChangeView } ) {
 		onChangeViewRef.current = onChangeView;
 	}, [ onChangeView ] );
 	useEffect( () => {
-		onChangeViewRef.current( {
-			...view,
-			page: 1,
-			search: debouncedSearch,
-		} );
-	}, [ debouncedSearch ] );
+		if ( debouncedSearch !== view.search ) {
+			onChangeViewRef.current( {
+				...view,
+				page: 1,
+				search: debouncedSearch,
+			} );
+		}
+	}, [ debouncedSearch, view ] );
 	const searchLabel = label || __( 'Search' );
 	return (
 		<SearchControl
