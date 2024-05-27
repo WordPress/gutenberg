@@ -29,8 +29,23 @@ function render_block_core_media_text( $attributes, $content ) {
 		return $content;
 	}
 
-	$image_tag = '<figure class="wp-block-media-text__media"><img>';
-	$content   = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
+	$has_media_on_right = isset( $attributes['mediaPosition'] ) && 'right' === $attributes['mediaPosition'];
+	$image_tag = '<figure class="wp-block-media-text__media"><img class="wp-block-media-text__featured_image">';
+
+	// When the media is on the right, the img tag is inserted inside the last figure tag.
+	if ( $has_media_on_right ) {
+		// Check if there is a media figure tag in the content: There should be at least one figure tag unless something broke the block.
+		if ( preg_match( '/<figure\s+class="wp-block-media-text__media">/', $content ) ) {
+			// Find the last figure tag and replace it with the combined figure and img tag.
+			$last_figure = strripos( $content, '<figure class="wp-block-media-text__media">' );
+			if ( $last_figure !== false ) {
+				$content = substr_replace( $content, $image_tag, $last_figure, strlen('<figure class="wp-block-media-text__media">') );
+			}
+		}
+	} else {
+		// When the media is on the left, the img tag is inserted inside the first figure tag.
+		$content = preg_replace( '/<figure\s+class="wp-block-media-text__media">/', $image_tag, $content );
+	}
 
 	$processor = new WP_HTML_Tag_Processor( $content );
 	if ( isset( $attributes['imageFill'] ) && $attributes['imageFill'] ) {
@@ -41,7 +56,8 @@ function render_block_core_media_text( $attributes, $content ) {
 		$processor->next_tag( 'figure' );
 		$processor->set_attribute( 'style', 'background-image:url(' . esc_url( $current_featured_image ) . ');background-position:' . $position . ';' );
 	}
-	$processor->next_tag( 'img' );
+	// Locate the img tag with the class wp-block-media-text__featured_image and update its attributes.
+	$processor->next_tag( array( 'class_name' => 'wp-block-media-text__featured_image' ) );
 	$media_size_slug = 'full';
 	if ( isset( $attributes['mediaSizeSlug'] ) ) {
 		$media_size_slug = $attributes['mediaSizeSlug'];
