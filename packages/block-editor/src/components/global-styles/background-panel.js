@@ -172,13 +172,13 @@ function InspectorImagePreview( { label, filename, url: imgUrl } ) {
 						{ imgLabel }
 					</Truncate>
 					<VisuallyHidden as="span">
-						{ filename
+						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
-									__( 'Selected image: %s' ),
-									filename
+									__( 'Background image: %s' ),
+									filename || imgLabel
 							  )
-							: __( 'No image selected' ) }
+							: __( 'No background image selected' ) }
 					</VisuallyHidden>
 				</FlexItem>
 			</HStack>
@@ -302,7 +302,7 @@ function BackgroundImageToolsPanelItem( {
 					name={
 						<InspectorImagePreview
 							label={ title }
-							filename={ title || __( 'Untitled' ) }
+							filename={ title }
 							url={ getResolvedThemeFilePath(
 								url,
 								themeFileURIs
